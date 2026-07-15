@@ -1,98 +1,77 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {useState} from 'react'
+import {Platform, Pressable, StyleSheet, Text, View} from 'react-native'
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
+function platformLabel(os: typeof Platform.OS): string {
+  if (os === 'ios') {
+    return 'iOS'
   }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
+  if (os === 'android') {
+    return 'Android'
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
+  if (os === 'web') {
+    return 'Web'
+  }
+  return os
 }
 
-export default function HomeScreen() {
+export default function FoundationScreen() {
+  const [interfaceCheck, setInterfaceCheck] = useState<'Not run' | 'Passed'>(
+    'Not run',
+  )
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
+    <View style={styles.screen} accessibilityRole="summary">
+      <Text style={styles.brand}>MODULA</Text>
+      <Text style={styles.line}>Fresh foundation</Text>
+      <Text style={styles.line}>Expo SDK 57</Text>
+      <Text style={styles.line}>React Native</Text>
+      <Text style={styles.line}>New Architecture</Text>
+      <Text style={styles.line}>Platform: {platformLabel(Platform.OS)}</Text>
+      <Text style={styles.line}>Foundation status: Running</Text>
+      <Text style={styles.line}>Interface check: {interfaceCheck}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => setInterfaceCheck('Passed')}
+        style={({pressed}) => [styles.button, pressed && styles.buttonPressed]}>
+        <Text style={styles.buttonLabel}>Run interface check</Text>
+      </Pressable>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    paddingHorizontal: 24,
+    gap: 8,
   },
-  title: {
+  brand: {
+    fontSize: 40,
+    fontWeight: '700',
+    letterSpacing: 2,
+    color: '#369CAA',
+    marginBottom: 8,
+  },
+  line: {
+    fontSize: 16,
+    color: '#111111',
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
+  button: {
+    marginTop: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#369CAA',
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  buttonPressed: {
+    opacity: 0.85,
   },
-});
+  buttonLabel: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+})
