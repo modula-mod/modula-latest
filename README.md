@@ -1,56 +1,93 @@
-# Welcome to your Expo app 👋
+# Modula
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Modula is a modular Social Operating System that combines identity, social
+interaction, personal tools, external integrations, and installable modules
+inside one user-controlled environment.
 
-## Get started
+This repository contains the greenfield Modula application for iOS, Android,
+and the web. It is built with React Native, Expo, TypeScript, and Expo Router.
 
-1. Install dependencies
+The application is being developed from a minimal native foundation. Product
+features, protocol adapters, modules, and advanced visual effects are added
+only after their underlying runtime contracts are proven stable.
 
-   ```bash
-   npm install
-   ```
+## Status
 
-2. Start the app
+**Phase 0 — Fresh Expo SDK 57 foundation**
 
-   ```bash
-   npx expo start
-   ```
+- Single foundation route (`/`)
+- Modula identity (`digital.modula.app`)
+- Primitives + semantic colour tokens
+- Documented architecture and dependency admission
+- Native projects generated via Expo prebuild (committed)
 
-In the output, you'll find options to open the app in a
+## Prerequisites
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Node.js 20+
+- pnpm
+- Xcode + CocoaPods for iOS (macOS)
+- Android SDK + JDK for Android
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Install
 
 ```bash
-npm run reset-project
+pnpm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Optional environment file:
 
-### Other setup steps
+```bash
+cp .env.example .env
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Commands
 
-## Learn more
+| Command | Purpose |
+|---|---|
+| `pnpm start` | Expo development server |
+| `pnpm web` | Web / PWA development |
+| `pnpm ios` | Native iOS run (`expo run:ios`) |
+| `pnpm android` | Native Android run (`expo run:android`) |
+| `pnpm typecheck` | TypeScript (`tsc --noEmit`) |
+| `pnpm lint` | `expo lint` |
+| `pnpm doctor` | `expo-doctor` |
+| `pnpm prebuild` | Generate native projects |
+| `pnpm prebuild:clean` | Clean regenerate native projects |
 
-To learn more about developing your project with Expo, look at the following resources:
+## Platform notes
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Web:** `pnpm web`
+- **iOS:** After prebuild, open `ios/Modula.xcworkspace` or run `pnpm ios`
+- **Android:** After prebuild, run `pnpm android`
 
-## Join the community
+See `docs/development/` for details.
 
-Join our community of developers creating universal apps.
+## Quality checks
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+pnpm install
+pnpm exec expo install --check
+pnpm doctor
+pnpm typecheck
+pnpm lint
+```
+
+## Native prebuild policy
+
+Native folders are generated only after the JS foundation validates. They are committed and treated as first-class source. See `docs/architecture/native-project-policy.md`.
+
+OTA updates / EAS Update are intentionally **not** configured in Phase 0.
+
+## Dependency admission
+
+New dependencies require use case, SDK 57 evidence, New Architecture compatibility, licence review, maintained upstream, isolated test, and removal path. See:
+
+- `docs/architecture/dependency-policy.md`
+- `docs/architecture/dependency-register.md`
+
+## Architecture docs
+
+- `docs/architecture/project-structure.md`
+- `docs/architecture/startup-contract.md`
+- `docs/architecture/bluesky-inspiration-policy.md`
+- `docs/architecture/module-boundary.md`
