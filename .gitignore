@@ -31,6 +31,7 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
 .env*.local
 
 # typescript
@@ -38,6 +39,5 @@ yarn-error.*
 
 example
 
-# generated native folders
-/ios
-/android
+# Native projects are committed after Phase 0 prebuild.
+# Local build artefacts under ios/android remain ignored via patterns below if needed.

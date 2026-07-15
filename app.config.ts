@@ -9,7 +9,6 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   userInterfaceStyle: 'automatic',
   icon: './assets/images/icon.png',
-  primaryLanguage: 'en',
   ios: {
     ...config.ios,
     bundleIdentifier: 'digital.modula.app',

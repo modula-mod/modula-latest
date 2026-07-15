@@ -25,3 +25,7 @@ Expo SDK modules
 7. Native builds must initially run the JavaScript bundle included with that build.
 
 After native customisation begins, treat `ios/` and `android/` as first-class source.
+
+## expo-doctor note
+
+After `ios/` and `android/` are committed, `expo-doctor` may warn that app config fields will not sync unless prebuild runs in the build pipeline. This is expected for Modula’s native-controlled model: regenerate with `pnpm prebuild:clean` when app config identity or plugins change, then review the native diff before committing.

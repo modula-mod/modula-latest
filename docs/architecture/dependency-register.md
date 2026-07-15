@@ -26,7 +26,7 @@ No package should enter the project merely because an example repository uses it
 | react-native-reanimated | 4.5.0 | Animation runtime (Expo Router peer) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-safe-area-context | ~5.7.0 | Safe area insets | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-screens | 4.25.2 | Native navigation screens | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| react-native-web | ~0.21.0 | Web rendering | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| react-native-web | ~0.21.0 | Web rendering | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-worklets | 0.10.0 | Worklets peer for Reanimated | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 
 ## Dev dependencies
@@ -34,4 +34,7 @@ No package should enter the project merely because an example repository uses it
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
 | @types/react | ~19.2.2 | React TypeScript types | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| eslint | ^9.39.5 | Linting | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
+| eslint-config-expo | ~57.0.0 | Expo ESLint flat config | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
+| expo-doctor | ^1.20.0 | Expo project health checks | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | typescript | ~6.0.3 | TypeScript compiler | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |

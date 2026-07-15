@@ -6,6 +6,10 @@
 pnpm prebuild:clean
 ```
 
+On macOS, Expo installs CocoaPods and creates `ios/Modula.xcworkspace`.
+
+On Linux, Expo still generates the `ios/` project sources, but skips CocoaPods installation (no Xcode). Run `pod install` on macOS before opening the workspace.
+
 Open:
 
 ```bash
