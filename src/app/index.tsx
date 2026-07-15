@@ -1,5 +1,12 @@
 import {useState} from 'react'
-import {Platform, Pressable, StyleSheet, Text, View} from 'react-native'
+import {Platform, StyleSheet, useColorScheme, View} from 'react-native'
+
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppScreen} from '@/components/primitives/AppScreen'
+import {AppText} from '@/components/primitives/AppText'
+import {radius} from '@/theme/foundations/radius'
+import {spacing} from '@/theme/foundations/spacing'
+import {getSemanticColours} from '@/theme/tokens/semantic'
 
 function platformLabel(os: typeof Platform.OS): string {
   if (os === 'ios') {
@@ -15,63 +22,72 @@ function platformLabel(os: typeof Platform.OS): string {
 }
 
 export default function FoundationScreen() {
+  const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
+  const colours = getSemanticColours(scheme)
   const [interfaceCheck, setInterfaceCheck] = useState<'Not run' | 'Passed'>(
     'Not run',
   )
 
   return (
-    <View style={styles.screen} accessibilityRole="summary">
-      <Text style={styles.brand}>MODULA</Text>
-      <Text style={styles.line}>Fresh foundation</Text>
-      <Text style={styles.line}>Expo SDK 57</Text>
-      <Text style={styles.line}>React Native</Text>
-      <Text style={styles.line}>New Architecture</Text>
-      <Text style={styles.line}>Platform: {platformLabel(Platform.OS)}</Text>
-      <Text style={styles.line}>Foundation status: Running</Text>
-      <Text style={styles.line}>Interface check: {interfaceCheck}</Text>
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => setInterfaceCheck('Passed')}
-        style={({pressed}) => [styles.button, pressed && styles.buttonPressed]}>
-        <Text style={styles.buttonLabel}>Run interface check</Text>
-      </Pressable>
-    </View>
+    <AppScreen style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <View style={styles.content}>
+        <AppText variant="display" colour="accent" style={styles.brand}>
+          MODULA
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          Fresh foundation
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          Expo SDK 57
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          React Native
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          New Architecture
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          Platform: {platformLabel(Platform.OS)}
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          Foundation status: Running
+        </AppText>
+        <AppText variant="body" style={{color: colours.text}}>
+          Interface check: {interfaceCheck}
+        </AppText>
+        <AppPressable
+          onPress={() => setInterfaceCheck('Passed')}
+          style={[
+            styles.button,
+            {
+              backgroundColor: colours.accent,
+              borderRadius: radius.md,
+            },
+          ]}>
+          <AppText variant="label" colour="accentForeground">
+            Run interface check
+          </AppText>
+        </AppPressable>
+      </View>
+    </AppScreen>
   )
 }
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 24,
-    gap: 8,
+  },
+  content: {
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   brand: {
-    fontSize: 40,
-    fontWeight: '700',
-    letterSpacing: 2,
-    color: '#369CAA',
-    marginBottom: 8,
-  },
-  line: {
-    fontSize: 16,
-    color: '#111111',
+    marginBottom: spacing.sm,
     textAlign: 'center',
   },
   button: {
-    marginTop: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#369CAA',
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonLabel: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
 })
