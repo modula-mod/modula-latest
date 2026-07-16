@@ -1,14 +1,17 @@
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 
-import {ThemeProvider} from '@/theme/runtime/ThemeProvider'
-import {useTheme} from '@/theme/runtime/useTheme'
+import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
+import {DemoSocialProvider} from '@/demo/DemoSocialContext'
+import {NavigationDrawer} from '@/shell/NavigationDrawer'
+import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 function RootNavigator() {
-  const {scheme, colours} = useTheme()
+  const {scheme, colours} = useThemeTokens()
 
   return (
-    <>
+    <AppErrorBoundary>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
@@ -16,22 +19,29 @@ function RootNavigator() {
           contentStyle: {backgroundColor: colours.canvas},
         }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="compose"
-          options={{presentation: 'modal', headerShown: false}}
-        />
-        <Stack.Screen name="settings" options={{headerShown: false}} />
-        <Stack.Screen name="coming-soon" options={{presentation: 'card'}} />
-        <Stack.Screen name="dev/components" options={{presentation: 'card'}} />
+        <Stack.Screen name="compose" options={{presentation: 'modal'}} />
+        <Stack.Screen name="reels" />
+        <Stack.Screen name="post/[postId]" />
+        <Stack.Screen name="board" />
+        <Stack.Screen name="messages" />
+        <Stack.Screen name="saved" />
+        <Stack.Screen name="communities" />
+        <Stack.Screen name="teams" />
+        <Stack.Screen name="modules" />
+        <Stack.Screen name="marketplace" />
+        <Stack.Screen name="settings" />
       </Stack>
-    </>
+      <NavigationDrawer />
+    </AppErrorBoundary>
   )
 }
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootNavigator />
-    </ThemeProvider>
+    <DemoSocialProvider>
+      <ShellDrawerProvider>
+        <RootNavigator />
+      </ShellDrawerProvider>
+    </DemoSocialProvider>
   )
 }

@@ -1,52 +1,44 @@
 import {Tabs} from 'expo-router'
-import {Platform} from 'react-native'
 
-import {useTheme} from '@/theme/runtime/useTheme'
+import {MainTabBar} from '@/shell/MainTabBar'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export default function TabsLayout() {
-  const {colours} = useTheme()
+  const {colours} = useThemeTokens()
 
   return (
     <Tabs
+      tabBar={props => <MainTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colours.accent,
-        tabBarInactiveTintColor: colours.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colours.canvas,
-          borderTopColor: colours.border,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
+        sceneStyle: {backgroundColor: colours.canvas},
       }}>
       <Tabs.Screen
-        name="board"
+        name="index"
         options={{
-          title: 'Board',
-          tabBarAccessibilityLabel: 'Board',
+          title: 'Home',
+          tabBarAccessibilityLabel: 'Home',
         }}
       />
       <Tabs.Screen
-        name="feed"
+        name="discover"
         options={{
-          title: 'Feed',
-          tabBarAccessibilityLabel: 'Feed',
+          title: 'Discover',
+          tabBarAccessibilityLabel: 'Discover',
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="create"
         options={{
-          title: 'Explore',
-          tabBarAccessibilityLabel: 'Explore',
+          title: 'Create',
+          tabBarAccessibilityLabel: 'Create',
         }}
       />
       <Tabs.Screen
-        name="notifications"
+        name="activity"
         options={{
-          title: Platform.OS === 'web' ? 'Alerts' : 'Alerts',
-          tabBarAccessibilityLabel: 'Notifications',
+          title: 'Activity',
+          tabBarAccessibilityLabel: 'Activity',
         }}
       />
       <Tabs.Screen
