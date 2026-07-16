@@ -65,7 +65,7 @@ const requiredFiles = [
   'src/features/profile/contracts/presence.ts',
   'src/features/profile/repository/ProfileRepository.ts',
   'src/features/profile/repository/DemoProfileRepository.ts',
-  'src/features/profile/runtime/ProfileProvider.tsx',
+  'src/features/profile/runtime/ProfilePresentationProvider.tsx',
   'src/features/profile/storage/profilePresentationStorage.ts',
   'src/features/profile/storage/validateProfilePresentation.ts',
   'src/features/profile/registry/ProfileTabRegistry.ts',
@@ -134,9 +134,9 @@ requireText(
   'Profile presentation schema version 1 is missing',
 )
 requireText(
-  'src/features/profile/runtime/ProfileProvider.tsx',
+  'src/features/profile/runtime/ProfilePresentationProvider.tsx',
   /if \(tabId === 'posts'\) return/,
-  'Posts tab must be protected from disabling in ProfileProvider',
+  'Posts tab must be protected from disabling in ProfilePresentationProvider',
 )
 requireText(
   'src/features/profile/contracts/identity.ts',
