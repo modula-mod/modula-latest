@@ -6,6 +6,7 @@ import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
 import {SessionProvider} from '@/auth/runtime'
 import {QueryRuntimeProvider} from '@/data/query'
 import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
+import '@/features/social/registerExpansionDestinations'
 import {
   AccountPanelProvider,
   AdaptiveAccountPanel,
@@ -33,10 +34,20 @@ function RootNavigator() {
         <Stack.Screen name="post/[postId]" />
         <Stack.Screen name="messages" />
         <Stack.Screen name="saved" />
+        <Stack.Screen name="lists" />
+        <Stack.Screen name="collections" />
+        <Stack.Screen name="drafts" />
         <Stack.Screen name="communities" />
         <Stack.Screen name="teams" />
         <Stack.Screen name="modules" />
         <Stack.Screen name="marketplace" />
+        <Stack.Screen name="creator" />
+        <Stack.Screen name="help" />
+        <Stack.Screen name="whats-new" />
+        <Stack.Screen name="account/switcher" options={{presentation: 'modal'}} />
+        <Stack.Screen name="share-profile" options={{presentation: 'modal'}} />
+        <Stack.Screen name="report" options={{presentation: 'modal'}} />
+        <Stack.Screen name="reactions" options={{presentation: 'modal'}} />
         <Stack.Screen name="settings" />
       </Stack>
       <AdaptiveAccountPanel />
