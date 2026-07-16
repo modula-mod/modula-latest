@@ -1,11 +1,9 @@
 import {useState} from 'react'
-import * as ImagePicker from 'expo-image-picker'
 import {Image} from 'expo-image'
 import {useRouter} from 'expo-router'
 import {
   Alert,
   Keyboard,
-  KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -22,7 +20,13 @@ import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useCreatePostMutation} from '@/features/feed/data'
-import {isIOS} from '@/lib/platform'
+import {selectionHaptic} from '@/lib/haptics'
+import {
+  KeyboardSafeScreen,
+  captureMediaFromSource,
+  confirmModulaAction,
+  keyboardScrollProps,
+} from '@/platform/ui'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DraftLinkPreview, PendingMediaAttachment} from '@/domain/social'
 
@@ -50,14 +54,33 @@ export function ComposerScreen() {
   const [toolsOpen, setToolsOpen] = useState(false)
   const [permissionMessage, setPermissionMessage] = useState<string | null>(null)
 
-  const canPost = Boolean(text.trim() || media || link || poll) && !createPostMutation.isPending
+  const hasDraft = Boolean(text.trim() || media || link || poll)
+  const canPost = hasDraft && !createPostMutation.isPending
 
-  const closeComposer = () => {
+  const leaveComposer = () => {
     Keyboard.dismiss()
     if (router.canGoBack()) {
       router.back()
     } else {
       router.replace('/')
+    }
+  }
+
+  const closeComposer = async () => {
+    if (!hasDraft) {
+      leaveComposer()
+      return
+    }
+
+    const discarded = await confirmModulaAction({
+      title: 'Discard draft?',
+      message: 'Your local draft will be lost. This does not affect published posts.',
+      confirmLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
+    })
+    if (discarded) {
+      leaveComposer()
     }
   }
 
@@ -77,6 +100,7 @@ export function ComposerScreen() {
       setMedia(null)
       setLink(null)
       setPoll(null)
+      void selectionHaptic()
       Keyboard.dismiss()
       router.replace('/')
     } catch {
@@ -84,65 +108,54 @@ export function ComposerScreen() {
     }
   }
 
-  const handlePickedAsset = (asset: ImagePicker.ImagePickerAsset) => {
+  const handlePickedAsset = (localUri: string, width?: number, height?: number, mimeType?: string | null) => {
     setPermissionMessage(null)
     setMedia({
       localId: `local-media-${Date.now()}`,
       kind: 'image',
-      localUri: asset.uri,
-      width: asset.width,
-      height: asset.height,
-      mimeType: asset.mimeType,
+      localUri,
+      width,
+      height,
+      mimeType: mimeType ?? undefined,
     })
   }
 
   const pickPhoto = async () => {
-    try {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
-      if (!permission.granted) {
-        setPermissionMessage(
-          'Photo access was not granted. You can still publish text-only posts.',
-        )
-        return
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: false,
-        quality: 0.85,
-      })
-      if (!result.canceled) {
-        handlePickedAsset(result.assets[0])
-      }
-    } catch {
-      setPermissionMessage('Photo selection is unavailable in this environment.')
+    const result = await captureMediaFromSource('library', {target: 'composer'})
+    if (result.ok) {
+      handlePickedAsset(
+        result.asset.uri,
+        result.asset.width,
+        result.asset.height,
+        result.asset.mimeType,
+      )
+      return
+    }
+    if (result.reason !== 'cancelled') {
+      setPermissionMessage(result.message)
     }
   }
 
   const capturePhoto = async () => {
-    try {
-      const permission = await ImagePicker.requestCameraPermissionsAsync()
-      if (!permission.granted) {
-        setPermissionMessage(
-          'Camera access was not granted. You can still choose a library photo.',
-        )
-        return
-      }
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
-        quality: 0.85,
-      })
-      if (!result.canceled) {
-        handlePickedAsset(result.assets[0])
-      }
-    } catch {
-      setPermissionMessage('Camera capture is unavailable in this environment.')
+    const result = await captureMediaFromSource('camera', {target: 'composer'})
+    if (result.ok) {
+      handlePickedAsset(
+        result.asset.uri,
+        result.asset.width,
+        result.asset.height,
+        result.asset.mimeType,
+      )
+      return
+    }
+    if (result.reason !== 'cancelled') {
+      setPermissionMessage(result.message)
     }
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={isIOS ? 'padding' : undefined}
-      style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <KeyboardSafeScreen
+      style={[styles.screen, {backgroundColor: colours.canvas}]}
+      headerOffset={0}>
       <View
         style={[
           styles.header,
@@ -154,7 +167,7 @@ export function ComposerScreen() {
         ]}>
         <AppPressable
           accessibilityLabel="Cancel composer"
-          onPress={closeComposer}
+          onPress={() => void closeComposer()}
           style={styles.headerButton}>
           <AppText variant="label">Cancel</AppText>
         </AppPressable>
@@ -173,7 +186,7 @@ export function ComposerScreen() {
           accessibilityLabel="Publish post"
           accessibilityState={{disabled: !canPost}}
           disabled={!canPost}
-          onPress={publish}
+          onPress={() => void publish()}
           style={[
             styles.postButton,
             {
@@ -191,7 +204,7 @@ export function ComposerScreen() {
         </AppPressable>
       </View>
       <ScrollView
-        keyboardShouldPersistTaps="handled"
+        {...keyboardScrollProps}
         contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
         <View style={[styles.composerRow, {gap: spacing[3]}]}>
           <Avatar
@@ -220,22 +233,35 @@ export function ComposerScreen() {
         {media ? (
           <View
             style={[
-              styles.mediaPreview,
+              styles.attachmentStrip,
               {
                 borderColor: colours.border,
                 borderRadius: radius.large,
+                backgroundColor: colours.surfaceRaised,
               },
             ]}>
-            <Image source={{uri: media.localUri}} style={StyleSheet.absoluteFill} contentFit="cover" />
-            <AppPressable
-              accessibilityLabel="Remove selected photo"
-              onPress={() => setMedia(null)}
+            <View
               style={[
-                styles.removeMedia,
-                {backgroundColor: colours.backdrop, borderRadius: radius.round},
+                styles.mediaPreview,
+                {
+                  borderColor: colours.border,
+                  borderRadius: radius.large,
+                },
               ]}>
-              <AppIcon name="trash" colour={colours.surface} />
-            </AppPressable>
+              <Image source={{uri: media.localUri}} style={StyleSheet.absoluteFill} contentFit="cover" />
+              <AppPressable
+                accessibilityLabel="Remove selected photo"
+                onPress={() => setMedia(null)}
+                style={[
+                  styles.removeMedia,
+                  {backgroundColor: colours.backdrop, borderRadius: radius.round},
+                ]}>
+                <AppIcon name="trash" colour={colours.surface} />
+              </AppPressable>
+            </View>
+            <AppText variant="caption" colour="textSecondary" style={styles.attachmentHint}>
+              Attachment stays above the keyboard. Local session only — not uploaded.
+            </AppText>
           </View>
         ) : null}
         {link ? (
@@ -293,18 +319,22 @@ export function ComposerScreen() {
             borderTopColor: colours.border,
             paddingBottom: Math.max(insets.bottom, spacing[2]),
             paddingHorizontal: spacing[4],
+            backgroundColor: colours.canvas,
           },
         ]}>
         <AppPressable
           accessibilityLabel="Open Composer Tools"
-          onPress={() => setToolsOpen(true)}
+          onPress={() => {
+            Keyboard.dismiss()
+            setToolsOpen(true)
+          }}
           style={[
             styles.toolButton,
             {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
           ]}>
           <AppIcon name="create" colour={colours.accent} />
         </AppPressable>
-        <AppText variant="caption" colour="textSecondary">
+        <AppText variant="caption" colour="textSecondary" style={styles.toolbarHint}>
           Add media, links, polls, and future Modula tools
         </AppText>
       </View>
@@ -333,11 +363,18 @@ export function ComposerScreen() {
           }
         />
       </FeatureErrorBoundary>
-    </KeyboardAvoidingView>
+    </KeyboardSafeScreen>
   )
 }
 
 const styles = StyleSheet.create({
+  attachmentHint: {
+    paddingHorizontal: 4,
+  },
+  attachmentStrip: {
+    gap: 10,
+    padding: 10,
+  },
   audience: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -349,13 +386,15 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
+    paddingBottom: 24,
   },
   header: {
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    height: 98,
     justifyContent: 'space-between',
+    minHeight: 56,
+    paddingBottom: 8,
   },
   headerButton: {
     justifyContent: 'center',
@@ -371,6 +410,7 @@ const styles = StyleSheet.create({
   mediaPreview: {
     aspectRatio: 4 / 5,
     borderWidth: StyleSheet.hairlineWidth,
+    maxHeight: 280,
     overflow: 'hidden',
   },
   permission: {},
@@ -407,6 +447,9 @@ const styles = StyleSheet.create({
     gap: 12,
     minHeight: 60,
     paddingTop: 8,
+  },
+  toolbarHint: {
+    flex: 1,
   },
   toolButton: {
     alignItems: 'center',

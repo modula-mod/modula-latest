@@ -6,6 +6,11 @@ import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {useReduceMotion} from '@/lib/accessibility'
+import {
+  sheetKeyboardBottomInset,
+  useKeyboardHeight,
+} from '@/platform/ui/keyboard'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ComposerToolsDrawerProps = {
@@ -24,6 +29,11 @@ type ToolItem = {
   onPress: () => void
 }
 
+/**
+ * Composer Tools sheet (RN Modal bridge).
+ * Phase 4.5 may replace the shell with Modula BottomSheet; keyboard inset
+ * helpers remain useful either way.
+ */
 export function ComposerToolsDrawer({
   visible,
   onClose,
@@ -34,17 +44,20 @@ export function ComposerToolsDrawer({
   onPlaceholder,
 }: ComposerToolsDrawerProps) {
   const insets = useSafeAreaInsets()
+  const keyboardHeight = useKeyboardHeight()
+  const reduceMotion = useReduceMotion()
   const [progress] = useState(() => new Animated.Value(0))
   const {colours, motion, radius, spacing} = useThemeTokens()
 
   useEffect(() => {
     progress.stopAnimation()
+    const duration = reduceMotion ? 0 : visible ? motion.normal : motion.fast
     Animated.timing(progress, {
       toValue: visible ? 1 : 0,
-      duration: visible ? motion.normal : motion.fast,
+      duration,
       useNativeDriver: true,
     }).start()
-  }, [motion.fast, motion.normal, progress, visible])
+  }, [motion.fast, motion.normal, progress, reduceMotion, visible])
 
   useEffect(() => {
     return () => progress.stopAnimation()
@@ -68,6 +81,8 @@ export function ComposerToolsDrawer({
       onPress: () => onPlaceholder('Browse tools'),
     },
   ]
+
+  const bottomPad = sheetKeyboardBottomInset(keyboardHeight, insets.bottom, spacing[4])
 
   return (
     <Modal
@@ -113,43 +128,43 @@ export function ComposerToolsDrawer({
                 borderTopColor: colours.border,
                 borderTopLeftRadius: radius.xlarge,
                 borderTopRightRadius: radius.xlarge,
-                paddingBottom: Math.max(insets.bottom, spacing[4]),
+                paddingBottom: bottomPad,
               },
             ]}>
-          <View style={[styles.handle, {backgroundColor: colours.border}]} />
-          <View style={[styles.header, {paddingHorizontal: spacing[4]}]}>
-            <AppText variant="headline">Composer Tools</AppText>
-            <AppPressable
-              accessibilityLabel="Close Composer Tools"
-              onPress={onClose}
-              style={styles.close}>
-              <AppIcon name="close" colour={colours.textSecondary} />
-            </AppPressable>
-          </View>
-          <View style={[styles.grid, {paddingHorizontal: spacing[4]}]}>
-            {tools.map(tool => (
+            <View style={[styles.handle, {backgroundColor: colours.border}]} />
+            <View style={[styles.header, {paddingHorizontal: spacing[4]}]}>
+              <AppText variant="headline">Composer Tools</AppText>
               <AppPressable
-                key={tool.label}
-                accessibilityLabel={tool.label}
-                onPress={() => {
-                  tool.onPress()
-                  onClose()
-                }}
-                style={[
-                  styles.tool,
-                  {
-                    backgroundColor: colours.surfaceRaised,
-                    borderColor: colours.border,
-                    borderRadius: radius.medium,
-                  },
-                ]}>
-                <AppIcon name={tool.icon} colour={colours.accent} />
-                <AppText variant="label" numberOfLines={1}>
-                  {tool.label}
-                </AppText>
+                accessibilityLabel="Close Composer Tools"
+                onPress={onClose}
+                style={styles.close}>
+                <AppIcon name="close" colour={colours.textSecondary} />
               </AppPressable>
-            ))}
-          </View>
+            </View>
+            <View style={[styles.grid, {paddingHorizontal: spacing[4]}]}>
+              {tools.map(tool => (
+                <AppPressable
+                  key={tool.label}
+                  accessibilityLabel={tool.label}
+                  onPress={() => {
+                    tool.onPress()
+                    onClose()
+                  }}
+                  style={[
+                    styles.tool,
+                    {
+                      backgroundColor: colours.surfaceRaised,
+                      borderColor: colours.border,
+                      borderRadius: radius.medium,
+                    },
+                  ]}>
+                  <AppIcon name={tool.icon} colour={colours.accent} />
+                  <AppText variant="label" numberOfLines={1}>
+                    {tool.label}
+                  </AppText>
+                </AppPressable>
+              ))}
+            </View>
           </MaterialSurface>
         </Animated.View>
       </View>
