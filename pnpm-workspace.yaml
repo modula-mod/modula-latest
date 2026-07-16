@@ -1,5 +1,5 @@
 allowBuilds:
-  unrs-resolver: set this to true or false
+  unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@expo/cli@57.0.8'
   - '@expo/config-plugins@57.0.5'
