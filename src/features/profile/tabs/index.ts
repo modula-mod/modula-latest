@@ -1,0 +1,5 @@
+export * from '@/features/profile/tabs/AboutProfileTab'
+export * from '@/features/profile/tabs/LinksProfileTab'
+export * from '@/features/profile/tabs/MediaProfileTab'
+export * from '@/features/profile/tabs/ModulesProfileTab'
+export * from '@/features/profile/tabs/PostsProfileTab'

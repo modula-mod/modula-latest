@@ -3,6 +3,7 @@ import {StatusBar} from 'expo-status-bar'
 
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
 import {DemoSocialProvider} from '@/demo/DemoSocialContext'
+import {ProfileProvider} from '@/features/profile/runtime/ProfileProvider'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
@@ -42,9 +43,11 @@ export default function RootLayout() {
     <AppErrorBoundary>
       <AppearanceProvider>
         <DemoSocialProvider>
-          <ShellDrawerProvider>
-            <RootNavigator />
-          </ShellDrawerProvider>
+          <ProfileProvider>
+            <ShellDrawerProvider>
+              <RootNavigator />
+            </ShellDrawerProvider>
+          </ProfileProvider>
         </DemoSocialProvider>
       </AppearanceProvider>
     </AppErrorBoundary>
