@@ -45,8 +45,7 @@ export function ProfileCover({profile, compact}: ProfileCoverProps) {
         />
       )}
       <View
-        pointerEvents="none"
-        style={[styles.scrim, {backgroundColor: colours.backdrop}]}
+        style={[styles.scrim, {backgroundColor: colours.backdrop, pointerEvents: 'none'}]}
       />
     </View>
   )

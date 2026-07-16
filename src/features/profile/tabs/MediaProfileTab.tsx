@@ -69,10 +69,9 @@ export function MediaProfileTab({profile, viewer}: ProfileTabRendererProps) {
             },
           ]}>
           <View
-            pointerEvents="none"
             style={[
               styles.tileScrim,
-              {backgroundColor: colours.backdrop, opacity: 0.12},
+              {backgroundColor: colours.backdrop, opacity: 0.12, pointerEvents: 'none'},
             ]}
           />
           <AppIcon name="photo" colour={colours.surface} />
