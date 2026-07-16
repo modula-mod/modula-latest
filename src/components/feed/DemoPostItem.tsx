@@ -9,6 +9,8 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {Divider} from '@/components/primitives/Divider'
 import {Surface} from '@/components/primitives/Surface'
 import {useDemoSocial} from '@/demo/DemoSocialContext'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DemoPost} from '@/types/social'
@@ -29,23 +31,42 @@ function formatRelative(iso: string): string {
 export function DemoPostItem({post}: DemoPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
+  const {ownerProfile} = useProfile()
+  const profileRoute = getProfileRouteForIdentity(post.author, ownerProfile.id)
 
   return (
     <View>
       <View style={[styles.row, {gap: spacing[3], padding: spacing[4]}]}>
-        <Avatar
-          name={post.author.displayName}
-          colour={post.author.avatarColour}
-          size={42}
-        />
+        <AppPressable
+          accessibilityLabel={`Open ${post.author.displayName} profile`}
+          onPress={() => router.push(profileRoute)}
+          style={styles.authorAvatar}>
+          <Avatar
+            name={post.author.displayName}
+            colour={post.author.avatarColour}
+            size={42}
+          />
+        </AppPressable>
         <View style={styles.body}>
           <View style={styles.meta}>
-            <AppText variant="label" numberOfLines={1}>
-              {post.author.displayName}
-            </AppText>
-            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-              @{post.author.handle} · {formatRelative(post.createdAt)}
-            </AppText>
+            <View style={styles.metaText}>
+              <AppPressable
+                accessibilityLabel={`Open ${post.author.displayName} profile`}
+                onPress={() => router.push(profileRoute)}
+                style={styles.authorTextButton}>
+                <AppText variant="label" numberOfLines={1}>
+                  {post.author.displayName}
+                </AppText>
+              </AppPressable>
+              <AppPressable
+                accessibilityLabel={`Open ${post.author.handle} profile`}
+                onPress={() => router.push(profileRoute)}
+                style={styles.authorTextButton}>
+                <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                  @{post.author.handle} · {formatRelative(post.createdAt)}
+                </AppText>
+              </AppPressable>
+            </View>
             <AppIcon name="more" colour={colours.textTertiary} size={20} />
           </View>
           <PostBody post={post} />
@@ -269,6 +290,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 8,
   },
+  authorAvatar: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  authorTextButton: {
+    justifyContent: 'center',
+    minHeight: 22,
+    minWidth: 0,
+  },
   body: {
     flex: 1,
     minWidth: 0,
@@ -297,6 +327,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: 6,
+  },
+  metaText: {
+    flex: 1,
+    minWidth: 0,
   },
   moduleAction: {
     alignItems: 'center',

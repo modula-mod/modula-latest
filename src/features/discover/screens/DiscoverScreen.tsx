@@ -13,6 +13,8 @@ import {useDemoSocial} from '@/demo/DemoSocialContext'
 import {demoModules} from '@/demo/demoModules'
 import {demoProfiles} from '@/demo/demoProfiles'
 import {demoReels} from '@/demo/demoReels'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -167,29 +169,37 @@ function ReelsPreviewRail() {
 }
 
 function SuggestedPeople({people}: {people: typeof demoProfiles[keyof typeof demoProfiles][]}) {
+  const router = useRouter()
   const {followedProfileIds, toggleFollow} = useDemoSocial()
+  const {ownerProfile} = useProfile()
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <Section title="Suggested people">
       <View style={{gap: spacing[3]}}>
         {people.map(profile => {
           const followed = followedProfileIds.has(profile.id)
+          const profileRoute = getProfileRouteForIdentity(profile, ownerProfile.id)
           return (
             <View key={profile.id} style={styles.personRow}>
-              <Avatar
-                name={profile.displayName}
-                colour={profile.avatarColour}
-                size={42}
-              />
-              <View style={styles.personBody}>
-                <AppText variant="label">{profile.displayName}</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  @{profile.handle}
-                </AppText>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-                  {profile.bio}
-                </AppText>
-              </View>
+              <AppPressable
+                accessibilityLabel={`Open ${profile.displayName} profile`}
+                onPress={() => router.push(profileRoute)}
+                style={styles.personIdentity}>
+                <Avatar
+                  name={profile.displayName}
+                  colour={profile.avatarColour}
+                  size={42}
+                />
+                <View style={styles.personBody}>
+                  <AppText variant="label">{profile.displayName}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    @{profile.handle}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                    {profile.bio}
+                  </AppText>
+                </View>
+              </AppPressable>
               <AppPressable
                 accessibilityLabel={followed ? `Unfollow ${profile.displayName}` : `Follow ${profile.displayName}`}
                 accessibilityState={{selected: followed}}
@@ -320,6 +330,13 @@ const styles = StyleSheet.create({
   },
   personBody: {
     flex: 1,
+    minWidth: 0,
+  },
+  personIdentity: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
     minWidth: 0,
   },
   personRow: {

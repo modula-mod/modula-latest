@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {Alert, FlatList, ScrollView, StyleSheet, View} from 'react-native'
+import {FlatList, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
@@ -12,6 +12,8 @@ import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useDemoSocial} from '@/demo/DemoSocialContext'
 import {currentDemoProfile, storyProfiles} from '@/demo/demoProfiles'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {AppHeader} from '@/shell/AppHeader'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -106,7 +108,9 @@ export function HomeFeedScreen() {
 }
 
 function StoryRail() {
+  const router = useRouter()
   const {colours, spacing} = useThemeTokens()
+  const {ownerProfile} = useProfile()
   const items = [
     {label: 'Your Story', profile: currentDemoProfile},
     {label: 'Gaia', profile: storyProfiles[1]},
@@ -127,8 +131,10 @@ function StoryRail() {
       {items.map(item => (
         <AppPressable
           key={item.label}
-          accessibilityLabel={`${item.label} preview`}
-          onPress={() => Alert.alert(item.label, 'Stories are local previews in Phase 1.')}
+          accessibilityLabel={`Open ${item.profile.displayName} profile`}
+          onPress={() =>
+            router.push(getProfileRouteForIdentity(item.profile, ownerProfile.id))
+          }
           style={styles.storyItem}>
           <View
             style={[

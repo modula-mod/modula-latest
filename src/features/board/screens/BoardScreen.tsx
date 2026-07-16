@@ -8,7 +8,7 @@ import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {demoActivity} from '@/demo/demoActivity'
 import {demoModules} from '@/demo/demoModules'
-import {currentDemoProfile} from '@/demo/demoProfiles'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -16,6 +16,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
+  const {ownerProfile} = useProfile()
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -25,7 +26,7 @@ export function BoardScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Good focus, {currentDemoProfile.displayName}</AppText>
+            <AppText variant="display">Good focus, {ownerProfile.displayName}</AppText>
             <AppText variant="body" colour="textSecondary">
               Your local Modula Board gathers the next useful actions without requiring a backend.
             </AppText>
@@ -45,6 +46,49 @@ export function BoardScreen() {
               <AppText variant="body" colour="textSecondary">
                 Validate Phase 1 shell flows on phone and web before adding accounts or APIs.
               </AppText>
+            </View>
+          </Surface>
+          <Surface
+            variant="contained"
+            style={[styles.profileCard, {gap: spacing[3], padding: spacing[4]}]}>
+            <View
+              style={[
+                styles.focusIcon,
+                {backgroundColor: colours.accentSubtle, borderRadius: radius.medium},
+              ]}>
+              <AppIcon name="profile" colour={colours.accent} />
+            </View>
+            <View style={styles.focusBody}>
+              <AppText variant="headline">Your Profile</AppText>
+              <AppText variant="body" colour="textSecondary">
+                Manage identity, tabs, modules and public presentation.
+              </AppText>
+            </View>
+            <View style={[styles.profileActions, {gap: spacing[2]}]}>
+              <AppPressable
+                accessibilityLabel="Open Profile"
+                onPress={() => router.push('/profile' as Href)}
+                style={[
+                  styles.profileAction,
+                  {backgroundColor: colours.accent, borderRadius: radius.round},
+                ]}>
+                <AppText variant="label" style={{color: colours.accentForeground}}>
+                  Open Profile
+                </AppText>
+              </AppPressable>
+              <AppPressable
+                accessibilityLabel="Customize profile"
+                onPress={() => router.push('/profile/customize' as Href)}
+                style={[
+                  styles.profileAction,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <AppText variant="label">Customize</AppText>
+              </AppPressable>
             </View>
           </Surface>
           <View style={[styles.quickActions, {gap: spacing[2]}]}>
@@ -160,6 +204,22 @@ const styles = StyleSheet.create({
     minHeight: 156,
   },
   moduleGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  profileAction: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    minHeight: 40,
+    paddingHorizontal: 12,
+  },
+  profileActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  profileCard: {
+    alignItems: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
   },

@@ -9,6 +9,8 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {demoReels, type DemoReel} from '@/demo/demoReels'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {strongestReadableForeground} from '@/theme/accents'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -46,9 +48,11 @@ function ReelItem({
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const [liked, setLiked] = useState(reel.liked)
+  const {ownerProfile} = useProfile()
   const {accessibility, colours, spacing} = useThemeTokens()
 
   const overlayColour = strongestReadableForeground(reel.colour)
+  const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfile.id)
 
   return (
     <View
@@ -97,7 +101,10 @@ function ReelItem({
       </View>
       <View style={styles.bottomRow}>
         <View style={[styles.caption, {gap: spacing[2]}]}>
-          <View style={styles.creator}>
+          <AppPressable
+            accessibilityLabel={`Open ${reel.author.displayName} profile`}
+            onPress={() => router.push(profileRoute)}
+            style={styles.creator}>
             <Avatar
               name={reel.author.displayName}
               colour={reel.author.avatarColour}
@@ -106,7 +113,7 @@ function ReelItem({
             <AppText variant="headline" style={{color: overlayColour}}>
               {reel.author.displayName}
             </AppText>
-          </View>
+          </AppPressable>
           <AppText variant="body" style={{color: overlayColour}}>
             {reel.caption}
           </AppText>
@@ -129,6 +136,10 @@ function ReelItem({
                 selected: action.label === 'Like' ? liked : undefined,
               }}
               onPress={() => {
+                if (action.label === 'Profile') {
+                  router.push(profileRoute)
+                  return
+                }
                 if (action.label === 'Like') {
                   void selectionHaptic()
                   setLiked(value => !value)

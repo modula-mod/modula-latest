@@ -1,12 +1,15 @@
-import {useLocalSearchParams} from 'expo-router'
+import {useLocalSearchParams, useRouter} from 'expo-router'
 import {ScrollView, StyleSheet, View} from 'react-native'
 
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {useDemoSocial} from '@/demo/DemoSocialContext'
 import {demoProfiles} from '@/demo/demoProfiles'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -41,27 +44,7 @@ export function PostDetailScreen() {
             <DemoPostItem post={post} />
             <View style={[styles.thread, {paddingHorizontal: spacing[4]}]}>
               {replies.map(reply => (
-                <View key={reply.id} style={styles.replyRow}>
-                  <View style={styles.connectorWrap}>
-                    <Avatar
-                      name={reply.author.displayName}
-                      colour={reply.author.avatarColour}
-                      size={34}
-                    />
-                    <View
-                      style={[styles.connector, {backgroundColor: colours.border}]}
-                    />
-                  </View>
-                  <View style={styles.replyBody}>
-                    <AppText variant="label">{reply.author.displayName}</AppText>
-                    <AppText variant="caption" colour="textSecondary">
-                      @{reply.author.handle} · {reply.time}
-                    </AppText>
-                    <AppText variant="body" style={{marginTop: spacing[1]}}>
-                      {reply.text}
-                    </AppText>
-                  </View>
-                </View>
+                <ReplyRow key={reply.id} reply={reply} />
               ))}
             </View>
             <View
@@ -91,6 +74,47 @@ export function PostDetailScreen() {
   )
 }
 
+function ReplyRow({reply}: {reply: (typeof replies)[number]}) {
+  const router = useRouter()
+  const {ownerProfile} = useProfile()
+  const {colours, spacing} = useThemeTokens()
+  const profileRoute = getProfileRouteForIdentity(reply.author, ownerProfile.id)
+
+  return (
+    <View style={styles.replyRow}>
+      <View style={styles.connectorWrap}>
+        <AppPressable
+          accessibilityLabel={`Open ${reply.author.displayName} profile`}
+          onPress={() => router.push(profileRoute)}
+          style={styles.replyAvatarPress}>
+          <Avatar
+            name={reply.author.displayName}
+            colour={reply.author.avatarColour}
+            size={34}
+          />
+        </AppPressable>
+        <View
+          style={[styles.connector, {backgroundColor: colours.border}]}
+        />
+      </View>
+      <View style={styles.replyBody}>
+        <AppPressable
+          accessibilityLabel={`Open ${reply.author.displayName} profile`}
+          onPress={() => router.push(profileRoute)}
+          style={styles.replyIdentityPress}>
+          <AppText variant="label">{reply.author.displayName}</AppText>
+          <AppText variant="caption" colour="textSecondary">
+            @{reply.author.handle} · {reply.time}
+          </AppText>
+        </AppPressable>
+        <AppText variant="body" style={{marginTop: spacing[1]}}>
+          {reply.text}
+        </AppText>
+      </View>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
   connector: {
     flex: 1,
@@ -103,6 +127,14 @@ const styles = StyleSheet.create({
   replyBody: {
     flex: 1,
     minWidth: 0,
+  },
+  replyAvatarPress: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replyIdentityPress: {
+    justifyContent: 'center',
+    minHeight: 42,
   },
   replyPrompt: {
     borderRadius: 14,

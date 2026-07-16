@@ -20,9 +20,26 @@ type SettingsRow = {
 
 const rows: SettingsRow[] = [
   {
-    title: 'Account',
-    description: 'Local profile identity and account surfaces.',
+    title: 'Profile',
+    description: 'Identity and public presentation.',
     icon: 'account',
+    route: '/profile/edit',
+  },
+  {
+    title: 'Profile presentation',
+    description: 'Tabs, layout and public appearance.',
+    icon: 'profile',
+    route: '/profile/customize',
+  },
+  {
+    title: 'Account details - Preview',
+    description: 'Future production account information.',
+    icon: 'account',
+  },
+  {
+    title: 'Connected accounts - Preview',
+    description: 'Future external identity and service connections.',
+    icon: 'integrations',
   },
   {
     title: 'Privacy',

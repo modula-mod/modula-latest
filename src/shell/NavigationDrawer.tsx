@@ -8,7 +8,7 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {currentDemoProfile} from '@/demo/demoProfiles'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -73,6 +73,7 @@ export function NavigationDrawer() {
   const insets = useSafeAreaInsets()
   const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
   const {phase, progress, closeDrawer} = useShellDrawer()
+  const {ownerProfile} = useProfile()
   const drawerWidth = Math.min(360, Math.max(280, width * 0.84))
 
   const animatedStyles = useMemo(
@@ -159,17 +160,25 @@ export function NavigationDrawer() {
               },
             ]}>
           <View style={[styles.header, {gap: spacing[3]}]}>
-            <Avatar
-              name={currentDemoProfile.displayName}
-              colour={currentDemoProfile.avatarColour}
-              size={54}
-            />
-            <View style={styles.headerText}>
-              <AppText variant="headline">{currentDemoProfile.displayName}</AppText>
-              <AppText variant="caption" colour="textSecondary">
-                @{currentDemoProfile.handle}
-              </AppText>
-            </View>
+            <AppPressable
+              accessibilityLabel="Open profile"
+              onPress={() =>
+                closeDrawer({afterClose: () => router.push('/profile' as Href)})
+              }
+              style={styles.headerIdentity}>
+              <Avatar
+                name={ownerProfile.displayName}
+                uri={ownerProfile.avatarUri}
+                colour={ownerProfile.coverColour}
+                size={54}
+              />
+              <View style={styles.headerText}>
+                <AppText variant="headline">{ownerProfile.displayName}</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  @{ownerProfile.handle}
+                </AppText>
+              </View>
+            </AppPressable>
             <AppPressable
               accessibilityLabel="Open profile"
               onPress={() =>
@@ -200,9 +209,9 @@ export function NavigationDrawer() {
               },
             ]}>
             {[
-              ['Following', currentDemoProfile.followingCount],
-              ['Followers', currentDemoProfile.followerCount],
-              ['Modules', currentDemoProfile.moduleCount],
+              ['Following', ownerProfile.followingCount],
+              ['Followers', ownerProfile.followerCount],
+              ['Modules', ownerProfile.moduleCount],
             ].map(([label, value]) => (
               <View key={label} style={styles.stat}>
                 <AppText variant="headline">{value}</AppText>
@@ -253,6 +262,13 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  headerIdentity: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
+    minWidth: 0,
   },
   headerText: {
     flex: 1,

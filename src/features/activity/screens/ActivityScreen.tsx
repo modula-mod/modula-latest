@@ -1,4 +1,5 @@
 import {ScrollView, StyleSheet, View} from 'react-native'
+import {useRouter} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -7,6 +8,8 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
 import {demoActivity, type DemoActivityEvent} from '@/demo/demoActivity'
+import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useProfile} from '@/features/profile/runtime/useProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -55,18 +58,28 @@ export function ActivityScreen() {
 }
 
 function ActivityRow({item}: {item: DemoActivityEvent}) {
+  const router = useRouter()
+  const {ownerProfile} = useProfile()
   const {colours, radius, spacing} = useThemeTokens()
+  const profileRoute = item.actor
+    ? getProfileRouteForIdentity(item.actor, ownerProfile.id)
+    : null
 
   return (
     <Surface
       variant="plain"
       style={[styles.row, {gap: spacing[3], paddingVertical: spacing[2]}]}>
-      {item.actor ? (
-        <Avatar
-          name={item.actor.displayName}
-          colour={item.actor.avatarColour}
-          size={42}
-        />
+      {item.actor && profileRoute ? (
+        <AppPressable
+          accessibilityLabel={`Open ${item.actor.displayName} profile`}
+          onPress={() => router.push(profileRoute)}
+          style={styles.actorPress}>
+          <Avatar
+            name={item.actor.displayName}
+            colour={item.actor.avatarColour}
+            size={42}
+          />
+        </AppPressable>
       ) : (
         <View
           style={[
@@ -80,10 +93,18 @@ function ActivityRow({item}: {item: DemoActivityEvent}) {
         </View>
       )}
       <View style={styles.body}>
-        <AppText variant="body">
-          {item.actor ? `${item.actor.displayName} ` : ''}
-          {item.description}
-        </AppText>
+        {item.actor && profileRoute ? (
+          <AppPressable
+            accessibilityLabel={`Open ${item.actor.displayName} profile`}
+            onPress={() => router.push(profileRoute)}
+            style={styles.actorNamePress}>
+            <AppText variant="body">
+              {item.actor.displayName} {item.description}
+            </AppText>
+          </AppPressable>
+        ) : (
+          <AppText variant="body">{item.description}</AppText>
+        )}
         <AppText variant="caption" colour="textSecondary">
           {item.timestamp}
         </AppText>
@@ -128,6 +149,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 38,
     paddingHorizontal: 12,
+  },
+  actorNamePress: {
+    justifyContent: 'center',
+    minHeight: 28,
+  },
+  actorPress: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   body: {
     flex: 1,
