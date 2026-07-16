@@ -5,7 +5,7 @@ import {ProfileActionsContext} from '@/features/profile/runtime/ProfileActionsCo
 export function useProfileActions() {
   const context = useContext(ProfileActionsContext)
   if (!context) {
-    throw new Error('useProfileActions must be used within ProfileProvider')
+    throw new Error('useProfileActions must be used within ProfilePresentationProvider')
   }
   return context
 }

@@ -1,6 +1,8 @@
 import {Alert, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
+import {useCapability, useProtectedPrompt} from '@/auth/runtime'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -8,10 +10,11 @@ import type {
   ModulaProfile,
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
-import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
+import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {shareProfile} from '@/features/profile/services/shareProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {parseProfileId} from '@/api/contracts'
 
 type ProfileActionsProps = {
   profile: ModulaProfile
@@ -20,7 +23,9 @@ type ProfileActionsProps = {
 
 export function ProfileActions({profile, viewer}: ProfileActionsProps) {
   const router = useRouter()
-  const {followProfile, unfollowProfile} = useProfileActions()
+  const canFollow = useCapability('social:follow')
+  const prompt = useProtectedPrompt()
+  const followMutation = useFollowProfileMutation()
   const {colours, radius, spacing} = useThemeTokens()
 
   if (viewer.canEdit) {
@@ -67,11 +72,14 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
         accessibilityState={{selected: profile.isFollowing}}
         onPress={() => {
           void selectionHaptic()
-          if (profile.isFollowing) {
-            unfollowProfile(profile.id)
-          } else {
-            followProfile(profile.id)
+          if (!canFollow) {
+            prompt.show()
+            return
           }
+          followMutation.mutate({
+            profileId: parseProfileId(profile.id),
+            following: !profile.isFollowing,
+          })
         }}
         style={[
           styles.button,
@@ -94,7 +102,10 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
       <ProfileActionButton
         label="Message"
         icon="messages"
-        onPress={() => router.push('/messages' as Href)}
+        onPress={() => {
+          if (canFollow) router.push('/messages' as Href)
+          else prompt.show()
+        }}
       />
       <ProfileActionButton
         label="Share"
@@ -112,6 +123,11 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
             {text: 'Cancel', style: 'cancel'},
           ])
         }
+      />
+      <ProtectedActionPrompt
+        visible={prompt.visible}
+        onClose={prompt.hide}
+        description="Sign in to follow profiles or use private social actions."
       />
     </View>
   )

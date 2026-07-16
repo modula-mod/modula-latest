@@ -2,6 +2,7 @@ import {useMemo, useState, type ReactNode} from 'react'
 import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -22,6 +23,7 @@ import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {ProfileTabBar} from '@/features/profile/components/ProfileTabBar'
 import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
+import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
@@ -53,17 +55,21 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {width} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
   const registry = useProfileRegistry()
-  const {ownerProfile, profiles, presentation} = useProfile()
+  const {presentation} = useProfile()
+  const ownerQuery = useOwnerProfileQuery()
+  const publicQuery = useProfileQuery(mode === 'public' ? handle : undefined)
   const isExpanded = width >= 1100
 
-  const profile = useMemo(() => {
-    if (mode === 'owner' || mode === 'preview') return ownerProfile
-    if (!handle) return null
-    return profiles[handle] ?? null
-  }, [handle, mode, ownerProfile, profiles])
+  const ownerProfile = ownerQuery.data ?? null
+  const profile = mode === 'owner' || mode === 'preview'
+    ? ownerQuery.data ?? null
+    : publicQuery.data ?? null
+  const loading = mode === 'public' ? publicQuery.isLoading : ownerQuery.isLoading
+  const error = mode === 'public' ? publicQuery.error : ownerQuery.error
+  const refetch = mode === 'public' ? publicQuery.refetch : ownerQuery.refetch
 
   const viewer = useMemo(() => {
-    const relationship = profile
+    const relationship = profile && ownerProfile
       ? relationshipForProfile(mode, profile, ownerProfile)
       : 'visitor'
     return createViewerContext(mode, relationship)
@@ -86,7 +92,27 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     visibleTabs,
   )
 
-  if (!profile) {
+  if (loading) {
+    return (
+      <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+        <ResponsiveContent>
+          <InitialLoadingState label="Loading profile" />
+        </ResponsiveContent>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+        <ResponsiveContent>
+          <QueryErrorState error={error} onRetry={() => void refetch()} />
+        </ResponsiveContent>
+      </View>
+    )
+  }
+
+  if (!profile || !ownerProfile) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
         <ResponsiveContent>

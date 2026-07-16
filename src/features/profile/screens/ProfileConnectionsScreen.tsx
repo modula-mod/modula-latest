@@ -1,19 +1,19 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {FlatList, StyleSheet, TextInput, View} from 'react-native'
 import {useRouter} from 'expo-router'
 
+import {parseProfileId} from '@/api/contracts'
+import {useCapability, useProtectedPrompt, useSession} from '@/auth/runtime'
+import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
+import {InitialLoadingState, PaginationIndicator, QueryErrorState} from '@/components/data'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
-import {
-  type ModulaProfile,
-} from '@/features/profile/contracts/profile'
-import {demoProfileRelations} from '@/features/profile/data/demoProfiles'
+import type {ModulaProfile} from '@/features/profile/contracts/profile'
+import {useFollowProfileMutation, useFollowersQuery, useFollowingQuery, useProfileQuery} from '@/features/profile/data-query'
 import {getProfileRoute} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
-import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -29,34 +29,40 @@ export function ProfileConnectionsScreen({
   handle,
   mode,
 }: ProfileConnectionsScreenProps) {
-  const {profiles, ownerProfile} = useProfile()
+  const profileQuery = useProfileQuery(handle)
+  const followersQuery = useFollowersQuery(handle)
+  const followingQuery = useFollowingQuery(handle)
+  const connectionsQuery = mode === 'followers' ? followersQuery : followingQuery
   const {colours, radius, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
-  const profile = profiles[handle] ?? null
-  const ids = profile
-    ? demoProfileRelations[mode][profile.handle] ?? []
-    : []
-  const connections = ids
-    .map(id => Object.values(profiles).find(next => next.id === id))
-    .filter((item): item is ModulaProfile => Boolean(item))
   const q = query.trim().toLowerCase()
+  const connectionPages = connectionsQuery.data?.pages
   const filtered = useMemo(
-    () =>
-      connections.filter(item =>
+    () => {
+      const connections = connectionPages?.flatMap(page => page.items) ?? []
+      return connections.filter(item =>
         `${item.displayName} ${item.handle} ${item.bio}`.toLowerCase().includes(q),
-      ),
-    [connections, q],
+      )
+    },
+    [connectionPages, q],
   )
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={mode === 'followers' ? 'Followers' : 'Following'} />
       <ResponsiveContent maxWidth={760}>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
-          {profile ? (
+        <View style={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
+          {profileQuery.isLoading || connectionsQuery.isLoading ? (
+            <InitialLoadingState label="Loading connections" />
+          ) : profileQuery.isError || connectionsQuery.isError ? (
+            <QueryErrorState
+              error={profileQuery.error ?? connectionsQuery.error}
+              onRetry={() => {
+                void profileQuery.refetch()
+                void connectionsQuery.refetch()
+              }}
+            />
+          ) : profileQuery.data ? (
             <>
               <View
                 style={[
@@ -78,16 +84,21 @@ export function ProfileConnectionsScreen({
                 />
               </View>
               {filtered.length ? (
-                <View style={{gap: spacing[2]}}>
-                  {filtered.map(item => (
-                    <ConnectionRow
-                      key={item.id}
-                      profile={item}
-                      ownerProfileId={ownerProfile.id}
-                      description={relationshipDescription(item, ownerProfile.id)}
-                    />
-                  ))}
-                </View>
+                <FlatList
+                  data={filtered}
+                  keyExtractor={item => item.id}
+                  renderItem={({item}) => <ConnectionRow profile={item} />}
+                  onEndReached={() => {
+                    if (connectionsQuery.hasNextPage && !connectionsQuery.isFetchingNextPage) {
+                      void connectionsQuery.fetchNextPage()
+                    }
+                  }}
+                  ListFooterComponent={
+                    connectionsQuery.isFetchingNextPage
+                      ? <PaginationIndicator label="Loading more" />
+                      : null
+                  }
+                />
               ) : (
                 <EmptyState
                   icon="search"
@@ -103,7 +114,7 @@ export function ProfileConnectionsScreen({
               description="This profile may have moved or may not be available."
             />
           )}
-        </ScrollView>
+        </View>
       </ResponsiveContent>
     </View>
   )
@@ -117,18 +128,14 @@ function relationshipDescription(profile: ModulaProfile, ownerProfileId: string)
   return 'Public profile'
 }
 
-function ConnectionRow({
-  profile,
-  ownerProfileId,
-  description,
-}: {
-  profile: ModulaProfile
-  ownerProfileId: string
-  description: string
-}) {
+function ConnectionRow({profile}: {profile: ModulaProfile}) {
   const router = useRouter()
-  const {followProfile, unfollowProfile} = useProfileActions()
+  const session = useSession()
+  const canFollow = useCapability('social:follow')
+  const prompt = useProtectedPrompt()
+  const followMutation = useFollowProfileMutation()
   const {colours, radius, spacing} = useThemeTokens()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const isOwner = profile.id === ownerProfileId
 
   return (
@@ -149,7 +156,7 @@ function ConnectionRow({
             @{profile.handle}
           </AppText>
           <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-            {description}
+            {relationshipDescription(profile, ownerProfileId)}
           </AppText>
         </View>
       </AppPressable>
@@ -159,9 +166,16 @@ function ConnectionRow({
             profile.isFollowing ? `Unfollow ${profile.displayName}` : `Follow ${profile.displayName}`
           }
           accessibilityState={{selected: profile.isFollowing}}
-          onPress={() =>
-            profile.isFollowing ? unfollowProfile(profile.id) : followProfile(profile.id)
-          }
+          onPress={() => {
+            if (!canFollow) {
+              prompt.show()
+              return
+            }
+            followMutation.mutate({
+              profileId: parseProfileId(profile.id),
+              following: !profile.isFollowing,
+            })
+          }}
           style={[
             styles.followButton,
             {
@@ -178,12 +192,18 @@ function ConnectionRow({
           </AppText>
         </AppPressable>
       ) : null}
+      <ProtectedActionPrompt
+        visible={prompt.visible}
+        onClose={prompt.hide}
+        description="Sign in to follow profiles in this local Modula build."
+      />
     </Surface>
   )
 }
 
 const styles = StyleSheet.create({
   content: {
+    flex: 1,
     paddingBottom: 48,
   },
   followButton: {

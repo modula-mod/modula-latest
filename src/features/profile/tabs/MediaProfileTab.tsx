@@ -4,14 +4,16 @@ import {useRouter, type Href} from 'expo-router'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
-import type {MediaPost} from '@/types/social'
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
+import {parseProfileId} from '@/api/contracts'
+import {useProfileFeedQuery} from '@/features/feed/data'
+import type {MediaSocialPost} from '@/domain/social'
 import type {ProfileTabRendererProps} from '@/features/profile/contracts/profileTabs'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileMediaItem = {
-  post: MediaPost
+  post: MediaSocialPost
   mediaId: string
   title: string
   colour: string
@@ -20,19 +22,27 @@ type ProfileMediaItem = {
 export function MediaProfileTab({profile, viewer}: ProfileTabRendererProps) {
   const router = useRouter()
   const {width} = useWindowDimensions()
-  const {posts} = useDemoSocial()
   const {colours, radius, spacing} = useThemeTokens()
+  const postsQuery = useProfileFeedQuery(parseProfileId(profile.id))
   const columns = width >= 1280 ? 6 : width >= 760 ? 4 : 3
-  const items: ProfileMediaItem[] = posts
-    .filter((post): post is MediaPost => post.author.id === profile.id && post.kind === 'media')
+  const items: ProfileMediaItem[] = (postsQuery.data?.pages.flatMap(page => page.items) ?? [])
+    .filter((post): post is MediaSocialPost => post.author.id === profile.id && post.kind === 'media')
     .flatMap(post =>
       post.media.map(media => ({
         post,
         mediaId: media.id,
-        title: media.title,
-        colour: media.colour,
+        title: media.title ?? 'Profile media',
+        colour: media.colour ?? colours.surfaceMuted,
       })),
     )
+
+  if (postsQuery.isLoading) {
+    return <InitialLoadingState label="Loading media" />
+  }
+
+  if (postsQuery.isError) {
+    return <QueryErrorState error={postsQuery.error} onRetry={() => void postsQuery.refetch()} />
+  }
 
   if (!items.length) {
     return (

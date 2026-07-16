@@ -7,10 +7,10 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {FOCUS_STATUS_OPTIONS, type FocusStatus} from '@/features/profile/contracts/presence'
-import type {ProfileLink} from '@/features/profile/contracts/profile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
-import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
+import type {ModulaProfile, ProfileLink} from '@/features/profile/contracts/profile'
+import {useOwnerProfileQuery, useUpdateProfileMutation} from '@/features/profile/data-query'
 import {
   normaliseHandle,
   normaliseWebsite,
@@ -34,33 +34,42 @@ type EditProfileDraft = {
   focusStatus: FocusStatus
 }
 
+function createDraft(profile?: ModulaProfile): EditProfileDraft {
+  return {
+    avatarUri: profile?.avatarUri ?? null,
+    coverUri: profile?.coverUri ?? null,
+    displayName: profile?.displayName ?? '',
+    handle: profile?.handle ?? '',
+    bio: profile?.bio ?? '',
+    pronouns: profile?.pronouns ?? '',
+    location: profile?.location?.label ?? '',
+    website: profile?.website?.url ?? '',
+    focusStatus: profile?.focusStatus ?? FOCUS_STATUS_OPTIONS[0],
+  }
+}
+
 export function EditProfileScreen() {
   const router = useRouter()
-  const {ownerProfile} = useProfile()
-  const {setOwnerAvatar, setOwnerCover, updateOwnerProfile} = useProfileActions()
+  const ownerProfileQuery = useOwnerProfileQuery()
+  const updateProfileMutation = useUpdateProfileMutation()
   const {colours, radius, spacing} = useThemeTokens()
-  const [draft, setDraft] = useState<EditProfileDraft>(() => ({
-    avatarUri: ownerProfile.avatarUri ?? null,
-    coverUri: ownerProfile.coverUri ?? null,
-    displayName: ownerProfile.displayName,
-    handle: ownerProfile.handle,
-    bio: ownerProfile.bio,
-    pronouns: ownerProfile.pronouns ?? '',
-    location: ownerProfile.location?.label ?? '',
-    website: ownerProfile.website?.url ?? '',
-    focusStatus: ownerProfile.focusStatus,
-  }))
+  const ownerProfile = ownerProfileQuery.data
+  const [draftOverride, setDraft] = useState<EditProfileDraft | null>(null)
+  const draft = draftOverride ?? createDraft(ownerProfile)
+  const updateDraft = (updater: (draft: EditProfileDraft) => EditProfileDraft) => {
+    setDraft(prev => updater(prev ?? createDraft(ownerProfile)))
+  }
 
   const initial = useMemo(() => JSON.stringify({
-    avatarUri: ownerProfile.avatarUri ?? null,
-    coverUri: ownerProfile.coverUri ?? null,
-    displayName: ownerProfile.displayName,
-    handle: ownerProfile.handle,
-    bio: ownerProfile.bio,
-    pronouns: ownerProfile.pronouns ?? '',
-    location: ownerProfile.location?.label ?? '',
-    website: ownerProfile.website?.url ?? '',
-    focusStatus: ownerProfile.focusStatus.id,
+    avatarUri: ownerProfile?.avatarUri ?? null,
+    coverUri: ownerProfile?.coverUri ?? null,
+    displayName: ownerProfile?.displayName ?? '',
+    handle: ownerProfile?.handle ?? '',
+    bio: ownerProfile?.bio ?? '',
+    pronouns: ownerProfile?.pronouns ?? '',
+    location: ownerProfile?.location?.label ?? '',
+    website: ownerProfile?.website?.url ?? '',
+    focusStatus: ownerProfile?.focusStatus.id ?? '',
   }), [ownerProfile])
   const current = JSON.stringify({
     ...draft,
@@ -79,7 +88,8 @@ export function EditProfileScreen() {
     ])
   }
 
-  const save = () => {
+  const save = async () => {
+    if (!ownerProfile) return
     const displayNameResult = validateDisplayName(draft.displayName)
     const handleResult = validateHandle(draft.handle)
     const bioResult = validateBio(draft.bio)
@@ -93,7 +103,9 @@ export function EditProfileScreen() {
     }
 
     const website = createWebsiteLink(draft.website)
-    updateOwnerProfile({
+    await updateProfileMutation.mutateAsync({
+      avatarUri: draft.avatarUri,
+      coverUri: draft.coverUri,
       displayName: draft.displayName.trim(),
       handle: normaliseHandle(draft.handle),
       bio: draft.bio.trim(),
@@ -107,8 +119,6 @@ export function EditProfileScreen() {
       website,
       focusStatus: draft.focusStatus,
     })
-    setOwnerAvatar(draft.avatarUri)
-    setOwnerCover(draft.coverUri)
     router.back()
   }
 
@@ -126,13 +136,26 @@ export function EditProfileScreen() {
             })
       if (result.canceled || !result.assets[0]?.uri) return
       const uri = result.assets[0].uri
-      setDraft(prev => ({
+      updateDraft(prev => ({
         ...prev,
         [target === 'avatar' ? 'avatarUri' : 'coverUri']: uri,
       }))
     } catch {
       Alert.alert('Image unavailable', 'Modula could not open the local image picker.')
     }
+  }
+
+  if (ownerProfileQuery.isLoading || !ownerProfile) {
+    return <InitialLoadingState label="Loading profile editor" />
+  }
+
+  if (ownerProfileQuery.isError) {
+    return (
+      <QueryErrorState
+        error={ownerProfileQuery.error}
+        onRetry={() => void ownerProfileQuery.refetch()}
+      />
+    )
   }
 
   return (
@@ -164,7 +187,7 @@ export function EditProfileScreen() {
             removeLabel="Remove profile picture"
             onLibrary={() => void pickImage('avatar', 'library')}
             onCamera={() => void pickImage('avatar', 'camera')}
-            onRemove={() => setDraft(prev => ({...prev, avatarUri: null}))}
+            onRemove={() => updateDraft(prev => ({...prev, avatarUri: null}))}
           />
           <ImageControls
             title="Cover"
@@ -172,19 +195,19 @@ export function EditProfileScreen() {
             removeLabel="Remove cover image"
             onLibrary={() => void pickImage('cover', 'library')}
             onCamera={() => void pickImage('cover', 'camera')}
-            onRemove={() => setDraft(prev => ({...prev, coverUri: null}))}
+            onRemove={() => updateDraft(prev => ({...prev, coverUri: null}))}
           />
 
           <ProfileField
             label="Display name"
             value={draft.displayName}
-            onChangeText={value => setDraft(prev => ({...prev, displayName: value}))}
+            onChangeText={value => updateDraft(prev => ({...prev, displayName: value}))}
             maxLength={50}
           />
           <ProfileField
             label="Handle"
             value={draft.handle}
-            onChangeText={value => setDraft(prev => ({...prev, handle: normaliseHandle(value)}))}
+            onChangeText={value => updateDraft(prev => ({...prev, handle: normaliseHandle(value)}))}
             autoCapitalize="none"
             maxLength={30}
             help="Availability will be checked when account services are connected."
@@ -192,7 +215,7 @@ export function EditProfileScreen() {
           <ProfileField
             label="Biography"
             value={draft.bio}
-            onChangeText={value => setDraft(prev => ({...prev, bio: value}))}
+            onChangeText={value => updateDraft(prev => ({...prev, bio: value}))}
             multiline
             maxLength={160}
             help={`${draft.bio.length}/160`}
@@ -200,17 +223,17 @@ export function EditProfileScreen() {
           <ProfileField
             label="Pronouns"
             value={draft.pronouns}
-            onChangeText={value => setDraft(prev => ({...prev, pronouns: value}))}
+            onChangeText={value => updateDraft(prev => ({...prev, pronouns: value}))}
           />
           <ProfileField
             label="Location"
             value={draft.location}
-            onChangeText={value => setDraft(prev => ({...prev, location: value}))}
+            onChangeText={value => updateDraft(prev => ({...prev, location: value}))}
           />
           <ProfileField
             label="Website"
             value={draft.website}
-            onChangeText={value => setDraft(prev => ({...prev, website: value}))}
+            onChangeText={value => updateDraft(prev => ({...prev, website: value}))}
             autoCapitalize="none"
             keyboardType="url"
             help="Use http:// or https://. Missing schemes are saved as https://."
@@ -227,7 +250,7 @@ export function EditProfileScreen() {
                     accessibilityLabel={`Set focus status to ${status.label}`}
                     accessibilityState={{selected}}
                     onPress={() =>
-                      setDraft(prev => ({
+                      updateDraft(prev => ({
                         ...prev,
                         focusStatus: {
                           ...status,

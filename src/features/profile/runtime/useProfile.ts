@@ -5,7 +5,7 @@ import {ProfileStateContext} from '@/features/profile/runtime/ProfileStateContex
 export function useProfile() {
   const context = useContext(ProfileStateContext)
   if (!context) {
-    throw new Error('useProfile must be used within ProfileProvider')
+    throw new Error('useProfile must be used within ProfilePresentationProvider')
   }
   return context
 }

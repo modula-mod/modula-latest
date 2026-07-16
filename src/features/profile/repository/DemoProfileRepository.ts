@@ -60,6 +60,8 @@ export class DemoProfileRepository implements ProfileRepository {
     const next: ModulaProfile = {
       ...owner,
       ...input,
+      avatarUri: input.avatarUri === null ? undefined : input.avatarUri ?? owner.avatarUri,
+      coverUri: input.coverUri === null ? undefined : input.coverUri ?? owner.coverUri,
       location: input.location === null ? undefined : input.location ?? owner.location,
       website: input.website === null ? undefined : input.website ?? owner.website,
       focusStatus: input.focusStatus ?? owner.focusStatus,

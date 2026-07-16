@@ -5,7 +5,7 @@ import {ProfileRegistryContext} from '@/features/profile/runtime/ProfileRegistry
 export function useProfileRegistry() {
   const context = useContext(ProfileRegistryContext)
   if (!context) {
-    throw new Error('useProfileRegistry must be used within ProfileProvider')
+    throw new Error('useProfileRegistry must be used within ProfilePresentationProvider')
   }
   return context
 }

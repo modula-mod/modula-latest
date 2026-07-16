@@ -1,5 +1,5 @@
 export * from '@/features/profile/runtime/ProfileActionsContext'
-export * from '@/features/profile/runtime/ProfileProvider'
+export * from '@/features/profile/runtime/ProfilePresentationProvider'
 export * from '@/features/profile/runtime/ProfileRegistryContext'
 export * from '@/features/profile/runtime/ProfileStateContext'
 export * from '@/features/profile/runtime/useProfile'

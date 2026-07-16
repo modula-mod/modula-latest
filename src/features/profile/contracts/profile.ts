@@ -84,6 +84,8 @@ export type ProfileViewerContext = {
 }
 
 export type UpdateProfileInput = {
+  avatarUri?: string | null
+  coverUri?: string | null
   displayName?: string
   handle?: string
   bio?: string

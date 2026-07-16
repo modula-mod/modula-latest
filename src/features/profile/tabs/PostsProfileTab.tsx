@@ -1,17 +1,27 @@
 import {FlatList, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
+import {parseProfileId} from '@/api/contracts'
+import {useProfileFeedQuery} from '@/features/feed/data'
 import type {ProfileTabRendererProps} from '@/features/profile/contracts/profileTabs'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PostsProfileTab({profile, viewer}: ProfileTabRendererProps) {
   const router = useRouter()
-  const {posts} = useDemoSocial()
   const {spacing} = useThemeTokens()
-  const profilePosts = posts.filter(post => post.author.id === profile.id)
+  const postsQuery = useProfileFeedQuery(parseProfileId(profile.id))
+  const profilePosts = postsQuery.data?.pages.flatMap(page => page.items) ?? []
+
+  if (postsQuery.isLoading) {
+    return <InitialLoadingState label="Loading profile posts" />
+  }
+
+  if (postsQuery.isError) {
+    return <QueryErrorState error={postsQuery.error} onRetry={() => void postsQuery.refetch()} />
+  }
 
   if (!profilePosts.length) {
     return (
@@ -44,6 +54,11 @@ export function PostsProfileTab({profile, viewer}: ProfileTabRendererProps) {
         keyExtractor={item => item.id}
         renderItem={({item}) => <DemoPostItem post={item} />}
         scrollEnabled={false}
+        onEndReached={() => {
+          if (postsQuery.hasNextPage && !postsQuery.isFetchingNextPage) {
+            void postsQuery.fetchNextPage()
+          }
+        }}
       />
     </View>
   )
