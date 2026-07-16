@@ -44,6 +44,7 @@ export default ({config}: ConfigContext): ExpoConfig => ({
           'Modula uses your camera when you choose to capture media for a post.',
       },
     ],
+    'expo-secure-store',
     [
       'expo-splash-screen',
       {
