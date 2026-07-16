@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react'
+import {useEffect, useState} from 'react'
 import {Animated, Modal, Pressable, StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -35,7 +35,7 @@ export function ComposerToolsDrawer({
 }: ComposerToolsDrawerProps) {
   const insets = useSafeAreaInsets()
   const reduceMotion = useReduceMotion()
-  const progress = useRef(new Animated.Value(0)).current
+  const [progress] = useState(() => new Animated.Value(0))
   const {colours, radius, spacing} = useThemeTokens()
 
   useEffect(() => {

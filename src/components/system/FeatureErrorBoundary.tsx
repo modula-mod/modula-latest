@@ -37,7 +37,7 @@ export class FeatureErrorBoundary extends Component<
     return (
       <View style={styles.wrap}>
         <AppText variant="headline" style={styles.center}>
-          This Modula surface couldn't open.
+          This Modula surface could not open.
         </AppText>
         <AppText variant="body" colour="textSecondary" style={styles.center}>
           The rest of the shell is still available.

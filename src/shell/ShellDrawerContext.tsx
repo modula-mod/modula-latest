@@ -4,8 +4,8 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
+  useRef,
   type PropsWithChildren,
 } from 'react'
 import {Animated} from 'react-native'
@@ -29,7 +29,7 @@ const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
 export function ShellDrawerProvider({children}: PropsWithChildren) {
   const reduceMotion = useReduceMotion()
-  const progress = useRef(new Animated.Value(0)).current
+  const [progress] = useState(() => new Animated.Value(0))
   const phaseRef = useRef<DrawerPhase>('closed')
   const afterCloseRef = useRef<(() => void) | undefined>(undefined)
   const [phase, setPhaseState] = useState<DrawerPhase>('closed')

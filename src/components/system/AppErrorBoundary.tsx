@@ -38,7 +38,7 @@ export class AppErrorBoundary extends Component<
       <View style={styles.wrap}>
         <View style={styles.panel}>
           <AppText variant="title" style={styles.center}>
-            Modula couldn't open this view.
+            Modula could not open this view.
           </AppText>
           <AppText variant="body" colour="textSecondary" style={styles.center}>
             Try again or return home.
