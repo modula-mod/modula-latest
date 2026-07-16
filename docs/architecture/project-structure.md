@@ -3,23 +3,28 @@
 ```text
 src/
 ├── app/                 # Expo Router routes only
+│   ├── (tabs)/          # Board, Feed, Explore, Notifications, Profile
+│   ├── settings/        # Settings tree (Account, Privacy, Moderation, …)
+│   ├── compose.tsx
+│   ├── coming-soon.tsx
+│   └── dev/components.tsx
 ├── components/
-│   ├── primitives/      # Shared UI primitives
-│   └── system/          # System-level UI helpers
-├── features/            # Product vertical slices
-├── shell/               # Application chrome (deferred)
-├── modules/             # Module host / contracts (docs only in Phase 0)
-├── services/            # api / storage adapters
-├── social/              # Social contracts and adapters
+│   ├── primitives/      # App* shared UI
+│   └── system/          # @expo/ui adapters (no swift-ui in features)
+├── features/            # Feed, profile slices
+├── shell/               # FAB, headers
+├── modules/             # Host contracts (docs/placeholders)
+├── services/
+├── social/              # SocialProvider + DevelopmentSocialProvider
 ├── theme/               # Foundations, tokens, runtime
-├── platform/            # iOS / Android / web forks
-├── lib/                 # Small shared utilities
-└── types/               # Shared TypeScript types
+├── platform/
+├── lib/
+└── types/
 ```
 
 ## Rules
 
 - Keep routes thin; put reusable UI in `components` or `features`.
-- Do not create a second root-level `app` directory. Routing lives in `src/app`.
-- Path alias `@/*` maps to `src/*`.
-- Native projects live at repository root (`ios/`, `android/`) after prebuild and are first-class source.
+- Routing lives only in `src/app`.
+- Path alias `@/*` → `src/*`.
+- Native projects at repo root (`ios/`, `android/`) are first-class after prebuild.

@@ -18,6 +18,6 @@ See also `src/modules/README.md`.
 - Declare permissions
 - Avoid importing private host internals
 
-## Phase 0
+## Phase 0–1
 
-Documentation and folder placeholders only. No dynamic code fetching. No Vault Notes, Tasks, or CRM implementations.
+Documentation and folder placeholders only. Settings → Modules is an empty navigable stub. No dynamic code fetching. No Vault Notes, Tasks, or CRM implementations.

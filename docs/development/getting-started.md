@@ -15,7 +15,7 @@ cd /home/andrei/modula-latest
 pnpm install
 ```
 
-Copy `.env.example` to `.env` when local overrides are needed. The foundation screen runs with defaults if no API is present.
+Copy `.env.example` to `.env` when local overrides are needed. The app opens on Board. Feed/Explore use in-memory mock social data — no API required.
 
 ## Commands
 

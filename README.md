@@ -1,93 +1,96 @@
 # Modula
 
-Modula is a modular Social Operating System that combines identity, social
-interaction, personal tools, external integrations, and installable modules
-inside one user-controlled environment.
+**Simplifying Digital.**
 
-This repository contains the greenfield Modula application for iOS, Android,
-and the web. It is built with React Native, Expo, TypeScript, and Expo Router.
+> One identity. One environment. Infinite configurations.
 
-The application is being developed from a minimal native foundation. Product
-features, protocol adapters, modules, and advanced visual effects are added
-only after their underlying runtime contracts are proven stable.
+Modula is a modular **Social Operating System** — identity, social interaction, personal tools, external integrations, and installable modules inside one user-controlled environment. The user’s profile becomes their platform.
 
-## Status
+This repository is the **greenfield** Modula client for iOS, Android, and web (Expo SDK 57, React Native, TypeScript, Expo Router). It replaces the Bluesky-derived prototype; that codebase may be studied for UI patterns only.
 
-**Phase 0 — Fresh Expo SDK 57 foundation**
+## What Modula is / is not
 
-- Single foundation route (`/`)
-- Modula identity (`digital.modula.app`)
-- Primitives + semantic colour tokens
-- Documented architecture and dependency admission
-- Native projects generated via Expo prebuild (committed)
+| Is | Is not |
+|---|---|
+| Profile-centred Social OS | Only a social network or notes app |
+| Host for installable modules | A Bluesky / AT Proto fork |
+| Protocol-independent social UI | Gaia-, wallet-, or marketplace-dependent |
+| Token-driven appearance system | A copy of Bluesky ALF |
 
-## Prerequisites
+## Current status
+
+| Phase | Status |
+|---|---|
+| **0 — Foundation** | Done — Expo SDK 57, native projects, tokens, startup contract |
+| **0.5 / 1 — Shell** | In progress — tabs shell, full Settings IA (Account/Privacy/Moderation…), mock social, Board |
+| 2–8 | Deferred — see roadmap below |
+
+First launch opens the **Board** (personal OS surface). Foundation status remains under Settings → About / Developer.
+
+## Tech stack
+
+- Expo SDK 57 · React Native New Architecture · React 19
+- Expo Router (file-based) · TypeScript
+- `@expo/ui` (universal) via system adapters
+- pnpm workspaces
+
+## Prerequisites & getting started
 
 - Node.js 20+
 - pnpm
-- Xcode + CocoaPods for iOS (macOS)
-- Android SDK + JDK for Android
-
-## Install
+- Xcode + CocoaPods (iOS, macOS)
+- Android SDK + JDK (Android)
 
 ```bash
 pnpm install
+cp .env.example .env   # optional
+pnpm start             # or: pnpm web / pnpm ios / pnpm android
 ```
 
-Optional environment file:
+Details: `docs/development/getting-started.md`.
 
-```bash
-cp .env.example .env
-```
-
-## Commands
+## Scripts
 
 | Command | Purpose |
 |---|---|
 | `pnpm start` | Expo development server |
-| `pnpm web` | Web / PWA development |
-| `pnpm ios` | Native iOS run (`expo run:ios`) |
-| `pnpm android` | Native Android run (`expo run:android`) |
-| `pnpm typecheck` | TypeScript (`tsc --noEmit`) |
+| `pnpm web` | Web / PWA |
+| `pnpm ios` | Native iOS (`expo run:ios`) |
+| `pnpm android` | Native Android (`expo run:android`) |
+| `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | `expo lint` |
 | `pnpm doctor` | `expo-doctor` |
 | `pnpm prebuild` | Generate native projects |
 | `pnpm prebuild:clean` | Clean regenerate native projects |
 
-## Platform notes
-
-- **Web:** `pnpm web`
-- **iOS:** After prebuild, open `ios/Modula.xcworkspace` or run `pnpm ios`
-- **Android:** After prebuild, run `pnpm android`
-
-See `docs/development/` for details.
-
-## Quality checks
-
-```bash
-pnpm install
-pnpm exec expo install --check
-pnpm doctor
-pnpm typecheck
-pnpm lint
-```
-
-## Native prebuild policy
-
-Native folders are generated only after the JS foundation validates. They are committed and treated as first-class source. See `docs/architecture/native-project-policy.md`.
-
-OTA updates / EAS Update are intentionally **not** configured in Phase 0.
-
-## Dependency admission
-
-New dependencies require use case, SDK 57 evidence, New Architecture compatibility, licence review, maintained upstream, isolated test, and removal path. See:
-
-- `docs/architecture/dependency-policy.md`
-- `docs/architecture/dependency-register.md`
-
 ## Architecture docs
 
-- `docs/architecture/project-structure.md`
-- `docs/architecture/startup-contract.md`
-- `docs/architecture/bluesky-inspiration-policy.md`
-- `docs/architecture/module-boundary.md`
+| Doc | Topic |
+|---|---|
+| `docs/product/overview.md` | Condensed product vision |
+| `docs/product/theme-architecture-v5.md` | Appearance dimensions (v5 adaptation) |
+| `docs/architecture/project-structure.md` | `src/` layout |
+| `docs/architecture/startup-contract.md` | Launch invariants |
+| `docs/architecture/module-boundary.md` | Host vs modules |
+| `docs/architecture/screen-map.md` | Bluesky → Modula map |
+| `docs/architecture/expo-native-component-list.md` | NCL relevance |
+| `docs/architecture/dependency-policy.md` | Admission rules |
+| `docs/architecture/dependency-register.md` | Admitted packages |
+| `docs/architecture/bluesky-inspiration-policy.md` | Study ≠ copy |
+| `docs/architecture/native-project-policy.md` | `ios/` / `android/` |
+
+Agent skills: `.cursor/skills/modula-architecture`, `modula-ui`, `modula-dependencies`.
+
+## Roadmap (condensed)
+
+0. Foundation · 1. Shell · 2. Appearance · 3. Profile · 4. Social foundation · 5. Module standard · 6. Core modules · 7. Marketplace · 8. Advanced (teams, wallet, Gaia, Neural Atlas)
+
+## Native & dependency policy
+
+- Native folders are first-class after prebuild; see `native-project-policy.md`.
+- OTA / EAS Update is **not** enabled.
+- New deps require register + `expo install` for Expo modules — no speculative installs.
+
+## Licence
+
+See [LICENSE](./LICENSE) (MIT, from Expo template provenance). Product branding and Modula identity are separate from template licence headers.
