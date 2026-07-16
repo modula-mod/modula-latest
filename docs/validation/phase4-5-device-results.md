@@ -39,3 +39,10 @@ Host checks run on the development Mac clone.
 - Sibling keyboard / camera / translate work retained on this branch.
 - Instant-close root cause was the drawer effect closing whenever `phase === 'open'`; replaced by explicit open/close sheet state machine.
 - Known Expo Doctor committed-native-folder warning may still apply from earlier phases; no new unexplained doctor findings were recorded in this pass.
+
+## Follow-up (2026-07-16 evening)
+
+- Profile cover/avatar editors wired into owner ProfileHero.
+- Account panel destinations extracted via `registerAccountPanelDestination` / `getAccountPanelDestinations` for sibling Marketplace/Settings expansions.
+- Sibling untracked `src/features/marketplace/` and research doc left untouched on disk.
+- Automated verifiers re-confirmed PASS; Simulator/device still NOT TESTED.
