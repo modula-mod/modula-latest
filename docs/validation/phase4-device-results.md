@@ -7,7 +7,7 @@ No physical-device result is claimed until the combined Phase 4 development clie
 | Web development | PASS | `CI=1 BROWSER=none pnpm web --port 8090`; requested routes returned HTTP 200 |
 | Web export | PASS | `pnpm exec expo export --platform web` exported 44 static routes |
 | iOS Simulator | NOT TESTED | Pending development-client run |
-| Physical iPhone development client | NOT TESTED | Pending EAS/dev-client build and device test |
+| Physical iPhone development client | NOT TESTED | EAS build request failed before queueing because no Expo account or `EXPO_TOKEN` is available |
 | Android emulator | NOT TESTED | Pending emulator run |
 | Android physical device | NOT TESTED | Pending device run |
 
@@ -42,3 +42,7 @@ Web dev-server notes:
 - Expo attempted to install React Native DevTools and Electron failed because the process runs as root without `--no-sandbox`.
 - A Node `NO_COLOR`/`FORCE_COLOR` warning appears during web bundling.
 - No Phase 4 auth require-cycle warning remains.
+
+EAS development-client build:
+
+`pnpm dlx eas-cli@latest build --platform ios --profile development --clear-cache --message "Modula Phase 4 data and authentication runtime" --non-interactive --no-wait` failed before queueing with: `An Expo user account is required to proceed.`
