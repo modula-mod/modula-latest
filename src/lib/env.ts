@@ -1,33 +1,20 @@
-export type AppEnv = 'development' | 'staging' | 'production'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
+
+export type AppEnv = 'development' | 'preview' | 'production'
 
 export type ModulaEnv = {
   appEnv: AppEnv
-  apiUrl: string
-}
-
-function readAppEnv(value: string | undefined): AppEnv {
-  if (value === 'development' || value === 'staging' || value === 'production') {
-    return value
-  }
-  return 'development'
-}
-
-function readApiUrl(value: string | undefined): string {
-  if (typeof value === 'string' && value.trim().length > 0) {
-    return value.trim()
-  }
-  return 'http://localhost:4010'
+  apiUrl: string | null
 }
 
 /**
- * Validates bootstrap environment values without a schema library.
- * Missing values fall back to safe development defaults so the foundation
- * screen can render without an API server.
+ * Compatibility wrapper for older Phase 1/2 call sites.
+ * Runtime environment validation lives in src/config/runtimeEnvironment.ts.
  */
 export function getEnv(): ModulaEnv {
   return {
-    appEnv: readAppEnv(process.env.EXPO_PUBLIC_APP_ENV),
-    apiUrl: readApiUrl(process.env.EXPO_PUBLIC_API_URL),
+    appEnv: runtimeEnvironment.appEnvironment,
+    apiUrl: runtimeEnvironment.apiUrl,
   }
 }
 

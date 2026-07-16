@@ -1,9 +1,12 @@
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 
+import {NetworkStatusBanner} from '@/components/data/NetworkStatusBanner'
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
-import {DemoSocialProvider} from '@/demo/DemoSocialContext'
-import {ProfileProvider} from '@/features/profile/runtime/ProfileProvider'
+import {SessionProvider} from '@/auth/runtime'
+import {QueryRuntimeProvider} from '@/data/query'
+import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
+import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
@@ -15,11 +18,12 @@ function RootNavigator() {
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack
+        <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: {backgroundColor: colours.canvas},
         }}>
+        <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="compose" options={{presentation: 'modal'}} />
         <Stack.Screen name="reels" />
@@ -42,13 +46,18 @@ export default function RootLayout() {
   return (
     <AppErrorBoundary>
       <AppearanceProvider>
-        <DemoSocialProvider>
-          <ProfileProvider>
-            <ShellDrawerProvider>
-              <RootNavigator />
-            </ShellDrawerProvider>
-          </ProfileProvider>
-        </DemoSocialProvider>
+        <AppServicesProvider>
+          <QueryRuntimeProvider>
+            <SessionProvider>
+              <ProfilePresentationProvider>
+                <ShellDrawerProvider>
+                  <RootNavigator />
+                  <NetworkStatusBanner />
+                </ShellDrawerProvider>
+              </ProfilePresentationProvider>
+            </SessionProvider>
+          </QueryRuntimeProvider>
+        </AppServicesProvider>
       </AppearanceProvider>
     </AppErrorBoundary>
   )
