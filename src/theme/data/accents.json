@@ -1,0 +1,34 @@
+{
+  "modulaTeal": {
+    "label": "Modula Teal",
+    "base": "#369CAA"
+  },
+  "electricCyan": {
+    "label": "Electric Cyan",
+    "base": "#00D2FF"
+  },
+  "vividViolet": {
+    "label": "Vivid Violet",
+    "base": "#A855F7"
+  },
+  "neonMint": {
+    "label": "Neon Mint",
+    "base": "#10B981"
+  },
+  "sunsetOrange": {
+    "label": "Sunset Orange",
+    "base": "#F97316"
+  },
+  "crimsonFlash": {
+    "label": "Crimson Flash",
+    "base": "#EF4444"
+  },
+  "lemonSpark": {
+    "label": "Lemon Spark",
+    "base": "#FACC15"
+  },
+  "rosePetal": {
+    "label": "Rose Petal",
+    "base": "#EC4899"
+  }
+}

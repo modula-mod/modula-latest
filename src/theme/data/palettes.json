@@ -1,0 +1,223 @@
+{
+  "standard": {
+    "light": {
+      "canvas": "#FFFFFF",
+      "surface1": "#F9FAFB",
+      "surface2": "#F3F4F6",
+      "surface3": "#ECEFF1",
+      "border": "#E5E7EB",
+      "borderStrong": "#CDD3D8",
+      "textMain": "#111827",
+      "textSub": "#4B5563",
+      "textMuted": "#7B8491"
+    },
+    "dim": {
+      "canvas": "#15202B",
+      "surface1": "#1E2732",
+      "surface2": "#253341",
+      "surface3": "#2C3B49",
+      "border": "#38444D",
+      "borderStrong": "#52616C",
+      "textMain": "#F3F4F6",
+      "textSub": "#A6B2BB",
+      "textMuted": "#7F8E99"
+    },
+    "dark": {
+      "canvas": "#171717",
+      "surface1": "#222222",
+      "surface2": "#2B2B2B",
+      "surface3": "#343434",
+      "border": "#404040",
+      "borderStrong": "#595959",
+      "textMain": "#F3F4F6",
+      "textSub": "#A3A3A3",
+      "textMuted": "#7D7D7D"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#0D0D0D",
+      "surface2": "#151515",
+      "surface3": "#1D1D1D",
+      "border": "#262626",
+      "borderStrong": "#3A3A3A",
+      "textMain": "#E5E7EB",
+      "textSub": "#9CA3AF",
+      "textMuted": "#737983"
+    }
+  },
+  "forest": {
+    "dim": {
+      "canvas": "#142019",
+      "surface1": "#1A2A20",
+      "surface2": "#22352A",
+      "surface3": "#2A4033",
+      "border": "#385444",
+      "borderStrong": "#506D5A",
+      "textMain": "#F1F6F2",
+      "textSub": "#9EB0A3",
+      "textMuted": "#778B7C"
+    },
+    "dark": {
+      "canvas": "#0F1712",
+      "surface1": "#152019",
+      "surface2": "#1C2A21",
+      "surface3": "#24342A",
+      "border": "#304537",
+      "borderStrong": "#47604E",
+      "textMain": "#F1F6F2",
+      "textSub": "#9CAD9F",
+      "textMuted": "#748579"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#09100B",
+      "surface2": "#101A13",
+      "surface3": "#17231B",
+      "border": "#263A2D",
+      "borderStrong": "#3C5443",
+      "textMain": "#EAF2EC",
+      "textSub": "#95A79A",
+      "textMuted": "#6F8174"
+    }
+  },
+  "ocean": {
+    "dim": {
+      "canvas": "#13212B",
+      "surface1": "#1A2B37",
+      "surface2": "#223746",
+      "surface3": "#2A4354",
+      "border": "#36566A",
+      "borderStrong": "#4D7085",
+      "textMain": "#F1F6F8",
+      "textSub": "#9EB2BE",
+      "textMuted": "#758D9B"
+    },
+    "dark": {
+      "canvas": "#0E171D",
+      "surface1": "#142129",
+      "surface2": "#1B2C36",
+      "surface3": "#233743",
+      "border": "#304A59",
+      "borderStrong": "#466475",
+      "textMain": "#F0F5F7",
+      "textSub": "#98ACB7",
+      "textMuted": "#718793"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#071015",
+      "surface2": "#0D1A21",
+      "surface3": "#14252E",
+      "border": "#223C49",
+      "borderStrong": "#385766",
+      "textMain": "#E8F0F3",
+      "textSub": "#91A6B1",
+      "textMuted": "#6C828E"
+    }
+  },
+  "plum": {
+    "dim": {
+      "canvas": "#211824",
+      "surface1": "#2C2030",
+      "surface2": "#38283D",
+      "surface3": "#44314A",
+      "border": "#59405F",
+      "borderStrong": "#745779",
+      "textMain": "#F7F1F7",
+      "textSub": "#B8A2B8",
+      "textMuted": "#927C93"
+    },
+    "dark": {
+      "canvas": "#171118",
+      "surface1": "#211822",
+      "surface2": "#2C2030",
+      "surface3": "#37283B",
+      "border": "#4B3750",
+      "borderStrong": "#654B6A",
+      "textMain": "#F6F0F6",
+      "textSub": "#B09DB0",
+      "textMuted": "#89758A"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#100A11",
+      "surface2": "#1A111C",
+      "surface3": "#241926",
+      "border": "#3D2B41",
+      "borderStrong": "#59415E",
+      "textMain": "#F0E8F1",
+      "textSub": "#A995AA",
+      "textMuted": "#816D82"
+    }
+  },
+  "espresso": {
+    "dim": {
+      "canvas": "#241C17",
+      "surface1": "#30251E",
+      "surface2": "#3C2F26",
+      "surface3": "#48392E",
+      "border": "#5E4A3D",
+      "borderStrong": "#785F50",
+      "textMain": "#F7F3EF",
+      "textSub": "#B8A79B",
+      "textMuted": "#927F73"
+    },
+    "dark": {
+      "canvas": "#18120F",
+      "surface1": "#211915",
+      "surface2": "#2C221C",
+      "surface3": "#372B23",
+      "border": "#4B3A30",
+      "borderStrong": "#645044",
+      "textMain": "#F6F1EC",
+      "textSub": "#AE9E93",
+      "textMuted": "#87766B"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#100B08",
+      "surface2": "#1A120E",
+      "surface3": "#251A14",
+      "border": "#3E2D23",
+      "borderStrong": "#594338",
+      "textMain": "#F0EAE5",
+      "textSub": "#A6968B",
+      "textMuted": "#7F6F65"
+    }
+  },
+  "spaceGray": {
+    "dim": {
+      "canvas": "#1A1D22",
+      "surface1": "#23272D",
+      "surface2": "#2C3138",
+      "surface3": "#353B43",
+      "border": "#474E58",
+      "borderStrong": "#606975",
+      "textMain": "#F3F5F7",
+      "textSub": "#A5ADB6",
+      "textMuted": "#7D8792"
+    },
+    "dark": {
+      "canvas": "#121418",
+      "surface1": "#1A1D22",
+      "surface2": "#22262C",
+      "surface3": "#2B3037",
+      "border": "#3C424B",
+      "borderStrong": "#555D68",
+      "textMain": "#F2F4F6",
+      "textSub": "#A0A8B1",
+      "textMuted": "#78828C"
+    },
+    "oled": {
+      "canvas": "#000000",
+      "surface1": "#0B0D10",
+      "surface2": "#12151A",
+      "surface3": "#191D23",
+      "border": "#292F38",
+      "borderStrong": "#424A56",
+      "textMain": "#E9ECF0",
+      "textSub": "#98A1AB",
+      "textMuted": "#727C87"
+    }
+  }
+}
