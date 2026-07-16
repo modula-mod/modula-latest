@@ -126,7 +126,7 @@ export function MessagesInboxScreen() {
       />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[4], paddingBottom: 100}]}
+          contentContainerStyle={[styles.content, {gap: spacing[4], paddingBottom: 112}]}
           keyboardShouldPersistTaps="handled">
           <AppText variant="display">Inbox</AppText>
           <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
@@ -153,6 +153,11 @@ export function MessagesInboxScreen() {
           <AppText variant="caption" colour="textSecondary">
             Filter: {filter === 'all' ? 'All' : filter === 'unread' ? 'Unread' : 'Pinned'}
           </AppText>
+          {threads.length === 0 && query ? (
+            <AppText variant="body" colour="textSecondary">
+              No conversations match this search.
+            </AppText>
+          ) : null}
           {threads.map(thread => (
             <ModulaContextMenu
               key={thread.id}
@@ -160,10 +165,10 @@ export function MessagesInboxScreen() {
               actions={[
                 {
                   id: 'pin',
-                  label: pinnedIds.has(thread.id) ? 'Unpin — Preview' : 'Pin — Preview',
+                  label: pinnedIds.has(thread.id) ? 'Unpin' : 'Pin',
                 },
-                {id: 'mute', label: 'Mute — Preview'},
-                {id: 'delete', label: 'Delete — Preview', style: 'destructive'},
+                {id: 'mute', label: 'Mute preview'},
+                {id: 'delete', label: 'Delete preview', style: 'destructive'},
               ]}
               onAction={id => {
                 if (id === 'pin') {

@@ -16,8 +16,10 @@ import {useDiscoverQuery} from '@/features/discover/data'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
+import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DiscoverResult} from '@/domain/discovery'
@@ -30,6 +32,7 @@ const categories: Category[] = ['For You', 'People', 'Communities', 'Marketplace
 export function DiscoverScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
@@ -47,7 +50,10 @@ export function DiscoverScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[
+            styles.content,
+            {gap: spacing[5], paddingBottom: tabPadding},
+          ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
@@ -269,6 +275,18 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   return (
     <Section title="Suggested people">
+      {people.length > 1 ? (
+        <StackedAvatars
+          faces={people.slice(0, 5).map(profile => ({
+            id: profile.id,
+            name: profile.displayName,
+            uri: profile.avatarUri,
+            colour: profile.coverColour,
+          }))}
+          size={36}
+          max={4}
+        />
+      ) : null}
       <View style={{gap: spacing[3]}}>
         {people.map(profile => {
           const profileRoute = getProfileRouteForIdentity(profile, ownerProfileId)

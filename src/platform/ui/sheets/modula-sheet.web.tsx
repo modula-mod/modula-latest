@@ -10,6 +10,7 @@ export type ModulaSheetProps = {
   snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
   showDragIndicator?: boolean
   testID?: string
+  material?: 'solid' | 'glass'
 }
 
 /** Accessible web/dialog fallback for ModulaSheet. */

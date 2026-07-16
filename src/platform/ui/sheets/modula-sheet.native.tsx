@@ -1,7 +1,9 @@
 import {BottomSheet} from '@expo/ui'
+import {BlurView} from 'expo-blur'
 import type {ReactNode} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {Platform, StyleSheet, View} from 'react-native'
 
+import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ModulaSheetProps = {
@@ -12,6 +14,8 @@ export type ModulaSheetProps = {
   snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
   showDragIndicator?: boolean
   testID?: string
+  /** Prefer glass material when Reduce Transparency is off. */
+  material?: 'solid' | 'glass'
 }
 
 /**
@@ -26,8 +30,14 @@ export function ModulaSheet({
   snapPoints = ['half', 'full'],
   showDragIndicator = true,
   testID,
+  material = 'glass',
 }: ModulaSheetProps) {
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, scheme} = useThemeTokens()
+  const {reduceTransparency} = useSystemAccessibility()
+  const useGlass =
+    material === 'glass' &&
+    !reduceTransparency &&
+    Platform.OS === 'ios'
 
   return (
     <BottomSheet
@@ -36,9 +46,24 @@ export function ModulaSheet({
       showDragIndicator={showDragIndicator}
       snapPoints={snapPoints}
       testID={testID}>
-      <View style={[styles.body, {backgroundColor: colours.surface, padding: spacing[4]}]}>
-        {children}
-      </View>
+      {useGlass ? (
+        <BlurView
+          intensity={48}
+          tint={scheme === 'dark' ? 'dark' : 'light'}
+          style={[styles.body, {padding: spacing[4]}]}>
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {backgroundColor: colours.surface, opacity: 0.55},
+            ]}
+          />
+          <View style={styles.content}>{children}</View>
+        </BlurView>
+      ) : (
+        <View style={[styles.body, {backgroundColor: colours.surface, padding: spacing[4]}]}>
+          {children}
+        </View>
+      )}
     </BottomSheet>
   )
 }
@@ -46,5 +71,10 @@ export function ModulaSheet({
 const styles = StyleSheet.create({
   body: {
     flex: 1,
+    overflow: 'hidden',
+  },
+  content: {
+    flex: 1,
+    zIndex: 1,
   },
 })

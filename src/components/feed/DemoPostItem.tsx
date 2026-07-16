@@ -12,9 +12,15 @@ import {Divider} from '@/components/primitives/Divider'
 import {Surface} from '@/components/primitives/Surface'
 import {PendingMutationBadge} from '@/components/data/PendingMutationBadge'
 import {useLikePostMutation, useRepostMutation, useSavePostMutation} from '@/features/feed/data'
-import {openPostMoreMenu, runPostOverflowAction} from '@/features/feed/postActions'
+import {
+  buildPostOverflowActions,
+  runPostOverflowAction,
+  type PostOverflowActionId,
+} from '@/features/feed/postActions'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {SocialPost} from '@/domain/social'
 
@@ -49,68 +55,79 @@ export function DemoPostItem({post}: DemoPostItemProps) {
   const session = useSession()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(post.author, ownerProfileId)
+  const overflowActions = buildPostOverflowActions(post)
+  const runOverflow = (id: string) => {
+    void runPostOverflowAction(id as PostOverflowActionId, post)
+  }
 
   return (
     <View>
-      <View style={[styles.row, {gap: spacing[3], padding: spacing[4]}]}>
-        <AppPressable
-          accessibilityLabel={`Open ${post.author.displayName} profile`}
-          onPress={() => router.push(profileRoute)}
-          style={styles.authorAvatar}>
-          <Avatar
-            name={post.author.displayName}
-            uri={post.author.avatarUri}
-            colour={post.author.coverColour}
-            size={42}
-          />
-        </AppPressable>
-        <View style={styles.body}>
-          <View style={styles.meta}>
-            <View style={styles.metaText}>
-              <AppPressable
-                accessibilityLabel={`Open ${post.author.displayName} profile`}
-                onPress={() => router.push(profileRoute)}
-                style={styles.authorTextButton}>
-                <AppText variant="label" numberOfLines={1}>
-                  {post.author.displayName}
-                </AppText>
-              </AppPressable>
-              <AppPressable
-                accessibilityLabel={`Open ${post.author.handle} profile`}
-                onPress={() => router.push(profileRoute)}
-                style={styles.authorTextButton}>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-                  @{post.author.handle} · {formatRelative(post.createdAt)}
-                </AppText>
-              </AppPressable>
+      <ModulaContextMenu
+        accessibilityLabel={`Post by ${post.author.displayName}`}
+        actions={overflowActions}
+        onAction={runOverflow}>
+        <View style={[styles.row, {gap: spacing[3], padding: spacing[4]}]}>
+          <AppPressable
+            accessibilityLabel={`Open ${post.author.displayName} profile`}
+            onPress={() => router.push(profileRoute)}
+            style={styles.authorAvatar}>
+            <Avatar
+              name={post.author.displayName}
+              uri={post.author.avatarUri}
+              colour={post.author.coverColour}
+              size={42}
+            />
+          </AppPressable>
+          <View style={styles.body}>
+            <View style={styles.meta}>
+              <View style={styles.metaText}>
+                <AppPressable
+                  accessibilityLabel={`Open ${post.author.displayName} profile`}
+                  onPress={() => router.push(profileRoute)}
+                  style={styles.authorTextButton}>
+                  <AppText variant="label" numberOfLines={1}>
+                    {post.author.displayName}
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel={`Open ${post.author.handle} profile`}
+                  onPress={() => router.push(profileRoute)}
+                  style={styles.authorTextButton}>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                    @{post.author.handle} · {formatRelative(post.createdAt)}
+                  </AppText>
+                </AppPressable>
+              </View>
+              <ModulaMenu
+                accessibilityLabel="Open post actions"
+                title="Post options"
+                actions={overflowActions}
+                onAction={runOverflow}
+                trigger={
+                  <View style={styles.moreButton}>
+                    <AppIcon name="more" colour={colours.textTertiary} size={20} />
+                  </View>
+                }
+              />
             </View>
-            <AppPressable
-              accessibilityLabel="Open post actions"
-              accessibilityHint="Translate, copy, share, mute, report, and more"
-              onPress={() => void openPostMoreMenu(post)}
-              style={styles.moreButton}>
-              <AppIcon name="more" colour={colours.textTertiary} size={20} />
-            </AppPressable>
+            <PostBody post={post} />
+            {post.optimisticState === 'pending' ? (
+              <View style={{marginTop: spacing[2]}}>
+                <PendingMutationBadge label="Posting" />
+              </View>
+            ) : null}
+            {post.optimisticState === 'failed' ? (
+              <View style={{marginTop: spacing[2]}}>
+                <PendingMutationBadge label="Failed" />
+              </View>
+            ) : null}
+            <PostActions
+              post={post}
+              onReply={() => router.push(`/post/${post.id}` as Href)}
+            />
           </View>
-          <PostBody post={post} />
-          {post.optimisticState === 'pending' ? (
-            <View style={{marginTop: spacing[2]}}>
-              <PendingMutationBadge label="Posting" />
-            </View>
-          ) : null}
-          {post.optimisticState === 'failed' ? (
-            <View style={{marginTop: spacing[2]}}>
-              <PendingMutationBadge label="Failed" />
-            </View>
-          ) : null}
-          <PostActions
-            post={post}
-            onReply={() =>
-              router.push(`/post/${post.id}` as Href)
-            }
-          />
         </View>
-      </View>
+      </ModulaContextMenu>
       <Divider />
     </View>
   )

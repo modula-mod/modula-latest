@@ -48,10 +48,11 @@ export function AdaptiveAccountPanel() {
         })
         notifyPresentationDismissed('swipe')
       }}
-      snapPoints={compact ? ['half', 'full'] : ['full']}
+      snapPoints={compact ? [{fraction: 0.72}, 'full'] : ['full']}
+      material="glass"
       testID="adaptive-account-panel">
       <ScrollView
-        contentContainerStyle={{paddingBottom: spacing[6], gap: spacing[3]}}
+        contentContainerStyle={{paddingBottom: spacing[8], gap: spacing[3]}}
         keyboardShouldPersistTaps="handled">
         <AppPressable
           accessibilityLabel="Open profile"
@@ -128,7 +129,7 @@ export function AdaptiveAccountPanel() {
             item={{
               label: 'Switch account',
               icon: 'switch',
-              description: 'Local account switcher Preview',
+              description: 'Local account switcher',
             }}
             onPress={() => navigate('/account/switcher')}
           />
@@ -136,7 +137,7 @@ export function AdaptiveAccountPanel() {
             item={{
               label: 'Quick appearance',
               icon: 'appearance',
-              description: 'Colour mode and accent',
+              description: 'Colour mode, accent, materials',
             }}
             onPress={() => navigate('/settings/appearance')}
           />

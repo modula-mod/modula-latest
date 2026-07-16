@@ -8,7 +8,8 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type DrawerItemModel = {
   label: string
   icon: AppIconName
-  description: string
+  /** Optional; prefer 2-line captions or omit for dense account-panel rows. */
+  description?: string
 }
 
 type DrawerItemProps = {
@@ -32,9 +33,11 @@ export function DrawerItem({item, onPress}: DrawerItemProps) {
       </View>
       <View style={styles.body}>
         <AppText variant="label">{item.label}</AppText>
-        <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-          {item.description}
-        </AppText>
+        {item.description ? (
+          <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+            {item.description}
+          </AppText>
+        ) : null}
       </View>
       <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
     </AppPressable>

@@ -1,6 +1,6 @@
 import {Button, ContextMenu, Host} from '@expo/ui/swift-ui'
 import type {ReactNode} from 'react'
-import {View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
@@ -16,6 +16,10 @@ type ModulaContextMenuProps = {
 /**
  * iOS long-press ContextMenu via Expo UI SwiftUI.
  * Features import this wrapper only — never `@expo/ui/swift-ui`.
+ *
+ * Important: do NOT use Host `matchContents` around full-width flex rows.
+ * SwiftUI intrinsic sizing crushed Activity / list rows into a narrow column
+ * (see docs/validation/phase4-5-ui-bugs/01-activity-broken.png).
  */
 export function ModulaContextMenu({
   children,
@@ -25,13 +29,13 @@ export function ModulaContextMenu({
   disabled,
 }: ModulaContextMenuProps) {
   if (disabled) {
-    return <View accessibilityLabel={accessibilityLabel}>{children}</View>
+    return <View style={styles.fill}>{children}</View>
   }
 
   const actionable = actions.filter(action => !action.disabled)
 
   return (
-    <Host matchContents style={{alignSelf: 'stretch'}}>
+    <Host style={styles.fill}>
       <ContextMenu>
         <ContextMenu.Items>
           {actionable.map(action => (
@@ -44,9 +48,18 @@ export function ModulaContextMenu({
           ))}
         </ContextMenu.Items>
         <ContextMenu.Trigger>
-          <View accessibilityLabel={accessibilityLabel}>{children}</View>
+          <View style={styles.fill} accessibilityLabel={accessibilityLabel}>
+            {children}
+          </View>
         </ContextMenu.Trigger>
       </ContextMenu>
     </Host>
   )
 }
+
+const styles = StyleSheet.create({
+  fill: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+})

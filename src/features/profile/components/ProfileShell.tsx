@@ -2,7 +2,7 @@ import {useMemo, useState, type ReactNode} from 'react'
 import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {InitialLoadingState, QueryErrorState} from '@/components/data'
+import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -27,6 +27,8 @@ import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-que
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -54,6 +56,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {tab} = useLocalSearchParams<{tab?: string}>()
   const {width} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const registry = useProfileRegistry()
   const {presentation} = useProfile()
   const ownerQuery = useOwnerProfileQuery()
@@ -96,7 +99,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
         <ResponsiveContent>
-          <InitialLoadingState label="Loading profile" />
+          <ProfileHeroSkeleton />
         </ResponsiveContent>
       </View>
     )
@@ -188,7 +191,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[styles.scrollContent, {paddingBottom: spacing[8]}]}>
+      contentContainerStyle={[styles.scrollContent, {paddingBottom: tabPadding}]}>
       {mode === 'preview' ? <PreviewBar /> : null}
       {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
       {presentation.layoutId === 'creator' && !isExpanded ? (

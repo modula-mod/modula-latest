@@ -12,9 +12,14 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {usePostQuery} from '@/features/feed/data'
-import {openPostMoreMenu} from '@/features/feed/postActions'
+import {
+  buildPostOverflowActions,
+  runPostOverflowAction,
+  type PostOverflowActionId,
+} from '@/features/feed/postActions'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -58,12 +63,19 @@ export function PostDetailScreen() {
         title="Post"
         right={
           post ? (
-            <AppPressable
+            <ModulaMenu
               accessibilityLabel="Post options"
-              onPress={() => void openPostMoreMenu(post)}
-              style={styles.headerMore}>
-              <AppIcon name="more" colour={colours.textSecondary} />
-            </AppPressable>
+              title="Post options"
+              actions={buildPostOverflowActions(post)}
+              onAction={id => {
+                void runPostOverflowAction(id as PostOverflowActionId, post)
+              }}
+              trigger={
+                <View style={styles.headerMore}>
+                  <AppIcon name="more" colour={colours.textSecondary} />
+                </View>
+              }
+            />
           ) : null
         }
       />

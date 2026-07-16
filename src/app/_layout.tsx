@@ -1,5 +1,6 @@
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
+import {useEffect} from 'react'
 
 import {NetworkStatusBanner} from '@/components/data/NetworkStatusBanner'
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
@@ -11,6 +12,7 @@ import {
   AccountPanelProvider,
   AdaptiveAccountPanel,
 } from '@/platform/ui'
+import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 import {AppServicesProvider} from '@/runtime'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
@@ -60,6 +62,10 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    hideExpoDevToolsButton()
+  }, [])
+
   return (
     <AppErrorBoundary>
       <AppearanceProvider>

@@ -82,11 +82,11 @@ type ExpandAction = {
 }
 
 const EXPAND_ACTIONS: ExpandAction[] = [
-  {id: 'compose', label: 'New Post', icon: 'create', compose: true},
+  {id: 'compose', label: 'Compose', icon: 'create', compose: true},
   {id: 'messages', label: 'Messages', icon: 'messages', href: '/messages'},
-  {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
   {id: 'marketplace', label: 'Marketplace', icon: 'marketplace', href: '/marketplace'},
-  {id: 'settings', label: 'Settings', icon: 'settings', href: '/settings'},
+  {id: 'discover', label: 'Search / Discover', icon: 'search', href: '/discover'},
+  {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
 ]
 
 function GlassSurface({
@@ -150,7 +150,7 @@ export function ModulaLiquidGlassTabBar({
 
   const menuStyle = useAnimatedStyle(() => ({
     height: expanded
-      ? withTiming(reduceMotion ? 280 : 300, {duration: reduceMotion ? 0 : 150})
+      ? withTiming(reduceMotion ? 300 : 320, {duration: reduceMotion ? 0 : 150})
       : withTiming(0, {duration: reduceMotion ? 0 : 150}),
     opacity: expanded
       ? withTiming(1, {duration: reduceMotion ? 0 : 150})
@@ -281,9 +281,9 @@ export function ModulaLiquidGlassTabBar({
                   }}>
                   {action.label}
                 </AppText>
-                {index === 0 ? (
+                {action.compose ? (
                   <AppText variant="caption" colour="textSecondary">
-                    Compose
+                    Quick
                   </AppText>
                 ) : null}
               </AppPressable>
