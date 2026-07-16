@@ -6,8 +6,11 @@ import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
 import {SessionProvider} from '@/auth/runtime'
 import {QueryRuntimeProvider} from '@/data/query'
 import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
+import {
+  AccountPanelProvider,
+  AdaptiveAccountPanel,
+} from '@/platform/ui'
 import {AppServicesProvider} from '@/runtime'
-import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -18,7 +21,7 @@ function RootNavigator() {
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <Stack
+      <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: {backgroundColor: colours.canvas},
@@ -28,7 +31,6 @@ function RootNavigator() {
         <Stack.Screen name="compose" options={{presentation: 'modal'}} />
         <Stack.Screen name="reels" />
         <Stack.Screen name="post/[postId]" />
-        <Stack.Screen name="board" />
         <Stack.Screen name="messages" />
         <Stack.Screen name="saved" />
         <Stack.Screen name="communities" />
@@ -37,7 +39,7 @@ function RootNavigator() {
         <Stack.Screen name="marketplace" />
         <Stack.Screen name="settings" />
       </Stack>
-      <NavigationDrawer />
+      <AdaptiveAccountPanel />
     </>
   )
 }
@@ -50,10 +52,12 @@ export default function RootLayout() {
           <QueryRuntimeProvider>
             <SessionProvider>
               <ProfilePresentationProvider>
-                <ShellDrawerProvider>
-                  <RootNavigator />
-                  <NetworkStatusBanner />
-                </ShellDrawerProvider>
+                <AccountPanelProvider>
+                  <ShellDrawerProvider>
+                    <RootNavigator />
+                    <NetworkStatusBanner />
+                  </ShellDrawerProvider>
+                </AccountPanelProvider>
               </ProfilePresentationProvider>
             </SessionProvider>
           </QueryRuntimeProvider>

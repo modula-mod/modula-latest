@@ -2,15 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
-  useRef,
   type PropsWithChildren,
 } from 'react'
 import {Animated} from 'react-native'
 
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
 
 export type DrawerPhase = 'closed' | 'opening' | 'open' | 'closing'
 
@@ -27,73 +24,38 @@ type ShellDrawerContextValue = {
 
 const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
+/**
+ * Compatibility shim over AccountPanelProvider.
+ * Prefer openAccountPanel / closeAccountPanel in new code.
+ */
 export function ShellDrawerProvider({children}: PropsWithChildren) {
-  const {motion} = useThemeTokens()
-  const [progress] = useState(() => new Animated.Value(0))
-  const phaseRef = useRef<DrawerPhase>('closed')
-  const afterCloseRef = useRef<(() => void) | undefined>(undefined)
-  const [phase, setPhaseState] = useState<DrawerPhase>('closed')
-
-  const setPhase = useCallback((next: DrawerPhase) => {
-    phaseRef.current = next
-    setPhaseState(next)
-  }, [])
+  const {state, openAccountPanel, closeAccountPanel} = useAccountPanel()
+  const [progress] = useMemo(() => [new Animated.Value(0)], [])
 
   const openDrawer = useCallback(() => {
-    if (phaseRef.current === 'opening' || phaseRef.current === 'open') {
-      return
-    }
-    progress.stopAnimation()
-    afterCloseRef.current = undefined
-    setPhase('opening')
-    Animated.timing(progress, {
-      toValue: 1,
-      duration: motion.normal,
-      useNativeDriver: true,
-    }).start(({finished}) => {
-      setPhase(finished ? 'open' : 'closed')
-    })
-  }, [motion.normal, progress, setPhase])
+    openAccountPanel('shell-drawer-shim')
+  }, [openAccountPanel])
 
   const closeDrawer = useCallback(
     (options?: CloseDrawerOptions) => {
-      if (phaseRef.current === 'closing' || phaseRef.current === 'closed') {
-        return
-      }
-      progress.stopAnimation()
-      afterCloseRef.current = options?.afterClose
-      setPhase('closing')
-      Animated.timing(progress, {
-        toValue: 0,
-        duration: motion.fast,
-        useNativeDriver: true,
-      }).start(({finished}) => {
-        setPhase(finished ? 'closed' : 'open')
-        if (finished) {
-          const afterClose = afterCloseRef.current
-          afterCloseRef.current = undefined
-          afterClose?.()
-        }
-      })
+      closeAccountPanel('explicit')
+      options?.afterClose?.()
     },
-    [motion.fast, progress, setPhase],
+    [closeAccountPanel],
   )
 
-  useEffect(() => {
-    return () => {
-      progress.stopAnimation()
-    }
-  }, [progress])
-
   const value = useMemo<ShellDrawerContextValue>(
-    () => ({phase, progress, openDrawer, closeDrawer}),
-    [phase, progress, openDrawer, closeDrawer],
+    () => ({
+      phase: state.status,
+      progress,
+      openDrawer,
+      closeDrawer,
+    }),
+    [state.status, progress, openDrawer, closeDrawer],
   )
 
   return (
-    <ShellDrawerContext.Provider value={value}>
-      {children}
-    </ShellDrawerContext.Provider>
+    <ShellDrawerContext.Provider value={value}>{children}</ShellDrawerContext.Provider>
   )
 }
 

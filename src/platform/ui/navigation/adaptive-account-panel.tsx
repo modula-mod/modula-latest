@@ -1,0 +1,168 @@
+import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
+
+import {Avatar} from '@/components/primitives/Avatar'
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
+import {Divider} from '@/components/primitives/Divider'
+import {useSession, useSessionActions} from '@/auth/runtime'
+import {isDevelopmentBuild} from '@/lib/platform'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
+import {emitAccountPanelEvent} from '@/platform/ui/navigation/account-panel-events'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {DrawerItem} from '@/shell/DrawerItem'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {DrawerDestination} from '@/types/navigation'
+
+const panelDestinations: DrawerDestination[] = [
+  {
+    label: 'Board',
+    route: '/board',
+    icon: 'board',
+    description: 'Focus, modules, and recent activity',
+  },
+  {
+    label: 'Saved',
+    route: '/saved',
+    icon: 'saved',
+    description: 'Posts, links, and module notes',
+  },
+  {
+    label: 'Messages',
+    route: '/messages',
+    icon: 'messages',
+    description: 'Private conversation preview',
+  },
+  {
+    label: 'Appearance',
+    route: '/settings/appearance',
+    icon: 'appearance',
+    description: 'Colour, accent, and materials',
+  },
+  {
+    label: 'Settings',
+    route: '/settings',
+    icon: 'settings',
+    description: 'Account and shell preferences',
+  },
+]
+
+/**
+ * Adaptive account panel:
+ * - compact: ModulaSheet (native BottomSheet)
+ * - wide: same sheet content (popover/split can refine later)
+ * Top-level destinations remain native tabs.
+ */
+export function AdaptiveAccountPanel() {
+  const router = useRouter()
+  const {width} = useWindowDimensions()
+  const {spacing} = useThemeTokens()
+  const session = useSession()
+  const {signOut} = useSessionActions()
+  const {isVisible, state, closeAccountPanel, notifyPresentationDismissed} =
+    useAccountPanel()
+  const ownerProfile = session.status === 'signedIn' ? session.profile : null
+  const compact = width < 768
+
+  const navigate = (route: string) => {
+    closeAccountPanel('route')
+    router.push(route as Href)
+  }
+
+  return (
+    <ModulaSheet
+      isPresented={isVisible}
+      onDismiss={() => {
+        emitAccountPanelEvent('accountPanel.backdrop.press', state, {
+          source: 'sheet-dismiss',
+        })
+        notifyPresentationDismissed('swipe')
+      }}
+      snapPoints={compact ? ['half', 'full'] : ['full']}
+      testID="adaptive-account-panel">
+      <ScrollView
+        contentContainerStyle={{paddingBottom: spacing[6], gap: spacing[3]}}
+        keyboardShouldPersistTaps="handled">
+        <AppPressable
+          accessibilityLabel="Open profile"
+          onPress={() => navigate('/profile')}
+          style={[styles.identity, {gap: spacing[3]}]}>
+          <Avatar
+            name={
+              ownerProfile?.displayName ??
+              (session.status === 'guest' ? 'Guest' : 'Modula')
+            }
+            uri={ownerProfile?.avatarUri}
+            colour={ownerProfile?.coverColour}
+            size={56}
+          />
+          <View style={styles.identityText}>
+            <AppText variant="headline">
+              {ownerProfile?.displayName ??
+                (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
+            </AppText>
+            <AppText variant="caption" colour="textSecondary">
+              {ownerProfile
+                ? `@${ownerProfile.handle}`
+                : session.status === 'guest'
+                  ? 'Browsing public Modula'
+                  : 'Local prototype account'}
+            </AppText>
+          </View>
+        </AppPressable>
+
+        <Divider />
+
+        <View style={{gap: spacing[2]}}>
+          {panelDestinations.map(item => (
+            <DrawerItem
+              key={item.route}
+              item={item}
+              onPress={() => navigate(item.route)}
+            />
+          ))}
+          {isDevelopmentBuild() ? (
+            <DrawerItem
+              item={{
+                label: 'Developer',
+                route: '/settings/developer',
+                icon: 'developer',
+                description: 'Diagnostics and local tools',
+              }}
+              onPress={() => navigate('/settings/developer')}
+            />
+          ) : null}
+        </View>
+
+        <Divider />
+
+        {session.status === 'signedIn' ? (
+          <ModulaButton
+            label="Sign out"
+            role="destructive"
+            onPress={() => {
+              closeAccountPanel('session')
+              void signOut()
+            }}
+          />
+        ) : null}
+
+        <AppText variant="caption" colour="textSecondary">
+          Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
+        </AppText>
+      </ScrollView>
+    </ModulaSheet>
+  )
+}
+
+const styles = StyleSheet.create({
+  identity: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  identityText: {
+    flex: 1,
+    minWidth: 0,
+  },
+})

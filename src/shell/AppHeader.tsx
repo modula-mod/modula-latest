@@ -34,7 +34,7 @@ export function AppHeader({centre}: AppHeaderProps) {
         },
       ]}>
       <View style={[styles.row, {paddingHorizontal: spacing[4]}]}>
-        <AppPressableAvatar onPress={openDrawer} />
+        <AppPressableAvatar onPress={openDrawer} accessibilityLabel="Open account panel" />
         <View style={styles.center}>{centre ?? <ModulaWordmark />}</View>
         <View style={styles.actions}>
           <IconButton
@@ -56,12 +56,18 @@ export function AppHeader({centre}: AppHeaderProps) {
   )
 }
 
-function AppPressableAvatar({onPress}: {onPress: () => void}) {
+function AppPressableAvatar({
+  onPress,
+  accessibilityLabel,
+}: {
+  onPress: () => void
+  accessibilityLabel: string
+}) {
   const session = useSession()
   const profile = session.status === 'signedIn' ? session.profile : null
   return (
     <AppPressable
-      accessibilityLabel="Open Modula drawer"
+      accessibilityLabel={accessibilityLabel}
       onPress={() => {
         void selectionHaptic()
         onPress()
