@@ -26,6 +26,13 @@ export type SemanticColours = {
   focusRing: string
   selection: string
   mediaGlowFallback: string
+  /** Overlay text/controls on media (Reels, full-bleed images). */
+  mediaOverlayText: string
+  mediaOverlaySecondary: string
+  mediaOverlayIcon: string
+  mediaOverlayScrim: string
+  mediaOverlayControlBackground: string
+  mediaOverlayShadow: string
 }
 
 export type AccentTokens = {
