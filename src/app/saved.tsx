@@ -1,5 +1,5 @@
-import {SavedScreen} from '@/features/secondary/screens/SecondaryPreviewScreens'
+import {SavedPostsScreen} from '@/features/saved/screens/SavedPostsScreen'
 
 export default function SavedRoute() {
-  return <SavedScreen />
+  return <SavedPostsScreen />
 }

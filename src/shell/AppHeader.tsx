@@ -7,7 +7,7 @@ import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {Avatar} from '@/components/primitives/Avatar'
 import {IconButton} from '@/components/primitives/IconButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
-import {currentDemoProfile} from '@/demo/demoProfiles'
+import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaWordmark} from '@/shell/ModulaWordmark'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -57,6 +57,8 @@ export function AppHeader({centre}: AppHeaderProps) {
 }
 
 function AppPressableAvatar({onPress}: {onPress: () => void}) {
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   return (
     <AppPressable
       accessibilityLabel="Open Modula drawer"
@@ -66,8 +68,9 @@ function AppPressableAvatar({onPress}: {onPress: () => void}) {
       }}
       style={styles.avatarButton}>
       <Avatar
-        name={currentDemoProfile.displayName}
-        colour={currentDemoProfile.avatarColour}
+        name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+        uri={profile?.avatarUri}
+        colour={profile?.coverColour}
         size={36}
       />
     </AppPressable>

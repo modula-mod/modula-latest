@@ -1,7 +1,17 @@
 import {FeaturePreviewScreen} from '@/components/system/FeaturePreviewScreen'
-import {demoModules} from '@/demo/demoModules'
+import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
+import {useCapability} from '@/auth/runtime'
 
 export function MessagesScreen() {
+  const canAccessMessages = useCapability('messages:access')
+  if (!canAccessMessages) {
+    return (
+      <ProtectedActionPrompt
+        visible
+        description="Messages will use the same session and repository architecture. Sign in to continue."
+      />
+    )
+  }
   return (
     <FeaturePreviewScreen
       title="Messages"
@@ -94,16 +104,37 @@ export function TeamsScreen() {
 }
 
 export function ModulesScreen() {
+  const moduleCards = [
+    {
+      title: 'Vault Notes',
+      description: 'Private notes that can attach to posts, Boards, and profile surfaces.',
+      icon: 'saved' as const,
+      actionLabel: 'Preview',
+    },
+    {
+      title: 'Tasks',
+      description: 'Plan work from social context without leaving your profile OS.',
+      icon: 'check' as const,
+      actionLabel: 'Local',
+    },
+    {
+      title: 'CRM',
+      description: 'Relationship memory for teams, builders, clients, and communities.',
+      icon: 'people' as const,
+      actionLabel: 'Preview',
+    },
+    {
+      title: 'Automations',
+      description: 'Local workflow cards that can later become governed actions.',
+      icon: 'automation' as const,
+      actionLabel: 'Simulated',
+    },
+  ]
   return (
     <FeaturePreviewScreen
       title="Modules"
       description="Install capabilities that become part of your Modula environment."
-      cards={demoModules.slice(0, 4).map(module => ({
-        title: module.name,
-        description: module.description,
-        icon: module.icon,
-        actionLabel: module.status,
-      }))}
+      cards={moduleCards}
     />
   )
 }

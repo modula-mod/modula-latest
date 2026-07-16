@@ -3,34 +3,43 @@ import {FlatList, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useRouter} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {demoReels, type DemoReel} from '@/demo/demoReels'
+import {useSession} from '@/auth/runtime'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
+import {useReelsQuery} from '@/features/reels/data'
 import {selectionHaptic} from '@/lib/haptics'
 import {strongestReadableForeground} from '@/theme/accents'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {ReelItem as ReelItemType} from '@/domain/discovery'
 
 export function ReelsScreen() {
   const {height, width} = useWindowDimensions()
   const {colours} = useThemeTokens()
+  const reelsQuery = useReelsQuery()
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <FeatureErrorBoundary label="Reels">
-        <FlatList
-          data={demoReels}
-          keyExtractor={item => item.id}
-          pagingEnabled
-          showsVerticalScrollIndicator={false}
-          renderItem={({item}) => (
-            <ReelItem reel={item} height={height} width={width} />
+        {reelsQuery.isLoading ? (
+          <InitialLoadingState label="Loading reels" />
+        ) : reelsQuery.isError ? (
+          <QueryErrorState error={reelsQuery.error} onRetry={() => void reelsQuery.refetch()} />
+        ) : (
+          <FlatList
+            data={reelsQuery.data ?? []}
+            keyExtractor={item => item.id}
+            pagingEnabled
+            showsVerticalScrollIndicator={false}
+            renderItem={({item}) => (
+              <ReelItem reel={item} height={height} width={width} />
+            )}
+          />
           )}
-        />
       </FeatureErrorBoundary>
     </View>
   )
@@ -41,18 +50,19 @@ function ReelItem({
   height,
   width,
 }: {
-  reel: DemoReel
+  reel: ReelItemType
   height: number
   width: number
 }) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const [liked, setLiked] = useState(reel.liked)
-  const {ownerProfile} = useProfile()
+  const session = useSession()
   const {accessibility, colours, spacing} = useThemeTokens()
 
   const overlayColour = strongestReadableForeground(reel.colour)
-  const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfile.id)
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
+  const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfileId)
 
   return (
     <View
@@ -107,7 +117,8 @@ function ReelItem({
             style={styles.creator}>
             <Avatar
               name={reel.author.displayName}
-              colour={reel.author.avatarColour}
+              uri={reel.author.avatarUri}
+              colour={reel.author.coverColour}
               size={36}
             />
             <AppText variant="headline" style={{color: overlayColour}}>

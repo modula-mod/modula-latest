@@ -9,6 +9,7 @@ import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 
 type SettingsRow = {
   title: string
@@ -32,9 +33,10 @@ const rows: SettingsRow[] = [
     route: '/profile/customize',
   },
   {
-    title: 'Account details - Preview',
-    description: 'Future production account information.',
+    title: 'Account',
+    description: 'Session and local prototype account information.',
     icon: 'account',
+    route: '/settings/account',
   },
   {
     title: 'Connected accounts - Preview',
@@ -85,9 +87,9 @@ const rows: SettingsRow[] = [
   },
   {
     title: 'Developer',
-    description: 'Appearance Lab and local validation tools.',
+    description: 'Data runtime, session and local validation tools.',
     icon: 'developer',
-    route: '/settings/appearance-lab',
+    route: '/settings/developer',
   },
 ]
 
@@ -121,6 +123,7 @@ export function SettingsHomeScreen() {
           </View>
           <MaterialSurface role="card" style={styles.list}>
             {rows.map((row, index) => (
+              runtimeEnvironment.appEnvironment !== 'development' && row.title === 'Developer' ? null :
               <SettingsListRow
                 key={row.title}
                 row={{...row, value: values[row.title] ?? row.value}}
@@ -130,7 +133,7 @@ export function SettingsHomeScreen() {
                     router.push(row.route as Href)
                     return
                   }
-                  Alert.alert(row.title, `${row.description}\n\nThis preview is not functional in Phase 2.`)
+                  Alert.alert(row.title, `${row.description}\n\nThis preview is not functional in Phase 4.`)
                 }}
               />
             ))}

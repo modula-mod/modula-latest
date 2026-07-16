@@ -6,7 +6,7 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
-import {currentDemoProfile} from '@/demo/demoProfiles'
+import {useSession} from '@/auth/runtime'
 import {CreateTabButton} from '@/shell/CreateTabButton'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -50,6 +50,8 @@ export function MainTabBar({state, descriptors, navigation}: MainTabBarProps) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   const showLabels = width >= 390
 
   return (
@@ -95,8 +97,9 @@ export function MainTabBar({state, descriptors, navigation}: MainTabBarProps) {
               style={styles.tab}>
               {route.name === 'profile' ? (
                 <Avatar
-                  name={currentDemoProfile.displayName}
-                  colour={currentDemoProfile.avatarColour}
+                  name={profile?.displayName ?? 'Profile'}
+                  uri={profile?.avatarUri}
+                  colour={profile?.coverColour}
                   size={26}
                   style={[
                     styles.profileAvatar,

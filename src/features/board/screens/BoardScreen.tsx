@@ -6,9 +6,9 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {demoActivity} from '@/demo/demoActivity'
-import {demoModules} from '@/demo/demoModules'
-import {useProfile} from '@/features/profile/runtime/useProfile'
+import {useSession} from '@/auth/runtime'
+import {useActivityQuery} from '@/features/activity/data'
+import {useDiscoverQuery} from '@/features/discover/data'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -16,7 +16,12 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
-  const {ownerProfile} = useProfile()
+  const session = useSession()
+  const discoverQuery = useDiscoverQuery()
+  const activityQuery = useActivityQuery()
+  const ownerName = session.status === 'signedIn' ? session.profile.displayName : 'there'
+  const modules = discoverQuery.data?.featuredModules ?? []
+  const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -26,7 +31,7 @@ export function BoardScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Good focus, {ownerProfile.displayName}</AppText>
+            <AppText variant="display">Good focus, {ownerName}</AppText>
             <AppText variant="body" colour="textSecondary">
               Your local Modula Board gathers the next useful actions without requiring a backend.
             </AppText>
@@ -121,7 +126,7 @@ export function BoardScreen() {
             <View style={{gap: spacing[3]}}>
               <AppText variant="headline">Modules</AppText>
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
-                {demoModules.map(module => (
+                {modules.map(module => (
                   <AppPressable
                     key={module.id}
                     accessibilityLabel={`Open ${module.name}`}
@@ -152,7 +157,7 @@ export function BoardScreen() {
           </FeatureErrorBoundary>
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Recent activity</AppText>
-            {demoActivity.slice(0, 3).map(item => (
+            {activity.slice(0, 3).map(item => (
               <Surface
                 key={item.id}
                 variant="plain"

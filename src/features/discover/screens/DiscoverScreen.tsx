@@ -2,51 +2,43 @@ import {useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {parseProfileId} from '@/api/contracts'
+import {useCapability, useProtectedPrompt, useSession} from '@/auth/runtime'
+import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
+import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
-import {EmptyState} from '@/components/primitives/EmptyState'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
-import {demoModules} from '@/demo/demoModules'
-import {demoProfiles} from '@/demo/demoProfiles'
-import {demoReels} from '@/demo/demoReels'
+import {useDiscoverQuery} from '@/features/discover/data'
+import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {DiscoverResult} from '@/domain/discovery'
+import type {ModulaProfile} from '@/features/profile/contracts'
 
 type Category = 'For You' | 'People' | 'Topics' | 'Modules' | 'Media'
 
 const categories: Category[] = ['For You', 'People', 'Topics', 'Modules', 'Media']
-const topics = ['Profile OS', 'Module SDK', 'Composer Tools', 'Board workflows', 'DIMON previews']
 
 export function DiscoverScreen() {
   const {colours, radius, spacing} = useThemeTokens()
+  const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
   const q = query.trim().toLowerCase()
+  const result = discoverQuery.data
 
-  const people = useMemo(
-    () =>
-      Object.values(demoProfiles).filter(profile =>
-        `${profile.displayName} ${profile.handle} ${profile.bio}`
-          .toLowerCase()
-          .includes(q),
-      ),
-    [q],
-  )
-  const modules = useMemo(
-    () =>
-      demoModules.filter(module =>
-        `${module.name} ${module.description}`.toLowerCase().includes(q),
-      ),
-    [q],
-  )
-  const visibleTopics = topics.filter(topic => topic.toLowerCase().includes(q))
-  const hasResults = people.length > 0 || modules.length > 0 || visibleTopics.length > 0
+  const filtered = useMemo(() => filterDiscover(result, q), [result, q])
+  const hasResults =
+    filtered.suggestedProfiles.length > 0 ||
+    filtered.featuredModules.length > 0 ||
+    filtered.trendingTopics.length > 0 ||
+    filtered.media.length > 0
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -91,13 +83,17 @@ export function DiscoverScreen() {
             </ScrollView>
           </View>
 
-          {hasResults ? (
+          {discoverQuery.isLoading ? (
+            <InitialLoadingState label="Loading discovery" />
+          ) : discoverQuery.isError ? (
+            <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
+          ) : hasResults ? (
             <>
-              <ReelsPreviewRail />
-              <SuggestedPeople people={people} />
-              <TrendingTopics topics={visibleTopics} />
-              <FeaturedModules modules={modules} />
-              <MediaGrid />
+              <ReelsPreviewRail result={filtered} />
+              <SuggestedPeople people={filtered.suggestedProfiles} />
+              <TrendingTopics topics={filtered.trendingTopics.map(topic => topic.label)} />
+              <FeaturedModules modules={filtered.featuredModules} />
+              <MediaGrid result={filtered} />
             </>
           ) : (
             <EmptyState
@@ -112,13 +108,34 @@ export function DiscoverScreen() {
   )
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
+function filterDiscover(result: DiscoverResult | undefined, query: string): DiscoverResult {
+  const empty: DiscoverResult = {
+    suggestedProfiles: [],
+    trendingTopics: [],
+    featuredModules: [],
+    media: [],
+    reels: [],
+  }
+  if (!result) return empty
+  if (!query) return result
+  return {
+    suggestedProfiles: result.suggestedProfiles.filter(profile =>
+      `${profile.displayName} ${profile.handle} ${profile.bio}`.toLowerCase().includes(query),
+    ),
+    trendingTopics: result.trendingTopics.filter(topic => topic.label.toLowerCase().includes(query)),
+    featuredModules: result.featuredModules.filter(module =>
+      `${module.name} ${module.description}`.toLowerCase().includes(query),
+    ),
+    media: result.media.filter(media =>
+      `${media.title ?? ''} ${media.altText ?? ''}`.toLowerCase().includes(query),
+    ),
+    reels: result.reels.filter(reel =>
+      `${reel.caption} ${reel.source} ${reel.author.displayName}`.toLowerCase().includes(query),
+    ),
+  }
+}
+
+function Section({title, children}: {title: string; children: React.ReactNode}) {
   const {spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[3]}}>
@@ -128,37 +145,23 @@ function Section({
   )
 }
 
-function ReelsPreviewRail() {
+function ReelsPreviewRail({result}: {result: DiscoverResult}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <Section title="Reels preview">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{gap: spacing[3]}}>
-        {demoReels.map(reel => (
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{gap: spacing[3]}}>
+        {result.reels.map(reel => (
           <AppPressable
             key={reel.id}
             accessibilityLabel={`Open reel by ${reel.author.displayName}`}
             onPress={() => router.push('/reels' as Href)}
-            style={[
-              styles.reelCard,
-              {backgroundColor: reel.colour, borderRadius: radius.large},
-            ]}>
-            <View
-              style={[
-                styles.reelScrim,
-                {backgroundColor: colours.backdrop, opacity: 0.18},
-              ]}
-            />
+            style={[styles.reelCard, {backgroundColor: reel.colour, borderRadius: radius.large}]}>
+            <View style={[styles.reelScrim, {backgroundColor: colours.backdrop, opacity: 0.18}]} />
             <AppText variant="label" style={{color: colours.surface}}>
               {reel.author.displayName}
             </AppText>
-            <AppText
-              variant="caption"
-              numberOfLines={3}
-              style={{color: colours.surface}}>
+            <AppText variant="caption" numberOfLines={3} style={{color: colours.surface}}>
               {reel.caption}
             </AppText>
           </AppPressable>
@@ -168,17 +171,19 @@ function ReelsPreviewRail() {
   )
 }
 
-function SuggestedPeople({people}: {people: typeof demoProfiles[keyof typeof demoProfiles][]}) {
+function SuggestedPeople({people}: {people: ModulaProfile[]}) {
   const router = useRouter()
-  const {followedProfileIds, toggleFollow} = useDemoSocial()
-  const {ownerProfile} = useProfile()
+  const session = useSession()
+  const canFollow = useCapability('social:follow')
+  const prompt = useProtectedPrompt()
+  const followMutation = useFollowProfileMutation()
   const {colours, radius, spacing} = useThemeTokens()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   return (
     <Section title="Suggested people">
       <View style={{gap: spacing[3]}}>
         {people.map(profile => {
-          const followed = followedProfileIds.has(profile.id)
-          const profileRoute = getProfileRouteForIdentity(profile, ownerProfile.id)
+          const profileRoute = getProfileRouteForIdentity(profile, ownerProfileId)
           return (
             <View key={profile.id} style={styles.personRow}>
               <AppPressable
@@ -187,7 +192,8 @@ function SuggestedPeople({people}: {people: typeof demoProfiles[keyof typeof dem
                 style={styles.personIdentity}>
                 <Avatar
                   name={profile.displayName}
-                  colour={profile.avatarColour}
+                  uri={profile.avatarUri}
+                  colour={profile.coverColour}
                   size={42}
                 />
                 <View style={styles.personBody}>
@@ -200,61 +206,68 @@ function SuggestedPeople({people}: {people: typeof demoProfiles[keyof typeof dem
                   </AppText>
                 </View>
               </AppPressable>
-              <AppPressable
-                accessibilityLabel={followed ? `Unfollow ${profile.displayName}` : `Follow ${profile.displayName}`}
-                accessibilityState={{selected: followed}}
-                onPress={() => toggleFollow(profile.id)}
-                style={[
-                  styles.followButton,
-                  {
-                    backgroundColor: followed ? colours.surfaceMuted : colours.accent,
-                    borderRadius: radius.round,
-                  },
-                ]}>
-                <AppText
-                  variant="label"
-                  style={{
-                    color: followed ? colours.textSecondary : colours.accentForeground,
-                  }}>
-                  {followed ? 'Following' : 'Follow'}
-                </AppText>
-              </AppPressable>
+              {profile.id !== ownerProfileId ? (
+                <AppPressable
+                  accessibilityLabel={profile.isFollowing ? `Unfollow ${profile.displayName}` : `Follow ${profile.displayName}`}
+                  accessibilityState={{selected: profile.isFollowing}}
+                  onPress={() => {
+                    if (!canFollow) {
+                      prompt.show()
+                      return
+                    }
+                    followMutation.mutate({
+                      profileId: parseProfileId(profile.id),
+                      following: !profile.isFollowing,
+                    })
+                  }}
+                  style={[
+                    styles.followButton,
+                    {
+                      backgroundColor: profile.isFollowing ? colours.surfaceMuted : colours.accent,
+                      borderRadius: radius.round,
+                    },
+                  ]}>
+                  <AppText
+                    variant="label"
+                    style={{
+                      color: profile.isFollowing ? colours.textSecondary : colours.accentForeground,
+                    }}>
+                    {profile.isFollowing ? 'Following' : 'Follow'}
+                  </AppText>
+                </AppPressable>
+              ) : null}
             </View>
           )
         })}
       </View>
+      <ProtectedActionPrompt
+        visible={prompt.visible}
+        onClose={prompt.hide}
+        description="Sign in to follow profiles in this local Modula build."
+      />
     </Section>
   )
 }
 
-function TrendingTopics({topics: visibleTopics}: {topics: string[]}) {
+function TrendingTopics({topics}: {topics: string[]}) {
   const {spacing} = useThemeTokens()
   return (
     <Section title="Trending topics">
       <View style={[styles.topicWrap, {gap: spacing[2]}]}>
-        {visibleTopics.map(topic => (
-          <Pill key={topic} label={topic} />
-        ))}
+        {topics.map(topic => <Pill key={topic} label={topic} />)}
       </View>
     </Section>
   )
 }
 
-function FeaturedModules({modules}: {modules: typeof demoModules}) {
+function FeaturedModules({modules}: {modules: DiscoverResult['featuredModules']}) {
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <Section title="Featured modules">
       <View style={{gap: spacing[3]}}>
         {modules.slice(0, 5).map(module => (
-          <Surface
-            key={module.id}
-            variant="contained"
-            style={[styles.moduleRow, {gap: spacing[3], padding: spacing[3]}]}>
-            <View
-              style={[
-                styles.moduleIcon,
-                {backgroundColor: colours.accentSubtle, borderRadius: radius.medium},
-              ]}>
+          <Surface key={module.id} variant="contained" style={[styles.moduleRow, {gap: spacing[3], padding: spacing[3]}]}>
+            <View style={[styles.moduleIcon, {backgroundColor: colours.accentSubtle, borderRadius: radius.medium}]}>
               <AppIcon name={module.icon} colour={colours.accent} />
             </View>
             <View style={styles.personBody}>
@@ -273,21 +286,13 @@ function FeaturedModules({modules}: {modules: typeof demoModules}) {
   )
 }
 
-function MediaGrid() {
+function MediaGrid({result}: {result: DiscoverResult}) {
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <Section title="Media grid">
       <View style={[styles.mediaGrid, {gap: spacing[2]}]}>
-        {demoReels.concat(demoReels).map((item, index) => (
-          <View
-            key={`${item.id}-${index}`}
-            style={[
-              styles.mediaTile,
-              {
-                backgroundColor: item.colour,
-                borderRadius: radius.medium,
-              },
-            ]}>
+        {result.media.map(item => (
+          <View key={item.id} style={[styles.mediaTile, {backgroundColor: item.colour ?? colours.surfaceMuted, borderRadius: radius.medium}]}>
             <AppIcon name="play" colour={colours.surface} />
           </View>
         ))}

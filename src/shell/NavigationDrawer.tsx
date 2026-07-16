@@ -8,7 +8,7 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {useProfile} from '@/features/profile/runtime/useProfile'
+import {useSession, useSessionActions} from '@/auth/runtime'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -73,7 +73,9 @@ export function NavigationDrawer() {
   const insets = useSafeAreaInsets()
   const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
   const {phase, progress, closeDrawer} = useShellDrawer()
-  const {ownerProfile} = useProfile()
+  const session = useSession()
+  const {signOut} = useSessionActions()
+  const ownerProfile = session.status === 'signedIn' ? session.profile : null
   const drawerWidth = Math.min(360, Math.max(280, width * 0.84))
 
   const animatedStyles = useMemo(
@@ -167,15 +169,17 @@ export function NavigationDrawer() {
               }
               style={styles.headerIdentity}>
               <Avatar
-                name={ownerProfile.displayName}
-                uri={ownerProfile.avatarUri}
-                colour={ownerProfile.coverColour}
+                name={ownerProfile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+                uri={ownerProfile?.avatarUri}
+                colour={ownerProfile?.coverColour}
                 size={54}
               />
               <View style={styles.headerText}>
-                <AppText variant="headline">{ownerProfile.displayName}</AppText>
+                <AppText variant="headline">
+                  {ownerProfile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
+                </AppText>
                 <AppText variant="caption" colour="textSecondary">
-                  @{ownerProfile.handle}
+                  {ownerProfile ? `@${ownerProfile.handle}` : session.status === 'guest' ? 'Browsing public Modula' : 'Local prototype account'}
                 </AppText>
               </View>
             </AppPressable>
@@ -209,9 +213,9 @@ export function NavigationDrawer() {
               },
             ]}>
             {[
-              ['Following', ownerProfile.followingCount],
-              ['Followers', ownerProfile.followerCount],
-              ['Modules', ownerProfile.moduleCount],
+              ['Following', ownerProfile?.followingCount ?? 0],
+              ['Followers', ownerProfile?.followerCount ?? 0],
+              ['Modules', ownerProfile?.moduleCount ?? 0],
             ].map(([label, value]) => (
               <View key={label} style={styles.stat}>
                 <AppText variant="headline">{value}</AppText>
@@ -237,6 +241,17 @@ export function NavigationDrawer() {
             <AppText variant="caption" colour="textSecondary">
               Appearance: {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
             </AppText>
+            {session.status === 'signedIn' ? (
+              <AppPressable
+                accessibilityLabel="Sign out"
+                onPress={() => {
+                  closeDrawer({afterClose: () => void signOut()})
+                }}>
+                <AppText variant="caption" colour="accent">
+                  Sign out
+                </AppText>
+              </AppPressable>
+            ) : null}
             <AppText variant="caption" colour="textSecondary">
               Modula 0.1.0 {isDevelopmentBuild() ? 'Development build' : 'Local shell'}
             </AppText>

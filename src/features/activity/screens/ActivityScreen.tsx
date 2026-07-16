@@ -1,24 +1,36 @@
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter} from 'expo-router'
 
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
-import {demoActivity, type DemoActivityEvent} from '@/demo/demoActivity'
+import {useSession} from '@/auth/runtime'
+import {useActivityQuery} from '@/features/activity/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {ActivityItem} from '@/domain/activity'
 
 const groups = ['Today', 'This week', 'Earlier'] as const
 
 export function ActivityScreen() {
   const {colours, spacing} = useThemeTokens()
+  const activityQuery = useActivityQuery()
+  const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
 
-  if (!demoActivity.length) {
+  if (activityQuery.isLoading) {
+    return <InitialLoadingState label="Loading activity" />
+  }
+
+  if (activityQuery.isError) {
+    return <QueryErrorState error={activityQuery.error} onRetry={() => void activityQuery.refetch()} />
+  }
+
+  if (!activity.length) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
         <EmptyState
@@ -38,7 +50,7 @@ export function ActivityScreen() {
           keyboardShouldPersistTaps="handled">
           <AppText variant="display">Activity</AppText>
           {groups.map(group => {
-            const items = demoActivity.filter(item => item.group === group)
+            const items = activity.filter(item => item.group === group)
             if (!items.length) return null
             return (
               <View key={group} style={{gap: spacing[3]}}>
@@ -57,12 +69,13 @@ export function ActivityScreen() {
   )
 }
 
-function ActivityRow({item}: {item: DemoActivityEvent}) {
+function ActivityRow({item}: {item: ActivityItem}) {
   const router = useRouter()
-  const {ownerProfile} = useProfile()
+  const session = useSession()
   const {colours, radius, spacing} = useThemeTokens()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = item.actor
-    ? getProfileRouteForIdentity(item.actor, ownerProfile.id)
+    ? getProfileRouteForIdentity(item.actor, ownerProfileId)
     : null
 
   return (
@@ -76,7 +89,8 @@ function ActivityRow({item}: {item: DemoActivityEvent}) {
           style={styles.actorPress}>
           <Avatar
             name={item.actor.displayName}
-            colour={item.actor.avatarColour}
+            uri={item.actor.avatarUri}
+            colour={item.actor.coverColour}
             size={42}
           />
         </AppPressable>
