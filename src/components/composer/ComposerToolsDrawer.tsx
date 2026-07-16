@@ -19,6 +19,7 @@ type ComposerToolsDrawerProps = {
   onCamera: () => void
   onInsertLink: () => void
   onInsertPoll: () => void
+  onBrowseMarketplace: () => void
   onPlaceholder: (toolName: string) => void
 }
 
@@ -40,6 +41,7 @@ export function ComposerToolsDrawer({
   onCamera,
   onInsertLink,
   onInsertPoll,
+  onBrowseMarketplace,
   onPlaceholder,
 }: ComposerToolsDrawerProps) {
   const insets = useSafeAreaInsets()
@@ -79,9 +81,12 @@ export function ComposerToolsDrawer({
     },
     {
       section: 'Marketplace',
-      label: 'Browse tools — Preview',
+      label: 'Browse tools',
       icon: 'marketplace',
-      onPress: () => onPlaceholder('Browse tools'),
+      onPress: () => {
+        onClose()
+        onBrowseMarketplace()
+      },
     },
   ]
 

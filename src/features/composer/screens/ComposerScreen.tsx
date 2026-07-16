@@ -355,10 +355,11 @@ export function ComposerScreen() {
               options: ['Board', 'Composer', 'Profile'],
             })
           }}
+          onBrowseMarketplace={() => router.push('/marketplace' as Href)}
           onPlaceholder={toolName =>
             Alert.alert(
-              toolName,
-              'This tool will be delivered through the Modula tool system.',
+              `${toolName} — Preview`,
+              'This tool remains a local Preview in Phase 4.5. Browse Marketplace for seeded modules.',
             )
           }
         />

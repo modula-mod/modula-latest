@@ -31,6 +31,18 @@ function formatRelative(iso: string): string {
   return `${Math.round(hours / 24)}d`
 }
 
+function marketplaceIdForModuleName(name: string): string {
+  const normalized = name.trim().toLowerCase()
+  if (normalized.includes('vault')) return 'module-vault-notes'
+  if (normalized.includes('task')) return 'module-tasks'
+  if (normalized.includes('crm')) return 'module-crm'
+  if (normalized.includes('health')) return 'module-health-agent'
+  if (normalized.includes('automation')) return 'module-automations'
+  if (normalized.includes('translate')) return 'module-translate-lite'
+  if (normalized.includes('insight')) return 'module-insights'
+  return 'module-vault-notes'
+}
+
 export function DemoPostItem({post}: DemoPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
@@ -105,6 +117,7 @@ export function DemoPostItem({post}: DemoPostItemProps) {
 }
 
 function PostBody({post}: {post: SocialPost}) {
+  const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
 
   if (post.kind === 'media') {
@@ -195,7 +208,11 @@ function PostBody({post}: {post: SocialPost}) {
           </View>
           <AppPressable
             accessibilityLabel={post.module.actionLabel}
-            onPress={() => Alert.alert(post.module.name, 'Local module preview')}
+            onPress={() =>
+              router.push(
+                `/marketplace/${marketplaceIdForModuleName(post.module.name)}` as Href,
+              )
+            }
             style={[
               styles.moduleAction,
               {backgroundColor: colours.accentSubtle, borderRadius: radius.round},

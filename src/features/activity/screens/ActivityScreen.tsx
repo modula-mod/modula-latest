@@ -1,5 +1,6 @@
+import {useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
-import {useRouter} from 'expo-router'
+import {useRouter, type Href} from 'expo-router'
 
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -11,16 +12,23 @@ import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ActivityItem} from '@/domain/activity'
 
 const groups = ['Today', 'This week', 'Earlier'] as const
+type ActivityFilter = 'all' | ActivityItem['type']
 
 export function ActivityScreen() {
   const {colours, spacing} = useThemeTokens()
   const activityQuery = useActivityQuery()
+  const [filter, setFilter] = useState<ActivityFilter>('all')
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
+  const filtered = useMemo(
+    () => (filter === 'all' ? activity : activity.filter(item => item.type === filter)),
+    [activity, filter],
+  )
 
   if (activityQuery.isLoading) {
     return <InitialLoadingState label="Loading activity" />
@@ -48,9 +56,31 @@ export function ActivityScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <AppText variant="display">Activity</AppText>
+          <View style={styles.titleRow}>
+            <AppText variant="display">Activity</AppText>
+            <ModulaMenu
+              accessibilityLabel="Filter activity"
+              title="Filter activity"
+              actions={[
+                {id: 'all', label: 'All'},
+                {id: 'like', label: 'Likes'},
+                {id: 'reply', label: 'Replies'},
+                {id: 'follow', label: 'Follows'},
+                {id: 'mention', label: 'Mentions'},
+                {id: 'moduleUpdate', label: 'Modules'},
+                {id: 'teamInvitation', label: 'Teams'},
+              ]}
+              onAction={id => setFilter(id as ActivityFilter)}
+              trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+            />
+          </View>
+          {filter !== 'all' ? (
+            <AppText variant="caption" colour="textSecondary">
+              Showing {filter} · Preview filters are local
+            </AppText>
+          ) : null}
           {groups.map(group => {
-            const items = activity.filter(item => item.group === group)
+            const items = filtered.filter(item => item.group === group)
             if (!items.length) return null
             return (
               <View key={group} style={{gap: spacing[3]}}>
@@ -77,6 +107,24 @@ function ActivityRow({item}: {item: ActivityItem}) {
   const profileRoute = item.actor
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
     : null
+
+  const openDestination = () => {
+    if (item.type === 'moduleUpdate') {
+      router.push('/marketplace/module-vault-notes' as Href)
+      return
+    }
+    if (item.type === 'teamInvitation') {
+      router.push('/teams' as Href)
+      return
+    }
+    if (item.type === 'like' || item.type === 'reply' || item.type === 'mention') {
+      router.push('/' as Href)
+      return
+    }
+    if (profileRoute) {
+      router.push(profileRoute)
+    }
+  }
 
   return (
     <Surface
@@ -106,16 +154,14 @@ function ActivityRow({item}: {item: ActivityItem}) {
           <AppIcon name={item.icon ?? 'activity'} colour={colours.accent} />
         </View>
       )}
-      <View style={styles.body}>
-        {item.actor && profileRoute ? (
-          <AppPressable
-            accessibilityLabel={`Open ${item.actor.displayName} profile`}
-            onPress={() => router.push(profileRoute)}
-            style={styles.actorNamePress}>
-            <AppText variant="body">
-              {item.actor.displayName} {item.description}
-            </AppText>
-          </AppPressable>
+      <AppPressable
+        accessibilityLabel={item.description}
+        onPress={openDestination}
+        style={styles.body}>
+        {item.actor ? (
+          <AppText variant="body">
+            {item.actor.displayName} {item.description}
+          </AppText>
         ) : (
           <AppText variant="body">{item.description}</AppText>
         )}
@@ -139,10 +185,11 @@ function ActivityRow({item}: {item: ActivityItem}) {
             </AppText>
           </View>
         ) : null}
-      </View>
+      </AppPressable>
       {item.actionLabel ? (
         <AppPressable
           accessibilityLabel={item.actionLabel}
+          onPress={openDestination}
           style={[
             styles.action,
             {
@@ -163,10 +210,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 38,
     paddingHorizontal: 12,
-  },
-  actorNamePress: {
-    justifyContent: 'center',
-    minHeight: 28,
   },
   actorPress: {
     alignItems: 'center',
@@ -195,5 +238,10 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  titleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 })

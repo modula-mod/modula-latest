@@ -18,8 +18,13 @@ export function ProfileHeaderRight() {
             title: 'Share',
             actions: [
               {id: 'share', label: 'Share profile'},
+              {id: 'qr', label: 'QR / share sheet — Preview'},
               {id: 'copy', label: 'Copy profile link'},
             ],
+          }).then(id => {
+            if (id === 'share' || id === 'qr') {
+              router.push('/share-profile' as Href)
+            }
           })
         }}
         style={{

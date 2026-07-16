@@ -1,4 +1,5 @@
 import * as Clipboard from 'expo-clipboard'
+import {router, type Href} from 'expo-router'
 import {Alert, Share} from 'react-native'
 
 import type {SocialPost} from '@/domain/social'
@@ -61,16 +62,7 @@ export async function runPostOverflowAction(
       return
     }
     case 'viewEngagement': {
-      Alert.alert(
-        'Engagement (Preview)',
-        [
-          `Likes: ${post.likeCount}`,
-          `Replies: ${post.replyCount}`,
-          `Reposts: ${post.repostCount}`,
-          '',
-          'Detailed analytics are not connected in this local build.',
-        ].join('\n'),
-      )
+      router.push(`/post/${post.id}/analytics` as Href)
       return
     }
     case 'openInBrowser': {
@@ -79,10 +71,7 @@ export async function runPostOverflowAction(
       return
     }
     case 'mute': {
-      Alert.alert(
-        'Mute (Preview)',
-        `Mute @${post.author.handle} is a local preview. No mute list is persisted yet.`,
-      )
+      router.push('/settings/mute-words' as Href)
       return
     }
     case 'hide': {
@@ -93,10 +82,7 @@ export async function runPostOverflowAction(
       return
     }
     case 'report': {
-      Alert.alert(
-        'Report (Preview)',
-        'Reporting is a local explanatory preview. No report is sent from this build.',
-      )
+      router.push('/report' as Href)
       return
     }
     default: {
