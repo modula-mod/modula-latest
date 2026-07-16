@@ -20,18 +20,18 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
-import {currentDemoProfile} from '@/demo/demoProfiles'
+import {useSession} from '@/auth/runtime'
+import {useCreatePostMutation} from '@/features/feed/data'
 import {isIOS} from '@/lib/platform'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DemoMedia, LinkPost} from '@/types/social'
+import type {DraftLinkPreview, PendingMediaAttachment} from '@/domain/social'
 
 type PollPreview = {
   question: string
   options: string[]
 }
 
-const demoLink: LinkPost['link'] = {
+const demoLink: DraftLinkPreview = {
   domain: 'modula.local',
   title: 'Local Composer link preview',
   description: 'A Phase 1-only link surface that does not call a backend.',
@@ -40,16 +40,17 @@ const demoLink: LinkPost['link'] = {
 export function ComposerScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const {createPost} = useDemoSocial()
+  const session = useSession()
+  const createPostMutation = useCreatePostMutation()
   const {colours, radius, spacing} = useThemeTokens()
   const [text, setText] = useState('')
-  const [media, setMedia] = useState<DemoMedia | null>(null)
-  const [link, setLink] = useState<LinkPost['link'] | null>(null)
+  const [media, setMedia] = useState<PendingMediaAttachment | null>(null)
+  const [link, setLink] = useState<DraftLinkPreview | null>(null)
   const [poll, setPoll] = useState<PollPreview | null>(null)
   const [toolsOpen, setToolsOpen] = useState(false)
   const [permissionMessage, setPermissionMessage] = useState<string | null>(null)
 
-  const canPost = Boolean(text.trim() || media || link || poll)
+  const canPost = Boolean(text.trim() || media || link || poll) && !createPostMutation.isPending
 
   const closeComposer = () => {
     Keyboard.dismiss()
@@ -60,32 +61,38 @@ export function ComposerScreen() {
     }
   }
 
-  const publish = () => {
-    if (!canPost) return
-    createPost({
-      text,
-      media: media ? [media] : undefined,
-      link: link ?? undefined,
-      poll: poll ?? undefined,
-    })
-    setText('')
-    setMedia(null)
-    setLink(null)
-    setPoll(null)
-    Keyboard.dismiss()
-    router.replace('/')
+  const publish = async () => {
+    if (!canPost || session.status !== 'signedIn') return
+    try {
+      await createPostMutation.mutateAsync({
+        text,
+        audience: 'public',
+        replyPermission: 'everyone',
+        media: media ? [media] : [],
+        linkPreview: link ?? undefined,
+        poll: poll ?? undefined,
+        idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
+      })
+      setText('')
+      setMedia(null)
+      setLink(null)
+      setPoll(null)
+      Keyboard.dismiss()
+      router.replace('/')
+    } catch {
+      setPermissionMessage('Post failed. Your draft is still here so you can retry.')
+    }
   }
 
   const handlePickedAsset = (asset: ImagePicker.ImagePickerAsset) => {
     setPermissionMessage(null)
     setMedia({
-      id: `local-media-${Date.now()}`,
+      localId: `local-media-${Date.now()}`,
       kind: 'image',
-      title: 'Selected local photo',
-      uri: asset.uri,
-      colour: colours.accent,
-      aspectRatio:
-        asset.width && asset.height ? asset.width / asset.height : 4 / 5,
+      localUri: asset.uri,
+      width: asset.width,
+      height: asset.height,
+      mimeType: asset.mimeType,
     })
   }
 
@@ -188,8 +195,9 @@ export function ComposerScreen() {
         contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
         <View style={[styles.composerRow, {gap: spacing[3]}]}>
           <Avatar
-            name={currentDemoProfile.displayName}
-            colour={currentDemoProfile.avatarColour}
+            name={session.status === 'signedIn' ? session.profile.displayName : 'Modula'}
+            uri={session.status === 'signedIn' ? session.profile.avatarUri : undefined}
+            colour={session.status === 'signedIn' ? session.profile.coverColour : undefined}
             size={42}
           />
           <TextInput
@@ -218,7 +226,7 @@ export function ComposerScreen() {
                 borderRadius: radius.large,
               },
             ]}>
-            <Image source={{uri: media.uri}} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <Image source={{uri: media.localUri}} style={StyleSheet.absoluteFill} contentFit="cover" />
             <AppPressable
               accessibilityLabel="Remove selected photo"
               onPress={() => setMedia(null)}
@@ -274,7 +282,7 @@ export function ComposerScreen() {
             Replies: everyone can reply
           </AppText>
           <AppText variant="caption" colour="textSecondary">
-            Phase 1 posts are local and reset after a full reload.
+            Local API posts reset after a JavaScript runtime reload.
           </AppText>
         </View>
       </ScrollView>

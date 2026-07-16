@@ -1,39 +1,45 @@
 import {useLocalSearchParams, useRouter} from 'expo-router'
 import {ScrollView, StyleSheet, View} from 'react-native'
 
+import {parsePostId} from '@/api/contracts'
+import {useSession} from '@/auth/runtime'
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
-import {demoProfiles} from '@/demo/demoProfiles'
+import {usePostQuery} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {ModulaProfile} from '@/features/profile/contracts'
 
 const replies = [
   {
     id: 'reply-1',
-    author: demoProfiles.design,
-    text: 'This keeps the first phase focused on shell reliability instead of protocol complexity.',
+    text: 'This keeps the data runtime focused on transport semantics before remote protocols arrive.',
     time: '12m',
   },
   {
     id: 'reply-2',
-    author: demoProfiles.builders,
-    text: 'The route-first structure also gives modules a clean place to attach later.',
+    text: 'The repository boundary gives modules a clean place to attach later.',
     time: '7m',
   },
 ]
 
 export function PostDetailScreen() {
   const {postId} = useLocalSearchParams<{postId: string}>()
-  const {posts} = useDemoSocial()
   const {colours, spacing} = useThemeTokens()
-  const post = posts.find(item => item.id === postId)
+  let parsedPostId = null
+  try {
+    parsedPostId = parsePostId(postId)
+  } catch {
+    parsedPostId = null
+  }
+  const postQuery = usePostQuery(parsedPostId ?? parsePostId('post-local-1'))
+  const post = parsedPostId ? postQuery.data : null
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -44,7 +50,7 @@ export function PostDetailScreen() {
             <DemoPostItem post={post} />
             <View style={[styles.thread, {paddingHorizontal: spacing[4]}]}>
               {replies.map(reply => (
-                <ReplyRow key={reply.id} reply={reply} />
+                <ReplyRow key={reply.id} reply={{...reply, author: post.author}} />
               ))}
             </View>
             <View
@@ -58,15 +64,19 @@ export function PostDetailScreen() {
               ]}>
               <AppText variant="headline">Add a local reply</AppText>
               <AppText variant="body" colour="textSecondary">
-                Reply composition will connect after Phase 1 shell validation.
+                Reply composition will connect after the data runtime stabilises.
               </AppText>
             </View>
           </ScrollView>
+        ) : postQuery.isLoading ? (
+          <InitialLoadingState label="Loading post" />
+        ) : postQuery.isError ? (
+          <QueryErrorState error={postQuery.error} onRetry={() => void postQuery.refetch()} />
         ) : (
           <EmptyState
             icon="comment"
             title="Post unavailable"
-            description="This local demonstration post is no longer in memory."
+            description="This post is not available from the local API simulator."
           />
         )}
       </ResponsiveContent>
@@ -74,11 +84,16 @@ export function PostDetailScreen() {
   )
 }
 
-function ReplyRow({reply}: {reply: (typeof replies)[number]}) {
+function ReplyRow({
+  reply,
+}: {
+  reply: (typeof replies)[number] & {author: ModulaProfile}
+}) {
   const router = useRouter()
-  const {ownerProfile} = useProfile()
+  const session = useSession()
   const {colours, spacing} = useThemeTokens()
-  const profileRoute = getProfileRouteForIdentity(reply.author, ownerProfile.id)
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
+  const profileRoute = getProfileRouteForIdentity(reply.author, ownerProfileId)
 
   return (
     <View style={styles.replyRow}>
@@ -89,13 +104,12 @@ function ReplyRow({reply}: {reply: (typeof replies)[number]}) {
           style={styles.replyAvatarPress}>
           <Avatar
             name={reply.author.displayName}
-            colour={reply.author.avatarColour}
+            uri={reply.author.avatarUri}
+            colour={reply.author.coverColour}
             size={34}
           />
         </AppPressable>
-        <View
-          style={[styles.connector, {backgroundColor: colours.border}]}
-        />
+        <View style={[styles.connector, {backgroundColor: colours.border}]} />
       </View>
       <View style={styles.replyBody}>
         <AppPressable

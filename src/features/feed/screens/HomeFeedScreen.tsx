@@ -1,8 +1,9 @@
 import {useMemo, useState} from 'react'
-import {FlatList, ScrollView, StyleSheet, View} from 'react-native'
+import {FlatList, RefreshControl, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
+import {InitialLoadingState, PaginationIndicator, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -10,19 +11,19 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
-import {currentDemoProfile, storyProfiles} from '@/demo/demoProfiles'
+import {useSession} from '@/auth/runtime'
+import {useDiscoverQuery} from '@/features/discover/data'
+import {useHomeFeedQuery} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {AppHeader} from '@/shell/AppHeader'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DemoPost} from '@/types/social'
+import type {FeedMode as RepositoryFeedMode} from '@/domain/social'
 
-type FeedMode = 'Following' | 'For You' | 'Modules'
+type FeedModeLabel = 'Following' | 'For You' | 'Modules'
 
-const modeToFeed: Record<FeedMode, DemoPost['feed']> = {
+const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
   Following: 'following',
   'For You': 'forYou',
   Modules: 'modules',
@@ -30,13 +31,12 @@ const modeToFeed: Record<FeedMode, DemoPost['feed']> = {
 
 export function HomeFeedScreen() {
   const router = useRouter()
-  const {posts} = useDemoSocial()
   const {colours, spacing} = useThemeTokens()
-  const [mode, setMode] = useState<FeedMode>('Following')
-
-  const filteredPosts = useMemo(
-    () => posts.filter(post => post.feed === modeToFeed[mode]),
-    [mode, posts],
+  const [mode, setMode] = useState<FeedModeLabel>('Following')
+  const feedQuery = useHomeFeedQuery(modeToFeed[mode])
+  const posts = useMemo(
+    () => feedQuery.data?.pages.flatMap(page => page.items) ?? [],
+    [feedQuery.data],
   )
 
   return (
@@ -45,9 +45,24 @@ export function HomeFeedScreen() {
       <ResponsiveContent>
         <FeatureErrorBoundary label="Home feed">
           <FlatList
-            data={filteredPosts}
+            data={posts}
             keyExtractor={item => item.id}
             renderItem={({item}) => <DemoPostItem post={item} />}
+            refreshControl={
+              <RefreshControl
+                refreshing={feedQuery.isRefetching && !feedQuery.isFetchingNextPage}
+                tintColor={colours.accent}
+                onRefresh={() => {
+                  if (!feedQuery.isRefetching) void feedQuery.refetch()
+                }}
+              />
+            }
+            onEndReachedThreshold={0.35}
+            onEndReached={() => {
+              if (feedQuery.hasNextPage && !feedQuery.isFetchingNextPage) {
+                void feedQuery.fetchNextPage()
+              }
+            }}
             ListHeaderComponent={
               <View>
                 <StoryRail />
@@ -86,18 +101,27 @@ export function HomeFeedScreen() {
               </View>
             }
             ListEmptyComponent={
-              <EmptyState
-                icon="home"
-                title="This feed is quiet."
-                description="Switch modes or publish a local demo post to start the conversation."
-                action={
-                  <Pill
-                    label="Create post"
-                    selected
-                    onPress={() => router.push('/compose' as Href)}
-                  />
-                }
-              />
+              feedQuery.isLoading ? (
+                <InitialLoadingState label="Loading feed" />
+              ) : feedQuery.isError ? (
+                <QueryErrorState error={feedQuery.error} onRetry={() => void feedQuery.refetch()} />
+              ) : (
+                <EmptyState
+                  icon="home"
+                  title="This feed is quiet."
+                  description="Switch modes or publish a local post to start the conversation."
+                  action={
+                    <Pill
+                      label="Create post"
+                      selected
+                      onPress={() => router.push('/compose' as Href)}
+                    />
+                  }
+                />
+              )
+            }
+            ListFooterComponent={
+              feedQuery.isFetchingNextPage ? <PaginationIndicator label="Loading more" /> : null
             }
             contentContainerStyle={{paddingBottom: spacing[6]}}
           />
@@ -110,15 +134,13 @@ export function HomeFeedScreen() {
 function StoryRail() {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
-  const {ownerProfile} = useProfile()
-  const items = [
-    {label: 'Your Story', profile: currentDemoProfile},
-    {label: 'Gaia', profile: storyProfiles[1]},
-    {label: 'Modula Team', profile: storyProfiles[2]},
-    {label: 'Design', profile: storyProfiles[2]},
-    {label: 'Builders', profile: storyProfiles[3]},
-    {label: 'Community', profile: storyProfiles[4]},
-  ]
+  const session = useSession()
+  const discover = useDiscoverQuery()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
+  const items = (discover.data?.suggestedProfiles ?? []).slice(0, 6).map(profile => ({
+    label: profile.id === ownerProfileId ? 'Your Story' : profile.displayName,
+    profile,
+  }))
 
   return (
     <ScrollView
@@ -133,7 +155,7 @@ function StoryRail() {
           key={item.label}
           accessibilityLabel={`Open ${item.profile.displayName} profile`}
           onPress={() =>
-            router.push(getProfileRouteForIdentity(item.profile, ownerProfile.id))
+            router.push(getProfileRouteForIdentity(item.profile, ownerProfileId))
           }
           style={styles.storyItem}>
           <View
@@ -143,7 +165,8 @@ function StoryRail() {
             ]}>
             <Avatar
               name={item.profile.displayName}
-              colour={item.profile.avatarColour}
+              uri={item.profile.avatarUri}
+              colour={item.profile.coverColour}
               size={54}
             />
           </View>
@@ -158,7 +181,9 @@ function StoryRail() {
 
 function ComposerPrompt() {
   const router = useRouter()
+  const session = useSession()
   const {colours, radius, spacing} = useThemeTokens()
+  const profile = session.status === 'signedIn' ? session.profile : null
 
   return (
     <View
@@ -172,8 +197,9 @@ function ComposerPrompt() {
         },
       ]}>
       <Avatar
-        name={currentDemoProfile.displayName}
-        colour={currentDemoProfile.avatarColour}
+        name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+        uri={profile?.avatarUri}
+        colour={profile?.coverColour}
         size={40}
       />
       <AppPressable

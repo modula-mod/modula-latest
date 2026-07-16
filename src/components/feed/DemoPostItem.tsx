@@ -2,21 +2,23 @@ import {Image} from 'expo-image'
 import {useRouter, type Href} from 'expo-router'
 import {Alert, StyleSheet, View} from 'react-native'
 
+import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
+import {useCapability, useProtectedPrompt, useSession} from '@/auth/runtime'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {Divider} from '@/components/primitives/Divider'
 import {Surface} from '@/components/primitives/Surface'
-import {useDemoSocial} from '@/demo/DemoSocialContext'
+import {PendingMutationBadge} from '@/components/data/PendingMutationBadge'
+import {useLikePostMutation, useRepostMutation, useSavePostMutation} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {useProfile} from '@/features/profile/runtime/useProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DemoPost} from '@/types/social'
+import type {SocialPost} from '@/domain/social'
 
 type DemoPostItemProps = {
-  post: DemoPost
+  post: SocialPost
 }
 
 function formatRelative(iso: string): string {
@@ -31,8 +33,9 @@ function formatRelative(iso: string): string {
 export function DemoPostItem({post}: DemoPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
-  const {ownerProfile} = useProfile()
-  const profileRoute = getProfileRouteForIdentity(post.author, ownerProfile.id)
+  const session = useSession()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
+  const profileRoute = getProfileRouteForIdentity(post.author, ownerProfileId)
 
   return (
     <View>
@@ -43,7 +46,8 @@ export function DemoPostItem({post}: DemoPostItemProps) {
           style={styles.authorAvatar}>
           <Avatar
             name={post.author.displayName}
-            colour={post.author.avatarColour}
+            uri={post.author.avatarUri}
+            colour={post.author.coverColour}
             size={42}
           />
         </AppPressable>
@@ -70,6 +74,16 @@ export function DemoPostItem({post}: DemoPostItemProps) {
             <AppIcon name="more" colour={colours.textTertiary} size={20} />
           </View>
           <PostBody post={post} />
+          {post.optimisticState === 'pending' ? (
+            <View style={{marginTop: spacing[2]}}>
+              <PendingMutationBadge label="Posting" />
+            </View>
+          ) : null}
+          {post.optimisticState === 'failed' ? (
+            <View style={{marginTop: spacing[2]}}>
+              <PendingMutationBadge label="Failed" />
+            </View>
+          ) : null}
           <PostActions
             post={post}
             onReply={() =>
@@ -83,7 +97,7 @@ export function DemoPostItem({post}: DemoPostItemProps) {
   )
 }
 
-function PostBody({post}: {post: DemoPost}) {
+function PostBody({post}: {post: SocialPost}) {
   const {colours, radius, spacing} = useThemeTokens()
 
   if (post.kind === 'media') {
@@ -111,9 +125,9 @@ function PostBody({post}: {post: DemoPost}) {
                 borderRadius: radius.large,
               },
             ]}>
-            {media?.uri ? (
+            {media?.url && !media.url.startsWith('local://') ? (
               <Image
-                source={{uri: media.uri}}
+                source={{uri: 'url' in media ? media.url : undefined}}
                 style={StyleSheet.absoluteFill}
                 contentFit="cover"
               />
@@ -195,9 +209,21 @@ function PostBody({post}: {post: DemoPost}) {
   )
 }
 
-function PostActions({post, onReply}: {post: DemoPost; onReply: () => void}) {
-  const {toggleLike, toggleSave, toggleRepost} = useDemoSocial()
+function PostActions({post, onReply}: {post: SocialPost; onReply: () => void}) {
+  const canEngage = useCapability('post:engage')
+  const prompt = useProtectedPrompt()
+  const likeMutation = useLikePostMutation()
+  const saveMutation = useSavePostMutation()
+  const repostMutation = useRepostMutation()
   const {colours} = useThemeTokens()
+
+  const protectedRun = (action: () => void) => {
+    if (!canEngage) {
+      prompt.show()
+      return
+    }
+    action()
+  }
 
   const actions: {
     label: string
@@ -219,7 +245,9 @@ function PostActions({post, onReply}: {post: DemoPost; onReply: () => void}) {
       selected: post.reposted,
       onPress: () => {
         void selectionHaptic()
-        toggleRepost(post.id)
+        protectedRun(() =>
+          repostMutation.mutate({postId: post.id, reposted: !post.reposted}),
+        )
       },
     },
     {
@@ -229,7 +257,9 @@ function PostActions({post, onReply}: {post: DemoPost; onReply: () => void}) {
       selected: post.liked,
       onPress: () => {
         void selectionHaptic()
-        toggleLike(post.id)
+        protectedRun(() =>
+          likeMutation.mutate({postId: post.id, liked: !post.liked}),
+        )
       },
     },
     {
@@ -243,37 +273,46 @@ function PostActions({post, onReply}: {post: DemoPost; onReply: () => void}) {
       selected: post.saved,
       onPress: () => {
         void selectionHaptic()
-        toggleSave(post.id)
+        protectedRun(() =>
+          saveMutation.mutate({postId: post.id, saved: !post.saved}),
+        )
       },
     },
   ]
 
   return (
-    <View style={styles.actions}>
-      {actions.map(action => (
-        <AppPressable
-          key={action.label}
-          accessibilityLabel={action.label}
-          accessibilityState={{selected: action.selected}}
-          onPress={action.onPress}
-          style={styles.actionButton}>
-          <AppIcon
-            name={action.icon}
-            colour={action.selected ? colours.accent : colours.textSecondary}
-            size={20}
-          />
-          {typeof action.count === 'number' ? (
-            <AppText
-              variant="caption"
-              style={{
-                color: action.selected ? colours.accent : colours.textSecondary,
-              }}>
-              {action.count}
-            </AppText>
-          ) : null}
-        </AppPressable>
-      ))}
-    </View>
+    <>
+      <View style={styles.actions}>
+        {actions.map(action => (
+          <AppPressable
+            key={action.label}
+            accessibilityLabel={action.label}
+            accessibilityState={{selected: action.selected}}
+            onPress={action.onPress}
+            style={styles.actionButton}>
+            <AppIcon
+              name={action.icon}
+              colour={action.selected ? colours.accent : colours.textSecondary}
+              size={20}
+            />
+            {typeof action.count === 'number' ? (
+              <AppText
+                variant="caption"
+                style={{
+                  color: action.selected ? colours.accent : colours.textSecondary,
+                }}>
+                {action.count}
+              </AppText>
+            ) : null}
+          </AppPressable>
+        ))}
+      </View>
+      <ProtectedActionPrompt
+        visible={prompt.visible}
+        onClose={prompt.hide}
+        description="Sign in to like, save, repost, or follow in this local Modula build."
+      />
+    </>
   )
 }
 
