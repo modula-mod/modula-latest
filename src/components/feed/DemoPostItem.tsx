@@ -12,6 +12,7 @@ import {Divider} from '@/components/primitives/Divider'
 import {Surface} from '@/components/primitives/Surface'
 import {PendingMutationBadge} from '@/components/data/PendingMutationBadge'
 import {useLikePostMutation, useRepostMutation, useSavePostMutation} from '@/features/feed/data'
+import {openPostMoreMenu, runPostOverflowAction} from '@/features/feed/postActions'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -71,7 +72,13 @@ export function DemoPostItem({post}: DemoPostItemProps) {
                 </AppText>
               </AppPressable>
             </View>
-            <AppIcon name="more" colour={colours.textTertiary} size={20} />
+            <AppPressable
+              accessibilityLabel="Open post actions"
+              accessibilityHint="Translate, copy, share, mute, report, and more"
+              onPress={() => void openPostMoreMenu(post)}
+              style={styles.moreButton}>
+              <AppIcon name="more" colour={colours.textTertiary} size={20} />
+            </AppPressable>
           </View>
           <PostBody post={post} />
           {post.optimisticState === 'pending' ? (
@@ -265,7 +272,7 @@ function PostActions({post, onReply}: {post: SocialPost; onReply: () => void}) {
     {
       label: 'Share',
       icon: 'share',
-      onPress: () => Alert.alert('Share', 'Sharing is local-only in Phase 1.'),
+      onPress: () => void runPostOverflowAction('share', post),
     },
     {
       label: 'Save',
@@ -390,6 +397,12 @@ const styles = StyleSheet.create({
   modulePost: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  moreButton: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    minWidth: 44,
   },
   row: {
     flexDirection: 'row',
