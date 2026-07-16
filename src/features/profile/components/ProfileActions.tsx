@@ -1,20 +1,21 @@
-import {Alert, StyleSheet, View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability, useProtectedPrompt} from '@/auth/runtime'
-import {AppIcon} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import type {
   ModulaProfile,
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
-import {shareProfile} from '@/features/profile/services/shareProfile'
+import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {parseProfileId} from '@/api/contracts'
+import {shareProfile} from '@/features/profile/services/shareProfile'
 
 type ProfileActionsProps = {
   profile: ModulaProfile
@@ -31,34 +32,32 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
   if (viewer.canEdit) {
     return (
       <View style={[styles.row, {gap: spacing[2]}]}>
-        <ProfileActionButton
-          label="Edit profile"
-          icon="profile"
-          primary
-          onPress={() => router.push('/profile/edit' as Href)}
-        />
-        <ProfileActionButton
-          label="Customize"
-          icon="appearance"
-          onPress={() => router.push('/profile/customize' as Href)}
-        />
-        <ProfileActionButton
-          label="Share"
-          icon="share"
-          onPress={() => void shareProfile(profile)}
-        />
-        <ProfileActionButton
+        <View style={styles.primary}>
+          <ModulaButton
+            label="Edit Profile"
+            role="primary"
+            onPress={() => router.push('/profile/edit' as Href)}
+          />
+        </View>
+        <ModulaButton
           label="More"
-          icon="more"
-          onPress={() =>
-            Alert.alert('Profile actions', 'Choose a preview action.', [
-              {text: 'View as visitor', onPress: () => router.push('/profile/preview' as Href)},
-              {text: 'Copy profile link preview', onPress: () => void shareProfile(profile)},
-              {text: 'Open Appearance', onPress: () => router.push('/settings/appearance' as Href)},
-              {text: 'Cancel', style: 'cancel'},
-            ])
-          }
+          role="secondary"
+          onPress={() => {
+            void presentModulaActions({
+              title: 'Profile',
+              actions: [
+                {id: 'customize', label: 'Customize'},
+                {id: 'share', label: 'Share profile'},
+                {id: 'preview', label: 'View as visitor'},
+              ],
+            }).then(id => {
+              if (id === 'customize') router.push('/profile/customize' as Href)
+              if (id === 'share') void shareProfile(profile)
+              if (id === 'preview') router.push('/profile/preview' as Href)
+            })
+          }}
         />
+        <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
       </View>
     )
   }
@@ -86,8 +85,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
           {
             backgroundColor: profile.isFollowing ? colours.surfaceRaised : colours.accent,
             borderColor: profile.isFollowing ? colours.border : 'transparent',
-            borderRadius: radius.round,
-            gap: spacing[2],
+            borderRadius: radius.md,
             paddingHorizontal: spacing[4],
           },
         ]}>
@@ -99,77 +97,26 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
           {profile.isFollowing ? 'Following' : 'Follow'}
         </AppText>
       </AppPressable>
-      <ProfileActionButton
-        label="Message"
-        icon="messages"
+      <ModulaButton
+        label="More"
+        role="secondary"
         onPress={() => {
-          if (canFollow) router.push('/messages' as Href)
-          else prompt.show()
+          void presentModulaActions({
+            title: profile.displayName,
+            actions: [
+              {id: 'share', label: 'Share profile'},
+              {id: 'copy', label: 'Copy profile link'},
+              {id: 'mute', label: 'Mute preview', style: 'destructive'},
+              {id: 'block', label: 'Block preview', style: 'destructive'},
+              {id: 'report', label: 'Report preview', style: 'destructive'},
+            ],
+          }).then(id => {
+            if (id === 'share' || id === 'copy') void shareProfile(profile)
+          })
         }}
       />
-      <ProfileActionButton
-        label="Share"
-        icon="share"
-        onPress={() => void shareProfile(profile)}
-      />
-      <ProfileActionButton
-        label="More"
-        icon="more"
-        onPress={() =>
-          Alert.alert('Visitor preview actions', 'These moderation actions are local explanatory previews only.', [
-            {text: 'Mute preview'},
-            {text: 'Block preview'},
-            {text: 'Report preview'},
-            {text: 'Cancel', style: 'cancel'},
-          ])
-        }
-      />
-      <ProtectedActionPrompt
-        visible={prompt.visible}
-        onClose={prompt.hide}
-        description="Sign in to follow profiles or use private social actions."
-      />
+      <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
     </View>
-  )
-}
-
-function ProfileActionButton({
-  label,
-  icon,
-  onPress,
-  primary,
-}: {
-  label: string
-  icon: Parameters<typeof AppIcon>[0]['name']
-  onPress: () => void
-  primary?: boolean
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={[
-        styles.button,
-        {
-          backgroundColor: primary ? colours.accent : colours.surfaceRaised,
-          borderColor: primary ? 'transparent' : colours.border,
-          borderRadius: radius.round,
-          gap: spacing[2],
-          paddingHorizontal: spacing[3],
-        },
-      ]}>
-      <AppIcon
-        name={icon}
-        colour={primary ? colours.accentForeground : colours.textSecondary}
-        size={18}
-      />
-      <AppText
-        variant="label"
-        style={{color: primary ? colours.accentForeground : colours.text}}>
-        {label}
-      </AppText>
-    </AppPressable>
   )
 }
 
@@ -177,11 +124,14 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
     justifyContent: 'center',
+    minHeight: 44,
+  },
+  primary: {
+    flex: 1,
   },
   row: {
+    alignItems: 'center',
     flexDirection: 'row',
-    flexWrap: 'wrap',
   },
 })
