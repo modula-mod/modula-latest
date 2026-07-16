@@ -47,7 +47,7 @@ const requiredRoutes = [
   'src/app/teams.tsx',
   'src/app/modules.tsx',
   'src/app/marketplace.tsx',
-  'src/app/settings.tsx',
+  'src/app/settings/index.tsx',
   'src/app/reels.tsx',
   'src/app/post/[postId].tsx',
   'src/app/(tabs)/_layout.tsx',
