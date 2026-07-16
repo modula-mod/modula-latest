@@ -144,7 +144,12 @@ function ReelsPreviewRail() {
               styles.reelCard,
               {backgroundColor: reel.colour, borderRadius: radius.large},
             ]}>
-            <View style={styles.reelScrim} />
+            <View
+              style={[
+                styles.reelScrim,
+                {backgroundColor: colours.backdrop, opacity: 0.18},
+              ]}
+            />
             <AppText variant="label" style={{color: colours.surface}}>
               {reel.author.displayName}
             </AppText>
@@ -332,7 +337,6 @@ const styles = StyleSheet.create({
   },
   reelScrim: {
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.18)',
     left: 0,
     position: 'absolute',
     right: 0,

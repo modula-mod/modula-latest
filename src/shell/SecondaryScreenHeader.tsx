@@ -3,6 +3,7 @@ import {useRouter} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {IconButton} from '@/components/primitives/IconButton'
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -18,12 +19,12 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
   const {colours, spacing} = useThemeTokens()
 
   return (
-    <View
+    <MaterialSurface
+      role="navigation"
       style={[
         styles.wrap,
         {
           paddingTop: insets.top,
-          backgroundColor: colours.canvas,
           borderBottomColor: colours.border,
         },
       ]}>
@@ -44,7 +45,7 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
         </AppText>
         <View style={styles.right}>{right}</View>
       </View>
-    </View>
+    </MaterialSurface>
   )
 }
 

@@ -1,7 +1,8 @@
 import type {ReactNode} from 'react'
-import {View, type StyleProp, type ViewStyle} from 'react-native'
+import {type StyleProp, type ViewStyle} from 'react-native'
 
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
+import type {SurfaceRole} from '@/theme/contracts'
 
 export type SurfaceVariant =
   | 'canvas'
@@ -14,31 +15,21 @@ type SurfaceProps = {
   variant?: SurfaceVariant
   children: ReactNode
   style?: StyleProp<ViewStyle>
+  role?: SurfaceRole
 }
 
-export function Surface({variant = 'plain', children, style}: SurfaceProps) {
-  const {colours, radius} = useThemeTokens()
-  const backgroundColor =
-    variant === 'canvas'
-      ? colours.canvas
-      : variant === 'raised'
-        ? colours.surfaceRaised
-        : variant === 'muted'
-          ? colours.surfaceMuted
-          : colours.surface
+function roleForVariant(variant: SurfaceVariant): SurfaceRole {
+  if (variant === 'canvas') return 'canvas'
+  if (variant === 'plain') return 'content'
+  if (variant === 'contained') return 'card'
+  if (variant === 'muted') return 'input'
+  return 'card'
+}
 
+export function Surface({variant = 'plain', children, style, role}: SurfaceProps) {
   return (
-    <View
-      style={[
-        {
-          backgroundColor,
-          borderColor: variant === 'contained' ? colours.border : 'transparent',
-          borderRadius: variant === 'contained' ? radius.medium : 0,
-          borderWidth: variant === 'contained' ? 1 : 0,
-        },
-        style,
-      ]}>
+    <MaterialSurface role={role ?? roleForVariant(variant)} style={style}>
       {children}
-    </View>
+    </MaterialSurface>
   )
 }

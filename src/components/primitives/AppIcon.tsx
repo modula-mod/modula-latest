@@ -20,6 +20,23 @@ export type AppIconName =
   | 'modules'
   | 'marketplace'
   | 'settings'
+  | 'appearance'
+  | 'accessibility'
+  | 'privacy'
+  | 'notifications'
+  | 'integrations'
+  | 'storage'
+  | 'security'
+  | 'developer'
+  | 'account'
+  | 'palette'
+  | 'text'
+  | 'contrast'
+  | 'motion'
+  | 'reset'
+  | 'warning'
+  | 'info'
+  | 'switch'
   | 'close'
   | 'back'
   | 'photo'
@@ -61,6 +78,23 @@ const iconMap: Record<AppIconName, IoniconName> = {
   modules: 'cube-outline',
   marketplace: 'storefront-outline',
   settings: 'settings-outline',
+  appearance: 'color-palette-outline',
+  accessibility: 'accessibility-outline',
+  privacy: 'lock-closed-outline',
+  notifications: 'notifications-outline',
+  integrations: 'git-network-outline',
+  storage: 'archive-outline',
+  security: 'shield-checkmark-outline',
+  developer: 'terminal-outline',
+  account: 'person-outline',
+  palette: 'color-fill-outline',
+  text: 'text-outline',
+  contrast: 'contrast-outline',
+  motion: 'pulse-outline',
+  reset: 'refresh-outline',
+  warning: 'warning-outline',
+  info: 'information-circle-outline',
+  switch: 'toggle-outline',
   close: 'close-outline',
   back: 'chevron-back',
   photo: 'image-outline',

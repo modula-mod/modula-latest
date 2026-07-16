@@ -10,7 +10,7 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {demoReels, type DemoReel} from '@/demo/demoReels'
 import {selectionHaptic} from '@/lib/haptics'
-import {lightColours} from '@/theme/foundations/colour'
+import {strongestReadableForeground} from '@/theme/accents'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ReelsScreen() {
@@ -46,9 +46,9 @@ function ReelItem({
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const [liked, setLiked] = useState(reel.liked)
-  const {spacing} = useThemeTokens()
+  const {accessibility, colours, spacing} = useThemeTokens()
 
-  const overlayColour = lightColours.canvas
+  const overlayColour = strongestReadableForeground(reel.colour)
 
   return (
     <View
@@ -63,7 +63,15 @@ function ReelItem({
           paddingHorizontal: spacing[4],
         },
       ]}>
-      <View style={styles.reelPattern} />
+      <View
+        style={[
+          styles.reelPattern,
+          {
+            backgroundColor: colours.backdrop,
+            opacity: accessibility.reduceTransparency ? 0.42 : 0.16,
+          },
+        ]}
+      />
       <View style={styles.topRow}>
         <AppPressable
           accessibilityLabel="Back from Reels"
@@ -185,7 +193,6 @@ const styles = StyleSheet.create({
     width: 44,
   },
   reelPattern: {
-    backgroundColor: 'rgba(0, 0, 0, 0.16)',
     bottom: 0,
     left: 0,
     position: 'absolute',

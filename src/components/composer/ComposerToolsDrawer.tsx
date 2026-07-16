@@ -2,10 +2,10 @@ import {useEffect, useState} from 'react'
 import {Animated, Modal, Pressable, StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ComposerToolsDrawerProps = {
@@ -34,18 +34,17 @@ export function ComposerToolsDrawer({
   onPlaceholder,
 }: ComposerToolsDrawerProps) {
   const insets = useSafeAreaInsets()
-  const reduceMotion = useReduceMotion()
   const [progress] = useState(() => new Animated.Value(0))
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, motion, radius, spacing} = useThemeTokens()
 
   useEffect(() => {
     progress.stopAnimation()
     Animated.timing(progress, {
       toValue: visible ? 1 : 0,
-      duration: reduceMotion ? 0 : visible ? 200 : 170,
+      duration: visible ? motion.normal : motion.fast,
       useNativeDriver: true,
     }).start()
-  }, [progress, reduceMotion, visible])
+  }, [motion.fast, motion.normal, progress, visible])
 
   useEffect(() => {
     return () => progress.stopAnimation()
@@ -94,13 +93,8 @@ export function ComposerToolsDrawer({
         </Animated.View>
         <Animated.View
           style={[
-            styles.sheet,
+            styles.sheetFrame,
             {
-              backgroundColor: colours.surface,
-              borderTopColor: colours.border,
-              borderTopLeftRadius: radius.xlarge,
-              borderTopRightRadius: radius.xlarge,
-              paddingBottom: Math.max(insets.bottom, spacing[4]),
               transform: [
                 {
                   translateY: progress.interpolate({
@@ -111,6 +105,17 @@ export function ComposerToolsDrawer({
               ],
             },
           ]}>
+          <MaterialSurface
+            role="modal"
+            style={[
+              styles.sheet,
+              {
+                borderTopColor: colours.border,
+                borderTopLeftRadius: radius.xlarge,
+                borderTopRightRadius: radius.xlarge,
+                paddingBottom: Math.max(insets.bottom, spacing[4]),
+              },
+            ]}>
           <View style={[styles.handle, {backgroundColor: colours.border}]} />
           <View style={[styles.header, {paddingHorizontal: spacing[4]}]}>
             <AppText variant="headline">Composer Tools</AppText>
@@ -145,6 +150,7 @@ export function ComposerToolsDrawer({
               </AppPressable>
             ))}
           </View>
+          </MaterialSurface>
         </Animated.View>
       </View>
     </Modal>
@@ -177,9 +183,11 @@ const styles = StyleSheet.create({
   },
   sheet: {
     borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 4,
+  },
+  sheetFrame: {
     bottom: 0,
     left: 0,
-    paddingTop: 4,
     position: 'absolute',
     right: 0,
   },

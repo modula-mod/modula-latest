@@ -3,6 +3,7 @@ import {Animated, BackHandler, Modal, Pressable, StyleSheet, View, useWindowDime
 import {usePathname, useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {Avatar} from '@/components/primitives/Avatar'
 import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -140,17 +141,23 @@ export function NavigationDrawer() {
         </Animated.View>
         <Animated.View
           style={[
-            styles.drawer,
+            styles.drawerFrame,
             animatedStyles.drawer,
             {
               width: drawerWidth,
+            },
+          ]}>
+          <MaterialSurface
+            role="modal"
+            style={[
+              styles.drawer,
+              {
               paddingTop: insets.top + spacing[3],
               paddingBottom: Math.max(insets.bottom, spacing[4]),
               paddingHorizontal: spacing[4],
-              backgroundColor: colours.surface,
               borderRightColor: colours.border,
-            },
-          ]}>
+              },
+            ]}>
           <View style={[styles.header, {gap: spacing[3]}]}>
             <Avatar
               name={currentDemoProfile.displayName}
@@ -225,6 +232,7 @@ export function NavigationDrawer() {
               Modula 0.1.0 {isDevelopmentBuild() ? 'Development build' : 'Local shell'}
             </AppText>
           </View>
+          </MaterialSurface>
         </Animated.View>
       </View>
     </Modal>
@@ -234,6 +242,9 @@ export function NavigationDrawer() {
 const styles = StyleSheet.create({
   drawer: {
     borderRightWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+  },
+  drawerFrame: {
     flex: 1,
   },
   footer: {

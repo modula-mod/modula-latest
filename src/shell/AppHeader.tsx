@@ -3,6 +3,7 @@ import {useRouter, type Href} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {Avatar} from '@/components/primitives/Avatar'
 import {IconButton} from '@/components/primitives/IconButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -23,12 +24,12 @@ export function AppHeader({centre}: AppHeaderProps) {
   const {colours, spacing} = useThemeTokens()
 
   return (
-    <View
+    <MaterialSurface
+      role="navigation"
       style={[
         styles.wrap,
         {
           paddingTop: insets.top,
-          backgroundColor: colours.canvas,
           borderBottomColor: colours.border,
         },
       ]}>
@@ -51,7 +52,7 @@ export function AppHeader({centre}: AppHeaderProps) {
           />
         </View>
       </View>
-    </View>
+    </MaterialSurface>
   )
 }
 

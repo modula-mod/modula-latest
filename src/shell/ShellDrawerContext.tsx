@@ -10,7 +10,7 @@ import {
 } from 'react'
 import {Animated} from 'react-native'
 
-import {useReduceMotion} from '@/lib/accessibility'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type DrawerPhase = 'closed' | 'opening' | 'open' | 'closing'
 
@@ -28,7 +28,7 @@ type ShellDrawerContextValue = {
 const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
 export function ShellDrawerProvider({children}: PropsWithChildren) {
-  const reduceMotion = useReduceMotion()
+  const {motion} = useThemeTokens()
   const [progress] = useState(() => new Animated.Value(0))
   const phaseRef = useRef<DrawerPhase>('closed')
   const afterCloseRef = useRef<(() => void) | undefined>(undefined)
@@ -48,12 +48,12 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
     setPhase('opening')
     Animated.timing(progress, {
       toValue: 1,
-      duration: reduceMotion ? 0 : 200,
+      duration: motion.normal,
       useNativeDriver: true,
     }).start(({finished}) => {
       setPhase(finished ? 'open' : 'closed')
     })
-  }, [progress, reduceMotion, setPhase])
+  }, [motion.normal, progress, setPhase])
 
   const closeDrawer = useCallback(
     (options?: CloseDrawerOptions) => {
@@ -65,7 +65,7 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
       setPhase('closing')
       Animated.timing(progress, {
         toValue: 0,
-        duration: reduceMotion ? 0 : 180,
+        duration: motion.fast,
         useNativeDriver: true,
       }).start(({finished}) => {
         setPhase(finished ? 'closed' : 'open')
@@ -76,7 +76,7 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
         }
       })
     },
-    [progress, reduceMotion, setPhase],
+    [motion.fast, progress, setPhase],
   )
 
   useEffect(() => {

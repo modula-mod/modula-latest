@@ -1,6 +1,7 @@
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {MaterialNavigationBar} from '@/components/materials/MaterialNavigationBar'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -52,12 +53,11 @@ export function MainTabBar({state, descriptors, navigation}: MainTabBarProps) {
   const showLabels = width >= 390
 
   return (
-    <View
+    <MaterialNavigationBar
       style={[
         styles.wrap,
         {
           paddingBottom: Math.max(insets.bottom, spacing[2]),
-          backgroundColor: colours.surface,
           borderTopColor: colours.border,
         },
       ]}>
@@ -123,7 +123,7 @@ export function MainTabBar({state, descriptors, navigation}: MainTabBarProps) {
           )
         })}
       </View>
-    </View>
+    </MaterialNavigationBar>
   )
 }
 
