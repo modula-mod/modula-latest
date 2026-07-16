@@ -1,0 +1,11 @@
+export type AuthCapability =
+  | 'social:read'
+  | 'post:create'
+  | 'post:engage'
+  | 'profile:manage'
+  | 'profile:customize'
+  | 'social:follow'
+  | 'saved:manage'
+  | 'messages:access'
+  | 'modules:install'
+  | 'account:manage'
