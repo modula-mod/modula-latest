@@ -13,10 +13,22 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
+!android/app/debug.keystore
 *.p8
 *.p12
+*.cer
 *.key
 *.mobileprovision
+*.pem
+
+# Signing / cloud credentials (never commit)
+credentials.json
+**/credentials.json
+service-account*.json
+*-service-account.json
+google-services.json
+GoogleService-Info.plist
 
 # Metro
 .metro-health-check*
@@ -28,11 +40,11 @@ yarn-error.*
 
 # macOS
 .DS_Store
-*.pem
 
-# local env files
+# local env files (keep .env.example tracked)
 .env
-.env*.local
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -40,4 +52,6 @@ yarn-error.*
 example
 
 # Native projects are committed after Phase 0 prebuild.
-# Local build artefacts under ios/android remain ignored via patterns below if needed.
+# Local build artefacts under ios/ and android/ remain ignored via
+# ios/.gitignore and android/.gitignore (build/, Pods/, .gradle, etc.).
+# Do not ignore the ios/ or android/ source trees themselves.
