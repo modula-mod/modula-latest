@@ -16,6 +16,7 @@ import {useDiscoverQuery} from '@/features/discover/data'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -60,6 +61,9 @@ export function DiscoverScreen() {
                   {id: 'Communities', label: 'Communities'},
                   {id: 'Marketplace', label: 'Marketplace'},
                   {id: 'Media', label: 'Media'},
+                  {id: 'interests', label: 'Edit interests — Preview'},
+                  {id: 'feeds', label: 'Custom feeds — Preview'},
+                  {id: 'media-grid', label: 'Media grid'},
                   {id: 'open-marketplace', label: 'Open Marketplace'},
                   {id: 'open-communities', label: 'Open Communities'},
                 ]}
@@ -72,11 +76,37 @@ export function DiscoverScreen() {
                     router.push('/communities' as Href)
                     return
                   }
+                  if (id === 'interests') {
+                    router.push('/discover/interests' as Href)
+                    return
+                  }
+                  if (id === 'feeds') {
+                    router.push('/discover/feeds' as Href)
+                    return
+                  }
+                  if (id === 'media-grid') {
+                    router.push('/discover/media' as Href)
+                    return
+                  }
                   setCategory(id as Category)
                 }}
                 trigger={<AppIcon name="more" colour={colours.textSecondary} />}
               />
             </View>
+            <AppPressable
+              accessibilityLabel="Edit interests Preview"
+              onPress={() => router.push('/discover/interests' as Href)}
+              style={[
+                styles.cta,
+                {
+                  backgroundColor: colours.accentSubtle,
+                  borderRadius: radius.round,
+                },
+              ]}>
+              <AppText variant="label" style={{color: colours.accent}}>
+                Choose interests — Preview
+              </AppText>
+            </AppPressable>
             <View
               style={[
                 styles.search,
@@ -314,13 +344,34 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
     <Section title="Trending topics">
       <View style={[styles.topicWrap, {gap: spacing[2]}]}>
         {topics.map(topic => (
-          <Pill
+          <ModulaContextMenu
             key={topic.id}
-            label={topic.label}
-            onPress={() => router.push(`/communities/${topic.id}` as Href)}
-          />
+            accessibilityLabel={`${topic.label} topic actions`}
+            actions={[
+              {id: 'open', label: 'Open topic'},
+              {id: 'pin', label: 'Pin feed — Preview'},
+              {id: 'mute', label: 'Mute topic — Preview', style: 'destructive'},
+            ]}
+            onAction={id => {
+              if (id === 'open') {
+                router.push(`/communities/${topic.id}` as Href)
+              }
+            }}>
+            <Pill
+              label={`${topic.label}`}
+              onPress={() => router.push(`/communities/${topic.id}` as Href)}
+            />
+          </ModulaContextMenu>
         ))}
       </View>
+      <AppPressable
+        accessibilityLabel="Manage custom feeds"
+        onPress={() => router.push('/discover/feeds' as Href)}
+        style={{minHeight: 44, justifyContent: 'center'}}>
+        <AppText variant="label" colour="textSecondary">
+          Custom feeds & pins — Preview
+        </AppText>
+      </AppPressable>
     </Section>
   )
 }

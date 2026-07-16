@@ -81,16 +81,65 @@ export function AdaptiveAccountPanel() {
           </View>
         </AppPressable>
 
+        {ownerProfile ? (
+          <View style={[styles.statsRow, {gap: spacing[4]}]}>
+            <AppText variant="caption" colour="textSecondary">
+              {ownerProfile.followerCount ?? 0} followers
+            </AppText>
+            <AppText variant="caption" colour="textSecondary">
+              {ownerProfile.followingCount ?? 0} following
+            </AppText>
+          </View>
+        ) : null}
+
         <Divider />
 
+        <AppText variant="label" colour="textSecondary">
+          Primary
+        </AppText>
         <View style={{gap: spacing[2]}}>
-          {destinations.map(item => (
-            <DrawerItem
-              key={item.id}
-              item={item}
-              onPress={() => navigate(item.route)}
-            />
-          ))}
+          {destinations
+            .filter(item => !['settings', 'appearance', 'developer', 'help'].includes(item.id))
+            .map(item => (
+              <DrawerItem
+                key={item.id}
+                item={item}
+                onPress={() => navigate(item.route)}
+              />
+            ))}
+        </View>
+
+        <Divider />
+
+        <AppText variant="label" colour="textSecondary">
+          Settings & help
+        </AppText>
+        <View style={{gap: spacing[2]}}>
+          {destinations
+            .filter(item => ['appearance', 'settings', 'help', 'developer'].includes(item.id))
+            .map(item => (
+              <DrawerItem
+                key={item.id}
+                item={item}
+                onPress={() => navigate(item.route)}
+              />
+            ))}
+          <DrawerItem
+            item={{
+              label: 'Switch account',
+              icon: 'switch',
+              description: 'Local account switcher Preview',
+            }}
+            onPress={() => navigate('/account/switcher')}
+          />
+          <DrawerItem
+            item={{
+              label: 'Quick appearance',
+              icon: 'appearance',
+              description: 'Colour mode and accent',
+            }}
+            onPress={() => navigate('/settings/appearance')}
+          />
         </View>
 
         <Divider />
@@ -122,5 +171,8 @@ const styles = StyleSheet.create({
   identityText: {
     flex: 1,
     minWidth: 0,
+  },
+  statsRow: {
+    flexDirection: 'row',
   },
 })

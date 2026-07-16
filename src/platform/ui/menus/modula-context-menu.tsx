@@ -14,9 +14,8 @@ type ModulaContextMenuProps = {
 }
 
 /**
- * Long-press context menu host.
- * Action lists are data-driven so siblings can add Translate / overflow items
- * without rewriting product screens.
+ * Long-press context menu host (web / Android fallback).
+ * iOS uses Expo UI SwiftUI ContextMenu via `.native.tsx`.
  */
 export function ModulaContextMenu({
   children,

@@ -10,6 +10,7 @@ export type SeededMessageThread = {
   preview: string
   timestamp: string
   unread: boolean
+  pinned?: boolean
 }
 
 export type SeededList = {
@@ -57,6 +58,7 @@ export const seededMessageThreads: SeededMessageThread[] = [
     preview: 'The profile hero feels calmer now — nice work.',
     timestamp: '12m',
     unread: true,
+    pinned: true,
   },
   {
     id: 'msg-2',
@@ -73,6 +75,7 @@ export const seededMessageThreads: SeededMessageThread[] = [
     preview: 'Saved your Vault Notes trail for later.',
     timestamp: 'Yesterday',
     unread: false,
+    pinned: true,
   },
   {
     id: 'msg-4',
@@ -81,6 +84,38 @@ export const seededMessageThreads: SeededMessageThread[] = [
     preview: 'Automation handoff stays human-controlled.',
     timestamp: '2d',
     unread: false,
+  },
+]
+
+export const seededSharePeople = seededMessageThreads
+
+export const seededInterests = [
+  'Design systems',
+  'Native UI',
+  'Modules',
+  'Creator tools',
+  'Local-first',
+  'Accessibility',
+]
+
+export const seededCustomFeeds = [
+  {
+    id: 'feed-builders',
+    name: 'Builders',
+    description: 'People shipping Modula modules',
+    pinned: true,
+  },
+  {
+    id: 'feed-calm',
+    name: 'Calm design',
+    description: 'Surface and token posts',
+    pinned: false,
+  },
+  {
+    id: 'feed-modules',
+    name: 'Module drops',
+    description: 'Marketplace and install notes',
+    pinned: false,
   },
 ]
 

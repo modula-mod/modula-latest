@@ -46,8 +46,12 @@ function RootNavigator() {
         <Stack.Screen name="whats-new" />
         <Stack.Screen name="account/switcher" options={{presentation: 'modal'}} />
         <Stack.Screen name="share-profile" options={{presentation: 'modal'}} />
+        <Stack.Screen name="share" options={{presentation: 'modal'}} />
         <Stack.Screen name="report" options={{presentation: 'modal'}} />
         <Stack.Screen name="reactions" options={{presentation: 'modal'}} />
+        <Stack.Screen name="discover/interests" options={{presentation: 'modal'}} />
+        <Stack.Screen name="discover/feeds" options={{presentation: 'modal'}} />
+        <Stack.Screen name="discover/media" />
         <Stack.Screen name="settings" />
       </Stack>
       <AdaptiveAccountPanel />

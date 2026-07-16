@@ -1,16 +1,20 @@
-import {useLocalSearchParams, useRouter} from 'expo-router'
+import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {ScrollView, StyleSheet, View} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {parsePostId} from '@/api/contracts'
 import {useSession} from '@/auth/runtime'
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {DemoPostItem} from '@/components/feed/DemoPostItem'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {usePostQuery} from '@/features/feed/data'
+import {openPostMoreMenu} from '@/features/feed/postActions'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -27,11 +31,18 @@ const replies = [
     text: 'The repository boundary gives modules a clean place to attach later.',
     time: '7m',
   },
+  {
+    id: 'reply-3',
+    text: 'Composer reply mode should feel like a sticky bar, not a dead-end card.',
+    time: '3m',
+  },
 ]
 
 export function PostDetailScreen() {
   const {postId} = useLocalSearchParams<{postId: string}>()
-  const {colours, spacing} = useThemeTokens()
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const {colours, radius, spacing} = useThemeTokens()
   let parsedPostId = null
   try {
     parsedPostId = parsePostId(postId)
@@ -43,31 +54,85 @@ export function PostDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Post" />
+      <SecondaryScreenHeader
+        title="Post"
+        right={
+          post ? (
+            <AppPressable
+              accessibilityLabel="Post options"
+              onPress={() => void openPostMoreMenu(post)}
+              style={styles.headerMore}>
+              <AppIcon name="more" colour={colours.textSecondary} />
+            </AppPressable>
+          ) : null
+        }
+      />
       <ResponsiveContent>
         {post ? (
-          <ScrollView contentContainerStyle={{paddingBottom: spacing[8]}}>
-            <DemoPostItem post={post} />
-            <View style={[styles.thread, {paddingHorizontal: spacing[4]}]}>
-              {replies.map(reply => (
-                <ReplyRow key={reply.id} reply={{...reply, author: post.author}} />
-              ))}
-            </View>
+          <>
+            <ScrollView contentContainerStyle={{paddingBottom: 120 + insets.bottom}}>
+              <DemoPostItem post={post} />
+              <View style={[styles.thread, {paddingHorizontal: spacing[4]}]}>
+                <AppText variant="headline" style={{marginBottom: spacing[3]}}>
+                  Replies
+                </AppText>
+                {replies.map(reply => (
+                  <ModulaContextMenu
+                    key={reply.id}
+                    accessibilityLabel={`Reply actions for ${reply.id}`}
+                    actions={[
+                      {id: 'reply', label: 'Reply'},
+                      {id: 'like', label: 'Like — Preview'},
+                      {id: 'report', label: 'Report — Preview', style: 'destructive'},
+                    ]}
+                    onAction={id => {
+                      if (id === 'reply') {
+                        router.push(
+                          `/compose?mode=reply&replyTo=${encodeURIComponent(post.id)}` as Href,
+                        )
+                      }
+                    }}>
+                    <ReplyRow reply={{...reply, author: post.author}} />
+                  </ModulaContextMenu>
+                ))}
+              </View>
+            </ScrollView>
             <View
               style={[
-                styles.replyPrompt,
+                styles.replyBar,
                 {
-                  borderColor: colours.border,
-                  margin: spacing[4],
-                  padding: spacing[4],
+                  backgroundColor: colours.surface,
+                  borderTopColor: colours.border,
+                  paddingBottom: Math.max(insets.bottom, spacing[2]),
+                  paddingHorizontal: spacing[4],
                 },
               ]}>
-              <AppText variant="headline">Add a local reply</AppText>
-              <AppText variant="body" colour="textSecondary">
-                Reply composition will connect after the data runtime stabilises.
-              </AppText>
+              <Avatar
+                name={post.author.displayName}
+                uri={post.author.avatarUri}
+                colour={post.author.coverColour}
+                size={34}
+              />
+              <AppPressable
+                accessibilityLabel="Write a reply"
+                onPress={() =>
+                  router.push(
+                    `/compose?mode=reply&replyTo=${encodeURIComponent(post.id)}` as Href,
+                  )
+                }
+                style={[
+                  styles.replyField,
+                  {
+                    backgroundColor: colours.surfaceMuted,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <AppText variant="body" colour="textTertiary">
+                  Post your reply…
+                </AppText>
+              </AppPressable>
             </View>
-          </ScrollView>
+          </>
         ) : postQuery.isLoading ? (
           <InitialLoadingState label="Loading post" />
         ) : postQuery.isError ? (
@@ -138,22 +203,41 @@ const styles = StyleSheet.create({
   connectorWrap: {
     alignItems: 'center',
   },
-  replyBody: {
-    flex: 1,
-    minWidth: 0,
+  headerMore: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
   },
   replyAvatarPress: {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  replyBar: {
+    alignItems: 'center',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    bottom: 0,
+    flexDirection: 'row',
+    gap: 10,
+    left: 0,
+    minHeight: 56,
+    paddingTop: 8,
+    position: 'absolute',
+    right: 0,
+  },
+  replyBody: {
+    flex: 1,
+    minWidth: 0,
+  },
+  replyField: {
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 44,
+    paddingHorizontal: 14,
+  },
   replyIdentityPress: {
     justifyContent: 'center',
     minHeight: 42,
-  },
-  replyPrompt: {
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    gap: 6,
   },
   replyRow: {
     flexDirection: 'row',

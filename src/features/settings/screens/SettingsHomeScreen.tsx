@@ -1,5 +1,7 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {useState} from 'react'
+import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
 
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
@@ -8,6 +10,7 @@ import {
   SettingsSection,
   type SettingsNavRow,
 } from '@/features/settings/components/SettingsRows'
+import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useAppearance} from '@/theme/runtime/useAppearance'
@@ -111,7 +114,9 @@ const supportRows: SettingsNavRow[] = [
 
 export function SettingsHomeScreen() {
   const {preferences, resolved} = useAppearance()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, radius, spacing} = useThemeTokens()
+  const [query, setQuery] = useState('')
+  const [advancedOpen, setAdvancedOpen] = useState(false)
 
   const appearanceValue = `${label(preferences.mode)} · ${label(preferences.surfaceType)}`
   const accessibilityValue = resolved.accessibility.reduceMotion
@@ -119,6 +124,15 @@ export function SettingsHomeScreen() {
     : resolved.accessibility.increaseContrast
       ? 'High contrast'
       : 'Standard'
+
+  const q = query.trim().toLowerCase()
+  const match = (row: SettingsNavRow) =>
+    !q ||
+    `${row.title} ${row.description ?? ''}`.toLowerCase().includes(q)
+
+  const filteredAccount = accountRows.filter(match)
+  const filteredPrefs = preferenceRows.filter(match)
+  const filteredSupport = supportRows.filter(match)
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -132,18 +146,39 @@ export function SettingsHomeScreen() {
             body="Manage the local Modula shell. Every row opens a real screen with usable controls or honest Preview content."
           />
 
+          <View
+            style={[
+              styles.search,
+              {
+                backgroundColor: colours.surfaceMuted,
+                borderRadius: radius.round,
+                gap: spacing[2],
+                paddingHorizontal: spacing[3],
+              },
+            ]}>
+            <AppIcon name="search" colour={colours.textTertiary} size={18} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search settings"
+              placeholderTextColor={colours.textTertiary}
+              accessibilityLabel="Search settings"
+              style={[styles.searchInput, {color: colours.text}]}
+            />
+          </View>
+
           <SettingsSection title="You">
-            {accountRows.map((row, index) => (
+            {filteredAccount.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
                 row={row}
-                last={index === accountRows.length - 1}
+                last={index === filteredAccount.length - 1}
               />
             ))}
           </SettingsSection>
 
           <SettingsSection title="Preferences">
-            {preferenceRows.map((row, index) => (
+            {filteredPrefs.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
                 row={{
@@ -155,17 +190,30 @@ export function SettingsHomeScreen() {
                         ? accessibilityValue
                         : row.value,
                 }}
-                last={index === preferenceRows.length - 1}
+                last={index === filteredPrefs.length - 1}
               />
             ))}
           </SettingsSection>
 
+          <ModulaDisclosureGroup
+            label="Advanced preferences"
+            isExpanded={advancedOpen}
+            onIsExpandedChange={setAdvancedOpen}
+            rows={[
+              'Data saver and autoplay live under Content & Media.',
+              'Mute words and blocked accounts live under Privacy.',
+              'Developer diagnostics are development-only.',
+            ]}
+          >
+            {null}
+          </ModulaDisclosureGroup>
+
           <SettingsSection title="Support">
-            {supportRows.map((row, index) => (
+            {filteredSupport.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
                 row={row}
-                last={index === supportRows.length - 1}
+                last={index === filteredSupport.length - 1}
               />
             ))}
           </SettingsSection>
@@ -205,5 +253,15 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  search: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 44,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    minHeight: 44,
   },
 })

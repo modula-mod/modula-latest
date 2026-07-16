@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {Platform, ScrollView, StyleSheet, View} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, TextInput, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
@@ -26,7 +26,9 @@ import {
   seededMuteWords,
   whatsNewNotes,
 } from '@/features/social/data/seededSurfaces'
+import {selectionHaptic} from '@/lib/haptics'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -69,12 +71,28 @@ export function MessagesInboxScreen() {
   const canAccess = useCapability('messages:access')
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [filter, setFilter] = useState<'all' | 'unread'>('all')
-  const threads = useMemo(
-    () =>
-      seededMessageThreads.filter(thread => (filter === 'unread' ? thread.unread : true)),
-    [filter],
+  const [filter, setFilter] = useState<'all' | 'unread' | 'pinned'>('all')
+  const [query, setQuery] = useState('')
+  const [newMessageOpen, setNewMessageOpen] = useState(false)
+  const [pinnedIds, setPinnedIds] = useState(
+    () => new Set(seededMessageThreads.filter(t => t.pinned).map(t => t.id)),
   )
+
+  const threads = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return seededMessageThreads
+      .filter(thread => {
+        if (filter === 'unread' && !thread.unread) return false
+        if (filter === 'pinned' && !pinnedIds.has(thread.id)) return false
+        if (!q) return true
+        return (
+          thread.name.toLowerCase().includes(q) ||
+          thread.handle.toLowerCase().includes(q) ||
+          thread.preview.toLowerCase().includes(q)
+        )
+      })
+      .sort((a, b) => Number(pinnedIds.has(b.id)) - Number(pinnedIds.has(a.id)))
+  }, [filter, pinnedIds, query])
 
   if (!canAccess) {
     return (
@@ -89,59 +107,151 @@ export function MessagesInboxScreen() {
   }
 
   return (
-    <ScreenShell
-      title="Messages"
-      right={
-        <ModulaMenu
-          accessibilityLabel="Filter messages"
-          title="Filter"
-          actions={[
-            {id: 'all', label: 'All'},
-            {id: 'unread', label: 'Unread'},
-          ]}
-          onAction={id => setFilter(id as 'all' | 'unread')}
-          trigger={<AppIcon name="more" colour={colours.textSecondary} />}
-        />
-      }>
-      <AppText variant="display">Inbox</AppText>
-      <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
-      {threads.map(thread => (
-        <AppPressable
-          key={thread.id}
-          accessibilityLabel={`Open conversation with ${thread.name}`}
-          onPress={() => router.push(`/messages/${thread.id}` as Href)}
-          style={[
-            styles.row,
-            {
-              backgroundColor: colours.surfaceRaised,
-              borderColor: colours.border,
-              borderRadius: radius.large,
-              padding: spacing[4],
-              gap: spacing[3],
-            },
-          ]}>
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <SecondaryScreenHeader
+        title="Messages"
+        right={
+          <ModulaMenu
+            accessibilityLabel="Filter messages"
+            title="Filter"
+            actions={[
+              {id: 'all', label: 'All'},
+              {id: 'unread', label: 'Unread'},
+              {id: 'pinned', label: 'Pinned'},
+            ]}
+            onAction={id => setFilter(id as 'all' | 'unread' | 'pinned')}
+            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+          />
+        }
+      />
+      <ResponsiveContent>
+        <ScrollView
+          contentContainerStyle={[styles.content, {gap: spacing[4], paddingBottom: 100}]}
+          keyboardShouldPersistTaps="handled">
+          <AppText variant="display">Inbox</AppText>
+          <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
           <View
             style={[
-              styles.avatar,
-              {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
+              styles.searchRow,
+              {
+                backgroundColor: colours.surfaceMuted,
+                borderRadius: radius.round,
+                gap: spacing[2],
+                paddingHorizontal: spacing[3],
+              },
             ]}>
-            <AppIcon name="messages" colour={colours.accent} />
+            <AppIcon name="search" colour={colours.textTertiary} size={18} />
+            <TextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search messages"
+              placeholderTextColor={colours.textTertiary}
+              accessibilityLabel="Search messages"
+              style={[styles.searchInput, {color: colours.text}]}
+            />
           </View>
-          <View style={styles.flex}>
-            <AppText variant="label">
-              {thread.name}
-              {thread.unread ? ' · Unread' : ''}
-            </AppText>
-            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-              {thread.preview}
-            </AppText>
-          </View>
-          <AppText variant="caption" colour="textTertiary">
-            {thread.timestamp}
+          <AppText variant="caption" colour="textSecondary">
+            Filter: {filter === 'all' ? 'All' : filter === 'unread' ? 'Unread' : 'Pinned'}
           </AppText>
-        </AppPressable>
-      ))}
-    </ScreenShell>
+          {threads.map(thread => (
+            <ModulaContextMenu
+              key={thread.id}
+              accessibilityLabel={`${thread.name} conversation actions`}
+              actions={[
+                {
+                  id: 'pin',
+                  label: pinnedIds.has(thread.id) ? 'Unpin — Preview' : 'Pin — Preview',
+                },
+                {id: 'mute', label: 'Mute — Preview'},
+                {id: 'delete', label: 'Delete — Preview', style: 'destructive'},
+              ]}
+              onAction={id => {
+                if (id === 'pin') {
+                  setPinnedIds(prev => {
+                    const next = new Set(prev)
+                    if (next.has(thread.id)) next.delete(thread.id)
+                    else next.add(thread.id)
+                    return next
+                  })
+                }
+              }}>
+              <AppPressable
+                accessibilityLabel={`Open conversation with ${thread.name}`}
+                onPress={() => router.push(`/messages/${thread.id}` as Href)}
+                style={[
+                  styles.row,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.large,
+                    padding: spacing[4],
+                    gap: spacing[3],
+                  },
+                ]}>
+                <View
+                  style={[
+                    styles.avatar,
+                    {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
+                  ]}>
+                  <AppIcon name="messages" colour={colours.accent} />
+                </View>
+                <View style={styles.flex}>
+                  <AppText variant="label">
+                    {pinnedIds.has(thread.id) ? 'Pinned · ' : ''}
+                    {thread.name}
+                    {thread.unread ? ' · Unread' : ''}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                    {thread.preview}
+                  </AppText>
+                </View>
+                <AppText variant="caption" colour="textTertiary">
+                  {thread.timestamp}
+                </AppText>
+              </AppPressable>
+            </ModulaContextMenu>
+          ))}
+        </ScrollView>
+      </ResponsiveContent>
+      <AppPressable
+        accessibilityLabel="New message Preview"
+        onPress={() => setNewMessageOpen(true)}
+        style={[
+          styles.fab,
+          {
+            backgroundColor: colours.accent,
+            borderRadius: radius.round,
+          },
+        ]}>
+        <AppIcon name="create" colour={colours.accentForeground} />
+      </AppPressable>
+      <ModulaSheet
+        isPresented={newMessageOpen}
+        onDismiss={() => setNewMessageOpen(false)}
+        snapPoints={['half', 'full']}
+        testID="new-message-sheet">
+        <AppText variant="headline">New message</AppText>
+        <PreviewBanner text="Compose a DM — Preview. Nothing is sent remotely." />
+        {seededMessageThreads.map(person => (
+          <AppPressable
+            key={`new-${person.id}`}
+            accessibilityLabel={`Message ${person.name} Preview`}
+            onPress={() => {
+              setNewMessageOpen(false)
+              router.push(`/messages/${person.id}` as Href)
+            }}
+            style={[styles.row, {paddingVertical: spacing[3], gap: spacing[3]}]}>
+            <AppIcon name="messages" colour={colours.accent} />
+            <View style={styles.flex}>
+              <AppText variant="label">{person.name}</AppText>
+              <AppText variant="caption" colour="textSecondary">
+                @{person.handle}
+              </AppText>
+            </View>
+          </AppPressable>
+        ))}
+      </ModulaSheet>
+    </View>
   )
 }
 
@@ -883,6 +993,15 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
+  fab: {
+    alignItems: 'center',
+    bottom: 24,
+    height: 56,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 20,
+    width: 56,
+  },
   flex: {
     flex: 1,
     minWidth: 0,
@@ -894,6 +1013,16 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    minHeight: 44,
+  },
+  searchRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 44,
   },
   sticker: {
     alignItems: 'center',

@@ -11,6 +11,7 @@ import {
 } from '@/features/marketplace/data/catalog'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
+import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -88,15 +89,34 @@ export function ModuleDetailScreen() {
             />
           ) : null}
 
-          <ModulaButton
-            label="Preview install"
-            role="primary"
-            onPress={() => {
+          <ModulaControlGroup
+            label="Module actions"
+            systemImage="ellipsis.circle"
+            actions={[
+              {id: 'install', label: 'Install Preview', systemImage: 'arrow.down.app'},
+              {id: 'edit', label: 'Edit', systemImage: 'pencil'},
+              {
+                id: 'remove',
+                label: 'Remove Preview',
+                systemImage: 'trash',
+                style: 'destructive',
+              },
+            ]}
+            onAction={id => {
+              if (id === 'install') {
+                void confirmModulaAction({
+                  title: 'Install Preview',
+                  message:
+                    `${module.name} will not be installed on a production backend. Local Phase 4.5 Preview only.`,
+                  confirmLabel: 'Acknowledge preview',
+                  cancelLabel: 'Cancel',
+                })
+                return
+              }
               void confirmModulaAction({
-                title: 'Preview install',
-                message:
-                  `${module.name} will not be installed on a production backend. This is a local Phase 4.5 Preview acknowledgement only.`,
-                confirmLabel: 'Acknowledge preview',
+                title: id === 'remove' ? 'Remove Preview' : 'Edit Preview',
+                message: 'This marketplace action is local Preview only.',
+                confirmLabel: 'OK',
                 cancelLabel: 'Cancel',
               })
             }}

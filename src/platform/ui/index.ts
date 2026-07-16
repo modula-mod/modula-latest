@@ -35,6 +35,10 @@ export {
 } from '@/platform/ui/navigation/account-panel-state'
 export {ModulaSheet, type ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet'
 export {
+  SelectionSheet,
+  type SelectionSheetOption,
+} from '@/platform/ui/sheets/selection-sheet'
+export {
   initialSheetState,
   isSheetVisible,
   sheetReducer,

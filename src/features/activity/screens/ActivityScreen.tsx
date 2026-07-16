@@ -12,7 +12,9 @@ import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {Pill} from '@/components/primitives/Pill'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ActivityItem} from '@/domain/activity'
@@ -21,6 +23,7 @@ const groups = ['Today', 'This week', 'Earlier'] as const
 type ActivityFilter = 'all' | ActivityItem['type']
 
 export function ActivityScreen() {
+  const router = useRouter()
   const {colours, spacing} = useThemeTokens()
   const activityQuery = useActivityQuery()
   const [filter, setFilter] = useState<ActivityFilter>('all')
@@ -58,23 +61,43 @@ export function ActivityScreen() {
           keyboardShouldPersistTaps="handled">
           <View style={styles.titleRow}>
             <AppText variant="display">Activity</AppText>
-            <ModulaMenu
-              accessibilityLabel="Filter activity"
-              title="Filter activity"
-              actions={[
-                {id: 'all', label: 'All'},
-                {id: 'like', label: 'Likes'},
-                {id: 'reply', label: 'Replies'},
-                {id: 'follow', label: 'Follows'},
-                {id: 'mention', label: 'Mentions'},
-                {id: 'moduleUpdate', label: 'Modules'},
-                {id: 'teamInvitation', label: 'Teams'},
-              ]}
-              onAction={id => setFilter(id as ActivityFilter)}
-              trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+              <AppPressable
+                accessibilityLabel="Notification settings"
+                onPress={() => router.push('/settings/notifications' as Href)}
+                style={{height: 44, width: 44, alignItems: 'center', justifyContent: 'center'}}>
+                <AppIcon name="settings" colour={colours.textSecondary} />
+              </AppPressable>
+              <ModulaMenu
+                accessibilityLabel="Filter activity"
+                title="Filter activity"
+                actions={[
+                  {id: 'all', label: 'All'},
+                  {id: 'mention', label: 'Mentions'},
+                  {id: 'like', label: 'Likes'},
+                  {id: 'reply', label: 'Replies'},
+                  {id: 'follow', label: 'Follows'},
+                  {id: 'moduleUpdate', label: 'Modules'},
+                  {id: 'teamInvitation', label: 'Teams'},
+                ]}
+                onAction={id => setFilter(id as ActivityFilter)}
+                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+              />
+            </View>
+          </View>
+          <View style={{flexDirection: 'row', gap: spacing[2]}}>
+            <Pill
+              label="All"
+              selected={filter === 'all'}
+              onPress={() => setFilter('all')}
+            />
+            <Pill
+              label="Mentions"
+              selected={filter === 'mention'}
+              onPress={() => setFilter('mention')}
             />
           </View>
-          {filter !== 'all' ? (
+          {filter !== 'all' && filter !== 'mention' ? (
             <AppText variant="caption" colour="textSecondary">
               Showing {filter} · Preview filters are local
             </AppText>
@@ -87,7 +110,21 @@ export function ActivityScreen() {
                 <AppText variant="headline">{group}</AppText>
                 <View style={{gap: spacing[2]}}>
                   {items.map(item => (
-                    <ActivityRow key={item.id} item={item} />
+                    <ModulaContextMenu
+                      key={item.id}
+                      accessibilityLabel={`Activity actions for ${item.description}`}
+                      actions={[
+                        {id: 'open', label: 'Open'},
+                        {id: 'mute', label: 'Mute — Preview'},
+                        {id: 'delete', label: 'Remove — Preview', style: 'destructive'},
+                      ]}
+                      onAction={id => {
+                        if (id === 'open') {
+                          // ActivityRow handles primary open on tap
+                        }
+                      }}>
+                      <ActivityRow item={item} />
+                    </ModulaContextMenu>
                   ))}
                 </View>
               </View>

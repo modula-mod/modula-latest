@@ -8,6 +8,9 @@ export type {
 } from '@/platform/ui/menus/types'
 export {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+export {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
+export type {ModulaControlGroupAction} from '@/platform/ui/menus/modula-control-group'
+export {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 export {
   ModulaConfirmationDialog,
   presentModulaConfirmationDialog,

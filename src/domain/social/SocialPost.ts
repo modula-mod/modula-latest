@@ -3,8 +3,9 @@ import type {ModulaProfile} from '@/features/profile/contracts'
 import type {PendingMediaAttachment, RemoteMediaAsset} from '@/domain/social/media'
 
 export type FeedMode = 'following' | 'forYou' | 'modules'
-export type PostAudience = 'public' | 'followers'
-export type ReplyPermission = 'everyone' | 'followers' | 'mentioned'
+/** `innerCircle` / `modules` are Preview audiences (local UI only). */
+export type PostAudience = 'public' | 'followers' | 'innerCircle' | 'modules'
+export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'innerCircle'
 
 export type PostEngagement = {
   liked: boolean

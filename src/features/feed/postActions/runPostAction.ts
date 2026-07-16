@@ -1,6 +1,6 @@
 import * as Clipboard from 'expo-clipboard'
 import {router, type Href} from 'expo-router'
-import {Alert, Share} from 'react-native'
+import {Alert} from 'react-native'
 
 import type {SocialPost} from '@/domain/social'
 import {
@@ -44,14 +44,11 @@ export async function runPostOverflowAction(
       return
     }
     case 'share': {
-      try {
-        await Share.share({
-          message: getPostShareMessage(post),
-          url: getPostPermalink(post),
-        })
-      } catch {
-        Alert.alert('Share unavailable', getPostShareMessage(post))
-      }
+      const permalink = getPostPermalink(post)
+      const message = getPostShareMessage(post)
+      router.push(
+        `/share?permalink=${encodeURIComponent(permalink)}&message=${encodeURIComponent(message)}&title=${encodeURIComponent('Share post')}` as Href,
+      )
       return
     }
     case 'quote': {

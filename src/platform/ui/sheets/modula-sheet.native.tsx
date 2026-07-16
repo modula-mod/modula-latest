@@ -16,7 +16,8 @@ export type ModulaSheetProps = {
 
 /**
  * Native sheet via `@expo/ui` universal BottomSheet.
- * Product screens consume ModulaSheet — never BottomSheet directly.
+ * On iOS that adapter hosts SwiftUI BottomSheet (detents + grabber + isPresented).
+ * Product screens consume ModulaSheet — never BottomSheet / `@expo/ui/swift-ui` directly.
  */
 export function ModulaSheet({
   isPresented,
