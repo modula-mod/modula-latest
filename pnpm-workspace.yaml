@@ -52,3 +52,6 @@ minimumReleaseAgeExclude:
   - expo-haptics@57.0.1
   - expo-image-loader@57.0.1
   - expo-image-picker@57.0.4
+  - expo-blur@57.0.2
+  - expo-linear-gradient@57.0.1
+  - expo-navigation-bar@57.0.2

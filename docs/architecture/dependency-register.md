@@ -38,3 +38,21 @@ No package should enter the project merely because an example repository uses it
 | eslint-config-expo | ~57.0.0 | Expo ESLint flat config | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | expo-doctor | ^1.20.0 | Expo project health checks | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | typescript | ~6.0.3 | TypeScript compiler | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+
+## Phase 2 appearance runtime additions
+
+| Package | Version | Purpose | Native code | Development-client rebuild required | Expo Go compatibility | Evidence | Added in |
+|---|---:|---|---|---|---|---|---|
+| @react-native-async-storage/async-storage | 2.2.0 | Persist non-sensitive appearance preferences only | Yes | Yes | Not guaranteed in this dev-client app | `pnpm exec expo install` | Phase 2 |
+| @react-native-community/slider | 5.2.0 | Native text-size control | Yes | Yes | Not guaranteed in this dev-client app | `pnpm exec expo install` | Phase 2 |
+| expo-blur | ~57.0.2 | Controlled Glass Surface implementation | Yes | Yes | Expo SDK module, isolated behind MaterialSurface | `pnpm exec expo install` | Phase 2 |
+| expo-glass-effect | ~57.0.1 | Native iOS 26 Liquid Glass adapter | Yes | Yes | Requires compatible native runtime | `pnpm exec expo install` | Phase 2 |
+| expo-linear-gradient | ~57.0.1 | Restrained material highlights and media effects | Yes | Yes | Expo SDK module | `pnpm exec expo install` | Phase 2 |
+| expo-system-ui | ~57.0.1 | Synchronise root native background | Yes | Already present; rebuild required when native deps change | Expo SDK module | Existing dependency confirmed by install | Phase 2 |
+| expo-navigation-bar | ~57.0.2 | Synchronise Android navigation-button appearance | Yes | Yes | Android native runtime only | `pnpm exec expo install` | Phase 2 |
+
+AsyncStorage policy:
+
+AsyncStorage stores appearance preferences only.
+
+Do not store passwords, session tokens, private keys, wallet data, personal identity documents, authentication state, or other sensitive material in AsyncStorage.
