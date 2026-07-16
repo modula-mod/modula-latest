@@ -1,5 +1,5 @@
 # Shell
 
-Application chrome such as navigation frames, drawers, and status surfaces will live here.
+Application chrome: tab frame helpers, composer FAB, screen headers.
 
-Phase 0 has no shell chrome. The root stack renders a single foundation route only.
+Phase 1 uses Expo Router tabs (`src/app/(tabs)`) as the primary navigation. Drawer architectures from Bluesky are intentionally not copied.
