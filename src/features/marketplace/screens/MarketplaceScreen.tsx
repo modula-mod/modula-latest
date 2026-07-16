@@ -5,7 +5,6 @@ import {useRouter, type Href} from 'expo-router'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
 import {
   marketplaceCatalog,
@@ -16,6 +15,7 @@ import {
   type MarketplaceModule,
 } from '@/features/marketplace/data/catalog'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ModulaCurvedSectionTabs} from '@/platform/ui/tabs'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -100,16 +100,14 @@ export function MarketplaceScreen() {
             />
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{gap: spacing[2]}}>
-            {marketplaceCategories.map(item => (
-              <Pill
-                key={item.id}
-                label={item.label}
-                selected={category === item.id}
-                onPress={() => setCategory(item.id)}
-              />
-            ))}
-          </ScrollView>
+          <ModulaCurvedSectionTabs
+            tabs={marketplaceCategories.map(item => ({
+              id: item.id,
+              label: item.label,
+            }))}
+            selectedId={category}
+            onSelect={id => setCategory(id as MarketplaceCategory | 'all')}
+          />
 
           {!query && category === 'all' ? (
             <>

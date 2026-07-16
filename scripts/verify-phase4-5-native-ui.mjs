@@ -150,6 +150,15 @@ for (const file of productFiles) {
     fail(`13. floating developer gear remnant in ${file}`)
   }
 }
+if (
+  !exists('src/platform/ui/dev/hide-expo-dev-tools-button.ts') ||
+  !text('src/app/_layout.tsx').includes('hideExpoDevToolsButton')
+) {
+  fail('13. Expo Dev Tools FAB must be hidden at launch via hideExpoDevToolsButton')
+}
+if (!text('app.config.ts').includes('toolsButton') || !/toolsButton:\s*false/.test(text('app.config.ts'))) {
+  fail('13. expo-dev-client plugin must set toolsButton: false')
+}
 
 // 14–18 account panel
 if (!exists('src/platform/ui/navigation/adaptive-account-panel.tsx')) {
@@ -280,11 +289,14 @@ if (identity.includes('visibleClaims') || identity.includes('IdentityIndicator')
   fail('29. identity claims still rendered in hero identity')
 }
 const tabBar = text('src/features/profile/components/ProfileTabBar.tsx')
+const motionTabs = exists('src/platform/ui/tabs/modula-motion-tabs.tsx')
+  ? text('src/platform/ui/tabs/modula-motion-tabs.tsx')
+  : ''
 if (tabBar.includes('radius.round') && tabBar.includes('backgroundColor: selected')) {
   fail('30. profile selected tab still uses giant pill styling')
 }
-if (!tabBar.includes('underline')) {
-  fail('30. profile selected tab underline missing')
+if (!tabBar.includes('ModulaMotionTabs') || !motionTabs.includes('underline')) {
+  fail('30. profile selected tab underline missing (ModulaMotionTabs)')
 }
 
 // 31 touch target
@@ -349,10 +361,57 @@ if (phase5Hints.length) {
   fail(`37. Phase 5 files were introduced: ${phase5Hints.join(', ')}`)
 }
 
+// 38 — no Board double tab strip (Create/Discover/Profile quick actions)
+const boardScreen = exists('src/features/board/screens/BoardScreen.tsx')
+  ? text('src/features/board/screens/BoardScreen.tsx')
+  : ''
+if (
+  boardScreen.includes("['Create', 'create', '/compose']") ||
+  (boardScreen.includes('quickActions') && boardScreen.includes('/discover'))
+) {
+  fail('38. Board must not render a Create/Discover/Profile secondary tab strip')
+}
+
+// 39 — ContextMenu must not crush flex rows with Host matchContents
+const ctxMenuNative = text('src/platform/ui/menus/modula-context-menu.native.tsx')
+if (/<Host[^>]*matchContents/.test(ctxMenuNative) || /matchContents\s*[=:{]/.test(ctxMenuNative)) {
+  fail('39. ModulaContextMenu native Host must not use matchContents (crushes list rows)')
+}
+if (!ctxMenuNative.includes("width: '100%'") && !ctxMenuNative.includes('width: "100%"')) {
+  fail('39. ModulaContextMenu native Host must stretch full width for list rows')
+}
+
+// 40 — skeletons + floating tab inset + avatars extension points
+for (const file of [
+  'src/platform/ui/skeletons/FeedPostSkeleton.tsx',
+  'src/platform/ui/skeletons/ActivityRowSkeleton.tsx',
+  'src/platform/ui/skeletons/ProfileHeroSkeleton.tsx',
+  'src/platform/ui/skeletons/BoardCardSkeleton.tsx',
+  'src/platform/ui/skeletons/MessagesRowSkeleton.tsx',
+  'src/platform/ui/navigation/floating-tab-bar-inset.ts',
+  'src/platform/ui/avatars/StackedAvatars.tsx',
+  'src/platform/ui/tabs/modula-motion-tabs.tsx',
+  'src/platform/ui/tabs/modula-curved-section-tabs.tsx',
+]) {
+  if (!exists(file)) fail(`40. missing polish surface: ${file}`)
+}
+if (!text('src/features/feed/screens/HomeFeedScreen.tsx').includes('FeedPostSkeleton')) {
+  fail('40. Home feed must show FeedPostSkeleton on initial load')
+}
+if (!text('src/features/activity/screens/ActivityScreen.tsx').includes('ActivityListSkeleton')) {
+  fail('40. Activity must show ActivityListSkeleton on initial load')
+}
+if (!text('src/components/feed/DemoPostItem.tsx').includes('ModulaContextMenu')) {
+  fail('40. DemoPostItem must use ModulaContextMenu for post overflow')
+}
+if (!text('src/features/marketplace/screens/MarketplaceScreen.tsx').includes('ModulaCurvedSectionTabs')) {
+  fail('40. Marketplace nested chrome must use ModulaCurvedSectionTabs')
+}
+
 if (errors.length) {
   console.error('Phase 4.5 native UI verification failed:')
   for (const error of errors) console.error(`- ${error}`)
   process.exit(1)
 }
 
-console.log('Phase 4.5 native UI verification passed (37 checks).')
+console.log('Phase 4.5 native UI verification passed (40 checks).')

@@ -100,3 +100,16 @@ pnpm exec expo run:ios
 ```
 
 Expo Go always uses the NativeTabs fallback. Do not expect liquid glass chrome inside Expo Go.
+
+## Phase 4.5 UI polish — library decisions (no new packages)
+
+Research: `docs/research/phase4-5-third-party-ui-libs.md`.
+
+| Candidate | Decision | Notes |
+|---|---|---|
+| `@outpacelabs/avatars` | Not installed | Generative web canvas gradients; wrong API for stacked/story/presence. Modula `src/platform/ui/avatars/` instead. |
+| Solarin-Johnson/my-app | Ideas only | Not a package; Reanimated playground — do not vendor. |
+| rit3zh/expo-curved-bottom-tabs | Not installed | Demo + Skia + Reanimated; would fight primary liquid-glass tabs. Modula `ModulaCurvedSectionTabs` for Marketplace nested chrome only. |
+| rit3zh/expo-motion-tabs | Not installed | Demo bottom-tab morph popups + Reanimated; wrong for Profile content tabs. Modula `ModulaMotionTabs` (LayoutAnimation). |
+
+No new rows in the dependency table — zero packages added for this polish pass.

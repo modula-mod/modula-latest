@@ -50,3 +50,8 @@ export {
   MODULA_MIN_TOUCH_TARGET,
   meetsTouchTarget,
 } from '@/platform/ui/touch/touch-target'
+export * from '@/platform/ui/avatars'
+export * from '@/platform/ui/skeletons'
+export * from '@/platform/ui/tabs'
+export {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+export {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
