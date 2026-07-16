@@ -1,25 +1,19 @@
-import {Alert, ScrollView, StyleSheet, View} from 'react-native'
-import {useRouter, type Href} from 'expo-router'
+import {ScrollView, StyleSheet, View} from 'react-native'
 
-import {MaterialSurface} from '@/components/materials/MaterialSurface'
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
+import {
+  SettingsInfoBlock,
+  SettingsLinkRow,
+  SettingsSection,
+  type SettingsNavRow,
+} from '@/features/settings/components/SettingsRows'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 
-type SettingsRow = {
-  title: string
-  description: string
-  icon: AppIconName
-  value?: string
-  route?: string
-}
-
-const rows: SettingsRow[] = [
+const accountRows: SettingsNavRow[] = [
   {
     title: 'Profile',
     description: 'Identity and public presentation.',
@@ -34,160 +28,169 @@ const rows: SettingsRow[] = [
   },
   {
     title: 'Account',
-    description: 'Session and local prototype account information.',
+    description: 'Session and local prototype account.',
     icon: 'account',
     route: '/settings/account',
   },
   {
-    title: 'Connected accounts - Preview',
-    description: 'Future external identity and service connections.',
-    icon: 'integrations',
+    title: 'Accounts',
+    description: 'Switcher Preview for local sessions.',
+    icon: 'switch',
+    route: '/account/switcher',
+    preview: true,
+  },
+]
+
+const preferenceRows: SettingsNavRow[] = [
+  {
+    title: 'Privacy & Safety',
+    description: 'Mute, block, inner circle, report.',
+    icon: 'privacy',
+    route: '/settings/privacy',
   },
   {
-    title: 'Privacy',
-    description: 'Audience controls and future trust boundaries.',
-    icon: 'privacy',
+    title: 'Notifications',
+    description: 'Activity preference toggles.',
+    icon: 'notifications',
+    route: '/settings/notifications',
   },
   {
     title: 'Appearance',
-    description: 'Colour, accent, material, and text preferences.',
+    description: 'Colour, accent, OLED, materials.',
     icon: 'appearance',
     route: '/settings/appearance',
   },
   {
     title: 'Accessibility',
-    description: 'Text, contrast, transparency, and motion controls.',
+    description: 'Text, contrast, transparency, motion.',
     icon: 'accessibility',
     route: '/settings/accessibility',
   },
   {
-    title: 'Notifications',
-    description: 'Future local and device notification preferences.',
-    icon: 'notifications',
+    title: 'Content & Media',
+    description: 'Autoplay, data saver, reactions.',
+    icon: 'photo',
+    route: '/settings/content',
   },
   {
-    title: 'Modules',
-    description: 'Installed module behaviour and visibility.',
-    icon: 'modules',
+    title: 'Language & Translate',
+    description: 'Translate Preview preferences.',
+    icon: 'text',
+    route: '/settings/language',
   },
   {
-    title: 'Integrations',
-    description: 'Connections and import surfaces.',
-    icon: 'integrations',
+    title: 'Marketplace',
+    description: 'Browse preferences Preview.',
+    icon: 'marketplace',
+    route: '/settings/marketplace',
+    preview: true,
   },
   {
-    title: 'Storage',
-    description: 'Local media, cache, and saved content.',
+    title: 'Data & storage',
+    description: 'Saved, drafts, local cache notes.',
     icon: 'storage',
+    route: '/settings/data',
+    preview: true,
+  },
+]
+
+const supportRows: SettingsNavRow[] = [
+  {
+    title: 'Help',
+    description: 'Articles and shortcuts.',
+    icon: 'info',
+    route: '/settings/help',
   },
   {
-    title: 'Security',
-    description: 'Device safety and future verification settings.',
-    icon: 'security',
-  },
-  {
-    title: 'Developer',
-    description: 'Data runtime, session and local validation tools.',
-    icon: 'developer',
-    route: '/settings/developer',
+    title: 'About',
+    description: 'Version and What’s New.',
+    icon: 'info',
+    route: '/settings/about',
   },
 ]
 
 export function SettingsHomeScreen() {
-  const router = useRouter()
   const {preferences, resolved} = useAppearance()
   const {colours, spacing} = useThemeTokens()
 
-  const values: Record<string, string> = {
-    Appearance: `${label(preferences.mode)} · ${label(preferences.surfaceType)}`,
-    Accessibility: resolved.accessibility.reduceMotion
-      ? 'Reduced motion'
-      : resolved.accessibility.increaseContrast
-        ? 'High contrast'
-        : 'Standard',
-    Developer: 'Lab available',
-  }
+  const appearanceValue = `${label(preferences.mode)} · ${label(preferences.surfaceType)}`
+  const accessibilityValue = resolved.accessibility.reduceMotion
+    ? 'Reduced motion'
+    : resolved.accessibility.increaseContrast
+      ? 'High contrast'
+      : 'Standard'
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Settings" />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[4]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Settings</AppText>
-            <AppText variant="body" colour="textSub">
-              Manage the local Modula shell experience on this device.
-            </AppText>
-          </View>
-          <MaterialSurface role="card" style={styles.list}>
-            {rows.map((row, index) => (
-              runtimeEnvironment.appEnvironment !== 'development' && row.title === 'Developer' ? null :
-              <SettingsListRow
+          <SettingsInfoBlock
+            title="Settings"
+            body="Manage the local Modula shell. Every row opens a real screen with usable controls or honest Preview content."
+          />
+
+          <SettingsSection title="You">
+            {accountRows.map((row, index) => (
+              <SettingsLinkRow
                 key={row.title}
-                row={{...row, value: values[row.title] ?? row.value}}
-                last={index === rows.length - 1}
-                onPress={() => {
-                  if (row.route) {
-                    router.push(row.route as Href)
-                    return
-                  }
-                  Alert.alert(row.title, `${row.description}\n\nThis preview is not functional in Phase 4.`)
-                }}
+                row={row}
+                last={index === accountRows.length - 1}
               />
             ))}
-          </MaterialSurface>
+          </SettingsSection>
+
+          <SettingsSection title="Preferences">
+            {preferenceRows.map((row, index) => (
+              <SettingsLinkRow
+                key={row.title}
+                row={{
+                  ...row,
+                  value:
+                    row.title === 'Appearance'
+                      ? appearanceValue
+                      : row.title === 'Accessibility'
+                        ? accessibilityValue
+                        : row.value,
+                }}
+                last={index === preferenceRows.length - 1}
+              />
+            ))}
+          </SettingsSection>
+
+          <SettingsSection title="Support">
+            {supportRows.map((row, index) => (
+              <SettingsLinkRow
+                key={row.title}
+                row={row}
+                last={index === supportRows.length - 1}
+              />
+            ))}
+          </SettingsSection>
+
+          {runtimeEnvironment.appEnvironment === 'development' ? (
+            <SettingsSection title="Development">
+              <SettingsLinkRow
+                row={{
+                  title: 'Developer',
+                  description: 'Data runtime, session and local tools.',
+                  icon: 'developer',
+                  route: '/settings/developer',
+                  value: 'Lab available',
+                }}
+                last
+              />
+            </SettingsSection>
+          ) : null}
+
+          <AppText variant="caption" colour="textSecondary">
+            Modula 0.1.0 · {runtimeEnvironment.appEnvironment}
+          </AppText>
         </ScrollView>
       </ResponsiveContent>
     </View>
-  )
-}
-
-function SettingsListRow({
-  row,
-  last,
-  onPress,
-}: {
-  row: SettingsRow
-  last: boolean
-  onPress: () => void
-}) {
-  const {colours, spacing} = useThemeTokens()
-
-  return (
-    <AppPressable
-      accessibilityLabel={row.title}
-      onPress={onPress}
-      style={[
-        styles.row,
-        {
-          borderBottomColor: last ? 'transparent' : colours.separator,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          gap: spacing[3],
-        },
-      ]}>
-      <View
-        style={[
-          styles.iconWrap,
-          {backgroundColor: colours.accentSubtle, borderColor: colours.accentBorder},
-        ]}>
-        <AppIcon name={row.icon} colour={colours.accent} size={20} />
-      </View>
-      <View style={styles.rowText}>
-        <AppText variant="headline">{row.title}</AppText>
-        <AppText variant="caption" colour="textSub">
-          {row.description}
-        </AppText>
-      </View>
-      {row.value ? (
-        <AppText variant="caption" colour="textMuted" numberOfLines={1}>
-          {row.value}
-        </AppText>
-      ) : null}
-      <AppIcon name="chevronRight" colour={colours.textMuted} size={18} />
-    </AppPressable>
   )
 }
 
@@ -198,29 +201,7 @@ function label(value: string): string {
 const styles = StyleSheet.create({
   content: {
     padding: 16,
-    paddingBottom: 32,
-  },
-  iconWrap: {
-    alignItems: 'center',
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 42,
-    justifyContent: 'center',
-    width: 42,
-  },
-  list: {
-    overflow: 'hidden',
-  },
-  row: {
-    alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    minHeight: 64,
-  },
-  rowText: {
-    flex: 1,
-    gap: 3,
-    minWidth: 0,
+    paddingBottom: 40,
   },
   screen: {
     flex: 1,
