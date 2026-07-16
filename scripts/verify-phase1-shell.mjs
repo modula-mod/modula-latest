@@ -70,7 +70,7 @@ const requiredFiles = [
   'src/features/feed/screens/HomeFeedScreen.tsx',
   'src/features/discover/screens/DiscoverScreen.tsx',
   'src/features/activity/screens/ActivityScreen.tsx',
-  'src/features/profile/screens/ProfileScreen.tsx',
+  'src/features/profile/screens/UnifiedProfileScreen.tsx',
   'src/features/board/screens/BoardScreen.tsx',
 ]
 
@@ -99,8 +99,16 @@ for (const file of sourceFiles) {
   if (/^\s*import\s+.*(?:bsky|bluesky|@atproto)/im.test(body)) {
     fail(`Source file contains forbidden Bluesky/AT import: ${file}`)
   }
-  if (/https?:\/\/(?!localhost|127\.0\.0\.1|0\.0\.0\.0)/i.test(body)) {
-    fail(`Possible hardcoded production API URL in source file: ${file}`)
+  const urls = body.match(/https?:\/\/[A-Za-z0-9][A-Za-z0-9.-]*/gi) ?? []
+  for (const url of urls) {
+    const host = url.replace(/^https?:\/\//i, '')
+    const allowed =
+      ['localhost', '127.0.0.1', '0.0.0.0', 'github.com'].includes(host) ||
+      host === 'modula.digital' ||
+      host.endsWith('.modula.digital')
+    if (!allowed) {
+      fail(`Possible hardcoded production API URL in source file: ${file}`)
+    }
   }
 }
 

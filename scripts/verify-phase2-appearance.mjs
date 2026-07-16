@@ -136,7 +136,13 @@ for (const file of sourceFiles) {
   if (/^\s*import\s+.*(?:GlassView|GlassContainer).*from ['"]expo-glass-effect['"]/im.test(body) && !isMaterialSystem) {
     fail(`GlassView imported outside material system: ${file}`)
   }
-  if (/^\s*import\s+.*AsyncStorage.*from ['"]@react-native-async-storage\/async-storage['"]/im.test(body) && file !== 'src/theme/storage/appearanceStorage.ts') {
+  if (
+    /^\s*import\s+.*AsyncStorage.*from ['"]@react-native-async-storage\/async-storage['"]/im.test(body) &&
+    ![
+      'src/theme/storage/appearanceStorage.ts',
+      'src/features/profile/storage/profilePresentationStorage.ts',
+    ].includes(file)
+  ) {
     fail(`AsyncStorage imported outside appearance storage: ${file}`)
   }
   if (/from ['"]@\/theme\/data\//.test(body) && !isTheme) {

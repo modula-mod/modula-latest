@@ -55,6 +55,7 @@
     "verify:phase1": "node scripts/verify-phase1-shell.mjs",
     "verify:phase2": "node scripts/verify-phase2-appearance.mjs",
     "verify:theme": "node scripts/verify-theme-contrast.mjs",
+    "verify:phase3": "node scripts/verify-phase3-profile.mjs",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean"
   },
