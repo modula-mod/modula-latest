@@ -7,7 +7,7 @@ export type ModulaSheetProps = {
   isPresented: boolean
   onDismiss: () => void
   children: ReactNode
-  snapPoints?: Array<'half' | 'full' | {fraction: number} | {height: number}>
+  snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
   showDragIndicator?: boolean
   testID?: string
 }

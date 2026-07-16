@@ -32,9 +32,12 @@ const AccountPanelContext = createContext<AccountPanelContextValue | null>(null)
 export function AccountPanelProvider({children}: PropsWithChildren) {
   const [state, dispatch] = useReducer(accountPanelReducer, initialPanelState)
   const stateRef = useRef(state)
-  stateRef.current = state
   const pathname = usePathname()
   const pathnameRef = useRef(pathname)
+
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
 
   const openAccountPanel = useCallback((source = 'unknown') => {
     const current = stateRef.current

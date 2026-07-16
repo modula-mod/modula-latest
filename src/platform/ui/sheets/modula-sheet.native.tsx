@@ -9,7 +9,7 @@ export type ModulaSheetProps = {
   onDismiss: () => void
   children: ReactNode
   /** Medium + large detents by default for Tools / account panel. */
-  snapPoints?: Array<'half' | 'full' | {fraction: number} | {height: number}>
+  snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
   showDragIndicator?: boolean
   testID?: string
 }

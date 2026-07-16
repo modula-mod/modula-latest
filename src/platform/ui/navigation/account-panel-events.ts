@@ -40,7 +40,6 @@ export function emitAccountPanelEvent(
   if (buffer.length > MAX_EVENTS) {
     buffer.shift()
   }
-  // eslint-disable-next-line no-console
   console.debug('[accountPanel]', event.name, {
     state: event.state,
     source: event.source,
