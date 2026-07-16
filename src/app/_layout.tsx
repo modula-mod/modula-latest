@@ -5,13 +5,14 @@ import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
 import {DemoSocialProvider} from '@/demo/DemoSocialContext'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
+import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 function RootNavigator() {
   const {scheme, colours} = useThemeTokens()
 
   return (
-    <AppErrorBoundary>
+    <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
@@ -32,16 +33,20 @@ function RootNavigator() {
         <Stack.Screen name="settings" />
       </Stack>
       <NavigationDrawer />
-    </AppErrorBoundary>
+    </>
   )
 }
 
 export default function RootLayout() {
   return (
-    <DemoSocialProvider>
-      <ShellDrawerProvider>
-        <RootNavigator />
-      </ShellDrawerProvider>
-    </DemoSocialProvider>
+    <AppErrorBoundary>
+      <AppearanceProvider>
+        <DemoSocialProvider>
+          <ShellDrawerProvider>
+            <RootNavigator />
+          </ShellDrawerProvider>
+        </DemoSocialProvider>
+      </AppearanceProvider>
+    </AppErrorBoundary>
   )
 }

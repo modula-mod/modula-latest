@@ -1,21 +1,13 @@
-import {useContext} from 'react'
+import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-import {ThemeContext, type ThemeContextValue} from '@/theme/runtime/ThemeProvider'
-import {resolveTheme} from '@/theme/runtime/resolveTheme'
+export function useTheme() {
+  const tokens = useThemeTokens()
+  const actions = useAppearanceActions()
 
-/**
- * Access the resolved theme. Falls back to a static light theme if used
- * outside ThemeProvider (should not happen in app routes).
- */
-export function useTheme(): ThemeContextValue {
-  const ctx = useContext(ThemeContext)
-  if (ctx) {
-    return ctx
-  }
-  const fallback = resolveTheme()
   return {
-    ...fallback,
+    ...tokens,
     setPreferences: () => {},
-    setColourMode: () => {},
+    setColourMode: actions.setMode,
   }
 }
