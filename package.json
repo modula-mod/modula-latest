@@ -62,6 +62,8 @@
     "verify:theme": "node scripts/verify-theme-contrast.mjs",
     "verify:phase3": "node scripts/verify-phase3-profile.mjs",
     "verify:phase4": "node scripts/verify-phase4-data-auth.mjs",
+    "verify:phase4-5": "node scripts/verify-phase4-5-native-ui.mjs",
+    "test:account-panel": "node scripts/test-account-panel-state.mjs",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean"
   },

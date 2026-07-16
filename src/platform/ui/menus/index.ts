@@ -6,3 +6,10 @@ export type {
   ModulaActionStyle,
   PresentModulaActionsOptions,
 } from '@/platform/ui/menus/types'
+export {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+export {
+  ModulaConfirmationDialog,
+  presentModulaConfirmationDialog,
+} from '@/platform/ui/menus/modula-confirmation-dialog'
+export type {ModulaConfirmationDialogOptions} from '@/platform/ui/menus/modula-confirmation-dialog'
