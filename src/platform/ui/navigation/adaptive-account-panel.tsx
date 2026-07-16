@@ -8,51 +8,19 @@ import {Divider} from '@/components/primitives/Divider'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {getAccountPanelDestinations} from '@/platform/ui/navigation/account-panel-destinations'
 import {useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
 import {emitAccountPanelEvent} from '@/platform/ui/navigation/account-panel-events'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DrawerDestination} from '@/types/navigation'
-
-const panelDestinations: DrawerDestination[] = [
-  {
-    label: 'Board',
-    route: '/board',
-    icon: 'board',
-    description: 'Focus, modules, and recent activity',
-  },
-  {
-    label: 'Saved',
-    route: '/saved',
-    icon: 'saved',
-    description: 'Posts, links, and module notes',
-  },
-  {
-    label: 'Messages',
-    route: '/messages',
-    icon: 'messages',
-    description: 'Private conversation preview',
-  },
-  {
-    label: 'Appearance',
-    route: '/settings/appearance',
-    icon: 'appearance',
-    description: 'Colour, accent, and materials',
-  },
-  {
-    label: 'Settings',
-    route: '/settings',
-    icon: 'settings',
-    description: 'Account and shell preferences',
-  },
-]
 
 /**
  * Adaptive account panel:
  * - compact: ModulaSheet (native BottomSheet)
  * - wide: same sheet content (popover/split can refine later)
- * Top-level destinations remain native tabs.
+ * Destinations come from getAccountPanelDestinations() so product-surface
+ * expansions can register Marketplace / Lists / Help without forking this file.
  */
 export function AdaptiveAccountPanel() {
   const router = useRouter()
@@ -64,6 +32,7 @@ export function AdaptiveAccountPanel() {
     useAccountPanel()
   const ownerProfile = session.status === 'signedIn' ? session.profile : null
   const compact = width < 768
+  const destinations = getAccountPanelDestinations()
 
   const navigate = (route: string) => {
     closeAccountPanel('route')
@@ -115,24 +84,13 @@ export function AdaptiveAccountPanel() {
         <Divider />
 
         <View style={{gap: spacing[2]}}>
-          {panelDestinations.map(item => (
+          {destinations.map(item => (
             <DrawerItem
-              key={item.route}
+              key={item.id}
               item={item}
               onPress={() => navigate(item.route)}
             />
           ))}
-          {isDevelopmentBuild() ? (
-            <DrawerItem
-              item={{
-                label: 'Developer',
-                route: '/settings/developer',
-                icon: 'developer',
-                description: 'Diagnostics and local tools',
-              }}
-              onPress={() => navigate('/settings/developer')}
-            />
-          ) : null}
         </View>
 
         <Divider />

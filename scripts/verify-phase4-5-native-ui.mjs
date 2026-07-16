@@ -124,8 +124,14 @@ if (!exists('src/platform/ui/navigation/adaptive-account-panel.tsx')) {
 const panel = exists('src/platform/ui/navigation/adaptive-account-panel.tsx')
   ? text('src/platform/ui/navigation/adaptive-account-panel.tsx')
   : ''
+const panelDest = exists('src/platform/ui/navigation/account-panel-destinations.ts')
+  ? text('src/platform/ui/navigation/account-panel-destinations.ts')
+  : ''
 if (!panel.includes('ModulaSheet')) {
   fail('15. iPhone account panel does not use ModulaSheet')
+}
+if (!panelDest.includes('registerAccountPanelDestination')) {
+  fail('14. account panel destinations are not extensible for product-surface expansions')
 }
 const panelCtx = exists('src/platform/ui/navigation/AccountPanelContext.tsx')
   ? text('src/platform/ui/navigation/AccountPanelContext.tsx')

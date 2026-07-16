@@ -13,6 +13,11 @@ export * from '@/platform/ui/menus'
 export {AccountPanelProvider, useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
 export {AdaptiveAccountPanel} from '@/platform/ui/navigation/adaptive-account-panel'
 export {
+  getAccountPanelDestinations,
+  registerAccountPanelDestination,
+  type AccountPanelDestination,
+} from '@/platform/ui/navigation/account-panel-destinations'
+export {
   MODULA_TABS,
   getModulaTab,
   type ModulaTabDefinition,

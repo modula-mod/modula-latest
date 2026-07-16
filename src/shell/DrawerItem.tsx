@@ -1,13 +1,18 @@
 import {StyleSheet, View} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DrawerDestination} from '@/types/navigation'
+
+export type DrawerItemModel = {
+  label: string
+  icon: AppIconName
+  description: string
+}
 
 type DrawerItemProps = {
-  item: DrawerDestination
+  item: DrawerItemModel
   onPress: () => void
 }
 
