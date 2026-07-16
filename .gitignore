@@ -55,3 +55,10 @@ example
 # Local build artefacts under ios/ and android/ remain ignored via
 # ios/.gitignore and android/.gitignore (build/, Pods/, .gradle, etc.).
 # Do not ignore the ios/ or android/ source trees themselves.
+
+# Phase 5 local release artefacts
+.web-release/
+services/api/.env
+services/api/dist/
+packages/*/dist/
+ops/docker/.env
