@@ -1,16 +1,15 @@
-import {useEffect, useState} from 'react'
-import {Animated, Modal, Pressable, StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {useReduceMotion} from '@/lib/accessibility'
 import {
+  keyboardScrollProps,
   sheetKeyboardBottomInset,
   useKeyboardHeight,
 } from '@/platform/ui/keyboard'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ComposerToolsDrawerProps = {
@@ -26,13 +25,13 @@ type ComposerToolsDrawerProps = {
 type ToolItem = {
   label: string
   icon: AppIconName
+  section: 'Media' | 'Create' | 'Tools' | 'Marketplace'
   onPress: () => void
 }
 
 /**
- * Composer Tools sheet (RN Modal bridge).
- * Phase 4.5 may replace the shell with Modula BottomSheet; keyboard inset
- * helpers remain useful either way.
+ * Composer Tools via ModulaSheet (Expo UI BottomSheet on native).
+ * Preserves sibling keyboard inset helpers and does not discard the draft.
  */
 export function ComposerToolsDrawer({
   visible,
@@ -45,175 +44,116 @@ export function ComposerToolsDrawer({
 }: ComposerToolsDrawerProps) {
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
-  const reduceMotion = useReduceMotion()
-  const [progress] = useState(() => new Animated.Value(0))
-  const {colours, motion, radius, spacing} = useThemeTokens()
-
-  useEffect(() => {
-    progress.stopAnimation()
-    const duration = reduceMotion ? 0 : visible ? motion.normal : motion.fast
-    Animated.timing(progress, {
-      toValue: visible ? 1 : 0,
-      duration,
-      useNativeDriver: true,
-    }).start()
-  }, [motion.fast, motion.normal, progress, reduceMotion, visible])
-
-  useEffect(() => {
-    return () => progress.stopAnimation()
-  }, [progress])
+  const {colours, radius, spacing} = useThemeTokens()
+  const bottomPad = sheetKeyboardBottomInset(keyboardHeight, insets.bottom, spacing[4])
 
   const tools: ToolItem[] = [
-    {label: 'Photo', icon: 'photo', onPress: onPhoto},
-    {label: 'Camera', icon: 'camera', onPress: onCamera},
-    {label: 'GIF', icon: 'gif', onPress: () => onPlaceholder('GIF')},
-    {label: 'Poll', icon: 'poll', onPress: onInsertPoll},
-    {label: 'Link', icon: 'link', onPress: onInsertLink},
-    {label: 'Event', icon: 'event', onPress: () => onPlaceholder('Event')},
+    {section: 'Media', label: 'Photo', icon: 'photo', onPress: onPhoto},
+    {section: 'Media', label: 'Camera', icon: 'camera', onPress: onCamera},
+    {section: 'Media', label: 'GIF', icon: 'gif', onPress: () => onPlaceholder('GIF')},
+    {section: 'Create', label: 'Poll', icon: 'poll', onPress: onInsertPoll},
+    {section: 'Create', label: 'Link', icon: 'link', onPress: onInsertLink},
     {
-      label: 'Automation',
+      section: 'Create',
+      label: 'Module post',
+      icon: 'modules',
+      onPress: () => onPlaceholder('Module post'),
+    },
+    {
+      section: 'Tools',
+      label: 'Comment to DM — Preview',
+      icon: 'messages',
+      onPress: () => onPlaceholder('Comment to DM'),
+    },
+    {
+      section: 'Tools',
+      label: 'Automation — Preview',
       icon: 'automation',
       onPress: () => onPlaceholder('Automation'),
     },
     {
-      label: 'Browse tools',
+      section: 'Tools',
+      label: 'AI Assist — Preview',
       icon: 'tools',
+      onPress: () => onPlaceholder('AI Assist'),
+    },
+    {
+      section: 'Marketplace',
+      label: 'Browse tools — Preview',
+      icon: 'marketplace',
       onPress: () => onPlaceholder('Browse tools'),
     },
   ]
 
-  const bottomPad = sheetKeyboardBottomInset(keyboardHeight, insets.bottom, spacing[4])
+  const sections = ['Media', 'Create', 'Tools', 'Marketplace'] as const
 
   return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="none"
-      onRequestClose={onClose}>
-      <View style={StyleSheet.absoluteFill}>
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              opacity: progress,
-              backgroundColor: colours.backdrop,
-            },
-          ]}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close Composer Tools"
-            onPress={onClose}
-            style={StyleSheet.absoluteFill}
-          />
-        </Animated.View>
-        <Animated.View
-          style={[
-            styles.sheetFrame,
-            {
-              transform: [
-                {
-                  translateY: progress.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [320, 0],
-                  }),
-                },
-              ],
-            },
-          ]}>
-          <MaterialSurface
-            role="modal"
-            style={[
-              styles.sheet,
-              {
-                borderTopColor: colours.border,
-                borderTopLeftRadius: radius.xlarge,
-                borderTopRightRadius: radius.xlarge,
-                paddingBottom: bottomPad,
-              },
-            ]}>
-            <View style={[styles.handle, {backgroundColor: colours.border}]} />
-            <View style={[styles.header, {paddingHorizontal: spacing[4]}]}>
-              <AppText variant="headline">Composer Tools</AppText>
-              <AppPressable
-                accessibilityLabel="Close Composer Tools"
-                onPress={onClose}
-                style={styles.close}>
-                <AppIcon name="close" colour={colours.textSecondary} />
-              </AppPressable>
+    <ModulaSheet
+      isPresented={visible}
+      onDismiss={onClose}
+      snapPoints={['half', 'full']}
+      testID="composer-tools-sheet">
+      <ScrollView
+        {...keyboardScrollProps}
+        contentContainerStyle={{paddingBottom: bottomPad, gap: spacing[4]}}>
+        <AppText variant="headline">Composer Tools</AppText>
+        {sections.map(section => (
+          <View key={section} style={{gap: spacing[2]}}>
+            <AppText variant="label" colour="textSecondary">
+              {section}
+            </AppText>
+            <View style={[styles.grid, {gap: spacing[2]}]}>
+              {tools
+                .filter(tool => tool.section === section)
+                .map(tool => (
+                  <AppPressable
+                    key={tool.label}
+                    accessibilityLabel={tool.label}
+                    onPress={() => {
+                      tool.onPress()
+                      // Keep sheet open for media/create until caller closes;
+                      // preview placeholders dismiss to reduce clutter.
+                      if (tool.label.includes('Preview')) {
+                        onClose()
+                      }
+                    }}
+                    style={[
+                      styles.tool,
+                      {
+                        backgroundColor: colours.surfaceRaised,
+                        borderColor: colours.border,
+                        borderRadius: radius.md,
+                      },
+                    ]}>
+                    <AppIcon name={tool.icon} colour={colours.accent} />
+                    <AppText variant="caption" numberOfLines={2} style={styles.toolLabel}>
+                      {tool.label}
+                    </AppText>
+                  </AppPressable>
+                ))}
             </View>
-            <View style={[styles.grid, {paddingHorizontal: spacing[4]}]}>
-              {tools.map(tool => (
-                <AppPressable
-                  key={tool.label}
-                  accessibilityLabel={tool.label}
-                  onPress={() => {
-                    tool.onPress()
-                    onClose()
-                  }}
-                  style={[
-                    styles.tool,
-                    {
-                      backgroundColor: colours.surfaceRaised,
-                      borderColor: colours.border,
-                      borderRadius: radius.medium,
-                    },
-                  ]}>
-                  <AppIcon name={tool.icon} colour={colours.accent} />
-                  <AppText variant="label" numberOfLines={1}>
-                    {tool.label}
-                  </AppText>
-                </AppPressable>
-              ))}
-            </View>
-          </MaterialSurface>
-        </Animated.View>
-      </View>
-    </Modal>
+          </View>
+        ))}
+      </ScrollView>
+    </ModulaSheet>
   )
 }
 
 const styles = StyleSheet.create({
-  close: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 44,
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-  },
-  handle: {
-    alignSelf: 'center',
-    height: 4,
-    marginTop: 10,
-    width: 38,
-  },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-  },
-  sheet: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 4,
-  },
-  sheetFrame: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
   },
   tool: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: '23%',
+    flexBasis: '30%',
     gap: 8,
-    minHeight: 92,
-    minWidth: 76,
     justifyContent: 'center',
+    minHeight: 88,
     padding: 10,
+  },
+  toolLabel: {
+    textAlign: 'center',
   },
 })
