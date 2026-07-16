@@ -64,3 +64,10 @@ Do not store passwords, session tokens, private keys, wallet data, personal iden
 | @tanstack/react-query | ^5.101.2 | Server-state cache, query orchestration, retries and mutations | No | No token storage | `pnpm add @tanstack/react-query` | Phase 4 |
 | expo-secure-store | ~57.0.1 | Native refresh-token storage boundary | Yes | Stores only `modula.session.refresh-token.v1` on native platforms | `pnpm exec expo install expo-secure-store` | Phase 4 |
 | expo-network | ~57.0.1 | Central network-state observation for Query online manager | Yes | No personal data | `pnpm exec expo install expo-network` | Phase 4 |
+
+## Phase 4.5 native UI recovery
+
+| Package | Version | Purpose | Native | Storage/security role | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @expo/ui | ~57.0.6 | Native buttons / sheets / menus via Modula platform adapters | Yes | No personal data | `pnpm exec expo install @expo/ui` | Phase 4.5 |
+| expo-clipboard | ~57.0.1 | Copy post text / permalink from native overflow menus | Yes | Clipboard only; no Modula persistence | `pnpm exec expo install expo-clipboard` | Phase 4.5 |
