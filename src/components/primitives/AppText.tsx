@@ -1,7 +1,6 @@
 import {Text, type TextProps, type TextStyle} from 'react-native'
 
-import {typography} from '@/theme/foundations/typography'
-import {lightSemanticColours} from '@/theme/tokens/semantic'
+import {useTheme} from '@/theme/runtime/useTheme'
 
 export type AppTextVariant =
   | 'display'
@@ -10,9 +9,11 @@ export type AppTextVariant =
   | 'label'
   | 'caption'
 
+type ColourKey = 'text' | 'textSecondary' | 'accent' | 'accentForeground' | 'destructive'
+
 type AppTextProps = TextProps & {
   variant?: AppTextVariant
-  colour?: 'text' | 'textSecondary' | 'accent' | 'accentForeground' | 'destructive'
+  colour?: ColourKey
 }
 
 /**
@@ -25,9 +26,10 @@ export function AppText({
   children,
   ...rest
 }: AppTextProps) {
+  const {colours, typography} = useTheme()
   const typeStyle = typography[variant]
   const colourStyle: TextStyle = {
-    color: lightSemanticColours[colour],
+    color: colours[colour],
   }
 
   return (

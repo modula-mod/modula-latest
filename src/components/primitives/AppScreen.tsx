@@ -8,13 +8,13 @@ import {
 } from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 
-import {spacing} from '@/theme/foundations/spacing'
-import {lightSemanticColours} from '@/theme/tokens/semantic'
+import {useTheme} from '@/theme/runtime/useTheme'
 
 type AppScreenProps = PropsWithChildren<{
   padded?: boolean
   scroll?: boolean
   style?: StyleProp<ViewStyle>
+  edges?: ('top' | 'right' | 'bottom' | 'left')[]
 }>
 
 /**
@@ -26,16 +26,21 @@ export function AppScreen({
   padded = true,
   scroll = false,
   style,
+  edges,
 }: AppScreenProps) {
+  const {colours, spacing} = useTheme()
   const contentStyle = [
     styles.content,
-    padded && styles.padded,
+    {backgroundColor: colours.canvas},
+    padded && {paddingHorizontal: spacing.xl},
     style,
   ]
 
   if (scroll) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView
+        style={[styles.safe, {backgroundColor: colours.canvas}]}
+        edges={edges}>
         <ScrollView
           contentContainerStyle={contentStyle}
           keyboardShouldPersistTaps="handled">
@@ -46,7 +51,9 @@ export function AppScreen({
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView
+      style={[styles.safe, {backgroundColor: colours.canvas}]}
+      edges={edges}>
       <View style={contentStyle}>{children}</View>
     </SafeAreaView>
   )
@@ -55,13 +62,8 @@ export function AppScreen({
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: lightSemanticColours.canvas,
   },
   content: {
     flexGrow: 1,
-    backgroundColor: lightSemanticColours.canvas,
-  },
-  padded: {
-    paddingHorizontal: spacing.xl,
   },
 })
