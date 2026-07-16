@@ -16,7 +16,6 @@ import {useDiscoverQuery} from '@/features/discover/data'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
-import {AppHeader} from '@/shell/AppHeader'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {FeedMode as RepositoryFeedMode} from '@/domain/social'
@@ -41,13 +40,13 @@ export function HomeFeedScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <AppHeader />
       <ResponsiveContent>
         <FeatureErrorBoundary label="Home feed">
           <FlatList
             data={posts}
             keyExtractor={item => item.id}
             renderItem={({item}) => <DemoPostItem post={item} />}
+            contentInsetAdjustmentBehavior="automatic"
             refreshControl={
               <RefreshControl
                 refreshing={feedQuery.isRefetching && !feedQuery.isFetchingNextPage}
@@ -203,7 +202,7 @@ function ComposerPrompt() {
         size={40}
       />
       <AppPressable
-        accessibilityLabel="Open composer"
+        accessibilityLabel="Create a post"
         onPress={() => router.push('/compose' as Href)}
         style={[
           styles.promptInput,
@@ -219,16 +218,10 @@ function ComposerPrompt() {
         </AppText>
       </AppPressable>
       <AppPressable
-        accessibilityLabel="Open composer media"
+        accessibilityLabel="Add media to a post"
         onPress={() => router.push('/compose' as Href)}
         style={styles.promptIcon}>
-        <AppIcon name="photo" colour={colours.accent} />
-      </AppPressable>
-      <AppPressable
-        accessibilityLabel="Open Composer Tools"
-        onPress={() => router.push('/compose' as Href)}
-        style={styles.promptIcon}>
-        <AppIcon name="tools" colour={colours.accent} />
+        <AppIcon name="photo" colour={colours.textSecondary} />
       </AppPressable>
     </View>
   )
