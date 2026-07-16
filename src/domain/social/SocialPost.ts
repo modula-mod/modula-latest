@@ -1,0 +1,81 @@
+import type {PostId} from '@/api/contracts/identifiers'
+import type {ModulaProfile} from '@/features/profile/contracts'
+import type {PendingMediaAttachment, RemoteMediaAsset} from '@/domain/social/media'
+
+export type FeedMode = 'following' | 'forYou' | 'modules'
+export type PostAudience = 'public' | 'followers'
+export type ReplyPermission = 'everyone' | 'followers' | 'mentioned'
+
+export type PostEngagement = {
+  liked: boolean
+  saved: boolean
+  reposted: boolean
+  likeCount: number
+  replyCount: number
+  repostCount: number
+}
+
+export type DraftLinkPreview = {
+  domain: string
+  title: string
+  description: string
+  image?: string
+}
+
+export type DraftPoll = {
+  question: string
+  options: string[]
+}
+
+export type CreatePostInput = {
+  text: string
+  audience: PostAudience
+  replyPermission: ReplyPermission
+  media: PendingMediaAttachment[]
+  linkPreview?: DraftLinkPreview
+  poll?: DraftPoll
+  idempotencyKey: string
+}
+
+export type OptimisticPostState = 'pending' | 'confirmed' | 'failed'
+
+export type BaseSocialPost = PostEngagement & {
+  id: PostId
+  author: ModulaProfile
+  createdAt: string
+  feed: FeedMode
+  text?: string
+  optimisticState?: OptimisticPostState
+}
+
+export type TextSocialPost = BaseSocialPost & {
+  kind: 'text'
+  text: string
+}
+
+export type MediaSocialPost = BaseSocialPost & {
+  kind: 'media'
+  media: RemoteMediaAsset[]
+  pendingMedia?: PendingMediaAttachment[]
+  glowColour: string
+}
+
+export type LinkSocialPost = BaseSocialPost & {
+  kind: 'link'
+  link: DraftLinkPreview
+}
+
+export type ModuleSocialPost = BaseSocialPost & {
+  kind: 'module'
+  module: {
+    name: string
+    actionLabel: string
+    status: string
+  }
+}
+
+export type SocialPost =
+  | TextSocialPost
+  | MediaSocialPost
+  | LinkSocialPost
+  | ModuleSocialPost
