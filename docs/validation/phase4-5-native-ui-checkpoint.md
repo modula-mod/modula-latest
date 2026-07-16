@@ -4,8 +4,8 @@ Status: Interim accepted checkpoint
 
 Label: Native UI Recovery — Interim Accepted Checkpoint
 
-Date: 2026-07-17  
-Branch: `phase4-5-native-ui-recovery`  
+Date: 2026-07-17
+Branch: `phase4-5-native-ui-recovery`
 Host: Mac clone at `$HOME/Developer/modula-latest`
 
 This checkpoint preserves the improved frontend before Phase 5 backend work.
