@@ -1,7 +1,8 @@
-import {Alert, ScrollView, StyleSheet, View} from 'react-native'
+import {useMemo, useState} from 'react'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
@@ -9,33 +10,127 @@ import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+const ALL_PINNED_SPACES: Array<{
+  id: string
+  label: string
+  icon: AppIconName
+  route: string
+  description: string
+}> = [
+  {
+    id: 'marketplace',
+    label: 'Marketplace',
+    icon: 'marketplace',
+    route: '/marketplace',
+    description: 'Browse modules and tools',
+  },
+  {
+    id: 'saved',
+    label: 'Saved',
+    icon: 'saved',
+    route: '/saved',
+    description: 'Posts and knowledge trails',
+  },
+  {
+    id: 'collections',
+    label: 'Collections',
+    icon: 'bookmark',
+    route: '/collections',
+    description: 'Saved collections',
+  },
+  {
+    id: 'lists',
+    label: 'Lists',
+    icon: 'people',
+    route: '/lists',
+    description: 'Custom feeds',
+  },
+  {
+    id: 'drafts',
+    label: 'Drafts',
+    icon: 'text',
+    route: '/drafts',
+    description: 'Composer drafts',
+  },
+  {
+    id: 'creator',
+    label: 'Creator Studio',
+    icon: 'poll',
+    route: '/creator',
+    description: 'Insights preview',
+  },
+]
+
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
+  const tabPadding = useFloatingTabBarContentPadding()
   const session = useSession()
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
   const ownerName = session.status === 'signedIn' ? session.profile.displayName : 'there'
   const modules = discoverQuery.data?.featuredModules ?? []
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
+  const [customizeOpen, setCustomizeOpen] = useState(false)
+  const [pinnedIds, setPinnedIds] = useState(() =>
+    ALL_PINNED_SPACES.map(space => space.id),
+  )
+
+  const pinnedSpaces = useMemo(
+    () => ALL_PINNED_SPACES.filter(space => pinnedIds.includes(space.id)),
+    [pinnedIds],
+  )
+
+  const loading = discoverQuery.isLoading && activityQuery.isLoading
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Board" />
+      <SecondaryScreenHeader
+        title="Board"
+        right={
+          <ModulaMenu
+            accessibilityLabel="Board layout menu"
+            title="Board"
+            actions={[
+              {id: 'customize', label: 'Customize pinned spaces'},
+              {id: 'marketplace', label: 'Open Marketplace'},
+              {id: 'saved', label: 'Open Saved'},
+              {id: 'compose', label: 'Quick compose'},
+            ]}
+            onAction={id => {
+              if (id === 'customize') setCustomizeOpen(true)
+              if (id === 'marketplace') router.push('/marketplace' as Href)
+              if (id === 'saved') router.push('/saved' as Href)
+              if (id === 'compose') router.push('/compose' as Href)
+            }}
+            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+          />
+        }
+      />
       <ResponsiveContent maxWidth={760}>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[
+            styles.content,
+            {gap: spacing[5], paddingBottom: tabPadding},
+          ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Good focus, {ownerName}</AppText>
             <AppText variant="body" colour="textSecondary">
-              Your local Modula Board gathers the next useful actions without requiring a backend.
+              Your local Modula Board gathers pinned spaces and next useful actions.
             </AppText>
           </View>
+
           <Surface
             variant="contained"
             style={[styles.focus, {gap: spacing[3], padding: spacing[4]}]}>
@@ -49,118 +144,136 @@ export function BoardScreen() {
             <View style={styles.focusBody}>
               <AppText variant="headline">Current focus</AppText>
               <AppText variant="body" colour="textSecondary">
-                Validate Phase 1 shell flows on phone and web before adding accounts or APIs.
+                Validate Phase 4.5 expansion surfaces — Marketplace, Settings, and Saved — before
+                production backends.
               </AppText>
             </View>
           </Surface>
-          <Surface
-            variant="contained"
-            style={[styles.profileCard, {gap: spacing[3], padding: spacing[4]}]}>
-            <View
-              style={[
-                styles.focusIcon,
-                {backgroundColor: colours.accentSubtle, borderRadius: radius.medium},
-              ]}>
-              <AppIcon name="profile" colour={colours.accent} />
-            </View>
-            <View style={styles.focusBody}>
-              <AppText variant="headline">Your Profile</AppText>
-              <AppText variant="body" colour="textSecondary">
-                Manage identity, tabs, modules and public presentation.
-              </AppText>
-            </View>
-            <View style={[styles.profileActions, {gap: spacing[2]}]}>
+
+          <View style={{gap: spacing[3]}}>
+            <View style={styles.sectionHeader}>
+              <AppText variant="headline">Pinned spaces</AppText>
               <AppPressable
-                accessibilityLabel="Open Profile"
-                onPress={() => router.push('/profile' as Href)}
-                style={[
-                  styles.profileAction,
-                  {backgroundColor: colours.accent, borderRadius: radius.round},
-                ]}>
-                <AppText variant="label" style={{color: colours.accentForeground}}>
-                  Open Profile
+                accessibilityLabel="Customize pinned spaces"
+                onPress={() => setCustomizeOpen(true)}
+                style={styles.customizeHit}>
+                <AppText variant="caption" colour="accent">
+                  Customize
                 </AppText>
               </AppPressable>
-              <AppPressable
-                accessibilityLabel="Customize profile"
-                onPress={() => router.push('/profile/customize' as Href)}
-                style={[
-                  styles.profileAction,
-                  {
-                    backgroundColor: colours.surfaceRaised,
-                    borderColor: colours.border,
-                    borderRadius: radius.round,
-                  },
-                ]}>
-                <AppText variant="label">Customize</AppText>
-              </AppPressable>
             </View>
-          </Surface>
-          <View style={[styles.quickActions, {gap: spacing[2]}]}>
-            {[
-              ['Create', 'create', '/compose'],
-              ['Discover', 'discover', '/discover'],
-              ['Profile', 'profile', '/profile'],
-            ].map(([label, icon, route]) => (
-              <AppPressable
-                key={label}
-                accessibilityLabel={label}
-                onPress={() => router.push(route as Href)}
-                style={[
-                  styles.quickAction,
-                  {
-                    backgroundColor: colours.surfaceRaised,
-                    borderColor: colours.border,
-                    borderRadius: radius.medium,
-                  },
-                ]}>
-                <AppIcon
-                  name={icon as Parameters<typeof AppIcon>[0]['name']}
-                  colour={colours.accent}
-                />
-                <AppText variant="label">{label}</AppText>
-              </AppPressable>
-            ))}
+            {loading ? (
+              <BoardGridSkeleton />
+            ) : (
+              <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
+                {pinnedSpaces.map(space => (
+                  <ModulaContextMenu
+                    key={space.route}
+                    accessibilityLabel={`${space.label} actions`}
+                    actions={[
+                      {id: 'open', label: 'Open'},
+                      {id: 'unpin', label: 'Unpin from Board'},
+                      {id: 'share', label: 'Share link preview'},
+                    ]}
+                    onAction={id => {
+                      if (id === 'open') router.push(space.route as Href)
+                      if (id === 'unpin') {
+                        setPinnedIds(prev => prev.filter(item => item !== space.id))
+                      }
+                    }}>
+                    <AppPressable
+                      accessibilityLabel={space.label}
+                      onPress={() => router.push(space.route as Href)}
+                      style={[
+                        styles.moduleCard,
+                        {
+                          backgroundColor: colours.surface,
+                          borderColor: colours.border,
+                          borderRadius: radius.large,
+                          padding: spacing[4],
+                        },
+                      ]}>
+                      <AppIcon name={space.icon} colour={colours.accent} />
+                      <View style={{gap: spacing[1]}}>
+                        <AppText variant="headline">{space.label}</AppText>
+                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                          {space.description}
+                        </AppText>
+                      </View>
+                    </AppPressable>
+                  </ModulaContextMenu>
+                ))}
+              </View>
+            )}
           </View>
+
           <FeatureErrorBoundary label="Board module grid">
             <View style={{gap: spacing[3]}}>
               <AppText variant="headline">Modules</AppText>
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {modules.map(module => (
-                  <AppPressable
-                    key={module.id}
-                    accessibilityLabel={`Open ${module.name}`}
-                    onPress={() => Alert.alert(module.name, 'Local module preview')}
-                    style={[
-                      styles.moduleCard,
-                      {
-                        backgroundColor: colours.surface,
-                        borderColor: colours.border,
-                        borderRadius: radius.large,
-                        padding: spacing[4],
-                      },
-                    ]}>
-                    <AppIcon name={module.icon} colour={colours.accent} />
-                    <View style={{gap: spacing[1]}}>
-                      <AppText variant="headline">{module.name}</AppText>
-                      <AppText variant="caption" colour="textSecondary">
-                        {module.description}
+                  <View key={module.id} style={styles.moduleCardWrap}>
+                    <AppPressable
+                      accessibilityLabel={`Open ${module.name}`}
+                      onPress={() => router.push(`/marketplace/${module.id}` as Href)}
+                      style={[
+                        styles.moduleCard,
+                        {
+                          backgroundColor: colours.surface,
+                          borderColor: colours.border,
+                          borderRadius: radius.large,
+                          padding: spacing[4],
+                        },
+                      ]}>
+                      <AppIcon name={module.icon} colour={colours.accent} />
+                      <View style={{gap: spacing[1]}}>
+                        <AppText variant="headline">{module.name}</AppText>
+                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                          {module.description}
+                        </AppText>
+                      </View>
+                      <AppText variant="caption" colour="accent">
+                        {module.status}
                       </AppText>
+                    </AppPressable>
+                    <View style={styles.controlGroup}>
+                      <ModulaControlGroup
+                        label="Module"
+                        actions={[
+                          {id: 'open', label: 'Open', systemImage: 'arrow.up.right'},
+                          {id: 'preview', label: 'Preview', systemImage: 'eye'},
+                          {id: 'pin', label: 'Pin', systemImage: 'pin'},
+                        ]}
+                        onAction={id => {
+                          if (id === 'open' || id === 'preview') {
+                            router.push(`/marketplace/${module.id}` as Href)
+                          }
+                        }}
+                      />
                     </View>
-                    <AppText variant="caption" colour="accent">
-                      {module.status}
-                    </AppText>
-                  </AppPressable>
+                  </View>
                 ))}
               </View>
             </View>
           </FeatureErrorBoundary>
+
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Recent activity</AppText>
             {activity.slice(0, 3).map(item => (
-              <Surface
+              <AppPressable
                 key={item.id}
-                variant="plain"
+                accessibilityLabel={item.description}
+                onPress={() => {
+                  if (item.type === 'moduleUpdate') {
+                    router.push('/marketplace/module-vault-notes' as Href)
+                    return
+                  }
+                  if (item.actor) {
+                    router.push(`/profile/${item.actor.handle}` as Href)
+                    return
+                  }
+                  router.push('/activity' as Href)
+                }}
                 style={[styles.activityRow, {gap: spacing[3]}]}>
                 <AppIcon name={item.icon ?? 'activity'} colour={colours.textSecondary} />
                 <View style={styles.focusBody}>
@@ -169,11 +282,58 @@ export function BoardScreen() {
                     {item.timestamp}
                   </AppText>
                 </View>
-              </Surface>
+                <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
+              </AppPressable>
             ))}
           </View>
         </ScrollView>
       </ResponsiveContent>
+
+      <ModulaSheet
+        isPresented={customizeOpen}
+        onDismiss={() => setCustomizeOpen(false)}
+        snapPoints={[{fraction: 0.65}, 'full']}
+        testID="board-customize-sheet">
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="headline">Customize pinned spaces</AppText>
+          <AppText variant="caption" colour="textSecondary">
+            Toggle which spaces appear on your Board. Local only.
+          </AppText>
+          {ALL_PINNED_SPACES.map(space => {
+            const pinned = pinnedIds.includes(space.id)
+            return (
+              <AppPressable
+                key={space.id}
+                accessibilityLabel={`${pinned ? 'Unpin' : 'Pin'} ${space.label}`}
+                onPress={() => {
+                  setPinnedIds(prev =>
+                    pinned
+                      ? prev.filter(id => id !== space.id)
+                      : [...prev, space.id],
+                  )
+                }}
+                style={[
+                  styles.customizeRow,
+                  {
+                    backgroundColor: pinned ? colours.accentSubtle : colours.surfaceRaised,
+                    borderRadius: radius.medium,
+                  },
+                ]}>
+                <AppIcon name={space.icon} colour={colours.accent} />
+                <View style={styles.focusBody}>
+                  <AppText variant="label">{space.label}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {space.description}
+                  </AppText>
+                </View>
+                <AppText variant="caption" colour={pinned ? 'accent' : 'textSecondary'}>
+                  {pinned ? 'Pinned' : 'Off'}
+                </AppText>
+              </AppPressable>
+            )
+          })}
+        </View>
+      </ModulaSheet>
     </View>
   )
 }
@@ -186,7 +346,20 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 32,
+  },
+  controlGroup: {
+    marginTop: 8,
+  },
+  customizeHit: {
+    justifyContent: 'center',
+    minHeight: 32,
+  },
+  customizeRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    minHeight: 56,
+    paddingHorizontal: 12,
   },
   focus: {
     alignItems: 'center',
@@ -204,43 +377,24 @@ const styles = StyleSheet.create({
   },
   moduleCard: {
     borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: '48%',
     gap: 12,
     minHeight: 156,
+    width: '100%',
+  },
+  moduleCardWrap: {
+    flexBasis: '48%',
+    flexGrow: 1,
   },
   moduleGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  profileAction: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    minHeight: 40,
-    paddingHorizontal: 12,
-  },
-  profileActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  profileCard: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  quickAction: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    minHeight: 48,
-  },
-  quickActions: {
-    flexDirection: 'row',
-  },
   screen: {
     flex: 1,
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 })

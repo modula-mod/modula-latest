@@ -79,13 +79,21 @@ for (const forbidden of [
   '@tanstack/query-persist-client-core',
   '@tanstack/react-query-persist-client',
   'jwt-decode',
-  'react-native-reanimated',
-  'react-native-worklets',
   'react-native-worklets-core',
   '@react-native/worklets',
 ]) {
   if (Object.prototype.hasOwnProperty.call(allDeps, forbidden)) {
     fail(`Forbidden Phase 4 dependency present: ${forbidden}`)
+  }
+}
+
+// Reanimated/Worklets re-admitted only for Phase 4.5 authorized liquid-glass tabs
+const liquidGlassGate =
+  exists('src/platform/ui/navigation/liquid-glass-availability.ts') &&
+  exists('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx')
+for (const name of ['react-native-reanimated', 'react-native-worklets']) {
+  if (Object.prototype.hasOwnProperty.call(allDeps, name) && !liquidGlassGate) {
+    fail(`Forbidden Phase 4 dependency present: ${name}`)
   }
 }
 

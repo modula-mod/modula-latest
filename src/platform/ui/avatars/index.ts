@@ -1,0 +1,5 @@
+export {GroupFaces} from '@/platform/ui/avatars/GroupFaces'
+export {PresenceAvatar} from '@/platform/ui/avatars/PresenceAvatar'
+export {StackedAvatars} from '@/platform/ui/avatars/StackedAvatars'
+export {StoryRingAvatar} from '@/platform/ui/avatars/StoryRingAvatar'
+export type {AvatarFace, PresenceStatus} from '@/platform/ui/avatars/types'

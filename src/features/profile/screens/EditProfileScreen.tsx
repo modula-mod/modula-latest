@@ -1,6 +1,5 @@
 import {useMemo, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, TextInput, View} from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
 import {useRouter} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -20,6 +19,13 @@ import {
   validateWebsite,
 } from '@/features/profile/utils/validators'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {
+  KeyboardSafeScreen,
+  captureMediaFromSource,
+  keyboardScrollProps,
+  presentMediaSourceMenu,
+  type MediaCaptureTarget,
+} from '@/platform/ui'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type EditProfileDraft = {
@@ -122,27 +128,48 @@ export function EditProfileScreen() {
     router.back()
   }
 
+  const applyCapturedUri = (target: MediaCaptureTarget, uri: string) => {
+    updateDraft(prev => ({
+      ...prev,
+      [target === 'avatar' ? 'avatarUri' : 'coverUri']: uri,
+    }))
+  }
+
   const pickImage = async (target: 'avatar' | 'cover', source: 'library' | 'camera') => {
-    try {
-      const result =
-        source === 'camera'
-          ? await ImagePicker.launchCameraAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-              quality: 0.9,
-            })
-          : await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-              quality: 0.9,
-            })
-      if (result.canceled || !result.assets[0]?.uri) return
-      const uri = result.assets[0].uri
+    const result = await captureMediaFromSource(source, {target})
+    if (result.ok) {
+      applyCapturedUri(target, result.asset.uri)
+      return
+    }
+    if (result.reason === 'cancelled') return
+    Alert.alert(
+      source === 'camera' ? 'Camera unavailable' : 'Photo unavailable',
+      result.message,
+    )
+  }
+
+  const openPhotoMenu = async (target: 'avatar' | 'cover') => {
+    const result = await presentMediaSourceMenu({
+      target,
+      title: target === 'avatar' ? 'Profile photo' : 'Cover photo',
+      message: 'Choose Photo or Take Photo. Changes stay in this local session.',
+      includeRemove: Boolean(target === 'avatar' ? draft.avatarUri : draft.coverUri),
+      removeLabel: target === 'avatar' ? 'Remove profile picture' : 'Remove cover image',
+    })
+
+    if (result.ok) {
+      applyCapturedUri(target, result.asset.uri)
+      return
+    }
+    if (result.reason === 'removed') {
       updateDraft(prev => ({
         ...prev,
-        [target === 'avatar' ? 'avatarUri' : 'coverUri']: uri,
+        [target === 'avatar' ? 'avatarUri' : 'coverUri']: null,
       }))
-    } catch {
-      Alert.alert('Image unavailable', 'Modula could not open the local image picker.')
+      return
     }
+    if (result.reason === 'dismissed' || result.reason === 'cancelled') return
+    Alert.alert('Photo unavailable', result.message)
   }
 
   if (ownerProfileQuery.isLoading || !ownerProfile) {
@@ -159,18 +186,17 @@ export function EditProfileScreen() {
   }
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <KeyboardSafeScreen style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent maxWidth={760}>
         <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          keyboardShouldPersistTaps="handled"
+          {...keyboardScrollProps}
           contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
           <View style={styles.header}>
             <HeaderButton label="Cancel" onPress={leave} />
             <AppText variant="headline" style={styles.headerTitle}>
               Edit Profile
             </AppText>
-            <HeaderButton label="Save" onPress={save} primary />
+            <HeaderButton label="Save" onPress={() => void save()} primary />
           </View>
           <Surface
             variant="contained"
@@ -184,18 +210,14 @@ export function EditProfileScreen() {
           <ImageControls
             title="Avatar"
             changeLabel="Change profile picture"
-            removeLabel="Remove profile picture"
-            onLibrary={() => void pickImage('avatar', 'library')}
+            onChoose={() => void openPhotoMenu('avatar')}
             onCamera={() => void pickImage('avatar', 'camera')}
-            onRemove={() => updateDraft(prev => ({...prev, avatarUri: null}))}
           />
           <ImageControls
             title="Cover"
             changeLabel="Change cover image"
-            removeLabel="Remove cover image"
-            onLibrary={() => void pickImage('cover', 'library')}
+            onChoose={() => void openPhotoMenu('cover')}
             onCamera={() => void pickImage('cover', 'camera')}
-            onRemove={() => updateDraft(prev => ({...prev, coverUri: null}))}
           />
 
           <ProfileField
@@ -279,7 +301,7 @@ export function EditProfileScreen() {
           </View>
         </ScrollView>
       </ResponsiveContent>
-    </View>
+    </KeyboardSafeScreen>
   )
 }
 
@@ -331,41 +353,34 @@ function HeaderButton({
 function ImageControls({
   title,
   changeLabel,
-  removeLabel,
-  onLibrary,
+  onChoose,
   onCamera,
-  onRemove,
 }: {
   title: string
   changeLabel: string
-  removeLabel: string
-  onLibrary: () => void
+  onChoose: () => void
   onCamera: () => void
-  onRemove: () => void
 }) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   return (
     <Surface variant="contained" style={[styles.imageControls, {gap: spacing[3], padding: spacing[3]}]}>
       <AppText variant="headline">{title}</AppText>
+      <AppText variant="caption" colour="textSecondary">
+        {changeLabel}. Local session only — not uploaded.
+      </AppText>
       <View style={[styles.controlRow, {gap: spacing[2]}]}>
-        <ControlButton label={changeLabel} icon="photo" onPress={onLibrary} />
-        <ControlButton label="Take photo" icon="camera" onPress={onCamera} />
-        <AppPressable
-          accessibilityLabel={removeLabel}
-          onPress={onRemove}
-          style={[
-            styles.controlButton,
-            {
-              backgroundColor: colours.surfaceRaised,
-              borderColor: colours.border,
-              borderRadius: radius.round,
-              gap: spacing[2],
-              paddingHorizontal: spacing[3],
-            },
-          ]}>
-          <AppIcon name="trash" colour={colours.destructive} size={18} />
-          <AppText variant="label">{removeLabel.replace(' image', '').replace(' picture', '')}</AppText>
-        </AppPressable>
+        <ControlButton
+          label="Choose Photo"
+          icon="photo"
+          onPress={onChoose}
+          accessibilityLabel={`${changeLabel}. Opens Choose Photo, Take Photo, or Remove`}
+        />
+        <ControlButton
+          label="Take Photo"
+          icon="camera"
+          onPress={onCamera}
+          accessibilityLabel={`Take Photo for ${title.toLowerCase()}`}
+        />
       </View>
     </Surface>
   )
@@ -375,15 +390,17 @@ function ControlButton({
   label,
   icon,
   onPress,
+  accessibilityLabel,
 }: {
   label: string
   icon: Parameters<typeof AppIcon>[0]['name']
   onPress: () => void
+  accessibilityLabel?: string
 }) {
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <AppPressable
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       style={[
         styles.controlButton,
@@ -462,6 +479,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     justifyContent: 'center',
+    minHeight: 44,
   },
   controlRow: {
     flexDirection: 'row',

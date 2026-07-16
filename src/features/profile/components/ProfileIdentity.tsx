@@ -9,7 +9,6 @@ import {
   type ProfileKind,
   type ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
-import {IdentityIndicator} from '@/features/profile/components/IdentityIndicator'
 import {ProfileVisibilityBadge} from '@/features/profile/components/ProfileVisibilityBadge'
 import {openSafeExternalUrl} from '@/lib/safeExternalUrl'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -30,9 +29,7 @@ const kindLabels: Record<ProfileKind, string> = {
 
 export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps) {
   const {colours, spacing} = useThemeTokens()
-  const visibleClaims = profile.identityClaims.filter(claim =>
-    canViewerSeeProfileField(claim.visibility, viewer.relationship),
-  )
+  // Identity claims belong in About — keep the hero personal-first.
   const locationVisible =
     profile.location &&
     canViewerSeeProfileField(profile.location.visibility, viewer.relationship)
@@ -56,22 +53,9 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
         </View>
       </View>
 
-      {visibleClaims.length ? (
-        <View style={[styles.indicators, {gap: spacing[2]}]}>
-          {visibleClaims.map(claim => (
-            <IdentityIndicator key={claim.id} claim={claim} />
-          ))}
-        </View>
-      ) : null}
-
       <AppText variant="body">{profile.bio}</AppText>
 
       <View style={[styles.metadata, {gap: spacing[2]}]}>
-        {profile.pronouns && viewer.relationship === 'owner' ? (
-          <AppText variant="caption" colour="textSecondary">
-            {profile.pronouns}
-          </AppText>
-        ) : null}
         {locationVisible ? (
           <View style={[styles.metaItem, {gap: spacing[1]}]}>
             <AppIcon name="discover" colour={colours.textSecondary} size={16} />

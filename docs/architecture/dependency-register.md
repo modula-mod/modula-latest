@@ -64,3 +64,52 @@ Do not store passwords, session tokens, private keys, wallet data, personal iden
 | @tanstack/react-query | ^5.101.2 | Server-state cache, query orchestration, retries and mutations | No | No token storage | `pnpm add @tanstack/react-query` | Phase 4 |
 | expo-secure-store | ~57.0.1 | Native refresh-token storage boundary | Yes | Stores only `modula.session.refresh-token.v1` on native platforms | `pnpm exec expo install expo-secure-store` | Phase 4 |
 | expo-network | ~57.0.1 | Central network-state observation for Query online manager | Yes | No personal data | `pnpm exec expo install expo-network` | Phase 4 |
+
+## Phase 4.5 native UI recovery
+
+| Package | Version | Purpose | Native | Storage/security role | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @expo/ui | ~57.0.6 | Native buttons / sheets / menus via Modula platform adapters | Yes | No personal data | `pnpm exec expo install @expo/ui` | Phase 4.5 |
+| expo-clipboard | ~57.0.1 | Copy post text / permalink from native overflow menus | Yes | Clipboard only; no Modula persistence | `pnpm exec expo install expo-clipboard` | Phase 4.5 |
+
+## Phase 4.5 expandable liquid-glass tab bar (user-authorized)
+
+Owner permission: Modula product owner spoke with [iamitkhatkar](https://github.com/iamitkhatkar) and authorized integrating the expandable liquid-glass tab pattern from [rn-expandable-tab-liquid-glass](https://github.com/iamitkhatkar/rn-expandable-tab-liquid-glass). That repo is a **demo app, not an npm package** — Modula vendors an adapted adapter under `src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx` (attribution retained). This directive overrides the earlier Phase 4.5 “NativeTabs-only / no third-party tab bar” rule for this specific integration.
+
+| Package | Version | Purpose | Native | Notes | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @callstack/liquid-glass | 0.8.0 | iOS liquid glass views for expandable tab chrome | Yes | Requires compatible iOS/Xcode liquid-glass runtime; falls back to solid/raised surface when unsupported or Reduce Transparency | `pnpm add @callstack/liquid-glass` | Phase 4.5 |
+| react-native-reanimated | 4.5.0 | Expand / plus-button motion from authorized tab pattern | Yes | Re-admitted **only** for this tab-bar adapter; Expo SDK 57 matrix | `pnpm exec expo install react-native-reanimated` | Phase 4.5 |
+| react-native-worklets | 0.10.0 | Peer for Reanimated 4 | Yes | Expo SDK 57 matrix | `pnpm exec expo install react-native-worklets` | Phase 4.5 |
+| @react-native-segmented-control/segmented-control | 2.5.7 | Installed for Expo parity with upstream demo peers; Modula adapter uses AppIcon tab hits (SF Symbol fork not required) | Yes | Expo SDK 57 | `pnpm exec expo install @react-native-segmented-control/segmented-control` | Phase 4.5 |
+| react-native-svg | 15.15.4 | Peer commonly required by icon tooling / Expo matrix | Yes | Expo SDK 57 | `pnpm exec expo install react-native-svg` | Phase 4.5 |
+
+Attribution: tab interaction pattern adapted from iamitkhatkar/rn-expandable-tab-liquid-glass (MIT / project licence as published upstream).
+
+### Liquid glass tabs — native rebuild required
+
+`@callstack/liquid-glass` links `NativeLiquidGlassModule`. A **static import crashes Expo Go** (and any binary without pods) because `TurboModuleRegistry.getEnforcing` runs at module load.
+
+Modula gates with `TurboModuleRegistry.get('NativeLiquidGlassModule')` (non-enforcing) + Expo Go detection in `src/platform/ui/navigation/liquid-glass-availability.ts`. When missing, `platform-tabs.native.tsx` falls back to Expo Router `NativeTabs`.
+
+For the expandable liquid-glass tab bar:
+
+```bash
+cd ios && pod install && cd ..
+pnpm exec expo run:ios
+```
+
+Expo Go always uses the NativeTabs fallback. Do not expect liquid glass chrome inside Expo Go.
+
+## Phase 4.5 UI polish — library decisions (no new packages)
+
+Research: `docs/research/phase4-5-third-party-ui-libs.md`.
+
+| Candidate | Decision | Notes |
+|---|---|---|
+| `@outpacelabs/avatars` | Not installed | Generative web canvas gradients; wrong API for stacked/story/presence. Modula `src/platform/ui/avatars/` instead. |
+| Solarin-Johnson/my-app | Ideas only | Not a package; Reanimated playground — do not vendor. |
+| rit3zh/expo-curved-bottom-tabs | Not installed | Demo + Skia + Reanimated; would fight primary liquid-glass tabs. Modula `ModulaCurvedSectionTabs` for Marketplace nested chrome only. |
+| rit3zh/expo-motion-tabs | Not installed | Demo bottom-tab morph popups + Reanimated; wrong for Profile content tabs. Modula `ModulaMotionTabs` (LayoutAnimation). |
+
+No new rows in the dependency table — zero packages added for this polish pass.

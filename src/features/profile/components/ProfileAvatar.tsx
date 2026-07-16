@@ -1,4 +1,4 @@
-import {StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
+import {Pressable, StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
 
 import {Avatar} from '@/components/primitives/Avatar'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
@@ -10,6 +10,9 @@ type ProfileAvatarProps = {
   size: number
   showFocusHalo: boolean
   style?: StyleProp<ViewStyle>
+  canEdit?: boolean
+  onEditPress?: () => void
+  previewUri?: string | null
 }
 
 export function ProfileAvatar({
@@ -17,10 +20,14 @@ export function ProfileAvatar({
   size,
   showFocusHalo,
   style,
+  canEdit,
+  onEditPress,
+  previewUri,
 }: ProfileAvatarProps) {
   const {colours} = useThemeTokens()
+  const uri = previewUri === undefined ? profile.avatarUri : previewUri ?? undefined
 
-  return (
+  const avatar = (
     <FocusHalo
       status={profile.focusStatus}
       profileName={profile.displayName}
@@ -28,7 +35,7 @@ export function ProfileAvatar({
       visible={showFocusHalo}>
       <Avatar
         name={profile.displayName}
-        uri={profile.avatarUri}
+        uri={uri}
         colour={profile.coverColour}
         size={size}
         style={[
@@ -41,6 +48,19 @@ export function ProfileAvatar({
         ]}
       />
     </FocusHalo>
+  )
+
+  if (!canEdit || !onEditPress) {
+    return avatar
+  }
+
+  return (
+    <Pressable
+      accessibilityLabel="Change profile photo"
+      accessibilityRole="button"
+      onPress={onEditPress}>
+      {avatar}
+    </Pressable>
   )
 }
 

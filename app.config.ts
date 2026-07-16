@@ -34,7 +34,14 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
-    'expo-dev-client',
+    [
+      'expo-dev-client',
+      {
+        // Hide floating Tools FAB on product surfaces (shake / 3-finger still opens menu).
+        // Requires a native rebuild to take full effect; runtime hide also runs at launch.
+        toolsButton: false,
+      },
+    ],
     [
       'expo-image-picker',
       {

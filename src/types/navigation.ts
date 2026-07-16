@@ -11,6 +11,8 @@ export type DrawerDestination = {
     | '/modules'
     | '/marketplace'
     | '/settings'
+    | '/settings/appearance'
+    | '/settings/developer'
   icon: AppIconName
   description: string
 }

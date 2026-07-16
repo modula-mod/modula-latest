@@ -1,33 +1,83 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
-import {useRouter} from 'expo-router'
+import {useEffect, useMemo, useState} from 'react'
+import {
+  LayoutAnimation,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  UIManager,
+  View,
+} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 
-import {InitialLoadingState, QueryErrorState} from '@/components/data'
+import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
+import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {useReduceMotion} from '@/lib/accessibility'
+import {selectionHaptic} from '@/lib/haptics'
+import {StackedAvatars} from '@/platform/ui/avatars'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {ActivityListSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ActivityItem} from '@/domain/activity'
 
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true)
+}
+
 const groups = ['Today', 'This week', 'Earlier'] as const
+type ActivityFilter = 'all' | ActivityItem['type']
 
 export function ActivityScreen() {
+  const router = useRouter()
   const {colours, spacing} = useThemeTokens()
+  const reduceMotion = useReduceMotion()
+  const tabPadding = useFloatingTabBarContentPadding()
   const activityQuery = useActivityQuery()
+  const [filter, setFilter] = useState<ActivityFilter>('all')
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
+  const [readIds, setReadIds] = useState<Set<string>>(() => new Set())
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
+  const filtered = useMemo(
+    () => (filter === 'all' ? activity : activity.filter(item => item.type === filter)),
+    [activity, filter],
+  )
+
+  useEffect(() => {
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+    }
+  }, [filter, reduceMotion])
 
   if (activityQuery.isLoading) {
-    return <InitialLoadingState label="Loading activity" />
+    return (
+      <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+        <ActivityListSkeleton />
+      </View>
+    )
   }
 
   if (activityQuery.isError) {
-    return <QueryErrorState error={activityQuery.error} onRetry={() => void activityQuery.refetch()} />
+    return (
+      <QueryErrorState
+        error={activityQuery.error}
+        onRetry={() => void activityQuery.refetch()}
+      />
+    )
   }
 
   if (!activity.length) {
@@ -42,22 +92,102 @@ export function ActivityScreen() {
     )
   }
 
+  const applyFilter = (next: ActivityFilter) => {
+    void selectionHaptic()
+    setFilter(next)
+    setFilterSheetOpen(false)
+  }
+
+  const markAllRead = () => {
+    setReadIds(new Set(activity.map(item => item.id)))
+    void selectionHaptic()
+  }
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[
+            styles.content,
+            {gap: spacing[5], paddingBottom: tabPadding},
+          ]}
           keyboardShouldPersistTaps="handled">
-          <AppText variant="display">Activity</AppText>
+          <View style={styles.titleRow}>
+            <AppText variant="display">Activity</AppText>
+            <View style={styles.titleActions}>
+              <AppPressable
+                accessibilityLabel="Mark all as read"
+                onPress={markAllRead}
+                style={styles.iconHit}>
+                <AppIcon name="check" colour={colours.textSecondary} />
+              </AppPressable>
+              <AppPressable
+                accessibilityLabel="Filter activity"
+                onPress={() => setFilterSheetOpen(true)}
+                style={styles.iconHit}>
+                <AppIcon name="settings" colour={colours.textSecondary} />
+              </AppPressable>
+              <ModulaMenu
+                accessibilityLabel="More activity actions"
+                title="Activity"
+                actions={[
+                  {id: 'notifications', label: 'Notification settings'},
+                  {id: 'markRead', label: 'Mark all as read'},
+                  {id: 'filter', label: 'Open filters'},
+                ]}
+                onAction={id => {
+                  if (id === 'notifications') {
+                    router.push('/settings/notifications' as Href)
+                  }
+                  if (id === 'markRead') markAllRead()
+                  if (id === 'filter') setFilterSheetOpen(true)
+                }}
+                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+              />
+            </View>
+          </View>
+
+          <View style={{flexDirection: 'row', gap: spacing[2]}}>
+            <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
+            <Pill
+              label="Mentions"
+              selected={filter === 'mention'}
+              onPress={() => applyFilter('mention')}
+            />
+            <Pill
+              label="Filters"
+              selected={
+                filter !== 'all' && filter !== 'mention'
+              }
+              onPress={() => setFilterSheetOpen(true)}
+            />
+          </View>
+
+          {filter !== 'all' && filter !== 'mention' ? (
+            <AppText variant="caption" colour="textSecondary">
+              Showing {filter} · local preview filters
+            </AppText>
+          ) : null}
+
           {groups.map(group => {
-            const items = activity.filter(item => item.group === group)
+            const items = filtered.filter(item => item.group === group)
             if (!items.length) return null
             return (
               <View key={group} style={{gap: spacing[3]}}>
                 <AppText variant="headline">{group}</AppText>
                 <View style={{gap: spacing[2]}}>
                   {items.map(item => (
-                    <ActivityRow key={item.id} item={item} />
+                    <ActivityRow
+                      key={item.id}
+                      item={item}
+                      unread={!readIds.has(item.id)}
+                      onOpen={() => {
+                        setReadIds(prev => new Set(prev).add(item.id))
+                      }}
+                      onMarkRead={() => {
+                        setReadIds(prev => new Set(prev).add(item.id))
+                      }}
+                    />
                   ))}
                 </View>
               </View>
@@ -65,11 +195,64 @@ export function ActivityScreen() {
           })}
         </ScrollView>
       </ResponsiveContent>
+
+      <ModulaSheet
+        isPresented={filterSheetOpen}
+        onDismiss={() => setFilterSheetOpen(false)}
+        snapPoints={[{fraction: 0.55}, 'full']}
+        testID="activity-filter-sheet">
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="headline">Filter activity</AppText>
+          <AppText variant="caption" colour="textSecondary">
+            Choose a local filter. Nothing is synced remotely.
+          </AppText>
+          {(
+            [
+              ['all', 'All'],
+              ['mention', 'Mentions'],
+              ['like', 'Likes'],
+              ['reply', 'Replies'],
+              ['follow', 'Follows'],
+              ['moduleUpdate', 'Modules'],
+              ['teamInvitation', 'Teams'],
+            ] as const
+          ).map(([id, label]) => (
+            <AppPressable
+              key={id}
+              accessibilityLabel={`Filter ${label}`}
+              onPress={() => applyFilter(id)}
+              style={[
+                styles.filterRow,
+                {
+                  backgroundColor:
+                    filter === id ? colours.accentSubtle : colours.surfaceRaised,
+                  borderRadius: 12,
+                },
+              ]}>
+              <AppText
+                variant="label"
+                style={{color: filter === id ? colours.accent : colours.text}}>
+                {label}
+              </AppText>
+            </AppPressable>
+          ))}
+        </View>
+      </ModulaSheet>
     </View>
   )
 }
 
-function ActivityRow({item}: {item: ActivityItem}) {
+function ActivityRow({
+  item,
+  unread,
+  onOpen,
+  onMarkRead,
+}: {
+  item: ActivityItem
+  unread: boolean
+  onOpen: () => void
+  onMarkRead: () => void
+}) {
   const router = useRouter()
   const session = useSession()
   const {colours, radius, spacing} = useThemeTokens()
@@ -78,107 +261,155 @@ function ActivityRow({item}: {item: ActivityItem}) {
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
     : null
 
+  const openDestination = () => {
+    onOpen()
+    if (item.type === 'moduleUpdate') {
+      router.push('/marketplace/module-vault-notes' as Href)
+      return
+    }
+    if (item.type === 'teamInvitation') {
+      router.push('/teams' as Href)
+      return
+    }
+    if (item.type === 'like' || item.type === 'reply' || item.type === 'mention') {
+      router.push('/' as Href)
+      return
+    }
+    if (profileRoute) {
+      router.push(profileRoute)
+    }
+  }
+
   return (
-    <Surface
-      variant="plain"
-      style={[styles.row, {gap: spacing[3], paddingVertical: spacing[2]}]}>
-      {item.actor && profileRoute ? (
-        <AppPressable
-          accessibilityLabel={`Open ${item.actor.displayName} profile`}
-          onPress={() => router.push(profileRoute)}
-          style={styles.actorPress}>
-          <Avatar
-            name={item.actor.displayName}
-            uri={item.actor.avatarUri}
-            colour={item.actor.coverColour}
-            size={42}
-          />
-        </AppPressable>
-      ) : (
-        <View
+    <ModulaContextMenu
+      accessibilityLabel={`Activity actions for ${item.description}`}
+      actions={[
+        {id: 'open', label: 'Open'},
+        {id: 'markRead', label: unread ? 'Mark as read' : 'Mark as unread'},
+        {id: 'mute', label: 'Mute preview'},
+        {id: 'copy', label: 'Copy text'},
+        {id: 'remove', label: 'Remove preview', style: 'destructive'},
+      ]}
+      onAction={id => {
+        if (id === 'open') openDestination()
+        if (id === 'markRead') onMarkRead()
+        if (id === 'copy' && item.description) {
+          void import('expo-clipboard').then(mod =>
+            mod.setStringAsync(
+              item.actor
+                ? `${item.actor.displayName} ${item.description}`
+                : item.description,
+            ),
+          )
+        }
+      }}>
+      <AppPressable
+        accessibilityLabel={item.description}
+        onPress={openDestination}
+        style={styles.rowPress}>
+        <Surface
+          variant="plain"
           style={[
-            styles.iconAvatar,
+            styles.row,
             {
-              backgroundColor: colours.accentSubtle,
-              borderRadius: radius.round,
+              gap: spacing[3],
+              opacity: unread ? 1 : 0.72,
+              paddingVertical: spacing[2],
             },
           ]}>
-          <AppIcon name={item.icon ?? 'activity'} colour={colours.accent} />
-        </View>
-      )}
-      <View style={styles.body}>
-        {item.actor && profileRoute ? (
-          <AppPressable
-            accessibilityLabel={`Open ${item.actor.displayName} profile`}
-            onPress={() => router.push(profileRoute)}
-            style={styles.actorNamePress}>
-            <AppText variant="body">
-              {item.actor.displayName} {item.description}
-            </AppText>
-          </AppPressable>
-        ) : (
-          <AppText variant="body">{item.description}</AppText>
-        )}
-        <AppText variant="caption" colour="textSecondary">
-          {item.timestamp}
-        </AppText>
-        {item.preview ? (
-          <View
-            style={[
-              styles.preview,
-              {
-                backgroundColor: colours.surfaceRaised,
-                borderColor: colours.border,
-                borderRadius: radius.medium,
-                marginTop: spacing[2],
-                padding: spacing[3],
-              },
-            ]}>
+          {item.actor && profileRoute ? (
+            <View>
+              <Avatar
+                name={item.actor.displayName}
+                uri={item.actor.avatarUri}
+                colour={item.actor.coverColour}
+                size={42}
+              />
+              {unread ? (
+                <View
+                  style={[
+                    styles.unreadDot,
+                    {backgroundColor: colours.accent, borderColor: colours.canvas},
+                  ]}
+                />
+              ) : null}
+            </View>
+          ) : (
+            <View
+              style={[
+                styles.iconAvatar,
+                {
+                  backgroundColor: colours.accentSubtle,
+                  borderRadius: radius.round,
+                },
+              ]}>
+              <AppIcon name={item.icon ?? 'activity'} colour={colours.accent} />
+            </View>
+          )}
+          <View style={styles.body}>
+            {item.actor ? (
+              <AppText variant="body">
+                <AppText variant="label">{item.actor.displayName}</AppText>{' '}
+                {item.description}
+              </AppText>
+            ) : (
+              <AppText variant="body">{item.description}</AppText>
+            )}
             <AppText variant="caption" colour="textSecondary">
-              {item.preview}
+              {item.timestamp}
             </AppText>
+            {item.preview ? (
+              <View
+                style={[
+                  styles.preview,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.medium,
+                    marginTop: spacing[2],
+                    padding: spacing[3],
+                  },
+                ]}>
+                <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                  {item.preview}
+                </AppText>
+              </View>
+            ) : null}
+            {item.type === 'follow' && item.actor ? (
+              <View style={{marginTop: spacing[2]}}>
+                <StackedAvatars
+                  faces={[
+                    {
+                      id: item.actor.id,
+                      name: item.actor.displayName,
+                      uri: item.actor.avatarUri,
+                      colour: item.actor.coverColour,
+                    },
+                  ]}
+                  size={28}
+                  max={1}
+                />
+              </View>
+            ) : null}
           </View>
-        ) : null}
-      </View>
-      {item.actionLabel ? (
-        <AppPressable
-          accessibilityLabel={item.actionLabel}
-          style={[
-            styles.action,
-            {
-              backgroundColor: colours.surfaceMuted,
-              borderRadius: radius.round,
-            },
-          ]}>
-          <AppText variant="label">{item.actionLabel}</AppText>
-        </AppPressable>
-      ) : null}
-    </Surface>
+        </Surface>
+      </AppPressable>
+    </ModulaContextMenu>
   )
 }
 
 const styles = StyleSheet.create({
-  action: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 38,
-    paddingHorizontal: 12,
-  },
-  actorNamePress: {
-    justifyContent: 'center',
-    minHeight: 28,
-  },
-  actorPress: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   body: {
     flex: 1,
     minWidth: 0,
   },
   content: {
     padding: 16,
-    paddingBottom: 96,
+  },
+  filterRow: {
+    justifyContent: 'center',
+    minHeight: 48,
+    paddingHorizontal: 14,
   },
   iconAvatar: {
     alignItems: 'center',
@@ -186,14 +417,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 42,
   },
+  iconHit: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
+  },
   preview: {
     borderWidth: StyleSheet.hairlineWidth,
   },
   row: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
+    width: '100%',
+  },
+  rowPress: {
+    width: '100%',
   },
   screen: {
     flex: 1,
+  },
+  titleActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+  },
+  titleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  unreadDot: {
+    borderRadius: 5,
+    borderWidth: 2,
+    bottom: 0,
+    height: 10,
+    position: 'absolute',
+    right: 0,
+    width: 10,
   },
 })

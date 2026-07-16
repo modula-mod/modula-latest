@@ -81,5 +81,11 @@ export function resolveSemanticColours(
     focusRing: accent.focus,
     selection: accent.subtleStrong,
     mediaGlowFallback: accent.subtleStrong,
+    mediaOverlayText: '#FFFFFF',
+    mediaOverlaySecondary: 'rgba(255,255,255,0.82)',
+    mediaOverlayIcon: '#FFFFFF',
+    mediaOverlayScrim: 'rgba(0,0,0,0.42)',
+    mediaOverlayControlBackground: 'rgba(0,0,0,0.35)',
+    mediaOverlayShadow: 'rgba(0,0,0,0.55)',
   }
 }

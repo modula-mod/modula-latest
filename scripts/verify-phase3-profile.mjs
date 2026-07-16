@@ -47,7 +47,7 @@ function requireText(file, pattern, message) {
 }
 
 const requiredRoutes = [
-  'src/app/(tabs)/profile.tsx',
+  'src/app/(tabs)/profile/index.tsx',
   'src/app/profile/edit.tsx',
   'src/app/profile/customize.tsx',
   'src/app/profile/preview.tsx',
@@ -103,7 +103,7 @@ const requiredFiles = [
 for (const file of requiredFiles) requireFile(file, 'Phase 3 profile file')
 
 requireText(
-  'src/app/(tabs)/profile.tsx',
+  'src/app/(tabs)/profile/index.tsx',
   /UnifiedProfileScreen[\s\S]*mode="owner"/,
   'Owner profile route must render UnifiedProfileScreen mode="owner"',
 )

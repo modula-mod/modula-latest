@@ -12,8 +12,15 @@ import {Divider} from '@/components/primitives/Divider'
 import {Surface} from '@/components/primitives/Surface'
 import {PendingMutationBadge} from '@/components/data/PendingMutationBadge'
 import {useLikePostMutation, useRepostMutation, useSavePostMutation} from '@/features/feed/data'
+import {
+  buildPostOverflowActions,
+  runPostOverflowAction,
+  type PostOverflowActionId,
+} from '@/features/feed/postActions'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {SocialPost} from '@/domain/social'
 
@@ -30,74 +37,104 @@ function formatRelative(iso: string): string {
   return `${Math.round(hours / 24)}d`
 }
 
+function marketplaceIdForModuleName(name: string): string {
+  const normalized = name.trim().toLowerCase()
+  if (normalized.includes('vault')) return 'module-vault-notes'
+  if (normalized.includes('task')) return 'module-tasks'
+  if (normalized.includes('crm')) return 'module-crm'
+  if (normalized.includes('health')) return 'module-health-agent'
+  if (normalized.includes('automation')) return 'module-automations'
+  if (normalized.includes('translate')) return 'module-translate-lite'
+  if (normalized.includes('insight')) return 'module-insights'
+  return 'module-vault-notes'
+}
+
 export function DemoPostItem({post}: DemoPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
   const session = useSession()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(post.author, ownerProfileId)
+  const overflowActions = buildPostOverflowActions(post)
+  const runOverflow = (id: string) => {
+    void runPostOverflowAction(id as PostOverflowActionId, post)
+  }
 
   return (
     <View>
-      <View style={[styles.row, {gap: spacing[3], padding: spacing[4]}]}>
-        <AppPressable
-          accessibilityLabel={`Open ${post.author.displayName} profile`}
-          onPress={() => router.push(profileRoute)}
-          style={styles.authorAvatar}>
-          <Avatar
-            name={post.author.displayName}
-            uri={post.author.avatarUri}
-            colour={post.author.coverColour}
-            size={42}
-          />
-        </AppPressable>
-        <View style={styles.body}>
-          <View style={styles.meta}>
-            <View style={styles.metaText}>
-              <AppPressable
-                accessibilityLabel={`Open ${post.author.displayName} profile`}
-                onPress={() => router.push(profileRoute)}
-                style={styles.authorTextButton}>
-                <AppText variant="label" numberOfLines={1}>
-                  {post.author.displayName}
-                </AppText>
-              </AppPressable>
-              <AppPressable
-                accessibilityLabel={`Open ${post.author.handle} profile`}
-                onPress={() => router.push(profileRoute)}
-                style={styles.authorTextButton}>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-                  @{post.author.handle} · {formatRelative(post.createdAt)}
-                </AppText>
-              </AppPressable>
+      <ModulaContextMenu
+        accessibilityLabel={`Post by ${post.author.displayName}`}
+        actions={overflowActions}
+        onAction={runOverflow}>
+        <View style={[styles.row, {gap: spacing[3], padding: spacing[4]}]}>
+          <AppPressable
+            accessibilityLabel={`Open ${post.author.displayName} profile`}
+            onPress={() => router.push(profileRoute)}
+            style={styles.authorAvatar}>
+            <Avatar
+              name={post.author.displayName}
+              uri={post.author.avatarUri}
+              colour={post.author.coverColour}
+              size={42}
+            />
+          </AppPressable>
+          <View style={styles.body}>
+            <View style={styles.meta}>
+              <View style={styles.metaText}>
+                <AppPressable
+                  accessibilityLabel={`Open ${post.author.displayName} profile`}
+                  onPress={() => router.push(profileRoute)}
+                  style={styles.authorTextButton}>
+                  <AppText variant="label" numberOfLines={1}>
+                    {post.author.displayName}
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel={`Open ${post.author.handle} profile`}
+                  onPress={() => router.push(profileRoute)}
+                  style={styles.authorTextButton}>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                    @{post.author.handle} · {formatRelative(post.createdAt)}
+                  </AppText>
+                </AppPressable>
+              </View>
+              <ModulaMenu
+                accessibilityLabel="Open post actions"
+                title="Post options"
+                actions={overflowActions}
+                onAction={runOverflow}
+                trigger={
+                  <View style={styles.moreButton}>
+                    <AppIcon name="more" colour={colours.textTertiary} size={20} />
+                  </View>
+                }
+              />
             </View>
-            <AppIcon name="more" colour={colours.textTertiary} size={20} />
+            <PostBody post={post} />
+            {post.optimisticState === 'pending' ? (
+              <View style={{marginTop: spacing[2]}}>
+                <PendingMutationBadge label="Posting" />
+              </View>
+            ) : null}
+            {post.optimisticState === 'failed' ? (
+              <View style={{marginTop: spacing[2]}}>
+                <PendingMutationBadge label="Failed" />
+              </View>
+            ) : null}
+            <PostActions
+              post={post}
+              onReply={() => router.push(`/post/${post.id}` as Href)}
+            />
           </View>
-          <PostBody post={post} />
-          {post.optimisticState === 'pending' ? (
-            <View style={{marginTop: spacing[2]}}>
-              <PendingMutationBadge label="Posting" />
-            </View>
-          ) : null}
-          {post.optimisticState === 'failed' ? (
-            <View style={{marginTop: spacing[2]}}>
-              <PendingMutationBadge label="Failed" />
-            </View>
-          ) : null}
-          <PostActions
-            post={post}
-            onReply={() =>
-              router.push(`/post/${post.id}` as Href)
-            }
-          />
         </View>
-      </View>
+      </ModulaContextMenu>
       <Divider />
     </View>
   )
 }
 
 function PostBody({post}: {post: SocialPost}) {
+  const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
 
   if (post.kind === 'media') {
@@ -188,7 +225,11 @@ function PostBody({post}: {post: SocialPost}) {
           </View>
           <AppPressable
             accessibilityLabel={post.module.actionLabel}
-            onPress={() => Alert.alert(post.module.name, 'Local module preview')}
+            onPress={() =>
+              router.push(
+                `/marketplace/${marketplaceIdForModuleName(post.module.name)}` as Href,
+              )
+            }
             style={[
               styles.moduleAction,
               {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
@@ -265,7 +306,7 @@ function PostActions({post, onReply}: {post: SocialPost; onReply: () => void}) {
     {
       label: 'Share',
       icon: 'share',
-      onPress: () => Alert.alert('Share', 'Sharing is local-only in Phase 1.'),
+      onPress: () => void runPostOverflowAction('share', post),
     },
     {
       label: 'Save',
@@ -390,6 +431,12 @@ const styles = StyleSheet.create({
   modulePost: {
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  moreButton: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    minWidth: 44,
   },
   row: {
     flexDirection: 'row',
