@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {Image} from 'expo-image'
-import {useRouter} from 'expo-router'
+import {useRouter, type Href} from 'expo-router'
 import {
   Alert,
   Keyboard,
@@ -62,7 +62,7 @@ export function ComposerScreen() {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/')
+      router.replace('/index' as Href)
     }
   }
 
@@ -102,7 +102,7 @@ export function ComposerScreen() {
       setPoll(null)
       void selectionHaptic()
       Keyboard.dismiss()
-      router.replace('/')
+      router.replace('/index' as Href)
     } catch {
       setPermissionMessage('Post failed. Your draft is still here so you can retry.')
     }

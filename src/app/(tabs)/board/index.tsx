@@ -1,5 +1,5 @@
 import {BoardScreen} from '@/features/board/screens/BoardScreen'
 
-export default function BoardRoute() {
+export default function BoardTabRoute() {
   return <BoardScreen />
 }

@@ -40,7 +40,6 @@ const requiredRoutes = [
   'src/app/_layout.tsx',
   'src/app/+not-found.tsx',
   'src/app/compose.tsx',
-  'src/app/board.tsx',
   'src/app/messages.tsx',
   'src/app/saved.tsx',
   'src/app/communities.tsx',
@@ -51,11 +50,12 @@ const requiredRoutes = [
   'src/app/reels.tsx',
   'src/app/post/[postId].tsx',
   'src/app/(tabs)/_layout.tsx',
-  'src/app/(tabs)/index.tsx',
-  'src/app/(tabs)/discover.tsx',
+  'src/app/(tabs)/index/index.tsx',
+  'src/app/(tabs)/discover/index.tsx',
+  'src/app/(tabs)/board/index.tsx',
   'src/app/(tabs)/create.tsx',
-  'src/app/(tabs)/activity.tsx',
-  'src/app/(tabs)/profile.tsx',
+  'src/app/(tabs)/activity/index.tsx',
+  'src/app/(tabs)/profile/index.tsx',
 ]
 
 for (const route of requiredRoutes) {
@@ -63,7 +63,7 @@ for (const route of requiredRoutes) {
 }
 
 const requiredFiles = [
-  'src/shell/NavigationDrawer.tsx',
+  'src/platform/ui/navigation/adaptive-account-panel.tsx',
   'src/features/composer/screens/ComposerScreen.tsx',
   'src/components/composer/ComposerToolsDrawer.tsx',
   'src/data/query/QueryRuntimeProvider.tsx',

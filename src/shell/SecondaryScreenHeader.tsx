@@ -36,7 +36,7 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
             if (router.canGoBack()) {
               router.back()
             } else {
-              router.replace('/')
+              router.replace('/index' as never)
             }
           }}
         />
