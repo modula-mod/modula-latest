@@ -33,6 +33,27 @@ function toFeedMode(feed: 'following' | 'forYou' | 'modules') {
   return feed
 }
 
+/**
+ * Profile module catalogs intentionally reuse marketplace ids across profiles
+ * (same module featured on multiple people). Discover's featured rail is one
+ * flat list, so flatten + slice must dedupe by id or React keys collide
+ * (e.g. module-automations on Andrei + GAIA).
+ */
+function uniqueFeaturedModules(
+  modules: (typeof demoProfileModules)[string],
+  limit: number,
+): (typeof demoProfileModules)[string] {
+  const seen = new Set<string>()
+  const unique: (typeof demoProfileModules)[string] = []
+  for (const module of modules) {
+    if (seen.has(module.id)) continue
+    seen.add(module.id)
+    unique.push(module)
+    if (unique.length >= limit) break
+  }
+  return unique
+}
+
 function toPostRecord(post: (typeof initialDemoPosts)[number]): LocalPostRecord {
   const author = profileById(post.author.id)
   const base = {
@@ -150,7 +171,10 @@ export function seedLocalApiDatabase(): LocalApiDatabaseState {
         {id: 'topic-board-workflows', label: 'Board workflows', postCount: 416},
         {id: 'topic-dimon-previews', label: 'DIMON previews', postCount: 208},
       ],
-      featuredModules: Object.values(demoProfileModules).flat().slice(0, 8),
+      featuredModules: uniqueFeaturedModules(
+        Object.values(demoProfileModules).flat(),
+        8,
+      ),
       media: reels.map(reel => ({
         id: `media-${reel.id}`,
         kind: 'image',
