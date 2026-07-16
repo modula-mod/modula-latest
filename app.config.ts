@@ -34,6 +34,16 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   },
   plugins: [
     'expo-router',
+    'expo-dev-client',
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Modula uses your photo library when you choose media for a post.',
+        cameraPermission:
+          'Modula uses your camera when you choose to capture media for a post.',
+      },
+    ],
     [
       'expo-splash-screen',
       {
@@ -43,8 +53,10 @@ export default ({config}: ConfigContext): ExpoConfig => ({
       },
     ],
   ],
+  updates: {
+    enabled: false,
+  },
   experiments: {
     typedRoutes: true,
-    reactCompiler: true,
   },
 })

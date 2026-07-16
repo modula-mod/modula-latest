@@ -8,7 +8,7 @@ import {
 } from 'react-native'
 import {SafeAreaView} from 'react-native-safe-area-context'
 
-import {useTheme} from '@/theme/runtime/useTheme'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type AppScreenProps = PropsWithChildren<{
   padded?: boolean
@@ -28,11 +28,11 @@ export function AppScreen({
   style,
   edges,
 }: AppScreenProps) {
-  const {colours, spacing} = useTheme()
+  const {colours, spacing} = useThemeTokens()
   const contentStyle = [
     styles.content,
     {backgroundColor: colours.canvas},
-    padded && {paddingHorizontal: spacing.xl},
+    padded && {paddingHorizontal: spacing[4]},
     style,
   ]
 

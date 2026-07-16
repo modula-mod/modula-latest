@@ -1,6 +1,5 @@
-import {colour} from '@/theme/foundations/colour'
+import {darkColours, lightColours} from '@/theme/foundations/colour'
 import {
-  ACCENT_HEX,
   type AccentId,
   type ResolvedColourMode,
 } from '@/theme/tokens/dimensions'
@@ -9,12 +8,17 @@ export type SemanticColours = {
   canvas: string
   surface: string
   surfaceRaised: string
+  surfaceMuted: string
   border: string
   text: string
   textSecondary: string
+  textTertiary: string
   accent: string
   accentForeground: string
+  accentSubtle: string
   destructive: string
+  success: string
+  backdrop: string
 }
 
 export type ColourScheme = 'light' | 'dark'
@@ -29,39 +33,10 @@ function isDarkMode(mode: ResolvedColourMode): boolean {
  */
 export function resolveSemanticColours(
   mode: ResolvedColourMode,
-  accentId: AccentId = 'modulaTeal',
+  _accentId: AccentId = 'modulaTeal',
 ): SemanticColours {
-  const accent = ACCENT_HEX[accentId] ?? colour.brandAccent
   const dark = isDarkMode(mode)
-
-  if (!dark) {
-    return {
-      canvas: colour.white,
-      surface: colour.neutral50,
-      surfaceRaised: colour.white,
-      border: colour.neutral200,
-      text: colour.neutral900,
-      textSecondary: colour.neutral500,
-      accent,
-      accentForeground: colour.white,
-      destructive: colour.red600,
-    }
-  }
-
-  const canvas =
-    mode === 'oled' ? colour.black : mode === 'dim' ? '#1F1F23' : colour.neutral900
-
-  return {
-    canvas,
-    surface: colour.black,
-    surfaceRaised: colour.neutral700,
-    border: colour.neutral700,
-    text: colour.neutral50,
-    textSecondary: colour.neutral300,
-    accent,
-    accentForeground: colour.white,
-    destructive: colour.red600,
-  }
+  return dark ? darkColours : lightColours
 }
 
 /** @deprecated Prefer resolveSemanticColours via theme runtime */

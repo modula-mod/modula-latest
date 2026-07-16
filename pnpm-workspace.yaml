@@ -46,3 +46,9 @@ minimumReleaseAgeExclude:
   - expo-system-ui@57.0.1
   - expo-web-browser@57.0.1
   - expo@57.0.6
+  - expo-dev-client@57.0.6
+  - expo-dev-launcher@57.0.6
+  - expo-dev-menu@57.0.6
+  - expo-haptics@57.0.1
+  - expo-image-loader@57.0.1
+  - expo-image-picker@57.0.4

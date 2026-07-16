@@ -1,5 +1,4 @@
-import {Host, Switch} from '@expo/ui'
-import {View} from 'react-native'
+import {Switch, View} from 'react-native'
 
 type SystemSwitchProps = {
   value: boolean
@@ -9,10 +8,7 @@ type SystemSwitchProps = {
   testID?: string
 }
 
-/**
- * Thin adapter over @expo/ui universal Switch.
- * Features must import this — not @expo/ui/swift-ui.
- */
+/** Thin adapter over the React Native Switch. */
 export function SystemSwitch({
   value,
   onValueChange,
@@ -22,15 +18,13 @@ export function SystemSwitch({
 }: SystemSwitchProps) {
   return (
     <View style={{minHeight: 44, justifyContent: 'center'}}>
-      <Host matchContents>
-        <Switch
-          value={value}
-          onValueChange={onValueChange}
-          label={label}
-          disabled={disabled}
-          testID={testID}
-        />
-      </Host>
+      <Switch
+        value={value}
+        onValueChange={onValueChange}
+        accessibilityLabel={label}
+        disabled={disabled}
+        testID={testID}
+      />
     </View>
   )
 }
