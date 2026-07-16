@@ -1,6 +1,6 @@
 # Phase 5 Frontend Handoff
 Backend branch: phase5-production-backend
-Backend commit: b751e7b3cd3b8c9bde3be71104c30e9b9719c9de
+Backend commit: 0cb1e3e01ec790011bd4737222b20633630c49e0
 API URL: https://api.modula.digital
 API version: v1
 Protocol version: 0.1
