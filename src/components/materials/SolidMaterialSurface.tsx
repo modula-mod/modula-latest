@@ -17,21 +17,41 @@ export type MaterialSurfaceBaseProps = PropsWithChildren<
   }
 >
 
+function shadowColourWithOpacity(colour: string, opacity: number): string {
+  if (opacity <= 0) return 'transparent'
+  const hex = colour.match(/^#([0-9a-f]{6})$/i)?.[1]
+  if (!hex) return colour
+  const red = Number.parseInt(hex.slice(0, 2), 16)
+  const green = Number.parseInt(hex.slice(2, 4), 16)
+  const blue = Number.parseInt(hex.slice(4, 6), 16)
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`
+}
+
 export function materialBaseStyle(material: MaterialTokens): ViewStyle {
+  const platformShadow =
+    Platform.OS === 'android'
+      ? {elevation: material.elevation}
+      : Platform.OS === 'web'
+        ? ({
+            boxShadow:
+              material.shadowOpacity > 0 && material.shadowRadius > 0
+                ? `0px ${material.shadowOffsetY}px ${material.shadowRadius}px ${shadowColourWithOpacity(material.shadowColor, material.shadowOpacity)}`
+                : 'none',
+          } as ViewStyle)
+        : {
+            shadowColor: material.shadowColor,
+            shadowOffset: {width: 0, height: material.shadowOffsetY},
+            shadowOpacity: material.shadowOpacity,
+            shadowRadius: material.shadowRadius,
+          }
+
   return {
     backgroundColor: material.backgroundColor,
     borderColor: material.borderColor,
     borderRadius: material.radius,
     borderWidth: material.borderWidth,
     overflow: material.radius > 0 ? 'hidden' : 'visible',
-    ...(Platform.OS === 'android'
-      ? {elevation: material.elevation}
-      : {
-          shadowColor: material.shadowColor,
-          shadowOffset: {width: 0, height: material.shadowOffsetY},
-          shadowOpacity: material.shadowOpacity,
-          shadowRadius: material.shadowRadius,
-        }),
+    ...platformShadow,
   }
 }
 
