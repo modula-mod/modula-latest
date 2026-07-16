@@ -43,10 +43,40 @@ const deps = {...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {})}
 // 1
 if (!deps['@expo/ui']) fail('1. @expo/ui is not installed')
 
-// 2
+// 2 — authorized expandable liquid-glass tab adapter with safe Expo Go fallback
 const tabsNative = 'src/platform/ui/navigation/platform-tabs.native.tsx'
-if (!exists(tabsNative) || !text(tabsNative).includes('NativeTabs')) {
-  fail('2. NativeTabs is not used on native')
+const liquidTabBar = 'src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx'
+const liquidAvailability = 'src/platform/ui/navigation/liquid-glass-availability.ts'
+if (
+  !exists(tabsNative) ||
+  !exists(liquidTabBar) ||
+  !exists(liquidAvailability) ||
+  !text(tabsNative).includes('ModulaLiquidGlassTabBar') ||
+  !text(tabsNative).includes('NativeTabs') ||
+  !text(tabsNative).includes('isCallstackLiquidGlassNativeAvailable') ||
+  !text(liquidAvailability).includes("TurboModuleRegistry.get(") ||
+  /TurboModuleRegistry\.getEnforcing\s*\(/.test(text(liquidAvailability))
+) {
+  fail(
+    '2. Native tabs must gate liquid-glass via non-enforcing TurboModule probe and NativeTabs fallback',
+  )
+}
+if (/from '@callstack\/liquid-glass'/.test(text(tabsNative))) {
+  fail('2. platform-tabs.native.tsx must not statically import @callstack/liquid-glass')
+}
+if (!deps['@callstack/liquid-glass']) {
+  fail('2. @callstack/liquid-glass is not installed for the liquid-glass tab adapter')
+}
+// Product features must not import the tab library or callstack glass directly
+for (const file of walk('src/features').concat(walk('src/app')).filter(f => /\.(tsx|ts)$/.test(f))) {
+  const body = text(file)
+  if (
+    body.includes('@callstack/liquid-glass') ||
+    body.includes('rn-expandable-tab-liquid-glass') ||
+    body.includes('ModulaLiquidGlassTabBar')
+  ) {
+    fail(`2. product/feature file imports liquid-glass tab internals: ${file}`)
+  }
 }
 
 // 3
@@ -72,9 +102,13 @@ for (const [n, id] of [
 if (/id:\s*'create'|routeName:\s*'create'/.test(tabBody)) {
   fail('9. Create must not be a Modula tab definition')
 }
-if (exists(tabsNative) && !text(tabsNative).includes("name=\"create\" hidden")) {
-  // hidden create trigger is OK; visible create is not
-  if (/Trigger[^\n]*create(?![^\n]*hidden)/.test(text(tabsNative))) {
+if (exists(tabsNative)) {
+  const nativeTabs = text(tabsNative)
+  // Route file may remain with href: null; must not be a visible destination
+  if (nativeTabs.includes('name="create"') && !nativeTabs.includes('href: null')) {
+    fail('9. Create appears as a visible native tab')
+  }
+  if (/MODULA_TABS\.map[\s\S]*create/.test(nativeTabs) && /id:\s*'create'/.test(tabBody)) {
     fail('9. Create appears as a visible native tab')
   }
 }
@@ -176,13 +210,47 @@ if (
   fail('21. Profile native toolbar actions missing')
 }
 
-// 22–23 composer
+// 22–23 composer + Expo BottomSheet product sheets
 if (!exists('src/features/composer/screens/ComposerScreen.tsx')) {
   fail('22. shared Composer editor missing')
 }
 const tools = text('src/components/composer/ComposerToolsDrawer.tsx')
 if (!tools.includes('ModulaSheet')) {
   fail('23. Composer Tools must use ModulaSheet')
+}
+const composer = text('src/features/composer/screens/ComposerScreen.tsx')
+for (const marker of [
+  'composer-audience-sheet',
+  'composer-reply-permissions-sheet',
+  'composer-content-warning-sheet',
+]) {
+  if (!composer.includes(marker)) {
+    fail(`23. Composer missing Expo BottomSheet host marker: ${marker}`)
+  }
+}
+if (!exists('src/features/social/sheets/ShareToSheet.tsx') || !text('src/features/social/sheets/ShareToSheet.tsx').includes('ModulaSheet')) {
+  fail('23. ShareToSheet must use ModulaSheet (Expo BottomSheet)')
+}
+// Product action sheets must not fall back to RN Modal for Composer Tools / Share / Audience / Reply
+for (const file of [
+  'src/components/composer/ComposerToolsDrawer.tsx',
+  'src/features/composer/screens/ComposerScreen.tsx',
+  'src/features/social/sheets/ShareToSheet.tsx',
+]) {
+  if (!exists(file)) continue
+  const body = text(file)
+  if (/\bModal\b/.test(body) && body.includes("from 'react-native'")) {
+    fail(`23. ${file} must not use RN Modal for product action sheets — use ModulaSheet`)
+  }
+}
+if (!exists('src/platform/ui/menus/modula-context-menu.native.tsx') || !text('src/platform/ui/menus/modula-context-menu.native.tsx').includes('ContextMenu')) {
+  fail('23. ModulaContextMenu native wrapper missing Expo ContextMenu')
+}
+if (!exists('src/platform/ui/menus/modula-control-group.tsx')) {
+  fail('23. ModulaControlGroup wrapper missing')
+}
+if (!exists('src/platform/ui/menus/modula-disclosure-group.tsx')) {
+  fail('23. ModulaDisclosureGroup wrapper missing')
 }
 
 // 24–26 reels
@@ -240,10 +308,26 @@ for (const name of [
 for (const name of ['@gorhom/bottom-sheet', 'react-native-raw-bottom-sheet']) {
   if (deps[name]) fail(`34. third-party sheet package added: ${name}`)
 }
-for (const name of ['react-native-reanimated', 'react-native-worklets', 'react-native-worklets-core']) {
-  if (Object.prototype.hasOwnProperty.call(pkg.dependencies ?? {}, name)) {
-    fail(`35. new Reanimated/Worklets dependency exists: ${name}`)
+// 35 — Reanimated/Worklets re-admitted only for authorized liquid-glass tab adapter
+for (const name of ['react-native-reanimated', 'react-native-worklets']) {
+  if (!deps[name]) {
+    fail(`35. ${name} required for authorized liquid-glass tab adapter`)
   }
+}
+if (deps['react-native-worklets-core']) {
+  fail('35. react-native-worklets-core must not be added (use react-native-worklets)')
+}
+// Keep Reanimated imports out of product features (adapter-only)
+for (const file of walk('src/features').filter(f => /\.(tsx|ts)$/.test(f))) {
+  if (text(file).includes('react-native-reanimated') || text(file).includes('react-native-worklets')) {
+    fail(`35. Reanimated/Worklets used outside platform tab adapter: ${file}`)
+  }
+}
+if (
+  exists(liquidTabBar) &&
+  !text(liquidTabBar).includes('react-native-reanimated')
+) {
+  fail('35. liquid-glass tab adapter should use Reanimated for expand motion')
 }
 
 // 36 prior verifiers remain
