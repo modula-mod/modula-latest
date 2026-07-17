@@ -113,3 +113,12 @@ Research: `docs/research/phase4-5-third-party-ui-libs.md`.
 | rit3zh/expo-motion-tabs | Not installed | Demo bottom-tab morph popups + Reanimated; wrong for Profile content tabs. Modula `ModulaMotionTabs` (LayoutAnimation). |
 
 No new rows in the dependency table — zero packages added for this polish pass.
+
+## Phase 6 AT Protocol frontend
+
+| Package | Version | Purpose | Native | Storage/security role | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @atproto/oauth-client-expo | 0.1.8 | Official AT Protocol OAuth client for Expo (native crypto / redirect scheme). Modula keeps provider tokens server-side. | Yes | Must not store AT access/refresh tokens in AsyncStorage; pending OAuth state only in SecureStore | `pnpm add -w @atproto/oauth-client-expo@0.1.8` | Phase 6 |
+| @modula/api-contracts | workspace:* | Shared API DTO types for metadata, AT connections, Atmosphere, preferences | No | Types only | `pnpm add -w @modula/api-contracts@workspace:*` | Phase 6 |
+
+Removal path: disconnect AT UI + drop `@atproto/oauth-client-expo` when AT OAuth is retired; contracts remain for backend.
