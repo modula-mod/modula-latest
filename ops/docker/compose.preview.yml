@@ -53,7 +53,7 @@ services:
       dockerfile: ops/docker/worker.Dockerfile
     restart: unless-stopped
     env_file:
-      - /etc/modula/api.env
+      - /etc/modula/worker.env
     depends_on:
       postgres:
         condition: service_healthy
