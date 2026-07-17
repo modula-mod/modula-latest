@@ -7,7 +7,7 @@
     "@callstack/liquid-glass": "^0.8.0",
     "@expo/ui": "~57.0.6",
     "@expo/vector-icons": "^15.1.1",
-    "@modula/api-contracts": "workspace:*",
+    "@modula/greenfield-contracts": "workspace:*",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/slider": "5.2.0",
     "@react-native-segmented-control/segmented-control": "2.5.7",
@@ -75,12 +75,13 @@
     "prebuild:clean": "expo prebuild --clean",
     "verify:phase5": "node scripts/verify-phase5-backend.mjs",
     "verify:phase6-backend": "node scripts/verify-phase6-backend.mjs",
+    "verify:phase6-greenfield-backend": "node scripts/verify-phase6-greenfield-backend.mjs",
     "verify:phase6-frontend": "node scripts/verify-phase6-atproto-frontend.mjs",
     "verify:phase6-frontend-boundary": "node scripts/verify-phase6-frontend-boundary.mjs",
-    "api:dev": "pnpm --filter @modula/api dev",
-    "api:test": "pnpm --filter @modula/api test",
-    "worker:dev": "pnpm --filter @modula/worker dev",
-    "worker:test": "pnpm --filter @modula/worker test"
+    "api:dev": "pnpm --filter @modula/greenfield-api dev",
+    "api:test": "pnpm --filter @modula/greenfield-api test",
+    "worker:dev": "pnpm --filter @modula/greenfield-worker dev",
+    "worker:test": "pnpm --filter @modula/greenfield-worker test"
   },
   "private": true
 }

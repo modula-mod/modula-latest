@@ -5,6 +5,7 @@ No package should enter the project merely because an example repository uses it
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
+| @node-rs/argon2 | ^2.0.2 | Server-side Argon2id password hashing for sovereign accounts | No (Node native binding) | N/A (backend only) | MIT | node-rs maintained package; required for Phase 6R password credentials | Phase 6R |
 | @expo/ui | ~57.0.6 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo | ~57.0.6 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-constants | ~57.0.5 | App config / constants access | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |

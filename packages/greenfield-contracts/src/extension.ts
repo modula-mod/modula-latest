@@ -7,6 +7,18 @@ export type GreenfieldExtensionKind =
   | 'widget'
   | 'bridge'
 
+export type GreenfieldExtensionTrust =
+  | 'firstParty'
+  | 'verifiedPublisher'
+  | 'reviewedCommunity'
+  | 'untrustedManifest'
+
+export type GreenfieldExtensionExecutionMode =
+  | 'builtIn'
+  | 'backgroundJob'
+  | 'remoteHttp'
+  | 'declarative'
+
 export type GreenfieldExtensionEntrypoint = {
   id: string
   /** Entrypoint role, e.g. `route`, `hook`, `toolSurface`, `widgetSlot`. */

@@ -10,9 +10,9 @@ function fail(msg) { console.error(`FAIL ${msg}`); failures += 1 }
 function exists(rel) { return fs.existsSync(path.join(root, rel)) }
 function read(rel) { return fs.readFileSync(path.join(root, rel), 'utf8') }
 
-if (!exists('services/api/migrations/002_phase6_social_atproto.sql')) fail('migration 002 missing')
+if (!exists('services/greenfield-api/migrations/002_phase6_social_atproto.sql')) fail('migration 002 missing')
 else {
-  const mig = read('services/api/migrations/002_phase6_social_atproto.sql')
+  const mig = read('services/greenfield-api/migrations/002_phase6_social_atproto.sql')
   for (const table of [
     'sessions', 'session_capabilities', 'notifications', 'blocks', 'mutes', 'reports',
     'background_jobs', 'job_failures', 'atproto_connections', 'atproto_oauth_states',
@@ -27,16 +27,16 @@ else {
   else ok('migration 002 tables and lease fields present')
 }
 
-if (!exists('services/api/migrations/003_phase6_api_rls_writes.sql')) fail('migration 003 missing')
+if (!exists('services/greenfield-api/migrations/003_phase6_api_rls_writes.sql')) fail('migration 003 missing')
 else {
-  const mig3 = read('services/api/migrations/003_phase6_api_rls_writes.sql')
+  const mig3 = read('services/greenfield-api/migrations/003_phase6_api_rls_writes.sql')
   if (!mig3.includes('posts_api_all') || !mig3.includes('TO modula_api')) {
     fail('migration 003 must add API write policies for FORCE RLS tables')
   } else ok('migration 003 API RLS write policies present')
 }
 
-if (!exists('services/worker') || !exists('services/worker/package.json')) fail('services/worker package missing')
-else if (!exists('services/worker/src/main.ts')) fail('worker service entrypoint missing')
+if (!exists('services/greenfield-worker') || !exists('services/greenfield-worker/package.json')) fail('services/greenfield-worker package missing')
+else if (!exists('services/greenfield-worker/src/main.ts')) fail('worker service entrypoint missing')
 else ok('worker service exists')
 
 if (!exists('packages/atproto-lexicons') || !exists('packages/atproto-lexicons/package.json')) fail('packages/atproto-lexicons package missing')
@@ -51,7 +51,7 @@ for (const lex of [
 }
 ok('experimental lexicons exist')
 
-const apiPkg = read('services/api/package.json')
+const apiPkg = read('services/greenfield-api/package.json')
 if (!apiPkg.includes('@atproto/oauth-client-node')) fail('official OAuth client missing')
 else ok('official @atproto/oauth-client-node present')
 if (apiPkg.includes('app-password') || apiPkg.toLowerCase().includes('apppassword')) fail('app-password dependency present')
@@ -59,8 +59,8 @@ else ok('no app-password auth dependency')
 
 // No hand-rolled OAuth implementation: the API must delegate PKCE/DPoP/token exchange to
 // @atproto/oauth-client-node rather than reinventing it.
-const oauthSourceFiles = exists('services/api/src/atproto')
-  ? execSync("grep -rl . --include='*.ts' services/api/src/atproto || true", {encoding: 'utf8', cwd: root}).split('\n').filter(Boolean)
+const oauthSourceFiles = exists('services/greenfield-api/src/atproto')
+  ? execSync("grep -rl . --include='*.ts' services/greenfield-api/src/atproto || true", {encoding: 'utf8', cwd: root}).split('\n').filter(Boolean)
   : []
 const customOauthMarkers = ['generateCodeVerifier', 'createDpopProof', 'signJwt(', 'jose.SignJWT']
 let customOauthFound = false
@@ -75,7 +75,7 @@ for (const file of oauthSourceFiles) {
 }
 if (!customOauthFound) ok('no custom OAuth (PKCE/DPoP/JWT signing) implementation markers')
 
-const routes = read('services/api/src/app/register-routes.ts')
+const routes = read('services/greenfield-api/src/app/register-routes.ts')
 for (const needle of [
   "app.post('/v1/posts'",
   "app.patch('/v1/posts/:postId'",
@@ -90,15 +90,20 @@ for (const needle of [
 }
 ok('authenticated social and AT routes registered')
 
-if (!exists('services/api/src/security/ssrf.ts')) fail('API SSRF protections missing'); else ok('API SSRF protections exist')
-if (!exists('services/worker/src/atproto/ssrf-guard.ts')) fail('worker SSRF protections missing'); else ok('worker SSRF protections exist')
-const crypto = read('services/api/src/security/crypto.ts')
+if (!exists('services/greenfield-api/src/security/ssrf.ts')) fail('API SSRF protections missing'); else ok('API SSRF protections exist')
+if (
+  !exists('services/greenfield-worker/src/bridges/atproto/ssrf-guard.ts') &&
+  !exists('services/greenfield-worker/src/atproto/ssrf-guard.ts')
+) {
+  fail('worker SSRF protections missing')
+} else ok('worker SSRF protections exist')
+const crypto = read('services/greenfield-api/src/security/crypto.ts')
 if (!crypto.includes('createCipheriv') || !crypto.includes('aes-256-gcm')) fail('AES-GCM encryption missing')
 else ok('AES-256-GCM encryption used')
-if (exists('services/api/src/security/crypto-custom.ts')) fail('custom crypto implementation present')
+if (exists('services/greenfield-api/src/security/crypto-custom.ts')) fail('custom crypto implementation present')
 else ok('no proprietary crypto module')
 
-const workerMain = read('services/worker/src/main.ts')
+const workerMain = read('services/greenfield-worker/src/main.ts')
 if (workerMain.includes('fastify') || workerMain.includes('listen(')) fail('worker appears to serve HTTP')
 else ok('worker is separate from API HTTP process')
 
