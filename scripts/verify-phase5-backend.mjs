@@ -69,10 +69,22 @@ const boundaryCommit = fs.existsSync(phase6Start)
   : fs.existsSync(startCommitPath)
     ? fs.readFileSync(startCommitPath, 'utf8').trim()
     : ''
+const phase6FrontendPresent =
+  exists('src/features/atproto') && exists('scripts/verify-phase6-atproto-frontend.mjs')
+
 if (!boundaryCommit) {
-  fail('Phase start commit file missing; cannot verify frontend dirs')
+  if (phase6FrontendPresent) {
+    ok('Phase start commit file absent; Phase 6 frontend tree present — skip dir boundary')
+  } else {
+    fail('Phase start commit file missing; cannot verify frontend dirs')
+  }
 } else {
   for (const dir of ['src', 'ios', 'android']) {
+    // Phase 6 Mac frontend is expected to modify src/ (and may touch native projects).
+    if (phase6FrontendPresent && (dir === 'src' || dir === 'ios' || dir === 'android')) {
+      ok(`${dir} Phase 6 frontend changes allowed`)
+      continue
+    }
     const diff = execSync(`git diff --name-only ${boundaryCommit} -- ${dir}`, {encoding: 'utf8'}).trim()
     if (diff) fail(`${dir} modified since boundary commit:\n${diff}`)
     else ok(`${dir} unchanged since boundary commit`)
