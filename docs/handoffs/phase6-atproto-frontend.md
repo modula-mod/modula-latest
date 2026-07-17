@@ -1,6 +1,6 @@
 # Phase 6 — AT Protocol frontend integration handoff
 
-Backend commit: _(set after push)_
+Backend commit: 6fbff66cb3ba92287a95f9210184d535d75a26a1
 API URL: https://api.modula.digital
 API version: v1
 Protocol version: 0.1
