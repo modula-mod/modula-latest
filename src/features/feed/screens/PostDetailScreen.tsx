@@ -11,6 +11,10 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
+import {PublicationStatusBanner} from '@/features/atproto/components/PublicationStatusBanner'
+import {usePrimaryAtprotoConnection} from '@/features/atproto/data/useAtprotoConnectionsQuery'
+import {useUpdateAtprotoPreferencesMutation} from '@/features/atproto/data/useAtprotoPreferences'
+import {mapConnectionToUiPublicationStatus} from '@/features/atproto/publishing/publicationStatus'
 import {usePostQuery} from '@/features/feed/data'
 import {
   buildPostOverflowActions,
@@ -56,6 +60,9 @@ export function PostDetailScreen() {
   }
   const postQuery = usePostQuery(parsedPostId ?? parsePostId('post-local-1'))
   const post = parsedPostId ? postQuery.data : null
+  const {connection} = usePrimaryAtprotoConnection()
+  const updatePreferences = useUpdateAtprotoPreferencesMutation()
+  const publicationStatus = mapConnectionToUiPublicationStatus(connection)
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -84,6 +91,21 @@ export function PostDetailScreen() {
           <>
             <ScrollView contentContainerStyle={{paddingBottom: 120 + insets.bottom}}>
               <DemoPostItem post={post} />
+              {publicationStatus === 'needsAttention' ||
+              publicationStatus === 'connectionExpired' ? (
+                <View style={{paddingHorizontal: spacing[4], paddingTop: spacing[3]}}>
+                  <PublicationStatusBanner
+                    status={publicationStatus}
+                    onRetry={() => void postQuery.refetch()}
+                    onKeepModulaOnly={() => {
+                      void updatePreferences.mutateAsync({
+                        defaultMode: 'modulaOnly',
+                        enabled: false,
+                      })
+                    }}
+                  />
+                </View>
+              ) : null}
               <View style={[styles.thread, {paddingHorizontal: spacing[4]}]}>
                 <AppText variant="headline" style={{marginBottom: spacing[3]}}>
                   Replies
