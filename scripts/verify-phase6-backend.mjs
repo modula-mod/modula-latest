@@ -35,15 +35,45 @@ else {
   } else ok('migration 003 API RLS write policies present')
 }
 
-if (!exists('services/worker/src/main.ts')) fail('worker service missing'); else ok('worker service exists')
-if (!exists('packages/atproto-lexicons/lexicons/digital/modula/temp/publication.json')) fail('lexicons missing')
-else ok('experimental lexicons exist')
+if (!exists('services/worker') || !exists('services/worker/package.json')) fail('services/worker package missing')
+else if (!exists('services/worker/src/main.ts')) fail('worker service entrypoint missing')
+else ok('worker service exists')
+
+if (!exists('packages/atproto-lexicons') || !exists('packages/atproto-lexicons/package.json')) fail('packages/atproto-lexicons package missing')
+else ok('atproto-lexicons package exists')
+
+for (const lex of [
+  'packages/atproto-lexicons/lexicons/digital/modula/temp/profileExtension.json',
+  'packages/atproto-lexicons/lexicons/digital/modula/temp/moduleManifest.json',
+  'packages/atproto-lexicons/lexicons/digital/modula/temp/publication.json',
+]) {
+  if (!exists(lex)) fail(`lexicon missing ${lex}`)
+}
+ok('experimental lexicons exist')
 
 const apiPkg = read('services/api/package.json')
 if (!apiPkg.includes('@atproto/oauth-client-node')) fail('official OAuth client missing')
 else ok('official @atproto/oauth-client-node present')
 if (apiPkg.includes('app-password') || apiPkg.toLowerCase().includes('apppassword')) fail('app-password dependency present')
 else ok('no app-password auth dependency')
+
+// No hand-rolled OAuth implementation: the API must delegate PKCE/DPoP/token exchange to
+// @atproto/oauth-client-node rather than reinventing it.
+const oauthSourceFiles = exists('services/api/src/atproto')
+  ? execSync("grep -rl . --include='*.ts' services/api/src/atproto || true", {encoding: 'utf8', cwd: root}).split('\n').filter(Boolean)
+  : []
+const customOauthMarkers = ['generateCodeVerifier', 'createDpopProof', 'signJwt(', 'jose.SignJWT']
+let customOauthFound = false
+for (const file of oauthSourceFiles) {
+  const contents = read(file)
+  for (const marker of customOauthMarkers) {
+    if (contents.includes(marker)) {
+      fail(`custom OAuth implementation marker "${marker}" found in ${file}`)
+      customOauthFound = true
+    }
+  }
+}
+if (!customOauthFound) ok('no custom OAuth (PKCE/DPoP/JWT signing) implementation markers')
 
 const routes = read('services/api/src/app/register-routes.ts')
 for (const needle of [
@@ -60,7 +90,8 @@ for (const needle of [
 }
 ok('authenticated social and AT routes registered')
 
-if (!exists('services/api/src/security/ssrf.ts')) fail('SSRF protections missing'); else ok('SSRF protections exist')
+if (!exists('services/api/src/security/ssrf.ts')) fail('API SSRF protections missing'); else ok('API SSRF protections exist')
+if (!exists('services/worker/src/atproto/ssrf-guard.ts')) fail('worker SSRF protections missing'); else ok('worker SSRF protections exist')
 const crypto = read('services/api/src/security/crypto.ts')
 if (!crypto.includes('createCipheriv') || !crypto.includes('aes-256-gcm')) fail('AES-GCM encryption missing')
 else ok('AES-256-GCM encryption used')

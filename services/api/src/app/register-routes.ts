@@ -1,4 +1,5 @@
 import {
+  ADMIN_SESSION_CAPABILITIES,
   PHASE6_PREVIEW_CAPABILITIES,
   PREVIEW_ACTOR_CAPABILITIES,
   isModulaHandle,
@@ -13,6 +14,7 @@ import type {FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AtprotoService} from '../domains/atproto/service.js'
+import {AuditRepository} from '../domains/audit/repository.js'
 import {DiscoveryRepository} from '../domains/discovery/repository.js'
 import {ModerationRepository} from '../domains/moderation/repository.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
@@ -139,7 +141,11 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       .select('actor_id')
       .where('id', '=', profile.id)
       .executeTakeFirstOrThrow()
-    const created = await sessions.createSession(actor.actor_id, PREVIEW_ACTOR_CAPABILITIES)
+    const isAdminHandle = config.adminHandles.includes(handle.toLowerCase())
+    const grantedCapabilities = isAdminHandle
+      ? Array.from(new Set([...PREVIEW_ACTOR_CAPABILITIES, ...ADMIN_SESSION_CAPABILITIES]))
+      : PREVIEW_ACTOR_CAPABILITIES
+    const created = await sessions.createSession(actor.actor_id, grantedCapabilities)
     return reply.send(
       successEnvelope(
         {
@@ -170,16 +176,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const limit = parseLimit(query.limit)
       const cursor = decodeCursor(query.cursor)
       const mode = typeof query.mode === 'string' ? query.mode : 'following'
-      const items = await posts.listHome(mode, limit, cursor)
-      const blocked = await moderation.blockedSet(request.auth?.actorId ?? null)
-      const muted = await moderation.mutedSet(request.auth?.actorId ?? null)
-      const filtered = items.filter(item => {
-        // author id is profile id; resolve via handle lookup not available — filter by author.id profile later
-        return true
-      })
-      void blocked
-      void muted
-      const page = toCursorPage(filtered, limit, item => `${item.createdAt}|${item.id}`)
+      const viewerActorId = request.auth?.actorId ?? null
+      const blocked = await moderation.blockedSet(viewerActorId)
+      const muted = await moderation.mutedSet(viewerActorId)
+      const excluded = Array.from(new Set([...blocked, ...muted]))
+      const items = await posts.listHome(mode, limit, cursor, excluded)
+      const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
       return reply.send(successEnvelope(page, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to load feed')
@@ -188,7 +190,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.get('/v1/posts/:postId', profileConfig, async (request, reply) => {
     const {postId} = request.params as {postId: string}
-    const post = await posts.getById(postId)
+    const post = await posts.getById(postId, request.auth?.actorId ?? null)
     if (!post) return sendError(reply, 'NOT_FOUND', 'Post not found', request.id)
     return reply.send(successEnvelope(post, request.id))
   })
@@ -266,7 +268,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.get('/v1/profiles/:handle', profileConfig, async (request, reply) => {
     const {handle} = request.params as {handle: string}
     if (!isModulaHandle(handle)) return sendError(reply, 'VALIDATION_FAILED', 'Invalid handle', request.id)
-    const profile = await profiles.getByHandle(handle)
+    const profile = await profiles.getByHandle(handle, request.auth?.actorId ?? null)
     if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
     return reply.send(successEnvelope(profile, request.id))
   })
@@ -278,7 +280,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const query = request.query as Record<string, unknown>
       const limit = parseLimit(query.limit)
       const cursor = decodeCursor(query.cursor)
-      const items = await posts.listForHandle(handle, limit, cursor)
+      const items = await posts.listForHandle(handle, limit, cursor, request.auth?.actorId ?? null)
       if (!items) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
       const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
       return reply.send(successEnvelope(page, request.id))
@@ -294,7 +296,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const query = request.query as Record<string, unknown>
       const limit = parseLimit(query.limit)
       const cursor = decodeCursor(query.cursor)
-      const result = await profiles.listFollowers(handle, limit, cursor)
+      const result = await profiles.listFollowers(handle, limit, cursor, request.auth?.actorId ?? null)
       if (!result) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
       const page = toCursorPage(result.items, limit, item => item.id)
       return reply.send(successEnvelope(page, request.id))
@@ -310,7 +312,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const query = request.query as Record<string, unknown>
       const limit = parseLimit(query.limit)
       const cursor = decodeCursor(query.cursor)
-      const result = await profiles.listFollowing(handle, limit, cursor)
+      const result = await profiles.listFollowing(handle, limit, cursor, request.auth?.actorId ?? null)
       if (!result) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
       const page = toCursorPage(result.items, limit, item => item.id)
       return reply.send(successEnvelope(page, request.id))
@@ -627,27 +629,101 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     )
   })
 
+  async function setOperationalControl(key: string, value: unknown, updatedBy: string): Promise<void> {
+    await db
+      .insertInto('operational_controls')
+      .values({key, value, updated_at: new Date(), updated_by: updatedBy})
+      .onConflict(oc => oc.column('key').doUpdateSet({value, updated_at: new Date(), updated_by: updatedBy}))
+      .execute()
+  }
+
   app.post('/v1/admin/ops/atproto/publish', writeConfig, async (request, reply) => {
     const auth = requireCapability(request, reply, 'admin:moderation')
     if (!auth) return
     const body = request.body as {enabled?: boolean}
-    await db
-      .insertInto('operational_controls')
-      .values({
-        key: 'atproto.publish.enabled',
-        value: Boolean(body.enabled),
-        updated_at: new Date(),
-        updated_by: auth.actorId,
-      })
-      .onConflict(oc =>
-        oc.column('key').doUpdateSet({
-          value: Boolean(body.enabled),
-          updated_at: new Date(),
-          updated_by: auth.actorId,
-        }),
-      )
-      .execute()
+    await setOperationalControl('atproto.publish.enabled', Boolean(body.enabled), auth.actorId)
     return reply.send(successEnvelope({atprotoPublishEnabled: Boolean(body.enabled)}, request.id))
+  })
+
+  app.post('/v1/admin/ops/atproto/ingest', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    const body = request.body as {paused?: boolean}
+    await setOperationalControl('atproto.ingest.paused', Boolean(body.paused), auth.actorId)
+    return reply.send(successEnvelope({atprotoIngestPaused: Boolean(body.paused)}, request.id))
+  })
+
+  app.post('/v1/admin/ops/atproto/connections/:connectionId/revoke', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    try {
+      const {connectionId} = request.params as {connectionId: string}
+      await atproto.adminRevokeConnection(connectionId, auth.actorId)
+      return reply.send(successEnvelope({revoked: true}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to revoke connection')
+    }
+  })
+
+  app.post('/v1/admin/ops/queue/drain', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    const body = request.body as {drained?: boolean}
+    await setOperationalControl('jobs.queue.drained', Boolean(body.drained), auth.actorId)
+    return reply.send(successEnvelope({queueDrained: Boolean(body.drained)}, request.id))
+  })
+
+  app.post('/v1/admin/ops/queue/dead-letters/:deadLetterId/retry', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    const {deadLetterId} = request.params as {deadLetterId: string}
+    try {
+      const requeued = await db.transaction().execute(async trx => {
+        const deadLetter = await trx
+          .selectFrom('atproto_dead_letters')
+          .selectAll()
+          .where('id', '=', deadLetterId)
+          .where('resolved_at', 'is', null)
+          .executeTakeFirst()
+        if (!deadLetter) throw Object.assign(new Error('Dead letter not found'), {code: 'NOT_FOUND'})
+        const now = new Date()
+        const jobId = `job-${deadLetterId}-retry-${now.getTime()}`
+        await trx
+          .insertInto('background_jobs')
+          .values({
+            id: jobId,
+            job_type: deadLetter.source,
+            payload: deadLetter.payload,
+            status: 'pending',
+            priority: 100,
+            available_at: now,
+            lease_owner: null,
+            lease_expires_at: null,
+            attempt_count: 0,
+            maximum_attempts: 5,
+            last_error: null,
+            created_at: now,
+            updated_at: now,
+            completed_at: null,
+          })
+          .execute()
+        await trx.updateTable('atproto_dead_letters').set({resolved_at: now}).where('id', '=', deadLetterId).execute()
+        await new AuditRepository(trx).append('admin.queue.dead_letter.retried', {deadLetterId, jobId}, {type: 'job', id: jobId, actorId: auth.actorId})
+        return jobId
+      })
+      return reply.send(successEnvelope({jobId: requeued}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to retry dead letter')
+    }
+  })
+
+  app.post('/v1/admin/ops/atproto/lexicons/:collection/disable', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    const {collection} = request.params as {collection: string}
+    const body = request.body as {disabled?: boolean}
+    await setOperationalControl(`atproto.lexicon.${collection}.disabled`, Boolean(body.disabled), auth.actorId)
+    return reply.send(successEnvelope({collection, disabled: Boolean(body.disabled)}, request.id))
   })
 
   // SSRF helper exposed only in tests via internal assert

@@ -194,6 +194,22 @@ export class AtprotoService {
     return connection
   }
 
+  /** Admin emergency control — force-disconnects a connection regardless of owning actor. */
+  async adminRevokeConnection(connectionId: string, adminActorId: string): Promise<void> {
+    const row = await this.db.selectFrom('atproto_connections').selectAll().where('id', '=', connectionId).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!row) throw Object.assign(new Error('Connection not found'), {code: 'NOT_FOUND'})
+    const now = new Date()
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .updateTable('atproto_connections')
+        .set({status: 'revoked', disconnected_at: now, updated_at: now})
+        .where('id', '=', connectionId)
+        .execute()
+      await trx.updateTable('atproto_oauth_sessions').set({revoked_at: now, updated_at: now}).where('connection_id', '=', connectionId).execute()
+      await new AuditRepository(trx).append('admin.atproto.connection.revoked', {connectionId}, {type: 'connection', id: connectionId, actorId: adminActorId})
+    })
+  }
+
   async disconnect(actorId: string, connectionId: string): Promise<void> {
     const row = await this.getConnection(actorId, connectionId)
     if (!row) throw Object.assign(new Error('Connection not found'), {code: 'NOT_FOUND'})

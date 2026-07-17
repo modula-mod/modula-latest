@@ -12,7 +12,7 @@ export class PostRepository {
     this.profiles = new ProfileRepository(db)
   }
 
-  async getById(postId: string): Promise<SocialPostDto | null> {
+  async getById(postId: string, viewerActorId: string | null = null): Promise<SocialPostDto | null> {
     const row = await this.db
       .selectFrom('posts')
       .selectAll()
@@ -21,6 +21,10 @@ export class PostRepository {
       .where('audience', '=', 'public')
       .executeTakeFirst()
     if (!row) return null
+    if (viewerActorId) {
+      const blocked = await this.profiles.blockedActorIds(viewerActorId)
+      if (blocked.includes(row.author_actor_id)) return null
+    }
     return this.hydrate(row)
   }
 
@@ -36,7 +40,7 @@ export class PostRepository {
     return this.hydrate(row)
   }
 
-  async listHome(mode: string, limit: number, cursor: string | null): Promise<SocialPostDto[]> {
+  async listHome(mode: string, limit: number, cursor: string | null, excludedActorIds: string[] = []): Promise<SocialPostDto[]> {
     let query = this.db
       .selectFrom('posts')
       .selectAll()
@@ -47,6 +51,7 @@ export class PostRepository {
       .limit(limit + 1)
     if (mode === 'modules') query = query.where('feed', '=', 'modules')
     else if (mode === 'forYou') query = query.where('feed', 'in', ['forYou', 'following'])
+    if (excludedActorIds.length > 0) query = query.where('author_actor_id', 'not in', excludedActorIds)
     if (cursor) {
       const [createdAt, id] = cursor.split('|')
       if (!createdAt || !id) throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
@@ -61,8 +66,15 @@ export class PostRepository {
     return Promise.all(rows.map(row => this.hydrate(row)))
   }
 
-  async listForHandle(handle: string, limit: number, cursor: string | null): Promise<SocialPostDto[] | null> {
-    const profile = await this.profiles.getByHandle(handle)
+  async listForHandle(
+    handle: string,
+    limit: number,
+    cursor: string | null,
+    viewerActorId: string | null = null,
+  ): Promise<SocialPostDto[] | null> {
+    // `getByHandle` already returns null when the viewer and author block each
+    // other in either direction, so a blocked author's posts are unreachable here.
+    const profile = await this.profiles.getByHandle(handle, viewerActorId)
     if (!profile) return null
     const actor = await this.db
       .selectFrom('profiles')
