@@ -1,6 +1,7 @@
 # Phase 6 — AT Protocol frontend integration handoff
 
-Backend commit: d74e3e9cce9105ce6031ec955394344938933305
+Backend branch: `phase6-atproto-backend`
+Backend commit: tip of `origin/phase6-atproto-backend` (verify with `git rev-parse HEAD` after pull)
 API URL: https://api.modula.digital
 API version: v1
 Protocol version: 0.1
@@ -25,9 +26,9 @@ Atmosphere endpoint:
 - GET `/v1/atproto/feed?mode=connected|following|modula-network`
 
 Backend capabilities (`/v1/meta`):
-- authentication / mutations
-- atprotoOAuth / atprotoPublishing / atprotoImport
-- pdsPilot (false while deferred)
+- authentication / mutations: true
+- atprotoOAuth / atprotoPublishing / atprotoImport: true
+- pdsPilot: false (deferred)
 
 Preview auth for integration:
 - POST `/v1/auth/preview/session` `{ "handle": "andrei.modula" }` → Bearer access token
@@ -35,9 +36,14 @@ Preview auth for integration:
 PDS status: DEFERRED
 Tap status: PREPARED
 
+Deployed on VPS preview:
+- API + worker + Postgres via `ops/docker/compose.preview.yml`
+- Migration `003_phase6_api_rls_writes` applied (API write policies on FORCE RLS tables)
+- Public smoke: health, meta, feed, search, Atmosphere, OAuth metadata → HTTP 200
+
 Known limitations:
-- Migration `003_phase6_api_rls_writes` grants `modula_api` write policies on FORCE RLS tables (posts, profiles, post_saves, profile_links)
 - Live provider OAuth completion uses official `@atproto/oauth-client-node`; preview callback supports disposable `preview=1` completion for tests
 - Atmosphere feed is selective projection, not a network AppView
 - Private Modula data remains PostgreSQL-only
-- Search indexing is asynchronous via the worker (`search.index.post` / `search.index.profile`)
+- A few early `search.index.post` jobs were dead-lettered under a stale worker image; current worker completes them
+- Do not merge PR #4 until Mac PART 3 frontend lands and PART 4/5 acceptance complete
