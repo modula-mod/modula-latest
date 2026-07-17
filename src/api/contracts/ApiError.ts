@@ -13,6 +13,8 @@ export type ApiErrorCode =
   | 'INVALID_RESPONSE'
   | 'CANCELLED'
   | 'UNKNOWN'
+  | 'AUTHENTICATION_NOT_AVAILABLE'
+  | 'CAPABILITY_DISABLED'
 
 export class ModulaApiError extends Error {
   readonly code: ApiErrorCode
@@ -64,6 +66,12 @@ export function getUserFacingErrorMessage(error: unknown): string {
     return 'Sign in to continue.'
   }
   if (error.code === 'FORBIDDEN') return 'This action is not available for this session.'
+  if (
+    error.code === 'AUTHENTICATION_NOT_AVAILABLE' ||
+    error.code === 'CAPABILITY_DISABLED'
+  ) {
+    return 'This action is not available in preview yet.'
+  }
   if (error.code === 'NOT_FOUND') return 'That content is no longer available.'
   if (error.code === 'VALIDATION_FAILED') return error.message
   if (error.retryable) return 'Modula could not load this yet. Please retry.'

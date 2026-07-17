@@ -1,6 +1,27 @@
 import type {ActivityItem} from '@/domain/activity'
 import {decodeProfile} from '@/api/decoding/decodeProfile'
 import {asRecord, asString, optional} from '@/api/decoding/validation'
+import {ModulaApiError} from '@/api/contracts/ApiError'
+
+const activityGroups = new Set<ActivityItem['group']>(['Today', 'This week', 'Earlier'])
+
+function decodeActivityGroup(value: unknown): ActivityItem['group'] {
+  const raw = asString(value, 'activity group')
+  if (activityGroups.has(raw as ActivityItem['group'])) {
+    return raw as ActivityItem['group']
+  }
+  // Preview API seeds lowercase group keys (today / earlier).
+  const normalized = raw.trim().toLowerCase()
+  if (normalized === 'today') return 'Today'
+  if (normalized === 'this week' || normalized === 'thisweek') return 'This week'
+  if (normalized === 'earlier') return 'Earlier'
+  throw new ModulaApiError({
+    message: 'Invalid activity group.',
+    code: 'INVALID_RESPONSE',
+    status: 0,
+    retryable: false,
+  })
+}
 
 export function decodeActivityItem(value: unknown): ActivityItem {
   const item = asRecord(value, 'activity item')
@@ -10,7 +31,7 @@ export function decodeActivityItem(value: unknown): ActivityItem {
   }
   return {
     id: asString(item.id, 'activity id'),
-    group: asString(item.group, 'activity group') as ActivityItem['group'],
+    group: decodeActivityGroup(item.group),
     type,
     actor: optional(item.actor, decodeProfile),
     icon: optional(item.icon, icon => asString(icon, 'activity icon')) as ActivityItem['icon'],
