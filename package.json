@@ -72,8 +72,12 @@
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean",
     "verify:phase5": "node scripts/verify-phase5-backend.mjs",
+    "verify:phase6-backend": "node scripts/verify-phase6-backend.mjs",
+    "verify:phase6-frontend-boundary": "node scripts/verify-phase6-frontend-boundary.mjs",
     "api:dev": "pnpm --filter @modula/api dev",
-    "api:test": "pnpm --filter @modula/api test"
+    "api:test": "pnpm --filter @modula/api test",
+    "worker:dev": "pnpm --filter @modula/worker dev",
+    "worker:test": "pnpm --filter @modula/worker test"
   },
   "private": true
 }

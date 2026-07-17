@@ -7,6 +7,10 @@ export type ApiCapabilities = {
   mediaUpload: boolean
   atproto: boolean
   modules: boolean
+  atprotoOAuth: boolean
+  atprotoPublishing: boolean
+  atprotoImport: boolean
+  pdsPilot: boolean
 }
 
 export type ApiMetadata = {
@@ -24,4 +28,21 @@ export const PHASE5_PREVIEW_CAPABILITIES: ApiCapabilities = {
   mediaUpload: false,
   atproto: false,
   modules: false,
+  atprotoOAuth: false,
+  atprotoPublishing: false,
+  atprotoImport: false,
+  pdsPilot: false,
+}
+
+export const PHASE6_PREVIEW_CAPABILITIES: ApiCapabilities = {
+  publicRead: true,
+  authentication: true,
+  mutations: true,
+  mediaUpload: false,
+  atproto: true,
+  modules: false,
+  atprotoOAuth: true,
+  atprotoPublishing: true,
+  atprotoImport: true,
+  pdsPilot: false,
 }

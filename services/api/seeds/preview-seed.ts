@@ -142,7 +142,38 @@ export async function runSeed(connectionString: string): Promise<void> {
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
-    for (const table of ['post_media','post_likes','post_saves','post_reposts','follows','posts','profile_links','activity_items','reels','trending_topics','featured_modules','profiles','actors']) {
+    for (const table of [
+      'atproto_dead_letters',
+      'atproto_records',
+      'atproto_publications',
+      'atproto_oauth_sessions',
+      'atproto_oauth_states',
+      'atproto_publication_preferences',
+      'atproto_connections',
+      'job_failures',
+      'background_jobs',
+      'moderation_actions',
+      'reports',
+      'mutes',
+      'blocks',
+      'notifications',
+      'notification_preferences',
+      'session_capabilities',
+      'sessions',
+      'post_media',
+      'post_likes',
+      'post_saves',
+      'post_reposts',
+      'follows',
+      'posts',
+      'profile_links',
+      'activity_items',
+      'reels',
+      'trending_topics',
+      'featured_modules',
+      'profiles',
+      'actors',
+    ]) {
       await client.query(`DELETE FROM ${table}`)
     }
     for (const p of profiles) {
@@ -227,7 +258,23 @@ export async function runSeed(connectionString: string): Promise<void> {
     for (const [id, group, typ, actor, description, preview] of activity) {
       await client.query(`INSERT INTO activity_items (id, group_key, type, actor_id, description, preview, occurred_at, created_at) VALUES ($1,$2,$3,$4,$5,$6,NOW(),NOW())`, [id, group, typ, actor, description, preview])
     }
-    await client.query(`INSERT INTO schema_metadata (key, value, updated_at) VALUES ('seed_version', 'phase5-preview-1', NOW()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`)
+    for (const profile of profiles) {
+      await client.query(
+        `INSERT INTO notification_preferences (
+          id, actor_id, follow_enabled, like_enabled, repost_enabled, reply_enabled, mention_enabled, module_event_enabled, created_at, updated_at, version
+        ) VALUES ($1,$2,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,NOW(),NOW(),1)
+        ON CONFLICT (actor_id) DO NOTHING`,
+        [`notif-pref-${profile.actorId}`, profile.actorId],
+      )
+      await client.query(
+        `INSERT INTO atproto_publication_preferences (
+          id, actor_id, enabled, default_mode, publish_profile_extension, publish_module_metadata, created_at, updated_at, version
+        ) VALUES ($1,$2,FALSE,'modulaOnly',FALSE,FALSE,NOW(),NOW(),1)
+        ON CONFLICT (actor_id) DO NOTHING`,
+        [`at-pref-${profile.actorId}`, profile.actorId],
+      )
+    }
+    await client.query(`INSERT INTO schema_metadata (key, value, updated_at) VALUES ('seed_version', 'phase6-preview-1', NOW()) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`)
     await client.query('COMMIT')
   } catch (error) {
     await client.query('ROLLBACK')

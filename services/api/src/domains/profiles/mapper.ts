@@ -63,5 +63,6 @@ export function mapProfile(
     featuredModuleIds: Array.isArray(row.featured_module_ids) ? row.featured_module_ids : [],
     isFollowing: false,
     followsViewer: false,
+    version: row.version,
   }
 }

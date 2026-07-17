@@ -47,6 +47,23 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  worker:
+    build:
+      context: ../..
+      dockerfile: ops/docker/worker.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/api.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    networks:
+      - modula_internal
+    security_opt:
+      - no-new-privileges:true
+
 networks:
   modula_internal:
     driver: bridge

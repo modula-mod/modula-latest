@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "digital.modula.temp.publication",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Experimental Modula publication reference to a standard AT post.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["createdAt", "post"],
+        "properties": {
+          "createdAt": {"type": "string", "format": "datetime"},
+          "post": {
+            "type": "object",
+            "required": ["uri", "cid"],
+            "properties": {
+              "uri": {"type": "string", "format": "at-uri"},
+              "cid": {"type": "string", "format": "cid"}
+            }
+          },
+          "contentKind": {"type": "string", "maxLength": 64},
+          "moduleId": {"type": "string", "maxLength": 128},
+          "modulaCanonicalUrl": {"type": "string", "format": "uri", "maxLength": 512},
+          "presentation": {
+            "type": "object",
+            "properties": {
+              "mediaBacklight": {"type": "boolean"},
+              "profileTab": {"type": "string", "maxLength": 64}
+            }
+          }
+        }
+      }
+    }
+  }
+}

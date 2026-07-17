@@ -24,6 +24,18 @@ export class PostRepository {
     return this.hydrate(row)
   }
 
+  async getByIdForAuthor(postId: string, authorActorId: string): Promise<SocialPostDto | null> {
+    const row = await this.db
+      .selectFrom('posts')
+      .selectAll()
+      .where('id', '=', postId)
+      .where('author_actor_id', '=', authorActorId)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    if (!row) return null
+    return this.hydrate(row)
+  }
+
   async listHome(mode: string, limit: number, cursor: string | null): Promise<SocialPostDto[]> {
     let query = this.db
       .selectFrom('posts')

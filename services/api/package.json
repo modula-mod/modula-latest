@@ -16,10 +16,12 @@
     "db:seed": "tsx scripts/db-seed.ts"
   },
   "dependencies": {
+    "@atproto/oauth-client-node": "^0.3.2",
     "@fastify/cors": "^11.0.1",
     "@fastify/helmet": "^13.0.1",
     "@fastify/rate-limit": "^10.3.0",
     "@modula/api-contracts": "workspace:*",
+    "@modula/atproto-lexicons": "workspace:*",
     "@modula/protocol-contracts": "workspace:*",
     "fastify": "^5.4.0",
     "kysely": "^0.28.2",

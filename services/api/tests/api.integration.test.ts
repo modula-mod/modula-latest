@@ -20,7 +20,7 @@ describeIf('Modula API integration', () => {
     process.env.MODULA_DATABASE_URL = databaseUrl!
     process.env.MODULA_DATABASE_MIGRATOR_URL = databaseUrl!
     process.env.MODULA_ALLOWED_ORIGINS = 'https://modula.digital,http://localhost:8081'
-    process.env.MODULA_PREVIEW_WRITES_ENABLED = 'false'
+    process.env.MODULA_PREVIEW_WRITES_ENABLED = 'true'
     process.env.MODULA_RATE_LIMIT_ENABLED = 'true'
     await migrateUp(databaseUrl!)
     await runSeed(databaseUrl!)
@@ -64,8 +64,9 @@ describeIf('Modula API integration', () => {
     const res = await app.inject({method: 'GET', url: '/v1/meta'})
     const body = res.json()
     expect(body.data.capabilities.publicRead).toBe(true)
-    expect(body.data.capabilities.authentication).toBe(false)
-    expect(body.data.capabilities.mutations).toBe(false)
+    expect(body.data.capabilities.authentication).toBe(true)
+    expect(body.data.capabilities.mutations).toBe(true)
+    expect(body.data.capabilities.atprotoOAuth).toBe(true)
   })
 
   it('returns home feed and profile', async () => {
@@ -106,10 +107,10 @@ describeIf('Modula API integration', () => {
     expect(deny.headers['access-control-allow-origin']).toBeUndefined()
   })
 
-  it('disables write routes', async () => {
+  it('requires authentication for write routes', async () => {
     const res = await app.inject({method: 'POST', url: '/v1/posts', payload: {text: 'nope'}})
     expect(res.statusCode).toBe(401)
-    expect(res.json().error.code).toBe('AUTHENTICATION_NOT_AVAILABLE')
+    expect(res.json().error.code).toBe('UNAUTHENTICATED')
   })
 
   it('serves discover activity and reels', async () => {

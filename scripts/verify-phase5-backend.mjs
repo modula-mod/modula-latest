@@ -50,24 +50,33 @@ if (!migration.includes('outbox_events')) fail('outbox table missing'); else ok(
 if (!migration.includes('ENABLE ROW LEVEL SECURITY')) fail('RLS missing'); else ok('RLS exists')
 if (!migration.includes('modula_api')) fail('runtime role grants missing'); else ok('runtime role present in migration')
 
-const forbidden = ['jsonwebtoken', 'jose', 'bcrypt', 'argon2', 'ethers', 'web3', '@atproto']
+// Phase 5 forbade AT Proto runtime; Phase 6 adds official @atproto OAuth on the same API package.
+// Keep forbidding password-hash and blockchain deps. Allow @atproto/* only.
+const forbidden = ['jsonwebtoken', 'jose', 'bcrypt', 'argon2', 'ethers', 'web3']
 for (const name of forbidden) {
   if (apiPkg.includes(name)) fail(`forbidden dependency ${name}`)
 }
-ok('no production auth/password/blockchain/atproto deps')
+ok('no password-hash/blockchain deps')
 
 if (exists('services/api/src/security/crypto-custom.ts')) fail('custom crypto implementation present')
 else ok('no custom encryption implementation')
 
-if (fs.existsSync(startCommitPath)) {
-  const start = fs.readFileSync(startCommitPath, 'utf8').trim()
-  for (const dir of ['src', 'ios', 'android']) {
-    const diff = execSync(`git diff --name-only ${start} -- ${dir}`, {encoding: 'utf8'}).trim()
-    if (diff) fail(`${dir} modified since Phase 5 start:\n${diff}`)
-    else ok(`${dir} unchanged since Phase 5 start`)
-  }
+// Prefer Phase 6 start commit when present so Mission C merges already on main
+// are not treated as VPS frontend modifications.
+const phase6Start = '/tmp/modula-phase6-start-commit.txt'
+const boundaryCommit = fs.existsSync(phase6Start)
+  ? fs.readFileSync(phase6Start, 'utf8').trim()
+  : fs.existsSync(startCommitPath)
+    ? fs.readFileSync(startCommitPath, 'utf8').trim()
+    : ''
+if (!boundaryCommit) {
+  fail('Phase start commit file missing; cannot verify frontend dirs')
 } else {
-  fail('Phase 5 start commit file missing; cannot verify frontend dirs')
+  for (const dir of ['src', 'ios', 'android']) {
+    const diff = execSync(`git diff --name-only ${boundaryCommit} -- ${dir}`, {encoding: 'utf8'}).trim()
+    if (diff) fail(`${dir} modified since boundary commit:\n${diff}`)
+    else ok(`${dir} unchanged since boundary commit`)
+  }
 }
 
 for (const script of [

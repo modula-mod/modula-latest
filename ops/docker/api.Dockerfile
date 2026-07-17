@@ -9,6 +9,7 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/api-contracts/package.json packages/api-contracts/
 COPY packages/protocol-contracts/package.json packages/protocol-contracts/
+COPY packages/atproto-lexicons/package.json packages/atproto-lexicons/
 COPY services/api/package.json services/api/
 RUN pnpm install --frozen-lockfile --filter @modula/api...
 
@@ -21,6 +22,7 @@ COPY packages ./packages
 COPY services/api ./services/api
 RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/protocol-contracts build \
+ && pnpm --filter @modula/atproto-lexicons build \
  && pnpm --filter @modula/api build
 
 FROM node:24.18.0-bookworm-slim AS runtime

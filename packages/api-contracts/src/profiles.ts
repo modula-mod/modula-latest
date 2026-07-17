@@ -50,4 +50,23 @@ export type ModulaProfileDto = {
   featuredModuleIds: string[]
   isFollowing: boolean
   followsViewer: boolean
+  version?: number
+}
+
+/**
+ * Actor identity and ownership fields are never accepted here — the profile
+ * to patch is always resolved from the authenticated session.
+ */
+export type PatchProfileInput = {
+  displayName?: string
+  bio?: string
+  pronouns?: string
+  avatarUri?: string
+  coverUri?: string
+  coverColour?: string
+  location?: ProfileLocation
+  website?: {label: string; url: string; domain: string; visibility: ProfileVisibility}
+  visibility?: ProfileVisibility
+  focusStatus?: {id: string; label: string; message: string}
+  expectedVersion: number
 }

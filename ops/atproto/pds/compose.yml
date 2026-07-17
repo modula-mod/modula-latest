@@ -1,0 +1,24 @@
+name: modula-pds-pilot
+
+services:
+  pds:
+    image: ghcr.io/bluesky-social/pds:0.4.182
+    profiles: ["manual"]
+    restart: unless-stopped
+    env_file:
+      - ./pds.env.example
+    volumes:
+      - pds_data:/pds
+    networks:
+      - modula_pds
+    ports:
+      - "127.0.0.1:3001:3001"
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  modula_pds:
+    driver: bridge
+
+volumes:
+  pds_data:
