@@ -27,6 +27,14 @@ else {
   else ok('migration 002 tables and lease fields present')
 }
 
+if (!exists('services/api/migrations/003_phase6_api_rls_writes.sql')) fail('migration 003 missing')
+else {
+  const mig3 = read('services/api/migrations/003_phase6_api_rls_writes.sql')
+  if (!mig3.includes('posts_api_all') || !mig3.includes('TO modula_api')) {
+    fail('migration 003 must add API write policies for FORCE RLS tables')
+  } else ok('migration 003 API RLS write policies present')
+}
+
 if (!exists('services/worker/src/main.ts')) fail('worker service missing'); else ok('worker service exists')
 if (!exists('packages/atproto-lexicons/lexicons/digital/modula/temp/publication.json')) fail('lexicons missing')
 else ok('experimental lexicons exist')
