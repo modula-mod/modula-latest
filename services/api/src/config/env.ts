@@ -118,8 +118,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (raw.MODULA_ENVIRONMENT === 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED) {
     refuse('preview writes must be disabled in production')
   }
-  if (raw.MODULA_API_HOST === '0.0.0.0' && (raw.NODE_ENV === 'production' || raw.MODULA_ENVIRONMENT === 'preview')) {
-    refuse('API host must bind to loopback in preview/production (use 127.0.0.1)')
+  // Inside Docker the process must listen on 0.0.0.0 so the published
+  // host-loopback mapping (127.0.0.1:4020->4020) can reach it. Host-level
+  // exposure remains loopback-only via compose port publishing.
+  if (
+    raw.MODULA_API_HOST === '0.0.0.0' &&
+    raw.MODULA_ENVIRONMENT === 'production' &&
+    env.MODULA_ALLOW_DOCKER_BIND !== 'true'
+  ) {
+    refuse('API host must bind to loopback in production unless MODULA_ALLOW_DOCKER_BIND=true')
   }
 
   const environment = raw.MODULA_ENVIRONMENT
