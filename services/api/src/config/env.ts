@@ -39,6 +39,8 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
+  MODULA_ADMIN_HANDLES: z.string().optional(),
 })
 
 export type EncryptionKeyMaterial = {
@@ -71,6 +73,8 @@ export type AppConfig = {
   atprotoOAuthEncryptionKeysByVersion: Map<number, Buffer>
   atprotoOAuthEncryptionKeyIsEphemeral: boolean
   pdsPilotEnabled: boolean
+  /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
+  adminHandles: string[]
 }
 
 function refuse(message: string): never {
@@ -109,10 +113,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   ) {
     refuse('public API URL must be HTTPS outside local development')
   }
-  if (
-    (raw.NODE_ENV === 'production' || raw.MODULA_ENVIRONMENT === 'production') &&
-    raw.MODULA_PREVIEW_WRITES_ENABLED
-  ) {
+  // Preview containers often run with NODE_ENV=production while MODULA_ENVIRONMENT=preview.
+  // Authenticated preview writes are allowed in that mode; only true production forbids them.
+  if (raw.MODULA_ENVIRONMENT === 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED) {
     refuse('preview writes must be disabled in production')
   }
   if (raw.MODULA_API_HOST === '0.0.0.0' && (raw.NODE_ENV === 'production' || raw.MODULA_ENVIRONMENT === 'preview')) {
@@ -172,5 +175,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     atprotoOAuthEncryptionKeysByVersion: keysByVersion,
     atprotoOAuthEncryptionKeyIsEphemeral: isEphemeral,
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
+    adminHandles: (raw.MODULA_ADMIN_HANDLES ?? '')
+      .split(',')
+      .map(h => h.trim().toLowerCase())
+      .filter(Boolean),
   }
 }
