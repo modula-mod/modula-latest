@@ -53,12 +53,12 @@ const PREFERENCE_OPTIONS: {
   {
     id: 'askEveryTime',
     label: 'Ask every time',
-    description: 'Choose Modula or Modula + AT Protocol in Composer.',
+    description: 'Choose Modula or Modula + External Network in Composer.',
   },
   {
     id: 'crossPostPublic',
     label: 'Cross-post public posts',
-    description: 'Public, supported posts can default to Modula + AT Protocol.',
+    description: 'Public, supported posts can default to Modula + this External Network.',
   },
 ]
 
@@ -103,7 +103,7 @@ export function AtprotoConnectionScreen() {
   const connect = async (requestScope: 'atproto' | 'publish') => {
     if (!oauthEnabled) return
     if (session.status !== 'signedIn') {
-      setStatusMessage('Sign in to connect an AT Protocol identity.')
+      setStatusMessage('Sign in with your Modula Account to connect this External Network.')
       return
     }
     if (requestScope === 'publish' && !publicAck) {

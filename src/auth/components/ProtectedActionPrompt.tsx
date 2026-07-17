@@ -16,7 +16,7 @@ type ProtectedActionPromptProps = {
 export function ProtectedActionPrompt({
   visible,
   title = 'Sign in to continue',
-  description = 'Use a local prototype account to continue this action.',
+  description = 'Use a Modula Account to continue this action.',
   onClose,
 }: ProtectedActionPromptProps) {
   const router = useRouter()

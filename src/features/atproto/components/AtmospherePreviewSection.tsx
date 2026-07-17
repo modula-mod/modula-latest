@@ -29,10 +29,10 @@ export function AtmospherePreviewSection() {
         </AppText>
       </View>
 
-      {feedQuery.isPending ? <InitialLoadingState label="Loading Atmosphere Preview" /> : null}
+      {feedQuery.isPending ? <InitialLoadingState label="Loading external network preview" /> : null}
       {feedQuery.isError ? (
         <QueryErrorState
-          title="Atmosphere Preview unavailable"
+          title="External network preview unavailable"
           error={feedQuery.error}
           onRetry={() => void feedQuery.refetch()}
         />
@@ -41,8 +41,8 @@ export function AtmospherePreviewSection() {
       {feedQuery.data ? (
         feedQuery.data.items.length === 0 ? (
           <EmptyState
-            title="No Atmosphere items yet"
-            description="Imported AT content and experimental Modula records will appear here."
+            title="No external network items yet"
+            description="Optional bridged public content will appear here when connected."
           />
         ) : (
           <View style={{gap: spacing[2]}}>

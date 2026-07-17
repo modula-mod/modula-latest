@@ -1,20 +1,22 @@
-/** Product copy for Phase 6 AT Protocol surfaces (mission §67–§74). */
+/** Product copy for optional AT Protocol bridge under External Networks. */
 
 export const ATPROTO_SETTINGS_TITLE = 'AT Protocol'
-export const ATPROTO_SETTINGS_DESCRIPTION = 'Connect a portable public social identity.'
+export const ATPROTO_SETTINGS_DESCRIPTION =
+  'Optional External Network bridge. Not required for a Modula Account.'
 
 export const ATPROTO_PUBLIC_DATA_WARNING = [
   'AT Protocol repositories contain public records.',
   '',
   'Only content you explicitly publish publicly will be written to your connected AT account.',
   '',
-  'Private Modula data, modules, settings and messages remain in Modula.',
+  'Private Modula data, modules, settings and messages remain on Greenfield.',
 ].join('\n')
 
 export const ATPROTO_PUBLIC_DATA_ACK_LABEL =
   'I understand that AT Protocol publishing is public and opt-in.'
 
-export const ATMOSPHERE_PREVIEW_LABEL = 'Atmosphere Preview'
+/** Demoted from primary Discover IA; optional bridge preview label only. */
+export const ATMOSPHERE_PREVIEW_LABEL = 'External network preview'
 
 export const ORIGIN_LABELS = {
   modula: 'Modula',

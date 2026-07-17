@@ -24,17 +24,17 @@ export function ConnectionsScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Connected Accounts" />
+      <SecondaryScreenHeader title="Connections" />
       <ResponsiveContent>
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
           <SettingsInfoBlock
-            title="Connected Accounts"
-            body="Link portable public social identities. Modula remains the home for private data, modules, and messages."
+            title="Connections"
+            body="Optional External Networks. Your Modula Account and Greenfield data stay authoritative; bridges never own your identity."
           />
 
-          <SettingsSection title="Social identity">
+          <SettingsSection title="External Networks">
             {oauthEnabled ? (
               <SettingsLinkRow
                 row={{
@@ -50,7 +50,7 @@ export function ConnectionsScreen() {
               <View style={{padding: spacing[4]}}>
                 <AppText variant="headline">{ATPROTO_SETTINGS_TITLE}</AppText>
                 <AppText variant="caption" colour="textSecondary">
-                  AT Protocol connections are unavailable in this environment.
+                  This External Network is unavailable in this environment.
                 </AppText>
               </View>
             )}
@@ -58,8 +58,8 @@ export function ConnectionsScreen() {
               <SettingsLinkRow
                 last
                 row={{
-                  title: 'Modula PDS pilot',
-                  description: 'Invite-only personal data server pilot.',
+                  title: 'Hosted bridge pilot',
+                  description: 'Invite-only external network pilot (deferred).',
                   icon: 'security',
                   preview: true,
                 }}

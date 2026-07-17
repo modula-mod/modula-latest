@@ -12,7 +12,6 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
-import {AtmospherePreviewSection} from '@/features/atproto/components/AtmospherePreviewSection'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
@@ -148,8 +147,6 @@ export function DiscoverScreen() {
               ))}
             </ScrollView>
           </View>
-
-          {category === 'For You' ? <AtmospherePreviewSection /> : null}
 
           {discoverQuery.isLoading ? (
             <InitialLoadingState label="Loading discovery" />

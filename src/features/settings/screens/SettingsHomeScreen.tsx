@@ -31,13 +31,13 @@ const accountRows: SettingsNavRow[] = [
   },
   {
     title: 'Account',
-    description: 'Session and local prototype account.',
+    description: 'Modula Account session and profile.',
     icon: 'account',
     route: '/settings/account',
   },
   {
-    title: 'Connected Accounts',
-    description: 'AT Protocol and portable public identities.',
+    title: 'Connections',
+    description: 'External Networks and optional bridges.',
     icon: 'integrations',
     route: '/settings/connections',
   },

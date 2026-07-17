@@ -18,7 +18,7 @@ export function RequireCapability({
     <ProtectedActionPrompt
       visible
       title="Sign in to continue"
-      description={message ?? 'This Modula action needs a local prototype account.'}
+      description={message ?? 'This Modula action needs a Modula Account.'}
     />
   )
 }

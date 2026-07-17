@@ -25,7 +25,7 @@ export function AccountScreen() {
           <Info label="Environment" value={runtimeEnvironment.appEnvironment} />
           {profile ? <Info label="Profile" value={`${profile.displayName} · @${profile.handle}`} /> : null}
           {account ? <Info label="Email" value={account.email} /> : null}
-          <Info label="Account type" value={account ? 'Local prototype account' : 'Public browsing'} />
+          <Info label="Account type" value={account ? 'Modula Account' : 'Public browsing'} />
           {session.status === 'signedIn' ? (
             <AppButton variant="secondary" onPress={() => void signOut()}>
               Sign out

@@ -59,7 +59,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           })}
         />
         {showAtConnection ? (
-          <InfoItem label="Connected to AT Protocol" value={`@${connection.handle}`} />
+          <InfoItem label="External Network" value={`AT Protocol · @${connection.handle}`} />
         ) : null}
       </Surface>
       {visibleClaims.length ? (

@@ -42,7 +42,7 @@ export function SignInScreen() {
       await signIn({email: nextEmail, password: nextPassword}, returnTo)
       setPassword('')
     } catch {
-      setError('Use an approved local prototype account.')
+      setError('Use an approved Modula Account.')
     } finally {
       setPending(false)
     }
@@ -54,7 +54,8 @@ export function SignInScreen() {
         <View style={{gap: spacing[1]}}>
           <AppText variant="display">Sign in</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Local prototype account. No production account will be created.
+            Sign in with your Modula Account. External Networks are optional and configured later in
+            Settings → Connections.
           </AppText>
         </View>
         <AuthPanel>

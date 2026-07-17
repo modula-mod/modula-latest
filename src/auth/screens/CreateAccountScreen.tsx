@@ -50,7 +50,7 @@ export function CreateAccountScreen() {
         password,
       }, sanitizeReturnTo(params.returnTo))
     } catch {
-      setError('That local email or handle is already in use.')
+      setError('That email or handle is already in use.')
     } finally {
       setPending(false)
     }
@@ -59,10 +59,10 @@ export function CreateAccountScreen() {
   return (
     <AuthShell>
       <View style={{gap: spacing[4]}}>
-        <AppText variant="display">Create account</AppText>
+        <AppText variant="display">Create Modula Account</AppText>
         <AuthPanel>
           <AppText variant="caption" colour="textSecondary">
-            This creates a temporary local prototype account.
+            Create a Modula Account on Greenfield. No AT Protocol or Bluesky account is required.
           </AppText>
           <AuthField label="Display name" value={displayName} onChangeText={setDisplayName} />
           <AuthField label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
@@ -70,7 +70,7 @@ export function CreateAccountScreen() {
           <AuthField label="Password" value={password} onChangeText={setPassword} secureTextEntry />
           <AuthField label="Password confirmation" value={confirmation} onChangeText={setConfirmation} secureTextEntry error={error ?? undefined} />
           <AppButton disabled={pending} onPress={() => void submit()}>
-            {pending ? 'Creating' : 'Create local account'}
+            {pending ? 'Creating' : 'Create Modula Account'}
           </AppButton>
         </AuthPanel>
       </View>

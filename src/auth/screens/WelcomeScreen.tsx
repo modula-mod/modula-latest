@@ -21,16 +21,16 @@ export function WelcomeScreen() {
         </View>
         <AuthPanel>
           <AppButton onPress={() => router.push('/sign-in' as Href)}>
-            Continue with local account
+            Continue with Modula Account
           </AppButton>
           <AppButton variant="secondary" onPress={continueAsGuest}>
             Explore as guest
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/create-account' as Href)}>
-            Create local prototype account
+            Create Modula Account
           </AppButton>
           <AppText variant="caption" colour="textSecondary">
-            This development build uses a local API simulation.
+            Modula Accounts are owned by Greenfield. External Networks are optional.
           </AppText>
         </AuthPanel>
       </View>

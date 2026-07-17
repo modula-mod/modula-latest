@@ -150,15 +150,15 @@ const DESTINATION_OPTIONS = [
   },
   {
     id: 'modula+atproto' as const,
-    label: 'Modula + AT Protocol',
-    description: 'Also publish a public copy to your connected AT account.',
+    label: 'Modula + External Network',
+    description: 'Optional: also publish a public copy via connected External Networks (AT Protocol).',
     icon: 'integrations' as AppIconName,
   },
 ]
 
 const DESTINATION_LABEL: Record<PublishingDestination, string> = {
   modula: 'Modula',
-  'modula+atproto': 'Modula + AT Protocol',
+  'modula+atproto': 'Modula + External Network',
 }
 
 const REPLY_LABEL: Record<ReplyPermission, string> = {

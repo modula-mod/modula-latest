@@ -33,7 +33,7 @@ export function createAuthRoutes(
           return database.createSession({email})
         } catch {
           throw new ModulaApiError({
-            message: 'Use an approved local prototype account.',
+            message: 'Use an approved Modula Account.',
             code: 'UNAUTHENTICATED',
             status: 401,
             retryable: false,
