@@ -126,9 +126,19 @@ if (exists('docs/audits/phase6-pds-gonogo.md')) {
   else ok('PDS go/no-go documented')
 } else fail('PDS go/no-go audit missing')
 
-const forbiddenFrontend = execSync('git diff --name-only main -- src ios android assets', {encoding: 'utf8'}).trim()
-if (forbiddenFrontend) fail(`frontend trees modified:\n${forbiddenFrontend}`)
-else ok('no VPS frontend tree modifications vs main')
+// After PR #5 merge, Phase 6 frontend trees are expected on this branch.
+// Keep the pre-merge boundary via verify-phase6-frontend-boundary.mjs + start commit.
+const phase6FrontendPresent =
+  exists('src/features/atproto') && exists('scripts/verify-phase6-atproto-frontend.mjs')
+if (phase6FrontendPresent) {
+  ok('Phase 6 frontend tree present — integrated branch allows src/ios/android/assets vs main')
+} else {
+  const forbiddenFrontend = execSync('git diff --name-only main -- src ios android assets', {
+    encoding: 'utf8',
+  }).trim()
+  if (forbiddenFrontend) fail(`frontend trees modified:\n${forbiddenFrontend}`)
+  else ok('no VPS frontend tree modifications vs main')
+}
 
 if (failures > 0) {
   console.error(`\nPhase 6 backend verifier failed with ${failures} issue(s)`)
