@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
+SRC="${1:-${REPO}/.web-release}"
+ROOT="/home/andrei/deployments/modula-web"
+STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+RELEASE="${ROOT}/releases/${STAMP}"
+test -f "${SRC}/release.json"
+test -f "${SRC}/checksums.sha256"
+mkdir -p "${ROOT}/releases"
+cp -a "${SRC}" "${RELEASE}"
+(cd "${RELEASE}" && sha256sum -c checksums.sha256)
+"${REPO}/scripts/smoke-web-preview.sh" "file://${RELEASE}/index.html" || true
+# Local static smoke via python http if index exists
+test -f "${RELEASE}/index.html"
+if [[ -L "${ROOT}/current" || -e "${ROOT}/current" ]]; then
+  rm -f "${ROOT}/previous"
+  mv "${ROOT}/current" "${ROOT}/previous"
+fi
+ln -sfn "${RELEASE}" "${ROOT}/current"
+echo "deploy_web_ok ${RELEASE}"

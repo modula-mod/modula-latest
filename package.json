@@ -70,7 +70,10 @@
     "verify:phase4-5": "node scripts/verify-phase4-5-native-ui.mjs",
     "test:account-panel": "node scripts/test-account-panel-state.mjs",
     "prebuild": "expo prebuild",
-    "prebuild:clean": "expo prebuild --clean"
+    "prebuild:clean": "expo prebuild --clean",
+    "verify:phase5": "node scripts/verify-phase5-backend.mjs",
+    "api:dev": "pnpm --filter @modula/api dev",
+    "api:test": "pnpm --filter @modula/api test"
   },
   "private": true
 }

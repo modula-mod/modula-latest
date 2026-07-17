@@ -1,0 +1,55 @@
+name: modula-preview
+
+services:
+  postgres:
+    image: postgres:16.9-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: modula
+      POSTGRES_USER: modula_admin
+      POSTGRES_PASSWORD: ${MODULA_ADMIN_PASSWORD}
+      MODULA_MIGRATOR_PASSWORD: ${MODULA_MIGRATOR_PASSWORD}
+      MODULA_API_PASSWORD: ${MODULA_API_PASSWORD}
+      MODULA_READONLY_PASSWORD: ${MODULA_READONLY_PASSWORD}
+      MODULA_BACKUP_PASSWORD: ${MODULA_BACKUP_PASSWORD}
+    volumes:
+      - modula_pg_data:/var/lib/postgresql/data
+      - ./postgres/init-roles.sh:/docker-entrypoint-initdb.d/10-init-roles.sh:ro
+    ports:
+      - '127.0.0.1:5433:5432'
+    networks:
+      - modula_internal
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U modula_admin -d modula']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../..
+      dockerfile: ops/docker/api.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/api.env
+    ports:
+      - '127.0.0.1:4020:4020'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - modula_internal
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:4020/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  modula_internal:
+    driver: bridge
+
+volumes:
+  modula_pg_data:

@@ -1,4 +1,10 @@
+packages:
+  - .
+  - services/*
+  - packages/*
+
 allowBuilds:
+  esbuild: true
   unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@expo/cli@57.0.8'
