@@ -1,6 +1,6 @@
 # Phase 6 — AT Protocol frontend integration handoff
 
-Backend commit: 6fbff66cb3ba92287a95f9210184d535d75a26a1
+Backend commit: ff98a203e7a023b52f6bca4a666ef0265fcd0e71
 API URL: https://api.modula.digital
 API version: v1
 Protocol version: 0.1
@@ -36,6 +36,8 @@ PDS status: DEFERRED
 Tap status: PREPARED
 
 Known limitations:
+- Migration `003_phase6_api_rls_writes` grants `modula_api` write policies on FORCE RLS tables
+- Migration  grants  write policies on FORCE RLS tables (posts, profiles, post_saves, profile_links)
 - Live provider OAuth completion uses official `@atproto/oauth-client-node`; preview callback supports disposable `preview=1` completion for tests
 - Atmosphere feed is selective projection, not a network AppView
 - Private Modula data remains PostgreSQL-only
