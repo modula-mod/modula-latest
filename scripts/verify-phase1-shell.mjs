@@ -98,7 +98,14 @@ for (const file of sourceFiles) {
     fail(`Source file references old repository path: ${file}`)
   }
   if (/^\s*import\s+.*(?:bsky|bluesky|@atproto)/im.test(body)) {
-    fail(`Source file contains forbidden Bluesky/AT import: ${file}`)
+    // Phase 6 exception: official Expo AT OAuth client only, under features/atproto/oauth.
+    const phase6OfficialOauth =
+      file.startsWith('src/features/atproto/oauth/') &&
+      /^\s*import\s+.*@atproto\/oauth-client-expo/m.test(body) &&
+      !/bsky|bluesky|@atproto\/(?!oauth-client-expo)/i.test(body)
+    if (!phase6OfficialOauth) {
+      fail(`Source file contains forbidden Bluesky/AT import: ${file}`)
+    }
   }
   const urls = body.match(/https?:\/\/[A-Za-z0-9][A-Za-z0-9.-]*/gi) ?? []
   for (const url of urls) {

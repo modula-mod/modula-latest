@@ -36,6 +36,8 @@ export type CreatePostInput = {
   linkPreview?: DraftLinkPreview
   poll?: DraftPoll
   idempotencyKey: string
+  /** Opt-in public AT Protocol cross-post. Never set for private audiences. */
+  publishToAtproto?: boolean
 }
 
 export type OptimisticPostState = 'pending' | 'confirmed' | 'failed'

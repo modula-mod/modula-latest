@@ -2,9 +2,11 @@ import type {ApiMethod, ApiRequest} from '@/api/contracts'
 import type {LocalApiDatabase} from '@/api/local/LocalApiDatabase'
 import type {MutableLocalApiConfiguration} from '@/api/local/LocalApiConfiguration'
 import {createActivityRoutes} from '@/api/local/routes/activityRoutes'
+import {createAtprotoRoutes} from '@/api/local/routes/atprotoRoutes'
 import {createAuthRoutes} from '@/api/local/routes/authRoutes'
 import {createDiscoverRoutes} from '@/api/local/routes/discoverRoutes'
 import {createFeedRoutes} from '@/api/local/routes/feedRoutes'
+import {createMetaRoutes} from '@/api/local/routes/metaRoutes'
 import {createPostRoutes} from '@/api/local/routes/postRoutes'
 import {createProfileRoutes} from '@/api/local/routes/profileRoutes'
 
@@ -51,12 +53,14 @@ export class LocalApiRouter {
     private readonly configuration: MutableLocalApiConfiguration,
   ) {
     this.routes = [
+      ...createMetaRoutes(),
       ...createAuthRoutes(database, configuration),
       ...createFeedRoutes(database),
       ...createPostRoutes(database),
       ...createProfileRoutes(database),
       ...createActivityRoutes(database),
       ...createDiscoverRoutes(database),
+      ...createAtprotoRoutes(),
     ]
   }
 

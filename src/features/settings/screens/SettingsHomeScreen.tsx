@@ -36,6 +36,12 @@ const accountRows: SettingsNavRow[] = [
     route: '/settings/account',
   },
   {
+    title: 'Connected Accounts',
+    description: 'AT Protocol and portable public identities.',
+    icon: 'integrations',
+    route: '/settings/connections',
+  },
+  {
     title: 'Accounts',
     description: 'Switcher Preview for local sessions.',
     icon: 'switch',

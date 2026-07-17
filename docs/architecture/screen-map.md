@@ -33,6 +33,9 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 |---|---|---|
 | Settings root | `/settings` | Implemented |
 | AccountSettings | `/settings/account` | Implemented |
+| Connected Accounts | `/settings/connections` | Implemented (Phase 6) |
+| AT Protocol connection | `/settings/connections/atproto` | Implemented (Phase 6) |
+| AT Protocol OAuth callback | `/oauth/atproto` | Implemented (Phase 6) |
 | Email (account) | `/settings/account/email` | Stub |
 | Password | `/settings/account/password` | Stub |
 | Export data | `/settings/account/export` | Stub |
@@ -68,4 +71,5 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 
 ## Deferred product (explicit)
 
-Login/Signup/Onboarding, Messages, Post thread, Merge Feeds engine, real auth, AT Proto adapter, Gaia, wallet, module runtime.
+Login/Signup/Onboarding, Messages, Post thread, Merge Feeds engine, Gaia, wallet, module runtime.
+AT Protocol connected accounts / Atmosphere Preview: Phase 6 frontend (server-mediated OAuth; no Bluesky shell).

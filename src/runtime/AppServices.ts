@@ -4,9 +4,11 @@ import type {SessionRefreshCoordinator} from '@/auth/runtime/SessionRefreshCoord
 import type {SessionStorage} from '@/auth/storage'
 import type {
   ActivityRepository,
+  AtprotoRepository,
   AuthRepository,
   DiscoverRepository,
   FeedRepository,
+  MetadataRepository,
   PostRepository,
   ProfileRepository,
   ReelsRepository,
@@ -22,6 +24,8 @@ export type AppServices = {
   activityRepository: ActivityRepository
   discoverRepository: DiscoverRepository
   reelsRepository: ReelsRepository
+  metadataRepository: MetadataRepository
+  atprotoRepository: AtprotoRepository
   localApiController: LocalApiController | null
   accessTokenStore: AccessTokenStore
   sessionStorage: SessionStorage
