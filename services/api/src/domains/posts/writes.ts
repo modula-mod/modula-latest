@@ -96,7 +96,7 @@ export class PostWriteService {
   }
 
   async update(actorId: string, postId: string, input: UpdatePostInput): Promise<SocialPostDto> {
-    const text = input.text.trim()
+    const text = (input.text ?? '').trim()
     if (!text || text.length > 5000) {
       throw Object.assign(new Error('Invalid post text'), {code: 'VALIDATION_FAILED'})
     }
