@@ -129,6 +129,28 @@ export class SessionService {
     }
   }
 
+  /** Full session projection for GET /v1/sessions/me — resolves fresh capabilities from the DB. */
+  async describeSession(sessionId: string): Promise<ModulaSession | null> {
+    const row = await this.db.selectFrom('sessions').selectAll().where('id', '=', sessionId).executeTakeFirst()
+    if (!row) return null
+    const capabilityRows = await this.db
+      .selectFrom('session_capabilities')
+      .select('capability')
+      .where('session_id', '=', row.id)
+      .where('revoked_at', 'is', null)
+      .execute()
+    return {
+      id: row.id,
+      actorId: row.actor_id,
+      status: row.status,
+      createdAt: row.created_at.toISOString(),
+      expiresAt: row.expires_at.toISOString(),
+      lastSeenAt: row.last_seen_at.toISOString(),
+      revokedAt: row.revoked_at?.toISOString() ?? null,
+      capabilities: capabilityRows.map(r => r.capability as BackendCapability),
+    }
+  }
+
   async revokeSession(sessionId: string): Promise<void> {
     const now = new Date()
     await this.db

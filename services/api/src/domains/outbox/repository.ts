@@ -1,54 +1,71 @@
 import {randomUUID} from 'node:crypto'
+import type {Transaction} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
-import type {Kysely, Transaction} from 'kysely'
 import type {Database} from '../../database/types.js'
 
-type Db = ModulaDb | Transaction<Database> | Kysely<Database>
+export type OutboxEventType =
+  | 'notification.create'
+  | 'search.index.post'
+  | 'search.index.profile'
+  | 'atproto.publish.create'
+  | 'atproto.publish.update'
+  | 'atproto.publish.delete'
 
+export type EnqueueOutboxEventInput = {
+  eventType: OutboxEventType
+  aggregateType: string
+  aggregateId: string
+  payload: Record<string, unknown>
+}
+
+/**
+ * Transactional outbox + job queue. The API process only ever enqueues rows
+ * here — it never performs the side effects (sending notifications,
+ * indexing, publishing to AT Protocol) itself. Every enqueue writes:
+ *  - an immutable event row to `outbox_events` (source-of-truth log), and
+ *  - a leasable row to `background_jobs` (what `services/worker` polls).
+ * Both writes happen inside the caller's transaction so they commit
+ * atomically with the domain write that caused them.
+ */
 export class OutboxRepository {
-  constructor(private readonly db: Db) {}
+  constructor(private readonly db: ModulaDb | Transaction<Database>) {}
 
-  async enqueue(input: {
-    eventType: string
-    aggregateType: string
-    aggregateId: string
-    payload: Record<string, unknown>
-  }): Promise<string> {
-    const id = randomUUID()
-    await this.db
+  async enqueue(trx: Transaction<Database> | ModulaDb, input: EnqueueOutboxEventInput): Promise<void> {
+    const now = new Date()
+    const outboxId = `outbox-${randomUUID()}`
+    await trx
       .insertInto('outbox_events')
       .values({
-        id,
+        id: outboxId,
         event_type: input.eventType,
         aggregate_type: input.aggregateType,
         aggregate_id: input.aggregateId,
         payload: input.payload,
-        created_at: new Date(),
+        created_at: now,
         published_at: null,
         attempt_count: 0,
         last_error: null,
       })
       .execute()
-    // Also create a background job for the worker
-    await this.db
+
+    await trx
       .insertInto('background_jobs')
       .values({
-        id: randomUUID(),
+        id: `job-${randomUUID()}`,
         job_type: input.eventType,
-        payload: {outboxId: id, ...input.payload},
+        payload: {...input.payload, outboxEventId: outboxId, aggregateType: input.aggregateType, aggregateId: input.aggregateId},
         status: 'pending',
         priority: 100,
-        available_at: new Date(),
+        available_at: now,
         lease_owner: null,
         lease_expires_at: null,
         attempt_count: 0,
         maximum_attempts: 5,
         last_error: null,
-        created_at: new Date(),
-        updated_at: new Date(),
+        created_at: now,
+        updated_at: now,
         completed_at: null,
       })
       .execute()
-    return id
   }
 }

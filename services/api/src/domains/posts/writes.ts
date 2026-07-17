@@ -69,16 +69,16 @@ export class PostWriteService {
           version: 1,
         })
         .execute()
-      const outbox = new OutboxRepository(trx)
-      await outbox.enqueue({
-        eventType: 'search.index',
+      const outbox = new OutboxRepository(this.db)
+      await outbox.enqueue(trx, {
+        eventType: 'search.index.post',
         aggregateType: 'post',
         aggregateId: id,
         payload: {postId: id},
       })
       if (audience === 'public' && input.publishToAtproto) {
-        await outbox.enqueue({
-          eventType: 'atproto.publish',
+        await outbox.enqueue(trx, {
+          eventType: 'atproto.publish.create',
           aggregateType: 'post',
           aggregateId: id,
           payload: {postId: id, actorId, collection: 'app.bsky.feed.post'},
@@ -123,8 +123,8 @@ export class PostWriteService {
       if (Number(updated.numUpdatedRows ?? 0) === 0) {
         throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
       }
-      await new OutboxRepository(trx).enqueue({
-        eventType: 'atproto.update',
+      await new OutboxRepository(this.db).enqueue(trx, {
+        eventType: 'atproto.publish.update',
         aggregateType: 'post',
         aggregateId: postId,
         payload: {postId, actorId},
@@ -157,8 +157,8 @@ export class PostWriteService {
         .set({deleted_at: new Date(), updated_at: new Date(), version: row.version + 1})
         .where('id', '=', postId)
         .execute()
-      await new OutboxRepository(trx).enqueue({
-        eventType: 'atproto.delete',
+      await new OutboxRepository(this.db).enqueue(trx, {
+        eventType: 'atproto.publish.delete',
         aggregateType: 'post',
         aggregateId: postId,
         payload: {postId, actorId},
@@ -228,7 +228,7 @@ export class PostWriteService {
           }
         }
         if (kind === 'like' || kind === 'repost') {
-          await new OutboxRepository(trx).enqueue({
+          await new OutboxRepository(this.db).enqueue(trx, {
             eventType: 'notification.create',
             aggregateType: 'post',
             aggregateId: postId,

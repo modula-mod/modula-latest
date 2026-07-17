@@ -51,7 +51,7 @@ export class ProfileWriteService {
           .where('id', '=', existing.id)
           .execute()
       }
-      await new OutboxRepository(trx).enqueue({
+      await new OutboxRepository(this.db).enqueue(trx, {
         eventType: 'notification.create',
         aggregateType: 'follow',
         aggregateId: `${followerActorId}:${target.actor_id}`,
@@ -121,8 +121,8 @@ export class ProfileWriteService {
       if (Number(result.numUpdatedRows ?? 0) === 0) {
         throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
       }
-      await new OutboxRepository(trx).enqueue({
-        eventType: 'atproto.profile.publish',
+      await new OutboxRepository(this.db).enqueue(trx, {
+        eventType: 'search.index.profile',
         aggregateType: 'profile',
         aggregateId: row.id,
         payload: {profileId: row.id, actorId},
