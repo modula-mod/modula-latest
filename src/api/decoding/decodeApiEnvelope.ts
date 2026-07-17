@@ -17,6 +17,8 @@ const knownCodes = new Set<ApiErrorCode>([
   'INVALID_RESPONSE',
   'CANCELLED',
   'UNKNOWN',
+  'AUTHENTICATION_NOT_AVAILABLE',
+  'CAPABILITY_DISABLED',
 ])
 
 function decodeMeta(value: unknown) {

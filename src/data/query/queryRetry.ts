@@ -12,7 +12,9 @@ export function queryRetry(failureCount: number, error: unknown): boolean {
     error.code === 'NOT_FOUND' ||
     error.code === 'CONFLICT' ||
     error.code === 'CANCELLED' ||
-    error.code === 'INVALID_RESPONSE'
+    error.code === 'INVALID_RESPONSE' ||
+    error.code === 'AUTHENTICATION_NOT_AVAILABLE' ||
+    error.code === 'CAPABILITY_DISABLED'
   ) {
     return false
   }
