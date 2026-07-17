@@ -135,28 +135,65 @@ export class AtprotoService {
         ? ['atproto', 'repo:app.bsky.feed.post', 'repo:app.bsky.graph.follow']
         : ['atproto']
     const now = new Date()
-    const connectionId = randomUUID()
+    // Reuse an existing row for the same DID (unique constraint) after disconnect/revoke.
+    const existing = await this.db
+      .selectFrom('atproto_connections')
+      .select(['id', 'actor_id'])
+      .where('did', '=', input.did)
+      .executeTakeFirst()
+    if (existing && existing.actor_id !== input.actorId) {
+      throw Object.assign(new Error('AT Protocol identity already linked to another actor'), {
+        code: 'CONFLICT',
+      })
+    }
+    const connectionId = existing?.id ?? randomUUID()
     await this.db.transaction().execute(async trx => {
-      await trx
-        .insertInto('atproto_connections')
-        .values({
-          id: connectionId,
-          actor_id: input.actorId,
-          did: input.did,
-          handle: input.handle,
-          pds_url: input.pdsUrl,
-          status: 'connected',
-          granted_scopes: scopes,
-          connected_at: now,
-          refreshed_at: now,
-          disconnected_at: null,
-          last_error_code: null,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-          version: 1,
-        })
-        .execute()
+      if (existing) {
+        await trx
+          .updateTable('atproto_connections')
+          .set({
+            actor_id: input.actorId,
+            handle: input.handle,
+            pds_url: input.pdsUrl,
+            status: 'connected',
+            granted_scopes: scopes,
+            connected_at: now,
+            refreshed_at: now,
+            disconnected_at: null,
+            last_error_code: null,
+            updated_at: now,
+            deleted_at: null,
+          })
+          .where('id', '=', connectionId)
+          .execute()
+        await trx
+          .updateTable('atproto_oauth_sessions')
+          .set({revoked_at: now, updated_at: now})
+          .where('connection_id', '=', connectionId)
+          .where('revoked_at', 'is', null)
+          .execute()
+      } else {
+        await trx
+          .insertInto('atproto_connections')
+          .values({
+            id: connectionId,
+            actor_id: input.actorId,
+            did: input.did,
+            handle: input.handle,
+            pds_url: input.pdsUrl,
+            status: 'connected',
+            granted_scopes: scopes,
+            connected_at: now,
+            refreshed_at: now,
+            disconnected_at: null,
+            last_error_code: null,
+            created_at: now,
+            updated_at: now,
+            deleted_at: null,
+            version: 1,
+          })
+          .execute()
+      }
       const encrypted = encryptSessionMaterial(
         this.config,
         Buffer.from(JSON.stringify({did: input.did, placeholder: true})),
