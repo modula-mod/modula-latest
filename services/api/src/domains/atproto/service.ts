@@ -198,18 +198,37 @@ export class AtprotoService {
         this.config,
         Buffer.from(JSON.stringify({did: input.did, placeholder: true})),
       )
-      await trx
-        .insertInto('atproto_oauth_sessions')
-        .values({
-          id: randomUUID(),
-          connection_id: connectionId,
-          encrypted_session: encrypted.ciphertext,
-          encryption_key_version: encrypted.keyVersion,
-          created_at: now,
-          updated_at: now,
-          revoked_at: null,
-        })
-        .execute()
+      // connection_id is unique on atproto_oauth_sessions — upsert session material.
+      const existingSession = await trx
+        .selectFrom('atproto_oauth_sessions')
+        .select('id')
+        .where('connection_id', '=', connectionId)
+        .executeTakeFirst()
+      if (existingSession) {
+        await trx
+          .updateTable('atproto_oauth_sessions')
+          .set({
+            encrypted_session: encrypted.ciphertext,
+            encryption_key_version: encrypted.keyVersion,
+            updated_at: now,
+            revoked_at: null,
+          })
+          .where('id', '=', existingSession.id)
+          .execute()
+      } else {
+        await trx
+          .insertInto('atproto_oauth_sessions')
+          .values({
+            id: randomUUID(),
+            connection_id: connectionId,
+            encrypted_session: encrypted.ciphertext,
+            encryption_key_version: encrypted.keyVersion,
+            created_at: now,
+            updated_at: now,
+            revoked_at: null,
+          })
+          .execute()
+      }
       await trx
         .insertInto('atproto_publication_preferences')
         .values({
