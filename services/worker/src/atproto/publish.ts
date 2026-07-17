@@ -3,7 +3,7 @@ import {sql} from 'kysely'
 import type {WorkerConfig} from '../config.js'
 import type {ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
-import {isCapabilityEnabled, loadConnectedConnection, parseAtUri, requireScope, resolvePublisherClient} from './session.js'
+import {isCapabilityEnabled, isLexiconDisabled, loadConnectedConnection, parseAtUri, requireScope, resolvePublisherClient} from './session.js'
 import {validateOutgoingRecord} from './validate-record.js'
 
 export interface AtprotoPublishPayload {
@@ -70,6 +70,10 @@ export async function handleAtprotoPublish(db: ModulaWorkerDb, config: WorkerCon
 
   if (!(await isCapabilityEnabled(db, 'atproto.publish.enabled'))) {
     return // operational pause, not a failure — no publication row is created
+  }
+
+  if (await isLexiconDisabled(db, payload.collection)) {
+    throw new PermanentJobError('INVALID_LEXICON', `Lexicon disabled by operational control: ${payload.collection}`)
   }
 
   validateOutgoingRecord(payload.collection, payload.record)

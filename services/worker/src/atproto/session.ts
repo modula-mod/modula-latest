@@ -25,6 +25,17 @@ export async function isCapabilityEnabled(db: ModulaWorkerDb, key: string, defau
   return row.value !== false
 }
 
+/** True when an admin emergency control flag is actively set (paused/drained/disabled). */
+export async function isOperationalFlagSet(db: ModulaWorkerDb, key: string, defaultValue = false): Promise<boolean> {
+  const row = await db.selectFrom('operational_controls').select('value').where('key', '=', key).executeTakeFirst()
+  if (!row) return defaultValue
+  return row.value === true
+}
+
+export async function isLexiconDisabled(db: ModulaWorkerDb, collection: string): Promise<boolean> {
+  return isOperationalFlagSet(db, `atproto.lexicon.${collection}.disabled`, false)
+}
+
 export async function loadConnectedConnection(db: ModulaWorkerDb, connectionId: string): Promise<ResolvedConnection> {
   const row = await db
     .selectFrom('atproto_connections')

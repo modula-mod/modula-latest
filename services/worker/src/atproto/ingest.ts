@@ -2,6 +2,7 @@ import {ATPROTO_INGEST_COLLECTIONS} from '@modula/atproto-lexicons'
 import type {WorkerConfig} from '../config.js'
 import type {ModulaWorkerDb} from '../database.js'
 import {TransientJobError} from '../jobs/errors.js'
+import {isLexiconDisabled, isOperationalFlagSet} from './session.js'
 import {createSafeFetch} from './ssrf-guard.js'
 import {validateIngestedRecord} from './validate-record.js'
 
@@ -27,6 +28,8 @@ export async function ingestConnection(
   config: WorkerConfig,
   connectionId: string,
 ): Promise<{ingested: number}> {
+  if (await isOperationalFlagSet(db, 'atproto.ingest.paused', false)) return {ingested: 0}
+
   const connection = await db
     .selectFrom('atproto_connections')
     .selectAll()
@@ -39,6 +42,7 @@ export async function ingestConnection(
   let ingested = 0
 
   for (const collection of ATPROTO_INGEST_COLLECTIONS) {
+    if (await isLexiconDisabled(db, collection)) continue
     const source = checkpointSource(connectionId, collection)
     const checkpoint = await db.selectFrom('atproto_sync_checkpoints').selectAll().where('source', '=', source).executeTakeFirst()
     let cursor = checkpoint?.cursor || undefined
@@ -122,6 +126,10 @@ export async function ingestConnection(
 
 /** Iterates all connected actors and ingests each in turn; used by the periodic ingest loop. */
 export async function ingestAllConnections(db: ModulaWorkerDb, config: WorkerConfig): Promise<{ingested: number; connections: number}> {
+  if (await isOperationalFlagSet(db, 'atproto.ingest.paused', false)) {
+    return {ingested: 0, connections: 0}
+  }
+
   const connections = await db
     .selectFrom('atproto_connections')
     .select('id')

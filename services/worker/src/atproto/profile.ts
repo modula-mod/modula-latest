@@ -3,7 +3,7 @@ import {PROFILE_EXTENSION_NSID} from '@modula/atproto-lexicons'
 import type {WorkerConfig} from '../config.js'
 import type {ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
-import {isCapabilityEnabled, loadConnectedConnection, requireScope, resolvePublisherClient} from './session.js'
+import {isCapabilityEnabled, isLexiconDisabled, loadConnectedConnection, requireScope, resolvePublisherClient} from './session.js'
 import {validateOutgoingRecord} from './validate-record.js'
 
 const PROFILE_SELF_RKEY = 'self'
@@ -64,6 +64,9 @@ export async function handleAtprotoProfilePublish(
   const payload = parsePayload(rawPayload)
 
   if (!(await isCapabilityEnabled(db, 'atproto.publish.enabled'))) return
+  if (await isLexiconDisabled(db, PROFILE_EXTENSION_NSID)) {
+    throw new PermanentJobError('INVALID_LEXICON', `Lexicon disabled by operational control: ${PROFILE_EXTENSION_NSID}`)
+  }
 
   validateOutgoingRecord(PROFILE_EXTENSION_NSID, payload.record)
 

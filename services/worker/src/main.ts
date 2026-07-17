@@ -4,6 +4,8 @@ import {processOneJob} from './jobs/runner.js'
 import {createLogger} from './observability/logger.js'
 import {drainOutboxOnce} from './outbox/drain.js'
 import {reapExpiredLeases} from './jobs/claim.js'
+import {ingestAllConnections} from './atproto/ingest.js'
+import {isOperationalFlagSet} from './atproto/session.js'
 
 async function main() {
   const config = loadConfig()
@@ -22,6 +24,7 @@ async function main() {
 
   let lastReap = 0
   let lastDrain = 0
+  let lastIngest = 0
 
   while (!stopping) {
     const now = Date.now()
@@ -33,6 +36,23 @@ async function main() {
       await drainOutboxOnce(db, config.outboxBatchSize)
       lastDrain = now
     }
+    if (config.ingestEnabled && now - lastIngest >= config.ingestIntervalMs) {
+      try {
+        const result = await ingestAllConnections(db, config)
+        if (result.connections > 0 || result.ingested > 0) {
+          log.info(result, 'selective AT ingest pass')
+        }
+      } catch (error) {
+        log.error({error}, 'selective AT ingest failed')
+      }
+      lastIngest = now
+    }
+
+    if (await isOperationalFlagSet(db, 'jobs.queue.drained', false)) {
+      await new Promise(r => setTimeout(r, config.emptyPollBackoffMs))
+      continue
+    }
+
     const worked = await processOneJob(db, config)
     if (!worked) await new Promise(r => setTimeout(r, config.emptyPollBackoffMs))
     else await new Promise(r => setTimeout(r, config.pollIntervalMs))

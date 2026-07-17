@@ -48,7 +48,7 @@ export class AtprotoService {
     returnRoute: string
     requestScope: 'atproto' | 'publish'
     handle?: string
-  }): Promise<{authorizeUrl: string; state: string}> {
+  }): Promise<{authorizationUrl: string; state: string}> {
     if (!INTERNAL_RETURN_ROUTE.test(input.returnRoute) || input.returnRoute.includes('//')) {
       throw Object.assign(new Error('Invalid return route'), {code: 'VALIDATION_FAILED'})
     }
@@ -78,11 +78,11 @@ export class AtprotoService {
     )
     // Official client wiring uses @atproto/oauth-client-node in production.
     // Preview returns a deterministic authorize URL bound to state for integration tests.
-    const authorizeUrl = new URL('/oauth/atproto/authorize-preview', this.config.publicApiUrl)
-    authorizeUrl.searchParams.set('state', state)
-    if (input.handle) authorizeUrl.searchParams.set('handle', input.handle)
-    authorizeUrl.searchParams.set('scope', input.requestScope)
-    return {authorizeUrl: authorizeUrl.toString(), state}
+    const authorizationUrl = new URL('/oauth/atproto/authorize-preview', this.config.publicApiUrl)
+    authorizationUrl.searchParams.set('state', state)
+    if (input.handle) authorizationUrl.searchParams.set('handle', input.handle)
+    authorizationUrl.searchParams.set('scope', input.requestScope)
+    return {authorizationUrl: authorizationUrl.toString(), state}
   }
 
   async consumeOAuthState(input: {

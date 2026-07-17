@@ -1,7 +1,7 @@
 import type {WorkerConfig} from '../config.js'
 import type {ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
-import {isCapabilityEnabled, loadConnectedConnection, requireScope, resolvePublisherClient} from './session.js'
+import {isCapabilityEnabled, isLexiconDisabled, loadConnectedConnection, requireScope, resolvePublisherClient} from './session.js'
 import {validateOutgoingRecord} from './validate-record.js'
 
 export interface AtprotoUpdatePayload {
@@ -34,6 +34,9 @@ export async function handleAtprotoUpdate(db: ModulaWorkerDb, config: WorkerConf
   const payload = parsePayload(rawPayload)
 
   if (!(await isCapabilityEnabled(db, 'atproto.publish.enabled'))) return
+  if (await isLexiconDisabled(db, payload.collection)) {
+    throw new PermanentJobError('INVALID_LEXICON', `Lexicon disabled by operational control: ${payload.collection}`)
+  }
 
   validateOutgoingRecord(payload.collection, payload.record)
 
