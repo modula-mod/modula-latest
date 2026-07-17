@@ -107,7 +107,7 @@ export async function handleAtprotoPublish(db: ModulaWorkerDb, config: WorkerCon
     .onConflict(oc =>
       oc.columns(['connection_id', 'local_record_type', 'local_record_id', 'collection']).doUpdateSet({
         status: 'publishing',
-        attempt_count: sql`attempt_count + 1`,
+        attempt_count: sql`atproto_publications.attempt_count + 1`,
         updated_at: now,
       }),
     )
