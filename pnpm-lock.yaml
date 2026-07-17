@@ -160,6 +160,28 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/dimon-contracts:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+
+  packages/greenfield-contracts:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+
+  packages/greenfield-protocol:
+    dependencies:
+      '@modula/greenfield-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-contracts
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+
   packages/protocol-contracts:
     devDependencies:
       typescript:

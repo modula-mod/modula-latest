@@ -61,7 +61,7 @@
     "ios:device": "expo run:ios --device",
     "android": "expo run:android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts typecheck",
     "lint": "expo lint",
     "doctor": "expo-doctor",
     "verify:phase1": "node scripts/verify-phase1-shell.mjs",
