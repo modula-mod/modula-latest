@@ -149,7 +149,14 @@ for (const file of sourceFiles) {
     fail(`Raw theme data imported outside theme runtime: ${file}`)
   }
   if (/^\s*import\s+.*(?:bsky|bluesky|@atproto)/im.test(body)) {
-    fail(`Forbidden Bluesky/AT import: ${file}`)
+    // Phase 6: official Expo AT OAuth client only under features/atproto/oauth.
+    const phase6OfficialOauth =
+      file.startsWith('src/features/atproto/oauth/') &&
+      /^\s*import\s+.*@atproto\/oauth-client-expo/m.test(body) &&
+      !/bsky|bluesky|@atproto\/(?!oauth-client-expo)/i.test(body)
+    if (!phase6OfficialOauth) {
+      fail(`Forbidden Bluesky/AT import: ${file}`)
+    }
   }
 
   const restrictedProductFile =
