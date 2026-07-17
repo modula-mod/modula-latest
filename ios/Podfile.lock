@@ -180,6 +180,9 @@ PODS:
     - Yoga
   - ExpoAsset (57.0.5):
     - ExpoModulesCore
+  - ExpoAtprotoOAuthClient (0.1.8):
+    - ExpoModulesCore
+    - JOSESwift (~> 2.3)
   - ExpoBlur (57.0.2):
     - ExpoModulesCore
   - ExpoClipboard (57.0.1):
@@ -268,6 +271,7 @@ PODS:
   - hermes-engine (250829098.0.14):
     - hermes-engine/Pre-built (= 250829098.0.14)
   - hermes-engine/Pre-built (250829098.0.14)
+  - JOSESwift (2.4.0)
   - LiquidGlass (0.8.0):
     - hermes-engine
     - RCTRequired
@@ -1713,6 +1717,28 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-mmkv (3.3.3):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-safe-area-context (5.7.0):
     - hermes-engine
     - RCTRequired
@@ -2566,6 +2592,7 @@ DEPENDENCIES:
   - "expo-dev-menu (from `../node_modules/.pnpm/expo-dev-menu@57.0.6_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+m_01b4ee1a3cc7ae604c13788c780a0f42/node_modules/expo-dev-menu`)"
   - "expo-dev-menu-interface (from `../node_modules/.pnpm/expo-dev-menu-interface@57.0.0_expo@57.0.6/node_modules/expo-dev-menu-interface/ios`)"
   - "ExpoAsset (from `../node_modules/.pnpm/expo-asset@57.0.5_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metr_572eccc236e147ee733d24da97e5e32b/node_modules/expo-asset/ios`)"
+  - "ExpoAtprotoOAuthClient (from `../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@re_0ff4b3aa3824d8c83bb66d49d95af330/node_modules/@atproto/oauth-client-expo/ios`)"
   - "ExpoBlur (from `../node_modules/.pnpm/expo-blur@57.0.2_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro_15666bb0c25da8bd0023b11681b9e495/node_modules/expo-blur/ios`)"
   - "ExpoClipboard (from `../node_modules/.pnpm/expo-clipboard@57.0.1_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+_bdea17f1c25214e4fde489255d5d7b75/node_modules/expo-clipboard/ios`)"
   - "ExpoDevice (from `../node_modules/.pnpm/expo-device@57.0.1_expo@57.0.6/node_modules/expo-device/ios`)"
@@ -2634,6 +2661,7 @@ DEPENDENCIES:
   - "React-Mapbuffer (from `../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon`)"
   - "React-microtasksnativemodule (from `../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)"
   - "React-mutationobservernativemodule (from `../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)"
+  - "react-native-mmkv (from `../node_modules/.pnpm/react-native-mmkv@3.3.3_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-conf_26a2f1ea3712239c4ab23e528c5fea8a/node_modules/react-native-mmkv`)"
   - "react-native-safe-area-context (from `../node_modules/.pnpm/react-native-safe-area-context@5.7.0_react-native@0.86.0_@babel+core@7.29.7_@react-nati_805fbd7266c94788e68d7b0207503391/node_modules/react-native-safe-area-context`)"
   - "react-native-segmented-control (from `../node_modules/.pnpm/@react-native-segmented-control+segmented-control@2.5.7_react-native@0.86.0_@babel+core_04dcc635fc0e163c3c7939fba1ece3af/node_modules/@react-native-segmented-control/segmented-control`)"
   - "react-native-slider (from `../node_modules/.pnpm/@react-native-community+slider@5.2.0/node_modules/@react-native-community/slider`)"
@@ -2681,6 +2709,10 @@ DEPENDENCIES:
   - "RNWorklets (from `../node_modules/.pnpm/react-native-worklets@0.10.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babe_6cdd05f70d3d43edd71f555ce63fd544/node_modules/react-native-worklets`)"
   - "Yoga (from `../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon/yoga`)"
 
+SPEC REPOS:
+  trunk:
+    - JOSESwift
+
 EXTERNAL SOURCES:
   EXConstants:
     :path: "../node_modules/.pnpm/expo-constants@57.0.5_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+_93ef981dcab9cafd41414caf7b5600e8/node_modules/expo-constants/ios"
@@ -2700,6 +2732,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/.pnpm/expo-dev-menu-interface@57.0.0_expo@57.0.6/node_modules/expo-dev-menu-interface/ios"
   ExpoAsset:
     :path: "../node_modules/.pnpm/expo-asset@57.0.5_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metr_572eccc236e147ee733d24da97e5e32b/node_modules/expo-asset/ios"
+  ExpoAtprotoOAuthClient:
+    :path: "../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@re_0ff4b3aa3824d8c83bb66d49d95af330/node_modules/@atproto/oauth-client-expo/ios"
   ExpoBlur:
     :path: "../node_modules/.pnpm/expo-blur@57.0.2_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro_15666bb0c25da8bd0023b11681b9e495/node_modules/expo-blur/ios"
   ExpoClipboard:
@@ -2835,6 +2869,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   React-mutationobservernativemodule:
     :path: "../node_modules/.pnpm/react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-config@0.86.0_@babel+core@7._8ad687c1df5ef68f743dca0c886f8df1/node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver"
+  react-native-mmkv:
+    :path: "../node_modules/.pnpm/react-native-mmkv@3.3.3_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro-conf_26a2f1ea3712239c4ab23e528c5fea8a/node_modules/react-native-mmkv"
   react-native-safe-area-context:
     :path: "../node_modules/.pnpm/react-native-safe-area-context@5.7.0_react-native@0.86.0_@babel+core@7.29.7_@react-nati_805fbd7266c94788e68d7b0207503391/node_modules/react-native-safe-area-context"
   react-native-segmented-control:
@@ -2938,6 +2974,7 @@ SPEC CHECKSUMS:
   expo-dev-menu: f76b2f016892b2659c85ad84bc6ed573e809d381
   expo-dev-menu-interface: 7a59e803916fbfd1b96c75ff91ea8dddac7e722f
   ExpoAsset: 05797403b7ab18f56ea9ab1026ef8475f8457ed4
+  ExpoAtprotoOAuthClient: 20ad6d8c1ce87e1ede0335fff66b0dd0b500e9cf
   ExpoBlur: 69e67b4fbfed6f7325377af2aefa8aa4f00cd2af
   ExpoClipboard: 95055b11758f339b61d4d8064dd799df1cf03b7f
   ExpoDevice: 93a72d7c2bd656a4f0c0d580523e390e9ee7fba5
@@ -2967,6 +3004,7 @@ SPEC CHECKSUMS:
   EXUpdatesInterface: 492cdb30f3889cc35d9e737a4b5fc3aec39d1131
   FBLazyVector: b3e7ad108f0d882e30445c5527d774e3fd432f3d
   hermes-engine: c3578e1910b89a60cf923cf4b06f7d206d69ae48
+  JOSESwift: 7ff178bb9173ff42c6e990929a9f2fa702a34f69
   LiquidGlass: 9dd6be7ac113cae8b84f895d8a3eede578dbef98
   RCTDeprecation: 2a74a2c57675e64419bd89078efde81f7c1de90b
   RCTRequired: 30451112e6fef4e6f31b4e7eee0845156e35e4b0
@@ -3005,6 +3043,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: ce449ccdf3b80384415b925606be8a4bdcfc65d3
   React-microtasksnativemodule: 2eb3f49d0d8e77b5343455eccd057010b8d38b6b
   React-mutationobservernativemodule: f0a0d5ae9b51caf7becbeabf836d716cfedb6bf2
+  react-native-mmkv: ffda49ce01998ce9c48f87cb8413f67300abc206
   react-native-safe-area-context: 6b4966397ada0f7dd481e4486a2ef936834861a1
   react-native-segmented-control: bf6e0032726727498e18dd437ae88afcdbc18e99
   react-native-slider: 08ecfc4e9cc16cc388a56dd9caeca51b55cd9bb7

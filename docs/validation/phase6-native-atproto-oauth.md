@@ -69,7 +69,17 @@ curl -sS -X POST https://api.modula.digital/v1/auth/preview/session \
 
 | Surface | Status |
 |---|---|
-| Native Simulator OAuth | PENDING manual run |
-| Physical iPhone OAuth | PENDING manual run |
+| `pod install` (includes ExpoAtprotoOAuthClient) | PASS |
+| ExpoAtprotoOAuthClient Swift compile | PASS (observed in xcodebuild) |
+| Full Simulator app link (`expo run:ios`) | FAIL on this machine after DerivedData clean — RN/dev-launcher `Sealable` / packager symbols; not an AT UI regression |
+| Native Simulator OAuth end-to-end | PENDING after successful native install |
+| Physical iPhone OAuth | PENDING / not attempted (no device run) |
 | Cross-post public post | PENDING after OAuth |
 | Private-content restriction | Implemented in Composer eligibility |
+
+Retry native install with a normal (non-wiped) DerivedData tree:
+
+```bash
+cd ios && pod install && cd ..
+pnpm exec expo run:ios
+```
