@@ -1,6 +1,6 @@
 # Phase 6 — AT Protocol frontend integration handoff
 
-Backend commit: ff98a203e7a023b52f6bca4a666ef0265fcd0e71
+Backend commit: PLACEHOLDER
 API URL: https://api.modula.digital
 API version: v1
 Protocol version: 0.1
@@ -18,7 +18,7 @@ Connection endpoints:
 - GET `/v1/atproto/connections/:connectionId/status`
 
 Publication endpoints:
-- Worker-driven via post create/update/delete outbox (`atproto.publish|update|delete`)
+- Worker-driven via post create/update/delete outbox (`atproto.publish.create|update|delete`)
 - Preferences: GET/PATCH `/v1/atproto/preferences`
 
 Atmosphere endpoint:
@@ -36,8 +36,8 @@ PDS status: DEFERRED
 Tap status: PREPARED
 
 Known limitations:
-- Migration `003_phase6_api_rls_writes` grants `modula_api` write policies on FORCE RLS tables
-- Migration  grants  write policies on FORCE RLS tables (posts, profiles, post_saves, profile_links)
+- Migration `003_phase6_api_rls_writes` grants `modula_api` write policies on FORCE RLS tables (posts, profiles, post_saves, profile_links)
 - Live provider OAuth completion uses official `@atproto/oauth-client-node`; preview callback supports disposable `preview=1` completion for tests
 - Atmosphere feed is selective projection, not a network AppView
 - Private Modula data remains PostgreSQL-only
+- Search indexing is asynchronous via the worker (`search.index.post` / `search.index.profile`)
