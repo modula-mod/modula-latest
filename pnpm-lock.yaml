@@ -4,13 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@atproto/oauth-client-expo@0.1.8': 80467d3818f8354c0d25cf11cadafa53caf59d3743c5f9780e9b0c7d604575cd
+
 importers:
 
   .:
     dependencies:
       '@atproto/oauth-client-expo':
         specifier: 0.1.8
-        version: 0.1.8(expo@57.0.6)(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
+        version: 0.1.8(patch_hash=80467d3818f8354c0d25cf11cadafa53caf59d3743c5f9780e9b0c7d604575cd)(expo@57.0.6)(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
       '@callstack/liquid-glass':
         specifier: ^0.8.0
         version: 0.8.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
@@ -5376,7 +5379,7 @@ snapshots:
       '@atproto/oauth-types': 0.7.5
       core-js: 3.49.0
 
-  '@atproto/oauth-client-expo@0.1.8(expo@57.0.6)(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)':
+  '@atproto/oauth-client-expo@0.1.8(patch_hash=80467d3818f8354c0d25cf11cadafa53caf59d3743c5f9780e9b0c7d604575cd)(expo@57.0.6)(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@atproto-labs/simple-store': 0.4.4
       '@atproto/oauth-client': 0.7.11

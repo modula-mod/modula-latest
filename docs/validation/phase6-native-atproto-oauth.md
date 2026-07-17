@@ -67,19 +67,26 @@ curl -sS -X POST https://api.modula.digital/v1/auth/preview/session \
 
 ## Acceptance status
 
+Updated in PART 5 (2026-07-17). Full checklist: `docs/validation/phase6-part5-acceptance.md`.
+
 | Surface | Status |
 |---|---|
 | `pod install` (includes ExpoAtprotoOAuthClient) | PASS |
-| ExpoAtprotoOAuthClient Swift compile | PASS (observed in xcodebuild) |
-| Full Simulator app link (`expo run:ios`) | FAIL on this machine after DerivedData clean — RN/dev-launcher `Sealable` / packager symbols; not an AT UI regression |
-| Native Simulator OAuth end-to-end | PENDING after successful native install |
-| Physical iPhone OAuth | PENDING / not attempted (no device run) |
+| ExpoAtprotoOAuthClient Swift compile | PASS |
+| Full Simulator app link / `xcodebuild` Debug | PASS — ensure **Debug** React-Core prebuilt (Sealable/Packager present); Release core after wipe causes `expo-dev-launcher` undefined symbols |
+| Metro `@atproto/oauth-client-expo` | PASS with pnpm patch `patches/@atproto__oauth-client-expo@0.1.8.patch` (published `./expo-oauth-client.js` missing; use platformless import) |
+| Native Simulator AT connection UI | PASS — Settings → Connected Accounts → AT Protocol loads; Connect identity + public-data warning visible |
+| Native Simulator OAuth end-to-end | PENDING — browser OAuth not completed in PART 5 (no disposable AT interactive run) |
+| Physical iPhone OAuth | SKIP — no deployable iPhone attached (Nicola’s offline; Mac listed as “Andrei Milea”) |
 | Cross-post public post | PENDING after OAuth |
-| Private-content restriction | Implemented in Composer eligibility |
+| Private-content restriction | Implemented in Composer eligibility (`evaluateCrossPostEligibility`) |
 
-Retry native install with a normal (non-wiped) DerivedData tree:
+Force Debug React-Core after a bad wipe:
 
 ```bash
-cd ios && pod install && cd ..
+cd ios/Pods
+echo Release > React-Core-prebuilt/.last_build_configuration
+node ../node_modules/react-native/scripts/replace-rncore-version.js -c Debug -r 0.86.0 -p "$(pwd)"
+cd ../..
 pnpm exec expo run:ios
 ```
