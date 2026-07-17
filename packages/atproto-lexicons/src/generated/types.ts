@@ -39,16 +39,3 @@ export type PublicationRecord = {
     profileTab?: string
   }
 }
-
-export const EXPERIMENTAL_MODULA_COLLECTIONS = [
-  'digital.modula.temp.profileExtension',
-  'digital.modula.temp.moduleManifest',
-  'digital.modula.temp.publication',
-] as const
-
-export const ATPROTO_INGEST_COLLECTIONS = [
-  'app.bsky.actor.profile',
-  'app.bsky.feed.post',
-  'app.bsky.graph.follow',
-  ...EXPERIMENTAL_MODULA_COLLECTIONS,
-] as const

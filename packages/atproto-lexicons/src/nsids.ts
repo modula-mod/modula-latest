@@ -16,7 +16,12 @@ export function isModulaLexiconNsid(value: string): value is ModulaLexiconNsid {
  * whole network — only Modula's own experimental lexicons plus the single
  * standard Bluesky post collection needed for the read-only "atmosphere" view.
  */
-export const ATPROTO_INGEST_COLLECTIONS = [...MODULA_LEXICON_NSIDS, 'app.bsky.feed.post'] as const
+export const ATPROTO_INGEST_COLLECTIONS = [
+  'app.bsky.actor.profile',
+  'app.bsky.feed.post',
+  'app.bsky.graph.follow',
+  ...MODULA_LEXICON_NSIDS,
+] as const
 
 export type AtprotoIngestCollection = (typeof ATPROTO_INGEST_COLLECTIONS)[number]
 
