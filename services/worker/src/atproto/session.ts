@@ -1,7 +1,12 @@
 import type {ModulaWorkerDb} from '../database.js'
 import type {WorkerConfig} from '../config.js'
 import {PermanentJobError, TransientJobError} from '../jobs/errors.js'
-import {createAtpAgentPublisherClient, type PdsPublisherClient, type StoredPdsSession} from './pds-client.js'
+import {
+  createAtpAgentPublisherClient,
+  createPreviewStubPublisherClient,
+  type PdsPublisherClient,
+  type StoredPdsSession,
+} from './pds-client.js'
 import {decryptJsonSessionMaterial, OAuthSessionUnavailableError} from './session-crypto.js'
 import {assertSafePdsUrl} from './ssrf-guard.js'
 
@@ -105,6 +110,12 @@ export async function resolvePublisherClient(
       throw new PermanentJobError('INSUFFICIENT_OAUTH_SCOPE', error.message)
     }
     throw error
+  }
+
+  // Preview OAuth stores `{did, placeholder:true}` without JWTs. Use the stub
+  // publisher so preview stack smoke can complete without a live PDS/account.
+  if (session.placeholder === true && config.environment === 'preview') {
+    return createPreviewStubPublisherClient(session.did || connection.did)
   }
 
   await assertSafePdsUrl(connection.pdsUrl, {allowPrivateNetworks: config.ssrfAllowPrivateNetworks})

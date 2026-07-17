@@ -31,6 +31,8 @@ export type StoredPdsSession = {
   handle?: string
   accessJwt?: string
   refreshJwt?: string
+  /** Preview OAuth (preview=1) stores a placeholder session without real JWTs. */
+  placeholder?: boolean
 }
 
 export type PdsClientOptions = {
@@ -46,6 +48,34 @@ async function wrapPdsCall<T>(action: string, fn: () => Promise<T>): Promise<T> 
       throw new PermanentJobError('VALIDATION_FAILED', `PDS rejected ${action}: ${error?.message ?? status}`)
     }
     throw new TransientJobError('PDS_UNAVAILABLE', `PDS ${action} failed: ${error?.message ?? 'unknown error'}`)
+  }
+}
+
+/**
+ * Deterministic preview publisher for `preview=1` OAuth connections.
+ * Never talks to a real PDS — records fake at:// URIs so the publication
+ * pipeline can be exercised end-to-end on the preview stack.
+ */
+export function createPreviewStubPublisherClient(did: string): PdsPublisherClient {
+  let seq = 0
+  return {
+    async createRecord(collection, _record, rkey) {
+      seq += 1
+      const key = rkey ?? `preview${Date.now().toString(36)}${seq}`
+      return {
+        uri: `at://${did}/${collection}/${key}`,
+        cid: `bafypreview${key}`,
+      }
+    },
+    async putRecord(collection, rkey, _record) {
+      return {
+        uri: `at://${did}/${collection}/${rkey}`,
+        cid: `bafypreview${rkey}`,
+      }
+    },
+    async deleteRecord() {
+      // no-op
+    },
   }
 }
 

@@ -81,7 +81,16 @@ export class PostWriteService {
           eventType: 'atproto.publish.create',
           aggregateType: 'post',
           aggregateId: id,
-          payload: {postId: id, actorId, collection: 'app.bsky.feed.post'},
+          payload: {
+            actorId,
+            localRecordType: 'post',
+            localRecordId: id,
+            collection: 'app.bsky.feed.post',
+            record: {
+              text,
+              createdAt: now.toISOString(),
+            },
+          },
         })
       }
       await new AuditRepository(trx).append('post.created', {audience, feed}, {
@@ -123,12 +132,23 @@ export class PostWriteService {
       if (Number(updated.numUpdatedRows ?? 0) === 0) {
         throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
       }
-      await new OutboxRepository(this.db).enqueue(trx, {
-        eventType: 'atproto.publish.update',
-        aggregateType: 'post',
-        aggregateId: postId,
-        payload: {postId, actorId},
-      })
+      if (row.audience === 'public') {
+        await new OutboxRepository(this.db).enqueue(trx, {
+          eventType: 'atproto.publish.update',
+          aggregateType: 'post',
+          aggregateId: postId,
+          payload: {
+            actorId,
+            localRecordType: 'post',
+            localRecordId: postId,
+            collection: 'app.bsky.feed.post',
+            record: {
+              text,
+              createdAt: row.created_at.toISOString(),
+            },
+          },
+        })
+      }
       await new AuditRepository(trx).append(
         'post.updated',
         {expectedVersion: input.expectedVersion},
@@ -157,12 +177,19 @@ export class PostWriteService {
         .set({deleted_at: new Date(), updated_at: new Date(), version: row.version + 1})
         .where('id', '=', postId)
         .execute()
-      await new OutboxRepository(this.db).enqueue(trx, {
-        eventType: 'atproto.publish.delete',
-        aggregateType: 'post',
-        aggregateId: postId,
-        payload: {postId, actorId},
-      })
+      if (row.audience === 'public') {
+        await new OutboxRepository(this.db).enqueue(trx, {
+          eventType: 'atproto.publish.delete',
+          aggregateType: 'post',
+          aggregateId: postId,
+          payload: {
+            actorId,
+            localRecordType: 'post',
+            localRecordId: postId,
+            collection: 'app.bsky.feed.post',
+          },
+        })
+      }
       await new AuditRepository(trx).append('post.deleted', {}, {type: 'post', id: postId, actorId})
     })
   }

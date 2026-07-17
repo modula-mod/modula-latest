@@ -48,7 +48,9 @@ export async function handleAtprotoUpdate(db: ModulaWorkerDb, config: WorkerConf
     .where('collection', '=', payload.collection)
     .executeTakeFirst()
 
-  if (!existing || !existing.rkey) {
+  // Modula-only posts never create a publication row — treat as a successful no-op.
+  if (!existing) return
+  if (!existing.rkey) {
     throw new PermanentJobError(
       'VALIDATION_FAILED',
       `No existing AT publication to update for ${payload.localRecordType}:${payload.localRecordId}`,
