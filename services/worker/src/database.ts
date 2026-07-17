@@ -172,6 +172,7 @@ export interface Database {
     id: string
     author_actor_id: string
     text: string | null
+    search_vector: unknown
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
@@ -182,6 +183,7 @@ export interface Database {
     handle: string
     display_name: string
     bio: string
+    search_vector: unknown
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
