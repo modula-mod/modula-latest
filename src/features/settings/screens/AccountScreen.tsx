@@ -1,59 +1,127 @@
 import {View, StyleSheet} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
-import {AppScreen} from '@/components/primitives/AppScreen'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {useSession, useSessionActions} from '@/auth/runtime'
+import {
+  SettingsInfoBlock,
+  SettingsLinkRow,
+  SettingsSection,
+} from '@/features/settings/components/SettingsRows'
+import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function AccountScreen() {
   const session = useSession()
   const {signOut} = useSessionActions()
-  const {spacing} = useThemeTokens()
-  const profile = session.status === 'signedIn' ? session.profile : null
-  const account = session.status === 'signedIn' ? session.account : null
+  const router = useRouter()
+  const {colours, spacing} = useThemeTokens()
+  const signedIn = session.status === 'signedIn'
+  const account = signedIn ? session.account : null
+  const greenfield = signedIn ? session.greenfieldAccount : null
 
   return (
-    <AppScreen scroll>
-      <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
-        <AppText variant="display">Account</AppText>
-        <Surface variant="contained" style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
-          <Info label="Session" value={session.status} />
-          <Info label="Data source" value={runtimeEnvironment.dataSource} />
-          <Info label="Environment" value={runtimeEnvironment.appEnvironment} />
-          {profile ? <Info label="Profile" value={`${profile.displayName} · @${profile.handle}`} /> : null}
-          {account ? <Info label="Email" value={account.email} /> : null}
-          <Info label="Account type" value={account ? 'Modula Account' : 'Public browsing'} />
-          {session.status === 'signedIn' ? (
-            <AppButton variant="secondary" onPress={() => void signOut()}>
-              Sign out
-            </AppButton>
-          ) : null}
-        </Surface>
-      </View>
-    </AppScreen>
-  )
-}
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <SecondaryScreenHeader title="Account" />
+      <ResponsiveContent>
+        <View style={[styles.content, {gap: spacing[5], padding: spacing[4]}]}>
+          <SettingsInfoBlock
+            title="Modula Account"
+            body="Your account is owned by Greenfield. Changing your handle does not change your account ID, ownership, followers, repository, modules, or future DIMON linkage."
+          />
 
-function Info({label, value}: {label: string; value: string}) {
-  return (
-    <View style={styles.info}>
-      <AppText variant="caption" colour="textSecondary">{label}</AppText>
-      <AppText variant="bodyStrong">{value}</AppText>
+          {signedIn && account && greenfield ? (
+            <>
+              <SettingsSection title="Identity">
+                <SettingsLinkRow
+                  row={{
+                    title: 'Handle',
+                    description: `@${greenfield.primaryHandle}`,
+                    icon: 'account',
+                    route: '/settings/account/handle',
+                  }}
+                />
+                <SettingsLinkRow
+                  row={{
+                    title: 'Email',
+                    description: account.email,
+                    icon: 'info',
+                    route: '/settings/account/email',
+                  }}
+                />
+                <SettingsLinkRow
+                  last
+                  row={{
+                    title: 'Password',
+                    description: 'Change your Modula Account password.',
+                    icon: 'security',
+                    route: '/settings/account/password',
+                  }}
+                />
+              </SettingsSection>
+
+              <SettingsSection title="Security">
+                <SettingsLinkRow
+                  last
+                  row={{
+                    title: 'Active Sessions',
+                    description: 'Review and revoke Greenfield sessions.',
+                    icon: 'switch',
+                    route: '/settings/account/sessions',
+                  }}
+                />
+              </SettingsSection>
+
+              <SettingsSection title="Your Data">
+                <SettingsLinkRow
+                  last
+                  row={{
+                    title: 'Export Greenfield Repository',
+                    description: 'Integrity-aware export of your repository.',
+                    icon: 'storage',
+                    route: '/settings/account/export',
+                  }}
+                />
+              </SettingsSection>
+
+              <SettingsSection title="Danger zone">
+                <View style={{padding: spacing[4], gap: spacing[2]}}>
+                  <AppText variant="headline">Deactivate</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Deactivation is not available in this build. Contact support when the product
+                    ships account lifecycle controls.
+                  </AppText>
+                  <AppText variant="headline">Delete</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Account deletion is not available in this build. Exports remain the portable path.
+                  </AppText>
+                </View>
+              </SettingsSection>
+
+              <AppButton variant="secondary" onPress={() => void signOut()}>
+                Sign out
+              </AppButton>
+            </>
+          ) : (
+            <>
+              <AppText variant="body">Sign in to manage your Modula Account.</AppText>
+              <AppButton onPress={() => router.push('/sign-in' as Href)}>Sign in</AppButton>
+            </>
+          )}
+        </View>
+      </ResponsiveContent>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  info: {
-    gap: 2,
-  },
-  panel: {},
-  wrap: {
+  content: {
     maxWidth: 760,
     width: '100%',
     alignSelf: 'center',
+    paddingBottom: 40,
   },
+  screen: {flex: 1},
 })

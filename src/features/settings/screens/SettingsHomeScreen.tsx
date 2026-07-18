@@ -31,7 +31,7 @@ const accountRows: SettingsNavRow[] = [
   },
   {
     title: 'Account',
-    description: 'Modula Account session and profile.',
+    description: 'Modula Account, handle, sessions, and export.',
     icon: 'account',
     route: '/settings/account',
   },
@@ -40,6 +40,18 @@ const accountRows: SettingsNavRow[] = [
     description: 'External Networks and optional bridges.',
     icon: 'integrations',
     route: '/settings/connections',
+  },
+  {
+    title: 'Extension Centre',
+    description: 'Tools, functions, plugins, modules, and connectors.',
+    icon: 'modules',
+    route: '/settings/extensions',
+  },
+  {
+    title: 'DIMON',
+    description: 'Future economic protocol — not active yet.',
+    icon: 'security',
+    route: '/settings/dimon',
   },
   {
     title: 'Accounts',
