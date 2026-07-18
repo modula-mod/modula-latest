@@ -1,88 +1,93 @@
-import {useEffect, useState} from 'react'
+import type {ComponentType} from 'react'
 import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
-import {useEvent} from 'expo'
-import {useVideoPlayer, VideoView} from 'expo-video'
+import {LinearGradient} from 'expo-linear-gradient'
 
+import {AppText} from '@/components/primitives/AppText'
 import {DraggableVideoControls} from '@/platform/ui/video/draggable-video-controls'
+import {isExpoVideoNativeAvailable} from '@/platform/ui/native-modules/expo-native-availability'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ModulaReelPlayerProps = {
   sourceUri: string
   posterColour?: string
-  /** When false, pause — used by paging Reels lists. */
   active?: boolean
   style?: StyleProp<ViewStyle>
 }
 
+type InnerProps = {
+  sourceUri: string
+  active?: boolean
+  style?: StyleProp<ViewStyle>
+}
+
+function loadInner(): ComponentType<InnerProps> | null {
+  if (!isExpoVideoNativeAvailable()) return null
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('./modula-reel-player-inner.native') as {
+      ModulaReelPlayerInner: ComponentType<InnerProps>
+    }
+    return mod.ModulaReelPlayerInner
+  } catch {
+    return null
+  }
+}
+
 /**
  * Full-bleed reel video + draggable glass controls foundation.
- * Built on expo-video; control physics from Motionary draggable-video-control.
+ * Falls back safely when ExpoVideo is not linked in the current binary.
  */
 export function ModulaReelPlayer({
   sourceUri,
+  posterColour,
   active = true,
   style,
 }: ModulaReelPlayerProps) {
-  const player = useVideoPlayer(sourceUri, instance => {
-    instance.loop = true
-    instance.muted = false
-  })
-  const {isPlaying} = useEvent(player, 'playingChange', {
-    isPlaying: player.playing,
-  })
-  const [playing, setPlaying] = useState(false)
+  const Inner = loadInner()
+  if (Inner) {
+    return <Inner sourceUri={sourceUri} active={active} style={style} />
+  }
 
-  useEffect(() => {
-    setPlaying(isPlaying)
-  }, [isPlaying])
+  return <ModulaReelPlayerUnavailable posterColour={posterColour} style={style} />
+}
 
-  useEffect(() => {
-    if (active) {
-      player.play()
-    } else {
-      player.pause()
-    }
-  }, [active, player])
+function ModulaReelPlayerUnavailable({
+  posterColour,
+  style,
+}: {
+  posterColour?: string
+  style?: StyleProp<ViewStyle>
+}) {
+  const {colours} = useThemeTokens()
+  const fill = posterColour ?? colours.accent
 
   return (
-    <View style={[styles.root, style]}>
-      <VideoView
+    <View style={[styles.root, {backgroundColor: colours.surface1}, style]}>
+      <LinearGradient
+        colors={[colours.surface1, fill, colours.surface3]}
+        locations={[0, 0.45, 1]}
+        start={{x: 0.15, y: 0}}
+        end={{x: 0.9, y: 1}}
         style={StyleSheet.absoluteFill}
-        player={player}
-        contentFit="cover"
-        nativeControls={false}
-        allowsPictureInPicture={false}
       />
-      <View style={styles.controls} pointerEvents="box-none">
-        <DraggableVideoControls
-          playing={playing}
-          onTogglePlay={() => {
-            if (player.playing) {
-              player.pause()
-            } else {
-              player.play()
-            }
-          }}
-          onSkipBack={() => {
-            player.seekBy(-10)
-          }}
-          onSkipForward={() => {
-            player.seekBy(30)
-          }}
-        />
+      <View style={styles.center} pointerEvents="box-none">
+        <DraggableVideoControls playing={false} onTogglePlay={() => undefined} />
+        <AppText variant="caption" style={{color: colours.mediaOverlaySecondary}}>
+          Video needs a native rebuild with expo-video linked
+        </AppText>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  controls: {
+  center: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
+    gap: 12,
     justifyContent: 'center',
-    zIndex: 2,
   },
   root: {
-    backgroundColor: '#000',
     overflow: 'hidden',
   },
 })

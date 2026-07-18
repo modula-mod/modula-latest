@@ -1,4 +1,5 @@
 export type ModulaCameraPermissionStatus =
+  | 'unavailable'
   | 'loading'
   | 'granted'
   | 'denied'
@@ -17,7 +18,7 @@ export function useModulaCameraPermission(
   _autoRequest = false,
 ): UseModulaCameraPermissionResult {
   return {
-    status: 'blocked',
+    status: 'unavailable',
     isReady: false,
     isLoading: false,
     canRetry: false,

@@ -7,10 +7,22 @@
 export * from '@/platform/ui/buttons/button-role'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
-export * from '@/platform/ui/camera'
+// Camera / video adapters stay out of this startup barrel — they must not
+// pull expo-camera / expo-video into `_layout` before a native rebuild.
+// Import from `@/platform/ui/camera/*` or `@/platform/ui/video` at call sites.
+export {
+  captureMediaFromSource,
+  presentMediaSourceMenu,
+} from '@/platform/ui/camera'
+export type {
+  PresentMediaSourceMenuOptions,
+  MediaSourceMenuResult,
+  MediaCaptureOptions,
+  MediaCaptureResult,
+  MediaCaptureSource,
+  MediaCaptureTarget,
+} from '@/platform/ui/camera'
 export * from '@/platform/ui/keyboard'
-export * from '@/platform/ui/video'
-export {CameraMaskedBlurSurface} from '@/platform/ui/materials/camera-masked-blur'
 export * from '@/platform/ui/menus'
 export {AccountPanelProvider, useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
 export {AdaptiveAccountPanel} from '@/platform/ui/navigation/adaptive-account-panel'

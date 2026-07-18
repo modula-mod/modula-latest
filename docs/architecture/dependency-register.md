@@ -137,3 +137,5 @@ Patterns (not packages):
 - [expo-camera-masked-blur](https://github.com/mahdidavoodi7/expo-camera-masked-blur) — MIT Motionary drop; Modula reimplements via existing MaskedView adapter + `CameraMaskedBlurSurface` (does **not** add `@react-native-masked-view/masked-view`).
 
 Removal path: drop Advanced toggle + Reels `videoUri` playback, then remove `expo-camera` / `expo-video` and native rebuild.
+
+**Stale binary safety:** JS must not statically import `expo-camera` / `expo-video` from the `@/platform/ui` startup barrel. Availability is probed with `requireOptionalNativeModule('ExpoCamera'|'ExpoVideo')` in `src/platform/ui/native-modules/expo-native-availability.ts`. Without a rebuild, UI shows an honest “native rebuild required” fallback instead of crashing.

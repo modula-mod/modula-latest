@@ -7,8 +7,5 @@ export type {
   MediaCaptureSource,
   MediaCaptureTarget,
 } from '@/platform/ui/camera/types'
-export {
-  useModulaCameraPermission,
-  type ModulaCameraPermissionStatus,
-  type UseModulaCameraPermissionResult,
-} from '@/platform/ui/camera/useModulaCameraPermission'
+// Permission hook: import from `@/platform/ui/camera/useModulaCameraPermission`
+// (kept out of this barrel so media-capture imports stay free of expo-camera).

@@ -1,12 +1,12 @@
-import type {ReactElement, ReactNode} from 'react'
+import type {ComponentType, ReactElement, ReactNode} from 'react'
 import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import {BlurView} from 'expo-blur'
-import {CameraView} from 'expo-camera'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useModulaCameraPermission} from '@/platform/ui/camera/useModulaCameraPermission'
 import {MaskedView} from '@/platform/ui/materials/masked-view'
+import {isExpoCameraNativeAvailable} from '@/platform/ui/native-modules/expo-native-availability'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type CameraMaskedBlurSurfaceProps = {
@@ -17,9 +17,27 @@ export type CameraMaskedBlurSurfaceProps = {
   active?: boolean
 }
 
+type CameraViewProps = {
+  style?: StyleProp<ViewStyle>
+  facing?: 'front' | 'back'
+  mirror?: boolean
+}
+
+function loadCameraView(): ComponentType<CameraViewProps> | null {
+  if (!isExpoCameraNativeAvailable()) return null
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('expo-camera') as {CameraView: ComponentType<CameraViewProps>}
+    return mod.CameraView
+  } catch {
+    return null
+  }
+}
+
 /**
  * Live camera feed cut through UI glyphs (Motionary masked-blur technique).
  * Uses Modula MaskedView adapter — not a direct `@react-native-masked-view` dep.
+ * Never statically imports expo-camera (stale binaries must stay launchable).
  */
 export function CameraMaskedBlurSurface({
   maskElement,
@@ -29,7 +47,10 @@ export function CameraMaskedBlurSurface({
   active = true,
 }: CameraMaskedBlurSurfaceProps) {
   const {colours, spacing, radius, scheme} = useThemeTokens()
-  const {status, isReady, requestPermission} = useModulaCameraPermission(active)
+  const cameraLinked = isExpoCameraNativeAvailable()
+  const {status, isReady, requestPermission} = useModulaCameraPermission(
+    active && cameraLinked,
+  )
 
   if (!active) {
     return (
@@ -46,6 +67,31 @@ export function CameraMaskedBlurSurface({
         ]}>
         <AppText variant="caption" colour="textTertiary">
           Enable Camera masked blur to preview the living backdrop.
+        </AppText>
+        {children}
+      </View>
+    )
+  }
+
+  if (!cameraLinked || status === 'unavailable') {
+    return (
+      <View
+        style={[
+          styles.shell,
+          {
+            backgroundColor: colours.surface1,
+            borderColor: colours.border,
+            borderRadius: radius.large,
+            padding: spacing[4],
+            gap: spacing[3],
+          },
+          style,
+        ]}>
+        <AppText variant="label">Native rebuild required</AppText>
+        <AppText variant="caption" colour="textTertiary">
+          Camera masked blur needs a Modula binary with expo-camera linked. Run
+          pod install and expo run:ios — Expo Go / stale clients stay safe without
+          crashing.
         </AppText>
         {children}
       </View>
@@ -89,6 +135,28 @@ export function CameraMaskedBlurSurface({
             </AppText>
           </AppPressable>
         ) : null}
+        {children}
+      </View>
+    )
+  }
+
+  const CameraView = loadCameraView()
+  if (!CameraView) {
+    return (
+      <View
+        style={[
+          styles.shell,
+          {
+            backgroundColor: colours.surface1,
+            borderColor: colours.border,
+            borderRadius: radius.large,
+            padding: spacing[4],
+          },
+          style,
+        ]}>
+        <AppText variant="caption" colour="textTertiary">
+          Camera module could not be loaded in this binary.
+        </AppText>
         {children}
       </View>
     )
