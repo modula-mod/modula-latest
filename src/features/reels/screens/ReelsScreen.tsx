@@ -24,11 +24,14 @@ import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProf
 import {ReelAuthorPeekSheet} from '@/features/reels/components/ReelAuthorPeekSheet'
 import {useReelsQuery} from '@/features/reels/data'
 import {
-  openReelMoreMenu,
+  buildReelOverflowActions,
   runReelOverflowAction,
+  type ReelOverflowActionId,
 } from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
@@ -159,6 +162,16 @@ function ReelItem({
   const {colours, spacing} = useThemeTokens()
   const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfileId)
   const likeCount = reel.likeCount + (liked && !reel.liked ? 1 : 0)
+  const overflowActions = buildReelOverflowActions(reel)
+
+  const handleOverflow = (id: string) => {
+    const actionId = id as ReelOverflowActionId
+    void runReelOverflowAction(actionId, reel, ownerProfileId).then(() => {
+      if (actionId === 'notInterested') {
+        onHideReel(reel.id)
+      }
+    })
+  }
 
   const actions: {
     label: string
@@ -178,7 +191,7 @@ function ReelItem({
     {label: 'More options', icon: 'more', action: 'more'},
   ]
 
-  const runAction = (action: (typeof actions)[number]['action']) => {
+  const runAction = (action: Exclude<(typeof actions)[number]['action'], 'more'>) => {
     void selectionHaptic()
     switch (action) {
       case 'like':
@@ -207,42 +220,55 @@ function ReelItem({
           return next
         })
         return
-      case 'more':
-        void openReelMoreMenu(reel, ownerProfileId).then(selected => {
-          if (selected === 'notInterested') {
-            onHideReel(reel.id)
-          }
-        })
-        return
       default:
         return
     }
   }
 
+  const moreTrigger = (
+    <View style={styles.railHit}>
+      <LiquidGlassChrome interactive fallback="clear" style={styles.railGlass}>
+        <AppIcon name="more" colour={colours.mediaOverlayIcon} size={22} />
+      </LiquidGlassChrome>
+    </View>
+  )
+
   return (
     <View style={[styles.item, {height, width, backgroundColor: colours.surface1}]}>
-      {reel.videoUri ? (
-        <ModulaReelPlayer
-          sourceUri={reel.videoUri}
-          posterColour={reel.colour}
-          active={active}
-          style={StyleSheet.absoluteFill}
-        />
-      ) : (
-        <LinearGradient
-          colors={[colours.surface1, reel.colour, colours.surface3]}
-          locations={[0, 0.45, 1]}
-          start={{x: 0.15, y: 0}}
-          end={{x: 0.9, y: 1}}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
+      <View style={[styles.mediaHost, {width, height}]}>
+        <ModulaContextMenu
+          accessibilityLabel={`Reel options for @${reel.author.handle}`}
+          title="Reel options"
+          actions={overflowActions}
+          onAction={handleOverflow}>
+          <View style={{width, height}}>
+            {reel.videoUri ? (
+              <ModulaReelPlayer
+                sourceUri={reel.videoUri}
+                posterColour={reel.colour}
+                active={active}
+                style={StyleSheet.absoluteFill}
+              />
+            ) : (
+              <LinearGradient
+                colors={[colours.surface1, reel.colour, colours.surface3]}
+                locations={[0, 0.45, 1]}
+                start={{x: 0.15, y: 0}}
+                end={{x: 0.9, y: 1}}
+                style={StyleSheet.absoluteFill}
+              />
+            )}
+          </View>
+        </ModulaContextMenu>
+      </View>
+
       <View
         pointerEvents="none"
         style={[StyleSheet.absoluteFill, {backgroundColor: colours.mediaOverlayScrim}]}
       />
 
       <View
+        pointerEvents="box-none"
         style={[
           styles.bottomRow,
           {
@@ -251,7 +277,7 @@ function ReelItem({
             gap: spacing[3],
           },
         ]}>
-        <View style={[styles.caption, {gap: spacing[2]}]}>
+        <View pointerEvents="box-none" style={[styles.caption, {gap: spacing[2]}]}>
           <AppPressable
             accessibilityLabel={`Open ${reel.author.displayName} profile. Long press for preview.`}
             onPress={() => router.push(profileRoute)}
@@ -282,46 +308,64 @@ function ReelItem({
               </AppText>
             </View>
           </AppPressable>
-          <AppText variant="body" style={{color: colours.mediaOverlayText}}>
+          <AppText
+            pointerEvents="none"
+            variant="body"
+            style={{color: colours.mediaOverlayText}}>
             {reel.caption}
           </AppText>
-          <AppText variant="caption" style={{color: colours.mediaOverlaySecondary}}>
+          <AppText
+            pointerEvents="none"
+            variant="caption"
+            style={{color: colours.mediaOverlaySecondary}}>
             Preview · {reel.source}
             {reel.videoUri ? ' · video foundation' : ''}
           </AppText>
         </View>
 
-        <View style={[styles.rail, {gap: spacing[3]}]}>
+        <View pointerEvents="box-none" style={[styles.rail, {gap: spacing[3]}]}>
           {actions.map(action => (
             <View key={action.action} style={styles.railItem}>
-              <AppPressable
-                accessibilityLabel={action.label}
-                accessibilityState={{
-                  selected:
-                    action.action === 'like'
-                      ? liked
-                      : action.action === 'save'
-                        ? saved
-                        : undefined,
-                }}
-                onPress={() => runAction(action.action)}
-                style={styles.railHit}>
-                <LiquidGlassChrome
-                  interactive
-                  fallback="clear"
-                  style={styles.railGlass}>
-                  <AppIcon
-                    name={action.icon}
-                    colour={
-                      (action.action === 'like' && liked) ||
-                      (action.action === 'save' && saved)
-                        ? colours.accent
-                        : colours.mediaOverlayIcon
-                    }
-                    size={22}
-                  />
-                </LiquidGlassChrome>
-              </AppPressable>
+              {action.action === 'more' ? (
+                <ModulaMenu
+                  accessibilityLabel={action.label}
+                  title="Reel options"
+                  actions={overflowActions}
+                  onAction={handleOverflow}
+                  trigger={moreTrigger}
+                />
+              ) : (
+                <AppPressable
+                  accessibilityLabel={action.label}
+                  accessibilityState={{
+                    selected:
+                      action.action === 'like'
+                        ? liked
+                        : action.action === 'save'
+                          ? saved
+                          : undefined,
+                  }}
+                  onPress={() => {
+                    if (action.action !== 'more') runAction(action.action)
+                  }}
+                  style={styles.railHit}>
+                  <LiquidGlassChrome
+                    interactive
+                    fallback="clear"
+                    style={styles.railGlass}>
+                    <AppIcon
+                      name={action.icon}
+                      colour={
+                        (action.action === 'like' && liked) ||
+                        (action.action === 'save' && saved)
+                          ? colours.accent
+                          : colours.mediaOverlayIcon
+                      }
+                      size={22}
+                    />
+                  </LiquidGlassChrome>
+                </AppPressable>
+              )}
               {typeof action.count === 'number' ? (
                 <AppText
                   variant="caption"
@@ -363,6 +407,13 @@ const styles = StyleSheet.create({
   },
   item: {
     overflow: 'hidden',
+  },
+  mediaHost: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   rail: {
     alignItems: 'center',

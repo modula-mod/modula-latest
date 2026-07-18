@@ -3,6 +3,7 @@ import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
@@ -22,6 +23,12 @@ type ReelAuthorPeekSheetProps = {
   onDismiss: () => void
 }
 
+function formatCompact(value: number): string {
+  if (value >= 1000000) return `${(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}M`
+  if (value >= 1000) return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}K`
+  return String(value)
+}
+
 /**
  * Long-press peek of a reel creator — summary + follow / open / share.
  * Distinct from `/profile/preview` (owner visitor mode).
@@ -33,7 +40,7 @@ export function ReelAuthorPeekSheet({
   onDismiss,
 }: ReelAuthorPeekSheetProps) {
   const router = useRouter()
-  const {colours, spacing, radius} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const followMutation = useFollowProfileMutation()
   const [following, setFollowing] = useState(author?.isFollowing ?? false)
 
@@ -54,6 +61,10 @@ export function ReelAuthorPeekSheet({
   }
 
   const profileRoute = getProfileRouteForIdentity(author, ownerProfileId)
+  const metaBits = [
+    author.pronouns?.trim(),
+    author.location?.label?.trim(),
+  ].filter(Boolean)
 
   return (
     <ModulaSheet
@@ -62,31 +73,40 @@ export function ReelAuthorPeekSheet({
       snapPoints={['half']}
       material="glass"
       testID="reel-author-peek">
-      <View style={[styles.body, {gap: spacing[4], padding: spacing[4]}]}>
+      <View style={[styles.body, {gap: spacing[4]}]}>
         <View style={[styles.identity, {gap: spacing[3]}]}>
           <Avatar
             name={author.displayName}
             uri={author.avatarUri}
             colour={author.coverColour}
-            size={64}
+            size={72}
           />
-          <View style={styles.identityText}>
+          <View style={[styles.identityText, {gap: spacing[1]}]}>
             <AppText variant="title2" numberOfLines={1}>
               {author.displayName}
             </AppText>
             <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
               @{author.handle}
             </AppText>
+            {metaBits.length > 0 ? (
+              <AppText variant="caption" colour="textTertiary" numberOfLines={1}>
+                {metaBits.join(' · ')}
+              </AppText>
+            ) : null}
           </View>
         </View>
 
         {author.bio.trim() ? (
-          <AppText variant="body" colour="textSecondary" numberOfLines={3}>
+          <AppText
+            variant="body"
+            colour="textSecondary"
+            numberOfLines={3}
+            style={styles.bio}>
             {author.bio}
           </AppText>
         ) : null}
 
-        <View style={[styles.stats, {gap: spacing[4]}]}>
+        <View style={[styles.stats, {gap: spacing[5]}]}>
           <Stat label="Followers" value={author.followerCount} />
           <Stat label="Following" value={author.followingCount} />
           <Stat label="Posts" value={author.postCount} />
@@ -113,6 +133,7 @@ export function ReelAuthorPeekSheet({
             variant="secondary"
             accessibilityLabel="Open profile"
             onPress={() => {
+              void selectionHaptic()
               onDismiss()
               router.push(profileRoute as Href)
             }}>
@@ -126,40 +147,28 @@ export function ReelAuthorPeekSheet({
             {
               borderTopColor: colours.separator,
               paddingTop: spacing[3],
-              gap: spacing[3],
+              gap: spacing[4],
             },
           ]}>
           <AppPressable
             accessibilityLabel="Share profile"
             onPress={() => {
+              void selectionHaptic()
               void shareProfile(author)
             }}
-            style={[
-              styles.secondaryChip,
-              {
-                backgroundColor: colours.surfaceMuted,
-                borderRadius: radius.medium,
-                paddingHorizontal: spacing[3],
-                paddingVertical: spacing[2],
-              },
-            ]}>
+            style={[styles.secondaryAction, {gap: spacing[2]}]}>
+            <AppIcon name="share" colour={colours.text} size={18} />
             <AppText variant="label">Share</AppText>
           </AppPressable>
           <AppPressable
             accessibilityLabel="Report creator"
             onPress={() => {
+              void selectionHaptic()
               onDismiss()
               router.push('/report' as Href)
             }}
-            style={[
-              styles.secondaryChip,
-              {
-                backgroundColor: colours.surfaceMuted,
-                borderRadius: radius.medium,
-                paddingHorizontal: spacing[3],
-                paddingVertical: spacing[2],
-              },
-            ]}>
+            style={[styles.secondaryAction, {gap: spacing[2]}]}>
+            <AppIcon name="warning" colour={colours.textSecondary} size={18} />
             <AppText variant="label" colour="textSecondary">
               Report
             </AppText>
@@ -173,7 +182,7 @@ export function ReelAuthorPeekSheet({
 function Stat({label, value}: {label: string; value: number}) {
   return (
     <View style={styles.stat}>
-      <AppText variant="headline">{value}</AppText>
+      <AppText variant="headline">{formatCompact(value)}</AppText>
       <AppText variant="caption" colour="textTertiary">
         {label}
       </AppText>
@@ -184,6 +193,9 @@ function Stat({label, value}: {label: string; value: number}) {
 const styles = StyleSheet.create({
   actions: {
     width: '100%',
+  },
+  bio: {
+    lineHeight: 22,
   },
   body: {
     width: '100%',
@@ -197,10 +209,11 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  secondaryChip: {
+  secondaryAction: {
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
+    flexDirection: 'row',
+    minHeight: 44,
+    paddingVertical: 4,
   },
   secondaryRow: {
     borderTopWidth: StyleSheet.hairlineWidth,

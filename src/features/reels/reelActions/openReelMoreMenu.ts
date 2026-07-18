@@ -6,7 +6,10 @@ import {
 import {runReelOverflowAction} from '@/features/reels/reelActions/runReelAction'
 import {presentModulaActions} from '@/platform/ui/menus'
 
-/** Opens the native More menu for a reel. Returns the chosen action id. */
+/**
+ * Imperative ActionSheet overflow (Android / non-Menu hosts).
+ * Prefer ModulaMenu / ModulaContextMenu on the Reels surface.
+ */
 export async function openReelMoreMenu(
   reel: ReelItem,
   ownerProfileId = '',
