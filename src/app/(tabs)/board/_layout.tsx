@@ -10,7 +10,7 @@ export default function BoardStackLayout() {
     <Stack
       screenOptions={{
         ...nativeScreenHeaderOptions({title: 'Board'}),
-        headerStyle: {backgroundColor: colours.canvas},
+        headerStyle: {backgroundColor: 'transparent'},
         headerTintColor: colours.text,
         headerTitleStyle: {color: colours.text},
         contentStyle: {backgroundColor: colours.canvas},

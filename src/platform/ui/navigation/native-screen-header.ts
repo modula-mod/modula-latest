@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react'
+import {Platform} from 'react-native'
 
 export type NativeScreenHeaderConfig = {
   title: string
@@ -7,6 +8,7 @@ export type NativeScreenHeaderConfig = {
 
 /**
  * Shared Stack header defaults for top-level tab stacks.
+ * Transparent + system blur on iOS so chrome matches progressive-blur secondary headers.
  * Screens compose trailing/leading controls via Stack.Screen options.
  */
 export function nativeScreenHeaderOptions(config: NativeScreenHeaderConfig) {
@@ -15,6 +17,10 @@ export function nativeScreenHeaderOptions(config: NativeScreenHeaderConfig) {
     title: config.title,
     headerLargeTitle: config.headerLargeTitle ?? false,
     headerShadowVisible: false,
+    headerTransparent: true as const,
+    ...(Platform.OS === 'ios'
+      ? {headerBlurEffect: 'systemChromeMaterial' as const}
+      : {}),
   }
 }
 

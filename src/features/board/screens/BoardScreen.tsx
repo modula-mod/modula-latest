@@ -18,7 +18,7 @@ import {
 } from '@/features/product/storage/productPreferencesStorage'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
@@ -163,7 +163,7 @@ export function BoardScreen() {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <ModulaMenu
+        <ChromeOverflowMenu
           accessibilityLabel="Board layout menu"
           title="Board"
           actions={[
@@ -178,11 +178,10 @@ export function BoardScreen() {
             if (id === 'saved') router.push('/saved' as Href)
             if (id === 'compose') router.push('/compose' as Href)
           }}
-          trigger={<AppIcon name="more" colour={colours.textSecondary} />}
         />
       ),
     })
-  }, [colours.textSecondary, navigation, router])
+  }, [navigation, router])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>

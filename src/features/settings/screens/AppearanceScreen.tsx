@@ -16,6 +16,7 @@ import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {validateCustomAccent} from '@/theme/accents'
@@ -78,6 +79,7 @@ export function AppearanceScreen() {
   const {preferences, resolved, systemAccessibility} = useAppearance()
   const actions = useAppearanceActions()
   const {colours, spacing, radius} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [customModalVisible, setCustomModalVisible] = useState(false)
   const [familiesOpen, setFamiliesOpen] = useState(false)
   const [surfacesOpen, setSurfacesOpen] = useState(false)
@@ -95,7 +97,7 @@ export function AppearanceScreen() {
       <SecondaryScreenHeader title="Appearance" />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: spacing[8]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <AppText variant="caption" colour="textTertiary">

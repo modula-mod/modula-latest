@@ -40,9 +40,11 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -57,12 +59,13 @@ function ScreenShell({
   right?: React.ReactNode
 }) {
   const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={title} right={right} />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[4]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[4], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
@@ -189,7 +192,7 @@ export function MessagesInboxScreen() {
       <SecondaryScreenHeader
         title="Messages"
         right={
-          <ModulaMenu
+          <ChromeOverflowMenu
             accessibilityLabel="Filter messages"
             title="Filter"
             actions={[
@@ -198,7 +201,6 @@ export function MessagesInboxScreen() {
               {id: 'pinned', label: 'Pinned'},
             ]}
             onAction={id => setFilter(id as 'all' | 'unread' | 'pinned')}
-            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
           />
         }
       />
@@ -442,7 +444,7 @@ export function MessageThreadScreen() {
     <ScreenShell
       title={thread.name}
       right={
-        <ModulaMenu
+        <ChromeOverflowMenu
           accessibilityLabel="Thread actions"
           title="Thread actions"
           actions={[
@@ -463,7 +465,6 @@ export function MessageThreadScreen() {
               )
             }
           }}
-          trigger={<AppIcon name="more" colour={colours.textSecondary} />}
         />
       }>
       <AppText variant="headline">@{thread.handle}</AppText>

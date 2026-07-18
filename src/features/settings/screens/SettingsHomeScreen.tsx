@@ -11,6 +11,7 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useAppearance} from '@/theme/runtime/useAppearance'
@@ -195,6 +196,7 @@ const supportRows: SettingsNavRow[] = [
 export function SettingsHomeScreen() {
   const {preferences, resolved} = useAppearance()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const [advancedOpen, setAdvancedOpen] = useState(false)
 
@@ -220,7 +222,7 @@ export function SettingsHomeScreen() {
       <SecondaryScreenHeader title="Settings" />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           <AppText variant="caption" colour="textTertiary">
             Manage the local Modula shell. Every row opens a real screen or honest Preview.

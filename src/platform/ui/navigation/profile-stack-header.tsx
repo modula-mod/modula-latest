@@ -1,17 +1,16 @@
 import {useRouter, type Href} from 'expo-router'
-import {Pressable} from 'react-native'
+import {View} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ProfileHeaderRight() {
   const router = useRouter()
-  const {colours} = useThemeTokens()
 
   return (
-    <>
-      <Pressable
+    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+      <ChromeCircleButton
+        icon="share"
         accessibilityLabel="Share profile"
         onPress={() => {
           void presentModulaActions({
@@ -27,15 +26,9 @@ export function ProfileHeaderRight() {
             }
           })
         }}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="share" colour={colours.textSecondary} size={22} />
-      </Pressable>
-      <Pressable
+      />
+      <ChromeCircleButton
+        icon="more"
         accessibilityLabel="Open profile actions"
         onPress={() => {
           void presentModulaActions({
@@ -51,14 +44,7 @@ export function ProfileHeaderRight() {
             if (id === 'settings') router.push('/settings' as Href)
           })
         }}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="more" colour={colours.textSecondary} size={22} />
-      </Pressable>
-    </>
+      />
+    </View>
   )
 }

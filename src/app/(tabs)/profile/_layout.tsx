@@ -11,7 +11,7 @@ export default function ProfileStackLayout() {
     <Stack
       screenOptions={{
         ...nativeScreenHeaderOptions({title: 'Profile'}),
-        headerStyle: {backgroundColor: colours.canvas},
+        headerStyle: {backgroundColor: 'transparent'},
         headerTintColor: colours.text,
         headerTitleStyle: {color: colours.text},
         contentStyle: {backgroundColor: colours.canvas},

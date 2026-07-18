@@ -11,6 +11,10 @@ type ProgressiveBlurEdgesProps = {
   style?: StyleProp<ViewStyle>
   /** When false, only soft canvas gradients (no BlurView). */
   enabled?: boolean
+  /** Which edges to paint. Headers use `top` only. */
+  edges?: 'both' | 'top' | 'bottom'
+  /** Soft teal side wash (Presence stage). Off for chrome headers. */
+  sideAtmosphere?: boolean
 }
 
 /**
@@ -21,6 +25,8 @@ export function ProgressiveBlurEdges({
   edgeHeight = 56,
   style,
   enabled = true,
+  edges = 'both',
+  sideAtmosphere = true,
 }: ProgressiveBlurEdgesProps) {
   const {colours, scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
@@ -30,41 +36,48 @@ export function ProgressiveBlurEdges({
     scheme === 'dark'
       ? (['rgba(11,20,22,0.92)', 'rgba(11,20,22,0.45)', 'rgba(11,20,22,0)'] as const)
       : (['rgba(243,247,248,0.95)', 'rgba(243,247,248,0.5)', 'rgba(243,247,248,0)'] as const)
+  const showTop = edges === 'both' || edges === 'top'
+  const showBottom = edges === 'both' || edges === 'bottom'
 
   return (
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, style]}>
-      <View style={[styles.edge, styles.top, {height: edgeHeight}]}>
-        {useBlur ? (
-          <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
-        ) : null}
+      {showTop ? (
+        <View style={[styles.edge, styles.top, {height: edgeHeight}]}>
+          {useBlur ? (
+            <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
+          ) : null}
+          <LinearGradient
+            colors={[...fadeSolid]}
+            locations={[0, 0.45, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
+      ) : null}
+      {showBottom ? (
+        <View style={[styles.edge, styles.bottom, {height: edgeHeight}]}>
+          {useBlur ? (
+            <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
+          ) : null}
+          <LinearGradient
+            colors={[...fadeSolid].reverse() as [string, string, ...string[]]}
+            locations={[0, 0.45, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
+      ) : null}
+      {sideAtmosphere ? (
         <LinearGradient
-          colors={[...fadeSolid]}
-          locations={[0, 0.45, 1]}
-          style={StyleSheet.absoluteFill}
+          pointerEvents="none"
+          colors={
+            scheme === 'dark'
+              ? ['rgba(54,156,170,0.12)', 'transparent', 'rgba(54,156,170,0.08)']
+              : ['rgba(54,156,170,0.1)', 'transparent', 'rgba(54,156,170,0.08)']
+          }
+          start={{x: 0, y: 0.5}}
+          end={{x: 1, y: 0.5}}
+          style={[StyleSheet.absoluteFill, {opacity: 0.9}]}
         />
-      </View>
-      <View style={[styles.edge, styles.bottom, {height: edgeHeight}]}>
-        {useBlur ? (
-          <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
-        ) : null}
-        <LinearGradient
-          colors={[...fadeSolid].reverse() as [string, string, ...string[]]}
-          locations={[0, 0.45, 1]}
-          style={StyleSheet.absoluteFill}
-        />
-      </View>
-      {/* Soft side atmosphere so the rail feels staged */}
-      <LinearGradient
-        pointerEvents="none"
-        colors={
-          scheme === 'dark'
-            ? ['rgba(54,156,170,0.12)', 'transparent', 'rgba(54,156,170,0.08)']
-            : ['rgba(54,156,170,0.1)', 'transparent', 'rgba(54,156,170,0.08)']
-        }
-        start={{x: 0, y: 0.5}}
-        end={{x: 1, y: 0.5}}
-        style={[StyleSheet.absoluteFill, {opacity: 0.9}]}
-      />
+      ) : null}
       <View
         style={[
           StyleSheet.absoluteFill,

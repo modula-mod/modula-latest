@@ -14,7 +14,7 @@ export default function HomeStackLayout() {
     <Stack
       screenOptions={{
         ...nativeScreenHeaderOptions({title: 'Modula'}),
-        headerStyle: {backgroundColor: colours.canvas},
+        headerStyle: {backgroundColor: 'transparent'},
         headerTintColor: colours.text,
         headerTitleStyle: {color: colours.text},
         contentStyle: {backgroundColor: colours.canvas},

@@ -11,6 +11,7 @@ import '@/features/social/registerExpansionDestinations'
 import {AccountPanelProvider} from '@/platform/ui'
 import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 import {AppServicesProvider} from '@/runtime'
+import {PersistentShellTabBar} from '@/platform/ui/navigation/persistent-shell-tab-bar'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
@@ -59,6 +60,8 @@ function RootNavigator() {
           AdaptiveAccountPanel remains in codebase for sheet Preview / verify,
           but is not mounted — nothing called openAccountPanel after the drawer restore. */}
       <NavigationDrawer />
+      {/* Floating tab bar at root so secondary stacks keep bottom chrome. */}
+      <PersistentShellTabBar />
     </>
   )
 }

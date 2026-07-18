@@ -49,25 +49,22 @@ function getLiquidGlassTabBar(): LiquidGlassTabBarComponent | null {
  * Create is not a tab destination — compose stays toolbar / expand action.
  */
 export function PlatformTabs() {
-  const LiquidGlassTabBar = getLiquidGlassTabBar()
-
-  if (LiquidGlassTabBar) {
-    return <LiquidGlassPlatformTabs TabBar={LiquidGlassTabBar} />
+  // Probe native module so PersistentShellTabBar and this navigator agree.
+  if (getLiquidGlassTabBar()) {
+    return <LiquidGlassPlatformTabs />
   }
 
   return <NativeTabsFallback />
 }
 
-function LiquidGlassPlatformTabs({
-  TabBar,
-}: {
-  TabBar: LiquidGlassTabBarComponent
-}) {
+function LiquidGlassPlatformTabs() {
   const {colours} = useThemeTokens()
 
+  // Floating bar is owned by PersistentShellTabBar at the root so settings /
+  // product / marketplace keep the same chrome. Avoid a second in-tabs bar.
   return (
     <Tabs
-      tabBar={props => <TabBar {...props} />}
+      tabBar={() => null}
       screenOptions={{
         headerShown: false,
         sceneStyle: {backgroundColor: colours.canvas},

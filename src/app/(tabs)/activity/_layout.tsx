@@ -1,7 +1,6 @@
 import {Stack} from 'expo-router'
-import {Pressable} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {nativeScreenHeaderOptions} from '@/platform/ui/navigation/native-screen-header'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -13,12 +12,13 @@ export default function ActivityStackLayout() {
     <Stack
       screenOptions={{
         ...nativeScreenHeaderOptions({title: 'Activity'}),
-        headerStyle: {backgroundColor: colours.canvas},
+        headerStyle: {backgroundColor: 'transparent'},
         headerTintColor: colours.text,
         headerTitleStyle: {color: colours.text},
         contentStyle: {backgroundColor: colours.canvas},
         headerRight: () => (
-          <Pressable
+          <ChromeCircleButton
+            icon="more"
             accessibilityLabel="Filter activity"
             onPress={() => {
               void presentModulaActions({
@@ -33,14 +33,7 @@ export default function ActivityStackLayout() {
                 ],
               })
             }}
-            style={{
-              alignItems: 'center',
-              height: 44,
-              justifyContent: 'center',
-              width: 44,
-            }}>
-            <AppIcon name="more" colour={colours.textSecondary} size={22} />
-          </Pressable>
+          />
         ),
       }}>
       <Stack.Screen name="index" />

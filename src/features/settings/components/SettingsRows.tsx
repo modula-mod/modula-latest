@@ -6,9 +6,11 @@ import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -40,12 +42,16 @@ export function SettingsScreen({
   children: ReactNode
 }) {
   const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={title} right={right} />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: spacing[8]}]}
+          contentContainerStyle={[
+            styles.content,
+            {gap: spacing[5], paddingBottom: tabPadding},
+          ]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           {caption ? <SettingsCaption>{caption}</SettingsCaption> : null}
@@ -285,7 +291,7 @@ export function SettingsContextRow({
   )
 }
 
-/** Header overflow (⋯) for settings screens. */
+/** Header overflow (⋯) — Board-style circular chrome control. */
 export function SettingsOverflowMenu({
   title,
   actions,
@@ -295,14 +301,12 @@ export function SettingsOverflowMenu({
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
-  const {colours} = useThemeTokens()
   return (
-    <ModulaMenu
+    <ChromeOverflowMenu
       title={title}
       actions={actions}
       onAction={onAction}
       accessibilityLabel="More settings actions"
-      trigger={<AppIcon name="more" colour={colours.textSecondary} />}
     />
   )
 }

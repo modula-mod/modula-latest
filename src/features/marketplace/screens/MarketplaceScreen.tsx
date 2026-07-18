@@ -14,8 +14,9 @@ import {
   type MarketplaceCategory,
   type MarketplaceModule,
 } from '@/features/marketplace/data/catalog'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaCurvedSectionTabs} from '@/platform/ui/tabs'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -25,6 +26,7 @@ type SortMode = 'featured' | 'new' | 'name'
 export function MarketplaceScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<MarketplaceCategory | 'all'>('all')
   const [sort, setSort] = useState<SortMode>('featured')
@@ -54,7 +56,7 @@ export function MarketplaceScreen() {
       <SecondaryScreenHeader
         title="Marketplace"
         right={
-          <ModulaMenu
+          <ChromeOverflowMenu
             accessibilityLabel="Marketplace sort menu"
             title="Sort modules"
             actions={[
@@ -63,13 +65,12 @@ export function MarketplaceScreen() {
               {id: 'name', label: 'Name A–Z'},
             ]}
             onAction={id => setSort(id as SortMode)}
-            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
           />
         }
       />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Marketplace</AppText>

@@ -147,11 +147,11 @@ export function ModulaLiquidGlassTabBar({
     state.routes.some(route => route.name === tab.routeName),
   )
 
-  const selectedRouteName = state.routes[state.index]?.name
-  const selectedIndex = Math.max(
-    0,
-    visibleTabs.findIndex(tab => tab.routeName === selectedRouteName),
-  )
+  const selectedRouteName =
+    state.index >= 0 ? state.routes[state.index]?.name : undefined
+  const selectedIndex = selectedRouteName
+    ? visibleTabs.findIndex(tab => tab.routeName === selectedRouteName)
+    : -1
 
   const menuStyle = useAnimatedStyle(() => ({
     height: expanded

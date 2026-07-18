@@ -12,6 +12,8 @@ import {
   type ProductMaturity,
 } from '@/features/product/data/productCatalogue'
 import {FEATURE_ATLAS} from '@/features/product/data/featureAtlas'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -27,6 +29,7 @@ const LABELS: Record<ProductMaturity, string> = {
 export function ProductHubScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {colours, radius, spacing, scheme} = useThemeTokens()
   const wash =
     scheme === 'dark'
@@ -35,13 +38,33 @@ export function ProductHubScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Modula" />
+      <SecondaryScreenHeader
+        title="Modula"
+        right={
+          <ChromeOverflowMenu
+            accessibilityLabel="Product hub menu"
+            title="Modula"
+            actions={[
+              {id: 'atlas', label: 'Open Feature Atlas'},
+              {id: 'forge', label: 'Open Forge Builder'},
+              {id: 'settings', label: 'Settings'},
+              {id: 'about', label: 'About'},
+            ]}
+            onAction={id => {
+              if (id === 'atlas') router.push('/product/atlas' as Href)
+              if (id === 'forge') router.push('/product/forge' as Href)
+              if (id === 'settings') router.push('/settings' as Href)
+              if (id === 'about') router.push('/settings/about' as Href)
+            }}
+          />
+        }
+      />
       <ResponsiveContent maxWidth={760}>
         <ScrollView
           contentContainerStyle={{
             gap: spacing[5],
             padding: spacing[4],
-            paddingBottom: insets.bottom + spacing[8],
+            paddingBottom: Math.max(tabPadding, insets.bottom + spacing[8]),
           }}>
           <LinearGradient
             colors={wash as [string, string]}
