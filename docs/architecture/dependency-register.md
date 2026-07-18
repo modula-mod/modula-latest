@@ -148,6 +148,8 @@ Removal path: drop Advanced toggle + Reels `videoUri` playback, then remove `exp
 
 Pattern (not a package): [telegram-join-animation](https://github.com/mahdidavoodi7/telegram-join-animation) — MIT Motionary drop. Modula reimplements under `src/platform/ui/motion/modula-join-island*` (Skia file only `require()`’d after `TurboModuleRegistry.get('RNSkiaModule')`). Does **not** admit `react-native-skia-gesture` (unused upstream).
 
+**Metro / pnpm note:** Skia 2.6.x `"react-native": "src/index.ts"` fails under pnpm (`Unable to resolve ./renderer/Offscreen`). Modula applies `patches/@shopify__react-native-skia@2.6.2.patch` so that field points at `lib/module/index.js`, and `metro.config.js` also forces the compiled entry. Import `@shopify/react-native-skia` only — never `/lib/module` (not a public export).
+
 **Owner use case:** product-requested Presence join pop + Appearance Advanced motion Preview — not speculative Skia chrome.
 
 Removal path: drop `ModulaJoinIsland` call sites, then remove `@shopify/react-native-skia` and native rebuild.
