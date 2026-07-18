@@ -3,10 +3,10 @@ import {FlatList, StyleSheet, View} from 'react-native'
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability} from '@/auth/runtime'
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
-import {DemoPostItem} from '@/components/feed/DemoPostItem'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {AppText} from '@/components/primitives/AppText'
 import {useSavedPostsQuery} from '@/features/saved/data'
+import {SocialPost} from '@/features/social/components/social-post'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -42,7 +42,7 @@ export function SavedPostsScreen() {
             <FlatList
               data={posts}
               keyExtractor={item => item.id}
-              renderItem={({item}) => <DemoPostItem post={item} />}
+              renderItem={({item}) => <SocialPost post={item} />}
               onEndReached={() => {
                 if (savedQuery.hasNextPage && !savedQuery.isFetchingNextPage) {
                   void savedQuery.fetchNextPage()

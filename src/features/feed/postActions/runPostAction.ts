@@ -52,10 +52,7 @@ export async function runPostOverflowAction(
       return
     }
     case 'quote': {
-      Alert.alert(
-        'Quote (Preview)',
-        'Quote drafts will open in Composer in a later phase. Your selection is local-only for now.',
-      )
+      router.push(`/compose?quotePostId=${encodeURIComponent(post.id)}` as Href)
       return
     }
     case 'viewEngagement': {
