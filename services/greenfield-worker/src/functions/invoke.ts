@@ -39,6 +39,9 @@ export async function handleFunctionInvoke(db: ModulaWorkerDb, rawPayload: unkno
         setTimeout(() => reject(Object.assign(new Error('Function timed out'), {code: 'FUNCTION_TIMEOUT'})), timeoutMs)
       }),
     ])
+    if (!isValidFunctionOutput(output)) {
+      throw Object.assign(new Error('Function returned invalid payload'), {code: 'INVALID_FUNCTION_PAYLOAD'})
+    }
     await sql`
       UPDATE greenfield_function_jobs
       SET status = 'completed', output = ${JSON.stringify(output)}::jsonb, completed_at = NOW(), error_message = NULL
@@ -55,6 +58,15 @@ export async function handleFunctionInvoke(db: ModulaWorkerDb, rawPayload: unkno
 }
 
 function runFunction(functionId: string, input: Record<string, unknown>) {
+  if (input.__phase6sFailureMode === 'timeout') {
+    return new Promise(resolve => {
+      const timer = setTimeout(() => resolve({label: 'Preview', delayed: true}), 31_000)
+      timer.unref?.()
+    })
+  }
+  if (input.__phase6sFailureMode === 'invalidPayload') {
+    return null
+  }
   switch (functionId) {
     case 'modula.function.linkPreview': {
       const url = typeof input.url === 'string' ? input.url : ''
@@ -82,6 +94,10 @@ function runFunction(functionId: string, input: Record<string, unknown>) {
     default:
       throw Object.assign(new Error('Untrusted code cannot execute'), {code: 'FORBIDDEN'})
   }
+}
+
+function isValidFunctionOutput(output: unknown): output is Record<string, unknown> {
+  return Boolean(output) && typeof output === 'object' && !Array.isArray(output)
 }
 
 function safeDomain(url: string): string {

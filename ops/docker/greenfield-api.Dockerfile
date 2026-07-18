@@ -39,10 +39,10 @@ ENV NODE_ENV=production
 WORKDIR /app
 RUN groupadd --system modula && useradd --system --gid modula --create-home modula \
  && corepack enable && corepack prepare pnpm@11.11.0 --activate
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages ./packages
-COPY --from=build /app/services/greenfield-api ./services/greenfield-api
+COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
+COPY --from=build --chown=modula:modula /app/packages ./packages
+COPY --from=build --chown=modula:modula /app/services/greenfield-api ./services/greenfield-api
 USER modula
 EXPOSE 4020
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 CMD node -e "fetch('http://127.0.0.1:4020/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
@@ -62,8 +63,14 @@ export class CommentService {
     const row = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).executeTakeFirst()
     if (!row) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
     if (deletionKind === 'user' && row.author_actor_id !== actorId) throw Object.assign(new Error('Cannot delete comment'), {code: 'FORBIDDEN'})
+    if (row.deleted_at) return
+    const now = new Date()
     await this.db.transaction().execute(async trx => {
-      await trx.updateTable('greenfield_comments').set({text: row.reply_count ? 'Comment deleted' : '', deleted_at: new Date(), deletion_kind: deletionKind, updated_at: new Date(), version: row.version + 1}).where('comment_id', '=', commentId).execute()
+      await trx.updateTable('greenfield_comments').set({text: row.reply_count ? 'Comment deleted' : '', deleted_at: now, deletion_kind: deletionKind, updated_at: now, version: row.version + 1}).where('comment_id', '=', commentId).execute()
+      await trx.updateTable('posts').set({reply_count: sql<number>`greatest(reply_count - 1, 0)`, updated_at: now}).where('id', '=', row.post_id).execute()
+      if (row.parent_comment_id) {
+        await trx.updateTable('greenfield_comments').set({reply_count: sql<number>`greatest(reply_count - 1, 0)`, updated_at: now}).where('comment_id', '=', row.parent_comment_id).execute()
+      }
       await new AuditRepository(trx).append('comment.deleted', {deletionKind}, {type: 'comment', id: commentId, actorId})
     })
   }

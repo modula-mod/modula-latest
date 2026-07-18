@@ -11,6 +11,7 @@ export class MentionService {
   async storeMentions(actorId: string, sourceType: 'post' | 'comment', sourceId: string, text: string) {
     const handles = await this.extractMentions(text)
     if (handles.length > 25) throw Object.assign(new Error('Too many mentions'), {code: 'VALIDATION_FAILED'})
+    if (handles.length === 0) return []
     const recent = await this.db.selectFrom('greenfield_mentions').select('mention_id').where('source_type', '=', sourceType).where('source_id', '=', sourceId).execute()
     if (recent.length) return []
     const identities = await this.db.selectFrom('greenfield_handles').selectAll().where('handle', 'in', handles).where('status', '=', 'active').execute()

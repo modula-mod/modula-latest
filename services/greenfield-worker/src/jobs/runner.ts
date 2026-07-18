@@ -51,7 +51,7 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
       case 'plugin.disable':
       case 'plugin.configure':
       case 'plugin.uninstall':
-        await handlePluginLifecycle(db, job.job_type, job.payload)
+        await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))
         break
       case 'function.invoke':
         await handleFunctionInvoke(db, job.payload)
@@ -95,6 +95,11 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
     }
   }
   return true
+}
+
+function withBackgroundJobId(payload: unknown, backgroundJobId: string): unknown {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload
+  return {...payload, backgroundJobId}
 }
 
 function normalizeSearchPayload(jobType: string, payload: unknown): unknown {
