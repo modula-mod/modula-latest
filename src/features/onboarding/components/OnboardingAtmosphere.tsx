@@ -25,7 +25,14 @@ export function OnboardingAtmosphere({children}: PropsWithChildren) {
         end={{x: 0.9, y: 1}}
         style={StyleSheet.absoluteFill}
       />
-      <View style={[styles.content, {paddingTop: insets.top + 12, paddingBottom: insets.bottom + 16}]}>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingTop: insets.top + 20,
+            paddingBottom: insets.bottom + 20,
+          },
+        ]}>
         {children}
       </View>
     </View>

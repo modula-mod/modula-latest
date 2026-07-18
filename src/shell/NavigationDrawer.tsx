@@ -1,5 +1,14 @@
 import {useEffect, useMemo} from 'react'
-import {Animated, BackHandler, Modal, Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {
+  Animated,
+  BackHandler,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 import {usePathname, useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -9,107 +18,126 @@ import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
-import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {DrawerDestination} from '@/types/navigation'
+import type {DrawerDestination, DrawerSectionId} from '@/types/navigation'
 
+const SECTION_LABELS: Record<DrawerSectionId, string> = {
+  spaces: 'Spaces',
+  create: 'Create',
+  labs: 'Labs',
+  system: 'System',
+}
+
+const SECTION_ORDER: DrawerSectionId[] = ['spaces', 'create', 'labs', 'system']
+
+/**
+ * Primary navigation destinations — sectioned for Apple-like hierarchy.
+ * Labs stay secondary so the drawer does not read as a feature dump.
+ */
 const drawerDestinations: DrawerDestination[] = [
   {
     label: 'Board',
     route: '/board',
     icon: 'board',
-    description: 'Focus, modules, and recent activity',
+    description: 'Your private operating home',
+    section: 'spaces',
   },
   {
     label: 'Messages',
     route: '/messages',
     icon: 'messages',
-    description: 'Private conversation preview',
+    section: 'spaces',
   },
   {
     label: 'Saved',
     route: '/saved',
     icon: 'saved',
-    description: 'Posts, links, and module notes',
-  },
-  {
-    label: 'Communities',
-    route: '/communities',
-    icon: 'community',
-    description: 'Groups attached to your environment',
-  },
-  {
-    label: 'Teams',
-    route: '/teams',
-    icon: 'teams',
-    description: 'Workspaces and shared surfaces',
+    section: 'spaces',
   },
   {
     label: 'Modules',
     route: '/modules',
     icon: 'modules',
-    description: 'Installed capabilities and previews',
+    description: 'Installed capabilities',
+    section: 'spaces',
+  },
+  {
+    label: 'Communities',
+    route: '/communities',
+    icon: 'community',
+    section: 'spaces',
+  },
+  {
+    label: 'Teams',
+    route: '/teams',
+    icon: 'teams',
+    section: 'spaces',
   },
   {
     label: 'Marketplace',
     route: '/marketplace',
     icon: 'marketplace',
-    description: 'Discover new Modula capabilities',
-  },
-  {
-    label: 'Product Hub',
-    route: '/product',
-    icon: 'discover',
-    description: 'Everything Modula offers',
-  },
-  ...PRODUCT_LAB_LINKS.map(
-    (link): DrawerDestination => ({
-      label: link.label,
-      route: link.route,
-      icon: link.icon,
-      description: link.description,
-    }),
-  ),
-  {
-    label: 'Focus Mode',
-    route: '/product/focus',
-    icon: 'contrast',
-    description: 'Quiet the shell and prioritise work',
+    section: 'create',
   },
   {
     label: 'Forge',
     route: '/product/forge',
     icon: 'developer',
-    description: 'Module Builder pipeline preview',
-  },
-  {
-    label: 'Agents',
-    route: '/product/agents',
-    icon: 'automation',
-    description: 'Gaia agents module studio',
-  },
-  {
-    label: 'Permissions',
-    route: '/product/permissions',
-    icon: 'privacy',
-    description: 'Module permission matrix',
+    description: 'Build modules',
+    section: 'create',
   },
   {
     label: 'Search',
     route: '/product/search',
     icon: 'search',
-    description: 'Capabilities and modules',
+    section: 'create',
+  },
+  {
+    label: 'Product Hub',
+    route: '/product',
+    icon: 'discover',
+    section: 'labs',
+  },
+  {
+    label: 'Design Lab',
+    route: '/product/design-lab',
+    icon: 'appearance',
+    section: 'labs',
+  },
+  {
+    label: 'Feature Atlas',
+    route: '/product/atlas',
+    icon: 'discover',
+    section: 'labs',
+  },
+  {
+    label: 'Focus Mode',
+    route: '/product/focus',
+    icon: 'contrast',
+    section: 'labs',
+  },
+  {
+    label: 'Developer Tools',
+    route: '/product/developer',
+    icon: 'tools',
+    section: 'labs',
   },
   {
     label: 'Settings',
     route: '/settings',
     icon: 'settings',
-    description: 'Local shell preferences preview',
+    section: 'system',
   },
 ]
+
+function routeSelected(pathname: string, route: string): boolean {
+  if (pathname === route) return true
+  if (route !== '/' && pathname.startsWith(`${route}/`)) return true
+  return false
+}
 
 export function NavigationDrawer() {
   const router = useRouter()
@@ -121,7 +149,17 @@ export function NavigationDrawer() {
   const session = useSession()
   const {signOut} = useSessionActions()
   const ownerProfile = session.status === 'signedIn' ? session.profile : null
-  const drawerWidth = Math.min(360, Math.max(280, width * 0.84))
+  const drawerWidth = Math.min(348, Math.max(292, width * 0.82))
+
+  const sections = useMemo(
+    () =>
+      SECTION_ORDER.map(id => ({
+        id,
+        label: SECTION_LABELS[id],
+        items: drawerDestinations.filter(item => item.section === id),
+      })).filter(section => section.items.length > 0),
+    [],
+  )
 
   const animatedStyles = useMemo(
     () => ({
@@ -200,107 +238,146 @@ export function NavigationDrawer() {
             style={[
               styles.drawer,
               {
-              paddingTop: insets.top + spacing[3],
-              paddingBottom: Math.max(insets.bottom, spacing[4]),
-              paddingHorizontal: spacing[4],
-              borderRightColor: colours.border,
+                paddingTop: insets.top + spacing[4],
+                borderRightColor: colours.border,
               },
             ]}>
-          <View style={[styles.header, {gap: spacing[3]}]}>
-            <AppPressable
-              accessibilityLabel="Open profile"
-              onPress={() =>
-                closeDrawer({afterClose: () => router.push('/profile' as Href)})
-              }
-              style={styles.headerIdentity}>
-              <Avatar
-                name={ownerProfile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
-                uri={ownerProfile?.avatarUri}
-                colour={ownerProfile?.coverColour}
-                size={54}
-              />
-              <View style={styles.headerText}>
-                <AppText variant="headline">
-                  {ownerProfile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
-                </AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  {ownerProfile ? `@${ownerProfile.handle}` : session.status === 'guest' ? 'Browsing public Modula' : 'Local prototype account'}
-                </AppText>
-              </View>
-            </AppPressable>
-            <AppPressable
-              accessibilityLabel="Open profile"
-              onPress={() =>
-                closeDrawer({afterClose: () => router.push('/profile' as Href)})
-              }
+            <View
               style={[
-                styles.profileShortcut,
+                styles.headerPad,
                 {
-                  backgroundColor: colours.accentSubtle,
-                  borderRadius: radius.round,
-                  paddingHorizontal: spacing[3],
+                  paddingHorizontal: spacing[4],
+                  gap: spacing[3],
+                  paddingBottom: spacing[3],
                 },
               ]}>
-              <AppText variant="label" style={{color: colours.accent}}>
-                Profile
-              </AppText>
-            </AppPressable>
-          </View>
-
-          <View
-            style={[
-              styles.stats,
-              {
-                backgroundColor: colours.surfaceRaised,
-                borderColor: colours.border,
-                borderRadius: radius.medium,
-                marginTop: spacing[4],
-              },
-            ]}>
-            {[
-              ['Following', ownerProfile?.followingCount ?? 0],
-              ['Followers', ownerProfile?.followerCount ?? 0],
-              ['Modules', ownerProfile?.moduleCount ?? 0],
-            ].map(([label, value]) => (
-              <View key={label} style={styles.stat}>
-                <AppText variant="headline">{value}</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  {label}
-                </AppText>
-              </View>
-            ))}
-          </View>
-
-          <Divider style={{marginVertical: spacing[4]}} />
-          <View style={{gap: spacing[2]}}>
-            {drawerDestinations.map(item => (
-              <DrawerItem
-                key={item.route}
-                item={item}
-                onPress={() => navigate(item.route)}
-              />
-            ))}
-          </View>
-          <View style={styles.footer}>
-            <Divider style={{marginBottom: spacing[3]}} />
-            <AppText variant="caption" colour="textSecondary">
-              Appearance: {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
-            </AppText>
-            {session.status === 'signedIn' ? (
               <AppPressable
-                accessibilityLabel="Sign out"
-                onPress={() => {
-                  closeDrawer({afterClose: () => void signOut()})
-                }}>
-                <AppText variant="caption" colour="accent">
-                  Sign out
-                </AppText>
+                accessibilityLabel="Open profile"
+                onPress={() =>
+                  closeDrawer({afterClose: () => router.push('/profile' as Href)})
+                }
+                style={[styles.headerIdentity, {gap: spacing[3]}]}>
+                <Avatar
+                  name={
+                    ownerProfile?.displayName ??
+                    (session.status === 'guest' ? 'Guest' : 'Modula')
+                  }
+                  uri={ownerProfile?.avatarUri}
+                  colour={ownerProfile?.coverColour}
+                  size={52}
+                />
+                <View style={styles.headerText}>
+                  <AppText variant="headline">
+                    {ownerProfile?.displayName ??
+                      (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {ownerProfile
+                      ? `@${ownerProfile.handle}`
+                      : session.status === 'guest'
+                        ? 'Browsing Modula'
+                        : 'Local prototype account'}
+                  </AppText>
+                </View>
               </AppPressable>
-            ) : null}
-            <AppText variant="caption" colour="textSecondary">
-              Modula 0.1.0 {isDevelopmentBuild() ? 'Development build' : 'Local shell'}
-            </AppText>
-          </View>
+
+              {ownerProfile ? (
+                <View style={[styles.statsQuiet, {gap: spacing[4]}]}>
+                  <AppText variant="caption" colour="textSecondary">
+                    {ownerProfile.followingCount ?? 0} following
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {ownerProfile.followerCount ?? 0} followers
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {ownerProfile.moduleCount ?? 0} modules
+                  </AppText>
+                </View>
+              ) : null}
+
+              <AppPressable
+                accessibilityLabel="View profile"
+                onPress={() =>
+                  closeDrawer({afterClose: () => router.push('/profile' as Href)})
+                }
+                style={[
+                  styles.profilePill,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.round,
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[2],
+                  },
+                ]}>
+                <AppText variant="label">View Profile</AppText>
+              </AppPressable>
+            </View>
+
+            <Divider />
+
+            <ScrollView
+              style={styles.scroll}
+              contentContainerStyle={{
+                paddingHorizontal: spacing[3],
+                paddingTop: spacing[3],
+                paddingBottom: spacing[4],
+                gap: spacing[4],
+              }}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled">
+              {sections.map(section => (
+                <View key={section.id} style={{gap: spacing[1]}}>
+                  <AppText
+                    variant="caption"
+                    colour="textTertiary"
+                    style={{paddingHorizontal: spacing[2], marginBottom: spacing[1]}}>
+                    {section.label.toUpperCase()}
+                  </AppText>
+                  <View style={{gap: spacing[1]}}>
+                    {section.items.map(item => (
+                      <DrawerItem
+                        key={item.route}
+                        item={item}
+                        dense={section.id === 'system' || section.id === 'labs'}
+                        selected={routeSelected(pathname, item.route)}
+                        onPress={() => navigate(item.route)}
+                      />
+                    ))}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            <View
+              style={[
+                styles.footer,
+                {
+                  paddingHorizontal: spacing[4],
+                  paddingBottom: Math.max(insets.bottom, spacing[4]),
+                  paddingTop: spacing[3],
+                  borderTopColor: colours.border,
+                  gap: spacing[2],
+                },
+              ]}>
+              <AppText variant="caption" colour="textTertiary">
+                Appearance · {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
+              </AppText>
+              {session.status === 'signedIn' ? (
+                <AppPressable
+                  accessibilityLabel="Sign out"
+                  onPress={() => {
+                    closeDrawer({afterClose: () => void signOut()})
+                  }}>
+                  <AppText variant="label" colour="accent">
+                    Sign out
+                  </AppText>
+                </AppPressable>
+              ) : null}
+              <AppText variant="micro" colour="textTertiary">
+                Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
+              </AppText>
+            </View>
           </MaterialSurface>
         </Animated.View>
       </View>
@@ -317,36 +394,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   footer: {
-    marginTop: 'auto',
-  },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   headerIdentity: {
     alignItems: 'center',
-    flex: 1,
     flexDirection: 'row',
-    gap: 12,
-    minWidth: 0,
+  },
+  headerPad: {
+    width: '100%',
   },
   headerText: {
     flex: 1,
     minWidth: 0,
   },
-  profileShortcut: {
+  profilePill: {
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 36,
-  },
-  stat: {
-    alignItems: 'center',
-    flex: 1,
-    gap: 2,
-  },
-  stats: {
+    alignSelf: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  scroll: {
+    flex: 1,
+  },
+  statsQuiet: {
     flexDirection: 'row',
-    paddingVertical: 14,
+    flexWrap: 'wrap',
   },
 })

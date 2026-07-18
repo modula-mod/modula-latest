@@ -12,29 +12,30 @@ import {markOnboardingCompleted} from '@/features/onboarding/data/onboardingStor
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const HERO_COPY =
-  'Modula is a Profile-OS where modules add the tools you choose and governed intelligence stays scoped: GAIA executes, AKI verifies, and Governor sets limits. This build previews that model honestly; real automation remains visible and user-confirmed.'
-
+/**
+ * Three calm steps — Apple-like hierarchy:
+ * small progress · brand eyebrow · one title · one supporting line · one preview · primary CTA.
+ */
 const STEPS = [
   {
     id: 'world',
     brand: 'MODULA',
     title: 'Your digital world, built around you.',
-    body: HERO_COPY,
+    body: 'Social activity, profiles, and tools live in one environment you control — not a pile of disconnected apps.',
     preview: 'social' as const,
   },
   {
     id: 'profile',
     brand: 'PROFILE-OS',
     title: 'Your profile becomes your platform.',
-    body: 'Public identity, private Board, tabs, widgets, and modules — you decide what the world sees.',
+    body: 'Public identity on the outside. Board, tabs, and modules on the inside. You decide what others see.',
     preview: 'profile' as const,
   },
   {
     id: 'modules',
     brand: 'MODULES',
     title: 'Install capabilities. Keep the shell light.',
-    body: 'CRM, Notes, Tasks, agents, automations, and more arrive as packages — not a bloated monolith. Forge will let you build them.',
+    body: 'Notes, Tasks, CRM, and more arrive as packages. The host stays calm; Forge helps the ecosystem grow.',
     preview: 'modules' as const,
   },
 ] as const
@@ -55,101 +56,125 @@ export function OnboardingScreen() {
   return (
     <OnboardingAtmosphere>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
-        <View style={styles.column}>
-          <View style={styles.topRow}>
-            <AppText variant="caption" colour="textSecondary">
-              {index + 1} / {STEPS.length}
+        contentContainerStyle={[styles.scrollContent, {gap: spacing[5]}]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        <View style={styles.topRow}>
+          <View style={[styles.progressTrack, {backgroundColor: colours.border, gap: 4}]}>
+            {STEPS.map((item, i) => (
+              <View
+                key={item.id}
+                style={[
+                  styles.progressSeg,
+                  {
+                    backgroundColor: i <= index ? colours.accent : colours.surfaceRaised,
+                    opacity: i <= index ? 1 : 0.5,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+          <AppButton
+            variant="ghost"
+            onPress={() => finish('/welcome' as Href)}
+            accessibilityLabel="Skip onboarding">
+            Skip
+          </AppButton>
+        </View>
+
+        <Animated.View
+          key={step.id}
+          entering={reduceMotion ? undefined : FadeIn.duration(260)}
+          exiting={reduceMotion ? undefined : FadeOut.duration(140)}
+          style={[styles.stage, {gap: spacing[5]}]}>
+          <View style={{gap: spacing[3]}}>
+            <AppText variant="caption" colour="accent">
+              {step.brand}
             </AppText>
-            <AppButton
-              variant="ghost"
-              onPress={() => finish('/welcome' as Href)}
-              accessibilityLabel="Skip onboarding">
-              Skip
-            </AppButton>
+            <AppText variant="display">{step.title}</AppText>
+            <AppText variant="body" colour="textSecondary">
+              {step.body}
+            </AppText>
           </View>
 
-          <Animated.View
-            key={step.id}
-            entering={reduceMotion ? undefined : FadeIn.duration(280)}
-            exiting={reduceMotion ? undefined : FadeOut.duration(160)}
-            style={[styles.stage, {gap: spacing[5]}]}>
-            <View style={{gap: spacing[2]}}>
-              <AppText variant="caption" colour="accent">
-                {step.brand}
-              </AppText>
-              <AppText variant="display">{step.title}</AppText>
-              <AppText variant="body" colour="textSecondary">
-                {step.body}
-              </AppText>
-            </View>
-
-            <Surface
-              variant="contained"
-              style={[
-                styles.preview,
-                {
-                  borderRadius: radius.large,
-                  padding: spacing[4],
-                  gap: spacing[4],
-                  backgroundColor: colours.surface,
-                  borderColor: colours.border,
-                },
-              ]}>
-              {step.preview === 'social' ? (
-                <View style={{gap: spacing[3]}}>
-                  <AppText variant="headline">Following · For You · Modules</AppText>
-                  <View
-                    style={[
-                      styles.fakePost,
-                      {
-                        backgroundColor: colours.surfaceRaised,
-                        borderRadius: radius.medium,
-                        padding: spacing[3],
-                        gap: spacing[2],
-                      },
-                    ]}>
-                    <AppText variant="label">Media glows. Text breathes.</AppText>
-                    <AppText variant="caption" colour="textSecondary">
-                      Social activity connects to profiles, modules, and tools — not a dead-end feed.
-                    </AppText>
-                  </View>
-                </View>
-              ) : null}
-              {step.preview === 'profile' ? (
-                <View style={{gap: spacing[3]}}>
-                  <AppText variant="headline">Owner environment</AppText>
+          <Surface
+            variant="contained"
+            style={[
+              styles.preview,
+              {
+                borderRadius: radius.large,
+                padding: spacing[5],
+                gap: spacing[4],
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            {step.preview === 'social' ? (
+              <View style={{gap: spacing[3]}}>
+                <AppText variant="caption" colour="textTertiary">
+                  HOME
+                </AppText>
+                <AppText variant="headline">Following · For You · Modules</AppText>
+                <View
+                  style={[
+                    styles.fakePost,
+                    {
+                      backgroundColor: colours.surfaceRaised,
+                      borderRadius: radius.medium,
+                      padding: spacing[4],
+                      gap: spacing[2],
+                      borderColor: colours.border,
+                    },
+                  ]}>
+                  <AppText variant="label">Media glows. Text breathes.</AppText>
                   <AppText variant="caption" colour="textSecondary">
-                    Tabs · Widgets · Portfolio · Services · Privacy
+                    The feed stays content-first — chrome stays quiet.
                   </AppText>
-                  <View style={[styles.tabRow, {gap: spacing[2]}]}>
-                    {['Posts', 'Modules', 'Links', 'About'].map(tab => (
-                      <View
-                        key={tab}
-                        style={[
-                          styles.tabChip,
-                          {
-                            backgroundColor:
-                              tab === 'Modules' ? colours.accentSubtle : colours.surfaceRaised,
-                            borderRadius: radius.round,
-                            paddingHorizontal: spacing[3],
-                            paddingVertical: spacing[2],
-                          },
-                        ]}>
-                        <AppText
-                          variant="caption"
-                          colour={tab === 'Modules' ? 'accent' : 'textSecondary'}>
-                          {tab}
-                        </AppText>
-                      </View>
-                    ))}
-                  </View>
                 </View>
-              ) : null}
-              {step.preview === 'modules' ? (
+              </View>
+            ) : null}
+            {step.preview === 'profile' ? (
+              <View style={{gap: spacing[3]}}>
+                <AppText variant="caption" colour="textTertiary">
+                  PROFILE
+                </AppText>
+                <AppText variant="headline">Owner environment</AppText>
+                <AppText variant="body" colour="textSecondary">
+                  Tabs, widgets, and privacy audiences share one identity system.
+                </AppText>
+                <View style={[styles.tabRow, {gap: spacing[2]}]}>
+                  {['Posts', 'Modules', 'Links', 'About'].map(tab => (
+                    <View
+                      key={tab}
+                      style={[
+                        styles.tabChip,
+                        {
+                          backgroundColor:
+                            tab === 'Modules' ? colours.accentSubtle : colours.surfaceRaised,
+                          borderColor: tab === 'Modules' ? colours.accentBorder : colours.border,
+                          borderRadius: radius.round,
+                          paddingHorizontal: spacing[3],
+                          paddingVertical: spacing[2],
+                        },
+                      ]}>
+                      <AppText
+                        variant="caption"
+                        colour={tab === 'Modules' ? 'accent' : 'textSecondary'}>
+                        {tab}
+                      </AppText>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : null}
+            {step.preview === 'modules' ? (
+              <View style={{gap: spacing[3]}}>
+                <AppText variant="caption" colour="textTertiary">
+                  CAPABILITIES
+                </AppText>
+                <AppText variant="headline">Add what you need</AppText>
                 <PresenceArc
-                  centreLabel="Add module"
+                  centreLabel="Add"
                   items={[
                     {id: 'notes', label: 'Notes', icon: 'saved', unread: true},
                     {id: 'tasks', label: 'Tasks', icon: 'check'},
@@ -158,61 +183,37 @@ export function OnboardingScreen() {
                     {id: 'forge', label: 'Forge', icon: 'developer'},
                   ]}
                 />
-              ) : null}
-            </Surface>
-          </Animated.View>
+              </View>
+            ) : null}
+          </Surface>
+        </Animated.View>
 
-          <View style={[styles.dots, {gap: spacing[2]}]}>
-            {STEPS.map((item, i) => (
-              <View
-                key={item.id}
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: i === index ? colours.accent : colours.border,
-                    width: i === index ? 18 : 8,
-                  },
-                ]}
-              />
-            ))}
-          </View>
-
-          <View style={{gap: spacing[3]}}>
-            <AppButton
-              onPress={() => {
-                if (isLast) {
-                  void finish('/register' as Href)
-                  return
-                }
-                setIndex(current => current + 1)
-              }}
-              accessibilityLabel={isLast ? 'Create Modula account' : 'Continue onboarding'}>
-              {isLast ? 'Create Modula Account' : 'Continue'}
+        <View style={[styles.actions, {gap: spacing[3]}]}>
+          <AppButton
+            onPress={() => {
+              if (isLast) {
+                void finish('/register' as Href)
+                return
+              }
+              setIndex(current => current + 1)
+            }}
+            accessibilityLabel={isLast ? 'Create Modula account' : 'Continue onboarding'}>
+            {isLast ? 'Create account' : 'Continue'}
+          </AppButton>
+          {isLast ? (
+            <AppButton variant="secondary" onPress={() => finish('/sign-in' as Href)}>
+              I already have an account
             </AppButton>
-            {isLast ? (
-              <>
-                <AppButton variant="secondary" onPress={() => finish('/sign-in' as Href)}>
-                  I already have an account
-                </AppButton>
-                <AppButton
-                  variant="ghost"
-                  accessibilityLabel="Open Product Hub"
-                  onPress={() => finish('/product' as Href)}>
-                  Open Product Hub
-                </AppButton>
-                <AppButton
-                  variant="ghost"
-                  accessibilityLabel="Open Design Lab"
-                  onPress={() => finish('/settings/appearance-lab' as Href)}>
-                  Visit Design Lab
-                </AppButton>
-              </>
-            ) : (
-              <AppButton variant="ghost" onPress={() => finish('/welcome' as Href)}>
-                Back to welcome
-              </AppButton>
-            )}
-          </View>
+          ) : (
+            <AppButton variant="ghost" onPress={() => finish('/welcome' as Href)}>
+              Back
+            </AppButton>
+          )}
+          {isLast ? (
+            <AppButton variant="ghost" onPress={() => finish('/' as Href)}>
+              Explore the app
+            </AppButton>
+          ) : null}
         </View>
       </ScrollView>
     </OnboardingAtmosphere>
@@ -220,43 +221,49 @@ export function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  column: {
+  actions: {
+    marginTop: 'auto',
+    width: '100%',
+  },
+  fakePost: {
+    borderWidth: StyleSheet.hairlineWidth,
+    width: '100%',
+  },
+  preview: {
+    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 200,
+    width: '100%',
+  },
+  progressSeg: {
+    borderRadius: 999,
     flex: 1,
-    justifyContent: 'space-between',
+    height: 4,
+  },
+  progressTrack: {
+    borderRadius: 999,
+    flex: 1,
+    flexDirection: 'row',
+    height: 4,
+    overflow: 'hidden',
   },
   scrollContent: {
     flexGrow: 1,
-  },
-  topRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   stage: {
     flexGrow: 1,
     justifyContent: 'center',
   },
-  preview: {
+  tabChip: {
     borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 220,
-    width: '100%',
-  },
-  fakePost: {
-    width: '100%',
   },
   tabRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  tabChip: {},
-  dots: {
+  topRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 12,
-  },
-  dot: {
-    borderRadius: 999,
-    height: 8,
+    gap: 12,
+    justifyContent: 'space-between',
   },
 })

@@ -8,38 +8,69 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type DrawerItemModel = {
   label: string
   icon: AppIconName
-  /** Optional; omit for dense account-panel rows. */
+  /** Optional; omit for dense account-panel / Settings-style rows. */
   description?: string
 }
 
 type DrawerItemProps = {
   item: DrawerItemModel
   onPress: () => void
+  /** Apple-like selected row when the destination matches the current route. */
+  selected?: boolean
+  /** Dense = label only, quieter chrome (Settings list feel). */
+  dense?: boolean
 }
 
-export function DrawerItem({item, onPress}: DrawerItemProps) {
-  const {colours, spacing} = useThemeTokens()
+export function DrawerItem({item, onPress, selected = false, dense = false}: DrawerItemProps) {
+  const {colours, spacing, radius} = useThemeTokens()
+  const showDescription = !dense && Boolean(item.description)
+
   return (
     <AppPressable
       accessibilityLabel={item.label}
+      accessibilityState={{selected}}
       onPress={onPress}
-      style={[styles.row, {gap: spacing[3]}]}>
+      style={[
+        styles.row,
+        {
+          gap: spacing[3],
+          minHeight: dense ? 44 : showDescription ? 56 : 48,
+          paddingVertical: dense ? spacing[2] : spacing[2],
+          paddingHorizontal: spacing[2],
+          borderRadius: radius.medium,
+          backgroundColor: selected ? colours.accentSubtle : 'transparent',
+        },
+      ]}>
       <View
         style={[
           styles.icon,
-          {backgroundColor: colours.surfaceMuted, borderColor: colours.border},
+          {
+            backgroundColor: selected ? colours.accentSubtle : colours.surfaceMuted,
+            borderColor: selected ? colours.accentBorder : colours.border,
+            borderRadius: radius.medium,
+          },
         ]}>
-        <AppIcon name={item.icon} colour={colours.textSecondary} size={20} />
+        <AppIcon
+          name={item.icon}
+          colour={selected ? colours.accent : colours.textSecondary}
+          size={dense ? 18 : 20}
+        />
       </View>
       <View style={styles.body}>
-        <AppText variant="label">{item.label}</AppText>
-        {item.description ? (
+        <AppText variant={dense ? 'body' : 'label'} colour={selected ? 'accent' : 'text'}>
+          {item.label}
+        </AppText>
+        {showDescription ? (
           <AppText variant="caption" colour="textSecondary">
             {item.description}
           </AppText>
         ) : null}
       </View>
-      <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
+      <AppIcon
+        name="chevronRight"
+        colour={selected ? colours.accent : colours.textTertiary}
+        size={16}
+      />
     </AppPressable>
   )
 }
@@ -59,6 +90,5 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 52,
   },
 })

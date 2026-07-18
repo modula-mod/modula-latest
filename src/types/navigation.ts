@@ -1,5 +1,7 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
 
+export type DrawerSectionId = 'spaces' | 'create' | 'labs' | 'system'
+
 export type DrawerDestination = {
   label: string
   route:
@@ -29,5 +31,7 @@ export type DrawerDestination = {
     | '/settings/appearance'
     | '/settings/developer'
   icon: AppIconName
-  description: string
+  /** Short supporting line; omit for dense rows. */
+  description?: string
+  section: DrawerSectionId
 }

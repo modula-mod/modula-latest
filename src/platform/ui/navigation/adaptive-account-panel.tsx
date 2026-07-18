@@ -15,28 +15,69 @@ import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+const SPACE_IDS = new Set([
+  'board',
+  'saved',
+  'messages',
+  'marketplace',
+  'product',
+  'focus',
+  'search',
+])
+
+const CREATE_IDS = new Set(['forge', 'agents', 'design-lab', 'feature-atlas', 'developer-tools'])
+
+const SYSTEM_IDS = new Set(['appearance', 'settings', 'help', 'developer', 'nft-studio'])
+
 /**
- * Adaptive account panel:
- * - compact: ModulaSheet (native BottomSheet)
- * - wide: same sheet content (popover/split can refine later)
- * Destinations come from getAccountPanelDestinations() so product-surface
- * expansions can register Marketplace / Lists / Help without forking this file.
+ * Adaptive account panel — Apple-like section hierarchy.
+ * Destinations still come from getAccountPanelDestinations() for extensibility.
  */
 export function AdaptiveAccountPanel() {
   const router = useRouter()
   const {width} = useWindowDimensions()
-  const {spacing} = useThemeTokens()
+  const {spacing, colours, radius} = useThemeTokens()
   const session = useSession()
   const {signOut} = useSessionActions()
-  const {isVisible, state, closeAccountPanel, notifyPresentationDismissed} =
-    useAccountPanel()
+  const {isVisible, state, closeAccountPanel, notifyPresentationDismissed} = useAccountPanel()
   const ownerProfile = session.status === 'signedIn' ? session.profile : null
   const compact = width < 768
   const destinations = getAccountPanelDestinations()
 
+  const spaces = destinations.filter(item => SPACE_IDS.has(item.id))
+  const create = destinations.filter(item => CREATE_IDS.has(item.id))
+  const system = destinations.filter(item => SYSTEM_IDS.has(item.id))
+  const leftover = destinations.filter(
+    item => !SPACE_IDS.has(item.id) && !CREATE_IDS.has(item.id) && !SYSTEM_IDS.has(item.id),
+  )
+
   const navigate = (route: string) => {
     closeAccountPanel('route')
     router.push(route as Href)
+  }
+
+  const renderGroup = (title: string, items: typeof destinations, dense = false) => {
+    if (items.length === 0) return null
+    return (
+      <View style={{gap: spacing[1]}}>
+        <AppText
+          variant="caption"
+          colour="textTertiary"
+          style={{paddingHorizontal: spacing[1], marginBottom: spacing[1]}}>
+          {title.toUpperCase()}
+        </AppText>
+        <View style={{gap: spacing[1]}}>
+          {items.map(item => (
+            <DrawerItem
+              key={item.id}
+              dense={dense}
+              item={{label: item.label, icon: item.icon}}
+              onPress={() => navigate(item.route)}
+            />
+          ))}
+        </View>
+      </View>
+    )
   }
 
   return (
@@ -52,16 +93,16 @@ export function AdaptiveAccountPanel() {
       material="glass"
       testID="adaptive-account-panel">
       <ScrollView
-        contentContainerStyle={{paddingBottom: spacing[8], gap: spacing[3]}}
-        keyboardShouldPersistTaps="handled">
+        contentContainerStyle={{paddingBottom: spacing[8], gap: spacing[4]}}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
         <AppPressable
           accessibilityLabel="Open profile"
           onPress={() => navigate('/profile')}
           style={[styles.identity, {gap: spacing[3]}]}>
           <Avatar
             name={
-              ownerProfile?.displayName ??
-              (session.status === 'guest' ? 'Guest' : 'Modula')
+              ownerProfile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')
             }
             uri={ownerProfile?.avatarUri}
             colour={ownerProfile?.coverColour}
@@ -76,7 +117,7 @@ export function AdaptiveAccountPanel() {
               {ownerProfile
                 ? `@${ownerProfile.handle}`
                 : session.status === 'guest'
-                  ? 'Browsing public Modula'
+                  ? 'Browsing Modula'
                   : 'Local prototype account'}
             </AppText>
           </View>
@@ -93,52 +134,38 @@ export function AdaptiveAccountPanel() {
           </View>
         ) : null}
 
+        <AppPressable
+          accessibilityLabel="View profile"
+          onPress={() => navigate('/profile')}
+          style={[
+            styles.profilePill,
+            {
+              backgroundColor: colours.surfaceRaised,
+              borderColor: colours.border,
+              borderRadius: radius.round,
+              paddingHorizontal: spacing[4],
+              paddingVertical: spacing[2],
+              alignSelf: 'flex-start',
+            },
+          ]}>
+          <AppText variant="label">View Profile</AppText>
+        </AppPressable>
+
         <Divider />
 
-        <AppText variant="label" colour="textSecondary">
-          Primary
-        </AppText>
-        <View style={{gap: spacing[2]}}>
-          {destinations
-            .filter(item => !['settings', 'appearance', 'developer', 'help'].includes(item.id))
-            .map(item => (
-              <DrawerItem
-                key={item.id}
-                item={item}
-                onPress={() => navigate(item.route)}
-              />
-            ))}
-        </View>
+        {renderGroup('Spaces', spaces)}
+        {renderGroup('Create & labs', [...create, ...leftover], true)}
+        {renderGroup('System', system, true)}
 
-        <Divider />
-
-        <AppText variant="label" colour="textSecondary">
-          Settings & help
-        </AppText>
-        <View style={{gap: spacing[2]}}>
-          {destinations
-            .filter(item => ['appearance', 'settings', 'help', 'developer'].includes(item.id))
-            .map(item => (
-              <DrawerItem
-                key={item.id}
-                item={item}
-                onPress={() => navigate(item.route)}
-              />
-            ))}
+        <View style={{gap: spacing[1]}}>
           <DrawerItem
-            item={{
-              label: 'Switch account',
-              icon: 'switch',
-              description: 'Local account switcher',
-            }}
+            dense
+            item={{label: 'Switch account', icon: 'switch'}}
             onPress={() => navigate('/account/switcher')}
           />
           <DrawerItem
-            item={{
-              label: 'Quick appearance',
-              icon: 'appearance',
-              description: 'Colour mode, accent, materials',
-            }}
+            dense
+            item={{label: 'Appearance', icon: 'appearance'}}
             onPress={() => navigate('/settings/appearance')}
           />
         </View>
@@ -156,7 +183,7 @@ export function AdaptiveAccountPanel() {
           />
         ) : null}
 
-        <AppText variant="caption" colour="textSecondary">
+        <AppText variant="micro" colour="textTertiary">
           Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
         </AppText>
       </ScrollView>
@@ -172,6 +199,9 @@ const styles = StyleSheet.create({
   identityText: {
     flex: 1,
     minWidth: 0,
+  },
+  profilePill: {
+    borderWidth: StyleSheet.hairlineWidth,
   },
   statsRow: {
     flexDirection: 'row',
