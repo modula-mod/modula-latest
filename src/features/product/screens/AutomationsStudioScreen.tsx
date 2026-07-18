@@ -57,6 +57,15 @@ const ACTIONS = [
   'Gaia summary (scoped)',
 ]
 
+const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+  {label: 'Ledger Replay', href: '/product/ledger'},
+  {label: 'Kaizen Queue', href: '/product/kaizen', variant: 'secondary'},
+  {label: 'Circuit Memory', href: '/product/circuit-memory', variant: 'secondary'},
+  {label: 'Commands', href: '/product/commands', variant: 'ghost'},
+  {label: 'Intelligence', href: '/product/intelligence', variant: 'ghost'},
+  {label: 'Design Lab', href: '/product/design-lab', variant: 'ghost'},
+]
+
 export function AutomationsStudioScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
@@ -77,7 +86,9 @@ export function AutomationsStudioScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Workflows for Profile-OS.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Enable drafts locally. Runner stays off — no unattended actions execute.
+              Enable drafts locally to inspect how a flow would be shaped. The runner is not wired
+              to live accounts in this Preview, so no unattended DMs, CRM writes, unlocks, purchases,
+              or remote side effects execute.
             </AppText>
           </View>
 
@@ -93,7 +104,11 @@ export function AutomationsStudioScreen() {
                 borderColor: colours.border,
               },
             ]}>
-            <AppText variant="headline">Create flow · Preview</AppText>
+            <AppText variant="headline">Create flow · dry-run draft only</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              Saving adds a local draft to this device and marks it enabled for simulation. It does
+              not register a background worker, schedule a job, or grant module permissions.
+            </AppText>
             <TextInput
               value={draftTitle}
               onChangeText={setDraftTitle}
@@ -132,7 +147,10 @@ export function AutomationsStudioScreen() {
                         paddingVertical: spacing[2],
                       },
                     ]}>
-                    <AppText variant="caption" colour={on ? 'accent' : 'textSecondary'}>
+                    <AppText
+                      variant="caption"
+                      colour={on ? 'accent' : 'textSecondary'}
+                      style={styles.wrapText}>
                       {trigger}
                     </AppText>
                   </AppPressable>
@@ -164,7 +182,10 @@ export function AutomationsStudioScreen() {
                         paddingVertical: spacing[2],
                       },
                     ]}>
-                    <AppText variant="caption" colour={on ? 'accent' : 'textSecondary'}>
+                    <AppText
+                      variant="caption"
+                      colour={on ? 'accent' : 'textSecondary'}
+                      style={styles.wrapText}>
                       {action}
                     </AppText>
                   </AppPressable>
@@ -210,7 +231,7 @@ export function AutomationsStudioScreen() {
                 ]}>
                 <View style={[styles.titleRow, {gap: spacing[2]}]}>
                   <AppIcon name="automation" colour={colours.accent} />
-                  <AppText variant="headline" style={{flex: 1}}>
+                  <AppText variant="headline" style={styles.flexText}>
                     {flow.title}
                   </AppText>
                   <Switch
@@ -238,9 +259,11 @@ export function AutomationsStudioScreen() {
                     <AppText variant="caption" colour="accent">
                       TRIGGER
                     </AppText>
-                    <AppText variant="body">{flow.trigger}</AppText>
+                    <AppText variant="body" style={styles.wrapText}>
+                      {flow.trigger}
+                    </AppText>
                   </Surface>
-                  <AppText variant="caption" colour="textTertiary">
+                  <AppText variant="caption" colour="textTertiary" style={styles.arrowText}>
                     →
                   </AppText>
                   <Surface
@@ -251,14 +274,17 @@ export function AutomationsStudioScreen() {
                         backgroundColor: colours.surfaceRaised,
                         borderRadius: radius.medium,
                         padding: spacing[3],
-                        flex: 1,
                       },
                     ]}>
                     <AppText variant="caption" colour="textTertiary">
                       ACTIONS
                     </AppText>
                     {flow.actions.map(action => (
-                      <AppText key={action} variant="caption" colour="textSecondary">
+                      <AppText
+                        key={action}
+                        variant="caption"
+                        colour="textSecondary"
+                        style={styles.wrapText}>
                         · {action}
                       </AppText>
                     ))}
@@ -285,27 +311,59 @@ export function AutomationsStudioScreen() {
             ]}>
             <AppText variant="headline">Dry-run simulation</AppText>
             <AppText variant="body" colour="textSecondary">
-              Preview path: Trigger → Command Layer → AKI check → Governor policy → Ledger entry.
-              Runner stays inactive — no DMs, CRM writes, or Marketplace unlocks execute.
+              Preview path: trigger intent → Command Layer validation → AKI check → Governor policy
+              → Ledger explanation. This is a storyboard for consent and auditability, not a promise
+              that the runner has executed or that connected services were touched.
             </AppText>
             <AppText variant="caption" colour="textTertiary">
-              Enabled drafts: {preferences.automationEnabledIds.length || 'none'} · open Ledger for
-              sample audit rows.
+              Enabled local drafts: {preferences.automationEnabledIds.length || 'none'} · open Ledger
+              Replay to inspect seeded audit rows and replay boundaries.
             </AppText>
           </Surface>
 
-          <AppButton onPress={() => router.push('/product/ledger' as Href)}>
-            Open Ledger Replay
-          </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/product/commands' as Href)}>
-            Command Layer
-          </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/marketplace/module-automations' as Href)}>
-            Automations module card
-          </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/product/forge' as Href)}>
-            Build nodes in Forge
-          </AppButton>
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[3],
+                padding: spacing[4],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Related workbenches</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Follow the same dry-run story through replay, improvement capture, memory inspection,
+              commands, intelligence, and design-system preview surfaces.
+            </AppText>
+            <View style={[styles.linkGrid, {gap: spacing[2]}]}>
+              {RELATED_LINKS.map(link => (
+                <AppButton
+                  key={link.label}
+                  variant={link.variant ?? 'primary'}
+                  onPress={() => router.push(link.href)}
+                  style={styles.linkButton}>
+                  {link.label}
+                </AppButton>
+              ))}
+            </View>
+            <View style={[styles.linkGrid, {gap: spacing[2]}]}>
+              <AppButton
+                variant="ghost"
+                onPress={() => router.push('/marketplace/module-automations' as Href)}
+                style={styles.linkButton}>
+                Automations module card
+              </AppButton>
+              <AppButton
+                variant="ghost"
+                onPress={() => router.push('/product/forge' as Href)}
+                style={styles.linkButton}>
+                Build nodes in Forge
+              </AppButton>
+            </View>
+          </Surface>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -316,9 +374,14 @@ const styles = StyleSheet.create({
   screen: {flex: 1},
   card: {borderWidth: StyleSheet.hairlineWidth},
   titleRow: {alignItems: 'center', flexDirection: 'row'},
-  nodeRow: {alignItems: 'stretch', flexDirection: 'row'},
-  node: {flex: 1, gap: 4},
+  nodeRow: {alignItems: 'stretch', flexDirection: 'row', flexWrap: 'wrap'},
+  node: {flexBasis: 220, flexGrow: 1, flexShrink: 1, gap: 4, minWidth: 0},
   input: {borderWidth: StyleSheet.hairlineWidth, minHeight: 44},
   chips: {flexDirection: 'row', flexWrap: 'wrap'},
-  chip: {borderWidth: StyleSheet.hairlineWidth},
+  chip: {borderWidth: StyleSheet.hairlineWidth, maxWidth: '100%'},
+  flexText: {flex: 1, flexShrink: 1, minWidth: 0},
+  wrapText: {flexShrink: 1, minWidth: 0},
+  arrowText: {alignSelf: 'center'},
+  linkGrid: {flexDirection: 'row', flexWrap: 'wrap'},
+  linkButton: {flexBasis: 210, flexGrow: 1, minWidth: 0},
 })

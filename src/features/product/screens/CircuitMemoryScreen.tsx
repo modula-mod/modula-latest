@@ -52,6 +52,15 @@ const SEED_ITEMS: MemoryItem[] = [
   },
 ]
 
+const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+  {label: 'Automations Studio', href: '/product/automations'},
+  {label: 'Kaizen Queue', href: '/product/kaizen', variant: 'secondary'},
+  {label: 'Ledger Replay', href: '/product/ledger', variant: 'secondary'},
+  {label: 'Commands', href: '/product/commands', variant: 'ghost'},
+  {label: 'Intelligence', href: '/product/intelligence', variant: 'ghost'},
+  {label: 'Design Lab', href: '/product/design-lab', variant: 'ghost'},
+]
+
 function isMemoryLevel(value: unknown): value is MemoryLevel {
   return (
     value === 'session' ||
@@ -130,8 +139,9 @@ export function CircuitMemoryScreen() {
             </AppText>
             <AppText variant="display">Inspect what the Preview remembers.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Circuit Memory is represented here as a local AsyncStorage list. There is no global
-              memory, no cloud sync, and no hidden conversation retention in this build.
+              Circuit Memory is represented here as a local AsyncStorage list seeded with Preview
+              examples. There is no global memory, no cloud sync, no model recall, and no hidden
+              conversation retention in this build.
             </AppText>
           </View>
 
@@ -149,8 +159,9 @@ export function CircuitMemoryScreen() {
             ]}>
             <AppText variant="label">Honesty boundary</AppText>
             <AppText variant="caption" colour="textSecondary">
-              Levels model session, workspace, user, module, validated, and system scopes. They are
-              explanatory labels only until encrypted namespaces ship.
+              Levels model session, workspace, user, module, validated, and system scopes for review.
+              They are explanatory labels only until encrypted namespaces, consent controls, and
+              service-backed memory APIs ship.
             </AppText>
           </Surface>
 
@@ -178,12 +189,14 @@ export function CircuitMemoryScreen() {
                     },
                   ]}>
                   <AppIcon name="saved" colour={colours.accent} />
-                  <View style={{flex: 1, gap: spacing[1]}}>
-                    <AppText variant="headline">{item.title}</AppText>
-                    <AppText variant="caption" colour="accent">
+                  <View style={[styles.titleCopy, {gap: spacing[1]}]}>
+                    <AppText variant="headline" style={styles.wrapText}>
+                      {item.title}
+                    </AppText>
+                    <AppText variant="caption" colour="accent" style={styles.wrapText}>
                       {item.level}
                     </AppText>
-                    <AppText variant="caption" colour="textSecondary">
+                    <AppText variant="caption" colour="textSecondary" style={styles.wrapText}>
                       {item.summary}
                     </AppText>
                   </View>
@@ -208,7 +221,9 @@ export function CircuitMemoryScreen() {
               <AppText variant="caption" colour="accent">
                 INSPECT
               </AppText>
-              <AppText variant="headline">{selectedItem.title}</AppText>
+              <AppText variant="headline" style={styles.wrapText}>
+                {selectedItem.title}
+              </AppText>
               <AppText variant="body" colour="textSecondary">
                 {selectedItem.summary}
               </AppText>
@@ -248,17 +263,44 @@ export function CircuitMemoryScreen() {
               ]}>
               <AppText variant="label">Export text</AppText>
               <AppText variant="caption" colour="textSecondary">
-                This is JSON text shown on device, not a cloud export.
+                This is JSON text rendered on device for inspection. It is not uploaded, shared, or
+                exported to a cloud service from this Preview.
               </AppText>
-              <AppText variant="caption" colour="textSecondary">
+              <AppText variant="caption" colour="textSecondary" style={styles.wrapText}>
                 {exportText}
               </AppText>
             </Surface>
           ) : null}
 
-          <AppButton onPress={() => router.push('/product/intelligence' as Href)}>
-            Intelligence Hub
-          </AppButton>
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.large,
+                padding: spacing[4],
+                gap: spacing[3],
+              },
+            ]}>
+            <AppText variant="headline">Related workbenches</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Trace memory scope labels through automation dry-runs, replay explanations, Kaizen
+              capture, command routing, intelligence policy, and design-system previews.
+            </AppText>
+            <View style={[styles.linkGrid, {gap: spacing[2]}]}>
+              {RELATED_LINKS.map(link => (
+                <AppButton
+                  key={link.label}
+                  variant={link.variant ?? 'primary'}
+                  onPress={() => router.push(link.href)}
+                  style={styles.linkButton}>
+                  {link.label}
+                </AppButton>
+              ))}
+            </View>
+          </Surface>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -277,4 +319,8 @@ const styles = StyleSheet.create({
   actions: {flexDirection: 'row', flexWrap: 'wrap'},
   actionButton: {flexGrow: 1},
   exportCard: {borderWidth: StyleSheet.hairlineWidth},
+  titleCopy: {flex: 1, flexShrink: 1, minWidth: 0},
+  wrapText: {flexShrink: 1, minWidth: 0},
+  linkGrid: {flexDirection: 'row', flexWrap: 'wrap'},
+  linkButton: {flexBasis: 210, flexGrow: 1, minWidth: 0},
 })

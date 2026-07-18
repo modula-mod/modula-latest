@@ -67,6 +67,15 @@ const LEDGER_ROWS: LedgerRow[] = [
   },
 ]
 
+const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+  {label: 'Automations Studio', href: '/product/automations'},
+  {label: 'Kaizen Queue', href: '/product/kaizen', variant: 'secondary'},
+  {label: 'Circuit Memory', href: '/product/circuit-memory', variant: 'secondary'},
+  {label: 'Commands', href: '/product/commands', variant: 'ghost'},
+  {label: 'Intelligence', href: '/product/intelligence', variant: 'ghost'},
+  {label: 'Design Lab', href: '/product/design-lab', variant: 'ghost'},
+]
+
 export function LedgerReplayScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
@@ -84,8 +93,9 @@ export function LedgerReplayScreen() {
             </AppText>
             <AppText variant="display">Replay the path, not the side effect.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Ledger rows are seeded Preview data. Replay explains decisions and policy checks; it
-              does not re-run destructive actions, send messages, install modules, or mutate data.
+              Ledger rows here are seeded Preview data. Replay reconstructs the visible timeline,
+              decisions, permissions, and policy checks; it never re-runs destructive actions, sends
+              messages, installs modules, calls models, contacts services, or mutates stored data.
             </AppText>
           </View>
 
@@ -114,9 +124,11 @@ export function LedgerReplayScreen() {
                   }}
                   style={[styles.titleRow, {gap: spacing[3]}]}>
                   <AppIcon name="storage" colour={colours.accent} />
-                  <View style={{flex: 1, gap: spacing[1]}}>
-                    <AppText variant="headline">{row.command}</AppText>
-                    <AppText variant="caption" colour="textSecondary">
+                  <View style={[styles.titleCopy, {gap: spacing[1]}]}>
+                    <AppText variant="headline" style={styles.wrapText}>
+                      {row.command}
+                    </AppText>
+                    <AppText variant="caption" colour="textSecondary" style={styles.wrapText}>
                       {row.status} / risk {row.risk} / initiator {row.initiator}
                     </AppText>
                   </View>
@@ -133,12 +145,13 @@ export function LedgerReplayScreen() {
                       {row.detail}
                     </AppText>
                     <AppText variant="caption" colour="textTertiary">
-                      Permissions / {row.permissions.length ? row.permissions.join(', ') : 'none'}
+                      Replay permissions shown for context only /{' '}
+                      {row.permissions.length ? row.permissions.join(', ') : 'none'}
                     </AppText>
                     {row.replayNotes.map(note => (
                       <View key={note} style={[styles.noteRow, {gap: spacing[2]}]}>
                         <AppIcon name="check" colour={colours.accent} size={16} />
-                        <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
+                        <AppText variant="caption" colour="textSecondary" style={styles.flexText}>
                           {note}
                         </AppText>
                       </View>
@@ -147,7 +160,7 @@ export function LedgerReplayScreen() {
                       variant="secondary"
                       onPress={() =>
                         setReplayText(
-                          `Diagnostic replay for ${row.command}: reconstructs policy checks and timeline only. It does not re-run destructive actions or remote side effects.`,
+                          `Diagnostic replay for ${row.command}: reconstructed the Preview timeline, policy checks, and permission labels only. No command was executed, no network request was made, and no source data was changed.`,
                         )
                       }>
                       Replay diagnostic
@@ -178,12 +191,35 @@ export function LedgerReplayScreen() {
             </Surface>
           ) : null}
 
-          <AppButton onPress={() => router.push('/product/intelligence' as Href)}>
-            Intelligence Hub
-          </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/product/commands' as Href)}>
-            Command Layer
-          </AppButton>
+          <Surface
+            variant="contained"
+            style={[
+              styles.replayCard,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.large,
+                padding: spacing[4],
+                gap: spacing[3],
+              },
+            ]}>
+            <AppText variant="headline">Related workbenches</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Compare replay explanations with the dry-run builder, improvement capture, memory
+              scopes, command routing, intelligence policy, and design-system previews.
+            </AppText>
+            <View style={[styles.linkGrid, {gap: spacing[2]}]}>
+              {RELATED_LINKS.map(link => (
+                <AppButton
+                  key={link.label}
+                  variant={link.variant ?? 'primary'}
+                  onPress={() => router.push(link.href)}
+                  style={styles.linkButton}>
+                  {link.label}
+                </AppButton>
+              ))}
+            </View>
+          </Surface>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -196,4 +232,9 @@ const styles = StyleSheet.create({
   titleRow: {alignItems: 'center', flexDirection: 'row'},
   noteRow: {alignItems: 'center', flexDirection: 'row'},
   replayCard: {borderWidth: StyleSheet.hairlineWidth},
+  flexText: {flex: 1, flexShrink: 1, minWidth: 0},
+  titleCopy: {flex: 1, flexShrink: 1, minWidth: 0},
+  wrapText: {flexShrink: 1, minWidth: 0},
+  linkGrid: {flexDirection: 'row', flexWrap: 'wrap'},
+  linkButton: {flexBasis: 210, flexGrow: 1, minWidth: 0},
 })

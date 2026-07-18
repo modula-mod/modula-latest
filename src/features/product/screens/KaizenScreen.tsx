@@ -33,6 +33,15 @@ const CLASSIFICATIONS = [
   'trust-safety',
 ]
 
+const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+  {label: 'Automations Studio', href: '/product/automations'},
+  {label: 'Ledger Replay', href: '/product/ledger', variant: 'secondary'},
+  {label: 'Circuit Memory', href: '/product/circuit-memory', variant: 'secondary'},
+  {label: 'Commands', href: '/product/commands', variant: 'ghost'},
+  {label: 'Intelligence', href: '/product/intelligence', variant: 'ghost'},
+  {label: 'Design Lab', href: '/product/design-lab', variant: 'ghost'},
+]
+
 function parseQueue(raw: string | null): KaizenItem[] {
   if (!raw) return []
   try {
@@ -94,7 +103,9 @@ export function KaizenScreen() {
     }
     saveQueue([item, ...queue])
     setDescription('')
-    setMessage('Queued locally for review. No code was rewritten or deployed.')
+    setMessage(
+      'Captured locally for human review. No agent ran, no code was rewritten, and nothing deployed.',
+    )
   }
 
   return (
@@ -108,8 +119,9 @@ export function KaizenScreen() {
             </AppText>
             <AppText variant="display">Capture improvements without pretending to ship them.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Kaizen records feedback into a local review queue. This Preview does not silently
-              rewrite production code, trigger agents, or deploy changes.
+              Kaizen records feedback into a local review queue so ideas are visible and sortable.
+              The capture button never edits files, opens a pull request, triggers an agent, changes
+              production code, or deploys on your behalf.
             </AppText>
           </View>
 
@@ -125,7 +137,11 @@ export function KaizenScreen() {
                 gap: spacing[3],
               },
             ]}>
-            <AppText variant="headline">Capture improvement</AppText>
+            <AppText variant="headline">Capture improvement · human review only</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              Use this as an intake form for better copy, accessibility, workflows, and intelligence
+              behavior. Treat the queue as evidence to review, not as an automatic fixer.
+            </AppText>
             <TextInput
               value={componentId}
               onChangeText={setComponentId}
@@ -185,7 +201,10 @@ export function KaizenScreen() {
                         paddingVertical: spacing[2],
                       },
                     ]}>
-                    <AppText variant="caption" colour={selected ? 'accent' : 'textSecondary'}>
+                    <AppText
+                      variant="caption"
+                      colour={selected ? 'accent' : 'textSecondary'}
+                      style={styles.wrapText}>
                       {label}
                     </AppText>
                   </AppPressable>
@@ -219,7 +238,7 @@ export function KaizenScreen() {
                   ]}>
                   <View style={[styles.titleRow, {gap: spacing[2]}]}>
                     <AppIcon name="motion" colour={colours.accent} />
-                    <AppText variant="headline" style={{flex: 1}}>
+                    <AppText variant="headline" style={styles.flexText}>
                       {item.componentId}
                     </AppText>
                   </View>
@@ -250,9 +269,35 @@ export function KaizenScreen() {
             )}
           </View>
 
-          <AppButton onPress={() => router.push('/product/intelligence' as Href)}>
-            Intelligence Hub
-          </AppButton>
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.large,
+                padding: spacing[4],
+                gap: spacing[3],
+              },
+            ]}>
+            <AppText variant="headline">Related workbenches</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Route a captured improvement to the surfaces that explain execution, replay, memory,
+              commands, intelligence, and design-system polish.
+            </AppText>
+            <View style={[styles.linkGrid, {gap: spacing[2]}]}>
+              {RELATED_LINKS.map(link => (
+                <AppButton
+                  key={link.label}
+                  variant={link.variant ?? 'primary'}
+                  onPress={() => router.push(link.href)}
+                  style={styles.linkButton}>
+                  {link.label}
+                </AppButton>
+              ))}
+            </View>
+          </Surface>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -268,7 +313,11 @@ const styles = StyleSheet.create({
     minHeight: 96,
   },
   chips: {flexDirection: 'row', flexWrap: 'wrap'},
-  chip: {borderWidth: StyleSheet.hairlineWidth},
+  chip: {borderWidth: StyleSheet.hairlineWidth, maxWidth: '100%'},
   queueCard: {borderWidth: StyleSheet.hairlineWidth},
   titleRow: {alignItems: 'center', flexDirection: 'row'},
+  flexText: {flex: 1, flexShrink: 1, minWidth: 0},
+  wrapText: {flexShrink: 1, minWidth: 0},
+  linkGrid: {flexDirection: 'row', flexWrap: 'wrap'},
+  linkButton: {flexBasis: 210, flexGrow: 1, minWidth: 0},
 })
