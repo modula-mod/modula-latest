@@ -13,14 +13,31 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const SURFACES = [
-  {title: 'Public identity', body: 'Posts, bio, links, and the tabs you choose to share.'},
-  {title: 'Private Board', body: 'Your daily OS — modules, widgets, focus, and quick actions.'},
+  {
+    title: 'Visitor presentation',
+    body:
+      'Visitors see the identity, posts, links, modules, and tabs you choose to publish. Private controls stay out of the public profile.',
+  },
+  {
+    title: 'Owner workspace',
+    body:
+      'You keep your daily OS behind the profile: modules, widgets, focus controls, drafts, and quick actions that visitors cannot operate.',
+  },
   {
     title: 'Custom tabs',
-    body: 'Core tabs plus module slots (Shop, Agents). Packs install via Registry — Preview slots today.',
+    body:
+      'Core tabs sit beside Preview slots for Shop and Agents. Real packages still need Registry installs before those slots become active modules.',
   },
   {title: 'Installed modules', body: 'CRM, Notes, Tasks, and more appear as tabs and cards.'},
-  {title: 'Privacy levels', body: 'Public, private, team, or selected audiences per surface.'},
+  {
+    title: 'Focus Halo',
+    body:
+      'A small availability ring around the avatar explains whether you are available, focused, busy, or offline before someone interrupts you.',
+  },
+  {
+    title: 'Privacy levels',
+    body: 'Each surface can stay public, private, team-only, or limited to selected audiences.',
+  },
 ]
 
 /**
@@ -57,8 +74,8 @@ export function ProfileOsPreScreen() {
             </AppText>
             <AppText variant="display">Build a digital environment around your identity.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Most apps give everyone the same shell. Modula lets each person construct a different
-              environment from modules, widgets, themes, and tools.
+              Most apps give everyone the same shell. Modula separates the profile visitors see from
+              the workspace owners use, so modules, widgets, themes, and tools can stay precise.
             </AppText>
           </LinearGradient>
 
@@ -104,10 +121,16 @@ export function ProfileOsPreScreen() {
               Customize tabs & layout
             </AppButton>
             <AppButton variant="secondary" onPress={() => router.push('/product/themes' as Href)}>
-              Themes & layouts packs
+              Themes & layout packs
             </AppButton>
             <AppButton variant="ghost" onPress={() => router.push('/product/agents' as Href)}>
               Agents profile tab
+            </AppButton>
+            <AppButton variant="secondary" onPress={() => router.push('/product/intelligence' as Href)}>
+              Intelligence Hub
+            </AppButton>
+            <AppButton variant="ghost" onPress={() => router.push('/product/nft' as Href)}>
+              NFT Studio (inactive)
             </AppButton>
             <AppButton variant="secondary" onPress={() => router.push('/marketplace' as Href)}>
               Browse modules

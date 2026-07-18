@@ -255,7 +255,7 @@ function PreviewBar() {
       style={[styles.previewBar, {gap: spacing[3], padding: spacing[3]}]}>
       <AppIcon name="profile" colour={colours.accent} />
       <AppText variant="label" style={styles.previewText}>
-        Viewing as visitor
+        You are viewing this profile as a visitor.
       </AppText>
       <AppPressable
         accessibilityLabel="Exit preview"
