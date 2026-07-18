@@ -43,6 +43,7 @@ function RootNavigator() {
         <Stack.Screen name="teams" />
         <Stack.Screen name="modules" />
         <Stack.Screen name="marketplace" />
+        <Stack.Screen name="product" />
         <Stack.Screen name="creator" />
         <Stack.Screen name="help" />
         <Stack.Screen name="whats-new" />

@@ -148,15 +148,58 @@ export function BoardScreen() {
                 Shape your Profile-OS, install first modules, and keep the shell light while
                 capabilities grow through the Registry.
               </AppText>
-              <AppPressable
-                accessibilityLabel="Open Profile-OS pre-screen"
-                onPress={() => router.push('/profile/os' as Href)}>
-                <AppText variant="caption" colour="accent">
-                  Explore Profile-OS →
-                </AppText>
-              </AppPressable>
+              <View style={{gap: spacing[2]}}>
+                <AppPressable
+                  accessibilityLabel="Open Profile-OS pre-screen"
+                  onPress={() => router.push('/profile/os' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Explore Profile-OS →
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel="Open Focus Mode"
+                  onPress={() => router.push('/product/focus' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Focus Mode →
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel="Open Product Hub"
+                  onPress={() => router.push('/product' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    All capabilities →
+                  </AppText>
+                </AppPressable>
+              </View>
             </View>
           </Surface>
+
+          <View style={[styles.quickRow, {gap: spacing[2]}]}>
+            {[
+              {label: 'Widgets', route: '/product/widgets'},
+              {label: 'Automations', route: '/product/automations'},
+              {label: 'Merge Feeds', route: '/product/merge-feeds'},
+              {label: 'Forge', route: '/product/forge'},
+              {label: 'Gaia', route: '/product/gaia'},
+            ].map(item => (
+              <AppPressable
+                key={item.route}
+                accessibilityLabel={item.label}
+                onPress={() => router.push(item.route as Href)}
+                style={[
+                  styles.quickChip,
+                  {
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                    borderRadius: radius.round,
+                    paddingHorizontal: spacing[3],
+                    paddingVertical: spacing[2],
+                  },
+                ]}>
+                <AppText variant="caption">{item.label}</AppText>
+              </AppPressable>
+            ))}
+          </View>
 
           <View style={{gap: spacing[3]}}>
             <View style={styles.sectionHeader}>
@@ -421,6 +464,13 @@ const styles = StyleSheet.create({
   emptyBoard: {
     borderWidth: StyleSheet.hairlineWidth,
     width: '100%',
+  },
+  quickRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  quickChip: {
+    borderWidth: StyleSheet.hairlineWidth,
   },
   controlGroup: {
     marginTop: 8,

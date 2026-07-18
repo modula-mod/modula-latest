@@ -59,6 +59,24 @@ const drawerDestinations: DrawerDestination[] = [
     description: 'Discover new Modula capabilities',
   },
   {
+    label: 'Product Hub',
+    route: '/product',
+    icon: 'discover',
+    description: 'Everything Modula offers',
+  },
+  {
+    label: 'Focus Mode',
+    route: '/product/focus',
+    icon: 'contrast',
+    description: 'Quiet the shell and prioritise work',
+  },
+  {
+    label: 'Forge',
+    route: '/product/forge',
+    icon: 'developer',
+    description: 'Module Builder pipeline preview',
+  },
+  {
     label: 'Settings',
     route: '/settings',
     icon: 'settings',

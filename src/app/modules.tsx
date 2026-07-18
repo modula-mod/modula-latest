@@ -1,5 +1,5 @@
-import {ModulesScreen} from '@/features/secondary/screens/SecondaryPreviewScreens'
+import {ModulesLibraryScreen} from '@/features/modules/screens/ModulesLibraryScreen'
 
 export default function ModulesRoute() {
-  return <ModulesScreen />
+  return <ModulesLibraryScreen />
 }
