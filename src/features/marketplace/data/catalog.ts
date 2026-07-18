@@ -411,6 +411,34 @@ export const marketplaceCatalog: MarketplaceModule[] = [
     tags: ['inventory', 'gamification'],
     section: ['forYou'],
   },
+  {
+    id: 'module-bridges',
+    name: 'Bridges',
+    description: 'Protocol bridges and external network connectors.',
+    longDescription:
+      'Bridges module Preview for AT/other networks as optional connectors — never the product core. AT remains optional/off.',
+    status: 'Gated',
+    icon: 'integrations',
+    category: 'social',
+    capability: 'Bridges · Connectors · Optional AT',
+    sellerId: 'seller-modula',
+    tags: ['bridges', 'connectors', 'at'],
+    section: ['forYou'],
+  },
+  {
+    id: 'module-functions',
+    name: 'Functions',
+    description: 'Serverless-style host functions modules can invoke.',
+    longDescription:
+      'Functions catalogue foreshadow. Composer tools already call the local registry with honest Preview states.',
+    status: 'Preview',
+    icon: 'tools',
+    category: 'intelligence',
+    capability: 'Functions · Tools · Registry',
+    sellerId: 'seller-modula',
+    tags: ['functions', 'tools'],
+    section: ['new'],
+  },
 ]
 
 export const marketplaceCategories: Array<{

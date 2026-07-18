@@ -82,7 +82,10 @@ export function ModuleStandardsScreen() {
           </View>
 
           <AppButton onPress={() => router.push('/product/forge' as Href)}>Open Forge Builder</AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/marketplace/module-standards' as Href)}>
+          <AppButton variant="secondary" onPress={() => router.push('/product/sandbox' as Href)}>
+            Module sandbox foreshadow
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/marketplace/module-standards' as Href)}>
             Standards marketplace card
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/marketplace/module-agents' as Href)}>

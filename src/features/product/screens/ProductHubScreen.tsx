@@ -87,6 +87,13 @@ export function ProductHubScreen() {
                   icon: 'appearance' as const,
                   route: '/product/themes',
                 },
+                {
+                  id: 'sandbox',
+                  name: 'Module Sandbox',
+                  summary: 'Isolation foreshadow for installs.',
+                  icon: 'security' as const,
+                  route: '/product/sandbox',
+                },
               ].map(item => (
                 <AppPressable
                   key={item.id}

@@ -168,8 +168,14 @@ export function GaiaConsoleScreen() {
             ) : null}
           </View>
 
-          <AppButton onPress={() => router.push('/product/gaia-atlas' as Href)}>
+          <AppButton onPress={() => router.push('/product/agents' as Href)}>
+            Agents module studio
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/gaia-atlas' as Href)}>
             Open Gaia Atlas
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/sandbox' as Href)}>
+            Module sandbox foreshadow
           </AppButton>
         </ScrollView>
       </ResponsiveContent>
