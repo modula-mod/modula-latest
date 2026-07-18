@@ -68,6 +68,19 @@ export function HomeFeedScreen() {
   const focusPreset = focus.preset ?? 'off'
   const focusActive = isFocusActive(focus)
   const focusMeta = FOCUS_PRESET_META[focusPreset]
+  const focusBannerCopy = useMemo(() => {
+    const sentences = [`${focusMeta.title} Focus is active.`]
+    if (focus.quietFeed) {
+      sentences.push('Quiet Feed is reducing algorithmic recommendations.')
+    }
+    if (focus.priorityWork) {
+      sentences.push('Work First is prioritising modules and project updates.')
+    }
+    if (!focus.quietFeed && !focus.priorityWork) {
+      sentences.push(focusMeta.summary)
+    }
+    return sentences.join(' ')
+  }, [focus.priorityWork, focus.quietFeed, focusMeta.summary, focusMeta.title])
 
   const modeOrder = useMemo((): FeedModeLabel[] => {
     if (focus.priorityWork && focus.quietFeed) {
@@ -186,11 +199,14 @@ export function HomeFeedScreen() {
                       },
                     ]}>
                     <AppIcon name="contrast" colour={colours.accent} size={16} />
-                    <AppText variant="caption" colour="accent" style={{flex: 1}}>
-                      Focus · {focusMeta.title}
-                      {focus.quietFeed ? ' · Quiet feed' : ''}
-                      {focus.priorityWork ? ' · Work first' : ''}
-                    </AppText>
+                    <View style={[styles.focusCopy, {gap: spacing[1]}]}>
+                      <AppText variant="label" colour="accent">
+                        Focus mode is on
+                      </AppText>
+                      <AppText variant="caption" colour="textSecondary">
+                        {focusBannerCopy}
+                      </AppText>
+                    </View>
                     <AppIcon name="chevronRight" colour={colours.accent} size={14} />
                   </AppPressable>
                 ) : null}
@@ -220,24 +236,45 @@ export function HomeFeedScreen() {
                   </AppPressable>
                 ) : null}
 
-                <View style={[styles.modeRow, {paddingHorizontal: spacing[4]}]}>
+                <View
+                  accessibilityRole="tablist"
+                  style={[
+                    styles.modeRow,
+                    {
+                      borderBottomColor: colours.border,
+                      gap: spacing[2],
+                      paddingHorizontal: spacing[4],
+                      paddingTop: spacing[1],
+                    },
+                  ]}>
                   {modeOrder.map(next => {
                     const demoted = focus.quietFeed && next === 'For You'
+                    const selected = mode === next
                     return (
                       <AppPressable
                         key={next}
                         accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
+                        accessibilityRole="tab"
                         accessibilityState={{selected: mode === next}}
                         onPress={() => {
                           void selectionHaptic()
                           setMode(next)
                         }}
-                        style={[styles.modeButton, demoted ? {opacity: 0.55} : null]}>
+                        style={[
+                          styles.modeButton,
+                          {
+                            backgroundColor: selected ? colours.accentSubtle : 'transparent',
+                            borderColor: selected ? colours.accentBorder : 'transparent',
+                            borderRadius: radius.round,
+                            paddingHorizontal: spacing[3],
+                          },
+                          demoted ? {opacity: 0.55} : null,
+                        ]}>
                         <AppText
                           variant="label"
                           style={{
                             color:
-                              mode === next ? colours.accent : colours.textSecondary,
+                              selected ? colours.accent : colours.textSecondary,
                           }}>
                           {next}
                           {demoted ? ' · Quiet' : ''}
@@ -247,7 +284,8 @@ export function HomeFeedScreen() {
                             styles.modeUnderline,
                             {
                               backgroundColor:
-                                mode === next ? colours.accent : 'transparent',
+                                selected ? colours.accent : 'transparent',
+                              borderRadius: radius.round,
                             },
                           ]}
                         />
@@ -344,23 +382,30 @@ function ComposerPrompt() {
 
 const styles = StyleSheet.create({
   focusBanner: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
+  focusCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
   modeButton: {
     alignItems: 'center',
-    gap: 6,
-    minHeight: 44,
+    borderWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+    gap: 5,
     justifyContent: 'center',
+    minHeight: 42,
   },
   modeRow: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    gap: 22,
+    paddingBottom: 8,
   },
   modeUnderline: {
-    height: 2,
-    width: '100%',
+    height: 3,
+    width: 28,
   },
   prompt: {
     alignItems: 'center',

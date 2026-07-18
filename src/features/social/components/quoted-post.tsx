@@ -18,7 +18,7 @@ export function QuotedPost({post}: {post: SocialPost | null | undefined}) {
   return (
     <Surface variant="contained" style={[styles.container, {gap: spacing[2], padding: spacing[3]}]}>
       <PostHeader post={post} />
-      {post.text ? <AppText variant="body" numberOfLines={4}>{post.text}</AppText> : null}
+      {post.text ? <AppText variant="body">{post.text}</AppText> : null}
     </Surface>
   )
 }

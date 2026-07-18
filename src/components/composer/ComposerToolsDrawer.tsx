@@ -56,6 +56,45 @@ function iconFor(tool: ComposerToolItem): AppIconName {
   return 'tools'
 }
 
+function isNftAttach(tool: ComposerToolItem): boolean {
+  const key = `${tool.toolId} ${tool.name}`.toLowerCase()
+  return key.includes('nft')
+}
+
+function isAiRewrite(tool: ComposerToolItem): boolean {
+  const key = `${tool.toolId} ${tool.name}`.toLowerCase()
+  return key.includes('airewrite') || key.includes('ai rewrite')
+}
+
+function unavailableTitle(tool: ComposerToolItem): string {
+  if (isAiRewrite(tool)) return 'AI rewrite is unavailable'
+  if (isNftAttach(tool)) return 'NFT attach is unavailable'
+  return tool.requiresModule ? `Requires ${tool.requiresModule}` : 'Tool unavailable'
+}
+
+function availabilitySentence(tool: ComposerToolItem): string {
+  if (tool.availability === 'unavailable') {
+    if (isAiRewrite(tool)) {
+      return 'Unavailable. An Agents manifest must grant composer rewrite scope before this can run.'
+    }
+    if (isNftAttach(tool)) {
+      return 'Unavailable. DIMON is inactive, so Composer will not attach NFT claims.'
+    }
+    if (tool.requiresModule) {
+      return `Unavailable. Enable the ${tool.requiresModule} module before using this tool.`
+    }
+    return 'Unavailable in this Preview build.'
+  }
+  if (tool.availability === 'preview') {
+    return 'Preview. This runs locally or as a stub until a module manifest enables the full action.'
+  }
+  return 'Available from a registered manifest.'
+}
+
+function unavailableMessage(tool: ComposerToolItem): string {
+  return tool.description ?? availabilitySentence(tool)
+}
+
 /**
  * Composer Tools via ModulaSheet (Expo UI BottomSheet on native).
  * Loads tools from the Greenfield registry with built-in fallback.
@@ -97,13 +136,7 @@ export function ComposerToolsDrawer({
 
   const runTool = (tool: ComposerToolItem) => {
     if (tool.availability === 'unavailable') {
-      const title = tool.requiresModule ? `Requires ${tool.requiresModule}` : 'Tool unavailable'
-      const message =
-        tool.description ??
-        (tool.requiresModule
-          ? `${tool.name} needs the ${tool.requiresModule} module.`
-          : `${tool.name} is not available in this Preview.`)
-      Alert.alert(title, message)
+      Alert.alert(unavailableTitle(tool), unavailableMessage(tool))
       return
     }
     if (tool.toolId.includes('photo')) {
@@ -160,6 +193,10 @@ export function ComposerToolsDrawer({
           <AppText variant="headline">Composer Tools</AppText>
           <AppText variant="caption" colour="textSecondary">
             Media, create, modules, and agents — honest Preview / Requires module states.
+          </AppText>
+          <AppText variant="caption" colour="textSecondary">
+            Tools register via manifests; this drawer shows whether each capability is available,
+            preview-only, or blocked before anything runs.
           </AppText>
         </View>
         {invocationState !== 'idle' ? (
@@ -219,17 +256,28 @@ export function ComposerToolsDrawer({
                           opacity: unavailable ? 0.7 : 1,
                         },
                       ]}>
-                      <AppIcon name={iconFor(tool)} colour={colours.accent} size={22} />
-                      <AppText variant="caption">{tool.name}</AppText>
-                      <AppText variant="micro" colour="textTertiary">
-                        {unavailable
-                          ? `Requires ${tool.requiresModule ?? 'module'}`
-                          : preview
-                            ? 'Preview'
-                            : tool.section}
-                      </AppText>
+                      <View style={[styles.toolHeader, {gap: spacing[2]}]}>
+                        <AppIcon
+                          name={iconFor(tool)}
+                          colour={unavailable ? colours.textSecondary : colours.accent}
+                          size={22}
+                        />
+                        <View style={styles.toolText}>
+                          <AppText variant="caption" style={styles.toolName}>
+                            {tool.name}
+                          </AppText>
+                          <AppText
+                            variant="micro"
+                            colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}>
+                            {availabilitySentence(tool)}
+                          </AppText>
+                        </View>
+                      </View>
                       {tool.description ? (
-                        <AppText variant="micro" colour="textSecondary" numberOfLines={2}>
+                        <AppText
+                          variant="micro"
+                          colour="textSecondary"
+                          style={styles.toolDescription}>
                           {tool.description}
                         </AppText>
                       ) : null}
@@ -250,10 +298,27 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   tool: {
+    alignItems: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
+    flexBasis: '46%',
     flexGrow: 1,
     minHeight: 96,
     minWidth: '46%',
+  },
+  toolDescription: {
+    width: '100%',
+  },
+  toolHeader: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  toolName: {
+    flexShrink: 1,
+  },
+  toolText: {
+    flex: 1,
+    minWidth: 0,
   },
   status: {
     borderWidth: StyleSheet.hairlineWidth,

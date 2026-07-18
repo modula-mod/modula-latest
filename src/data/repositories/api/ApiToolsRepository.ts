@@ -156,8 +156,10 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     moduleId: 'module-agents',
     name: 'AI rewrite',
     section: 'AI',
-    availability: 'preview',
-    description: 'Governed rewrite preview. No private module access without scopes.',
+    availability: 'unavailable',
+    requiresModule: 'Agents',
+    description:
+      'AI rewrite is blocked until an Agents module manifest grants the composer rewrite scope. No text is sent to an AI service in this preview.',
   },
   {
     toolId: 'modula.tool.translate',
@@ -186,7 +188,8 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     section: 'Modules',
     availability: 'unavailable',
     requiresModule: 'NFT Entitlements',
-    description: 'Blocked while ownership verification is Preview and DIMON inactive.',
+    description:
+      'NFT attach is unavailable because DIMON is inactive. Composer will not mint, verify, or attach NFT claims in this build.',
   },
   {
     toolId: 'modula.tool.marketplace',
