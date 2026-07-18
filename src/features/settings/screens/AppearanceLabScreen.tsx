@@ -14,7 +14,7 @@ import type {
   SurfaceType,
   ThemeFamily,
 } from '@/theme/contracts'
-import {SURFACE_ROLES} from '@/theme/contracts'
+import {SURFACE_ROLES, SURFACE_TYPES} from '@/theme/contracts'
 import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -43,6 +43,16 @@ const presets: Preset[] = [
   {label: 'Reduced Transparency', reduceTransparency: true},
   {label: 'Reduced Motion', reduceMotion: true},
 ]
+
+const surfacePreviewNotes: Record<SurfaceType, string> = {
+  native: 'Native asks the platform for material chrome when supported, then falls back through MaterialSurface.',
+  solid: 'Solid keeps opaque cards and controls as the stable accessibility baseline.',
+  glass: 'Glass is a Liquid Glass-inspired chrome direction for bars, sheets, and floating controls only.',
+  glay: 'Glay explores grey glass tone and softened depth without turning content panes translucent.',
+  minimalSpatial: 'Minimal Spatial uses quiet separation and restrained elevation so content stays first.',
+  skeuomorphic: 'Skeuomorphic reserves tactile highlights for controls; it must not change IA or layout.',
+  neomorphic: 'Neomorphic reserves raised controls for places where dark/OLED contrast remains safe.',
+}
 
 export function AppearanceLabScreen() {
   const {resolved} = useAppearance()
@@ -75,8 +85,9 @@ export function AppearanceLabScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Appearance Lab</AppText>
             <AppText variant="body" colour="textSub">
-              Inspect token behaviour, material differences, and accessibility
-              fallbacks inside the live runtime.
+              Inspect token behaviour, material contracts, and accessibility
+              fallbacks inside the live runtime. Glass previews are chrome-only;
+              the unfinished engines are deferred per theme architecture.
             </AppText>
           </View>
 
@@ -112,6 +123,45 @@ export function AppearanceLabScreen() {
                 </AppText>
               </AppPressable>
             </View>
+          </LabSection>
+
+          <LabSection title="Surface Type preview notes" icon="appearance">
+            <MaterialSurface role="card" style={[styles.panel, {gap: spacing[3]}]}>
+              <AppText variant="body" colour="textSub">
+                Surface Type changes material treatment, not navigation, hierarchy, or content
+                order. Product design lab: /product/design-lab.
+              </AppText>
+              <AppText variant="caption" colour="textMuted">
+                Docs: docs/product/theme-architecture-v5.md and
+                docs/architecture/surface-type-contract.md.
+              </AppText>
+              <View style={[styles.noteGrid, {gap: spacing[2]}]}>
+                {SURFACE_TYPES.map(surfaceType => (
+                  <View
+                    key={surfaceType}
+                    style={[
+                      styles.noteCard,
+                      {backgroundColor: colours.surface1, borderColor: colours.border},
+                    ]}>
+                    <AppText variant="label">{labelSurface(surfaceType)}</AppText>
+                    <AppText variant="micro" colour="textMuted">
+                      {surfacePreviewNotes[surfaceType]}
+                    </AppText>
+                  </View>
+                ))}
+              </View>
+              <View
+                style={[
+                  styles.callout,
+                  {backgroundColor: colours.accentSubtle, borderColor: colours.accentBorder},
+                ]}>
+                <AppIcon name="info" colour={colours.accent} size={18} />
+                <AppText variant="caption" colour="textSub" style={{flex: 1}}>
+                  Reduce Transparency wins over Native, Glass, and Glay by forcing opaque,
+                  non-glass treatment.
+                </AppText>
+              </View>
+            </MaterialSurface>
           </LabSection>
 
           <LabSection title="Colour tokens" icon="appearance">
@@ -333,6 +383,10 @@ function AlertFragment() {
   )
 }
 
+function labelSurface(surfaceType: SurfaceType): string {
+  return surfaceType.replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
+}
+
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
@@ -341,6 +395,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 44,
     paddingHorizontal: 16,
+  },
+  callout: {
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: 8,
+    padding: 12,
   },
   content: {
     padding: 16,
@@ -359,6 +421,17 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
+  },
+  noteCard: {
+    borderRadius: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    gap: 6,
+    padding: 12,
+    width: '48%',
+  },
+  noteGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   panel: {
     padding: 16,

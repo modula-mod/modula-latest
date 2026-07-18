@@ -24,6 +24,19 @@ const LAYOUTS = [
   {id: 'minimal', name: 'Minimal', note: 'Quiet chrome'},
 ]
 
+const DESIGN_DIRECTIONS = [
+  {
+    id: 'oled-canvas',
+    name: 'OLED canvas',
+    note: 'True-black canvas direction with restrained glow and strong text contrast.',
+  },
+  {
+    id: 'content-first-chrome',
+    name: 'content-first chrome',
+    note: 'Liquid Glass-inspired chrome stays around navigation, sheets, and floating controls.',
+  },
+]
+
 export function ThemesLayoutsStudioScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
@@ -69,6 +82,37 @@ export function ThemesLayoutsStudioScreen() {
                 <AppText variant="headline">{theme.name}</AppText>
                 <AppText variant="caption" colour="textTertiary">
                   {theme.note}
+                </AppText>
+              </Surface>
+            ))}
+          </View>
+
+          <AppText variant="headline">Design directions</AppText>
+          <View style={[styles.grid, {gap: spacing[3]}]}>
+            {DESIGN_DIRECTIONS.map(direction => (
+              <Surface
+                key={direction.id}
+                variant="contained"
+                style={[
+                  styles.card,
+                  {
+                    padding: spacing[4],
+                    gap: spacing[2],
+                    borderRadius: radius.large,
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                  },
+                ]}>
+                <AppIcon
+                  name={direction.id === 'oled-canvas' ? 'appearance' : 'modules'}
+                  colour={colours.accent}
+                />
+                <AppText variant="headline">{direction.name}</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  {direction.note}
+                </AppText>
+                <AppText variant="micro" colour="textTertiary">
+                  Preview note: glass engines remain deferred per theme architecture.
                 </AppText>
               </Surface>
             ))}

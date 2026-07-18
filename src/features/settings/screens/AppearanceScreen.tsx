@@ -51,13 +51,13 @@ const familyLabels: Record<ThemeFamily, string> = {
 }
 
 const surfaceCopy: Record<SurfaceType, string> = {
-  native: 'Platform material when available, with safe fallbacks.',
-  solid: 'Opaque, stable hierarchy for every accessibility mode.',
-  glass: 'Selective blur for navigation and floating controls.',
-  glay: 'Soft material colour with modest physical depth.',
-  minimalSpatial: 'Quiet surfaces with subtle separation.',
-  skeuomorphic: 'Tactile controls with restrained highlights.',
-  neomorphic: 'Raised controls where contrast remains safe.',
+  native: 'Platform material adapter for host chrome when available, with safe fallbacks elsewhere.',
+  solid: 'Opaque, stable surfaces for every colour mode and accessibility setting.',
+  glass: 'Liquid Glass-inspired chrome for tabs, sheets, and floating controls only - not content panes.',
+  glay: 'Grey glass direction: softer chrome colour and depth without app-wide translucency.',
+  minimalSpatial: 'Quiet separation, restrained elevation, and content-first spacing.',
+  skeuomorphic: 'Tactile controls with restrained highlights; no layout or IA changes.',
+  neomorphic: 'Raised controls where contrast remains safe, especially over OLED/dark canvases.',
 }
 
 export function AppearanceScreen() {
@@ -147,6 +147,8 @@ export function AppearanceScreen() {
 
           <Section title="Surface Type">
             <View style={{gap: spacing[3]}}>
+              <InlineNote text="Surface Types are material contracts. Glass means the chrome layer only; the full glass engines remain deferred per theme architecture." />
+              <InlineNote text="Design lab path: /product/design-lab. Docs: docs/product/theme-architecture-v5.md and docs/architecture/surface-type-contract.md." />
               {SURFACE_TYPES.map(surfaceType => (
                 <SurfaceTypeCard
                   key={surfaceType}
@@ -223,6 +225,7 @@ export function AppearanceScreen() {
                 onValueChange={actions.setReduceTransparency}
                 deviceOverride={systemAccessibility.reduceTransparency}
               />
+              <InlineNote text="Reduce Transparency forces opaque, non-glass material treatment. It wins over Native, Glass, and Glay previews." />
               <SwitchRow
                 title="Increase Contrast"
                 value={resolved.accessibility.increaseContrast}
