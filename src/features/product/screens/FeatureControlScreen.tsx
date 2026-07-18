@@ -9,13 +9,15 @@ import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const META: Record<string, {label: string; channel: string}> = {
-  reels: {label: 'Reels / short media', channel: 'Experimental'},
-  merge: {label: 'Merge Feeds', channel: 'Experimental'},
-  focus: {label: 'Focus Mode', channel: 'Stable'},
-  gaia: {label: 'Gaia assistants', channel: 'Experimental'},
-  dimon: {label: 'DIMON wallet UI', channel: 'Stable'},
-  automations: {label: 'Automations runner', channel: 'Experimental'},
+const META: Record<string, {label: string; channel: string; href?: Href}> = {
+  reels: {label: 'Reels / short media', channel: 'Experimental', href: '/reels'},
+  merge: {label: 'Merge Feeds', channel: 'Experimental', href: '/product/merge-feeds'},
+  focus: {label: 'Focus Mode', channel: 'Stable', href: '/product/focus'},
+  gaia: {label: 'Gaia assistants', channel: 'Experimental', href: '/product/gaia'},
+  agents: {label: 'Agents module', channel: 'Preview', href: '/product/agents'},
+  forge: {label: 'Forge Builder', channel: 'Preview', href: '/product/forge'},
+  dimon: {label: 'DIMON wallet UI', channel: 'Inactive', href: '/settings/dimon'},
+  automations: {label: 'Automations runner', channel: 'Experimental', href: '/product/automations'},
 }
 
 export function FeatureControlScreen() {
@@ -56,11 +58,17 @@ export function FeatureControlScreen() {
                   <AppText variant="caption" colour="textSecondary">
                     Channel · {meta.channel}
                     {row.locked ? ' · Version locked' : ''}
+                    {row.id === 'dimon' ? ' · DIMON is not active yet' : ''}
                   </AppText>
+                  {meta.href ? (
+                    <AppButton variant="ghost" onPress={() => router.push(meta.href!)}>
+                      Open surface
+                    </AppButton>
+                  ) : null}
                 </View>
                 <Switch
                   accessibilityLabel={`Toggle ${meta.label}`}
-                  disabled={row.id === 'dimon'}
+                  disabled={row.id === 'dimon' || row.locked}
                   value={row.enabled}
                   onValueChange={value => {
                     const next = preferences.featureControl.map((item, i) =>
@@ -73,7 +81,10 @@ export function FeatureControlScreen() {
             )
           })}
 
-          <AppButton onPress={() => router.push('/settings/extensions' as Href)}>
+          <AppButton onPress={() => router.push('/product/sandbox' as Href)}>
+            Module sandbox
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/settings/extensions' as Href)}>
             Extension Centre
           </AppButton>
         </ScrollView>

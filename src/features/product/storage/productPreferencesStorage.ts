@@ -42,6 +42,8 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
     {id: 'merge', enabled: true, locked: false},
     {id: 'focus', enabled: true, locked: false},
     {id: 'gaia', enabled: false, locked: true},
+    {id: 'agents', enabled: true, locked: false},
+    {id: 'forge', enabled: true, locked: false},
     {id: 'dimon', enabled: false, locked: true},
     {id: 'automations', enabled: false, locked: false},
   ],
@@ -66,16 +68,22 @@ function mergePreferences(raw: unknown): ProductPreferences {
       value.glassPrivacyLevel === 'vault-chat'
         ? value.glassPrivacyLevel
         : DEFAULT_PRODUCT_PREFERENCES.glassPrivacyLevel,
-    featureControl: Array.isArray(value.featureControl)
-      ? value.featureControl.filter(
-          (row): row is FeatureControlRow =>
-            !!row &&
-            typeof row === 'object' &&
-            typeof row.id === 'string' &&
-            typeof row.enabled === 'boolean' &&
-            typeof row.locked === 'boolean',
-        )
-      : DEFAULT_PRODUCT_PREFERENCES.featureControl,
+    featureControl: (() => {
+      const stored = Array.isArray(value.featureControl)
+        ? value.featureControl.filter(
+            (row): row is FeatureControlRow =>
+              !!row &&
+              typeof row === 'object' &&
+              typeof row.id === 'string' &&
+              typeof row.enabled === 'boolean' &&
+              typeof row.locked === 'boolean',
+          )
+        : []
+      const byId = new Map(stored.map(row => [row.id, row]))
+      return DEFAULT_PRODUCT_PREFERENCES.featureControl.map(
+        row => byId.get(row.id) ?? row,
+      )
+    })(),
     boardWidgetIds:
       Array.isArray(value.boardWidgetIds) && value.boardWidgetIds.every(item => typeof item === 'string')
         ? value.boardWidgetIds
