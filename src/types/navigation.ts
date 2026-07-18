@@ -15,6 +15,8 @@ export type DrawerDestination = {
     | '/product/forge'
     | '/product/agents'
     | '/product/module-standards'
+    | '/product/permissions'
+    | '/product/sandbox'
     | '/product/gaia'
     | '/product/automations'
     | '/product/search'

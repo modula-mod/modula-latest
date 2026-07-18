@@ -50,6 +50,15 @@ Optional contribution arrays: `routes`, `profileTabs`, `boardSurfaces`, `setting
 4. Agents/tools must not silently access private modules.
 5. Failure in a module must not crash the host (error boundaries).
 
+### Catalogue UI
+
+- Host catalogue: `src/features/product/data/modulePermissions.ts`
+- Matrix studio: `/product/permissions`
+- Forge Build mode toggles the same IDs
+- Security Scan Preview is a local checklist — not a CVE database
+
+See also `docs/design/forge-builder-inspiration.md` (Lovable / Bolt / Base44 remap).
+
 ---
 
 ## Host guarantees

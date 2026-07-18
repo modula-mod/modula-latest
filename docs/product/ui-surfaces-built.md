@@ -23,7 +23,8 @@
 | `/product/widgets` | Toggle widgets → Board strip (persisted) |
 | `/product/feature-control` | Enable/lock features (persisted) |
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |
-| `/product/forge` | Multi-step Forge Builder + Greenfield manifest preview |
+| `/product/forge` | Plan/Build/Preview/Manifest workspace + templates, chat, scan, versions |
+| `/product/permissions` | Permissions matrix + Security Scan Preview |
 | `/product/agents` | Agents module studio (Gaia scopes) |
 | `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |

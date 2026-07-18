@@ -83,6 +83,12 @@ const drawerDestinations: DrawerDestination[] = [
     description: 'Gaia agents module studio',
   },
   {
+    label: 'Permissions',
+    route: '/product/permissions',
+    icon: 'privacy',
+    description: 'Module permission matrix',
+  },
+  {
     label: 'Search',
     route: '/product/search',
     icon: 'search',

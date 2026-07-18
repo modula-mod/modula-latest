@@ -57,15 +57,45 @@ export function ProductHubScreen() {
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Create & extend</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Builder craft inspired by Plan Mode + Preview panes — remapped to Modula modules.
+            </AppText>
+            <AppPressable
+              accessibilityLabel="Open Forge Builder"
+              onPress={() => router.push('/product/forge' as Href)}
+              style={[
+                styles.featured,
+                {
+                  borderRadius: radius.large,
+                  borderColor: colours.accentBorder,
+                  overflow: 'hidden',
+                },
+              ]}>
+              <LinearGradient
+                colors={
+                  scheme === 'dark'
+                    ? [colours.accentSubtle, '#0B1416']
+                    : [colours.accentSubtle, colours.surface]
+                }
+                style={{padding: spacing[5], gap: spacing[3]}}>
+                <AppText variant="caption" colour="accent">
+                  FEATURED · FORGE
+                </AppText>
+                <AppText variant="title">Plan → Build → Preview → Manifest</AppText>
+                <AppText variant="body" colour="textSecondary">
+                  Templates, chat discussion, permissions scan, version snapshots — publish stays
+                  Preview until Registry sandbox ships.
+                </AppText>
+                <View style={[styles.ctaRow, {gap: spacing[2]}]}>
+                  <AppText variant="label" colour="accent">
+                    Open Forge Builder
+                  </AppText>
+                  <AppIcon name="chevronRight" colour={colours.accent} size={16} />
+                </View>
+              </LinearGradient>
+            </AppPressable>
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {[
-                {
-                  id: 'forge',
-                  name: 'Forge Builder',
-                  summary: 'Draft Greenfield manifests visually.',
-                  icon: 'developer' as const,
-                  route: '/product/forge',
-                },
                 {
                   id: 'agents',
                   name: 'Agents',
@@ -79,6 +109,13 @@ export function ProductHubScreen() {
                   summary: 'Manifest rules + boilerplate.',
                   icon: 'check' as const,
                   route: '/product/module-standards',
+                },
+                {
+                  id: 'permissions',
+                  name: 'Permissions',
+                  summary: 'Least-privilege matrix + scan.',
+                  icon: 'privacy' as const,
+                  route: '/product/permissions',
                 },
                 {
                   id: 'themes',
@@ -102,8 +139,8 @@ export function ProductHubScreen() {
                   style={[
                     styles.card,
                     {
-                      backgroundColor: colours.accentSubtle,
-                      borderColor: colours.accentBorder,
+                      backgroundColor: colours.surface,
+                      borderColor: colours.border,
                       borderRadius: radius.large,
                       padding: spacing[4],
                       gap: spacing[2],
@@ -180,6 +217,8 @@ export function ProductHubScreen() {
 const styles = StyleSheet.create({
   screen: {flex: 1},
   hero: {width: '100%'},
+  featured: {borderWidth: StyleSheet.hairlineWidth, width: '100%'},
+  ctaRow: {alignItems: 'center', flexDirection: 'row'},
   grid: {flexDirection: 'row', flexWrap: 'wrap'},
   card: {
     borderWidth: StyleSheet.hairlineWidth,

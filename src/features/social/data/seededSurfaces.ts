@@ -331,6 +331,15 @@ export const helpArticles: HelpArticle[] = [
 
 export const whatsNewNotes = [
   {
+    version: '0.3.1 · Forge workspace',
+    items: [
+      'Forge Plan → Build → Preview → Manifest (Lovable/Bolt/Base44 remap)',
+      'Templates, Discussion chat, Security Scan Preview, version snapshots',
+      'Permissions matrix with risk levels + user-visible copy',
+      'Richer Module Standards + Product Hub featured Forge card',
+    ],
+  },
+  {
     version: '0.3.0 · Builder + Agents',
     items: [
       'Forge Builder — multi-step Greenfield manifest draft',
