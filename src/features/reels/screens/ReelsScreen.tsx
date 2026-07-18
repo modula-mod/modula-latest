@@ -1,5 +1,6 @@
 import {useCallback, useRef, useState} from 'react'
 import {
+  Alert,
   FlatList,
   StyleSheet,
   View,
@@ -18,8 +19,14 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
+import type {ModulaProfile} from '@/features/profile/contracts'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {ReelAuthorPeekSheet} from '@/features/reels/components/ReelAuthorPeekSheet'
 import {useReelsQuery} from '@/features/reels/data'
+import {
+  openReelMoreMenu,
+  runReelOverflowAction,
+} from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaReelPlayer} from '@/platform/ui/video'
@@ -29,9 +36,13 @@ import type {ReelItem as ReelItemType} from '@/domain/discovery'
 export function ReelsScreen() {
   const router = useRouter()
   const {height, width} = useWindowDimensions()
-  const {colours} = useThemeTokens()
   const reelsQuery = useReelsQuery()
+  const session = useSession()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [peekAuthor, setPeekAuthor] = useState<ModulaProfile | null>(null)
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set())
+
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: ViewToken[]}) => {
       const first = viewableItems.find(item => item.isViewable)
@@ -48,8 +59,12 @@ export function ReelsScreen() {
     onViewableItemsChanged,
   ])
 
+  const visibleReels = (reelsQuery.data ?? []).filter(
+    reel => !hiddenIds.has(reel.id),
+  )
+
   return (
-    <View style={[styles.screen, {backgroundColor: '#000'}]}>
+    <View style={styles.screen}>
       <Stack.Screen
         options={{
           title: '',
@@ -84,7 +99,7 @@ export function ReelsScreen() {
           />
         ) : (
           <FlatList
-            data={reelsQuery.data ?? []}
+            data={visibleReels}
             keyExtractor={item => item.id}
             pagingEnabled
             showsVerticalScrollIndicator={false}
@@ -95,15 +110,27 @@ export function ReelsScreen() {
                 reel={item}
                 height={height}
                 width={width}
+                ownerProfileId={ownerProfileId}
                 active={
                   activeId === item.id ||
-                  (activeId === null && item.id === reelsQuery.data?.[0]?.id)
+                  (activeId === null && item.id === visibleReels[0]?.id)
                 }
+                onOpenAuthorPeek={setPeekAuthor}
+                onHideReel={id => {
+                  setHiddenIds(prev => new Set(prev).add(id))
+                }}
               />
             )}
           />
         )}
       </FeatureErrorBoundary>
+
+      <ReelAuthorPeekSheet
+        author={peekAuthor}
+        ownerProfileId={ownerProfileId}
+        isPresented={peekAuthor != null}
+        onDismiss={() => setPeekAuthor(null)}
+      />
     </View>
   )
 }
@@ -113,31 +140,84 @@ function ReelItem({
   height,
   width,
   active,
+  ownerProfileId,
+  onOpenAuthorPeek,
+  onHideReel,
 }: {
   reel: ReelItemType
   height: number
   width: number
   active: boolean
+  ownerProfileId: string
+  onOpenAuthorPeek: (author: ModulaProfile) => void
+  onHideReel: (id: string) => void
 }) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const [liked, setLiked] = useState(reel.liked)
-  const session = useSession()
+  const [saved, setSaved] = useState(false)
   const {colours, spacing} = useThemeTokens()
-  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfileId)
   const likeCount = reel.likeCount + (liked && !reel.liked ? 1 : 0)
 
   const actions: {
     label: string
     icon: AppIconName
-    action: 'like' | 'reply' | 'share' | 'more'
+    action: 'like' | 'reply' | 'share' | 'save' | 'more'
+    count?: number
   }[] = [
-    {label: 'Like', icon: 'like', action: 'like'},
-    {label: 'Reply', icon: 'comment', action: 'reply'},
+    {label: 'Like', icon: 'like', action: 'like', count: likeCount},
+    {
+      label: 'Comments',
+      icon: 'comment',
+      action: 'reply',
+      count: reel.replyCount,
+    },
     {label: 'Share', icon: 'share', action: 'share'},
-    {label: 'More', icon: 'more', action: 'more'},
+    {label: saved ? 'Saved' : 'Save', icon: 'saved', action: 'save'},
+    {label: 'More options', icon: 'more', action: 'more'},
   ]
+
+  const runAction = (action: (typeof actions)[number]['action']) => {
+    void selectionHaptic()
+    switch (action) {
+      case 'like':
+        setLiked(value => !value)
+        return
+      case 'reply':
+        Alert.alert(
+          'Comments (Preview)',
+          reel.replyCount > 0
+            ? `${reel.replyCount} replies on this reel. Full threaded comments land with the reels engagement API.`
+            : 'No replies yet. Threaded comments land with the reels engagement API.',
+        )
+        return
+      case 'share':
+        void runReelOverflowAction('share', reel, ownerProfileId)
+        return
+      case 'save':
+        setSaved(value => {
+          const next = !value
+          if (next) {
+            Alert.alert(
+              'Saved (Preview)',
+              'Saved reels will sync once collections land. Local preview only.',
+            )
+          }
+          return next
+        })
+        return
+      case 'more':
+        void openReelMoreMenu(reel, ownerProfileId).then(selected => {
+          if (selected === 'notInterested') {
+            onHideReel(reel.id)
+          }
+        })
+        return
+      default:
+        return
+    }
+  }
 
   return (
     <View style={[styles.item, {height, width, backgroundColor: colours.surface1}]}>
@@ -173,8 +253,13 @@ function ReelItem({
         ]}>
         <View style={[styles.caption, {gap: spacing[2]}]}>
           <AppPressable
-            accessibilityLabel={`Open ${reel.author.displayName} profile`}
+            accessibilityLabel={`Open ${reel.author.displayName} profile. Long press for preview.`}
             onPress={() => router.push(profileRoute)}
+            onLongPress={() => {
+              void selectionHaptic()
+              onOpenAuthorPeek(reel.author)
+            }}
+            delayLongPress={280}
             style={styles.creator}>
             <Avatar
               name={reel.author.displayName}
@@ -182,9 +267,20 @@ function ReelItem({
               colour={reel.author.coverColour}
               size={36}
             />
-            <AppText variant="headline" style={{color: colours.mediaOverlayText}}>
-              {reel.author.displayName}
-            </AppText>
+            <View style={styles.creatorText}>
+              <AppText
+                variant="headline"
+                style={{color: colours.mediaOverlayText}}
+                numberOfLines={1}>
+                {reel.author.displayName}
+              </AppText>
+              <AppText
+                variant="caption"
+                style={{color: colours.mediaOverlaySecondary}}
+                numberOfLines={1}>
+                @{reel.author.handle}
+              </AppText>
+            </View>
           </AppPressable>
           <AppText variant="body" style={{color: colours.mediaOverlayText}}>
             {reel.caption}
@@ -201,14 +297,14 @@ function ReelItem({
               <AppPressable
                 accessibilityLabel={action.label}
                 accessibilityState={{
-                  selected: action.action === 'like' ? liked : undefined,
+                  selected:
+                    action.action === 'like'
+                      ? liked
+                      : action.action === 'save'
+                        ? saved
+                        : undefined,
                 }}
-                onPress={() => {
-                  if (action.action === 'like') {
-                    void selectionHaptic()
-                    setLiked(value => !value)
-                  }
-                }}
+                onPress={() => runAction(action.action)}
                 style={styles.railHit}>
                 <LiquidGlassChrome
                   interactive
@@ -217,7 +313,8 @@ function ReelItem({
                   <AppIcon
                     name={action.icon}
                     colour={
-                      action.action === 'like' && liked
+                      (action.action === 'like' && liked) ||
+                      (action.action === 'save' && saved)
                         ? colours.accent
                         : colours.mediaOverlayIcon
                     }
@@ -225,14 +322,14 @@ function ReelItem({
                   />
                 </LiquidGlassChrome>
               </AppPressable>
-              {action.action === 'like' ? (
+              {typeof action.count === 'number' ? (
                 <AppText
                   variant="caption"
                   style={{
                     color: colours.mediaOverlayText,
                     fontVariant: ['tabular-nums'],
                   }}>
-                  {likeCount}
+                  {action.count}
                 </AppText>
               ) : null}
             </View>
@@ -260,6 +357,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+  creatorText: {
+    flex: 1,
+    minWidth: 0,
+  },
   item: {
     overflow: 'hidden',
   },
@@ -282,6 +383,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   screen: {
+    backgroundColor: '#000',
     flex: 1,
   },
 })
