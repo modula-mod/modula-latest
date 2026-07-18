@@ -20,7 +20,7 @@ import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useHomeFeedQuery} from '@/features/feed/data'
-import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
+import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {
   FOCUS_PRESET_META,
   isFocusActive,
@@ -48,14 +48,6 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
   Following: 'following',
   'For You': 'forYou',
   Modules: 'modules',
-}
-
-const PRESENCE_ROUTES: Record<string, Href> = {
-  focus: '/product/focus',
-  board: '/board',
-  you: '/profile/os',
-  modules: '/modules',
-  team: '/teams',
 }
 
 export function HomeFeedScreen() {
@@ -138,46 +130,7 @@ export function HomeFeedScreen() {
               <View>
                 {!focus.hideNav ? (
                   <View style={{paddingVertical: spacing[3]}}>
-                    <PresenceArc
-                      centreLabel={focus.showHalo ? 'Focused' : 'Available'}
-                      onCentrePress={() => router.push('/product/focus' as Href)}
-                      onItemPress={id => {
-                        void selectionHaptic()
-                        const route = PRESENCE_ROUTES[id]
-                        if (route) router.push(route)
-                      }}
-                      items={[
-                        {
-                          id: 'focus',
-                          label: 'Focus',
-                          icon: 'contrast',
-                          unread: focusActive,
-                        },
-                        {
-                          id: 'board',
-                          label: 'Board',
-                          icon: 'board',
-                          unread: focus.priorityWork,
-                        },
-                        {
-                          id: 'you',
-                          label: 'You',
-                          icon: 'profile',
-                          unread: focus.showHalo,
-                        },
-                        {
-                          id: 'modules',
-                          label: 'Modules',
-                          icon: 'modules',
-                          unread: !focus.quietFeed,
-                        },
-                        {
-                          id: 'team',
-                          label: 'Team',
-                          icon: 'teams',
-                        },
-                      ]}
-                    />
+                    <PresenceStoriesRail compact showCaption />
                   </View>
                 ) : null}
 

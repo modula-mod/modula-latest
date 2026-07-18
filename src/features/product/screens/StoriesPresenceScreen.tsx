@@ -5,6 +5,7 @@ import {useRouter, type Href} from 'expo-router'
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -28,21 +29,32 @@ export function StoriesPresenceScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Presence" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Presence — not Instagram Stories.</AppText>
+        <ScrollView contentContainerStyle={{gap: spacing[5], paddingBottom: spacing[6]}}>
+          <View style={{gap: spacing[2], paddingHorizontal: spacing[4], paddingTop: spacing[4]}}>
+            <AppText variant="display">Presence</AppText>
             <AppText variant="body" colour="textSecondary">
-              Short-form and live experiences are planned social capabilities. The arc below maps to
-              Focus, modules, and Inner Circle — not a clone of ephemeral social as the core product.
+              Focus Halo rail Preview — not Instagram Stories. Centre-focus avatars, gradient rings,
+              and progressive blur stage the presence strip.
+            </AppText>
+          </View>
+
+          <PresenceStoriesRail showCaption={false} />
+
+          <View style={{gap: spacing[2], paddingHorizontal: spacing[4]}}>
+            <AppText variant="headline">Spaces arc</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Module and Focus shortcuts stay on the icon arc — separate from the people rail.
             </AppText>
           </View>
 
           <PresenceArc
             centreLabel="Add presence"
             items={ARCS.map(({id, label, icon, unread}) => ({id, label, icon, unread}))}
+            onItemPress={id => setSelectedId(id)}
+            onCentrePress={() => setSelectedId('c')}
           />
 
-          <View style={[styles.chips, {gap: spacing[2]}]}>
+          <View style={[styles.chips, {gap: spacing[2], paddingHorizontal: spacing[4]}]}>
             {ARCS.map(item => {
               const on = item.id === selectedId
               return (
@@ -73,6 +85,7 @@ export function StoriesPresenceScreen() {
             style={[
               styles.card,
               {
+                marginHorizontal: spacing[4],
                 padding: spacing[4],
                 gap: spacing[2],
                 borderRadius: radius.large,
@@ -95,10 +108,12 @@ export function StoriesPresenceScreen() {
             </AppText>
           </Surface>
 
-          <AppButton onPress={() => router.push('/reels' as Href)}>Open Reels preview</AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/product/focus' as Href)}>
-            Focus Mode
-          </AppButton>
+          <View style={{paddingHorizontal: spacing[4], gap: spacing[3]}}>
+            <AppButton onPress={() => router.push('/reels' as Href)}>Open Reels preview</AppButton>
+            <AppButton variant="secondary" onPress={() => router.push('/product/focus' as Href)}>
+              Focus Mode
+            </AppButton>
+          </View>
         </ScrollView>
       </ResponsiveContent>
     </View>
