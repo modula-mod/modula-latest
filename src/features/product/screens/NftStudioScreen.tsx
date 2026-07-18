@@ -16,31 +16,51 @@ const OWNERSHIP_MEANINGS: Array<{
 }> = [
   {
     title: 'Module entitlements',
-    body: 'Proof that an account may access a module, tier, add-on, or private workspace.',
+    body: 'Future proof that an account may access a module, tier, add-on, or private workspace. Nothing here grants paid access while DIMON is inactive.',
     icon: 'modules',
   },
   {
     title: 'Creator editions',
-    body: 'Limited editions, membership proofs, and collector records without floor-price theatre.',
+    body: 'Reserved limited editions, membership proofs, and collector records without floor-price theatre, live sales, or secondary-market claims.',
     icon: 'poll',
   },
   {
     title: 'Profile collectibles',
-    body: 'Opt-in profile items and achievements that never gate professional use.',
+    body: 'Planned opt-in profile items and achievements that can decorate identity later but never gate professional use or claim active chain ownership.',
     icon: 'profile',
   },
   {
     title: 'Team credentials',
-    body: 'Role, certification, and organisation proofs that can be revoked by policy.',
+    body: 'Potential role, certification, and organisation proofs that remain revocable by policy and do not replace team permissions or audit records.',
     icon: 'teams',
   },
 ]
 
-const PREVIEW_COLLECTIONS = [
-  'Module Access Pass',
-  'Creator Edition Proof',
-  'Profile Collectible Badge',
-  'Team Credential Proof',
+const PREVIEW_COLLECTIONS: ReadonlyArray<{
+  name: string
+  status: string
+  detail: string
+}> = [
+  {
+    name: 'Module Access Pass',
+    status: 'Reserved preview stub - no mintable collection exists.',
+    detail: 'Represents future module entitlement language only; it does not unlock paid modules or show a token ID.',
+  },
+  {
+    name: 'Creator Edition Proof',
+    status: 'Reserved preview stub - no creator edition can be minted.',
+    detail: 'Represents future creator membership or edition records only; it does not list supply, price, or owner data.',
+  },
+  {
+    name: 'Profile Collectible Badge',
+    status: 'Reserved preview stub - no profile collectible ownership is live.',
+    detail: 'Represents future profile decoration language only; it does not claim wallet ownership or verification.',
+  },
+  {
+    name: 'Team Credential Proof',
+    status: 'Reserved preview stub - no team credential NFT exists.',
+    detail: 'Represents future revocable credential language only; team roles and permissions remain the source of truth.',
+  },
 ] as const
 
 const CREATOR_FLOW = [
@@ -65,34 +85,28 @@ const LINKS: Array<{
   icon: AppIconName
 }> = [
   {
-    label: 'DIMON status',
-    detail: 'Required inactive ownership layer status.',
-    href: '/settings/dimon',
-    icon: 'security',
-  },
-  {
-    label: 'Ledger & Replay',
-    detail: 'Audit path preview without re-running side effects.',
-    href: '/product/ledger',
-    icon: 'storage',
+    label: 'Design Lab',
+    detail: 'Themes and layouts preview where visual identity work can happen before any ownership layer exists.',
+    href: '/product/themes',
+    icon: 'palette',
   },
   {
     label: 'Ownership & Portability',
-    detail: 'Export, permissions, sessions, and future purchase preservation.',
+    detail: 'Export, permissions, sessions, backups, and future purchase preservation without blockchain claims.',
     href: '/product/ownership',
     icon: 'privacy',
   },
   {
-    label: 'Marketplace',
-    detail: 'Seeded module catalog. No billing or NFT trading.',
-    href: '/marketplace',
-    icon: 'marketplace',
+    label: 'Ledger & Replay',
+    detail: 'Audit path preview for local product actions, with no chain writes or destructive replay.',
+    href: '/product/ledger',
+    icon: 'storage',
   },
   {
-    label: 'Developer Tools',
-    detail: 'CLI, MCP, contracts, and command references.',
-    href: '/product/developer',
-    icon: 'developer',
+    label: 'DIMON status',
+    detail: 'Inactive ownership-layer status and the honesty boundary for wallets, balances, mints, and settlements.',
+    href: '/settings/dimon',
+    icon: 'security',
   },
 ]
 
@@ -125,6 +139,11 @@ export function NftStudioScreen() {
               NFT Studio foreshadows ownership proofs for Modula. It is not a live mint
               marketplace, not a wallet, and not a speculative trading surface.
             </AppText>
+            <AppText variant="body" colour="textSecondary">
+              Every collection, flow, and holder row on this screen is explanatory copy only. There
+              are no hidden mint jobs, token IDs, wallet balances, transfer records, prices, or
+              settlement events behind these stubs.
+            </AppText>
           </Surface>
 
           <Surface
@@ -153,6 +172,11 @@ export function NftStudioScreen() {
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">What NFTs mean in Modula</AppText>
+            <AppText variant="body" colour="textSecondary">
+              The intended shape is ownership proof and entitlement language for useful product
+              boundaries. It is not casino mechanics, speculative pricing, or a replacement for
+              PostgreSQL-backed application state.
+            </AppText>
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {OWNERSHIP_MEANINGS.map(item => (
                 <Surface
@@ -181,12 +205,14 @@ export function NftStudioScreen() {
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Collection gallery</AppText>
             <AppText variant="body" colour="textSecondary">
-              Seeded Preview stubs. Names only. Status Reserved.
+              Seeded Preview stubs list their full collection names and statuses. They are product
+              taxonomy only: no artwork pipeline, token metadata, supply count, mint queue, owner
+              record, wallet balance, floor price, or marketplace listing exists in this build.
             </AppText>
             <View style={[styles.grid, {gap: spacing[3]}]}>
-              {PREVIEW_COLLECTIONS.map(name => (
+              {PREVIEW_COLLECTIONS.map(collection => (
                 <Surface
-                  key={name}
+                  key={collection.name}
                   variant="contained"
                   style={[
                     styles.gridCard,
@@ -201,9 +227,12 @@ export function NftStudioScreen() {
                   <AppText variant="caption" colour="accent">
                     Preview
                   </AppText>
-                  <AppText variant="headline">{name}</AppText>
+                  <AppText variant="headline">{collection.name}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Status: {collection.status}
+                  </AppText>
                   <AppText variant="caption" colour="textTertiary">
-                    Status: Reserved
+                    {collection.detail}
                   </AppText>
                 </Surface>
               ))}
@@ -212,6 +241,12 @@ export function NftStudioScreen() {
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Creator flow Preview</AppText>
+            <AppText variant="body" colour="textSecondary">
+              The flow shows the order a future creator collection would need to pass through:
+              definition, metadata, AKI scan, Governor policy, ledger review, and DIMON settlement.
+              Only the local definition can be inspected today; all mint and transfer actions remain
+              blocked.
+            </AppText>
             {CREATOR_FLOW.map(item => (
               <Surface
                 key={item.step}
@@ -241,11 +276,37 @@ export function NftStudioScreen() {
               </Surface>
             ))}
             <View style={[styles.actions, {gap: spacing[2]}]}>
-              <AppButton disabled variant="secondary" style={styles.actionButton}>
-                Preview blocked: mint request
+              <AppButton
+                disabled
+                variant="secondary"
+                style={styles.actionButton}
+                accessibilityLabel="Mint request disabled because ADR-006 keeps PostgreSQL as the primary database and DIMON is not active yet">
+                <View style={styles.actionContent}>
+                  <AppText variant="label" style={styles.centerText}>
+                    Mint request disabled
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" style={styles.centerText}>
+                    ADR-006: PostgreSQL is the primary application database; blockchain is not the
+                    app database. DIMON is not active yet, so no mint job, token ID, chain write,
+                    wallet balance, or settlement event can be created.
+                  </AppText>
+                </View>
               </AppButton>
-              <AppButton disabled variant="secondary" style={styles.actionButton}>
-                Preview blocked: transfer request
+              <AppButton
+                disabled
+                variant="secondary"
+                style={styles.actionButton}
+                accessibilityLabel="Transfer request disabled because ADR-006 keeps PostgreSQL as the primary database and DIMON is not active yet">
+                <View style={styles.actionContent}>
+                  <AppText variant="label" style={styles.centerText}>
+                    Transfer request disabled
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" style={styles.centerText}>
+                    ADR-006: PostgreSQL remains the source of truth for application records.
+                    DIMON is not active yet, so there is no wallet transfer, ownership handoff,
+                    marketplace settlement, or blockchain success state to run.
+                  </AppText>
+                </View>
               </AppButton>
             </View>
           </View>
@@ -279,6 +340,10 @@ export function NftStudioScreen() {
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Related surfaces</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Use these linked surfaces for design exploration, ownership controls, and audit
+              language while NFT Studio stays an inactive, non-minting preview.
+            </AppText>
             {LINKS.map(link => (
               <Surface
                 key={link.href.toString()}
@@ -324,6 +389,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   actions: {flexDirection: 'row', flexWrap: 'wrap'},
-  actionButton: {flexGrow: 1},
+  actionButton: {flexBasis: 300, flexGrow: 1},
+  actionContent: {alignItems: 'center', gap: 4},
+  centerText: {textAlign: 'center'},
   noteRow: {alignItems: 'center', flexDirection: 'row'},
 })
