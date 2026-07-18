@@ -166,11 +166,67 @@ Isolation suffix: `mrq88801`.
 | `ops/docker/greenfield-api.Dockerfile` | Fixes runtime ownership for non-root API container |
 | `ops/docker/greenfield-worker.Dockerfile` | Fixes runtime ownership for non-root Worker container |
 
+## PART 5 — Mac acceptance (post PART 4 handoff)
+
+**Mac tip pulled:** `4ba1d3bc4d1abcffc261dc0d716c67f5f2a9fdfe`  
+**Mac model / OS / Xcode:** Mac14,10 · macOS 27.0 (26A5378n) · Xcode 26.3 (17C529)
+
+### Mac live API corroboration
+
+| Check | Result |
+| --- | --- |
+| `GET /v1/meta` | PASS — `backend:greenfield`, `environment:preview`, `atproto:false`, `inviteOnly:true`, Greenfield accounts/sessions/repos/extensions true |
+| `GET /v1/feed/home` | PASS — 200 |
+| `GET /v1/extensions` | PASS — 200 |
+| `GET /v1/tools` | PASS — 200 |
+| Bad sign-in | PASS — 401 |
+
+### Mac static gates
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| `pnpm install --frozen-lockfile` | PASS | |
+| `pnpm typecheck` | PASS | |
+| `pnpm verify:theme` | PASS | |
+| `pnpm verify:phase4` | PASS | |
+| `pnpm verify:phase5` | PASS | |
+| `pnpm verify:phase6-greenfield-backend` | PASS | |
+| `pnpm verify:phase6-greenfield-frontend` | PASS | |
+| `pnpm verify:phase6s-social-backend` | PASS | |
+| `pnpm verify:phase6s-social-frontend` | PASS | |
+| `pnpm exec expo export --platform web` | PASS | 100 routes |
+| `git diff --check` | PASS | at PART 4 tip |
+| `pnpm exec expo install --check` | FAIL (pre-existing) | Expo patch drift (`57.0.6` vs `~57.0.7`) — not introduced by PART 5 |
+| `pnpm lint` | FAIL (pre-existing) | SkeletonBlock refs + prior liquid-glass/immutability debt |
+| `pnpm verify:phase1` | FAIL (pre-existing) | Route layout / reanimated policy drift |
+| `pnpm verify:phase2` | FAIL (pre-existing) | Reanimated / BlurView policy drift |
+| `pnpm verify:phase3` | FAIL (pre-existing) | Route thinness / reanimated drift |
+
+### Simulator
+
+| Check | Result |
+| --- | --- |
+| Native Simulator build + install + launch | PASS |
+| Home feed shows live PART 4 acceptance fixtures | PASS |
+| Extension Centre / Appearance / Activity surfaces | PASS (deep-link screenshots) |
+| Full interactive social checklist | NOT EXECUTED |
+| Evidence | `docs/validation/phase6s-simulator-acceptance.md` + `docs/validation/phase6s-screenshots/` |
+
+### Physical iPhone / TestFlight
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Device paired / available | FAIL / BLOCKED | `xcrun devicectl list devices` — simulated only; no physical iPhone |
+| `pnpm exec expo run:ios --device` (physical) | BLOCKED | no physical destination |
+| Appearance screenshot matrix (physical) | BLOCKED | |
+| Release / TestFlight | BLOCKED | requires physical PASS |
+
 ## Remaining Gates
 
 | Gate | Status |
 | --- | --- |
-| Physical iPhone validation | BLOCKED - requires a paired physical iPhone; not performed on VPS |
-| TestFlight | BLOCKED - should start only after physical iPhone/PART 5 validation |
-| Merge to `main` | BLOCKED - PART 5 gates still required |
-| Phase 6R merge | BLOCKED by instruction - do not merge Phase 6R |
+| Physical iPhone validation | BLOCKED — no paired physical iPhone on this Mac |
+| TestFlight | BLOCKED — starts only after physical iPhone PASS |
+| Merge to `main` | BLOCKED — physical/TestFlight still required by Phase 6S definition of done |
+| Phase 6R merge | BLOCKED by instruction — do not merge Phase 6R |
+| Phase 6S PR into `phase6-greenfield-sovereign-core` | OPEN — code + PART 4 complete; physical gate still open |
