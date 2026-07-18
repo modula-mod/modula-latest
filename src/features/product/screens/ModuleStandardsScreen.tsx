@@ -22,6 +22,14 @@ const RULES = [
     body: 'Declare GreenfieldModuleManifest fields — id, version, hostCompatibility, uninstall.',
   },
   {
+    title: 'skill.md digital DNA',
+    body: 'Ship skill.md with commands, AI actions, permissions, network, risk, and audit behaviour for GAIA, AKI, and the Governor.',
+  },
+  {
+    title: 'Command Layer registration',
+    body: 'Expose capabilities as typed commands (risk, preview, confirmation, undo, Ledger policy) — not hardwired UI-only actions.',
+  },
+  {
     title: 'Least privilege',
     body: 'Permissions must match user-visible purpose. High-risk scopes need owner defaults.',
   },
@@ -162,8 +170,14 @@ export function ModuleStandardsScreen() {
           <AppButton onPress={() => router.push('/product/permissions' as Href)}>
             Open permissions matrix
           </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/commands' as Href)}>
+            Command Layer catalogue
+          </AppButton>
           <AppButton variant="secondary" onPress={() => router.push('/product/forge' as Href)}>
             Open Forge Builder
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/intelligence' as Href)}>
+            Intelligence Hub
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/product/sandbox' as Href)}>
             Module sandbox

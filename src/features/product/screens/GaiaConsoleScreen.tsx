@@ -6,6 +6,7 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {evaluateFocusPolicy} from '@/features/product/data/focusPolicy'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -30,6 +31,15 @@ const SCOPES = [
   {id: 'search', label: 'Search queries'},
 ]
 
+const FLOW = [
+  'GAIA interprets + prepares a plan',
+  'Command Layer resolves tools',
+  'AKI verifies claims + permissions',
+  'Governor applies autonomy / approval',
+  'User confirms consequential actions',
+  'Ledger records the path',
+]
+
 export function GaiaConsoleScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
@@ -37,18 +47,71 @@ export function GaiaConsoleScreen() {
   const [prompt, setPrompt] = useState('')
   const [reply, setReply] = useState<string | null>(null)
   const allowed = new Set(preferences.gaiaAllowedScopes)
+  const focusPreset = preferences.focus.preset ?? 'off'
+  const focusPolicy = evaluateFocusPolicy(focusPreset)
+  const gaiaMayInterrupt = focusPolicy.gaiaUnsolicitedAllowed
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Gaia" />
+      <SecondaryScreenHeader title="GAIA" />
       <ResponsiveContent maxWidth={720}>
         <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Intelligence with permission.</AppText>
+            <AppText variant="caption" colour="accent">
+              EXECUTES · AKI VERIFIES · GOVERNOR CONTROLS
+            </AppText>
+            <AppText variant="display">The intelligence users work with.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Scopes persist locally. Responses are deterministic Preview labels — no model calls.
+              GAIA is context and orchestration — not an unrestricted agent. It operates through the
+              Command Layer, module permissions, AKI validation, and Governor policy. This console is
+              Preview: deterministic labels only, no model calls.
             </AppText>
           </View>
+
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                padding: spacing[4],
+                gap: spacing[2],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="caption" colour="textTertiary">
+              GOVERNED FLOW
+            </AppText>
+            {FLOW.map((step, index) => (
+              <AppText key={step} variant="body" colour="textSecondary">
+                {index + 1}. {step}
+              </AppText>
+            ))}
+          </Surface>
+
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                padding: spacing[4],
+                gap: spacing[2],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">GaiaFocusAdapter</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Focus preset · {focusPreset}
+            </AppText>
+            <AppText variant="caption" colour={gaiaMayInterrupt ? 'accent' : 'textTertiary'}>
+              {gaiaMayInterrupt
+                ? 'Unsolicited GAIA suggestions allowed under this preset.'
+                : 'Deep / Custom Focus: GAIA avoids unsolicited interruptions.'}
+            </AppText>
+          </Surface>
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Allowed scopes</AppText>
@@ -91,7 +154,7 @@ export function GaiaConsoleScreen() {
                   key={agent.name}
                   variant="contained"
                   style={[
-                    styles.card,
+                    styles.agentCard,
                     {
                       padding: spacing[4],
                       gap: spacing[2],
@@ -114,13 +177,13 @@ export function GaiaConsoleScreen() {
           </View>
 
           <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">Ask Gaia (Preview)</AppText>
+            <AppText variant="headline">Ask GAIA (Preview)</AppText>
             <TextInput
               value={prompt}
               onChangeText={setPrompt}
-              placeholder="e.g. Summarise my Board focus"
+              placeholder="e.g. Prepare my Board for tomorrow"
               placeholderTextColor={colours.textTertiary}
-              accessibilityLabel="Gaia prompt"
+              accessibilityLabel="GAIA prompt"
               style={[
                 styles.input,
                 {
@@ -144,7 +207,7 @@ export function GaiaConsoleScreen() {
                   return
                 }
                 setReply(
-                  `Preview (not a model): Based on allowed scopes [${preferences.gaiaAllowedScopes.join(', ')}], Gaia would only use those surfaces for “${text}”. No private modules were read.`,
+                  `Preview (not a model): GAIA would plan “${text}” using scopes [${preferences.gaiaAllowedScopes.join(', ')}], route via Command Layer, request AKI verification, and await Governor + user confirmation before any write. No private modules were read.`,
                 )
               }}>
               Run Preview
@@ -168,14 +231,20 @@ export function GaiaConsoleScreen() {
             ) : null}
           </View>
 
-          <AppButton onPress={() => router.push('/product/agents' as Href)}>
-            Agents module studio
+          <AppButton onPress={() => router.push('/product/intelligence' as Href)}>
+            Intelligence Hub
           </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/product/gaia-atlas' as Href)}>
-            Open Gaia Atlas
+          <AppButton variant="secondary" onPress={() => router.push('/product/aki' as Href)}>
+            Open AKI
           </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/product/sandbox' as Href)}>
-            Module sandbox foreshadow
+          <AppButton variant="secondary" onPress={() => router.push('/product/governor' as Href)}>
+            Open AGI Governor
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/commands' as Href)}>
+            Command Layer
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/gaia-atlas' as Href)}>
+            Gaia Atlas
           </AppButton>
         </ScrollView>
       </ResponsiveContent>
@@ -185,13 +254,14 @@ export function GaiaConsoleScreen() {
 
 const styles = StyleSheet.create({
   screen: {flex: 1},
+  card: {borderWidth: StyleSheet.hairlineWidth},
   scopeRow: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
   grid: {flexDirection: 'row', flexWrap: 'wrap'},
-  card: {
+  agentCard: {
     borderWidth: StyleSheet.hairlineWidth,
     flexBasis: '47%',
     flexGrow: 1,

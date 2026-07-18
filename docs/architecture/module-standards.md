@@ -88,14 +88,37 @@ Forge Preview in the app drafts manifests only. It does not publish or execute m
 
 ---
 
+## skill.md — module digital DNA
+
+Every module should ship `skill.md` alongside the JSON manifest. GAIA uses it to understand capabilities; AKI uses it to validate; the AGI Governor uses it to control.
+
+Declare at minimum:
+
+- What the module does
+- Commands exposed (risk, confirmation)
+- Data types owned
+- AI-accessible actions
+- Permissions + network destinations
+- Events emitted/consumed
+- Audit / Ledger behaviour
+- Compatible host versions
+
+Template: `templates/modula-module/skill.md`  
+Intelligence model: `docs/architecture/intelligence-architecture.md`
+
+Commands must also register with the **Command Layer** (typed inputs, preview, undo, Ledger policy) — see `/product/commands`.
+
+---
+
 ## Boilerplate
 
 Start from `templates/modula-module/`:
 
 1. Copy the template
 2. Fill `modula.module.json` (manifest)
-3. Implement surfaces behind the declared routes
-4. Keep host imports limited to public contracts / tokens
-5. Document permissions in README
+3. Fill `skill.md` (digital DNA for GAIA / AKI / Governor)
+4. Implement surfaces behind the declared routes
+5. Keep host imports limited to public contracts / tokens
+6. Document permissions in README
 
 See also: `src/modules/README.md`, ADR-008 (extension kernel).

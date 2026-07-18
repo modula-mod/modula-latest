@@ -51,7 +51,8 @@ export function ProductHubScreen() {
             <AppText variant="display">Everything Modula offers</AppText>
             <AppText variant="body" colour="textSecondary">
               Social is the foundation. The profile is the platform. Modules provide capabilities.
-              Gaia provides intelligence. DIMON provides ownership. Forge lets the ecosystem grow.
+              GAIA executes, AKI verifies, and the AGI Governor controls. DIMON provides ownership.
+              Forge lets the ecosystem grow.
             </AppText>
           </LinearGradient>
 
@@ -97,16 +98,30 @@ export function ProductHubScreen() {
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {[
                 {
+                  id: 'intelligence',
+                  name: 'Intelligence',
+                  summary: 'GAIA · AKI · Governor map.',
+                  icon: 'discover' as const,
+                  route: '/product/intelligence',
+                },
+                {
+                  id: 'commands',
+                  name: 'Commands',
+                  summary: 'Universal execution router.',
+                  icon: 'developer' as const,
+                  route: '/product/commands',
+                },
+                {
                   id: 'agents',
                   name: 'Agents',
-                  summary: 'Scoped Gaia agent packages.',
+                  summary: 'Scoped GAIA agent packages.',
                   icon: 'automation' as const,
                   route: '/product/agents',
                 },
                 {
                   id: 'standards',
                   name: 'Module Standards',
-                  summary: 'Manifest rules + boilerplate.',
+                  summary: 'Manifest + skill.md DNA.',
                   icon: 'check' as const,
                   route: '/product/module-standards',
                 },

@@ -600,6 +600,26 @@ export function ForgeStudioScreen() {
                 </AppText>
               </Surface>
 
+              <Surface
+                variant="contained"
+                style={[
+                  styles.manifest,
+                  {
+                    padding: spacing[4],
+                    gap: spacing[2],
+                    borderRadius: radius.medium,
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                  },
+                ]}>
+                <AppText variant="label">skill.md · digital DNA</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  Ship `templates/modula-module/skill.md` with commands, AI actions, permissions,
+                  network, risk, and Ledger behaviour. GAIA reads it; AKI validates it; the Governor
+                  controls it. Preview only — not written to disk from this studio yet.
+                </AppText>
+              </Surface>
+
               <AppButton onPress={saveVersion}>Save version snapshot</AppButton>
               {versions.length > 0 ? (
                 <View style={{gap: spacing[2]}}>
@@ -636,6 +656,12 @@ export function ForgeStudioScreen() {
           </AppButton>
           <AppButton variant="secondary" onPress={() => router.push('/product/module-standards' as Href)}>
             Module standards
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/commands' as Href)}>
+            Command Layer
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/intelligence' as Href)}>
+            Intelligence Hub
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/product/sandbox' as Href)}>
             Sandbox foreshadow

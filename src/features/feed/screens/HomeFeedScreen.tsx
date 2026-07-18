@@ -21,6 +21,10 @@ import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
+import {
+  FOCUS_PRESET_META,
+  isFocusActive,
+} from '@/features/product/data/focusPolicy'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
@@ -61,8 +65,9 @@ export function HomeFeedScreen() {
   const tabPadding = useFloatingTabBarContentPadding()
   const {preferences} = useProductPreferences()
   const focus = preferences.focus
-  const focusActive =
-    focus.quietFeed || focus.suppressPings || focus.priorityWork || focus.hideNav
+  const focusPreset = focus.preset ?? 'off'
+  const focusActive = isFocusActive(focus)
+  const focusMeta = FOCUS_PRESET_META[focusPreset]
 
   const modeOrder = useMemo((): FeedModeLabel[] => {
     if (focus.priorityWork && focus.quietFeed) {
@@ -182,7 +187,7 @@ export function HomeFeedScreen() {
                     ]}>
                     <AppIcon name="contrast" colour={colours.accent} size={16} />
                     <AppText variant="caption" colour="accent" style={{flex: 1}}>
-                      Focus Mode
+                      Focus · {focusMeta.title}
                       {focus.quietFeed ? ' · Quiet feed' : ''}
                       {focus.priorityWork ? ' · Work first' : ''}
                     </AppText>

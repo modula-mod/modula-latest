@@ -15,11 +15,17 @@
 
 | Route | Surface |
 | --- | --- |
-| `/product/focus` | Focus Mode toggles + Halo (persisted) |
+| `/product/focus` | Focus Off/Light/Deep/Custom + policy engine Preview + Halo |
+| `/product/intelligence` | Canonical intelligence Hub (GAIA · AKI · Governor …) |
+| `/product/intelligence/[slug]` | Layer detail + seeded Preview samples |
+| `/product/commands` | Command Layer catalogue |
+| `/product/aki` → `/product/intelligence/aki` | AKI redirect |
+| `/product/governor` → Governor layer | AGI Governor redirect |
+| `/product/circuit-memory` · `/kaizen` · `/foundry` · `/claims-graph` · `/ledger` | Layer redirects |
 | `/product/merge-feeds` | Merge 2–5 feeds (persisted) |
 | `/product/automations` | Workflow cards + local enable (persisted) |
-| `/product/gaia` | Agent console + scopes (persisted) |
-| `/product/gaia-atlas` | Atlas schematic |
+| `/product/gaia` | GAIA console — scopes + governed flow (persisted) |
+| `/product/gaia-atlas` | Atlas schematic (GAIA centre · AKI/Governor orbit) |
 | `/product/widgets` | Toggle widgets → Board strip (persisted) |
 | `/product/feature-control` | Enable/lock features (persisted) |
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |

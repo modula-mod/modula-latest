@@ -133,6 +133,15 @@ export function BoardScreen() {
   const loading = discoverQuery.isLoading && activityQuery.isLoading
   const focusQuiet = preferences.focus.quietFeed
   const focusHalo = preferences.focus.showHalo
+  const focusPreset = preferences.focus.preset ?? 'off'
+  const focusPresetTitle =
+    focusPreset === 'off'
+      ? 'Off'
+      : focusPreset === 'light'
+        ? 'Light'
+        : focusPreset === 'deep'
+          ? 'Deep'
+          : 'Custom'
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -185,11 +194,15 @@ export function BoardScreen() {
             </View>
             <View style={styles.focusBody}>
               <AppText variant="headline">
-                {focusHalo ? 'Focus Mode on' : 'Current focus'}
+                {focusHalo
+                  ? `Focus · ${focusPresetTitle}`
+                  : focusPreset === 'off'
+                    ? 'Focus Off'
+                    : 'Current focus'}
               </AppText>
               <AppText variant="body" colour="textSecondary">
                 {focusQuiet
-                  ? 'Feed noise is quieted. Prioritise modules, Board widgets, and Profile-OS.'
+                  ? 'BoardFocusAdapter prioritises work. Feed noise is quieted where the preset allows.'
                   : 'Shape your Profile-OS, install modules, and keep the shell light via the Registry.'}
               </AppText>
               <View style={{gap: spacing[2]}}>

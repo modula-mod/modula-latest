@@ -2,7 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const KEY = 'modula.product.preferences.v1'
 
+export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
+
 export type FocusPreferences = {
+  /** Off / Light / Deep / Custom — drives FocusPolicyEngine Preview. */
+  preset: FocusPresetId
   quietFeed: boolean
   hideNav: boolean
   suppressPings: boolean
@@ -29,6 +33,7 @@ export type ProductPreferences = {
 
 export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
   focus: {
+    preset: 'light',
     quietFeed: true,
     hideNav: false,
     suppressPings: true,
@@ -57,7 +62,14 @@ function mergePreferences(raw: unknown): ProductPreferences {
   if (!raw || typeof raw !== 'object') return DEFAULT_PRODUCT_PREFERENCES
   const value = raw as Partial<ProductPreferences>
   return {
-    focus: {...DEFAULT_PRODUCT_PREFERENCES.focus, ...(value.focus ?? {})},
+    focus: (() => {
+      const merged = {...DEFAULT_PRODUCT_PREFERENCES.focus, ...(value.focus ?? {})}
+      const preset = merged.preset
+      if (preset === 'off' || preset === 'light' || preset === 'deep' || preset === 'custom') {
+        return {...merged, preset}
+      }
+      return {...merged, preset: DEFAULT_PRODUCT_PREFERENCES.focus.preset}
+    })(),
     mergeFeedIds:
       Array.isArray(value.mergeFeedIds) && value.mergeFeedIds.every(item => typeof item === 'string')
         ? value.mergeFeedIds
