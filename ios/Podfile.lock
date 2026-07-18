@@ -2592,7 +2592,7 @@ DEPENDENCIES:
   - "expo-dev-menu (from `../node_modules/.pnpm/expo-dev-menu@57.0.6_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+m_01b4ee1a3cc7ae604c13788c780a0f42/node_modules/expo-dev-menu`)"
   - "expo-dev-menu-interface (from `../node_modules/.pnpm/expo-dev-menu-interface@57.0.0_expo@57.0.6/node_modules/expo-dev-menu-interface/ios`)"
   - "ExpoAsset (from `../node_modules/.pnpm/expo-asset@57.0.5_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metr_572eccc236e147ee733d24da97e5e32b/node_modules/expo-asset/ios`)"
-  - "ExpoAtprotoOAuthClient (from `../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@re_0ff4b3aa3824d8c83bb66d49d95af330/node_modules/@atproto/oauth-client-expo/ios`)"
+  - "ExpoAtprotoOAuthClient (from `../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_patch_hash=80467d3818f8354c0d25cf11cadafa53caf59d3743c_eed209606a433debbdad155a94fc49fe/node_modules/@atproto/oauth-client-expo/ios`)"
   - "ExpoBlur (from `../node_modules/.pnpm/expo-blur@57.0.2_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro_15666bb0c25da8bd0023b11681b9e495/node_modules/expo-blur/ios`)"
   - "ExpoClipboard (from `../node_modules/.pnpm/expo-clipboard@57.0.1_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+_bdea17f1c25214e4fde489255d5d7b75/node_modules/expo-clipboard/ios`)"
   - "ExpoDevice (from `../node_modules/.pnpm/expo-device@57.0.1_expo@57.0.6/node_modules/expo-device/ios`)"
@@ -2733,7 +2733,7 @@ EXTERNAL SOURCES:
   ExpoAsset:
     :path: "../node_modules/.pnpm/expo-asset@57.0.5_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metr_572eccc236e147ee733d24da97e5e32b/node_modules/expo-asset/ios"
   ExpoAtprotoOAuthClient:
-    :path: "../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@re_0ff4b3aa3824d8c83bb66d49d95af330/node_modules/@atproto/oauth-client-expo/ios"
+    :path: "../node_modules/.pnpm/@atproto+oauth-client-expo@0.1.8_patch_hash=80467d3818f8354c0d25cf11cadafa53caf59d3743c_eed209606a433debbdad155a94fc49fe/node_modules/@atproto/oauth-client-expo/ios"
   ExpoBlur:
     :path: "../node_modules/.pnpm/expo-blur@57.0.2_expo@57.0.6_react-native@0.86.0_@babel+core@7.29.7_@react-native+metro_15666bb0c25da8bd0023b11681b9e495/node_modules/expo-blur/ios"
   ExpoClipboard:
