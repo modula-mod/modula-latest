@@ -414,7 +414,7 @@ export function BoardScreen() {
                       <AppIcon name={space.icon} colour={colours.accent} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{space.label}</AppText>
-                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                        <AppText variant="caption" colour="textSecondary">
                           {space.description}
                         </AppText>
                       </View>
@@ -483,7 +483,7 @@ export function BoardScreen() {
                       <AppIcon name={module.icon} colour={colours.accent} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{module.name}</AppText>
-                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                        <AppText variant="caption" colour="textSecondary">
                           {module.description}
                         </AppText>
                       </View>

@@ -319,7 +319,7 @@ export function ForgeStudioScreen() {
                     <AppText variant="caption" colour="accent">
                       {template.blurb}
                     </AppText>
-                    <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                    <AppText variant="caption" colour="textSecondary">
                       {template.description}
                     </AppText>
                   </AppPressable>

@@ -88,7 +88,7 @@ export function IntelligenceHubScreen() {
                 <AppText variant="caption" colour="accent">
                   {layer.interpretation}
                 </AppText>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                <AppText variant="caption" colour="textSecondary">
                   {layer.role}
                 </AppText>
                 <AppText variant="micro" colour="textTertiary">
