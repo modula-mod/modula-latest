@@ -10,6 +10,7 @@ import {
   SettingsSection,
   type SettingsNavRow,
 } from '@/features/settings/components/SettingsRows'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -170,6 +171,13 @@ const preferenceRows: SettingsNavRow[] = [
   },
 ]
 
+const productLinkRows: SettingsNavRow[] = PRODUCT_LAB_LINKS.map(link => ({
+  title: link.label,
+  description: link.description,
+  icon: link.icon,
+  route: link.route,
+}))
+
 const supportRows: SettingsNavRow[] = [
   {
     title: 'Help',
@@ -205,6 +213,7 @@ export function SettingsHomeScreen() {
 
   const filteredAccount = accountRows.filter(match)
   const filteredPrefs = preferenceRows.filter(match)
+  const filteredProductLinks = productLinkRows.filter(match)
   const filteredSupport = supportRows.filter(match)
 
   return (
@@ -264,6 +273,16 @@ export function SettingsHomeScreen() {
                         : row.value,
                 }}
                 last={index === filteredPrefs.length - 1}
+              />
+            ))}
+          </SettingsSection>
+
+          <SettingsSection title="Product links">
+            {filteredProductLinks.map((row, index) => (
+              <SettingsLinkRow
+                key={row.title}
+                row={row}
+                last={index === filteredProductLinks.length - 1}
               />
             ))}
           </SettingsSection>

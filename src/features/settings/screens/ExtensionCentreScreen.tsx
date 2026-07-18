@@ -10,6 +10,7 @@ import {
   SettingsLinkRow,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {useAppServices} from '@/runtime/useAppServices'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -90,6 +91,20 @@ export function ExtensionCentreScreen() {
               Browse Marketplace
             </AppButton>
           </View>
+          <SettingsSection title="Product labs">
+            {PRODUCT_LAB_LINKS.map((link, index) => (
+              <SettingsLinkRow
+                key={link.id}
+                last={index === PRODUCT_LAB_LINKS.length - 1}
+                row={{
+                  title: link.label,
+                  description: link.description,
+                  icon: link.icon,
+                  onPress: () => router.push(link.route as Href),
+                }}
+              />
+            ))}
+          </SettingsSection>
           {SECTIONS.map(section => (
             <SettingsSection key={section} title={section}>
               {bySection[section].length ? (

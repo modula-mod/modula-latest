@@ -9,6 +9,7 @@ import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -64,6 +65,14 @@ const drawerDestinations: DrawerDestination[] = [
     icon: 'discover',
     description: 'Everything Modula offers',
   },
+  ...PRODUCT_LAB_LINKS.map(
+    (link): DrawerDestination => ({
+      label: link.label,
+      route: link.route,
+      icon: link.icon,
+      description: link.description,
+    }),
+  ),
   {
     label: 'Focus Mode',
     route: '/product/focus',

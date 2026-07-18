@@ -12,6 +12,7 @@ import {
   FORGE_AI_ACTIONS,
   FORGE_CAPABILITIES,
   FORGE_EVENT_OPTIONS,
+  FORGE_INSPIRATION_TIPS,
   FORGE_MONETISATION_OPTIONS,
   FORGE_TEST_TARGETS,
   FORGE_TEMPLATES,
@@ -324,6 +325,25 @@ export function ForgeStudioScreen() {
                   </AppPressable>
                 ))}
               </View>
+              <Surface
+                variant="contained"
+                style={[
+                  styles.inspiration,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.large,
+                    padding: spacing[4],
+                    gap: spacing[2],
+                  },
+                ]}>
+                <AppText variant="headline">Inspiration</AppText>
+                {FORGE_INSPIRATION_TIPS.map(tip => (
+                  <AppText key={tip} variant="caption" colour="textSecondary">
+                    · {tip}
+                  </AppText>
+                ))}
+              </Surface>
               <AppText variant="headline">Plan notes</AppText>
               <TextInput
                 value={planNotes}
@@ -858,7 +878,9 @@ export function ForgeStudioScreen() {
                 ]}>
                 <AppText variant="headline">Monetisation Preview</AppText>
                 <AppText variant="caption" colour="textSecondary">
-                  Pricing is draft metadata only. No checkout can complete from Forge Preview.
+                  Pricing is draft metadata only. DIMON is not active yet, so paid module
+                  economics cannot run. Forge does not create wallets, balances, tokens, mints,
+                  checkout sessions, subscriptions, or settlement records.
                 </AppText>
                 {FORGE_MONETISATION_OPTIONS.map(option => {
                   const on = monetisation === option.id
@@ -1019,9 +1041,18 @@ export function ForgeStudioScreen() {
                   },
                 ]}>
                 <AppText variant="label">skill.md Preview · digital DNA</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  {skillPreview}
-                </AppText>
+                <ScrollView
+                  nestedScrollEnabled
+                  style={styles.markdownScroll}
+                  contentContainerStyle={{paddingBottom: spacing[1]}}>
+                  <AppText
+                    selectable
+                    variant="caption"
+                    colour="textSecondary"
+                    style={styles.markdownText}>
+                    {skillPreview}
+                  </AppText>
+                </ScrollView>
               </Surface>
 
               <AppButton onPress={saveVersion}>Save version snapshot</AppButton>
@@ -1092,6 +1123,7 @@ const styles = StyleSheet.create({
   mode: {borderWidth: StyleSheet.hairlineWidth},
   grid: {flexDirection: 'row', flexWrap: 'wrap'},
   template: {borderWidth: StyleSheet.hairlineWidth, flexBasis: '47%', flexGrow: 1, minWidth: 150},
+  inspiration: {borderWidth: StyleSheet.hairlineWidth},
   input: {borderWidth: StyleSheet.hairlineWidth, minHeight: 48},
   multiline: {minHeight: 100, textAlignVertical: 'top'},
   canvas: {
@@ -1125,4 +1157,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   manifest: {borderWidth: StyleSheet.hairlineWidth},
+  markdownScroll: {maxHeight: 420, width: '100%'},
+  markdownText: {lineHeight: 18},
 })

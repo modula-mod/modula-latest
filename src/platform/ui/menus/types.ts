@@ -7,6 +7,8 @@ export type ModulaActionItem = {
   /** Accessibility / VoiceOver label override. */
   accessibilityLabel?: string
   disabled?: boolean
+  /** Full explanation shown when a disabled action should remain visible. */
+  disabledReason?: string
 }
 
 export type PresentModulaActionsOptions = {

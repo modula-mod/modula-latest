@@ -1,4 +1,5 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {isDevelopmentBuild} from '@/lib/platform'
 
 /**
@@ -59,6 +60,15 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     icon: 'contrast',
     description: 'Quiet the shell',
   },
+  ...PRODUCT_LAB_LINKS.map(
+    (link): AccountPanelDestination => ({
+      id: link.id,
+      label: link.label,
+      route: link.route,
+      icon: link.icon,
+      description: link.description,
+    }),
+  ),
   {
     id: 'forge',
     label: 'Forge Builder',

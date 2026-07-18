@@ -22,6 +22,12 @@ export const FORGE_WORKSPACE_MODES: Array<{id: ForgeWorkspaceMode; label: string
   {id: 'manifest', label: 'Manifest', hint: 'JSON + skill.md + publish readiness'},
 ]
 
+export const FORGE_INSPIRATION_TIPS = [
+  'Lovable/Bolt -> plan first, preview locally, inspect manifest before publish.',
+  'X content-first -> posts, people, and media stay primary; module chrome stays quiet.',
+  'Apple chrome-layer -> native-feeling controls frame the work without fake glass runtime.',
+] as const
+
 export const FORGE_STEPS: Array<{id: ForgeBuilderStep; label: string}> = [
   {id: 'identity', label: 'Identity'},
   {id: 'surfaces', label: 'Surfaces'},
@@ -58,6 +64,12 @@ export const FORGE_CAPABILITIES = [
   'newsletter.digest',
   'game.surface',
   'team.inbox',
+  'integrations.element',
+  'presence.pack',
+  'presence.status',
+  'theme.pack',
+  'theme.token',
+  'search.extension',
   'monetisation.preview',
 ] as const
 
@@ -194,19 +206,22 @@ export const FORGE_MONETISATION_OPTIONS: ForgeMonetisationOption[] = [
   {
     id: 'free',
     label: 'Free',
-    description: 'No checkout. Registry pricing remains unset.',
+    description:
+      'Free listing does not require DIMON. No checkout, wallet, balance, token, mint, or settlement is created.',
     checkoutEnabled: true,
   },
   {
     id: 'one-time',
     label: 'One-time',
-    description: 'DIMON is not active yet. Paid checkout cannot complete.',
+    description:
+      'DIMON is not active yet, so one-time paid checkout cannot complete. Forge stores draft pricing intent only and creates no wallet, balance, token, mint, or settlement.',
     checkoutEnabled: false,
   },
   {
     id: 'subscription',
     label: 'Subscription',
-    description: 'DIMON is not active yet. Paid checkout cannot complete.',
+    description:
+      'DIMON is not active yet, so subscription checkout cannot complete. Forge stores draft pricing intent only and creates no wallet, balance, token, mint, or settlement.',
     checkoutEnabled: false,
   },
 ]
@@ -382,6 +397,61 @@ export const FORGE_TEMPLATES: ForgeTemplate[] = [
       'agent.action.extract-tasks',
     ],
     permissions: ['storage:namespaced', 'automation:node', 'agent:scope', 'notifications:opt-in'],
+  },
+  {
+    id: 'integrations-element',
+    name: 'Integrations Element',
+    blurb: 'Connection cards',
+    description:
+      'Declared integration cards with settings, automation hooks, and no background sync until the user connects a service.',
+    surfaces: ['route', 'settings', 'auto', 'widget'],
+    capabilities: [
+      'settings.section',
+      'automation.node',
+      'automation.trigger',
+      'widget.board',
+      'board.widget.inbox',
+      'integrations.element',
+    ],
+    permissions: ['storage:namespaced', 'network:declared', 'automation:node'],
+  },
+  {
+    id: 'presence-pack',
+    name: 'Presence pack',
+    blurb: 'Status + availability',
+    description:
+      'Presence status surfaces for profile and Board with opt-in reminders and local availability state.',
+    surfaces: ['route', 'board', 'tab', 'settings', 'widget'],
+    capabilities: [
+      'board.card',
+      'profile.tab',
+      'settings.section',
+      'widget.board',
+      'board.widget.summary',
+      'presence.pack',
+      'presence.status',
+    ],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write', 'notifications:opt-in'],
+  },
+  {
+    id: 'theme-pack',
+    name: 'Theme pack',
+    blurb: 'Appearance presets',
+    description:
+      'Theme preset package that documents token intent and settings controls without changing host chrome globally.',
+    surfaces: ['route', 'settings', 'tab'],
+    capabilities: ['profile.tab', 'settings.section', 'theme.pack', 'theme.token'],
+    permissions: ['storage:namespaced', 'profile:read'],
+  },
+  {
+    id: 'search-extension',
+    name: 'Search extension',
+    blurb: 'Scoped search provider',
+    description:
+      'Search provider and index extension for module-owned content, exposed through a route and optional composer helper.',
+    surfaces: ['route', 'settings', 'tool'],
+    capabilities: ['settings.section', 'composer.tool', 'search.provider', 'search.index', 'search.extension'],
+    permissions: ['storage:namespaced', 'composer:tool'],
   },
 ]
 
@@ -560,6 +630,7 @@ ${list(selectedEvents.map(item => `${item.direction}: ${item.label}`))}
 ## Monetisation
 - ${monetisation?.label ?? 'Free'}
 - ${monetisation?.description ?? 'No checkout. Registry pricing remains unset.'}
+- DIMON is not active yet for paid module economics; this markdown is a draft contract preview only.
 
 ## Preview boundary
 - No codegen execution from Forge Builder.
@@ -645,7 +716,7 @@ export function forgeChatReply(prompt: string, context: {name: string; surfaces:
     return 'AI actions Preview: summarise, draft reply, and extract tasks are local toggles here. Real execution needs GAIA scopes, AKI verification, and Governor control.'
   }
   if (q.includes('template')) {
-    return 'Templates include Vault Notes, Tasks, CRM, Calendar, Files, Newsletter, Analytics, Health Agent, Game stub, Widget pack, Team inbox, and Automations pack. They only seed local draft state.'
+    return 'Templates include Vault Notes, Tasks, CRM, Calendar, Files, Newsletter, Analytics, Health Agent, Game stub, Widget pack, Team inbox, Automations pack, Integrations Element, Presence pack, Theme pack, and Search extension. They only seed local draft state.'
   }
   return `Preview (not a model): For “${context.name}”, I’d map “${prompt.trim()}” onto surfaces [${context.surfaces.join(', ') || 'none'}], then ask you to approve permissions before any Registry install.`
 }

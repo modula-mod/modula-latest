@@ -28,7 +28,7 @@ export function ModulaMenu({
     return <View accessibilityLabel={accessibilityLabel}>{trigger}</View>
   }
 
-  const actionable = actions.filter(action => !action.disabled)
+  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
 
   return (
     <Host matchContents>
@@ -40,15 +40,22 @@ export function ModulaMenu({
             </View>
           </RNHostView>
         }>
-        {actionable.map(action => (
+        {visibleActions.map(action => (
           <Button
             key={action.id}
-            label={action.accessibilityLabel ?? action.label}
-            role={action.style === 'destructive' ? 'destructive' : undefined}
-            onPress={() => onAction(action.id)}
+            label={action.accessibilityLabel ?? getActionLabel(action)}
+            role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
+            onPress={() => {
+              if (!action.disabled) onAction(action.id)
+            }}
           />
         ))}
       </Menu>
     </Host>
   )
+}
+
+function getActionLabel(action: ModulaActionItem): string {
+  if (!action.disabled || !action.disabledReason) return action.label
+  return `${action.label} unavailable — ${action.disabledReason}`
 }

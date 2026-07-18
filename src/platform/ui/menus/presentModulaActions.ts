@@ -15,13 +15,20 @@ export function presentModulaActions(
   options: PresentModulaActionsOptions,
 ): Promise<string | null> {
   const cancelLabel = options.cancelLabel ?? 'Cancel'
-  const actionable = options.actions.filter(action => !action.disabled)
+  const visibleActions = options.actions.filter(
+    action => !action.disabled || action.disabledReason,
+  )
 
   if (Platform.OS === 'ios') {
-    return presentIosActionSheet(options, actionable, cancelLabel)
+    return presentIosActionSheet(options, visibleActions, cancelLabel)
   }
 
-  return presentAlertActions(options, actionable, cancelLabel)
+  return presentAlertActions(options, visibleActions, cancelLabel)
+}
+
+function getActionLabel(action: ModulaActionItem): string {
+  if (!action.disabled || !action.disabledReason) return action.label
+  return `${action.label} unavailable — ${action.disabledReason}`
 }
 
 function presentIosActionSheet(
@@ -30,10 +37,10 @@ function presentIosActionSheet(
   cancelLabel: string,
 ): Promise<string | null> {
   return new Promise(resolve => {
-    const labels = [...actions.map(action => action.label), cancelLabel]
+    const labels = [...actions.map(getActionLabel), cancelLabel]
     const cancelButtonIndex = labels.length - 1
     const destructiveButtonIndex = actions.findIndex(
-      action => action.style === 'destructive',
+      action => !action.disabled && action.style === 'destructive',
     )
 
     ActionSheetIOS.showActionSheetWithOptions(
@@ -50,7 +57,8 @@ function presentIosActionSheet(
           resolve(null)
           return
         }
-        resolve(actions[buttonIndex]?.id ?? null)
+        const selected = actions[buttonIndex]
+        resolve(selected && !selected.disabled ? selected.id : null)
       },
     )
   })
@@ -67,12 +75,12 @@ function presentAlertActions(
       options.message,
       [
         ...actions.map(action => ({
-          text: action.label,
+          text: getActionLabel(action),
           style:
-            action.style === 'destructive'
+            !action.disabled && action.style === 'destructive'
               ? ('destructive' as const)
               : ('default' as const),
-          onPress: () => resolve(action.id),
+          onPress: () => resolve(action.disabled ? null : action.id),
         })),
         {
           text: cancelLabel,

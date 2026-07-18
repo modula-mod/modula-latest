@@ -133,6 +133,13 @@ export function ProductHubScreen() {
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {[
                 {
+                  id: 'design-lab',
+                  name: 'Design Lab',
+                  summary: 'Inspiration remap Preview.',
+                  icon: 'palette' as const,
+                  route: '/product/design-lab',
+                },
+                {
                   id: 'start',
                   name: 'Start',
                   summary: 'Quick actions + command previews.',
@@ -258,7 +265,7 @@ export function ProductHubScreen() {
                       ]}>
                       <AppIcon name={item.icon} colour={colours.accent} />
                       <AppText variant="headline">{item.name}</AppText>
-                      <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                      <AppText variant="caption" colour="textSecondary">
                         {item.summary}
                       </AppText>
                     </AppPressable>

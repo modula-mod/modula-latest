@@ -154,6 +154,42 @@ const FORGE_TEMPLATES = [
     capabilities: ['profile.tab', 'settings.section'],
     permissions: ['storage:namespaced', 'profile:read', 'network:declared'],
   },
+  {
+    id: 'integrations-element',
+    name: 'Integrations Element',
+    blurb: 'Connection cards',
+    description: 'Declared integration cards; no background sync until a user connects a service.',
+    surfaces: ['route', 'settings', 'auto', 'widget'],
+    capabilities: ['settings.section', 'automation.node', 'automation.trigger', 'integrations.element'],
+    permissions: ['storage:namespaced', 'network:declared', 'automation:node'],
+  },
+  {
+    id: 'presence-pack',
+    name: 'Presence pack',
+    blurb: 'Status + availability',
+    description: 'Presence status surfaces for profile and Board with opt-in reminders.',
+    surfaces: ['route', 'board', 'tab', 'settings', 'widget'],
+    capabilities: ['board.card', 'profile.tab', 'settings.section', 'presence.pack', 'presence.status'],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write', 'notifications:opt-in'],
+  },
+  {
+    id: 'theme-pack',
+    name: 'Theme pack',
+    blurb: 'Appearance presets',
+    description: 'Theme preset package that documents token intent without changing host chrome globally.',
+    surfaces: ['route', 'settings', 'tab'],
+    capabilities: ['profile.tab', 'settings.section', 'theme.pack', 'theme.token'],
+    permissions: ['storage:namespaced', 'profile:read'],
+  },
+  {
+    id: 'search-extension',
+    name: 'Search extension',
+    blurb: 'Scoped search provider',
+    description: 'Search provider and index extension for module-owned content.',
+    surfaces: ['route', 'settings', 'tool'],
+    capabilities: ['settings.section', 'composer.tool', 'search.provider', 'search.index', 'search.extension'],
+    permissions: ['storage:namespaced', 'composer:tool'],
+  },
 ] as const
 
 const COMMAND_CATALOGUE: CommandCatalogueEntry[] = [

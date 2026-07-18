@@ -384,7 +384,7 @@ function ActivityRow({
                     padding: spacing[3],
                   },
                 ]}>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                <AppText variant="caption" colour="textSecondary">
                   {item.preview}
                 </AppText>
               </View>

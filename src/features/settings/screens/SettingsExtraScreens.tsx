@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {Pressable, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppText} from '@/components/primitives/AppText'
 import {
   SettingsInfoBlock,
@@ -110,22 +111,82 @@ export function NotificationsSettingsScreen() {
   const [replies, setReplies] = useState(true)
   const [follows, setFollows] = useState(true)
   const [modules, setModules] = useState(false)
+  const {colours, radius, spacing} = useThemeTokens()
   return (
     <SettingsPage title="Notifications">
       <SettingsInfoBlock
         title="Notifications"
         body="Local preference toggles. Device push is not connected in Phase 4.5."
       />
+      <MaterialSurface
+        role="card"
+        style={[
+          styles.banner,
+          {
+            backgroundColor: colours.accentSubtle,
+            borderColor: colours.accentBorder,
+            borderRadius: radius.large,
+            gap: spacing[2],
+            padding: spacing[4],
+          },
+        ]}>
+        <AppText variant="headline">Focus-aware bundling</AppText>
+        <AppText variant="body" colour="textSub">
+          Light Focus groups low-priority notifications into a calmer bundle. Deep
+          Focus and Custom Focus can hold non-urgent activity until you return,
+          while direct mentions and allowlisted people can still break through.
+        </AppText>
+      </MaterialSurface>
       <SettingsSection title="Activity">
-        <SettingsToggleRow label="Likes" value={likes} onValueChange={setLikes} preview />
-        <SettingsToggleRow label="Replies" value={replies} onValueChange={setReplies} preview />
-        <SettingsToggleRow label="Follows" value={follows} onValueChange={setFollows} preview />
+        <SettingsToggleRow
+          label="Likes"
+          description="Show likes as individual activity unless Focus Mode bundles them."
+          value={likes}
+          onValueChange={setLikes}
+          preview
+        />
+        <SettingsToggleRow
+          label="Replies"
+          description="Show replies and conversation updates when they are not held by Focus Mode."
+          value={replies}
+          onValueChange={setReplies}
+          preview
+        />
+        <SettingsToggleRow
+          label="Follows"
+          description="Show new follows and relationship updates in Activity."
+          value={follows}
+          onValueChange={setFollows}
+          preview
+        />
         <SettingsToggleRow
           label="Module updates"
+          description="Show module lifecycle and marketplace preview notifications."
           value={modules}
           onValueChange={setModules}
           last
           preview
+        />
+      </SettingsSection>
+      <SettingsSection title="Related controls">
+        <SettingsLinkRow
+          row={{
+            title: 'Focus Mode',
+            description: 'Choose when notifications bundle, wait, or interrupt.',
+            icon: 'contrast',
+            route: '/product/focus',
+            preview: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Glass Privacy',
+            description: 'Review message privacy levels that affect private notification context.',
+            icon: 'privacy',
+            route: '/product/glass-privacy',
+            preview: true,
+          }}
+          last
         />
       </SettingsSection>
     </SettingsPage>
@@ -384,6 +445,9 @@ export function HelpSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  banner: {
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   content: {
     padding: 16,
     paddingBottom: 40,

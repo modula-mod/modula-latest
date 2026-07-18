@@ -9,7 +9,10 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
-import {GLASS_PRIVACY_LABELS} from '@/features/product/data/glassPrivacyLabels'
+import {
+  GLASS_PRIVACY_LABELS,
+  type GlassPrivacyLevel,
+} from '@/features/product/data/glassPrivacyLabels'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {
   getHelpArticle,
@@ -63,10 +66,73 @@ function ScreenShell({
 
 function PreviewBanner({text}: {text: string}) {
   return (
-    <AppText variant="caption" colour="textSecondary">
+    <AppText variant="caption" colour="textSecondary" style={styles.bannerText}>
       {text}
     </AppText>
   )
+}
+
+function getGlassPrivacyBannerText(level: GlassPrivacyLevel): string {
+  if (level === 'vault-chat') {
+    return 'Glass Privacy is set to Vault Chat. Chat Assist stays off by default, forwarding and export controls are blocked in this Preview, and the future sandbox requirement is made explicit.'
+  }
+
+  if (level === 'protected-chat') {
+    return 'Glass Privacy is set to Protected Chat. Forwarding stays restricted in this Preview, privacy events are logged locally, and future limited-forward checks are clearly marked as planned.'
+  }
+
+  return 'Glass Privacy is set to Disable Sharing. Forwarding and export controls are restricted wherever this local Preview can enforce them.'
+}
+
+function getQuietSendBannerText(): string {
+  return 'Quiet Send is holding non-urgent message drafts locally while Focus or Quiet Send is active. This Preview never sends messages remotely.'
+}
+
+function getChatAssistBannerText(mode: string): string {
+  return `Chat Assist is set to ${mode}. Conversation intelligence is permission-controlled, stays local to this Preview, and remains off unless you choose an assist mode.`
+}
+
+function getForwardRestrictionReason(level: GlassPrivacyLevel): string {
+  if (level === 'vault-chat') {
+    return 'Vault Chat is active, so forwarding is disabled until the planned sandbox and verified-participant flow exist.'
+  }
+
+  if (level === 'protected-chat') {
+    return 'Protected Chat is active, so forwarding stays disabled in this Preview until limited-forward consent and device checks exist.'
+  }
+
+  return 'Disable Sharing is active, so forwarding and export controls are restricted for this local Preview thread.'
+}
+
+function getInboxEmptyState(
+  filter: 'all' | 'unread' | 'pinned',
+  query: string,
+): {title: string; description: string} | null {
+  if (query.trim()) {
+    return {
+      title: 'No conversations match this search.',
+      description: 'Try a different name, handle, or message preview in this seeded inbox.',
+    }
+  }
+
+  if (filter === 'unread') {
+    return {
+      title: 'There are no unread conversations right now.',
+      description: 'Seeded Preview threads are still available when you switch the filter back to All.',
+    }
+  }
+
+  if (filter === 'pinned') {
+    return {
+      title: 'There are no pinned conversations right now.',
+      description: 'Pin a seeded Preview thread from its actions menu, or switch back to All.',
+    }
+  }
+
+  return {
+    title: 'There are no conversations in this local Preview inbox yet.',
+    description: 'Messages remain seeded in this build, and no remote inbox is connected.',
+  }
 }
 
 export function MessagesInboxScreen() {
@@ -97,6 +163,7 @@ export function MessagesInboxScreen() {
       })
       .sort((a, b) => Number(pinnedIds.has(b.id)) - Number(pinnedIds.has(a.id)))
   }, [filter, pinnedIds, query])
+  const emptyState = threads.length === 0 ? getInboxEmptyState(filter, query) : null
 
   if (!canAccess) {
     return (
@@ -154,11 +221,7 @@ export function MessagesInboxScreen() {
                 {glass.short} · local
               </AppText>
               <AppText variant="caption" colour="textSecondary">
-                {preferences.glassPrivacyLevel === 'vault-chat'
-                  ? 'Vault · Chat Assist off by default · forward/export blocked in Preview'
-                  : preferences.glassPrivacyLevel === 'protected-chat'
-                    ? 'Protected · restricted forward · privacy events logged locally'
-                    : 'Disable Sharing · forward/export controls restricted where enforceable'}
+                {getGlassPrivacyBannerText(preferences.glassPrivacyLevel)}
               </AppText>
             </View>
           </AppPressable>
@@ -185,7 +248,7 @@ export function MessagesInboxScreen() {
                   Quiet Send · held locally
                 </AppText>
                 <AppText variant="caption" colour="textSecondary">
-                  Non-urgent deliveries held under Focus / Quiet Send. No remote send.
+                  {getQuietSendBannerText()}
                 </AppText>
               </View>
             </AppPressable>
@@ -210,7 +273,7 @@ export function MessagesInboxScreen() {
                 Chat Assist · {preferences.chatAssistMode}
               </AppText>
               <AppText variant="caption" colour="textSecondary">
-                Permission-controlled conversation intelligence →
+                {getChatAssistBannerText(preferences.chatAssistMode)}
               </AppText>
             </View>
           </AppPressable>
@@ -237,10 +300,12 @@ export function MessagesInboxScreen() {
           <AppText variant="caption" colour="textSecondary">
             Filter: {filter === 'all' ? 'All' : filter === 'unread' ? 'Unread' : 'Pinned'}
           </AppText>
-          {threads.length === 0 && query ? (
-            <AppText variant="body" colour="textSecondary">
-              No conversations match this search.
-            </AppText>
+          {emptyState ? (
+            <EmptyState
+              icon="messages"
+              title={emptyState.title}
+              description={emptyState.description}
+            />
           ) : null}
           {threads.map(thread => (
             <ModulaContextMenu
@@ -290,7 +355,7 @@ export function MessagesInboxScreen() {
                     {thread.name}
                     {thread.unread ? ' · Unread' : ''}
                   </AppText>
-                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                  <AppText variant="caption" colour="textSecondary">
                     {thread.preview}
                   </AppText>
                 </View>
@@ -351,6 +416,7 @@ export function MessageThreadScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const {preferences} = useProductPreferences()
   const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
+  const forwardRestrictionReason = getForwardRestrictionReason(preferences.glassPrivacyLevel)
 
   if (!thread) {
     return (
@@ -358,7 +424,7 @@ export function MessageThreadScreen() {
         <SecondaryScreenHeader title="Conversation" />
         <EmptyState
           icon="messages"
-          title="Conversation not found"
+          title="This conversation was not found."
           description="This seeded thread is not in the local inbox preview."
         />
       </View>
@@ -366,7 +432,33 @@ export function MessageThreadScreen() {
   }
 
   return (
-    <ScreenShell title={thread.name}>
+    <ScreenShell
+      title={thread.name}
+      right={
+        <ModulaMenu
+          accessibilityLabel="Thread actions"
+          title="Thread actions"
+          actions={[
+            {
+              id: 'forward',
+              label: 'Forward',
+              disabled: true,
+              disabledReason: forwardRestrictionReason,
+            },
+            {id: 'mute', label: 'Mute preview'},
+            {id: 'delete', label: 'Delete preview', style: 'destructive'},
+          ]}
+          onAction={id => {
+            if (id === 'forward') {
+              Alert.alert(
+                'Forward Preview',
+                'Forwarding is not connected to a remote messaging service in this Preview.',
+              )
+            }
+          }}
+          trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+        />
+      }>
       <AppText variant="headline">@{thread.handle}</AppText>
       <PreviewBanner text="Conversation Preview — replies are not delivered." />
       <AppPressable
@@ -389,7 +481,7 @@ export function MessageThreadScreen() {
             {glass.short}
           </AppText>
           <AppText variant="caption" colour="textSecondary">
-            {glass.threadHint}
+            {getGlassPrivacyBannerText(preferences.glassPrivacyLevel)}
           </AppText>
         </View>
       </AppPressable>
@@ -1104,6 +1196,10 @@ const styles = StyleSheet.create({
     height: 44,
     justifyContent: 'center',
     width: 44,
+  },
+  bannerText: {
+    flexShrink: 1,
+    lineHeight: 20,
   },
   content: {
     padding: 16,
