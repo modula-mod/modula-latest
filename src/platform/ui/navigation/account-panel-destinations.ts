@@ -46,6 +46,27 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     description: 'Browse modules and tools',
   },
   {
+    id: 'product',
+    label: 'Product Hub',
+    route: '/product',
+    icon: 'discover',
+    description: 'Everything Modula offers',
+  },
+  {
+    id: 'focus',
+    label: 'Focus Mode',
+    route: '/product/focus',
+    icon: 'contrast',
+    description: 'Quiet the shell',
+  },
+  {
+    id: 'search',
+    label: 'Search',
+    route: '/product/search',
+    icon: 'search',
+    description: 'Capabilities and modules',
+  },
+  {
     id: 'appearance',
     label: 'Appearance',
     route: '/settings/appearance',

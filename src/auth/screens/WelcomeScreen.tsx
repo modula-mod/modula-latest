@@ -50,6 +50,9 @@ export function WelcomeScreen() {
           <AppButton variant="secondary" onPress={() => router.push('/sign-in' as Href)}>
             Sign in
           </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product' as Href)}>
+            Explore capabilities
+          </AppButton>
           <AppButton variant="ghost" onPress={continueAsGuest}>
             Explore as guest
           </AppButton>

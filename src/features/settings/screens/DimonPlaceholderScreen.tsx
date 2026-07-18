@@ -29,8 +29,8 @@ export function DimonPlaceholderScreen() {
       <ResponsiveContent>
         <ScrollView contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
           <SettingsInfoBlock
-            title="Ownership, identity, and economic layer"
-            body="DIMON is designed to power value and ownership across Modula — not speculative crypto theatre. It stays inactive until the shell, social foundation, and module standard are reliable."
+            title="DIMON"
+            body="DIMON is not active yet. Modula is preparing Greenfield account IDs, integrity, and capability namespaces so a future economic ledger can bind safely — without fake balances, wallets, or blockchain. DIMON is designed to power value and ownership across Modula — not speculative crypto theatre."
           />
 
           <Surface

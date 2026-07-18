@@ -73,3 +73,25 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 
 Login/Signup/Onboarding, Messages, Post thread, Merge Feeds engine, Gaia, wallet, module runtime.
 AT Protocol connected accounts / Atmosphere Preview: Phase 6 frontend (server-mediated OAuth; no Bluesky shell).
+
+## Product Hub (Phase 6S craft)
+
+| Route | Surface |
+| --- | --- |
+| `/product` | Product Hub catalogue |
+| `/product/focus` | Focus Mode studio |
+| `/product/merge-feeds` | Merge Feeds studio |
+| `/product/automations` | Automations studio |
+| `/product/gaia` | Gaia agents console |
+| `/product/gaia-atlas` | Gaia Atlas schematic |
+| `/product/widgets` | Widgets studio |
+| `/product/feature-control` | Feature Control |
+| `/product/glass-privacy` | Glass Privacy levels |
+| `/product/forge` | Forge Module Builder |
+| `/product/integrations` | Integrations hub |
+| `/product/search` | Universal search preview |
+| `/product/creator` | Creator economy |
+| `/product/[slug]` | Capability pre-screen |
+| `/onboarding` | First-run onboarding |
+| `/profile/os` | Profile-OS pre-screen |
+

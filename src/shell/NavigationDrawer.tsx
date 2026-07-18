@@ -77,6 +77,12 @@ const drawerDestinations: DrawerDestination[] = [
     description: 'Module Builder pipeline preview',
   },
   {
+    label: 'Search',
+    route: '/product/search',
+    icon: 'search',
+    description: 'Capabilities and modules',
+  },
+  {
     label: 'Settings',
     route: '/settings',
     icon: 'settings',

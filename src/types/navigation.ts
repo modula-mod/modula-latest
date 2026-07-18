@@ -15,6 +15,8 @@ export type DrawerDestination = {
     | '/product/forge'
     | '/product/gaia'
     | '/product/automations'
+    | '/product/search'
+    | '/product/integrations'
     | '/settings'
     | '/settings/appearance'
     | '/settings/developer'
