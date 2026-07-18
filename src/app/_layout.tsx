@@ -1,6 +1,10 @@
+import 'react-native-gesture-handler'
+
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useEffect} from 'react'
+import {StyleSheet} from 'react-native'
+import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
 import {NetworkStatusBanner} from '@/components/data/NetworkStatusBanner'
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
@@ -80,23 +84,31 @@ export default function RootLayout() {
   }, [])
 
   return (
-    <AppErrorBoundary>
-      <AppServicesProvider>
-        <QueryRuntimeProvider>
-          <SessionProvider>
-            <AppearanceProvider>
-              <ProfilePresentationProvider>
-                <AccountPanelProvider>
-                  <ShellDrawerProvider>
-                    <RootNavigator />
-                    <NetworkStatusBanner />
-                  </ShellDrawerProvider>
-                </AccountPanelProvider>
-              </ProfilePresentationProvider>
-            </AppearanceProvider>
-          </SessionProvider>
-        </QueryRuntimeProvider>
-      </AppServicesProvider>
-    </AppErrorBoundary>
+    <GestureHandlerRootView style={styles.root}>
+      <AppErrorBoundary>
+        <AppServicesProvider>
+          <QueryRuntimeProvider>
+            <SessionProvider>
+              <AppearanceProvider>
+                <ProfilePresentationProvider>
+                  <AccountPanelProvider>
+                    <ShellDrawerProvider>
+                      <RootNavigator />
+                      <NetworkStatusBanner />
+                    </ShellDrawerProvider>
+                  </AccountPanelProvider>
+                </ProfilePresentationProvider>
+              </AppearanceProvider>
+            </SessionProvider>
+          </QueryRuntimeProvider>
+        </AppServicesProvider>
+      </AppErrorBoundary>
+    </GestureHandlerRootView>
   )
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+})
