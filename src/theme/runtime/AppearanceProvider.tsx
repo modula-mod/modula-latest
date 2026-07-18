@@ -10,6 +10,7 @@ import {useColorScheme} from 'react-native'
 
 import type {
   AccentId,
+  AdvancedChromeEffect,
   AppearanceMode,
   AppearancePreferences,
   SurfaceType,
@@ -32,6 +33,7 @@ import {ThemeTokensContext, type ThemeTokenSet} from '@/theme/runtime/ThemeToken
 import {resolveAppearance} from '@/theme/runtime/resolveAppearance'
 import {
   isAccentId,
+  isAdvancedChromeEffect,
   isAppearanceMode,
   isSurfaceType,
   isTextScale,
@@ -163,7 +165,12 @@ export function AppearanceProvider({children}: PropsWithChildren) {
           .then(server => {
             versionRef.current = server.version
             warnedSyncFailureRef.current = false
-            setPreferences(server.preferences)
+            // Advanced chrome is local Preview — preserve across sync until Greenfield owns it.
+            setPreferences({
+              ...server.preferences,
+              advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+              showSwitchLabels: preferencesRef.current.showSwitchLabels,
+            })
           })
           .catch(error => {
             if (!warnedSyncFailureRef.current) {
@@ -176,7 +183,11 @@ export function AppearanceProvider({children}: PropsWithChildren) {
                 .then(server => {
                   versionRef.current = server.version
                   warnedSyncFailureRef.current = false
-                  setPreferences(server.preferences)
+                  setPreferences({
+                    ...server.preferences,
+                    advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+                    showSwitchLabels: preferencesRef.current.showSwitchLabels,
+                  })
                 })
                 .catch(() => undefined)
             }, 30_000)
@@ -195,7 +206,11 @@ export function AppearanceProvider({children}: PropsWithChildren) {
         if (!active) return
         if (server.version >= versionRef.current) {
           versionRef.current = server.version
-          setPreferences(server.preferences)
+          setPreferences({
+            ...server.preferences,
+            advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+            showSwitchLabels: preferencesRef.current.showSwitchLabels,
+          })
         } else {
           syncToServer(preferencesRef.current)
         }
@@ -277,6 +292,11 @@ export function AppearanceProvider({children}: PropsWithChildren) {
       },
       setShowSwitchLabels: (showSwitchLabels: boolean) => {
         updatePreferences(prev => ({...prev, showSwitchLabels}))
+      },
+      setAdvancedChromeEffect: (advancedChromeEffect: AdvancedChromeEffect) => {
+        if (isAdvancedChromeEffect(advancedChromeEffect)) {
+          updatePreferences(prev => ({...prev, advancedChromeEffect}))
+        }
       },
       resetAppearance: () => {
         updatePreferences(() => DEFAULT_APPEARANCE_PREFERENCES)

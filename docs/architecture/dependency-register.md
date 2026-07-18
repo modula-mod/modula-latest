@@ -123,3 +123,17 @@ No new rows in the dependency table — zero packages added for this polish pass
 | @modula/api-contracts | workspace:* | Shared API DTO types for metadata, AT connections, Atmosphere, preferences | No | Types only | `pnpm add -w @modula/api-contracts@workspace:*` | Phase 6 |
 
 Removal path: disconnect AT UI + drop `@atproto/oauth-client-expo` when AT OAuth is retired; contracts remain for backend.
+
+## Phase 6S — video foundation + Appearance Advanced living backdrop
+
+| Package | Version | Purpose | Native | Development-client rebuild required | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| expo-video | ~57.0.1 | Reels / short-media playback foundation (`ModulaReelPlayer`) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
+| expo-camera | ~57.0.3 | Appearance → Advanced camera masked-blur Preview (Motionary-style cutouts) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
+
+Patterns (not packages):
+
+- [draggable-video-control](https://github.com/mahdidavoodi7/draggable-video-control) — MIT Motionary drop; Modula reimplements draggable glass controls under `src/platform/ui/video/` (no vendored demo app).
+- [expo-camera-masked-blur](https://github.com/mahdidavoodi7/expo-camera-masked-blur) — MIT Motionary drop; Modula reimplements via existing MaskedView adapter + `CameraMaskedBlurSurface` (does **not** add `@react-native-masked-view/masked-view`).
+
+Removal path: drop Advanced toggle + Reels `videoUri` playback, then remove `expo-camera` / `expo-video` and native rebuild.

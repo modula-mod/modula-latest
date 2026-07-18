@@ -1,6 +1,12 @@
 import type {DiscoverResult, ReelItem} from '@/domain/discovery'
 import {decodeProfile} from '@/api/decoding/decodeProfile'
-import {asArray, asNumber, asRecord, asString} from '@/api/decoding/validation'
+import {
+  asArray,
+  asNumber,
+  asOptionalString,
+  asRecord,
+  asString,
+} from '@/api/decoding/validation'
 
 function decodeReel(value: unknown): ReelItem {
   const reel = asRecord(value, 'reel')
@@ -10,6 +16,7 @@ function decodeReel(value: unknown): ReelItem {
     caption: asString(reel.caption, 'reel caption'),
     source: asString(reel.source, 'reel source'),
     colour: asString(reel.colour, 'reel colour'),
+    videoUri: asOptionalString(reel.videoUri, 'reel videoUri'),
     liked: Boolean(reel.liked),
     likeCount: asNumber(reel.likeCount, 'reel like count'),
     replyCount: asNumber(reel.replyCount, 'reel reply count'),

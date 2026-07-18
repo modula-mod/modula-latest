@@ -2,6 +2,7 @@ import {createContext} from 'react'
 
 import type {
   AccentId,
+  AdvancedChromeEffect,
   AppearanceMode,
   SurfaceType,
   TextScale,
@@ -20,6 +21,7 @@ export type AppearanceActionsContextValue = {
   setReduceTransparency: (enabled: boolean) => void
   setIncreaseContrast: (enabled: boolean) => void
   setShowSwitchLabels: (enabled: boolean) => void
+  setAdvancedChromeEffect: (effect: AdvancedChromeEffect) => void
   resetAppearance: () => void
 }
 

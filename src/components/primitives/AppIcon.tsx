@@ -54,6 +54,9 @@ export type AppIconName =
   | 'check'
   | 'chevronRight'
   | 'play'
+  | 'pause'
+  | 'skipBack'
+  | 'skipForward'
   | 'send'
   | 'trash'
   | 'arrowUp'
@@ -114,6 +117,9 @@ const iconMap: Record<AppIconName, IoniconName> = {
   check: 'checkmark-outline',
   chevronRight: 'chevron-forward',
   play: 'play',
+  pause: 'pause',
+  skipBack: 'play-back',
+  skipForward: 'play-forward',
   send: 'send-outline',
   trash: 'trash-outline',
   arrowUp: 'arrow-up-outline',

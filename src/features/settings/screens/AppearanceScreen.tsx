@@ -16,6 +16,7 @@ import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -321,6 +322,35 @@ export function AppearanceScreen() {
               Reduce Transparency forces opaque chrome and wins over Glass / Glay / Native
               previews.
             </AppText>
+          </Section>
+
+          <Section title="Advanced">
+            <MaterialSurface
+              role="card"
+              style={[
+                styles.optionList,
+                {borderRadius: radius.large, borderColor: colours.border},
+              ]}>
+              <SwitchRow
+                title="Camera masked blur"
+                value={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+                storedValue={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+                onValueChange={enabled => {
+                  actions.setAdvancedChromeEffect(
+                    enabled ? 'cameraMaskedBlur' : 'off',
+                  )
+                }}
+                last
+              />
+            </MaterialSurface>
+            <AppText variant="caption" colour="textTertiary">
+              Preview — live camera cut through chrome glyphs. Needs camera permission;
+              nothing is recorded. Reduce Transparency disables the blur layer.
+            </AppText>
+            <AdvancedCameraMaskedBlurPreview
+              active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+              disabledByTransparency={resolved.accessibility.reduceTransparency}
+            />
           </Section>
 
           <AppPressable

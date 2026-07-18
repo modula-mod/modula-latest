@@ -1,5 +1,11 @@
-import {useState} from 'react'
-import {FlatList, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {useCallback, useRef, useState} from 'react'
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  type ViewToken,
+} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
 import {Stack, useRouter} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -14,6 +20,7 @@ import {useSession} from '@/auth/runtime'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReelsQuery} from '@/features/reels/data'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
 
@@ -21,6 +28,21 @@ export function ReelsScreen() {
   const {height, width} = useWindowDimensions()
   const {colours} = useThemeTokens()
   const reelsQuery = useReelsQuery()
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const onViewableItemsChanged = useRef(
+    ({viewableItems}: {viewableItems: ViewToken[]}) => {
+      const first = viewableItems.find(item => item.isViewable)
+      const id = typeof first?.item === 'object' && first.item && 'id' in first.item
+        ? String((first.item as ReelItemType).id)
+        : null
+      setActiveId(id)
+    },
+  ).current
+  const viewabilityConfig = useRef({itemVisiblePercentThreshold: 70}).current
+
+  const handleViewable = useCallback(onViewableItemsChanged, [
+    onViewableItemsChanged,
+  ])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -44,8 +66,15 @@ export function ReelsScreen() {
             keyExtractor={item => item.id}
             pagingEnabled
             showsVerticalScrollIndicator={false}
+            onViewableItemsChanged={handleViewable}
+            viewabilityConfig={viewabilityConfig}
             renderItem={({item}) => (
-              <ReelItem reel={item} height={height} width={width} />
+              <ReelItem
+                reel={item}
+                height={height}
+                width={width}
+                active={activeId === item.id || (activeId === null && item.id === reelsQuery.data?.[0]?.id)}
+              />
             )}
           />
         )}
@@ -58,10 +87,12 @@ function ReelItem({
   reel,
   height,
   width,
+  active,
 }: {
   reel: ReelItemType
   height: number
   width: number
+  active: boolean
 }) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -73,14 +104,25 @@ function ReelItem({
 
   return (
     <View style={[styles.item, {height, width, backgroundColor: colours.surface1}]}>
-      {/* Editorial still — never a flat accent-only fill across the screen. */}
-      <LinearGradient
-        colors={[colours.surface1, reel.colour, colours.surface3]}
-        locations={[0, 0.45, 1]}
-        start={{x: 0.15, y: 0}}
-        end={{x: 0.9, y: 1}}
-        style={StyleSheet.absoluteFill}
-      />
+      {reel.videoUri ? (
+        <ModulaReelPlayer
+          sourceUri={reel.videoUri}
+          posterColour={reel.colour}
+          active={active}
+          style={StyleSheet.absoluteFill}
+        />
+      ) : (
+        <>
+          {/* Editorial still — never a flat accent-only fill across the screen. */}
+          <LinearGradient
+            colors={[colours.surface1, reel.colour, colours.surface3]}
+            locations={[0, 0.45, 1]}
+            start={{x: 0.15, y: 0}}
+            end={{x: 0.9, y: 1}}
+            style={StyleSheet.absoluteFill}
+          />
+        </>
+      )}
       <View
         pointerEvents="none"
         style={[StyleSheet.absoluteFill, {backgroundColor: colours.mediaOverlayScrim}]}
@@ -115,6 +157,7 @@ function ReelItem({
           </AppText>
           <AppText variant="caption" style={{color: colours.mediaOverlaySecondary}}>
             Preview · {reel.source}
+            {reel.videoUri ? ' · video foundation' : ''}
           </AppText>
         </View>
         <View style={styles.rail}>
@@ -164,6 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
+    zIndex: 3,
   },
   caption: {
     flex: 1,
