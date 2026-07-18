@@ -17,8 +17,10 @@
 | Permissions / security | Agent tool access + OAuth | Auth sidebar | Security Scan | **Permissions matrix** + Security Scan Preview |
 | Version history | Versions | Version history | Version control | **Local snapshots** of draft manifests |
 | Publish confidence | Publish + MCP tools | Publish status | Verification + Testing Agent | **Publish readiness checklist** — no package publish yet |
-| Templates / launchpad | Starters | Scaffold first | Launchpad / templates | **Module templates** (Notes-shaped, CRM-shaped, Agent-shaped) |
+| Templates / launchpad | Starters | Scaffold first | Launchpad / templates | **Module templates** (Vault Notes, Tasks, CRM, Calendar, Files, Newsletter, Analytics, Health Agent, Game stub, Widget pack, Team inbox, Automations pack) |
 | Agents as products | MCP agent integrations | — | Agent Builder | Agents studio + `agent.scope` capability |
+| Widget builder | Component blocks | Preview panes | Dashboard widgets | **Widgets mode** — pick Board widgets, AI actions, and event contracts |
+| Test/checkout preview | Launch checks | Deploy guardrails | Testing + payments | **Preview matrix + Monetisation Preview** — local-only tests, DIMON checkout disabled |
 
 ---
 
@@ -40,4 +42,5 @@ It **may** show planned pipeline steps and local draft state.
 - Workspace modes → `ForgeStudioScreen`
 - Permission risk catalogue → `src/features/product/data/modulePermissions.ts`
 - Standards + matrix → `/product/module-standards`, `/product/permissions`
-- Templates → `FORGE_TEMPLATES` in `forgeDraft.ts`
+- Templates, Widgets mode options, Events, AI actions, Test matrix, Monetisation Preview → `FORGE_TEMPLATES` and related constants in `forgeDraft.ts`
+- `skill.md` preview pane → generated markdown string from the local draft; display-only
