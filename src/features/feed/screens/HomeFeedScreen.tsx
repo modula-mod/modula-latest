@@ -11,7 +11,6 @@ import {
 } from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {DemoPostItem} from '@/components/feed/DemoPostItem'
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -24,6 +23,7 @@ import {useSession} from '@/auth/runtime'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StoryRingAvatar} from '@/platform/ui/avatars'
@@ -74,7 +74,7 @@ export function HomeFeedScreen() {
           <FlatList
             data={posts}
             keyExtractor={item => item.id}
-            renderItem={({item}) => <DemoPostItem post={item} />}
+            renderItem={({item}) => <SocialPost post={item} />}
             contentInsetAdjustmentBehavior="automatic"
             refreshControl={
               <RefreshControl
@@ -165,7 +165,7 @@ export function HomeFeedScreen() {
 
 function StoryRail() {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const session = useSession()
   const discover = useDiscoverQuery()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
