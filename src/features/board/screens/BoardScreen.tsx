@@ -119,7 +119,15 @@ export function BoardScreen() {
     void loadProductPreferences().then(value => {
       if (value.boardWidgetIds.length === 0) {
         void patchProductPreferences({
-          boardWidgetIds: ['tasks', 'calendar', 'notes', 'crm'],
+          boardWidgetIds: [
+            'tasks',
+            'calendar',
+            'gaia-briefing',
+            'dimon-activity',
+            'nft-entitlements',
+            'notes',
+            'crm',
+          ],
         })
       }
     })
@@ -284,7 +292,10 @@ export function BoardScreen() {
                       <AppIcon name={widget.icon} colour={colours.accent} />
                       <AppText variant="headline">{widget.name}</AppText>
                       <AppText variant="caption" colour="textTertiary">
-                        {widget.size} · #{index + 1}
+                        {widget.size} · {widget.status} · #{index + 1}
+                      </AppText>
+                      <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                        {widget.description}
                       </AppText>
                     </Surface>
                   </ModulaContextMenu>

@@ -25,6 +25,7 @@ export type FeatureControlRow = {
 export type ProductPreferences = {
   focus: FocusPreferences
   mergeFeedIds: string[]
+  mergeFeedPresetName: string
   glassPrivacyLevel: 'disable-sharing' | 'protected-chat' | 'vault-chat'
   featureControl: FeatureControlRow[]
   boardWidgetIds: string[]
@@ -34,6 +35,7 @@ export type ProductPreferences = {
   chatAssistMode: ChatAssistMode
   chatAssistFunctions: string[]
   quietSendEnabled: boolean
+  teamsRoleId: string
 }
 
 export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
@@ -46,6 +48,7 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
     showHalo: true,
   },
   mergeFeedIds: ['following', 'team'],
+  mergeFeedPresetName: 'Daily operating mix',
   glassPrivacyLevel: 'protected-chat',
   featureControl: [
     {id: 'reels', enabled: false, locked: false},
@@ -57,13 +60,14 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
     {id: 'dimon', enabled: false, locked: true},
     {id: 'automations', enabled: false, locked: false},
   ],
-  boardWidgetIds: ['tasks', 'calendar', 'notes', 'crm'],
+  boardWidgetIds: ['tasks', 'calendar', 'gaia-briefing', 'dimon-activity', 'nft-entitlements', 'notes', 'crm'],
   automationEnabledIds: ['1', '2'],
   forgeDraftName: 'My Module',
   gaiaAllowedScopes: ['composer', 'tasks'],
   chatAssistMode: 'off',
   chatAssistFunctions: ['summarise', 'suggested-replies', 'tone'],
   quietSendEnabled: false,
+  teamsRoleId: 'admin',
 }
 
 function isChatAssistMode(value: unknown): value is ChatAssistMode {
@@ -92,6 +96,10 @@ function mergePreferences(raw: unknown): ProductPreferences {
       Array.isArray(value.mergeFeedIds) && value.mergeFeedIds.every(item => typeof item === 'string')
         ? value.mergeFeedIds
         : DEFAULT_PRODUCT_PREFERENCES.mergeFeedIds,
+    mergeFeedPresetName:
+      typeof value.mergeFeedPresetName === 'string' && value.mergeFeedPresetName.trim()
+        ? value.mergeFeedPresetName.trim()
+        : DEFAULT_PRODUCT_PREFERENCES.mergeFeedPresetName,
     glassPrivacyLevel:
       value.glassPrivacyLevel === 'disable-sharing' ||
       value.glassPrivacyLevel === 'protected-chat' ||
@@ -144,6 +152,10 @@ function mergePreferences(raw: unknown): ProductPreferences {
       typeof value.quietSendEnabled === 'boolean'
         ? value.quietSendEnabled
         : DEFAULT_PRODUCT_PREFERENCES.quietSendEnabled,
+    teamsRoleId:
+      typeof value.teamsRoleId === 'string' && value.teamsRoleId.trim()
+        ? value.teamsRoleId.trim()
+        : DEFAULT_PRODUCT_PREFERENCES.teamsRoleId,
   }
 }
 

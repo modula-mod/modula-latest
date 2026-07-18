@@ -65,7 +65,10 @@ export function WidgetsStudioScreen() {
                   <View style={{flex: 1, gap: 2}}>
                     <AppText variant="headline">{widget.name}</AppText>
                     <AppText variant="caption" colour="textTertiary">
-                      {widget.size} · #{index + 1}
+                      {widget.size} · {widget.status} · #{index + 1}
+                    </AppText>
+                    <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                      {widget.description}
                     </AppText>
                   </View>
                   <AppPressable
@@ -118,7 +121,10 @@ export function WidgetsStudioScreen() {
                   <AppIcon name={widget.icon} colour={colours.accent} />
                   <AppText variant="headline">{widget.name}</AppText>
                   <AppText variant="caption" colour="textTertiary">
-                    {widget.size} · {on ? 'On Board' : 'Off'}
+                    {widget.size} · {widget.status} · {on ? 'On Board' : 'Off'}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                    {widget.description}
                   </AppText>
                 </AppPressable>
               )

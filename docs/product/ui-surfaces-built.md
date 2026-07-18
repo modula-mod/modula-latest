@@ -29,11 +29,11 @@
 | `/product/kaizen` | Kaizen Improve capture + local review queue |
 | `/product/ledger` | Ledger Replay diagnostic rows + non-destructive replay explanation |
 | `/product/foundry` · `/claims-graph` | Layer redirects |
-| `/product/merge-feeds` | Merge 2–5 feeds (persisted) |
+| `/product/merge-feeds` | Merge 2–5 feeds (persisted) + local preset name + source weighting Preview |
 | `/product/automations` | Workflow cards + local enable (persisted) |
 | `/product/gaia` | GAIA console — scopes + governed flow (persisted) |
 | `/product/gaia-atlas` | Atlas schematic (GAIA centre · AKI/Governor orbit) |
-| `/product/widgets` | Toggle widgets → Board strip (persisted) |
+| `/product/widgets` | Toggle widgets → Board strip (persisted); GAIA briefing Preview, DIMON activity inactive, NFT entitlements Preview |
 | `/product/feature-control` | Enable/lock features (persisted) |
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |
 | `/product/forge` | Plan/Build/Preview/Manifest workspace + templates, chat, scan, versions |
@@ -57,10 +57,10 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | --- | --- |
 | `/profile/os` | Profile-OS pre-screen |
 | `/modules` | Modules library (marketplace-backed) |
-| `/marketplace/[id]` | Module pre-screens + Forge card |
-| `/teams` | Teams OS role preview + deep links |
+| `/marketplace/[id]` | 69 module pre-screens across Notes, Tasks, CRM, Calendar, Files, DIMON inactive wallet, NFT entitlements, Newsletter, Analytics, Health, Games, Automations, Agents, Themes, Widgets, Team tools |
+| `/teams` | Teams OS role preview + persisted role choice + roles matrix + shared Board/modules + approval stubs + focus/availability + Intelligence/Ledger links |
 | `/communities` | Communities OS seeded list |
-| `/board` | Widget strip (reorder/remove) + Focus copy from prefs |
+| `/board` | Widget strip (reorder/remove) + Focus copy from prefs + GAIA/DIMON/NFT entitlement widget cards |
 | Home (`/`) | PresenceArc + Focus banner + quiet/work mode order |
 | Messages | Glass Privacy badge + thread hint from prefs |
 | Profile customize | Shop + Agents module tab slots (Preview) |
@@ -71,6 +71,7 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | `/product/themes` | Themes & layouts packs Preview |
 | `/settings/dimon` | Expanded inactive DIMON direction: ownership ledger future, ADR-006 DB boundary, reserved events, forbidden fake balances/token UI |
 | Extension Centre | Links to Forge / Standards / Agents / Marketplace |
+| Composer Tools drawer | Manifest-like tool registry fallback: Photo, Camera, Video, GIF, File, Poll, Location, Schedule, Comment-to-DM, Automation, AI rewrite, Translation, Content warning, Product attach, NFT attach blocked; unavailable tools explain required modules |
 
 ## Navigation wiring
 

@@ -38,8 +38,16 @@ const SECTIONS: ComposerToolSection[] = [
 
 function iconFor(tool: ComposerToolItem): AppIconName {
   if (tool.toolId.includes('camera')) return 'camera'
-  if (tool.toolId.includes('photo') || tool.toolId.includes('gif')) return 'photo'
+  if (tool.toolId.includes('gif')) return 'gif'
+  if (tool.toolId.includes('photo') || tool.toolId.includes('video')) return 'photo'
+  if (tool.toolId.includes('file')) return 'storage'
   if (tool.toolId.includes('poll')) return 'poll'
+  if (tool.toolId.includes('location')) return 'link'
+  if (tool.toolId.includes('schedule')) return 'event'
+  if (tool.toolId.includes('warning')) return 'warning'
+  if (tool.toolId.includes('nft')) return 'security'
+  if (tool.toolId.includes('product')) return 'marketplace'
+  if (tool.toolId.includes('translate')) return 'text'
   if (tool.toolId.includes('link')) return 'link'
   if (tool.toolId.includes('market')) return 'marketplace'
   if (tool.toolId.includes('automation')) return 'automation'
@@ -88,8 +96,14 @@ export function ComposerToolsDrawer({
   )
 
   const runTool = (tool: ComposerToolItem) => {
-    if (tool.requiresModule && tool.availability === 'unavailable') {
-      Alert.alert(`Requires ${tool.requiresModule}`, `${tool.name} needs the ${tool.requiresModule} module.`)
+    if (tool.availability === 'unavailable') {
+      const title = tool.requiresModule ? `Requires ${tool.requiresModule}` : 'Tool unavailable'
+      const message =
+        tool.description ??
+        (tool.requiresModule
+          ? `${tool.name} needs the ${tool.requiresModule} module.`
+          : `${tool.name} is not available in this Preview.`)
+      Alert.alert(title, message)
       return
     }
     if (tool.toolId.includes('photo')) {
@@ -214,6 +228,11 @@ export function ComposerToolsDrawer({
                             ? 'Preview'
                             : tool.section}
                       </AppText>
+                      {tool.description ? (
+                        <AppText variant="micro" colour="textSecondary" numberOfLines={2}>
+                          {tool.description}
+                        </AppText>
+                      ) : null}
                     </AppPressable>
                   )
                 })}
