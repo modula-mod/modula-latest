@@ -30,8 +30,9 @@ const CREATE_IDS = new Set(['forge', 'agents', 'design-lab', 'feature-atlas', 'd
 const SYSTEM_IDS = new Set(['appearance', 'settings', 'help', 'developer', 'nft-studio'])
 
 /**
- * Adaptive account panel — Apple-like section hierarchy.
- * Destinations still come from getAccountPanelDestinations() for extensibility.
+ * Adaptive account panel — Apple-like section hierarchy (ModulaSheet Preview).
+ * Not mounted in root layout; live chrome is NavigationDrawer via openDrawer.
+ * Kept for verify scripts / sheet Preview. Destinations: getAccountPanelDestinations().
  */
 export function AdaptiveAccountPanel() {
   const router = useRouter()

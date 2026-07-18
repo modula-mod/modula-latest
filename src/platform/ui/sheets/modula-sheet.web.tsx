@@ -1,17 +1,9 @@
-import type {ReactNode} from 'react'
 import {Modal, Pressable, StyleSheet, View} from 'react-native'
 
+import type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export type ModulaSheetProps = {
-  isPresented: boolean
-  onDismiss: () => void
-  children: ReactNode
-  snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
-  showDragIndicator?: boolean
-  testID?: string
-  material?: 'solid' | 'glass'
-}
+export type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 
 /** Accessible web/dialog fallback for ModulaSheet. */
 export function ModulaSheet({

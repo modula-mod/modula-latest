@@ -1,23 +1,13 @@
 import {BottomSheet} from '@expo/ui'
 import {containerRelativeFrame, frame} from '@expo/ui/swift-ui/modifiers'
 import {BlurView} from 'expo-blur'
-import type {ReactNode} from 'react'
 import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native'
 
+import type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export type ModulaSheetProps = {
-  isPresented: boolean
-  onDismiss: () => void
-  children: ReactNode
-  /** Medium + large detents by default for Tools / account panel. */
-  snapPoints?: ('half' | 'full' | {fraction: number} | {height: number})[]
-  showDragIndicator?: boolean
-  testID?: string
-  /** Prefer glass material when Reduce Transparency is off. */
-  material?: 'solid' | 'glass'
-}
+export type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 
 /**
  * Native sheet via `@expo/ui` universal BottomSheet.

@@ -19,6 +19,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {isDevelopmentBuild} from '@/lib/platform'
+import {getAccountPanelDestinations} from '@/platform/ui/navigation/account-panel-destinations'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -139,6 +140,28 @@ function routeSelected(pathname: string, route: string): boolean {
   return false
 }
 
+/** Map registry-only destinations into drawer sections (Lists, Drafts, Help, …). */
+function sectionForRegistryRoute(route: string): DrawerSectionId {
+  if (
+    route.startsWith('/settings') ||
+    route === '/help' ||
+    route === '/account/switcher'
+  ) {
+    return 'system'
+  }
+  if (
+    route.startsWith('/product') ||
+    route === '/creator' ||
+    route === '/reels'
+  ) {
+    return 'labs'
+  }
+  if (route === '/marketplace' || route === '/product/forge' || route === '/product/search') {
+    return 'create'
+  }
+  return 'spaces'
+}
+
 export function NavigationDrawer() {
   const router = useRouter()
   const pathname = usePathname()
@@ -151,15 +174,24 @@ export function NavigationDrawer() {
   const ownerProfile = session.status === 'signedIn' ? session.profile : null
   const drawerWidth = Math.min(348, Math.max(292, width * 0.82))
 
-  const sections = useMemo(
-    () =>
-      SECTION_ORDER.map(id => ({
-        id,
-        label: SECTION_LABELS[id],
-        items: drawerDestinations.filter(item => item.section === id),
-      })).filter(section => section.items.length > 0),
-    [],
-  )
+  const sections = useMemo(() => {
+    const knownRoutes = new Set(drawerDestinations.map(item => item.route))
+    const extras: DrawerDestination[] = getAccountPanelDestinations()
+      .filter(item => !knownRoutes.has(item.route))
+      .map(item => ({
+        label: item.label,
+        route: item.route,
+        icon: item.icon,
+        description: item.description,
+        section: sectionForRegistryRoute(item.route),
+      }))
+    const merged = [...drawerDestinations, ...extras]
+    return SECTION_ORDER.map(id => ({
+      id,
+      label: SECTION_LABELS[id],
+      items: merged.filter(item => item.section === id),
+    })).filter(section => section.items.length > 0)
+  }, [])
 
   const animatedStyles = useMemo(
     () => ({

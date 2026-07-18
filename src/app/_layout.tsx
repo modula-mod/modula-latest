@@ -8,10 +8,7 @@ import {SessionProvider} from '@/auth/runtime'
 import {QueryRuntimeProvider} from '@/data/query'
 import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
 import '@/features/social/registerExpansionDestinations'
-import {
-  AccountPanelProvider,
-  AdaptiveAccountPanel,
-} from '@/platform/ui'
+import {AccountPanelProvider} from '@/platform/ui'
 import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
@@ -58,8 +55,10 @@ function RootNavigator() {
         <Stack.Screen name="discover/media" />
         <Stack.Screen name="settings" />
       </Stack>
+      {/* Live nav chrome: left NavigationDrawer (avatar → openDrawer).
+          AdaptiveAccountPanel remains in codebase for sheet Preview / verify,
+          but is not mounted — nothing called openAccountPanel after the drawer restore. */}
       <NavigationDrawer />
-      <AdaptiveAccountPanel />
     </>
   )
 }

@@ -29,7 +29,7 @@ const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
 /**
  * Left navigation drawer controller (animated Modal).
- * Account panel (ModulaSheet) remains available via AccountPanelProvider for sheet entry points.
+ * Avatar / shell chrome should call openDrawer — this is the live navigation surface.
  */
 export function ShellDrawerProvider({children}: PropsWithChildren) {
   const {motion} = useThemeTokens()
