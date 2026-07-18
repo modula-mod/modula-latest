@@ -27,6 +27,8 @@
 | `/product/integrations` | Elements catalogue |
 | `/product/search` | Universal search preview |
 | `/product/creator` | Creator economy |
+| `/product/ownership` | Ownership & portability |
+| `/product/presence` | Presence / short-form (not IG Stories) |
 | `/product/[slug]` | Capability pre-screen for every catalogue item |
 
 ## Social OS surfaces

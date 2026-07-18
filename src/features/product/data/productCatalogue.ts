@@ -338,8 +338,10 @@ export const productCatalogue: ProductCapability[] = [
     icon: 'security',
     maturity: 'preview',
     bullets: ['Export', 'Sessions', 'Permissions', 'Backups'],
-    ctaLabel: 'Account export',
-    ctaRoute: '/settings/account/export',
+    ctaLabel: 'Ownership controls',
+    ctaRoute: '/product/ownership',
+    secondaryLabel: 'Account export',
+    secondaryRoute: '/settings/account/export',
   },
   {
     id: 'dimon',
@@ -364,6 +366,20 @@ export const productCatalogue: ProductCapability[] = [
     bullets: ['Badges', 'Achievements', 'Cosmetics', 'Opt-in only'],
     ctaLabel: 'Product Hub',
     ctaRoute: '/product',
+  },
+  {
+    id: 'presence',
+    name: 'Presence & short-form',
+    eyebrow: 'SOCIAL',
+    summary: 'Focus Halo, ephemeral presence, short-form and live — mapped to Modula, not IG.',
+    body: 'Stories-like craft informs presence rails. The product remains Profile-OS + modules.',
+    icon: 'play',
+    maturity: 'planned',
+    bullets: ['Focus Halo', 'Presence arc', 'Reels preview', 'Live rooms (later)'],
+    ctaLabel: 'Presence studio',
+    ctaRoute: '/product/presence',
+    secondaryLabel: 'Reels preview',
+    secondaryRoute: '/reels',
   },
 ]
 
