@@ -46,11 +46,13 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
             void presentModulaActions({
               title: 'Profile',
               actions: [
+                {id: 'os', label: 'Profile-OS'},
                 {id: 'customize', label: 'Customize'},
                 {id: 'share', label: 'Share profile'},
                 {id: 'preview', label: 'View as visitor'},
               ],
             }).then(id => {
+              if (id === 'os') router.push('/profile/os' as Href)
               if (id === 'customize') router.push('/profile/customize' as Href)
               if (id === 'share') void shareProfile(profile)
               if (id === 'preview') router.push('/profile/preview' as Href)

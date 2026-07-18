@@ -1,7 +1,7 @@
 # Modula — UI enhancement opportunities
 
-**Date:** 2026-07-18  
-**Status:** Exploration — ranked after owner brief; not Phase 6S merge criteria  
+**Date:** 2026-07-18
+**Status:** Exploration — ranked after owner brief; not Phase 6S merge criteria
 **Product brief:** `docs/product/overview.md`
 
 ---
@@ -53,10 +53,10 @@ Reference products that are "close but wrong":
 
 ## Chosen vibe direction
 
-**Primary:** Spatial OS + soft craft  
+**Primary:** Spatial OS + soft craft
 Board / Profile / first-run feel like a personal environment; social feed is calm and media-aware.
 
-**Secondary (Extension Centre + future Builder):** Builder precision  
+**Secondary (Extension Centre + future Builder):** Builder precision
 Catalogue, install states, and (later) module creation should feel like a capable tool — clear hierarchy, honest status, no fake success.
 
 Accent remains **Modula Teal** (`#369CAA`) unless the user overrides via Appearance.
@@ -116,13 +116,17 @@ Do **not** copy pink–purple brand wash or family-tree IA.
 
 ---
 
-## Suggested first implementation slice (when you say go)
+## First implementation slice (started 2026-07-18)
 
-One pass, three screens — no whole-app redesign:
+Shipped on `phase6s-social-product-completion`:
 
-1. **Welcome / first-run** — atmospheric stage, Modula copy, Continue/Skip  
-2. **Board empty + Extension Centre Available** — modules as the promise  
-3. **Home feed craft** — timestamp fix + reaction motion + post presentation principle  
+1. **Welcome + `/onboarding`** — atmospheric stage, 3-step Social → Profile-OS → Modules, PresenceArc
+2. **Module pre-screens** — `ModulePreScreenHero` on marketplace module detail + Forge catalogue entry
+3. **Profile-OS pre-screen** — `/profile/os` with Focus Halo arc + CTAs
+4. **Board craft** — Focus copy, empty pinned/modules invitation, link to Profile-OS
+5. **Activity timestamps** — ISO → relative via `formatRelativeTime`
+
+Still open: reaction bloom polish, real Surface Type engines, Forge builder itself, full offering screens.
 
 Keep Phase 6S physical / TestFlight gates on a separate track.
 
@@ -130,18 +134,18 @@ Keep Phase 6S physical / TestFlight gates on a separate track.
 
 ## What not to do
 
-- Do not reintroduce Bluesky/AT as the product identity.  
-- Do not redesign everything while finishing device acceptance.  
-- Do not ship fake Stories or a fake Lovable builder.  
-- Do not hardcode modules into the host as permanent feature code.  
+- Do not reintroduce Bluesky/AT as the product identity.
+- Do not redesign everything while finishing device acceptance.
+- Do not ship fake Stories or a fake Lovable builder.
+- Do not hardcode modules into the host as permanent feature code.
 - Do not use pastel purple defaults or family-app IA.
 
 ---
 
 ## Related
 
-- `docs/product/overview.md`  
-- `docs/design/social-ui-inspiration.md`  
-- `docs/design/modula-appearance-guidelines.md`  
-- `docs/product/theme-architecture-v5.md`  
-- `docs/architecture/module-boundary.md`  
+- `docs/product/overview.md`
+- `docs/design/social-ui-inspiration.md`
+- `docs/design/modula-appearance-guidelines.md`
+- `docs/product/theme-architecture-v5.md`
+- `docs/architecture/module-boundary.md`

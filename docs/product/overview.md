@@ -4,7 +4,7 @@
 
 ## Motto
 
-**Your digital world, built around you.**  
+**Your digital world, built around you.**
 **Simplifying Digital.**
 
 > One identity. One environment. Your modules. Your rules.
@@ -61,18 +61,19 @@ A Modula installation can grow to include social feeds and conversations, custom
 
 ## Near-term product priorities
 
-1. Stable universal application shell  
-2. Modula social foundation (Greenfield) — Phase 6S track  
-3. External module standard and runtime (Phase 7+)  
-4. First official modules (external packages)  
-5. Marketplace + developer ecosystem  
-6. In-Modula module builder  
+1. Stable universal application shell
+2. Modula social foundation (Greenfield) — Phase 6S track
+3. External module standard and runtime (Phase 7+)
+4. First official modules (external packages)
+5. Marketplace + developer ecosystem
+6. In-Modula module builder
 7. Deeper automation and Gaia (permission-aware)
 
 ## Related
 
-- `docs/design/modula-ui-enhancement-opportunities.md` — UI vibe / opportunity map  
-- `docs/product/theme-architecture-v5.md`  
-- `docs/architecture/module-boundary.md`  
-- `docs/architecture/startup-contract.md`  
-- `docs/architecture/bluesky-inspiration-policy.md` — study patterns only; no fork/copy of Bluesky product UI  
+- `docs/product/modula-product-direction.md` — full offering catalogue (Shell → Forge → DIMON)
+- `docs/design/modula-ui-enhancement-opportunities.md` — UI vibe / opportunity map
+- `docs/product/theme-architecture-v5.md`
+- `docs/architecture/module-boundary.md`
+- `docs/architecture/startup-contract.md`
+- `docs/architecture/bluesky-inspiration-policy.md` — study patterns only; no fork/copy of Bluesky product UI

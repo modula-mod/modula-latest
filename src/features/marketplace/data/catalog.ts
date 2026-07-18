@@ -201,6 +201,20 @@ export const marketplaceCatalog: MarketplaceModule[] = [
     tags: ['links', 'saved'],
     section: ['new'],
   },
+  {
+    id: 'module-forge',
+    name: 'Forge',
+    description: 'Module Builder preview — create installable Modula packages visually.',
+    longDescription:
+      'Forge is the future Module Builder (Lovable/Bolt-class craft inside Modula). This pre-screen explains the pipeline: Builder → SDK → Fusion → Registry → Marketplace. No remote code generation or package publish runs in this build.',
+    status: 'Gated',
+    icon: 'developer',
+    category: 'intelligence',
+    capability: 'Builder · Registry · Marketplace',
+    sellerId: 'seller-modula',
+    tags: ['forge', 'builder', 'developer'],
+    section: ['featured', 'forYou'],
+  },
 ]
 
 export const marketplaceCategories: Array<{

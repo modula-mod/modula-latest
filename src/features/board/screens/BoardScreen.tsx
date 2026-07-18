@@ -127,7 +127,8 @@ export function BoardScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Good focus, {ownerName}</AppText>
             <AppText variant="body" colour="textSecondary">
-              Your local Modula Board gathers pinned spaces and next useful actions.
+              Board is your private operating dashboard — modules, widgets, and next actions in one
+              place.
             </AppText>
           </View>
 
@@ -144,9 +145,16 @@ export function BoardScreen() {
             <View style={styles.focusBody}>
               <AppText variant="headline">Current focus</AppText>
               <AppText variant="body" colour="textSecondary">
-                Validate Phase 4.5 expansion surfaces — Marketplace, Settings, and Saved — before
-                production backends.
+                Shape your Profile-OS, install first modules, and keep the shell light while
+                capabilities grow through the Registry.
               </AppText>
+              <AppPressable
+                accessibilityLabel="Open Profile-OS pre-screen"
+                onPress={() => router.push('/profile/os' as Href)}>
+                <AppText variant="caption" colour="accent">
+                  Explore Profile-OS →
+                </AppText>
+              </AppPressable>
             </View>
           </Surface>
 
@@ -164,6 +172,32 @@ export function BoardScreen() {
             </View>
             {loading ? (
               <BoardGridSkeleton />
+            ) : pinnedSpaces.length === 0 ? (
+              <Surface
+                variant="contained"
+                style={[
+                  styles.emptyBoard,
+                  {
+                    gap: spacing[3],
+                    padding: spacing[4],
+                    borderRadius: radius.large,
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                  },
+                ]}>
+                <AppIcon name="board" colour={colours.accent} size={28} />
+                <AppText variant="headline">Pin your daily surfaces</AppText>
+                <AppText variant="body" colour="textSecondary">
+                  Board stays empty until you choose spaces — Marketplace, Saved, Lists, and more.
+                </AppText>
+                <AppPressable
+                  accessibilityLabel="Customize pinned spaces"
+                  onPress={() => setCustomizeOpen(true)}>
+                  <AppText variant="label" colour="accent">
+                    Customize pinned spaces
+                  </AppText>
+                </AppPressable>
+              </Surface>
             ) : (
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {pinnedSpaces.map(space => (
@@ -209,7 +243,44 @@ export function BoardScreen() {
 
           <FeatureErrorBoundary label="Board module grid">
             <View style={{gap: spacing[3]}}>
-              <AppText variant="headline">Modules</AppText>
+              <View style={styles.sectionHeader}>
+                <AppText variant="headline">Modules</AppText>
+                <AppPressable
+                  accessibilityLabel="Browse marketplace modules"
+                  onPress={() => router.push('/marketplace' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Browse
+                  </AppText>
+                </AppPressable>
+              </View>
+              {modules.length === 0 ? (
+                <Surface
+                  variant="contained"
+                  style={[
+                    styles.emptyBoard,
+                    {
+                      gap: spacing[3],
+                      padding: spacing[4],
+                      borderRadius: radius.large,
+                      backgroundColor: colours.surfaceRaised,
+                      borderColor: colours.border,
+                    },
+                  ]}>
+                  <AppIcon name="modules" colour={colours.accent} size={28} />
+                  <AppText variant="headline">Install your first capability</AppText>
+                  <AppText variant="body" colour="textSecondary">
+                    Modules like Vault Notes, Tasks, and CRM ship as packages — preview them in the
+                    Marketplace before Registry install lands.
+                  </AppText>
+                  <AppPressable
+                    accessibilityLabel="Open Marketplace"
+                    onPress={() => router.push('/marketplace' as Href)}>
+                    <AppText variant="label" colour="accent">
+                      Open Marketplace
+                    </AppText>
+                  </AppPressable>
+                </Surface>
+              ) : null}
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {modules.map(module => (
                   <View key={module.id} style={styles.moduleCardWrap}>
@@ -346,6 +417,10 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+  },
+  emptyBoard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    width: '100%',
   },
   controlGroup: {
     marginTop: 8,
