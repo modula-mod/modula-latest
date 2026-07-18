@@ -301,6 +301,17 @@ export const helpArticles: HelpArticle[] = [
 
 export const whatsNewNotes = [
   {
+    version: '0.2.0 · Social OS craft',
+    items: [
+      'Product Hub — full Modula capability catalogue',
+      'Onboarding + Profile-OS + module pre-screens',
+      'Focus Mode, Merge Feeds, Automations, Widgets studios',
+      'Gaia / Atlas / Forge / Glass Privacy foreshadow (honest Preview)',
+      'Universal Search, Integrations hub, Ownership controls',
+      'Greenfield social: reactions, comments, appearance sync',
+    ],
+  },
+  {
     version: '0.1.0 · Phase 4.5',
     items: [
       'Native tabs: Home, Discover, Board, Activity, Profile',

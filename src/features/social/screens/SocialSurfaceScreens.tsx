@@ -130,6 +130,13 @@ export function MessagesInboxScreen() {
           keyboardShouldPersistTaps="handled">
           <AppText variant="display">Inbox</AppText>
           <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
+          <AppPressable
+            accessibilityLabel="Open Glass Privacy levels"
+            onPress={() => router.push('/product/glass-privacy' as Href)}>
+            <AppText variant="caption" colour="accent">
+              Protected Chat & Vault Chat (Glass Privacy) →
+            </AppText>
+          </AppPressable>
           <View
             style={[
               styles.searchRow,
