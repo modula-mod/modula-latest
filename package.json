@@ -62,7 +62,7 @@
     "ios:device": "expo run:ios --device",
     "android": "expo run:android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts typecheck",
+    "typecheck": "tsc --noEmit && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck",
     "lint": "expo lint",
     "doctor": "expo-doctor",
     "modula": "pnpm --filter @modula/modula-cli exec node dist/cli.js",

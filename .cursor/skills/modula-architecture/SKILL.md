@@ -40,6 +40,8 @@ description: >-
 - `docs/architecture/module-boundary.md`
 - `docs/architecture/intelligence-architecture.md` — GAIA executes · AKI verifies · Governor controls
 - `docs/architecture/intelligence-phases.md` — Phases A–E sequencing
+- `docs/architecture/greenfield-mcp.md` — local Cursor MCP preview helper
+- `docs/architecture/modula-cli.md` — local Modula CLI boundary and commands
 - `docs/architecture/bluesky-inspiration-policy.md`
 - `docs/architecture/screen-map.md`
 - `templates/modula-module/skill.md` — module digital DNA

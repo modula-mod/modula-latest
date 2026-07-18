@@ -91,5 +91,7 @@ Host Preview routes (no production intelligence runtime yet):
 - `docs/architecture/module-standards.md`  
 - `docs/architecture/module-boundary.md`  
 - `docs/architecture/dimon-future-integration-boundary.md`  
+- `docs/architecture/greenfield-mcp.md`
+- `docs/architecture/modula-cli.md`
 - `docs/design/forge-builder-inspiration.md`  
 - `templates/modula-module/skill.md`  

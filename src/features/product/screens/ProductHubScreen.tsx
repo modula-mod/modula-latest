@@ -112,6 +112,13 @@ export function ProductHubScreen() {
                   route: '/product/commands',
                 },
                 {
+                  id: 'developer',
+                  name: 'Developer Tools',
+                  summary: 'Greenfield MCP + Modula CLI.',
+                  icon: 'tools' as const,
+                  route: '/product/developer',
+                },
+                {
                   id: 'agents',
                   name: 'Agents',
                   summary: 'Scoped GAIA agent packages.',

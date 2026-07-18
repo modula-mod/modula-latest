@@ -31,6 +31,7 @@
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |
 | `/product/forge` | Plan/Build/Preview/Manifest workspace + templates, chat, scan, versions |
 | `/product/permissions` | Permissions matrix + Security Scan Preview |
+| `/product/developer` | Developer Tools studio: Greenfield MCP status, Modula CLI commands, Cursor `mcp.json` example |
 | `/product/agents` | Agents module studio (Gaia scopes) |
 | `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |
@@ -60,9 +61,8 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | `templates/modula-module/` | Module boilerplate + `docs/architecture/module-standards.md` |
 | `/product/module-standards` | Standards studio |
 | `/product/themes` | Themes & layouts packs Preview |
-| `/settings/dimon` | Expanded inactive DIMON direction (no balances) |
+| `/settings/dimon` | Expanded inactive DIMON direction: ownership ledger future, ADR-006 DB boundary, reserved events, forbidden fake balances/token UI |
 | Extension Centre | Links to Forge / Standards / Agents / Marketplace |
-| `/settings/dimon` | Expanded DIMON direction (inactive) |
 
 ## Navigation wiring
 

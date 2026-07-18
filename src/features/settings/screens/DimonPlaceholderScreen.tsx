@@ -29,6 +29,20 @@ const CAPABILITIES = [
   {id: 'dimon:ledger:audit', label: 'Ledger audit', state: 'Reserved'},
 ]
 
+const EVENT_TYPES = [
+  'dimon.account.linked',
+  'dimon.transaction.requested',
+  'dimon.transaction.approved',
+  'dimon.ledger.audited',
+]
+
+const FORBIDDEN = [
+  'Fake balances',
+  'Decorative token UI',
+  'Chain RPC status or calls',
+  'Mining, staking, or speculative token mechanics',
+]
+
 const PHASES = [
   {
     title: '1 · Shell + social + modules',
@@ -76,6 +90,47 @@ export function DimonPlaceholderScreen() {
             <AppText variant="body" colour="textSecondary">
               No balances, wallets, mining, staking, or transactions in this build. Feature Control
               keeps DIMON locked until activation.
+            </AppText>
+          </Surface>
+
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[2],
+                padding: spacing[4],
+                borderRadius: radius.medium,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Ownership ledger (future)</AppText>
+            <AppText variant="body" colour="textSecondary">
+              DIMON may later add a transaction ledger for ownership, settlement, reward, and audit
+              events. That requires a dedicated service boundary, stable Greenfield account binding,
+              explicit user approval, tamper-evident records, replay protection, key-management
+              rules, and a reviewed security model before any activation.
+            </AppText>
+          </Surface>
+
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[2],
+                padding: spacing[4],
+                borderRadius: radius.medium,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">ADR-006 boundary</AppText>
+            <AppText variant="body" colour="textSecondary">
+              ADR-006 says PostgreSQL is primary DB; blockchain is NOT the app database. DIMON may
+              later provide ownership and settlement proofs, but not mining, speculative tokens, or
+              a replacement for Greenfield application state in this phase.
             </AppText>
           </Surface>
 
@@ -131,6 +186,29 @@ export function DimonPlaceholderScreen() {
             ))}
           </View>
 
+          <AppText variant="headline">Reserved event types</AppText>
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[2],
+                padding: spacing[4],
+                borderRadius: radius.medium,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="caption" colour="textTertiary">
+              From @modula/dimon-contracts. Reserved only; Phase 6R does not emit or persist them.
+            </AppText>
+            {EVENT_TYPES.map(eventType => (
+              <AppText key={eventType} variant="body" colour="textSecondary">
+                · {eventType}
+              </AppText>
+            ))}
+          </Surface>
+
           <Surface
             variant="contained"
             style={[
@@ -151,22 +229,43 @@ export function DimonPlaceholderScreen() {
             ))}
           </Surface>
 
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[2],
+                padding: spacing[4],
+                borderRadius: radius.medium,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="label">What is forbidden now</AppText>
+            {FORBIDDEN.map(item => (
+              <AppText key={item} variant="body" colour="textSecondary">
+                · {item}
+              </AppText>
+            ))}
+          </Surface>
+
           <AppText variant="caption" colour="textSecondary">
             There are no balances, wallets, mining, staking, or transactions in this build. See
-            ADR-009 for the integration boundary. Contracts live in @modula/dimon-contracts.
+            ADR-006 and ADR-009 for the integration boundary. Contracts live in
+            @modula/dimon-contracts.
           </AppText>
 
-          <AppButton onPress={() => router.push('/product/dimon' as Href)}>
-            Open DIMON capability card
+          <AppButton onPress={() => router.push('/product/ledger' as Href)}>
+            Ledger & Replay
           </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/marketplace/module-wallet' as Href)}>
-            Wallet module pre-screen
+          <AppButton variant="secondary" onPress={() => router.push('/product/intelligence' as Href)}>
+            Intelligence Hub
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/product/ownership' as Href)}>
             Ownership & portability
           </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/product' as Href)}>
-            All Modula capabilities
+          <AppButton variant="ghost" onPress={() => router.push('/product/developer' as Href)}>
+            Developer Tools
           </AppButton>
         </ScrollView>
       </ResponsiveContent>
