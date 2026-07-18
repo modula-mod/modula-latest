@@ -1,15 +1,13 @@
-import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import type {StyleProp, ViewStyle} from 'react-native'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {AppIconName} from '@/components/primitives/AppIcon'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 
 type ChromeCircleButtonProps = {
   icon: AppIconName
   accessibilityLabel: string
   onPress?: () => void
-  /** Visual-only glyph for hosts that already wrap press (e.g. ModulaMenu). */
+  /** Visual-only — still renders native chrome; host owns press when false. */
   pressable?: boolean
   size?: number
   iconSize?: number
@@ -17,63 +15,22 @@ type ChromeCircleButtonProps = {
 }
 
 /**
- * Circular liquid-glass chrome control for header back / options.
- * Matches Board options: clear glass disc, not an opaque grey circle.
+ * Header back / options control — Expo UI glass Icon Button on native.
  */
 export function ChromeCircleButton({
   icon,
   accessibilityLabel,
   onPress,
   pressable = true,
-  size = 36,
-  iconSize = 18,
   style,
 }: ChromeCircleButtonProps) {
-  const {colours} = useThemeTokens()
-  const circleStyle = [
-    styles.circle,
-    {
-      width: size,
-      height: size,
-      borderRadius: size / 2,
-    },
-    style,
-  ]
-
-  const circle = (
-    <LiquidGlassChrome interactive fallback="clear" style={circleStyle}>
-      <AppIcon name={icon} size={iconSize} colour={colours.text} />
-    </LiquidGlassChrome>
-  )
-
-  if (!pressable || !onPress) {
-    return (
-      <View accessibilityLabel={accessibilityLabel} accessibilityRole="button">
-        {circle}
-      </View>
-    )
-  }
-
   return (
-    <AppPressable
+    <ModulaIconButton
+      icon={icon}
       accessibilityLabel={accessibilityLabel}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.hit}>
-      {circle}
-    </AppPressable>
+      onPress={pressable ? onPress : undefined}
+      chrome="glass"
+      style={style}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  circle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  hit: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 44,
-    minWidth: 44,
-  },
-})

@@ -2,7 +2,6 @@ import type {ReactNode} from 'react'
 import {ScrollView, StyleSheet, Switch, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -77,17 +76,32 @@ export function SettingsSection({
   title?: string
   children: ReactNode
 }) {
-  const {spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
   return (
     <View style={{gap: spacing[2]}}>
       {title ? (
-        <AppText variant="label" colour="textSecondary">
+        <AppText
+          variant="caption"
+          colour="textTertiary"
+          style={{
+            letterSpacing: 0.6,
+            paddingHorizontal: spacing[4],
+            textTransform: 'uppercase',
+          }}>
           {title}
         </AppText>
       ) : null}
-      <MaterialSurface role="card" style={styles.list}>
+      <View
+        style={[
+          styles.list,
+          {
+            backgroundColor: colours.surface,
+            borderColor: colours.separator,
+            borderRadius: radius.large,
+          },
+        ]}>
         {children}
-      </MaterialSurface>
+      </View>
     </View>
   )
 }
@@ -128,15 +142,15 @@ export function SettingsLinkRow({
         <View
           style={[
             styles.iconWrap,
-            {backgroundColor: colours.accentSubtle, borderColor: colours.accentBorder},
+            {backgroundColor: colours.accentSubtle, borderColor: 'transparent'},
           ]}>
-          <AppIcon name={row.icon} colour={colours.accent} size={20} />
+          <AppIcon name={row.icon} colour={colours.accent} size={18} />
         </View>
       ) : null}
       <View style={styles.rowText}>
-        <AppText variant="label">{title}</AppText>
+        <AppText variant="body">{title}</AppText>
         {row.description ? (
-          <AppText variant="caption" colour="textSecondary">
+          <AppText variant="caption" colour="textTertiary" numberOfLines={1}>
             {row.description}
           </AppText>
         ) : null}
@@ -335,12 +349,12 @@ const styles = StyleSheet.create({
   },
   iconWrap: {
     alignItems: 'center',
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+    borderWidth: 0,
     flexShrink: 0,
-    height: 36,
+    height: 30,
     justifyContent: 'center',
-    width: 36,
+    width: 30,
   },
   list: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -350,12 +364,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    minHeight: 52,
+    minHeight: 48,
     width: '100%',
   },
   rowText: {
     flex: 1,
-    gap: 3,
+    gap: 2,
     minWidth: 0,
   },
   screen: {

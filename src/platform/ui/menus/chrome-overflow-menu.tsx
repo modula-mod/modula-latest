@@ -1,6 +1,6 @@
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 
 type ChromeOverflowMenuProps = {
   title?: string
@@ -9,7 +9,9 @@ type ChromeOverflowMenuProps = {
   accessibilityLabel?: string
 }
 
-/** Circular ⋯ menu trigger — Board / settings / secondary headers. */
+/**
+ * Native Menu (SwiftUI) with glass ellipsis trigger — not ActionSheet sheets.
+ */
 export function ChromeOverflowMenu({
   title,
   actions,
@@ -23,10 +25,10 @@ export function ChromeOverflowMenu({
       onAction={onAction}
       accessibilityLabel={accessibilityLabel}
       trigger={
-        <ChromeCircleButton
+        <ModulaIconButton
           icon="more"
           accessibilityLabel={accessibilityLabel}
-          pressable={false}
+          chrome="glass"
         />
       }
     />

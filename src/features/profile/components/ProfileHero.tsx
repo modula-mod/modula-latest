@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import type {SharedValue} from 'react-native-reanimated'
 
 import type {
   ModulaProfile,
@@ -33,6 +34,7 @@ type ProfileHeroProps = {
   showActions?: boolean
   compact?: boolean
   onSelectTab: (tabId: string) => void
+  scrollY?: SharedValue<number>
 }
 
 /**
@@ -48,6 +50,7 @@ export function ProfileHero({
   showActions = true,
   compact,
   onSelectTab,
+  scrollY,
 }: ProfileHeroProps) {
   const {width} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
@@ -70,6 +73,7 @@ export function ProfileHero({
         onEditPress={() => setCoverEditorOpen(true)}
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
+        scrollY={scrollY}
       />
       <View
         style={[

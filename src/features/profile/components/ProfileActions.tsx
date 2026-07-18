@@ -10,7 +10,7 @@ import type {
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -39,25 +39,22 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
             onPress={() => router.push('/profile/edit' as Href)}
           />
         </View>
-        <ModulaButton
-          label="More"
-          role="secondary"
-          onPress={() => {
-            void presentModulaActions({
-              title: 'Profile',
-              actions: [
-                {id: 'os', label: 'Profile-OS'},
-                {id: 'customize', label: 'Customize'},
-                {id: 'share', label: 'Share profile'},
-                {id: 'preview', label: 'View as visitor'},
-              ],
-            }).then(id => {
-              if (id === 'os') router.push('/profile/os' as Href)
-              if (id === 'customize') router.push('/profile/customize' as Href)
-              if (id === 'share') void shareProfile(profile)
-              if (id === 'preview') router.push('/profile/preview' as Href)
-            })
+        <ModulaMenu
+          accessibilityLabel="More profile actions"
+          title="Profile"
+          actions={[
+            {id: 'os', label: 'Profile-OS'},
+            {id: 'customize', label: 'Customize'},
+            {id: 'share', label: 'Share profile'},
+            {id: 'preview', label: 'View as visitor'},
+          ]}
+          onAction={id => {
+            if (id === 'os') router.push('/profile/os' as Href)
+            if (id === 'customize') router.push('/profile/customize' as Href)
+            if (id === 'share') void shareProfile(profile)
+            if (id === 'preview') router.push('/profile/preview' as Href)
           }}
+          trigger={<ModulaButton label="More" role="secondary" />}
         />
         <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
       </View>
@@ -99,23 +96,20 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
           {profile.isFollowing ? 'Following' : 'Follow'}
         </AppText>
       </AppPressable>
-      <ModulaButton
-        label="More"
-        role="secondary"
-        onPress={() => {
-          void presentModulaActions({
-            title: profile.displayName,
-            actions: [
-              {id: 'share', label: 'Share profile'},
-              {id: 'copy', label: 'Copy profile link'},
-              {id: 'mute', label: 'Mute preview', style: 'destructive'},
-              {id: 'block', label: 'Block preview', style: 'destructive'},
-              {id: 'report', label: 'Report preview', style: 'destructive'},
-            ],
-          }).then(id => {
-            if (id === 'share' || id === 'copy') void shareProfile(profile)
-          })
+      <ModulaMenu
+        accessibilityLabel="More profile actions"
+        title={profile.displayName}
+        actions={[
+          {id: 'share', label: 'Share profile'},
+          {id: 'copy', label: 'Copy profile link'},
+          {id: 'mute', label: 'Mute preview', style: 'destructive'},
+          {id: 'block', label: 'Block preview', style: 'destructive'},
+          {id: 'report', label: 'Report preview', style: 'destructive'},
+        ]}
+        onAction={id => {
+          if (id === 'share' || id === 'copy') void shareProfile(profile)
         }}
+        trigger={<ModulaButton label="More" role="secondary" />}
       />
       <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
     </View>

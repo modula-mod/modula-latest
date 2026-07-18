@@ -1,6 +1,10 @@
 import {useMemo, useState, type ReactNode} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated'
 
 import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -62,6 +66,12 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const ownerQuery = useOwnerProfileQuery()
   const publicQuery = useProfileQuery(mode === 'public' ? handle : undefined)
   const isExpanded = width >= 1100
+  const scrollY = useSharedValue(0)
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollY.value = event.contentOffset.y
+    },
+  })
 
   const ownerProfile = ownerQuery.data ?? null
   const profile = mode === 'owner' || mode === 'preview'
@@ -159,6 +169,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       showActions={presentation.layoutId !== 'minimal'}
       compact={presentation.layoutId === 'minimal' || isExpanded}
       onSelectTab={setSelectedTabRequest}
+      scrollY={scrollY}
     />
   )
 
@@ -188,8 +199,10 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   )
 
   const main = (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
+    <Animated.ScrollView
+      contentInsetAdjustmentBehavior="never"
+      scrollEventThrottle={16}
+      onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={[styles.scrollContent, {paddingBottom: tabPadding}]}>
       {mode === 'preview' ? <PreviewBar /> : null}
@@ -232,7 +245,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         onSelectTab={setSelectedTabRequest}
       />
       <ProfileTabContent profile={profile} viewer={viewer} tab={selectedTab} />
-    </ScrollView>
+    </Animated.ScrollView>
   )
 
   return (

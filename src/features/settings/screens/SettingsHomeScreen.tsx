@@ -224,16 +224,14 @@ export function SettingsHomeScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
-          <AppText variant="caption" colour="textTertiary">
-            Manage the local Modula shell. Every row opens a real screen or honest Preview.
-          </AppText>
-
           <View
             style={[
               styles.search,
               {
-                backgroundColor: colours.surfaceMuted,
-                borderRadius: radius.round,
+                backgroundColor: colours.surface,
+                borderColor: colours.separator,
+                borderRadius: radius.large,
+                borderWidth: StyleSheet.hairlineWidth,
                 gap: spacing[2],
                 paddingHorizontal: spacing[3],
               },
@@ -242,7 +240,7 @@ export function SettingsHomeScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search settings"
+              placeholder="Search"
               placeholderTextColor={colours.textTertiary}
               accessibilityLabel="Search settings"
               style={[styles.searchInput, {color: colours.text}]}
@@ -253,7 +251,7 @@ export function SettingsHomeScreen() {
             {filteredAccount.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={row}
+                row={{...row, description: undefined}}
                 last={index === filteredAccount.length - 1}
               />
             ))}
@@ -265,6 +263,7 @@ export function SettingsHomeScreen() {
                 key={row.title}
                 row={{
                   ...row,
+                  description: undefined,
                   value:
                     row.title === 'Appearance'
                       ? appearanceValue
@@ -277,11 +276,11 @@ export function SettingsHomeScreen() {
             ))}
           </SettingsSection>
 
-          <SettingsSection title="Product links">
+          <SettingsSection title="Product">
             {filteredProductLinks.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={row}
+                row={{...row, description: undefined}}
                 last={index === filteredProductLinks.length - 1}
               />
             ))}
@@ -304,7 +303,7 @@ export function SettingsHomeScreen() {
             {filteredSupport.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={row}
+                row={{...row, description: undefined}}
                 last={index === filteredSupport.length - 1}
               />
             ))}
@@ -315,10 +314,9 @@ export function SettingsHomeScreen() {
               <SettingsLinkRow
                 row={{
                   title: 'Developer',
-                  description: 'Data runtime, session and local tools.',
                   icon: 'developer',
                   route: '/settings/developer',
-                  value: 'Lab available',
+                  value: 'Lab',
                 }}
                 last
               />
