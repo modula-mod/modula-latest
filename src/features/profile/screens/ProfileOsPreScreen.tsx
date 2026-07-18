@@ -15,6 +15,10 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 const SURFACES = [
   {title: 'Public identity', body: 'Posts, bio, links, and the tabs you choose to share.'},
   {title: 'Private Board', body: 'Your daily OS — modules, widgets, focus, and quick actions.'},
+  {
+    title: 'Custom tabs',
+    body: 'Core tabs plus module slots (Shop, Agents). Packs install via Registry — Preview slots today.',
+  },
   {title: 'Installed modules', body: 'CRM, Notes, Tasks, and more appear as tabs and cards.'},
   {title: 'Privacy levels', body: 'Public, private, team, or selected audiences per surface.'},
 ]
@@ -97,7 +101,13 @@ export function ProfileOsPreScreen() {
 
           <View style={{gap: spacing[3]}}>
             <AppButton onPress={() => router.push('/profile/customize' as Href)}>
-              Customize your profile
+              Customize tabs & layout
+            </AppButton>
+            <AppButton variant="secondary" onPress={() => router.push('/product/themes' as Href)}>
+              Themes & layouts packs
+            </AppButton>
+            <AppButton variant="ghost" onPress={() => router.push('/product/agents' as Href)}>
+              Agents profile tab
             </AppButton>
             <AppButton variant="secondary" onPress={() => router.push('/marketplace' as Href)}>
               Browse modules

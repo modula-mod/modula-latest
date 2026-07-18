@@ -369,6 +369,48 @@ export const marketplaceCatalog: MarketplaceModule[] = [
     tags: ['commerce', 'payments'],
     section: ['featured'],
   },
+  {
+    id: 'module-themes',
+    name: 'Themes',
+    description: 'Publishable Appearance packs for Modula shells.',
+    longDescription:
+      'Themes module Preview. Creators will sell colour/material packs via Marketplace. No remote theme install execution in this build.',
+    status: 'Preview',
+    icon: 'appearance',
+    category: 'creative',
+    capability: 'Themes · Appearance · Marketplace',
+    sellerId: 'seller-garden',
+    tags: ['themes', 'appearance'],
+    section: ['new', 'forYou'],
+  },
+  {
+    id: 'module-layouts',
+    name: 'Layouts',
+    description: 'Profile and Board layout packs for Profile-OS.',
+    longDescription:
+      'Layouts module Preview for Profile-OS tab arrangements and Board grids. Customize Profile already ships core layouts; packs stay external.',
+    status: 'Preview',
+    icon: 'board',
+    category: 'creative',
+    capability: 'Layouts · Profile-OS · Board',
+    sellerId: 'seller-builders',
+    tags: ['layouts', 'profile'],
+    section: ['new', 'featured'],
+  },
+  {
+    id: 'module-inventory',
+    name: 'Inventory',
+    description: 'Cosmetics, badges, and collectibles — optional gamification.',
+    longDescription:
+      'Inventory foreshadow only. Never required for professional use. No fake item balances.',
+    status: 'Gated',
+    icon: 'gif',
+    category: 'wellbeing',
+    capability: 'Inventory · Cosmetics · Optional',
+    sellerId: 'seller-modula',
+    tags: ['inventory', 'gamification'],
+    section: ['forYou'],
+  },
 ]
 
 export const marketplaceCategories: Array<{

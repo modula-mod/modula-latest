@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import type {ExtensionCentreItem} from '@/data/repositories/contracts'
 import {
@@ -70,6 +71,25 @@ export function ExtensionCentreScreen() {
             title="Extension Centre"
             body="Install and manage Greenfield tools, functions, plugins, connectors, and modules. Module product code lives in separate repositories — Modula hosts contracts and UI only."
           />
+          <View style={{gap: spacing[2]}}>
+            <AppText variant="caption" colour="textSecondary">
+              Build & standards
+            </AppText>
+            <AppButton onPress={() => router.push('/product/forge' as Href)}>
+              Open Forge Builder
+            </AppButton>
+            <AppButton
+              variant="secondary"
+              onPress={() => router.push('/product/module-standards' as Href)}>
+              Module standards
+            </AppButton>
+            <AppButton variant="ghost" onPress={() => router.push('/product/agents' as Href)}>
+              Agents studio
+            </AppButton>
+            <AppButton variant="ghost" onPress={() => router.push('/marketplace' as Href)}>
+              Browse Marketplace
+            </AppButton>
+          </View>
           {SECTIONS.map(section => (
             <SettingsSection key={section} title={section}>
               {bySection[section].length ? (

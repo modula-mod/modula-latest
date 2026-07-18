@@ -51,7 +51,10 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | Tab bar expand | Product Hub, Forge, Focus, Agents shortcuts |
 | Web rail | CREATE shortcuts (Product / Forge / Agents / Focus) |
 | `templates/modula-module/` | Module boilerplate + `docs/architecture/module-standards.md` |
+| `/product/module-standards` | Standards studio |
+| `/product/themes` | Themes & layouts packs Preview |
 | `/settings/dimon` | Expanded inactive DIMON direction (no balances) |
+| Extension Centre | Links to Forge / Standards / Agents / Marketplace |
 | `/settings/dimon` | Expanded DIMON direction (inactive) |
 
 ## Navigation wiring

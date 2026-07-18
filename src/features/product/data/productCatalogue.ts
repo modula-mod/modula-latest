@@ -187,6 +187,8 @@ export const productCatalogue: ProductCapability[] = [
     bullets: ['Light → OLED', 'Theme families', 'Custom accent', 'Reduce Transparency'],
     ctaLabel: 'Open Appearance',
     ctaRoute: '/settings/appearance',
+    secondaryLabel: 'Themes & layouts',
+    secondaryRoute: '/product/themes',
   },
   {
     id: 'privacy',
@@ -394,8 +396,10 @@ export const productCatalogue: ProductCapability[] = [
     icon: 'gif',
     maturity: 'planned',
     bullets: ['Badges', 'Achievements', 'Cosmetics', 'Opt-in only'],
-    ctaLabel: 'Product Hub',
-    ctaRoute: '/product',
+    ctaLabel: 'Inventory marketplace card',
+    ctaRoute: '/marketplace/module-inventory',
+    secondaryLabel: 'Themes studio',
+    secondaryRoute: '/product/themes',
   },
   {
     id: 'presence',

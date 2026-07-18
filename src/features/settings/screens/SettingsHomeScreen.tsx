@@ -105,9 +105,23 @@ const preferenceRows: SettingsNavRow[] = [
   },
   {
     title: 'Forge',
-    description: 'Module Builder pipeline — planned.',
+    description: 'Module Builder — multi-step Preview.',
     icon: 'developer',
     route: '/product/forge',
+    preview: true,
+  },
+  {
+    title: 'Agents',
+    description: 'Gaia agent packages with scopes — Preview.',
+    icon: 'automation',
+    route: '/product/agents',
+    preview: true,
+  },
+  {
+    title: 'Module Standards',
+    description: 'Manifest rules and boilerplate for packages.',
+    icon: 'developer',
+    route: '/product/module-standards',
     preview: true,
   },
   {

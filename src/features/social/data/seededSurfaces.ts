@@ -297,9 +297,51 @@ export const helpArticles: HelpArticle[] = [
       'Shortcuts are documented for the local shell and do not require a desktop app.',
     ],
   },
+  {
+    id: 'help-forge',
+    title: 'Forge Builder Preview',
+    summary: 'Draft Greenfield module manifests without publishing.',
+    body: [
+      'Open Product Hub → Forge or the tab bar expand menu.',
+      'Steps cover identity, surfaces, permissions, manifest JSON, and publish foreshadow.',
+      'Nothing is published or executed — copy the draft into templates/modula-module for an external package.',
+    ],
+  },
+  {
+    id: 'help-agents',
+    title: 'Agents module',
+    summary: 'Scoped Gaia agents as installable packages.',
+    body: [
+      'Agents studio lists Summariser, Scheduler, CRM Analyst, and more.',
+      'Enabling an agent expands Gaia scopes locally — there is no model runtime yet.',
+      'Agents must never silently read private modules.',
+    ],
+  },
+  {
+    id: 'help-dimon',
+    title: 'DIMON status',
+    summary: 'Why you do not see a wallet yet.',
+    body: [
+      'DIMON is not active yet.',
+      'Capabilities are reserved in @modula/dimon-contracts without balances or transfers.',
+      'See Settings → DIMON and ADR-009 for the activation boundary.',
+    ],
+  },
 ]
 
 export const whatsNewNotes = [
+  {
+    version: '0.3.0 · Builder + Agents',
+    items: [
+      'Forge Builder — multi-step Greenfield manifest draft',
+      'Agents module studio + marketplace card',
+      'Module standards + templates/modula-module boilerplate',
+      'Custom profile tabs: Shop + Agents (Preview slots)',
+      'Tab bar / web rail shortcuts: Product, Forge, Agents, Focus',
+      'DIMON direction expanded (still inactive — no balances)',
+      'Home PresenceArc + Glass Privacy on Messages',
+    ],
+  },
   {
     version: '0.2.0 · Social OS craft',
     items: [
