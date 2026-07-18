@@ -67,7 +67,7 @@ export function WidgetsStudioScreen() {
                     <AppText variant="caption" colour="textTertiary">
                       {widget.size} · {widget.status} · #{index + 1}
                     </AppText>
-                    <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                    <AppText variant="caption" colour="textSecondary">
                       {widget.description}
                     </AppText>
                   </View>
@@ -123,7 +123,7 @@ export function WidgetsStudioScreen() {
                   <AppText variant="caption" colour="textTertiary">
                     {widget.size} · {widget.status} · {on ? 'On Board' : 'Off'}
                   </AppText>
-                  <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                  <AppText variant="caption" colour="textSecondary">
                     {widget.description}
                   </AppText>
                 </AppPressable>

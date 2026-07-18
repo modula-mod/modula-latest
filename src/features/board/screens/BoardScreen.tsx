@@ -77,6 +77,16 @@ const ALL_PINNED_SPACES: Array<{
   },
 ]
 
+const BOARD_FOCUS_POLICY_SENTENCES = {
+  off: 'Focus is off, so Board follows normal Modula behavior and does not apply quiet-feed or work-priority rules.',
+  light:
+    'Light Focus policy bundles lower-priority notifications, reduces feed recommendations, quiets the dock, and prioritises active work on Board.',
+  deep:
+    'Deep Focus policy may hide feed and Reels, hold non-urgent chats, block unsolicited GAIA interruptions, and prioritise selected work modules on Board.',
+  custom:
+    'Custom Focus policy uses your saved toggles for feed quieting, navigation, pings, work priority, and Focus Halo on Board.',
+} as const
+
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
@@ -139,7 +149,6 @@ export function BoardScreen() {
   )
 
   const loading = discoverQuery.isLoading && activityQuery.isLoading
-  const focusQuiet = preferences.focus.quietFeed
   const focusHalo = preferences.focus.showHalo
   const focusPreset = preferences.focus.preset ?? 'off'
   const focusPresetTitle =
@@ -209,9 +218,7 @@ export function BoardScreen() {
                     : 'Current focus'}
               </AppText>
               <AppText variant="body" colour="textSecondary">
-                {focusQuiet
-                  ? 'BoardFocusAdapter prioritises work. Feed noise is quieted where the preset allows.'
-                  : 'Shape your Profile-OS, install modules, and keep the shell light via the Registry.'}
+                {BOARD_FOCUS_POLICY_SENTENCES[focusPreset]}
               </AppText>
               <View style={{gap: spacing[2]}}>
                 <AppPressable
@@ -294,7 +301,7 @@ export function BoardScreen() {
                       <AppText variant="caption" colour="textTertiary">
                         {widget.size} · {widget.status} · #{index + 1}
                       </AppText>
-                      <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                      <AppText variant="caption" colour="textSecondary">
                         {widget.description}
                       </AppText>
                     </Surface>
@@ -306,6 +313,10 @@ export function BoardScreen() {
 
           <View style={[styles.quickRow, {gap: spacing[2]}]}>
             {[
+              {label: 'Design Lab', route: '/settings/appearance-lab'},
+              {label: 'Atlas', route: '/product/atlas'},
+              {label: 'Start', route: '/product/start'},
+              {label: 'Intelligence', route: '/product/intelligence'},
               {label: 'Widgets', route: '/product/widgets'},
               {label: 'Automations', route: '/product/automations'},
               {label: 'Merge Feeds', route: '/product/merge-feeds'},

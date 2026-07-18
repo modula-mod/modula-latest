@@ -78,7 +78,8 @@ export const BOARD_WIDGET_CATALOG: Array<{
     icon: 'automation',
     size: '2×1',
     status: 'Preview',
-    description: 'GAIA executes · AKI verifies · Governor controls. Briefing is seeded Preview.',
+    description:
+      'GAIA executes, AKI verifies, and Governor controls this seeded briefing preview; no agent runs automatically.',
   },
   {
     id: 'dimon-activity',
@@ -86,7 +87,8 @@ export const BOARD_WIDGET_CATALOG: Array<{
     icon: 'security',
     size: '1×1',
     status: 'Inactive',
-    description: 'DIMON inactive — reserved ledger activity only; no fake token UI.',
+    description:
+      'DIMON is not active yet, so this card shows reserved ledger language only and never fake token activity.',
   },
   {
     id: 'nft-entitlements',
@@ -94,7 +96,8 @@ export const BOARD_WIDGET_CATALOG: Array<{
     icon: 'bookmark',
     size: '1×1',
     status: 'Preview',
-    description: 'Entitlement preview for ownership claims. NFT attach remains blocked.',
+    description:
+      'NFT entitlements are a preview of future claim language; NFT attach remains blocked and no chain ownership is verified.',
   },
   {
     id: 'newsletter',
