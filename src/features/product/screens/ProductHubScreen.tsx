@@ -11,6 +11,7 @@ import {
   productCatalogue,
   type ProductMaturity,
 } from '@/features/product/data/productCatalogue'
+import {FEATURE_ATLAS} from '@/features/product/data/featureAtlas'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -61,6 +62,40 @@ export function ProductHubScreen() {
             <AppText variant="body" colour="textSecondary">
               Builder craft inspired by Plan Mode + Preview panes — remapped to Modula modules.
             </AppText>
+            <AppPressable
+              accessibilityLabel="Open Feature Atlas"
+              onPress={() => router.push('/product/atlas' as Href)}
+              style={[
+                styles.featured,
+                {
+                  borderRadius: radius.large,
+                  borderColor: colours.accentBorder,
+                  overflow: 'hidden',
+                },
+              ]}>
+              <LinearGradient
+                colors={
+                  scheme === 'dark'
+                    ? [colours.accentSubtle, '#0B1416']
+                    : [colours.accentSubtle, colours.surface]
+                }
+                style={{padding: spacing[5], gap: spacing[3]}}>
+                <AppText variant="caption" colour="accent">
+                  FEATURED · ATLAS
+                </AppText>
+                <AppText variant="title">{FEATURE_ATLAS.length} mapped capabilities</AppText>
+                <AppText variant="body" colour="textSecondary">
+                  Browse Modula by domain and maturity. Preview surfaces are product maps, not
+                  production runtimes.
+                </AppText>
+                <View style={[styles.ctaRow, {gap: spacing[2]}]}>
+                  <AppText variant="label" colour="accent">
+                    Open Feature Atlas
+                  </AppText>
+                  <AppIcon name="chevronRight" colour={colours.accent} size={16} />
+                </View>
+              </LinearGradient>
+            </AppPressable>
             <AppPressable
               accessibilityLabel="Open Forge Builder"
               onPress={() => router.push('/product/forge' as Href)}

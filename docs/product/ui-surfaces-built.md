@@ -10,6 +10,7 @@
 | `/welcome` | Atmospheric welcome + capabilities CTA |
 | `/onboarding` | 3-step first-run + PresenceArc |
 | `/product` | Full Product Hub catalogue |
+| `/product/atlas` | Feature Atlas registry: hundreds of named capabilities with honest maturity labels |
 
 ## Interactive studios
 
@@ -41,6 +42,7 @@
 | `/product/agents` | Agents module studio (Gaia scopes) |
 | `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |
+| `/product/atlas` | Feature Atlas browse/search/filter surface; maps capabilities to existing routes or atlas-filter fallbacks |
 | `/product/creator` | Creator economy path picker |
 | `/product/ownership` | Ownership & portability |
 | `/product/presence` | Presence rings (not IG Stories) |
@@ -76,3 +78,4 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 - Settings: Product Hub, Feature Control, Glass Privacy, Focus, Gaia, Forge  
 - Account panel: Product Hub, Focus, Search  
 - Board: Profile-OS, Focus, product chips  
+- Product Hub: Feature Atlas featured card near Create & Extend

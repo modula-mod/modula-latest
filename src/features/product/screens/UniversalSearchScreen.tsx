@@ -7,13 +7,14 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {COMMAND_CATALOGUE} from '@/features/product/data/commandCatalogue'
+import {ATLAS_DOMAIN_LABELS, atlasSearch} from '@/features/product/data/featureAtlas'
 import {productCatalogue} from '@/features/product/data/productCatalogue'
 import {marketplaceCatalog} from '@/features/marketplace/data/catalog'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type Hit = {id: string; title: string; subtitle: string; icon: AppIconName; route: string}
+type Hit = {id: string; title: string; subtitle: string; icon: AppIconName; route: string; body?: string}
 
 export function UniversalSearchScreen() {
   const router = useRouter()
@@ -43,9 +44,21 @@ export function UniversalSearchScreen() {
       icon: 'developer',
       route: `/product/start?command=${encodeURIComponent(command.id)}`,
     }))
-    const all = [...commandHits, ...capabilityHits, ...moduleHits]
+    const atlasHits: Hit[] = atlasSearch(q)
+      .slice(0, q ? 12 : 6)
+      .map(feature => ({
+        id: `atlas-${feature.id}`,
+        title: feature.name,
+        subtitle: `Atlas · ${ATLAS_DOMAIN_LABELS[feature.domain]} · ${feature.maturity}`,
+        body: `${feature.summary} ${feature.tags.join(' ')}`,
+        icon: feature.icon ?? 'info',
+        route: feature.route,
+      }))
+    const all = [...commandHits, ...capabilityHits, ...atlasHits, ...moduleHits]
     if (!q) return all.slice(0, 12)
-    return all.filter(hit => `${hit.title} ${hit.subtitle}`.toLowerCase().includes(q)).slice(0, 24)
+    return all
+      .filter(hit => `${hit.title} ${hit.subtitle} ${hit.body ?? ''}`.toLowerCase().includes(q))
+      .slice(0, 24)
   }, [query])
 
   return (

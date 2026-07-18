@@ -13,6 +13,7 @@ import {
   type CommandRisk,
   type ModulaCommand,
 } from '@/features/product/data/commandCatalogue'
+import {ATLAS_DOMAIN_LABELS, atlasSearch} from '@/features/product/data/featureAtlas'
 import {productCatalogue} from '@/features/product/data/productCatalogue'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -128,7 +129,17 @@ export function StartLauncherScreen() {
       icon: item.icon,
       route: `/marketplace/${item.id}`,
     }))
-    const all = [...commandHits, ...productHits, ...marketplaceHits]
+    const atlasHits: Hit[] = atlasSearch(q)
+      .slice(0, q ? 12 : 6)
+      .map(feature => ({
+        id: `atlas-${feature.id}`,
+        title: feature.name,
+        subtitle: `Atlas / ${ATLAS_DOMAIN_LABELS[feature.domain]} / ${feature.maturity}`,
+        body: `${feature.summary} ${feature.tags.join(' ')}`,
+        icon: feature.icon ?? 'info',
+        route: feature.route,
+      }))
+    const all = [...commandHits, ...productHits, ...atlasHits, ...marketplaceHits]
     if (!q) return all.slice(0, 16)
     return all
       .filter(hit => `${hit.title} ${hit.subtitle} ${hit.body}`.toLowerCase().includes(q))

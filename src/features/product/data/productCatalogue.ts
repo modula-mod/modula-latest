@@ -1,4 +1,5 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {FEATURE_ATLAS} from '@/features/product/data/featureAtlas'
 
 export type ProductMaturity = 'live' | 'preview' | 'planned' | 'inactive'
 
@@ -42,6 +43,25 @@ export const productCatalogue: ProductCapability[] = [
     bullets: ['Quick actions', 'Command search', 'Risk preview', 'No side effects'],
     ctaLabel: 'Open Start',
     ctaRoute: '/product/start',
+    secondaryLabel: 'Universal Search',
+    secondaryRoute: '/product/search',
+  },
+  {
+    id: 'atlas',
+    name: 'Feature Atlas',
+    eyebrow: 'MAP',
+    summary: `${FEATURE_ATLAS.length} named Modula capabilities across live, preview, planned, and inactive surfaces.`,
+    body: 'The atlas is the honest map of Modula surface area. It names capabilities and routes without pretending that planned modules, DIMON, NFT, billing, or sandbox runtimes are live.',
+    icon: 'search',
+    maturity: 'preview',
+    bullets: [
+      `${FEATURE_ATLAS.length} capability entries`,
+      'Domain and maturity filters',
+      'Preview does not mean runtime',
+      'DIMON/NFT marked inactive or planned',
+    ],
+    ctaLabel: 'Open Feature Atlas',
+    ctaRoute: '/product/atlas',
     secondaryLabel: 'Universal Search',
     secondaryRoute: '/product/search',
   },
