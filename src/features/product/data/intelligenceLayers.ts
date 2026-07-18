@@ -111,7 +111,7 @@ export const INTELLIGENCE_LAYERS: IntelligenceLayer[] = [
     interpretation: 'The system’s learned muscle memory',
     icon: 'saved',
     route: '/product/circuit-memory',
-    maturity: 'planned',
+    maturity: 'preview',
     responsibilities: [
       'Isolated encrypted per-user namespaces',
       'Approved workflows and preferences',
@@ -136,7 +136,7 @@ export const INTELLIGENCE_LAYERS: IntelligenceLayer[] = [
     interpretation: 'The improvement engine',
     icon: 'motion',
     route: '/product/kaizen',
-    maturity: 'planned',
+    maturity: 'preview',
     responsibilities: [
       'Capture Improve feedback from UI',
       'Classify, cluster, investigate',
@@ -194,7 +194,7 @@ export const INTELLIGENCE_LAYERS: IntelligenceLayer[] = [
     interpretation: 'The system’s black box recorder',
     icon: 'storage',
     route: '/product/ledger',
-    maturity: 'planned',
+    maturity: 'preview',
     responsibilities: [
       'Record initiator, commands, permissions, AKI, Governor, approval',
       'Side effects and rollback info',

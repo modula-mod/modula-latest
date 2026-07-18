@@ -6,6 +6,7 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {COMMAND_CATALOGUE} from '@/features/product/data/commandCatalogue'
 import {productCatalogue} from '@/features/product/data/productCatalogue'
 import {marketplaceCatalog} from '@/features/marketplace/data/catalog'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -35,7 +36,14 @@ export function UniversalSearchScreen() {
       icon: item.icon,
       route: `/marketplace/${item.id}`,
     }))
-    const all = [...capabilityHits, ...moduleHits]
+    const commandHits: Hit[] = COMMAND_CATALOGUE.map(command => ({
+      id: `cmd-${command.id}`,
+      title: command.label,
+      subtitle: `Command · ${command.risk} · Preview executable`,
+      icon: 'developer',
+      route: `/product/start?command=${encodeURIComponent(command.id)}`,
+    }))
+    const all = [...commandHits, ...capabilityHits, ...moduleHits]
     if (!q) return all.slice(0, 12)
     return all.filter(hit => `${hit.title} ${hit.subtitle}`.toLowerCase().includes(q)).slice(0, 24)
   }, [query])

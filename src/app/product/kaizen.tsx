@@ -1,5 +1,5 @@
-import {Redirect} from 'expo-router'
+import {KaizenScreen} from '@/features/product/screens/KaizenScreen'
 
 export default function KaizenRoute() {
-  return <Redirect href="/product/intelligence/kaizen" />
+  return <KaizenScreen />
 }

@@ -1,5 +1,5 @@
-import {Redirect} from 'expo-router'
+import {LedgerReplayScreen} from '@/features/product/screens/LedgerReplayScreen'
 
 export default function LedgerRoute() {
-  return <Redirect href="/product/intelligence/ledger" />
+  return <LedgerReplayScreen />
 }

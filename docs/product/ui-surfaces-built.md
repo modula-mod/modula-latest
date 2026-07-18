@@ -16,12 +16,18 @@
 | Route | Surface |
 | --- | --- |
 | `/product/focus` | Focus Off/Light/Deep/Custom + policy engine Preview + Halo |
+| `/product/start` | Start Launcher quick actions + local command/product/module search |
+| `/product/chat-assist` | Chat Assist permission modes + functions checklist + Quiet Send section |
+| `/product/quiet-send` → `/product/chat-assist` | Quiet Send redirect into Chat Assist |
 | `/product/intelligence` | Canonical intelligence Hub (GAIA · AKI · Governor …) |
 | `/product/intelligence/[slug]` | Layer detail + seeded Preview samples |
 | `/product/commands` | Command Layer catalogue |
 | `/product/aki` → `/product/intelligence/aki` | AKI redirect |
 | `/product/governor` → Governor layer | AGI Governor redirect |
-| `/product/circuit-memory` · `/kaizen` · `/foundry` · `/claims-graph` · `/ledger` | Layer redirects |
+| `/product/circuit-memory` | Circuit Memory Centre local inspect/delete/export controls |
+| `/product/kaizen` | Kaizen Improve capture + local review queue |
+| `/product/ledger` | Ledger Replay diagnostic rows + non-destructive replay explanation |
+| `/product/foundry` · `/claims-graph` | Layer redirects |
 | `/product/merge-feeds` | Merge 2–5 feeds (persisted) |
 | `/product/automations` | Workflow cards + local enable (persisted) |
 | `/product/gaia` | GAIA console — scopes + governed flow (persisted) |
@@ -41,7 +47,7 @@
 | `/product/communities` | Communities OS (also `/communities`) |
 | `/product/[slug]` | Capability pre-screen for every catalogue item |
 
-Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (AsyncStorage).
+Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (AsyncStorage). Kaizen queue: `modula.kaizen.queue.v1`. Circuit Memory Preview list: `modula.circuit-memory.items.v1`.
 
 ## Social OS surfaces
 

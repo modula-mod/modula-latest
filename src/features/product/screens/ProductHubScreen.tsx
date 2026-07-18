@@ -98,6 +98,20 @@ export function ProductHubScreen() {
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {[
                 {
+                  id: 'start',
+                  name: 'Start',
+                  summary: 'Quick actions + command previews.',
+                  icon: 'switch' as const,
+                  route: '/product/start',
+                },
+                {
+                  id: 'chat-assist',
+                  name: 'Chat Assist',
+                  summary: 'Message assist permissions + Quiet Send.',
+                  icon: 'messages' as const,
+                  route: '/product/chat-assist',
+                },
+                {
                   id: 'intelligence',
                   name: 'Intelligence',
                   summary: 'GAIA · AKI · Governor map.',

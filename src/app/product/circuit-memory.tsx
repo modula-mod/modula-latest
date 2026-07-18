@@ -1,5 +1,5 @@
-import {Redirect} from 'expo-router'
+import {CircuitMemoryScreen} from '@/features/product/screens/CircuitMemoryScreen'
 
 export default function CircuitMemoryRoute() {
-  return <Redirect href="/product/intelligence/circuit-memory" />
+  return <CircuitMemoryScreen />
 }

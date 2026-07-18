@@ -4,6 +4,8 @@ const KEY = 'modula.product.preferences.v1'
 
 export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
 
+export type ChatAssistMode = 'off' | 'on-device' | 'manual' | 'selected' | 'full'
+
 export type FocusPreferences = {
   /** Off / Light / Deep / Custom — drives FocusPolicyEngine Preview. */
   preset: FocusPresetId
@@ -29,6 +31,9 @@ export type ProductPreferences = {
   automationEnabledIds: string[]
   forgeDraftName: string
   gaiaAllowedScopes: string[]
+  chatAssistMode: ChatAssistMode
+  chatAssistFunctions: string[]
+  quietSendEnabled: boolean
 }
 
 export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
@@ -56,6 +61,19 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
   automationEnabledIds: ['1', '2'],
   forgeDraftName: 'My Module',
   gaiaAllowedScopes: ['composer', 'tasks'],
+  chatAssistMode: 'off',
+  chatAssistFunctions: ['summarise', 'suggested-replies', 'tone'],
+  quietSendEnabled: false,
+}
+
+function isChatAssistMode(value: unknown): value is ChatAssistMode {
+  return (
+    value === 'off' ||
+    value === 'on-device' ||
+    value === 'manual' ||
+    value === 'selected' ||
+    value === 'full'
+  )
 }
 
 function mergePreferences(raw: unknown): ProductPreferences {
@@ -114,6 +132,18 @@ function mergePreferences(raw: unknown): ProductPreferences {
       value.gaiaAllowedScopes.every(item => typeof item === 'string')
         ? value.gaiaAllowedScopes
         : DEFAULT_PRODUCT_PREFERENCES.gaiaAllowedScopes,
+    chatAssistMode: isChatAssistMode(value.chatAssistMode)
+      ? value.chatAssistMode
+      : DEFAULT_PRODUCT_PREFERENCES.chatAssistMode,
+    chatAssistFunctions:
+      Array.isArray(value.chatAssistFunctions) &&
+      value.chatAssistFunctions.every(item => typeof item === 'string')
+        ? value.chatAssistFunctions
+        : DEFAULT_PRODUCT_PREFERENCES.chatAssistFunctions,
+    quietSendEnabled:
+      typeof value.quietSendEnabled === 'boolean'
+        ? value.quietSendEnabled
+        : DEFAULT_PRODUCT_PREFERENCES.quietSendEnabled,
   }
 }
 
