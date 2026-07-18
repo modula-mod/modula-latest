@@ -9,14 +9,14 @@
 | Gate | Result |
 | --- | --- |
 | Contracts (PART 1) | PASS |
-| Backend social APIs (PART 2, in-repo) | PASS (typecheck, worker tests, verify:phase6s-social-backend) |
-| Frontend social surfaces (PART 3) | PASS (typecheck, verify:phase6s-social-frontend) |
-| Interactive Simulator walk | PENDING — run `pnpm exec expo run:ios` locally |
-| Physical iPhone | BLOCKED until device paired (see Phase 6R PART 5) |
-| VPS migrate / backup restore | BLOCKED — Mac SSH key passphrase required for `87.106.40.136` |
-| TestFlight | Not started (requires physical + VPS gates) |
+| Backend social APIs (PART 2, in-repo) | PASS (`verify:phase6s-social-backend`) |
+| Frontend social surfaces (PART 3) | PASS (`verify:phase6s-social-frontend`) |
+| Interactive Simulator walk | **DEFERRED** — live API returned 502; resume after VPS restore |
+| Physical iPhone | **BLOCKED** — no paired physical device |
+| VPS migrate / backup restore | **DEFERRED** — SSH unlock when operator is home (`phase6s-backup-restore.md`) |
+| TestFlight | **BLOCKED** — requires physical + VPS gates |
 
-## Simulator checklist (to execute)
+## Simulator checklist (resume after API healthy)
 
 ```text
 Create account / Verify / Sign in
@@ -30,4 +30,10 @@ Extension Centre / Plugin lifecycle / Function execution
 Offline state
 ```
 
-Record PASS/FAIL only after interactive run on Simulator; do not equate Simulator with physical-device acceptance.
+Record PASS/FAIL only after an interactive run on Simulator. Do not equate Simulator with physical-device acceptance.
+
+## Notes
+
+- In-repo Phase 6S frontend/backend verifiers already PASS on Mac.
+- Remote interactive acceptance waits on VPS SSH + API recovery.
+- When home: restore API, then run `pnpm exec expo run:ios` and fill PASS/FAIL rows above.
