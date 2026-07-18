@@ -2,64 +2,30 @@ import {useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
-import {COMMAND_CATALOGUE} from '@/features/product/data/commandCatalogue'
-import {ATLAS_DOMAIN_LABELS, atlasSearch} from '@/features/product/data/featureAtlas'
-import {productCatalogue} from '@/features/product/data/productCatalogue'
-import {marketplaceCatalog} from '@/features/marketplace/data/catalog'
+import {CommandPreviewCard} from '@/features/product/components/CommandPreviewCard'
+import type {ModulaCommand} from '@/features/product/data/commandCatalogue'
+import {
+  getLauncherSearchGroups,
+  type LauncherSearchHit,
+} from '@/features/product/data/launcherSearch'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-
-type Hit = {id: string; title: string; subtitle: string; icon: AppIconName; route: string; body?: string}
 
 export function UniversalSearchScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
+  const [selectedCommand, setSelectedCommand] = useState<ModulaCommand | null>(null)
 
-  const hits = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const capabilityHits: Hit[] = productCatalogue.map(item => ({
-      id: `cap-${item.id}`,
-      title: item.name,
-      subtitle: `Capability · ${item.maturity}`,
-      icon: item.icon,
-      route: `/product/${item.id}`,
-    }))
-    const moduleHits: Hit[] = marketplaceCatalog.map(item => ({
-      id: `mod-${item.id}`,
-      title: item.name,
-      subtitle: `Module · ${item.status}`,
-      icon: item.icon,
-      route: `/marketplace/${item.id}`,
-    }))
-    const commandHits: Hit[] = COMMAND_CATALOGUE.map(command => ({
-      id: `cmd-${command.id}`,
-      title: command.label,
-      subtitle: `Command · ${command.risk} · Preview executable`,
-      icon: 'developer',
-      route: `/product/start?command=${encodeURIComponent(command.id)}`,
-    }))
-    const atlasHits: Hit[] = atlasSearch(q)
-      .slice(0, q ? 12 : 6)
-      .map(feature => ({
-        id: `atlas-${feature.id}`,
-        title: feature.name,
-        subtitle: `Atlas · ${ATLAS_DOMAIN_LABELS[feature.domain]} · ${feature.maturity}`,
-        body: `${feature.summary} ${feature.tags.join(' ')}`,
-        icon: feature.icon ?? 'info',
-        route: feature.route,
-      }))
-    const all = [...commandHits, ...capabilityHits, ...atlasHits, ...moduleHits]
-    if (!q) return all.slice(0, 12)
-    return all
-      .filter(hit => `${hit.title} ${hit.subtitle} ${hit.body ?? ''}`.toLowerCase().includes(q))
-      .slice(0, 24)
-  }, [query])
+  const groups = useMemo(
+    () => getLauncherSearchGroups(query, {defaultLimit: 4, searchLimit: 12}),
+    [query],
+  )
+  const visibleGroups = groups.filter(group => group.hits.length > 0)
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -92,36 +58,80 @@ export function UniversalSearchScreen() {
             ]}
           />
 
+          {selectedCommand ? (
+            <CommandPreviewCard
+              command={selectedCommand}
+              onDismiss={() => setSelectedCommand(null)}
+            />
+          ) : null}
+
           <View style={{gap: spacing[2]}}>
-            {hits.map(hit => (
-              <AppPressable
-                key={hit.id}
-                accessibilityLabel={hit.title}
-                onPress={() => router.push(hit.route as Href)}
-                style={[
-                  styles.hit,
-                  {
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    borderRadius: radius.medium,
-                    padding: spacing[3],
-                    gap: spacing[3],
-                  },
-                ]}>
-                <AppIcon name={hit.icon} colour={colours.accent} />
-                <View style={{flex: 1, gap: 2}}>
-                  <AppText variant="headline">{hit.title}</AppText>
-                  <AppText variant="caption" colour="textSecondary">
-                    {hit.subtitle}
+            {visibleGroups.length ? (
+              visibleGroups.map(group => (
+                <View key={group.id} style={{gap: spacing[2]}}>
+                  <AppText variant="caption" colour="accent">
+                    {group.title}
                   </AppText>
+                  {group.hits.map(hit => (
+                    <SearchHitRow
+                      key={hit.id}
+                      hit={hit}
+                      onPress={() => {
+                        if (hit.command) {
+                          setSelectedCommand(hit.command)
+                          return
+                        }
+                        if (hit.route) router.push(hit.route as Href)
+                      }}
+                    />
+                  ))}
                 </View>
-                <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
-              </AppPressable>
-            ))}
+              ))
+            ) : (
+              <AppText variant="body" colour="textSecondary">
+                No local search results for "{query.trim()}".
+              </AppText>
+            )}
           </View>
         </ScrollView>
       </ResponsiveContent>
     </View>
+  )
+}
+
+function SearchHitRow({hit, onPress}: {hit: LauncherSearchHit; onPress: () => void}) {
+  const {colours, radius, spacing} = useThemeTokens()
+
+  return (
+    <AppPressable
+      accessibilityLabel={hit.title}
+      onPress={onPress}
+      style={[
+        styles.hit,
+        {
+          backgroundColor: colours.surface,
+          borderColor: colours.border,
+          borderRadius: radius.medium,
+          padding: spacing[3],
+          gap: spacing[3],
+        },
+      ]}>
+      <AppIcon name={hit.icon} colour={colours.accent} />
+      <View style={styles.hitText}>
+        <AppText variant="headline">{hit.title}</AppText>
+        <AppText variant="caption" colour="textSecondary">
+          {hit.subtitle}
+        </AppText>
+        <AppText variant="caption" colour="textTertiary">
+          {hit.body}
+        </AppText>
+      </View>
+      <AppIcon
+        name={hit.command ? 'info' : 'chevronRight'}
+        colour={colours.textTertiary}
+        size={18}
+      />
+    </AppPressable>
   )
 }
 
@@ -132,8 +142,9 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   hit: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
+  hitText: {flex: 1, gap: 4},
 })

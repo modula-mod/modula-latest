@@ -7,7 +7,7 @@ Route: `/product/atlas`
 
 ## What it is
 
-- A registry of **500+** named capabilities (core map + expansion seeds).
+- A registry of **580+** named capabilities (core map + expansion seeds).
 - A way to search by name, domain, maturity, route, summary, and tags.
 - A filterable surface for domain and maturity: `live`, `preview`, `planned`, `inactive`.
 - A routing map to existing surfaces where they exist, or an atlas-filter fallback for planned-only areas.
