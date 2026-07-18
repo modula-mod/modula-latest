@@ -5,9 +5,10 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
-import {SettingsInfoBlock} from '@/features/settings/components/SettingsRows'
-import {ResponsiveContent} from '@/shell/ResponsiveContent'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {
+  SettingsOverflowMenu,
+  SettingsScreen,
+} from '@/features/settings/components/SettingsRows'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const USES = [
@@ -70,14 +71,25 @@ export function DimonPlaceholderScreen() {
   const router = useRouter()
   const {colours, spacing, radius} = useThemeTokens()
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="DIMON" />
-      <ResponsiveContent>
-        <ScrollView contentContainerStyle={[styles.content, {gap: spacing[4], padding: spacing[4]}]}>
-          <SettingsInfoBlock
-            title="DIMON"
-            body="DIMON is not active yet. Modula is preparing Greenfield account IDs, integrity, and capability namespaces so a future economic ledger can bind safely — without fake balances, wallets, or blockchain. DIMON is designed to power value and ownership across Modula — not speculative crypto theatre."
-          />
+    <SettingsScreen
+      title="DIMON"
+      caption="DIMON is not active yet. Modula is preparing Greenfield account IDs, integrity, and capability namespaces so a future economic ledger can bind safely — without fake balances, wallets, or blockchain."
+      right={
+        <SettingsOverflowMenu
+          title="DIMON"
+          actions={[
+            {id: 'feature', label: 'Feature Control'},
+            {id: 'nft', label: 'NFT studio Preview'},
+          ]}
+          onAction={id => {
+            if (id === 'feature') router.push('/product/feature-control' as Href)
+            if (id === 'nft') router.push('/product/nft' as Href)
+          }}
+        />
+      }>
+      <ScrollView
+        contentContainerStyle={{gap: spacing[4]}}
+        showsVerticalScrollIndicator={false}>
 
           <Surface
             variant="contained"
@@ -278,15 +290,12 @@ export function DimonPlaceholderScreen() {
           <AppButton variant="ghost" onPress={() => router.push('/product/developer' as Href)}>
             Developer Tools
           </AppButton>
-        </ScrollView>
-      </ResponsiveContent>
-    </View>
+      </ScrollView>
+    </SettingsScreen>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {maxWidth: 640, width: '100%', alignSelf: 'center'},
-  screen: {flex: 1},
   card: {borderWidth: StyleSheet.hairlineWidth},
   capRow: {
     alignItems: 'center',

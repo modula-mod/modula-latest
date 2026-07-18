@@ -1,19 +1,17 @@
 import {useEffect, useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import type {ExtensionCentreItem} from '@/data/repositories/contracts'
 import {
-  SettingsInfoBlock,
   SettingsLinkRow,
+  SettingsOverflowMenu,
+  SettingsScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {useAppServices} from '@/runtime/useAppServices'
-import {ResponsiveContent} from '@/shell/ResponsiveContent'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const SECTIONS = [
@@ -30,7 +28,7 @@ const SECTIONS = [
 export function ExtensionCentreScreen() {
   const services = useAppServices()
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const [available, setAvailable] = useState<ExtensionCentreItem[]>([])
   const [installed, setInstalled] = useState<ExtensionCentreItem[]>([])
 
@@ -64,82 +62,108 @@ export function ExtensionCentreScreen() {
   }, [available, installed])
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Extension Centre" />
-      <ResponsiveContent>
-        <ScrollView contentContainerStyle={[styles.content, {gap: spacing[5]}]}>
-          <SettingsInfoBlock
-            title="Extension Centre"
-            body="Install and manage Greenfield tools, functions, plugins, connectors, and modules. Module product code lives in separate repositories — Modula hosts contracts and UI only."
+    <SettingsScreen
+      title="Extension Centre"
+      caption="Install and manage Greenfield tools, functions, plugins, connectors, and modules. Module product code lives in separate repositories — Modula hosts contracts and UI only."
+      right={
+        <SettingsOverflowMenu
+          title="Extension Centre"
+          actions={[
+            {id: 'forge', label: 'Open Forge Builder'},
+            {id: 'standards', label: 'Module standards'},
+            {id: 'agents', label: 'Agents studio'},
+            {id: 'marketplace', label: 'Browse Marketplace'},
+          ]}
+          onAction={id => {
+            if (id === 'forge') router.push('/product/forge' as Href)
+            if (id === 'standards') router.push('/product/module-standards' as Href)
+            if (id === 'agents') router.push('/product/agents' as Href)
+            if (id === 'marketplace') router.push('/marketplace' as Href)
+          }}
+        />
+      }>
+      <SettingsSection title="Build & standards">
+        <SettingsLinkRow
+          row={{
+            title: 'Forge Builder',
+            description: 'Draft module manifests.',
+            icon: 'developer',
+            route: '/product/forge',
+            preview: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Module standards',
+            description: 'Manifest rules and boilerplate.',
+            icon: 'developer',
+            route: '/product/module-standards',
+            preview: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Agents studio',
+            description: 'Gaia agent packages with scopes.',
+            icon: 'automation',
+            route: '/product/agents',
+            preview: true,
+          }}
+        />
+        <SettingsLinkRow
+          last
+          row={{
+            title: 'Browse Marketplace',
+            description: 'Seeded catalog Preview.',
+            icon: 'marketplace',
+            route: '/marketplace',
+          }}
+        />
+      </SettingsSection>
+
+      <SettingsSection title="Product labs">
+        {PRODUCT_LAB_LINKS.map((link, index) => (
+          <SettingsLinkRow
+            key={link.id}
+            last={index === PRODUCT_LAB_LINKS.length - 1}
+            row={{
+              title: link.label,
+              description: link.description,
+              icon: link.icon,
+              onPress: () => router.push(link.route as Href),
+            }}
           />
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="caption" colour="textSecondary">
-              Build & standards
-            </AppText>
-            <AppButton onPress={() => router.push('/product/forge' as Href)}>
-              Open Forge Builder
-            </AppButton>
-            <AppButton
-              variant="secondary"
-              onPress={() => router.push('/product/module-standards' as Href)}>
-              Module standards
-            </AppButton>
-            <AppButton variant="ghost" onPress={() => router.push('/product/agents' as Href)}>
-              Agents studio
-            </AppButton>
-            <AppButton variant="ghost" onPress={() => router.push('/marketplace' as Href)}>
-              Browse Marketplace
-            </AppButton>
-          </View>
-          <SettingsSection title="Product labs">
-            {PRODUCT_LAB_LINKS.map((link, index) => (
+        ))}
+      </SettingsSection>
+
+      {SECTIONS.map(section => (
+        <SettingsSection key={section} title={section}>
+          {bySection[section].length ? (
+            bySection[section].map((item, index) => (
               <SettingsLinkRow
-                key={link.id}
-                last={index === PRODUCT_LAB_LINKS.length - 1}
+                key={`${section}-${item.extensionId}`}
+                last={index === bySection[section].length - 1}
                 row={{
-                  title: link.label,
-                  description: link.description,
-                  icon: link.icon,
-                  onPress: () => router.push(link.route as Href),
+                  title: item.name,
+                  description: `${item.publisher} · v${item.version} · ${item.kind}`,
+                  icon: 'modules',
+                  value: item.status,
+                  onPress: () =>
+                    router.push(
+                      `/settings/extensions/${encodeURIComponent(item.extensionId)}` as Href,
+                    ),
                 }}
               />
-            ))}
-          </SettingsSection>
-          {SECTIONS.map(section => (
-            <SettingsSection key={section} title={section}>
-              {bySection[section].length ? (
-                bySection[section].map((item, index) => (
-                  <SettingsLinkRow
-                    key={`${section}-${item.extensionId}`}
-                    last={index === bySection[section].length - 1}
-                    row={{
-                      title: item.name,
-                      description: `${item.publisher} · v${item.version} · ${item.kind}`,
-                      icon: 'modules',
-                      value: item.status,
-                      onPress: () =>
-                        router.push(
-                          `/settings/extensions/${encodeURIComponent(item.extensionId)}` as Href,
-                        ),
-                    }}
-                  />
-                ))
-              ) : (
-                <View style={{padding: spacing[4]}}>
-                  <AppText variant="caption" colour="textSecondary">
-                    Nothing in {section} yet.
-                  </AppText>
-                </View>
-              )}
-            </SettingsSection>
-          ))}
-        </ScrollView>
-      </ResponsiveContent>
-    </View>
+            ))
+          ) : (
+            <View style={{padding: spacing[4]}}>
+              <AppText variant="caption" colour="textSecondary">
+                Nothing in {section} yet.
+              </AppText>
+            </View>
+          )}
+        </SettingsSection>
+      ))}
+    </SettingsScreen>
   )
 }
-
-const styles = StyleSheet.create({
-  content: {padding: 16, paddingBottom: 40},
-  screen: {flex: 1},
-})

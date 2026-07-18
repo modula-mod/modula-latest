@@ -31,6 +31,13 @@ import {
   seededMuteWords,
   whatsNewNotes,
 } from '@/features/social/data/seededSurfaces'
+import {
+  SettingsContextRow,
+  SettingsLinkRow,
+  SettingsOverflowMenu,
+  SettingsScreen as SettingsKitScreen,
+  SettingsSection,
+} from '@/features/settings/components/SettingsRows'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
@@ -759,72 +766,114 @@ export function CommunityTopicScreen() {
 }
 
 export function MuteWordsScreen() {
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Mute words">
-      <AppText variant="display">Mute words</AppText>
-      <PreviewBanner text="Seeded mute list — Preview. Not synced to a backend." />
-      {seededMuteWords.map(word => (
-        <Surface key={word} variant="contained" style={{padding: spacing[4]}}>
-          <AppText variant="label">{word}</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Local mute preview
-          </AppText>
-        </Surface>
-      ))}
-      <ModulaButton label="Add mute word — Preview" role="secondary" onPress={() => undefined} />
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Mute words"
+      caption="Seeded mute list — Preview. Not synced to a backend."
+      right={
+        <SettingsOverflowMenu
+          title="Mute words"
+          actions={[
+            {
+              id: 'add',
+              label: 'Add mute word (Preview)',
+              disabled: true,
+              disabledReason: 'Not wired yet',
+            },
+          ]}
+          onAction={() => undefined}
+        />
+      }>
+      <SettingsSection title="Muted">
+        {seededMuteWords.map((word, index) => (
+          <SettingsContextRow
+            key={word}
+            title={word}
+            actions={[
+              {
+                id: 'remove',
+                label: 'Remove (Preview)',
+                style: 'destructive',
+                disabled: true,
+                disabledReason: 'Not wired yet',
+              },
+            ]}
+            onAction={() => undefined}>
+            <SettingsLinkRow
+              last={index === seededMuteWords.length - 1}
+              row={{
+                title: word,
+                description: 'Local mute preview · long-press for actions',
+                icon: 'text',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+          </SettingsContextRow>
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
 export function BlockedAccountsScreen() {
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Blocked accounts">
-      <AppText variant="display">Blocked accounts</AppText>
-      <PreviewBanner text="Seeded block list — Preview. Blocks are not persisted remotely." />
-      {seededBlockedAccounts.map(account => (
-        <Surface
-          key={account.id}
-          variant="contained"
-          style={[styles.row, {padding: spacing[4], gap: spacing[3]}]}>
-          <AppIcon name="privacy" colour={colours.accent} />
-          <View style={styles.flex}>
-            <AppText variant="label">{account.name}</AppText>
-            <AppText variant="caption" colour="textSecondary">
-              @{account.handle}
-            </AppText>
-          </View>
-        </Surface>
-      ))}
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Blocked accounts"
+      caption="Seeded block list — Preview. Blocks are not persisted remotely.">
+      <SettingsSection title="Blocked">
+        {seededBlockedAccounts.map((account, index) => (
+          <SettingsContextRow
+            key={account.id}
+            title={account.name}
+            actions={[
+              {
+                id: 'unblock',
+                label: 'Unblock (Preview)',
+                disabled: true,
+                disabledReason: 'Not wired yet',
+              },
+            ]}
+            onAction={() => undefined}>
+            <SettingsLinkRow
+              last={index === seededBlockedAccounts.length - 1}
+              row={{
+                title: account.name,
+                description: `@${account.handle} · long-press for actions`,
+                icon: 'privacy',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+          </SettingsContextRow>
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
 export function InnerCircleScreen() {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Inner circle">
-      <AppText variant="display">Inner circle</AppText>
-      <PreviewBanner text="Close friends style audience — Preview." />
-      {seededInnerCircle.map(person => (
-        <AppPressable
-          key={person.id}
-          accessibilityLabel={`Open @${person.handle}`}
-          onPress={() => router.push(`/profile/${person.handle}` as Href)}
-          style={[styles.row, {gap: spacing[3], minHeight: 52}]}>
-          <AppIcon name="community" colour={colours.accent} />
-          <View style={styles.flex}>
-            <AppText variant="label">{person.name}</AppText>
-            <AppText variant="caption" colour="textSecondary">
-              @{person.handle}
-            </AppText>
-          </View>
-          <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
-        </AppPressable>
-      ))}
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Inner circle"
+      caption="Close friends style audience — Preview.">
+      <SettingsSection title="People">
+        {seededInnerCircle.map((person, index) => (
+          <SettingsLinkRow
+            key={person.id}
+            last={index === seededInnerCircle.length - 1}
+            row={{
+              title: person.name,
+              description: `@${person.handle}`,
+              icon: 'community',
+              preview: true,
+              onPress: () => router.push(`/profile/${person.handle}` as Href),
+            }}
+          />
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
