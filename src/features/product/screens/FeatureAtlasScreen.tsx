@@ -2,9 +2,11 @@ import {useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
+import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {EmptyState} from '@/components/primitives/EmptyState'
 import {
   ATLAS_DOMAIN_LABELS,
   ATLAS_DOMAINS,
@@ -33,6 +35,13 @@ const MATURITY_LABELS: Record<MaturityFilter, string> = {
   inactive: 'Inactive',
 }
 
+const MATURITY_LEGEND: Record<FeatureMaturity, string> = {
+  live: 'Live features are available in the current app surface and should behave like shipped Modula product.',
+  preview: 'Preview features are mapped for evaluation, but they are not production runtimes or final contracts.',
+  planned: 'Planned features describe approved product direction that still needs implementation before users can rely on it.',
+  inactive: 'Inactive features are intentionally unavailable until their safety, ownership, or platform prerequisites exist.',
+}
+
 function firstParam(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] ?? '' : value ?? ''
 }
@@ -48,6 +57,7 @@ export function FeatureAtlasScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{domain?: string; maturity?: string}>()
   const {colours, radius, spacing} = useThemeTokens()
+  const totalFeatures = FEATURE_ATLAS.length
   const domainParam = firstParam(params.domain)
   const maturityParam = firstParam(params.maturity)
   const [query, setQuery] = useState('')
@@ -84,12 +94,21 @@ export function FeatureAtlasScreen() {
               },
             ]}>
             <AppText variant="caption" colour="accent">
-              FEATURE ATLAS / {FEATURE_ATLAS.length} NAMED CAPABILITIES
+              FEATURE ATLAS / {totalFeatures} EXACT CAPABILITY ENTRIES
             </AppText>
             <AppText variant="display">A map of Modula's surface area.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Atlas maps Modula’s surface area. Preview ≠ production runtime.
+              Atlas maps all {totalFeatures} entries in FEATURE_ATLAS by domain and maturity.
+              Preview does not mean production runtime.
             </AppText>
+            <View style={[styles.ctaRow, {gap: spacing[2]}]}>
+              <AppButton
+                variant="secondary"
+                accessibilityLabel="Open Design Lab"
+                onPress={() => router.push('/profile/design.modula' as Href)}>
+                Design Lab
+              </AppButton>
+            </View>
             <View style={[styles.statsRow, {gap: spacing[2]}]}>
               {(Object.keys(ATLAS_MATURITY_COUNTS) as FeatureMaturity[]).map(key => (
                 <View
@@ -150,12 +169,36 @@ export function FeatureAtlasScreen() {
                         paddingVertical: spacing[2],
                       },
                     ]}>
-                    <AppText variant="caption" colour={active ? 'accent' : 'textSecondary'}>
+                    <AppText
+                      variant="caption"
+                      colour={active ? 'accent' : 'textSecondary'}
+                      style={styles.chipText}>
                       {MATURITY_LABELS[item]}
                     </AppText>
                   </AppPressable>
                 )
               })}
+            </View>
+            <View style={[styles.legendGrid, {gap: spacing[2]}]}>
+              {(Object.keys(MATURITY_LEGEND) as FeatureMaturity[]).map(item => (
+                <View
+                  key={item}
+                  style={[
+                    styles.legendCard,
+                    {
+                      backgroundColor: colours.surface,
+                      borderColor: colours.border,
+                      borderRadius: radius.medium,
+                      padding: spacing[3],
+                      gap: spacing[1],
+                    },
+                  ]}>
+                  <AppText variant="label">{MATURITY_LABELS[item]}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {MATURITY_LEGEND[item]} {ATLAS_MATURITY_COUNTS[item]} entries currently sit here.
+                  </AppText>
+                </View>
+              ))}
             </View>
           </View>
 
@@ -181,16 +224,40 @@ export function FeatureAtlasScreen() {
           <View style={{gap: spacing[3]}}>
             <View style={[styles.titleRow, {gap: spacing[2]}]}>
               <AppText variant="headline" style={{flex: 1}}>
-                {filtered.length} matches
+                {filtered.length} of {totalFeatures} matches
               </AppText>
               <AppText variant="caption" colour="textSecondary">
                 Tap a row to open its mapped surface.
               </AppText>
             </View>
             <View style={{gap: spacing[3]}}>
-              {filtered.map(feature => (
-                <FeatureRow key={feature.id} feature={feature} onPress={() => router.push(feature.route as Href)} />
-              ))}
+              {filtered.length === 0 ? (
+                <EmptyState
+                  icon="search"
+                  title="No atlas entries match this view"
+                  description="Try clearing the search text, switching maturity back to All, or selecting All domains. The atlas still contains the full FEATURE_ATLAS list, so this empty state only means the current filters are too narrow."
+                  action={
+                    <AppButton
+                      variant="secondary"
+                      accessibilityLabel="Clear Feature Atlas filters"
+                      onPress={() => {
+                        setQuery('')
+                        setDomain('all')
+                        setMaturity('all')
+                      }}>
+                      Clear search and filters
+                    </AppButton>
+                  }
+                />
+              ) : (
+                filtered.map(feature => (
+                  <FeatureRow
+                    key={feature.id}
+                    feature={feature}
+                    onPress={() => router.push(feature.route as Href)}
+                  />
+                ))
+              )}
             </View>
           </View>
         </ScrollView>
@@ -215,7 +282,10 @@ function DomainChip({label, active, onPress}: {label: string; active: boolean; o
           paddingVertical: spacing[2],
         },
       ]}>
-      <AppText variant="caption" colour={active ? 'accent' : 'textSecondary'}>
+      <AppText
+        variant="caption"
+        colour={active ? 'accent' : 'textSecondary'}
+        style={styles.chipText}>
         {label}
       </AppText>
     </AppPressable>
@@ -267,13 +337,22 @@ const styles = StyleSheet.create({
   screen: {flex: 1},
   hero: {borderWidth: StyleSheet.hairlineWidth},
   input: {borderWidth: StyleSheet.hairlineWidth, minHeight: 48},
+  ctaRow: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap'},
   chipWrap: {flexDirection: 'row', flexWrap: 'wrap'},
-  chip: {borderWidth: StyleSheet.hairlineWidth},
+  chip: {borderWidth: StyleSheet.hairlineWidth, flexShrink: 1, maxWidth: '100%'},
+  chipText: {flexShrink: 1},
   statsRow: {flexDirection: 'row', flexWrap: 'wrap'},
   statPill: {borderWidth: StyleSheet.hairlineWidth},
+  legendGrid: {flexDirection: 'row', flexWrap: 'wrap'},
+  legendCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    flexBasis: '47%',
+    flexGrow: 1,
+    minWidth: 220,
+  },
   titleRow: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap'},
   featureRow: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
