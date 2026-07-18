@@ -6,6 +6,7 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {MarketplaceStatusBadge} from '@/features/marketplace/components/MarketplaceStatusBadge'
 import {marketplaceCatalog} from '@/features/marketplace/data/catalog'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -92,12 +93,10 @@ export function ModulesLibraryScreen() {
                       ]}>
                       <AppIcon name={module.icon} colour={colours.accent} />
                       <AppText variant="headline">{module.name}</AppText>
-                      <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                      <AppText variant="caption" colour="textSecondary">
                         {module.description}
                       </AppText>
-                      <AppText variant="caption" colour="accent">
-                        {module.status}
-                      </AppText>
+                      <MarketplaceStatusBadge status={module.status} />
                     </AppPressable>
                   ))}
                 </View>

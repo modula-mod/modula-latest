@@ -5,7 +5,7 @@ import {useRouter, type Href} from 'expo-router'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
+import {MarketplaceStatusBadge} from '@/features/marketplace/components/MarketplaceStatusBadge'
 import {
   marketplaceCatalog,
   marketplaceCategories,
@@ -155,6 +155,9 @@ export function MarketplaceScreen() {
                       <AppText variant="caption" colour="textSecondary">
                         @{seller.handle} · {seller.moduleCount} modules · Preview
                       </AppText>
+                      <AppText variant="caption" colour="textSecondary">
+                        {seller.bio}
+                      </AppText>
                     </View>
                     <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
                   </AppPressable>
@@ -217,15 +220,13 @@ function ModuleRail({
               },
             ]}>
             <AppIcon name={module.icon} colour={colours.accent} />
-            <AppText variant="label" numberOfLines={1}>
+            <AppText variant="label">
               {module.name}
             </AppText>
-            <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+            <AppText variant="caption" colour="textSecondary">
               {module.description}
             </AppText>
-            <AppText variant="caption" colour="accent">
-              {module.status}
-            </AppText>
+            <MarketplaceStatusBadge status={module.status} />
           </AppPressable>
         ))}
       </ScrollView>
@@ -255,13 +256,11 @@ function ModuleRow({
       </View>
       <View style={styles.flex}>
         <AppText variant="label">{module.name}</AppText>
-        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+        <AppText variant="caption" colour="textSecondary">
           {module.description}
         </AppText>
       </View>
-      <AppText variant="caption" colour="accent">
-        {module.status}
-      </AppText>
+      <MarketplaceStatusBadge status={module.status} />
     </AppPressable>
   )
 }
@@ -282,7 +281,7 @@ const styles = StyleSheet.create({
     width: 44,
   },
   moduleRow: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
   },
   railCard: {
@@ -311,7 +310,7 @@ const styles = StyleSheet.create({
     width: 44,
   },
   sellerRow: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },

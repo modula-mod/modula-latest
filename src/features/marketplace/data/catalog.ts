@@ -41,21 +41,21 @@ export const marketplaceSellers: MarketplaceSeller[] = [
     id: 'seller-modula',
     name: 'Modula Studio',
     handle: 'modula',
-    bio: 'First-party tools for the Modula shell.',
+    bio: 'First-party team building shell-owned modules, standards, and honest preview surfaces for Modula.',
     moduleCount: 33,
   },
   {
     id: 'seller-builders',
     name: 'Builders Collective',
     handle: 'builders',
-    bio: 'Community modules for workflows and CRM.',
+    bio: 'Community operators creating workflow, CRM, team, and commerce modules with explicit permissions and Preview-only installs.',
     moduleCount: 23,
   },
   {
     id: 'seller-garden',
     name: 'Garden Labs',
     handle: 'garden',
-    bio: 'Calm creative and wellbeing experiments.',
+    bio: 'Independent lab for calmer creative, wellbeing, and appearance experiments that stay optional and transparent.',
     moduleCount: 13,
   },
 ]
@@ -274,9 +274,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-wallet',
     name: 'Wallet',
-    description: 'DIMON and digital ownership UI — inactive until DIMON activates.',
+    description: 'DIMON is not active yet. Wallet balances, transfers, and blockchain actions are not available.',
     longDescription:
-      'Wallet pre-screen only. No balances, transfers, or blockchain. See ADR-009.',
+      'Wallet is an inactive pre-screen only. DIMON is not active yet, so there are no balances, transfers, token prices, or blockchain writes.',
     status: 'Inactive',
     icon: 'security',
     category: 'commerce',
@@ -288,7 +288,7 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-nft-studio',
     name: 'NFT Studio',
-    description: 'Digital ownership proofs for modules, creator editions, profiles, and teams.',
+    description: 'DIMON is not active yet. NFT Studio is a reserved catalogue card with no minting or transfers.',
     longDescription:
       'NFT Studio is reserved only. DIMON is not active yet, so there is no minting, transfer, wallet balance, floor price, or blockchain marketplace in this build.',
     status: 'Inactive',
@@ -302,9 +302,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-creator-editions',
     name: 'Creator Editions',
-    description: 'Planned ownership-gated creator collectibles and member proofs.',
+    description: 'DIMON is not active yet. Creator editions are planned only, with no minting or ownership gates.',
     longDescription:
-      'Creator Editions are planned as entitlement and proof surfaces, not speculative trading. Mint and transfer requests stay blocked until DIMON activation and policy review.',
+      'Creator Editions are planned as entitlement and proof surfaces, not speculative trading. DIMON is not active yet, and mint or transfer requests stay blocked until activation and policy review.',
     status: 'Planned',
     icon: 'poll',
     category: 'creative',
@@ -316,7 +316,7 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-nft-studio',
     name: 'NFT Studio',
-    description: 'Digital ownership proofs for modules, creator editions, profiles, and teams.',
+    description: 'DIMON is not active yet. NFT Studio is a reserved catalogue card with no minting or transfers.',
     longDescription:
       'NFT Studio is reserved only. DIMON is not active yet, so there is no minting, transfer, wallet balance, floor price, or blockchain marketplace in this build.',
     status: 'Inactive',
@@ -330,9 +330,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-creator-editions',
     name: 'Creator Editions',
-    description: 'Planned ownership-gated creator collectibles and member proofs.',
+    description: 'DIMON is not active yet. Creator editions are planned only, with no minting or ownership gates.',
     longDescription:
-      'Creator Editions are planned as entitlement and proof surfaces, not speculative trading. Mint and transfer requests stay blocked until DIMON activation and policy review.',
+      'Creator Editions are planned as entitlement and proof surfaces, not speculative trading. DIMON is not active yet, and mint or transfer requests stay blocked until activation and policy review.',
     status: 'Planned',
     icon: 'poll',
     category: 'creative',
@@ -694,9 +694,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-dimon-ledger-monitor',
     name: 'DIMON Ledger Monitor',
-    description: 'Inactive monitor for future ownership and settlement events.',
+    description: 'DIMON is not active yet. Ledger Monitor only names future ownership and settlement events.',
     longDescription:
-      'DIMON inactive. Ledger Monitor shows reserved event language only — no balances, transfers, wallets, or chain status.',
+      'DIMON is not active yet. Ledger Monitor shows reserved event language only, with no balances, transfers, wallets, or chain status.',
     status: 'Inactive',
     icon: 'security',
     category: 'commerce',
@@ -708,9 +708,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-dimon-invoices',
     name: 'DIMON Invoices',
-    description: 'Inactive invoice and settlement direction for future commerce.',
+    description: 'DIMON is not active yet. Invoice and settlement flows are inactive future direction.',
     longDescription:
-      'DIMON inactive; no invoice payment, settlement, wallet, token, or checkout is available.',
+      'DIMON is not active yet. No invoice payment, settlement, wallet, token, or checkout is available.',
     status: 'Inactive',
     icon: 'security',
     category: 'commerce',
@@ -722,9 +722,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-nft-entitlements',
     name: 'NFT Entitlements',
-    description: 'Preview entitlement checks for ownership-gated content.',
+    description: 'DIMON is not active yet. Entitlement checks are Preview language only and verify no NFT ownership.',
     longDescription:
-      'NFT Entitlements previews claim and access language. NFT attach is blocked and DIMON remains inactive.',
+      'NFT Entitlements previews claim and access language. NFT attach is blocked, DIMON remains inactive, and no NFT ownership is verified.',
     status: 'Preview',
     icon: 'bookmark',
     category: 'commerce',
@@ -988,9 +988,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-dimon-activity-widget',
     name: 'DIMON Activity Widget',
-    description: 'Inactive Board widget for future DIMON activity language.',
+    description: 'DIMON is not active yet. This Board widget only explains reserved activity language.',
     longDescription:
-      'DIMON inactive. The widget can explain reserved activity concepts but must not show balances, transfers, or token UI.',
+      'DIMON is not active yet. The widget can explain reserved activity concepts but must not show balances, transfers, or token UI.',
     status: 'Inactive',
     icon: 'security',
     category: 'commerce',
@@ -1002,9 +1002,9 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   {
     id: 'module-entitlements-widget',
     name: 'Entitlements Widget',
-    description: 'Preview Board card for ownership and access checks.',
+    description: 'DIMON is not active yet. This Preview Board card explains access checks without chain verification.',
     longDescription:
-      'Entitlements Widget previews claim status language. It does not verify chain ownership or unlock paid content.',
+      'Entitlements Widget previews claim status language. DIMON is not active yet, so it does not verify chain ownership or unlock paid content.',
     status: 'Preview',
     icon: 'bookmark',
     category: 'commerce',
