@@ -109,6 +109,11 @@ export function CommandsLayerScreen() {
               <AppText variant="body" colour="textSecondary">
                 {cmd.description}
               </AppText>
+              {cmd.note ? (
+                <AppText variant="caption" colour="textTertiary">
+                  {cmd.note}
+                </AppText>
+              ) : null}
               <AppText variant="caption" colour="textSecondary">
                 Confirm · {cmd.confirmation} · Undo · {cmd.undo}
               </AppText>

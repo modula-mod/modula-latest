@@ -175,6 +175,13 @@ export function ProductHubScreen() {
                   route: '/product/agents',
                 },
                 {
+                  id: 'nft',
+                  name: 'NFT Studio',
+                  summary: 'Ownership proofs reserved; DIMON inactive.',
+                  icon: 'security' as const,
+                  route: '/product/nft',
+                },
+                {
                   id: 'standards',
                   name: 'Module Standards',
                   summary: 'Manifest + skill.md DNA.',

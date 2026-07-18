@@ -16,6 +16,7 @@ const MCP_TOOLS = [
   'greenfield.intelligence.layers',
   'greenfield.commands.list',
   'greenfield.dimon.status',
+  'greenfield.nft.status',
   'greenfield.skill.template',
 ]
 
@@ -29,6 +30,7 @@ const CLI_COMMANDS = [
   'modula commands list',
   'modula focus presets',
   'modula dimon status',
+  'modula nft status',
   'modula version',
 ]
 

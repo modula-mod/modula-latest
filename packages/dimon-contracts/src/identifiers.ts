@@ -2,3 +2,4 @@
 export type DimonAccountId = string
 export type DimonTransactionId = string
 export type DimonAssetId = string
+export type DimonCollectionId = string

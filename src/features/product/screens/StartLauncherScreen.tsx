@@ -225,6 +225,11 @@ export function StartLauncherScreen() {
               <AppText variant="body" colour="textSecondary">
                 {selectedCommand.description}
               </AppText>
+              {selectedCommand.note ? (
+                <AppText variant="caption" colour="textTertiary">
+                  {selectedCommand.note}
+                </AppText>
+              ) : null}
               <AppText variant="caption" colour="textSecondary">
                 Risk / {RISK_COPY[selectedCommand.risk]}
               </AppText>

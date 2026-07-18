@@ -91,6 +91,7 @@ AT Protocol connected accounts / Atmosphere Preview: Phase 6 frontend (server-me
 | `/product/integrations` | Integrations hub |
 | `/product/search` | Universal search preview |
 | `/product/creator` | Creator economy |
+| `/product/nft` | NFT / digital ownership foreshadow; DIMON inactive |
 | `/product/[slug]` | Capability pre-screen |
 | `/onboarding` | First-run onboarding |
 | `/profile/os` | Profile-OS pre-screen |

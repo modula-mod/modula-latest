@@ -27,6 +27,10 @@ const CAPABILITIES = [
   {id: 'dimon:transaction:request', label: 'Transaction request', state: 'Reserved'},
   {id: 'dimon:transaction:approve', label: 'Transaction approve', state: 'Reserved'},
   {id: 'dimon:ledger:audit', label: 'Ledger audit', state: 'Reserved'},
+  {id: 'dimon:asset:read', label: 'Asset read', state: 'Reserved'},
+  {id: 'dimon:asset:mint:request', label: 'Asset mint request', state: 'Reserved'},
+  {id: 'dimon:asset:transfer:request', label: 'Asset transfer request', state: 'Reserved'},
+  {id: 'dimon:asset:entitlement:read', label: 'Asset entitlement read', state: 'Reserved'},
 ]
 
 const EVENT_TYPES = [
@@ -34,6 +38,10 @@ const EVENT_TYPES = [
   'dimon.transaction.requested',
   'dimon.transaction.approved',
   'dimon.ledger.audited',
+  'dimon.asset.mint.requested',
+  'dimon.asset.transfer.requested',
+  'dimon.asset.entitlement.reserved',
+  'dimon.asset.metadata.reserved',
 ]
 
 const FORBIDDEN = [
@@ -257,6 +265,9 @@ export function DimonPlaceholderScreen() {
 
           <AppButton onPress={() => router.push('/product/ledger' as Href)}>
             Ledger & Replay
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/nft' as Href)}>
+            NFT Studio Preview
           </AppButton>
           <AppButton variant="secondary" onPress={() => router.push('/product/intelligence' as Href)}>
             Intelligence Hub

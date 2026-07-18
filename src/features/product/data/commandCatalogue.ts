@@ -4,6 +4,7 @@ export type ModulaCommand = {
   id: string
   label: string
   description: string
+  note?: string
   risk: CommandRisk
   confirmation: 'none' | 'preview' | 'explicit'
   permissions: string[]
@@ -105,9 +106,20 @@ export const COMMAND_CATALOGUE: ModulaCommand[] = [
     id: 'dimon.transfer',
     label: 'DIMON transfer',
     description: 'Reserved — DIMON is not active yet.',
+    note: 'Preview blocked while DIMON is inactive.',
     risk: 'high',
     confirmation: 'explicit',
     permissions: ['dimon:transaction:request'],
+    undo: 'Blocked while DIMON inactive',
+  },
+  {
+    id: 'dimon.asset.transfer',
+    label: 'Transfer digital ownership asset',
+    description: 'Reserved NFT / digital ownership transfer request. DIMON is not active yet.',
+    note: 'Preview blocked: no mint, transfer, wallet, or chain operation is available.',
+    risk: 'high',
+    confirmation: 'explicit',
+    permissions: ['dimon:asset:transfer:request'],
     undo: 'Blocked while DIMON inactive',
   },
 ]

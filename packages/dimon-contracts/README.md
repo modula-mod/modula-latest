@@ -12,8 +12,9 @@ No balances, wallets, transfers, mining, staking, or blockchain dependencies are
 
 ## What this package is
 
-- Opaque ID types (`DimonAccountId`, …)
+- Opaque ID types (`DimonAccountId`, `DimonAssetId`, …)
 - Capability strings (`dimon:account:read`, …)
+- Reserved NFT / digital ownership types (`DimonAssetReservation`, not minted)
 - Event envelope types (not emitted)
 - Extension reservation id `modula.dimon.core`
 
