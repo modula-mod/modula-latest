@@ -1,85 +1,78 @@
 # Modula — Product Overview
 
-> Condensed vision for the greenfield Expo SDK 57 application. Full owner brief lives in conversation history; this document is the in-repo source of truth for product intent.
+> In-repo source of truth for product intent. Engineering phases (Phase 6S, Greenfield, etc.) live under `docs/validation/` and `docs/architecture/`.
 
 ## Motto
 
+**Your digital world, built around you.**  
 **Simplifying Digital.**
 
-> One identity. One environment. Infinite configurations.
-
-Secondary statement: Modula does not force users into one application. It gives them the foundation to create their own.
+> One identity. One environment. Your modules. Your rules.
 
 ## What Modula is
 
-A modular **Social Operating System** that unifies social interaction, personal productivity, digital identity, communication, services, and third-party tools inside one user-controlled environment.
+Modula is a **modular social operating system**: a social network with installable modules, not a thin client for someone else’s network.
+
+It brings identity, communication, productivity, content, services, and digital tools into **one configurable application shell**. Users decide what their environment contains, how it looks, and how it behaves.
 
 Central idea:
 
 > The user’s profile becomes their platform.
 
-Capabilities (social, modules, marketplace, widgets, Elements, teams, appearance, optional AI/wallet) operate through **shared contracts**, shared identity, shared permissions, shared design tokens, and shared navigation — not as disconnected apps.
+A Modula installation can grow to include social feeds and conversations, customisable profiles, independent modules (CRM, agents, automations, notes, tasks, …), widgets and boards, privacy controls, themes/surfaces, and later AI-assisted tools — through **shared contracts**, shared identity, shared permissions, shared design tokens, and shared navigation.
 
 ## What Modula is not
 
-- Not only a social network, productivity suite, launcher, marketplace, wallet, or AI assistant
-- Not a Bluesky fork or AT Protocol UI shell
-- Not a monolith that hardcodes every module
-- Not dependent on Gaia, Neural Atlas, or DIMON wallet to be useful
+- Not a Bluesky-branded client or permanent AT Protocol UI shell
+- Not “another social network” with bolted-on settings
+- Not a monolith that hardcodes every tool as core feature code
+- Not dependent on Gaia, a marketplace, or DIMON to be useful on day one
+- Not a family-tree / pastel lifestyle clone (inspiration may inform craft only)
+
+## Current technical reality (2026)
+
+| Topic | Status |
+| --- | --- |
+| App stack | Expo SDK 57 / React Native / TypeScript (greenfield Modula host) |
+| Social backend | **Greenfield** (`api.modula.digital`) — Modula-owned accounts, posts, social graph |
+| AT Protocol | Optional / inactive for the core product path — not the identity or feed authority |
+| Bluesky upstream | Historical engineering scaffold only — not product branding, analytics, or architecture destination |
+| Modules | First-party catalogue + lifecycle in Greenfield; production modules intended as **external packages / GitHub repos** resolved by registry |
+| Module builder | Planned — in-Modula builder (Lovable / Bolt–class) for creating modules; not yet the current phase |
+| Production readiness | Active development — not production-ready |
 
 ## Core concepts
 
 | Concept | Role |
-|---|---|
-| Profile-as-platform | Owner sees a private OS; visitors see a public profile — same identity |
-| Modules | Installable capabilities (Vault Notes, Tasks, CRM, …) via host contracts |
-| Board | Personal configurable OS surface (cards, layouts, shortcuts) |
-| Social foundation | Protocol-independent feeds/posts via `SocialProvider` |
-| Marketplace | Distribution for modules, widgets, themes, tools |
-| Widgets / Elements | Lightweight surfaces and external integrations |
-| Appearance | Independent dimensions: colour mode × family × accent × Surface Type |
-| Teams / privacy | Collaborative spaces and presence — later phases |
+| --- | --- |
+| Social foundation | Modula posts, feeds, reactions, comments, profiles — Greenfield-first |
+| Profile-as-platform | Owner OS vs visitor public profile — same identity |
+| Board | Configurable home environment driven by registered capabilities |
+| Modules | Independent tools (Vault Notes, Tasks, CRM, Agents, Automations, …) hosted outside the main app when possible |
+| Extension Centre | Install / enable / configure host extensions, tools, plugins, connections |
+| Composer tools | Registry-driven creation tools, not a fixed icon strip |
+| Appearance | Colour mode × theme family × accent × Surface Type (materials must change hierarchy) |
+| Marketplace / builder | Later: discover modules; eventually **build** modules inside Modula |
+| Gaia / DIMON | Future intelligence / optional decentralised layer — inactive until intentional |
 
-## Intentionally deferred
+## Content presentation principle
 
-- Gaia / AI agents as platform core
-- Neural Atlas
-- Wallet / DIMON
-- Real AT Protocol / auth / marketplace backend
-- Full module runtime and dynamic code loading
-- Full Glass / Liquid Glass material engines
+**Media glows. Text breathes. Links contain.**
 
-## Early navigation (Phase 1)
+## Near-term product priorities
 
-```text
-Modula
-├── Board
-├── Feed
-├── Explore
-├── Notifications
-├── Profile
-├── Composer (stub)
-└── Settings
-```
+1. Stable universal application shell  
+2. Modula social foundation (Greenfield) — Phase 6S track  
+3. External module standard and runtime (Phase 7+)  
+4. First official modules (external packages)  
+5. Marketplace + developer ecosystem  
+6. In-Modula module builder  
+7. Deeper automation and Gaia (permission-aware)
 
-## Build order
+## Related
 
-| Phase | Focus |
-|---|---|
-| 0 | Foundation (Expo SDK 57, tokens, startup contract) — **done** |
-| 0.5 / 1 | Theme runtime stubs + navigable shell + mock social |
-| 2 | Appearance engine (Surface Types, families) |
-| 3 | Profile as platform |
-| 4 | Social foundation (real providers) |
-| 5 | Module standard |
-| 6 | Core modules (Vault Notes, Tasks, CRM) |
-| 7 | Marketplace |
-| 8 | Advanced (automations, teams, wallet, Gaia, Neural Atlas) |
-
-## Related docs
-
-- `docs/product/theme-architecture-v5.md`
-- `docs/architecture/screen-map.md`
-- `docs/architecture/module-boundary.md`
-- `docs/architecture/bluesky-inspiration-policy.md`
-- `docs/architecture/startup-contract.md`
+- `docs/design/modula-ui-enhancement-opportunities.md` — UI vibe / opportunity map  
+- `docs/product/theme-architecture-v5.md`  
+- `docs/architecture/module-boundary.md`  
+- `docs/architecture/startup-contract.md`  
+- `docs/architecture/bluesky-inspiration-policy.md` — study patterns only; no fork/copy of Bluesky product UI  
