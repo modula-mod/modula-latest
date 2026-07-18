@@ -57,11 +57,14 @@ export function DrawerItem({item, onPress, selected = false, dense = false}: Dra
         />
       </View>
       <View style={styles.body}>
-        <AppText variant={dense ? 'body' : 'label'} colour={selected ? 'accent' : 'text'}>
+        <AppText
+          variant={dense ? 'body' : 'label'}
+          colour={selected ? 'accent' : 'text'}
+          numberOfLines={1}>
           {item.label}
         </AppText>
         {showDescription ? (
-          <AppText variant="caption" colour="textSecondary">
+          <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
             {item.description}
           </AppText>
         ) : null}
@@ -78,17 +81,21 @@ export function DrawerItem({item, onPress, selected = false, dense = false}: Dra
 const styles = StyleSheet.create({
   body: {
     flex: 1,
-    minWidth: 0,
+    flexShrink: 1,
+    minWidth: 64,
   },
   icon: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
+    flexShrink: 0,
     height: 36,
     justifyContent: 'center',
     width: 36,
   },
   row: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
+    width: '100%',
   },
 })

@@ -1,6 +1,6 @@
 import {LinearGradient} from 'expo-linear-gradient'
 import {useRouter, type Href} from 'expo-router'
-import {useEffect, useMemo, useRef} from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -9,6 +9,7 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
+  type LayoutChangeEvent,
 } from 'react-native'
 import Animated, {
   Extrapolation,
@@ -45,6 +46,7 @@ export function PresenceStoriesRail({
   const {colours, spacing, scheme} = useThemeTokens()
   const router = useRouter()
   const {width: windowWidth} = useWindowDimensions()
+  const [stageWidth, setStageWidth] = useState(windowWidth)
   const scrollRef = useRef<ScrollView>(null)
   const scrollX = useSharedValue(0)
 
@@ -53,7 +55,7 @@ export function PresenceStoriesRail({
     [people],
   )
 
-  const sidePad = Math.max(0, (windowWidth - ITEM_SLOT) / 2)
+  const sidePad = Math.max(0, (stageWidth - ITEM_SLOT) / 2)
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -64,10 +66,17 @@ export function PresenceStoriesRail({
       scrollX.value = youIndex * ITEM_SLOT
     }, 40)
     return () => clearTimeout(timer)
-  }, [scrollX, youIndex])
+  }, [scrollX, stageWidth, youIndex])
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollX.value = event.nativeEvent.contentOffset.x
+  }
+
+  const onStageLayout = (event: LayoutChangeEvent) => {
+    const next = event.nativeEvent.layout.width
+    if (next > 0 && Math.abs(next - stageWidth) > 1) {
+      setStageWidth(next)
+    }
   }
 
   return (
@@ -84,6 +93,7 @@ export function PresenceStoriesRail({
       ) : null}
 
       <View
+        onLayout={onStageLayout}
         style={[
           styles.stage,
           compact ? styles.stageCompact : styles.stageTall,
@@ -289,10 +299,12 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
   },
   stageTall: {
-    minHeight: 228,
+    minHeight: 248,
+    paddingBottom: 12,
   },
   stageCompact: {
-    minHeight: 176,
+    minHeight: 196,
+    paddingBottom: 10,
   },
   slot: {
     width: ITEM_SLOT,

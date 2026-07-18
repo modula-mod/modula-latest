@@ -5,20 +5,20 @@ import {Avatar} from '@/components/primitives/Avatar'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
-import {useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
+import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function HomeHeaderLeft() {
-  const {openAccountPanel} = useAccountPanel()
+  const {openDrawer} = useShellDrawer()
   const session = useSession()
   const profile = session.status === 'signedIn' ? session.profile : null
 
   return (
     <Pressable
-      accessibilityLabel="Open account panel"
+      accessibilityLabel="Open navigation drawer"
       onPress={() => {
         void selectionHaptic()
-        openAccountPanel('home-header')
+        openDrawer()
       }}
       style={{
         alignItems: 'center',

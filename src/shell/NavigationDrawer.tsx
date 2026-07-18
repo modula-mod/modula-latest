@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react'
+import {useEffect, useMemo, useRef} from 'react'
 import {
   Animated,
   BackHandler,
@@ -192,8 +192,12 @@ export function NavigationDrawer() {
     return () => subscription.remove()
   }, [closeDrawer, phase])
 
+  // Close only when the route changes — not when the drawer first opens.
+  const pathnameRef = useRef(pathname)
   useEffect(() => {
-    if (phase === 'open') {
+    if (pathnameRef.current === pathname) return
+    pathnameRef.current = pathname
+    if (phase !== 'closed') {
       closeDrawer()
     }
   }, [closeDrawer, pathname, phase])
@@ -267,11 +271,11 @@ export function NavigationDrawer() {
                   size={52}
                 />
                 <View style={styles.headerText}>
-                  <AppText variant="headline">
+                  <AppText variant="headline" numberOfLines={1}>
                     {ownerProfile?.displayName ??
                       (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
                   </AppText>
-                  <AppText variant="caption" colour="textSecondary">
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
                     {ownerProfile
                       ? `@${ownerProfile.handle}`
                       : session.status === 'guest'
@@ -387,25 +391,33 @@ export function NavigationDrawer() {
 
 const styles = StyleSheet.create({
   drawer: {
+    borderRadius: 0,
     borderRightWidth: StyleSheet.hairlineWidth,
     flex: 1,
+    width: '100%',
   },
   drawerFrame: {
-    flex: 1,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    top: 0,
   },
   footer: {
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   headerIdentity: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
+    width: '100%',
   },
   headerPad: {
     width: '100%',
   },
   headerText: {
     flex: 1,
-    minWidth: 0,
+    flexShrink: 1,
+    minWidth: 96,
   },
   profilePill: {
     alignItems: 'center',
@@ -414,6 +426,7 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
+    width: '100%',
   },
   statsQuiet: {
     flexDirection: 'row',

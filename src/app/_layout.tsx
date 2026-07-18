@@ -14,6 +14,7 @@ import {
 } from '@/platform/ui'
 import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 import {AppServicesProvider} from '@/runtime'
+import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -57,6 +58,7 @@ function RootNavigator() {
         <Stack.Screen name="discover/media" />
         <Stack.Screen name="settings" />
       </Stack>
+      <NavigationDrawer />
       <AdaptiveAccountPanel />
     </>
   )

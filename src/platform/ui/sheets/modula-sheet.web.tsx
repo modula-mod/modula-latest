@@ -65,7 +65,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
+    alignSelf: 'stretch',
     maxHeight: '85%',
     minHeight: 240,
+    width: '100%',
   },
 })

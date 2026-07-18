@@ -1,7 +1,8 @@
 import {BottomSheet} from '@expo/ui'
+import {containerRelativeFrame, frame} from '@expo/ui/swift-ui/modifiers'
 import {BlurView} from 'expo-blur'
 import type {ReactNode} from 'react'
-import {Platform, StyleSheet, View} from 'react-native'
+import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -20,8 +21,8 @@ export type ModulaSheetProps = {
 
 /**
  * Native sheet via `@expo/ui` universal BottomSheet.
- * On iOS that adapter hosts SwiftUI BottomSheet (detents + grabber + isPresented).
- * Product screens consume ModulaSheet — never BottomSheet / `@expo/ui/swift-ui` directly.
+ * Forces full-width content — Expo's SwiftUI Host defaults to topLeading
+ * intrinsic sizing, which otherwise shrink-wraps rows to ~44pt and letter-wraps labels.
  */
 export function ModulaSheet({
   isPresented,
@@ -33,11 +34,15 @@ export function ModulaSheet({
   material = 'glass',
 }: ModulaSheetProps) {
   const {colours, spacing, scheme} = useThemeTokens()
+  const {width: windowWidth} = useWindowDimensions()
   const {reduceTransparency} = useSystemAccessibility()
   const useGlass =
     material === 'glass' &&
     !reduceTransparency &&
     Platform.OS === 'ios'
+
+  // Expo BottomSheet applies 16pt leading/trailing padding; keep content ≥ usable width.
+  const contentWidth = Math.max(280, windowWidth - 32)
 
   return (
     <BottomSheet
@@ -45,23 +50,47 @@ export function ModulaSheet({
       onDismiss={onDismiss}
       showDragIndicator={showDragIndicator}
       snapPoints={snapPoints}
-      testID={testID}>
+      testID={testID}
+      modifiers={[
+        containerRelativeFrame({axes: 'horizontal', alignment: 'topLeading'}),
+        frame({
+          minWidth: contentWidth,
+          maxWidth: Infinity,
+          alignment: 'topLeading',
+        }),
+      ]}>
       {useGlass ? (
         <BlurView
           intensity={48}
           tint={scheme === 'dark' ? 'dark' : 'light'}
-          style={[styles.body, {padding: spacing[4]}]}>
+          style={[
+            styles.body,
+            {
+              padding: spacing[4],
+              width: contentWidth,
+              minWidth: contentWidth,
+            },
+          ]}>
           <View
             style={[
               StyleSheet.absoluteFill,
               {backgroundColor: colours.surface, opacity: 0.55},
             ]}
           />
-          <View style={styles.content}>{children}</View>
+          <View style={[styles.content, {width: '100%', minWidth: '100%'}]}>{children}</View>
         </BlurView>
       ) : (
-        <View style={[styles.body, {backgroundColor: colours.surface, padding: spacing[4]}]}>
-          {children}
+        <View
+          style={[
+            styles.body,
+            {
+              backgroundColor: colours.surface,
+              padding: spacing[4],
+              width: contentWidth,
+              minWidth: contentWidth,
+            },
+          ]}>
+          <View style={[styles.content, {width: '100%', minWidth: '100%'}]}>{children}</View>
         </View>
       )}
     </BottomSheet>
@@ -70,10 +99,12 @@ export function ModulaSheet({
 
 const styles = StyleSheet.create({
   body: {
+    alignSelf: 'stretch',
     flex: 1,
     overflow: 'hidden',
   },
   content: {
+    alignSelf: 'stretch',
     flex: 1,
     zIndex: 1,
   },

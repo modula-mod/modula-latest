@@ -27,8 +27,10 @@ export function AppPressable({
       accessibilityRole={accessibilityRole}
       disabled={disabled}
       style={({pressed}) => [
+        // minHeight only — global minWidth:44 shrink-wraps sheet/drawer rows
+        // and letter-wraps labels when the SwiftUI Host sizes to intrinsic width.
+        {minHeight: 44},
         style,
-        {minHeight: 44, minWidth: 44},
         disabled ? {opacity: 0.4} : null,
         pressed && !disabled
           ? {opacity: 0.85, transform: [{scale: motion.pressScale}]}

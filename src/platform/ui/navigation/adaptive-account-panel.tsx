@@ -59,14 +59,14 @@ export function AdaptiveAccountPanel() {
   const renderGroup = (title: string, items: typeof destinations, dense = false) => {
     if (items.length === 0) return null
     return (
-      <View style={{gap: spacing[1]}}>
+      <View style={[styles.group, {gap: spacing[1]}]}>
         <AppText
           variant="caption"
           colour="textTertiary"
           style={{paddingHorizontal: spacing[1], marginBottom: spacing[1]}}>
           {title.toUpperCase()}
         </AppText>
-        <View style={{gap: spacing[1]}}>
+        <View style={[styles.group, {gap: spacing[1]}]}>
           {items.map(item => (
             <DrawerItem
               key={item.id}
@@ -93,7 +93,11 @@ export function AdaptiveAccountPanel() {
       material="glass"
       testID="adaptive-account-panel">
       <ScrollView
-        contentContainerStyle={{paddingBottom: spacing[8], gap: spacing[4]}}
+        style={styles.scroll}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {paddingBottom: spacing[8], gap: spacing[4]},
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
         <AppPressable
@@ -109,11 +113,11 @@ export function AdaptiveAccountPanel() {
             size={56}
           />
           <View style={styles.identityText}>
-            <AppText variant="headline">
+            <AppText variant="headline" numberOfLines={1}>
               {ownerProfile?.displayName ??
                 (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
             </AppText>
-            <AppText variant="caption" colour="textSecondary">
+            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
               {ownerProfile
                 ? `@${ownerProfile.handle}`
                 : session.status === 'guest'
@@ -192,16 +196,31 @@ export function AdaptiveAccountPanel() {
 }
 
 const styles = StyleSheet.create({
+  group: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
   identity: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
+    width: '100%',
   },
   identityText: {
     flex: 1,
-    minWidth: 0,
+    flexShrink: 1,
+    minWidth: 96,
   },
   profilePill: {
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  scroll: {
+    alignSelf: 'stretch',
+    width: '100%',
+  },
+  scrollContent: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   statsRow: {
     flexDirection: 'row',

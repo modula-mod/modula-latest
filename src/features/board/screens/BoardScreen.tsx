@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useLayoutEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
-import {useRouter, type Href} from 'expo-router'
+import {useNavigation, useRouter, type Href} from 'expo-router'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -23,7 +23,6 @@ import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const ALL_PINNED_SPACES: Array<{
@@ -90,6 +89,7 @@ const BOARD_FOCUS_POLICY_SENTENCES = {
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
+  const navigation = useNavigation()
   const tabPadding = useFloatingTabBarContentPadding()
   const session = useSession()
   const discoverQuery = useDiscoverQuery()
@@ -160,30 +160,32 @@ export function BoardScreen() {
           ? 'Deep'
           : 'Custom'
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <ModulaMenu
+          accessibilityLabel="Board layout menu"
+          title="Board"
+          actions={[
+            {id: 'customize', label: 'Customize pinned spaces'},
+            {id: 'marketplace', label: 'Open Marketplace'},
+            {id: 'saved', label: 'Open Saved'},
+            {id: 'compose', label: 'Quick compose'},
+          ]}
+          onAction={id => {
+            if (id === 'customize') setCustomizeOpen(true)
+            if (id === 'marketplace') router.push('/marketplace' as Href)
+            if (id === 'saved') router.push('/saved' as Href)
+            if (id === 'compose') router.push('/compose' as Href)
+          }}
+          trigger={<AppIcon name="more" colour={colours.textSecondary} />}
+        />
+      ),
+    })
+  }, [colours.textSecondary, navigation, router])
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader
-        title="Board"
-        right={
-          <ModulaMenu
-            accessibilityLabel="Board layout menu"
-            title="Board"
-            actions={[
-              {id: 'customize', label: 'Customize pinned spaces'},
-              {id: 'marketplace', label: 'Open Marketplace'},
-              {id: 'saved', label: 'Open Saved'},
-              {id: 'compose', label: 'Quick compose'},
-            ]}
-            onAction={id => {
-              if (id === 'customize') setCustomizeOpen(true)
-              if (id === 'marketplace') router.push('/marketplace' as Href)
-              if (id === 'saved') router.push('/saved' as Href)
-              if (id === 'compose') router.push('/compose' as Href)
-            }}
-            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
-          />
-        }
-      />
       <ResponsiveContent maxWidth={760}>
         <ScrollView
           contentContainerStyle={[
@@ -576,8 +578,10 @@ export function BoardScreen() {
                 ]}>
                 <AppIcon name={space.icon} colour={colours.accent} />
                 <View style={styles.focusBody}>
-                  <AppText variant="label">{space.label}</AppText>
-                  <AppText variant="caption" colour="textSecondary">
+                  <AppText variant="label" numberOfLines={1}>
+                    {space.label}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
                     {space.description}
                   </AppText>
                 </View>
@@ -627,10 +631,12 @@ const styles = StyleSheet.create({
   },
   customizeRow: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
     gap: 12,
     minHeight: 56,
     paddingHorizontal: 12,
+    width: '100%',
   },
   focus: {
     alignItems: 'center',
