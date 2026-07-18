@@ -79,6 +79,7 @@
     "verify:phase6-greenfield-backend": "node scripts/verify-phase6-greenfield-backend.mjs",
     "verify:phase6-greenfield-frontend": "node scripts/verify-phase6-greenfield-frontend.mjs",
     "verify:phase6s-social-backend": "node scripts/verify-phase6s-social-backend.mjs",
+    "verify:phase6s-social-frontend": "node scripts/verify-phase6s-social-frontend.mjs",
     "verify:phase6-frontend": "node scripts/verify-phase6-atproto-frontend.mjs",
     "verify:phase6-frontend-boundary": "node scripts/verify-phase6-frontend-boundary.mjs",
     "api:dev": "pnpm --filter @modula/greenfield-api dev",
