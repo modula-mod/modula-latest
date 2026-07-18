@@ -183,7 +183,7 @@ export function CircuitMemoryScreen() {
                     <AppText variant="caption" colour="accent">
                       {item.level}
                     </AppText>
-                    <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                    <AppText variant="caption" colour="textSecondary">
                       {item.summary}
                     </AppText>
                   </View>
