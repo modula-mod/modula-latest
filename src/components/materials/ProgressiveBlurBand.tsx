@@ -35,23 +35,26 @@ export function ProgressiveBlurBand({
   const useBlur =
     enabled && !reduceTransparency && Platform.OS !== 'web'
   const tint = scheme === 'dark' ? 'dark' : 'light'
+  const androidBlurMethod =
+    Platform.OS === 'android' ? 'dimezisBlurViewSdk31Plus' : undefined
 
   // Mask: black = reveal blur, transparent = hide blur (fade to clear).
+  // Bottom-heavy: keep more of the upper band soft so tall shell bands still dissolve.
   const maskColors = topHeavy
     ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
-    : (['transparent', 'rgba(0,0,0,0.55)', '#000000', '#000000'] as const)
+    : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
   const maskLocations = topHeavy
     ? ([0, 0.35, 0.7, 1] as const)
-    : ([0, 0.3, 0.65, 1] as const)
+    : ([0, 0.22, 0.55, 1] as const)
 
   const tintColors =
     scheme === 'dark'
       ? topHeavy
         ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
-        : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0.42)'] as const)
+        : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
       : topHeavy
         ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
-        : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0.55)'] as const)
+        : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
 
   if (!useBlur) {
     return (
@@ -76,7 +79,12 @@ export function ProgressiveBlurBand({
             style={StyleSheet.absoluteFill}
           />
         }>
-        <BlurView intensity={intensity} tint={tint} style={StyleSheet.absoluteFill} />
+        <BlurView
+          intensity={intensity}
+          tint={tint}
+          blurMethod={androidBlurMethod}
+          style={StyleSheet.absoluteFill}
+        />
       </MaskedView>
       <LinearGradient
         colors={[...tintColors]}

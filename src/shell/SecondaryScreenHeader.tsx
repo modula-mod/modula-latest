@@ -20,18 +20,20 @@ type SecondaryScreenHeaderProps = {
 
 /**
  * Secondary-route chrome: progressive blur overlay + liquid-glass circular back.
- * Spacer includes the fade so body content starts below the dissolve (readable).
+ *
+ * In-flow spacer clears the nav row only. The fade is a sibling absolute overlay
+ * so it can paint over the top of the body (Android does not clip it to the spacer).
  */
 export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const {spacing} = useThemeTokens()
   const rowHeight = insets.top + CHROME_HEADER_ROW
-  const spacerHeight = rowHeight + CHROME_FADE_EXTENSION
-  const blurHeight = spacerHeight
+  const blurHeight = rowHeight + CHROME_FADE_EXTENSION
 
   return (
-    <View style={[styles.spacer, {height: spacerHeight}]}>
+    <>
+      <View style={{height: rowHeight}} />
       <View style={[styles.overlay, {height: blurHeight}]} pointerEvents="box-none">
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           <ProgressiveBlurBand
@@ -70,7 +72,7 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
           </View>
         </View>
       </View>
-    </View>
+    </>
   )
 }
 
@@ -100,10 +102,6 @@ const styles = StyleSheet.create({
   slotSpacer: {
     height: 36,
     width: 36,
-  },
-  spacer: {
-    width: '100%',
-    zIndex: 4,
   },
   title: {
     flex: 1,

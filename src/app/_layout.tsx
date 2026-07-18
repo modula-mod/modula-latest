@@ -10,13 +10,17 @@ import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePre
 import '@/features/social/registerExpansionDestinations'
 import {AccountPanelProvider} from '@/platform/ui/navigation/AccountPanelContext'
 import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
-import {AppServicesProvider} from '@/runtime'
 import {PersistentShellTabBar} from '@/platform/ui/navigation/persistent-shell-tab-bar'
 import {ShellBottomProgressiveBlur} from '@/platform/ui/navigation/shell-bottom-progressive-blur'
+import {ModulaSplashOverlay} from '@/platform/ui/splash/ModulaSplashOverlay'
+import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
+import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
 import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+void prepareModulaSplash()
 
 function RootNavigator() {
   const {scheme, colours} = useThemeTokens()
@@ -65,6 +69,7 @@ function RootNavigator() {
       <ShellBottomProgressiveBlur />
       {/* Floating tab bar at root so secondary stacks keep bottom chrome. */}
       <PersistentShellTabBar />
+      <ModulaSplashOverlay />
     </>
   )
 }

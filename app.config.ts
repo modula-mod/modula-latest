@@ -71,9 +71,15 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#369CAA',
+        // Brand ink + Modula mark — JS overlay continues the exit animation.
+        backgroundColor: '#0B1416',
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        imageWidth: 120,
+        dark: {
+          backgroundColor: '#0B1416',
+          image: './assets/images/splash-icon.png',
+          imageWidth: 120,
+        },
       },
     ],
   ],

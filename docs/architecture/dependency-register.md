@@ -15,7 +15,7 @@ No package should enter the project merely because an example repository uses it
 | expo-image | ~57.0.1 | Image component (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-linking | ~57.0.3 | Deep linking support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-router | ~57.0.6 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-splash-screen | ~57.0.4 | Native splash screen | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| expo-splash-screen | ~57.0.4 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module | Phase 0 / chrome pass |
 | expo-status-bar | ~57.0.1 | Status bar control | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-symbols | ~57.0.1 | SF Symbols helper (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-system-ui | ~57.0.1 | System UI styling | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |

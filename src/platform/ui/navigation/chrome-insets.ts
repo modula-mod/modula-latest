@@ -5,20 +5,23 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
  * Keep SecondaryScreenHeader and ProgressiveBlurHeaderBackground in sync here.
  */
 export const CHROME_HEADER_ROW = 54
-/** Dissolve painted below the nav row; content must clear this. */
+/** Dissolve painted below the nav row; content may scroll under this zone. */
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
-/** Soft dissolve above the floating tab bar — keep short so lists stay readable. */
-export const CHROME_BOTTOM_FADE = 40
-export const CHROME_BOTTOM_BLUR_INTENSITY = 30
+/**
+ * Soft dissolve height above the floating tab island.
+ * Total bottom band also includes segment + safe-area (see ShellBottomProgressiveBlur).
+ */
+export const CHROME_BOTTOM_FADE = 56
+export const CHROME_BOTTOM_BLUR_INTENSITY = 48
 
 /**
- * Layout spacer under SecondaryScreenHeader (safe area + row + fade).
- * Blur overlay may still paint into the fade zone; content starts below it.
+ * Layout spacer under SecondaryScreenHeader — safe area + nav row only.
+ * Fade extension is painted by the overlay so list content can scroll under it.
  */
 export function useSecondaryChromeSpacerHeight(): number {
   const insets = useSafeAreaInsets()
-  return insets.top + CHROME_HEADER_ROW + CHROME_FADE_EXTENSION
+  return insets.top + CHROME_HEADER_ROW
 }
 
 /**

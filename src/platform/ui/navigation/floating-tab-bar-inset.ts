@@ -8,8 +8,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
  * segment row 60 + bottom offset (safe area) + breathing room.
  */
 export const FLOATING_TAB_BAR_SEGMENT_HEIGHT = 60
-/** Clears glass shadow + FAB adjacency so last rows stay readable. */
-export const FLOATING_TAB_BAR_EXTRA_GAP = 48
+/**
+ * Clears glass shadow + FAB adjacency so last rows stay readable.
+ * Kept modest so list content can enter the bottom progressive-blur dissolve.
+ */
+export const FLOATING_TAB_BAR_EXTRA_GAP = 36
 
 export function useFloatingTabBarContentPadding(): number {
   const insets = useSafeAreaInsets()

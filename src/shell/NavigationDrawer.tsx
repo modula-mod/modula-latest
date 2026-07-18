@@ -1,23 +1,29 @@
 import {useEffect, useMemo, useRef} from 'react'
 import {
-  Animated,
   BackHandler,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
 } from 'react-native'
 import {usePathname, useRouter, type Href} from 'expo-router'
+import {Gesture, GestureDetector} from 'react-native-gesture-handler'
+import Animated, {
+  FadeInDown,
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+} from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {Avatar} from '@/components/primitives/Avatar'
-import {Divider} from '@/components/primitives/Divider'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
+import {useReduceMotion} from '@/lib/accessibility'
 import {isDevelopmentBuild} from '@/lib/platform'
 import {getAccountPanelDestinations} from '@/platform/ui/navigation/account-panel-destinations'
 import {DrawerItem} from '@/shell/DrawerItem'
@@ -33,6 +39,7 @@ const SECTION_LABELS: Record<DrawerSectionId, string> = {
 }
 
 const SECTION_ORDER: DrawerSectionId[] = ['spaces', 'create', 'labs', 'system']
+const FOOTER_FADE = 36
 
 /**
  * Primary navigation destinations — sectioned for Apple-like hierarchy.
@@ -168,7 +175,8 @@ export function NavigationDrawer() {
   const {width} = useWindowDimensions()
   const insets = useSafeAreaInsets()
   const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
-  const {phase, progress, closeDrawer} = useShellDrawer()
+  const {phase, progress, closeDrawer, settleDrawer} = useShellDrawer()
+  const reduceMotion = useReduceMotion()
   const session = useSession()
   const {signOut} = useSessionActions()
   const ownerProfile = session.status === 'signedIn' ? session.profile : null
@@ -193,26 +201,40 @@ export function NavigationDrawer() {
     })).filter(section => section.items.length > 0)
   }, [])
 
-  const animatedStyles = useMemo(
-    () => ({
-      backdrop: {
-        opacity: progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 1],
+  const backdropStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(progress.value, [0, 1], [0, 1]),
+  }))
+
+  const drawerStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: interpolate(progress.value, [0, 1], [-drawerWidth, 0]),
+      },
+      {
+        scale: interpolate(progress.value, [0, 1], [0.97, 1]),
+      },
+    ],
+    opacity: interpolate(progress.value, [0, 0.2, 1], [0.85, 1, 1]),
+  }))
+
+  const pan = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX([-18, 18])
+        .failOffsetY([-24, 24])
+        .onUpdate(event => {
+          'worklet'
+          const next = 1 + event.translationX / drawerWidth
+          progress.value = Math.max(0, Math.min(1, next))
+        })
+        .onEnd(event => {
+          'worklet'
+          runOnJS(settleDrawer)({
+            velocityX: event.velocityX,
+            at: progress.value,
+          })
         }),
-      },
-      drawer: {
-        transform: [
-          {
-            translateX: progress.interpolate({
-              inputRange: [0, 1],
-              outputRange: [-drawerWidth, 0],
-            }),
-          },
-        ],
-      },
-    }),
-    [drawerWidth, progress],
+    [drawerWidth, progress, settleDrawer],
   )
 
   useEffect(() => {
@@ -244,6 +266,8 @@ export function NavigationDrawer() {
     })
   }
 
+  let staggerIndex = 0
+
   return (
     <Modal transparent visible animationType="none" onRequestClose={() => closeDrawer()}>
       <View style={StyleSheet.absoluteFill}>
@@ -252,7 +276,7 @@ export function NavigationDrawer() {
           style={[
             StyleSheet.absoluteFill,
             {backgroundColor: colours.backdrop},
-            animatedStyles.backdrop,
+            backdropStyle,
           ]}>
           <Pressable
             accessibilityRole="button"
@@ -261,161 +285,186 @@ export function NavigationDrawer() {
             style={StyleSheet.absoluteFill}
           />
         </Animated.View>
-        <Animated.View
-          style={[
-            styles.drawerFrame,
-            animatedStyles.drawer,
-            {
-              width: drawerWidth,
-            },
-          ]}>
-          <MaterialSurface
-            role="modal"
+
+        <GestureDetector gesture={pan}>
+          <Animated.View
             style={[
-              styles.drawer,
+              styles.drawerFrame,
+              drawerStyle,
               {
-                paddingTop: insets.top + spacing[4],
-                borderRightColor: colours.border,
+                width: drawerWidth,
               },
             ]}>
-            <View
+            <MaterialSurface
+              role="modal"
               style={[
-                styles.headerPad,
+                styles.drawer,
                 {
-                  paddingHorizontal: spacing[4],
-                  gap: spacing[3],
-                  paddingBottom: spacing[3],
+                  paddingTop: insets.top + spacing[4],
+                  borderRightColor: colours.border,
                 },
               ]}>
-              <AppPressable
-                accessibilityLabel="Open profile"
-                onPress={() =>
-                  closeDrawer({afterClose: () => router.push('/profile' as Href)})
-                }
-                style={[styles.headerIdentity, {gap: spacing[3]}]}>
-                <Avatar
-                  name={
-                    ownerProfile?.displayName ??
-                    (session.status === 'guest' ? 'Guest' : 'Modula')
-                  }
-                  uri={ownerProfile?.avatarUri}
-                  colour={ownerProfile?.coverColour}
-                  size={52}
-                />
-                <View style={styles.headerText}>
-                  <AppText variant="headline" numberOfLines={1}>
-                    {ownerProfile?.displayName ??
-                      (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
-                  </AppText>
-                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-                    {ownerProfile
-                      ? `@${ownerProfile.handle}`
-                      : session.status === 'guest'
-                        ? 'Browsing Modula'
-                        : 'Local prototype account'}
-                  </AppText>
-                </View>
-              </AppPressable>
-
-              {ownerProfile ? (
-                <View style={[styles.statsQuiet, {gap: spacing[4]}]}>
-                  <AppText variant="caption" colour="textSecondary">
-                    {ownerProfile.followingCount ?? 0} following
-                  </AppText>
-                  <AppText variant="caption" colour="textSecondary">
-                    {ownerProfile.followerCount ?? 0} followers
-                  </AppText>
-                  <AppText variant="caption" colour="textSecondary">
-                    {ownerProfile.moduleCount ?? 0} modules
-                  </AppText>
-                </View>
-              ) : null}
-
-              <AppPressable
-                accessibilityLabel="View profile"
-                onPress={() =>
-                  closeDrawer({afterClose: () => router.push('/profile' as Href)})
-                }
+              <View
                 style={[
-                  styles.profilePill,
+                  styles.headerPad,
                   {
-                    backgroundColor: colours.surfaceRaised,
-                    borderColor: colours.border,
-                    borderRadius: radius.round,
                     paddingHorizontal: spacing[4],
-                    paddingVertical: spacing[2],
+                    gap: spacing[3],
+                    paddingBottom: spacing[3],
                   },
                 ]}>
-                <AppText variant="label">View Profile</AppText>
-              </AppPressable>
-            </View>
-
-            <Divider />
-
-            <ScrollView
-              style={styles.scroll}
-              contentContainerStyle={{
-                paddingHorizontal: spacing[3],
-                paddingTop: spacing[3],
-                paddingBottom: spacing[4],
-                gap: spacing[4],
-              }}
-              showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
-              {sections.map(section => (
-                <View key={section.id} style={{gap: spacing[1]}}>
-                  <AppText
-                    variant="caption"
-                    colour="textTertiary"
-                    style={{paddingHorizontal: spacing[2], marginBottom: spacing[1]}}>
-                    {section.label.toUpperCase()}
-                  </AppText>
-                  <View style={{gap: spacing[1]}}>
-                    {section.items.map(item => (
-                      <DrawerItem
-                        key={item.route}
-                        item={item}
-                        dense={section.id === 'system' || section.id === 'labs'}
-                        selected={routeSelected(pathname, item.route)}
-                        onPress={() => navigate(item.route)}
-                      />
-                    ))}
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-
-            <View
-              style={[
-                styles.footer,
-                {
-                  paddingHorizontal: spacing[4],
-                  paddingBottom: Math.max(insets.bottom, spacing[4]),
-                  paddingTop: spacing[3],
-                  borderTopColor: colours.border,
-                  gap: spacing[2],
-                },
-              ]}>
-              <AppText variant="caption" colour="textTertiary">
-                Appearance · {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
-              </AppText>
-              {session.status === 'signedIn' ? (
                 <AppPressable
-                  accessibilityLabel="Sign out"
-                  onPress={() => {
-                    closeDrawer({afterClose: () => void signOut()})
-                  }}>
-                  <AppText variant="label" colour="accent">
-                    Sign out
-                  </AppText>
+                  accessibilityLabel="Open profile"
+                  onPress={() =>
+                    closeDrawer({afterClose: () => router.push('/profile' as Href)})
+                  }
+                  style={[styles.headerIdentity, {gap: spacing[3]}]}>
+                  <Avatar
+                    name={
+                      ownerProfile?.displayName ??
+                      (session.status === 'guest' ? 'Guest' : 'Modula')
+                    }
+                    uri={ownerProfile?.avatarUri}
+                    colour={ownerProfile?.coverColour}
+                    size={52}
+                  />
+                  <View style={styles.headerText}>
+                    <AppText variant="headline" numberOfLines={1}>
+                      {ownerProfile?.displayName ??
+                        (session.status === 'guest' ? 'Guest' : 'Sign in to Modula')}
+                    </AppText>
+                    <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                      {ownerProfile
+                        ? `@${ownerProfile.handle}`
+                        : session.status === 'guest'
+                          ? 'Browsing Modula'
+                          : 'Local prototype account'}
+                    </AppText>
+                  </View>
                 </AppPressable>
-              ) : null}
-              <AppText variant="micro" colour="textTertiary">
-                Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
-              </AppText>
-            </View>
-          </MaterialSurface>
-        </Animated.View>
+
+                {ownerProfile ? (
+                  <View style={[styles.statsQuiet, {gap: spacing[4]}]}>
+                    <AppText variant="caption" colour="textSecondary">
+                      {ownerProfile.followingCount ?? 0} following
+                    </AppText>
+                    <AppText variant="caption" colour="textSecondary">
+                      {ownerProfile.followerCount ?? 0} followers
+                    </AppText>
+                    <AppText variant="caption" colour="textSecondary">
+                      {ownerProfile.moduleCount ?? 0} modules
+                    </AppText>
+                  </View>
+                ) : null}
+
+                <AppPressable
+                  accessibilityLabel="View profile"
+                  onPress={() =>
+                    closeDrawer({afterClose: () => router.push('/profile' as Href)})
+                  }
+                  style={[
+                    styles.profilePill,
+                    {
+                      backgroundColor: colours.surfaceRaised,
+                      borderColor: colours.border,
+                      borderRadius: radius.round,
+                      paddingHorizontal: spacing[4],
+                      paddingVertical: spacing[2],
+                    },
+                  ]}>
+                  <AppText variant="label">View Profile</AppText>
+                </AppPressable>
+              </View>
+
+              <View style={styles.headerFade} pointerEvents="none">
+                <ProgressiveBlurBand height={28} topHeavy intensity={36} />
+              </View>
+
+              <Animated.ScrollView
+                style={styles.scroll}
+                contentContainerStyle={{
+                  paddingHorizontal: spacing[3],
+                  paddingTop: spacing[2],
+                  paddingBottom: spacing[4] + FOOTER_FADE,
+                  gap: spacing[4],
+                }}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled">
+                {sections.map(section => (
+                  <View key={section.id} style={{gap: spacing[1]}}>
+                    <AppText
+                      variant="caption"
+                      colour="textTertiary"
+                      style={{
+                        paddingHorizontal: spacing[2],
+                        marginBottom: spacing[1],
+                      }}>
+                      {section.label.toUpperCase()}
+                    </AppText>
+                    <View style={{gap: spacing[1]}}>
+                      {section.items.map(item => {
+                        const delay = reduceMotion ? 0 : 40 + staggerIndex * 28
+                        staggerIndex += 1
+                        return (
+                          <Animated.View
+                            key={item.route}
+                            entering={
+                              reduceMotion
+                                ? undefined
+                                : FadeInDown.delay(delay).springify().damping(20)
+                            }>
+                            <DrawerItem
+                              item={item}
+                              dense={section.id === 'system' || section.id === 'labs'}
+                              selected={routeSelected(pathname, item.route)}
+                              onPress={() => navigate(item.route)}
+                            />
+                          </Animated.View>
+                        )
+                      })}
+                    </View>
+                  </View>
+                ))}
+              </Animated.ScrollView>
+
+              <View
+                style={[
+                  styles.footer,
+                  {
+                    paddingHorizontal: spacing[4],
+                    paddingBottom: Math.max(insets.bottom, spacing[4]),
+                    paddingTop: spacing[3],
+                    gap: spacing[2],
+                  },
+                ]}>
+                <View style={styles.footerFade} pointerEvents="none">
+                  <ProgressiveBlurBand
+                    height={FOOTER_FADE}
+                    topHeavy={false}
+                    intensity={40}
+                  />
+                </View>
+                <AppText variant="caption" colour="textTertiary">
+                  Appearance · {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
+                </AppText>
+                {session.status === 'signedIn' ? (
+                  <AppPressable
+                    accessibilityLabel="Sign out"
+                    onPress={() => {
+                      closeDrawer({afterClose: () => void signOut()})
+                    }}>
+                    <AppText variant="label" colour="accent">
+                      Sign out
+                    </AppText>
+                  </AppPressable>
+                ) : null}
+                <AppText variant="micro" colour="textTertiary">
+                  Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
+                </AppText>
+              </View>
+            </MaterialSurface>
+          </Animated.View>
+        </GestureDetector>
       </View>
     </Modal>
   )
@@ -435,7 +484,20 @@ const styles = StyleSheet.create({
     top: 0,
   },
   footer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
+    overflow: 'visible',
+    position: 'relative',
+  },
+  footerFade: {
+    height: FOOTER_FADE,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: -FOOTER_FADE,
+  },
+  headerFade: {
+    height: 28,
+    marginTop: -4,
+    width: '100%',
   },
   headerIdentity: {
     alignItems: 'center',
