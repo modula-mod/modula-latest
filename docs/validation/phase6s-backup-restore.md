@@ -2,7 +2,7 @@
 
 **Date recorded:** 2026-07-18  
 **Branch:** `phase6s-social-product-completion`  
-**Git tip at record time:** `e548aa5a0ae49180b35591de4af7a67980e23496`  
+**Git tip at record time:** tip of `phase6s-social-product-completion`  
 **Status:** **DEFERRED** — VPS SSH unavailable from this Mac agent session.
 
 ## Why deferred
