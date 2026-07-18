@@ -52,14 +52,18 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           <InfoItem label="Website" value={profile.website.domain} />
         ) : null}
         <InfoItem
-          label="Joined"
+          label="Modula member since"
           value={new Date(profile.joinedAt).toLocaleDateString(undefined, {
             month: 'long',
             year: 'numeric',
           })}
         />
+        <InfoItem
+          label="Portability"
+          value="Greenfield repository export available in Settings → Account → Your Data"
+        />
         {showAtConnection ? (
-          <InfoItem label="External Network" value={`AT Protocol · @${connection.handle}`} />
+          <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />
         ) : null}
       </Surface>
       {visibleClaims.length ? (

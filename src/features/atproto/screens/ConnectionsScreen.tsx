@@ -19,7 +19,6 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function ConnectionsScreen() {
   const {colours, spacing} = useThemeTokens()
   const oauthEnabled = useAtprotoCapability('atprotoOAuth')
-  const pdsPilot = useAtprotoCapability('pdsPilot')
   const {connection} = usePrimaryAtprotoConnection()
 
   return (
@@ -42,30 +41,55 @@ export function ConnectionsScreen() {
                   description: ATPROTO_SETTINGS_DESCRIPTION,
                   icon: 'integrations',
                   route: '/settings/connections/atproto',
-                  value: connection ? `@${connection.handle}` : undefined,
+                  value: connection ? `@${connection.handle}` : 'Optional',
                 }}
-                last={!pdsPilot}
               />
             ) : (
-              <View style={{padding: spacing[4]}}>
-                <AppText variant="headline">{ATPROTO_SETTINGS_TITLE}</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  This External Network is unavailable in this environment.
-                </AppText>
-              </View>
-            )}
-            {pdsPilot ? (
               <SettingsLinkRow
-                last
                 row={{
-                  title: 'Hosted bridge pilot',
-                  description: 'Invite-only external network pilot (deferred).',
-                  icon: 'security',
-                  preview: true,
+                  title: ATPROTO_SETTINGS_TITLE,
+                  description: 'Optional External Network — unavailable in this environment.',
+                  icon: 'integrations',
+                  value: 'Unavailable',
                 }}
               />
-            ) : null}
+            )}
+            <SettingsLinkRow
+              row={{
+                title: 'GitHub',
+                description: 'Future connector — not available yet.',
+                icon: 'developer',
+                value: 'Future',
+                preview: true,
+              }}
+            />
+            <SettingsLinkRow
+              row={{
+                title: 'Drive',
+                description: 'Future connector — not available yet.',
+                icon: 'storage',
+                value: 'Future',
+                preview: true,
+              }}
+            />
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Nextcloud',
+                description: 'Future connector — not available yet.',
+                icon: 'integrations',
+                value: 'Future',
+                preview: true,
+              }}
+            />
           </SettingsSection>
+
+          <View style={{gap: spacing[2]}}>
+            <AppText variant="caption" colour="textSecondary">
+              Plugin states: Enabled, Disabled, Needs configuration, Unavailable, Update available.
+              AT Protocol is one optional row — not the Modula identity system.
+            </AppText>
+          </View>
         </ScrollView>
       </ResponsiveContent>
     </View>
