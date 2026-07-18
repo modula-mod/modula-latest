@@ -55,6 +55,63 @@ export function ProductHubScreen() {
             </AppText>
           </LinearGradient>
 
+          <View style={{gap: spacing[3]}}>
+            <AppText variant="headline">Create & extend</AppText>
+            <View style={[styles.grid, {gap: spacing[3]}]}>
+              {[
+                {
+                  id: 'forge',
+                  name: 'Forge Builder',
+                  summary: 'Draft Greenfield manifests visually.',
+                  icon: 'developer' as const,
+                  route: '/product/forge',
+                },
+                {
+                  id: 'agents',
+                  name: 'Agents',
+                  summary: 'Scoped Gaia agent packages.',
+                  icon: 'automation' as const,
+                  route: '/product/agents',
+                },
+                {
+                  id: 'standards',
+                  name: 'Module Standards',
+                  summary: 'Manifest rules + boilerplate.',
+                  icon: 'check' as const,
+                  route: '/product/module-standards',
+                },
+                {
+                  id: 'themes',
+                  name: 'Themes & Layouts',
+                  summary: 'Packs for Profile-OS.',
+                  icon: 'appearance' as const,
+                  route: '/product/themes',
+                },
+              ].map(item => (
+                <AppPressable
+                  key={item.id}
+                  accessibilityLabel={item.name}
+                  onPress={() => router.push(item.route as Href)}
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: colours.accentSubtle,
+                      borderColor: colours.accentBorder,
+                      borderRadius: radius.large,
+                      padding: spacing[4],
+                      gap: spacing[2],
+                    },
+                  ]}>
+                  <AppIcon name={item.icon} colour={colours.accent} />
+                  <AppText variant="headline">{item.name}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {item.summary}
+                  </AppText>
+                </AppPressable>
+              ))}
+            </View>
+          </View>
+
           {ORDER.map(maturity => {
             const items = productCatalogue.filter(item => item.maturity === maturity)
             if (items.length === 0) return null

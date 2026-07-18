@@ -190,6 +190,31 @@ export function HomeFeedScreen() {
                   </AppPressable>
                 ) : null}
 
+                {preferences.mergeFeedIds.length >= 2 ? (
+                  <AppPressable
+                    accessibilityLabel="Open Merge Feeds"
+                    onPress={() => router.push('/product/merge-feeds' as Href)}
+                    style={[
+                      styles.focusBanner,
+                      {
+                        backgroundColor: colours.surface,
+                        borderColor: colours.border,
+                        borderRadius: radius.medium,
+                        marginHorizontal: spacing[4],
+                        marginBottom: spacing[2],
+                        paddingHorizontal: spacing[3],
+                        paddingVertical: spacing[2],
+                        gap: spacing[2],
+                      },
+                    ]}>
+                    <AppIcon name="discover" colour={colours.accent} size={16} />
+                    <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
+                      Merge Feeds · {preferences.mergeFeedIds.length} sources (local Preview)
+                    </AppText>
+                    <AppIcon name="chevronRight" colour={colours.textTertiary} size={14} />
+                  </AppPressable>
+                ) : null}
+
                 <View style={[styles.modeRow, {paddingHorizontal: spacing[4]}]}>
                   {modeOrder.map(next => {
                     const demoted = focus.quietFeed && next === 'For You'

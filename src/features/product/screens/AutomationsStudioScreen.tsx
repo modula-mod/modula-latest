@@ -1,11 +1,14 @@
-import {ScrollView, StyleSheet, Switch, View} from 'react-native'
+import {useState} from 'react'
+import {ScrollView, StyleSheet, Switch, TextInput, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {selectionHaptic} from '@/lib/haptics'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -37,11 +40,34 @@ const FLOWS = [
   },
 ]
 
+const TRIGGERS = [
+  'New comment contains keyword',
+  'Contact form submitted',
+  'Post saved',
+  'Marketplace purchase',
+  'Focus Mode enabled',
+]
+
+const ACTIONS = [
+  'Send DM',
+  'Create CRM lead',
+  'Create Task',
+  'Notify owner',
+  'Add to Vault Notes',
+  'Gaia summary (scoped)',
+]
+
 export function AutomationsStudioScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const {preferences, update} = useProductPreferences()
   const enabled = new Set(preferences.automationEnabledIds)
+  const [draftTitle, setDraftTitle] = useState('My flow')
+  const [draftTrigger, setDraftTrigger] = useState(TRIGGERS[0])
+  const [draftActions, setDraftActions] = useState<string[]>([ACTIONS[0]])
+  const [customFlows, setCustomFlows] = useState<typeof FLOWS>([])
+
+  const allFlows = [...FLOWS, ...customFlows]
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -55,7 +81,118 @@ export function AutomationsStudioScreen() {
             </AppText>
           </View>
 
-          {FLOWS.map(flow => {
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[3],
+                padding: spacing[4],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Create flow · Preview</AppText>
+            <TextInput
+              value={draftTitle}
+              onChangeText={setDraftTitle}
+              accessibilityLabel="Flow title"
+              placeholder="Flow title"
+              placeholderTextColor={colours.textTertiary}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colours.surfaceRaised,
+                  borderColor: colours.border,
+                  borderRadius: radius.medium,
+                  color: colours.text,
+                  paddingHorizontal: spacing[3],
+                },
+              ]}
+            />
+            <AppText variant="caption" colour="textTertiary">
+              TRIGGER
+            </AppText>
+            <View style={[styles.chips, {gap: spacing[2]}]}>
+              {TRIGGERS.map(trigger => {
+                const on = draftTrigger === trigger
+                return (
+                  <AppPressable
+                    key={trigger}
+                    accessibilityLabel={trigger}
+                    onPress={() => setDraftTrigger(trigger)}
+                    style={[
+                      styles.chip,
+                      {
+                        backgroundColor: on ? colours.accentSubtle : colours.surfaceRaised,
+                        borderColor: on ? colours.accent : colours.border,
+                        borderRadius: radius.round,
+                        paddingHorizontal: spacing[3],
+                        paddingVertical: spacing[2],
+                      },
+                    ]}>
+                    <AppText variant="caption" colour={on ? 'accent' : 'textSecondary'}>
+                      {trigger}
+                    </AppText>
+                  </AppPressable>
+                )
+              })}
+            </View>
+            <AppText variant="caption" colour="textTertiary">
+              ACTIONS
+            </AppText>
+            <View style={[styles.chips, {gap: spacing[2]}]}>
+              {ACTIONS.map(action => {
+                const on = draftActions.includes(action)
+                return (
+                  <AppPressable
+                    key={action}
+                    accessibilityLabel={action}
+                    onPress={() =>
+                      setDraftActions(prev =>
+                        on ? prev.filter(item => item !== action) : [...prev, action],
+                      )
+                    }
+                    style={[
+                      styles.chip,
+                      {
+                        backgroundColor: on ? colours.accentSubtle : colours.surfaceRaised,
+                        borderColor: on ? colours.accent : colours.border,
+                        borderRadius: radius.round,
+                        paddingHorizontal: spacing[3],
+                        paddingVertical: spacing[2],
+                      },
+                    ]}>
+                    <AppText variant="caption" colour={on ? 'accent' : 'textSecondary'}>
+                      {action}
+                    </AppText>
+                  </AppPressable>
+                )
+              })}
+            </View>
+            <AppButton
+              onPress={() => {
+                const id = `custom-${Date.now()}`
+                void selectionHaptic()
+                setCustomFlows(prev => [
+                  ...prev,
+                  {
+                    id,
+                    title: draftTitle.trim() || 'Untitled flow',
+                    trigger: draftTrigger,
+                    actions: draftActions.length ? draftActions : [ACTIONS[0]],
+                  },
+                ])
+                void update({
+                  automationEnabledIds: [...preferences.automationEnabledIds, id],
+                })
+              }}>
+              Save draft flow (local)
+            </AppButton>
+          </Surface>
+
+          {allFlows.map(flow => {
             const on = enabled.has(flow.id)
             return (
               <Surface
@@ -152,4 +289,7 @@ const styles = StyleSheet.create({
   titleRow: {alignItems: 'center', flexDirection: 'row'},
   nodeRow: {alignItems: 'stretch', flexDirection: 'row'},
   node: {flex: 1, gap: 4},
+  input: {borderWidth: StyleSheet.hairlineWidth, minHeight: 44},
+  chips: {flexDirection: 'row', flexWrap: 'wrap'},
+  chip: {borderWidth: StyleSheet.hairlineWidth},
 })
