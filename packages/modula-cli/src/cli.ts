@@ -89,7 +89,7 @@ const ATLAS_DOMAIN_STATS = [
   },
 ] as const
 
-const HOST_ATLAS_ENTRY_COUNT = '500+'
+const HOST_ATLAS_ENTRY_COUNT = '580+'
 
 const DESIGN_PRINCIPLES = [
   {
