@@ -90,15 +90,40 @@ export function GlassPrivacyScreen() {
               Selected · {LEVELS.find(item => item.id === level)?.title}
             </AppText>
             <AppText variant="caption" colour="textSecondary">
-              Saved on device · works with sessions, export, and module permissions.
+              Saved on device · Messages inbox reflects forward/export and Chat Assist defaults.
             </AppText>
           </Surface>
 
-          <AppButton onPress={() => router.push('/settings/privacy' as Href)}>
-            Privacy & Safety
-          </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/messages' as Href)}>
+          <Surface
+            variant="contained"
+            style={[
+              styles.note,
+              {
+                padding: spacing[4],
+                gap: spacing[2],
+                borderRadius: radius.medium,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Enforcement Preview</AppText>
+            <AppText variant="body" colour="textSecondary">
+              {level === 'vault-chat'
+                ? 'Vault Chat: isolated storage foreshadow · verified participants · Chat Assist off · no unapproved AI · modules blocked unless authorised · enhanced audit.'
+                : level === 'protected-chat'
+                  ? 'Protected Chat: restricted forward · sensitive-content warnings · controlled media save · privacy event logging · optional expiration later.'
+                  : 'Disable Sharing: restrict forward/export where enforceable · screenshot limits explained as platform-constrained.'}
+            </AppText>
+          </Surface>
+
+          <AppButton onPress={() => router.push('/messages' as Href)}>
             Messaging preview
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/chat-assist' as Href)}>
+            Chat Assist permissions
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/settings/privacy' as Href)}>
+            Privacy & Safety
           </AppButton>
         </ScrollView>
       </ResponsiveContent>

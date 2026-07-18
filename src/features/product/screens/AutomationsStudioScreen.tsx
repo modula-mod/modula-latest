@@ -271,10 +271,39 @@ export function AutomationsStudioScreen() {
             )
           })}
 
-          <AppButton onPress={() => router.push('/marketplace/module-automations' as Href)}>
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                gap: spacing[2],
+                padding: spacing[4],
+                borderRadius: radius.large,
+                backgroundColor: colours.surfaceRaised,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Dry-run simulation</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Preview path: Trigger → Command Layer → AKI check → Governor policy → Ledger entry.
+              Runner stays inactive — no DMs, CRM writes, or Marketplace unlocks execute.
+            </AppText>
+            <AppText variant="caption" colour="textTertiary">
+              Enabled drafts: {preferences.automationEnabledIds.length || 'none'} · open Ledger for
+              sample audit rows.
+            </AppText>
+          </Surface>
+
+          <AppButton onPress={() => router.push('/product/ledger' as Href)}>
+            Open Ledger Replay
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/product/commands' as Href)}>
+            Command Layer
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/marketplace/module-automations' as Href)}>
             Automations module card
           </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/product/forge' as Href)}>
+          <AppButton variant="ghost" onPress={() => router.push('/product/forge' as Href)}>
             Build nodes in Forge
           </AppButton>
         </ScrollView>

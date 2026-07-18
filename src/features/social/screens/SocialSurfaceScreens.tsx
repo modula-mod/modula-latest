@@ -154,7 +154,63 @@ export function MessagesInboxScreen() {
                 {glass.short} · local
               </AppText>
               <AppText variant="caption" colour="textSecondary">
-                Glass Privacy — change level →
+                {preferences.glassPrivacyLevel === 'vault-chat'
+                  ? 'Vault · Chat Assist off by default · forward/export blocked in Preview'
+                  : preferences.glassPrivacyLevel === 'protected-chat'
+                    ? 'Protected · restricted forward · privacy events logged locally'
+                    : 'Disable Sharing · forward/export controls restricted where enforceable'}
+              </AppText>
+            </View>
+          </AppPressable>
+          {(preferences.quietSendEnabled ||
+            preferences.focus.preset === 'deep' ||
+            preferences.focus.preset === 'custom') && (
+            <AppPressable
+              accessibilityLabel="Open Quiet Send and Chat Assist"
+              onPress={() => router.push('/product/chat-assist' as Href)}
+              style={[
+                styles.glassBadge,
+                {
+                  backgroundColor: colours.surface,
+                  borderColor: colours.border,
+                  borderRadius: radius.medium,
+                  paddingHorizontal: spacing[3],
+                  paddingVertical: spacing[2],
+                  gap: spacing[2],
+                },
+              ]}>
+              <AppIcon name="messages" colour={colours.accent} size={16} />
+              <View style={styles.flex}>
+                <AppText variant="caption" colour="accent">
+                  Quiet Send · held locally
+                </AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  Non-urgent deliveries held under Focus / Quiet Send. No remote send.
+                </AppText>
+              </View>
+            </AppPressable>
+          )}
+          <AppPressable
+            accessibilityLabel="Open Chat Assist permissions"
+            onPress={() => router.push('/product/chat-assist' as Href)}
+            style={[
+              styles.glassBadge,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.medium,
+                paddingHorizontal: spacing[3],
+                paddingVertical: spacing[2],
+                gap: spacing[2],
+              },
+            ]}>
+            <AppIcon name="automation" colour={colours.accent} size={16} />
+            <View style={styles.flex}>
+              <AppText variant="caption" colour="accent">
+                Chat Assist · {preferences.chatAssistMode}
+              </AppText>
+              <AppText variant="caption" colour="textSecondary">
+                Permission-controlled conversation intelligence →
               </AppText>
             </View>
           </AppPressable>
