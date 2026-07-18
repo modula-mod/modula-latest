@@ -1,4 +1,5 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {FEATURE_ATLAS_EXPANSION_SEEDS} from '@/features/product/data/featureAtlasExpansion'
 
 export const ATLAS_DOMAINS = [
   'shell',
@@ -82,7 +83,7 @@ const ROUTE_BY_DOMAIN: Record<FeatureDomain, string> = {
   integrations: '/product/integrations',
   ownership: '/product/ownership',
   dimon: '/settings/dimon',
-  nft: '/product/atlas?domain=nft',
+  nft: '/product/nft',
   creator: '/product/creator',
   presence: '/product/presence',
   'developer-tools': '/product/developer',
@@ -99,7 +100,7 @@ const ROUTE_BY_DOMAIN: Record<FeatureDomain, string> = {
   games: '/product/atlas?domain=games',
   registry: '/settings/extensions',
   sandbox: '/product/sandbox',
-  'dimon-nft': '/settings/dimon',
+  'dimon-nft': '/product/nft',
 }
 
 const ICON_BY_DOMAIN: Record<FeatureDomain, AppIconName> = {
@@ -529,7 +530,7 @@ const atlasSections: Record<FeatureDomain, AtlasSeed[]> = {
   ],
 }
 
-export const FEATURE_ATLAS: AtlasFeature[] = ATLAS_DOMAINS.flatMap(domain =>
+const CORE_ATLAS: AtlasFeature[] = ATLAS_DOMAINS.flatMap(domain =>
   atlasSections[domain].map(feature => ({
     id: `${domain}.${feature.slug}`,
     domain,
@@ -541,6 +542,24 @@ export const FEATURE_ATLAS: AtlasFeature[] = ATLAS_DOMAINS.flatMap(domain =>
     tags: feature.tags,
   })),
 )
+
+const EXPANSION_ATLAS: AtlasFeature[] = FEATURE_ATLAS_EXPANSION_SEEDS.flatMap(seed => {
+  if (!isFeatureDomain(seed.domain)) return []
+  return [
+    {
+      id: `${seed.domain}.x.${seed.slug}`,
+      domain: seed.domain,
+      route: seed.route ?? ROUTE_BY_DOMAIN[seed.domain],
+      icon: ICON_BY_DOMAIN[seed.domain],
+      name: seed.name,
+      maturity: seed.maturity,
+      summary: seed.summary,
+      tags: seed.tags,
+    },
+  ]
+})
+
+export const FEATURE_ATLAS: AtlasFeature[] = [...CORE_ATLAS, ...EXPANSION_ATLAS]
 
 const EMPTY_MATURITY_COUNTS: Record<FeatureMaturity, number> = {
   live: 0,

@@ -1,0 +1,363 @@
+/**
+ * Additional Feature Atlas seeds — planned/preview map entries.
+ * Maturity labels stay honest. Merged in featureAtlas.ts (no circular imports).
+ */
+
+export type ExpansionSeed = {
+  domain: string
+  slug: string
+  name: string
+  maturity: 'live' | 'preview' | 'planned' | 'inactive'
+  summary: string
+  tags: string[]
+  route?: string
+}
+
+function pair(
+  domain: string,
+  maturity: ExpansionSeed['maturity'],
+  rows: Array<[string, string, string, string[]]>,
+  route?: string,
+): ExpansionSeed[] {
+  return rows.map(([slug, name, summary, tags]) => ({
+    domain,
+    slug,
+    name,
+    maturity,
+    summary,
+    tags,
+    route,
+  }))
+}
+
+/** Compact expansion across Modula domains. */
+export const FEATURE_ATLAS_EXPANSION_SEEDS: ExpansionSeed[] = [
+  ...pair('shell', 'planned', [
+    ['keyboard-shortcuts', 'Keyboard Shortcuts Map', 'Discoverable shortcuts for Start, Focus, Compose, and Search.', ['shortcuts', 'accessibility']],
+    ['deep-link-router', 'Deep Link Router', 'modula:// routes resolve to shell destinations with permission checks.', ['deeplink', 'routing']],
+    ['offline-banner', 'Offline Status Banner', 'Clear offline state without blocking first frame.', ['offline', 'status']],
+    ['update-channels-ui', 'Update Channels UI', 'Stable vs experimental host channels under Feature Control.', ['updates', 'control']],
+    ['crash-recovery-card', 'Crash Recovery Card', 'Calm recovery when a route fails without restarting the shell.', ['resilience', 'errors']],
+    ['locale-pack', 'Locale Pack Preview', 'Language packs for shell chrome; modules declare their own strings.', ['i18n', 'shell']],
+    ['haptics-policy', 'Haptics Policy', 'Selection and confirmation haptics respect Reduce Motion / system settings.', ['haptics', 'a11y']],
+  ]),
+  ...pair('social', 'planned', [
+    ['topic-feeds', 'Topic Feeds', 'Follow topics without forcing a single algorithmic For You.', ['feeds', 'topics']],
+    ['lists-v2', 'People Lists v2', 'Curated people lists with privacy audiences.', ['lists', 'audience']],
+    ['post-analytics-owner', 'Owner Post Analytics', 'Owner-only reach previews — no fake vanity metrics.', ['analytics', 'owner']],
+    ['scheduled-posts', 'Scheduled Posts', 'Composer schedule tool with Command Layer preview.', ['composer', 'schedule']],
+    ['content-warnings', 'Content Warning Labels', 'Author-applied warnings before media expands.', ['safety', 'media']],
+    ['cross-post-bridges', 'Cross-Post Bridges', 'Optional Element bridges — never silent private reads.', ['bridges', 'integrations']],
+    ['mentions-inbox', 'Mentions Inbox Filter', 'Activity filter for mentions under Focus Quiet rules.', ['activity', 'focus']],
+    ['hashtag-browse', 'Hashtag Browse', 'Explore tags with permission-aware search.', ['discover', 'tags']],
+  ]),
+  ...pair('profile-os', 'planned', [
+    ['services-tab', 'Services Tab', 'Bookable services as a profile module tab — external package.', ['services', 'modules']],
+    ['verification-badges', 'Verification Badges', 'Identity verification states without fake chain proofs.', ['identity', 'trust']],
+    ['cover-motion', 'Cover Motion Packs', 'Optional motion covers respecting Reduce Motion.', ['appearance', 'motion']],
+    ['pinned-posts', 'Pinned Posts', 'Owner pins on public profile with audience controls.', ['profile', 'social']],
+    ['module-shop-tab', 'Shop Tab Slot', 'Marketplace-backed shop tab — no fake checkout.', ['shop', 'marketplace']],
+    ['agents-tab-slot', 'Agents Tab Slot', 'Scoped GAIA agents as a profile preview tab.', ['agents', 'gaia']],
+    ['activity-ownership', 'Activity Ownership Log', 'What you posted, edited, or deleted — exportable.', ['ownership', 'audit']],
+  ]),
+  ...pair('board', 'preview', [
+    ['today-card', 'Today Card', 'Agenda + tasks strip driven by permitted modules.', ['today', 'widgets']],
+    ['messages-attention', 'Messages Requiring Attention', 'Held Quiet Send + unread requiring action.', ['messages', 'focus']],
+    ['crm-pipeline-widget', 'CRM Pipeline Widget', 'Pipeline stages as a Board widget Preview.', ['crm', 'widgets']],
+    ['automation-activity', 'Automation Activity Widget', 'Dry-run and last draft enables — runner inactive.', ['automations', 'widgets']],
+    ['gaia-briefing-widget', 'GAIA Briefing Widget', 'Read-only briefing from allowed scopes only.', ['gaia', 'widgets']],
+    ['team-updates-widget', 'Team Updates Widget', 'Shared profile activity for team members.', ['teams', 'widgets']],
+    ['calendar-day-widget', 'Calendar Day Widget', 'Day strip without claiming full calendar sync.', ['calendar', 'widgets']],
+    ['notes-scratch', 'Notes Scratch Widget', 'Quick capture into Vault Notes module later.', ['notes', 'widgets']],
+  ]),
+  ...pair('modules', 'planned', [
+    ['install-prompt', 'Install Permission Prompt', 'Least-privilege prompt before Registry install.', ['permissions', 'install']],
+    ['update-diff', 'Module Update Diff', 'AKI reviews permission deltas between versions.', ['aki', 'updates']],
+    ['disable-preserve', 'Disable Preserve Data', 'Disable without purge; exportThenPurge documented.', ['uninstall', 'data']],
+    ['module-events-bus', 'Module Events Bus', 'Declared emit/consume events only.', ['events', 'manifest']],
+    ['hot-reload-dev', 'Dev Hot Reload Boundary', 'Developer reload never loads untrusted GitHub eval.', ['developer', 'sandbox']],
+    ['compatibility-matrix', 'Host Compatibility Matrix', 'minimumHostVersion enforcement at install.', ['compat', 'registry']],
+  ]),
+  ...pair('forge', 'preview', [
+    ['widget-mode', 'Forge Widgets Mode', 'Pick Board widgets during Build.', ['widgets', 'builder']],
+    ['ai-actions-pane', 'Forge AI Actions Pane', 'Declare GAIA-accessible actions with AKI risk.', ['gaia', 'aki']],
+    ['skill-md-preview', 'skill.md Preview Pane', 'Digital DNA markdown generated from draft.', ['skill', 'manifest']],
+    ['events-checklist', 'Forge Events Checklist', 'Emitted and consumed events before publish.', ['events', 'audit']],
+    ['test-matrix', 'Forge Test Matrix', 'iOS / Android / Web local checkboxes.', ['qa', 'platforms']],
+    ['monetisation-preview', 'Forge Monetisation Preview', 'Paid options blocked — DIMON is not active yet.', ['dimon', 'pricing']],
+    ['template-vault-notes', 'Template · Vault Notes', 'Notes module starter from Forge templates.', ['template', 'notes']],
+    ['template-tasks', 'Template · Tasks', 'Tasks module starter package shape.', ['template', 'tasks']],
+    ['template-crm', 'Template · CRM', 'CRM module starter with contacts scopes.', ['template', 'crm']],
+    ['template-game', 'Template · Game Stub', 'Optional game module that cannot break pro OS.', ['template', 'games']],
+    ['risk-score', 'Forge Risk Score', 'Permission-derived risk summary before scan.', ['security', 'permissions']],
+  ]),
+  ...pair('marketplace', 'planned', [
+    ['category-filters', 'Category Filters', 'Browse by work, creative, team, ownership.', ['browse', 'filters']],
+    ['install-history', 'Install History', 'Local history of attempted installs and disables.', ['history', 'modules']],
+    ['publisher-verification', 'Publisher Verification', 'Trust marks after Registry review — not chain theatre.', ['trust', 'registry']],
+    ['dependency-graph', 'Module Dependency Graph', 'Show required host capabilities before install.', ['deps', 'compat']],
+    ['refund-policy-stub', 'Refund Policy Stub', 'Settlement policies wait for DIMON activation.', ['dimon', 'billing']],
+    ['team-private-listing', 'Team Private Listing', 'Private Registry channel cards for orgs.', ['teams', 'private']],
+  ]),
+  ...pair('messaging', 'planned', [
+    ['team-inbox', 'Team Inbox', 'Shared inbox on team profiles with roles.', ['teams', 'inbox']],
+    ['message-requests', 'Message Requests', 'Request folder for non-contacts.', ['safety', 'dm']],
+    ['media-save-policy', 'Media Save Policy', 'Glass Privacy controls local media save.', ['privacy', 'media']],
+    ['expiration-timers', 'Message Expiration', 'Optional expiration under Protected/Vault.', ['privacy', 'ttl']],
+    ['participant-verification', 'Participant Verification', 'Vault Chat verified participants foreshadow.', ['vault', 'trust']],
+    ['translation-assist', 'Translation Assist', 'Chat Assist function with explicit consent.', ['assist', 'i18n']],
+    ['tone-adjust', 'Tone Adjust Assist', 'Manual-request rewrite — never Vault-default.', ['assist', 'compose']],
+  ]),
+  ...pair('focus', 'planned', [
+    ['scheduled-focus', 'Scheduled Focus', 'Calendar-driven Deep Focus windows.', ['schedule', 'calendar']],
+    ['emergency-bypass', 'Emergency Bypass', 'Allowlisted contacts break Deep Focus.', ['rules', 'safety']],
+    ['halo-audience', 'Halo Audience Controls', 'Public / contacts / team / private Halo visibility.', ['presence', 'privacy']],
+    ['composer-quiet', 'Composer Quiet Tools', 'Disable recommendation tools under Deep Focus.', ['composer', 'focus']],
+    ['nav-contract', 'Navigation Contract', 'Deep Focus hides non-allowed destinations.', ['navigation', 'deep']],
+    ['automation-pause', 'Automation Pause Under Focus', 'Automations respect Focus interruption policy.', ['automations', 'focus']],
+  ]),
+  ...pair('privacy', 'planned', [
+    ['screenshot-disclosure', 'Screenshot Disclosure', 'Honest platform limits copy for Disable Sharing.', ['disclosure', 'platform']],
+    ['privacy-event-log', 'Privacy Event Log', 'Local log of forward/export attempts.', ['audit', 'privacy']],
+    ['export-redaction', 'Export Redaction', 'Redact Vault Chat from bulk export by default.', ['export', 'vault']],
+    ['device-binding', 'Device Binding Preview', 'Tighter devices for Protected Chat later.', ['devices', 'security']],
+    ['ai-processing-ban', 'Vault AI Processing Ban', 'Vault disables unapproved AI processing.', ['vault', 'gaia']],
+  ]),
+  ...pair('intelligence', 'preview', [
+    ['gaia-board-brief', 'GAIA Board Brief', 'Prepare Board from permitted modules only.', ['gaia', 'board']],
+    ['aki-action-gate', 'AKI Action Gate', 'Sensitive commands require AKI preview.', ['aki', 'commands']],
+    ['governor-autonomy', 'Governor Autonomy Presets', 'Suggest / confirm / restricted levels.', ['governor', 'policy']],
+    ['circuit-memory-centre', 'Circuit Memory Centre', 'Inspect, edit, export, delete retained patterns.', ['memory', 'ownership']],
+    ['kaizen-improve', 'Kaizen Improve Capture', 'Long-press Improve → review queue.', ['kaizen', 'feedback']],
+    ['claims-sample', 'Claims Graph Samples', 'Evidence-backed claim cards.', ['claims', 'aki']],
+    ['ledger-replay', 'Ledger Diagnostic Replay', 'Replay without destructive re-run.', ['ledger', 'audit']],
+    ['foundry-gates', 'Foundry Promotion Gates', 'No training until provenance passes.', ['foundry', 'gates']],
+    ['atlas-map', 'Gaia Atlas Map', 'Visual GAIA/AKI/Governor relationships.', ['atlas', 'gaia']],
+    ['command-preview', 'Command Action Preview', 'Risk + confirmation before execute.', ['commands', 'preview']],
+  ]),
+  ...pair('automations', 'planned', [
+    ['trigger-library', 'Trigger Library', 'Social, CRM, Focus, Marketplace triggers.', ['triggers', 'library']],
+    ['condition-builder', 'Condition Builder', 'If/then nodes with typed inputs.', ['conditions', 'builder']],
+    ['dry-run-report', 'Dry-Run Report', 'Simulated path into Ledger Preview.', ['dry-run', 'ledger']],
+    ['approval-node', 'Human Approval Node', 'Governor-required pause before send.', ['governor', 'approval']],
+    ['module-nodes', 'Module-Provided Nodes', 'Modules register automation nodes via manifest.', ['modules', 'nodes']],
+    ['rate-limits', 'Automation Rate Limits', 'Governor compute and send budgets.', ['limits', 'governor']],
+  ]),
+  ...pair('teams', 'preview', [
+    ['role-matrix', 'Team Role Matrix', 'Owner, admin, editor, member, guest.', ['roles', 'permissions']],
+    ['shared-board', 'Shared Team Board', 'Board layout shared under team profile.', ['board', 'teams']],
+    ['team-approvals', 'Team Approval Workflows', 'Publish and spend approvals foreshadow.', ['approvals', 'governor']],
+    ['team-focus', 'Team Focus Availability', 'Shared Focus Halo for teammates.', ['focus', 'presence']],
+    ['team-modules', 'Shared Modules', 'Install modules for the team namespace.', ['modules', 'teams']],
+    ['team-ledger', 'Team Activity Ledger', 'Auditable team actions Preview.', ['ledger', 'audit']],
+    ['team-treasury', 'Team Treasury Later', 'DIMON is not active yet — treasury reserved.', ['dimon', 'treasury']],
+  ]),
+  ...pair('communities', 'planned', [
+    ['community-roles', 'Community Roles', 'Moderation and member roles.', ['roles', 'moderation']],
+    ['community-feed', 'Community Feed', 'Scoped feed tab for community posts.', ['feed', 'community']],
+    ['join-requests', 'Join Requests', 'Approval gates for private communities.', ['membership', 'approvals']],
+    ['community-modules', 'Community Modules', 'Shared tools for members.', ['modules', 'community']],
+    ['guidelines', 'Community Guidelines', 'Pinned rules surface.', ['safety', 'rules']],
+  ]),
+  ...pair('search', 'preview', [
+    ['executable-results', 'Executable Search Results', 'Start Focus or create task from results.', ['commands', 'start']],
+    ['permission-filters', 'Permission-Aware Filters', 'Hide private module hits without scopes.', ['permissions', 'privacy']],
+    ['command-search', 'Command Search', 'Universal Search includes Command Layer.', ['commands', 'search']],
+    ['people-search', 'People Search', 'Identity search across Greenfield accounts.', ['people', 'identity']],
+    ['settings-search', 'Settings Search', 'Jump to appearance, privacy, DIMON status.', ['settings', 'search']],
+  ]),
+  ...pair('composer', 'preview', [
+    ['tools-drawer', 'Composer Tools Drawer', 'Registry-driven + menu — not hardcoded forever.', ['tools', 'composer']],
+    ['poll-tool', 'Poll Tool', 'Poll creation tool registration.', ['poll', 'tools']],
+    ['location-tool', 'Location Tool', 'Location attach with explicit permission.', ['location', 'permissions']],
+    ['schedule-tool', 'Schedule Tool', 'Schedule post Preview.', ['schedule', 'composer']],
+    ['ai-rewrite-tool', 'AI Rewrite Tool', 'GAIA scope + user confirm.', ['gaia', 'composer']],
+    ['nft-attach-blocked', 'NFT Attach Blocked', 'NFT attach blocked — DIMON is not active yet.', ['nft', 'dimon']],
+    ['product-attach', 'Product Attach', 'Marketplace product attach Preview.', ['marketplace', 'composer']],
+    ['comment-to-dm', 'Comment-to-DM Tool', 'Convert comment thread into DM draft.', ['messages', 'tools']],
+  ]),
+  ...pair('appearance', 'preview', [
+    ['oled-mode', 'OLED Mode', 'True black canvas for OLED.', ['theme', 'oled']],
+    ['surface-types', 'Surface Types', 'Native, Solid, Glass, Glay, Spatial, Skeuo, Neo.', ['materials', 'surface']],
+    ['accent-custom', 'Custom Accent', 'User accent across shell.', ['accent', 'theme']],
+    ['reduce-transparency', 'Reduce Transparency', 'Accessibility material fallback.', ['a11y', 'materials']],
+    ['theme-packs', 'Theme Packs Marketplace', 'Installable theme packs later.', ['marketplace', 'themes']],
+    ['layout-packs', 'Layout Packs', 'Profile-OS layout packs Preview.', ['layout', 'profile']],
+  ]),
+  ...pair('integrations', 'planned', [
+    ['calendar-element', 'Calendar Element', 'External calendar as Element — not forced migration.', ['calendar', 'elements']],
+    ['matrix-element', 'Matrix Element', 'Optional Matrix bridge foreshadow.', ['matrix', 'bridges']],
+    ['crm-element', 'External CRM Element', 'Connect existing CRM instead of rip-and-replace.', ['crm', 'elements']],
+    ['storage-element', 'Cloud Storage Element', 'Files providers with explicit scopes.', ['files', 'integrations']],
+    ['automation-api', 'Automation API Nodes', 'HTTP nodes under network allowlists.', ['automations', 'network']],
+  ]),
+  ...pair('ownership', 'preview', [
+    ['data-export', 'Data Export', 'Export account and module namespaces.', ['export', 'ownership']],
+    ['permission-revoke', 'Permission Revoke', 'Revoke module scopes anytime.', ['permissions', 'control']],
+    ['purchase-portability', 'Purchase Portability', 'Keep entitlements when modules update — after DIMON.', ['dimon', 'entitlements']],
+    ['backup-restore', 'Backup and Restore', 'Backup foreshadow without claiming cloud yet.', ['backup', 'ownership']],
+    ['session-kill', 'Remote Session Kill', 'End sessions from Account settings.', ['sessions', 'security']],
+  ]),
+  ...pair('dimon', 'inactive', [
+    ['wallet-reserved', 'Wallet Reserved', 'DIMON is not active yet — wallet reserved only.', ['wallet', 'inactive']],
+    ['payments-reserved', 'Payments Reserved', 'DIMON is not active yet — no payments runtime.', ['payments', 'inactive']],
+    ['rewards-reserved', 'Rewards Reserved', 'DIMON is not active yet — no rewards balances.', ['rewards', 'inactive']],
+    ['settlement-reserved', 'Settlement Reserved', 'DIMON is not active yet — marketplace settlement off.', ['settlement', 'inactive']],
+    ['identity-link', 'Identity Link Capability', 'dimon:account:link reserved in contracts.', ['identity', 'contracts']],
+    ['ledger-audit-cap', 'Ledger Audit Capability', 'dimon:ledger:audit reserved — no chain RPC.', ['ledger', 'contracts']],
+  ], '/settings/dimon'),
+  ...pair('nft', 'inactive', [
+    ['module-entitlements', 'Module Entitlement Proofs', 'DIMON is not active yet — NFT entitlements reserved.', ['nft', 'modules']],
+    ['creator-editions', 'Creator Editions', 'DIMON is not active yet — editions do not mint.', ['nft', 'creator']],
+    ['profile-collectibles', 'Profile Collectibles', 'DIMON is not active yet — no live collectibles.', ['nft', 'profile']],
+    ['team-credentials', 'Team Credential NFTs', 'DIMON is not active yet — credentials reserved.', ['nft', 'teams']],
+    ['aki-mint-scan', 'AKI Mint Scan', 'Future mint requests require AKI + Governor.', ['aki', 'nft']],
+    ['no-floor-prices', 'No Live Floor Prices', 'DIMON is not active yet — no speculative floors.', ['honesty', 'nft']],
+    ['transfer-request', 'Asset Transfer Request', 'dimon.asset.transfer command Preview blocked.', ['commands', 'nft']],
+  ], '/product/nft'),
+  ...pair('creator', 'planned', [
+    ['creator-studio', 'Creator Studio', 'Insights and monetisation stubs — no fake revenue.', ['creator', 'studio']],
+    ['member-tabs', 'Member Tabs', 'Paid member tabs after DIMON — inactive billing.', ['members', 'dimon']],
+    ['newsletter-bridge', 'Newsletter Bridge', 'Creator ↔ newsletter module path.', ['newsletter', 'creator']],
+    ['edition-drops', 'Edition Drops', 'Scheduled drops wait for ownership ledger.', ['nft', 'creator']],
+  ]),
+  ...pair('presence', 'planned', [
+    ['stories-rail', 'Presence Rail', 'Ephemeral presence — not IG clone.', ['presence', 'social']],
+    ['live-rooms', 'Live Rooms Later', 'Live rooms after messaging foundations.', ['live', 'planned']],
+    ['reels-preview', 'Reels Preview', 'Short-form preview surface; Focus can hide.', ['reels', 'focus']],
+    ['status-composer', 'Status Composer', 'Short status with Halo audience.', ['status', 'halo']],
+  ]),
+  ...pair('developer-tools', 'preview', [
+    ['greenfield-mcp', 'Greenfield MCP', 'Architecture MCP for Cursor agents.', ['mcp', 'developer']],
+    ['modula-cli', 'Modula CLI', 'doctor, module validate, focus policy, nft status.', ['cli', 'developer']],
+    ['feature-atlas-dev', 'Feature Atlas for Agents', 'Agents browse mapped capabilities.', ['atlas', 'mcp']],
+    ['manifest-validate-cli', 'Manifest Validate CLI', 'modula module validate path.', ['cli', 'manifest']],
+    ['mcp-json-example', 'mcp.json Example', '.cursor/mcp.json.example wiring.', ['cursor', 'mcp']],
+  ], '/product/developer'),
+  ...pair('accessibility', 'planned', [
+    ['dynamic-type', 'Dynamic Type', 'Typography scales with system settings.', ['a11y', 'type']],
+    ['screen-reader-labels', 'Screen Reader Labels', 'Actions and Halo states announced.', ['a11y', 'voiceover']],
+    ['color-contrast-verify', 'Contrast Verify Script', 'Theme contrast verification script.', ['a11y', 'theme']],
+    ['motor-targets', 'Motor Target Sizes', 'Hit targets meet platform guidance.', ['a11y', 'touch']],
+  ]),
+  ...pair('notifications', 'planned', [
+    ['digest-bundling', 'Digest Bundling', 'Light Focus bundles low-priority alerts.', ['focus', 'notifications']],
+    ['category-controls', 'Category Controls', 'Social, work, commerce, system categories.', ['settings', 'notifications']],
+    ['focus-routing', 'Focus-Aware Routing', 'Deep Focus delivers only allowlisted rules.', ['focus', 'policy']],
+    ['push-permission', 'Push Permission Honesty', 'OS permission prompts with clear purpose.', ['permissions', 'push']],
+  ]),
+  ...pair('calendar', 'planned', [
+    ['day-agenda', 'Day Agenda Module', 'External calendar module — not host hardcoded.', ['calendar', 'modules']],
+    ['focus-blocks', 'Focus Blocks', 'Block Deep Focus on calendar.', ['focus', 'calendar']],
+    ['meeting-prep-gaia', 'Meeting Prep GAIA', 'Board briefing from calendar + CRM scopes.', ['gaia', 'calendar']],
+    ['rsvp-commands', 'RSVP Commands', 'calendar.rsvp via Command Layer later.', ['commands', 'calendar']],
+  ]),
+  ...pair('files', 'planned', [
+    ['files-module', 'Files Module', 'Namespaced file library package.', ['files', 'modules']],
+    ['attach-from-files', 'Attach From Files', 'Composer file tool from module storage.', ['composer', 'files']],
+    ['vault-files', 'Vault Files', 'Highest privacy file tier with Glass rules.', ['vault', 'privacy']],
+    ['share-links-policy', 'Share Links Policy', 'Disable Sharing blocks export links where enforceable.', ['privacy', 'files']],
+  ]),
+  ...pair('notes', 'planned', [
+    ['vault-notes', 'Vault Notes Module', 'Private notes as external package.', ['notes', 'modules']],
+    ['chat-to-note', 'Chat-to-Note', 'GAIA command with user confirm.', ['gaia', 'notes']],
+    ['note-board-card', 'Note Board Card', 'Board widget for recent notes.', ['board', 'notes']],
+    ['note-encryption-tier', 'Note Encryption Tier', 'Vault-tier notes policy foreshadow.', ['vault', 'notes']],
+  ]),
+  ...pair('tasks', 'planned', [
+    ['tasks-module', 'Tasks Module', 'Task lists as external package.', ['tasks', 'modules']],
+    ['chat-to-task', 'Chat-to-Task', 'Extract action items with confirm.', ['gaia', 'tasks']],
+    ['task-board-card', 'Tasks Board Card', 'Today tasks on Board.', ['board', 'tasks']],
+    ['crm-followups', 'CRM Follow-up Tasks', 'CRM → Tasks command bridge.', ['crm', 'tasks']],
+  ]),
+  ...pair('crm', 'planned', [
+    ['crm-module', 'CRM Module', 'Contacts and pipeline as package.', ['crm', 'modules']],
+    ['lead-capture', 'Lead Capture Forms', 'Profile forms → CRM leads.', ['crm', 'profile']],
+    ['follow-up-batch', 'Follow-up Batch Preview', 'GAIA plans; Governor requires approval to send.', ['gaia', 'governor']],
+    ['crm-privacy', 'CRM Privacy Scopes', 'Contacts scopes never silent.', ['permissions', 'crm']],
+  ]),
+  ...pair('analytics', 'planned', [
+    ['creator-insights', 'Creator Insights', 'Owner analytics without vanity fakes.', ['creator', 'analytics']],
+    ['module-usage', 'Module Usage Analytics', 'Local usage patterns for Circuit Memory.', ['memory', 'analytics']],
+    ['kaizen-metrics', 'Kaizen Before/After', 'Observe metrics after approved releases.', ['kaizen', 'metrics']],
+    ['privacy-preserving', 'Privacy-Preserving Analytics', 'Aggregate first; export controls.', ['privacy', 'analytics']],
+  ]),
+  ...pair('newsletter', 'planned', [
+    ['newsletter-module', 'Newsletter Module', 'External newsletter package.', ['newsletter', 'modules']],
+    ['subscriber-import', 'Subscriber Import', 'Consent-aware import foreshadow.', ['consent', 'newsletter']],
+    ['digest-from-board', 'Digest From Board', 'GAIA drafts digest from permitted widgets.', ['gaia', 'newsletter']],
+  ]),
+  ...pair('health', 'planned', [
+    ['health-agent', 'Health Agent Module', 'Optional wellbeing agent — scoped.', ['health', 'agents']],
+    ['attention-debt', 'Attention Debt Score', 'Focus + notification load insight.', ['focus', 'health']],
+    ['break-reminders', 'Break Reminders', 'Local reminders — not medical claims.', ['health', 'local']],
+  ]),
+  ...pair('games', 'planned', [
+    ['mini-games-module', 'Mini Games Module', 'Optional games package — never required.', ['games', 'optional']],
+    ['season-pass-blocked', 'Season Pass Blocked', 'DIMON is not active yet — no pass checkout.', ['dimon', 'games']],
+    ['fair-play-rules', 'Fair Play Rules', 'Games cannot harvest private modules.', ['privacy', 'games']],
+  ]),
+  ...pair('registry', 'planned', [
+    ['signed-releases', 'Signed Releases', 'Publisher signatures on packages.', ['registry', 'trust']],
+    ['sbom-preview', 'SBOM Preview', 'Software bill of materials foreshadow.', ['security', 'registry']],
+    ['yank-version', 'Yank Version', 'Pull broken versions from channels.', ['rollback', 'registry']],
+  ]),
+  ...pair('sandbox', 'planned', [
+    ['memory-caps', 'Memory Caps', 'Sandbox memory limits per module.', ['sandbox', 'limits']],
+    ['cpu-budget', 'CPU Budget', 'Governor compute budgets for agents/modules.', ['governor', 'sandbox']],
+    ['denied-scope-ux', 'Denied Scope UX', 'Clear UI when a scope is refused.', ['permissions', 'ux']],
+  ]),
+  ...pair('dimon-nft', 'inactive', [
+    ['entitlement-bridge', 'Entitlement Bridge', 'DIMON is not active yet — NFT↔module entitlements reserved.', ['dimon', 'nft']],
+    ['royalty-policy', 'Royalty Policy Stub', 'DIMON is not active yet — royalties not live.', ['dimon', 'creator']],
+    ['custody-model', 'Custody Model Doc', 'Future custody and key management — design only.', ['security', 'dimon']],
+    ['onchain-anchor-later', 'On-chain Anchor Later', 'Optional proofs later; Postgres remains primary DB (ADR-006).', ['adr-006', 'dimon']],
+  ], '/product/nft'),
+  // Extra platform coverage to round the atlas map past 500 named capabilities.
+  ...pair('shell', 'preview', [
+    ['start-launcher', 'Start Launcher', 'Mobile-first launcher for commands and destinations.', ['start', 'commands']],
+    ['feature-atlas-hub', 'Feature Atlas Hub', 'Browsable map of Modula capabilities.', ['atlas', 'product']],
+    ['account-panel-shortcuts', 'Account Panel Shortcuts', 'Product, Focus, Search shortcuts from account panel.', ['account', 'navigation']],
+  ], '/product/atlas'),
+  ...pair('intelligence', 'planned', [
+    ['session-memory', 'Session Memory Tier', 'Temporary context cleared at session end.', ['memory', 'session']],
+    ['workspace-memory', 'Workspace Memory Tier', 'Team/project memory namespace.', ['memory', 'teams']],
+    ['validated-patterns', 'Validated Pattern Store', 'AKI-approved reusable workflows only.', ['memory', 'aki']],
+    ['replay-safe-mode', 'Replay Safe Mode', 'Ledger replay never auto-sends messages.', ['ledger', 'safety']],
+    ['kaizen-rollback', 'Kaizen Rollback Path', 'Restore previous version after bad release.', ['kaizen', 'rollback']],
+  ]),
+  ...pair('forge', 'planned', [
+    ['github-connect', 'GitHub Connect Preview', 'Link repo URL in draft — no remote eval.', ['github', 'forge']],
+    ['fusion-hand-off', 'Fusion Hand-off', 'Forge → SDK → Fusion → Registry path documented.', ['pipeline', 'registry']],
+    ['boilerplate-copy', 'Boilerplate Copy Path', 'Copy templates/modula-module to a new repo.', ['template', 'modules']],
+    ['permission-catalogue-link', 'Permission Catalogue Link', 'Forge toggles match /product/permissions IDs.', ['permissions', 'forge']],
+  ]),
+  ...pair('nft', 'planned', [
+    ['metadata-schema', 'NFT Metadata Schema', 'Reserved metadata shape for entitlements — no mint.', ['nft', 'schema']],
+    ['holder-view', 'Holder View Preview', 'Local entitlements list — DIMON is not active yet.', ['nft', 'holder']],
+    ['creator-flow', 'Creator Collection Flow', 'Define → scan → policy → ledger → settlement (blocked).', ['nft', 'creator']],
+    ['marketplace-card-nft', 'Marketplace NFT Cards', 'Planned/inactive catalogue cards only.', ['nft', 'marketplace']],
+  ], '/product/nft'),
+  ...pair('messaging', 'preview', [
+    ['glass-badge-inbox', 'Glass Badge on Inbox', 'Messages show active Glass Privacy level.', ['privacy', 'messages']],
+    ['quiet-send-banner', 'Quiet Send Banner', 'Held deliveries under Focus / Quiet Send.', ['focus', 'messages']],
+    ['chat-assist-entry', 'Chat Assist Entry', 'Permission entry from inbox.', ['assist', 'messages']],
+  ], '/product/chat-assist'),
+  ...pair('board', 'planned', [
+    ['dimon-activity-card', 'DIMON Activity Card', 'Board card states DIMON is not active yet.', ['dimon', 'board']],
+    ['nft-entitlements-card', 'NFT Entitlements Card', 'Preview entitlements — no balances.', ['nft', 'board']],
+    ['widget-reorder', 'Widget Reorder', 'Local reorder/remove for Board widgets.', ['widgets', 'prefs']],
+  ]),
+  ...pair('marketplace', 'preview', [
+    ['expanded-catalogue', 'Expanded Module Catalogue', 'Dozens of Preview/Planned/Inactive module cards.', ['catalogue', 'modules']],
+    ['forge-marketplace-card', 'Forge Marketplace Card', 'Entry to Forge from Marketplace.', ['forge', 'marketplace']],
+    ['agents-marketplace-card', 'Agents Marketplace Card', 'Scoped agents module card.', ['agents', 'marketplace']],
+  ]),
+  ...pair('developer-tools', 'planned', [
+    ['platform-tooling-doc', 'Platform Tooling Doc', 'MCP + CLI architecture guide.', ['docs', 'mcp']],
+    ['greenfield-contracts-pkg', 'Greenfield Contracts Package', '@modula/greenfield-contracts shared types.', ['contracts', 'greenfield']],
+    ['dimon-contracts-pkg', 'DIMON Contracts Package', 'Reserved capabilities — DIMON is not active yet.', ['dimon', 'contracts']],
+    ['phase6s-verify', 'Phase 6S Verify Script', 'pnpm verify:phase6s-social-frontend honesty gates.', ['qa', 'verify']],
+    ['agent-swarm-ops', 'Agent Swarm Ops', 'Multiple coding agents ship Preview surfaces in parallel.', ['agents', 'ops']],
+  ], '/product/developer'),
+]

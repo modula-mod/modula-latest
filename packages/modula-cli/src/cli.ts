@@ -54,33 +54,38 @@ type CommandCatalogueEntry = {
 const ATLAS_DOMAIN_STATS = [
   {
     domain: 'Shell, identity, and profile',
-    count: 5,
-    examples: ['Modula Shell', 'Start Launcher', 'Profile-OS', 'Identity & SSO', 'Ownership controls'],
+    count: 48,
+    examples: ['Modula Shell', 'Start Launcher', 'Profile-OS', 'Feature Atlas', 'Ownership controls'],
   },
   {
     domain: 'Social, messaging, and presence',
-    count: 7,
+    count: 62,
     examples: ['Social Network', 'Messaging', 'Chat Assist', 'Quiet Send', 'Merge Feeds', 'Presence'],
   },
   {
     domain: 'Modules, Registry, Marketplace, and Forge',
-    count: 10,
-    examples: ['Installable Modules', 'Module Registry', 'Marketplace', 'Forge', 'Sandbox'],
+    count: 95,
+    examples: ['Installable Modules', 'Module Registry', 'Marketplace', 'Forge', 'Sandbox', 'skill.md'],
   },
   {
     domain: 'Intelligence, commands, and automation',
-    count: 10,
-    examples: ['GAIA', 'AKI', 'Governor', 'Command Layer', 'Gaia Atlas', 'Automations'],
+    count: 88,
+    examples: ['GAIA', 'AKI', 'Governor', 'Command Layer', 'Gaia Atlas', 'Automations', 'Ledger'],
   },
   {
     domain: 'Attention, privacy, and safety',
-    count: 6,
-    examples: ['Focus Mode', 'Glass Privacy', 'Permissions', 'Feature Control'],
+    count: 54,
+    examples: ['Focus Mode', 'Glass Privacy', 'Permissions', 'Feature Control', 'Vault Chat'],
   },
   {
-    domain: 'Creation, economy, and optional inventory',
-    count: 6,
-    examples: ['Composer Tools', 'Creator Economy', 'DIMON', 'Gamification', 'Widgets'],
+    domain: 'Creation, economy, NFT, and optional inventory',
+    count: 72,
+    examples: ['Composer Tools', 'Creator Economy', 'DIMON', 'NFT Studio', 'Gamification', 'Widgets'],
+  },
+  {
+    domain: 'Module families (Notes, Tasks, CRM, Files, …)',
+    count: 81,
+    examples: ['Vault Notes', 'Tasks', 'CRM', 'Calendar', 'Files', 'Newsletter', 'Health', 'Games'],
   },
 ] as const
 
