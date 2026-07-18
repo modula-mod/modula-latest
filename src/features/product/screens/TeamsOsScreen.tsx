@@ -14,31 +14,31 @@ const ROLES = [
   {
     id: 'owner',
     label: 'Owner',
-    desc: 'Full org control',
+    desc: 'Owns the team profile, seat policy, billing direction, module admission, and final approval for high-risk actions. Owners can delegate day-to-day work, but they remain accountable for data export, member removal, and audit review.',
     permissions: ['Billing future', 'Roles', 'Module approvals', 'Ledger view'],
   },
   {
     id: 'admin',
     label: 'Admin',
-    desc: 'Manage members & modules',
+    desc: 'Runs the operating layer for members, modules, Board layout, automations, and review queues. Admins can prepare changes for the Owner and resolve normal workflow approvals without taking ownership away from the team profile.',
     permissions: ['Roles', 'Board layout', 'Module approvals', 'Automations'],
   },
   {
     id: 'editor',
     label: 'Editor',
-    desc: 'Edit shared Board & content',
+    desc: 'Creates and maintains shared content, posts, resources, task lanes, and Board widgets. Editors can draft organization-facing updates and request promotion, while approval gates protect publishing, module scopes, and external commitments.',
     permissions: ['Posts', 'Board widgets', 'Files preview', 'Tasks'],
   },
   {
     id: 'member',
     label: 'Member',
-    desc: 'Post & collaborate',
+    desc: 'Collaborates in the shared workspace through posts, comments, tasks, files, and availability signals. Members keep their personal Profile-OS data separate from team state unless they explicitly share a surface or module result.',
     permissions: ['Posts', 'Comments', 'Tasks', 'Availability'],
   },
   {
     id: 'guest',
     label: 'Guest',
-    desc: 'View limited surfaces',
+    desc: 'Receives limited visibility for reviews, partner work, or client collaboration. Guests can comment where invited, but sensitive modules, team settings, and broad publishing actions require approval from a trusted role.',
     permissions: ['Read Board', 'Read files', 'Comment with approval'],
   },
 ] as const
@@ -79,10 +79,57 @@ const SHARED = [
 ]
 
 const APPROVALS = [
-  {step: 'Draft', owner: 'Editor', state: 'Local draft'},
-  {step: 'Review', owner: 'Admin', state: 'Approval stub'},
-  {step: 'Verify', owner: 'AKI', state: 'Preview verification'},
-  {step: 'Publish', owner: 'Owner/Admin', state: 'Manual only'},
+  {
+    step: 'Draft',
+    owner: 'Editor',
+    state: 'Local draft',
+    detail:
+      'The work starts as a local draft with visible intent, destination, and risk. Drafts can describe posts, task changes, module recommendations, or automation ideas without executing them.',
+  },
+  {
+    step: 'Review',
+    owner: 'Admin',
+    state: 'Approval stub',
+    detail:
+      'Admins check whether the draft matches team policy, member expectations, and module permission boundaries. Review can request changes or escalate to the Owner for sensitive scope.',
+  },
+  {
+    step: 'Verify',
+    owner: 'AKI',
+    state: 'Preview verification',
+    detail:
+      'AKI verification is represented as Preview copy here: it explains the future check for claims, permissions, and risk, but it does not run unattended validation or background actions.',
+  },
+  {
+    step: 'Publish',
+    owner: 'Owner/Admin',
+    state: 'Manual only',
+    detail:
+      'Publishing stays manual. The responsible Owner or Admin confirms the final action after reviewing copy, audience, module scopes, and the Ledger-facing explanation.',
+  },
+] as const
+
+const GUIDELINES = [
+  {
+    label: 'One team profile, many personal boundaries',
+    detail:
+      'Teams reuse Profile-OS as a shared operating surface. Personal profiles, private Boards, Focus state, and account ownership remain separate unless a member explicitly shares context into the team.',
+  },
+  {
+    label: 'Least-privilege modules',
+    detail:
+      'Modules should request only the scopes needed for the shared job. Admins and Owners review higher-risk scopes before a module affects shared Board widgets, files, CRM, automations, or publishing.',
+  },
+  {
+    label: 'Human confirmation for consequential work',
+    detail:
+      'Posts, automations, billing direction, member removal, and external commitments need an explicit trusted-role confirmation. Preview cards can prepare the action, but they do not silently execute it.',
+  },
+  {
+    label: 'Availability without surveillance',
+    detail:
+      'Focus and availability help route work respectfully. Teams can show high-level status and interruption policy without exposing private reasons, personal messages, or unrelated module content.',
+  },
 ] as const
 
 const AVAILABILITY = [
@@ -91,16 +138,30 @@ const AVAILABILITY = [
   {label: 'Approval needed', detail: 'Guests and risky module actions require review.'},
 ] as const
 
-const LINKS = [
+const PRODUCT_LINKS = [
   {
-    label: 'Intelligence Hub',
-    detail: 'GAIA executes · AKI verifies · Governor controls',
-    href: '/product/intelligence' as Href,
+    label: 'Design Lab',
+    detail: 'Open the Forge builder surface for team module, workflow, and workspace drafts.',
+    href: '/product/forge' as Href,
+    icon: 'tools',
   },
   {
-    label: 'Ledger Replay',
-    detail: 'Inspect intended actions without mutating state',
+    label: 'Atlas',
+    detail: 'Browse Feature Atlas entries for teams, roles, approvals, modules, and shared Board work.',
+    href: '/product/atlas' as Href,
+    icon: 'search',
+  },
+  {
+    label: 'Focus',
+    detail: 'Review Focus modes and availability rules that help teams route interruptions respectfully.',
+    href: '/product/focus' as Href,
+    icon: 'switch',
+  },
+  {
+    label: 'Ledger',
+    detail: 'Inspect seeded replay language for approval trails and audit-sensitive team actions.',
     href: '/product/ledger' as Href,
+    icon: 'storage',
   },
 ] as const
 
@@ -179,6 +240,7 @@ export function TeamsOsScreen() {
               return (
                 <Pressable
                   key={item.id}
+                  style={styles.rolePressable}
                   onPress={() => {
                     void update({teamsRoleId: item.id})
                   }}>
@@ -187,9 +249,9 @@ export function TeamsOsScreen() {
                     style={[
                       styles.role,
                       {
-                        paddingHorizontal: spacing[3],
-                        paddingVertical: spacing[2],
-                        borderRadius: radius.round,
+                        padding: spacing[3],
+                        gap: spacing[1],
+                        borderRadius: radius.medium,
                         backgroundColor: on ? colours.accentSubtle : colours.surface,
                         borderColor: on ? colours.accent : colours.border,
                       },
@@ -197,7 +259,7 @@ export function TeamsOsScreen() {
                     <AppText variant="caption" colour={on ? 'accent' : 'text'}>
                       {item.label}
                     </AppText>
-                    <AppText variant="micro" colour="textTertiary">
+                    <AppText variant="caption" colour="textTertiary">
                       {item.desc}
                     </AppText>
                   </Surface>
@@ -225,7 +287,7 @@ export function TeamsOsScreen() {
                   <AppIcon name="teams" colour={colours.accent} size={18} />
                   <View style={styles.rowBody}>
                     <AppText variant="body">{item.label}</AppText>
-                    <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                    <AppText variant="caption" colour="textSecondary">
                       {item.detail}
                     </AppText>
                   </View>
@@ -234,6 +296,29 @@ export function TeamsOsScreen() {
               </Pressable>
             ))}
           </View>
+
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                padding: spacing[4],
+                gap: spacing[3],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="headline">Guidelines</AppText>
+            {GUIDELINES.map(item => (
+              <View key={item.label} style={{gap: spacing[1]}}>
+                <AppText variant="label">{item.label}</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  {item.detail}
+                </AppText>
+              </View>
+            ))}
+          </Surface>
 
           <Surface
             variant="contained"
@@ -262,11 +347,15 @@ export function TeamsOsScreen() {
                   <AppText variant="caption" colour="textSecondary">
                     {item.owner} · {item.state}
                   </AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {item.detail}
+                  </AppText>
                 </View>
               </View>
             ))}
             <AppText variant="caption" colour="textTertiary">
-              Preview only: approvals are local stubs and publish remains manual.
+              Preview only: approvals are local stubs, verification copy is explanatory, and publish
+              remains manual.
             </AppText>
           </Surface>
 
@@ -304,8 +393,8 @@ export function TeamsOsScreen() {
           </Surface>
 
           <View style={{gap: spacing[3]}}>
-            <AppText variant="headline">Intelligence & ledger</AppText>
-            {LINKS.map(item => (
+            <AppText variant="headline">Product links</AppText>
+            {PRODUCT_LINKS.map(item => (
               <Pressable key={item.label} onPress={() => router.push(item.href)}>
                 <Surface
                   variant="contained"
@@ -319,10 +408,10 @@ export function TeamsOsScreen() {
                       borderColor: colours.border,
                     },
                   ]}>
-                  <AppIcon name="automation" colour={colours.accent} size={18} />
+                  <AppIcon name={item.icon} colour={colours.accent} size={18} />
                   <View style={styles.rowBody}>
                     <AppText variant="body">{item.label}</AppText>
-                    <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                    <AppText variant="caption" colour="textSecondary">
                       {item.detail}
                     </AppText>
                   </View>
@@ -353,8 +442,9 @@ const styles = StyleSheet.create({
   card: {borderWidth: StyleSheet.hairlineWidth},
   matrix: {flexDirection: 'row', flexWrap: 'wrap'},
   permissionChip: {borderWidth: StyleSheet.hairlineWidth},
+  rolePressable: {flexBasis: 240, flexGrow: 1},
   roles: {flexDirection: 'row', flexWrap: 'wrap'},
-  role: {borderWidth: StyleSheet.hairlineWidth},
+  role: {borderWidth: StyleSheet.hairlineWidth, minHeight: 128},
   row: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
