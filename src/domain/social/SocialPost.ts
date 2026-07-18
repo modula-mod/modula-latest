@@ -14,6 +14,27 @@ export type PostEngagement = {
   likeCount: number
   replyCount: number
   repostCount: number
+  /** The signed-in viewer's selected reaction, when the provider exposes it. */
+  viewerReaction?: ReactionType | null
+  reactionCount?: number
+  quoteCount?: number
+}
+
+export type ReactionType = 'like' | 'love' | 'celebrate' | 'insightful' | 'support' | 'funny'
+
+export type SocialComment = {
+  id: string
+  postId: PostId
+  authorId: string
+  parentCommentId: string | null
+  rootCommentId: string | null
+  text: string
+  depth: number
+  replyCount: number
+  version: number
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
 }
 
 export type DraftLinkPreview = {
@@ -48,6 +69,8 @@ export type BaseSocialPost = PostEngagement & {
   createdAt: string
   feed: FeedMode
   text?: string
+  /** Embedded quote data is optional so providers without quote support remain compatible. */
+  quotedPost?: SocialPost | null
   optimisticState?: OptimisticPostState
 }
 

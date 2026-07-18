@@ -1,4 +1,4 @@
-import type {SocialPost} from '@/domain/social'
+import type {ReactionType, SocialPost} from '@/domain/social'
 import {decodeProfile} from '@/api/decoding/decodeProfile'
 import {asArray, asBoolean, asIsoDate, asNumber, asRecord, asString, optional} from '@/api/decoding/validation'
 
@@ -16,6 +16,16 @@ export function decodePost(value: unknown): SocialPost {
     likeCount: asNumber(record.likeCount, 'post like count'),
     replyCount: asNumber(record.replyCount, 'post reply count'),
     repostCount: asNumber(record.repostCount, 'post repost count'),
+    viewerReaction: optional(
+      record.viewerReaction,
+      item => asString(item, 'post viewer reaction') as ReactionType,
+    ),
+    reactionCount: optional(record.reactionCount, item => asNumber(item, 'post reaction count')),
+    quoteCount: optional(record.quoteCount, item => asNumber(item, 'post quote count')),
+    quotedPost:
+      record.quotedPost === null
+        ? null
+        : optional(record.quotedPost, item => decodePost(item)),
     optimisticState: optional(record.optimisticState, item => asString(item, 'optimistic state')) as SocialPost['optimisticState'],
   }
   const kind = asString(record.kind, 'post kind')

@@ -39,6 +39,10 @@ export class ApiClient {
     return this.request('POST', request, decode)
   }
 
+  put<T>(request: RequestInput, decode: (data: unknown) => T): Promise<T> {
+    return this.request('PUT', request, decode)
+  }
+
   patch<T>(request: RequestInput, decode: (data: unknown) => T): Promise<T> {
     return this.request('PATCH', request, decode)
   }
