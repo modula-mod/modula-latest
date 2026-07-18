@@ -1,0 +1,79 @@
+# @modula/modula-cli
+
+Local developer CLI for Modula Greenfield package, module, and intelligence previews.
+
+## Install/build in the workspace
+
+```sh
+pnpm --filter @modula/modula-cli build
+```
+
+The package exposes a `modula` bin after build:
+
+```json
+{
+  "modula": "./dist/cli.js"
+}
+```
+
+## Commands
+
+```sh
+modula help
+modula doctor
+modula mcp info
+modula module validate <path-to-modula.module.json>
+modula module init [--write]
+modula intelligence layers
+modula commands list
+modula focus presets
+modula dimon status
+modula version
+```
+
+From the workspace root, the root script runs the built CLI:
+
+```sh
+pnpm modula -- doctor
+```
+
+## Manifest validation
+
+`modula module validate` reads a JSON manifest from disk and validates the current
+`GreenfieldModuleManifest` shape without importing runtime dependencies.
+
+It checks:
+
+- required identity fields: `moduleId`, `name`, `repositoryUrl`, `packageVersion`
+- `hostCompatibility.minimumHostVersion`
+- `capabilities` and `permissions` arrays
+- valid `uninstallBehaviour`
+- optional contribution arrays for routes, profile tabs, board surfaces, and settings
+
+## Module init
+
+`modula module init` prints copy instructions for `templates/modula-module/`.
+It does not write files by default.
+
+If `--write` is passed, this preview CLI still prints path instructions instead of
+copying files. This keeps the command simple and avoids creating module packages
+inside the host repository by accident.
+
+## Honest boundaries
+
+This CLI is intentionally local and informational:
+
+- no runtime dependencies
+- no package publishing
+- no fake install success
+- no wallet balances
+- no DIMON economic activity
+- no blockchain or smart-contract RPC calls
+
+DIMON status must remain:
+
+```txt
+DIMON is not active yet
+```
+
+See `docs/architecture/modula-cli.md` for the architecture boundary.

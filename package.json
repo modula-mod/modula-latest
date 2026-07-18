@@ -65,6 +65,8 @@
     "typecheck": "tsc --noEmit && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts typecheck",
     "lint": "expo lint",
     "doctor": "expo-doctor",
+    "modula": "pnpm --filter @modula/modula-cli exec node dist/cli.js",
+    "cli:build": "pnpm --filter @modula/modula-cli build",
     "verify:phase1": "node scripts/verify-phase1-shell.mjs",
     "verify:phase2": "node scripts/verify-phase2-appearance.mjs",
     "verify:theme": "node scripts/verify-theme-contrast.mjs",
