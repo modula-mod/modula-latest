@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-18  
 **Branch:** `phase6s-social-product-completion`  
-**Git commit:** `872fcd1c368c1868d02b9fbbd07bc8fc39b505cb` (+ docs commits after this tip)  
+**Git commit:** `e548aa5a0ae49180b35591de4af7a67980e23496`  
 **Base branch (do not merge Phase 6R yet):** `phase6-greenfield-sovereign-core` @ `88695cd`  
 **Product API:** `https://api.modula.digital` (502 at Mac record time)
 
