@@ -143,7 +143,9 @@ export function ShimmerRefreshEdgeSkia({
   )
 }
 
+/** Must be a worklet — called from useDerivedValue on the UI runtime. */
 function withAlpha(hex: string, alpha: number): string {
+  'worklet'
   const cleaned = hex.replace('#', '')
   if (cleaned.length !== 6) {
     return `rgba(54,156,170,${Math.max(0, Math.min(1, alpha))})`
