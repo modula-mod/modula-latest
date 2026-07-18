@@ -14,12 +14,12 @@ type SecondaryScreenHeaderProps = {
 }
 
 const HEADER_ROW_HEIGHT = 54
-/** Blur dissolves into content below the nav row. */
-const FADE_EXTENSION = 36
+/** Blur dissolves into content below the nav row (MaskedView fade). */
+const FADE_EXTENSION = 48
 
 /**
  * Secondary-route chrome: progressive blur overlay + liquid-glass circular back.
- * Fade extension paints over the top of the scroll content so the edge softens.
+ * Blur is absolutely positioned so it never pushes title/controls down.
  */
 export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps) {
   const router = useRouter()
@@ -31,7 +31,9 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
   return (
     <View style={[styles.spacer, {height: bandHeight}]}>
       <View style={[styles.overlay, {height: blurHeight}]} pointerEvents="box-none">
-        <ProgressiveBlurBand height={blurHeight} topHeavy />
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ProgressiveBlurBand height={blurHeight} topHeavy />
+        </View>
         <View
           style={[
             styles.row,
@@ -79,7 +81,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingBottom: 10,
     width: '100%',
-    zIndex: 1,
+    zIndex: 2,
   },
   side: {
     alignItems: 'flex-start',

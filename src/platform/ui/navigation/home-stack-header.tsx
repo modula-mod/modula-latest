@@ -25,7 +25,7 @@ export function HomeHeaderLeft() {
       style={styles.avatarHit}>
       <LiquidGlassChrome
         interactive
-        fallback="raised"
+        fallback="clear"
         style={styles.avatarGlass}>
         <Avatar
           name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
@@ -43,7 +43,7 @@ export function HomeHeaderRight() {
   const {colours} = useThemeTokens()
 
   return (
-    <LiquidGlassChrome interactive fallback="raised" style={styles.actionPill}>
+    <LiquidGlassChrome interactive fallback="clear" style={styles.actionPill}>
       <AppPressable
         accessibilityLabel="Create a post"
         onPress={() => {

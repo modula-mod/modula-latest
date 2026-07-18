@@ -1,5 +1,11 @@
 import type {ComponentType, ReactNode} from 'react'
-import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import {
+  Platform,
+  StyleSheet,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native'
 import {BlurView} from 'expo-blur'
 
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
@@ -11,8 +17,8 @@ type LiquidGlassChromeProps = {
   children: ReactNode
   style?: StyleProp<ViewStyle>
   interactive?: boolean
-  /** Solid / raised colour when glass is unavailable. */
-  fallback?: 'raised' | 'surface' | 'accent'
+  /** Visual density when true liquid glass is unavailable. */
+  fallback?: 'clear' | 'regular'
 }
 
 type CallstackModule = {
@@ -44,27 +50,37 @@ function loadCallstackLiquidGlass(): CallstackModule | null {
 }
 
 /**
- * Shared liquid-glass chrome for circular / pill controls.
- * Prefer Callstack liquid glass → expo-glass-effect → BlurView → solid.
+ * Liquid-glass chrome for circular / pill controls.
+ * Callstack (iOS 26) → expo-glass-effect → translucent BlurView glass.
+ * Never paints an opaque surface fill (that reads as a flat grey disc).
  */
 export function LiquidGlassChrome({
   children,
   style,
   interactive = true,
-  fallback = 'raised',
+  fallback = 'clear',
 }: LiquidGlassChromeProps) {
-  const {colours, scheme} = useThemeTokens()
+  const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const solid =
-    fallback === 'accent'
-      ? colours.accent
-      : fallback === 'surface'
-        ? colours.surface
-        : colours.surfaceRaised
+  const isDark = scheme === 'dark'
+  const effect = fallback === 'regular' ? 'regular' : 'clear'
+  const wash = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.42)'
+  const rim = isDark ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.78)'
 
   if (reduceTransparency) {
     return (
-      <View style={[styles.base, {backgroundColor: solid}, style]}>{children}</View>
+      <View
+        style={[
+          styles.base,
+          {
+            backgroundColor: isDark ? 'rgba(40,48,52,0.92)' : 'rgba(245,247,248,0.94)',
+            borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+            borderWidth: StyleSheet.hairlineWidth,
+          },
+          style,
+        ]}>
+        {children}
+      </View>
     )
   }
 
@@ -72,7 +88,10 @@ export function LiquidGlassChrome({
   if (callstack?.isLiquidGlassSupported) {
     const Glass = callstack.LiquidGlassView
     return (
-      <Glass interactive={interactive} effect="regular" style={[styles.base, style]}>
+      <Glass
+        interactive={interactive}
+        effect={effect}
+        style={[styles.base, styles.shadow, style]}>
         {children}
       </Glass>
     )
@@ -91,9 +110,9 @@ export function LiquidGlassChrome({
       }
       return (
         <GlassView
-          glassEffectStyle="regular"
-          colorScheme={scheme === 'dark' ? 'dark' : 'light'}
-          style={[styles.base, style]}>
+          glassEffectStyle={effect}
+          colorScheme={isDark ? 'dark' : 'light'}
+          style={[styles.base, styles.shadow, style]}>
           {children}
         </GlassView>
       )
@@ -102,22 +121,63 @@ export function LiquidGlassChrome({
     }
   }
 
+  if (Platform.OS === 'web') {
+    return (
+      <View
+        style={[
+          styles.base,
+          styles.shadow,
+          {
+            backgroundColor: wash,
+            borderColor: rim,
+            borderWidth: StyleSheet.hairlineWidth,
+          },
+          style,
+        ]}>
+        {children}
+      </View>
+    )
+  }
+
   return (
-    <BlurView
-      intensity={48}
-      tint={scheme === 'dark' ? 'dark' : 'light'}
-      style={[styles.base, {overflow: 'hidden'}, style]}>
+    <View style={[styles.base, styles.shadow, style]}>
+      <BlurView
+        intensity={fallback === 'regular' ? 52 : 68}
+        tint={
+          isDark ? 'systemUltraThinMaterialDark' : 'systemUltraThinMaterialLight'
+        }
+        style={StyleSheet.absoluteFill}
+      />
       <View
         pointerEvents="none"
-        style={[StyleSheet.absoluteFill, {backgroundColor: solid, opacity: 0.28}]}
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: wash,
+            borderColor: rim,
+            borderWidth: StyleSheet.hairlineWidth,
+          },
+        ]}
       />
-      {children}
-    </BlurView>
+      <View style={styles.foreground}>{children}</View>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
+  },
+  foreground: {
+    ...StyleSheet.absoluteFill,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shadow: {
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
 })

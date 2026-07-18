@@ -137,7 +137,10 @@ function GlassSurface({
   }
 
   return (
-    <LiquidGlassView interactive={interactive} effect="regular" style={style}>
+    <LiquidGlassView
+      interactive={interactive}
+      effect={interactive ? 'clear' : 'regular'}
+      style={style}>
       {children}
     </LiquidGlassView>
   )

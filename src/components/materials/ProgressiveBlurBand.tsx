@@ -2,6 +2,7 @@ import {Platform, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-
 import {BlurView} from 'expo-blur'
 import {LinearGradient} from 'expo-linear-gradient'
 
+import {MaskedView} from '@/platform/ui/materials/masked-view'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -11,81 +12,77 @@ type ProgressiveBlurBandProps = {
   /** Strongest blur at the top fading to clear (header). Default true. */
   topHeavy?: boolean
   enabled?: boolean
+  /** Max BlurView intensity under the opaque end of the mask. */
+  intensity?: number
 }
 
 /**
- * True progressive blur: stacked BlurView strips with falling intensity,
- * plus a soft canvas fade so the bottom edge dissolves (not a hard material bar).
+ * Progressive blur — MaskedView + BlurView + gradient mask
+ * (same technique as rit3zh/expo-progressive-blur).
+ *
+ * Opaque mask → blur visible; transparent mask → content clear.
+ * Soft canvas tint sits on top so the dissolve reads on light and dark.
  */
 export function ProgressiveBlurBand({
   height,
   style,
   topHeavy = true,
   enabled = true,
+  intensity = 55,
 }: ProgressiveBlurBandProps) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const useBlur = enabled && !reduceTransparency && Platform.OS !== 'web'
+  const useBlur =
+    enabled && !reduceTransparency && Platform.OS !== 'web'
   const tint = scheme === 'dark' ? 'dark' : 'light'
 
-  // Top → bottom intensities (or reversed for bottom-heavy edges).
-  const intensities = topHeavy
-    ? [72, 58, 44, 32, 22, 14, 8, 3]
-    : [3, 8, 14, 22, 32, 44, 58, 72]
-  const stripCount = intensities.length
-  const stripHeight = height / stripCount
-  const overlap = Math.ceil(stripHeight * 0.55)
+  // Mask: black = reveal blur, transparent = hide blur (fade to clear).
+  const maskColors = topHeavy
+    ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
+    : (['transparent', 'rgba(0,0,0,0.55)', '#000000', '#000000'] as const)
+  const maskLocations = topHeavy
+    ? ([0, 0.35, 0.7, 1] as const)
+    : ([0, 0.3, 0.65, 1] as const)
 
-  const tintStops =
+  const tintColors =
     scheme === 'dark'
-      ? ([
-          'rgba(11,20,22,0.55)',
-          'rgba(11,20,22,0.28)',
-          'rgba(11,20,22,0.1)',
-          'rgba(11,20,22,0)',
-        ] as const)
-      : ([
-          'rgba(243,247,248,0.62)',
-          'rgba(243,247,248,0.32)',
-          'rgba(243,247,248,0.12)',
-          'rgba(243,247,248,0)',
-        ] as const)
+      ? topHeavy
+        ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
+        : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0.42)'] as const)
+      : topHeavy
+        ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
+        : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0.55)'] as const)
+
+  if (!useBlur) {
+    return (
+      <View pointerEvents="none" style={[{height, overflow: 'hidden'}, style]}>
+        <LinearGradient
+          colors={[...tintColors]}
+          locations={[0, 0.55, 1]}
+          style={StyleSheet.absoluteFill}
+        />
+      </View>
+    )
+  }
 
   return (
     <View pointerEvents="none" style={[{height, overflow: 'hidden'}, style]}>
-      {useBlur
-        ? intensities.map((intensity, index) => {
-            const top = index * stripHeight - (index === 0 ? 0 : overlap / 2)
-            const h = stripHeight + (index === 0 || index === stripCount - 1 ? overlap / 2 : overlap)
-            return (
-              <View
-                key={`blur-${index}`}
-                style={[
-                  styles.strip,
-                  {
-                    top: Math.max(0, top),
-                    height: h,
-                  },
-                ]}>
-                <BlurView intensity={intensity} tint={tint} style={StyleSheet.absoluteFill} />
-              </View>
-            )
-          })
-        : null}
+      <MaskedView
+        style={StyleSheet.absoluteFill}
+        maskElement={
+          <LinearGradient
+            colors={[...maskColors]}
+            locations={[...maskLocations]}
+            style={StyleSheet.absoluteFill}
+          />
+        }>
+        <BlurView intensity={intensity} tint={tint} style={StyleSheet.absoluteFill} />
+      </MaskedView>
       <LinearGradient
-        colors={[...tintStops]}
-        locations={[0, 0.35, 0.7, 1]}
+        colors={[...tintColors]}
+        locations={[0, 0.55, 1]}
         style={StyleSheet.absoluteFill}
       />
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  strip: {
-    left: 0,
-    overflow: 'hidden',
-    position: 'absolute',
-    right: 0,
-  },
-})

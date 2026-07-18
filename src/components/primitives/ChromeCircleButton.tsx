@@ -18,6 +18,7 @@ type ChromeCircleButtonProps = {
 
 /**
  * Circular liquid-glass chrome control for header back / options.
+ * Matches Board options: clear glass disc, not an opaque grey circle.
  */
 export function ChromeCircleButton({
   icon,
@@ -29,19 +30,18 @@ export function ChromeCircleButton({
   style,
 }: ChromeCircleButtonProps) {
   const {colours} = useThemeTokens()
+  const circleStyle = [
+    styles.circle,
+    {
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+    },
+    style,
+  ]
+
   const circle = (
-    <LiquidGlassChrome
-      interactive
-      fallback="raised"
-      style={[
-        styles.circle,
-        {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-        },
-        style,
-      ]}>
+    <LiquidGlassChrome interactive fallback="clear" style={circleStyle}>
       <AppIcon name={icon} size={iconSize} colour={colours.text} />
     </LiquidGlassChrome>
   )

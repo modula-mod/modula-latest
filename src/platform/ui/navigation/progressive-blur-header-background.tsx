@@ -5,11 +5,11 @@ import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 
 const HEADER_ROW = 54
 /** Extra dissolve below the nav row so content softens under the chrome. */
-const FADE_EXTENSION = 40
+const FADE_EXTENSION = 52
 
 /**
- * React Navigation `headerBackground` — progressive blur instead of
- * hard-edged `headerBlurEffect` system material.
+ * React Navigation `headerBackground` — MaskedView progressive blur
+ * (rit3zh/expo-progressive-blur technique), not hard system material.
  */
 export function ProgressiveBlurHeaderBackground() {
   const insets = useSafeAreaInsets()
@@ -17,7 +17,7 @@ export function ProgressiveBlurHeaderBackground() {
 
   return (
     <View style={[styles.wrap, {height}]} pointerEvents="none">
-      <ProgressiveBlurBand height={height} topHeavy />
+      <ProgressiveBlurBand height={height} topHeavy intensity={58} />
     </View>
   )
 }
