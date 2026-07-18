@@ -13,6 +13,8 @@ export type DrawerDestination = {
     | '/product'
     | '/product/focus'
     | '/product/forge'
+    | '/product/agents'
+    | '/product/module-standards'
     | '/product/gaia'
     | '/product/automations'
     | '/product/search'

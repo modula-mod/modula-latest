@@ -77,6 +77,12 @@ const drawerDestinations: DrawerDestination[] = [
     description: 'Module Builder pipeline preview',
   },
   {
+    label: 'Agents',
+    route: '/product/agents',
+    icon: 'automation',
+    description: 'Gaia agents module studio',
+  },
+  {
     label: 'Search',
     route: '/product/search',
     icon: 'search',

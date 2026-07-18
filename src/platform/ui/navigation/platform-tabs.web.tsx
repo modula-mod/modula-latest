@@ -1,4 +1,4 @@
-import {Tabs} from 'expo-router'
+import {Tabs, useRouter, type Href} from 'expo-router'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -15,6 +15,13 @@ const webIcons: Record<string, AppIconName> = {
   activity: 'activity',
   profile: 'profile',
 }
+
+const RAIL_SHORTCUTS: Array<{label: string; icon: AppIconName; href: Href}> = [
+  {label: 'Product', icon: 'modules', href: '/product'},
+  {label: 'Forge', icon: 'developer', href: '/product/forge'},
+  {label: 'Agents', icon: 'automation', href: '/product/agents'},
+  {label: 'Focus', icon: 'contrast', href: '/product/focus'},
+]
 
 /**
  * Web adaptive rail / bottom bar using the same ModulaTabDefinition list.
@@ -60,8 +67,9 @@ type WebTabRailProps = {
 
 function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const insets = useSafeAreaInsets()
+  const router = useRouter()
   const {width} = useWindowDimensions()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
   const rail = width >= 900
 
   const visibleRoutes = state.routes.filter(route =>
@@ -100,7 +108,16 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
                 navigation.navigate(route.name)
               }
             }}
-            style={[styles.item, rail && styles.railItem]}>
+            style={[
+              styles.item,
+              rail && styles.railItem,
+              focused && rail
+                ? {
+                    backgroundColor: colours.accentSubtle,
+                    borderRadius: radius.medium,
+                  }
+                : null,
+            ]}>
             <AppIcon
               name={webIcons[route.name] ?? 'home'}
               colour={focused ? colours.accent : colours.textSecondary}
@@ -114,6 +131,26 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
           </AppPressable>
         )
       })}
+
+      {rail ? (
+        <View style={[styles.shortcuts, {gap: spacing[1], marginTop: spacing[3]}]}>
+          <AppText variant="micro" colour="textTertiary">
+            CREATE
+          </AppText>
+          {RAIL_SHORTCUTS.map(item => (
+            <AppPressable
+              key={item.href.toString()}
+              accessibilityLabel={item.label}
+              onPress={() => router.push(item.href)}
+              style={[styles.item, styles.railItem]}>
+              <AppIcon name={item.icon} colour={colours.textSecondary} size={18} />
+              <AppText variant="caption" colour="textSecondary">
+                {item.label}
+              </AppText>
+            </AppPressable>
+          ))}
+        </View>
+      ) : null}
     </View>
   )
 }
@@ -134,11 +171,15 @@ const styles = StyleSheet.create({
     borderRightWidth: StyleSheet.hairlineWidth,
     gap: 8,
     paddingHorizontal: 12,
-    width: 96,
+    width: 104,
   },
   railItem: {
     flex: 0,
     minHeight: 56,
+    width: '100%',
+  },
+  shortcuts: {
+    borderTopColor: 'transparent',
     width: '100%',
   },
 })

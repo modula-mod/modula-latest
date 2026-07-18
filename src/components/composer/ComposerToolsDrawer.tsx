@@ -142,12 +142,28 @@ export function ComposerToolsDrawer({
       <ScrollView
         {...keyboardScrollProps}
         contentContainerStyle={{paddingBottom: bottomPad, gap: spacing[4]}}>
-        <AppText variant="headline">Composer Tools</AppText>
-        {invocationState !== 'idle' ? (
+        <View style={{gap: spacing[1]}}>
+          <AppText variant="headline">Composer Tools</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Function: {invocationState}
-            {invocationMessage ? ` · ${invocationMessage}` : ''}
+            Media, create, modules, and agents — honest Preview / Requires module states.
           </AppText>
+        </View>
+        {invocationState !== 'idle' ? (
+          <View
+            style={[
+              styles.status,
+              {
+                backgroundColor: colours.accentSubtle,
+                borderColor: colours.accentBorder,
+                borderRadius: radius.medium,
+                padding: spacing[3],
+              },
+            ]}>
+            <AppText variant="caption" colour="accent">
+              Function: {invocationState}
+              {invocationMessage ? ` · ${invocationMessage}` : ''}
+            </AppText>
+          </View>
         ) : null}
         {sections.map(section => (
           <View key={section} style={{gap: spacing[2]}}>
@@ -158,9 +174,11 @@ export function ComposerToolsDrawer({
               {tools
                 .filter(tool => tool.section === section)
                 .map(tool => {
+                  const preview = tool.availability === 'preview'
+                  const unavailable = tool.availability === 'unavailable'
                   const label = tool.requiresModule
                     ? `${tool.name} · Requires ${tool.requiresModule}`
-                    : tool.availability === 'preview'
+                    : preview
                       ? `${tool.name} — Preview`
                       : tool.name
                   return (
@@ -171,15 +189,31 @@ export function ComposerToolsDrawer({
                       style={[
                         styles.tool,
                         {
-                          backgroundColor: colours.surfaceMuted,
+                          backgroundColor: unavailable
+                            ? colours.surfaceMuted
+                            : preview
+                              ? colours.accentSubtle
+                              : colours.surface,
+                          borderColor: unavailable
+                            ? colours.border
+                            : preview
+                              ? colours.accentBorder
+                              : colours.border,
                           borderRadius: radius.medium,
                           padding: spacing[3],
                           gap: spacing[2],
-                          opacity: tool.availability === 'unavailable' ? 0.7 : 1,
+                          opacity: unavailable ? 0.7 : 1,
                         },
                       ]}>
                       <AppIcon name={iconFor(tool)} colour={colours.accent} size={22} />
-                      <AppText variant="caption">{label}</AppText>
+                      <AppText variant="caption">{tool.name}</AppText>
+                      <AppText variant="micro" colour="textTertiary">
+                        {unavailable
+                          ? `Requires ${tool.requiresModule ?? 'module'}`
+                          : preview
+                            ? 'Preview'
+                            : tool.section}
+                      </AppText>
                     </AppPressable>
                   )
                 })}
@@ -197,7 +231,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   tool: {
-    minWidth: '46%',
+    borderWidth: StyleSheet.hairlineWidth,
     flexGrow: 1,
+    minHeight: 96,
+    minWidth: '46%',
+  },
+  status: {
+    borderWidth: StyleSheet.hairlineWidth,
   },
 })

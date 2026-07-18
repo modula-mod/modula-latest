@@ -114,11 +114,23 @@ export function CustomizeProfileScreen() {
           </Section>
 
           <Section title="Profile tabs">
+            <AppText variant="caption" colour="textSecondary">
+              Core tabs plus module slots (Shop, Agents). Module tabs stay Preview until packages
+              install via Registry.
+            </AppText>
             <View style={{gap: spacing[2]}}>
               {draft.tabOrder.map((tabId, index) => {
                 const manifest = coreProfileTabs.find(tab => tab.id === tabId)
                 if (!manifest) return null
                 const enabled = draft.enabledTabIds.includes(tabId)
+                const sourceLabel =
+                  manifest.source === 'module'
+                    ? 'Module · Preview'
+                    : manifest.visibility === 'public'
+                      ? 'Public'
+                      : manifest.visibility === 'followers'
+                        ? 'Followers'
+                        : 'Owner only'
                 return (
                   <Surface
                     key={tabId}
@@ -128,11 +140,7 @@ export function CustomizeProfileScreen() {
                     <View style={styles.tabBody}>
                       <AppText variant="label">{manifest.title}</AppText>
                       <AppText variant="caption" colour="textSecondary">
-                        {manifest.visibility === 'public'
-                          ? 'Public'
-                          : manifest.visibility === 'followers'
-                            ? 'Followers'
-                            : 'Owner only'}
+                        {sourceLabel}
                       </AppText>
                     </View>
                     <Switch

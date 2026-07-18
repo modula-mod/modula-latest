@@ -85,6 +85,10 @@ const EXPAND_ACTIONS: ExpandAction[] = [
   {id: 'compose', label: 'Compose', icon: 'create', compose: true},
   {id: 'messages', label: 'Messages', icon: 'messages', href: '/messages'},
   {id: 'marketplace', label: 'Marketplace', icon: 'marketplace', href: '/marketplace'},
+  {id: 'product', label: 'Product Hub', icon: 'modules', href: '/product'},
+  {id: 'forge', label: 'Forge Builder', icon: 'developer', href: '/product/forge'},
+  {id: 'focus', label: 'Focus Mode', icon: 'contrast', href: '/product/focus'},
+  {id: 'agents', label: 'Agents', icon: 'automation', href: '/product/agents'},
   {id: 'discover', label: 'Search / Discover', icon: 'search', href: '/discover'},
   {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
 ]
@@ -150,7 +154,7 @@ export function ModulaLiquidGlassTabBar({
 
   const menuStyle = useAnimatedStyle(() => ({
     height: expanded
-      ? withTiming(reduceMotion ? 300 : 320, {duration: reduceMotion ? 0 : 150})
+      ? withTiming(reduceMotion ? 420 : 460, {duration: reduceMotion ? 0 : 150})
       : withTiming(0, {duration: reduceMotion ? 0 : 150}),
     opacity: expanded
       ? withTiming(1, {duration: reduceMotion ? 0 : 150})

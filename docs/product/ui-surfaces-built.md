@@ -23,7 +23,8 @@
 | `/product/widgets` | Toggle widgets → Board strip (persisted) |
 | `/product/feature-control` | Enable/lock features (persisted) |
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |
-| `/product/forge` | Builder canvas + draft name (persisted) |
+| `/product/forge` | Multi-step Forge Builder + Greenfield manifest preview |
+| `/product/agents` | Agents module studio (Gaia scopes) |
 | `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |
 | `/product/creator` | Creator economy path picker |
@@ -46,6 +47,11 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | `/board` | Widget strip (reorder/remove) + Focus copy from prefs |
 | Home (`/`) | PresenceArc + Focus banner + quiet/work mode order |
 | Messages | Glass Privacy badge + thread hint from prefs |
+| Profile customize | Shop + Agents module tab slots (Preview) |
+| Tab bar expand | Product Hub, Forge, Focus, Agents shortcuts |
+| Web rail | CREATE shortcuts (Product / Forge / Agents / Focus) |
+| `templates/modula-module/` | Module boilerplate + `docs/architecture/module-standards.md` |
+| `/settings/dimon` | Expanded inactive DIMON direction (no balances) |
 | `/settings/dimon` | Expanded DIMON direction (inactive) |
 
 ## Navigation wiring
