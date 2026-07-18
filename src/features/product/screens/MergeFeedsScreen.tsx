@@ -1,10 +1,11 @@
-import {useMemo, useState} from 'react'
+import {useMemo} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -20,7 +21,8 @@ const FEEDS = [
 
 export function MergeFeedsScreen() {
   const {colours, radius, spacing} = useThemeTokens()
-  const [selected, setSelected] = useState<string[]>(['following', 'team'])
+  const {preferences, update} = useProductPreferences()
+  const selected = preferences.mergeFeedIds
 
   const count = selected.length
   const valid = count >= 2 && count <= 5
@@ -30,11 +32,12 @@ export function MergeFeedsScreen() {
   )
 
   const toggle = (id: string) => {
-    setSelected(prev => {
-      if (prev.includes(id)) return prev.filter(item => item !== id)
-      if (prev.length >= 5) return prev
-      return [...prev, id]
-    })
+    const next = selected.includes(id)
+      ? selected.filter(item => item !== id)
+      : selected.length >= 5
+        ? selected
+        : [...selected, id]
+    void update({mergeFeedIds: next})
   }
 
   return (
@@ -45,7 +48,7 @@ export function MergeFeedsScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Assemble your stream.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Combine two to five feeds. Preview only — Greenfield merge recipes are not persisted yet.
+              Combine two to five feeds. Selection persists locally on this device.
             </AppText>
           </View>
 
@@ -66,7 +69,7 @@ export function MergeFeedsScreen() {
               {preview.length ? preview.join(' + ') : 'Select feeds'}
             </AppText>
             <AppText variant="caption" colour={valid ? 'accent' : 'destructive'}>
-              {count} selected · need 2–5
+              {count} selected · need 2–5 · saved locally
             </AppText>
           </Surface>
 
@@ -102,7 +105,7 @@ export function MergeFeedsScreen() {
           </View>
 
           <AppButton disabled={!valid} onPress={() => undefined}>
-            Save merge (Preview)
+            {valid ? 'Merge saved on device' : 'Select 2–5 feeds'}
           </AppButton>
         </ScrollView>
       </ResponsiveContent>

@@ -15,21 +15,24 @@
 
 | Route | Surface |
 | --- | --- |
-| `/product/focus` | Focus Mode toggles + Halo |
-| `/product/merge-feeds` | Merge 2–5 feeds |
-| `/product/automations` | Workflow cards |
-| `/product/gaia` | Agent console |
+| `/product/focus` | Focus Mode toggles + Halo (persisted) |
+| `/product/merge-feeds` | Merge 2–5 feeds (persisted) |
+| `/product/automations` | Workflow cards + local enable (persisted) |
+| `/product/gaia` | Agent console + scopes (persisted) |
 | `/product/gaia-atlas` | Atlas schematic |
-| `/product/widgets` | Widget board preview |
-| `/product/feature-control` | Enable/lock features |
-| `/product/glass-privacy` | Glass Privacy levels |
-| `/product/forge` | Builder pipeline |
-| `/product/integrations` | Elements catalogue |
+| `/product/widgets` | Toggle widgets → Board strip (persisted) |
+| `/product/feature-control` | Enable/lock features (persisted) |
+| `/product/glass-privacy` | Glass Privacy levels (persisted) |
+| `/product/forge` | Builder canvas + draft name (persisted) |
+| `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |
-| `/product/creator` | Creator economy |
+| `/product/creator` | Creator economy path picker |
 | `/product/ownership` | Ownership & portability |
-| `/product/presence` | Presence / short-form (not IG Stories) |
+| `/product/presence` | Presence rings (not IG Stories) |
+| `/product/communities` | Communities OS (also `/communities`) |
 | `/product/[slug]` | Capability pre-screen for every catalogue item |
+
+Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (AsyncStorage).
 
 ## Social OS surfaces
 
@@ -38,8 +41,9 @@
 | `/profile/os` | Profile-OS pre-screen |
 | `/modules` | Modules library (marketplace-backed) |
 | `/marketplace/[id]` | Module pre-screens + Forge card |
-| `/teams` | Teams OS roles preview |
-| `/board` | Empty states + product quick chips |
+| `/teams` | Teams OS role preview + deep links |
+| `/communities` | Communities OS seeded list |
+| `/board` | Widget strip + Focus copy from prefs |
 | `/settings/dimon` | Expanded DIMON direction (inactive) |
 
 ## Navigation wiring

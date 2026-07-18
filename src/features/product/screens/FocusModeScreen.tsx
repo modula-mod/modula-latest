@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import {ScrollView, StyleSheet, Switch, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
@@ -6,47 +5,45 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import type {FocusPreferences} from '@/features/product/storage/productPreferencesStorage'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type FocusToggle = {id: string; label: string; description: string; value: boolean}
+const ROWS: Array<{id: keyof FocusPreferences; label: string; description: string}> = [
+  {
+    id: 'quietFeed',
+    label: 'Quiet the feed',
+    description: 'Prefer Following and mute algorithmic noise.',
+  },
+  {
+    id: 'hideNav',
+    label: 'Hide secondary navigation',
+    description: 'Keep Board, Messages, and active modules.',
+  },
+  {
+    id: 'suppressPings',
+    label: 'Suppress social pings',
+    description: 'Allow mentions and DMs from Inner Circle only.',
+  },
+  {
+    id: 'priorityWork',
+    label: 'Prioritise Tasks + CRM',
+    description: 'Surface work modules above Discover.',
+  },
+  {
+    id: 'showHalo',
+    label: 'Show Focus Halo',
+    description: 'Signal availability on your avatar.',
+  },
+]
 
 export function FocusModeScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [toggles, setToggles] = useState<FocusToggle[]>([
-    {
-      id: 'quiet-feed',
-      label: 'Quiet the feed',
-      description: 'Prefer Following and mute algorithmic noise.',
-      value: true,
-    },
-    {
-      id: 'hide-nav',
-      label: 'Hide secondary navigation',
-      description: 'Keep Board, Messages, and active modules.',
-      value: false,
-    },
-    {
-      id: 'suppress',
-      label: 'Suppress social pings',
-      description: 'Allow mentions and DMs from Inner Circle only.',
-      value: true,
-    },
-    {
-      id: 'priority',
-      label: 'Prioritise Tasks + CRM',
-      description: 'Surface work modules above Discover.',
-      value: true,
-    },
-    {
-      id: 'halo',
-      label: 'Show Focus Halo',
-      description: 'Signal availability on your avatar.',
-      value: true,
-    },
-  ])
+  const {preferences, ready, update} = useProductPreferences()
+  const focus = preferences.focus
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -56,23 +53,24 @@ export function FocusModeScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Protect attention across the Shell.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Focus Mode is local Preview — preferences stay on device until Greenfield sync lands.
+              Preferences persist locally on this device until Greenfield sync lands.
+              {!ready ? ' Loading…' : ''}
             </AppText>
           </View>
 
           <PresenceArc
-            centreLabel={toggles.find(t => t.id === 'halo')?.value ? 'Focused' : 'Available'}
+            centreLabel={focus.showHalo ? 'Focused' : 'Available'}
             items={[
-              {id: 'feed', label: 'Feed', icon: 'home', unread: !toggles[0]?.value},
+              {id: 'feed', label: 'Feed', icon: 'home', unread: !focus.quietFeed},
               {id: 'board', label: 'Board', icon: 'board', unread: true},
-              {id: 'you', label: 'You', icon: 'profile', unread: toggles.find(t => t.id === 'halo')?.value},
+              {id: 'you', label: 'You', icon: 'profile', unread: focus.showHalo},
               {id: 'tasks', label: 'Tasks', icon: 'check'},
               {id: 'crm', label: 'CRM', icon: 'people'},
             ]}
           />
 
           <View style={{gap: spacing[3]}}>
-            {toggles.map((item, index) => (
+            {ROWS.map(item => (
               <Surface
                 key={item.id}
                 variant="contained"
@@ -94,18 +92,16 @@ export function FocusModeScreen() {
                 </View>
                 <Switch
                   accessibilityLabel={item.label}
-                  value={item.value}
+                  value={focus[item.id]}
                   onValueChange={value => {
-                    setToggles(prev =>
-                      prev.map((row, i) => (i === index ? {...row, value} : row)),
-                    )
+                    void update({focus: {...focus, [item.id]: value}})
                   }}
                 />
               </Surface>
             ))}
           </View>
 
-          <AppButton onPress={() => router.push('/board' as Href)}>Apply on Board</AppButton>
+          <AppButton onPress={() => router.push('/board' as Href)}>Open Board</AppButton>
           <AppButton variant="secondary" onPress={() => router.push('/profile/customize' as Href)}>
             Focus Halo on profile
           </AppButton>

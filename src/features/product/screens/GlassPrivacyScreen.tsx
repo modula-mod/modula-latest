@@ -1,4 +1,3 @@
-import {useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
@@ -6,32 +5,34 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const LEVELS = [
   {
-    id: 'disable-sharing',
+    id: 'disable-sharing' as const,
     title: '1 · Disable Sharing',
     body: 'Prevents content from being forwarded or exported through normal controls.',
   },
   {
-    id: 'protected-chat',
+    id: 'protected-chat' as const,
     title: '2 · Protected Chat',
     body: 'Stronger controls for private conversations — limited forward, tighter devices.',
   },
   {
-    id: 'vault-chat',
+    id: 'vault-chat' as const,
     title: '3 · Vault Chat',
     body: 'Highest protection for communication and storage. Module sandbox required.',
   },
-] as const
+]
 
 export function GlassPrivacyScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [level, setLevel] = useState<(typeof LEVELS)[number]['id']>('protected-chat')
+  const {preferences, update} = useProductPreferences()
+  const level = preferences.glassPrivacyLevel
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -41,8 +42,7 @@ export function GlassPrivacyScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Understandable protection levels.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Glass Privacy is product direction Preview — enforcement lands with messaging and Vault
-              modules.
+              Selection persists locally. Enforcement lands with messaging and Vault modules.
             </AppText>
           </View>
 
@@ -53,7 +53,9 @@ export function GlassPrivacyScreen() {
                 key={item.id}
                 accessibilityLabel={item.title}
                 accessibilityState={{selected}}
-                onPress={() => setLevel(item.id)}
+                onPress={() => {
+                  void update({glassPrivacyLevel: item.id})
+                }}
                 style={[
                   styles.card,
                   {
@@ -84,9 +86,11 @@ export function GlassPrivacyScreen() {
                 borderColor: colours.border,
               },
             ]}>
-            <AppText variant="label">Selected · {LEVELS.find(l => l.id === level)?.title}</AppText>
+            <AppText variant="label">
+              Selected · {LEVELS.find(item => item.id === level)?.title}
+            </AppText>
             <AppText variant="caption" colour="textSecondary">
-              Works with per-module permissions, session devices, and export controls.
+              Saved on device · works with sessions, export, and module permissions.
             </AppText>
           </Surface>
 

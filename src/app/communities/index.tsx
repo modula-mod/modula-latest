@@ -1,5 +1,5 @@
-import {CommunitiesHomeScreen} from '@/features/social/screens/SocialSurfaceScreens'
+import {CommunitiesOsScreen} from '@/features/product/screens/CommunitiesOsScreen'
 
 export default function CommunitiesRoute() {
-  return <CommunitiesHomeScreen />
+  return <CommunitiesOsScreen />
 }

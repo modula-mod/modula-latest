@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
@@ -10,6 +10,12 @@ import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
+import {
+  loadProductPreferences,
+  patchProductPreferences,
+} from '@/features/product/storage/productPreferencesStorage'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
@@ -85,6 +91,21 @@ export function BoardScreen() {
   const [pinnedIds, setPinnedIds] = useState(() =>
     ALL_PINNED_SPACES.map(space => space.id),
   )
+  const {preferences} = useProductPreferences()
+  const boardWidgets = useMemo(
+    () => BOARD_WIDGET_CATALOG.filter(widget => preferences.boardWidgetIds.includes(widget.id)),
+    [preferences.boardWidgetIds],
+  )
+
+  useEffect(() => {
+    void loadProductPreferences().then(value => {
+      if (value.boardWidgetIds.length === 0) {
+        void patchProductPreferences({
+          boardWidgetIds: ['tasks', 'calendar', 'notes', 'crm'],
+        })
+      }
+    })
+  }, [])
 
   const pinnedSpaces = useMemo(
     () => ALL_PINNED_SPACES.filter(space => pinnedIds.includes(space.id)),
@@ -92,6 +113,8 @@ export function BoardScreen() {
   )
 
   const loading = discoverQuery.isLoading && activityQuery.isLoading
+  const focusQuiet = preferences.focus.quietFeed
+  const focusHalo = preferences.focus.showHalo
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -143,10 +166,13 @@ export function BoardScreen() {
               <AppIcon name="board" colour={colours.accent} />
             </View>
             <View style={styles.focusBody}>
-              <AppText variant="headline">Current focus</AppText>
+              <AppText variant="headline">
+                {focusHalo ? 'Focus Mode on' : 'Current focus'}
+              </AppText>
               <AppText variant="body" colour="textSecondary">
-                Shape your Profile-OS, install first modules, and keep the shell light while
-                capabilities grow through the Registry.
+                {focusQuiet
+                  ? 'Feed noise is quieted. Prioritise modules, Board widgets, and Profile-OS.'
+                  : 'Shape your Profile-OS, install modules, and keep the shell light via the Registry.'}
               </AppText>
               <View style={{gap: spacing[2]}}>
                 <AppPressable
@@ -173,6 +199,49 @@ export function BoardScreen() {
               </View>
             </View>
           </Surface>
+
+          <View style={{gap: spacing[3]}}>
+            <View style={styles.sectionHeader}>
+              <AppText variant="headline">Widgets</AppText>
+              <AppPressable
+                accessibilityLabel="Manage widgets"
+                onPress={() => router.push('/product/widgets' as Href)}>
+                <AppText variant="caption" colour="accent">
+                  Manage
+                </AppText>
+              </AppPressable>
+            </View>
+            {boardWidgets.length === 0 ? (
+              <AppText variant="caption" colour="textSecondary">
+                No widgets on Board — add some in Widgets studio.
+              </AppText>
+            ) : (
+              <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
+                {boardWidgets.map(widget => (
+                  <Surface
+                    key={widget.id}
+                    variant="contained"
+                    style={[
+                      styles.widgetCard,
+                      {
+                        backgroundColor: colours.surface,
+                        borderColor: colours.border,
+                        borderRadius: radius.large,
+                        padding: spacing[4],
+                        gap: spacing[2],
+                        flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
+                      },
+                    ]}>
+                    <AppIcon name={widget.icon} colour={colours.accent} />
+                    <AppText variant="headline">{widget.name}</AppText>
+                    <AppText variant="caption" colour="textTertiary">
+                      {widget.size} · Local
+                    </AppText>
+                  </Surface>
+                ))}
+              </View>
+            )}
+          </View>
 
           <View style={[styles.quickRow, {gap: spacing[2]}]}>
             {[
@@ -471,6 +540,11 @@ const styles = StyleSheet.create({
   },
   quickChip: {
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  widgetCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    flexGrow: 1,
+    minWidth: 140,
   },
   controlGroup: {
     marginTop: 8,

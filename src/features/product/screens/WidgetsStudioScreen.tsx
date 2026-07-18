@@ -2,27 +2,21 @@ import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
+import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const WIDGETS: Array<{name: string; icon: AppIconName; size: string}> = [
-  {name: 'Tasks', icon: 'check', size: '1×1'},
-  {name: 'Calendar', icon: 'event', size: '2×1'},
-  {name: 'CRM pipeline', icon: 'people', size: '2×2'},
-  {name: 'Notes', icon: 'saved', size: '1×1'},
-  {name: 'Wallet', icon: 'security', size: '1×1'},
-  {name: 'AI summary', icon: 'automation', size: '2×1'},
-  {name: 'Team activity', icon: 'teams', size: '2×1'},
-  {name: 'Recent files', icon: 'storage', size: '1×1'},
-]
-
 export function WidgetsStudioScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const {preferences, update} = useProductPreferences()
+  const selected = new Set(preferences.boardWidgetIds)
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -32,37 +26,46 @@ export function WidgetsStudioScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Lightweight blocks for Board & profiles.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Widgets install independently of full modules. Arrangement Preview — not persisted.
+              Toggle widgets for Board. Selection persists locally.
             </AppText>
           </View>
 
           <View style={[styles.grid, {gap: spacing[3]}]}>
-            {WIDGETS.map(widget => (
-              <Surface
-                key={widget.name}
-                variant="contained"
-                style={[
-                  styles.card,
-                  {
-                    padding: spacing[4],
-                    gap: spacing[2],
-                    borderRadius: radius.large,
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    minHeight: widget.size.startsWith('2×2') ? 160 : 120,
-                    flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
-                  },
-                ]}>
-                <AppIcon name={widget.icon} colour={colours.accent} />
-                <AppText variant="headline">{widget.name}</AppText>
-                <AppText variant="caption" colour="textTertiary">
-                  {widget.size} · Preview
-                </AppText>
-              </Surface>
-            ))}
+            {BOARD_WIDGET_CATALOG.map(widget => {
+              const on = selected.has(widget.id)
+              return (
+                <AppPressable
+                  key={widget.id}
+                  accessibilityLabel={`${on ? 'Remove' : 'Add'} ${widget.name}`}
+                  onPress={() => {
+                    const next = on
+                      ? preferences.boardWidgetIds.filter(id => id !== widget.id)
+                      : [...preferences.boardWidgetIds, widget.id]
+                    void update({boardWidgetIds: next})
+                  }}
+                  style={[
+                    styles.card,
+                    {
+                      padding: spacing[4],
+                      gap: spacing[2],
+                      borderRadius: radius.large,
+                      backgroundColor: on ? colours.accentSubtle : colours.surface,
+                      borderColor: on ? colours.accent : colours.border,
+                      minHeight: widget.size.startsWith('2×2') ? 160 : 120,
+                      flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
+                    },
+                  ]}>
+                  <AppIcon name={widget.icon} colour={colours.accent} />
+                  <AppText variant="headline">{widget.name}</AppText>
+                  <AppText variant="caption" colour="textTertiary">
+                    {widget.size} · {on ? 'On Board' : 'Off'}
+                  </AppText>
+                </AppPressable>
+              )
+            })}
           </View>
 
-          <AppButton onPress={() => router.push('/board' as Href)}>Place on Board</AppButton>
+          <AppButton onPress={() => router.push('/board' as Href)}>Open Board</AppButton>
         </ScrollView>
       </ResponsiveContent>
     </View>

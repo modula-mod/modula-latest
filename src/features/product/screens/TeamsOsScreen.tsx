@@ -1,4 +1,5 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {useState} from 'react'
+import {Pressable, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
@@ -9,19 +10,28 @@ import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const ROLES = ['Owner', 'Admin', 'Editor', 'Member', 'Guest']
+const ROLES = [
+  {id: 'owner', label: 'Owner', desc: 'Full org control'},
+  {id: 'admin', label: 'Admin', desc: 'Manage members & modules'},
+  {id: 'editor', label: 'Editor', desc: 'Edit shared Board & content'},
+  {id: 'member', label: 'Member', desc: 'Post & collaborate'},
+  {id: 'guest', label: 'Guest', desc: 'View limited surfaces'},
+] as const
+
 const SHARED = [
-  'Shared Board widgets',
-  'Team CRM',
-  'Collaborative tasks',
-  'Shared files & calendar',
-  'Organisation posts',
-  'Approval workflows',
+  {label: 'Shared Board widgets', href: '/product/widgets' as Href},
+  {label: 'Team CRM', href: '/marketplace/module-crm' as Href},
+  {label: 'Collaborative tasks', href: '/marketplace/module-tasks' as Href},
+  {label: 'Shared files & calendar', href: '/marketplace/module-calendar' as Href},
+  {label: 'Organisation posts', href: '/communities' as Href},
+  {label: 'Approval workflows', href: '/product/automations' as Href},
 ]
 
 export function TeamsOsScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const [activeRole, setActiveRole] = useState<(typeof ROLES)[number]['id']>('admin')
+  const role = ROLES.find(r => r.id === activeRole) ?? ROLES[1]
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -35,52 +45,83 @@ export function TeamsOsScreen() {
             </AppText>
           </View>
 
+          <Surface
+            variant="contained"
+            style={[
+              styles.card,
+              {
+                padding: spacing[4],
+                gap: spacing[2],
+                borderRadius: radius.large,
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+              },
+            ]}>
+            <AppText variant="caption" colour="textTertiary">
+              PREVIEW AS
+            </AppText>
+            <AppText variant="title">{role.label}</AppText>
+            <AppText variant="body" colour="textSecondary">
+              {role.desc}
+            </AppText>
+          </Surface>
+
           <View style={[styles.roles, {gap: spacing[2]}]}>
-            {ROLES.map(role => (
-              <Surface
-                key={role}
-                variant="contained"
-                style={[
-                  styles.role,
-                  {
-                    paddingHorizontal: spacing[3],
-                    paddingVertical: spacing[2],
-                    borderRadius: radius.round,
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                  },
-                ]}>
-                <AppText variant="caption">{role}</AppText>
-              </Surface>
-            ))}
+            {ROLES.map(item => {
+              const on = item.id === activeRole
+              return (
+                <Pressable key={item.id} onPress={() => setActiveRole(item.id)}>
+                  <Surface
+                    variant="contained"
+                    style={[
+                      styles.role,
+                      {
+                        paddingHorizontal: spacing[3],
+                        paddingVertical: spacing[2],
+                        borderRadius: radius.round,
+                        backgroundColor: on ? colours.accentSubtle : colours.surface,
+                        borderColor: on ? colours.accent : colours.border,
+                      },
+                    ]}>
+                    <AppText variant="caption" colour={on ? 'accent' : 'text'}>
+                      {item.label}
+                    </AppText>
+                  </Surface>
+                </Pressable>
+              )
+            })}
           </View>
 
           <View style={{gap: spacing[3]}}>
             {SHARED.map(item => (
-              <Surface
-                key={item}
-                variant="contained"
-                style={[
-                  styles.row,
-                  {
-                    padding: spacing[4],
-                    gap: spacing[2],
-                    borderRadius: radius.medium,
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                  },
-                ]}>
-                <AppIcon name="teams" colour={colours.accent} size={18} />
-                <AppText variant="body">{item}</AppText>
-              </Surface>
+              <Pressable key={item.label} onPress={() => router.push(item.href)}>
+                <Surface
+                  variant="contained"
+                  style={[
+                    styles.row,
+                    {
+                      padding: spacing[4],
+                      gap: spacing[2],
+                      borderRadius: radius.medium,
+                      backgroundColor: colours.surface,
+                      borderColor: colours.border,
+                    },
+                  ]}>
+                  <AppIcon name="teams" colour={colours.accent} size={18} />
+                  <AppText variant="body" style={{flex: 1}}>
+                    {item.label}
+                  </AppText>
+                  <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
+                </Surface>
+              </Pressable>
             ))}
           </View>
 
           <AppButton onPress={() => router.push('/product/teams' as Href)}>
             Teams capability card
           </AppButton>
-          <AppButton variant="secondary" onPress={() => router.push('/profile/os' as Href)}>
-            Profile-OS
+          <AppButton variant="secondary" onPress={() => router.push('/product' as Href)}>
+            All capabilities
           </AppButton>
         </ScrollView>
       </ResponsiveContent>
@@ -90,6 +131,7 @@ export function TeamsOsScreen() {
 
 const styles = StyleSheet.create({
   screen: {flex: 1},
+  card: {borderWidth: StyleSheet.hairlineWidth},
   roles: {flexDirection: 'row', flexWrap: 'wrap'},
   role: {borderWidth: StyleSheet.hairlineWidth},
   row: {
