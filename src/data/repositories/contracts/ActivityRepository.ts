@@ -3,4 +3,6 @@ import type {ActivityItem} from '@/domain/activity'
 
 export interface ActivityRepository {
   getActivity(input: {cursor?: string | null; limit?: number}): Promise<CursorPage<ActivityItem>>
+  markRead(activityId: string): Promise<void>
+  markAllRead(): Promise<void>
 }

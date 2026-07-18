@@ -29,6 +29,7 @@ import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ActivityListSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ActivityItem} from '@/domain/activity'
 
@@ -40,10 +41,33 @@ if (
 }
 
 const groups = ['Today', 'This week', 'Earlier'] as const
-type ActivityFilter = 'all' | ActivityItem['type']
+type ActivityFilter = 'all' | 'replies' | 'mentions' | 'reactions' | 'follows' | 'extensions' | 'system'
+const filters: readonly [ActivityFilter, string][] = [
+  ['all', 'All'],
+  ['replies', 'Replies'],
+  ['mentions', 'Mentions'],
+  ['reactions', 'Reactions'],
+  ['follows', 'Follows'],
+  ['extensions', 'Extensions'],
+  ['system', 'System'],
+]
+
+function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
+  if (filter === 'all') return true
+  const types: Record<Exclude<ActivityFilter, 'all'>, ActivityItem['type'][]> = {
+    replies: ['reply'],
+    mentions: ['mention'],
+    reactions: ['reaction', 'like'],
+    follows: ['follow'],
+    extensions: ['extension', 'moduleUpdate'],
+    system: ['system', 'teamInvitation'],
+  }
+  return types[filter].includes(item.type)
+}
 
 export function ActivityScreen() {
   const router = useRouter()
+  const {activityRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
@@ -53,7 +77,7 @@ export function ActivityScreen() {
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set())
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
   const filtered = useMemo(
-    () => (filter === 'all' ? activity : activity.filter(item => item.type === filter)),
+    () => activity.filter(item => matchesFilter(item, filter)),
     [activity, filter],
   )
 
@@ -101,6 +125,7 @@ export function ActivityScreen() {
   const markAllRead = () => {
     setReadIds(new Set(activity.map(item => item.id)))
     void selectionHaptic()
+    void activityRepository.markAllRead().catch(() => undefined)
   }
 
   return (
@@ -149,23 +174,20 @@ export function ActivityScreen() {
 
           <View style={{flexDirection: 'row', gap: spacing[2]}}>
             <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
-            <Pill
-              label="Mentions"
-              selected={filter === 'mention'}
-              onPress={() => applyFilter('mention')}
-            />
+            <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
+            <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
             <Pill
               label="Filters"
               selected={
-                filter !== 'all' && filter !== 'mention'
+                filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
               }
               onPress={() => setFilterSheetOpen(true)}
             />
           </View>
 
-          {filter !== 'all' && filter !== 'mention' ? (
+          {filter !== 'all' && filter !== 'mentions' && filter !== 'replies' ? (
             <AppText variant="caption" colour="textSecondary">
-              Showing {filter} · local preview filters
+              Showing {filter}
             </AppText>
           ) : null}
 
@@ -183,9 +205,11 @@ export function ActivityScreen() {
                       unread={!readIds.has(item.id)}
                       onOpen={() => {
                         setReadIds(prev => new Set(prev).add(item.id))
+                        void activityRepository.markRead(item.id).catch(() => undefined)
                       }}
                       onMarkRead={() => {
                         setReadIds(prev => new Set(prev).add(item.id))
+                        void activityRepository.markRead(item.id).catch(() => undefined)
                       }}
                     />
                   ))}
@@ -204,19 +228,9 @@ export function ActivityScreen() {
         <View style={{gap: spacing[3]}}>
           <AppText variant="headline">Filter activity</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Choose a local filter. Nothing is synced remotely.
+            Filter notifications by type.
           </AppText>
-          {(
-            [
-              ['all', 'All'],
-              ['mention', 'Mentions'],
-              ['like', 'Likes'],
-              ['reply', 'Replies'],
-              ['follow', 'Follows'],
-              ['moduleUpdate', 'Modules'],
-              ['teamInvitation', 'Teams'],
-            ] as const
-          ).map(([id, label]) => (
+          {filters.map(([id, label]) => (
             <AppPressable
               key={id}
               accessibilityLabel={`Filter ${label}`}
