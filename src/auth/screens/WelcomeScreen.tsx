@@ -53,12 +53,15 @@ export function WelcomeScreen() {
           <AppButton variant="secondary" onPress={() => router.push('/product' as Href)}>
             Explore capabilities
           </AppButton>
+          <AppButton variant="ghost" onPress={() => router.push('/product/forge' as Href)}>
+            Peek at Forge Builder
+          </AppButton>
           <AppButton variant="ghost" onPress={continueAsGuest}>
             Explore as guest
           </AppButton>
           <AppText variant="caption" colour="textSecondary">
-            Modula Accounts are owned by Greenfield. Modules install through the Registry — DIMON and
-            Gaia come later.
+            Modula Accounts are owned by Greenfield. Modules install through the Registry — Forge drafts
+            manifests now; DIMON and Gaia models come later.
           </AppText>
         </AuthPanel>
       </View>

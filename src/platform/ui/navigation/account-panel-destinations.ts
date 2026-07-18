@@ -60,6 +60,20 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     description: 'Quiet the shell',
   },
   {
+    id: 'forge',
+    label: 'Forge Builder',
+    route: '/product/forge',
+    icon: 'developer',
+    description: 'Draft module manifests',
+  },
+  {
+    id: 'agents',
+    label: 'Agents',
+    route: '/product/agents',
+    icon: 'automation',
+    description: 'Gaia agent packages',
+  },
+  {
     id: 'search',
     label: 'Search',
     route: '/product/search',

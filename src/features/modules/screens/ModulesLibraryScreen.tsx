@@ -33,38 +33,77 @@ export function ModulesLibraryScreen() {
             <AppButton variant="secondary" onPress={() => router.push('/product/forge' as Href)}>
               Forge Builder
             </AppButton>
+            <AppButton variant="ghost" onPress={() => router.push('/product/module-standards' as Href)}>
+              Module standards
+            </AppButton>
             <AppButton variant="ghost" onPress={() => router.push('/product' as Href)}>
               All capabilities
             </AppButton>
           </View>
 
-          <View style={[styles.grid, {gap: spacing[3]}]}>
-            {marketplaceCatalog.map(module => (
-              <AppPressable
-                key={module.id}
-                accessibilityLabel={`Open ${module.name} pre-screen`}
-                onPress={() => router.push(`/marketplace/${module.id}` as Href)}
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    borderRadius: radius.large,
-                    padding: spacing[4],
-                    gap: spacing[2],
-                  },
-                ]}>
-                <AppIcon name={module.icon} colour={colours.accent} />
-                <AppText variant="headline">{module.name}</AppText>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
-                  {module.description}
-                </AppText>
-                <AppText variant="caption" colour="accent">
-                  {module.status}
-                </AppText>
-              </AppPressable>
-            ))}
-          </View>
+          {(
+            [
+              {
+                title: 'Build',
+                ids: ['module-forge', 'module-standards', 'module-agents', 'module-themes', 'module-layouts'],
+              },
+              {
+                title: 'Intelligence',
+                ids: marketplaceCatalog
+                  .filter(m => m.category === 'intelligence')
+                  .map(m => m.id),
+              },
+              {
+                title: 'Productivity',
+                ids: marketplaceCatalog
+                  .filter(m => m.category === 'productivity')
+                  .map(m => m.id),
+              },
+              {
+                title: 'All modules',
+                ids: marketplaceCatalog.map(m => m.id),
+              },
+            ] as const
+          ).map(shelf => {
+            const items = shelf.ids
+              .map(id => marketplaceCatalog.find(module => module.id === id))
+              .filter((module): module is (typeof marketplaceCatalog)[number] => Boolean(module))
+            if (items.length === 0) return null
+            return (
+              <View key={shelf.title} style={{gap: spacing[3]}}>
+                <AppText variant="headline">{shelf.title}</AppText>
+                <View style={[styles.grid, {gap: spacing[3]}]}>
+                  {items.map(module => (
+                    <AppPressable
+                      key={`${shelf.title}-${module.id}`}
+                      accessibilityLabel={`Open ${module.name} pre-screen`}
+                      onPress={() => router.push(`/marketplace/${module.id}` as Href)}
+                      style={[
+                        styles.card,
+                        {
+                          backgroundColor:
+                            shelf.title === 'Build' ? colours.accentSubtle : colours.surface,
+                          borderColor:
+                            shelf.title === 'Build' ? colours.accentBorder : colours.border,
+                          borderRadius: radius.large,
+                          padding: spacing[4],
+                          gap: spacing[2],
+                        },
+                      ]}>
+                      <AppIcon name={module.icon} colour={colours.accent} />
+                      <AppText variant="headline">{module.name}</AppText>
+                      <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                        {module.description}
+                      </AppText>
+                      <AppText variant="caption" colour="accent">
+                        {module.status}
+                      </AppText>
+                    </AppPressable>
+                  ))}
+                </View>
+              </View>
+            )
+          })}
 
           <Surface
             variant="contained"
@@ -79,6 +118,11 @@ export function ModulesLibraryScreen() {
               },
             ]}>
             <AppText variant="label">Also explore</AppText>
+            <AppPressable onPress={() => router.push('/product/agents' as Href)}>
+              <AppText variant="body" colour="accent">
+                Agents studio →
+              </AppText>
+            </AppPressable>
             <AppPressable onPress={() => router.push('/product/automations' as Href)}>
               <AppText variant="body" colour="accent">
                 Automations studio →
