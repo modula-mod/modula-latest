@@ -82,14 +82,10 @@ export function AppearanceLabScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Appearance Lab</AppText>
-            <AppText variant="body" colour="textSub">
-              Inspect token behaviour, material contracts, and accessibility
-              fallbacks inside the live runtime. Glass previews are chrome-only;
-              the unfinished engines are deferred per theme architecture.
-            </AppText>
-          </View>
+          <AppText variant="caption" colour="textTertiary">
+            Inspect token behaviour and material contracts. Glass previews are
+            chrome-only — unfinished engines remain deferred.
+          </AppText>
 
           <LabSection title="Quick presets" icon="palette">
             <View style={[styles.wrap, {gap: spacing[2]}]}>

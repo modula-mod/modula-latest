@@ -28,12 +28,9 @@ export function AccessibilityScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Accessibility</AppText>
-            <AppText variant="body" colour="textSub">
-              Keep Modula legible, operable, and calm across device settings.
-            </AppText>
-          </View>
+          <AppText variant="caption" colour="textTertiary">
+            Keep Modula legible, operable, and calm across device settings.
+          </AppText>
 
           <Section title="Vision" icon="text">
             <MaterialSurface role="card" style={[styles.panel, {gap: spacing[3]}]}>

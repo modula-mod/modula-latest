@@ -5,7 +5,6 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
-  SettingsInfoBlock,
   SettingsLinkRow,
   SettingsSection,
   type SettingsNavRow,
@@ -223,10 +222,9 @@ export function SettingsHomeScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <SettingsInfoBlock
-            title="Settings"
-            body="Manage the local Modula shell. Every row opens a real screen with usable controls or honest Preview content."
-          />
+          <AppText variant="caption" colour="textTertiary">
+            Manage the local Modula shell. Every row opens a real screen or honest Preview.
+          </AppText>
 
           <View
             style={[
