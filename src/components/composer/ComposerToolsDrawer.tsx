@@ -1,15 +1,18 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {useEffect, useMemo, useState} from 'react'
+import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import type {ComposerToolItem, ComposerToolSection, FunctionInvocationState} from '@/data/repositories/contracts'
 import {
   keyboardScrollProps,
   sheetKeyboardBottomInset,
   useKeyboardHeight,
 } from '@/platform/ui/keyboard'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ComposerToolsDrawerProps = {
@@ -23,16 +26,31 @@ type ComposerToolsDrawerProps = {
   onPlaceholder: (toolName: string) => void
 }
 
-type ToolItem = {
-  label: string
-  icon: AppIconName
-  section: 'Media' | 'Create' | 'Tools' | 'Marketplace'
-  onPress: () => void
+const SECTIONS: ComposerToolSection[] = [
+  'Media',
+  'Create',
+  'Productivity',
+  'Automation',
+  'AI',
+  'Modules',
+  'Marketplace',
+]
+
+function iconFor(tool: ComposerToolItem): AppIconName {
+  if (tool.toolId.includes('camera')) return 'camera'
+  if (tool.toolId.includes('photo') || tool.toolId.includes('gif')) return 'photo'
+  if (tool.toolId.includes('poll')) return 'poll'
+  if (tool.toolId.includes('link')) return 'link'
+  if (tool.toolId.includes('market')) return 'marketplace'
+  if (tool.toolId.includes('automation')) return 'automation'
+  if (tool.section === 'Modules') return 'modules'
+  if (tool.section === 'AI') return 'tools'
+  return 'tools'
 }
 
 /**
  * Composer Tools via ModulaSheet (Expo UI BottomSheet on native).
- * Preserves sibling keyboard inset helpers and does not discard the draft.
+ * Loads tools from the Greenfield registry with built-in fallback.
  */
 export function ComposerToolsDrawer({
   visible,
@@ -47,50 +65,73 @@ export function ComposerToolsDrawer({
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
   const {colours, radius, spacing} = useThemeTokens()
+  const services = useAppServices()
+  const [tools, setTools] = useState<ComposerToolItem[]>([])
+  const [invocationState, setInvocationState] = useState<FunctionInvocationState>('idle')
+  const [invocationMessage, setInvocationMessage] = useState<string | null>(null)
   const bottomPad = sheetKeyboardBottomInset(keyboardHeight, insets.bottom, spacing[4])
 
-  const tools: ToolItem[] = [
-    {section: 'Media', label: 'Photo', icon: 'photo', onPress: onPhoto},
-    {section: 'Media', label: 'Camera', icon: 'camera', onPress: onCamera},
-    {section: 'Media', label: 'GIF', icon: 'gif', onPress: () => onPlaceholder('GIF')},
-    {section: 'Create', label: 'Poll', icon: 'poll', onPress: onInsertPoll},
-    {section: 'Create', label: 'Link', icon: 'link', onPress: onInsertLink},
-    {
-      section: 'Create',
-      label: 'Module post',
-      icon: 'modules',
-      onPress: () => onPlaceholder('Module post'),
-    },
-    {
-      section: 'Tools',
-      label: 'Comment to DM — Preview',
-      icon: 'messages',
-      onPress: () => onPlaceholder('Comment to DM'),
-    },
-    {
-      section: 'Tools',
-      label: 'Automation — Preview',
-      icon: 'automation',
-      onPress: () => onPlaceholder('Automation'),
-    },
-    {
-      section: 'Tools',
-      label: 'AI Assist — Preview',
-      icon: 'tools',
-      onPress: () => onPlaceholder('AI Assist'),
-    },
-    {
-      section: 'Marketplace',
-      label: 'Browse tools',
-      icon: 'marketplace',
-      onPress: () => {
-        onClose()
-        onBrowseMarketplace()
-      },
-    },
-  ]
+  useEffect(() => {
+    if (!visible) return
+    let active = true
+    void services.toolsRepository.listComposerTools().then(items => {
+      if (active) setTools(items)
+    })
+    return () => {
+      active = false
+    }
+  }, [services.toolsRepository, visible])
 
-  const sections = ['Media', 'Create', 'Tools', 'Marketplace'] as const
+  const sections = useMemo(
+    () => SECTIONS.filter(section => tools.some(tool => tool.section === section)),
+    [tools],
+  )
+
+  const runTool = (tool: ComposerToolItem) => {
+    if (tool.requiresModule && tool.availability === 'unavailable') {
+      Alert.alert(`Requires ${tool.requiresModule}`, `${tool.name} needs the ${tool.requiresModule} module.`)
+      return
+    }
+    if (tool.toolId.includes('photo')) {
+      onPhoto()
+      return
+    }
+    if (tool.toolId.includes('camera')) {
+      onCamera()
+      return
+    }
+    if (tool.toolId.includes('link')) {
+      onInsertLink()
+      return
+    }
+    if (tool.toolId.includes('poll')) {
+      onInsertPoll()
+      return
+    }
+    if (tool.toolId.includes('market')) {
+      onClose()
+      onBrowseMarketplace()
+      return
+    }
+    setInvocationState('validating')
+    setInvocationMessage(`Validating ${tool.name}…`)
+    void (async () => {
+      setInvocationState('running')
+      const result = await services.toolsRepository.invokeFunction(tool.toolId, {})
+      setInvocationState(result.state)
+      if (result.jobId) {
+        setInvocationMessage(`Queued as job ${result.jobId}. Composer stays usable.`)
+        return
+      }
+      if (result.state === 'failed') {
+        setInvocationMessage(result.message ?? 'Failed')
+        onPlaceholder(tool.name)
+        return
+      }
+      setInvocationMessage(result.message ?? 'Completed')
+      onPlaceholder(tool.name)
+    })()
+  }
 
   return (
     <ModulaSheet
@@ -102,6 +143,12 @@ export function ComposerToolsDrawer({
         {...keyboardScrollProps}
         contentContainerStyle={{paddingBottom: bottomPad, gap: spacing[4]}}>
         <AppText variant="headline">Composer Tools</AppText>
+        {invocationState !== 'idle' ? (
+          <AppText variant="caption" colour="textSecondary">
+            Function: {invocationState}
+            {invocationMessage ? ` · ${invocationMessage}` : ''}
+          </AppText>
+        ) : null}
         {sections.map(section => (
           <View key={section} style={{gap: spacing[2]}}>
             <AppText variant="label" colour="textSecondary">
@@ -110,32 +157,32 @@ export function ComposerToolsDrawer({
             <View style={[styles.grid, {gap: spacing[2]}]}>
               {tools
                 .filter(tool => tool.section === section)
-                .map(tool => (
-                  <AppPressable
-                    key={tool.label}
-                    accessibilityLabel={tool.label}
-                    onPress={() => {
-                      tool.onPress()
-                      // Keep sheet open for media/create until caller closes;
-                      // preview placeholders dismiss to reduce clutter.
-                      if (tool.label.includes('Preview')) {
-                        onClose()
-                      }
-                    }}
-                    style={[
-                      styles.tool,
-                      {
-                        backgroundColor: colours.surfaceRaised,
-                        borderColor: colours.border,
-                        borderRadius: radius.md,
-                      },
-                    ]}>
-                    <AppIcon name={tool.icon} colour={colours.accent} />
-                    <AppText variant="caption" numberOfLines={2} style={styles.toolLabel}>
-                      {tool.label}
-                    </AppText>
-                  </AppPressable>
-                ))}
+                .map(tool => {
+                  const label = tool.requiresModule
+                    ? `${tool.name} · Requires ${tool.requiresModule}`
+                    : tool.availability === 'preview'
+                      ? `${tool.name} — Preview`
+                      : tool.name
+                  return (
+                    <AppPressable
+                      key={tool.toolId}
+                      accessibilityLabel={label}
+                      onPress={() => runTool(tool)}
+                      style={[
+                        styles.tool,
+                        {
+                          backgroundColor: colours.surfaceMuted,
+                          borderRadius: radius.medium,
+                          padding: spacing[3],
+                          gap: spacing[2],
+                          opacity: tool.availability === 'unavailable' ? 0.7 : 1,
+                        },
+                      ]}>
+                      <AppIcon name={iconFor(tool)} colour={colours.accent} size={22} />
+                      <AppText variant="caption">{label}</AppText>
+                    </AppPressable>
+                  )
+                })}
             </View>
           </View>
         ))}
@@ -150,15 +197,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   tool: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: '30%',
-    gap: 8,
-    justifyContent: 'center',
-    minHeight: 88,
-    padding: 10,
-  },
-  toolLabel: {
-    textAlign: 'center',
+    minWidth: '46%',
+    flexGrow: 1,
   },
 })
