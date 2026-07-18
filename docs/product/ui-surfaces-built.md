@@ -10,7 +10,8 @@
 | `/welcome` | Atmospheric welcome + capabilities CTA |
 | `/onboarding` | 3-step first-run + PresenceArc |
 | `/product` | Full Product Hub catalogue |
-| `/product/atlas` | Feature Atlas registry: hundreds of named capabilities with honest maturity labels |
+| `/product/atlas` | Feature Atlas registry: **580+** named capabilities with honest maturity labels |
+| `/product/design-lab` | X + Apple Liquid Glass inspiration remaps (Modula Teal, not a clone) |
 
 ## Interactive studios
 
@@ -39,6 +40,7 @@
 | `/product/forge` | Plan/Build/Preview/Manifest workspace + templates, chat, scan, versions |
 | `/product/permissions` | Permissions matrix + Security Scan Preview |
 | `/product/developer` | Developer Tools studio: Greenfield MCP status, Modula CLI commands, Cursor `mcp.json` example |
+| `/product/nft` | NFT ownership foreshadow — DIMON inactive, mint/transfer blocked |
 | `/product/agents` | Agents module studio (Gaia scopes) |
 | `/product/integrations` | Elements catalogue + pin/filter |
 | `/product/search` | Universal search preview |

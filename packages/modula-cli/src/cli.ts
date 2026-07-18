@@ -95,15 +95,28 @@ const DESIGN_PRINCIPLES = [
   {
     source: 'X',
     bullets: [
-      'Public square -> protocol-independent social surfaces, not a feed clone.',
-      'Creator reach -> user-owned graph, modules, and permissions instead of platform lock-in.',
+      'Content-first densification: text breathes, media glows, chrome stays thin.',
+      'Following / For You mode bar inspired — Modula adds Modules as a third rail.',
+      'Hairline separators over heavy cards for social reading.',
+      'Action-row micro-feedback with honest pending/preview states.',
+      'Not a clone: no Chirp, X Blue, or X logo — Modula Teal #369CAA via tokens.',
     ],
   },
   {
     source: 'Apple',
     bullets: [
-      'Integrated device feel -> calm host shell with accessible native surfaces.',
-      'Ecosystem polish -> explicit module contracts, review gates, and user control.',
+      'Liquid Glass belongs on the navigation layer (tabs, sheets), not post content.',
+      'Minimize chrome on scroll inspiration — content stays the hero.',
+      'Reduce Transparency must keep glass chrome readable.',
+      'OLED black canvas + solid content surfaces for legibility.',
+      'Surface Types map glass/glay/native/solid — engines stay deferred until ready.',
+    ],
+  },
+  {
+    source: 'Modula',
+    bullets: [
+      'Profile-OS is the platform; modules are capabilities; GAIA/AKI/Governor govern intelligence.',
+      'See /product/design-lab and docs/design/ui-inspiration-index.md',
     ],
   },
 ] as const
