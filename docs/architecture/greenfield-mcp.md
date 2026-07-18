@@ -121,6 +121,12 @@ Current static domains:
 - Attention, privacy, and safety
 - Creation, economy, and optional inventory
 
+### `greenfield.design.principles`
+
+Returns short X / Apple remap bullets for Modula product direction. The response
+is static product guidance only and does not publish, call a network, touch a
+wallet, or use chain RPC.
+
 ### `greenfield.commands.list`
 
 Returns a static catalogue of example commands:

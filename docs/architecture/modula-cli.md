@@ -37,6 +37,8 @@ Node shebang so the built file starts with:
 | `modula help` | Print available commands and honesty boundary |
 | `modula doctor` | Print Greenfield host readiness checks |
 | `modula atlas stats` | Print approximate package-local Feature Atlas domain counts |
+| `modula atlas count` | Print the static host atlas `500+` entry-count statement |
+| `modula design principles` | Print short X / Apple remap bullets for Modula product direction |
 | `modula mcp info` | Explain the current MCP run boundary |
 | `modula module validate <path>` | Read and validate a manifest JSON file |
 | `modula module init [--write]` | Print instructions for copying `templates/modula-module/` |
@@ -81,9 +83,10 @@ contracts, local development surfaces, and static preview catalogues.
 
 ## Static catalogue boundary
 
-`atlas stats`, `forge templates`, `commands list/search`, `focus policy`, and
-`privacy levels` duplicate small package-local summaries. They must not import
-app source or present the data as live telemetry, runtime state, or user data.
+`atlas stats`, `atlas count`, `design principles`, `forge templates`,
+`commands list/search`, `focus policy`, and `privacy levels` duplicate small
+package-local summaries. They must not import app source or present the data as
+live telemetry, runtime state, user data, or chain RPC.
 
 `verify phase6s` intentionally prints:
 

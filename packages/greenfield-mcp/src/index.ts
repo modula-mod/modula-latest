@@ -51,6 +51,7 @@ type GreenfieldToolName =
   | 'greenfield.doctor'
   | 'greenfield.manifest.validate'
   | 'greenfield.atlas.summary'
+  | 'greenfield.design.principles'
   | 'greenfield.intelligence.layers'
   | 'greenfield.commands.list'
   | 'greenfield.dimon.status'
@@ -148,6 +149,23 @@ const atlasDomainStats = [
     domain: 'Creation, economy, and optional inventory',
     count: 6,
     examples: ['Composer Tools', 'Creator Economy', 'DIMON', 'Gamification', 'Widgets'],
+  },
+] as const
+
+const designPrinciples = [
+  {
+    source: 'X',
+    bullets: [
+      'Public square -> protocol-independent social surfaces, not a feed clone.',
+      'Creator reach -> user-owned graph, modules, and permissions instead of platform lock-in.',
+    ],
+  },
+  {
+    source: 'Apple',
+    bullets: [
+      'Integrated device feel -> calm host shell with accessible native surfaces.',
+      'Ecosystem polish -> explicit module contracts, review gates, and user control.',
+    ],
   },
 ] as const
 
@@ -316,6 +334,15 @@ export const toolDefinitions: ToolDefinition[] = [
     },
   },
   {
+    name: 'greenfield.design.principles',
+    description: 'Return short X / Apple remap bullets for Modula product direction.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
     name: 'greenfield.commands.list',
     description: 'List static example commands for the Greenfield preview.',
     inputSchema: {
@@ -435,6 +462,14 @@ export function callGreenfieldTool(name: string, args: unknown = {}): ToolCallRe
           'Schematic only. No live graph runtime, telemetry, user data, chain RPC, or network calls.',
       })
     }
+
+    case 'greenfield.design.principles':
+      return jsonToolResult({
+        status: 'static-guidance',
+        principles: designPrinciples,
+        honesty:
+          'Static product guidance only. No publishing, wallet action, network call, or chain RPC.',
+      })
 
     case 'greenfield.commands.list':
       return jsonToolResult({

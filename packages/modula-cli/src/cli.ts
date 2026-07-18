@@ -89,6 +89,25 @@ const ATLAS_DOMAIN_STATS = [
   },
 ] as const
 
+const HOST_ATLAS_ENTRY_COUNT = '500+'
+
+const DESIGN_PRINCIPLES = [
+  {
+    source: 'X',
+    bullets: [
+      'Public square -> protocol-independent social surfaces, not a feed clone.',
+      'Creator reach -> user-owned graph, modules, and permissions instead of platform lock-in.',
+    ],
+  },
+  {
+    source: 'Apple',
+    bullets: [
+      'Integrated device feel -> calm host shell with accessible native surfaces.',
+      'Ecosystem polish -> explicit module contracts, review gates, and user control.',
+    ],
+  },
+] as const
+
 const FORGE_TEMPLATES = [
   {
     id: 'blank',
@@ -160,6 +179,24 @@ const COMMAND_CATALOGUE: CommandCatalogueEntry[] = [
     id: 'atlas.stats',
     label: 'Atlas domain stats',
     description: 'Print approximate Feature Atlas domain counts.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No side effects',
+  },
+  {
+    id: 'atlas.count',
+    label: 'Atlas entry count',
+    description: 'Print the static host Feature Atlas entry-count statement.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No side effects',
+  },
+  {
+    id: 'design.principles',
+    label: 'Design principles',
+    description: 'Print short X / Apple remap bullets for Modula product direction.',
     risk: 'low',
     confirmation: 'none',
     permissions: [],
@@ -352,6 +389,8 @@ Usage:
   modula help
   modula doctor
   modula atlas stats
+  modula atlas count
+  modula design principles
   modula mcp info
   modula module validate <path-to-modula.module.json>
   modula module init [--write]
@@ -386,6 +425,14 @@ export async function run(args: string[]): Promise<CommandResult> {
 
   if (first === 'atlas' && second === 'stats') {
     return ok(atlasStatsText())
+  }
+
+  if (first === 'atlas' && second === 'count') {
+    return ok(atlasCountText())
+  }
+
+  if (first === 'design' && second === 'principles') {
+    return ok(designPrinciplesText())
   }
 
   if (first === 'mcp' && second === 'info') {
@@ -544,6 +591,30 @@ ${ATLAS_DOMAIN_STATS.map(
 
 Honesty:
   Schematic only. No live graph runtime, telemetry, user data, or network calls.
+`
+}
+
+function atlasCountText(): string {
+  return `Feature Atlas count
+
+Host atlas: ${HOST_ATLAS_ENTRY_COUNT} entries (static)
+
+Boundary:
+  Package-local statement only. No app source import, telemetry, user data,
+  network call, wallet action, or chain RPC.
+`
+}
+
+function designPrinciplesText(): string {
+  return `Modula design principles
+
+${DESIGN_PRINCIPLES.map(
+  (group) => `${group.source} remap:
+${group.bullets.map((bullet) => `  - ${bullet}`).join('\n')}`,
+).join('\n\n')}
+
+Boundary:
+  Static product guidance only. No publishing, wallet action, network call, or chain RPC.
 `
 }
 
