@@ -398,6 +398,8 @@ const styles = StyleSheet.create({
     left: 16,
     position: 'absolute',
     right: 16,
+    // Above ShellBottomProgressiveBlur (zIndex 3).
+    zIndex: 10,
   },
   liquidGlassView: {
     backgroundColor: 'transparent',
