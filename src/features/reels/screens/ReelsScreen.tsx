@@ -11,20 +11,23 @@ import {Stack, useRouter} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
-import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReelsQuery} from '@/features/reels/data'
 import {selectionHaptic} from '@/lib/haptics'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
 
 export function ReelsScreen() {
+  const router = useRouter()
   const {height, width} = useWindowDimensions()
   const {colours} = useThemeTokens()
   const reelsQuery = useReelsQuery()
@@ -32,9 +35,10 @@ export function ReelsScreen() {
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: ViewToken[]}) => {
       const first = viewableItems.find(item => item.isViewable)
-      const id = typeof first?.item === 'object' && first.item && 'id' in first.item
-        ? String((first.item as ReelItemType).id)
-        : null
+      const id =
+        typeof first?.item === 'object' && first.item && 'id' in first.item
+          ? String((first.item as ReelItemType).id)
+          : null
       setActiveId(id)
     },
   ).current
@@ -45,13 +49,28 @@ export function ReelsScreen() {
   ])
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View style={[styles.screen, {backgroundColor: '#000'}]}>
       <Stack.Screen
         options={{
+          title: '',
           headerShown: true,
-          title: 'Reels',
           headerTransparent: true,
-          headerTintColor: colours.mediaOverlayText,
+          headerShadowVisible: false,
+          headerTitle: () => null,
+          headerBackVisible: false,
+          headerLeft: () => (
+            <ChromeCircleButton
+              icon="back"
+              accessibilityLabel="Go back"
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back()
+                } else {
+                  router.replace('/(tabs)' as never)
+                }
+              }}
+            />
+          ),
           headerStyle: {backgroundColor: 'transparent'},
         }}
       />
@@ -59,7 +78,10 @@ export function ReelsScreen() {
         {reelsQuery.isLoading ? (
           <InitialLoadingState label="Loading reels" />
         ) : reelsQuery.isError ? (
-          <QueryErrorState error={reelsQuery.error} onRetry={() => void reelsQuery.refetch()} />
+          <QueryErrorState
+            error={reelsQuery.error}
+            onRetry={() => void reelsQuery.refetch()}
+          />
         ) : (
           <FlatList
             data={reelsQuery.data ?? []}
@@ -73,7 +95,10 @@ export function ReelsScreen() {
                 reel={item}
                 height={height}
                 width={width}
-                active={activeId === item.id || (activeId === null && item.id === reelsQuery.data?.[0]?.id)}
+                active={
+                  activeId === item.id ||
+                  (activeId === null && item.id === reelsQuery.data?.[0]?.id)
+                }
               />
             )}
           />
@@ -101,6 +126,18 @@ function ReelItem({
   const {colours, spacing} = useThemeTokens()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(reel.author, ownerProfileId)
+  const likeCount = reel.likeCount + (liked && !reel.liked ? 1 : 0)
+
+  const actions: {
+    label: string
+    icon: AppIconName
+    action: 'like' | 'reply' | 'share' | 'more'
+  }[] = [
+    {label: 'Like', icon: 'like', action: 'like'},
+    {label: 'Reply', icon: 'comment', action: 'reply'},
+    {label: 'Share', icon: 'share', action: 'share'},
+    {label: 'More', icon: 'more', action: 'more'},
+  ]
 
   return (
     <View style={[styles.item, {height, width, backgroundColor: colours.surface1}]}>
@@ -112,16 +149,13 @@ function ReelItem({
           style={StyleSheet.absoluteFill}
         />
       ) : (
-        <>
-          {/* Editorial still — never a flat accent-only fill across the screen. */}
-          <LinearGradient
-            colors={[colours.surface1, reel.colour, colours.surface3]}
-            locations={[0, 0.45, 1]}
-            start={{x: 0.15, y: 0}}
-            end={{x: 0.9, y: 1}}
-            style={StyleSheet.absoluteFill}
-          />
-        </>
+        <LinearGradient
+          colors={[colours.surface1, reel.colour, colours.surface3]}
+          locations={[0, 0.45, 1]}
+          start={{x: 0.15, y: 0}}
+          end={{x: 0.9, y: 1}}
+          style={StyleSheet.absoluteFill}
+        />
       )}
       <View
         pointerEvents="none"
@@ -160,40 +194,48 @@ function ReelItem({
             {reel.videoUri ? ' · video foundation' : ''}
           </AppText>
         </View>
-        <View style={styles.rail}>
-          {(
-            [
-              {label: 'Like post', icon: 'like' as const, action: 'like'},
-              {label: 'Reply', icon: 'comment' as const, action: 'reply'},
-              {label: 'Share', icon: 'share' as const, action: 'share'},
-              {label: 'Open post actions', icon: 'more' as const, action: 'more'},
-            ] as const
-          ).map(action => (
-            <AppPressable
-              key={action.action}
-              accessibilityLabel={action.label}
-              accessibilityState={{
-                selected: action.action === 'like' ? liked : undefined,
-              }}
-              onPress={() => {
-                if (action.action === 'like') {
-                  void selectionHaptic()
-                  setLiked(value => !value)
-                }
-              }}
-              style={[
-                styles.railButton,
-                {backgroundColor: colours.mediaOverlayControlBackground},
-              ]}>
-              <AppIcon name={action.icon} colour={colours.mediaOverlayIcon} size={22} />
+
+        <View style={[styles.rail, {gap: spacing[3]}]}>
+          {actions.map(action => (
+            <View key={action.action} style={styles.railItem}>
+              <AppPressable
+                accessibilityLabel={action.label}
+                accessibilityState={{
+                  selected: action.action === 'like' ? liked : undefined,
+                }}
+                onPress={() => {
+                  if (action.action === 'like') {
+                    void selectionHaptic()
+                    setLiked(value => !value)
+                  }
+                }}
+                style={styles.railHit}>
+                <LiquidGlassChrome
+                  interactive
+                  fallback="clear"
+                  style={styles.railGlass}>
+                  <AppIcon
+                    name={action.icon}
+                    colour={
+                      action.action === 'like' && liked
+                        ? colours.accent
+                        : colours.mediaOverlayIcon
+                    }
+                    size={22}
+                  />
+                </LiquidGlassChrome>
+              </AppPressable>
               {action.action === 'like' ? (
                 <AppText
                   variant="caption"
-                  style={{color: colours.mediaOverlayText, fontVariant: ['tabular-nums']}}>
-                  {reel.likeCount + (liked && !reel.liked ? 1 : 0)}
+                  style={{
+                    color: colours.mediaOverlayText,
+                    fontVariant: ['tabular-nums'],
+                  }}>
+                  {likeCount}
                 </AppText>
               ) : null}
-            </AppPressable>
+            </View>
           ))}
         </View>
       </View>
@@ -203,10 +245,10 @@ function ReelItem({
 
 const styles = StyleSheet.create({
   bottomRow: {
+    alignItems: 'flex-end',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'flex-end',
     zIndex: 3,
   },
   caption: {
@@ -222,15 +264,22 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   rail: {
-    gap: 10,
-  },
-  railButton: {
     alignItems: 'center',
-    borderRadius: 999,
+  },
+  railGlass: {
+    alignItems: 'center',
+    borderRadius: 24,
+    height: 48,
     justifyContent: 'center',
-    minHeight: 48,
-    minWidth: 48,
-    padding: 8,
+    width: 48,
+  },
+  railHit: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  railItem: {
+    alignItems: 'center',
+    gap: 4,
   },
   screen: {
     flex: 1,

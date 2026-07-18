@@ -1,7 +1,6 @@
 /**
  * Routes where the persistent floating tab bar should stay hidden.
- * Auth + presentation modals only — secondary stacks (settings, product, …)
- * keep the bar until we introduce per-surface chrome.
+ * Immersive surfaces (reels) + auth/modals — secondary stacks keep the bar.
  */
 export function shouldHideShellTabBar(segments: readonly string[]): boolean {
   const root = segments[0]
@@ -9,6 +8,7 @@ export function shouldHideShellTabBar(segments: readonly string[]): boolean {
   if (root === '(auth)') return true
   if (root === 'oauth') return true
   if (root === 'compose') return true
+  if (root === 'reels') return true
   if (root === 'share' || root === 'share-profile') return true
   if (root === 'report' || root === 'reactions') return true
   if (root === 'account' && segments[1] === 'switcher') return true
