@@ -1,6 +1,5 @@
 import {useEffect, useMemo, useState} from 'react'
 import {
-  FlatList,
   LayoutAnimation,
   Platform,
   RefreshControl,
@@ -8,6 +7,7 @@ import {
   UIManager,
   View,
 } from 'react-native'
+import Animated from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
@@ -30,6 +30,10 @@ import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {
+  ShimmerRefreshEdge,
+  useScrollPullProgress,
+} from '@/platform/ui/refresh'
 import {FeedPostSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -89,6 +93,8 @@ export function HomeFeedScreen() {
     () => feedQuery.data?.pages.flatMap(page => page.items) ?? [],
     [feedQuery.data],
   )
+  const {pullDistance, onScroll} = useScrollPullProgress()
+  const refreshing = feedQuery.isRefetching && !feedQuery.isFetchingNextPage
 
   useEffect(() => {
     if (focus.quietFeed && mode === 'For You') {
@@ -106,15 +112,25 @@ export function HomeFeedScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <FeatureErrorBoundary label="Home feed">
-          <FlatList
+          <View style={styles.screen}>
+            <ShimmerRefreshEdge
+              pullDistance={pullDistance}
+              refreshing={refreshing}
+            />
+            <Animated.FlatList
             data={posts}
             keyExtractor={item => item.id}
             renderItem={({item}) => <SocialPost post={item} />}
             contentInsetAdjustmentBehavior="automatic"
+            onScroll={onScroll}
+            scrollEventThrottle={16}
             refreshControl={
               <RefreshControl
-                refreshing={feedQuery.isRefetching && !feedQuery.isFetchingNextPage}
-                tintColor={colours.accent}
+                refreshing={refreshing}
+                // Hide the stock spinner — shimmer edge is the refresh signal.
+                tintColor="transparent"
+                colors={['transparent']}
+                progressBackgroundColor="transparent"
                 onRefresh={() => {
                   if (!feedQuery.isRefetching) void feedQuery.refetch()
                 }}
@@ -278,6 +294,7 @@ export function HomeFeedScreen() {
             }
             contentContainerStyle={{paddingBottom: tabPadding}}
           />
+          </View>
         </FeatureErrorBoundary>
       </ResponsiveContent>
     </View>
