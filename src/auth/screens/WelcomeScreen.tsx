@@ -20,17 +20,18 @@ export function WelcomeScreen() {
           <AppText variant="title2">Your digital environment.</AppText>
         </View>
         <AuthPanel>
-          <AppButton onPress={() => router.push('/sign-in' as Href)}>
-            Continue with Modula Account
-          </AppButton>
-          <AppButton variant="secondary" onPress={continueAsGuest}>
-            Explore as guest
-          </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/create-account' as Href)}>
+          <AppButton onPress={() => router.push('/register' as Href)}>
             Create Modula Account
           </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/sign-in' as Href)}>
+            Sign in
+          </AppButton>
+          <AppButton variant="ghost" onPress={continueAsGuest}>
+            Explore as guest
+          </AppButton>
           <AppText variant="caption" colour="textSecondary">
-            Modula Accounts are owned by Greenfield. External Networks are optional.
+            Modula Accounts are owned by Greenfield. External Networks are optional under Settings →
+            Connections.
           </AppText>
         </AuthPanel>
       </View>
