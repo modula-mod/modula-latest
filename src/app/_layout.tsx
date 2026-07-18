@@ -68,10 +68,10 @@ export default function RootLayout() {
 
   return (
     <AppErrorBoundary>
-      <AppearanceProvider>
-        <AppServicesProvider>
-          <QueryRuntimeProvider>
-            <SessionProvider>
+      <AppServicesProvider>
+        <QueryRuntimeProvider>
+          <SessionProvider>
+            <AppearanceProvider>
               <ProfilePresentationProvider>
                 <AccountPanelProvider>
                   <ShellDrawerProvider>
@@ -80,10 +80,10 @@ export default function RootLayout() {
                   </ShellDrawerProvider>
                 </AccountPanelProvider>
               </ProfilePresentationProvider>
-            </SessionProvider>
-          </QueryRuntimeProvider>
-        </AppServicesProvider>
-      </AppearanceProvider>
+            </AppearanceProvider>
+          </SessionProvider>
+        </QueryRuntimeProvider>
+      </AppServicesProvider>
     </AppErrorBoundary>
   )
 }

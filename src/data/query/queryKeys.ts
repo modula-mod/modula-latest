@@ -20,6 +20,11 @@ export const queryKeys = {
     saved: (accountId?: AccountId | 'guest' | 'signedOut') =>
       ['posts', 'saved', accountId ?? 'public'] as const,
   },
+  comments: {
+    all: ['comments'] as const,
+    post: (postId: PostId) => ['comments', 'post', postId] as const,
+    replies: (commentId: string) => ['comments', 'replies', commentId] as const,
+  },
   profiles: {
     all: ['profiles'] as const,
     byHandle: (handle: string) => ['profiles', 'handle', handle] as const,

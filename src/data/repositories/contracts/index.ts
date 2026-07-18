@@ -1,11 +1,16 @@
 export type {ActivityRepository} from '@/data/repositories/contracts/ActivityRepository'
 export type {
+  AppearanceRepository,
+  SyncedAppearancePreferences,
+} from '@/data/repositories/contracts/AppearanceRepository'
+export type {
   AtmosphereFeedPage,
   AtprotoOAuthCallbackResult,
   AtprotoRepository,
 } from '@/data/repositories/contracts/AtprotoRepository'
 export type {
   AuthRepository,
+  EmailVerificationResult,
   HandleAvailability,
   RepositoryExportJob,
 } from '@/data/repositories/contracts/AuthRepository'
