@@ -33,9 +33,9 @@ Next surfaces to elevate (priority):
 - [x] Onboarding / first-run (Modula identity → environment → modules)
 - [x] Profile-as-platform + Board empty/first-module states
 - [x] Extension Centre (modules feel installable / buildable)
-- [ ] Home / presence rail (secondary — map to Focus/modules, not IG Stories)
+- [x] Home / presence rail (secondary — map to Focus/modules, not IG Stories)
 - [ ] Composer tools drawer craft
-- [ ] Activity polish (timestamps, filters)
+- [x] Activity polish (timestamps, filters)
 
 Emotional keywords (3):
 Configurable · Coherent · Capable
@@ -93,11 +93,11 @@ Do **not** copy pink–purple brand wash or family-tree IA.
 
 | ID | Opportunity | Why |
 | --- | --- | --- |
-| P1.1 | Activity human timestamps | Quick win (Simulator showed ISO strings) |
-| P1.2 | Reaction bloom + haptics polish | Phase 6S control exists |
-| P1.3 | Media glows / text breathes on shared post renderer | One renderer — raise the craft once |
-| P1.4 | Intentional motion set (feed enter, tab select, reaction) | 2–3 motions, Reduce Motion safe |
-| P1.5 | Presence rail (modules/Focus) | Steal arc carousel energy without Stories product |
+| P1.1 | Activity human timestamps | Done — relative via `formatRelativeTime` |
+| P1.2 | Reaction bloom + haptics polish | Done — staggered bloom + selection haptic |
+| P1.3 | Media glows / text breathes on shared post renderer | Done — `PostBody` media glow |
+| P1.4 | Intentional motion set (feed enter, tab select, reaction) | Partial — reaction + PresenceArc |
+| P1.5 | Presence rail (modules/Focus) | Done — Home uses PresenceArc + Focus prefs |
 
 ### P2 — Builder foreshadow (before Lovable-class builder ships)
 
@@ -126,7 +126,7 @@ Shipped on `phase6s-social-product-completion`:
 4. **Board craft** — Focus copy, empty pinned/modules invitation, link to Profile-OS
 5. **Activity timestamps** — ISO → relative via `formatRelativeTime`
 
-Still open: reaction bloom polish, real Surface Type engines, Forge builder itself, full offering screens.
+Still open: composer tools drawer craft, real Surface Type engines, Forge builder itself, live Automations/Gaia backends.
 
 Keep Phase 6S physical / TestFlight gates on a separate track.
 

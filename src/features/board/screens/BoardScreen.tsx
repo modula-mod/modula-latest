@@ -91,11 +91,29 @@ export function BoardScreen() {
   const [pinnedIds, setPinnedIds] = useState(() =>
     ALL_PINNED_SPACES.map(space => space.id),
   )
-  const {preferences} = useProductPreferences()
+  const {preferences, update: updatePreferences} = useProductPreferences()
   const boardWidgets = useMemo(
-    () => BOARD_WIDGET_CATALOG.filter(widget => preferences.boardWidgetIds.includes(widget.id)),
+    () =>
+      preferences.boardWidgetIds
+        .map(id => BOARD_WIDGET_CATALOG.find(widget => widget.id === id))
+        .filter((widget): widget is (typeof BOARD_WIDGET_CATALOG)[number] => Boolean(widget)),
     [preferences.boardWidgetIds],
   )
+
+  const reorderWidget = (id: string, direction: -1 | 1) => {
+    const ids = [...preferences.boardWidgetIds]
+    const index = ids.indexOf(id)
+    const nextIndex = index + direction
+    if (index < 0 || nextIndex < 0 || nextIndex >= ids.length) return
+    ;[ids[index], ids[nextIndex]] = [ids[nextIndex], ids[index]]
+    void updatePreferences({boardWidgetIds: ids})
+  }
+
+  const removeWidget = (id: string) => {
+    void updatePreferences({
+      boardWidgetIds: preferences.boardWidgetIds.filter(item => item !== id),
+    })
+  }
 
   useEffect(() => {
     void loadProductPreferences().then(value => {
@@ -217,27 +235,46 @@ export function BoardScreen() {
               </AppText>
             ) : (
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
-                {boardWidgets.map(widget => (
-                  <Surface
+                {boardWidgets.map((widget, index) => (
+                  <ModulaContextMenu
                     key={widget.id}
-                    variant="contained"
-                    style={[
-                      styles.widgetCard,
+                    accessibilityLabel={`${widget.name} widget actions`}
+                    actions={[
+                      {id: 'up', label: 'Move up', disabled: index === 0},
                       {
-                        backgroundColor: colours.surface,
-                        borderColor: colours.border,
-                        borderRadius: radius.large,
-                        padding: spacing[4],
-                        gap: spacing[2],
-                        flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
+                        id: 'down',
+                        label: 'Move down',
+                        disabled: index === boardWidgets.length - 1,
                       },
-                    ]}>
-                    <AppIcon name={widget.icon} colour={colours.accent} />
-                    <AppText variant="headline">{widget.name}</AppText>
-                    <AppText variant="caption" colour="textTertiary">
-                      {widget.size} · Local
-                    </AppText>
-                  </Surface>
+                      {id: 'remove', label: 'Remove from Board', style: 'destructive'},
+                      {id: 'manage', label: 'Manage widgets'},
+                    ]}
+                    onAction={id => {
+                      if (id === 'up') reorderWidget(widget.id, -1)
+                      if (id === 'down') reorderWidget(widget.id, 1)
+                      if (id === 'remove') removeWidget(widget.id)
+                      if (id === 'manage') router.push('/product/widgets' as Href)
+                    }}>
+                    <Surface
+                      variant="contained"
+                      style={[
+                        styles.widgetCard,
+                        {
+                          backgroundColor: colours.surface,
+                          borderColor: colours.border,
+                          borderRadius: radius.large,
+                          padding: spacing[4],
+                          gap: spacing[2],
+                          flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
+                        },
+                      ]}>
+                      <AppIcon name={widget.icon} colour={colours.accent} />
+                      <AppText variant="headline">{widget.name}</AppText>
+                      <AppText variant="caption" colour="textTertiary">
+                        {widget.size} · #{index + 1}
+                      </AppText>
+                    </Surface>
+                  </ModulaContextMenu>
                 ))}
               </View>
             )}

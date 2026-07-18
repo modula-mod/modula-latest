@@ -43,7 +43,9 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | `/marketplace/[id]` | Module pre-screens + Forge card |
 | `/teams` | Teams OS role preview + deep links |
 | `/communities` | Communities OS seeded list |
-| `/board` | Widget strip + Focus copy from prefs |
+| `/board` | Widget strip (reorder/remove) + Focus copy from prefs |
+| Home (`/`) | PresenceArc + Focus banner + quiet/work mode order |
+| Messages | Glass Privacy badge + thread hint from prefs |
 | `/settings/dimon` | Expanded DIMON direction (inactive) |
 
 ## Navigation wiring

@@ -4,7 +4,6 @@ import {
   LayoutAnimation,
   Platform,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   UIManager,
   View,
@@ -20,14 +19,12 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
-import {useDiscoverQuery} from '@/features/discover/data'
 import {useHomeFeedQuery} from '@/features/feed/data'
-import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
-import {StoryRingAvatar} from '@/platform/ui/avatars'
-import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {FeedPostSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -49,17 +46,45 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
   Modules: 'modules',
 }
 
+const PRESENCE_ROUTES: Record<string, Href> = {
+  focus: '/product/focus',
+  board: '/board',
+  you: '/profile/os',
+  modules: '/modules',
+  team: '/teams',
+}
+
 export function HomeFeedScreen() {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
+  const {preferences} = useProductPreferences()
+  const focus = preferences.focus
+  const focusActive =
+    focus.quietFeed || focus.suppressPings || focus.priorityWork || focus.hideNav
+
+  const modeOrder = useMemo((): FeedModeLabel[] => {
+    if (focus.priorityWork && focus.quietFeed) {
+      return ['Modules', 'Following', 'For You']
+    }
+    if (focus.priorityWork) return ['Modules', 'Following', 'For You']
+    if (focus.quietFeed) return ['Following', 'Modules', 'For You']
+    return ['Following', 'For You', 'Modules']
+  }, [focus.priorityWork, focus.quietFeed])
+
   const [mode, setMode] = useState<FeedModeLabel>('Following')
   const feedQuery = useHomeFeedQuery(modeToFeed[mode])
   const posts = useMemo(
     () => feedQuery.data?.pages.flatMap(page => page.items) ?? [],
     [feedQuery.data],
   )
+
+  useEffect(() => {
+    if (focus.quietFeed && mode === 'For You') {
+      setMode('Following')
+    }
+  }, [focus.quietFeed, mode])
 
   useEffect(() => {
     if (!reduceMotion) {
@@ -93,37 +118,112 @@ export function HomeFeedScreen() {
             }}
             ListHeaderComponent={
               <View>
-                <StoryRail />
-                <View style={[styles.modeRow, {paddingHorizontal: spacing[4]}]}>
-                  {(['Following', 'For You', 'Modules'] as const).map(next => (
-                    <AppPressable
-                      key={next}
-                      accessibilityLabel={`${next} feed`}
-                      accessibilityState={{selected: mode === next}}
-                      onPress={() => {
+                {!focus.hideNav ? (
+                  <View style={{paddingVertical: spacing[3]}}>
+                    <PresenceArc
+                      centreLabel={focus.showHalo ? 'Focused' : 'Available'}
+                      onCentrePress={() => router.push('/product/focus' as Href)}
+                      onItemPress={id => {
                         void selectionHaptic()
-                        setMode(next)
+                        const route = PRESENCE_ROUTES[id]
+                        if (route) router.push(route)
                       }}
-                      style={styles.modeButton}>
-                      <AppText
-                        variant="label"
-                        style={{
-                          color:
-                            mode === next ? colours.accent : colours.textSecondary,
-                        }}>
-                        {next}
-                      </AppText>
-                      <View
-                        style={[
-                          styles.modeUnderline,
-                          {
-                            backgroundColor:
-                              mode === next ? colours.accent : 'transparent',
-                          },
-                        ]}
-                      />
-                    </AppPressable>
-                  ))}
+                      items={[
+                        {
+                          id: 'focus',
+                          label: 'Focus',
+                          icon: 'contrast',
+                          unread: focusActive,
+                        },
+                        {
+                          id: 'board',
+                          label: 'Board',
+                          icon: 'board',
+                          unread: focus.priorityWork,
+                        },
+                        {
+                          id: 'you',
+                          label: 'You',
+                          icon: 'profile',
+                          unread: focus.showHalo,
+                        },
+                        {
+                          id: 'modules',
+                          label: 'Modules',
+                          icon: 'modules',
+                          unread: !focus.quietFeed,
+                        },
+                        {
+                          id: 'team',
+                          label: 'Team',
+                          icon: 'teams',
+                        },
+                      ]}
+                    />
+                  </View>
+                ) : null}
+
+                {focusActive ? (
+                  <AppPressable
+                    accessibilityLabel="Open Focus Mode"
+                    onPress={() => router.push('/product/focus' as Href)}
+                    style={[
+                      styles.focusBanner,
+                      {
+                        backgroundColor: colours.accentSubtle,
+                        borderColor: colours.accentBorder,
+                        borderRadius: radius.medium,
+                        marginHorizontal: spacing[4],
+                        marginBottom: spacing[2],
+                        paddingHorizontal: spacing[3],
+                        paddingVertical: spacing[2],
+                        gap: spacing[2],
+                      },
+                    ]}>
+                    <AppIcon name="contrast" colour={colours.accent} size={16} />
+                    <AppText variant="caption" colour="accent" style={{flex: 1}}>
+                      Focus Mode
+                      {focus.quietFeed ? ' · Quiet feed' : ''}
+                      {focus.priorityWork ? ' · Work first' : ''}
+                    </AppText>
+                    <AppIcon name="chevronRight" colour={colours.accent} size={14} />
+                  </AppPressable>
+                ) : null}
+
+                <View style={[styles.modeRow, {paddingHorizontal: spacing[4]}]}>
+                  {modeOrder.map(next => {
+                    const demoted = focus.quietFeed && next === 'For You'
+                    return (
+                      <AppPressable
+                        key={next}
+                        accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
+                        accessibilityState={{selected: mode === next}}
+                        onPress={() => {
+                          void selectionHaptic()
+                          setMode(next)
+                        }}
+                        style={[styles.modeButton, demoted ? {opacity: 0.55} : null]}>
+                        <AppText
+                          variant="label"
+                          style={{
+                            color:
+                              mode === next ? colours.accent : colours.textSecondary,
+                          }}>
+                          {next}
+                          {demoted ? ' · Quiet' : ''}
+                        </AppText>
+                        <View
+                          style={[
+                            styles.modeUnderline,
+                            {
+                              backgroundColor:
+                                mode === next ? colours.accent : 'transparent',
+                            },
+                          ]}
+                        />
+                      </AppPressable>
+                    )
+                  })}
                 </View>
                 <ComposerPrompt />
               </View>
@@ -160,62 +260,6 @@ export function HomeFeedScreen() {
         </FeatureErrorBoundary>
       </ResponsiveContent>
     </View>
-  )
-}
-
-function StoryRail() {
-  const router = useRouter()
-  const {spacing} = useThemeTokens()
-  const session = useSession()
-  const discover = useDiscoverQuery()
-  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
-  const items = (discover.data?.suggestedProfiles ?? []).slice(0, 6).map(profile => ({
-    label: profile.id === ownerProfileId ? 'Your Story' : profile.displayName,
-    profile,
-  }))
-
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[
-        styles.storyRail,
-        {gap: spacing[3], paddingHorizontal: spacing[4]},
-      ]}>
-      {items.map((item, index) => (
-        <ModulaContextMenu
-          key={item.label}
-          accessibilityLabel={`${item.profile.displayName} story actions`}
-          actions={[
-            {id: 'open', label: 'Open profile'},
-            {id: 'mute', label: 'Mute story preview'},
-            {id: 'share', label: 'Share profile'},
-          ]}
-          onAction={id => {
-            if (id === 'open' || id === 'share') {
-              router.push(getProfileRouteForIdentity(item.profile, ownerProfileId))
-            }
-          }}>
-          <AppPressable
-            accessibilityLabel={`Open ${item.profile.displayName} profile`}
-            onPress={() =>
-              router.push(getProfileRouteForIdentity(item.profile, ownerProfileId))
-            }
-            style={styles.storyItem}>
-            <StoryRingAvatar
-              name={item.profile.displayName}
-              uri={item.profile.avatarUri}
-              colour={item.profile.coverColour}
-              size={58}
-              seen={index > 2}
-            />
-            <AppText variant="caption" numberOfLines={1} style={styles.storyText}>
-              {item.label}
-            </AppText>
-          </AppPressable>
-        </ModulaContextMenu>
-      ))}
-    </ScrollView>
   )
 }
 
@@ -269,6 +313,11 @@ function ComposerPrompt() {
 }
 
 const styles = StyleSheet.create({
+  focusBanner: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+  },
   modeButton: {
     alignItems: 'center',
     gap: 6,
@@ -303,17 +352,5 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
-  },
-  storyItem: {
-    alignItems: 'center',
-    gap: 6,
-    width: 76,
-  },
-  storyRail: {
-    paddingVertical: 14,
-  },
-  storyText: {
-    textAlign: 'center',
-    width: '100%',
   },
 })

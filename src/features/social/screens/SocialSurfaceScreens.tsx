@@ -9,6 +9,8 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
+import {GLASS_PRIVACY_LABELS} from '@/features/product/data/glassPrivacyLabels'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {
   getHelpArticle,
   getSeededCollection,
@@ -71,6 +73,8 @@ export function MessagesInboxScreen() {
   const canAccess = useCapability('messages:access')
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
   const [filter, setFilter] = useState<'all' | 'unread' | 'pinned'>('all')
   const [query, setQuery] = useState('')
   const [newMessageOpen, setNewMessageOpen] = useState(false)
@@ -132,10 +136,27 @@ export function MessagesInboxScreen() {
           <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
           <AppPressable
             accessibilityLabel="Open Glass Privacy levels"
-            onPress={() => router.push('/product/glass-privacy' as Href)}>
-            <AppText variant="caption" colour="accent">
-              Protected Chat & Vault Chat (Glass Privacy) →
-            </AppText>
+            onPress={() => router.push('/product/glass-privacy' as Href)}
+            style={[
+              styles.glassBadge,
+              {
+                backgroundColor: colours.accentSubtle,
+                borderColor: colours.accentBorder,
+                borderRadius: radius.medium,
+                paddingHorizontal: spacing[3],
+                paddingVertical: spacing[2],
+                gap: spacing[2],
+              },
+            ]}>
+            <AppIcon name="privacy" colour={colours.accent} size={16} />
+            <View style={styles.flex}>
+              <AppText variant="caption" colour="accent">
+                {glass.short} · local
+              </AppText>
+              <AppText variant="caption" colour="textSecondary">
+                Glass Privacy — change level →
+              </AppText>
+            </View>
           </AppPressable>
           <View
             style={[
@@ -270,7 +291,10 @@ export function MessagesInboxScreen() {
 export function MessageThreadScreen() {
   const {threadId} = useLocalSearchParams<{threadId: string}>()
   const thread = getSeededThread(String(threadId ?? ''))
-  const {colours, spacing} = useThemeTokens()
+  const router = useRouter()
+  const {colours, radius, spacing} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
 
   if (!thread) {
     return (
@@ -289,6 +313,30 @@ export function MessageThreadScreen() {
     <ScreenShell title={thread.name}>
       <AppText variant="headline">@{thread.handle}</AppText>
       <PreviewBanner text="Conversation Preview — replies are not delivered." />
+      <AppPressable
+        accessibilityLabel="Open Glass Privacy levels"
+        onPress={() => router.push('/product/glass-privacy' as Href)}
+        style={[
+          styles.glassBadge,
+          {
+            backgroundColor: colours.accentSubtle,
+            borderColor: colours.accentBorder,
+            borderRadius: radius.medium,
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[2],
+            gap: spacing[2],
+          },
+        ]}>
+        <AppIcon name="privacy" colour={colours.accent} size={16} />
+        <View style={styles.flex}>
+          <AppText variant="caption" colour="accent">
+            {glass.short}
+          </AppText>
+          <AppText variant="caption" colour="textSecondary">
+            {glass.threadHint}
+          </AppText>
+        </View>
+      </AppPressable>
       <Surface variant="contained" style={{padding: spacing[4], gap: spacing[2]}}>
         <AppText variant="body">{thread.preview}</AppText>
         <AppText variant="caption" colour="textSecondary">
@@ -1017,6 +1065,11 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
     minWidth: 0,
+  },
+  glassBadge: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
   },
   row: {
     alignItems: 'center',

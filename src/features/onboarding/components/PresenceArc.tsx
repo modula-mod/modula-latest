@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -22,6 +23,8 @@ export type PresenceArcItem = {
 type PresenceArcProps = {
   items: PresenceArcItem[]
   centreLabel?: string
+  onItemPress?: (id: string) => void
+  onCentrePress?: () => void
 }
 
 function ArcNode({
@@ -29,11 +32,13 @@ function ArcNode({
   index,
   centreIndex,
   reduceMotion,
+  onPress,
 }: {
   item: PresenceArcItem
   index: number
   centreIndex: number
   reduceMotion: boolean
+  onPress?: () => void
 }) {
   const {colours, radius, spacing} = useThemeTokens()
   const distance = index - centreIndex
@@ -63,36 +68,42 @@ function ArcNode({
 
   return (
     <Animated.View style={[styles.node, animatedStyle, {marginHorizontal: spacing[1]}]}>
-      <View
-        style={[
-          styles.ring,
-          {
-            borderColor: item.unread ? colours.accent : colours.border,
-            borderWidth: item.unread ? 2.5 : StyleSheet.hairlineWidth,
-            borderRadius: radius.round,
-            backgroundColor: colours.surface,
-          },
-          isCentre ? styles.ringCentre : null,
-        ]}>
+      <AppPressable
+        accessibilityLabel={`${item.label}${item.unread ? ', activity' : ''}`}
+        onPress={onPress}
+        disabled={!onPress}
+        style={styles.nodePress}>
         <View
           style={[
-            styles.avatar,
+            styles.ring,
             {
-              backgroundColor: colours.accentSubtle,
+              borderColor: item.unread ? colours.accent : colours.border,
+              borderWidth: item.unread ? 2.5 : StyleSheet.hairlineWidth,
               borderRadius: radius.round,
+              backgroundColor: colours.surface,
             },
-            isCentre ? styles.avatarCentre : null,
+            isCentre ? styles.ringCentre : null,
           ]}>
-          <AppIcon name={item.icon} colour={colours.accent} size={isCentre ? 26 : 18} />
+          <View
+            style={[
+              styles.avatar,
+              {
+                backgroundColor: colours.accentSubtle,
+                borderRadius: radius.round,
+              },
+              isCentre ? styles.avatarCentre : null,
+            ]}>
+            <AppIcon name={item.icon} colour={colours.accent} size={isCentre ? 26 : 18} />
+          </View>
         </View>
-      </View>
-      <AppText
-        variant="micro"
-        colour={isCentre ? 'text' : 'textSecondary'}
-        numberOfLines={1}
-        style={styles.label}>
-        {item.label}
-      </AppText>
+        <AppText
+          variant="micro"
+          colour={isCentre ? 'text' : 'textSecondary'}
+          numberOfLines={1}
+          style={styles.label}>
+          {item.label}
+        </AppText>
+      </AppPressable>
     </Animated.View>
   )
 }
@@ -100,7 +111,7 @@ function ArcNode({
 /**
  * Centre-weighted presence rail — modules / Focus, not Instagram Stories.
  */
-export function PresenceArc({items, centreLabel}: PresenceArcProps) {
+export function PresenceArc({items, centreLabel, onItemPress, onCentrePress}: PresenceArcProps) {
   const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const centreIndex = Math.floor(items.length / 2)
@@ -115,13 +126,18 @@ export function PresenceArc({items, centreLabel}: PresenceArcProps) {
             index={index}
             centreIndex={centreIndex}
             reduceMotion={reduceMotion}
+            onPress={onItemPress ? () => onItemPress(item.id) : undefined}
           />
         ))}
       </View>
       {centreLabel ? (
-        <View style={styles.centreAction}>
+        <AppPressable
+          accessibilityLabel={centreLabel}
+          onPress={onCentrePress}
+          disabled={!onCentrePress}
+          style={styles.centreAction}>
           <AppText variant="label">{centreLabel}</AppText>
-        </View>
+        </AppPressable>
       ) : null}
     </View>
   )
@@ -143,6 +159,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: 72,
     width: 64,
+  },
+  nodePress: {
+    alignItems: 'center',
+    width: '100%',
   },
   ring: {
     alignItems: 'center',
@@ -169,5 +189,7 @@ const styles = StyleSheet.create({
   },
   centreAction: {
     alignItems: 'center',
+    minHeight: 32,
+    justifyContent: 'center',
   },
 })

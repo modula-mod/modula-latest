@@ -7,6 +7,8 @@ import {Surface} from '@/components/primitives/Surface'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import type {FocusPreferences} from '@/features/product/storage/productPreferencesStorage'
+import {useProfile} from '@/features/profile/runtime/useProfile'
+import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -44,6 +46,8 @@ export function FocusModeScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const {preferences, ready, update} = useProductPreferences()
   const focus = preferences.focus
+  const {presentation} = useProfile()
+  const {setProfilePresentation} = useProfileActions()
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -95,6 +99,12 @@ export function FocusModeScreen() {
                   value={focus[item.id]}
                   onValueChange={value => {
                     void update({focus: {...focus, [item.id]: value}})
+                    if (item.id === 'showHalo') {
+                      setProfilePresentation({
+                        ...presentation,
+                        showFocusHalo: value,
+                      })
+                    }
                   }}
                 />
               </Surface>
