@@ -19,6 +19,7 @@ import {
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
@@ -91,6 +92,7 @@ export function BoardScreen() {
   const router = useRouter()
   const navigation = useNavigation()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
   const session = useSession()
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
@@ -187,13 +189,18 @@ export function BoardScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent maxWidth={760}>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Good focus, {ownerName}</AppText>
+            <AppText variant="headline">Good focus, {ownerName}</AppText>
             <AppText variant="body" colour="textSecondary">
               Board is your private operating dashboard — modules, widgets, and next actions in one
               place.

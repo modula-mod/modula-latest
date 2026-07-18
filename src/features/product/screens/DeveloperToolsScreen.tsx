@@ -8,6 +8,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const MCP_TOOLS = [
@@ -63,6 +64,7 @@ const MCP_JSON_EXAMPLE = `{
 export function DeveloperToolsScreen() {
   const router = useRouter()
   const {colours, radius, spacing, scheme} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const wash =
     scheme === 'dark'
       ? ['#0B1416', colours.accentSubtle]
@@ -72,7 +74,7 @@ export function DeveloperToolsScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Developer Tools" />
       <ResponsiveContent maxWidth={760}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <LinearGradient
             colors={wash as [string, string]}
             style={[

@@ -8,6 +8,7 @@ import {Surface} from '@/components/primitives/Surface'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const LEVELS = [
@@ -31,6 +32,7 @@ const LEVELS = [
 export function GlassPrivacyScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, update} = useProductPreferences()
   const level = preferences.glassPrivacyLevel
 
@@ -38,7 +40,7 @@ export function GlassPrivacyScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Glass Privacy" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Understandable protection levels.</AppText>
             <AppText variant="body" colour="textSecondary">

@@ -73,7 +73,6 @@ export function MarketplaceScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Marketplace</AppText>
             <AppText variant="body" colour="textSecondary">
               Browse seeded modules and tools. Install remains a Preview — nothing is provisioned remotely.
             </AppText>

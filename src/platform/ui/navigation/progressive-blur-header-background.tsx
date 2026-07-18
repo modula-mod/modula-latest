@@ -2,10 +2,11 @@ import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
-
-const HEADER_ROW = 54
-/** Extra dissolve below the nav row so content softens under the chrome. */
-const FADE_EXTENSION = 52
+import {
+  CHROME_BLUR_INTENSITY,
+  CHROME_FADE_EXTENSION,
+  CHROME_HEADER_ROW,
+} from '@/platform/ui/navigation/chrome-insets'
 
 /**
  * React Navigation `headerBackground` — MaskedView progressive blur
@@ -13,11 +14,15 @@ const FADE_EXTENSION = 52
  */
 export function ProgressiveBlurHeaderBackground() {
   const insets = useSafeAreaInsets()
-  const height = insets.top + HEADER_ROW + FADE_EXTENSION
+  const height = insets.top + CHROME_HEADER_ROW + CHROME_FADE_EXTENSION
 
   return (
     <View style={[styles.wrap, {height}]} pointerEvents="none">
-      <ProgressiveBlurBand height={height} topHeavy intensity={58} />
+      <ProgressiveBlurBand
+        height={height}
+        topHeavy
+        intensity={CHROME_BLUR_INTENSITY}
+      />
     </View>
   )
 }

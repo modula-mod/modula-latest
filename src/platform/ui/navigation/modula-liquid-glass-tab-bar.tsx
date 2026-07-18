@@ -269,47 +269,49 @@ export function ModulaLiquidGlassTabBar({
               borderWidth: isLiquidGlassSupported && !reduceTransparency ? 0 : StyleSheet.hairlineWidth,
             },
           ]}>
-          <Animated.View
-            style={[styles.menuContainer, menuStyle]}
-            pointerEvents={expanded ? 'auto' : 'none'}
-            accessibilityElementsHidden={!expanded}
-            importantForAccessibility={expanded ? 'yes' : 'no-hide-descendants'}>
-            {EXPAND_ACTIONS.map((action, index) => (
-              <AppPressable
-                key={action.id}
-                accessibilityLabel={action.label}
-                accessibilityRole="button"
-                onPress={() => onExpandAction(action)}
-                style={[
-                  styles.menuItem,
-                  {
-                    backgroundColor:
-                      action.compose ? colours.accentSubtle : 'transparent',
-                    borderRadius: radius.md,
-                    opacity: expanded ? 1 : 0,
-                  },
-                ]}>
-                <AppIcon
-                  name={action.icon}
-                  colour={action.compose ? colours.accent : colours.text}
-                  size={20}
-                />
-                <AppText
-                  variant="label"
-                  style={{
-                    color: action.compose ? colours.accent : colours.text,
-                    flex: 1,
-                  }}>
-                  {action.label}
-                </AppText>
-                {action.compose ? (
-                  <AppText variant="caption" colour="textSecondary">
-                    Quick
+          {/* Only mount expand menu when open — avoids ghost icons through glass. */}
+          {expanded ? (
+            <Animated.View
+              style={[styles.menuContainer, menuStyle]}
+              pointerEvents="auto"
+              accessibilityElementsHidden={false}>
+              {EXPAND_ACTIONS.map(action => (
+                <AppPressable
+                  key={action.id}
+                  accessibilityLabel={action.label}
+                  accessibilityRole="button"
+                  onPress={() => onExpandAction(action)}
+                  style={[
+                    styles.menuItem,
+                    {
+                      backgroundColor: action.compose
+                        ? colours.accentSubtle
+                        : 'transparent',
+                      borderRadius: radius.md,
+                    },
+                  ]}>
+                  <AppIcon
+                    name={action.icon}
+                    colour={action.compose ? colours.accent : colours.text}
+                    size={20}
+                  />
+                  <AppText
+                    variant="label"
+                    style={{
+                      color: action.compose ? colours.accent : colours.text,
+                      flex: 1,
+                    }}>
+                    {action.label}
                   </AppText>
-                ) : null}
-              </AppPressable>
-            ))}
-          </Animated.View>
+                  {action.compose ? (
+                    <AppText variant="caption" colour="textSecondary">
+                      Quick
+                    </AppText>
+                  ) : null}
+                </AppPressable>
+              ))}
+            </Animated.View>
+          ) : null}
 
           <View
             style={[
@@ -327,18 +329,22 @@ export function ModulaLiquidGlassTabBar({
                   accessibilityRole="tab"
                   accessibilityState={{selected}}
                   onPress={() => navigateTab(tab)}
-                  style={[
-                    styles.tabHit,
-                    selected && {
-                      backgroundColor: colours.accentSubtle,
-                      borderRadius: radius.round,
-                    },
-                  ]}>
+                  style={styles.tabHit}>
                   <AppIcon
                     name={TAB_ICONS[tab.routeName] ?? 'home'}
                     colour={selected ? colours.accent : colours.textSecondary}
                     size={22}
                   />
+                  {selected ? (
+                    <View
+                      style={[
+                        styles.tabIndicator,
+                        {backgroundColor: colours.accent},
+                      ]}
+                    />
+                  ) : (
+                    <View style={styles.tabIndicatorSpacer} />
+                  )}
                 </AppPressable>
               )
             })}
@@ -437,5 +443,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minWidth: 44,
     paddingHorizontal: 8,
+  },
+  tabIndicator: {
+    borderRadius: 1.5,
+    height: 3,
+    marginTop: 4,
+    width: 16,
+  },
+  tabIndicatorSpacer: {
+    height: 3,
+    marginTop: 4,
+    width: 16,
   },
 })

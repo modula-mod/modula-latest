@@ -6,6 +6,11 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {AppText} from '@/components/primitives/AppText'
+import {
+  CHROME_BLUR_INTENSITY,
+  CHROME_FADE_EXTENSION,
+  CHROME_HEADER_ROW,
+} from '@/platform/ui/navigation/chrome-insets'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type SecondaryScreenHeaderProps = {
@@ -13,26 +18,27 @@ type SecondaryScreenHeaderProps = {
   right?: ReactNode
 }
 
-const HEADER_ROW_HEIGHT = 54
-/** Blur dissolves into content below the nav row (MaskedView fade). */
-const FADE_EXTENSION = 48
-
 /**
  * Secondary-route chrome: progressive blur overlay + liquid-glass circular back.
- * Blur is absolutely positioned so it never pushes title/controls down.
+ * Spacer includes the fade so body content starts below the dissolve (readable).
  */
 export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const {spacing} = useThemeTokens()
-  const bandHeight = insets.top + HEADER_ROW_HEIGHT
-  const blurHeight = bandHeight + FADE_EXTENSION
+  const rowHeight = insets.top + CHROME_HEADER_ROW
+  const spacerHeight = rowHeight + CHROME_FADE_EXTENSION
+  const blurHeight = spacerHeight
 
   return (
-    <View style={[styles.spacer, {height: bandHeight}]}>
+    <View style={[styles.spacer, {height: spacerHeight}]}>
       <View style={[styles.overlay, {height: blurHeight}]} pointerEvents="box-none">
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          <ProgressiveBlurBand height={blurHeight} topHeavy />
+          <ProgressiveBlurBand
+            height={blurHeight}
+            topHeavy
+            intensity={CHROME_BLUR_INTENSITY}
+          />
         </View>
         <View
           style={[
@@ -40,7 +46,7 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
             {
               paddingTop: insets.top,
               paddingHorizontal: spacing[3],
-              height: bandHeight,
+              height: rowHeight,
             },
           ]}>
           <View style={styles.side}>

@@ -8,6 +8,7 @@ export type {
 } from '@/platform/ui/menus/types'
 export {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 export {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+export {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 export {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 export type {ModulaControlGroupAction} from '@/platform/ui/menus/modula-control-group'

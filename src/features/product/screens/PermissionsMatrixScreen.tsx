@@ -16,6 +16,7 @@ import {
 } from '@/features/product/data/modulePermissions'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const FILTERS: Array<'all' | PermissionRisk> = ['all', 'low', 'medium', 'high']
@@ -23,6 +24,7 @@ const FILTERS: Array<'all' | PermissionRisk> = ['all', 'low', 'medium', 'high']
 export function PermissionsMatrixScreen() {
   const router = useRouter()
   const {colours, radius, spacing, scheme} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('all')
   const [selected, setSelected] = useState<string[]>([
     'storage:namespaced',
@@ -46,7 +48,7 @@ export function PermissionsMatrixScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Permissions" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <LinearGradient
             colors={wash as [string, string]}
             style={[

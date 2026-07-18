@@ -17,6 +17,7 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import type {FocusPreferences} from '@/features/product/storage/productPreferencesStorage'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -54,6 +55,7 @@ const CUSTOM_ROWS: Array<{id: keyof FocusPreferences; label: string; description
 export function FocusModeScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, ready, update} = useProductPreferences()
   const focus = preferences.focus
   const preset = focus.preset ?? 'light'
@@ -75,9 +77,14 @@ export function FocusModeScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Focus Mode" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView
+          contentContainerStyle={{
+            gap: spacing[5],
+            padding: spacing[4],
+            paddingBottom: tabPadding,
+          }}>
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Adaptive attention, not a settings dump.</AppText>
+            <AppText variant="headline">Adaptive attention, not a settings dump.</AppText>
             <AppText variant="body" colour="textSecondary">
               Presets drive a FocusPolicyEngine Preview. Home, Board, presence, and GAIA interruption
               rules follow. Preferences persist locally until Greenfield sync lands.

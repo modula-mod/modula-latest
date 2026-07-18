@@ -9,11 +9,13 @@ import {Surface} from '@/components/primitives/Surface'
 import {INTELLIGENCE_LAYERS} from '@/features/product/data/intelligenceLayers'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function IntelligenceHubScreen() {
   const router = useRouter()
   const {colours, radius, spacing, scheme} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const wash =
     scheme === 'dark'
       ? ['#0B1416', colours.accentSubtle]
@@ -23,7 +25,7 @@ export function IntelligenceHubScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Intelligence" />
       <ResponsiveContent maxWidth={760}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <LinearGradient
             colors={wash as [string, string]}
             style={[

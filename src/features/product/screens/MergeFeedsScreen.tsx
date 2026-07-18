@@ -8,6 +8,7 @@ import {Surface} from '@/components/primitives/Surface'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const FEEDS = [
@@ -21,6 +22,7 @@ const FEEDS = [
 
 export function MergeFeedsScreen() {
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, update} = useProductPreferences()
   const selected = preferences.mergeFeedIds
 
@@ -49,7 +51,7 @@ export function MergeFeedsScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Merge Feeds" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Assemble your stream.</AppText>
             <AppText variant="body" colour="textSecondary">

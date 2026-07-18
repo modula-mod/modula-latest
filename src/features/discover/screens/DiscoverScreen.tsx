@@ -18,7 +18,8 @@ import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProf
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -33,6 +34,7 @@ export function DiscoverScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
@@ -50,15 +52,22 @@ export function DiscoverScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
-              <AppText variant="display">Discover</AppText>
-              <ModulaMenu
+              <AppText variant="body" colour="textSecondary" style={{flex: 1}}>
+                People, topics, modules, and media
+              </AppText>
+              <ChromeOverflowMenu
                 accessibilityLabel="Discover filter menu"
                 title="Discover filters"
                 actions={[
@@ -96,7 +105,6 @@ export function DiscoverScreen() {
                   }
                   setCategory(id as Category)
                 }}
-                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
               />
             </View>
             <AppPressable

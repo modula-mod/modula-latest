@@ -8,6 +8,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const PATHS: Array<{
@@ -64,6 +65,7 @@ const PATHS: Array<{
 export function CreatorEconomyScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [activeId, setActiveId] = useState(PATHS[0].id)
   const active = PATHS.find(item => item.id === activeId) ?? PATHS[0]
 
@@ -71,7 +73,7 @@ export function CreatorEconomyScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Creator Economy" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Create. Publish. Earn. Own.</AppText>
             <AppText variant="body" colour="textSecondary">

@@ -10,6 +10,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const STORAGE_KEY = 'modula.circuit-memory.items.v1'
@@ -97,6 +98,7 @@ function parseItems(raw: string | null): MemoryItem[] {
 export function CircuitMemoryScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [items, setItems] = useState<MemoryItem[]>(SEED_ITEMS)
   const [selectedId, setSelectedId] = useState(SEED_ITEMS[0]?.id ?? '')
   const [exportText, setExportText] = useState('')
@@ -132,7 +134,7 @@ export function CircuitMemoryScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Circuit Memory" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="accent">
               MEMORY CENTRE / LOCAL PREVIEW

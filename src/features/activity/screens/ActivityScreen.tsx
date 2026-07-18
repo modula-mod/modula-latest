@@ -24,7 +24,8 @@ import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ActivityListSkeleton} from '@/platform/ui/skeletons'
@@ -71,6 +72,7 @@ export function ActivityScreen() {
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
   const activityQuery = useActivityQuery()
   const [filter, setFilter] = useState<ActivityFilter>('all')
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
@@ -132,27 +134,31 @@ export function ActivityScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={styles.titleRow}>
-            <AppText variant="display">Activity</AppText>
+            <AppPressable
+              accessibilityLabel="Mark all as read"
+              onPress={markAllRead}
+              style={styles.iconHit}>
+              <AppIcon name="check" colour={colours.textSecondary} />
+            </AppPressable>
             <View style={styles.titleActions}>
-              <AppPressable
-                accessibilityLabel="Mark all as read"
-                onPress={markAllRead}
-                style={styles.iconHit}>
-                <AppIcon name="check" colour={colours.textSecondary} />
-              </AppPressable>
               <AppPressable
                 accessibilityLabel="Filter activity"
                 onPress={() => setFilterSheetOpen(true)}
                 style={styles.iconHit}>
                 <AppIcon name="settings" colour={colours.textSecondary} />
               </AppPressable>
-              <ModulaMenu
+              <ChromeOverflowMenu
                 accessibilityLabel="More activity actions"
                 title="Activity"
                 actions={[
@@ -167,7 +173,6 @@ export function ActivityScreen() {
                   if (id === 'markRead') markAllRead()
                   if (id === 'filter') setFilterSheetOpen(true)
                 }}
-                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
               />
             </View>
           </View>

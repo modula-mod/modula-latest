@@ -1,16 +1,17 @@
 import {useRouter, type Href} from 'expo-router'
 import {View} from 'react-native'
 
+import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 
 export function ProfileHeaderRight() {
   const router = useRouter()
 
   return (
     <View style={{flexDirection: 'row', alignItems: 'center', gap: 2}}>
-      <ModulaMenu
+      <ChromeIconMenu
+        systemImage="square.and.arrow.up"
+        icon="share"
         accessibilityLabel="Share profile"
         title="Share"
         actions={[
@@ -23,13 +24,6 @@ export function ProfileHeaderRight() {
             router.push('/share-profile' as Href)
           }
         }}
-        trigger={
-          <ModulaIconButton
-            icon="share"
-            accessibilityLabel="Share profile"
-            chrome="glass"
-          />
-        }
       />
       <ChromeOverflowMenu
         accessibilityLabel="Open profile actions"

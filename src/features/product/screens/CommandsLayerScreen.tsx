@@ -11,6 +11,7 @@ import {Surface} from '@/components/primitives/Surface'
 import {COMMAND_CATALOGUE, type CommandRisk} from '@/features/product/data/commandCatalogue'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const RISK: Record<CommandRisk, string> = {
@@ -22,6 +23,7 @@ const RISK: Record<CommandRisk, string> = {
 export function CommandsLayerScreen() {
   const router = useRouter()
   const {colours, radius, spacing, scheme} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const wash =
     scheme === 'dark'
@@ -40,7 +42,7 @@ export function CommandsLayerScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Command Layer" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <LinearGradient
             colors={wash as [string, string]}
             style={[

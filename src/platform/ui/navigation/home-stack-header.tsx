@@ -23,17 +23,12 @@ export function HomeHeaderLeft() {
         openDrawer()
       }}
       style={styles.avatarHit}>
-      <LiquidGlassChrome
-        interactive
-        fallback="clear"
-        style={styles.avatarGlass}>
-        <Avatar
-          name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
-          uri={profile?.avatarUri}
-          colour={profile?.coverColour}
-          size={30}
-        />
-      </LiquidGlassChrome>
+      <Avatar
+        name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+        uri={profile?.avatarUri}
+        colour={profile?.coverColour}
+        size={32}
+      />
     </AppPressable>
   )
 }
@@ -72,13 +67,6 @@ const styles = StyleSheet.create({
     height: 36,
     marginRight: 4,
     paddingHorizontal: 4,
-  },
-  avatarGlass: {
-    alignItems: 'center',
-    borderRadius: 18,
-    height: 36,
-    justifyContent: 'center',
-    width: 36,
   },
   avatarHit: {
     alignItems: 'center',

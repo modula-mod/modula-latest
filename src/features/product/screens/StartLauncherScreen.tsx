@@ -13,6 +13,7 @@ import {
 } from '@/features/product/data/launcherSearch'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const QUICK_ACTIONS: Array<{
@@ -84,6 +85,7 @@ export function StartLauncherScreen() {
   const params = useLocalSearchParams<{command?: string; query?: string}>()
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const commandParam = firstParam(params.command)
   const queryParam = firstParam(params.query)
   const [query, setQuery] = useState(queryParam)
@@ -101,7 +103,7 @@ export function StartLauncherScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Start" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="accent">
               LAUNCHER / PREVIEW COMMANDS / LOCAL SEARCH

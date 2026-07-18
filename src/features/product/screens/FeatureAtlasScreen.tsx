@@ -21,6 +21,7 @@ import {
 } from '@/features/product/data/featureAtlas'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type MaturityFilter = FeatureMaturity | 'all'
@@ -57,6 +58,7 @@ export function FeatureAtlasScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{domain?: string; maturity?: string}>()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const totalFeatures = FEATURE_ATLAS.length
   const domainParam = firstParam(params.domain)
   const maturityParam = firstParam(params.maturity)
@@ -81,7 +83,7 @@ export function FeatureAtlasScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Feature Atlas" />
       <ResponsiveContent maxWidth={840}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View
             style={[
               styles.hero,

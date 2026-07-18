@@ -69,7 +69,7 @@ const iconMap: Record<AppIconName, IoniconName> = {
   discover: 'compass-outline',
   create: 'add',
   activity: 'heart-outline',
-  profile: 'person-circle-outline',
+  profile: 'person-outline',
   menu: 'menu-outline',
   messages: 'chatbubble-ellipses-outline',
   search: 'search-outline',

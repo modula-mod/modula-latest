@@ -10,6 +10,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const STORAGE_KEY = 'modula.kaizen.queue.v1'
@@ -66,6 +67,7 @@ function parseQueue(raw: string | null): KaizenItem[] {
 export function KaizenScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [componentId, setComponentId] = useState('product.chat-assist')
   const [description, setDescription] = useState('')
   const [classifications, setClassifications] = useState<string[]>(['workflow'])
@@ -112,7 +114,7 @@ export function KaizenScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Kaizen" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="accent">
               IMPROVE QUEUE / LOCAL REVIEW

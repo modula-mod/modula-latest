@@ -13,6 +13,7 @@ import {
 } from '@/features/product/data/intelligenceLayers'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function IntelligenceLayerScreen() {
@@ -20,6 +21,7 @@ export function IntelligenceLayerScreen() {
   const layer = getIntelligenceLayer(String(slug ?? ''))
   const router = useRouter()
   const {colours, radius, spacing, scheme} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const wash =
     scheme === 'dark'
       ? ['#0B1416', colours.accentSubtle]
@@ -42,7 +44,7 @@ export function IntelligenceLayerScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={layer.name} />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <LinearGradient
             colors={wash as [string, string]}
             style={[

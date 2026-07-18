@@ -10,6 +10,7 @@ import {evaluateFocusPolicy} from '@/features/product/data/focusPolicy'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const AGENTS: Array<{name: string; icon: AppIconName; scope: string}> = [
@@ -43,6 +44,7 @@ const FLOW = [
 export function GaiaConsoleScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, update} = useProductPreferences()
   const [prompt, setPrompt] = useState('')
   const [reply, setReply] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export function GaiaConsoleScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="GAIA" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="accent">
               EXECUTES · AKI VERIFIES · GOVERNOR CONTROLS

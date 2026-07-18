@@ -9,6 +9,7 @@ import {PresenceStoriesRail} from '@/features/presence/components/PresenceStorie
 import {PRESENCE_RAIL_SEED} from '@/features/presence/data/presenceRailSeed'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -24,6 +25,7 @@ const ARCS = [
 export function StoriesPresenceScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [selectedId, setSelectedId] = useState(ARCS[0].id)
   const selected = ARCS.find(item => item.id === selectedId) ?? ARCS[0]
 
@@ -31,9 +33,12 @@ export function StoriesPresenceScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Presence" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], paddingBottom: spacing[6]}}>
-          <View style={{gap: spacing[2], paddingHorizontal: spacing[4], paddingTop: spacing[4]}}>
-            <AppText variant="display">Presence</AppText>
+        <ScrollView
+          contentContainerStyle={{
+            gap: spacing[5],
+            paddingBottom: tabPadding,
+          }}>
+          <View style={{gap: spacing[2], paddingHorizontal: spacing[4]}}>
             <AppText variant="body" colour="textSecondary">
               Focus Halo rail Preview — not Instagram Stories. Centre-focus avatars, gradient rings,
               and progressive blur stage the presence strip.

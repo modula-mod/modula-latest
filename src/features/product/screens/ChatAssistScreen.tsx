@@ -10,6 +10,7 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import type {ChatAssistMode} from '@/features/product/storage/productPreferencesStorage'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const MODES: Array<{id: ChatAssistMode; label: string; detail: string}> = [
@@ -69,6 +70,7 @@ const HELD_MESSAGES = [
 export function ChatAssistScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, ready, update} = useProductPreferences()
   const selectedFunctions = new Set(preferences.chatAssistFunctions)
   const focusPreset = preferences.focus.preset ?? 'off'
@@ -79,7 +81,7 @@ export function ChatAssistScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Chat Assist" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
           <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="accent">
               LOCAL PREFERENCES / NO SILENT PRIVATE AI

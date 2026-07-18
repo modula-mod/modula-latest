@@ -8,6 +8,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -66,6 +67,7 @@ const AGENTS: Array<{
 export function AgentsStudioScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const {preferences, update} = useProductPreferences()
   const [activeId, setActiveId] = useState(AGENTS[0].id)
   const [enabled, setEnabled] = useState<string[]>(['summariser', 'content'])
@@ -76,9 +78,14 @@ export function AgentsStudioScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Agents" />
       <ResponsiveContent maxWidth={720}>
-        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4]}}>
+        <ScrollView
+          contentContainerStyle={{
+            gap: spacing[5],
+            padding: spacing[4],
+            paddingBottom: tabPadding,
+          }}>
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Agents module — Preview.</AppText>
+            <AppText variant="headline">Agents module — Preview.</AppText>
             <AppText variant="body" colour="textSecondary">
               Installable agent packages will extend Gaia. This studio is local Preview — not a
               model runtime. Agents never silently read private modules.
