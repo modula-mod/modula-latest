@@ -1,5 +1,6 @@
 import type {ReactNode} from 'react'
-import {Platform} from 'react-native'
+
+import {ProgressiveBlurHeaderBackground} from '@/platform/ui/navigation/progressive-blur-header-background'
 
 export type NativeScreenHeaderConfig = {
   title: string
@@ -8,8 +9,7 @@ export type NativeScreenHeaderConfig = {
 
 /**
  * Shared Stack header defaults for top-level tab stacks.
- * Transparent + system blur on iOS so chrome matches progressive-blur secondary headers.
- * Screens compose trailing/leading controls via Stack.Screen options.
+ * Transparent + progressive blur background (not hard-edged system material).
  */
 export function nativeScreenHeaderOptions(config: NativeScreenHeaderConfig) {
   return {
@@ -18,9 +18,7 @@ export function nativeScreenHeaderOptions(config: NativeScreenHeaderConfig) {
     headerLargeTitle: config.headerLargeTitle ?? false,
     headerShadowVisible: false,
     headerTransparent: true as const,
-    ...(Platform.OS === 'ios'
-      ? {headerBlurEffect: 'systemChromeMaterial' as const}
-      : {}),
+    headerBackground: ProgressiveBlurHeaderBackground,
   }
 }
 

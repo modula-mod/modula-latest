@@ -1,8 +1,7 @@
-import {Platform, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
-import {BlurView} from 'expo-blur'
+import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
 
-import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProgressiveBlurEdgesProps = {
@@ -18,8 +17,8 @@ type ProgressiveBlurEdgesProps = {
 }
 
 /**
- * Apple-like progressive blur bands at the top and bottom of a surface.
- * Respects Reduce Transparency — falls back to soft canvas fades.
+ * Progressive blur bands at the top and/or bottom of a surface.
+ * Uses stacked intensity strips so the edge dissolves instead of a hard bar.
  */
 export function ProgressiveBlurEdges({
   edgeHeight = 56,
@@ -29,13 +28,6 @@ export function ProgressiveBlurEdges({
   sideAtmosphere = true,
 }: ProgressiveBlurEdgesProps) {
   const {colours, scheme} = useThemeTokens()
-  const {reduceTransparency} = useSystemAccessibility()
-  const useBlur = enabled && !reduceTransparency && Platform.OS !== 'web'
-  const tint = scheme === 'dark' ? 'dark' : 'light'
-  const fadeSolid =
-    scheme === 'dark'
-      ? (['rgba(11,20,22,0.92)', 'rgba(11,20,22,0.45)', 'rgba(11,20,22,0)'] as const)
-      : (['rgba(243,247,248,0.95)', 'rgba(243,247,248,0.5)', 'rgba(243,247,248,0)'] as const)
   const showTop = edges === 'both' || edges === 'top'
   const showBottom = edges === 'both' || edges === 'bottom'
 
@@ -43,26 +35,12 @@ export function ProgressiveBlurEdges({
     <View pointerEvents="none" style={[StyleSheet.absoluteFill, style]}>
       {showTop ? (
         <View style={[styles.edge, styles.top, {height: edgeHeight}]}>
-          {useBlur ? (
-            <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
-          ) : null}
-          <LinearGradient
-            colors={[...fadeSolid]}
-            locations={[0, 0.45, 1]}
-            style={StyleSheet.absoluteFill}
-          />
+          <ProgressiveBlurBand height={edgeHeight} enabled={enabled} topHeavy />
         </View>
       ) : null}
       {showBottom ? (
         <View style={[styles.edge, styles.bottom, {height: edgeHeight}]}>
-          {useBlur ? (
-            <BlurView intensity={42} tint={tint} style={StyleSheet.absoluteFill} />
-          ) : null}
-          <LinearGradient
-            colors={[...fadeSolid].reverse() as [string, string, ...string[]]}
-            locations={[0, 0.45, 1]}
-            style={StyleSheet.absoluteFill}
-          />
+          <ProgressiveBlurBand height={edgeHeight} enabled={enabled} topHeavy={false} />
         </View>
       ) : null}
       {sideAtmosphere ? (

@@ -1,6 +1,7 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState, type ComponentType, type ReactNode} from 'react'
 import {Pressable, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import {BlurView} from 'expo-blur'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -105,21 +106,33 @@ function GlassSurface({
   interactive?: boolean
   solidFallback: string
 }) {
+  const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const useGlass = isLiquidGlassSupported && !reduceTransparency
 
   if (!useGlass) {
+    if (reduceTransparency) {
+      return (
+        <View style={[style, {backgroundColor: solidFallback, overflow: 'hidden'}]}>
+          {children}
+        </View>
+      )
+    }
+    // Soft glass fallback when Callstack liquid glass isn't linked / supported.
     return (
-      <View
-        style={[
-          style,
-          {
-            backgroundColor: solidFallback,
-            overflow: 'hidden',
-          },
-        ]}>
+      <BlurView
+        intensity={52}
+        tint={scheme === 'dark' ? 'dark' : 'light'}
+        style={[style, {overflow: 'hidden'}]}>
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {backgroundColor: solidFallback, opacity: 0.3},
+          ]}
+        />
         {children}
-      </View>
+      </BlurView>
     )
   }
 

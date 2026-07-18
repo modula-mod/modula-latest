@@ -1,10 +1,12 @@
 import {useRouter, type Href} from 'expo-router'
-import {Pressable} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {Avatar} from '@/components/primitives/Avatar'
 import {AppIcon} from '@/components/primitives/AppIcon'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -14,26 +16,25 @@ export function HomeHeaderLeft() {
   const profile = session.status === 'signedIn' ? session.profile : null
 
   return (
-    <Pressable
+    <AppPressable
       accessibilityLabel="Open navigation drawer"
       onPress={() => {
         void selectionHaptic()
         openDrawer()
       }}
-      style={{
-        alignItems: 'center',
-        height: 44,
-        justifyContent: 'center',
-        marginLeft: 4,
-        width: 44,
-      }}>
-      <Avatar
-        name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
-        uri={profile?.avatarUri}
-        colour={profile?.coverColour}
-        size={32}
-      />
-    </Pressable>
+      style={styles.avatarHit}>
+      <LiquidGlassChrome
+        interactive
+        fallback="raised"
+        style={styles.avatarGlass}>
+        <Avatar
+          name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+          uri={profile?.avatarUri}
+          colour={profile?.coverColour}
+          size={30}
+        />
+      </LiquidGlassChrome>
+    </AppPressable>
   )
 }
 
@@ -42,32 +43,61 @@ export function HomeHeaderRight() {
   const {colours} = useThemeTokens()
 
   return (
-    <>
-      <Pressable
+    <LiquidGlassChrome interactive fallback="raised" style={styles.actionPill}>
+      <AppPressable
         accessibilityLabel="Create a post"
         onPress={() => {
           void selectionHaptic()
           router.push('/compose' as Href)
         }}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="create" colour={colours.accent} size={22} />
-      </Pressable>
-      <Pressable
+        style={styles.pillHit}>
+        <AppIcon name="create" colour={colours.accent} size={20} />
+      </AppPressable>
+      <View style={[styles.divider, {backgroundColor: colours.separator}]} />
+      <AppPressable
         accessibilityLabel="Open messages"
         onPress={() => router.push('/messages' as Href)}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="messages" colour={colours.textSecondary} size={22} />
-      </Pressable>
-    </>
+        style={styles.pillHit}>
+        <AppIcon name="messages" colour={colours.text} size={20} />
+      </AppPressable>
+    </LiquidGlassChrome>
   )
 }
+
+const styles = StyleSheet.create({
+  actionPill: {
+    alignItems: 'center',
+    borderRadius: 20,
+    flexDirection: 'row',
+    height: 36,
+    marginRight: 4,
+    paddingHorizontal: 4,
+  },
+  avatarGlass: {
+    alignItems: 'center',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  avatarHit: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    marginLeft: 4,
+    minWidth: 44,
+  },
+  divider: {
+    height: 18,
+    marginHorizontal: 2,
+    opacity: 0.55,
+    width: StyleSheet.hairlineWidth,
+  },
+  pillHit: {
+    alignItems: 'center',
+    height: 36,
+    justifyContent: 'center',
+    minWidth: 36,
+    paddingHorizontal: 8,
+  },
+})

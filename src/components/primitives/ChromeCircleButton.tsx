@@ -2,6 +2,7 @@ import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ChromeCircleButtonProps = {
@@ -16,8 +17,7 @@ type ChromeCircleButtonProps = {
 }
 
 /**
- * Circular chrome control used for header back / options (Board-style).
- * Dark circle + icon — shared across secondary headers and overflow menus.
+ * Circular liquid-glass chrome control for header back / options.
  */
 export function ChromeCircleButton({
   icon,
@@ -30,20 +30,20 @@ export function ChromeCircleButton({
 }: ChromeCircleButtonProps) {
   const {colours} = useThemeTokens()
   const circle = (
-    <View
+    <LiquidGlassChrome
+      interactive
+      fallback="raised"
       style={[
         styles.circle,
         {
           width: size,
           height: size,
           borderRadius: size / 2,
-          backgroundColor: colours.surface2,
-          borderColor: colours.border,
         },
         style,
       ]}>
       <AppIcon name={icon} size={iconSize} colour={colours.text} />
-    </View>
+    </LiquidGlassChrome>
   )
 
   if (!pressable || !onPress) {
@@ -68,7 +68,6 @@ export function ChromeCircleButton({
 const styles = StyleSheet.create({
   circle: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
   },
   hit: {
