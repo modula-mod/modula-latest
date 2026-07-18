@@ -89,6 +89,10 @@ export const FEATURE_ATLAS_EXPANSION_SEEDS: ExpansionSeed[] = [
     ['template-tasks', 'Template · Tasks', 'Tasks module starter package shape.', ['template', 'tasks']],
     ['template-crm', 'Template · CRM', 'CRM module starter with contacts scopes.', ['template', 'crm']],
     ['template-game', 'Template · Game Stub', 'Optional game module that cannot break pro OS.', ['template', 'games']],
+    ['template-integrations-element', 'Template · Integrations Element', 'Connection-card starter with declared network scope.', ['template', 'integrations']],
+    ['template-presence-pack', 'Template · Presence Pack', 'Presence and availability starter without silent tracking.', ['template', 'presence']],
+    ['template-theme-pack', 'Template · Theme Pack', 'Theme-token starter that does not mutate host chrome globally.', ['template', 'theme']],
+    ['template-search-extension', 'Template · Search Extension', 'Scoped search provider starter for module-owned content.', ['template', 'search']],
     ['risk-score', 'Forge Risk Score', 'Permission-derived risk summary before scan.', ['security', 'permissions']],
   ]),
   ...pair('marketplace', 'planned', [
