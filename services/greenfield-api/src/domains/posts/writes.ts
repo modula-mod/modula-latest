@@ -61,6 +61,8 @@ export class PostWriteService {
           module_status: null,
           glow_colour: null,
           like_count: 0,
+          reaction_count: 0,
+          quote_count: 0,
           reply_count: 0,
           repost_count: 0,
           created_at: now,
@@ -256,7 +258,7 @@ export class PostWriteService {
         }
         if (kind === 'like' || kind === 'repost') {
           await new OutboxRepository(this.db).enqueue(trx, {
-            eventType: 'notification.create',
+            eventType: kind === 'repost' ? 'notification.repost' : 'notification.create',
             aggregateType: 'post',
             aggregateId: postId,
             payload: {
