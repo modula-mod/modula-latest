@@ -4,7 +4,22 @@ export type {
   AtprotoOAuthCallbackResult,
   AtprotoRepository,
 } from '@/data/repositories/contracts/AtprotoRepository'
-export type {AuthRepository} from '@/data/repositories/contracts/AuthRepository'
+export type {
+  AuthRepository,
+  HandleAvailability,
+  RepositoryExportJob,
+} from '@/data/repositories/contracts/AuthRepository'
+export type {
+  ExtensionCentreItem,
+  ExtensionRepository,
+} from '@/data/repositories/contracts/ExtensionRepository'
+export type {
+  ComposerToolItem,
+  ComposerToolSection,
+  FunctionInvocationResult,
+  FunctionInvocationState,
+  ToolsRepository,
+} from '@/data/repositories/contracts/ToolsRepository'
 export type {DiscoverRepository} from '@/data/repositories/contracts/DiscoverRepository'
 export type {
   FeedRepository,
