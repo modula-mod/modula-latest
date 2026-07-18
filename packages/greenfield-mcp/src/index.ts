@@ -32,12 +32,32 @@ type ManifestValidationResult = {
   errors: string[]
 }
 
+type FocusPreset = 'off' | 'light' | 'deep' | 'custom'
+
+type FocusPolicyAnswers = {
+  notificationsCanInterrupt: boolean
+  feedVisible: boolean
+  reelsVisible: boolean
+  nonEssentialChatHeld: boolean
+  gaiaUnsolicitedAllowed: boolean
+  composerRecommendations: boolean
+  dockQuieter: boolean
+  boardPrioritisesWork: boolean
+  modulesRestricted: boolean
+  haloActive: boolean
+}
+
 type GreenfieldToolName =
   | 'greenfield.doctor'
   | 'greenfield.manifest.validate'
+  | 'greenfield.atlas.summary'
   | 'greenfield.intelligence.layers'
   | 'greenfield.commands.list'
   | 'greenfield.dimon.status'
+  | 'greenfield.forge.templates'
+  | 'greenfield.nft.status'
+  | 'greenfield.focus.policy'
+  | 'greenfield.privacy.levels'
   | 'greenfield.skill.template'
 
 const intelligenceModelPhrase = 'GAIA executes · AKI verifies · Governor controls'
@@ -90,6 +110,153 @@ const commandCatalogue = [
     description: 'Reserved economic command.',
     note: 'DIMON inactive; no transfer, chain, or wallet operation is available.',
   },
+  {
+    command: 'dimon.asset.transfer',
+    status: 'reserved',
+    description: 'Reserved NFT / digital ownership transfer request.',
+    note: 'DIMON inactive; Preview blocked with no mint, transfer, wallet, or chain operation.',
+  },
+] as const
+
+const atlasDomainStats = [
+  {
+    domain: 'Shell, identity, and profile',
+    count: 5,
+    examples: ['Modula Shell', 'Start Launcher', 'Profile-OS', 'Identity & SSO', 'Ownership controls'],
+  },
+  {
+    domain: 'Social, messaging, and presence',
+    count: 7,
+    examples: ['Social Network', 'Messaging', 'Chat Assist', 'Quiet Send', 'Merge Feeds', 'Presence'],
+  },
+  {
+    domain: 'Modules, Registry, Marketplace, and Forge',
+    count: 10,
+    examples: ['Installable Modules', 'Module Registry', 'Marketplace', 'Forge', 'Sandbox'],
+  },
+  {
+    domain: 'Intelligence, commands, and automation',
+    count: 10,
+    examples: ['GAIA', 'AKI', 'Governor', 'Command Layer', 'Gaia Atlas', 'Automations'],
+  },
+  {
+    domain: 'Attention, privacy, and safety',
+    count: 6,
+    examples: ['Focus Mode', 'Glass Privacy', 'Permissions', 'Feature Control'],
+  },
+  {
+    domain: 'Creation, economy, and optional inventory',
+    count: 6,
+    examples: ['Composer Tools', 'Creator Economy', 'DIMON', 'Gamification', 'Widgets'],
+  },
+] as const
+
+const forgeTemplates = [
+  {
+    id: 'blank',
+    name: 'Blank module',
+    blurb: 'Empty canvas',
+    description: 'Start from a minimal Greenfield manifest.',
+    surfaces: ['route'],
+    capabilities: ['board.card'],
+    permissions: ['storage:namespaced', 'profile:read'],
+  },
+  {
+    id: 'notes',
+    name: 'Notes-shaped',
+    blurb: 'Board + tab',
+    description: 'Personal notes surfaces; package stays external.',
+    surfaces: ['route', 'board', 'tab', 'widget'],
+    capabilities: ['board.card', 'profile.tab', 'widget.board'],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write'],
+  },
+  {
+    id: 'crm',
+    name: 'CRM-shaped',
+    blurb: 'Leads + automations',
+    description: 'CRM foreshadow with automation nodes; not hardcoded in host.',
+    surfaces: ['route', 'board', 'tab', 'settings', 'auto'],
+    capabilities: ['board.card', 'profile.tab', 'settings.section', 'automation.node'],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write', 'contacts:read', 'automation:node'],
+  },
+  {
+    id: 'agent',
+    name: 'Agent-shaped',
+    blurb: 'GAIA scopes',
+    description: 'Agent package that extends GAIA with explicit scopes.',
+    surfaces: ['route', 'settings', 'agent', 'tool'],
+    capabilities: ['settings.section', 'composer.tool', 'agent.scope'],
+    permissions: ['storage:namespaced', 'agent:scope', 'composer:tool', 'notifications:opt-in'],
+  },
+  {
+    id: 'commerce',
+    name: 'Commerce-shaped',
+    blurb: 'Shop tab',
+    description: 'Storefront tab foreshadow; settlements wait for DIMON.',
+    surfaces: ['route', 'tab', 'settings'],
+    capabilities: ['profile.tab', 'settings.section'],
+    permissions: ['storage:namespaced', 'profile:read', 'network:declared'],
+  },
+] as const
+
+const focusPresetMeta: Record<FocusPreset, {title: string; summary: string; haloLabel: string | null}> = {
+  off: {
+    title: 'Off',
+    summary: 'Normal Modula. Feeds, chats, modules, and notifications operate as permitted.',
+    haloLabel: null,
+  },
+  light: {
+    title: 'Light',
+    summary:
+      'Lower-priority notifications bundled, feed recommendations reduced, dock quieter, Board prioritises active work.',
+    haloLabel: 'Light Focus',
+  },
+  deep: {
+    title: 'Deep',
+    summary:
+      'Only selected modules visible. Feed/Reels may hide. Non-urgent chats held. GAIA avoids unsolicited interruptions. Focus Halo on.',
+    haloLabel: 'Deep Focus',
+  },
+  custom: {
+    title: 'Custom',
+    summary:
+      'User-controlled contacts, modules, navigation, feed, chat, notifications, AI interruptions, duration, and bypass.',
+    haloLabel: 'Custom Focus',
+  },
+}
+
+const focusPolicyQuestions: Array<{key: keyof FocusPolicyAnswers; label: string}> = [
+  {key: 'notificationsCanInterrupt', label: 'Can notifications interrupt?'},
+  {key: 'feedVisible', label: 'Is the feed fully visible?'},
+  {key: 'reelsVisible', label: 'Are Reels / discovery available?'},
+  {key: 'nonEssentialChatHeld', label: 'Are non-urgent chats held?'},
+  {key: 'gaiaUnsolicitedAllowed', label: 'May GAIA interrupt unsolicited?'},
+  {key: 'composerRecommendations', label: 'Composer recommendations on?'},
+  {key: 'dockQuieter', label: 'Is the dock / drawer quieter?'},
+  {key: 'boardPrioritisesWork', label: 'Does Board prioritise work?'},
+  {key: 'modulesRestricted', label: 'Are modules restricted?'},
+  {key: 'haloActive', label: 'Is Focus Halo active?'},
+]
+
+const glassPrivacyLevels = [
+  {
+    id: 'disable-sharing',
+    title: '1 - Disable Sharing',
+    body: 'Prevents content from being forwarded or exported through normal controls.',
+    threadHint: 'Forwarding disabled in preview',
+  },
+  {
+    id: 'protected-chat',
+    title: '2 - Protected Chat',
+    body: 'Stronger controls for private conversations: limited forward, tighter devices.',
+    threadHint: 'Protected; limited forward (preview)',
+  },
+  {
+    id: 'vault-chat',
+    title: '3 - Vault Chat',
+    body: 'Highest protection for communication and storage. Module sandbox required.',
+    threadHint: 'Vault Chat; sandbox required (planned)',
+  },
 ] as const
 
 const reservedDimonCapabilities = [
@@ -99,6 +266,8 @@ const reservedDimonCapabilities = [
   'ownership and entitlement records',
   'economic ledger entries',
   'future Greenfield account binding',
+  'NFT / digital ownership asset reservations',
+  'asset transfer request capability',
 ] as const
 
 export const toolDefinitions: ToolDefinition[] = [
@@ -138,6 +307,15 @@ export const toolDefinitions: ToolDefinition[] = [
     },
   },
   {
+    name: 'greenfield.atlas.summary',
+    description: 'Return approximate Feature Atlas domain counts without reading app source.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
     name: 'greenfield.commands.list',
     description: 'List static example commands for the Greenfield preview.',
     inputSchema: {
@@ -147,8 +325,51 @@ export const toolDefinitions: ToolDefinition[] = [
     },
   },
   {
+    name: 'greenfield.forge.templates',
+    description: 'List static Forge module templates and declared surfaces.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
     name: 'greenfield.dimon.status',
     description: 'Report inactive DIMON preview status and reserved capabilities.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: 'greenfield.nft.status',
+    description: 'Report reserved NFT/ownership status without chain, wallet, or balance access.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: 'greenfield.focus.policy',
+    description: 'Return Focus policy answers for the off, light, deep, or custom preset.',
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        preset: {
+          type: 'string',
+          enum: ['off', 'light', 'deep', 'custom'],
+          description: 'Focus preset to evaluate.',
+        },
+      },
+      required: ['preset'],
+    },
+  },
+  {
+    name: 'greenfield.privacy.levels',
+    description: 'List Glass Privacy levels and preview enforcement hints.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -200,12 +421,35 @@ export function callGreenfieldTool(name: string, args: unknown = {}): ToolCallRe
         layers: layerCatalogue,
       })
 
+    case 'greenfield.atlas.summary': {
+      const total = atlasDomainStats.reduce((sum, item) => sum + item.count, 0)
+      return jsonToolResult({
+        status: 'static-summary',
+        source:
+          'Package-local summary mirroring Feature Atlas domains; the MCP package does not import app source.',
+        approximate: true,
+        totalDomains: atlasDomainStats.length,
+        totalEntries: total,
+        domains: atlasDomainStats,
+        honesty:
+          'Schematic only. No live graph runtime, telemetry, user data, chain RPC, or network calls.',
+      })
+    }
+
     case 'greenfield.commands.list':
       return jsonToolResult({
         status: 'preview',
         honesty:
           'These are catalogue examples only; this MCP server does not execute commands.',
         commands: commandCatalogue,
+      })
+
+    case 'greenfield.forge.templates':
+      return jsonToolResult({
+        status: 'preview',
+        templates: forgeTemplates,
+        honesty:
+          'Templates seed local draft thinking only. This server does not publish packages, install modules, run untrusted code, or settle commerce.',
       })
 
     case 'greenfield.dimon.status':
@@ -215,6 +459,30 @@ export function callGreenfieldTool(name: string, args: unknown = {}): ToolCallRe
         honesty:
           'No chain, wallet, transfer, or settlement access is exposed by this preview server.',
         reservedCapabilities: reservedDimonCapabilities,
+      })
+
+    case 'greenfield.nft.status':
+      return jsonToolResult({
+        status: 'reserved',
+        phrase: 'DIMON is not active yet',
+        summary:
+          'NFT ownership and entitlement records are reserved for a future ownership layer.',
+        blockedActions: ['mint request', 'transfer request', 'settlement'],
+        honesty:
+          'No chain RPC, wallet connection, balance lookup, funded-looking wallet address, floor price, minting, transfer, or settlement is exposed by this preview server.',
+        databaseBoundary:
+          'ADR-006: PostgreSQL is the primary application database. Blockchain is not the app database.',
+      })
+
+    case 'greenfield.focus.policy':
+      return focusPolicyTool(args)
+
+    case 'greenfield.privacy.levels':
+      return jsonToolResult({
+        status: 'preview',
+        levels: glassPrivacyLevels,
+        honesty:
+          'Selection can persist locally in the app. Enforcement remains preview/planned and is not cryptographic, chain, or wallet protection.',
       })
 
     case 'greenfield.skill.template':
@@ -248,6 +516,100 @@ export function callGreenfieldTool(name: string, args: unknown = {}): ToolCallRe
         true,
       )
   }
+}
+
+function focusPolicyTool(args: unknown): ToolCallResult {
+  const argsObject = isRecord(args) ? args : {}
+  const preset = argsObject.preset
+
+  if (!isFocusPreset(preset)) {
+    return jsonToolResult(
+      {
+        ok: false,
+        error: 'greenfield.focus.policy requires preset: off, light, deep, or custom',
+      },
+      true,
+    )
+  }
+
+  const meta = focusPresetMeta[preset]
+  const answers = evaluateFocusPolicy(preset)
+
+  return jsonToolResult({
+    ok: true,
+    preset,
+    title: meta.title,
+    summary: meta.summary,
+    haloLabel: meta.haloLabel,
+    answers,
+    questions: focusPolicyQuestions.map((question) => ({
+      ...question,
+      answer: answers[question.key],
+    })),
+    honesty:
+      'Preview only. Production enforcement depends on FocusPolicyEngine surface adapters.',
+  })
+}
+
+function evaluateFocusPolicy(preset: FocusPreset): FocusPolicyAnswers {
+  switch (preset) {
+    case 'off':
+      return {
+        notificationsCanInterrupt: true,
+        feedVisible: true,
+        reelsVisible: true,
+        nonEssentialChatHeld: false,
+        gaiaUnsolicitedAllowed: true,
+        composerRecommendations: true,
+        dockQuieter: false,
+        boardPrioritisesWork: false,
+        modulesRestricted: false,
+        haloActive: false,
+      }
+    case 'light':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: true,
+        reelsVisible: true,
+        nonEssentialChatHeld: false,
+        gaiaUnsolicitedAllowed: true,
+        composerRecommendations: true,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: false,
+        haloActive: true,
+      }
+    case 'deep':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: false,
+        reelsVisible: false,
+        nonEssentialChatHeld: true,
+        gaiaUnsolicitedAllowed: false,
+        composerRecommendations: false,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: true,
+        haloActive: true,
+      }
+    case 'custom':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: true,
+        reelsVisible: false,
+        nonEssentialChatHeld: true,
+        gaiaUnsolicitedAllowed: false,
+        composerRecommendations: false,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: true,
+        haloActive: true,
+      }
+  }
+}
+
+function isFocusPreset(value: unknown): value is FocusPreset {
+  return value === 'off' || value === 'light' || value === 'deep' || value === 'custom'
 }
 
 function validateManifestArgument(args: unknown): ManifestValidationResult {

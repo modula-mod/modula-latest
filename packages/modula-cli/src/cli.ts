@@ -25,18 +25,341 @@ const OPTIONAL_STRING_ARRAY_FIELDS = [
 
 const UNINSTALL_BEHAVIOURS = new Set(['retainData', 'purgeData', 'exportThenPurge'])
 
+type FocusPreset = 'off' | 'light' | 'deep' | 'custom'
+
+type FocusPolicyAnswers = {
+  notificationsCanInterrupt: boolean
+  feedVisible: boolean
+  reelsVisible: boolean
+  nonEssentialChatHeld: boolean
+  gaiaUnsolicitedAllowed: boolean
+  composerRecommendations: boolean
+  dockQuieter: boolean
+  boardPrioritisesWork: boolean
+  modulesRestricted: boolean
+  haloActive: boolean
+}
+
+type CommandCatalogueEntry = {
+  id: string
+  label: string
+  description: string
+  risk: 'low' | 'medium' | 'high'
+  confirmation: 'none' | 'preview' | 'explicit'
+  permissions: string[]
+  undo: string
+  note?: string
+}
+
+const ATLAS_DOMAIN_STATS = [
+  {
+    domain: 'Shell, identity, and profile',
+    count: 5,
+    examples: ['Modula Shell', 'Start Launcher', 'Profile-OS', 'Identity & SSO', 'Ownership controls'],
+  },
+  {
+    domain: 'Social, messaging, and presence',
+    count: 7,
+    examples: ['Social Network', 'Messaging', 'Chat Assist', 'Quiet Send', 'Merge Feeds', 'Presence'],
+  },
+  {
+    domain: 'Modules, Registry, Marketplace, and Forge',
+    count: 10,
+    examples: ['Installable Modules', 'Module Registry', 'Marketplace', 'Forge', 'Sandbox'],
+  },
+  {
+    domain: 'Intelligence, commands, and automation',
+    count: 10,
+    examples: ['GAIA', 'AKI', 'Governor', 'Command Layer', 'Gaia Atlas', 'Automations'],
+  },
+  {
+    domain: 'Attention, privacy, and safety',
+    count: 6,
+    examples: ['Focus Mode', 'Glass Privacy', 'Permissions', 'Feature Control'],
+  },
+  {
+    domain: 'Creation, economy, and optional inventory',
+    count: 6,
+    examples: ['Composer Tools', 'Creator Economy', 'DIMON', 'Gamification', 'Widgets'],
+  },
+] as const
+
+const FORGE_TEMPLATES = [
+  {
+    id: 'blank',
+    name: 'Blank module',
+    blurb: 'Empty canvas',
+    description: 'Start from a minimal Greenfield manifest.',
+    surfaces: ['route'],
+    capabilities: ['board.card'],
+    permissions: ['storage:namespaced', 'profile:read'],
+  },
+  {
+    id: 'notes',
+    name: 'Notes-shaped',
+    blurb: 'Board + tab',
+    description: 'Personal notes surfaces; package stays external.',
+    surfaces: ['route', 'board', 'tab', 'widget'],
+    capabilities: ['board.card', 'profile.tab', 'widget.board'],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write'],
+  },
+  {
+    id: 'crm',
+    name: 'CRM-shaped',
+    blurb: 'Leads + automations',
+    description: 'CRM foreshadow with automation nodes; not hardcoded in host.',
+    surfaces: ['route', 'board', 'tab', 'settings', 'auto'],
+    capabilities: ['board.card', 'profile.tab', 'settings.section', 'automation.node'],
+    permissions: ['storage:namespaced', 'profile:read', 'board:write', 'contacts:read', 'automation:node'],
+  },
+  {
+    id: 'agent',
+    name: 'Agent-shaped',
+    blurb: 'GAIA scopes',
+    description: 'Agent package that extends GAIA with explicit scopes.',
+    surfaces: ['route', 'settings', 'agent', 'tool'],
+    capabilities: ['settings.section', 'composer.tool', 'agent.scope'],
+    permissions: ['storage:namespaced', 'agent:scope', 'composer:tool', 'notifications:opt-in'],
+  },
+  {
+    id: 'commerce',
+    name: 'Commerce-shaped',
+    blurb: 'Shop tab',
+    description: 'Storefront tab foreshadow; settlements wait for DIMON.',
+    surfaces: ['route', 'tab', 'settings'],
+    capabilities: ['profile.tab', 'settings.section'],
+    permissions: ['storage:namespaced', 'profile:read', 'network:declared'],
+  },
+] as const
+
+const COMMAND_CATALOGUE: CommandCatalogueEntry[] = [
+  {
+    id: 'module.validateManifest',
+    label: 'Validate module manifest',
+    description: 'Validate a modula.module.json file before Registry or host review.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No side effects',
+  },
+  {
+    id: 'module.init',
+    label: 'Copy module template instructions',
+    description: 'Print instructions for copying templates/modula-module into an external repo.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No files written by preview CLI',
+  },
+  {
+    id: 'atlas.stats',
+    label: 'Atlas domain stats',
+    description: 'Print approximate Feature Atlas domain counts.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No side effects',
+  },
+  {
+    id: 'forge.templates',
+    label: 'List Forge templates',
+    description: 'Show static Forge module templates and their declared surfaces.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'No side effects',
+  },
+  {
+    id: 'notes.create',
+    label: 'Create note',
+    description: 'Create a private note from context or chat.',
+    risk: 'low',
+    confirmation: 'preview',
+    permissions: ['storage:namespaced'],
+    undo: 'Delete draft note',
+  },
+  {
+    id: 'tasks.create',
+    label: 'Create task',
+    description: 'Turn a conversation or post into a task.',
+    risk: 'low',
+    confirmation: 'preview',
+    permissions: ['storage:namespaced', 'board:write'],
+    undo: 'Archive task',
+  },
+  {
+    id: 'crm.contact.update',
+    label: 'Update CRM contact',
+    description: 'Update a lead or contact field.',
+    risk: 'medium',
+    confirmation: 'explicit',
+    permissions: ['contacts:read', 'storage:namespaced'],
+    undo: 'Revert field change',
+  },
+  {
+    id: 'messaging.send',
+    label: 'Send message',
+    description: 'Send a DM or team message.',
+    risk: 'high',
+    confirmation: 'explicit',
+    permissions: ['network:declared'],
+    undo: 'Not always reversible; soft recall where supported',
+  },
+  {
+    id: 'focus.start',
+    label: 'Start Focus',
+    description: 'Begin Light, Deep, or Custom Focus session.',
+    risk: 'low',
+    confirmation: 'preview',
+    permissions: [],
+    undo: 'focus.stop',
+  },
+  {
+    id: 'focus.stop',
+    label: 'Stop Focus',
+    description: 'End the active Focus session.',
+    risk: 'low',
+    confirmation: 'none',
+    permissions: [],
+    undo: 'Restore previous session if scheduled',
+  },
+  {
+    id: 'privacy.setLevel',
+    label: 'Set Glass Privacy',
+    description: 'Disable Sharing / Protected Chat / Vault Chat.',
+    risk: 'medium',
+    confirmation: 'explicit',
+    permissions: [],
+    undo: 'Restore previous level',
+  },
+  {
+    id: 'board.addWidget',
+    label: 'Add Board widget',
+    description: 'Place a module widget on Board.',
+    risk: 'low',
+    confirmation: 'preview',
+    permissions: ['board:write'],
+    undo: 'Remove widget',
+  },
+  {
+    id: 'module.install',
+    label: 'Install module',
+    description: 'Install from Registry after AKI scan.',
+    risk: 'high',
+    confirmation: 'explicit',
+    permissions: ['network:declared'],
+    undo: 'module.disable / uninstall',
+  },
+  {
+    id: 'module.disable',
+    label: 'Disable module',
+    description: 'Disable without purge.',
+    risk: 'medium',
+    confirmation: 'explicit',
+    permissions: [],
+    undo: 'Re-enable',
+  },
+  {
+    id: 'dimon.transfer',
+    label: 'DIMON transfer',
+    description: 'Reserved; DIMON is not active yet.',
+    risk: 'high',
+    confirmation: 'explicit',
+    permissions: ['dimon:transaction:request'],
+    undo: 'Blocked while DIMON inactive',
+    note: 'No chain, wallet, balance, or RPC operation exists in this CLI.',
+  },
+  {
+    id: 'dimon.asset.transfer',
+    label: 'DIMON asset transfer',
+    description: 'Reserved NFT / digital ownership transfer request. DIMON is not active yet.',
+    risk: 'high',
+    confirmation: 'explicit',
+    permissions: ['dimon:asset:transfer:request'],
+    undo: 'Blocked while DIMON inactive',
+    note: 'Preview blocked; no mint, transfer, wallet, or chain operation is available.',
+  },
+]
+
+const FOCUS_PRESET_META: Record<FocusPreset, {title: string; summary: string; haloLabel: string | null}> = {
+  off: {
+    title: 'Off',
+    summary: 'Normal Modula. Feeds, chats, modules, and notifications operate as permitted.',
+    haloLabel: null,
+  },
+  light: {
+    title: 'Light',
+    summary:
+      'Lower-priority notifications bundled, feed recommendations reduced, dock quieter, Board prioritises active work.',
+    haloLabel: 'Light Focus',
+  },
+  deep: {
+    title: 'Deep',
+    summary:
+      'Only selected modules visible. Feed/Reels may hide. Non-urgent chats held. GAIA avoids unsolicited interruptions. Focus Halo on.',
+    haloLabel: 'Deep Focus',
+  },
+  custom: {
+    title: 'Custom',
+    summary:
+      'User-controlled contacts, modules, navigation, feed, chat, notifications, AI interruptions, duration, and bypass.',
+    haloLabel: 'Custom Focus',
+  },
+}
+
+const FOCUS_POLICY_QUESTIONS: Array<{key: keyof FocusPolicyAnswers; label: string}> = [
+  {key: 'notificationsCanInterrupt', label: 'Can notifications interrupt?'},
+  {key: 'feedVisible', label: 'Is the feed fully visible?'},
+  {key: 'reelsVisible', label: 'Are Reels / discovery available?'},
+  {key: 'nonEssentialChatHeld', label: 'Are non-urgent chats held?'},
+  {key: 'gaiaUnsolicitedAllowed', label: 'May GAIA interrupt unsolicited?'},
+  {key: 'composerRecommendations', label: 'Composer recommendations on?'},
+  {key: 'dockQuieter', label: 'Is the dock / drawer quieter?'},
+  {key: 'boardPrioritisesWork', label: 'Does Board prioritise work?'},
+  {key: 'modulesRestricted', label: 'Are modules restricted?'},
+  {key: 'haloActive', label: 'Is Focus Halo active?'},
+]
+
+const GLASS_PRIVACY_LEVELS = [
+  {
+    id: 'disable-sharing',
+    title: '1 - Disable Sharing',
+    body: 'Prevents content from being forwarded or exported through normal controls.',
+    threadHint: 'Forwarding disabled in preview',
+  },
+  {
+    id: 'protected-chat',
+    title: '2 - Protected Chat',
+    body: 'Stronger controls for private conversations: limited forward, tighter devices.',
+    threadHint: 'Protected; limited forward (preview)',
+  },
+  {
+    id: 'vault-chat',
+    title: '3 - Vault Chat',
+    body: 'Highest protection for communication and storage. Module sandbox required.',
+    threadHint: 'Vault Chat; sandbox required (planned)',
+  },
+] as const
+
 const HELP_TEXT = `Modula CLI
 
 Usage:
   modula help
   modula doctor
+  modula atlas stats
   modula mcp info
   modula module validate <path-to-modula.module.json>
   modula module init [--write]
+  modula forge templates
   modula intelligence layers
   modula commands list
+  modula commands search <q>
   modula focus presets
+  modula focus policy <off|light|deep|custom>
+  modula privacy levels
   modula dimon status
+  modula nft status
+  modula verify phase6s
   modula version
 
 This CLI is intentionally local and informational. It does not publish packages,
@@ -56,6 +379,10 @@ export async function run(args: string[]): Promise<CommandResult> {
     return ok(await doctorText())
   }
 
+  if (first === 'atlas' && second === 'stats') {
+    return ok(atlasStatsText())
+  }
+
   if (first === 'mcp' && second === 'info') {
     return ok(mcpInfoText())
   }
@@ -68,6 +395,10 @@ export async function run(args: string[]): Promise<CommandResult> {
     return ok(moduleInitText(args.includes('--write')))
   }
 
+  if (first === 'forge' && second === 'templates') {
+    return ok(forgeTemplatesText())
+  }
+
   if (first === 'intelligence' && second === 'layers') {
     return ok(intelligenceLayersText())
   }
@@ -76,12 +407,32 @@ export async function run(args: string[]): Promise<CommandResult> {
     return ok(commandsListText())
   }
 
+  if (first === 'commands' && second === 'search') {
+    return searchCommands(args.slice(2).join(' '))
+  }
+
   if (first === 'focus' && second === 'presets') {
     return ok(focusPresetsText())
   }
 
+  if (first === 'focus' && second === 'policy') {
+    return focusPolicyCommand(third)
+  }
+
+  if (first === 'privacy' && second === 'levels') {
+    return ok(privacyLevelsText())
+  }
+
   if (first === 'dimon' && second === 'status') {
     return ok('DIMON is not active yet\n')
+  }
+
+  if (first === 'nft' && second === 'status') {
+    return ok(nftStatusText())
+  }
+
+  if (first === 'verify' && second === 'phase6s') {
+    return ok(verifyPhase6sText())
   }
 
   if (first === 'version' || first === '--version' || first === '-v') {
@@ -153,12 +504,12 @@ function mcpInfoText(): string {
   return `Greenfield MCP
 
 Status:
-  This workspace does not currently ship a packaged Greenfield MCP server.
+  This workspace ships @modula/greenfield-mcp as a local preview server.
   The Modula CLI does not start or fake an MCP process.
 
-Local run pattern when the MCP package lands:
-  1. Build the MCP server package from the workspace root.
-  2. Configure your MCP client to launch that package with pnpm --filter.
+Local run pattern:
+  1. pnpm --filter @modula/greenfield-mcp build
+  2. pnpm --filter @modula/greenfield-mcp start
   3. Keep the server on local contracts; do not use it to publish packages or
      perform blockchain, wallet, balance, or RPC actions.
 
@@ -166,6 +517,28 @@ Current authoring inputs:
   - packages/greenfield-contracts
   - docs/architecture/module-standards.md
   - templates/modula-module/
+`
+}
+
+function atlasStatsText(): string {
+  const total = ATLAS_DOMAIN_STATS.reduce((sum, item) => sum + item.count, 0)
+
+  return `Feature Atlas domain stats
+
+Source:
+  Static package-local summary mirroring the product Feature Atlas.
+  Approximate counts only; this CLI does not import app source.
+
+Approximate domains: ${ATLAS_DOMAIN_STATS.length}
+Approximate entries: ${total}
+
+${ATLAS_DOMAIN_STATS.map(
+  (item) => `${item.domain}: ${item.count}
+  examples: ${item.examples.join(', ')}`,
+).join('\n\n')}
+
+Honesty:
+  Schematic only. No live graph runtime, telemetry, user data, or network calls.
 `
 }
 
@@ -385,6 +758,23 @@ Keep modules outside the host app and depend only on public contracts.
 `
 }
 
+function forgeTemplatesText(): string {
+  return `Forge templates
+
+${FORGE_TEMPLATES.map(
+  (template) => `${template.name} (${template.id})
+  ${template.blurb}
+  ${template.description}
+  surfaces: ${template.surfaces.join(', ')}
+  capabilities: ${template.capabilities.join(', ')}
+  permissions: ${template.permissions.join(', ')}`,
+).join('\n\n')}
+
+These templates seed local draft thinking only. Forge does not publish packages,
+install modules, run untrusted code, or settle commerce from this CLI.
+`
+}
+
 function intelligenceLayersText(): string {
   return `Modula intelligence layers
 
@@ -400,38 +790,206 @@ AGI Governor:
 }
 
 function commandsListText(): string {
-  return `Command catalogue sample
+  return `Command catalogue
 
-module.validateManifest:
-  Validate a modula.module.json file before Registry or host review.
+${COMMAND_CATALOGUE.map(formatCommandEntry).join('\n\n')}
 
-focus.setPreset:
-  Apply Off, Light, Deep, or Custom attention policy presets.
+Use:
+  modula commands search <q>
 
-gaia.preparePlan:
-  Draft a user-visible plan. Consequential actions require confirmation.
-
-governor.requestApproval:
-  Route higher-risk actions through approval and audit policy.
-
-This is a sample catalogue, not a live execution router.
+This is a static catalogue, not a live execution router.
 `
+}
+
+function searchCommands(query: string): CommandResult {
+  const trimmed = query.trim()
+  if (!trimmed) {
+    return {
+      exitCode: 1,
+      stderr: 'Missing search query. Usage: modula commands search <q>\n',
+    }
+  }
+
+  const needle = trimmed.toLowerCase()
+  const matches = COMMAND_CATALOGUE.filter((command) => {
+    const haystack = [
+      command.id,
+      command.label,
+      command.description,
+      command.risk,
+      command.confirmation,
+      command.permissions.join(' '),
+      command.undo,
+      command.note ?? '',
+    ]
+      .join(' ')
+      .toLowerCase()
+
+    return haystack.includes(needle)
+  })
+
+  if (matches.length === 0) {
+    return ok(`Command search: ${trimmed}
+
+No matching commands in the static preview catalogue.
+`)
+  }
+
+  return ok(`Command search: ${trimmed}
+
+${matches.map(formatCommandEntry).join('\n\n')}
+
+Matches are informational only. The CLI does not execute commands.
+`)
+}
+
+function formatCommandEntry(command: CommandCatalogueEntry): string {
+  const permissions = command.permissions.length > 0 ? command.permissions.join(', ') : 'none'
+  const note = command.note ? `\n  note: ${command.note}` : ''
+
+  return `${command.id}: ${command.label}
+  ${command.description}
+  risk: ${command.risk}
+  confirmation: ${command.confirmation}
+  permissions: ${permissions}
+  undo: ${command.undo}${note}`
 }
 
 function focusPresetsText(): string {
   return `Focus presets
 
-Off:
-  No focus filtering.
+${(Object.keys(FOCUS_PRESET_META) as FocusPreset[]).map((preset) => {
+  const meta = FOCUS_PRESET_META[preset]
+  return `${meta.title} (${preset}):
+  ${meta.summary}
+  halo: ${meta.haloLabel ?? 'none'}`
+}).join('\n\n')}
 
-Light:
-  Reduce non-urgent interruptions.
+Use:
+  modula focus policy <off|light|deep|custom>
+`
+}
 
-Deep:
-  Prioritize current work and suppress low-priority surfaces.
+function focusPolicyCommand(preset: string | undefined): CommandResult {
+  if (!isFocusPreset(preset)) {
+    return {
+      exitCode: 1,
+      stderr: 'Invalid focus preset. Usage: modula focus policy <off|light|deep|custom>\n',
+    }
+  }
 
-Custom:
-  User-defined attention policy for modules, commands, and notifications.
+  const meta = FOCUS_PRESET_META[preset]
+  const policy = evaluateFocusPolicy(preset)
+
+  return ok(`Focus policy: ${meta.title}
+
+${meta.summary}
+
+Policy answers:
+${FOCUS_POLICY_QUESTIONS.map((row) => `  ${row.label} ${policy[row.key] ? 'Yes' : 'No'}`).join('\n')}
+
+Preview only. Production enforcement depends on FocusPolicyEngine surface adapters.
+`)
+}
+
+function evaluateFocusPolicy(preset: FocusPreset): FocusPolicyAnswers {
+  switch (preset) {
+    case 'off':
+      return {
+        notificationsCanInterrupt: true,
+        feedVisible: true,
+        reelsVisible: true,
+        nonEssentialChatHeld: false,
+        gaiaUnsolicitedAllowed: true,
+        composerRecommendations: true,
+        dockQuieter: false,
+        boardPrioritisesWork: false,
+        modulesRestricted: false,
+        haloActive: false,
+      }
+    case 'light':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: true,
+        reelsVisible: true,
+        nonEssentialChatHeld: false,
+        gaiaUnsolicitedAllowed: true,
+        composerRecommendations: true,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: false,
+        haloActive: true,
+      }
+    case 'deep':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: false,
+        reelsVisible: false,
+        nonEssentialChatHeld: true,
+        gaiaUnsolicitedAllowed: false,
+        composerRecommendations: false,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: true,
+        haloActive: true,
+      }
+    case 'custom':
+      return {
+        notificationsCanInterrupt: false,
+        feedVisible: true,
+        reelsVisible: false,
+        nonEssentialChatHeld: true,
+        gaiaUnsolicitedAllowed: false,
+        composerRecommendations: false,
+        dockQuieter: true,
+        boardPrioritisesWork: true,
+        modulesRestricted: true,
+        haloActive: true,
+      }
+  }
+}
+
+function isFocusPreset(value: string | undefined): value is FocusPreset {
+  return value === 'off' || value === 'light' || value === 'deep' || value === 'custom'
+}
+
+function privacyLevelsText(): string {
+  return `Glass Privacy levels
+
+${GLASS_PRIVACY_LEVELS.map(
+  (level) => `${level.title} (${level.id})
+  ${level.body}
+  thread hint: ${level.threadHint}`,
+).join('\n\n')}
+
+Selection can persist locally in the app. Enforcement remains preview/planned and
+must not be represented as cryptographic, chain, or wallet protection.
+`
+}
+
+function nftStatusText(): string {
+  return `NFT / digital ownership status
+
+DIMON is not active yet
+NFT ownership and entitlement records are reserved for a future ownership layer.
+Mint and transfer requests are Preview blocked.
+
+No chain RPC, wallet connection, balance lookup, funded-looking wallet address,
+floor price, minting, transfer, or settlement is available through this CLI.
+
+ADR-006: PostgreSQL is the primary application database. Blockchain is not the
+app database.
+`
+}
+
+function verifyPhase6sText(): string {
+  return `Phase 6s social frontend verification
+
+Run from the workspace root when you want the full frontend check:
+  pnpm verify:phase6s-social-frontend
+
+This command prints the instruction only; it does not shell out or mutate the
+working tree.
 `
 }
 

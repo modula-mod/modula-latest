@@ -21,13 +21,20 @@ The package exposes a `modula` bin after build:
 ```sh
 modula help
 modula doctor
+modula atlas stats
 modula mcp info
 modula module validate <path-to-modula.module.json>
 modula module init [--write]
+modula forge templates
 modula intelligence layers
 modula commands list
+modula commands search <q>
 modula focus presets
+modula focus policy <off|light|deep|custom>
+modula privacy levels
 modula dimon status
+modula nft status
+modula verify phase6s
 modula version
 ```
 
@@ -58,6 +65,21 @@ It does not write files by default.
 If `--write` is passed, this preview CLI still prints path instructions instead of
 copying files. This keeps the command simple and avoids creating module packages
 inside the host repository by accident.
+
+## Informational catalogues
+
+- `atlas stats` prints a package-local, approximate Feature Atlas domain count.
+- `forge templates` lists the static Blank, Notes-shaped, CRM-shaped,
+  Agent-shaped, and Commerce-shaped module templates.
+- `commands search <q>` searches the static command catalogue; it does not
+  execute commands.
+- `focus policy <preset>` prints FocusPolicyEngine preview answers for Off,
+  Light, Deep, or Custom.
+- `privacy levels` lists Glass Privacy levels and preview enforcement hints.
+- `nft status` reports that NFT ownership records are reserved until DIMON is
+  active.
+- `verify phase6s` prints the command to run:
+  `pnpm verify:phase6s-social-frontend`.
 
 ## Honest boundaries
 
