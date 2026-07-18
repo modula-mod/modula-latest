@@ -139,3 +139,15 @@ Patterns (not packages):
 Removal path: drop Advanced toggle + Reels `videoUri` playback, then remove `expo-camera` / `expo-video` and native rebuild.
 
 **Stale binary safety:** JS must not statically import `expo-camera` / `expo-video` from the `@/platform/ui` startup barrel. Availability is probed with `requireOptionalNativeModule('ExpoCamera'|'ExpoVideo')` in `src/platform/ui/native-modules/expo-native-availability.ts`. Without a rebuild, UI shows an honest “native rebuild required” fallback instead of crashing.
+
+## Phase 6S — Presence join island (Telegram-style meatball)
+
+| Package | Version | Purpose | Native | Development-client rebuild required | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @shopify/react-native-skia | 2.6.2 | Presence / Appearance Advanced join-island meta-ball (Motionary telegram-join-animation pattern) | Yes | Yes — `RNSkiaModule` via `getEnforcing` at Skia import | `pnpm exec expo install @shopify/react-native-skia` / `pnpm add -w` | Phase 6S |
+
+Pattern (not a package): [telegram-join-animation](https://github.com/mahdidavoodi7/telegram-join-animation) — MIT Motionary drop. Modula reimplements under `src/platform/ui/motion/modula-join-island*` (Skia file only `require()`’d after `TurboModuleRegistry.get('RNSkiaModule')`). Does **not** admit `react-native-skia-gesture` (unused upstream).
+
+**Owner use case:** product-requested Presence join pop + Appearance Advanced motion Preview — not speculative Skia chrome.
+
+Removal path: drop `ModulaJoinIsland` call sites, then remove `@shopify/react-native-skia` and native rebuild.

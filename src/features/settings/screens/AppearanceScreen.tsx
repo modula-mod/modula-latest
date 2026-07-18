@@ -17,6 +17,7 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
+import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -350,6 +351,15 @@ export function AppearanceScreen() {
             <AdvancedCameraMaskedBlurPreview
               active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
               disabledByTransparency={resolved.accessibility.reduceTransparency}
+            />
+            <AppText variant="caption" colour="textTertiary">
+              Join island — Telegram-style avatar meatball (Skia). Same Preview surface as
+              Presence; needs a native rebuild with @shopify/react-native-skia.
+            </AppText>
+            <ModulaJoinIsland
+              name="Modula"
+              avatarColour={colours.accent}
+              caption="Appearance Advanced motion Preview."
             />
           </Section>
 

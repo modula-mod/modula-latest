@@ -6,7 +6,9 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
+import {PRESENCE_RAIL_SEED} from '@/features/presence/data/presenceRailSeed'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
+import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -39,6 +41,21 @@ export function StoriesPresenceScreen() {
           </View>
 
           <PresenceStoriesRail showCaption={false} />
+
+          <View style={{gap: spacing[2], paddingHorizontal: spacing[4]}}>
+            <AppText variant="headline">Join island</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Telegram-style join pop — avatar emerges from a Dynamic Island meatball
+              (Motionary Preview). Scroll the stage or tap Simulate join.
+            </AppText>
+          </View>
+          <View style={{paddingHorizontal: spacing[4]}}>
+            <ModulaJoinIsland
+              name={PRESENCE_RAIL_SEED[0]?.name ?? 'Maya Okonkwo'}
+              avatarColour={PRESENCE_RAIL_SEED[0]?.colour}
+              caption="Presence join Preview — not a live call surface."
+            />
+          </View>
 
           <View style={{gap: spacing[2], paddingHorizontal: spacing[4]}}>
             <AppText variant="headline">Spaces arc</AppText>

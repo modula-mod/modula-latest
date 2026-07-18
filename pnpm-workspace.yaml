@@ -4,6 +4,7 @@ packages:
   - packages/*
 
 allowBuilds:
+  '@shopify/react-native-skia': true
   core-js: false
   esbuild: true
   unrs-resolver: false
