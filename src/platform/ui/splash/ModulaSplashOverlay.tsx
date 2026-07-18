@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {Image, Platform, StyleSheet, View} from 'react-native'
+import {Image, Platform, StyleSheet, Text, View} from 'react-native'
 import Animated, {
   Easing,
   runOnJS,
@@ -9,23 +9,20 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
-import {AppText} from '@/components/primitives/AppText'
 import {
   hideNativeSplash,
   prepareModulaSplash,
 } from '@/platform/ui/splash/modula-splash'
 import {useReduceMotion} from '@/lib/accessibility'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const BRAND_TEAL = '#369CAA'
 const BRAND_INK = '#0B1416'
 
 /**
  * Full-screen brand hold after the native splash.
- * Logo + wordmark, then a short fade so first frame does not flash canvas.
+ * Theme-independent so it never races AppearanceProvider on first paint.
  */
 export function ModulaSplashOverlay() {
-  const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const [visible, setVisible] = useState(Platform.OS !== 'web')
   const opacity = useSharedValue(1)
@@ -97,16 +94,14 @@ export function ModulaSplashOverlay() {
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants">
       <View style={styles.glow} />
-      <Animated.View style={[styles.mark, markStyle, {gap: spacing[3]}]}>
+      <Animated.View style={[styles.mark, markStyle]}>
         <Image
           source={require('../../../../assets/images/splash-icon.png')}
           style={styles.logo}
           resizeMode="contain"
           accessibilityIgnoresInvertColors
         />
-        <AppText variant="headline" style={styles.wordmark}>
-          MODULA
-        </AppText>
+        <Text style={styles.wordmark}>MODULA</Text>
       </Animated.View>
     </Animated.View>
   )
@@ -124,6 +119,7 @@ const styles = StyleSheet.create({
   },
   mark: {
     alignItems: 'center',
+    gap: 12,
   },
   shell: {
     ...StyleSheet.absoluteFill,
@@ -134,6 +130,8 @@ const styles = StyleSheet.create({
   },
   wordmark: {
     color: '#F4FAFB',
+    fontSize: 22,
+    fontWeight: '700',
     letterSpacing: 4,
   },
 })
