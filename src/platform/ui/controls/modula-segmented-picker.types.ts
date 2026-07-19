@@ -6,7 +6,7 @@ export type ModulaSegmentedOption = {
   disabled?: boolean
 }
 
-export type ModulaSegmentedAppearance = 'segmented' | 'plain'
+export type ModulaSegmentedAppearance = 'segmented' | 'glass' | 'plain'
 
 export type ModulaSegmentedPickerProps = {
   options: ModulaSegmentedOption[]
@@ -17,7 +17,8 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * `segmented` — liquid-glass wrapper; selected thumb is a plain token capsule.
+   * `segmented` — classic system segmented control (UISegmentedControl on iOS).
+   * `glass` — liquid-glass wrapper; selected thumb is a plain token capsule.
    * `plain` — label tabs only, no chrome around the menu.
    */
   appearance?: ModulaSegmentedAppearance

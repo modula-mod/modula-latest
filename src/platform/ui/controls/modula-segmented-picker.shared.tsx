@@ -16,8 +16,9 @@ const DEFAULT_SEGMENT_MIN_WIDTH = 88
 const TRACK_HEIGHT = 40
 
 /**
- * Segmented control:
- * - `segmented` — liquid-glass wrapper; segments are plain (no glass on thumbs)
+ * Cross-platform segmented control.
+ * - `segmented` — classic muted track + raised selected thumb (system look)
+ * - `glass` — liquid-glass wrapper; selected thumb is a plain token capsule
  * - `plain` — label tabs only
  */
 export function ModulaSegmentedPicker({
@@ -35,6 +36,7 @@ export function ModulaSegmentedPicker({
   const {colours, radius, spacing, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const plain = appearance === 'plain'
+  const glass = appearance === 'glass'
   const isDark = scheme === 'dark'
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
@@ -46,6 +48,14 @@ export function ModulaSegmentedPicker({
 
   const segments = options.map(option => {
     const selected = option.value === value
+    const selectedFill = glass
+      ? isDark
+        ? 'rgba(255,255,255,0.14)'
+        : colours.surface
+      : selected
+        ? colours.surface
+        : 'transparent'
+
     return (
       <AppPressable
         key={option.value}
@@ -63,13 +73,7 @@ export function ModulaSegmentedPicker({
             minWidth: scrollable && !plain ? segmentMinWidth - 8 : undefined,
             flex: scrollable ? undefined : 1,
             borderRadius: radius.round,
-            // Selected thumb: token wash only — no liquid glass on the capsule.
-            backgroundColor:
-              plain || !selected
-                ? 'transparent'
-                : isDark
-                  ? 'rgba(255,255,255,0.14)'
-                  : colours.surface,
+            backgroundColor: plain || !selected ? 'transparent' : selectedFill,
             ...(plain || !selected
               ? null
               : {
@@ -105,19 +109,30 @@ export function ModulaSegmentedPicker({
               maxWidth: scrollable ? contentWidth : viewportWidth,
               gap: spacing[1],
             }
-          : {
-              width: '100%',
-              gap: 2,
-              padding: 3,
-              minHeight: TRACK_HEIGHT,
-            },
+          : glass
+            ? {
+                width: '100%',
+                gap: 2,
+                padding: 3,
+                minHeight: TRACK_HEIGHT,
+              }
+            : {
+                backgroundColor: colours.surfaceMuted,
+                borderRadius: radius.round,
+                padding: 3,
+                gap: 2,
+                width: scrollable ? contentWidth : viewportWidth,
+                maxWidth: scrollable ? contentWidth : viewportWidth,
+                minHeight: TRACK_HEIGHT,
+              },
         plain && !scrollable ? style : null,
+        !plain && !glass && !scrollable ? style : null,
       ]}>
       {segments}
     </View>
   )
 
-  if (plain) {
+  if (plain || !glass) {
     if (!scrollable) {
       return (
         <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
@@ -142,6 +157,7 @@ export function ModulaSegmentedPicker({
     )
   }
 
+  // glass appearance
   const wrapped = (
     <LiquidGlassChrome
       interactive
