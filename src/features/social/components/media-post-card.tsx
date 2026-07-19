@@ -23,20 +23,18 @@ import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import type {AvatarFace} from '@/platform/ui/avatars/types'
+import {buildMediaInvertedCornerPath} from '@/features/social/components/inverted-corner-path'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {MaskedView} from '@/platform/ui/materials/masked-view'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Outer media corner radius. */
+/** Matches corner-inverter geometry for the reference post. */
 const CORNER = 36
-/** White action-tray width (bottom-left bite). */
-const TRAY_W = 196
-/** White action-tray height. */
-const TRAY_H = 62
-/** Concave fillet where media curves into the tray. */
-const FILLET = 52
+const TRAY_W = 200
+const TRAY_H = 64
+const BITE: [number, number, number] = [24, 32, 24]
 
 function relativeTime(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -52,42 +50,8 @@ function formatCompact(value: number): string {
 }
 
 /**
- * Rounded media with a crisp concave bite at bottom-left.
- * The missing corner is canvas — that white/dark tray holds the actions.
- */
-export function buildInvertedCornerPath(
-  width: number,
-  height: number,
-  corner = CORNER,
-  trayW = TRAY_W,
-  trayH = TRAY_H,
-  fillet = FILLET,
-): string {
-  const r = Math.min(corner, width / 5, height / 5)
-  const tw = Math.min(Math.max(trayW, fillet + 8), width * 0.62)
-  const th = Math.min(Math.max(trayH, fillet * 0.7), height * 0.2)
-  const f = Math.min(fillet, tw * 0.85, th * 1.15)
-
-  // Clockwise media outline. Bottom edge stops at `tw`, then a concave
-  // cubic scoops up to the left edge at `height - th` — clear tray below.
-  return [
-    `M ${r} 0`,
-    `H ${width - r}`,
-    `A ${r} ${r} 0 0 1 ${width} ${r}`,
-    `V ${height - r}`,
-    `A ${r} ${r} 0 0 1 ${width - r} ${height}`,
-    `H ${tw}`,
-    `C ${tw} ${height - f * 0.92}, ${f * 0.92} ${height - th}, 0 ${height - th}`,
-    `V ${r}`,
-    `A ${r} ${r} 0 0 1 ${r} 0`,
-    'Z',
-  ].join(' ')
-}
-
-/**
- * Media card matching the inverted-corner / liquid-glass reference:
- * scooped white tray + cutout actions, progressive blur on media only,
- * glass proof pill on the remaining bottom-right.
+ * Media card: corner-inverter inverted BL tray, progressive blur on media,
+ * liquid-glass views pill, actions in the canvas bite.
  */
 export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const router = useRouter()
@@ -140,10 +104,14 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
 
   const path =
     frame.width > 0
-      ? buildInvertedCornerPath(frame.width, frame.height)
+      ? buildMediaInvertedCornerPath(frame.width, frame.height, {
+          cornerRadius: CORNER,
+          trayWidth: TRAY_W,
+          trayHeight: TRAY_H,
+          biteRadii: BITE,
+        })
       : ''
 
-  // Preview views figure for the glass pill (no views field on posts yet).
   const viewsLabel = formatCompact(Math.max(post.likeCount * 700, post.likeCount))
 
   return (
@@ -165,9 +133,11 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             <MaskedView
               style={{width: frame.width, height: frame.height}}
               maskElement={
-                <Svg width={frame.width} height={frame.height}>
-                  <Path d={path} fill="#FFFFFF" />
-                </Svg>
+                <View style={{width: frame.width, height: frame.height, backgroundColor: 'transparent'}}>
+                  <Svg width={frame.width} height={frame.height}>
+                    <Path d={path} fill="#FFFFFF" />
+                  </Svg>
+                </View>
               }>
               <View
                 style={{
@@ -193,16 +163,15 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
 
                 <LinearGradient
                   colors={['rgba(0,0,0,0.42)', 'transparent']}
-                  locations={[0, 0.3]}
+                  locations={[0, 0.28]}
                   style={StyleSheet.absoluteFill}
                   pointerEvents="none"
                 />
 
-                {/* Blur follows the masked scoop — dissolves media into the feed. */}
                 <ProgressiveBlurBand
-                  height={TRAY_H + 36}
+                  height={TRAY_H + 40}
                   topHeavy={false}
-                  intensity={62}
+                  intensity={64}
                   style={styles.bottomBlur}
                 />
               </View>
@@ -211,7 +180,6 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             <View style={[styles.mediaPlaceholder, {aspectRatio: aspect}]} />
           )}
 
-          {/* Header overlay on media */}
           <View
             pointerEvents="box-none"
             style={[
@@ -277,15 +245,11 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             />
           </View>
 
-          {/* Glass proof pill — on remaining bottom-right media, not in the tray. */}
           <View
             pointerEvents="box-none"
             style={[
               styles.proofAnchor,
-              {
-                right: spacing[3],
-                bottom: spacing[3] + 4,
-              },
+              {right: spacing[3], bottom: spacing[3] + 6},
             ]}>
             <LiquidGlassChrome interactive fallback="regular" style={styles.proofGlass}>
               <View style={[styles.proofInner, {gap: spacing[2], paddingHorizontal: spacing[3]}]}>
@@ -300,16 +264,13 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             </LiquidGlassChrome>
           </View>
 
-          {/*
-            Action tray: sits in the scooped canvas bite (sibling of MaskedView).
-            Not on the media / blur — matches the white notch in the reference.
-          */}
+          {/* Canvas bite — icons live here, not on the masked media. */}
           <View
             pointerEvents="box-none"
             style={[
               styles.tray,
               {
-                width: TRAY_W - 6,
+                width: TRAY_W - BITE[0],
                 height: TRAY_H,
                 paddingLeft: spacing[2],
               },
@@ -376,15 +337,6 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             {post.text}
           </AppText>
         ) : null}
-        {post.replyCount > 0 ? (
-          <AppPressable
-            accessibilityLabel="View comments"
-            onPress={() => router.push(`/post/${post.id}` as Href)}>
-            <AppText variant="caption" colour="textSecondary">
-              more
-            </AppText>
-          </AppPressable>
-        ) : null}
       </View>
     </View>
   )
@@ -442,13 +394,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.92)',
     borderRadius: 999,
+    elevation: 3,
     height: 34,
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.12,
     shadowRadius: 6,
-    elevation: 3,
     width: 34,
   },
   nameRow: {
