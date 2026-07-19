@@ -19,6 +19,11 @@ type LiquidGlassChromeProps = {
   interactive?: boolean
   /** Visual density when true liquid glass is unavailable. */
   fallback?: 'clear' | 'regular'
+  /**
+   * `fill` (default) — children absolute-fill the chrome (icon discs).
+   * `flow` — children keep normal layout (pills / segmented rows).
+   */
+  contentLayout?: 'fill' | 'flow'
 }
 
 type CallstackModule = {
@@ -59,6 +64,7 @@ export function LiquidGlassChrome({
   style,
   interactive = true,
   fallback = 'clear',
+  contentLayout = 'fill',
 }: LiquidGlassChromeProps) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
@@ -66,6 +72,7 @@ export function LiquidGlassChrome({
   const effect = fallback === 'regular' ? 'regular' : 'clear'
   const wash = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.42)'
   const rim = isDark ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.78)'
+  const flow = contentLayout === 'flow'
 
   if (reduceTransparency) {
     return (
@@ -159,7 +166,9 @@ export function LiquidGlassChrome({
           },
         ]}
       />
-      <View style={styles.foreground}>{children}</View>
+      <View style={flow ? styles.flowForeground : styles.foreground}>
+        {children}
+      </View>
     </View>
   )
 }
@@ -168,10 +177,18 @@ const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
   },
+  flowForeground: {
+    flexDirection: 'row',
+    width: '100%',
+  },
   foreground: {
-    ...StyleSheet.absoluteFill,
     alignItems: 'center',
+    bottom: 0,
     justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   shadow: {
     elevation: 3,
