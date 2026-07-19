@@ -7,9 +7,9 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import {Avatar} from '@/components/primitives/Avatar'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
@@ -84,12 +84,10 @@ export function HomeHeaderTitle() {
   )
 }
 
-/**
- * Separate glass icon buttons — never nest pressables inside LiquidGlassChrome.
- * A shared glass pill around AppPressables reads as button-in-button / double rim.
- */
+/** Plain icon actions — no glass disc behind the glyph. */
 export function HomeHeaderRight() {
   const router = useRouter()
+  const {colours} = useThemeTokens()
   const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
@@ -98,19 +96,21 @@ export function HomeHeaderRight() {
       style={[styles.rightRow, obscureStyle]}>
       {visible ? (
         <>
-          <ChromeCircleButton
-            icon="create"
+          <AppPressable
             accessibilityLabel="Create a post"
             onPress={() => {
               void selectionHaptic()
               router.push('/compose' as Href)
             }}
-          />
-          <ChromeCircleButton
-            icon="messages"
+            style={styles.iconHit}>
+            <AppIcon name="create" colour={colours.accent} size={22} />
+          </AppPressable>
+          <AppPressable
             accessibilityLabel="Open messages"
             onPress={() => router.push('/messages' as Href)}
-          />
+            style={styles.iconHit}>
+            <AppIcon name="messages" colour={colours.text} size={22} />
+          </AppPressable>
         </>
       ) : null}
     </Animated.View>
@@ -128,11 +128,17 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     minWidth: 44,
   },
+  iconHit: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    minWidth: 40,
+    paddingHorizontal: 6,
+  },
   rightRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 2,
-    marginRight: 2,
+    marginRight: 4,
   },
   titleWrap: {
     alignItems: 'center',
