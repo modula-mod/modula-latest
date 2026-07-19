@@ -18,6 +18,7 @@ import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {
   MODULA_TABS,
@@ -429,10 +430,13 @@ const styles = StyleSheet.create({
   },
   liquidGlassView: {
     backgroundColor: 'transparent',
+    justifyContent: 'center',
+    minHeight: FLOATING_TAB_BAR_SEGMENT_HEIGHT,
     overflow: 'hidden',
   },
   mainCluster: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   menuContainer: {
     gap: 8,
