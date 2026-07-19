@@ -1,12 +1,12 @@
-import {useEffect, useMemo, useState, type ReactNode} from 'react'
+import {useCallback, useEffect, useMemo, useState, type ReactNode} from 'react'
 import {
   LayoutAnimation,
   Platform,
-  RefreshControl,
   StyleSheet,
   UIManager,
   View,
 } from 'react-native'
+import {GestureDetector} from 'react-native-gesture-handler'
 import Animated from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 
@@ -36,8 +36,10 @@ import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {
+  PullActionTray,
   ShimmerRefreshEdge,
-  useScrollPullProgress,
+  usePullActionGesture,
+  type PullActionId,
 } from '@/platform/ui/refresh'
 import {FeedPostSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -99,11 +101,44 @@ export function HomeFeedScreen() {
     () => feedQuery.data?.pages.flatMap(page => page.items) ?? [],
     [feedQuery.data],
   )
-  const {pullDistance, onScroll} = useScrollPullProgress()
   const [manualRefreshing, setManualRefreshing] = useState(false)
   const refreshing =
     manualRefreshing ||
     (feedQuery.isRefetching && !feedQuery.isFetchingNextPage)
+
+  const onRefresh = useCallback(() => {
+    if (manualRefreshing || feedQuery.isRefetching) return
+    setManualRefreshing(true)
+    void feedQuery
+      .refetch()
+      .catch(() => undefined)
+      .finally(() => setManualRefreshing(false))
+  }, [feedQuery, manualRefreshing])
+
+  const onPullAction = useCallback(
+    (action: PullActionId) => {
+      if (action === 'close') {
+        void selectionHaptic()
+        return
+      }
+      if (action === 'search') {
+        void selectionHaptic()
+        router.push('/discover' as Href)
+        return
+      }
+      onRefresh()
+    },
+    [onRefresh, router],
+  )
+
+  const {
+    pullDistance,
+    swipeX,
+    selectedIndex,
+    armed,
+    onScroll,
+    listGesture,
+  } = usePullActionGesture(onPullAction)
 
   useEffect(() => {
     if (focus.quietFeed && mode === 'For You') {
@@ -117,15 +152,6 @@ export function HomeFeedScreen() {
     }
   }, [mode, reduceMotion])
 
-  const onRefresh = () => {
-    if (manualRefreshing || feedQuery.isRefetching) return
-    setManualRefreshing(true)
-    void feedQuery
-      .refetch()
-      .catch(() => undefined)
-      .finally(() => setManualRefreshing(false))
-  }
-
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
@@ -135,73 +161,78 @@ export function HomeFeedScreen() {
               pullDistance={pullDistance}
               refreshing={refreshing}
             />
-            <Animated.FlatList
-            data={posts}
-            keyExtractor={item => item.id}
-            renderItem={({item}) => <SocialPost post={item} />}
-            contentInsetAdjustmentBehavior="automatic"
-            bounces
-            alwaysBounceVertical
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                tintColor={colours.accent}
-                colors={[colours.accent]}
-                progressBackgroundColor={colours.surface}
-                onRefresh={onRefresh}
-              />
-            }
-            onEndReachedThreshold={0.35}
-            onEndReached={() => {
-              if (feedQuery.hasNextPage && !feedQuery.isFetchingNextPage) {
-                void feedQuery.fetchNextPage()
-              }
-            }}
-            ListHeaderComponent={
-              <HomeLayoutHeader
-                homeBlocks={homeBlocks}
-                focusActive={focusActive}
-                focusBannerCopy={focusBannerCopy}
-                focus={focus}
-                mode={mode}
-                modeOrder={modeOrder}
-                mergeCount={preferences.mergeFeedIds.length}
-                focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
-                mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
-                onModeChange={setMode}
-              />
-            }
-            ListEmptyComponent={
-              feedQuery.isLoading ? (
-                <View>
-                  <FeedPostSkeleton />
-                  <FeedPostSkeleton />
-                  <FeedPostSkeleton />
-                </View>
-              ) : feedQuery.isError ? (
-                <QueryErrorState error={feedQuery.error} onRetry={() => void feedQuery.refetch()} />
-              ) : (
-                <EmptyState
-                  icon="home"
-                  title="This feed is quiet."
-                  description="Switch modes or publish a local post to start the conversation."
-                  action={
-                    <Pill
-                      label="Create post"
-                      selected
-                      onPress={() => router.push('/compose' as Href)}
-                    />
+            <PullActionTray
+              pullDistance={pullDistance}
+              swipeX={swipeX}
+              selectedIndex={selectedIndex}
+              armed={armed}
+              refreshing={refreshing}
+            />
+            <GestureDetector gesture={listGesture}>
+              <Animated.FlatList
+                data={posts}
+                keyExtractor={item => item.id}
+                renderItem={({item}) => <SocialPost post={item} />}
+                contentInsetAdjustmentBehavior="automatic"
+                bounces
+                alwaysBounceVertical
+                onScroll={onScroll}
+                scrollEventThrottle={16}
+                onEndReachedThreshold={0.35}
+                onEndReached={() => {
+                  if (feedQuery.hasNextPage && !feedQuery.isFetchingNextPage) {
+                    void feedQuery.fetchNextPage()
                   }
-                />
-              )
-            }
-            ListFooterComponent={
-              feedQuery.isFetchingNextPage ? <PaginationIndicator label="Loading more" /> : null
-            }
-            contentContainerStyle={{paddingBottom: tabPadding}}
-          />
+                }}
+                ListHeaderComponent={
+                  <HomeLayoutHeader
+                    homeBlocks={homeBlocks}
+                    focusActive={focusActive}
+                    focusBannerCopy={focusBannerCopy}
+                    focus={focus}
+                    mode={mode}
+                    modeOrder={modeOrder}
+                    mergeCount={preferences.mergeFeedIds.length}
+                    focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
+                    mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
+                    onModeChange={setMode}
+                  />
+                }
+                ListEmptyComponent={
+                  feedQuery.isLoading ? (
+                    <View>
+                      <FeedPostSkeleton />
+                      <FeedPostSkeleton />
+                      <FeedPostSkeleton />
+                    </View>
+                  ) : feedQuery.isError ? (
+                    <QueryErrorState
+                      error={feedQuery.error}
+                      onRetry={() => void feedQuery.refetch()}
+                    />
+                  ) : (
+                    <EmptyState
+                      icon="home"
+                      title="This feed is quiet."
+                      description="Switch modes or publish a local post to start the conversation."
+                      action={
+                        <Pill
+                          label="Create post"
+                          selected
+                          onPress={() => router.push('/compose' as Href)}
+                        />
+                      }
+                    />
+                  )
+                }
+                ListFooterComponent={
+                  feedQuery.isFetchingNextPage ? (
+                    <PaginationIndicator label="Loading more" />
+                  ) : null
+                }
+                contentContainerStyle={{paddingBottom: tabPadding}}
+              />
+            </GestureDetector>
           </View>
         </FeatureErrorBoundary>
       </ResponsiveContent>
