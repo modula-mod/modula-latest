@@ -1,4 +1,4 @@
-import {useCallback, useRef, useState} from 'react'
+import {useCallback, useMemo, useRef, useState} from 'react'
 import {
   Alert,
   FlatList,
@@ -8,7 +8,7 @@ import {
   type ViewToken,
 } from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
-import {Stack, useRouter} from 'expo-router'
+import {Stack, useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
@@ -22,16 +22,25 @@ import {useSession} from '@/auth/runtime'
 import type {ModulaProfile} from '@/features/profile/contracts'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {ReelAuthorPeekSheet} from '@/features/reels/components/ReelAuthorPeekSheet'
+import {
+  ReelsModeSwitcher,
+  type ReelsFeedMode,
+} from '@/features/reels/components/ReelsModeSwitcher'
 import {useReelsQuery} from '@/features/reels/data'
 import {
+  buildReelHeaderFilterActions,
+  buildReelHeaderMoreActions,
   buildReelOverflowActions,
+  runReelChromeAction,
   runReelOverflowAction,
   type ReelOverflowActionId,
 } from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
@@ -39,12 +48,14 @@ import type {ReelItem as ReelItemType} from '@/domain/discovery'
 export function ReelsScreen() {
   const router = useRouter()
   const {height, width} = useWindowDimensions()
+  const tabPadding = useFloatingTabBarContentPadding()
   const reelsQuery = useReelsQuery()
   const session = useSession()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const [activeId, setActiveId] = useState<string | null>(null)
   const [peekAuthor, setPeekAuthor] = useState<ModulaProfile | null>(null)
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set())
+  const [mode, setMode] = useState<ReelsFeedMode>('reels')
 
   const onViewableItemsChanged = useRef(
     ({viewableItems}: {viewableItems: ViewToken[]}) => {
@@ -62,9 +73,46 @@ export function ReelsScreen() {
     onViewableItemsChanged,
   ])
 
-  const visibleReels = (reelsQuery.data ?? []).filter(
-    reel => !hiddenIds.has(reel.id),
+  const allVisible = useMemo(
+    () => (reelsQuery.data ?? []).filter(reel => !hiddenIds.has(reel.id)),
+    [hiddenIds, reelsQuery.data],
   )
+
+  const friendFaces = useMemo(() => {
+    const seen = new Set<string>()
+    const faces: ModulaProfile[] = []
+    for (const reel of allVisible) {
+      if (!reel.author.isFollowing || seen.has(reel.author.id)) continue
+      seen.add(reel.author.id)
+      faces.push(reel.author)
+      if (faces.length >= 3) break
+    }
+    return faces
+  }, [allVisible])
+
+  const visibleReels = useMemo(() => {
+    if (mode !== 'friends') return allVisible
+    return allVisible.filter(reel => reel.author.isFollowing)
+  }, [allVisible, mode])
+
+  const goBack = () => {
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.replace('/(tabs)' as never)
+    }
+  }
+
+  const runChrome = (id: string) => {
+    runReelChromeAction(id, {
+      onToggleFriends: () => {
+        setMode(current => (current === 'friends' ? 'reels' : 'friends'))
+      },
+      onGoBack: goBack,
+      onPolitical: () => router.push('/reels/algorithm' as Href),
+      onSensitive: () => router.push('/reels/algorithm' as Href),
+    })
+  }
 
   return (
     <View style={styles.screen}>
@@ -74,20 +122,43 @@ export function ReelsScreen() {
           headerShown: true,
           headerTransparent: true,
           headerShadowVisible: false,
-          headerTitle: () => null,
           headerBackVisible: false,
-          headerLeft: () => (
-            <ChromeCircleButton
-              icon="back"
-              accessibilityLabel="Go back"
-              onPress={() => {
-                if (router.canGoBack()) {
-                  router.back()
-                } else {
-                  router.replace('/(tabs)' as never)
-                }
-              }}
+          headerTitleAlign: 'center',
+          headerTitle: () => (
+            <ReelsModeSwitcher
+              mode={mode}
+              onChange={setMode}
+              friendFaces={friendFaces}
             />
+          ),
+          headerLeft: () => (
+            <View style={styles.headerSide}>
+              <ChromeCircleButton
+                icon="create"
+                accessibilityLabel="Create"
+                onPress={() => router.push('/compose' as Href)}
+              />
+            </View>
+          ),
+          headerRight: () => (
+            <View style={styles.headerSideEnd}>
+              <ChromeIconMenu
+                systemImage="ellipsis"
+                icon="more"
+                accessibilityLabel="Reels options"
+                title="Reels"
+                actions={buildReelHeaderMoreActions()}
+                onAction={runChrome}
+              />
+              <ChromeIconMenu
+                systemImage="line.3.horizontal.decrease"
+                icon="settings"
+                accessibilityLabel="Reels filters"
+                title="Filters"
+                actions={buildReelHeaderFilterActions(mode)}
+                onAction={runChrome}
+              />
+            </View>
           ),
           headerStyle: {backgroundColor: 'transparent'},
         }}
@@ -100,6 +171,27 @@ export function ReelsScreen() {
             error={reelsQuery.error}
             onRetry={() => void reelsQuery.refetch()}
           />
+        ) : visibleReels.length === 0 ? (
+          <View style={styles.empty}>
+            <AppText variant="headline" style={{color: '#fff'}}>
+              {mode === 'friends' ? 'No friend reels yet' : 'No reels'}
+            </AppText>
+            <AppText variant="caption" style={{color: 'rgba(255,255,255,0.7)'}}>
+              {mode === 'friends'
+                ? 'Follow creators to fill Friends — or switch back to Reels.'
+                : 'Pull to refresh once the reels API returns items.'}
+            </AppText>
+            {mode === 'friends' ? (
+              <AppPressable
+                accessibilityLabel="Show all reels"
+                onPress={() => setMode('reels')}
+                style={styles.emptyAction}>
+                <AppText variant="label" style={{color: '#fff'}}>
+                  Show all reels
+                </AppText>
+              </AppPressable>
+            ) : null}
+          </View>
         ) : (
           <FlatList
             data={visibleReels}
@@ -113,6 +205,7 @@ export function ReelsScreen() {
                 reel={item}
                 height={height}
                 width={width}
+                bottomInset={tabPadding}
                 ownerProfileId={ownerProfileId}
                 active={
                   activeId === item.id ||
@@ -142,6 +235,7 @@ function ReelItem({
   reel,
   height,
   width,
+  bottomInset,
   active,
   ownerProfileId,
   onOpenAuthorPeek,
@@ -150,6 +244,7 @@ function ReelItem({
   reel: ReelItemType
   height: number
   width: number
+  bottomInset: number
   active: boolean
   ownerProfileId: string
   onOpenAuthorPeek: (author: ModulaProfile) => void
@@ -167,7 +262,7 @@ function ReelItem({
   const handleOverflow = (id: string) => {
     const actionId = id as ReelOverflowActionId
     void runReelOverflowAction(actionId, reel, ownerProfileId).then(() => {
-      if (actionId === 'notInterested') {
+      if (actionId === 'notInterested' || actionId === 'seeLess') {
         onHideReel(reel.id)
       }
     })
@@ -272,7 +367,7 @@ function ReelItem({
         style={[
           styles.bottomRow,
           {
-            paddingBottom: Math.max(insets.bottom, spacing[4]),
+            paddingBottom: Math.max(bottomInset, insets.bottom, spacing[4]),
             paddingHorizontal: spacing[4],
             gap: spacing[3],
           },
@@ -404,6 +499,26 @@ const styles = StyleSheet.create({
   creatorText: {
     flex: 1,
     minWidth: 0,
+  },
+  empty: {
+    alignItems: 'center',
+    flex: 1,
+    gap: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  emptyAction: {
+    marginTop: 8,
+    padding: 12,
+  },
+  headerSide: {
+    paddingLeft: 4,
+  },
+  headerSideEnd: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    paddingRight: 4,
   },
   item: {
     overflow: 'hidden',

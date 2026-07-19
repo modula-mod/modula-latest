@@ -8,7 +8,9 @@ export function shouldHideShellTabBar(segments: readonly string[]): boolean {
   if (root === '(auth)') return true
   if (root === 'oauth') return true
   if (root === 'compose') return true
-  if (root === 'reels') return true
+  // Reels feed keeps the floating pill bar (IG-like). Algorithm prefs hide it.
+  if (root === 'reels' && segments[1] === 'algorithm') return true
+
   if (root === 'share' || root === 'share-profile') return true
   if (root === 'report' || root === 'reactions') return true
   if (root === 'account' && segments[1] === 'switcher') return true
