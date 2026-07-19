@@ -33,11 +33,11 @@ import {
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Slot width = snap distance. Nodes share one base size; focus scales them. */
-const ITEM_SLOT = 108
-/** Drawn size at full focus (scale 1). */
-const NODE_SIZE = 128
-const AVATAR_INSET = 20
+/** Slot width = snap distance. Tighter = denser dial. */
+const ITEM_SLOT = 76
+/** Drawn size at full focus (scale 1) — compact dial. */
+const NODE_SIZE = 86
+const AVATAR_INSET = 14
 
 type PresenceStoriesRailProps = {
   people?: PresenceRailPerson[]
@@ -68,6 +68,10 @@ export function PresenceStoriesRail({
   )
 
   const sidePad = Math.max(0, (stageWidth - ITEM_SLOT) / 2)
+  const snapOffsets = useMemo(
+    () => people.map((_, index) => index * ITEM_SLOT),
+    [people],
+  )
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -93,9 +97,16 @@ export function PresenceStoriesRail({
     }
   }
 
+  const snapToIndex = (index: number, animated: boolean) => {
+    scrollRef.current?.scrollTo({
+      x: index * ITEM_SLOT,
+      animated,
+    })
+  }
+
   return (
     <Animated.View
-      entering={reduceMotion ? undefined : FadeIn.duration(280)}
+      entering={reduceMotion ? undefined : FadeIn.duration(220)}
       style={[styles.root, compact && styles.rootCompact, {gap: spacing[1]}]}>
       {showCaption ? (
         <View
@@ -116,16 +127,20 @@ export function PresenceStoriesRail({
           ref={scrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
-          snapToInterval={ITEM_SLOT}
+          snapToOffsets={snapOffsets}
+          snapToAlignment="start"
           disableIntervalMomentum
-          decelerationRate="fast"
+          decelerationRate={0.9}
+          bounces
           contentContainerStyle={{
             paddingHorizontal: sidePad,
-            alignItems: 'center',
-            minHeight: compact ? 200 : 248,
+            // Peak of the arc at the top — sides drop via translateY.
+            paddingTop: 6,
+            alignItems: 'flex-start',
+            minHeight: compact ? 168 : 196,
           }}
           onScroll={onScroll}
-          scrollEventThrottle={16}>
+          scrollEventThrottle={1}>
           {people.map((person, index) => (
             <StoryNode
               key={person.id}
@@ -134,11 +149,7 @@ export function PresenceStoriesRail({
               scrollX={scrollX}
               reduceMotion={reduceMotion}
               onPress={() => {
-                // Snap this story to center, then open.
-                scrollRef.current?.scrollTo({
-                  x: index * ITEM_SLOT,
-                  animated: true,
-                })
+                snapToIndex(index, !reduceMotion)
                 router.push('/product/presence' as Href)
               }}
             />
@@ -188,7 +199,7 @@ function StoryDial({
 }) {
   if (mode === 'idle') return null
 
-  const stroke = mode === 'ring' ? 2.5 : 5.5
+  const stroke = mode === 'ring' ? 2 : 4.25
   const r = (size - stroke) / 2
   const c = size / 2
   const gradientId = `story-grad-${id}`
@@ -234,53 +245,43 @@ function StoryNode({
   const {colours, scheme} = useThemeTokens()
   const isYou = person.id === 'you'
   const avatarSize = NODE_SIZE - AVATAR_INSET
-  const gap = 5
-
-  /**
-   * Focus progress 1 → centered, 0 → far.
-   * Size is driven only by this — every story can become the big selected one.
-   */
-  const focusOf = (distance: number) => {
-    'worklet'
-    return interpolate(
-      distance,
-      [0, ITEM_SLOT * 0.55, ITEM_SLOT, ITEM_SLOT * 1.85],
-      [1, 0.72, 0.58, 0.46],
-      Extrapolation.CLAMP,
-    )
-  }
+  const gap = 3
 
   const animatedStyle = useAnimatedStyle(() => {
-    const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
-    const focus = focusOf(distance)
-    const scale = reduceMotion
-      ? interpolate(distance, [0, ITEM_SLOT], [1, 0.62], Extrapolation.CLAMP)
-      : focus
+    const offset = scrollX.value - index * ITEM_SLOT
+    const distance = Math.abs(offset)
+    // Compact dial: center pops, sides drop hard along an arch.
+    const scale = interpolate(
+      distance,
+      [0, ITEM_SLOT * 0.5, ITEM_SLOT, ITEM_SLOT * 2],
+      [1, 0.78, 0.62, 0.48],
+      Extrapolation.CLAMP,
+    )
     const opacity = interpolate(
       distance,
       [0, ITEM_SLOT, ITEM_SLOT * 2],
-      [1, 0.78, 0.42],
+      [1, 0.82, 0.48],
       Extrapolation.CLAMP,
     )
+    // Downward arch — further from center = lower on the dial.
     const translateY = reduceMotion
       ? 0
       : interpolate(
           distance,
-          [0, ITEM_SLOT, ITEM_SLOT * 2],
-          [0, 14, 26],
+          [0, ITEM_SLOT, ITEM_SLOT * 2, ITEM_SLOT * 3],
+          [0, 22, 40, 52],
           Extrapolation.CLAMP,
         )
-    // Mild dial rotation as items leave center.
     const rotate = reduceMotion
       ? '0deg'
       : `${interpolate(
-          scrollX.value - index * ITEM_SLOT,
-          [-ITEM_SLOT, 0, ITEM_SLOT],
-          [-14, 0, 14],
+          offset,
+          [-ITEM_SLOT * 2, -ITEM_SLOT, 0, ITEM_SLOT, ITEM_SLOT * 2],
+          [22, 12, 0, -12, -22],
           Extrapolation.CLAMP,
         )}deg`
     const zIndex = Math.round(
-      interpolate(distance, [0, ITEM_SLOT], [30, 5], Extrapolation.CLAMP),
+      interpolate(distance, [0, ITEM_SLOT], [40, 4], Extrapolation.CLAMP),
     )
 
     return {
@@ -516,11 +517,11 @@ const styles = StyleSheet.create({
     overflow: 'visible',
   },
   stageCompact: {
-    minHeight: 200,
-    paddingBottom: 4,
+    minHeight: 168,
+    paddingBottom: 2,
   },
   stageTall: {
-    minHeight: 248,
-    paddingBottom: 6,
+    minHeight: 196,
+    paddingBottom: 4,
   },
 })
