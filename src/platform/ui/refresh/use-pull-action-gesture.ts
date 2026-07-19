@@ -12,6 +12,7 @@ import {
 import {selectionHaptic} from '@/lib/haptics'
 import {
   releaseShellChromePullObscure,
+  shellChromeHoldObscure,
   syncShellChromePullObscure,
 } from '@/platform/ui/navigation/shell-chrome-obscure'
 import {
@@ -129,9 +130,28 @@ export function usePullActionGesture(
         .onEnd(() => {
           'worklet'
           if (armed.value || pullDistance.value >= PULL_ACTION_ARM_DISTANCE) {
-            runOnJS(dispatchCommit)(actionFromSelection(selectedIndex.value))
+            const action = actionFromSelection(selectedIndex.value)
+            // Hold chrome immediately so tab bar doesn't flash before React state.
+            if (action !== 'close') {
+              shellChromeHoldObscure.value = 1
+            }
+            runOnJS(dispatchCommit)(action)
+            // Keep the stage up briefly for refresh so the orb glow doesn't drop
+            // a frame before `refreshing` lands from React.
+            if (action === 'refresh') {
+              pullDistance.value = Math.max(
+                pullDistance.value,
+                PULL_ACTION_ARM_DISTANCE,
+              )
+            } else {
+              pullDistance.value = withTiming(0, {
+                duration: 420,
+                easing: SETTLE,
+              })
+            }
+          } else {
+            pullDistance.value = withTiming(0, {duration: 420, easing: SETTLE})
           }
-          pullDistance.value = withTiming(0, {duration: 420, easing: SETTLE})
           swipeX.value = withTiming(0, {duration: 360, easing: SETTLE})
           releaseShellChromePullObscure()
           armed.value = 0

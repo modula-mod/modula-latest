@@ -26,7 +26,8 @@ function smoothstep(t: number): number {
 /** Call from pull-action worklets while the finger is down. */
 export function syncShellChromePullObscure(pullDistance: number): void {
   'worklet'
-  const t = pullDistance / (PULL_ACTION_ARM_DISTANCE * 0.9)
+  // Hide chrome early so the pull stage owns the screen quickly.
+  const t = pullDistance / (PULL_ACTION_ARM_DISTANCE * 0.55)
   shellChromePullObscure.value = smoothstep(t)
 }
 

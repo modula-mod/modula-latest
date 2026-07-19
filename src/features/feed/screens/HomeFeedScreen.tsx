@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native'
 import {GestureDetector} from 'react-native-gesture-handler'
-import Animated from 'react-native-reanimated'
+import Animated, {withTiming} from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
@@ -39,7 +39,6 @@ import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {
   PullActionTray,
-  ShimmerRefreshEdge,
   usePullActionGesture,
   type PullActionId,
 } from '@/platform/ui/refresh'
@@ -164,8 +163,20 @@ export function HomeFeedScreen() {
   // Keep tab bar / header chrome hidden while refresh runs or search is open.
   useEffect(() => {
     setShellChromeHoldObscure(refreshing || searchOpen)
-    return () => setShellChromeHoldObscure(false)
   }, [refreshing, searchOpen])
+
+  useEffect(() => {
+    return () => setShellChromeHoldObscure(false)
+  }, [])
+
+  // Gesture may leave pullDistance armed for refresh; relax it once React holds the stage.
+  useEffect(() => {
+    if (!refreshing) return
+    const id = setTimeout(() => {
+      pullDistance.value = withTiming(0, {duration: 480})
+    }, 100)
+    return () => clearTimeout(id)
+  }, [pullDistance, refreshing])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -182,10 +193,6 @@ export function HomeFeedScreen() {
               selectedIndex={selectedIndex}
               armed={armed}
               refreshing={refreshing}>
-              <ShimmerRefreshEdge
-                pullDistance={pullDistance}
-                refreshing={refreshing}
-              />
               <GestureDetector gesture={listGesture}>
                 <Animated.FlatList
                   style={styles.screen}

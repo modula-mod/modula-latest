@@ -14,10 +14,10 @@ export function useShellChromeObscureStyle(
       opacity: 1 - o,
       transform: [
         {
-          translateY: direction === 'down' ? o * 88 : -o * 36,
+          translateY: direction === 'down' ? o * 110 : -o * 48,
         },
         {
-          scale: 1 - o * 0.04,
+          scale: 1 - o * 0.06,
         },
       ],
     }
