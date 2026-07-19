@@ -9,12 +9,11 @@ export const CHROME_HEADER_ROW = 54
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
 /**
- * Absolute height of the shell bottom progressive blur, measured from the
- * physical screen bottom (`bottom: 0`). 56px rise — do not add safe-area or
- * tab-bar height (those lift the dissolve up to the tab island).
+ * Absolute height of the shell bottom progressive blur from physical
+ * `bottom: 0` — never add safe-area or tab-bar height.
  */
 export const CHROME_BOTTOM_FADE = 56
-export const CHROME_BOTTOM_BLUR_INTENSITY = 48
+export const CHROME_BOTTOM_BLUR_INTENSITY = 52
 
 /**
  * Layout spacer under SecondaryScreenHeader — safe area + nav row only.

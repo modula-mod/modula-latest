@@ -46,17 +46,16 @@ export function ProgressiveBlurBand({
   const soft = strength === 'soft'
 
   // Mask: black = reveal blur, transparent = hide blur (fade to clear).
-  // Soft bottom: stay clear through most of the band, ramp only at the
-  // literal screen bottom (home indicator) — not up at the tab island.
+  // Bottom-heavy: clear at top of band → strongest at physical bottom (y=1).
   const maskColors = topHeavy
     ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
     : soft
-      ? (['transparent', 'transparent', 'rgba(0,0,0,0.4)', '#000000'] as const)
+      ? (['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.7)', '#000000'] as const)
       : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
   const maskLocations = topHeavy
     ? ([0, 0.35, 0.7, 1] as const)
     : soft
-      ? ([0, 0.45, 0.78, 1] as const)
+      ? ([0, 0.28, 0.62, 1] as const)
       : ([0, 0.22, 0.55, 1] as const)
 
   const tintColors =
@@ -64,16 +63,15 @@ export function ProgressiveBlurBand({
       ? topHeavy
         ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
         : soft
-          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.04)', 'rgba(11,20,22,0.22)'] as const)
+          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.1)', 'rgba(11,20,22,0.28)'] as const)
           : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
       : topHeavy
         ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
         : soft
-          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.06)', 'rgba(255,255,255,0.28)'] as const)
+          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.12)', 'rgba(255,255,255,0.32)'] as const)
           : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
 
-  const tintLocations =
-    soft && !topHeavy ? ([0, 0.7, 1] as const) : ([0, 0.55, 1] as const)
+  const tintLocations = [0, 0.55, 1] as const
 
   if (!useBlur) {
     return (

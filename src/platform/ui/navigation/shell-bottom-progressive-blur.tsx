@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {useSegments} from 'expo-router'
 import Animated from 'react-native-reanimated'
 
@@ -11,10 +11,10 @@ import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visi
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 /**
- * Progressive blur from the physical screen bottom (`bottom: 0`).
+ * Progressive blur pinned to the physical screen bottom.
  *
- * Intentionally ignores safe-area inset and tab-bar geometry — adding either
- * lifts the dissolve up to the floating tab island (the previous bug).
+ * Full-screen host + `bottom: 0` band — no safe-area inset, no tab-bar offset.
+ * Height is exactly `CHROME_BOTTOM_FADE` (56).
  */
 export function ShellBottomProgressiveBlur() {
   const segments = useSegments()
@@ -27,23 +27,28 @@ export function ShellBottomProgressiveBlur() {
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.wrap, {height: CHROME_BOTTOM_FADE}, obscureStyle]}>
-      <ProgressiveBlurBand
-        height={CHROME_BOTTOM_FADE}
-        topHeavy={false}
-        strength="soft"
-        intensity={CHROME_BOTTOM_BLUR_INTENSITY}
-      />
+      style={[styles.host, obscureStyle]}>
+      <View style={styles.band}>
+        <ProgressiveBlurBand
+          height={CHROME_BOTTOM_FADE}
+          topHeavy={false}
+          intensity={CHROME_BOTTOM_BLUR_INTENSITY}
+        />
+      </View>
     </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
-  wrap: {
+  band: {
     bottom: 0,
+    height: CHROME_BOTTOM_FADE,
     left: 0,
     position: 'absolute',
     right: 0,
+  },
+  host: {
+    ...StyleSheet.absoluteFill,
     zIndex: 3,
   },
 })
