@@ -406,49 +406,42 @@ function HomeLayoutHeader({
         </ShellChromeObscureView>
       ) : null,
     'mode-tabs': showBlock('mode-tabs') ? (
-      <View
-        key="mode-tabs"
-        onLayout={event => {
-          // Y relative to ListHeader root = scroll offset when tabs hit the top.
-          modeTabsStickAtY.value = event.nativeEvent.layout.y
-        }}>
-        <ShellChromeObscureView direction="up">
-          <Animated.View
-            pointerEvents={modeTabsInteractive ? 'auto' : 'none'}
-            style={[
-              styles.modeRow,
-              {
-                borderBottomColor: colours.border,
-                paddingHorizontal: spacing[4],
-                paddingTop: spacing[1],
-                paddingBottom: spacing[2],
-              },
-              inlineModeStyle,
-            ]}>
-            <ModulaSegmentedPicker
-              accessibilityLabel="Feed mode"
-              options={modeOrder.map(next => ({
-                value: next,
-                label:
-                  focus.quietFeed && next === 'For You'
-                    ? 'For You · Quiet'
-                    : next,
-              }))}
-              value={mode}
-              onValueChange={next => {
-                if (
-                  next === 'Following' ||
-                  next === 'For You' ||
-                  next === 'Modules'
-                ) {
-                  void selectionHaptic()
-                  onModeChange(next)
-                }
-              }}
-            />
-          </Animated.View>
-        </ShellChromeObscureView>
-      </View>
+      <ShellChromeObscureView key="mode-tabs" direction="up">
+        <Animated.View
+          pointerEvents={modeTabsInteractive ? 'auto' : 'none'}
+          style={[
+            styles.modeRow,
+            {
+              borderBottomColor: colours.border,
+              paddingHorizontal: spacing[4],
+              paddingTop: spacing[1],
+              paddingBottom: spacing[2],
+            },
+            inlineModeStyle,
+          ]}>
+          <ModulaSegmentedPicker
+            accessibilityLabel="Feed mode"
+            options={modeOrder.map(next => ({
+              value: next,
+              label:
+                focus.quietFeed && next === 'For You'
+                  ? 'For You · Quiet'
+                  : next,
+            }))}
+            value={mode}
+            onValueChange={next => {
+              if (
+                next === 'Following' ||
+                next === 'For You' ||
+                next === 'Modules'
+              ) {
+                void selectionHaptic()
+                onModeChange(next)
+              }
+            }}
+          />
+        </Animated.View>
+      </ShellChromeObscureView>
     ) : null,
     composer: showBlock('composer') ? (
       <ShellChromeObscureView key="composer" direction="up">
@@ -457,11 +450,25 @@ function HomeLayoutHeader({
     ) : null,
   }
 
+  const orderedIds = homeBlocks.includes('mode-tabs')
+    ? homeBlocks
+    : [...homeBlocks, 'mode-tabs']
+  const modeIndex = orderedIds.indexOf('mode-tabs')
+  const beforeIds = modeIndex >= 0 ? orderedIds.slice(0, modeIndex) : orderedIds
+  const afterIds = modeIndex >= 0 ? orderedIds.slice(modeIndex + 1) : []
+
   return (
     <View>
-      {homeBlocks.map(id => nodes[id] ?? null)}
-      {/* Required chrome fallback if sanitize failed oddly */}
-      {!homeBlocks.includes('mode-tabs') ? nodes['mode-tabs'] : null}
+      <View
+        collapsable={false}
+        onLayout={event => {
+          // Height above the mode tabs = scrollY when they reach the stick line.
+          modeTabsStickAtY.value = event.nativeEvent.layout.height
+        }}>
+        {beforeIds.map(id => nodes[id] ?? null)}
+      </View>
+      {modeIndex >= 0 ? nodes['mode-tabs'] : null}
+      {afterIds.map(id => nodes[id] ?? null)}
     </View>
   )
 }

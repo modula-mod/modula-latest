@@ -14,28 +14,34 @@ import Animated, {
 import {selectionHaptic} from '@/lib/haptics'
 import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {ShellChromeObscureView} from '@/platform/ui/navigation/shell-chrome-obscure-view'
+import {useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
+import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type HomeFeedModeLabel = 'Following' | 'For You' | 'Modules'
 
 const MORPH_DISTANCE = 36
-/** Below this, tabs are already at the list top — no sticky clone. */
-const MIN_STICK_OFFSET = 12
 
-function stickProgress(
-  scrollY: number,
-  stickAtY: number,
-): number {
+/** 0 → inline / expanded, 1 → stuck / compact. */
+export function stickProgress(scrollY: number, stickAtY: number): number {
   'worklet'
-  if (stickAtY < MIN_STICK_OFFSET) return 0
-  const from = Math.max(0, stickAtY - MORPH_DISTANCE)
-  return interpolate(scrollY, [from, stickAtY], [0, 1], Extrapolation.CLAMP)
+  const start = Math.max(0, stickAtY)
+  if (start <= 0) {
+    // Modes already at the top of the header — morph as soon as we scroll.
+    return interpolate(
+      scrollY,
+      [0, MORPH_DISTANCE],
+      [0, 1],
+      Extrapolation.CLAMP,
+    )
+  }
+  const from = Math.max(0, start - MORPH_DISTANCE)
+  return interpolate(scrollY, [from, start], [0, 1], Extrapolation.CLAMP)
 }
 
 type Props = {
   scrollY: SharedValue<number>
-  /** Header-local Y of the inline mode tabs (scroll offset when they hit the top). */
+  /** Header-local Y of the inline mode tabs (scroll offset when they hit the stick line). */
   stickAtY: SharedValue<number>
   mode: HomeFeedModeLabel
   modeOrder: HomeFeedModeLabel[]
@@ -44,8 +50,9 @@ type Props = {
 }
 
 /**
- * Sticky clone of the home feed mode picker.
- * Morphs in (shrink + settle) as the inline tabs reach the top of the list.
+ * Sticky clone of the home feed mode picker, pinned just under the nav row.
+ * Must fill the screen with `pointerEvents="box-none"` so absolute children
+ * aren't parented to a zero-height flex sibling under the list.
  */
 export function HomeStickyFeedModes({
   scrollY,
@@ -57,6 +64,8 @@ export function HomeStickyFeedModes({
 }: Props) {
   const {colours, spacing, scheme} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const headerOffset = useSecondaryChromeSpacerHeight()
+  const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
 
   const progress = useDerivedValue(() =>
@@ -80,8 +89,8 @@ export function HomeStickyFeedModes({
       transform: reduceMotion
         ? [{translateY: 0}]
         : [
-            {translateY: interpolate(p, [0, 1], [-12, 0])},
-            {scale: interpolate(p, [0, 1], [1.06, 1])},
+            {translateY: interpolate(p, [0, 1], [-10, 0])},
+            {scale: interpolate(p, [0, 1], [1.05, 1])},
           ],
     }
   })
@@ -108,10 +117,12 @@ export function HomeStickyFeedModes({
   }))
 
   return (
-    <ShellChromeObscureView direction="up">
+    <Animated.View
+      pointerEvents="box-none"
+      style={[styles.fill, obscureStyle]}>
       <Animated.View
         pointerEvents={interactive ? 'auto' : 'none'}
-        style={[styles.shell, shellStyle]}>
+        style={[styles.shell, {top: headerOffset}, shellStyle]}>
         {Platform.OS === 'ios' ? (
           <BlurView
             intensity={scheme === 'dark' ? 48 : 64}
@@ -131,7 +142,7 @@ export function HomeStickyFeedModes({
             StyleSheet.absoluteFill,
             {
               backgroundColor: colours.canvas,
-              opacity: scheme === 'dark' ? 0.35 : 0.55,
+              opacity: scheme === 'dark' ? 0.4 : 0.58,
             },
           ]}
         />
@@ -163,7 +174,7 @@ export function HomeStickyFeedModes({
           </Animated.View>
         </Animated.View>
       </Animated.View>
-    </ShellChromeObscureView>
+    </Animated.View>
   )
 }
 
@@ -198,6 +209,14 @@ export function useInlineModeTabsInteractive(
 }
 
 const styles = StyleSheet.create({
+  fill: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 30,
+  },
   row: {
     alignSelf: 'stretch',
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -208,7 +227,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'absolute',
     right: 0,
-    top: 0,
-    zIndex: 20,
   },
 })
