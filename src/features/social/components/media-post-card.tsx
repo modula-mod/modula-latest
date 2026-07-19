@@ -1,8 +1,15 @@
 import {Image} from 'expo-image'
 import {LinearGradient} from 'expo-linear-gradient'
 import {useRouter, type Href} from 'expo-router'
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {LayoutChangeEvent, StyleSheet, View} from 'react-native'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 import Svg, {Path} from 'react-native-svg'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
@@ -20,21 +27,22 @@ import {useSavePostMutation} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReactionMutation} from '@/features/social/data/useReactionMutation'
 import {useSession} from '@/auth/runtime'
-import {selectionHaptic} from '@/lib/haptics'
+import {useReduceMotion} from '@/lib/accessibility'
+import {lightImpactHaptic, selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import type {AvatarFace} from '@/platform/ui/avatars/types'
-import {buildMediaInvertedCornerPath} from '@/features/social/components/inverted-corner-path'
+import {
+  buildMediaInvertedCornerPath,
+  MEDIA_INVERTED_DEFAULTS,
+} from '@/features/social/components/inverted-corner-path'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {MaskedView} from '@/platform/ui/materials/masked-view'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Matches corner-inverter geometry for the reference post. */
-const CORNER = 36
-const TRAY_W = 200
-const TRAY_H = 64
-const BITE: [number, number, number] = [24, 32, 24]
+const {cornerRadius: CORNER, trayWidth: TRAY_W, trayHeight: TRAY_H, biteRadii: BITE} =
+  MEDIA_INVERTED_DEFAULTS
 
 function relativeTime(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -49,17 +57,65 @@ function formatCompact(value: number): string {
   return String(value)
 }
 
+function TrayIcon({
+  label,
+  selected,
+  colour,
+  icon,
+  onPress,
+  onLongPress,
+}: {
+  label: string
+  selected?: boolean
+  colour: string
+  icon: 'like' | 'comment' | 'share' | 'saved' | 'event'
+  onPress: () => void
+  onLongPress?: () => void
+}) {
+  const reduceMotion = useReduceMotion()
+  const scale = useSharedValue(1)
+  const style = useAnimatedStyle(() => ({transform: [{scale: scale.value}]}))
+
+  return (
+    <AppPressable
+      accessibilityLabel={label}
+      accessibilityState={{selected}}
+      onPress={() => {
+        if (!reduceMotion) {
+          scale.value = withSequence(
+            withSpring(0.86, {damping: 14, stiffness: 320}),
+            withSpring(1, {damping: 12, stiffness: 220}),
+          )
+        }
+        onPress()
+      }}
+      onLongPress={onLongPress}
+      delayLongPress={320}
+      style={styles.trayHit}>
+      <Animated.View style={style}>
+        <AppIcon name={icon} colour={colour} size={25} />
+      </Animated.View>
+    </AppPressable>
+  )
+}
+
 /**
- * Media card: corner-inverter inverted BL tray, progressive blur on media,
- * liquid-glass views pill, actions in the canvas bite.
+ * Media card: corner-inverter BL tray, progressive blur, liquid-glass views,
+ * double-tap like, spring tray presses.
  */
 export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const router = useRouter()
   const session = useSession()
   const {colours, spacing, scheme} = useThemeTokens()
+  const reduceMotion = useReduceMotion()
   const reaction = useReactionMutation()
   const save = useSavePostMutation()
   const [frame, setFrame] = useState({width: 0, height: 0})
+  const lastTap = useRef(0)
+  const heartScale = useSharedValue(0)
+  const heartOpacity = useSharedValue(0)
+  const audioPulse = useSharedValue(1)
+
   const media = post.media[0]
   const glow = post.glowColour || colours.mediaGlowFallback
   const aspect = media?.aspectRatio ?? 4 / 5
@@ -72,6 +128,8 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const audioLabel = media?.title?.trim() || `Original audio · @${post.author.handle}`
   const likedRed = colours.destructive
   const moreInk = scheme === 'dark' ? '#141418' : colours.text
+  const caption = post.text?.trim() ?? ''
+  const captionLong = caption.length > 96
 
   const likerFaces: AvatarFace[] = [
     {
@@ -88,8 +146,57 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
     )
   }
 
+  useEffect(() => {
+    if (reduceMotion) {
+      audioPulse.value = 1
+      return
+    }
+    audioPulse.value = withSequence(
+      withTiming(0.55, {duration: 900}),
+      withTiming(1, {duration: 900}),
+    )
+    const id = setInterval(() => {
+      audioPulse.value = withSequence(
+        withTiming(0.55, {duration: 900}),
+        withTiming(1, {duration: 900}),
+      )
+    }, 1800)
+    return () => clearInterval(id)
+  }, [audioPulse, reduceMotion])
+
+  const heartStyle = useAnimatedStyle(() => ({
+    opacity: heartOpacity.value,
+    transform: [{scale: heartScale.value}],
+  }))
+  const audioStyle = useAnimatedStyle(() => ({opacity: audioPulse.value}))
+
   const runOverflow = (id: string) => {
     void runPostOverflowAction(id as PostOverflowActionId, post)
+  }
+
+  const toggleLike = (forceLike = false) => {
+    void lightImpactHaptic()
+    const nextLiked = forceLike ? true : !liked
+    reaction.mutate({
+      postId: post.id,
+      reaction: nextLiked ? 'like' : null,
+    })
+    if (nextLiked && !reduceMotion) {
+      heartScale.value = 0.4
+      heartOpacity.value = 1
+      heartScale.value = withSpring(1.12, {damping: 10, stiffness: 200})
+      heartOpacity.value = withTiming(0, {duration: 520})
+    }
+  }
+
+  const onMediaPress = () => {
+    const now = Date.now()
+    if (now - lastTap.current < 280) {
+      toggleLike(true)
+      lastTap.current = 0
+      return
+    }
+    lastTap.current = now
   }
 
   const onLayout = (event: LayoutChangeEvent) => {
@@ -104,12 +211,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
 
   const path =
     frame.width > 0
-      ? buildMediaInvertedCornerPath(frame.width, frame.height, {
-          cornerRadius: CORNER,
-          trayWidth: TRAY_W,
-          trayHeight: TRAY_H,
-          biteRadii: BITE,
-        })
+      ? buildMediaInvertedCornerPath(frame.width, frame.height, MEDIA_INVERTED_DEFAULTS)
       : ''
 
   const viewsLabel = formatCompact(Math.max(post.likeCount * 700, post.likeCount))
@@ -133,13 +235,20 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             <MaskedView
               style={{width: frame.width, height: frame.height}}
               maskElement={
-                <View style={{width: frame.width, height: frame.height, backgroundColor: 'transparent'}}>
+                <View
+                  style={{
+                    width: frame.width,
+                    height: frame.height,
+                    backgroundColor: 'transparent',
+                  }}>
                   <Svg width={frame.width} height={frame.height}>
                     <Path d={path} fill="#FFFFFF" />
                   </Svg>
                 </View>
               }>
-              <View
+              <AppPressable
+                accessibilityLabel="Double tap to like"
+                onPress={onMediaPress}
                 style={{
                   width: frame.width,
                   height: frame.height,
@@ -155,26 +264,30 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                   <LinearGradient
                     colors={[glow, media?.colour ?? colours.surfaceMuted, colours.surface3]}
                     locations={[0, 0.55, 1]}
-                    start={{x: 0.1, y: 0}}
+                    start={{x: 0.12, y: 0}}
                     end={{x: 0.9, y: 1}}
                     style={StyleSheet.absoluteFill}
                   />
                 )}
 
                 <LinearGradient
-                  colors={['rgba(0,0,0,0.42)', 'transparent']}
-                  locations={[0, 0.28]}
+                  colors={['rgba(0,0,0,0.48)', 'transparent', 'transparent']}
+                  locations={[0, 0.26, 1]}
                   style={StyleSheet.absoluteFill}
                   pointerEvents="none"
                 />
 
                 <ProgressiveBlurBand
-                  height={TRAY_H + 40}
+                  height={TRAY_H + 48}
                   topHeavy={false}
-                  intensity={64}
+                  intensity={72}
                   style={styles.bottomBlur}
                 />
-              </View>
+
+                <Animated.View pointerEvents="none" style={[styles.heartBurst, heartStyle]}>
+                  <AppIcon name="like" colour={likedRed} size={72} />
+                </Animated.View>
+              </AppPressable>
             </MaskedView>
           ) : (
             <View style={[styles.mediaPlaceholder, {aspectRatio: aspect}]} />
@@ -204,7 +317,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                     name={post.author.displayName}
                     uri={post.author.avatarUri}
                     colour={post.author.coverColour}
-                    size={36}
+                    size={38}
                   />
                 </View>
               </LinearGradient>
@@ -212,19 +325,21 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                 <View style={styles.nameRow}>
                   <AppText
                     variant="label"
-                    style={{color: colours.mediaOverlayText}}
+                    style={[styles.overlayText, {color: colours.mediaOverlayText}]}
                     numberOfLines={1}>
                     {post.author.displayName}
                   </AppText>
-                  <View style={[styles.verified, {backgroundColor: '#7B5CFF'}]}>
+                  <View style={styles.verified}>
                     <AppIcon name="check" colour="#FFFFFF" size={10} />
                   </View>
                 </View>
-                <View style={[styles.audioRow, {gap: 4}]}>
-                  <AppIcon name="play" colour={colours.mediaOverlaySecondary} size={12} />
+                <View style={[styles.audioRow, {gap: 5}]}>
+                  <Animated.View style={audioStyle}>
+                    <AppIcon name="play" colour={colours.mediaOverlaySecondary} size={12} />
+                  </Animated.View>
                   <AppText
                     variant="caption"
-                    style={{color: colours.mediaOverlaySecondary, flex: 1}}
+                    style={[styles.overlayText, {color: colours.mediaOverlaySecondary, flex: 1}]}
                     numberOfLines={1}>
                     {audioLabel}
                   </AppText>
@@ -249,11 +364,11 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             pointerEvents="box-none"
             style={[
               styles.proofAnchor,
-              {right: spacing[3], bottom: spacing[3] + 6},
+              {right: spacing[3], bottom: spacing[3] + 8},
             ]}>
             <LiquidGlassChrome interactive fallback="regular" style={styles.proofGlass}>
               <View style={[styles.proofInner, {gap: spacing[2], paddingHorizontal: spacing[3]}]}>
-                <StackedAvatars faces={likerFaces} size={22} max={3} overlap={8} />
+                <StackedAvatars faces={likerFaces} size={24} max={3} overlap={9} />
                 <AppText
                   variant="label"
                   style={{color: colours.mediaOverlayText}}
@@ -264,60 +379,50 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             </LiquidGlassChrome>
           </View>
 
-          {/* Canvas bite — icons live here, not on the masked media. */}
           <View
             pointerEvents="box-none"
             style={[
               styles.tray,
               {
-                width: TRAY_W - BITE[0],
+                width: TRAY_W - BITE[0] + 4,
                 height: TRAY_H,
                 paddingLeft: spacing[2],
+                gap: 2,
               },
             ]}>
-            <AppPressable
-              accessibilityLabel={liked ? 'Unlike' : 'Like'}
-              accessibilityState={{selected: liked}}
-              onPress={() => {
-                void selectionHaptic()
-                reaction.mutate({
-                  postId: post.id,
-                  reaction: liked ? null : 'like',
-                })
-              }}
+            <TrayIcon
+              label={liked ? 'Unlike' : 'Like'}
+              selected={liked}
+              icon="like"
+              colour={liked ? likedRed : colours.text}
+              onPress={() => toggleLike()}
               onLongPress={() => {
                 void selectionHaptic()
                 reaction.mutate({postId: post.id, reaction: 'love'})
               }}
-              style={styles.trayHit}>
-              <AppIcon name="like" colour={liked ? likedRed : colours.text} size={26} />
-            </AppPressable>
-            <AppPressable
-              accessibilityLabel="Comment on post"
+            />
+            <TrayIcon
+              label="Comment on post"
+              icon="comment"
+              colour={colours.text}
               onPress={() => router.push(`/post/${post.id}` as Href)}
-              style={styles.trayHit}>
-              <AppIcon name="comment" colour={colours.text} size={26} />
-            </AppPressable>
-            <AppPressable
-              accessibilityLabel="Share post"
+            />
+            <TrayIcon
+              label="Share post"
+              icon="share"
+              colour={colours.text}
               onPress={() => void runPostOverflowAction('share', post)}
-              style={styles.trayHit}>
-              <AppIcon name="share" colour={colours.text} size={26} />
-            </AppPressable>
-            <AppPressable
-              accessibilityLabel={post.saved ? 'Unsave post' : 'Save for later'}
-              accessibilityState={{selected: post.saved}}
+            />
+            <TrayIcon
+              label={post.saved ? 'Unsave post' : 'Save for later'}
+              selected={post.saved}
+              icon={post.saved ? 'saved' : 'event'}
+              colour={post.saved ? colours.accent : colours.text}
               onPress={() => {
                 void selectionHaptic()
                 save.mutate({postId: post.id, saved: !post.saved})
               }}
-              style={styles.trayHit}>
-              <AppIcon
-                name={post.saved ? 'saved' : 'event'}
-                colour={post.saved ? colours.accent : colours.text}
-                size={26}
-              />
-            </AppPressable>
+            />
           </View>
         </View>
       </ModulaContextMenu>
@@ -331,11 +436,21 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             @{post.author.handle} and others liked this post
           </AppText>
         ) : null}
-        {post.text?.trim() ? (
-          <AppText variant="body" numberOfLines={3}>
-            <AppText variant="label">@{post.author.handle} </AppText>
-            {post.text}
-          </AppText>
+        {caption ? (
+          <AppPressable
+            accessibilityLabel="Open post"
+            onPress={() => router.push(`/post/${post.id}` as Href)}>
+            <AppText variant="body" numberOfLines={2}>
+              <AppText variant="label">@{post.author.handle} </AppText>
+              {caption}
+              {captionLong ? (
+                <AppText variant="body" colour="textSecondary">
+                  {' '}
+                  more
+                </AppText>
+              ) : null}
+            </AppText>
+          </AppPressable>
         ) : null}
       </View>
     </View>
@@ -355,7 +470,7 @@ const styles = StyleSheet.create({
   },
   avatarRing: {
     borderRadius: 999,
-    padding: 2,
+    padding: 2.5,
   },
   bottomBlur: {
     bottom: 0,
@@ -368,6 +483,15 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
   },
+  heartBurst: {
+    alignItems: 'center',
+    bottom: 0,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   identity: {
     alignItems: 'center',
     flex: 1,
@@ -376,31 +500,31 @@ const styles = StyleSheet.create({
   },
   identityText: {
     flex: 1,
-    gap: 2,
+    gap: 3,
     minWidth: 0,
   },
   mediaGlow: {
-    bottom: -6,
-    left: 16,
-    opacity: 0.14,
+    bottom: -8,
+    left: 14,
+    opacity: 0.18,
     position: 'absolute',
-    right: 16,
-    top: 16,
+    right: 14,
+    top: 14,
   },
   mediaPlaceholder: {
     width: '100%',
   },
   moreButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: 'rgba(255,255,255,0.94)',
     borderRadius: 999,
-    elevation: 3,
+    elevation: 4,
     height: 34,
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
     width: 34,
   },
   nameRow: {
@@ -409,19 +533,24 @@ const styles = StyleSheet.create({
     gap: 6,
     minWidth: 0,
   },
+  overlayText: {
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: {width: 0, height: 1},
+    textShadowRadius: 3,
+  },
   proofAnchor: {
     position: 'absolute',
     zIndex: 4,
   },
   proofGlass: {
     borderRadius: 999,
-    minHeight: 44,
+    minHeight: 46,
     overflow: 'hidden',
   },
   proofInner: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 44,
+    minHeight: 46,
   },
   topRow: {
     alignItems: 'flex-start',
@@ -444,15 +573,16 @@ const styles = StyleSheet.create({
   },
   trayHit: {
     alignItems: 'center',
-    height: 52,
+    height: 54,
     justifyContent: 'center',
-    width: 46,
+    width: 44,
   },
   verified: {
     alignItems: 'center',
+    backgroundColor: '#7B5CFF',
     borderRadius: 999,
-    height: 14,
+    height: 15,
     justifyContent: 'center',
-    width: 14,
+    width: 15,
   },
 })

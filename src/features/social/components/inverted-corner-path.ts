@@ -5,10 +5,25 @@
  * Regular corners use sweep=1 arcs; the concave bite uses sweep=0.
  */
 
+export type MediaInvertedCornerOptions = {
+  cornerRadius?: number
+  trayWidth?: number
+  trayHeight?: number
+  /** [leading fillet, inverted fillet, trailing fillet] */
+  biteRadii?: [number, number, number]
+}
+
+/** Tuned for feed media posts — larger concave fillet reads closer to the reference. */
+export const MEDIA_INVERTED_DEFAULTS = {
+  cornerRadius: 40,
+  trayWidth: 204,
+  trayHeight: 68,
+  biteRadii: [22, 36, 22] as [number, number, number],
+}
+
 type InvertedCorner = {
   width: number
   height: number
-  /** [leading fillet, inverted fillet, trailing fillet] */
   corners: [number, number, number]
 }
 
@@ -36,23 +51,27 @@ function drawInvertedBottomLeft(
 
 /**
  * Rounded rect with an inverted (concave) bottom-left corner —
- * the white/canvas action tray from the reference post UI.
+ * the canvas action tray from the reference post UI.
  */
 export function buildMediaInvertedCornerPath(
   width: number,
   height: number,
-  options?: {
-    cornerRadius?: number
-    trayWidth?: number
-    trayHeight?: number
-    /** Fillet radii around the inverted bite. */
-    biteRadii?: [number, number, number]
-  },
+  options?: MediaInvertedCornerOptions,
 ): string {
-  const r = Math.min(options?.cornerRadius ?? 36, width / 4, height / 4)
-  const trayW = Math.min(options?.trayWidth ?? 196, width * 0.65)
-  const trayH = Math.min(options?.trayHeight ?? 62, height * 0.22)
-  const bite = options?.biteRadii ?? [22, 28, 22]
+  const r = Math.min(
+    options?.cornerRadius ?? MEDIA_INVERTED_DEFAULTS.cornerRadius,
+    width / 4,
+    height / 4,
+  )
+  const trayW = Math.min(
+    options?.trayWidth ?? MEDIA_INVERTED_DEFAULTS.trayWidth,
+    width * 0.65,
+  )
+  const trayH = Math.min(
+    options?.trayHeight ?? MEDIA_INVERTED_DEFAULTS.trayHeight,
+    height * 0.22,
+  )
+  const bite = options?.biteRadii ?? MEDIA_INVERTED_DEFAULTS.biteRadii
   const [c0, c1, c2] = bite.map(v =>
     Math.min(v, trayW / 2, trayH / 2),
   ) as [number, number, number]
@@ -63,16 +82,15 @@ export function buildMediaInvertedCornerPath(
     corners: [c0, c1, c2],
   }
 
-  // Clockwise outline — same order as corner-inverter generatePath.
   let path = M(r, 0)
   path += H(width - r)
-  path += A(r, width, r) // top-right
+  path += A(r, width, r)
   path += V(height - r)
-  path += A(r, width - r, height) // bottom-right
+  path += A(r, width - r, height)
   path += H(bl.width + bl.corners[0])
   path += drawInvertedBottomLeft(bl, {x: bl.width, y: height})
   path += V(r)
-  path += A(r, r, 0) // top-left
+  path += A(r, r, 0)
   path += 'Z'
   return path
 }
