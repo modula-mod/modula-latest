@@ -16,7 +16,7 @@ const DEFAULT_SCROLL_MAX_WIDTH = 360
 const DEFAULT_SEGMENT_MIN_WIDTH = 88
 
 /**
- * Web / Android fallback — theme-aware segmented row with optional max width.
+ * Web / Android fallback — theme-aware segmented / plain tab row.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -25,16 +25,21 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  appearance = 'segmented',
   scrollable = false,
   segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
   maxWidth,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
+  const plain = appearance === 'plain'
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
   const viewportWidth = Math.min(windowWidth - 32, viewportCap)
-  const contentWidth = Math.max(viewportWidth, options.length * segmentMinWidth)
+  const contentWidth = Math.max(
+    viewportWidth,
+    plain ? viewportWidth : options.length * segmentMinWidth,
+  )
 
   const row = (
     <View
@@ -43,14 +48,20 @@ export function ModulaSegmentedPicker({
       accessibilityLabel={accessibilityLabel}
       style={[
         styles.row,
-        {
-          backgroundColor: colours.surfaceMuted,
-          borderRadius: radius.round,
-          padding: 3,
-          gap: spacing[1],
-          width: scrollable ? contentWidth : viewportWidth,
-          maxWidth: scrollable ? contentWidth : viewportWidth,
-        },
+        plain
+          ? {
+              width: scrollable ? contentWidth : viewportWidth,
+              maxWidth: scrollable ? contentWidth : viewportWidth,
+              gap: spacing[1],
+            }
+          : {
+              backgroundColor: colours.surfaceMuted,
+              borderRadius: radius.round,
+              padding: 3,
+              gap: spacing[1],
+              width: scrollable ? contentWidth : viewportWidth,
+              maxWidth: scrollable ? contentWidth : viewportWidth,
+            },
         !scrollable ? style : null,
       ]}>
       {options.map(option => {
@@ -66,22 +77,31 @@ export function ModulaSegmentedPicker({
             style={[
               styles.segment,
               {
-                backgroundColor: selected ? colours.accent : 'transparent',
+                backgroundColor: plain
+                  ? 'transparent'
+                  : selected
+                    ? colours.accent
+                    : 'transparent',
                 borderRadius: radius.round,
                 opacity: option.disabled ? 0.45 : 1,
                 paddingHorizontal: spacing[3],
                 paddingVertical: spacing[2],
-                minWidth: scrollable ? segmentMinWidth - 8 : undefined,
+                minWidth: scrollable && !plain ? segmentMinWidth - 8 : undefined,
                 flex: scrollable ? undefined : 1,
               },
             ]}>
             <AppText
               variant="label"
               style={{
-                color: selected
-                  ? colours.accentForeground
-                  : colours.textSecondary,
+                color: plain
+                  ? selected
+                    ? colours.text
+                    : colours.textSecondary
+                  : selected
+                    ? colours.accentForeground
+                    : colours.textSecondary,
                 textAlign: 'center',
+                fontWeight: plain && selected ? '600' : undefined,
               }}
               numberOfLines={1}>
               {option.label}
@@ -107,7 +127,10 @@ export function ModulaSegmentedPicker({
       decelerationRate="fast"
       keyboardShouldPersistTaps="handled"
       nestedScrollEnabled
-      style={[{alignSelf: 'center', maxWidth: viewportWidth, width: viewportWidth}, style]}
+      style={[
+        {alignSelf: 'center', maxWidth: viewportWidth, width: viewportWidth},
+        style,
+      ]}
       contentContainerStyle={{alignItems: 'center'}}>
       {row}
     </ScrollView>

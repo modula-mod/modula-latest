@@ -20,9 +20,9 @@ const DEFAULT_SEGMENT_MIN_WIDTH = 86
 
 /**
  * Native Expo UI control.
- * - Default: real segmented `Picker`.
+ * - Default: real segmented `Picker` (capsule track).
+ * - `appearance="plain"`: label tabs only — no track around the menu.
  * - `scrollable`: SwiftUI horizontal `ScrollView` + `HStack` of Buttons.
- *   (UISegmentedControl cannot scroll — it always compresses into its viewport.)
  */
 export function ModulaSegmentedPicker({
   options,
@@ -31,6 +31,7 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  appearance = 'segmented',
   scrollable = false,
   segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
   maxWidth,
@@ -41,6 +42,50 @@ export function ModulaSegmentedPicker({
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
   const viewportWidth = Math.min(windowWidth - 32, viewportCap)
+
+  if (appearance === 'plain') {
+    const segmentWidth = Math.floor(viewportWidth / Math.max(options.length, 1))
+    return (
+      <Host
+        matchContents
+        colorScheme={scheme}
+        seedColor={colours.accent}
+        style={[
+          {
+            alignSelf: 'center',
+            width: viewportWidth,
+            maxWidth: viewportWidth,
+            height: 36,
+          },
+          style,
+        ]}>
+        <HStack spacing={0} alignment="center">
+          {options.map(option => {
+            const selected = option.value === value
+            return (
+              <Button
+                key={option.value}
+                label={option.label}
+                onPress={
+                  option.disabled
+                    ? undefined
+                    : () => {
+                        if (allowed.has(option.value)) onValueChange(option.value)
+                      }
+                }
+                modifiers={[
+                  buttonStyle('plain'),
+                  tint(selected ? colours.text : colours.textSecondary),
+                  controlSize('regular'),
+                  frame({width: segmentWidth, height: 34}),
+                ]}
+              />
+            )
+          })}
+        </HStack>
+      </Host>
+    )
+  }
 
   if (scrollable) {
     return (

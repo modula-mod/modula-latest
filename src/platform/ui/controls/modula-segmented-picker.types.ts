@@ -6,6 +6,8 @@ export type ModulaSegmentedOption = {
   disabled?: boolean
 }
 
+export type ModulaSegmentedAppearance = 'segmented' | 'plain'
+
 export type ModulaSegmentedPickerProps = {
   options: ModulaSegmentedOption[]
   value: string
@@ -14,6 +16,11 @@ export type ModulaSegmentedPickerProps = {
   accessibilityLabel?: string
   style?: StyleProp<ViewStyle>
   testID?: string
+  /**
+   * `segmented` — native UISegmentedControl track (default).
+   * `plain` — label tabs only, no capsule / track background around the menu.
+   */
+  appearance?: ModulaSegmentedAppearance
   /**
    * Horizontal overflow mode. Uses a native SwiftUI ScrollView of buttons —
    * UISegmentedControl itself cannot scroll (it always compresses).

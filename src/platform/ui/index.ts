@@ -10,6 +10,7 @@ export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 export {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 export type {
+  ModulaSegmentedAppearance,
   ModulaSegmentedOption,
   ModulaSegmentedPickerProps,
 } from '@/platform/ui/controls/modula-segmented-picker.types'
