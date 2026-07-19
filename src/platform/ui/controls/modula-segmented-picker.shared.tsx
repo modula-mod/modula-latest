@@ -157,28 +157,38 @@ export function ModulaSegmentedPicker({
     )
   }
 
-  // glass appearance — denser than icon discs so feed content doesn’t show through
+  // glass appearance — denser blur; shadow sits on an outer shell (height 0)
+  // so overflow:hidden on the glass doesn’t clip it.
   const wrapped = (
-    <LiquidGlassChrome
-      interactive
-      fallback="regular"
-      contentLayout="flow"
+    <View
       style={[
-        styles.trackGlass,
+        styles.trackShadow,
         {
           borderRadius: radius.round,
           width: scrollable ? contentWidth : viewportWidth,
           maxWidth: scrollable ? contentWidth : viewportWidth,
-          minHeight: TRACK_HEIGHT,
-          // Opaque-enough wash under glass (Callstack ignores solid fills; BlurView path uses it).
-          backgroundColor: isDark
-            ? 'rgba(18, 24, 28, 0.72)'
-            : 'rgba(245, 247, 248, 0.82)',
         },
         !scrollable ? style : null,
       ]}>
-      {row}
-    </LiquidGlassChrome>
+      <LiquidGlassChrome
+        interactive
+        fallback="regular"
+        contentLayout="flow"
+        blurIntensity={96}
+        style={[
+          styles.trackGlass,
+          {
+            borderRadius: radius.round,
+            width: '100%',
+            minHeight: TRACK_HEIGHT,
+            backgroundColor: isDark
+              ? 'rgba(18, 24, 28, 0.78)'
+              : 'rgba(245, 247, 248, 0.88)',
+          },
+        ]}>
+        {row}
+      </LiquidGlassChrome>
+    </View>
   )
 
   if (!scrollable) {
@@ -217,7 +227,15 @@ const styles = StyleSheet.create({
     minHeight: 34,
   },
   trackGlass: {
-    alignSelf: 'center',
+    alignSelf: 'stretch',
     overflow: 'hidden',
+  },
+  trackShadow: {
+    alignSelf: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 0},
+    shadowOpacity: 0.22,
+    shadowRadius: 18,
   },
 })

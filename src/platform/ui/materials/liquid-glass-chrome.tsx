@@ -24,6 +24,8 @@ type LiquidGlassChromeProps = {
    * `flow` — children keep normal layout (pills / segmented rows).
    */
   contentLayout?: 'fill' | 'flow'
+  /** BlurView intensity override (BlurView fallback path only). */
+  blurIntensity?: number
 }
 
 type CallstackModule = {
@@ -65,11 +67,14 @@ export function LiquidGlassChrome({
   interactive = true,
   fallback = 'clear',
   contentLayout = 'fill',
+  blurIntensity,
 }: LiquidGlassChromeProps) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const isDark = scheme === 'dark'
   const effect = fallback === 'regular' ? 'regular' : 'clear'
+  const resolvedBlur =
+    blurIntensity ?? (fallback === 'regular' ? 78 : 64)
   // `regular` is intentionally denser (segmented tracks, composer) than icon discs.
   const wash =
     fallback === 'regular'
@@ -164,12 +169,12 @@ export function LiquidGlassChrome({
   return (
     <View style={[styles.base, styles.shadow, style]}>
       <BlurView
-        intensity={fallback === 'regular' ? 78 : 64}
+        intensity={resolvedBlur}
         tint={
           fallback === 'regular'
             ? isDark
-              ? 'systemMaterialDark'
-              : 'systemMaterialLight'
+              ? 'systemThickMaterialDark'
+              : 'systemThickMaterialLight'
             : isDark
               ? 'systemUltraThinMaterialDark'
               : 'systemUltraThinMaterialLight'
