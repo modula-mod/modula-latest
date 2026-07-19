@@ -54,8 +54,9 @@ export function ModulaSegmentedPicker({
       seedColor={colours.accent}
       style={[
         {
-          alignSelf: 'center',
-          width: viewportWidth,
+          alignSelf: 'stretch',
+          height: 34,
+          width: '100%',
           maxWidth: viewportWidth,
         },
         style,

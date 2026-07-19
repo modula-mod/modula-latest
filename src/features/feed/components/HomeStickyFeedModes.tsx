@@ -25,6 +25,8 @@ export type HomeFeedModeLabel = 'Following' | 'For You' | 'Modules'
 
 const MORPH_DISTANCE = 48
 const COMPACT_SCALE = 0.94
+/** Matches Expo UI segmented `frame` height — glass wrapper hugs this. */
+const STICKY_SEGMENT_HEIGHT = 34
 /** Unstick slightly before the stick line so snap-back doesn’t chatter. */
 const UNSTICK_SLOP = 18
 
@@ -145,22 +147,20 @@ export function HomeStickyFeedModes({
           {
             top: headerOffset,
             paddingHorizontal: spacing[4],
-            paddingTop: 4,
-            paddingBottom: 4,
           },
           shellStyle,
         ]}>
+        {/* Glass hugs the 34pt segmented control — denser `regular` so it’s not see-through. */}
         <LiquidGlassChrome
           interactive
-          fallback="clear"
+          fallback="regular"
           contentLayout="flow"
-          blurIntensity={92}
+          blurIntensity={100}
           style={[
             styles.stickyGlass,
             {
               borderRadius: radius.round,
-              paddingHorizontal: spacing[2],
-              paddingVertical: spacing[2],
+              height: STICKY_SEGMENT_HEIGHT,
             },
           ]}>
           <ModulaSegmentedPicker
@@ -292,6 +292,8 @@ const styles = StyleSheet.create({
     right: 0,
   },
   stickyGlass: {
+    alignSelf: 'stretch',
+    justifyContent: 'center',
     overflow: 'hidden',
     width: '100%',
   },
