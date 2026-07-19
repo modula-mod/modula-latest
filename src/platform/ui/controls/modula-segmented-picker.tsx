@@ -2,15 +2,13 @@ import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {ModulaSegmentedScrollRail} from '@/platform/ui/controls/modula-segmented-scroll-rail'
 import type {ModulaSegmentedPickerProps} from '@/platform/ui/controls/modula-segmented-picker.types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
 /**
- * Web / Android — theme-aware segmented control.
- * `layout="scroll"` shares the progressive near-end reveal rail with iOS.
+ * Web / Android fallback — theme-aware segmented row (native Expo UI on iOS).
  */
 export function ModulaSegmentedPicker({
   options,
@@ -19,28 +17,8 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
-  layout = 'fit',
-  initialVisibleCount,
-  revealBatchSize,
-  onNearEnd,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
-
-  if (layout === 'scroll') {
-    return (
-      <ModulaSegmentedScrollRail
-        options={options}
-        value={value}
-        onValueChange={onValueChange}
-        accessibilityLabel={accessibilityLabel}
-        style={style}
-        testID={testID}
-        initialVisibleCount={initialVisibleCount}
-        revealBatchSize={revealBatchSize}
-        onNearEnd={onNearEnd}
-      />
-    )
-  }
 
   return (
     <View
@@ -80,7 +58,9 @@ export function ModulaSegmentedPicker({
             <AppText
               variant="label"
               style={{
-                color: selected ? colours.accentForeground : colours.textSecondary,
+                color: selected
+                  ? colours.accentForeground
+                  : colours.textSecondary,
                 textAlign: 'center',
               }}
               numberOfLines={1}>

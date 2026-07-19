@@ -392,7 +392,6 @@ function HomeLayoutHeader({
           ]}>
           <ModulaSegmentedPicker
             accessibilityLabel="Feed mode"
-            layout="fit"
             options={modeOrder.map(next => ({
               value: next,
               label:

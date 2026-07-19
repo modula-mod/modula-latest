@@ -15,14 +15,8 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * `fit` — full-width segmented control (home feed modes).
-   * `scroll` — horizontal rail; swipe near the right edge to reveal more.
+   * Kept for API stability. Always renders the native Expo UI segmented
+   * Picker on iOS (`fit`). Scroll/chip rail was removed.
    */
   layout?: 'fit' | 'scroll'
-  /** How many options show before the first near-end reveal (`scroll`). */
-  initialVisibleCount?: number
-  /** Extra options revealed each time the user nears the right edge. */
-  revealBatchSize?: number
-  /** Fired when the scroll position approaches the trailing edge. */
-  onNearEnd?: () => void
 }
