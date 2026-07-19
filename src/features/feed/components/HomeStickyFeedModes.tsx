@@ -1,6 +1,5 @@
 import {useState} from 'react'
-import {Platform, StyleSheet, View} from 'react-native'
-import {BlurView} from 'expo-blur'
+import {StyleSheet} from 'react-native'
 import Animated, {
   Extrapolation,
   interpolate,
@@ -20,14 +19,14 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type HomeFeedModeLabel = 'Following' | 'For You' | 'Modules'
 
-const MORPH_DISTANCE = 36
+const MORPH_DISTANCE = 40
+const COMPACT_SCALE = 0.92
 
-/** 0 → inline / expanded, 1 → stuck / compact. */
-export function stickProgress(scrollY: number, stickAtY: number): number {
+/** Approach morph 0→1 as the inline tabs near the stick line (not a crossfade). */
+export function approachProgress(scrollY: number, stickAtY: number): number {
   'worklet'
   const start = Math.max(0, stickAtY)
   if (start <= 0) {
-    // Modes already at the top of the header — morph as soon as we scroll.
     return interpolate(
       scrollY,
       [0, MORPH_DISTANCE],
@@ -37,6 +36,12 @@ export function stickProgress(scrollY: number, stickAtY: number): number {
   }
   const from = Math.max(0, start - MORPH_DISTANCE)
   return interpolate(scrollY, [from, start], [0, 1], Extrapolation.CLAMP)
+}
+
+/** Hard stick latch — avoids dual-picker ghosting on scroll-up. */
+export function isStuck(scrollY: number, stickAtY: number): boolean {
+  'worklet'
+  return scrollY >= Math.max(0, stickAtY)
 }
 
 type Props = {
@@ -50,9 +55,8 @@ type Props = {
 }
 
 /**
- * Sticky clone of the home feed mode picker, pinned just under the nav row.
- * Must fill the screen with `pointerEvents="box-none"` so absolute children
- * aren't parented to a zero-height flex sibling under the list.
+ * Sticky clone of the home feed mode picker — just the control, no wash bar.
+ * Hard handoff with the inline row (no opacity crossfade) so scroll-up stays clean.
  */
 export function HomeStickyFeedModes({
   scrollY,
@@ -62,52 +66,31 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {colours, spacing, scheme} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
 
-  const progress = useDerivedValue(() =>
-    stickProgress(scrollY.value, stickAtY.value),
-  )
+  const stuck = useDerivedValue(() => isStuck(scrollY.value, stickAtY.value))
 
   useAnimatedReaction(
-    () => progress.value > 0.55,
-    (stuck, previous) => {
-      if (stuck !== previous) {
-        runOnJS(setInteractive)(stuck)
+    () => stuck.value,
+    (next, previous) => {
+      if (next !== previous) {
+        runOnJS(setInteractive)(next)
       }
     },
     [],
   )
 
   const shellStyle = useAnimatedStyle(() => {
-    const p = progress.value
+    const on = stuck.value
     return {
-      opacity: p,
+      opacity: on ? 1 : 0,
       transform: reduceMotion
-        ? [{translateY: 0}]
-        : [
-            {translateY: interpolate(p, [0, 1], [-10, 0])},
-            {scale: interpolate(p, [0, 1], [1.05, 1])},
-          ],
-    }
-  })
-
-  const padStyle = useAnimatedStyle(() => {
-    const p = progress.value
-    return {
-      paddingTop: interpolate(p, [0, 1], [spacing[1], 4]),
-      paddingBottom: interpolate(p, [0, 1], [spacing[2], 5]),
-    }
-  })
-
-  const pickerStyle = useAnimatedStyle(() => {
-    if (reduceMotion) return {transform: [{scale: 1}]}
-    const p = progress.value
-    return {
-      transform: [{scale: interpolate(p, [0, 1], [1, 0.92])}],
+        ? []
+        : [{scale: on ? COMPACT_SCALE : 1}],
     }
   })
 
@@ -122,70 +105,61 @@ export function HomeStickyFeedModes({
       style={[styles.fill, obscureStyle]}>
       <Animated.View
         pointerEvents={interactive ? 'auto' : 'none'}
-        style={[styles.shell, {top: headerOffset}, shellStyle]}>
-        {Platform.OS === 'ios' ? (
-          <BlurView
-            intensity={scheme === 'dark' ? 48 : 64}
-            tint={scheme === 'dark' ? 'dark' : 'light'}
-            style={StyleSheet.absoluteFill}
-          />
-        ) : (
-          <View
-            style={[
-              StyleSheet.absoluteFill,
-              {backgroundColor: colours.canvas, opacity: 0.96},
-            ]}
-          />
-        )}
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: colours.canvas,
-              opacity: scheme === 'dark' ? 0.4 : 0.58,
-            },
-          ]}
+        style={[
+          styles.shell,
+          {
+            top: headerOffset,
+            paddingHorizontal: spacing[4],
+            paddingTop: 4,
+            paddingBottom: 4,
+          },
+          shellStyle,
+        ]}>
+        <ModulaSegmentedPicker
+          accessibilityLabel="Feed mode"
+          options={options}
+          value={mode}
+          onValueChange={next => {
+            if (
+              next === 'Following' ||
+              next === 'For You' ||
+              next === 'Modules'
+            ) {
+              void selectionHaptic()
+              onModeChange(next)
+            }
+          }}
         />
-        <Animated.View
-          style={[
-            styles.row,
-            {
-              borderBottomColor: colours.border,
-              paddingHorizontal: spacing[4],
-            },
-            padStyle,
-          ]}>
-          <Animated.View style={pickerStyle}>
-            <ModulaSegmentedPicker
-              accessibilityLabel="Feed mode"
-              options={options}
-              value={mode}
-              onValueChange={next => {
-                if (
-                  next === 'Following' ||
-                  next === 'For You' ||
-                  next === 'Modules'
-                ) {
-                  void selectionHaptic()
-                  onModeChange(next)
-                }
-              }}
-            />
-          </Animated.View>
-        </Animated.View>
       </Animated.View>
     </Animated.View>
   )
 }
 
-/** Fades the inline mode row out as the sticky clone takes over. */
+/** Inline row: hide when stuck; shrink as it approaches the stick line. */
 export function useInlineModeTabsStyle(
   scrollY: SharedValue<number>,
   stickAtY: SharedValue<number>,
+  reduceMotion: boolean,
 ) {
-  return useAnimatedStyle(() => ({
-    opacity: 1 - stickProgress(scrollY.value, stickAtY.value),
-  }))
+  return useAnimatedStyle(() => {
+    const stuck = isStuck(scrollY.value, stickAtY.value)
+    const approach = approachProgress(scrollY.value, stickAtY.value)
+    return {
+      opacity: stuck ? 0 : 1,
+      transform: reduceMotion
+        ? []
+        : [
+            {
+              scale: interpolate(
+                approach,
+                [0, 1],
+                [1, COMPACT_SCALE],
+                Extrapolation.CLAMP,
+              ),
+            },
+          ],
+    }
+  })
 }
 
 /** True while the inline picker should still receive taps. */
@@ -196,7 +170,7 @@ export function useInlineModeTabsInteractive(
   const [interactive, setInteractive] = useState(true)
 
   useAnimatedReaction(
-    () => stickProgress(scrollY.value, stickAtY.value) < 0.55,
+    () => !isStuck(scrollY.value, stickAtY.value),
     (next, previous) => {
       if (next !== previous) {
         runOnJS(setInteractive)(next)
@@ -217,14 +191,8 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 30,
   },
-  row: {
-    alignSelf: 'stretch',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    width: '100%',
-  },
   shell: {
     left: 0,
-    overflow: 'hidden',
     position: 'absolute',
     right: 0,
   },

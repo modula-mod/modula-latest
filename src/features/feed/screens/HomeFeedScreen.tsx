@@ -241,6 +241,7 @@ export function HomeFeedScreen() {
                       onModeChange={setMode}
                       scrollY={scrollY}
                       modeTabsStickAtY={modeTabsStickAtY}
+                      reduceMotion={reduceMotion}
                     />
                   }
                   ListEmptyComponent={
@@ -309,6 +310,7 @@ function HomeLayoutHeader({
   onModeChange,
   scrollY,
   modeTabsStickAtY,
+  reduceMotion,
 }: {
   homeBlocks: string[]
   focusActive: boolean
@@ -322,11 +324,16 @@ function HomeLayoutHeader({
   onModeChange: (mode: FeedModeLabel) => void
   scrollY: SharedValue<number>
   modeTabsStickAtY: SharedValue<number>
+  reduceMotion: boolean
 }) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const showBlock = (id: string) => isBlockOn(homeBlocks, id)
-  const inlineModeStyle = useInlineModeTabsStyle(scrollY, modeTabsStickAtY)
+  const inlineModeStyle = useInlineModeTabsStyle(
+    scrollY,
+    modeTabsStickAtY,
+    reduceMotion,
+  )
   const modeTabsInteractive = useInlineModeTabsInteractive(
     scrollY,
     modeTabsStickAtY,
@@ -412,7 +419,6 @@ function HomeLayoutHeader({
           style={[
             styles.modeRow,
             {
-              borderBottomColor: colours.border,
               paddingHorizontal: spacing[4],
               paddingTop: spacing[1],
               paddingBottom: spacing[2],
@@ -546,7 +552,6 @@ const styles = StyleSheet.create({
   },
   modeRow: {
     alignSelf: 'stretch',
-    borderBottomWidth: StyleSheet.hairlineWidth,
     width: '100%',
   },
   prompt: {
