@@ -1,4 +1,6 @@
 export type PullActionId = 'search' | 'refresh' | 'close'
 
-export const PULL_ACTION_ARM_DISTANCE = 72
-export const PULL_ACTION_ZONE_DISTANCE = 56
+/** Pull distance before the action tray arms and blur peaks. */
+export const PULL_ACTION_ARM_DISTANCE = 84
+/** Horizontal swipe distance to leave the middle (refresh) zone. */
+export const PULL_ACTION_ZONE_DISTANCE = 64
