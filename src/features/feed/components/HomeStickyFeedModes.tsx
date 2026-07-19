@@ -159,11 +159,12 @@ export function HomeStickyFeedModes({
             styles.stickyGlass,
             {
               borderRadius: radius.round,
-              padding: 3,
+              paddingHorizontal: spacing[2],
+              paddingVertical: spacing[2],
             },
           ]}>
           <ModulaSegmentedPicker
-            appearance="plain"
+            appearance="segmented"
             accessibilityLabel="Feed mode"
             options={options}
             value={mode}

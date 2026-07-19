@@ -6,13 +6,14 @@ import {
 } from 'react-native-reanimated'
 
 /**
- * 0 = full tab bar, 1 = minimised (~25% smaller) while scrolling down a feed.
+ * 0 = full tab bar, 1 = minimised (~20% smaller) while scrolling down a feed.
  */
 export const shellTabBarCompact: SharedValue<number> = makeMutable(0)
 
-const SETTLE = Easing.bezier(0.22, 1, 0.36, 1)
-const COMPACT_IN = {duration: 240, easing: SETTLE}
-const COMPACT_OUT = {duration: 280, easing: SETTLE}
+const SETTLE = Easing.bezier(0.25, 0.1, 0.25, 1)
+/** Slow ease — not snappy. */
+const COMPACT_IN = {duration: 480, easing: SETTLE}
+const COMPACT_OUT = {duration: 520, easing: SETTLE}
 
 /**
  * Drive tab-bar compact from scroll direction.
@@ -28,19 +29,20 @@ export function syncShellTabBarCompactFromScroll(
   const dy = y - prev
   lastScrollY.value = y
 
-  if (y < 28) {
+  if (y < 40) {
     if (shellTabBarCompact.value > 0.01) {
       shellTabBarCompact.value = withTiming(0, COMPACT_OUT)
     }
     return
   }
 
-  if (dy > 4 && shellTabBarCompact.value < 0.99) {
+  // Slightly larger dy threshold so tiny jitter doesn’t flip state.
+  if (dy > 8 && shellTabBarCompact.value < 0.99) {
     shellTabBarCompact.value = withTiming(1, COMPACT_IN)
     return
   }
 
-  if (dy < -4 && shellTabBarCompact.value > 0.01) {
+  if (dy < -8 && shellTabBarCompact.value > 0.01) {
     shellTabBarCompact.value = withTiming(0, COMPACT_OUT)
   }
 }

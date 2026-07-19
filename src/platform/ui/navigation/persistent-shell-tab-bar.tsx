@@ -22,8 +22,8 @@ import {
 } from '@/platform/ui/navigation/shell-tab-bar-visibility'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
-/** ~25% smaller while scrolling down a feed. */
-const TAB_BAR_COMPACT_SCALE = 0.75
+/** ~20% smaller while scrolling down a feed. */
+const TAB_BAR_COMPACT_SCALE = 0.8
 
 type LiquidGlassTabBarComponent = ComponentType<ModulaLiquidGlassTabBarProps>
 
@@ -76,11 +76,9 @@ export function PersistentShellTabBar() {
 
   const compactStyle = useAnimatedStyle(() => {
     const c = shellTabBarCompact.value
+    // Scale only — anchored to the bottom so it shrinks in place (no jump to mid-screen).
     return {
       transform: [
-        {
-          translateY: interpolate(c, [0, 1], [0, 12], Extrapolation.CLAMP),
-        },
         {
           scale: interpolate(
             c,
@@ -136,6 +134,8 @@ const styles = StyleSheet.create({
   compactWrap: {
     ...StyleSheet.absoluteFill,
     justifyContent: 'flex-end',
+    // Shrink toward the bottom edge, not the screen center.
+    transformOrigin: 'bottom',
   },
   wrap: {
     ...StyleSheet.absoluteFill,
