@@ -1,8 +1,11 @@
 import {Image} from 'expo-image'
 import {LinearGradient} from 'expo-linear-gradient'
 import {useRouter, type Href} from 'expo-router'
-import {StyleSheet, View} from 'react-native'
+import {useState} from 'react'
+import {LayoutChangeEvent, StyleSheet, View} from 'react-native'
+import Svg, {Path} from 'react-native-svg'
 
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -13,15 +16,22 @@ import {
   runPostOverflowAction,
   type PostOverflowActionId,
 } from '@/features/feed/postActions'
+import {useSavePostMutation} from '@/features/feed/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReactionMutation} from '@/features/social/data/useReactionMutation'
 import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import type {AvatarFace} from '@/platform/ui/avatars/types'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {MaskedView} from '@/platform/ui/materials/masked-view'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+const CORNER = 40
+const SCOOP_W = 188
+const SCOOP_H = 58
 
 function relativeTime(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -36,17 +46,46 @@ function formatCompact(value: number): string {
   return String(value)
 }
 
+/** Rounded rect with a concave inverted corner scooped from bottom-left. */
+function invertedCornerPath(
+  width: number,
+  height: number,
+  corner: number,
+  scoopW: number,
+  scoopH: number,
+): string {
+  const r = Math.min(corner, width / 4, height / 4)
+  const sw = Math.min(scoopW, width * 0.58)
+  const sh = Math.min(scoopH, height * 0.22)
+  return [
+    `M ${r} 0`,
+    `H ${width - r}`,
+    `A ${r} ${r} 0 0 1 ${width} ${r}`,
+    `V ${height - r}`,
+    `A ${r} ${r} 0 0 1 ${width - r} ${height}`,
+    `H ${sw}`,
+    // Concave scoop into the media — soft S-curve inverted corner.
+    `C ${sw * 0.42} ${height}, 0 ${height - sh * 0.42}, 0 ${height - sh}`,
+    `V ${r}`,
+    `A ${r} ${r} 0 0 1 ${r} 0`,
+    'Z',
+  ].join(' ')
+}
+
 /**
- * Media-forward feed card: large rounded media, overlay identity,
- * floating action + social-proof pills, caption below.
+ * Media-forward feed card: inverted-corner hero, progressive blur dissolve,
+ * liquid-glass chrome, cutout action row, caption below.
  */
 export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const router = useRouter()
   const session = useSession()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const reaction = useReactionMutation()
+  const save = useSavePostMutation()
+  const [frame, setFrame] = useState({width: 0, height: 0})
   const media = post.media[0]
   const glow = post.glowColour || colours.mediaGlowFallback
+  const aspect = media?.aspectRatio ?? 4 / 5
   const profileRoute = getProfileRouteForIdentity(
     post.author,
     session.status === 'signedIn' ? session.profile.id : '',
@@ -54,6 +93,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const overflowActions = buildPostOverflowActions(post)
   const liked = Boolean(post.liked || post.viewerReaction)
   const audioLabel = media?.title?.trim() || `Original audio · @${post.author.handle}`
+  const likedRed = colours.destructive
 
   const likerFaces: AvatarFace[] = [
     {
@@ -65,16 +105,8 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
   ]
   if (post.likeCount > 1) {
     likerFaces.push(
-      {
-        id: `${post.id}-liker-b`,
-        name: 'Liked',
-        colour: glow,
-      },
-      {
-        id: `${post.id}-liker-c`,
-        name: 'Liked',
-        colour: colours.accent,
-      },
+      {id: `${post.id}-liker-b`, name: 'Liked', colour: glow},
+      {id: `${post.id}-liker-c`, name: 'Liked', colour: colours.accent},
     )
   }
 
@@ -82,10 +114,20 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
     void runPostOverflowAction(id as PostOverflowActionId, post)
   }
 
-  const pillBg = colours.textInverse
-  // Dark ink on light floating pills — intentional media chrome, both schemes.
-  const ink = '#141418'
-  const likedRed = colours.destructive
+  const onLayout = (event: LayoutChangeEvent) => {
+    const width = event.nativeEvent.layout.width
+    if (width <= 0) return
+    const height = width / aspect
+    if (Math.abs(width - frame.width) < 0.5 && Math.abs(height - frame.height) < 0.5) {
+      return
+    }
+    setFrame({width, height})
+  }
+
+  const path =
+    frame.width > 0
+      ? invertedCornerPath(frame.width, frame.height, CORNER, SCOOP_W, SCOOP_H)
+      : ''
 
   return (
     <View style={{gap: spacing[3]}}>
@@ -93,242 +135,214 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
         accessibilityLabel={`Post by ${post.author.displayName}`}
         actions={overflowActions}
         onAction={runOverflow}>
-        <View>
+        <View onLayout={onLayout} style={styles.frame}>
           <View
             pointerEvents="none"
             style={[
               styles.mediaGlow,
               {
                 backgroundColor: glow,
-                borderRadius: radius.xxlarge,
+                borderRadius: CORNER,
               },
             ]}
           />
+
+          {frame.width > 0 ? (
+            <MaskedView
+              style={{width: frame.width, height: frame.height}}
+              maskElement={
+                <Svg width={frame.width} height={frame.height}>
+                  <Path d={path} fill="#FFFFFF" />
+                </Svg>
+              }>
+              <View
+                style={[
+                  styles.mediaFill,
+                  {
+                    width: frame.width,
+                    height: frame.height,
+                    backgroundColor: media?.colour ?? colours.surfaceMuted,
+                  },
+                ]}>
+                {media?.url && !media.url.startsWith('local://') ? (
+                  <Image
+                    source={{uri: media.url}}
+                    style={StyleSheet.absoluteFill}
+                    contentFit="cover"
+                  />
+                ) : (
+                  <LinearGradient
+                    colors={[glow, media?.colour ?? colours.surfaceMuted, colours.surface3]}
+                    locations={[0, 0.55, 1]}
+                    start={{x: 0.1, y: 0}}
+                    end={{x: 0.9, y: 1}}
+                    style={StyleSheet.absoluteFill}
+                  />
+                )}
+
+                <LinearGradient
+                  colors={['rgba(0,0,0,0.4)', 'transparent', 'transparent']}
+                  locations={[0, 0.32, 1]}
+                  style={StyleSheet.absoluteFill}
+                  pointerEvents="none"
+                />
+
+                {/* Progressive blur dissolves the bottom edge into the feed. */}
+                <ProgressiveBlurBand
+                  height={Math.max(72, SCOOP_H + 28)}
+                  topHeavy={false}
+                  intensity={54}
+                  style={styles.bottomBlur}
+                />
+              </View>
+            </MaskedView>
+          ) : (
+            <View style={[styles.mediaPlaceholder, {aspectRatio: aspect}]} />
+          )}
+
+          {/* Top identity + liquid-glass more */}
           <View
+            pointerEvents="box-none"
             style={[
-              styles.media,
+              styles.topRow,
               {
-                aspectRatio: media?.aspectRatio ?? 4 / 5,
-                backgroundColor: media?.colour ?? colours.surfaceMuted,
-                borderRadius: radius.xxlarge,
-                shadowColor: colours.mediaOverlayShadow,
+                paddingHorizontal: spacing[3],
+                paddingTop: spacing[3],
+                gap: spacing[2],
               },
             ]}>
-            {media?.url && !media.url.startsWith('local://') ? (
-              <Image
-                source={{uri: media.url}}
-                style={StyleSheet.absoluteFill}
-                contentFit="cover"
-              />
-            ) : (
+            <AppPressable
+              accessibilityLabel={`Open ${post.author.displayName} profile`}
+              onPress={() => router.push(profileRoute)}
+              style={[styles.identity, {gap: spacing[2]}]}>
               <LinearGradient
-                colors={[glow, media?.colour ?? colours.surfaceMuted, colours.surface3]}
-                locations={[0, 0.55, 1]}
-                start={{x: 0.1, y: 0}}
-                end={{x: 0.9, y: 1}}
-                style={StyleSheet.absoluteFill}
-              />
-            )}
-
-            <LinearGradient
-              colors={['rgba(0,0,0,0.45)', 'transparent', 'transparent', 'rgba(0,0,0,0.35)']}
-              locations={[0, 0.28, 0.62, 1]}
-              style={StyleSheet.absoluteFill}
-              pointerEvents="none"
-            />
-
-            {/* Top identity overlay */}
-            <View
-              style={[
-                styles.topRow,
-                {
-                  paddingHorizontal: spacing[3],
-                  paddingTop: spacing[3],
-                  gap: spacing[2],
-                },
-              ]}>
-              <AppPressable
-                accessibilityLabel={`Open ${post.author.displayName} profile`}
-                onPress={() => router.push(profileRoute)}
-                style={[styles.identity, {gap: spacing[2]}]}>
-                <LinearGradient
-                  colors={[colours.accent, '#7B5CFF', colours.warning]}
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 1}}
-                  style={styles.avatarRing}>
-                  <View style={styles.avatarInner}>
-                    <Avatar
-                      name={post.author.displayName}
-                      uri={post.author.avatarUri}
-                      colour={post.author.coverColour}
-                      size={36}
-                    />
-                  </View>
-                </LinearGradient>
-                <View style={styles.identityText}>
-                  <View style={styles.nameRow}>
-                    <AppText
-                      variant="label"
-                      style={{color: colours.mediaOverlayText}}
-                      numberOfLines={1}>
-                      {post.author.displayName}
-                    </AppText>
-                    <View
-                      style={[
-                        styles.verified,
-                        {backgroundColor: colours.accent},
-                      ]}>
-                      <AppIcon name="check" colour={colours.accentForeground} size={10} />
-                    </View>
-                  </View>
-                  <View style={[styles.audioRow, {gap: 4}]}>
-                    <AppIcon name="play" colour={colours.mediaOverlaySecondary} size={12} />
-                    <AppText
-                      variant="caption"
-                      style={{color: colours.mediaOverlaySecondary, flex: 1}}
-                      numberOfLines={1}>
-                      {audioLabel}
-                    </AppText>
+                colors={[colours.accent, '#7B5CFF', colours.warning]}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.avatarRing}>
+                <View style={styles.avatarInner}>
+                  <Avatar
+                    name={post.author.displayName}
+                    uri={post.author.avatarUri}
+                    colour={post.author.coverColour}
+                    size={36}
+                  />
+                </View>
+              </LinearGradient>
+              <View style={styles.identityText}>
+                <View style={styles.nameRow}>
+                  <AppText
+                    variant="label"
+                    style={{color: colours.mediaOverlayText}}
+                    numberOfLines={1}>
+                    {post.author.displayName}
+                  </AppText>
+                  <View style={[styles.verified, {backgroundColor: colours.accent}]}>
+                    <AppIcon name="check" colour={colours.accentForeground} size={10} />
                   </View>
                 </View>
-              </AppPressable>
-
-              <ModulaMenu
-                accessibilityLabel="Open post options"
-                title="Post options"
-                actions={overflowActions}
-                onAction={runOverflow}
-                trigger={
-                  <View
-                    style={[
-                      styles.moreButton,
-                      {
-                        backgroundColor: pillBg,
-                        shadowColor: colours.mediaOverlayShadow,
-                      },
-                    ]}>
-                    <AppIcon name="more" colour={ink} size={18} />
-                  </View>
-                }
-              />
-            </View>
-
-            {/* Floating liker sparks */}
-            {post.likeCount > 0 ? (
-              <View
-                pointerEvents="none"
-                style={[styles.floatLikes, {left: spacing[4], bottom: 72}]}>
-                {likerFaces.slice(0, 2).map((face, index) => (
-                  <View
-                    key={face.id}
-                    style={[
-                      styles.floatFace,
-                      {
-                        marginLeft: index === 0 ? 0 : 10,
-                        transform: [{translateY: index === 0 ? 0 : -14}],
-                      },
-                    ]}>
-                    <Avatar
-                      name={face.name}
-                      uri={face.uri}
-                      colour={face.colour}
-                      size={28}
-                    />
-                    <View
-                      style={[
-                        styles.floatHeart,
-                        {backgroundColor: likedRed, borderColor: pillBg},
-                      ]}>
-                      <AppIcon name="like" colour={pillBg} size={8} />
-                    </View>
-                  </View>
-                ))}
+                <View style={[styles.audioRow, {gap: 4}]}>
+                  <AppIcon name="play" colour={colours.mediaOverlaySecondary} size={12} />
+                  <AppText
+                    variant="caption"
+                    style={{color: colours.mediaOverlaySecondary, flex: 1}}
+                    numberOfLines={1}>
+                    {audioLabel}
+                  </AppText>
+                </View>
               </View>
-            ) : null}
+            </AppPressable>
 
-            {/* Bottom floating pills */}
-            <View
-              style={[
-                styles.bottomPills,
-                {
-                  paddingHorizontal: spacing[3],
-                  paddingBottom: spacing[3],
-                  gap: spacing[2],
-                },
-              ]}>
-              <View
-                style={[
-                  styles.actionPill,
-                  {
-                    backgroundColor: pillBg,
-                    shadowColor: colours.mediaOverlayShadow,
-                    gap: spacing[1],
-                    paddingHorizontal: spacing[2],
-                  },
-                ]}>
-                <AppPressable
-                  accessibilityLabel={liked ? 'Unlike' : 'Like'}
-                  accessibilityState={{selected: liked}}
-                  onPress={() => {
-                    void selectionHaptic()
-                    reaction.mutate({
-                      postId: post.id,
-                      reaction: liked ? null : 'like',
-                    })
-                  }}
-                  onLongPress={() => {
-                    void selectionHaptic()
-                    reaction.mutate({postId: post.id, reaction: 'love'})
-                  }}
-                  style={styles.pillHit}>
-                  <AppIcon
-                    name="like"
-                    colour={liked ? likedRed : ink}
-                    size={22}
-                  />
-                </AppPressable>
-                <AppPressable
-                  accessibilityLabel="Comment on post"
-                  onPress={() => router.push(`/post/${post.id}` as Href)}
-                  style={styles.pillHit}>
-                  <AppIcon name="comment" colour={ink} size={22} />
-                </AppPressable>
-                <AppPressable
-                  accessibilityLabel="Share post"
-                  onPress={() => void runPostOverflowAction('share', post)}
-                  style={styles.pillHit}>
-                  <AppIcon name="share" colour={ink} size={22} />
-                </AppPressable>
-                <AppPressable
-                  accessibilityLabel="React to post"
-                  onPress={() => {
-                    void selectionHaptic()
-                    reaction.mutate({
-                      postId: post.id,
-                      reaction: post.viewerReaction === 'funny' ? null : 'funny',
-                    })
-                  }}
-                  style={styles.pillHit}>
-                  <AppIcon name="gif" colour={ink} size={22} />
-                </AppPressable>
-              </View>
+            <ModulaMenu
+              accessibilityLabel="Open post options"
+              title="Post options"
+              actions={overflowActions}
+              onAction={runOverflow}
+              trigger={
+                <LiquidGlassChrome interactive fallback="clear" style={styles.moreGlass}>
+                  <AppIcon name="more" colour={colours.mediaOverlayIcon} size={18} />
+                </LiquidGlassChrome>
+              }
+            />
+          </View>
 
-              <View
-                style={[
-                  styles.proofPill,
-                  {
-                    backgroundColor: pillBg,
-                    shadowColor: colours.mediaOverlayShadow,
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[2],
-                  },
-                ]}>
+          {/* Liquid-glass social proof on the remaining bottom-right media. */}
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.proofAnchor,
+              {
+                right: spacing[3],
+                bottom: spacing[3],
+              },
+            ]}>
+            <LiquidGlassChrome interactive fallback="regular" style={styles.proofGlass}>
+              <View style={[styles.proofInner, {gap: spacing[2], paddingHorizontal: spacing[2]}]}>
                 <StackedAvatars faces={likerFaces} size={22} max={3} overlap={8} />
-                <AppText variant="label" style={{color: ink}} numberOfLines={1}>
+                <AppText
+                  variant="label"
+                  style={{color: colours.mediaOverlayText}}
+                  numberOfLines={1}>
                   {formatCompact(post.likeCount)} Liked
                 </AppText>
               </View>
-            </View>
+            </LiquidGlassChrome>
+          </View>
+
+          {/* Actions sit in the inverted-corner negative space (canvas, not on media). */}
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.cutoutActions,
+              {
+                width: SCOOP_W - 8,
+                height: SCOOP_H,
+                paddingLeft: spacing[1],
+              },
+            ]}>
+            <AppPressable
+              accessibilityLabel={liked ? 'Unlike' : 'Like'}
+              accessibilityState={{selected: liked}}
+              onPress={() => {
+                void selectionHaptic()
+                reaction.mutate({
+                  postId: post.id,
+                  reaction: liked ? null : 'like',
+                })
+              }}
+              onLongPress={() => {
+                void selectionHaptic()
+                reaction.mutate({postId: post.id, reaction: 'love'})
+              }}
+              style={styles.cutoutHit}>
+              <AppIcon name="like" colour={liked ? likedRed : colours.text} size={24} />
+            </AppPressable>
+            <AppPressable
+              accessibilityLabel="Comment on post"
+              onPress={() => router.push(`/post/${post.id}` as Href)}
+              style={styles.cutoutHit}>
+              <AppIcon name="comment" colour={colours.text} size={24} />
+            </AppPressable>
+            <AppPressable
+              accessibilityLabel="Share post"
+              onPress={() => void runPostOverflowAction('share', post)}
+              style={styles.cutoutHit}>
+              <AppIcon name="share" colour={colours.text} size={24} />
+            </AppPressable>
+            <AppPressable
+              accessibilityLabel={post.saved ? 'Unsave post' : 'Save post'}
+              accessibilityState={{selected: post.saved}}
+              onPress={() => {
+                void selectionHaptic()
+                save.mutate({postId: post.id, saved: !post.saved})
+              }}
+              style={styles.cutoutHit}>
+              <AppIcon
+                name="saved"
+                colour={post.saved ? colours.accent : colours.text}
+                size={24}
+              />
+            </AppPressable>
           </View>
         </View>
       </ModulaContextMenu>
@@ -337,9 +351,14 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
         <AppText variant="caption" colour="textTertiary">
           {relativeTime(post.createdAt)}
         </AppText>
+        {post.likeCount > 0 ? (
+          <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+            @{post.author.handle} and others liked this post
+          </AppText>
+        ) : null}
         {post.text?.trim() ? (
           <AppText variant="body" numberOfLines={3}>
-            <AppText variant="label">{post.author.displayName} </AppText>
+            <AppText variant="label">@{post.author.handle} </AppText>
             {post.text}
           </AppText>
         ) : null}
@@ -358,16 +377,6 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
 }
 
 const styles = StyleSheet.create({
-  actionPill: {
-    alignItems: 'center',
-    borderRadius: 999,
-    flexDirection: 'row',
-    minHeight: 48,
-    shadowOffset: {width: 0, height: 8},
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    elevation: 6,
-  },
   audioRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -382,33 +391,30 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     padding: 2,
   },
-  bottomPills: {
-    alignItems: 'flex-end',
+  bottomBlur: {
     bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     left: 0,
     position: 'absolute',
     right: 0,
   },
-  floatFace: {
-    position: 'relative',
-  },
-  floatHeart: {
+  cutoutActions: {
     alignItems: 'center',
-    borderRadius: 999,
-    borderWidth: 1.5,
-    height: 14,
-    justifyContent: 'center',
-    position: 'absolute',
-    right: -2,
-    top: -2,
-    width: 14,
-  },
-  floatLikes: {
-    alignItems: 'flex-end',
+    bottom: 0,
     flexDirection: 'row',
+    justifyContent: 'flex-start',
+    left: 0,
     position: 'absolute',
+    zIndex: 3,
+  },
+  cutoutHit: {
+    alignItems: 'center',
+    height: 48,
+    justifyContent: 'center',
+    width: 44,
+  },
+  frame: {
+    position: 'relative',
+    width: '100%',
   },
   identity: {
     alignItems: 'center',
@@ -421,31 +427,25 @@ const styles = StyleSheet.create({
     gap: 2,
     minWidth: 0,
   },
-  media: {
-    justifyContent: 'flex-end',
+  mediaFill: {
     overflow: 'hidden',
-    shadowOffset: {width: 0, height: 12},
-    shadowOpacity: 0.22,
-    shadowRadius: 24,
-    elevation: 8,
   },
   mediaGlow: {
-    bottom: -10,
-    left: 16,
-    opacity: 0.18,
+    bottom: -8,
+    left: 18,
+    opacity: 0.16,
     position: 'absolute',
-    right: 16,
-    top: 16,
+    right: 18,
+    top: 18,
   },
-  moreButton: {
+  mediaPlaceholder: {
+    width: '100%',
+  },
+  moreGlass: {
     alignItems: 'center',
     borderRadius: 999,
     height: 36,
     justifyContent: 'center',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.16,
-    shadowRadius: 10,
-    elevation: 4,
     width: 36,
   },
   nameRow: {
@@ -454,22 +454,19 @@ const styles = StyleSheet.create({
     gap: 6,
     minWidth: 0,
   },
-  pillHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 40,
+  proofAnchor: {
+    position: 'absolute',
+    zIndex: 3,
   },
-  proofPill: {
-    alignItems: 'center',
+  proofGlass: {
     borderRadius: 999,
+    minHeight: 44,
+    overflow: 'hidden',
+  },
+  proofInner: {
+    alignItems: 'center',
     flexDirection: 'row',
-    maxWidth: '46%',
-    minHeight: 48,
-    shadowOffset: {width: 0, height: 8},
-    shadowOpacity: 0.18,
-    shadowRadius: 16,
-    elevation: 6,
+    minHeight: 44,
   },
   topRow: {
     alignItems: 'flex-start',
