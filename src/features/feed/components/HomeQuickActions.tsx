@@ -6,6 +6,7 @@ import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ShellChromeObscureView} from '@/platform/ui/navigation/shell-chrome-obscure-view'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -13,11 +14,11 @@ type QuickAction = {
   id: string
   label: string
   href: Href
-  /** Feature Control gate — omit when always available. */
   featureId?: string
 }
 
-const ACTIONS: QuickAction[] = [
+/** Kept to 3 so the native segmented control stays readable. */
+const PRIMARY_ACTIONS: QuickAction[] = [
   {id: 'compose', label: 'Compose', href: '/compose' as Href},
   {
     id: 'reels',
@@ -26,6 +27,10 @@ const ACTIONS: QuickAction[] = [
     featureId: 'reels',
   },
   {id: 'discover', label: 'Discover', href: '/discover' as Href},
+]
+
+/** Overflow destinations — opened from the More menu, not jammed into segments. */
+const MORE_ACTIONS: QuickAction[] = [
   {id: 'presence', label: 'Presence', href: '/product/presence' as Href},
   {id: 'board', label: 'Board', href: '/board' as Href},
   {
@@ -36,26 +41,36 @@ const ACTIONS: QuickAction[] = [
 ]
 
 /**
- * Home quick destinations — native Expo UI segmented Picker
- * (same control as feed modes / Lab Lists & empty states).
+ * Home quick destinations: compact native segmented Picker + More menu.
+ * Avoids overcrowding UISegmentedControl (which was wrapping / looking broken).
  */
 export function HomeQuickActions() {
   const {spacing} = useThemeTokens()
   const router = useRouter()
   const {preferences} = useProductPreferences()
-  const actions = useMemo(
+
+  const primary = useMemo(
     () =>
-      ACTIONS.filter(
+      PRIMARY_ACTIONS.filter(
         action =>
           !action.featureId || isFeatureEnabled(preferences, action.featureId),
       ),
     [preferences],
   )
-  const [selected, setSelected] = useState(actions[0]?.id ?? 'compose')
+  const more = useMemo(
+    () =>
+      MORE_ACTIONS.filter(
+        action =>
+          !action.featureId || isFeatureEnabled(preferences, action.featureId),
+      ),
+    [preferences],
+  )
+
+  const [selected, setSelected] = useState(primary[0]?.id ?? 'compose')
 
   const options = useMemo(
-    () => actions.map(action => ({value: action.id, label: action.label})),
-    [actions],
+    () => primary.map(action => ({value: action.id, label: action.label})),
+    [primary],
   )
 
   if (options.length === 0) return null
@@ -64,34 +79,68 @@ export function HomeQuickActions() {
     ? selected
     : options[0].value
 
+  const go = (href: Href) => {
+    void selectionHaptic()
+    router.push(href)
+  }
+
   return (
     <ShellChromeObscureView direction="up">
       <View
         style={[
           styles.wrap,
-          {paddingHorizontal: spacing[4], paddingBottom: spacing[2]},
+          {
+            gap: spacing[2],
+            paddingHorizontal: spacing[4],
+            paddingBottom: spacing[2],
+          },
         ]}>
-        <ModulaSegmentedPicker
-          accessibilityLabel="Home quick actions"
-          options={options}
-          value={value}
-          initialVisibleCount={3}
-          revealBatchSize={2}
-          autoRevealIntervalMs={650}
-          onValueChange={next => {
-            setSelected(next)
-            const action = actions.find(item => item.id === next)
-            if (!action) return
-            void selectionHaptic()
-            router.push(action.href)
-          }}
-        />
+        <View style={styles.row}>
+          <View style={styles.picker}>
+            <ModulaSegmentedPicker
+              accessibilityLabel="Home quick actions"
+              options={options}
+              value={value}
+              onValueChange={next => {
+                setSelected(next)
+                const action = primary.find(item => item.id === next)
+                if (action) go(action.href)
+              }}
+            />
+          </View>
+          {more.length > 0 ? (
+            <ChromeIconMenu
+              systemImage="ellipsis.circle"
+              icon="more"
+              accessibilityLabel="More quick actions"
+              title="More"
+              actions={more.map(action => ({
+                id: action.id,
+                label: action.label,
+              }))}
+              onAction={id => {
+                const action = more.find(item => item.id === id)
+                if (action) go(action.href)
+              }}
+            />
+          ) : null}
+        </View>
       </View>
     </ShellChromeObscureView>
   )
 }
 
 const styles = StyleSheet.create({
+  picker: {
+    flex: 1,
+    minWidth: 0,
+  },
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    width: '100%',
+  },
   wrap: {
     alignSelf: 'stretch',
     width: '100%',
