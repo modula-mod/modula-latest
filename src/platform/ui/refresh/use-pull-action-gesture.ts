@@ -1,6 +1,7 @@
 import {useEffect, useMemo, useRef} from 'react'
 import {Gesture} from 'react-native-gesture-handler'
 import {
+  Easing,
   runOnJS,
   useAnimatedScrollHandler,
   useSharedValue,
@@ -9,6 +10,10 @@ import {
 } from 'react-native-reanimated'
 
 import {selectionHaptic} from '@/lib/haptics'
+import {
+  releaseShellChromePullObscure,
+  syncShellChromePullObscure,
+} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {
   PULL_ACTION_ARM_DISTANCE,
   PULL_ACTION_ZONE_DISTANCE,
@@ -25,6 +30,8 @@ export type UsePullActionGestureResult = {
   onScroll: ReturnType<typeof useAnimatedScrollHandler>
   listGesture: ReturnType<typeof Gesture.Simultaneous>
 }
+
+const SETTLE = Easing.bezier(0.22, 1, 0.36, 1)
 
 function actionFromSelection(index: PullActionSelection): PullActionId {
   'worklet'
@@ -92,7 +99,7 @@ export function usePullActionGesture(
           }
           const y = event.allTouches[0]?.y ?? touchStartY.value
           const dy = y - touchStartY.value
-          if (dy >= 12) {
+          if (dy >= 10) {
             state.activate()
             return
           }
@@ -104,10 +111,11 @@ export function usePullActionGesture(
           'worklet'
           const pull = Math.max(0, event.translationY)
           pullDistance.value = pull
+          syncShellChromePullObscure(pull)
           const isArmed = pull >= PULL_ACTION_ARM_DISTANCE ? 1 : 0
           armed.value = isArmed
           if (!isArmed) {
-            swipeX.value = 0
+            swipeX.value = withTiming(0, {duration: 160, easing: SETTLE})
             selectedIndex.value = 1
             return
           }
@@ -123,8 +131,9 @@ export function usePullActionGesture(
           if (armed.value || pullDistance.value >= PULL_ACTION_ARM_DISTANCE) {
             runOnJS(dispatchCommit)(actionFromSelection(selectedIndex.value))
           }
-          pullDistance.value = withTiming(0, {duration: 220})
-          swipeX.value = withTiming(0, {duration: 180})
+          pullDistance.value = withTiming(0, {duration: 420, easing: SETTLE})
+          swipeX.value = withTiming(0, {duration: 360, easing: SETTLE})
+          releaseShellChromePullObscure()
           armed.value = 0
           selectedIndex.value = 1
         })
@@ -134,8 +143,9 @@ export function usePullActionGesture(
             pullDistance.value > 0 &&
             pullDistance.value < PULL_ACTION_ARM_DISTANCE
           ) {
-            pullDistance.value = withTiming(0, {duration: 180})
-            swipeX.value = 0
+            pullDistance.value = withTiming(0, {duration: 380, easing: SETTLE})
+            swipeX.value = withTiming(0, {duration: 300, easing: SETTLE})
+            releaseShellChromePullObscure()
             armed.value = 0
             selectedIndex.value = 1
           }

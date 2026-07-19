@@ -35,9 +35,11 @@ const SPECTRUM = {
   amber: '#FFB020',
 } as const
 
+const BREATH_EASE = Easing.bezier(0.37, 0, 0.63, 1)
+
 /**
- * Elegant perimeter glow — soft bloom that breathes.
- * Spectrum stays put; only intensity pulses (no rotating rainbow).
+ * Elegant perimeter glow — very soft bloom that breathes slowly.
+ * Spectrum stays put; only intensity eases (no rotating rainbow).
  */
 export function LightningScreenGlow({
   pullDistance,
@@ -45,7 +47,7 @@ export function LightningScreenGlow({
 }: LightningScreenGlowProps) {
   const {width, height} = useWindowDimensions()
   const reduceMotion = useReduceMotion()
-  const breath = useSharedValue(0)
+  const breath = useSharedValue(0.5)
   const inset = 2.5
   const radius = 42
   const rimW = Math.max(1, width - inset * 2)
@@ -53,13 +55,13 @@ export function LightningScreenGlow({
 
   useEffect(() => {
     if (reduceMotion) {
-      breath.value = 0.55
+      breath.value = 0.62
       return
     }
     breath.value = withRepeat(
       withTiming(1, {
-        duration: refreshing ? 1100 : 1800,
-        easing: Easing.inOut(Easing.sin),
+        duration: refreshing ? 2400 : 3600,
+        easing: BREATH_EASE,
       }),
       -1,
       true,
@@ -69,11 +71,13 @@ export function LightningScreenGlow({
   const intensity = useDerivedValue(() => {
     const fromPull = interpolate(
       pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE * 0.22, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.7, 1],
+      [0, PULL_ACTION_ARM_DISTANCE * 0.35, PULL_ACTION_ARM_DISTANCE * 1.15],
+      [0, 0.55, 1],
       Extrapolation.CLAMP,
     )
-    return refreshing ? Math.max(fromPull, 0.9) : fromPull
+    // Ease the pull ramp so glow fades in gently.
+    const eased = fromPull * fromPull * (3 - 2 * fromPull)
+    return refreshing ? Math.max(eased, 0.88) : eased
   })
 
   const hostStyle = useAnimatedStyle(() => ({
@@ -82,45 +86,43 @@ export function LightningScreenGlow({
 
   const outerBloomStyle = useAnimatedStyle(() => {
     const pulse = reduceMotion
-      ? 0.7
-      : interpolate(breath.value, [0, 1], [0.45, 0.85])
-    return {
-      opacity: intensity.value * pulse,
-    }
+      ? 0.72
+      : interpolate(breath.value, [0, 1], [0.7, 0.92])
+    return {opacity: intensity.value * pulse}
   })
 
   const midBloomStyle = useAnimatedStyle(() => {
     const pulse = reduceMotion
       ? 0.8
-      : interpolate(breath.value, [0, 1], [0.65, 1])
-    return {
-      opacity: intensity.value * pulse,
-    }
+      : interpolate(breath.value, [0, 1], [0.78, 1])
+    return {opacity: intensity.value * pulse}
   })
 
   const rimStyle = useAnimatedStyle(() => {
     const pulse = reduceMotion
       ? 0.9
-      : interpolate(breath.value, [0, 1], [0.72, 1])
-    return {
-      opacity: intensity.value * pulse,
-    }
+      : interpolate(breath.value, [0, 1], [0.84, 1])
+    return {opacity: intensity.value * pulse}
   })
 
   return (
     <Animated.View
       pointerEvents="none"
       style={[StyleSheet.absoluteFill, styles.host, hostStyle]}>
-      {/* Wide soft bloom */}
       <Animated.View style={[StyleSheet.absoluteFill, outerBloomStyle]}>
         <Svg width={width} height={height}>
           <Defs>
-            <SvgLinearGradient id="lightningBloomOuter" x1="0%" y1="0%" x2="100%" y2="100%">
-              <Stop offset="0%" stopColor={SPECTRUM.cyan} stopOpacity={0.55} />
-              <Stop offset="25%" stopColor={SPECTRUM.blue} stopOpacity={0.4} />
-              <Stop offset="50%" stopColor={SPECTRUM.magenta} stopOpacity={0.5} />
-              <Stop offset="75%" stopColor={SPECTRUM.amber} stopOpacity={0.55} />
-              <Stop offset="100%" stopColor={SPECTRUM.violet} stopOpacity={0.4} />
+            <SvgLinearGradient
+              id="lightningBloomOuter"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%">
+              <Stop offset="0%" stopColor={SPECTRUM.cyan} stopOpacity={0.5} />
+              <Stop offset="25%" stopColor={SPECTRUM.blue} stopOpacity={0.35} />
+              <Stop offset="50%" stopColor={SPECTRUM.magenta} stopOpacity={0.45} />
+              <Stop offset="75%" stopColor={SPECTRUM.amber} stopOpacity={0.5} />
+              <Stop offset="100%" stopColor={SPECTRUM.violet} stopOpacity={0.35} />
             </SvgLinearGradient>
           </Defs>
           <Rect
@@ -132,21 +134,25 @@ export function LightningScreenGlow({
             ry={radius}
             fill="none"
             stroke="url(#lightningBloomOuter)"
-            strokeWidth={42}
-            strokeOpacity={0.35}
+            strokeWidth={48}
+            strokeOpacity={0.32}
           />
         </Svg>
       </Animated.View>
 
-      {/* Mid bloom */}
       <Animated.View style={[StyleSheet.absoluteFill, midBloomStyle]}>
         <Svg width={width} height={height}>
           <Defs>
-            <SvgLinearGradient id="lightningBloomMid" x1="100%" y1="0%" x2="0%" y2="100%">
-              <Stop offset="0%" stopColor={SPECTRUM.amber} stopOpacity={0.6} />
-              <Stop offset="30%" stopColor={SPECTRUM.magenta} stopOpacity={0.55} />
-              <Stop offset="60%" stopColor={SPECTRUM.cyan} stopOpacity={0.6} />
-              <Stop offset="100%" stopColor={SPECTRUM.blue} stopOpacity={0.5} />
+            <SvgLinearGradient
+              id="lightningBloomMid"
+              x1="100%"
+              y1="0%"
+              x2="0%"
+              y2="100%">
+              <Stop offset="0%" stopColor={SPECTRUM.amber} stopOpacity={0.55} />
+              <Stop offset="30%" stopColor={SPECTRUM.magenta} stopOpacity={0.5} />
+              <Stop offset="60%" stopColor={SPECTRUM.cyan} stopOpacity={0.55} />
+              <Stop offset="100%" stopColor={SPECTRUM.blue} stopOpacity={0.45} />
             </SvgLinearGradient>
           </Defs>
           <Rect
@@ -158,13 +164,12 @@ export function LightningScreenGlow({
             ry={radius}
             fill="none"
             stroke="url(#lightningBloomMid)"
-            strokeWidth={18}
-            strokeOpacity={0.55}
+            strokeWidth={20}
+            strokeOpacity={0.5}
           />
         </Svg>
       </Animated.View>
 
-      {/* Crisp inner rim — stationary spectrum, breathing opacity */}
       <Animated.View style={[StyleSheet.absoluteFill, rimStyle]}>
         <Svg width={width} height={height}>
           <Defs>
@@ -186,7 +191,7 @@ export function LightningScreenGlow({
             ry={radius}
             fill="none"
             stroke="url(#lightningRim)"
-            strokeWidth={refreshing ? 3 : 2.25}
+            strokeWidth={refreshing ? 2.75 : 2.1}
           />
         </Svg>
       </Animated.View>

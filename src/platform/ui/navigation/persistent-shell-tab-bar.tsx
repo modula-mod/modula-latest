@@ -1,15 +1,22 @@
 import {usePathname, useRouter, useSegments, type Href} from 'expo-router'
-import type {ComponentType} from 'react'
+import {useState, type ComponentType} from 'react'
+import {StyleSheet} from 'react-native'
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+} from 'react-native-reanimated'
 
 import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
+import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {
   hrefForShellTab,
   resolveShellTabRouteName,
   shouldHideShellTabBar,
 } from '@/platform/ui/navigation/shell-tab-bar-visibility'
+import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 type LiquidGlassTabBarComponent = ComponentType<ModulaLiquidGlassTabBarProps>
 
@@ -48,6 +55,16 @@ export function PersistentShellTabBar() {
   const router = useRouter()
   const {preferences} = useProductPreferences()
   const TabBar = getLiquidGlassTabBar()
+  const obscureStyle = useShellChromeObscureStyle('down')
+  const [interactive, setInteractive] = useState(true)
+
+  useAnimatedReaction(
+    () => shellChromeObscureAmount(),
+    value => {
+      runOnJS(setInteractive)(value < 0.4)
+    },
+    [],
+  )
 
   if (!TabBar) return null
   if (shouldHideShellTabBar(segments)) return null
@@ -73,5 +90,18 @@ export function PersistentShellTabBar() {
     },
   }
 
-  return <TabBar state={{index, routes}} navigation={navigation} />
+  return (
+    <Animated.View
+      pointerEvents={interactive ? 'box-none' : 'none'}
+      style={[styles.wrap, obscureStyle]}>
+      <TabBar state={{index, routes}} navigation={navigation} />
+    </Animated.View>
+  )
 }
+
+const styles = StyleSheet.create({
+  wrap: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 10,
+  },
+})

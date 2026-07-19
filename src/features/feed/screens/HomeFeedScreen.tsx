@@ -36,6 +36,7 @@ import {selectionHaptic} from '@/lib/haptics'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {
   PullActionTray,
   ShimmerRefreshEdge,
@@ -108,6 +109,7 @@ export function HomeFeedScreen() {
 
   const onRefresh = useCallback(() => {
     if (manualRefreshing) return
+    setShellChromeHoldObscure(true)
     setManualRefreshing(true)
     const started = Date.now()
     const holdMs = 3000
@@ -124,10 +126,12 @@ export function HomeFeedScreen() {
     (action: PullActionId) => {
       if (action === 'close') {
         void selectionHaptic()
+        setShellChromeHoldObscure(false)
         return
       }
       if (action === 'search') {
         void selectionHaptic()
+        setShellChromeHoldObscure(true)
         setSearchOpen(true)
         return
       }
@@ -156,6 +160,12 @@ export function HomeFeedScreen() {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     }
   }, [mode, reduceMotion])
+
+  // Keep tab bar / header chrome hidden while refresh runs or search is open.
+  useEffect(() => {
+    setShellChromeHoldObscure(refreshing || searchOpen)
+    return () => setShellChromeHoldObscure(false)
+  }, [refreshing, searchOpen])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>

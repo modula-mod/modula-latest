@@ -1,5 +1,6 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet} from 'react-native'
 import {useSegments} from 'expo-router'
+import Animated from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
@@ -9,6 +10,7 @@ import {
 } from '@/platform/ui/navigation/chrome-insets'
 import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visibility'
+import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 /**
  * Progressive blur along the bottom edge of the shell.
@@ -18,6 +20,7 @@ import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visi
 export function ShellBottomProgressiveBlur() {
   const segments = useSegments()
   const insets = useSafeAreaInsets()
+  const obscureStyle = useShellChromeObscureStyle('down')
 
   if (shouldHideShellTabBar(segments)) {
     return null
@@ -28,13 +31,15 @@ export function ShellBottomProgressiveBlur() {
     CHROME_BOTTOM_FADE + FLOATING_TAB_BAR_SEGMENT_HEIGHT + bottomLift
 
   return (
-    <View pointerEvents="none" style={[styles.wrap, {height}]}>
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.wrap, {height}, obscureStyle]}>
       <ProgressiveBlurBand
         height={height}
         topHeavy={false}
         intensity={CHROME_BOTTOM_BLUR_INTENSITY}
       />
-    </View>
+    </Animated.View>
   )
 }
 

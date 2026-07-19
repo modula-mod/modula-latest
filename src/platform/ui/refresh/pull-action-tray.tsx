@@ -93,33 +93,35 @@ export function PullActionTray({
   const blurStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE * 0.28, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.4, 1],
+      [0, PULL_ACTION_ARM_DISTANCE * 0.4, PULL_ACTION_ARM_DISTANCE * 1.1],
+      [0, 0.35, 1],
       Extrapolation.CLAMP,
     )
-    return {opacity: refreshing ? Math.max(progress, 0.65) : progress}
+    const eased = progress * progress * (3 - 2 * progress)
+    return {opacity: refreshing ? Math.max(eased, 0.62) : eased}
   })
 
   const contentStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE],
+      [0, PULL_ACTION_ARM_DISTANCE * 1.05],
       [0, 1],
       Extrapolation.CLAMP,
     )
+    const eased = progress * progress * (3 - 2 * progress)
     if (reduceMotion) {
       return {
-        opacity: interpolate(progress, [0, 1], [1, 0.94], Extrapolation.CLAMP),
+        opacity: interpolate(eased, [0, 1], [1, 0.95], Extrapolation.CLAMP),
       }
     }
     return {
-      opacity: interpolate(progress, [0, 1], [1, 0.9], Extrapolation.CLAMP),
+      opacity: interpolate(eased, [0, 1], [1, 0.92], Extrapolation.CLAMP),
       transform: [
         {
-          scale: interpolate(progress, [0, 1], [1, 0.97], Extrapolation.CLAMP),
+          scale: interpolate(eased, [0, 1], [1, 0.975], Extrapolation.CLAMP),
         },
       ],
-      borderRadius: interpolate(progress, [0, 1], [0, 36], Extrapolation.CLAMP),
+      borderRadius: interpolate(eased, [0, 1], [0, 32], Extrapolation.CLAMP),
       overflow: 'hidden' as const,
     }
   })
@@ -127,25 +129,26 @@ export function PullActionTray({
   const chromeStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE * 0.4, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.45, 1],
+      [0, PULL_ACTION_ARM_DISTANCE * 0.5, PULL_ACTION_ARM_DISTANCE],
+      [0, 0.4, 1],
       Extrapolation.CLAMP,
     )
-    const boost = refreshing ? Math.max(progress, 0.9) : progress
+    const eased = progress * progress * (3 - 2 * progress)
+    const boost = refreshing ? Math.max(eased, 0.92) : eased
     return {
       opacity: boost,
       transform: [
         {
           translateY: reduceMotion
             ? 0
-            : interpolate(boost, [0, 1], [-16, 0], Extrapolation.CLAMP),
+            : interpolate(boost, [0, 1], [-12, 0], Extrapolation.CLAMP),
         },
         {
           translateX: armed.value
             ? interpolate(
                 swipeX.value,
                 [-140, 0, 140],
-                [-10, 0, 10],
+                [-8, 0, 8],
                 Extrapolation.CLAMP,
               )
             : 0,
@@ -157,11 +160,12 @@ export function PullActionTray({
   const titleStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [PULL_ACTION_ARM_DISTANCE * 0.45, PULL_ACTION_ARM_DISTANCE],
+      [PULL_ACTION_ARM_DISTANCE * 0.55, PULL_ACTION_ARM_DISTANCE],
       [0, 1],
       Extrapolation.CLAMP,
     )
-    return {opacity: refreshing ? 1 : progress}
+    const eased = progress * progress * (3 - 2 * progress)
+    return {opacity: refreshing ? 1 : eased}
   })
 
   const washColor =
