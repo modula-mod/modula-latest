@@ -14,6 +14,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {Avatar} from '@/components/primitives/Avatar'
+import {useSession} from '@/auth/runtime'
 import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
@@ -180,6 +182,8 @@ export function ModulaLiquidGlassTabBar({
 }: ModulaLiquidGlassTabBarProps) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {reduceTransparency} = useSystemAccessibility()
@@ -353,6 +357,7 @@ export function ModulaLiquidGlassTabBar({
             accessibilityRole="tablist">
             {visibleTabs.map((tab, index) => {
               const selected = index === selectedIndex
+              const isProfile = tab.routeName === 'profile'
               return (
                 <AppPressable
                   key={tab.id}
@@ -361,11 +366,35 @@ export function ModulaLiquidGlassTabBar({
                   accessibilityState={{selected}}
                   onPress={() => navigateTab(tab)}
                   style={styles.tabHit}>
-                  <AppIcon
-                    name={TAB_ICONS[tab.routeName] ?? 'home'}
-                    colour={selected ? colours.accent : colours.textSecondary}
-                    size={22}
-                  />
+                  {isProfile ? (
+                    <View
+                      style={[
+                        styles.profileAvatarRing,
+                        selected
+                          ? {
+                              borderColor: colours.accent,
+                              borderWidth: 1.5,
+                            }
+                          : {borderColor: 'transparent', borderWidth: 1.5},
+                      ]}>
+                      <Avatar
+                        name={
+                          profile?.displayName ??
+                          (session.status === 'guest' ? 'Guest' : 'Modula')
+                        }
+                        uri={profile?.avatarUri}
+                        colour={profile?.coverColour}
+                        size={22}
+                        style={styles.profileAvatar}
+                      />
+                    </View>
+                  ) : (
+                    <AppIcon
+                      name={TAB_ICONS[tab.routeName] ?? 'home'}
+                      colour={selected ? colours.accent : colours.textSecondary}
+                      size={22}
+                    />
+                  )}
                   {selected ? (
                     <View
                       style={[
@@ -456,6 +485,16 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: 'center',
     width: 60,
+  },
+  profileAvatar: {
+    borderWidth: 0,
+  },
+  profileAvatarRing: {
+    alignItems: 'center',
+    borderRadius: 999,
+    height: 26,
+    justifyContent: 'center',
+    width: 26,
   },
   segmentHidden: {
     height: 0,

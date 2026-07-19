@@ -5,6 +5,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {Avatar} from '@/components/primitives/Avatar'
+import {useSession} from '@/auth/runtime'
 import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
@@ -77,6 +79,8 @@ type WebTabRailProps = {
 function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   const {width} = useWindowDimensions()
   const {colours, spacing, radius} = useThemeTokens()
   const {preferences} = useProductPreferences()
@@ -110,6 +114,7 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
         const focused = state.index === index
         const {options} = descriptors[route.key]
         const label = options.title ?? route.name
+        const isProfile = route.name === 'profile'
 
         return (
           <AppPressable
@@ -136,11 +141,24 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
                   }
                 : null,
             ]}>
-            <AppIcon
-              name={webIcons[route.name] ?? 'home'}
-              colour={focused ? colours.accent : colours.textSecondary}
-              size={22}
-            />
+            {isProfile ? (
+              <Avatar
+                name={
+                  profile?.displayName ??
+                  (session.status === 'guest' ? 'Guest' : 'Modula')
+                }
+                uri={profile?.avatarUri}
+                colour={profile?.coverColour}
+                size={22}
+                style={styles.profileAvatar}
+              />
+            ) : (
+              <AppIcon
+                name={webIcons[route.name] ?? 'home'}
+                colour={focused ? colours.accent : colours.textSecondary}
+                size={22}
+              />
+            )}
             <AppText
               variant="caption"
               style={{color: focused ? colours.accent : colours.textSecondary}}>
@@ -184,6 +202,9 @@ const styles = StyleSheet.create({
     gap: 2,
     justifyContent: 'center',
     minHeight: 52,
+  },
+  profileAvatar: {
+    borderWidth: 0,
   },
   rail: {
     borderRightWidth: StyleSheet.hairlineWidth,

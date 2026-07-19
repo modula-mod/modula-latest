@@ -6,11 +6,9 @@ import Animated, {
   useAnimatedReaction,
 } from 'react-native-reanimated'
 
-import {Avatar} from '@/components/primitives/Avatar'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
@@ -35,8 +33,7 @@ function useShellChromeVisible(threshold = 0.2) {
 
 export function HomeHeaderLeft() {
   const {openDrawer} = useShellDrawer()
-  const session = useSession()
-  const profile = session.status === 'signedIn' ? session.profile : null
+  const {colours} = useThemeTokens()
   const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
@@ -50,17 +47,8 @@ export function HomeHeaderLeft() {
             void selectionHaptic()
             openDrawer()
           }}
-          style={styles.avatarHit}>
-          <Avatar
-            name={
-              profile?.displayName ??
-              (session.status === 'guest' ? 'Guest' : 'Modula')
-            }
-            uri={profile?.avatarUri}
-            colour={profile?.coverColour}
-            size={32}
-            style={styles.avatarBare}
-          />
+          style={styles.menuHit}>
+          <AppIcon name="menu" colour={colours.text} size={24} />
         </AppPressable>
       ) : null}
     </Animated.View>
@@ -118,16 +106,6 @@ export function HomeHeaderRight() {
 }
 
 const styles = StyleSheet.create({
-  avatarBare: {
-    borderWidth: 0,
-  },
-  avatarHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    marginLeft: 4,
-    minWidth: 44,
-  },
   iconHit: {
     alignItems: 'center',
     height: 44,
@@ -139,6 +117,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginRight: 4,
+  },
+  menuHit: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    marginLeft: 4,
+    minWidth: 44,
   },
   titleWrap: {
     alignItems: 'center',
