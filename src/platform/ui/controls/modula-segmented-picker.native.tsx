@@ -13,9 +13,12 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
+const DEFAULT_SCROLL_MAX_WIDTH = 360
+const DEFAULT_SEGMENT_MIN_WIDTH = 88
+
 /**
  * Native Expo UI segmented Picker — theme via Host seedColor + accent tint.
- * `scrollable` uses SwiftUI ScrollView so segment taps still register.
+ * `scrollable` uses SwiftUI ScrollView inside a max-width viewport.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -25,15 +28,16 @@ export function ModulaSegmentedPicker({
   style,
   testID,
   scrollable = false,
-  segmentMinWidth = 92,
+  segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
+  maxWidth,
 }: ModulaSegmentedPickerProps) {
   const {colours, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const allowed = new Set(options.map(option => option.value))
-  const contentWidth = Math.max(
-    windowWidth - 32,
-    options.length * segmentMinWidth,
-  )
+
+  const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
+  const viewportWidth = Math.min(windowWidth - 32, viewportCap)
+  const contentWidth = Math.max(viewportWidth, options.length * segmentMinWidth)
 
   const picker = (
     <Picker
@@ -47,9 +51,11 @@ export function ModulaSegmentedPicker({
       modifiers={[
         pickerStyle('segmented'),
         tint(colours.accent),
-        ...(scrollable
-          ? [frame({width: contentWidth, height: 36})]
-          : [frame({maxWidth: Infinity, height: 36})]),
+        frame({
+          width: scrollable ? contentWidth : viewportWidth,
+          height: 34,
+          maxWidth: scrollable ? contentWidth : viewportWidth,
+        }),
       ]}
       testID={testID}>
       {options.map(option => (
@@ -62,20 +68,26 @@ export function ModulaSegmentedPicker({
 
   return (
     <Host
-      matchContents={!scrollable}
+      matchContents
       colorScheme={scheme}
       seedColor={colours.accent}
       style={[
-        scrollable
-          ? {width: '100%', height: 40}
-          : {alignSelf: 'stretch', width: '100%'},
+        {
+          alignSelf: 'center',
+          width: viewportWidth,
+          maxWidth: viewportWidth,
+          height: 38,
+        },
         style,
       ]}>
       {scrollable ? (
         <ScrollView
           axes="horizontal"
           showsIndicators={false}
-          modifiers={[scrollIndicators('hidden', 'horizontal')]}>
+          modifiers={[
+            scrollIndicators('hidden', 'horizontal'),
+            frame({width: viewportWidth, height: 38, maxWidth: viewportWidth}),
+          ]}>
           {picker}
         </ScrollView>
       ) : (

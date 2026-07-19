@@ -117,7 +117,8 @@ export function HomeQuickActions() {
         <ModulaSegmentedPicker
           accessibilityLabel="Home quick actions"
           scrollable
-          segmentMinWidth={96}
+          maxWidth={340}
+          segmentMinWidth={86}
           options={options}
           value={selected}
           onValueChange={runAction}

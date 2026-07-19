@@ -15,10 +15,15 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * When true, the segmented control is laid out wider than the screen and
+   * When true, the segmented control is laid out wider than the viewport and
    * wrapped in a horizontal ScrollView so many segments can be panned.
    */
   scrollable?: boolean
-  /** Approximate width per segment when `scrollable` (default 92). */
+  /** Approximate width per segment when `scrollable` (default 88). */
   segmentMinWidth?: number
+  /**
+   * Max width of the visible control (Host / viewport). Scroll content may be
+   * wider. Defaults to 360 when `scrollable`, otherwise full width.
+   */
+  maxWidth?: number
 }

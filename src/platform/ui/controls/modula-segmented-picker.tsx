@@ -12,9 +12,11 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
+const DEFAULT_SCROLL_MAX_WIDTH = 360
+const DEFAULT_SEGMENT_MIN_WIDTH = 88
+
 /**
- * Web / Android fallback — theme-aware segmented row, optionally scrollable.
- * Uses RN pressables so each segment always receives taps.
+ * Web / Android fallback — theme-aware segmented row with optional max width.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -24,14 +26,15 @@ export function ModulaSegmentedPicker({
   style,
   testID,
   scrollable = false,
-  segmentMinWidth = 92,
+  segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
+  maxWidth,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
-  const contentWidth = Math.max(
-    windowWidth - 32,
-    options.length * segmentMinWidth,
-  )
+
+  const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
+  const viewportWidth = Math.min(windowWidth - 32, viewportCap)
+  const contentWidth = Math.max(viewportWidth, options.length * segmentMinWidth)
 
   const row = (
     <View
@@ -45,10 +48,10 @@ export function ModulaSegmentedPicker({
           borderRadius: radius.round,
           padding: 3,
           gap: spacing[1],
-          width: scrollable ? contentWidth : '100%',
-          minWidth: scrollable ? contentWidth : undefined,
+          width: scrollable ? contentWidth : viewportWidth,
+          maxWidth: scrollable ? contentWidth : viewportWidth,
         },
-        style,
+        !scrollable ? style : null,
       ]}>
       {options.map(option => {
         const selected = option.value === value
@@ -89,7 +92,13 @@ export function ModulaSegmentedPicker({
     </View>
   )
 
-  if (!scrollable) return row
+  if (!scrollable) {
+    return (
+      <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
+        {row}
+      </View>
+    )
+  }
 
   return (
     <ScrollView
@@ -97,7 +106,9 @@ export function ModulaSegmentedPicker({
       showsHorizontalScrollIndicator={false}
       decelerationRate="fast"
       keyboardShouldPersistTaps="handled"
-      nestedScrollEnabled>
+      nestedScrollEnabled
+      style={[{alignSelf: 'center', maxWidth: viewportWidth, width: viewportWidth}, style]}
+      contentContainerStyle={{alignItems: 'center'}}>
       {row}
     </ScrollView>
   )
@@ -106,7 +117,6 @@ export function ModulaSegmentedPicker({
 const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
-    alignSelf: 'stretch',
     flexDirection: 'row',
   },
   segment: {
