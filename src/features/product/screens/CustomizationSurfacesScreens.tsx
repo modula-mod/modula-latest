@@ -568,7 +568,7 @@ export function ChromeDensityScreen() {
 
   return (
     <SurfaceShell title="Chrome density">
-      <PreviewBanner text="Chrome density Preview — sample card below; shell-wide application is staged." />
+      <PreviewBanner text="Chrome density is live for floating tab bar content insets across the shell." />
       {options.map(option => {
         const on = preferences.chromeDensity === option.id
         return (

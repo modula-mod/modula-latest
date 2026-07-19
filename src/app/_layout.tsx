@@ -10,6 +10,7 @@ import {NetworkStatusBanner} from '@/components/data/NetworkStatusBanner'
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'
 import {SessionProvider} from '@/auth/runtime'
 import {QueryRuntimeProvider} from '@/data/query'
+import {ProductPreferencesProvider} from '@/features/product/runtime/ProductPreferencesProvider'
 import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
 import '@/features/social/registerExpansionDestinations'
 import {AccountPanelProvider} from '@/platform/ui/navigation/AccountPanelContext'
@@ -90,14 +91,16 @@ export default function RootLayout() {
           <QueryRuntimeProvider>
             <SessionProvider>
               <AppearanceProvider>
-                <ProfilePresentationProvider>
-                  <AccountPanelProvider>
-                    <ShellDrawerProvider>
-                      <RootNavigator />
-                      <NetworkStatusBanner />
-                    </ShellDrawerProvider>
-                  </AccountPanelProvider>
-                </ProfilePresentationProvider>
+                <ProductPreferencesProvider>
+                  <ProfilePresentationProvider>
+                    <AccountPanelProvider>
+                      <ShellDrawerProvider>
+                        <RootNavigator />
+                        <NetworkStatusBanner />
+                      </ShellDrawerProvider>
+                    </AccountPanelProvider>
+                  </ProfilePresentationProvider>
+                </ProductPreferencesProvider>
               </AppearanceProvider>
             </SessionProvider>
           </QueryRuntimeProvider>

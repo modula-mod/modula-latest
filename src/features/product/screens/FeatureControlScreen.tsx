@@ -35,7 +35,8 @@ export function FeatureControlScreen() {
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">Keep Modula controllable.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Enable, hide, or lock versions. Choices persist locally on this device.
+              Enable, hide, or lock versions. Choices persist locally and gate entry points
+              (Home quick actions, banners, web rail shortcuts).
             </AppText>
             <AppButton onPress={() => router.push('/product/customize' as Href)}>
               Open Customize hub

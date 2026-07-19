@@ -227,13 +227,34 @@ export const PROFILE_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     description: 'Link shelf tab.',
     icon: 'link',
   },
+  {
+    id: 'shop',
+    slot: 'profile',
+    label: 'Shop',
+    description: 'Module Preview tab — Marketplace foreshadow.',
+    icon: 'marketplace',
+  },
+  {
+    id: 'agents',
+    slot: 'profile',
+    label: 'Agents',
+    description: 'Scoped GAIA agents tab Preview.',
+    icon: 'automation',
+  },
 ]
 
 export const DEFAULT_HOME_BLOCK_IDS = HOME_LAYOUT_BLOCKS.map(block => block.id)
 export const DEFAULT_DISCOVER_BLOCK_IDS = DISCOVER_LAYOUT_BLOCKS.map(block => block.id)
 export const DEFAULT_TAB_BAR_IDS = TAB_LAYOUT_BLOCKS.map(block => block.id) as ModulaTabId[]
 export const DEFAULT_ACTIVITY_BLOCK_IDS = ACTIVITY_LAYOUT_BLOCKS.map(block => block.id)
-export const DEFAULT_PROFILE_TAB_IDS = PROFILE_LAYOUT_BLOCKS.map(block => block.id)
+/** Matches DEFAULT_PROFILE_PRESENTATION.enabledTabIds — shop/agents stay opt-in. */
+export const DEFAULT_PROFILE_TAB_IDS = [
+  'posts',
+  'media',
+  'about',
+  'modules',
+  'links',
+] as const
 
 export type ChromeDensity = 'compact' | 'comfortable' | 'airy'
 export type MotionDensity = 'full' | 'reduced' | 'minimal'

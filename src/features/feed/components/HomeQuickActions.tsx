@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import Animated, {
   useAnimatedStyle,
@@ -9,6 +9,8 @@ import Animated, {
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -18,23 +20,40 @@ type QuickAction = {
   label: string
   icon: AppIconName
   href: Href
+  /** Feature Control gate — omit when always available. */
+  featureId?: string
 }
 
 const ACTIONS: QuickAction[] = [
   {id: 'compose', label: 'Compose', icon: 'create', href: '/compose' as Href},
-  {id: 'reels', label: 'Reels', icon: 'play', href: '/reels' as Href},
+  {
+    id: 'reels',
+    label: 'Reels',
+    icon: 'play',
+    href: '/reels' as Href,
+    featureId: 'reels',
+  },
   {id: 'discover', label: 'Discover', icon: 'discover', href: '/discover' as Href},
   {id: 'presence', label: 'Presence', icon: 'people', href: '/product/presence' as Href},
   {id: 'board', label: 'Board', icon: 'board', href: '/board' as Href},
-  {id: 'customize', label: 'Customize', icon: 'appearance', href: '/product/customize' as Href},
+  {
+    id: 'customize',
+    label: 'Customize',
+    icon: 'appearance',
+    href: '/product/customize' as Href,
+  },
 ]
 
 /**
  * Horizontal quick-action pills under the home feed header.
- * Inspiration: soft pill rails — adapted to Modula destinations, not product clones.
+ * Respects Feature Control channels (e.g. Reels off → pill hidden).
  */
 export function HomeQuickActions() {
   const {spacing} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const actions = ACTIONS.filter(
+    action => !action.featureId || isFeatureEnabled(preferences, action.featureId),
+  )
 
   return (
     <ScrollView
@@ -44,14 +63,20 @@ export function HomeQuickActions() {
         styles.row,
         {gap: spacing[2], paddingHorizontal: spacing[4], paddingBottom: spacing[2]},
       ]}>
-      {ACTIONS.map((action, index) => (
-        <QuickActionPill key={action.id} action={action} index={index} />
+      {actions.map((action, index) => (
+        <QuickActionPill key={action.id} action={action} primary={index === 0} />
       ))}
     </ScrollView>
   )
 }
 
-function QuickActionPill({action, index}: {action: QuickAction; index: number}) {
+function QuickActionPill({
+  action,
+  primary,
+}: {
+  action: QuickAction
+  primary: boolean
+}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
@@ -81,8 +106,8 @@ function QuickActionPill({action, index}: {action: QuickAction; index: number}) 
         style={[
           styles.pill,
           {
-            backgroundColor: index === 0 ? colours.accent : colours.surfaceRaised,
-            borderColor: index === 0 ? colours.accentBorder : colours.border,
+            backgroundColor: primary ? colours.accent : colours.surfaceRaised,
+            borderColor: primary ? colours.accentBorder : colours.border,
             borderRadius: radius.round,
             gap: spacing[2],
             paddingHorizontal: spacing[3],
@@ -90,13 +115,13 @@ function QuickActionPill({action, index}: {action: QuickAction; index: number}) 
         ]}>
         <AppIcon
           name={action.icon}
-          colour={index === 0 ? colours.accentForeground : colours.accent}
+          colour={primary ? colours.accentForeground : colours.accent}
           size={16}
         />
         <AppText
           variant="label"
           style={{
-            color: index === 0 ? colours.accentForeground : colours.text,
+            color: primary ? colours.accentForeground : colours.text,
           }}>
           {action.label}
         </AppText>

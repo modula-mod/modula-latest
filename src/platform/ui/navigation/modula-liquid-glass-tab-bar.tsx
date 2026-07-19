@@ -14,6 +14,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
@@ -80,6 +82,7 @@ type ExpandAction = {
   icon: AppIconName
   href?: Href
   compose?: boolean
+  featureId?: string
 }
 
 const EXPAND_ACTIONS: ExpandAction[] = [
@@ -87,9 +90,28 @@ const EXPAND_ACTIONS: ExpandAction[] = [
   {id: 'messages', label: 'Messages', icon: 'messages', href: '/messages'},
   {id: 'marketplace', label: 'Marketplace', icon: 'marketplace', href: '/marketplace'},
   {id: 'product', label: 'Product Hub', icon: 'modules', href: '/product'},
-  {id: 'forge', label: 'Forge Builder', icon: 'developer', href: '/product/forge'},
-  {id: 'focus', label: 'Focus Mode', icon: 'contrast', href: '/product/focus'},
-  {id: 'agents', label: 'Agents', icon: 'automation', href: '/product/agents'},
+  {id: 'customize', label: 'Customize', icon: 'appearance', href: '/product/customize'},
+  {
+    id: 'forge',
+    label: 'Forge Builder',
+    icon: 'developer',
+    href: '/product/forge',
+    featureId: 'forge',
+  },
+  {
+    id: 'focus',
+    label: 'Focus Mode',
+    icon: 'contrast',
+    href: '/product/focus',
+    featureId: 'focus',
+  },
+  {
+    id: 'agents',
+    label: 'Agents',
+    icon: 'automation',
+    href: '/product/agents',
+    featureId: 'agents',
+  },
   {id: 'permissions', label: 'Permissions', icon: 'privacy', href: '/product/permissions'},
   {id: 'discover', label: 'Search / Discover', icon: 'search', href: '/discover'},
   {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
@@ -155,9 +177,13 @@ export function ModulaLiquidGlassTabBar({
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {reduceTransparency} = useSystemAccessibility()
+  const {preferences} = useProductPreferences()
   const [expanded, setExpanded] = useState(false)
   const mainTabScale = useSharedValue(1)
   const plusIconRotate = useSharedValue(0)
+  const expandActions = EXPAND_ACTIONS.filter(
+    action => !action.featureId || isFeatureEnabled(preferences, action.featureId),
+  )
 
   const visibleTabs = MODULA_TABS.filter(tab =>
     state.routes.some(route => route.name === tab.routeName),
@@ -275,7 +301,7 @@ export function ModulaLiquidGlassTabBar({
               style={[styles.menuContainer, menuStyle]}
               pointerEvents="auto"
               accessibilityElementsHidden={false}>
-              {EXPAND_ACTIONS.map(action => (
+              {expandActions.map(action => (
                 <AppPressable
                   key={action.id}
                   accessibilityLabel={action.label}

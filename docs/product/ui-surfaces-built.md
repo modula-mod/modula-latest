@@ -35,7 +35,11 @@
 | `/product/gaia` | GAIA console — scopes + governed flow (persisted) |
 | `/product/gaia-atlas` | Atlas schematic (GAIA centre · AKI/Governor orbit) |
 | `/product/widgets` | Toggle widgets → Board strip (persisted); GAIA briefing Preview, DIMON activity inactive, NFT entitlements Preview |
-| `/product/feature-control` | Enable/lock features (persisted) |
+| `/product/feature-control` | Enable/lock features (persisted) — gates Home CTAs, banners, expand/rail shortcuts |
+| `/product/customize` | Customize hub — layout studios + optional surfaces |
+| `/product/layout-*` | Live Home / Discover / Tabs / Activity / Profile layout studios |
+| `/product/motion-prefs` · `/chrome-density` · `/surface-playground` | Motion (SectionEnter), chrome insets (live), Surface Type Preview |
+| `/product/status-composer` · `/saved-hub` · `/quiet-inbox` · `/inner-circle` · … | Optional Customize surfaces (honest Preview) |
 | `/product/glass-privacy` | Glass Privacy levels (persisted) |
 | `/product/forge` | Plan/Build/Preview/Manifest workspace + templates, chat, scan, versions |
 | `/product/permissions` | Permissions matrix + Security Scan Preview |
@@ -51,7 +55,7 @@
 | `/product/communities` | Communities OS (also `/communities`) |
 | `/product/[slug]` | Capability pre-screen for every catalogue item |
 
-Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (AsyncStorage). Kaizen queue: `modula.kaizen.queue.v1`. Circuit Memory Preview list: `modula.circuit-memory.items.v1`.
+Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (AsyncStorage) via `ProductPreferencesProvider`. Layout block catalog: `src/features/product/data/layoutBlocks.ts`. Verify: `pnpm verify:layout-preferences`. Kaizen queue: `modula.kaizen.queue.v1`. Circuit Memory Preview list: `modula.circuit-memory.items.v1`.
 
 ## Social OS surfaces
 
@@ -63,11 +67,12 @@ Local craft prefs: `src/features/product/storage/productPreferencesStorage.ts` (
 | `/teams` | Teams OS role preview + persisted role choice + roles matrix + shared Board/modules + approval stubs + focus/availability + Intelligence/Ledger links |
 | `/communities` | Communities OS seeded list |
 | `/board` | Widget strip (reorder/remove) + Focus copy from prefs + GAIA/DIMON/NFT entitlement widget cards |
-| Home (`/`) | PresenceArc + Focus banner + quiet/work mode order |
+| Home (`/`) | Ordered home blocks + Feature Control gates + quick actions |
+| Discover | Ordered sections + empty-layout restore |
 | Messages | Glass Privacy badge + thread hint from prefs |
-| Profile customize | Shop + Agents module tab slots (Preview) |
-| Tab bar expand | Product Hub, Forge, Focus, Agents shortcuts |
-| Web rail | CREATE shortcuts (Product / Forge / Agents / Focus) |
+| Profile customize | Shop + Agents slots; syncs `profileTabIds` with Customize hub |
+| Tab bar expand | Product Hub, Customize, Forge, Focus, Agents (feature-gated) |
+| Web rail | CREATE shortcuts (feature-gated) |
 | `templates/modula-module/` | Module boilerplate + `docs/architecture/module-standards.md` |
 | `/product/module-standards` | Standards studio |
 | `/product/themes` | Themes & layouts packs Preview |

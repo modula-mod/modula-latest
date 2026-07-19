@@ -5,6 +5,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -16,11 +19,17 @@ const webIcons: Record<string, AppIconName> = {
   profile: 'profile',
 }
 
-const RAIL_SHORTCUTS: Array<{label: string; icon: AppIconName; href: Href}> = [
+const RAIL_SHORTCUTS: Array<{
+  label: string
+  icon: AppIconName
+  href: Href
+  featureId?: string
+}> = [
   {label: 'Product', icon: 'modules', href: '/product'},
-  {label: 'Forge', icon: 'developer', href: '/product/forge'},
-  {label: 'Agents', icon: 'automation', href: '/product/agents'},
-  {label: 'Focus', icon: 'contrast', href: '/product/focus'},
+  {label: 'Customize', icon: 'appearance', href: '/product/customize'},
+  {label: 'Forge', icon: 'developer', href: '/product/forge', featureId: 'forge'},
+  {label: 'Agents', icon: 'automation', href: '/product/agents', featureId: 'agents'},
+  {label: 'Focus', icon: 'contrast', href: '/product/focus', featureId: 'focus'},
 ]
 
 /**
@@ -70,10 +79,19 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const router = useRouter()
   const {width} = useWindowDimensions()
   const {colours, spacing, radius} = useThemeTokens()
+  const {preferences} = useProductPreferences()
   const rail = width >= 900
+  const selectedRouteName =
+    state.index >= 0 ? state.routes[state.index]?.name : undefined
+  const visibleTabNames = new Set(
+    resolveVisibleModulaTabs(preferences.tabBarIds, {
+      alwaysIncludeRouteName: selectedRouteName,
+    }).map(tab => tab.routeName),
+  )
 
-  const visibleRoutes = state.routes.filter(route =>
-    MODULA_TABS.some(tab => tab.routeName === route.name),
+  const visibleRoutes = state.routes.filter(route => visibleTabNames.has(route.name))
+  const shortcuts = RAIL_SHORTCUTS.filter(
+    item => !item.featureId || isFeatureEnabled(preferences, item.featureId),
   )
 
   return (
@@ -137,7 +155,7 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
           <AppText variant="micro" colour="textTertiary">
             CREATE
           </AppText>
-          {RAIL_SHORTCUTS.map(item => (
+          {shortcuts.map(item => (
             <AppPressable
               key={item.href.toString()}
               accessibilityLabel={item.label}

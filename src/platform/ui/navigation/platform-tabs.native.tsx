@@ -2,6 +2,8 @@ import {Tabs} from 'expo-router'
 import {NativeTabs} from 'expo-router/unstable-native-tabs'
 import type {ComponentType} from 'react'
 
+import {isTabEnabled} from '@/features/product/data/resolveTabBar'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
@@ -86,6 +88,7 @@ function LiquidGlassPlatformTabs() {
 
 function NativeTabsFallback() {
   const {colours} = useThemeTokens()
+  const {preferences} = useProductPreferences()
 
   return (
     <NativeTabs
@@ -104,6 +107,7 @@ function NativeTabsFallback() {
           key={tab.id}
           name={tab.routeName}
           accessibilityLabel={tab.label}
+          hidden={!isTabEnabled(preferences.tabBarIds, tab.id)}
           disableTransparentOnScrollEdge>
           <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon

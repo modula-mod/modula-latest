@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useMemo, useState, type ReactNode} from 'react'
 import {
   LayoutAnimation,
   Platform,
@@ -26,6 +26,7 @@ import {
   FOCUS_PRESET_META,
   isFocusActive,
 } from '@/features/product/data/focusPolicy'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {isBlockOn} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {SocialPost} from '@/features/social/components/social-post'
@@ -60,7 +61,7 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
 
 export function HomeFeedScreen() {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
   const {preferences} = useProductPreferences()
@@ -68,7 +69,6 @@ export function HomeFeedScreen() {
   const focusPreset = focus.preset ?? 'off'
   const focusActive = isFocusActive(focus)
   const homeBlocks = preferences.homeBlockIds
-  const showBlock = (id: string) => isBlockOn(homeBlocks, id)
   const focusMeta = FOCUS_PRESET_META[focusPreset]
   const focusBannerCopy = useMemo(() => {
     const sentences = [`${focusMeta.title} Focus is active.`]
@@ -149,137 +149,18 @@ export function HomeFeedScreen() {
               }
             }}
             ListHeaderComponent={
-              <View>
-                {!focus.hideNav && showBlock('presence') ? (
-                  <SectionEnter>
-                    <View style={{paddingVertical: spacing[3]}}>
-                      <PresenceStoriesRail compact showCaption />
-                    </View>
-                  </SectionEnter>
-                ) : null}
-
-                {showBlock('quick-actions') ? (
-                  <SectionEnter delay={50} from="right">
-                    <HomeQuickActions />
-                  </SectionEnter>
-                ) : null}
-
-                {focusActive && showBlock('focus-banner') ? (
-                  <AppPressable
-                    accessibilityLabel="Open Focus Mode"
-                    onPress={() => router.push('/product/focus' as Href)}
-                    style={[
-                      styles.focusBanner,
-                      {
-                        backgroundColor: colours.accentSubtle,
-                        borderColor: colours.accentBorder,
-                        borderRadius: radius.medium,
-                        marginHorizontal: spacing[4],
-                        marginBottom: spacing[2],
-                        paddingHorizontal: spacing[3],
-                        paddingVertical: spacing[2],
-                        gap: spacing[2],
-                      },
-                    ]}>
-                    <AppIcon name="contrast" colour={colours.accent} size={16} />
-                    <View style={[styles.focusCopy, {gap: spacing[1]}]}>
-                      <AppText variant="label" colour="accent">
-                        Focus mode is on
-                      </AppText>
-                      <AppText variant="caption" colour="textSecondary">
-                        {focusBannerCopy}
-                      </AppText>
-                    </View>
-                    <AppIcon name="chevronRight" colour={colours.accent} size={14} />
-                  </AppPressable>
-                ) : null}
-
-                {preferences.mergeFeedIds.length >= 2 && showBlock('merge-banner') ? (
-                  <AppPressable
-                    accessibilityLabel="Open Merge Feeds"
-                    onPress={() => router.push('/product/merge-feeds' as Href)}
-                    style={[
-                      styles.focusBanner,
-                      {
-                        backgroundColor: colours.surface,
-                        borderColor: colours.border,
-                        borderRadius: radius.medium,
-                        marginHorizontal: spacing[4],
-                        marginBottom: spacing[2],
-                        paddingHorizontal: spacing[3],
-                        paddingVertical: spacing[2],
-                        gap: spacing[2],
-                      },
-                    ]}>
-                    <AppIcon name="discover" colour={colours.accent} size={16} />
-                    <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
-                      Merge Feeds · {preferences.mergeFeedIds.length} sources (local Preview)
-                    </AppText>
-                    <AppIcon name="chevronRight" colour={colours.textTertiary} size={14} />
-                  </AppPressable>
-                ) : null}
-
-                {showBlock('mode-tabs') ? (
-                  <View
-                    accessibilityRole="tablist"
-                    style={[
-                      styles.modeRow,
-                      {
-                        borderBottomColor: colours.border,
-                        gap: spacing[2],
-                        paddingHorizontal: spacing[4],
-                        paddingTop: spacing[1],
-                      },
-                    ]}>
-                    {modeOrder.map(next => {
-                      const demoted = focus.quietFeed && next === 'For You'
-                      const selected = mode === next
-                      return (
-                        <AppPressable
-                          key={next}
-                          accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
-                          accessibilityRole="tab"
-                          accessibilityState={{selected: mode === next}}
-                          onPress={() => {
-                            void selectionHaptic()
-                            setMode(next)
-                          }}
-                          style={[
-                            styles.modeButton,
-                            {
-                              backgroundColor: selected ? colours.accentSubtle : 'transparent',
-                              borderColor: selected ? colours.accentBorder : 'transparent',
-                              borderRadius: radius.round,
-                              paddingHorizontal: spacing[3],
-                            },
-                            demoted ? {opacity: 0.55} : null,
-                          ]}>
-                          <AppText
-                            variant="label"
-                            style={{
-                              color:
-                                selected ? colours.accent : colours.textSecondary,
-                            }}>
-                            {next}
-                            {demoted ? ' · Quiet' : ''}
-                          </AppText>
-                          <View
-                            style={[
-                              styles.modeUnderline,
-                              {
-                                backgroundColor:
-                                  selected ? colours.accent : 'transparent',
-                                borderRadius: radius.round,
-                              },
-                            ]}
-                          />
-                        </AppPressable>
-                      )
-                    })}
-                  </View>
-                ) : null}
-                {showBlock('composer') ? <ComposerPrompt /> : null}
-              </View>
+              <HomeLayoutHeader
+                homeBlocks={homeBlocks}
+                focusActive={focusActive}
+                focusBannerCopy={focusBannerCopy}
+                focus={focus}
+                mode={mode}
+                modeOrder={modeOrder}
+                mergeCount={preferences.mergeFeedIds.length}
+                focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
+                mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
+                onModeChange={setMode}
+              />
             }
             ListEmptyComponent={
               feedQuery.isLoading ? (
@@ -313,6 +194,174 @@ export function HomeFeedScreen() {
           </View>
         </FeatureErrorBoundary>
       </ResponsiveContent>
+    </View>
+  )
+}
+
+function HomeLayoutHeader({
+  homeBlocks,
+  focusActive,
+  focusBannerCopy,
+  focus,
+  mode,
+  modeOrder,
+  mergeCount,
+  focusFeatureOn,
+  mergeFeatureOn,
+  onModeChange,
+}: {
+  homeBlocks: string[]
+  focusActive: boolean
+  focusBannerCopy: string
+  focus: ReturnType<typeof useProductPreferences>['preferences']['focus']
+  mode: FeedModeLabel
+  modeOrder: FeedModeLabel[]
+  mergeCount: number
+  focusFeatureOn: boolean
+  mergeFeatureOn: boolean
+  onModeChange: (mode: FeedModeLabel) => void
+}) {
+  const router = useRouter()
+  const {colours, radius, spacing} = useThemeTokens()
+  const showBlock = (id: string) => isBlockOn(homeBlocks, id)
+
+  const nodes: Record<string, ReactNode> = {
+    presence:
+      !focus.hideNav && showBlock('presence') ? (
+        <SectionEnter key="presence">
+          <View style={{paddingVertical: spacing[3]}}>
+            <PresenceStoriesRail compact showCaption />
+          </View>
+        </SectionEnter>
+      ) : null,
+    'quick-actions': showBlock('quick-actions') ? (
+      <SectionEnter key="quick-actions" delay={50} from="right">
+        <HomeQuickActions />
+      </SectionEnter>
+    ) : null,
+    'focus-banner':
+      focusActive && focusFeatureOn && showBlock('focus-banner') ? (
+        <AppPressable
+          key="focus-banner"
+          accessibilityLabel="Open Focus Mode"
+          onPress={() => router.push('/product/focus' as Href)}
+          style={[
+            styles.focusBanner,
+            {
+              backgroundColor: colours.accentSubtle,
+              borderColor: colours.accentBorder,
+              borderRadius: radius.medium,
+              marginHorizontal: spacing[4],
+              marginBottom: spacing[2],
+              paddingHorizontal: spacing[3],
+              paddingVertical: spacing[2],
+              gap: spacing[2],
+            },
+          ]}>
+          <AppIcon name="contrast" colour={colours.accent} size={16} />
+          <View style={[styles.focusCopy, {gap: spacing[1]}]}>
+            <AppText variant="label" colour="accent">
+              Focus mode is on
+            </AppText>
+            <AppText variant="caption" colour="textSecondary">
+              {focusBannerCopy}
+            </AppText>
+          </View>
+          <AppIcon name="chevronRight" colour={colours.accent} size={14} />
+        </AppPressable>
+      ) : null,
+    'merge-banner':
+      mergeCount >= 2 && mergeFeatureOn && showBlock('merge-banner') ? (
+        <AppPressable
+          key="merge-banner"
+          accessibilityLabel="Open Merge Feeds"
+          onPress={() => router.push('/product/merge-feeds' as Href)}
+          style={[
+            styles.focusBanner,
+            {
+              backgroundColor: colours.surface,
+              borderColor: colours.border,
+              borderRadius: radius.medium,
+              marginHorizontal: spacing[4],
+              marginBottom: spacing[2],
+              paddingHorizontal: spacing[3],
+              paddingVertical: spacing[2],
+              gap: spacing[2],
+            },
+          ]}>
+          <AppIcon name="discover" colour={colours.accent} size={16} />
+          <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
+            Merge Feeds · {mergeCount} sources (local Preview)
+          </AppText>
+          <AppIcon name="chevronRight" colour={colours.textTertiary} size={14} />
+        </AppPressable>
+      ) : null,
+    'mode-tabs': showBlock('mode-tabs') ? (
+      <View
+        key="mode-tabs"
+        accessibilityRole="tablist"
+        style={[
+          styles.modeRow,
+          {
+            borderBottomColor: colours.border,
+            gap: spacing[2],
+            paddingHorizontal: spacing[4],
+            paddingTop: spacing[1],
+          },
+        ]}>
+        {modeOrder.map(next => {
+          const demoted = focus.quietFeed && next === 'For You'
+          const selected = mode === next
+          return (
+            <AppPressable
+              key={next}
+              accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
+              accessibilityRole="tab"
+              accessibilityState={{selected: mode === next}}
+              onPress={() => {
+                void selectionHaptic()
+                onModeChange(next)
+              }}
+              style={[
+                styles.modeButton,
+                {
+                  backgroundColor: selected ? colours.accentSubtle : 'transparent',
+                  borderColor: selected ? colours.accentBorder : 'transparent',
+                  borderRadius: radius.round,
+                  paddingHorizontal: spacing[3],
+                },
+                demoted ? {opacity: 0.55} : null,
+              ]}>
+              <AppText
+                variant="label"
+                style={{
+                  color: selected ? colours.accent : colours.textSecondary,
+                }}>
+                {next}
+                {demoted ? ' · Quiet' : ''}
+              </AppText>
+              <View
+                style={[
+                  styles.modeUnderline,
+                  {
+                    backgroundColor: selected ? colours.accent : 'transparent',
+                    borderRadius: radius.round,
+                  },
+                ]}
+              />
+            </AppPressable>
+          )
+        })}
+      </View>
+    ) : null,
+    composer: showBlock('composer') ? <ComposerPrompt key="composer" /> : null,
+  }
+
+  return (
+    <View>
+      {homeBlocks.map(id => nodes[id] ?? null)}
+      {/* Required chrome fallback if sanitize failed oddly */}
+      {!homeBlocks.includes('mode-tabs') ? nodes['mode-tabs'] : null}
     </View>
   )
 }

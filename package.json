@@ -77,6 +77,7 @@
     "verify:phase3": "node scripts/verify-phase3-profile.mjs",
     "verify:phase4": "node scripts/verify-phase4-data-auth.mjs",
     "verify:phase4-5": "node scripts/verify-phase4-5-native-ui.mjs",
+    "verify:layout-preferences": "node scripts/verify-layout-preferences.mjs",
     "test:account-panel": "node scripts/test-account-panel-state.mjs",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean",

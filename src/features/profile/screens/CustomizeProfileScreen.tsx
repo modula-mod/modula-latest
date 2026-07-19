@@ -6,6 +6,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {profileTabIdsFromPresentation} from '@/features/product/data/profileTabsSync'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {coreProfileTabs} from '@/features/profile/data/coreProfileTabs'
 import {
   DEFAULT_PROFILE_PRESENTATION,
@@ -55,6 +57,7 @@ export function CustomizeProfileScreen() {
   const router = useRouter()
   const {presentation} = useProfile()
   const {setProfilePresentation} = useProfileActions()
+  const {update: updateProductPrefs} = useProductPreferences()
   const {colours, spacing} = useThemeTokens()
   const [draft, setDraft] = useState<ProfilePresentationPreferences>(presentation)
   const initial = useMemo(() => JSON.stringify(presentation), [presentation])
@@ -71,13 +74,22 @@ export function CustomizeProfileScreen() {
     ])
   }
 
+  const persistPresentation = (next: ProfilePresentationPreferences) => {
+    const normalised = normalisePresentation(next)
+    setProfilePresentation(normalised)
+    void updateProductPrefs({
+      profileTabIds: profileTabIdsFromPresentation(normalised),
+    })
+    return normalised
+  }
+
   const save = () => {
-    setProfilePresentation(normalisePresentation(draft))
+    persistPresentation(draft)
     router.back()
   }
 
   const preview = () => {
-    setProfilePresentation(normalisePresentation(draft))
+    persistPresentation(draft)
     router.push('/profile/preview' as Href)
   }
 

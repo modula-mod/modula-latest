@@ -1,10 +1,10 @@
 import {usePathname, useRouter, useSegments, type Href} from 'expo-router'
 import type {ComponentType} from 'react'
 
+import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
-import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
 import {
   hrefForShellTab,
   resolveShellTabRouteName,
@@ -53,10 +53,9 @@ export function PersistentShellTabBar() {
   if (shouldHideShellTabBar(segments)) return null
 
   const selectedRouteName = resolveShellTabRouteName(pathname)
-  const enabledIds = new Set(preferences.tabBarIds)
-  const routes = MODULA_TABS.filter(
-    tab => enabledIds.has(tab.id) || tab.routeName === selectedRouteName,
-  ).map(tab => ({
+  const routes = resolveVisibleModulaTabs(preferences.tabBarIds, {
+    alwaysIncludeRouteName: selectedRouteName,
+  }).map(tab => ({
     key: tab.routeName,
     name: tab.routeName,
   }))

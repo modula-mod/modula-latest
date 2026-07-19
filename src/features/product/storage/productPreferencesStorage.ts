@@ -266,3 +266,14 @@ export async function patchProductPreferences(
   await saveProductPreferences(next)
   return next
 }
+
+/** Wipe craft prefs back to defaults (Customize hub reset). */
+export async function resetProductPreferences(): Promise<ProductPreferences> {
+  await saveProductPreferences(DEFAULT_PRODUCT_PREFERENCES)
+  return DEFAULT_PRODUCT_PREFERENCES
+}
+
+/** Exposed for verify scripts / unit-style checks without AsyncStorage. */
+export function mergeProductPreferencesForTest(raw: unknown): ProductPreferences {
+  return mergePreferences(raw)
+}

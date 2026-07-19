@@ -15,7 +15,11 @@ import {Pill} from '@/components/primitives/Pill'
 import {InspireNextList} from '@/features/discover/components/InspireNextList'
 import {LivePresenceRail} from '@/features/discover/components/LivePresenceRail'
 import {useDiscoverQuery} from '@/features/discover/data'
-import {isBlockOn} from '@/features/product/data/layoutBlocks'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {
+  DEFAULT_DISCOVER_BLOCK_IDS,
+  isBlockOn,
+} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
@@ -41,13 +45,15 @@ export function DiscoverScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
-  const {preferences} = useProductPreferences()
+  const {preferences, update} = useProductPreferences()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
   const q = query.trim().toLowerCase()
   const result = discoverQuery.data
-  const showBlock = (id: string) => isBlockOn(preferences.discoverBlockIds, id)
+  const discoverBlocks = preferences.discoverBlockIds
+  const showBlock = (id: string) => isBlockOn(discoverBlocks, id)
+  const reelsFeatureOn = isFeatureEnabled(preferences, 'reels')
 
   const filtered = useMemo(() => filterDiscover(result, q), [result, q])
   const hasResults =
@@ -55,6 +61,52 @@ export function DiscoverScreen() {
     filtered.featuredModules.length > 0 ||
     filtered.trendingTopics.length > 0 ||
     filtered.media.length > 0
+
+  const visibleSectionIds = useMemo(() => {
+    return discoverBlocks.filter(id => {
+      if (!showBlock(id)) return false
+      if (id === 'live') return category === 'For You'
+      if (id === 'reels') {
+        return (
+          reelsFeatureOn &&
+          (category === 'For You' || category === 'Media') &&
+          filtered.reels.length > 0
+        )
+      }
+      if (id === 'people') {
+        return (
+          (category === 'For You' || category === 'People') &&
+          filtered.suggestedProfiles.length > 0
+        )
+      }
+      if (id === 'inspire') return category === 'For You'
+      if (id === 'topics') {
+        return (
+          (category === 'For You' || category === 'Communities') &&
+          filtered.trendingTopics.length > 0
+        )
+      }
+      if (id === 'communities') {
+        return category === 'For You' || category === 'Communities'
+      }
+      if (id === 'modules') {
+        return (
+          (category === 'For You' || category === 'Marketplace') &&
+          filtered.featuredModules.length > 0
+        )
+      }
+      if (id === 'media') {
+        return (
+          (category === 'For You' || category === 'Media') && filtered.media.length > 0
+        )
+      }
+      return false
+    })
+    // showBlock closes over discoverBlocks
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, discoverBlocks, filtered, reelsFeatureOn])
+
+  const layoutEmpty = hasResults && visibleSectionIds.length === 0
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -209,41 +261,78 @@ export function DiscoverScreen() {
             <InitialLoadingState label="Loading discovery" />
           ) : discoverQuery.isError ? (
             <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
+          ) : layoutEmpty ? (
+            <EmptyState
+              icon="discover"
+              title="Discover layout is empty"
+              description="Every Discover section is turned off for this category. Restore defaults or open the layout studio."
+              action={
+                <View style={{gap: spacing[2]}}>
+                  <Pill
+                    label="Restore Discover layout"
+                    selected
+                    onPress={() => void update({discoverBlockIds: [...DEFAULT_DISCOVER_BLOCK_IDS]})}
+                  />
+                  <Pill
+                    label="Customize layout"
+                    onPress={() => router.push('/product/layout-discover' as Href)}
+                  />
+                </View>
+              }
+            />
           ) : hasResults ? (
             <>
-              {category === 'For You' && showBlock('live') ? <LivePresenceRail /> : null}
-              {(category === 'For You' || category === 'Media') && showBlock('reels') ? (
-                <SectionEnter delay={100}>
-                  <ReelsPreviewRail result={filtered} />
-                </SectionEnter>
-              ) : null}
-              {(category === 'For You' || category === 'People') && showBlock('people') ? (
-                <SectionEnter delay={120}>
-                  <SuggestedPeople people={filtered.suggestedProfiles} />
-                </SectionEnter>
-              ) : null}
-              {category === 'For You' && showBlock('inspire') ? <InspireNextList /> : null}
-              {(category === 'For You' || category === 'Communities') && showBlock('topics') ? (
-                <SectionEnter delay={160}>
-                  <TrendingTopics topics={filtered.trendingTopics} />
-                </SectionEnter>
-              ) : null}
-              {(category === 'For You' || category === 'Communities') &&
-              showBlock('communities') ? (
-                <SectionEnter delay={180}>
-                  <CommunitiesRail />
-                </SectionEnter>
-              ) : null}
-              {(category === 'For You' || category === 'Marketplace') && showBlock('modules') ? (
-                <SectionEnter delay={200}>
-                  <FeaturedModules modules={filtered.featuredModules} />
-                </SectionEnter>
-              ) : null}
-              {(category === 'For You' || category === 'Media') && showBlock('media') ? (
-                <SectionEnter delay={220}>
-                  <MediaGrid result={filtered} />
-                </SectionEnter>
-              ) : null}
+              {visibleSectionIds.map((id, index) => {
+                if (id === 'live') {
+                  return <LivePresenceRail key={id} />
+                }
+                if (id === 'reels') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <ReelsPreviewRail result={filtered} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'people') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <SuggestedPeople people={filtered.suggestedProfiles} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'inspire') {
+                  return <InspireNextList key={id} />
+                }
+                if (id === 'topics') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <TrendingTopics topics={filtered.trendingTopics} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'communities') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <CommunitiesRail />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'modules') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <FeaturedModules modules={filtered.featuredModules} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'media') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <MediaGrid result={filtered} />
+                    </SectionEnter>
+                  )
+                }
+                return null
+              })}
               {category === 'Marketplace' ? (
                 <AppPressable
                   accessibilityLabel="Browse Marketplace"

@@ -7,12 +7,20 @@ import {AppText} from '@/components/primitives/AppText'
 import {BlockStudioList} from '@/features/product/components/BlockStudioList'
 import {
   ACTIVITY_LAYOUT_BLOCKS,
+  DEFAULT_ACTIVITY_BLOCK_IDS,
+  DEFAULT_DISCOVER_BLOCK_IDS,
+  DEFAULT_HOME_BLOCK_IDS,
+  DEFAULT_PROFILE_TAB_IDS,
+  DEFAULT_TAB_BAR_IDS,
   DISCOVER_LAYOUT_BLOCKS,
   HOME_LAYOUT_BLOCKS,
   PROFILE_LAYOUT_BLOCKS,
   TAB_LAYOUT_BLOCKS,
 } from '@/features/product/data/layoutBlocks'
+import {presentationFromProfileTabIds} from '@/features/product/data/profileTabsSync'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {useProfile} from '@/features/profile/runtime/useProfile'
+import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -25,6 +33,8 @@ function StudioShell({
   children,
   footerHref,
   footerLabel,
+  onResetSlot,
+  resetLabel,
 }: {
   title: string
   eyebrow: string
@@ -32,6 +42,8 @@ function StudioShell({
   children: ReactNode
   footerHref?: Href
   footerLabel?: string
+  onResetSlot?: () => void
+  resetLabel?: string
 }) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
@@ -60,6 +72,11 @@ function StudioShell({
           {footerHref && footerLabel ? (
             <AppButton onPress={() => router.push(footerHref)}>{footerLabel}</AppButton>
           ) : null}
+          {onResetSlot ? (
+            <AppButton variant="secondary" onPress={onResetSlot}>
+              {resetLabel ?? 'Reset this surface'}
+            </AppButton>
+          ) : null}
           <AppButton variant="secondary" onPress={() => router.push('/product/customize' as Href)}>
             Back to Customize hub
           </AppButton>
@@ -75,9 +92,11 @@ export function HomeLayoutStudioScreen() {
     <StudioShell
       title="Home layout"
       eyebrow="LAYOUT STUDIO · LIVE"
-      body="Toggle and reorder Home header blocks. Changes apply immediately on the Home feed."
+      body="Toggle and reorder Home header blocks. Order and visibility apply immediately on the Home feed."
       footerHref={'/' as Href}
-      footerLabel="Open Home">
+      footerLabel="Open Home"
+      onResetSlot={() => void update({homeBlockIds: [...DEFAULT_HOME_BLOCK_IDS]})}
+      resetLabel="Reset Home layout">
       <BlockStudioList
         catalog={HOME_LAYOUT_BLOCKS}
         selectedIds={preferences.homeBlockIds}
@@ -93,9 +112,11 @@ export function DiscoverLayoutStudioScreen() {
     <StudioShell
       title="Discover layout"
       eyebrow="LAYOUT STUDIO · LIVE"
-      body="Choose which Discover sections appear under For You and related categories."
+      body="Choose which Discover sections appear under For You and related categories. Order is respected."
       footerHref={'/discover' as Href}
-      footerLabel="Open Discover">
+      footerLabel="Open Discover"
+      onResetSlot={() => void update({discoverBlockIds: [...DEFAULT_DISCOVER_BLOCK_IDS]})}
+      resetLabel="Reset Discover layout">
       <BlockStudioList
         catalog={DISCOVER_LAYOUT_BLOCKS}
         selectedIds={preferences.discoverBlockIds}
@@ -111,9 +132,11 @@ export function TabBarLayoutStudioScreen() {
     <StudioShell
       title="Tab bar"
       eyebrow="LAYOUT STUDIO · LIVE"
-      body="Hide optional primary tabs. Home and Profile stay required so the shell always has an anchor."
+      body="Hide or reorder optional primary tabs. Home and Profile stay required so the shell always has an anchor."
       footerHref={'/' as Href}
-      footerLabel="Return to tabs">
+      footerLabel="Return to tabs"
+      onResetSlot={() => void update({tabBarIds: [...DEFAULT_TAB_BAR_IDS]})}
+      resetLabel="Reset tab bar">
       <BlockStudioList
         catalog={TAB_LAYOUT_BLOCKS}
         selectedIds={preferences.tabBarIds}
@@ -131,7 +154,9 @@ export function ActivityLayoutStudioScreen() {
       eyebrow="LAYOUT STUDIO · LIVE"
       body="Control digest strip, filter row chrome, unread wash, and enter motion on Activity."
       footerHref={'/activity' as Href}
-      footerLabel="Open Activity">
+      footerLabel="Open Activity"
+      onResetSlot={() => void update({activityBlockIds: [...DEFAULT_ACTIVITY_BLOCK_IDS]})}
+      resetLabel="Reset Activity prefs">
       <BlockStudioList
         catalog={ACTIVITY_LAYOUT_BLOCKS}
         selectedIds={preferences.activityBlockIds}
@@ -143,17 +168,28 @@ export function ActivityLayoutStudioScreen() {
 
 export function ProfileLayoutStudioScreen() {
   const {preferences, update} = useProductPreferences()
+  const {presentation} = useProfile()
+  const {setProfilePresentation} = useProfileActions()
   return (
     <StudioShell
       title="Profile tabs"
-      eyebrow="LAYOUT STUDIO · PREVIEW"
-      body="Preferred profile tab slots for this device. Signed-in Customize Profile remains the live presentation editor."
+      eyebrow="LAYOUT STUDIO · LIVE"
+      body="Profile tab slots sync with Customize Profile presentation on this device."
       footerHref={'/profile/customize' as Href}
-      footerLabel="Open Customize Profile">
+      footerLabel="Open Customize Profile"
+      onResetSlot={() => {
+        const profileTabIds = [...DEFAULT_PROFILE_TAB_IDS]
+        void update({profileTabIds})
+        setProfilePresentation(presentationFromProfileTabIds(profileTabIds, presentation))
+      }}
+      resetLabel="Reset profile tabs">
       <BlockStudioList
         catalog={PROFILE_LAYOUT_BLOCKS}
         selectedIds={preferences.profileTabIds}
-        onChange={profileTabIds => void update({profileTabIds})}
+        onChange={profileTabIds => {
+          void update({profileTabIds})
+          setProfilePresentation(presentationFromProfileTabIds(profileTabIds, presentation))
+        }}
       />
     </StudioShell>
   )

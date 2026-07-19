@@ -1,10 +1,13 @@
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {selectionHaptic} from '@/lib/haptics'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -172,9 +175,9 @@ const SURFACES: HubLink[] = [
 ]
 
 export function CustomizationHubScreen() {
-  const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
+  const {reset, ready} = useProductPreferences()
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -192,10 +195,22 @@ export function CustomizationHubScreen() {
               Layout studios control real Home, Discover, Activity, and tab chrome. Extra surfaces
               are honest Previews — toggle them on when you want them later.
             </AppText>
+            <AppText variant="caption" colour="textTertiary">
+              {ready ? 'Preferences loaded on this device.' : 'Loading preferences…'}
+            </AppText>
           </View>
 
           <Section title="Layout studios" items={STUDIOS} />
           <Section title="Optional surfaces" items={SURFACES} />
+
+          <AppButton
+            variant="secondary"
+            onPress={() => {
+              void selectionHaptic()
+              void reset()
+            }}>
+            Reset all customize prefs
+          </AppButton>
         </ScrollView>
       </ResponsiveContent>
     </View>
