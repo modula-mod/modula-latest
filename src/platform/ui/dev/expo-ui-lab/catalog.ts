@@ -46,8 +46,8 @@ export const EXPO_UI_LAB_SECTIONS: ExpoUiLabSectionMeta[] = [
     title: 'Lists & empty states',
     summary: 'Segmented filter, toggle rows, and ContentUnavailableView empty state.',
     expoComponents: ['Picker', 'Toggle', 'ContentUnavailableView', 'VStack', 'HStack'],
-    modulaWrappers: ['SystemSwitch', 'QueryErrorState'],
-    suggestedContexts: ['Feed filters', 'Saved / drafts empty', 'Moderation lists'],
+    modulaWrappers: ['ModulaSegmentedPicker', 'SystemSwitch', 'QueryErrorState'],
+    suggestedContexts: ['Feed filters', 'Home quick actions', 'Saved / drafts empty'],
     status: 'candidate',
   },
   {

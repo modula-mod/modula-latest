@@ -34,6 +34,7 @@ import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -380,65 +381,36 @@ function HomeLayoutHeader({
     'mode-tabs': showBlock('mode-tabs') ? (
       <ShellChromeObscureView key="mode-tabs" direction="up">
         <View
-          accessibilityRole="tablist"
           style={[
             styles.modeRow,
             {
               borderBottomColor: colours.border,
-              gap: spacing[2],
               paddingHorizontal: spacing[4],
               paddingTop: spacing[1],
+              paddingBottom: spacing[2],
             },
           ]}>
-          {modeOrder.map(next => {
-            const demoted = focus.quietFeed && next === 'For You'
-            const selected = mode === next
-            return (
-              <AppPressable
-                key={next}
-                accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
-                accessibilityRole="tab"
-                accessibilityState={{selected: mode === next}}
-                onPress={() => {
-                  void selectionHaptic()
-                  onModeChange(next)
-                }}
-                style={[
-                  styles.modeButton,
-                  {
-                    backgroundColor: selected
-                      ? colours.accentSubtle
-                      : 'transparent',
-                    borderColor: selected
-                      ? colours.accentBorder
-                      : 'transparent',
-                    borderRadius: radius.round,
-                    paddingHorizontal: spacing[3],
-                  },
-                  demoted ? {opacity: 0.55} : null,
-                ]}>
-                <AppText
-                  variant="label"
-                  style={{
-                    color: selected ? colours.accent : colours.textSecondary,
-                  }}>
-                  {next}
-                  {demoted ? ' · Quiet' : ''}
-                </AppText>
-                <View
-                  style={[
-                    styles.modeUnderline,
-                    {
-                      backgroundColor: selected
-                        ? colours.accent
-                        : 'transparent',
-                      borderRadius: radius.round,
-                    },
-                  ]}
-                />
-              </AppPressable>
-            )
-          })}
+          <ModulaSegmentedPicker
+            accessibilityLabel="Feed mode"
+            options={modeOrder.map(next => ({
+              value: next,
+              label:
+                focus.quietFeed && next === 'For You'
+                  ? 'For You · Quiet'
+                  : next,
+            }))}
+            value={mode}
+            onValueChange={next => {
+              if (
+                next === 'Following' ||
+                next === 'For You' ||
+                next === 'Modules'
+              ) {
+                void selectionHaptic()
+                onModeChange(next)
+              }
+            }}
+          />
         </View>
       </ShellChromeObscureView>
     ) : null,
@@ -529,22 +501,10 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
-  modeButton: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    gap: 5,
-    justifyContent: 'center',
-    minHeight: 42,
-  },
   modeRow: {
+    alignSelf: 'stretch',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    paddingBottom: 8,
-  },
-  modeUnderline: {
-    height: 3,
-    width: 28,
+    width: '100%',
   },
   prompt: {
     alignItems: 'center',
