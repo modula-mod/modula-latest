@@ -1,4 +1,9 @@
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -9,6 +14,7 @@ export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmente
 
 /**
  * Web / Android fallback — theme-aware segmented row, optionally scrollable.
+ * Uses RN pressables so each segment always receives taps.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -49,7 +55,7 @@ export function ModulaSegmentedPicker({
         return (
           <AppPressable
             key={option.value}
-            accessibilityRole="tab"
+            accessibilityRole="button"
             accessibilityState={{selected, disabled: !!option.disabled}}
             accessibilityLabel={option.label}
             disabled={option.disabled}
@@ -89,7 +95,9 @@ export function ModulaSegmentedPicker({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      decelerationRate="fast">
+      decelerationRate="fast"
+      keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled>
       {row}
     </ScrollView>
   )
