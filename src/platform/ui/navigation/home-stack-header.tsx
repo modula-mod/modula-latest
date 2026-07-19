@@ -10,6 +10,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {
+  HEADER_ICON_PAIR_GAP,
   plainHeaderCustomItem,
   plainHeaderSpacing,
   supportsPlainHeaderItems,
@@ -124,10 +125,10 @@ export function HomeHeaderMessages() {
  */
 export function HomeHeaderRight() {
   return (
-    <>
+    <View style={styles.fallbackPair}>
       <HomeHeaderCreate />
       <HomeHeaderMessages />
-    </>
+    </View>
   )
 }
 
@@ -147,6 +148,11 @@ export function homeHeaderRightItems() {
 }
 
 const styles = StyleSheet.create({
+  fallbackPair: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: HEADER_ICON_PAIR_GAP,
+  },
   titleWrap: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -55,7 +55,12 @@ function ProfileOverflowMenu() {
 /** Android / web fallback — one slot (may share a capsule on older paths). */
 export function ProfileHeaderRight() {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: HEADER_ICON_PAIR_GAP,
+      }}>
       <ProfileShareMenu />
       <ProfileOverflowMenu />
     </View>
