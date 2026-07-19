@@ -53,18 +53,24 @@ export function ModulaIconButton({
   const styleName =
     chrome === 'plain' ? 'plain' : glassOk ? 'glass' : 'bordered'
 
+  // Plain = glyph only (no filled disc). Glass/bordered keep circular chrome.
+  const modifiers =
+    chrome === 'plain'
+      ? [buttonStyle('plain'), labelStyle('iconOnly'), controlSize('regular')]
+      : [
+          buttonStyle(styleName),
+          labelStyle('iconOnly'),
+          buttonBorderShape('circle'),
+          controlSize('regular'),
+        ]
+
   return (
     <Host matchContents style={style}>
       <Button
         label={accessibilityLabel}
         systemImage={systemImage as never}
         onPress={disabled ? undefined : onPress}
-        modifiers={[
-          buttonStyle(styleName),
-          labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
-          controlSize('regular'),
-        ]}
+        modifiers={modifiers}
         testID={testID}
       />
     </Host>

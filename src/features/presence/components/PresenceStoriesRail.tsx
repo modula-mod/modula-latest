@@ -1,16 +1,14 @@
 import {useRouter, type Href} from 'expo-router'
-import {useMemo, useRef, useState} from 'react'
+import {useLayoutEffect, useMemo, useRef, useState} from 'react'
 import {
   Pressable,
   StyleSheet,
   View,
-  useWindowDimensions,
   type LayoutChangeEvent,
 } from 'react-native'
 import Animated, {
   Extrapolation,
   FadeIn,
-  FadeInDown,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -45,9 +43,13 @@ type PresenceStoriesRailProps = {
   showCaption?: boolean
 }
 
+/** Focus line sits left of true center so the dial opens more on the left. */
+const FOCUS_BIAS = 52
+
 /**
  * Home Stories dial — open carousel (no card).
  * First story starts focused; dial only rotates to the right (scroll ≥ 0).
+ * Waits for measured width before mounting the scroller so first paint matches.
  */
 export function PresenceStoriesRail({
   people = PRESENCE_RAIL_SEED,
@@ -57,14 +59,16 @@ export function PresenceStoriesRail({
   const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const router = useRouter()
-  const {width: windowWidth} = useWindowDimensions()
-  const [stageWidth, setStageWidth] = useState(windowWidth)
+  const [stageWidth, setStageWidth] = useState(0)
   const scrollRef = useRef<Animated.ScrollView>(null)
-  // Start at 0 so focus scales match the first story on first paint.
   const scrollX = useSharedValue(0)
+  const ready = stageWidth > 0
 
-  /** Center the focused slot; right pad lets the last story reach center. */
-  const edgePad = Math.max(0, (stageWidth - ITEM_SLOT) / 2)
+  // Focus slot left-of-center; right pad still lets the last story reach focus.
+  const padLeft = ready
+    ? Math.max(spacing[4], (stageWidth - ITEM_SLOT) / 2 - FOCUS_BIAS)
+    : 0
+  const padRight = ready ? Math.max(0, (stageWidth - ITEM_SLOT) / 2) : 0
   const snapOffsets = useMemo(
     () => people.map((_, index) => index * ITEM_SLOT),
     [people],
@@ -72,17 +76,23 @@ export function PresenceStoriesRail({
 
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
-      // Clamp — dial does not rotate left of the first story.
       scrollX.value = Math.max(0, event.contentOffset.x)
     },
   })
 
   const onStageLayout = (event: LayoutChangeEvent) => {
-    const next = event.nativeEvent.layout.width
-    if (next > 0 && Math.abs(next - stageWidth) > 1) {
+    const next = Math.round(event.nativeEvent.layout.width)
+    if (next > 0 && next !== stageWidth) {
       setStageWidth(next)
     }
   }
+
+  // After measure, force offset 0 so focus math matches the first story immediately.
+  useLayoutEffect(() => {
+    if (!ready) return
+    scrollX.value = 0
+    scrollRef.current?.scrollTo({x: 0, y: 0, animated: false})
+  }, [ready, padLeft, scrollX])
 
   const snapToIndex = (index: number, animated: boolean) => {
     scrollRef.current?.scrollTo({
@@ -91,9 +101,11 @@ export function PresenceStoriesRail({
     })
   }
 
+  const stageHeight = compact ? 168 : 196
+
   return (
     <Animated.View
-      entering={reduceMotion ? undefined : FadeIn.duration(220)}
+      entering={reduceMotion ? undefined : FadeIn.duration(180)}
       style={[styles.root, compact && styles.rootCompact, {gap: spacing[1]}]}>
       {showCaption ? (
         <View
@@ -109,43 +121,44 @@ export function PresenceStoriesRail({
 
       <View
         onLayout={onStageLayout}
-        style={[styles.stage, compact ? styles.stageCompact : styles.stageTall]}>
-        <Animated.ScrollView
-          ref={scrollRef}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          // First story starts centered; only scroll right from here.
-          contentOffset={{x: 0, y: 0}}
-          snapToOffsets={snapOffsets}
-          snapToAlignment="start"
-          disableIntervalMomentum
-          decelerationRate={0.88}
-          bounces
-          // Resist overscroll on the left (start of dial).
-          alwaysBounceHorizontal={false}
-          contentContainerStyle={{
-            paddingLeft: edgePad,
-            paddingRight: edgePad,
-            paddingTop: 6,
-            alignItems: 'flex-start',
-            minHeight: compact ? 168 : 196,
-          }}
-          onScroll={onScroll}
-          scrollEventThrottle={1}>
-          {people.map((person, index) => (
-            <StoryNode
-              key={person.id}
-              person={person}
-              index={index}
-              scrollX={scrollX}
-              reduceMotion={reduceMotion}
-              onPress={() => {
-                snapToIndex(index, !reduceMotion)
-                router.push('/product/presence' as Href)
-              }}
-            />
-          ))}
-        </Animated.ScrollView>
+        style={[styles.stage, {minHeight: stageHeight}]}>
+        {ready ? (
+          <Animated.ScrollView
+            ref={scrollRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToOffsets={snapOffsets}
+            snapToAlignment="start"
+            disableIntervalMomentum
+            decelerationRate={0.88}
+            bounces
+            alwaysBounceHorizontal={false}
+            contentContainerStyle={{
+              paddingLeft: padLeft,
+              paddingRight: padRight,
+              paddingTop: 6,
+              alignItems: 'flex-start',
+              minHeight: stageHeight,
+            }}
+            onScroll={onScroll}
+            scrollEventThrottle={1}>
+            {people.map((person, index) => (
+              <StoryNode
+                key={person.id}
+                person={person}
+                index={index}
+                scrollX={scrollX}
+                reduceMotion={reduceMotion}
+                onPress={() => {
+                  snapToIndex(index, !reduceMotion)
+                  router.push('/product/presence' as Href)
+                }}
+              />
+            ))}
+          </Animated.ScrollView>
+        ) : (
+          <View style={{height: stageHeight}} />
+        )}
       </View>
     </Animated.View>
   )
@@ -350,13 +363,7 @@ function StoryNode({
   const plusBg = colours.text
 
   return (
-    <Animated.View
-      entering={
-        reduceMotion
-          ? undefined
-          : FadeInDown.delay(index * 36).springify().damping(18)
-      }
-      style={[styles.slot, animatedStyle]}>
+    <Animated.View style={[styles.slot, animatedStyle]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={
@@ -506,13 +513,5 @@ const styles = StyleSheet.create({
   },
   stage: {
     overflow: 'visible',
-  },
-  stageCompact: {
-    minHeight: 168,
-    paddingBottom: 2,
-  },
-  stageTall: {
-    minHeight: 196,
-    paddingBottom: 4,
   },
 })
