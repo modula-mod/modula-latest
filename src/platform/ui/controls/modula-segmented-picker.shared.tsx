@@ -48,13 +48,10 @@ export function ModulaSegmentedPicker({
 
   const segments = options.map(option => {
     const selected = option.value === value
-    const selectedFill = glass
-      ? isDark
-        ? 'rgba(255,255,255,0.14)'
-        : colours.surface
-      : selected
-        ? colours.surface
-        : 'transparent'
+    const selectedFill = isDark
+      ? 'rgba(255,255,255,0.14)'
+      : colours.surface
+    const showThumb = selected && !plain
 
     return (
       <AppPressable
@@ -70,16 +67,26 @@ export function ModulaSegmentedPicker({
             opacity: option.disabled ? 0.45 : 1,
             paddingHorizontal: spacing[3],
             paddingVertical: spacing[2],
-            minWidth: scrollable && !plain ? segmentMinWidth - 8 : undefined,
+            minWidth: scrollable ? segmentMinWidth - 8 : undefined,
             flex: scrollable ? undefined : 1,
             borderRadius: radius.round,
-            backgroundColor: plain || !selected ? 'transparent' : selectedFill,
-            ...(plain || !selected
-              ? null
-              : {
+            // Scrollable menu (plain): muted selected chip. Glass/segmented: raised thumb.
+            backgroundColor: !selected
+              ? 'transparent'
+              : plain
+                ? colours.surfaceMuted
+                : selectedFill,
+            ...(showThumb
+              ? {
                   borderWidth: StyleSheet.hairlineWidth,
                   borderColor: colours.border,
-                }),
+                }
+              : plain && selected
+                ? {
+                    borderWidth: StyleSheet.hairlineWidth,
+                    borderColor: colours.border,
+                  }
+                : null),
           },
         ]}>
         <AppText

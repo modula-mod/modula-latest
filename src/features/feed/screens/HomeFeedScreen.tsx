@@ -427,7 +427,9 @@ function HomeLayoutHeader({
             inlineModeStyle,
           ]}>
           <ModulaSegmentedPicker
-            appearance="glass"
+            appearance="plain"
+            scrollable
+            segmentMinWidth={96}
             accessibilityLabel="Feed mode"
             options={modeOrder.map(next => ({
               value: next,

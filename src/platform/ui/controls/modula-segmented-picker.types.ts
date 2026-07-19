@@ -18,13 +18,13 @@ export type ModulaSegmentedPickerProps = {
   testID?: string
   /**
    * `segmented` — classic system segmented control (UISegmentedControl on iOS).
-   * `glass` — liquid-glass wrapper; selected thumb is a plain token capsule.
-   * `plain` — label tabs only, no chrome around the menu.
+   * `glass` — dense liquid-glass wrapper (sticky chrome); plain selected thumb.
+   * `plain` — label / chip tabs (use with `scrollable` for a horizontal menu).
    */
   appearance?: ModulaSegmentedAppearance
   /**
-   * Horizontal overflow mode. Uses a native SwiftUI ScrollView of buttons —
-   * UISegmentedControl itself cannot scroll (it always compresses).
+   * Horizontal scrollable menu. Prefer with `appearance="plain"`.
+   * (UISegmentedControl itself cannot scroll.)
    */
   scrollable?: boolean
   /** Min width per scrollable segment button (default 86). */

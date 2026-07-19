@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet} from 'react-native'
 import Animated, {
   Easing,
   Extrapolation,
@@ -72,12 +72,11 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {colours, radius, spacing, scheme} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
-  const isDark = scheme === 'dark'
 
   /** 0 = free / inline, 1 = stuck under nav. Spring-smoothed. */
   const handoff = useSharedValue(0)
@@ -150,34 +149,22 @@ export function HomeStickyFeedModes({
           },
           shellStyle,
         ]}>
-        <View
-          style={[
-            styles.stickyTrack,
-            {
-              borderRadius: radius.round,
-              backgroundColor: isDark
-                ? 'rgba(18, 24, 28, 0.88)'
-                : colours.surfaceMuted,
-              borderColor: colours.border,
-            },
-          ]}>
-          <ModulaSegmentedPicker
-            appearance="segmented"
-            accessibilityLabel="Feed mode"
-            options={options}
-            value={mode}
-            onValueChange={next => {
-              if (
-                next === 'Following' ||
-                next === 'For You' ||
-                next === 'Modules'
-              ) {
-                void selectionHaptic()
-                onModeChange(next)
-              }
-            }}
-          />
-        </View>
+        <ModulaSegmentedPicker
+          appearance="glass"
+          accessibilityLabel="Feed mode"
+          options={options}
+          value={mode}
+          onValueChange={next => {
+            if (
+              next === 'Following' ||
+              next === 'For You' ||
+              next === 'Modules'
+            ) {
+              void selectionHaptic()
+              onModeChange(next)
+            }
+          }}
+        />
       </Animated.View>
     </Animated.View>
   )
@@ -288,10 +275,5 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
     right: 0,
-  },
-  stickyTrack: {
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-    padding: 2,
   },
 })
