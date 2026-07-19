@@ -22,13 +22,12 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated'
 import Svg, {
-  Circle,
   Defs,
   LinearGradient as SvgLinearGradient,
+  Path,
   Stop,
 } from 'react-native-svg'
 
-import {ProgressiveBlurEdges} from '@/components/materials/ProgressiveBlurEdges'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {
@@ -38,10 +37,9 @@ import {
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const ITEM_SLOT = 96
-const CENTER_SIZE = 118
-const SIDE_SIZE = 72
-const DIAL_STROKE = 3.5
+const ITEM_SLOT = 100
+const CENTER_SIZE = 124
+const SIDE_SIZE = 78
 
 type PresenceStoriesRailProps = {
   people?: PresenceRailPerson[]
@@ -50,15 +48,15 @@ type PresenceStoriesRailProps = {
 }
 
 /**
- * Home stories rail — focus-scaled carousel with dial rings (full circle stroke).
- * Copy is Stories; route still opens the Presence preview surface.
+ * Home Stories rail — open (no card), focus-scaled carousel.
+ * Side nodes: thick gradient dial arc. Center: thin full ring + Add Story pill.
  */
 export function PresenceStoriesRail({
   people = PRESENCE_RAIL_SEED,
   compact = false,
   showCaption = true,
 }: PresenceStoriesRailProps) {
-  const {colours, spacing, scheme} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const router = useRouter()
   const {width: windowWidth} = useWindowDimensions()
@@ -98,7 +96,7 @@ export function PresenceStoriesRail({
   return (
     <Animated.View
       entering={reduceMotion ? undefined : FadeIn.duration(280)}
-      style={[styles.root, compact && styles.rootCompact, {gap: spacing[2]}]}>
+      style={[styles.root, compact && styles.rootCompact, {gap: spacing[1]}]}>
       {showCaption ? (
         <View
           style={[
@@ -108,27 +106,13 @@ export function PresenceStoriesRail({
           <AppText variant="caption" colour="textSecondary">
             STORIES
           </AppText>
-          <AppText variant="caption" colour="textTertiary">
-            Dial rings · Preview
-          </AppText>
         </View>
       ) : null}
 
+      {/* Open stage — no card / border / fill. */}
       <View
         onLayout={onStageLayout}
-        style={[
-          styles.stage,
-          compact ? styles.stageCompact : styles.stageTall,
-          {
-            backgroundColor:
-              scheme === 'dark'
-                ? 'rgba(10,16,18,0.55)'
-                : 'rgba(243,247,248,0.78)',
-            borderColor: colours.border,
-          },
-        ]}>
-        <ProgressiveBlurEdges edgeHeight={compact ? 40 : 56} />
-
+        style={[styles.stage, compact ? styles.stageCompact : styles.stageTall]}>
         <ScrollView
           ref={scrollRef}
           horizontal
@@ -138,7 +122,7 @@ export function PresenceStoriesRail({
           contentContainerStyle={{
             paddingHorizontal: sidePad,
             alignItems: 'center',
-            minHeight: compact ? 168 : 220,
+            minHeight: compact ? 176 : 228,
           }}
           onScroll={onScroll}
           scrollEventThrottle={16}>
@@ -160,59 +144,82 @@ export function PresenceStoriesRail({
   )
 }
 
+/** Degrees → radians. 0° = 3 o’clock, clockwise (SVG). */
+function polar(cx: number, cy: number, r: number, deg: number) {
+  const rad = (deg * Math.PI) / 180
+  return {
+    x: cx + r * Math.cos(rad),
+    y: cy + r * Math.sin(rad),
+  }
+}
+
+/**
+ * Dial arc path (reference: thick gradient on top-left ~120°).
+ * Angles in screen space (0° = east, clockwise). Uses CCW sweep so the
+ * short top→left dial is drawn, not the long bottom arc.
+ */
+function dialArcPath(
+  cx: number,
+  cy: number,
+  r: number,
+  startDeg: number,
+  endDeg: number,
+): string {
+  const start = polar(cx, cy, r, startDeg)
+  const end = polar(cx, cy, r, endDeg)
+  // Counterclockwise delta from start → end.
+  const ccw = ((startDeg - endDeg + 360) % 360)
+  const large = ccw > 180 ? 1 : 0
+  // sweep-flag 0 = counterclockwise in SVG
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 0 ${end.x} ${end.y}`
+}
+
+function fullRingPath(cx: number, cy: number, r: number): string {
+  // Two semicircles so SVG can stroke a closed ring cleanly.
+  const left = polar(cx, cy, r, 180)
+  const right = polar(cx, cy, r, 0)
+  return `M ${right.x} ${right.y} A ${r} ${r} 0 1 1 ${left.x} ${left.y} A ${r} ${r} 0 1 1 ${right.x} ${right.y}`
+}
+
 function StoryDial({
   id,
   size,
-  active,
-  isYou,
-  mutedStroke,
+  mode,
 }: {
   id: string
   size: number
-  active: boolean
-  isYou: boolean
-  mutedStroke: string
+  /** `dial` = thick partial arc; `ring` = thin full circle; `idle` = none */
+  mode: 'dial' | 'ring' | 'idle'
 }) {
-  const stroke = DIAL_STROKE
+  if (mode === 'idle') return null
+
+  const stroke = mode === 'ring' ? 2.25 : 5.5
   const r = (size - stroke) / 2
   const c = size / 2
-  const gradientId = `story-dial-${id}`
+  const gradientId = `story-grad-${id}`
 
-  if (!active && !isYou) {
-    return (
-      <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
-        <Circle
-          cx={c}
-          cy={c}
-          r={r}
-          stroke={mutedStroke}
-          strokeWidth={StyleSheet.hairlineWidth * 2}
-          fill="none"
-        />
-      </Svg>
-    )
-  }
+  // Reference dial: thick arc from just past 12 o'clock through 9 o'clock (~130°).
+  const path =
+    mode === 'ring'
+      ? fullRingPath(c, c, r)
+      : dialArcPath(c, c, r, -70, 200)
 
-  // Full dial ring — continuous stroke (not a filled wedge / partial arc).
   return (
     <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
       <Defs>
         <SvgLinearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <Stop offset="0%" stopColor="#FF5A7A" />
-          <Stop offset="45%" stopColor="#369CAA" />
+          <Stop offset="0%" stopColor="#FF4D8D" />
+          <Stop offset="42%" stopColor="#C45CFF" />
+          <Stop offset="78%" stopColor="#4B7BFF" />
           <Stop offset="100%" stopColor="#E8A838" />
         </SvgLinearGradient>
       </Defs>
-      <Circle
-        cx={c}
-        cy={c}
-        r={r}
+      <Path
+        d={path}
         stroke={`url(#${gradientId})`}
         strokeWidth={stroke}
         fill="none"
         strokeLinecap="round"
-        // Slight dash breaks make the ring read as a dial, not a blob.
-        strokeDasharray={isYou ? undefined : `${r * 0.55} ${r * 0.18}`}
       />
     </Svg>
   )
@@ -231,19 +238,23 @@ function StoryNode({
   reduceMotion: boolean
   onPress: () => void
 }) {
-  const {colours} = useThemeTokens()
+  const {colours, scheme} = useThemeTokens()
   const isYou = person.id === 'you'
-  const size = isYou ? CENTER_SIZE : SIDE_SIZE + 8
-  const avatarSize = isYou ? CENTER_SIZE - 22 : SIDE_SIZE - 14
+  const size = isYou ? CENTER_SIZE : SIDE_SIZE
+  // White gap between avatar and dial (reference).
+  const gap = isYou ? 5 : 4
+  const avatarSize = size - (isYou ? 18 : 22)
   const ringPulse = useSharedValue(1)
 
   useEffect(() => {
-    if (!person.fresh || reduceMotion) return
-    ringPulse.value = withRepeat(withTiming(1.04, {duration: 1400}), -1, true)
-  }, [person.fresh, reduceMotion, ringPulse])
+    if (!person.fresh || reduceMotion || isYou) return
+    ringPulse.value = withRepeat(withTiming(1.03, {duration: 1600}), -1, true)
+  }, [isYou, person.fresh, reduceMotion, ringPulse])
 
   const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{scale: person.fresh && !reduceMotion ? ringPulse.value : 1}],
+    transform: [
+      {scale: person.fresh && !reduceMotion && !isYou ? ringPulse.value : 1},
+    ],
   }))
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -252,19 +263,19 @@ function StoryNode({
     const scale = interpolate(
       distance,
       [0, ITEM_SLOT, ITEM_SLOT * 2],
-      [1, 0.72, 0.58],
+      [1, 0.7, 0.55],
       Extrapolation.CLAMP,
     )
     const opacity = interpolate(
       distance,
       [0, ITEM_SLOT, ITEM_SLOT * 2.2],
-      [1, 0.78, 0.45],
+      [1, 0.85, 0.5],
       Extrapolation.CLAMP,
     )
     const translateY = interpolate(
       distance,
       [0, ITEM_SLOT, ITEM_SLOT * 2],
-      [0, 10, 18],
+      [0, 12, 20],
       Extrapolation.CLAMP,
     )
     return {
@@ -277,8 +288,8 @@ function StoryNode({
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
     const opacity = interpolate(
       distance,
-      [0, ITEM_SLOT * 0.55, ITEM_SLOT],
-      [0, 0.55, 1],
+      [0, ITEM_SLOT * 0.5, ITEM_SLOT],
+      [0, 0.45, 1],
       Extrapolation.CLAMP,
     )
     return {opacity}
@@ -288,14 +299,14 @@ function StoryNode({
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
     const opacity = interpolate(
       distance,
-      [0, ITEM_SLOT * 0.4],
+      [0, ITEM_SLOT * 0.35],
       [1, 0],
       Extrapolation.CLAMP,
     )
     const translateY = interpolate(
       distance,
-      [0, ITEM_SLOT * 0.4],
-      [0, 8],
+      [0, ITEM_SLOT * 0.35],
+      [0, 10],
       Extrapolation.CLAMP,
     )
     return {
@@ -303,6 +314,15 @@ function StoryNode({
       transform: [{translateY}],
     }
   })
+
+  const dialMode: 'dial' | 'ring' | 'idle' = isYou
+    ? 'ring'
+    : person.fresh
+      ? 'dial'
+      : 'idle'
+
+  const pillBg = scheme === 'dark' ? colours.surface : '#FFFFFF'
+  const plusBg = colours.text
 
   return (
     <Animated.View
@@ -323,25 +343,28 @@ function StoryNode({
         style={styles.nodePress}>
         <Animated.View
           style={[
-            styles.ring,
+            styles.ringHost,
             pulseStyle,
-            {width: size, height: size, borderRadius: size / 2},
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+            },
           ]}>
-          <StoryDial
-            id={person.id}
-            size={size}
-            active={person.fresh || isYou}
-            isYou={isYou}
-            mutedStroke={colours.border}
-          />
+          <StoryDial id={person.id} size={size} mode={dialMode} />
           <View
             style={[
-              styles.avatarInset,
+              styles.avatarWell,
               {
-                backgroundColor: colours.canvas,
-                width: avatarSize + 6,
-                height: avatarSize + 6,
+                width: avatarSize + gap * 2,
+                height: avatarSize + gap * 2,
                 borderRadius: 999,
+                backgroundColor: colours.canvas,
+                // Soft lift matching reference floating faces.
+                shadowColor: '#000',
+                shadowOpacity: scheme === 'dark' ? 0.35 : 0.12,
+                shadowRadius: 10,
+                shadowOffset: {width: 0, height: 4},
               },
             ]}>
             <Avatar
@@ -356,13 +379,23 @@ function StoryNode({
 
         {isYou ? (
           <Animated.View style={[styles.addWrap, addStyle]}>
-            <AppText
-              variant="caption"
-              colour="accent"
-              numberOfLines={1}
-              style={styles.name}>
-              Add Story
-            </AppText>
+            <View
+              style={[
+                styles.addPill,
+                {
+                  backgroundColor: pillBg,
+                  borderColor: colours.border,
+                },
+              ]}>
+              <AppText variant="label" colour="text">
+                Add Story
+              </AppText>
+              <View style={[styles.addPlus, {backgroundColor: plusBg}]}>
+                <AppText variant="label" style={styles.addPlusGlyph}>
+                  +
+                </AppText>
+              </View>
+            </View>
           </Animated.View>
         ) : (
           <Animated.View style={labelStyle}>
@@ -381,14 +414,41 @@ function StoryNode({
 }
 
 const styles = StyleSheet.create({
+  addPill: {
+    alignItems: 'center',
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: 8,
+    paddingLeft: 14,
+    paddingRight: 5,
+    paddingVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  addPlus: {
+    alignItems: 'center',
+    borderRadius: 12,
+    height: 24,
+    justifyContent: 'center',
+    width: 24,
+  },
+  addPlusGlyph: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
+    lineHeight: 17,
+  },
   addWrap: {
     justifyContent: 'center',
-    minHeight: 20,
+    minHeight: 34,
   },
   avatarBare: {
     borderWidth: 0,
   },
-  avatarInset: {
+  avatarWell: {
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -396,7 +456,7 @@ const styles = StyleSheet.create({
   },
   captionRow: {},
   name: {
-    maxWidth: ITEM_SLOT - 8,
+    maxWidth: ITEM_SLOT - 6,
     textAlign: 'center',
   },
   nodePress: {
@@ -404,12 +464,12 @@ const styles = StyleSheet.create({
     gap: 10,
     width: ITEM_SLOT,
   },
-  ring: {
+  ringHost: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   root: {
-    marginBottom: 4,
+    marginBottom: 2,
   },
   rootCompact: {
     marginBottom: 0,
@@ -420,17 +480,15 @@ const styles = StyleSheet.create({
     width: ITEM_SLOT,
   },
   stage: {
-    borderRadius: 28,
-    borderWidth: StyleSheet.hairlineWidth,
-    marginHorizontal: 12,
-    overflow: 'hidden',
+    // Intentionally open — no card chrome.
+    overflow: 'visible',
   },
   stageCompact: {
-    minHeight: 196,
-    paddingBottom: 10,
+    minHeight: 176,
+    paddingBottom: 4,
   },
   stageTall: {
-    minHeight: 248,
-    paddingBottom: 12,
+    minHeight: 228,
+    paddingBottom: 6,
   },
 })
