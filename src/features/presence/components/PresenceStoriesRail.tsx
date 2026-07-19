@@ -61,8 +61,9 @@ export function PresenceStoriesRail({
   const scrollX = useSharedValue(0)
   const ready = stageWidth > 0
 
-  // Literal left edge (no side inset). Right pad lets the last story reach left focus.
-  const padLeft = 0
+  // Nudge right so the Add Story pill isn’t clipped off the left edge.
+  // Pill is wider than ITEM_SLOT (~128 vs 76) and sits under the first node.
+  const padLeft = ready ? Math.max(spacing[4], 28) : 0
   const padRight = ready
     ? Math.max(0, stageWidth - padLeft - ITEM_SLOT)
     : 0
@@ -108,7 +109,7 @@ export function PresenceStoriesRail({
         <View
           style={[
             styles.captionRow,
-            {paddingHorizontal: 0, gap: 2},
+            {paddingHorizontal: Math.max(spacing[4], 28), gap: 2},
           ]}>
           <AppText variant="caption" colour="textSecondary">
             STORIES
@@ -294,12 +295,12 @@ function StoryNode({
 
   const labelStyle = useAnimatedStyle(() => {
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
-    // Names on neighbours; hide under the focused node (pill / clean center).
+    // Keep the focused name fully readable; only fade far neighbours.
     return {
       opacity: interpolate(
         distance,
-        [0, ITEM_SLOT * 0.35, ITEM_SLOT * 0.85],
-        [0, 0.35, 1],
+        [0, ITEM_SLOT * 0.55, ITEM_SLOT * 1.4],
+        [1, 0.9, 0.45],
         Extrapolation.CLAMP,
       ),
     }
@@ -430,7 +431,7 @@ function StoryNode({
           <Animated.View style={labelStyle}>
             <AppText
               variant="caption"
-              colour="textSecondary"
+              colour="text"
               numberOfLines={1}
               style={styles.name}>
               {person.name}
