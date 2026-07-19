@@ -1,5 +1,5 @@
-import {useEffect, useMemo} from 'react'
-import {StyleSheet, useWindowDimensions, View} from 'react-native'
+import {useEffect} from 'react'
+import {StyleSheet, useWindowDimensions} from 'react-native'
 import Svg, {
   Defs,
   LinearGradient as SvgLinearGradient,
@@ -10,7 +10,6 @@ import Animated, {
   Easing,
   Extrapolation,
   interpolate,
-  useAnimatedProps,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
@@ -34,15 +33,11 @@ const SPECTRUM = {
   magenta: '#FF4D9A',
   violet: '#B794F6',
   amber: '#FFB020',
-  white: '#FFFFFF',
 } as const
 
-const AnimatedGradient = Animated.createAnimatedComponent(SvgLinearGradient)
-const AnimatedRect = Animated.createAnimatedComponent(Rect)
-
 /**
- * Elegant perimeter “lightning screen” glow.
- * Spectrum rotates around the rim; a bright dash races the edge.
+ * Elegant perimeter glow — soft bloom that breathes.
+ * Spectrum stays put; only intensity pulses (no rotating rainbow).
  */
 export function LightningScreenGlow({
   pullDistance,
@@ -50,33 +45,26 @@ export function LightningScreenGlow({
 }: LightningScreenGlowProps) {
   const {width, height} = useWindowDimensions()
   const reduceMotion = useReduceMotion()
-  const phase = useSharedValue(0)
+  const breath = useSharedValue(0)
   const inset = 2.5
   const radius = 42
   const rimW = Math.max(1, width - inset * 2)
   const rimH = Math.max(1, height - inset * 2)
-  // Approximate rounded-rect path length for dash chase.
-  const perimeter = useMemo(() => {
-    const straight = 2 * (rimW + rimH - 4 * radius)
-    const arcs = 2 * Math.PI * radius
-    return Math.max(400, straight + arcs)
-  }, [radius, rimH, rimW])
 
   useEffect(() => {
     if (reduceMotion) {
-      phase.value = 0
+      breath.value = 0.55
       return
     }
-    phase.value = 0
-    phase.value = withRepeat(
+    breath.value = withRepeat(
       withTiming(1, {
-        duration: refreshing ? 1400 : 2400,
-        easing: Easing.linear,
+        duration: refreshing ? 1100 : 1800,
+        easing: Easing.inOut(Easing.sin),
       }),
       -1,
-      false,
+      true,
     )
-  }, [phase, reduceMotion, refreshing])
+  }, [breath, reduceMotion, refreshing])
 
   const intensity = useDerivedValue(() => {
     const fromPull = interpolate(
@@ -92,73 +80,48 @@ export function LightningScreenGlow({
     opacity: intensity.value,
   }))
 
-  const bloomStyle = useAnimatedStyle(() => {
+  const outerBloomStyle = useAnimatedStyle(() => {
     const pulse = reduceMotion
-      ? 1
-      : interpolate(phase.value, [0, 0.5, 1], [0.78, 1, 0.78])
-    return {opacity: intensity.value * pulse}
-  })
-
-  // Sweep gradient angle around the frame (spectrum chase).
-  const gradientProps = useAnimatedProps(() => {
-    const angle = phase.value * Math.PI * 2
-    const x1 = 50 + Math.cos(angle) * 50
-    const y1 = 50 + Math.sin(angle) * 50
-    const x2 = 50 + Math.cos(angle + Math.PI) * 50
-    const y2 = 50 + Math.sin(angle + Math.PI) * 50
+      ? 0.7
+      : interpolate(breath.value, [0, 1], [0.45, 0.85])
     return {
-      x1: `${x1}%`,
-      y1: `${y1}%`,
-      x2: `${x2}%`,
-      y2: `${y2}%`,
+      opacity: intensity.value * pulse,
     }
   })
 
-  // Bright bolt racing along the perimeter.
-  const boltProps = useAnimatedProps(() => {
-    const dash = perimeter * (refreshing ? 0.12 : 0.08)
-    const gap = Math.max(1, perimeter - dash)
+  const midBloomStyle = useAnimatedStyle(() => {
+    const pulse = reduceMotion
+      ? 0.8
+      : interpolate(breath.value, [0, 1], [0.65, 1])
     return {
-      strokeDasharray: `${dash} ${gap}`,
-      strokeDashoffset: -phase.value * perimeter,
-      strokeOpacity: intensity.value * (refreshing ? 1 : 0.9),
+      opacity: intensity.value * pulse,
     }
   })
 
-  // Secondary chase bolt, offset half a lap.
-  const boltSecondaryProps = useAnimatedProps(() => {
-    const dash = perimeter * 0.05
-    const gap = Math.max(1, perimeter - dash)
+  const rimStyle = useAnimatedStyle(() => {
+    const pulse = reduceMotion
+      ? 0.9
+      : interpolate(breath.value, [0, 1], [0.72, 1])
     return {
-      strokeDasharray: `${dash} ${gap}`,
-      strokeDashoffset: -(phase.value + 0.5) * perimeter,
-      strokeOpacity: intensity.value * 0.75,
+      opacity: intensity.value * pulse,
     }
   })
-
-  const rimWidth = refreshing ? 3.5 : 2.5
 
   return (
     <Animated.View
       pointerEvents="none"
       style={[StyleSheet.absoluteFill, styles.host, hostStyle]}>
-      <Animated.View style={[StyleSheet.absoluteFill, bloomStyle]}>
+      {/* Wide soft bloom */}
+      <Animated.View style={[StyleSheet.absoluteFill, outerBloomStyle]}>
         <Svg width={width} height={height}>
           <Defs>
-            <AnimatedGradient
-              id="lightningBloom"
-              animatedProps={gradientProps}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%">
-              <Stop offset="0%" stopColor={SPECTRUM.cyan} stopOpacity={0.75} />
-              <Stop offset="20%" stopColor={SPECTRUM.blue} stopOpacity={0.55} />
-              <Stop offset="40%" stopColor={SPECTRUM.magenta} stopOpacity={0.7} />
-              <Stop offset="60%" stopColor={SPECTRUM.amber} stopOpacity={0.75} />
-              <Stop offset="80%" stopColor={SPECTRUM.violet} stopOpacity={0.55} />
-              <Stop offset="100%" stopColor={SPECTRUM.cyan} stopOpacity={0.75} />
-            </AnimatedGradient>
+            <SvgLinearGradient id="lightningBloomOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+              <Stop offset="0%" stopColor={SPECTRUM.cyan} stopOpacity={0.55} />
+              <Stop offset="25%" stopColor={SPECTRUM.blue} stopOpacity={0.4} />
+              <Stop offset="50%" stopColor={SPECTRUM.magenta} stopOpacity={0.5} />
+              <Stop offset="75%" stopColor={SPECTRUM.amber} stopOpacity={0.55} />
+              <Stop offset="100%" stopColor={SPECTRUM.violet} stopOpacity={0.4} />
+            </SvgLinearGradient>
           </Defs>
           <Rect
             x={inset}
@@ -168,10 +131,24 @@ export function LightningScreenGlow({
             rx={radius}
             ry={radius}
             fill="none"
-            stroke="url(#lightningBloom)"
-            strokeWidth={36}
-            strokeOpacity={0.26}
+            stroke="url(#lightningBloomOuter)"
+            strokeWidth={42}
+            strokeOpacity={0.35}
           />
+        </Svg>
+      </Animated.View>
+
+      {/* Mid bloom */}
+      <Animated.View style={[StyleSheet.absoluteFill, midBloomStyle]}>
+        <Svg width={width} height={height}>
+          <Defs>
+            <SvgLinearGradient id="lightningBloomMid" x1="100%" y1="0%" x2="0%" y2="100%">
+              <Stop offset="0%" stopColor={SPECTRUM.amber} stopOpacity={0.6} />
+              <Stop offset="30%" stopColor={SPECTRUM.magenta} stopOpacity={0.55} />
+              <Stop offset="60%" stopColor={SPECTRUM.cyan} stopOpacity={0.6} />
+              <Stop offset="100%" stopColor={SPECTRUM.blue} stopOpacity={0.5} />
+            </SvgLinearGradient>
+          </Defs>
           <Rect
             x={inset}
             y={inset}
@@ -180,30 +157,25 @@ export function LightningScreenGlow({
             rx={radius}
             ry={radius}
             fill="none"
-            stroke="url(#lightningBloom)"
-            strokeWidth={16}
-            strokeOpacity={0.48}
+            stroke="url(#lightningBloomMid)"
+            strokeWidth={18}
+            strokeOpacity={0.55}
           />
         </Svg>
       </Animated.View>
 
-      <View style={StyleSheet.absoluteFill}>
+      {/* Crisp inner rim — stationary spectrum, breathing opacity */}
+      <Animated.View style={[StyleSheet.absoluteFill, rimStyle]}>
         <Svg width={width} height={height}>
           <Defs>
-            <AnimatedGradient
-              id="lightningRim"
-              animatedProps={gradientProps}
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%">
+            <SvgLinearGradient id="lightningRim" x1="0%" y1="0%" x2="100%" y2="100%">
               <Stop offset="0%" stopColor={SPECTRUM.cyan} />
-              <Stop offset="20%" stopColor={SPECTRUM.blue} />
-              <Stop offset="40%" stopColor={SPECTRUM.magenta} />
-              <Stop offset="60%" stopColor={SPECTRUM.amber} />
-              <Stop offset="80%" stopColor={SPECTRUM.violet} />
+              <Stop offset="22%" stopColor={SPECTRUM.blue} />
+              <Stop offset="45%" stopColor={SPECTRUM.magenta} />
+              <Stop offset="68%" stopColor={SPECTRUM.amber} />
+              <Stop offset="88%" stopColor={SPECTRUM.violet} />
               <Stop offset="100%" stopColor={SPECTRUM.cyan} />
-            </AnimatedGradient>
+            </SvgLinearGradient>
           </Defs>
           <Rect
             x={inset}
@@ -214,39 +186,10 @@ export function LightningScreenGlow({
             ry={radius}
             fill="none"
             stroke="url(#lightningRim)"
-            strokeWidth={rimWidth}
-            strokeOpacity={0.85}
-          />
-          {/* Hot bolt */}
-          <AnimatedRect
-            animatedProps={boltProps}
-            x={inset}
-            y={inset}
-            width={rimW}
-            height={rimH}
-            rx={radius}
-            ry={radius}
-            fill="none"
-            stroke={SPECTRUM.white}
-            strokeWidth={rimWidth + 1.25}
-            strokeLinecap="round"
-          />
-          {/* Magenta chase bolt */}
-          <AnimatedRect
-            animatedProps={boltSecondaryProps}
-            x={inset}
-            y={inset}
-            width={rimW}
-            height={rimH}
-            rx={radius}
-            ry={radius}
-            fill="none"
-            stroke={SPECTRUM.magenta}
-            strokeWidth={rimWidth + 0.5}
-            strokeLinecap="round"
+            strokeWidth={refreshing ? 3 : 2.25}
           />
         </Svg>
-      </View>
+      </Animated.View>
     </Animated.View>
   )
 }
