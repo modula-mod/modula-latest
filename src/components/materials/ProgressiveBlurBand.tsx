@@ -14,6 +14,11 @@ type ProgressiveBlurBandProps = {
   enabled?: boolean
   /** Max BlurView intensity under the opaque end of the mask. */
   intensity?: number
+  /**
+   * `soft` — lighter mask + tint (shell bottom under floating glass tabs).
+   * `normal` — denser dissolve (headers / drawers).
+   */
+  strength?: 'normal' | 'soft'
 }
 
 /**
@@ -29,6 +34,7 @@ export function ProgressiveBlurBand({
   topHeavy = true,
   enabled = true,
   intensity = 55,
+  strength = 'normal',
 }: ProgressiveBlurBandProps) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
@@ -37,24 +43,32 @@ export function ProgressiveBlurBand({
   const tint = scheme === 'dark' ? 'dark' : 'light'
   const androidBlurMethod =
     Platform.OS === 'android' ? 'dimezisBlurViewSdk31Plus' : undefined
+  const soft = strength === 'soft'
 
   // Mask: black = reveal blur, transparent = hide blur (fade to clear).
-  // Bottom-heavy: keep more of the upper band soft so tall shell bands still dissolve.
   const maskColors = topHeavy
     ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
-    : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
+    : soft
+      ? (['transparent', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.82)'] as const)
+      : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
   const maskLocations = topHeavy
     ? ([0, 0.35, 0.7, 1] as const)
-    : ([0, 0.22, 0.55, 1] as const)
+    : soft
+      ? ([0, 0.35, 0.72, 1] as const)
+      : ([0, 0.22, 0.55, 1] as const)
 
   const tintColors =
     scheme === 'dark'
       ? topHeavy
         ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
-        : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
+        : soft
+          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.06)', 'rgba(11,20,22,0.16)'] as const)
+          : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
       : topHeavy
         ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
-        : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
+        : soft
+          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.08)', 'rgba(255,255,255,0.2)'] as const)
+          : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
 
   if (!useBlur) {
     return (

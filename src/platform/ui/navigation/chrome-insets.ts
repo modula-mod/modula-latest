@@ -9,11 +9,12 @@ export const CHROME_HEADER_ROW = 54
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
 /**
- * Soft dissolve height above the floating tab island.
- * Total bottom band also includes segment + safe-area (see ShellBottomProgressiveBlur).
+ * Short feather above the home-indicator / under the floating tab island.
+ * Keep this small — the liquid-glass tab bar is the chrome; a tall muddy
+ * progressive band just obscures feed text.
  */
-export const CHROME_BOTTOM_FADE = 56
-export const CHROME_BOTTOM_BLUR_INTENSITY = 48
+export const CHROME_BOTTOM_FADE = 22
+export const CHROME_BOTTOM_BLUR_INTENSITY = 28
 
 /**
  * Layout spacer under SecondaryScreenHeader — safe area + nav row only.

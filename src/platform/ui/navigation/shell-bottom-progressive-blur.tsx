@@ -8,14 +8,12 @@ import {
   CHROME_BOTTOM_BLUR_INTENSITY,
   CHROME_BOTTOM_FADE,
 } from '@/platform/ui/navigation/chrome-insets'
-import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visibility'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 /**
- * Progressive blur along the bottom edge of the shell.
- * Tall enough to dissolve content *above* the floating tab island, while the
- * tab bar itself stays crisp on a higher z-index.
+ * Short soft feather at the very bottom edge (home indicator).
+ * Does not cover the floating liquid-glass tab island — that chrome is self-contained.
  */
 export function ShellBottomProgressiveBlur() {
   const segments = useSegments()
@@ -27,8 +25,8 @@ export function ShellBottomProgressiveBlur() {
   }
 
   const bottomLift = Math.max(insets.bottom, 8)
-  const height =
-    CHROME_BOTTOM_FADE + FLOATING_TAB_BAR_SEGMENT_HEIGHT + bottomLift
+  // Feather only the home-indicator strip + a short rise — not the whole tab zone.
+  const height = CHROME_BOTTOM_FADE + bottomLift
 
   return (
     <Animated.View
@@ -37,6 +35,7 @@ export function ShellBottomProgressiveBlur() {
       <ProgressiveBlurBand
         height={height}
         topHeavy={false}
+        strength="soft"
         intensity={CHROME_BOTTOM_BLUR_INTENSITY}
       />
     </Animated.View>
