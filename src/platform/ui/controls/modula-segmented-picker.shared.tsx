@@ -13,11 +13,11 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const DEFAULT_SCROLL_MAX_WIDTH = 360
 const DEFAULT_SEGMENT_MIN_WIDTH = 88
-const CAPSULE_HEIGHT = 36
+const TRACK_HEIGHT = 40
 
 /**
  * Segmented control:
- * - `segmented` — each option is its own liquid-glass capsule
+ * - `segmented` — liquid-glass wrapper; segments are plain (no glass on thumbs)
  * - `plain` — label tabs only
  */
 export function ModulaSegmentedPicker({
@@ -32,59 +32,20 @@ export function ModulaSegmentedPicker({
   segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
   maxWidth,
 }: ModulaSegmentedPickerProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, radius, spacing, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const plain = appearance === 'plain'
+  const isDark = scheme === 'dark'
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
   const viewportWidth = Math.min(windowWidth - 32, viewportCap)
-  const gap = spacing[2]
   const contentWidth = Math.max(
     viewportWidth,
-    plain
-      ? viewportWidth
-      : options.length * segmentMinWidth + gap * Math.max(0, options.length - 1),
+    plain ? viewportWidth : options.length * segmentMinWidth,
   )
 
   const segments = options.map(option => {
     const selected = option.value === value
-    const label = (
-      <AppText
-        variant="label"
-        style={{
-          color: selected ? colours.text : colours.textSecondary,
-          textAlign: 'center',
-          fontWeight: selected ? '600' : '500',
-        }}
-        numberOfLines={1}>
-        {option.label}
-      </AppText>
-    )
-
-    if (plain) {
-      return (
-        <AppPressable
-          key={option.value}
-          accessibilityRole="button"
-          accessibilityState={{selected, disabled: !!option.disabled}}
-          accessibilityLabel={option.label}
-          disabled={option.disabled}
-          onPress={() => onValueChange(option.value)}
-          style={[
-            styles.segment,
-            {
-              opacity: option.disabled ? 0.45 : 1,
-              paddingHorizontal: spacing[3],
-              paddingVertical: spacing[2],
-              flex: scrollable ? undefined : 1,
-              minWidth: scrollable ? segmentMinWidth - 8 : undefined,
-            },
-          ]}>
-          {label}
-        </AppPressable>
-      )
-    }
-
     return (
       <AppPressable
         key={option.value}
@@ -94,37 +55,39 @@ export function ModulaSegmentedPicker({
         disabled={option.disabled}
         onPress={() => onValueChange(option.value)}
         style={[
-          styles.capsuleHit,
+          styles.segment,
           {
             opacity: option.disabled ? 0.45 : 1,
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[2],
+            minWidth: scrollable && !plain ? segmentMinWidth - 8 : undefined,
             flex: scrollable ? undefined : 1,
-            minWidth: scrollable ? segmentMinWidth : undefined,
-            height: CAPSULE_HEIGHT,
             borderRadius: radius.round,
+            // Selected thumb: token wash only — no liquid glass on the capsule.
+            backgroundColor:
+              plain || !selected
+                ? 'transparent'
+                : isDark
+                  ? 'rgba(255,255,255,0.14)'
+                  : colours.surface,
+            ...(plain || !selected
+              ? null
+              : {
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: colours.border,
+                }),
           },
         ]}>
-        <LiquidGlassChrome
-          interactive
-          fallback={selected ? 'regular' : 'clear'}
-          contentLayout="flow"
-          style={[
-            styles.capsuleGlass,
-            {
-              borderRadius: radius.round,
-              height: CAPSULE_HEIGHT,
-            },
-          ]}>
-          <View
-            style={[
-              styles.capsuleInner,
-              {
-                paddingHorizontal: spacing[3],
-                minHeight: CAPSULE_HEIGHT,
-              },
-            ]}>
-            {label}
-          </View>
-        </LiquidGlassChrome>
+        <AppText
+          variant="label"
+          style={{
+            color: selected ? colours.text : colours.textSecondary,
+            textAlign: 'center',
+            fontWeight: selected ? '600' : '500',
+          }}
+          numberOfLines={1}>
+          {option.label}
+        </AppText>
       </AppPressable>
     )
   })
@@ -136,21 +99,72 @@ export function ModulaSegmentedPicker({
       accessibilityLabel={accessibilityLabel}
       style={[
         styles.row,
-        {
-          width: scrollable ? contentWidth : viewportWidth,
-          maxWidth: scrollable ? contentWidth : viewportWidth,
-          gap,
-        },
-        !scrollable ? style : null,
+        plain
+          ? {
+              width: scrollable ? contentWidth : viewportWidth,
+              maxWidth: scrollable ? contentWidth : viewportWidth,
+              gap: spacing[1],
+            }
+          : {
+              width: '100%',
+              gap: 2,
+              padding: 3,
+              minHeight: TRACK_HEIGHT,
+            },
+        plain && !scrollable ? style : null,
       ]}>
       {segments}
     </View>
   )
 
+  if (plain) {
+    if (!scrollable) {
+      return (
+        <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
+          {row}
+        </View>
+      )
+    }
+    return (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        decelerationRate="fast"
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        style={[
+          {alignSelf: 'center', maxWidth: viewportWidth, width: viewportWidth},
+          style,
+        ]}
+        contentContainerStyle={{alignItems: 'center'}}>
+        {row}
+      </ScrollView>
+    )
+  }
+
+  const wrapped = (
+    <LiquidGlassChrome
+      interactive
+      fallback="clear"
+      contentLayout="flow"
+      style={[
+        styles.trackGlass,
+        {
+          borderRadius: radius.round,
+          width: scrollable ? contentWidth : viewportWidth,
+          maxWidth: scrollable ? contentWidth : viewportWidth,
+          minHeight: TRACK_HEIGHT,
+        },
+        !scrollable ? style : null,
+      ]}>
+      {row}
+    </LiquidGlassChrome>
+  )
+
   if (!scrollable) {
     return (
-      <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
-        {row}
+      <View style={{alignSelf: 'center', maxWidth: viewportWidth}}>
+        {wrapped}
       </View>
     )
   }
@@ -167,35 +181,23 @@ export function ModulaSegmentedPicker({
         style,
       ]}
       contentContainerStyle={{alignItems: 'center'}}>
-      {row}
+      {wrapped}
     </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  capsuleGlass: {
-    alignSelf: 'stretch',
-    flex: 1,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  capsuleHit: {
-    overflow: 'hidden',
-  },
-  capsuleInner: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    width: '100%',
-  },
   row: {
     alignItems: 'center',
-    alignSelf: 'center',
     flexDirection: 'row',
   },
   segment: {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 34,
+  },
+  trackGlass: {
+    alignSelf: 'center',
+    overflow: 'hidden',
   },
 })

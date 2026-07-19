@@ -17,7 +17,7 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * `segmented` — each option is its own liquid-glass capsule (default).
+   * `segmented` — liquid-glass wrapper; selected thumb is a plain token capsule.
    * `plain` — label tabs only, no chrome around the menu.
    */
   appearance?: ModulaSegmentedAppearance
