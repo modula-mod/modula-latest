@@ -9,6 +9,7 @@ import Animated, {
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {selectionHaptic} from '@/lib/haptics'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
@@ -33,7 +34,6 @@ function useShellChromeVisible(threshold = 0.2) {
 
 export function HomeHeaderLeft() {
   const {openDrawer} = useShellDrawer()
-  const {colours} = useThemeTokens()
   const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
@@ -41,15 +41,14 @@ export function HomeHeaderLeft() {
       pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
       {visible ? (
-        <AppPressable
+        <ChromeCircleButton
+          icon="menu"
           accessibilityLabel="Open navigation drawer"
           onPress={() => {
             void selectionHaptic()
             openDrawer()
           }}
-          style={styles.menuHit}>
-          <AppIcon name="menu" colour={colours.text} size={24} />
-        </AppPressable>
+        />
       ) : null}
     </Animated.View>
   )
@@ -117,13 +116,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginRight: 4,
-  },
-  menuHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    marginLeft: 4,
-    minWidth: 44,
   },
   titleWrap: {
     alignItems: 'center',

@@ -30,6 +30,7 @@ const SF_FOR_ICON: Partial<Record<AppIconName, string>> = {
   close: 'xmark',
   settings: 'gearshape',
   messages: 'bubble.left.and.bubble.right',
+  menu: 'line.3.horizontal',
 }
 
 /**
