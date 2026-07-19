@@ -7,7 +7,11 @@ import {
   View,
 } from 'react-native'
 import {GestureDetector} from 'react-native-gesture-handler'
-import Animated, {useSharedValue, withTiming} from 'react-native-reanimated'
+import Animated, {
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
@@ -19,9 +23,12 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
-import type {SocialPost as SocialPostModel} from '@/domain/social'
 import {HomeSearchModal} from '@/features/feed/components/HomeSearchModal'
-import {HomeFeedModeTabs} from '@/features/feed/components/HomeStickyFeedModes'
+import {
+  HomeStickyFeedModes,
+  useInlineModeTabsInteractive,
+  useInlineModeTabsStyle,
+} from '@/features/feed/components/HomeStickyFeedModes'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {
@@ -35,6 +42,7 @@ import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -64,14 +72,6 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
   'For You': 'forYou',
   Modules: 'modules',
 }
-
-type HomeListRow =
-  | {key: string; kind: 'mode-tabs'}
-  | {key: string; kind: 'header-tail'}
-  | {key: string; kind: 'post'; post: SocialPostModel}
-  | {key: string; kind: 'loading'}
-  | {key: string; kind: 'error'}
-  | {key: string; kind: 'empty'}
 
 export function HomeFeedScreen() {
   const router = useRouter()
@@ -119,16 +119,6 @@ export function HomeFeedScreen() {
 
   const showModeTabs =
     isBlockOn(homeBlocks, 'mode-tabs') || !homeBlocks.includes('mode-tabs')
-  const modeTabsIndex = homeBlocks.indexOf('mode-tabs')
-  const beforeModeBlocks = useMemo(() => {
-    if (!showModeTabs) return homeBlocks
-    if (modeTabsIndex < 0) return homeBlocks
-    return homeBlocks.slice(0, modeTabsIndex)
-  }, [homeBlocks, modeTabsIndex, showModeTabs])
-  const afterModeBlocks = useMemo(() => {
-    if (!showModeTabs || modeTabsIndex < 0) return []
-    return homeBlocks.slice(modeTabsIndex + 1)
-  }, [homeBlocks, modeTabsIndex, showModeTabs])
 
   const onRefresh = useCallback(() => {
     if (manualRefreshing) return
@@ -174,39 +164,6 @@ export function HomeFeedScreen() {
   } = usePullActionGesture(onPullAction)
   const modeTabsStickAtY = useSharedValue(0)
 
-  const listData = useMemo((): HomeListRow[] => {
-    const rows: HomeListRow[] = []
-    if (showModeTabs) {
-      rows.push({key: '__mode_tabs__', kind: 'mode-tabs'})
-    }
-    if (afterModeBlocks.length > 0) {
-      rows.push({key: '__header_tail__', kind: 'header-tail'})
-    }
-    if (feedQuery.isLoading && posts.length === 0) {
-      rows.push({key: '__loading__', kind: 'loading'})
-    } else if (feedQuery.isError && posts.length === 0) {
-      rows.push({key: '__error__', kind: 'error'})
-    } else if (posts.length === 0) {
-      rows.push({key: '__empty__', kind: 'empty'})
-    } else {
-      for (const post of posts) {
-        rows.push({key: post.id, kind: 'post', post})
-      }
-    }
-    return rows
-  }, [
-    afterModeBlocks.length,
-    feedQuery.isError,
-    feedQuery.isLoading,
-    posts,
-    showModeTabs,
-  ])
-
-  const stickyHeaderIndices = useMemo(
-    () => (showModeTabs ? [0] : undefined),
-    [showModeTabs],
-  )
-
   useEffect(() => {
     if (focus.quietFeed && mode === 'For You') {
       setMode('Following')
@@ -235,87 +192,6 @@ export function HomeFeedScreen() {
     return () => clearTimeout(id)
   }, [pullDistance, refreshing])
 
-  const renderItem = useCallback(
-    ({item}: {item: HomeListRow}) => {
-      switch (item.kind) {
-        case 'mode-tabs':
-          return (
-            <ShellChromeObscureView direction="up">
-              <HomeFeedModeTabs
-                scrollY={scrollY}
-                stickAtY={modeTabsStickAtY}
-                mode={mode}
-                modeOrder={modeOrder}
-                quietFeed={!!focus.quietFeed}
-                onModeChange={setMode}
-              />
-            </ShellChromeObscureView>
-          )
-        case 'header-tail':
-          return (
-            <HomeLayoutBlocks
-              blockIds={afterModeBlocks}
-              homeBlocks={homeBlocks}
-              focusActive={focusActive}
-              focusBannerCopy={focusBannerCopy}
-              focus={focus}
-              mergeCount={preferences.mergeFeedIds.length}
-              focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
-              mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
-            />
-          )
-        case 'post':
-          return <SocialPost post={item.post} />
-        case 'loading':
-          return (
-            <View>
-              <FeedPostSkeleton />
-              <FeedPostSkeleton />
-              <FeedPostSkeleton />
-            </View>
-          )
-        case 'error':
-          return (
-            <QueryErrorState
-              error={feedQuery.error}
-              onRetry={() => void feedQuery.refetch()}
-            />
-          )
-        case 'empty':
-          return (
-            <EmptyState
-              icon="home"
-              title="This feed is quiet."
-              description="Switch modes or publish a local post to start the conversation."
-              action={
-                <Pill
-                  label="Create post"
-                  selected
-                  onPress={() => router.push('/compose' as Href)}
-                />
-              }
-            />
-          )
-        default:
-          return null
-      }
-    },
-    [
-      afterModeBlocks,
-      feedQuery,
-      focus,
-      focusActive,
-      focusBannerCopy,
-      homeBlocks,
-      mode,
-      modeOrder,
-      modeTabsStickAtY,
-      preferences,
-      router,
-      scrollY,
-    ],
-  )
-
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <HomeSearchModal
@@ -334,10 +210,9 @@ export function HomeFeedScreen() {
               <GestureDetector gesture={listGesture}>
                 <Animated.FlatList
                   style={styles.screen}
-                  data={listData}
-                  keyExtractor={item => item.key}
-                  renderItem={renderItem}
-                  stickyHeaderIndices={stickyHeaderIndices}
+                  data={posts}
+                  keyExtractor={item => item.id}
+                  renderItem={({item}) => <SocialPost post={item} />}
                   contentInsetAdjustmentBehavior="automatic"
                   bounces
                   alwaysBounceVertical
@@ -353,22 +228,48 @@ export function HomeFeedScreen() {
                     }
                   }}
                   ListHeaderComponent={
-                    <View
-                      collapsable={false}
-                      onLayout={event => {
-                        modeTabsStickAtY.value = event.nativeEvent.layout.height
-                      }}>
-                      <HomeLayoutBlocks
-                        blockIds={beforeModeBlocks}
-                        homeBlocks={homeBlocks}
-                        focusActive={focusActive}
-                        focusBannerCopy={focusBannerCopy}
-                        focus={focus}
-                        mergeCount={preferences.mergeFeedIds.length}
-                        focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
-                        mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
+                    <HomeLayoutHeader
+                      homeBlocks={homeBlocks}
+                      focusActive={focusActive}
+                      focusBannerCopy={focusBannerCopy}
+                      focus={focus}
+                      mode={mode}
+                      modeOrder={modeOrder}
+                      mergeCount={preferences.mergeFeedIds.length}
+                      focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
+                      mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
+                      onModeChange={setMode}
+                      scrollY={scrollY}
+                      modeTabsStickAtY={modeTabsStickAtY}
+                      reduceMotion={reduceMotion}
+                    />
+                  }
+                  ListEmptyComponent={
+                    feedQuery.isLoading ? (
+                      <View>
+                        <FeedPostSkeleton />
+                        <FeedPostSkeleton />
+                        <FeedPostSkeleton />
+                      </View>
+                    ) : feedQuery.isError ? (
+                      <QueryErrorState
+                        error={feedQuery.error}
+                        onRetry={() => void feedQuery.refetch()}
                       />
-                    </View>
+                    ) : (
+                      <EmptyState
+                        icon="home"
+                        title="This feed is quiet."
+                        description="Switch modes or publish a local post to start the conversation."
+                        action={
+                          <Pill
+                            label="Create post"
+                            selected
+                            onPress={() => router.push('/compose' as Href)}
+                          />
+                        }
+                      />
+                    )
                   }
                   ListFooterComponent={
                     feedQuery.isFetchingNextPage ? (
@@ -379,6 +280,16 @@ export function HomeFeedScreen() {
                 />
               </GestureDetector>
             </PullActionTray>
+            {showModeTabs ? (
+              <HomeStickyFeedModes
+                scrollY={scrollY}
+                stickAtY={modeTabsStickAtY}
+                mode={mode}
+                modeOrder={modeOrder}
+                quietFeed={!!focus.quietFeed}
+                onModeChange={setMode}
+              />
+            ) : null}
           </View>
         </FeatureErrorBoundary>
       </ResponsiveContent>
@@ -386,28 +297,47 @@ export function HomeFeedScreen() {
   )
 }
 
-function HomeLayoutBlocks({
-  blockIds,
+function HomeLayoutHeader({
   homeBlocks,
   focusActive,
   focusBannerCopy,
   focus,
+  mode,
+  modeOrder,
   mergeCount,
   focusFeatureOn,
   mergeFeatureOn,
+  onModeChange,
+  scrollY,
+  modeTabsStickAtY,
+  reduceMotion,
 }: {
-  blockIds: readonly string[]
   homeBlocks: string[]
   focusActive: boolean
   focusBannerCopy: string
   focus: ReturnType<typeof useProductPreferences>['preferences']['focus']
+  mode: FeedModeLabel
+  modeOrder: FeedModeLabel[]
   mergeCount: number
   focusFeatureOn: boolean
   mergeFeatureOn: boolean
+  onModeChange: (mode: FeedModeLabel) => void
+  scrollY: SharedValue<number>
+  modeTabsStickAtY: SharedValue<number>
+  reduceMotion: boolean
 }) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const showBlock = (id: string) => isBlockOn(homeBlocks, id)
+  const inlineModeStyle = useInlineModeTabsStyle(
+    scrollY,
+    modeTabsStickAtY,
+    reduceMotion,
+  )
+  const modeTabsInteractive = useInlineModeTabsInteractive(
+    scrollY,
+    modeTabsStickAtY,
+  )
 
   const nodes: Record<string, ReactNode> = {
     presence:
@@ -482,6 +412,45 @@ function HomeLayoutBlocks({
           </AppPressable>
         </ShellChromeObscureView>
       ) : null,
+    'mode-tabs':
+      showBlock('mode-tabs') || !homeBlocks.includes('mode-tabs') ? (
+      <ShellChromeObscureView key="mode-tabs" direction="up">
+        <Animated.View
+          pointerEvents={modeTabsInteractive ? 'auto' : 'none'}
+          style={[
+            styles.modeRow,
+            {
+              paddingHorizontal: spacing[4],
+              paddingTop: spacing[1],
+              paddingBottom: spacing[2],
+            },
+            inlineModeStyle,
+          ]}>
+          <ModulaSegmentedPicker
+            appearance="segmented"
+            accessibilityLabel="Feed mode"
+            options={modeOrder.map(next => ({
+              value: next,
+              label:
+                focus.quietFeed && next === 'For You'
+                  ? 'For You · Quiet'
+                  : next,
+            }))}
+            value={mode}
+            onValueChange={next => {
+              if (
+                next === 'Following' ||
+                next === 'For You' ||
+                next === 'Modules'
+              ) {
+                void selectionHaptic()
+                onModeChange(next)
+              }
+            }}
+          />
+        </Animated.View>
+      </ShellChromeObscureView>
+      ) : null,
     composer: showBlock('composer') ? (
       <ShellChromeObscureView key="composer" direction="up">
         <ComposerPrompt />
@@ -489,7 +458,26 @@ function HomeLayoutBlocks({
     ) : null,
   }
 
-  return <>{blockIds.map(id => nodes[id] ?? null)}</>
+  const orderedIds = homeBlocks.includes('mode-tabs')
+    ? homeBlocks
+    : [...homeBlocks, 'mode-tabs']
+  const modeIndex = orderedIds.indexOf('mode-tabs')
+  const beforeIds = modeIndex >= 0 ? orderedIds.slice(0, modeIndex) : orderedIds
+  const afterIds = modeIndex >= 0 ? orderedIds.slice(modeIndex + 1) : []
+
+  return (
+    <View>
+      <View
+        collapsable={false}
+        onLayout={event => {
+          modeTabsStickAtY.value = event.nativeEvent.layout.height
+        }}>
+        {beforeIds.map(id => nodes[id] ?? null)}
+      </View>
+      {modeIndex >= 0 ? nodes['mode-tabs'] : null}
+      {afterIds.map(id => nodes[id] ?? null)}
+    </View>
+  )
 }
 
 function ComposerPrompt() {
@@ -565,6 +553,10 @@ const styles = StyleSheet.create({
   focusCopy: {
     flex: 1,
     minWidth: 0,
+  },
+  modeRow: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
   prompt: {
     alignItems: 'center',
