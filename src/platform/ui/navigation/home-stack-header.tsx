@@ -9,8 +9,8 @@ import Animated, {
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -41,8 +41,10 @@ export function HomeHeaderLeft() {
       pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
       {visible ? (
-        <ChromeCircleButton
+        // Expo UI plain icon button — circle glyph, no glass / filled chrome.
+        <ModulaIconButton
           icon="menu"
+          chrome="plain"
           accessibilityLabel="Open navigation drawer"
           onPress={() => {
             void selectionHaptic()

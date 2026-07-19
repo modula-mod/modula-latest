@@ -1,5 +1,5 @@
 import {useRouter, type Href} from 'expo-router'
-import {useEffect, useMemo, useRef, useState} from 'react'
+import {useMemo, useRef, useState} from 'react'
 import {
   Pressable,
   StyleSheet,
@@ -47,7 +47,7 @@ type PresenceStoriesRailProps = {
 
 /**
  * Home Stories dial — open carousel (no card).
- * Whichever story is centered grows large; neighbours shrink as the dial turns.
+ * First story starts focused; dial only rotates to the right (scroll ≥ 0).
  */
 export function PresenceStoriesRail({
   people = PRESENCE_RAIL_SEED,
@@ -60,33 +60,20 @@ export function PresenceStoriesRail({
   const {width: windowWidth} = useWindowDimensions()
   const [stageWidth, setStageWidth] = useState(windowWidth)
   const scrollRef = useRef<Animated.ScrollView>(null)
+  // Start at 0 so focus scales match the first story on first paint.
   const scrollX = useSharedValue(0)
 
-  const youIndex = useMemo(
-    () => Math.max(0, people.findIndex(person => person.id === 'you')),
-    [people],
-  )
-
-  const sidePad = Math.max(0, (stageWidth - ITEM_SLOT) / 2)
+  /** Center the focused slot; right pad lets the last story reach center. */
+  const edgePad = Math.max(0, (stageWidth - ITEM_SLOT) / 2)
   const snapOffsets = useMemo(
     () => people.map((_, index) => index * ITEM_SLOT),
     [people],
   )
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      scrollRef.current?.scrollTo({
-        x: youIndex * ITEM_SLOT,
-        animated: false,
-      })
-      scrollX.value = youIndex * ITEM_SLOT
-    }, 40)
-    return () => clearTimeout(timer)
-  }, [scrollX, stageWidth, youIndex])
-
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
-      scrollX.value = event.contentOffset.x
+      // Clamp — dial does not rotate left of the first story.
+      scrollX.value = Math.max(0, event.contentOffset.x)
     },
   })
 
@@ -99,7 +86,7 @@ export function PresenceStoriesRail({
 
   const snapToIndex = (index: number, animated: boolean) => {
     scrollRef.current?.scrollTo({
-      x: index * ITEM_SLOT,
+      x: Math.max(0, index * ITEM_SLOT),
       animated,
     })
   }
@@ -127,14 +114,18 @@ export function PresenceStoriesRail({
           ref={scrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
+          // First story starts centered; only scroll right from here.
+          contentOffset={{x: 0, y: 0}}
           snapToOffsets={snapOffsets}
           snapToAlignment="start"
           disableIntervalMomentum
-          decelerationRate={0.9}
+          decelerationRate={0.88}
           bounces
+          // Resist overscroll on the left (start of dial).
+          alwaysBounceHorizontal={false}
           contentContainerStyle={{
-            paddingHorizontal: sidePad,
-            // Peak of the arc at the top — sides drop via translateY.
+            paddingLeft: edgePad,
+            paddingRight: edgePad,
             paddingTop: 6,
             alignItems: 'flex-start',
             minHeight: compact ? 168 : 196,
