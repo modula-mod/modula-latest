@@ -21,10 +21,29 @@ export function DeveloperSettingsScreen() {
     <AppScreen scroll>
       <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
         <AppText variant="display">Developer</AppText>
-        <AppButton onPress={() => router.push('/settings/developer/data-runtime' as Href)}>
+        <AppText variant="body" colour="textSub">
+          Runtime labs and the Expo UI component gallery for picking patterns by
+          product context.
+        </AppText>
+        <AppButton
+          onPress={() => router.push('/settings/developer/expo-ui' as Href)}>
+          Expo UI Lab
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          onPress={() =>
+            router.push('/settings/developer/expo-ui/playground' as Href)
+          }>
+          Full Expo UI playground
+        </AppButton>
+        <AppButton
+          variant="secondary"
+          onPress={() => router.push('/settings/developer/data-runtime' as Href)}>
           Data Runtime Lab
         </AppButton>
-        <AppButton variant="secondary" onPress={() => router.push('/settings/developer/session' as Href)}>
+        <AppButton
+          variant="secondary"
+          onPress={() => router.push('/settings/developer/session' as Href)}>
           Session Lab
         </AppButton>
       </View>

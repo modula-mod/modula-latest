@@ -32,5 +32,7 @@ Policy: reimplement component **roles**, not Bluesky files. No ALF / `@bsky.app/
 ## Rules
 
 1. Screens compose primitives — avoid one-off StyleSheets for colours.
-2. Features import `@/components/system/*`, never `@expo/ui/swift-ui`.
+2. Features import `@/components/system/*` / `@/platform/ui/*`, never `@expo/ui/swift-ui`.
 3. Social presentation uses `SocialProvider` types only.
+4. Evaluate new Expo UI candidates in Settings → Developer → Expo UI Lab
+   (`src/platform/ui/dev/expo-ui-lab`) before promoting into wrappers.
