@@ -10,6 +10,7 @@ import {
   type SettingsNavRow,
 } from '@/features/settings/components/SettingsRows'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -309,7 +310,7 @@ export function SettingsHomeScreen() {
             ))}
           </SettingsSection>
 
-          {runtimeEnvironment.appEnvironment === 'development' ? (
+          {canAccessDeveloperLabs() ? (
             <SettingsSection title="Development">
               <SettingsLinkRow
                 row={{

@@ -1,6 +1,6 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
-import {isDevelopmentBuild} from '@/lib/platform'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 
 /**
  * Extensible account-panel destinations.
@@ -142,7 +142,7 @@ export function getAccountPanelDestinations(): AccountPanelDestination[] {
   return merged.filter(item => {
     if (seen.has(item.id)) return false
     seen.add(item.id)
-    if (item.devOnly && !isDevelopmentBuild()) return false
+    if (item.devOnly && !canAccessDeveloperLabs()) return false
     return true
   })
 }

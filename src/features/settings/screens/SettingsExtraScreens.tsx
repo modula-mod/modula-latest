@@ -12,7 +12,7 @@ import {
   SettingsSection,
   SettingsToggleRow,
 } from '@/features/settings/components/SettingsRows'
-import {isDevelopmentBuild} from '@/lib/platform'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PrivacySafetyScreen() {
@@ -494,7 +494,7 @@ export function AboutScreen() {
           actions={[
             {id: 'whats-new', label: 'What’s New'},
             {id: 'help', label: 'Help & Support'},
-            ...(isDevelopmentBuild()
+            ...(canAccessDeveloperLabs()
               ? [{id: 'developer', label: 'Developer settings'}]
               : []),
           ]}
@@ -508,7 +508,7 @@ export function AboutScreen() {
       <Pressable
         accessibilityLabel="Modula version"
         onLongPress={() => {
-          if (isDevelopmentBuild()) {
+          if (canAccessDeveloperLabs()) {
             router.push('/settings/developer' as Href)
           }
         }}
@@ -516,7 +516,7 @@ export function AboutScreen() {
         <AppText variant="headline">Modula 0.1.0</AppText>
         <AppText variant="caption" colour="textSecondary">
           Phase 6S · Local / Simulator
-          {isDevelopmentBuild() ? ' · Long-press for Developer' : ''}
+          {canAccessDeveloperLabs() ? ' · Long-press for Developer' : ''}
         </AppText>
       </Pressable>
       <SettingsSection>

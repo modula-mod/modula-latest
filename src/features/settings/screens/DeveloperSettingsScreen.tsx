@@ -7,17 +7,19 @@ import {
   SettingsScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {AppText} from '@/components/primitives/AppText'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 
 export function DeveloperSettingsScreen() {
   const router = useRouter()
 
-  if (runtimeEnvironment.appEnvironment !== 'development') {
+  if (!canAccessDeveloperLabs()) {
     return (
       <SettingsScreen title="Developer">
         <AppText variant="headline">Developer settings are unavailable.</AppText>
-        <SettingsCaption>This surface is only available in development builds.</SettingsCaption>
+        <SettingsCaption>
+          This surface is only available in development and preview builds.
+        </SettingsCaption>
       </SettingsScreen>
     )
   }

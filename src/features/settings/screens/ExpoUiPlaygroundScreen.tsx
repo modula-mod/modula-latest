@@ -3,16 +3,16 @@ import {
   SettingsCaption,
   SettingsScreen,
 } from '@/features/settings/components/SettingsRows'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {AppText} from '@/components/primitives/AppText'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 
 export function ExpoUiPlaygroundScreen() {
-  if (runtimeEnvironment.appEnvironment !== 'development') {
+  if (!canAccessDeveloperLabs()) {
     return (
       <SettingsScreen title="Full playground">
         <AppText variant="headline">Developer settings are unavailable.</AppText>
         <SettingsCaption>
-          This surface is only available in development builds.
+          This surface is only available in development and preview builds.
         </SettingsCaption>
       </SettingsScreen>
     )

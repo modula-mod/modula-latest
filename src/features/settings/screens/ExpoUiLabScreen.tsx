@@ -8,7 +8,7 @@ import {
   SettingsCaption,
   SettingsScreen,
 } from '@/features/settings/components/SettingsRows'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 import {EXPO_UI_LAB_SECTIONS} from '@/platform/ui/dev/expo-ui-lab'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -31,12 +31,12 @@ export function ExpoUiLabScreen() {
   const router = useRouter()
   const {spacing} = useThemeTokens()
 
-  if (runtimeEnvironment.appEnvironment !== 'development') {
+  if (!canAccessDeveloperLabs()) {
     return (
       <SettingsScreen title="Expo UI Lab">
         <AppText variant="headline">Developer settings are unavailable.</AppText>
         <SettingsCaption>
-          This surface is only available in development builds.
+          This surface is only available in development and preview builds.
         </SettingsCaption>
       </SettingsScreen>
     )
