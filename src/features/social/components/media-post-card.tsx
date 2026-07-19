@@ -29,9 +29,14 @@ import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const CORNER = 40
-const SCOOP_W = 188
-const SCOOP_H = 58
+/** Outer media corner radius. */
+const CORNER = 36
+/** White action-tray width (bottom-left bite). */
+const TRAY_W = 196
+/** White action-tray height. */
+const TRAY_H = 62
+/** Concave fillet where media curves into the tray. */
+const FILLET = 52
 
 function relativeTime(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -46,26 +51,33 @@ function formatCompact(value: number): string {
   return String(value)
 }
 
-/** Rounded rect with a concave inverted corner scooped from bottom-left. */
-function invertedCornerPath(
+/**
+ * Rounded media with a crisp concave bite at bottom-left.
+ * The missing corner is canvas — that white/dark tray holds the actions.
+ */
+export function buildInvertedCornerPath(
   width: number,
   height: number,
-  corner: number,
-  scoopW: number,
-  scoopH: number,
+  corner = CORNER,
+  trayW = TRAY_W,
+  trayH = TRAY_H,
+  fillet = FILLET,
 ): string {
-  const r = Math.min(corner, width / 4, height / 4)
-  const sw = Math.min(scoopW, width * 0.58)
-  const sh = Math.min(scoopH, height * 0.22)
+  const r = Math.min(corner, width / 5, height / 5)
+  const tw = Math.min(Math.max(trayW, fillet + 8), width * 0.62)
+  const th = Math.min(Math.max(trayH, fillet * 0.7), height * 0.2)
+  const f = Math.min(fillet, tw * 0.85, th * 1.15)
+
+  // Clockwise media outline. Bottom edge stops at `tw`, then a concave
+  // cubic scoops up to the left edge at `height - th` — clear tray below.
   return [
     `M ${r} 0`,
     `H ${width - r}`,
     `A ${r} ${r} 0 0 1 ${width} ${r}`,
     `V ${height - r}`,
     `A ${r} ${r} 0 0 1 ${width - r} ${height}`,
-    `H ${sw}`,
-    // Concave scoop into the media — soft S-curve inverted corner.
-    `C ${sw * 0.42} ${height}, 0 ${height - sh * 0.42}, 0 ${height - sh}`,
+    `H ${tw}`,
+    `C ${tw} ${height - f * 0.92}, ${f * 0.92} ${height - th}, 0 ${height - th}`,
     `V ${r}`,
     `A ${r} ${r} 0 0 1 ${r} 0`,
     'Z',
@@ -73,13 +85,14 @@ function invertedCornerPath(
 }
 
 /**
- * Media-forward feed card: inverted-corner hero, progressive blur dissolve,
- * liquid-glass chrome, cutout action row, caption below.
+ * Media card matching the inverted-corner / liquid-glass reference:
+ * scooped white tray + cutout actions, progressive blur on media only,
+ * glass proof pill on the remaining bottom-right.
  */
 export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const router = useRouter()
   const session = useSession()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, scheme} = useThemeTokens()
   const reaction = useReactionMutation()
   const save = useSavePostMutation()
   const [frame, setFrame] = useState({width: 0, height: 0})
@@ -94,6 +107,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const liked = Boolean(post.liked || post.viewerReaction)
   const audioLabel = media?.title?.trim() || `Original audio · @${post.author.handle}`
   const likedRed = colours.destructive
+  const moreInk = scheme === 'dark' ? '#141418' : colours.text
 
   const likerFaces: AvatarFace[] = [
     {
@@ -126,8 +140,11 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
 
   const path =
     frame.width > 0
-      ? invertedCornerPath(frame.width, frame.height, CORNER, SCOOP_W, SCOOP_H)
+      ? buildInvertedCornerPath(frame.width, frame.height)
       : ''
+
+  // Preview views figure for the glass pill (no views field on posts yet).
+  const viewsLabel = formatCompact(Math.max(post.likeCount * 700, post.likeCount))
 
   return (
     <View style={{gap: spacing[3]}}>
@@ -140,10 +157,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             pointerEvents="none"
             style={[
               styles.mediaGlow,
-              {
-                backgroundColor: glow,
-                borderRadius: CORNER,
-              },
+              {backgroundColor: glow, borderRadius: CORNER},
             ]}
           />
 
@@ -156,14 +170,11 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                 </Svg>
               }>
               <View
-                style={[
-                  styles.mediaFill,
-                  {
-                    width: frame.width,
-                    height: frame.height,
-                    backgroundColor: media?.colour ?? colours.surfaceMuted,
-                  },
-                ]}>
+                style={{
+                  width: frame.width,
+                  height: frame.height,
+                  backgroundColor: media?.colour ?? colours.surfaceMuted,
+                }}>
                 {media?.url && !media.url.startsWith('local://') ? (
                   <Image
                     source={{uri: media.url}}
@@ -181,17 +192,17 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                 )}
 
                 <LinearGradient
-                  colors={['rgba(0,0,0,0.4)', 'transparent', 'transparent']}
-                  locations={[0, 0.32, 1]}
+                  colors={['rgba(0,0,0,0.42)', 'transparent']}
+                  locations={[0, 0.3]}
                   style={StyleSheet.absoluteFill}
                   pointerEvents="none"
                 />
 
-                {/* Progressive blur dissolves the bottom edge into the feed. */}
+                {/* Blur follows the masked scoop — dissolves media into the feed. */}
                 <ProgressiveBlurBand
-                  height={Math.max(72, SCOOP_H + 28)}
+                  height={TRAY_H + 36}
                   topHeavy={false}
-                  intensity={54}
+                  intensity={62}
                   style={styles.bottomBlur}
                 />
               </View>
@@ -200,7 +211,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             <View style={[styles.mediaPlaceholder, {aspectRatio: aspect}]} />
           )}
 
-          {/* Top identity + liquid-glass more */}
+          {/* Header overlay on media */}
           <View
             pointerEvents="box-none"
             style={[
@@ -237,8 +248,8 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                     numberOfLines={1}>
                     {post.author.displayName}
                   </AppText>
-                  <View style={[styles.verified, {backgroundColor: colours.accent}]}>
-                    <AppIcon name="check" colour={colours.accentForeground} size={10} />
+                  <View style={[styles.verified, {backgroundColor: '#7B5CFF'}]}>
+                    <AppIcon name="check" colour="#FFFFFF" size={10} />
                   </View>
                 </View>
                 <View style={[styles.audioRow, {gap: 4}]}>
@@ -259,45 +270,48 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
               actions={overflowActions}
               onAction={runOverflow}
               trigger={
-                <LiquidGlassChrome interactive fallback="clear" style={styles.moreGlass}>
-                  <AppIcon name="more" colour={colours.mediaOverlayIcon} size={18} />
-                </LiquidGlassChrome>
+                <View style={styles.moreButton}>
+                  <AppIcon name="more" colour={moreInk} size={18} />
+                </View>
               }
             />
           </View>
 
-          {/* Liquid-glass social proof on the remaining bottom-right media. */}
+          {/* Glass proof pill — on remaining bottom-right media, not in the tray. */}
           <View
             pointerEvents="box-none"
             style={[
               styles.proofAnchor,
               {
                 right: spacing[3],
-                bottom: spacing[3],
+                bottom: spacing[3] + 4,
               },
             ]}>
             <LiquidGlassChrome interactive fallback="regular" style={styles.proofGlass}>
-              <View style={[styles.proofInner, {gap: spacing[2], paddingHorizontal: spacing[2]}]}>
+              <View style={[styles.proofInner, {gap: spacing[2], paddingHorizontal: spacing[3]}]}>
                 <StackedAvatars faces={likerFaces} size={22} max={3} overlap={8} />
                 <AppText
                   variant="label"
                   style={{color: colours.mediaOverlayText}}
                   numberOfLines={1}>
-                  {formatCompact(post.likeCount)} Liked
+                  {viewsLabel} views
                 </AppText>
               </View>
             </LiquidGlassChrome>
           </View>
 
-          {/* Actions sit in the inverted-corner negative space (canvas, not on media). */}
+          {/*
+            Action tray: sits in the scooped canvas bite (sibling of MaskedView).
+            Not on the media / blur — matches the white notch in the reference.
+          */}
           <View
             pointerEvents="box-none"
             style={[
-              styles.cutoutActions,
+              styles.tray,
               {
-                width: SCOOP_W - 8,
-                height: SCOOP_H,
-                paddingLeft: spacing[1],
+                width: TRAY_W - 6,
+                height: TRAY_H,
+                paddingLeft: spacing[2],
               },
             ]}>
             <AppPressable
@@ -314,33 +328,33 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
                 void selectionHaptic()
                 reaction.mutate({postId: post.id, reaction: 'love'})
               }}
-              style={styles.cutoutHit}>
-              <AppIcon name="like" colour={liked ? likedRed : colours.text} size={24} />
+              style={styles.trayHit}>
+              <AppIcon name="like" colour={liked ? likedRed : colours.text} size={26} />
             </AppPressable>
             <AppPressable
               accessibilityLabel="Comment on post"
               onPress={() => router.push(`/post/${post.id}` as Href)}
-              style={styles.cutoutHit}>
-              <AppIcon name="comment" colour={colours.text} size={24} />
+              style={styles.trayHit}>
+              <AppIcon name="comment" colour={colours.text} size={26} />
             </AppPressable>
             <AppPressable
               accessibilityLabel="Share post"
               onPress={() => void runPostOverflowAction('share', post)}
-              style={styles.cutoutHit}>
-              <AppIcon name="share" colour={colours.text} size={24} />
+              style={styles.trayHit}>
+              <AppIcon name="share" colour={colours.text} size={26} />
             </AppPressable>
             <AppPressable
-              accessibilityLabel={post.saved ? 'Unsave post' : 'Save post'}
+              accessibilityLabel={post.saved ? 'Unsave post' : 'Save for later'}
               accessibilityState={{selected: post.saved}}
               onPress={() => {
                 void selectionHaptic()
                 save.mutate({postId: post.id, saved: !post.saved})
               }}
-              style={styles.cutoutHit}>
+              style={styles.trayHit}>
               <AppIcon
-                name="saved"
+                name={post.saved ? 'saved' : 'event'}
                 colour={post.saved ? colours.accent : colours.text}
-                size={24}
+                size={26}
               />
             </AppPressable>
           </View>
@@ -367,7 +381,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
             accessibilityLabel="View comments"
             onPress={() => router.push(`/post/${post.id}` as Href)}>
             <AppText variant="caption" colour="textSecondary">
-              View {post.replyCount} comment{post.replyCount === 1 ? '' : 's'}
+              more
             </AppText>
           </AppPressable>
         ) : null}
@@ -397,22 +411,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  cutoutActions: {
-    alignItems: 'center',
-    bottom: 0,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    left: 0,
-    position: 'absolute',
-    zIndex: 3,
-  },
-  cutoutHit: {
-    alignItems: 'center',
-    height: 48,
-    justifyContent: 'center',
-    width: 44,
-  },
   frame: {
+    overflow: 'visible',
     position: 'relative',
     width: '100%',
   },
@@ -427,26 +427,29 @@ const styles = StyleSheet.create({
     gap: 2,
     minWidth: 0,
   },
-  mediaFill: {
-    overflow: 'hidden',
-  },
   mediaGlow: {
-    bottom: -8,
-    left: 18,
-    opacity: 0.16,
+    bottom: -6,
+    left: 16,
+    opacity: 0.14,
     position: 'absolute',
-    right: 18,
-    top: 18,
+    right: 16,
+    top: 16,
   },
   mediaPlaceholder: {
     width: '100%',
   },
-  moreGlass: {
+  moreButton: {
     alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.92)',
     borderRadius: 999,
-    height: 36,
+    height: 34,
     justifyContent: 'center',
-    width: 36,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+    width: 34,
   },
   nameRow: {
     alignItems: 'center',
@@ -456,7 +459,7 @@ const styles = StyleSheet.create({
   },
   proofAnchor: {
     position: 'absolute',
-    zIndex: 3,
+    zIndex: 4,
   },
   proofGlass: {
     borderRadius: 999,
@@ -477,6 +480,21 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: 2,
+  },
+  tray: {
+    alignItems: 'center',
+    bottom: 0,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    left: 0,
+    position: 'absolute',
+    zIndex: 5,
+  },
+  trayHit: {
+    alignItems: 'center',
+    height: 52,
+    justifyContent: 'center',
+    width: 46,
   },
   verified: {
     alignItems: 'center',
