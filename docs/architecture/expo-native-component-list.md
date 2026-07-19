@@ -34,7 +34,10 @@ NCL is Expo’s internal gallery of modules and components. Use it to **learn AP
 
 **No new Expo modules added** for the shell. Existing `package.json` covers Feed/Board/Explore placeholders, `expo-image` avatars, and `@expo/ui` settings switches.
 
-Dev gallery at `/dev/components` exercises Modula primitives and system adapters only.
+Dev gallery at `/settings/developer/expo-ui` (alias `/dev/components`) hosts the
+Expo UI playground sections (adapted from [expo-ui-playground](https://github.com/betomoedano/expo-ui-playground))
+so the team can pick candidates by product context. Live SwiftUI demos live under
+`src/platform/ui/dev/expo-ui-lab/`; product screens still consume Modula wrappers only.
 
 ## Admission reminder
 

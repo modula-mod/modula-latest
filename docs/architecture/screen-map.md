@@ -59,7 +59,10 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 | — | `/settings/modules` | Implemented (empty) |
 | — | `/settings/marketplace` | Stub |
 | — | `/settings/developer` | Implemented |
-| — | `/dev/components` | Implemented (`__DEV__`) |
+| — | `/settings/developer/expo-ui` | Implemented (Expo UI Lab catalog) |
+| — | `/settings/developer/expo-ui/playground` | Implemented (full playground) |
+| — | `/settings/developer/expo-ui/[section]` | Implemented (per-section demos) |
+| — | `/dev/components` | Implemented (`__DEV__` → Expo UI Lab) |
 
 ## Shell
 

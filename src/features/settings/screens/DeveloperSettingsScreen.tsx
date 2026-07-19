@@ -75,6 +75,22 @@ export function DeveloperSettingsScreen() {
       <SettingsSection title="Host labs">
         <SettingsLinkRow
           row={{
+            title: 'Expo UI Lab',
+            description: 'Pick Expo UI playground components by product context.',
+            icon: 'developer',
+            route: '/settings/developer/expo-ui',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Full Expo UI playground',
+            description: 'All playground sections in one Form host.',
+            icon: 'developer',
+            route: '/settings/developer/expo-ui/playground',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
             title: 'Extension Centre',
             description: 'Tools, plugins, and connectors.',
             icon: 'modules',

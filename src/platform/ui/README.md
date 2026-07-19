@@ -2,6 +2,8 @@
 
 Thin Modula adapters for native chrome. Feature screens consume these wrappers — never `@expo/ui/swift-ui` directly.
 
+Developer evaluation gallery (adapted from expo-ui-playground): `src/platform/ui/dev/expo-ui-lab/` → Settings → Developer → Expo UI Lab.
+
 ## Ownership (Phase 4.5)
 
 | Area | Owner |
