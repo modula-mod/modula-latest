@@ -109,7 +109,15 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     label: 'Developer',
     route: '/settings/developer',
     icon: 'developer',
-    description: 'Diagnostics and local tools',
+    description: 'Expo UI Lab, data runtime, session',
+    devOnly: true,
+  },
+  {
+    id: 'expo-ui-lab',
+    label: 'Expo UI Lab',
+    route: '/settings/developer/expo-ui',
+    icon: 'developer',
+    description: 'Pick Expo UI components by context',
     devOnly: true,
   },
 ]

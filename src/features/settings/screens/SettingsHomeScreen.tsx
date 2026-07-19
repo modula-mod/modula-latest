@@ -313,10 +313,21 @@ export function SettingsHomeScreen() {
             <SettingsSection title="Development">
               <SettingsLinkRow
                 row={{
+                  title: 'Expo UI Lab',
+                  description:
+                    'Pick Expo UI playground components by product context.',
+                  icon: 'developer',
+                  route: '/settings/developer/expo-ui',
+                  value: 'Open',
+                }}
+              />
+              <SettingsLinkRow
+                row={{
                   title: 'Developer',
+                  description: 'Data runtime, session, Expo UI Lab and local tools.',
                   icon: 'developer',
                   route: '/settings/developer',
-                  value: 'Lab',
+                  value: 'Labs',
                 }}
                 last
               />
