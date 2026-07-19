@@ -26,6 +26,7 @@ const ACTIONS: QuickAction[] = [
   {id: 'discover', label: 'Discover', icon: 'discover', href: '/discover' as Href},
   {id: 'presence', label: 'Presence', icon: 'people', href: '/product/presence' as Href},
   {id: 'board', label: 'Board', icon: 'board', href: '/board' as Href},
+  {id: 'customize', label: 'Customize', icon: 'appearance', href: '/product/customize' as Href},
 ]
 
 /**

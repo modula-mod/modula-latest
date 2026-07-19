@@ -37,6 +37,9 @@ export function FeatureControlScreen() {
             <AppText variant="body" colour="textSecondary">
               Enable, hide, or lock versions. Choices persist locally on this device.
             </AppText>
+            <AppButton onPress={() => router.push('/product/customize' as Href)}>
+              Open Customize hub
+            </AppButton>
           </View>
 
           {preferences.featureControl.map((row, index) => {

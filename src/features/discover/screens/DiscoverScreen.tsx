@@ -15,6 +15,8 @@ import {Pill} from '@/components/primitives/Pill'
 import {InspireNextList} from '@/features/discover/components/InspireNextList'
 import {LivePresenceRail} from '@/features/discover/components/LivePresenceRail'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {isBlockOn} from '@/features/product/data/layoutBlocks'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
@@ -39,11 +41,13 @@ export function DiscoverScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
+  const {preferences} = useProductPreferences()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
   const q = query.trim().toLowerCase()
   const result = discoverQuery.data
+  const showBlock = (id: string) => isBlockOn(preferences.discoverBlockIds, id)
 
   const filtered = useMemo(() => filterDiscover(result, q), [result, q])
   const hasResults =
@@ -84,6 +88,7 @@ export function DiscoverScreen() {
                   {id: 'feeds', label: 'Custom feeds — Preview'},
                   {id: 'inspire', label: 'Inspire next'},
                   {id: 'live', label: 'Live presence'},
+                  {id: 'customize', label: 'Customize Discover layout'},
                   {id: 'media-grid', label: 'Media grid'},
                   {id: 'open-marketplace', label: 'Open Marketplace'},
                   {id: 'open-communities', label: 'Open Communities'},
@@ -111,6 +116,10 @@ export function DiscoverScreen() {
                   }
                   if (id === 'live') {
                     router.push('/discover/live' as Href)
+                    return
+                  }
+                  if (id === 'customize') {
+                    router.push('/product/layout-discover' as Href)
                     return
                   }
                   if (id === 'media-grid') {
@@ -202,38 +211,39 @@ export function DiscoverScreen() {
             <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
           ) : hasResults ? (
             <>
-              {category === 'For You' ? <LivePresenceRail /> : null}
-              {(category === 'For You' || category === 'Media') && (
+              {category === 'For You' && showBlock('live') ? <LivePresenceRail /> : null}
+              {(category === 'For You' || category === 'Media') && showBlock('reels') ? (
                 <SectionEnter delay={100}>
                   <ReelsPreviewRail result={filtered} />
                 </SectionEnter>
-              )}
-              {(category === 'For You' || category === 'People') && (
+              ) : null}
+              {(category === 'For You' || category === 'People') && showBlock('people') ? (
                 <SectionEnter delay={120}>
                   <SuggestedPeople people={filtered.suggestedProfiles} />
                 </SectionEnter>
-              )}
-              {category === 'For You' ? <InspireNextList /> : null}
-              {(category === 'For You' || category === 'Communities') && (
-                <>
-                  <SectionEnter delay={160}>
-                    <TrendingTopics topics={filtered.trendingTopics} />
-                  </SectionEnter>
-                  <SectionEnter delay={180}>
-                    <CommunitiesRail />
-                  </SectionEnter>
-                </>
-              )}
-              {(category === 'For You' || category === 'Marketplace') && (
+              ) : null}
+              {category === 'For You' && showBlock('inspire') ? <InspireNextList /> : null}
+              {(category === 'For You' || category === 'Communities') && showBlock('topics') ? (
+                <SectionEnter delay={160}>
+                  <TrendingTopics topics={filtered.trendingTopics} />
+                </SectionEnter>
+              ) : null}
+              {(category === 'For You' || category === 'Communities') &&
+              showBlock('communities') ? (
+                <SectionEnter delay={180}>
+                  <CommunitiesRail />
+                </SectionEnter>
+              ) : null}
+              {(category === 'For You' || category === 'Marketplace') && showBlock('modules') ? (
                 <SectionEnter delay={200}>
                   <FeaturedModules modules={filtered.featuredModules} />
                 </SectionEnter>
-              )}
-              {(category === 'For You' || category === 'Media') && (
+              ) : null}
+              {(category === 'For You' || category === 'Media') && showBlock('media') ? (
                 <SectionEnter delay={220}>
                   <MediaGrid result={filtered} />
                 </SectionEnter>
-              )}
+              ) : null}
               {category === 'Marketplace' ? (
                 <AppPressable
                   accessibilityLabel="Browse Marketplace"

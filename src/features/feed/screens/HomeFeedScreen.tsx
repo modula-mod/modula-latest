@@ -26,6 +26,7 @@ import {
   FOCUS_PRESET_META,
   isFocusActive,
 } from '@/features/product/data/focusPolicy'
+import {isBlockOn} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
@@ -66,6 +67,8 @@ export function HomeFeedScreen() {
   const focus = preferences.focus
   const focusPreset = focus.preset ?? 'off'
   const focusActive = isFocusActive(focus)
+  const homeBlocks = preferences.homeBlockIds
+  const showBlock = (id: string) => isBlockOn(homeBlocks, id)
   const focusMeta = FOCUS_PRESET_META[focusPreset]
   const focusBannerCopy = useMemo(() => {
     const sentences = [`${focusMeta.title} Focus is active.`]
@@ -147,7 +150,7 @@ export function HomeFeedScreen() {
             }}
             ListHeaderComponent={
               <View>
-                {!focus.hideNav ? (
+                {!focus.hideNav && showBlock('presence') ? (
                   <SectionEnter>
                     <View style={{paddingVertical: spacing[3]}}>
                       <PresenceStoriesRail compact showCaption />
@@ -155,11 +158,13 @@ export function HomeFeedScreen() {
                   </SectionEnter>
                 ) : null}
 
-                <SectionEnter delay={50} from="right">
-                  <HomeQuickActions />
-                </SectionEnter>
+                {showBlock('quick-actions') ? (
+                  <SectionEnter delay={50} from="right">
+                    <HomeQuickActions />
+                  </SectionEnter>
+                ) : null}
 
-                {focusActive ? (
+                {focusActive && showBlock('focus-banner') ? (
                   <AppPressable
                     accessibilityLabel="Open Focus Mode"
                     onPress={() => router.push('/product/focus' as Href)}
@@ -189,7 +194,7 @@ export function HomeFeedScreen() {
                   </AppPressable>
                 ) : null}
 
-                {preferences.mergeFeedIds.length >= 2 ? (
+                {preferences.mergeFeedIds.length >= 2 && showBlock('merge-banner') ? (
                   <AppPressable
                     accessibilityLabel="Open Merge Feeds"
                     onPress={() => router.push('/product/merge-feeds' as Href)}
@@ -214,64 +219,66 @@ export function HomeFeedScreen() {
                   </AppPressable>
                 ) : null}
 
-                <View
-                  accessibilityRole="tablist"
-                  style={[
-                    styles.modeRow,
-                    {
-                      borderBottomColor: colours.border,
-                      gap: spacing[2],
-                      paddingHorizontal: spacing[4],
-                      paddingTop: spacing[1],
-                    },
-                  ]}>
-                  {modeOrder.map(next => {
-                    const demoted = focus.quietFeed && next === 'For You'
-                    const selected = mode === next
-                    return (
-                      <AppPressable
-                        key={next}
-                        accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
-                        accessibilityRole="tab"
-                        accessibilityState={{selected: mode === next}}
-                        onPress={() => {
-                          void selectionHaptic()
-                          setMode(next)
-                        }}
-                        style={[
-                          styles.modeButton,
-                          {
-                            backgroundColor: selected ? colours.accentSubtle : 'transparent',
-                            borderColor: selected ? colours.accentBorder : 'transparent',
-                            borderRadius: radius.round,
-                            paddingHorizontal: spacing[3],
-                          },
-                          demoted ? {opacity: 0.55} : null,
-                        ]}>
-                        <AppText
-                          variant="label"
-                          style={{
-                            color:
-                              selected ? colours.accent : colours.textSecondary,
-                          }}>
-                          {next}
-                          {demoted ? ' · Quiet' : ''}
-                        </AppText>
-                        <View
+                {showBlock('mode-tabs') ? (
+                  <View
+                    accessibilityRole="tablist"
+                    style={[
+                      styles.modeRow,
+                      {
+                        borderBottomColor: colours.border,
+                        gap: spacing[2],
+                        paddingHorizontal: spacing[4],
+                        paddingTop: spacing[1],
+                      },
+                    ]}>
+                    {modeOrder.map(next => {
+                      const demoted = focus.quietFeed && next === 'For You'
+                      const selected = mode === next
+                      return (
+                        <AppPressable
+                          key={next}
+                          accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
+                          accessibilityRole="tab"
+                          accessibilityState={{selected: mode === next}}
+                          onPress={() => {
+                            void selectionHaptic()
+                            setMode(next)
+                          }}
                           style={[
-                            styles.modeUnderline,
+                            styles.modeButton,
                             {
-                              backgroundColor:
-                                selected ? colours.accent : 'transparent',
+                              backgroundColor: selected ? colours.accentSubtle : 'transparent',
+                              borderColor: selected ? colours.accentBorder : 'transparent',
                               borderRadius: radius.round,
+                              paddingHorizontal: spacing[3],
                             },
-                          ]}
-                        />
-                      </AppPressable>
-                    )
-                  })}
-                </View>
-                <ComposerPrompt />
+                            demoted ? {opacity: 0.55} : null,
+                          ]}>
+                          <AppText
+                            variant="label"
+                            style={{
+                              color:
+                                selected ? colours.accent : colours.textSecondary,
+                            }}>
+                            {next}
+                            {demoted ? ' · Quiet' : ''}
+                          </AppText>
+                          <View
+                            style={[
+                              styles.modeUnderline,
+                              {
+                                backgroundColor:
+                                  selected ? colours.accent : 'transparent',
+                                borderRadius: radius.round,
+                              },
+                            ]}
+                          />
+                        </AppPressable>
+                      )
+                    })}
+                  </View>
+                ) : null}
+                {showBlock('composer') ? <ComposerPrompt /> : null}
               </View>
             }
             ListEmptyComponent={

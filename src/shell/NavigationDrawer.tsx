@@ -110,6 +110,13 @@ const drawerDestinations: DrawerDestination[] = [
     section: 'labs',
   },
   {
+    label: 'Customize',
+    route: '/product/customize',
+    icon: 'appearance',
+    description: 'Layout studios and optional surfaces',
+    section: 'labs',
+  },
+  {
     label: 'Design Lab',
     route: '/product/design-lab',
     icon: 'appearance',

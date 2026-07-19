@@ -1,5 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import {
+  DEFAULT_ACTIVITY_BLOCK_IDS,
+  DEFAULT_DISCOVER_BLOCK_IDS,
+  DEFAULT_HOME_BLOCK_IDS,
+  DEFAULT_PROFILE_TAB_IDS,
+  DEFAULT_TAB_BAR_IDS,
+  ACTIVITY_LAYOUT_BLOCKS,
+  DISCOVER_LAYOUT_BLOCKS,
+  HOME_LAYOUT_BLOCKS,
+  PROFILE_LAYOUT_BLOCKS,
+  TAB_LAYOUT_BLOCKS,
+  sanitizeOrderedIds,
+  type ChromeDensity,
+  type MotionDensity,
+  type SurfacePreviewId,
+} from '@/features/product/data/layoutBlocks'
+
 const KEY = 'modula.product.preferences.v1'
 
 export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
@@ -36,6 +53,19 @@ export type ProductPreferences = {
   chatAssistFunctions: string[]
   quietSendEnabled: boolean
   teamsRoleId: string
+  /** Ordered enabled Home header blocks. */
+  homeBlockIds: string[]
+  /** Ordered enabled Discover sections. */
+  discoverBlockIds: string[]
+  /** Ordered visible tab bar ids (home + profile always kept). */
+  tabBarIds: string[]
+  /** Activity surface blocks (digest, filters, etc.). */
+  activityBlockIds: string[]
+  /** Preferred profile tab order/visibility Preview. */
+  profileTabIds: string[]
+  chromeDensity: ChromeDensity
+  motionDensity: MotionDensity
+  surfacePreview: SurfacePreviewId
 }
 
 export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
@@ -68,6 +98,14 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
   chatAssistFunctions: ['summarise', 'suggested-replies', 'tone'],
   quietSendEnabled: false,
   teamsRoleId: 'admin',
+  homeBlockIds: [...DEFAULT_HOME_BLOCK_IDS],
+  discoverBlockIds: [...DEFAULT_DISCOVER_BLOCK_IDS],
+  tabBarIds: [...DEFAULT_TAB_BAR_IDS],
+  activityBlockIds: [...DEFAULT_ACTIVITY_BLOCK_IDS],
+  profileTabIds: [...DEFAULT_PROFILE_TAB_IDS],
+  chromeDensity: 'comfortable',
+  motionDensity: 'full',
+  surfacePreview: 'solid',
 }
 
 function isChatAssistMode(value: unknown): value is ChatAssistMode {
@@ -156,6 +194,49 @@ function mergePreferences(raw: unknown): ProductPreferences {
       typeof value.teamsRoleId === 'string' && value.teamsRoleId.trim()
         ? value.teamsRoleId.trim()
         : DEFAULT_PRODUCT_PREFERENCES.teamsRoleId,
+    homeBlockIds: sanitizeOrderedIds(
+      value.homeBlockIds,
+      HOME_LAYOUT_BLOCKS,
+      DEFAULT_HOME_BLOCK_IDS,
+    ),
+    discoverBlockIds: sanitizeOrderedIds(
+      value.discoverBlockIds,
+      DISCOVER_LAYOUT_BLOCKS,
+      DEFAULT_DISCOVER_BLOCK_IDS,
+    ),
+    tabBarIds: sanitizeOrderedIds(
+      value.tabBarIds,
+      TAB_LAYOUT_BLOCKS,
+      DEFAULT_TAB_BAR_IDS,
+    ),
+    activityBlockIds: sanitizeOrderedIds(
+      value.activityBlockIds,
+      ACTIVITY_LAYOUT_BLOCKS,
+      DEFAULT_ACTIVITY_BLOCK_IDS,
+    ),
+    profileTabIds: sanitizeOrderedIds(
+      value.profileTabIds,
+      PROFILE_LAYOUT_BLOCKS,
+      DEFAULT_PROFILE_TAB_IDS,
+    ),
+    chromeDensity:
+      value.chromeDensity === 'compact' ||
+      value.chromeDensity === 'comfortable' ||
+      value.chromeDensity === 'airy'
+        ? value.chromeDensity
+        : DEFAULT_PRODUCT_PREFERENCES.chromeDensity,
+    motionDensity:
+      value.motionDensity === 'full' ||
+      value.motionDensity === 'reduced' ||
+      value.motionDensity === 'minimal'
+        ? value.motionDensity
+        : DEFAULT_PRODUCT_PREFERENCES.motionDensity,
+    surfacePreview:
+      value.surfacePreview === 'solid' ||
+      value.surfacePreview === 'glass' ||
+      value.surfacePreview === 'minimal'
+        ? value.surfacePreview
+        : DEFAULT_PRODUCT_PREFERENCES.surfacePreview,
   }
 }
 

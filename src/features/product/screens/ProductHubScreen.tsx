@@ -156,6 +156,13 @@ export function ProductHubScreen() {
             <View style={[styles.grid, {gap: spacing[3]}]}>
               {[
                 {
+                  id: 'customize',
+                  name: 'Customize',
+                  summary: 'Pick Home, Discover, tabs, and optional surfaces.',
+                  icon: 'appearance' as const,
+                  route: '/product/customize',
+                },
+                {
                   id: 'design-lab',
                   name: 'Design Lab',
                   summary: 'Inspiration remap Preview.',

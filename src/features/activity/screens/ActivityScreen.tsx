@@ -20,6 +20,8 @@ import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
+import {isBlockOn} from '@/features/product/data/layoutBlocks'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
@@ -73,6 +75,7 @@ export function ActivityScreen() {
   const {activityRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
   const activityQuery = useActivityQuery()
@@ -84,6 +87,8 @@ export function ActivityScreen() {
     () => activity.filter(item => matchesFilter(item, filter)),
     [activity, filter],
   )
+  const showBlock = (id: string) => isBlockOn(preferences.activityBlockIds, id)
+  const staggerEnter = showBlock('stagger-enter') && !reduceMotion
 
   useEffect(() => {
     if (!reduceMotion) {
@@ -167,6 +172,8 @@ export function ActivityScreen() {
                   {id: 'notifications', label: 'Notification settings'},
                   {id: 'markRead', label: 'Mark all as read'},
                   {id: 'filter', label: 'Open filters'},
+                  {id: 'customize', label: 'Customize Activity'},
+                  {id: 'quiet', label: 'Quiet inbox'},
                 ]}
                 onAction={id => {
                   if (id === 'notifications') {
@@ -174,27 +181,31 @@ export function ActivityScreen() {
                   }
                   if (id === 'markRead') markAllRead()
                   if (id === 'filter') setFilterSheetOpen(true)
+                  if (id === 'customize') router.push('/product/layout-activity' as Href)
+                  if (id === 'quiet') router.push('/product/quiet-inbox' as Href)
                 }}
               />
             </View>
           </View>
 
-          <SectionEnter delay={20} from="right">
-            <View style={{flexDirection: 'row', gap: spacing[2]}}>
-              <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
-              <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
-              <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
-              <Pill
-                label="Filters"
-                selected={
-                  filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
-                }
-                onPress={() => setFilterSheetOpen(true)}
-              />
-            </View>
-          </SectionEnter>
+          {showBlock('filter-pills') ? (
+            <SectionEnter delay={20} from="right">
+              <View style={{flexDirection: 'row', gap: spacing[2]}}>
+                <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
+                <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
+                <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
+                <Pill
+                  label="Filters"
+                  selected={
+                    filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
+                  }
+                  onPress={() => setFilterSheetOpen(true)}
+                />
+              </View>
+            </SectionEnter>
+          ) : null}
 
-          {filter === 'all' ? (
+          {filter === 'all' && showBlock('digest') ? (
             <ActivityDigestStrip
               items={activity}
               readIds={readIds}
@@ -211,36 +222,47 @@ export function ActivityScreen() {
           {groups.map((group, groupIndex) => {
             const items = filtered.filter(item => item.group === group)
             if (!items.length) return null
+            const groupBody = (
+              <View style={{gap: spacing[3]}}>
+                <AppText variant="headline">{group}</AppText>
+                <View style={{gap: spacing[2]}}>
+                  {items.map((item, itemIndex) => {
+                    const row = (
+                      <ActivityRow
+                        item={item}
+                        unread={!readIds.has(item.id)}
+                        highlightUnread={showBlock('unread-cards')}
+                        peers={activity.filter(
+                          peer =>
+                            peer.id !== item.id &&
+                            peer.group === item.group &&
+                            (peer.type === 'like' || peer.type === 'reaction') &&
+                            (item.type === 'like' || item.type === 'reaction'),
+                        )}
+                        onOpen={() => {
+                          setReadIds(prev => new Set(prev).add(item.id))
+                          void activityRepository.markRead(item.id).catch(() => undefined)
+                        }}
+                        onMarkRead={() => {
+                          setReadIds(prev => new Set(prev).add(item.id))
+                          void activityRepository.markRead(item.id).catch(() => undefined)
+                        }}
+                      />
+                    )
+                    if (!staggerEnter) return <View key={item.id}>{row}</View>
+                    return (
+                      <SectionEnter key={item.id} delay={80 + groupIndex * 40 + itemIndex * 28}>
+                        {row}
+                      </SectionEnter>
+                    )
+                  })}
+                </View>
+              </View>
+            )
+            if (!staggerEnter) return <View key={group}>{groupBody}</View>
             return (
               <SectionEnter key={group} delay={60 + groupIndex * 50}>
-                <View style={{gap: spacing[3]}}>
-                  <AppText variant="headline">{group}</AppText>
-                  <View style={{gap: spacing[2]}}>
-                    {items.map((item, itemIndex) => (
-                      <SectionEnter key={item.id} delay={80 + groupIndex * 40 + itemIndex * 28}>
-                        <ActivityRow
-                          item={item}
-                          unread={!readIds.has(item.id)}
-                          peers={activity.filter(
-                            peer =>
-                              peer.id !== item.id &&
-                              peer.group === item.group &&
-                              (peer.type === 'like' || peer.type === 'reaction') &&
-                              (item.type === 'like' || item.type === 'reaction'),
-                          )}
-                          onOpen={() => {
-                            setReadIds(prev => new Set(prev).add(item.id))
-                            void activityRepository.markRead(item.id).catch(() => undefined)
-                          }}
-                          onMarkRead={() => {
-                            setReadIds(prev => new Set(prev).add(item.id))
-                            void activityRepository.markRead(item.id).catch(() => undefined)
-                          }}
-                        />
-                      </SectionEnter>
-                    ))}
-                  </View>
-                </View>
+                {groupBody}
               </SectionEnter>
             )
           })}
@@ -286,12 +308,14 @@ export function ActivityScreen() {
 function ActivityRow({
   item,
   unread,
+  highlightUnread,
   peers,
   onOpen,
   onMarkRead,
 }: {
   item: ActivityItem
   unread: boolean
+  highlightUnread: boolean
   peers: ActivityItem[]
   onOpen: () => void
   onMarkRead: () => void
@@ -365,7 +389,8 @@ function ActivityRow({
           style={[
             styles.row,
             {
-              backgroundColor: unread ? colours.surfaceRaised : 'transparent',
+              backgroundColor:
+                unread && highlightUnread ? colours.surfaceRaised : 'transparent',
               borderRadius: radius.xlarge,
               gap: spacing[3],
               opacity: unread ? 1 : 0.72,

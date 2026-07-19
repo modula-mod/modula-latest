@@ -7,6 +7,13 @@ import {registerAccountPanelDestination} from '@/platform/ui/navigation/account-
 export function registerExpansionAccountPanelDestinations(): void {
   const extras = [
     {
+      id: 'customize',
+      label: 'Customize',
+      route: '/product/customize',
+      icon: 'appearance' as const,
+      description: 'Layout studios and optional surfaces',
+    },
+    {
       id: 'lists',
       label: 'Lists',
       route: '/lists',
