@@ -67,7 +67,7 @@ export function ProfileHeaderRight() {
   )
 }
 
-/** iOS 26+: share and more as separate plain items with a real gap. */
+/** iOS 26+: shared liquid glass with share + more spaced apart inside it. */
 export function profileHeaderRightItems() {
   if (!supportsPlainHeaderItems()) return undefined
   return [

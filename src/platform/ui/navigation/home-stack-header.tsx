@@ -120,8 +120,8 @@ export function HomeHeaderMessages() {
 }
 
 /**
- * Android / web fallback — single slot. Prefer `homeHeaderRightItems` on iOS
- * so the pair is not crushed into one shared glass capsule.
+ * Android / web fallback. On iOS prefer `homeHeaderRightItems` so the shared
+ * liquid-glass capsule keeps both icons with a real gap between them.
  */
 export function HomeHeaderRight() {
   return (
@@ -132,7 +132,7 @@ export function HomeHeaderRight() {
   )
 }
 
-/** iOS 26+: separate plain items with gap — not one wide pill of clustered icons. */
+/** iOS 26+: shared liquid glass + spaced icons (not clustered left). */
 export function homeHeaderLeftItems() {
   if (!supportsPlainHeaderItems()) return undefined
   return [plainHeaderCustomItem(<HomeHeaderLeft />)]
