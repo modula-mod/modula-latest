@@ -19,7 +19,6 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
-import {HomeQuickActions} from '@/features/feed/components/HomeQuickActions'
 import {HomeSearchModal} from '@/features/feed/components/HomeSearchModal'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
@@ -311,11 +310,6 @@ function HomeLayoutHeader({
           </SectionEnter>
         </ShellChromeObscureView>
       ) : null,
-    'quick-actions': showBlock('quick-actions') ? (
-      <SectionEnter key="quick-actions" delay={50} from="right">
-        <HomeQuickActions />
-      </SectionEnter>
-    ) : null,
     'focus-banner':
       focusActive && focusFeatureOn && showBlock('focus-banner') ? (
         <AppPressable

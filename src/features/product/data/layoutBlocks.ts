@@ -22,13 +22,6 @@ export const HOME_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     icon: 'people',
   },
   {
-    id: 'quick-actions',
-    slot: 'home',
-    label: 'Quick actions',
-    description: 'Compose, Reels, Discover, Presence, Board pills.',
-    icon: 'create',
-  },
-  {
     id: 'focus-banner',
     slot: 'home',
     label: 'Focus banner',

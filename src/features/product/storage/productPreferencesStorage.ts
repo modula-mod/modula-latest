@@ -25,7 +25,7 @@ const KEY = 'modula.product.preferences.v1'
  * ids to product defaults (fixes the "Home+Profile only" collapse from treating
  * a missing tabBarIds key as required-only).
  */
-export const LAYOUT_SCHEMA_VERSION = 1
+export const LAYOUT_SCHEMA_VERSION = 2
 
 export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
 

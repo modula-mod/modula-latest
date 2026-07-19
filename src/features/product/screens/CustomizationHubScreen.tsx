@@ -25,7 +25,7 @@ const STUDIOS: HubLink[] = [
   {
     id: 'home',
     label: 'Home layout',
-    description: 'Presence, quick actions, composer, banners',
+    description: 'Presence, composer, feed modes, banners',
     icon: 'home',
     href: '/product/layout-home' as Href,
   },
