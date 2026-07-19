@@ -9,6 +9,7 @@ import Animated, {
 import {Avatar} from '@/components/primitives/Avatar'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
 import {useSession} from '@/auth/runtime'
 import {selectionHaptic} from '@/lib/haptics'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
@@ -17,42 +18,68 @@ import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chr
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function HomeHeaderLeft() {
-  const {openDrawer} = useShellDrawer()
-  const session = useSession()
-  const profile = session.status === 'signedIn' ? session.profile : null
+function useShellChromeVisible(threshold = 0.2) {
   const obscureStyle = useShellChromeObscureStyle('up')
-  const [interactive, setInteractive] = useState(true)
+  const [visible, setVisible] = useState(true)
 
   useAnimatedReaction(
     () => shellChromeObscureAmount(),
     value => {
-      runOnJS(setInteractive)(value < 0.4)
+      // Glass / header chrome often ignores parent opacity — unmount when pulled.
+      runOnJS(setVisible)(value < threshold)
     },
-    [],
+    [threshold],
   )
+
+  return {obscureStyle, visible}
+}
+
+export function HomeHeaderLeft() {
+  const {openDrawer} = useShellDrawer()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
+  const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
     <Animated.View
-      pointerEvents={interactive ? 'auto' : 'none'}
+      pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
-      <AppPressable
-        accessibilityLabel="Open navigation drawer"
-        onPress={() => {
-          void selectionHaptic()
-          openDrawer()
-        }}
-        style={styles.avatarHit}>
-        <Avatar
-          name={
-            profile?.displayName ??
-            (session.status === 'guest' ? 'Guest' : 'Modula')
-          }
-          uri={profile?.avatarUri}
-          colour={profile?.coverColour}
-          size={32}
-        />
-      </AppPressable>
+      {visible ? (
+        <AppPressable
+          accessibilityLabel="Open navigation drawer"
+          onPress={() => {
+            void selectionHaptic()
+            openDrawer()
+          }}
+          style={styles.avatarHit}>
+          <Avatar
+            name={
+              profile?.displayName ??
+              (session.status === 'guest' ? 'Guest' : 'Modula')
+            }
+            uri={profile?.avatarUri}
+            colour={profile?.coverColour}
+            size={32}
+          />
+        </AppPressable>
+      ) : null}
+    </Animated.View>
+  )
+}
+
+export function HomeHeaderTitle() {
+  const {colours} = useThemeTokens()
+  const {obscureStyle, visible} = useShellChromeVisible()
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.titleWrap, obscureStyle]}>
+      {visible ? (
+        <AppText variant="headline" style={{color: colours.text}}>
+          Modula
+        </AppText>
+      ) : null}
     </Animated.View>
   )
 }
@@ -60,39 +87,32 @@ export function HomeHeaderLeft() {
 export function HomeHeaderRight() {
   const router = useRouter()
   const {colours} = useThemeTokens()
-  const obscureStyle = useShellChromeObscureStyle('up')
-  const [interactive, setInteractive] = useState(true)
-
-  useAnimatedReaction(
-    () => shellChromeObscureAmount(),
-    value => {
-      runOnJS(setInteractive)(value < 0.4)
-    },
-    [],
-  )
+  const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
     <Animated.View
-      pointerEvents={interactive ? 'auto' : 'none'}
+      pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
-      <LiquidGlassChrome interactive fallback="clear" style={styles.actionPill}>
-        <AppPressable
-          accessibilityLabel="Create a post"
-          onPress={() => {
-            void selectionHaptic()
-            router.push('/compose' as Href)
-          }}
-          style={styles.pillHit}>
-          <AppIcon name="create" colour={colours.accent} size={20} />
-        </AppPressable>
-        <View style={[styles.divider, {backgroundColor: colours.separator}]} />
-        <AppPressable
-          accessibilityLabel="Open messages"
-          onPress={() => router.push('/messages' as Href)}
-          style={styles.pillHit}>
-          <AppIcon name="messages" colour={colours.text} size={20} />
-        </AppPressable>
-      </LiquidGlassChrome>
+      {visible ? (
+        <LiquidGlassChrome interactive fallback="clear" style={styles.actionPill}>
+          <AppPressable
+            accessibilityLabel="Create a post"
+            onPress={() => {
+              void selectionHaptic()
+              router.push('/compose' as Href)
+            }}
+            style={styles.pillHit}>
+            <AppIcon name="create" colour={colours.accent} size={20} />
+          </AppPressable>
+          <View style={[styles.divider, {backgroundColor: colours.separator}]} />
+          <AppPressable
+            accessibilityLabel="Open messages"
+            onPress={() => router.push('/messages' as Href)}
+            style={styles.pillHit}>
+            <AppIcon name="messages" colour={colours.text} size={20} />
+          </AppPressable>
+        </LiquidGlassChrome>
+      ) : null}
     </Animated.View>
   )
 }
@@ -125,5 +145,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minWidth: 36,
     paddingHorizontal: 8,
+  },
+  titleWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })
