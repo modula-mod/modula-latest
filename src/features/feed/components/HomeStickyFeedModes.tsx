@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {StyleSheet} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import Animated, {
   Easing,
   Extrapolation,
@@ -25,8 +25,6 @@ export type HomeFeedModeLabel = 'Following' | 'For You' | 'Modules'
 
 const MORPH_DISTANCE = 48
 const COMPACT_SCALE = 0.94
-/** Matches Expo UI segmented `frame` height — glass wrapper hugs this. */
-const STICKY_SEGMENT_HEIGHT = 34
 /** Unstick slightly before the stick line so snap-back doesn’t chatter. */
 const UNSTICK_SLOP = 18
 
@@ -64,8 +62,8 @@ type Props = {
 }
 
 /**
- * Sticky clone of the feed mode picker — spring enter, quick snap-back.
- * Stories / composer stay in the list header and scroll away normally.
+ * Sticky clone — real segmented track inside a hugging, dense liquid-glass capsule.
+ * Opaque underlay (sibling under glass) blocks feed bleed without killing the glass.
  */
 export function HomeStickyFeedModes({
   scrollY,
@@ -75,13 +73,13 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {radius, spacing} = useThemeTokens()
+  const {colours, radius, spacing, scheme} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
+  const isDark = scheme === 'dark'
 
-  /** 0 = free / inline, 1 = stuck under nav. Spring-smoothed. */
   const handoff = useSharedValue(0)
   const latched = useSharedValue(0)
 
@@ -89,7 +87,6 @@ export function HomeStickyFeedModes({
     () => {
       const start = stickThreshold(stickAtY.value)
       const y = scrollY.value
-      // Hysteresis: stick at `start`, unstick at `start - slop`.
       if (latched.value === 1) {
         return y >= start - UNSTICK_SLOP ? 1 : 0
       }
@@ -103,7 +100,6 @@ export function HomeStickyFeedModes({
       } else if (next === 1) {
         handoff.value = withSpring(1, ENTER_SPRING)
       } else {
-        // Snap-back: dismiss sticky quickly so it doesn’t ghost over Stories.
         handoff.value = withTiming(0, EXIT_TIMING)
       }
       runOnJS(setInteractive)(next === 1)
@@ -136,12 +132,14 @@ export function HomeStickyFeedModes({
     label: quietFeed && next === 'For You' ? 'For You · Quiet' : next,
   }))
 
+  const underlay = isDark ? 'rgba(14, 18, 20, 0.97)' : colours.canvas
+
   return (
     <Animated.View
       pointerEvents="box-none"
       style={[styles.fill, obscureStyle]}>
       <Animated.View
-        pointerEvents={interactive ? 'auto' : 'none'}
+        pointerEvents={interactive ? 'box-none' : 'none'}
         style={[
           styles.shell,
           {
@@ -150,45 +148,54 @@ export function HomeStickyFeedModes({
           },
           shellStyle,
         ]}>
-        {/* Glass hugs the 34pt segmented control — denser `regular` so it’s not see-through. */}
-        <LiquidGlassChrome
-          interactive
-          fallback="regular"
-          contentLayout="flow"
-          blurIntensity={100}
+        <View
           style={[
-            styles.stickyGlass,
+            styles.capsule,
             {
               borderRadius: radius.round,
-              height: STICKY_SEGMENT_HEIGHT,
+              borderColor: isDark
+                ? 'rgba(255,255,255,0.16)'
+                : colours.border,
             },
           ]}>
-          <ModulaSegmentedPicker
-            appearance="segmented"
-            accessibilityLabel="Feed mode"
-            options={options}
-            value={mode}
-            onValueChange={next => {
-              if (
-                next === 'Following' ||
-                next === 'For You' ||
-                next === 'Modules'
-              ) {
-                void selectionHaptic()
-                onModeChange(next)
-              }
-            }}
+          {/* Sibling under glass — blocks feed text; glass stays translucent on top. */}
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              {backgroundColor: underlay, borderRadius: radius.round},
+            ]}
           />
-        </LiquidGlassChrome>
+          <LiquidGlassChrome
+            interactive
+            fallback="regular"
+            contentLayout="flow"
+            blurIntensity={100}
+            style={[styles.stickyGlass, {borderRadius: radius.round}]}>
+            <ModulaSegmentedPicker
+              appearance="track"
+              embedded
+              accessibilityLabel="Feed mode"
+              options={options}
+              value={mode}
+              onValueChange={next => {
+                if (
+                  next === 'Following' ||
+                  next === 'For You' ||
+                  next === 'Modules'
+                ) {
+                  void selectionHaptic()
+                  onModeChange(next)
+                }
+              }}
+            />
+          </LiquidGlassChrome>
+        </View>
       </Animated.View>
     </Animated.View>
   )
 }
 
-/**
- * Inline row — scroll-linked shrink on approach; hard-hide while sticky;
- * spring settle on snap-back.
- */
 export function useInlineModeTabsStyle(
   scrollY: SharedValue<number>,
   stickAtY: SharedValue<number>,
@@ -211,13 +218,11 @@ export function useInlineModeTabsStyle(
       if (next === prev) return
       latched.value = next
       if (next === 1) {
-        // Stick: hide inline immediately (sticky clone takes over).
         visible.value = 0
       } else if (reduceMotion) {
         visible.value = 1
         settleScale.value = 1
       } else {
-        // Snap-back: show inline at compact, spring open.
         visible.value = 1
         settleScale.value = COMPACT_SCALE
         settleScale.value = withSpring(1, SNAP_BACK_SPRING)
@@ -237,7 +242,6 @@ export function useInlineModeTabsStyle(
       [1, COMPACT_SCALE],
       Extrapolation.CLAMP,
     )
-    // Mid snap-back spring takes priority; otherwise follow scroll-linked shrink.
     const liveScale =
       latched.value === 0 && settleScale.value < 0.999
         ? settleScale.value
@@ -278,23 +282,33 @@ export function useInlineModeTabsInteractive(
 }
 
 const styles = StyleSheet.create({
+  capsule: {
+    alignSelf: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    elevation: 8,
+    // Hug the segmented control — not a full-bleed bar.
+    maxWidth: '100%',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+  },
   fill: {
     bottom: 0,
     left: 0,
     position: 'absolute',
     right: 0,
     top: 0,
-    zIndex: 30,
+    zIndex: 40,
   },
   shell: {
+    alignItems: 'center',
     left: 0,
     position: 'absolute',
     right: 0,
   },
   stickyGlass: {
-    alignSelf: 'stretch',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    width: '100%',
+    alignSelf: 'center',
   },
 })

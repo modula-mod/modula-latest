@@ -21,6 +21,7 @@ import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {expandShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-compact'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {
   MODULA_TABS,
@@ -224,6 +225,7 @@ export function ModulaLiquidGlassTabBar({
   }))
 
   const navigateTab = (tab: ModulaTabDefinition) => {
+    expandShellTabBar()
     const route = state.routes.find(item => item.name === tab.routeName)
     if (!route) return
     const event = navigation.emit({
@@ -239,6 +241,7 @@ export function ModulaLiquidGlassTabBar({
   }
 
   const onPlusPress = () => {
+    expandShellTabBar()
     void selectionHaptic()
     if (reduceMotion) {
       setExpanded(prev => !prev)
@@ -264,6 +267,7 @@ export function ModulaLiquidGlassTabBar({
   }
 
   const onExpandAction = (action: ExpandAction) => {
+    expandShellTabBar()
     setExpanded(false)
     plusIconRotate.value = withTiming(0, {duration: reduceMotion ? 0 : 150})
     void selectionHaptic()
@@ -340,6 +344,7 @@ export function ModulaLiquidGlassTabBar({
                   accessibilityLabel={tab.label}
                   accessibilityRole="tab"
                   accessibilityState={{selected}}
+                  onPressIn={expandShellTabBar}
                   onPress={() => navigateTab(tab)}
                   style={styles.tabHit}>
                   {isProfile ? (
@@ -391,8 +396,10 @@ export function ModulaLiquidGlassTabBar({
       <Pressable
         accessibilityLabel={expanded ? 'Close compose menu' : 'Open compose menu'}
         accessibilityRole="button"
+        onPressIn={expandShellTabBar}
         onPress={onPlusPress}
         onLongPress={() => {
+          expandShellTabBar()
           router.push('/compose' as Href)
           void selectionHaptic()
         }}

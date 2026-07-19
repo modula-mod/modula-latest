@@ -6,7 +6,11 @@ export type ModulaSegmentedOption = {
   disabled?: boolean
 }
 
-export type ModulaSegmentedAppearance = 'segmented' | 'glass' | 'plain'
+export type ModulaSegmentedAppearance =
+  | 'segmented'
+  | 'track'
+  | 'glass'
+  | 'plain'
 
 export type ModulaSegmentedPickerProps = {
   options: ModulaSegmentedOption[]
@@ -17,8 +21,9 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * `segmented` — classic system segmented control (UISegmentedControl on iOS).
-   * `glass` — dense liquid-glass wrapper (sticky chrome); plain selected thumb.
+   * `segmented` — system UISegmentedControl on iOS (Expo UI Host).
+   * `track` — classic token segmented track (shared RN, all platforms).
+   * `glass` — liquid-glass wrapper + token thumbs.
    * `plain` — label / chip tabs (use with `scrollable` for a horizontal menu).
    */
   appearance?: ModulaSegmentedAppearance
@@ -34,4 +39,9 @@ export type ModulaSegmentedPickerProps = {
    * Defaults to 340 when `scrollable`.
    */
   maxWidth?: number
+  /**
+   * When true with `appearance="track"`, omit the muted track fill and hug
+   * content width — for nesting inside an outer liquid-glass capsule.
+   */
+  embedded?: boolean
 }

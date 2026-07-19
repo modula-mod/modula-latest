@@ -24,13 +24,15 @@ export function ModulaSegmentedPicker({
   scrollable = false,
   segmentMinWidth,
   maxWidth,
+  embedded,
 }: ModulaSegmentedPickerProps) {
   const {colours, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const allowed = new Set(options.map(option => option.value))
   const viewportWidth = Math.min(windowWidth - 32, maxWidth ?? windowWidth)
 
-  if (appearance !== 'segmented' || scrollable) {
+  // Sticky / glass / track / scrollable → shared RN (Host Picker breaks inside overlays).
+  if (appearance !== 'segmented' || scrollable || embedded) {
     return (
       <SharedModulaSegmentedPicker
         options={options}
@@ -39,10 +41,11 @@ export function ModulaSegmentedPicker({
         accessibilityLabel={accessibilityLabel}
         style={style}
         testID={testID}
-        appearance={appearance}
+        appearance={appearance === 'segmented' ? 'track' : appearance}
         scrollable={scrollable}
         segmentMinWidth={segmentMinWidth}
         maxWidth={maxWidth}
+        embedded={embedded}
       />
     )
   }

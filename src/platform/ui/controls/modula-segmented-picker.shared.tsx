@@ -32,12 +32,17 @@ export function ModulaSegmentedPicker({
   scrollable = false,
   segmentMinWidth = DEFAULT_SEGMENT_MIN_WIDTH,
   maxWidth,
+  embedded = false,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const plain = appearance === 'plain'
   const glass = appearance === 'glass'
+  /** Classic muted track + raised thumb (also used for `segmented` on non-iOS). */
+  const track = appearance === 'track' || appearance === 'segmented'
   const isDark = scheme === 'dark'
+  /** Parent liquid-glass capsule supplies chrome — keep track fill clear. */
+  const nestInGlass = embedded && track
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
   const viewportWidth = Math.min(windowWidth - 32, viewportCap)
@@ -45,6 +50,11 @@ export function ModulaSegmentedPicker({
     viewportWidth,
     plain ? viewportWidth : options.length * segmentMinWidth,
   )
+  const trackWidth = nestInGlass
+    ? Math.min(viewportWidth, Math.max(options.length * 96, 280))
+    : scrollable
+      ? contentWidth
+      : ('100%' as const)
 
   const segments = options.map(option => {
     const selected = option.value === value
@@ -124,25 +134,37 @@ export function ModulaSegmentedPicker({
                 minHeight: TRACK_HEIGHT,
               }
             : {
-                backgroundColor: colours.surfaceMuted,
+                // `track` / fallback `segmented`
+                backgroundColor: nestInGlass
+                  ? 'transparent'
+                  : colours.surfaceMuted,
                 borderRadius: radius.round,
                 padding: 3,
                 gap: 2,
-                width: scrollable ? contentWidth : viewportWidth,
-                maxWidth: scrollable ? contentWidth : viewportWidth,
+                width: trackWidth,
+                maxWidth: viewportWidth,
                 minHeight: TRACK_HEIGHT,
+                alignSelf: nestInGlass ? 'center' : 'stretch',
               },
         plain && !scrollable ? style : null,
-        !plain && !glass && !scrollable ? style : null,
+        track && !scrollable ? style : null,
       ]}>
       {segments}
     </View>
   )
 
-  if (plain || !glass) {
+  if (plain || track || !glass) {
     if (!scrollable) {
       return (
-        <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
+        <View
+          style={[
+            {
+              alignSelf: 'center',
+              maxWidth: viewportWidth,
+              width: nestInGlass ? trackWidth : undefined,
+            },
+            style,
+          ]}>
           {row}
         </View>
       )

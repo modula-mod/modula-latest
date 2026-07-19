@@ -76,11 +76,12 @@ export function LiquidGlassChrome({
   const resolvedBlur =
     blurIntensity ?? (fallback === 'regular' ? 78 : 64)
   // `regular` is intentionally denser (segmented tracks, composer) than icon discs.
+  // `regular` is denser so sticky chrome / tracks don’t read as see-through.
   const wash =
     fallback === 'regular'
       ? isDark
-        ? 'rgba(22, 28, 32, 0.62)'
-        : 'rgba(255, 255, 255, 0.78)'
+        ? 'rgba(22, 28, 32, 0.72)'
+        : 'rgba(255, 255, 255, 0.86)'
       : isDark
         ? 'rgba(255,255,255,0.1)'
         : 'rgba(255,255,255,0.42)'

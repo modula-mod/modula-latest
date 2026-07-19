@@ -15,6 +15,12 @@ const SETTLE = Easing.bezier(0.25, 0.1, 0.25, 1)
 const COMPACT_IN = {duration: 480, easing: SETTLE}
 const COMPACT_OUT = {duration: 520, easing: SETTLE}
 
+/** Expand back to full size (e.g. when the user presses the tab bar). */
+export function expandShellTabBar(): void {
+  if (shellTabBarCompact.value < 0.01) return
+  shellTabBarCompact.value = withTiming(0, COMPACT_OUT)
+}
+
 /**
  * Drive tab-bar compact from scroll direction.
  * Call from an animated scroll handler / reaction.
