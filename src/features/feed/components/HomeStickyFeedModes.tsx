@@ -1,12 +1,15 @@
 import {useState} from 'react'
 import {StyleSheet} from 'react-native'
 import Animated, {
+  Easing,
   Extrapolation,
   interpolate,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
-  useDerivedValue,
+  useSharedValue,
+  withSpring,
+  withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
 
@@ -19,12 +22,23 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type HomeFeedModeLabel = 'Following' | 'For You' | 'Modules'
 
-const MORPH_DISTANCE = 40
+const MORPH_DISTANCE = 48
 const COMPACT_SCALE = 0.94
+/** Unstick slightly before the stick line so snap-back doesn’t chatter. */
+const UNSTICK_SLOP = 18
 
-export function approachProgress(scrollY: number, stickAtY: number): number {
+const ENTER_SPRING = {damping: 22, stiffness: 280, mass: 0.82}
+const SNAP_BACK_SPRING = {damping: 20, stiffness: 320, mass: 0.75}
+const EXIT_TIMING = {duration: 140, easing: Easing.out(Easing.cubic)}
+
+function stickThreshold(stickAtY: number): number {
   'worklet'
-  const start = Math.max(0, stickAtY)
+  return Math.max(0, stickAtY)
+}
+
+function approachProgress(scrollY: number, stickAtY: number): number {
+  'worklet'
+  const start = stickThreshold(stickAtY)
   if (start <= 0) {
     return interpolate(
       scrollY,
@@ -37,15 +51,8 @@ export function approachProgress(scrollY: number, stickAtY: number): number {
   return interpolate(scrollY, [from, start], [0, 1], Extrapolation.CLAMP)
 }
 
-/** Hard stick latch — avoids dual-picker ghosting on scroll-up. */
-export function isStuck(scrollY: number, stickAtY: number): boolean {
-  'worklet'
-  return scrollY >= Math.max(0, stickAtY)
-}
-
 type Props = {
   scrollY: SharedValue<number>
-  /** Height of header content above the inline mode tabs. */
   stickAtY: SharedValue<number>
   mode: HomeFeedModeLabel
   modeOrder: HomeFeedModeLabel[]
@@ -54,7 +61,7 @@ type Props = {
 }
 
 /**
- * Sticky clone of the feed mode picker (gray capsule), pinned under the nav.
+ * Sticky clone of the feed mode picker — spring enter, quick snap-back.
  * Stories / composer stay in the list header and scroll away normally.
  */
 export function HomeStickyFeedModes({
@@ -71,23 +78,53 @@ export function HomeStickyFeedModes({
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
 
-  const stuck = useDerivedValue(() => isStuck(scrollY.value, stickAtY.value))
+  /** 0 = free / inline, 1 = stuck under nav. Spring-smoothed. */
+  const handoff = useSharedValue(0)
+  const latched = useSharedValue(0)
 
   useAnimatedReaction(
-    () => stuck.value,
-    (next, previous) => {
-      if (next !== previous) {
-        runOnJS(setInteractive)(next)
+    () => {
+      const start = stickThreshold(stickAtY.value)
+      const y = scrollY.value
+      // Hysteresis: stick at `start`, unstick at `start - slop`.
+      if (latched.value === 1) {
+        return y >= start - UNSTICK_SLOP ? 1 : 0
       }
+      return y >= start ? 1 : 0
     },
-    [],
+    (next, prev) => {
+      if (next === prev) return
+      latched.value = next
+      if (reduceMotion) {
+        handoff.value = next
+      } else if (next === 1) {
+        handoff.value = withSpring(1, ENTER_SPRING)
+      } else {
+        // Snap-back: dismiss sticky quickly so it doesn’t ghost over Stories.
+        handoff.value = withTiming(0, EXIT_TIMING)
+      }
+      runOnJS(setInteractive)(next === 1)
+    },
+    [reduceMotion],
   )
 
   const shellStyle = useAnimatedStyle(() => {
-    const on = stuck.value
+    const p = handoff.value
     return {
-      opacity: on ? 1 : 0,
-      transform: reduceMotion ? [] : [{scale: on ? COMPACT_SCALE : 1}],
+      opacity: p,
+      transform: reduceMotion
+        ? []
+        : [
+            {translateY: interpolate(p, [0, 1], [-14, 0], Extrapolation.CLAMP)},
+            {
+              scale: interpolate(
+                p,
+                [0, 1],
+                [1.05, COMPACT_SCALE],
+                Extrapolation.CLAMP,
+              ),
+            },
+          ],
     }
   })
 
@@ -133,29 +170,67 @@ export function HomeStickyFeedModes({
   )
 }
 
-/** Inline row: hide when stuck; shrink as it approaches the stick line. */
+/**
+ * Inline row — scroll-linked shrink on approach; hard-hide while sticky;
+ * spring settle on snap-back.
+ */
 export function useInlineModeTabsStyle(
   scrollY: SharedValue<number>,
   stickAtY: SharedValue<number>,
   reduceMotion: boolean,
 ) {
+  const visible = useSharedValue(1)
+  const settleScale = useSharedValue(1)
+  const latched = useSharedValue(0)
+
+  useAnimatedReaction(
+    () => {
+      const start = stickThreshold(stickAtY.value)
+      const y = scrollY.value
+      if (latched.value === 1) {
+        return y >= start - UNSTICK_SLOP ? 1 : 0
+      }
+      return y >= start ? 1 : 0
+    },
+    (next, prev) => {
+      if (next === prev) return
+      latched.value = next
+      if (next === 1) {
+        // Stick: hide inline immediately (sticky clone takes over).
+        visible.value = 0
+      } else if (reduceMotion) {
+        visible.value = 1
+        settleScale.value = 1
+      } else {
+        // Snap-back: show inline at compact, spring open.
+        visible.value = 1
+        settleScale.value = COMPACT_SCALE
+        settleScale.value = withSpring(1, SNAP_BACK_SPRING)
+      }
+    },
+    [reduceMotion],
+  )
+
   return useAnimatedStyle(() => {
-    const stuck = isStuck(scrollY.value, stickAtY.value)
+    if (reduceMotion) {
+      return {opacity: visible.value, transform: [{scale: 1}]}
+    }
     const approach = approachProgress(scrollY.value, stickAtY.value)
+    const scrollScale = interpolate(
+      approach,
+      [0, 1],
+      [1, COMPACT_SCALE],
+      Extrapolation.CLAMP,
+    )
+    // Mid snap-back spring takes priority; otherwise follow scroll-linked shrink.
+    const liveScale =
+      latched.value === 0 && settleScale.value < 0.999
+        ? settleScale.value
+        : scrollScale
+
     return {
-      opacity: stuck ? 0 : 1,
-      transform: reduceMotion
-        ? []
-        : [
-            {
-              scale: interpolate(
-                approach,
-                [0, 1],
-                [1, COMPACT_SCALE],
-                Extrapolation.CLAMP,
-              ),
-            },
-          ],
+      opacity: visible.value,
+      transform: [{scale: liveScale}],
     }
   })
 }
@@ -165,13 +240,21 @@ export function useInlineModeTabsInteractive(
   stickAtY: SharedValue<number>,
 ) {
   const [interactive, setInteractive] = useState(true)
+  const latched = useSharedValue(0)
 
   useAnimatedReaction(
-    () => !isStuck(scrollY.value, stickAtY.value),
-    (next, previous) => {
-      if (next !== previous) {
-        runOnJS(setInteractive)(next)
+    () => {
+      const start = stickThreshold(stickAtY.value)
+      const y = scrollY.value
+      if (latched.value === 1) {
+        return y >= start - UNSTICK_SLOP ? 1 : 0
       }
+      return y >= start ? 1 : 0
+    },
+    (next, prev) => {
+      if (next === prev) return
+      latched.value = next
+      runOnJS(setInteractive)(next === 0)
     },
     [],
   )
