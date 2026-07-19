@@ -157,11 +157,11 @@ export function ModulaSegmentedPicker({
     )
   }
 
-  // glass appearance
+  // glass appearance — denser than icon discs so feed content doesn’t show through
   const wrapped = (
     <LiquidGlassChrome
       interactive
-      fallback="clear"
+      fallback="regular"
       contentLayout="flow"
       style={[
         styles.trackGlass,
@@ -170,6 +170,10 @@ export function ModulaSegmentedPicker({
           width: scrollable ? contentWidth : viewportWidth,
           maxWidth: scrollable ? contentWidth : viewportWidth,
           minHeight: TRACK_HEIGHT,
+          // Opaque-enough wash under glass (Callstack ignores solid fills; BlurView path uses it).
+          backgroundColor: isDark
+            ? 'rgba(18, 24, 28, 0.72)'
+            : 'rgba(245, 247, 248, 0.82)',
         },
         !scrollable ? style : null,
       ]}>

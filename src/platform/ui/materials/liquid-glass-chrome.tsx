@@ -70,8 +70,23 @@ export function LiquidGlassChrome({
   const {reduceTransparency} = useSystemAccessibility()
   const isDark = scheme === 'dark'
   const effect = fallback === 'regular' ? 'regular' : 'clear'
-  const wash = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.42)'
-  const rim = isDark ? 'rgba(255,255,255,0.24)' : 'rgba(255,255,255,0.78)'
+  // `regular` is intentionally denser (segmented tracks, composer) than icon discs.
+  const wash =
+    fallback === 'regular'
+      ? isDark
+        ? 'rgba(22, 28, 32, 0.62)'
+        : 'rgba(255, 255, 255, 0.78)'
+      : isDark
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(255,255,255,0.42)'
+  const rim =
+    fallback === 'regular'
+      ? isDark
+        ? 'rgba(255,255,255,0.2)'
+        : 'rgba(0,0,0,0.08)'
+      : isDark
+        ? 'rgba(255,255,255,0.24)'
+        : 'rgba(255,255,255,0.78)'
   const flow = contentLayout === 'flow'
 
   if (reduceTransparency) {
@@ -149,9 +164,15 @@ export function LiquidGlassChrome({
   return (
     <View style={[styles.base, styles.shadow, style]}>
       <BlurView
-        intensity={fallback === 'regular' ? 52 : 68}
+        intensity={fallback === 'regular' ? 78 : 64}
         tint={
-          isDark ? 'systemUltraThinMaterialDark' : 'systemUltraThinMaterialLight'
+          fallback === 'regular'
+            ? isDark
+              ? 'systemMaterialDark'
+              : 'systemMaterialLight'
+            : isDark
+              ? 'systemUltraThinMaterialDark'
+              : 'systemUltraThinMaterialLight'
         }
         style={StyleSheet.absoluteFill}
       />
