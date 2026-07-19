@@ -3,12 +3,14 @@ import {StyleSheet, View} from 'react-native'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModulaSegmentedPickerProps} from '@/platform/ui/controls/modula-segmented-picker.types'
+import {useSegmentedVisibleOptions} from '@/platform/ui/controls/use-segmented-visible-options'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
 /**
- * Web / Android fallback — theme-aware segmented row (native Expo UI on iOS).
+ * Web / Android fallback — theme-aware segmented row with the same
+ * automatic progressive reveal as the native Expo UI control.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -17,8 +19,20 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  initialVisibleCount,
+  revealBatchSize,
+  autoRevealIntervalMs,
+  onRevealMore,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
+  const {visibleOptions, hasMore, revealMoreNow} = useSegmentedVisibleOptions({
+    options,
+    value,
+    initialVisibleCount,
+    revealBatchSize,
+    autoRevealIntervalMs,
+    onRevealMore,
+  })
 
   return (
     <View
@@ -35,7 +49,7 @@ export function ModulaSegmentedPicker({
         },
         style,
       ]}>
-      {options.map(option => {
+      {visibleOptions.map(option => {
         const selected = option.value === value
         return (
           <AppPressable
@@ -44,7 +58,15 @@ export function ModulaSegmentedPicker({
             accessibilityState={{selected, disabled: !!option.disabled}}
             accessibilityLabel={option.label}
             disabled={option.disabled}
-            onPress={() => onValueChange(option.value)}
+            onPress={() => {
+              onValueChange(option.value)
+              const index = visibleOptions.findIndex(
+                item => item.value === option.value,
+              )
+              if (hasMore && index >= visibleOptions.length - 1) {
+                revealMoreNow()
+              }
+            }}
             style={[
               styles.segment,
               {

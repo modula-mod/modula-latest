@@ -15,8 +15,15 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * Kept for API stability. Always renders the native Expo UI segmented
-   * Picker on iOS (`fit`). Scroll/chip rail was removed.
+   * When set below `options.length`, the native segmented control starts with
+   * this many segments and automatically loads more over time / on selection.
+   * Omit or pass `options.length` to show everything immediately.
    */
-  layout?: 'fit' | 'scroll'
+  initialVisibleCount?: number
+  /** How many segments to append each auto-load step. Default 2. */
+  revealBatchSize?: number
+  /** Delay before the first automatic reveal, then between batches. Default 700ms. */
+  autoRevealIntervalMs?: number
+  /** Fired whenever more options are revealed into the control. */
+  onRevealMore?: (visibleCount: number) => void
 }

@@ -73,9 +73,11 @@ export function HomeQuickActions() {
         ]}>
         <ModulaSegmentedPicker
           accessibilityLabel="Home quick actions"
-          layout="fit"
           options={options}
           value={value}
+          initialVisibleCount={3}
+          revealBatchSize={2}
+          autoRevealIntervalMs={650}
           onValueChange={next => {
             setSelected(next)
             const action = actions.find(item => item.id === next)
