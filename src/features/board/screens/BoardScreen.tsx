@@ -21,6 +21,10 @@ import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {
+  plainHeaderCustomItem,
+  supportsPlainHeaderItems,
+} from '@/platform/ui/navigation/plain-header-items'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -163,25 +167,33 @@ export function BoardScreen() {
           : 'Custom'
 
   useLayoutEffect(() => {
+    const renderMenu = () => (
+      <ChromeOverflowMenu
+        accessibilityLabel="Board layout menu"
+        title="Board"
+        actions={[
+          {id: 'customize', label: 'Customize pinned spaces'},
+          {id: 'marketplace', label: 'Open Marketplace'},
+          {id: 'saved', label: 'Open Saved'},
+          {id: 'compose', label: 'Quick compose'},
+        ]}
+        onAction={id => {
+          if (id === 'customize') setCustomizeOpen(true)
+          if (id === 'marketplace') router.push('/marketplace' as Href)
+          if (id === 'saved') router.push('/saved' as Href)
+          if (id === 'compose') router.push('/compose' as Href)
+        }}
+      />
+    )
     navigation.setOptions({
-      headerRight: () => (
-        <ChromeOverflowMenu
-          accessibilityLabel="Board layout menu"
-          title="Board"
-          actions={[
-            {id: 'customize', label: 'Customize pinned spaces'},
-            {id: 'marketplace', label: 'Open Marketplace'},
-            {id: 'saved', label: 'Open Saved'},
-            {id: 'compose', label: 'Quick compose'},
-          ]}
-          onAction={id => {
-            if (id === 'customize') setCustomizeOpen(true)
-            if (id === 'marketplace') router.push('/marketplace' as Href)
-            if (id === 'saved') router.push('/saved' as Href)
-            if (id === 'compose') router.push('/compose' as Href)
-          }}
-        />
-      ),
+      headerRight: renderMenu,
+      ...(supportsPlainHeaderItems()
+        ? {
+            unstable_headerRightItems: () => [
+              plainHeaderCustomItem(renderMenu()),
+            ],
+          }
+        : null),
     })
   }, [navigation, router])
 

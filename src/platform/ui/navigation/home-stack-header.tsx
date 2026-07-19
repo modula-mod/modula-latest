@@ -1,6 +1,6 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState} from 'react'
-import {StyleSheet} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -9,6 +9,11 @@ import Animated, {
 import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {
+  plainHeaderCustomItem,
+  plainHeaderSpacing,
+  supportsPlainHeaderItems,
+} from '@/platform/ui/navigation/plain-header-items'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -39,7 +44,6 @@ export function HomeHeaderLeft() {
       pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
       {visible ? (
-        // Expo UI plain icon button — circle glyph, no glass / filled chrome.
         <ModulaIconButton
           icon="menu"
           chrome="plain"
@@ -71,46 +75,78 @@ export function HomeHeaderTitle() {
   )
 }
 
-/** Plain Expo UI icon actions — no glass / filled disc. */
-export function HomeHeaderRight() {
+export function HomeHeaderCreate() {
   const router = useRouter()
   const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
     <Animated.View
       pointerEvents={visible ? 'auto' : 'none'}
-      style={[styles.rightRow, obscureStyle]}>
+      style={obscureStyle}>
       {visible ? (
-        <>
-          <ModulaIconButton
-            icon="create"
-            chrome="plain"
-            accessibilityLabel="Create a post"
-            onPress={() => {
-              void selectionHaptic()
-              router.push('/compose' as Href)
-            }}
-          />
-          <ModulaIconButton
-            icon="messages"
-            chrome="plain"
-            accessibilityLabel="Open messages"
-            onPress={() => router.push('/messages' as Href)}
-          />
-        </>
+        <ModulaIconButton
+          icon="create"
+          chrome="plain"
+          accessibilityLabel="Create a post"
+          onPress={() => {
+            void selectionHaptic()
+            router.push('/compose' as Href)
+          }}
+        />
       ) : null}
     </Animated.View>
   )
 }
 
+export function HomeHeaderMessages() {
+  const router = useRouter()
+  const {obscureStyle, visible} = useShellChromeVisible()
+
+  return (
+    <Animated.View
+      pointerEvents={visible ? 'auto' : 'none'}
+      style={obscureStyle}>
+      {visible ? (
+        <ModulaIconButton
+          icon="messages"
+          chrome="plain"
+          accessibilityLabel="Open messages"
+          onPress={() => router.push('/messages' as Href)}
+        />
+      ) : null}
+    </Animated.View>
+  )
+}
+
+/**
+ * Android / web fallback — single slot. Prefer `homeHeaderRightItems` on iOS
+ * so the pair is not crushed into one shared glass capsule.
+ */
+export function HomeHeaderRight() {
+  return (
+    <>
+      <HomeHeaderCreate />
+      <HomeHeaderMessages />
+    </>
+  )
+}
+
+/** iOS 26+: separate plain items with gap — not one wide pill of clustered icons. */
+export function homeHeaderLeftItems() {
+  if (!supportsPlainHeaderItems()) return undefined
+  return [plainHeaderCustomItem(<HomeHeaderLeft />)]
+}
+
+export function homeHeaderRightItems() {
+  if (!supportsPlainHeaderItems()) return undefined
+  return [
+    plainHeaderCustomItem(<HomeHeaderCreate />),
+    plainHeaderSpacing(),
+    plainHeaderCustomItem(<HomeHeaderMessages />),
+  ]
+}
+
 const styles = StyleSheet.create({
-  rightRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 4,
-    marginRight: 4,
-    minWidth: 88,
-  },
   titleWrap: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -61,8 +61,8 @@ export function PresenceStoriesRail({
   const scrollX = useSharedValue(0)
   const ready = stageWidth > 0
 
-  // Literal left start — small inset only. Right pad lets the last story reach left focus.
-  const padLeft = ready ? spacing[4] : 0
+  // Literal left edge (no side inset). Right pad lets the last story reach left focus.
+  const padLeft = 0
   const padRight = ready
     ? Math.max(0, stageWidth - padLeft - ITEM_SLOT)
     : 0
@@ -108,7 +108,7 @@ export function PresenceStoriesRail({
         <View
           style={[
             styles.captionRow,
-            {paddingHorizontal: spacing[4], gap: 2},
+            {paddingHorizontal: 0, gap: 2},
           ]}>
           <AppText variant="caption" colour="textSecondary">
             STORIES

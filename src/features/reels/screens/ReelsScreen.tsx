@@ -40,6 +40,11 @@ import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {
+  plainHeaderCustomItem,
+  plainHeaderSpacing,
+  supportsPlainHeaderItems,
+} from '@/platform/ui/navigation/plain-header-items'
 import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
@@ -131,13 +136,11 @@ export function ReelsScreen() {
             />
           ),
           headerLeft: () => (
-            <View style={styles.headerSide}>
-              <ChromeCircleButton
-                icon="create"
-                accessibilityLabel="Create"
-                onPress={() => router.push('/compose' as Href)}
-              />
-            </View>
+            <ChromeCircleButton
+              icon="create"
+              accessibilityLabel="Create"
+              onPress={() => router.push('/compose' as Href)}
+            />
           ),
           headerRight: () => (
             <View style={styles.headerSideEnd}>
@@ -159,6 +162,42 @@ export function ReelsScreen() {
               />
             </View>
           ),
+          ...(supportsPlainHeaderItems()
+            ? {
+                unstable_headerLeftItems: () => [
+                  plainHeaderCustomItem(
+                    <ChromeCircleButton
+                      icon="create"
+                      accessibilityLabel="Create"
+                      onPress={() => router.push('/compose' as Href)}
+                    />,
+                  ),
+                ],
+                unstable_headerRightItems: () => [
+                  plainHeaderCustomItem(
+                    <ChromeIconMenu
+                      systemImage="ellipsis"
+                      icon="more"
+                      accessibilityLabel="Reels options"
+                      title="Reels"
+                      actions={buildReelHeaderMoreActions()}
+                      onAction={runChrome}
+                    />,
+                  ),
+                  plainHeaderSpacing(),
+                  plainHeaderCustomItem(
+                    <ChromeIconMenu
+                      systemImage="line.3.horizontal.decrease"
+                      icon="settings"
+                      accessibilityLabel="Reels filters"
+                      title="Filters"
+                      actions={buildReelHeaderFilterActions(mode)}
+                      onAction={runChrome}
+                    />,
+                  ),
+                ],
+              }
+            : null),
           headerStyle: {backgroundColor: 'transparent'},
         }}
       />
@@ -503,14 +542,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
     padding: 12,
   },
-  headerSide: {
-    paddingLeft: 4,
-  },
   headerSideEnd: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
-    minWidth: 88,
+    gap: 22,
     paddingRight: 4,
   },
   item: {

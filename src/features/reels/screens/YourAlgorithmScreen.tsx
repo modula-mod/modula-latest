@@ -22,6 +22,7 @@ import {
 import {selectionHaptic} from '@/lib/haptics'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -101,7 +102,7 @@ export function YourAlgorithmScreen() {
   ]
 
   const headerRight = (
-    <View style={[styles.headerActions, {gap: spacing[2]}]}>
+    <View style={[styles.headerActions, {gap: HEADER_ICON_PAIR_GAP}]}>
       <ChromeIconMenu
         systemImage="ellipsis"
         icon="more"
