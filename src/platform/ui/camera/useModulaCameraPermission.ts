@@ -27,14 +27,52 @@ type ExpoCameraPermissionsApi = {
   requestCameraPermissionsAsync: () => Promise<CameraPermissionResponse>
 }
 
+type ExpoCameraModule = {
+  getCameraPermissionsAsync?: () => Promise<CameraPermissionResponse>
+  requestCameraPermissionsAsync?: () => Promise<CameraPermissionResponse>
+  Camera?: {
+    getCameraPermissionsAsync?: () => Promise<CameraPermissionResponse>
+    requestCameraPermissionsAsync?: () => Promise<CameraPermissionResponse>
+  }
+}
+
+function pickPermissionMethod(
+  mod: ExpoCameraModule,
+  key: 'getCameraPermissionsAsync' | 'requestCameraPermissionsAsync',
+): (() => Promise<CameraPermissionResponse>) | null {
+  const topLevel = mod[key]
+  if (typeof topLevel === 'function') {
+    return topLevel.bind(mod)
+  }
+  const nested = mod.Camera?.[key]
+  if (typeof nested === 'function') {
+    return nested.bind(mod.Camera)
+  }
+  return null
+}
+
 function loadCameraPermissionsApi(): ExpoCameraPermissionsApi | null {
   if (!isExpoCameraNativeAvailable()) {
     return null
   }
   try {
     // Dynamic require — static import crashes binaries without ExpoCamera linked.
+    // Permission helpers live on `Camera` in current expo-camera; older builds
+    // may also expose them as top-level named exports.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('expo-camera') as ExpoCameraPermissionsApi
+    const mod = require('expo-camera') as ExpoCameraModule
+    const getCameraPermissionsAsync = pickPermissionMethod(
+      mod,
+      'getCameraPermissionsAsync',
+    )
+    const requestCameraPermissionsAsync = pickPermissionMethod(
+      mod,
+      'requestCameraPermissionsAsync',
+    )
+    if (!getCameraPermissionsAsync || !requestCameraPermissionsAsync) {
+      return null
+    }
+    return {getCameraPermissionsAsync, requestCameraPermissionsAsync}
   } catch {
     return null
   }
@@ -42,10 +80,10 @@ function loadCameraPermissionsApi(): ExpoCameraPermissionsApi | null {
 
 function statusFromPermission(
   permission: CameraPermissionResponse | null,
-  available: boolean,
+  apiAvailable: boolean | null,
 ): ModulaCameraPermissionStatus {
-  if (!available) return 'unavailable'
-  if (!permission) return 'loading'
+  if (apiAvailable === false) return 'unavailable'
+  if (apiAvailable === null || !permission) return 'loading'
   if (permission.granted) return 'granted'
   if (!permission.canAskAgain) return 'blocked'
   return 'denied'
@@ -58,35 +96,56 @@ function statusFromPermission(
 export function useModulaCameraPermission(
   autoRequest = false,
 ): UseModulaCameraPermissionResult {
-  const available = isExpoCameraNativeAvailable()
+  const nativeAvailable = isExpoCameraNativeAvailable()
+  const [apiAvailable, setApiAvailable] = useState<boolean | null>(() =>
+    nativeAvailable ? null : false,
+  )
   const [permission, setPermission] = useState<CameraPermissionResponse | null>(
     null,
   )
 
   useEffect(() => {
-    if (!available) {
+    if (!nativeAvailable) {
+      setApiAvailable(false)
       setPermission(null)
       return
     }
     const api = loadCameraPermissionsApi()
     if (!api) {
+      setApiAvailable(false)
       setPermission(null)
       return
     }
+    setApiAvailable(true)
     let active = true
-    void api.getCameraPermissionsAsync().then(next => {
-      if (active) setPermission(next)
-    })
+    void api
+      .getCameraPermissionsAsync()
+      .then(next => {
+        if (active) setPermission(next)
+      })
+      .catch(error => {
+        if (__DEV__) {
+          console.warn('Camera permission lookup failed', error)
+        }
+        if (active) {
+          setApiAvailable(false)
+          setPermission(null)
+        }
+      })
     return () => {
       active = false
     }
-  }, [available])
+  }, [nativeAvailable])
 
   const requestPermission = useCallback(async () => {
     const api = loadCameraPermissionsApi()
-    if (!api) return
+    if (!api) {
+      setApiAvailable(false)
+      return
+    }
     try {
       const next = await api.requestCameraPermissionsAsync()
+      setApiAvailable(true)
       setPermission(next)
     } catch (error) {
       if (__DEV__) {
@@ -95,7 +154,7 @@ export function useModulaCameraPermission(
     }
   }, [])
 
-  const status = statusFromPermission(permission, available)
+  const status = statusFromPermission(permission, apiAvailable)
 
   useEffect(() => {
     if (autoRequest && status === 'denied') {
