@@ -1,10 +1,7 @@
 import {useRouter, type Href} from 'expo-router'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   Pressable,
-  ScrollView,
   StyleSheet,
   View,
   useWindowDimensions,
@@ -15,10 +12,9 @@ import Animated, {
   FadeIn,
   FadeInDown,
   interpolate,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withRepeat,
-  withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
 import Svg, {
@@ -37,9 +33,11 @@ import {
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const ITEM_SLOT = 100
-const CENTER_SIZE = 124
-const SIDE_SIZE = 78
+/** Slot width = snap distance. Nodes share one base size; focus scales them. */
+const ITEM_SLOT = 108
+/** Drawn size at full focus (scale 1). */
+const NODE_SIZE = 128
+const AVATAR_INSET = 20
 
 type PresenceStoriesRailProps = {
   people?: PresenceRailPerson[]
@@ -48,8 +46,8 @@ type PresenceStoriesRailProps = {
 }
 
 /**
- * Home Stories rail — open (no card), focus-scaled carousel.
- * Side nodes: thick gradient dial arc. Center: thin full ring + Add Story pill.
+ * Home Stories dial — open carousel (no card).
+ * Whichever story is centered grows large; neighbours shrink as the dial turns.
  */
 export function PresenceStoriesRail({
   people = PRESENCE_RAIL_SEED,
@@ -61,7 +59,7 @@ export function PresenceStoriesRail({
   const router = useRouter()
   const {width: windowWidth} = useWindowDimensions()
   const [stageWidth, setStageWidth] = useState(windowWidth)
-  const scrollRef = useRef<ScrollView>(null)
+  const scrollRef = useRef<Animated.ScrollView>(null)
   const scrollX = useSharedValue(0)
 
   const youIndex = useMemo(
@@ -82,9 +80,11 @@ export function PresenceStoriesRail({
     return () => clearTimeout(timer)
   }, [scrollX, stageWidth, youIndex])
 
-  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    scrollX.value = event.nativeEvent.contentOffset.x
-  }
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      scrollX.value = event.contentOffset.x
+    },
+  })
 
   const onStageLayout = (event: LayoutChangeEvent) => {
     const next = event.nativeEvent.layout.width
@@ -109,20 +109,20 @@ export function PresenceStoriesRail({
         </View>
       ) : null}
 
-      {/* Open stage — no card / border / fill. */}
       <View
         onLayout={onStageLayout}
         style={[styles.stage, compact ? styles.stageCompact : styles.stageTall]}>
-        <ScrollView
+        <Animated.ScrollView
           ref={scrollRef}
           horizontal
           showsHorizontalScrollIndicator={false}
           snapToInterval={ITEM_SLOT}
+          disableIntervalMomentum
           decelerationRate="fast"
           contentContainerStyle={{
             paddingHorizontal: sidePad,
             alignItems: 'center',
-            minHeight: compact ? 176 : 228,
+            minHeight: compact ? 200 : 248,
           }}
           onScroll={onScroll}
           scrollEventThrottle={16}>
@@ -134,17 +134,21 @@ export function PresenceStoriesRail({
               scrollX={scrollX}
               reduceMotion={reduceMotion}
               onPress={() => {
+                // Snap this story to center, then open.
+                scrollRef.current?.scrollTo({
+                  x: index * ITEM_SLOT,
+                  animated: true,
+                })
                 router.push('/product/presence' as Href)
               }}
             />
           ))}
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
     </Animated.View>
   )
 }
 
-/** Degrees → radians. 0° = 3 o’clock, clockwise (SVG). */
 function polar(cx: number, cy: number, r: number, deg: number) {
   const rad = (deg * Math.PI) / 180
   return {
@@ -153,11 +157,6 @@ function polar(cx: number, cy: number, r: number, deg: number) {
   }
 }
 
-/**
- * Dial arc path (reference: thick gradient on top-left ~120°).
- * Angles in screen space (0° = east, clockwise). Uses CCW sweep so the
- * short top→left dial is drawn, not the long bottom arc.
- */
 function dialArcPath(
   cx: number,
   cy: number,
@@ -167,15 +166,12 @@ function dialArcPath(
 ): string {
   const start = polar(cx, cy, r, startDeg)
   const end = polar(cx, cy, r, endDeg)
-  // Counterclockwise delta from start → end.
-  const ccw = ((startDeg - endDeg + 360) % 360)
+  const ccw = (startDeg - endDeg + 360) % 360
   const large = ccw > 180 ? 1 : 0
-  // sweep-flag 0 = counterclockwise in SVG
   return `M ${start.x} ${start.y} A ${r} ${r} 0 ${large} 0 ${end.x} ${end.y}`
 }
 
 function fullRingPath(cx: number, cy: number, r: number): string {
-  // Two semicircles so SVG can stroke a closed ring cleanly.
   const left = polar(cx, cy, r, 180)
   const right = polar(cx, cy, r, 0)
   return `M ${right.x} ${right.y} A ${r} ${r} 0 1 1 ${left.x} ${left.y} A ${r} ${r} 0 1 1 ${right.x} ${right.y}`
@@ -188,17 +184,14 @@ function StoryDial({
 }: {
   id: string
   size: number
-  /** `dial` = thick partial arc; `ring` = thin full circle; `idle` = none */
   mode: 'dial' | 'ring' | 'idle'
 }) {
   if (mode === 'idle') return null
 
-  const stroke = mode === 'ring' ? 2.25 : 5.5
+  const stroke = mode === 'ring' ? 2.5 : 5.5
   const r = (size - stroke) / 2
   const c = size / 2
   const gradientId = `story-grad-${id}`
-
-  // Reference dial: thick arc from just past 12 o'clock through 9 o'clock (~130°).
   const path =
     mode === 'ring'
       ? fullRingPath(c, c, r)
@@ -240,86 +233,126 @@ function StoryNode({
 }) {
   const {colours, scheme} = useThemeTokens()
   const isYou = person.id === 'you'
-  const size = isYou ? CENTER_SIZE : SIDE_SIZE
-  // White gap between avatar and dial (reference).
-  const gap = isYou ? 5 : 4
-  const avatarSize = size - (isYou ? 18 : 22)
-  const ringPulse = useSharedValue(1)
+  const avatarSize = NODE_SIZE - AVATAR_INSET
+  const gap = 5
 
-  useEffect(() => {
-    if (!person.fresh || reduceMotion || isYou) return
-    ringPulse.value = withRepeat(withTiming(1.03, {duration: 1600}), -1, true)
-  }, [isYou, person.fresh, reduceMotion, ringPulse])
-
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [
-      {scale: person.fresh && !reduceMotion && !isYou ? ringPulse.value : 1},
-    ],
-  }))
+  /**
+   * Focus progress 1 → centered, 0 → far.
+   * Size is driven only by this — every story can become the big selected one.
+   */
+  const focusOf = (distance: number) => {
+    'worklet'
+    return interpolate(
+      distance,
+      [0, ITEM_SLOT * 0.55, ITEM_SLOT, ITEM_SLOT * 1.85],
+      [1, 0.72, 0.58, 0.46],
+      Extrapolation.CLAMP,
+    )
+  }
 
   const animatedStyle = useAnimatedStyle(() => {
-    const center = index * ITEM_SLOT
-    const distance = Math.abs(scrollX.value - center)
-    const scale = interpolate(
-      distance,
-      [0, ITEM_SLOT, ITEM_SLOT * 2],
-      [1, 0.7, 0.55],
-      Extrapolation.CLAMP,
-    )
+    const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
+    const focus = focusOf(distance)
+    const scale = reduceMotion
+      ? interpolate(distance, [0, ITEM_SLOT], [1, 0.62], Extrapolation.CLAMP)
+      : focus
     const opacity = interpolate(
       distance,
-      [0, ITEM_SLOT, ITEM_SLOT * 2.2],
-      [1, 0.85, 0.5],
-      Extrapolation.CLAMP,
-    )
-    const translateY = interpolate(
-      distance,
       [0, ITEM_SLOT, ITEM_SLOT * 2],
-      [0, 12, 20],
+      [1, 0.78, 0.42],
       Extrapolation.CLAMP,
     )
+    const translateY = reduceMotion
+      ? 0
+      : interpolate(
+          distance,
+          [0, ITEM_SLOT, ITEM_SLOT * 2],
+          [0, 14, 26],
+          Extrapolation.CLAMP,
+        )
+    // Mild dial rotation as items leave center.
+    const rotate = reduceMotion
+      ? '0deg'
+      : `${interpolate(
+          scrollX.value - index * ITEM_SLOT,
+          [-ITEM_SLOT, 0, ITEM_SLOT],
+          [-14, 0, 14],
+          Extrapolation.CLAMP,
+        )}deg`
+    const zIndex = Math.round(
+      interpolate(distance, [0, ITEM_SLOT], [30, 5], Extrapolation.CLAMP),
+    )
+
     return {
-      transform: [{scale}, {translateY}],
+      zIndex,
       opacity,
+      transform: [{translateY}, {scale}, {rotate}],
     }
   })
 
   const labelStyle = useAnimatedStyle(() => {
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
-    const opacity = interpolate(
-      distance,
-      [0, ITEM_SLOT * 0.5, ITEM_SLOT],
-      [0, 0.45, 1],
-      Extrapolation.CLAMP,
-    )
-    return {opacity}
+    // Names on neighbours; hide under the focused node (pill / clean center).
+    return {
+      opacity: interpolate(
+        distance,
+        [0, ITEM_SLOT * 0.35, ITEM_SLOT * 0.85],
+        [0, 0.35, 1],
+        Extrapolation.CLAMP,
+      ),
+    }
   })
 
   const addStyle = useAnimatedStyle(() => {
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
-    const opacity = interpolate(
-      distance,
-      [0, ITEM_SLOT * 0.35],
-      [1, 0],
-      Extrapolation.CLAMP,
-    )
-    const translateY = interpolate(
-      distance,
-      [0, ITEM_SLOT * 0.35],
-      [0, 10],
-      Extrapolation.CLAMP,
-    )
+    // Add Story only when *this* (you) node is focused.
     return {
-      opacity,
-      transform: [{translateY}],
+      opacity: interpolate(
+        distance,
+        [0, ITEM_SLOT * 0.4],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
+      transform: [
+        {
+          translateY: interpolate(
+            distance,
+            [0, ITEM_SLOT * 0.4],
+            [0, 12],
+            Extrapolation.CLAMP,
+          ),
+        },
+        {
+          scale: interpolate(
+            distance,
+            [0, ITEM_SLOT * 0.4],
+            [1, 0.85],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
     }
   })
 
-  const dialMode: 'dial' | 'ring' | 'idle' = isYou
-    ? 'ring'
-    : person.fresh
-      ? 'dial'
-      : 'idle'
+  // Chrome: focused → thin full ring; side + unread → dial arc.
+  // Approximate with static modes from person; animated ring swap is heavy —
+  // use dial for fresh sides, ring for everyone when we'd need focus... 
+  // Simpler: always draw dial for fresh, ring for you; focus scale does the rest.
+  // Better UX: both ring when centered — use two layers with animated opacity.
+  const dialSideStyle = useAnimatedStyle(() => {
+    const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
+    const focused = distance < ITEM_SLOT * 0.45
+    if (!person.fresh && !isYou) return {opacity: 0}
+    // Side dial visible when not focused.
+    return {opacity: focused ? 0 : person.fresh || isYou ? 1 : 0}
+  })
+
+  const ringFocusStyle = useAnimatedStyle(() => {
+    const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
+    const focused = distance < ITEM_SLOT * 0.45
+    if (!person.fresh && !isYou) return {opacity: 0}
+    return {opacity: focused ? 1 : 0}
+  })
 
   const pillBg = scheme === 'dark' ? colours.surface : '#FFFFFF'
   const plusBg = colours.text
@@ -341,17 +374,18 @@ function StoryNode({
         }
         onPress={onPress}
         style={styles.nodePress}>
-        <Animated.View
+        <View
           style={[
             styles.ringHost,
-            pulseStyle,
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-            },
+            {width: NODE_SIZE, height: NODE_SIZE, borderRadius: NODE_SIZE / 2},
           ]}>
-          <StoryDial id={person.id} size={size} mode={dialMode} />
+          <Animated.View style={[StyleSheet.absoluteFill, dialSideStyle]}>
+            <StoryDial id={`${person.id}-dial`} size={NODE_SIZE} mode="dial" />
+          </Animated.View>
+          <Animated.View style={[StyleSheet.absoluteFill, ringFocusStyle]}>
+            <StoryDial id={`${person.id}-ring`} size={NODE_SIZE} mode="ring" />
+          </Animated.View>
+
           <View
             style={[
               styles.avatarWell,
@@ -360,11 +394,10 @@ function StoryNode({
                 height: avatarSize + gap * 2,
                 borderRadius: 999,
                 backgroundColor: colours.canvas,
-                // Soft lift matching reference floating faces.
                 shadowColor: '#000',
-                shadowOpacity: scheme === 'dark' ? 0.35 : 0.12,
-                shadowRadius: 10,
-                shadowOffset: {width: 0, height: 4},
+                shadowOpacity: scheme === 'dark' ? 0.35 : 0.14,
+                shadowRadius: 12,
+                shadowOffset: {width: 0, height: 5},
               },
             ]}>
             <Avatar
@@ -375,10 +408,10 @@ function StoryNode({
               style={styles.avatarBare}
             />
           </View>
-        </Animated.View>
+        </View>
 
         {isYou ? (
-          <Animated.View style={[styles.addWrap, addStyle]}>
+          <Animated.View style={[styles.addWrap, addStyle]} pointerEvents="none">
             <View
               style={[
                 styles.addPill,
@@ -480,15 +513,14 @@ const styles = StyleSheet.create({
     width: ITEM_SLOT,
   },
   stage: {
-    // Intentionally open — no card chrome.
     overflow: 'visible',
   },
   stageCompact: {
-    minHeight: 176,
+    minHeight: 200,
     paddingBottom: 4,
   },
   stageTall: {
-    minHeight: 228,
+    minHeight: 248,
     paddingBottom: 6,
   },
 })
