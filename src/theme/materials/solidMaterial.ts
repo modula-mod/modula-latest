@@ -9,7 +9,7 @@ const ROLE_RADIUS: Record<SurfaceRole, number> = {
   floating: 18,
   input: 16,
   modal: 24,
-  media: 18,
+  media: 40,
   control: 999,
 }
 
