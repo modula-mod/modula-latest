@@ -3,8 +3,6 @@ import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
-import {AppIcon} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {useFollowProfileMutation} from '@/features/profile/data-query/useFollowProfileMutation'
@@ -13,6 +11,7 @@ import {shareProfile} from '@/features/profile/services/shareProfile'
 import type {ProfileId} from '@/api/contracts'
 import type {ModulaProfile} from '@/features/profile/contracts'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -150,29 +149,29 @@ export function ReelAuthorPeekSheet({
               gap: spacing[4],
             },
           ]}>
-          <AppPressable
-            accessibilityLabel="Share profile"
+          <ModulaTitleIconButton
+            icon="share"
+            label="Share"
+            chrome="plain"
+            stretch
             onPress={() => {
               void selectionHaptic()
               void shareProfile(author)
             }}
-            style={[styles.secondaryAction, {gap: spacing[2]}]}>
-            <AppIcon name="share" colour={colours.text} size={18} />
-            <AppText variant="label">Share</AppText>
-          </AppPressable>
-          <AppPressable
-            accessibilityLabel="Report creator"
+            style={styles.secondaryAction}
+          />
+          <ModulaTitleIconButton
+            icon="warning"
+            label="Report"
+            chrome="plain"
+            stretch
             onPress={() => {
               void selectionHaptic()
               onDismiss()
               router.push('/report' as Href)
             }}
-            style={[styles.secondaryAction, {gap: spacing[2]}]}>
-            <AppIcon name="warning" colour={colours.textSecondary} size={18} />
-            <AppText variant="label" colour="textSecondary">
-              Report
-            </AppText>
-          </AppPressable>
+            style={styles.secondaryAction}
+          />
         </View>
       </View>
     </ModulaSheet>
@@ -210,12 +209,11 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   secondaryAction: {
-    alignItems: 'center',
-    flexDirection: 'row',
+    flex: 1,
     minHeight: 44,
-    paddingVertical: 4,
   },
   secondaryRow: {
+    alignItems: 'center',
     borderTopWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     width: '100%',

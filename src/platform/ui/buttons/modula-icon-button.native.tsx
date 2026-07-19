@@ -8,6 +8,7 @@ import {
 import type {StyleProp, ViewStyle} from 'react-native'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
@@ -19,26 +20,6 @@ type ModulaIconButtonProps = {
   chrome?: 'glass' | 'bordered' | 'plain'
   style?: StyleProp<ViewStyle>
   testID?: string
-}
-
-const SF_FOR_ICON: Partial<Record<AppIconName, string>> = {
-  back: 'chevron.left',
-  more: 'ellipsis',
-  share: 'square.and.arrow.up',
-  create: 'plus',
-  search: 'magnifyingglass',
-  close: 'xmark',
-  settings: 'gearshape',
-  messages: 'bubble.left.and.bubble.right',
-  menu: 'line.3.horizontal',
-  photo: 'photo',
-  play: 'play.fill',
-  pause: 'pause.fill',
-  skipBack: 'gobackward.10',
-  skipForward: 'goforward.30',
-  like: 'heart',
-  comment: 'bubble.right',
-  bookmark: 'bookmark',
 }
 
 /**
@@ -54,7 +35,7 @@ export function ModulaIconButton({
   style,
   testID,
 }: ModulaIconButtonProps) {
-  const systemImage = SF_FOR_ICON[icon] ?? 'circle'
+  const systemImage = sfSymbolForIcon(icon)
   const glassOk =
     chrome === 'glass' &&
     (isNativeGlassRuntimeAvailable() || isCallstackLiquidGlassNativeAvailable())

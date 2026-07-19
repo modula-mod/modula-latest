@@ -7,6 +7,7 @@
 export * from '@/platform/ui/buttons/button-role'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 // Camera / video adapters stay out of this startup barrel — they must not
 // pull expo-camera / expo-video into `_layout` before a native rebuild.
 // Import from `@/platform/ui/camera/*` or `@/platform/ui/video` at call sites.

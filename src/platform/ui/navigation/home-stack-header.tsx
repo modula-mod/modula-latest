@@ -107,7 +107,9 @@ const styles = StyleSheet.create({
   rightRow: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 4,
     marginRight: 4,
+    minWidth: 88,
   },
   titleWrap: {
     alignItems: 'center',

@@ -13,13 +13,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {useSession} from '@/auth/runtime'
 import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {
@@ -311,39 +311,15 @@ export function ModulaLiquidGlassTabBar({
               pointerEvents="auto"
               accessibilityElementsHidden={false}>
               {expandActions.map(action => (
-                <AppPressable
+                <ModulaTitleIconButton
                   key={action.id}
-                  accessibilityLabel={action.label}
-                  accessibilityRole="button"
+                  icon={action.icon}
+                  label={action.label}
+                  chrome={action.compose ? 'prominent' : 'plain'}
+                  stretch
                   onPress={() => onExpandAction(action)}
-                  style={[
-                    styles.menuItem,
-                    {
-                      backgroundColor: action.compose
-                        ? colours.accentSubtle
-                        : 'transparent',
-                      borderRadius: radius.md,
-                    },
-                  ]}>
-                  <AppIcon
-                    name={action.icon}
-                    colour={action.compose ? colours.accent : colours.text}
-                    size={20}
-                  />
-                  <AppText
-                    variant="label"
-                    style={{
-                      color: action.compose ? colours.accent : colours.text,
-                      flex: 1,
-                    }}>
-                    {action.label}
-                  </AppText>
-                  {action.compose ? (
-                    <AppText variant="caption" colour="textSecondary">
-                      Quick
-                    </AppText>
-                  ) : null}
-                </AppPressable>
+                  style={styles.menuItem}
+                />
               ))}
             </Animated.View>
           ) : null}
@@ -471,11 +447,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   menuItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 10,
+    alignSelf: 'stretch',
     minHeight: 44,
-    paddingHorizontal: 10,
+    minWidth: '100%',
   },
   plusButtonContainer: {
     marginBottom: 2,

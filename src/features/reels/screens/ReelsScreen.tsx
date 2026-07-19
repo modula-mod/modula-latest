@@ -509,7 +509,8 @@ const styles = StyleSheet.create({
   headerSideEnd: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
+    minWidth: 88,
     paddingRight: 4,
   },
   item: {

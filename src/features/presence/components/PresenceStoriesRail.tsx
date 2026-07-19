@@ -445,13 +445,15 @@ function StoryNode({
 const styles = StyleSheet.create({
   addPill: {
     alignItems: 'center',
+    alignSelf: 'center',
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    gap: 8,
-    paddingLeft: 14,
-    paddingRight: 5,
-    paddingVertical: 5,
+    gap: 10,
+    minWidth: 128,
+    paddingLeft: 16,
+    paddingRight: 6,
+    paddingVertical: 6,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.1,
@@ -459,20 +461,21 @@ const styles = StyleSheet.create({
   },
   addPlus: {
     alignItems: 'center',
-    borderRadius: 12,
-    height: 24,
+    borderRadius: 13,
+    height: 26,
     justifyContent: 'center',
-    width: 24,
+    width: 26,
   },
   addPlusGlyph: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
-    lineHeight: 17,
+    lineHeight: 18,
   },
   addWrap: {
     justifyContent: 'center',
-    minHeight: 34,
+    minHeight: 36,
+    minWidth: 128,
   },
   avatarBare: {
     borderWidth: 0,
@@ -491,6 +494,7 @@ const styles = StyleSheet.create({
   nodePress: {
     alignItems: 'center',
     gap: 10,
+    overflow: 'visible',
     width: ITEM_SLOT,
   },
   ringHost: {
@@ -499,6 +503,7 @@ const styles = StyleSheet.create({
   },
   root: {
     marginBottom: 2,
+    overflow: 'visible',
   },
   rootCompact: {
     marginBottom: 0,
@@ -506,6 +511,7 @@ const styles = StyleSheet.create({
   slot: {
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'visible',
     width: ITEM_SLOT,
   },
   stage: {
