@@ -131,41 +131,46 @@ function GlassSurface({
 }) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const useGlass = isLiquidGlassSupported && !reduceTransparency
+  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
 
-  if (!useGlass) {
-    if (reduceTransparency) {
-      return (
-        <View style={[style, {backgroundColor: solidFallback, overflow: 'hidden'}]}>
-          {children}
-        </View>
-      )
-    }
-    // Soft glass fallback when Callstack liquid glass isn't linked / supported.
+  if (reduceTransparency) {
     return (
-      <BlurView
-        intensity={52}
-        tint={scheme === 'dark' ? 'dark' : 'light'}
-        style={[style, {overflow: 'hidden'}]}>
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {backgroundColor: solidFallback, opacity: 0.3},
-          ]}
-        />
+      <View style={[style, {backgroundColor: solidFallback, overflow: 'hidden'}]}>
         {children}
-      </BlurView>
+      </View>
     )
   }
 
+  if (useNativeGlass) {
+    return (
+      <LiquidGlassView
+        interactive={interactive}
+        effect={interactive ? 'clear' : 'regular'}
+        style={style}>
+        {children}
+      </LiquidGlassView>
+    )
+  }
+
+  // Soft glass fallback when Callstack liquid glass isn't linked / supported.
+  // Keep the wash very light so BlurView can read as glass, not a solid pill.
   return (
-    <LiquidGlassView
-      interactive={interactive}
-      effect={interactive ? 'clear' : 'regular'}
-      style={style}>
+    <BlurView
+      intensity={78}
+      tint={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
+      style={[style, {overflow: 'hidden', backgroundColor: 'transparent'}]}>
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: '#FFFFFF',
+            opacity: scheme === 'dark' ? 0.08 : 0.14,
+          },
+        ]}
+      />
       {children}
-    </LiquidGlassView>
+    </BlurView>
   )
 }
 
@@ -267,13 +272,10 @@ export function ModulaLiquidGlassTabBar({
     }
   }
 
-  const glassFallback = reduceTransparency
-    ? colours.surface
-    : colours.surfaceRaised
+  const glassFallback = colours.surface
+  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
 
-  const Container = isLiquidGlassSupported && !reduceTransparency
-    ? LiquidGlassContainerView
-    : View
+  const Container = useNativeGlass ? LiquidGlassContainerView : View
 
   return (
     <Container
@@ -284,7 +286,7 @@ export function ModulaLiquidGlassTabBar({
           gap: spacing[3],
         },
       ]}
-      {...(isLiquidGlassSupported && !reduceTransparency ? {spacing: 16} : {})}>
+      {...(useNativeGlass ? {spacing: 16} : {})}>
       <Animated.View style={[mainTabStyle, styles.mainCluster]}>
         <GlassSurface
           solidFallback={glassFallback}
@@ -292,8 +294,10 @@ export function ModulaLiquidGlassTabBar({
             styles.liquidGlassView,
             {
               borderRadius: radius.xlarge,
-              borderColor: colours.border,
-              borderWidth: isLiquidGlassSupported && !reduceTransparency ? 0 : StyleSheet.hairlineWidth,
+              // Native liquid glass needs no stroke; BlurView fallback stays
+              // borderless too so the pill reads as glass, not a solid card.
+              borderColor: 'transparent',
+              borderWidth: 0,
             },
           ]}>
           {/* Only mount expand menu when open — avoids ghost icons through glass. */}
@@ -395,19 +399,14 @@ export function ModulaLiquidGlassTabBar({
             styles.plusButtonGlass,
             {
               borderRadius: radius.round,
-              backgroundColor:
-                isLiquidGlassSupported && !reduceTransparency
-                  ? undefined
-                  : colours.accent,
+              backgroundColor: useNativeGlass ? undefined : colours.accent,
             },
           ]}>
           <Animated.View style={plusIconStyle}>
             <AppIcon
               name="create"
               colour={
-                isLiquidGlassSupported && !reduceTransparency
-                  ? colours.text
-                  : colours.accentForeground
+                useNativeGlass ? colours.text : colours.accentForeground
               }
               size={26}
             />

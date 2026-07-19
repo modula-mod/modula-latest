@@ -100,7 +100,10 @@ export function HomeFeedScreen() {
     [feedQuery.data],
   )
   const {pullDistance, onScroll} = useScrollPullProgress()
-  const refreshing = feedQuery.isRefetching && !feedQuery.isFetchingNextPage
+  const [manualRefreshing, setManualRefreshing] = useState(false)
+  const refreshing =
+    manualRefreshing ||
+    (feedQuery.isRefetching && !feedQuery.isFetchingNextPage)
 
   useEffect(() => {
     if (focus.quietFeed && mode === 'For You') {
@@ -113,6 +116,15 @@ export function HomeFeedScreen() {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     }
   }, [mode, reduceMotion])
+
+  const onRefresh = () => {
+    if (manualRefreshing || feedQuery.isRefetching) return
+    setManualRefreshing(true)
+    void feedQuery
+      .refetch()
+      .catch(() => undefined)
+      .finally(() => setManualRefreshing(false))
+  }
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -128,18 +140,17 @@ export function HomeFeedScreen() {
             keyExtractor={item => item.id}
             renderItem={({item}) => <SocialPost post={item} />}
             contentInsetAdjustmentBehavior="automatic"
+            bounces
+            alwaysBounceVertical
             onScroll={onScroll}
             scrollEventThrottle={16}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
-                // Hide the stock spinner — shimmer edge is the refresh signal.
-                tintColor="transparent"
-                colors={['transparent']}
-                progressBackgroundColor="transparent"
-                onRefresh={() => {
-                  if (!feedQuery.isRefetching) void feedQuery.refetch()
-                }}
+                tintColor={colours.accent}
+                colors={[colours.accent]}
+                progressBackgroundColor={colours.surface}
+                onRefresh={onRefresh}
               />
             }
             onEndReachedThreshold={0.35}

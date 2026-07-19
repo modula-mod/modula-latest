@@ -295,9 +295,15 @@ export function sanitizeOrderedIds(
 ): string[] {
   const allowed = new Set(catalog.map(block => block.id))
   const required = catalog.filter(block => block.required).map(block => block.id)
-  const raw = Array.isArray(ids)
-    ? ids.filter((id): id is string => typeof id === 'string' && allowed.has(id))
-    : []
+  // Missing / non-array must use the product default — NOT "required only".
+  // Otherwise migrating older AsyncStorage blobs (no tabBarIds key) silently
+  // collapses the tab bar to Home + Profile.
+  if (!Array.isArray(ids)) {
+    return [...fallback]
+  }
+  const raw = ids.filter(
+    (id): id is string => typeof id === 'string' && allowed.has(id),
+  )
   const unique = [...new Set(raw)]
   for (const id of required) {
     if (!unique.includes(id)) unique.unshift(id)

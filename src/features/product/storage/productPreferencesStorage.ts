@@ -19,6 +19,14 @@ import {
 
 const KEY = 'modula.product.preferences.v1'
 
+/**
+ * Bumped when layout-block fields are introduced or their migration semantics
+ * change. Prefs below this version re-seed home/discover/tabs/activity/profile
+ * ids to product defaults (fixes the "Home+Profile only" collapse from treating
+ * a missing tabBarIds key as required-only).
+ */
+export const LAYOUT_SCHEMA_VERSION = 1
+
 export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
 
 export type ChatAssistMode = 'off' | 'on-device' | 'manual' | 'selected' | 'full'
@@ -66,6 +74,8 @@ export type ProductPreferences = {
   chromeDensity: ChromeDensity
   motionDensity: MotionDensity
   surfacePreview: SurfacePreviewId
+  /** Layout-block prefs schema; used for one-shot migrations. */
+  layoutSchemaVersion: number
 }
 
 export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
@@ -106,6 +116,7 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
   chromeDensity: 'comfortable',
   motionDensity: 'full',
   surfacePreview: 'solid',
+  layoutSchemaVersion: LAYOUT_SCHEMA_VERSION,
 }
 
 function isChatAssistMode(value: unknown): value is ChatAssistMode {
@@ -120,7 +131,12 @@ function isChatAssistMode(value: unknown): value is ChatAssistMode {
 
 function mergePreferences(raw: unknown): ProductPreferences {
   if (!raw || typeof raw !== 'object') return DEFAULT_PRODUCT_PREFERENCES
-  const value = raw as Partial<ProductPreferences>
+  const value = raw as Partial<ProductPreferences> & {
+    layoutSchemaVersion?: unknown
+  }
+  const storedLayoutVersion =
+    typeof value.layoutSchemaVersion === 'number' ? value.layoutSchemaVersion : 0
+  const migrateLayout = storedLayoutVersion < LAYOUT_SCHEMA_VERSION
   return {
     focus: (() => {
       const merged = {...DEFAULT_PRODUCT_PREFERENCES.focus, ...(value.focus ?? {})}
@@ -194,31 +210,41 @@ function mergePreferences(raw: unknown): ProductPreferences {
       typeof value.teamsRoleId === 'string' && value.teamsRoleId.trim()
         ? value.teamsRoleId.trim()
         : DEFAULT_PRODUCT_PREFERENCES.teamsRoleId,
-    homeBlockIds: sanitizeOrderedIds(
-      value.homeBlockIds,
-      HOME_LAYOUT_BLOCKS,
-      DEFAULT_HOME_BLOCK_IDS,
-    ),
-    discoverBlockIds: sanitizeOrderedIds(
-      value.discoverBlockIds,
-      DISCOVER_LAYOUT_BLOCKS,
-      DEFAULT_DISCOVER_BLOCK_IDS,
-    ),
-    tabBarIds: sanitizeOrderedIds(
-      value.tabBarIds,
-      TAB_LAYOUT_BLOCKS,
-      DEFAULT_TAB_BAR_IDS,
-    ),
-    activityBlockIds: sanitizeOrderedIds(
-      value.activityBlockIds,
-      ACTIVITY_LAYOUT_BLOCKS,
-      DEFAULT_ACTIVITY_BLOCK_IDS,
-    ),
-    profileTabIds: sanitizeOrderedIds(
-      value.profileTabIds,
-      PROFILE_LAYOUT_BLOCKS,
-      DEFAULT_PROFILE_TAB_IDS,
-    ),
+    homeBlockIds: migrateLayout
+      ? [...DEFAULT_HOME_BLOCK_IDS]
+      : sanitizeOrderedIds(
+          value.homeBlockIds,
+          HOME_LAYOUT_BLOCKS,
+          DEFAULT_HOME_BLOCK_IDS,
+        ),
+    discoverBlockIds: migrateLayout
+      ? [...DEFAULT_DISCOVER_BLOCK_IDS]
+      : sanitizeOrderedIds(
+          value.discoverBlockIds,
+          DISCOVER_LAYOUT_BLOCKS,
+          DEFAULT_DISCOVER_BLOCK_IDS,
+        ),
+    tabBarIds: migrateLayout
+      ? [...DEFAULT_TAB_BAR_IDS]
+      : sanitizeOrderedIds(
+          value.tabBarIds,
+          TAB_LAYOUT_BLOCKS,
+          DEFAULT_TAB_BAR_IDS,
+        ),
+    activityBlockIds: migrateLayout
+      ? [...DEFAULT_ACTIVITY_BLOCK_IDS]
+      : sanitizeOrderedIds(
+          value.activityBlockIds,
+          ACTIVITY_LAYOUT_BLOCKS,
+          DEFAULT_ACTIVITY_BLOCK_IDS,
+        ),
+    profileTabIds: migrateLayout
+      ? [...DEFAULT_PROFILE_TAB_IDS]
+      : sanitizeOrderedIds(
+          value.profileTabIds,
+          PROFILE_LAYOUT_BLOCKS,
+          DEFAULT_PROFILE_TAB_IDS,
+        ),
     chromeDensity:
       value.chromeDensity === 'compact' ||
       value.chromeDensity === 'comfortable' ||
@@ -237,6 +263,7 @@ function mergePreferences(raw: unknown): ProductPreferences {
       value.surfacePreview === 'minimal'
         ? value.surfacePreview
         : DEFAULT_PRODUCT_PREFERENCES.surfacePreview,
+    layoutSchemaVersion: LAYOUT_SCHEMA_VERSION,
   }
 }
 
@@ -244,7 +271,20 @@ export async function loadProductPreferences(): Promise<ProductPreferences> {
   try {
     const stored = await AsyncStorage.getItem(KEY)
     if (!stored) return DEFAULT_PRODUCT_PREFERENCES
-    return mergePreferences(JSON.parse(stored))
+    const raw = JSON.parse(stored) as unknown
+    const merged = mergePreferences(raw)
+    const rawVersion =
+      raw &&
+      typeof raw === 'object' &&
+      typeof (raw as {layoutSchemaVersion?: unknown}).layoutSchemaVersion ===
+        'number'
+        ? (raw as {layoutSchemaVersion: number}).layoutSchemaVersion
+        : 0
+    // Persist one-shot layout migration so Home+Profile collapse does not stick.
+    if (rawVersion < LAYOUT_SCHEMA_VERSION) {
+      await saveProductPreferences(merged)
+    }
+    return merged
   } catch {
     return DEFAULT_PRODUCT_PREFERENCES
   }

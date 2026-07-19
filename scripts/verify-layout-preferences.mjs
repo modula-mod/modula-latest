@@ -20,9 +20,8 @@ function text(file) {
 /** Mirror of sanitizeOrderedIds for invariant checks. */
 function sanitizeOrderedIds(ids, catalogIds, requiredIds, fallback) {
   const allowed = new Set(catalogIds)
-  const raw = Array.isArray(ids)
-    ? ids.filter(id => typeof id === 'string' && allowed.has(id))
-    : []
+  if (!Array.isArray(ids)) return [...fallback]
+  const raw = ids.filter(id => typeof id === 'string' && allowed.has(id))
   const unique = [...new Set(raw)]
   for (const id of requiredIds) {
     if (!unique.includes(id)) unique.unshift(id)
@@ -57,6 +56,8 @@ for (const key of [
   'motionDensity',
   'surfacePreview',
   'resetProductPreferences',
+  'LAYOUT_SCHEMA_VERSION',
+  'layoutSchemaVersion',
 ]) {
   if (!storage.includes(key)) fail(`productPreferencesStorage missing ${key}`)
 }
@@ -109,6 +110,11 @@ const empty = sanitizeOrderedIds([], catalog, required, fallback)
 if (JSON.stringify(empty) !== JSON.stringify(['required'])) {
   // required unshifted onto empty unique → ['required']
   if (!empty.includes('required')) fail('empty input must still include required')
+}
+
+const missing = sanitizeOrderedIds(undefined, catalog, required, fallback)
+if (JSON.stringify(missing) !== JSON.stringify(fallback)) {
+  fail('missing ids must fall back to full defaults (not required-only)')
 }
 
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
