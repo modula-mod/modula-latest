@@ -1,4 +1,3 @@
-import {LinearGradient} from 'expo-linear-gradient'
 import {useRouter, type Href} from 'expo-router'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {
@@ -22,6 +21,12 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+} from 'react-native-svg'
 
 import {ProgressiveBlurEdges} from '@/components/materials/ProgressiveBlurEdges'
 import {AppText} from '@/components/primitives/AppText'
@@ -36,6 +41,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 const ITEM_SLOT = 96
 const CENTER_SIZE = 118
 const SIDE_SIZE = 72
+const DIAL_STROKE = 3.5
 
 type PresenceStoriesRailProps = {
   people?: PresenceRailPerson[]
@@ -43,6 +49,10 @@ type PresenceStoriesRailProps = {
   showCaption?: boolean
 }
 
+/**
+ * Home stories rail — focus-scaled carousel with dial rings (full circle stroke).
+ * Copy is Stories; route still opens the Presence preview surface.
+ */
 export function PresenceStoriesRail({
   people = PRESENCE_RAIL_SEED,
   compact = false,
@@ -90,12 +100,16 @@ export function PresenceStoriesRail({
       entering={reduceMotion ? undefined : FadeIn.duration(280)}
       style={[styles.root, compact && styles.rootCompact, {gap: spacing[2]}]}>
       {showCaption ? (
-        <View style={[styles.captionRow, {paddingHorizontal: spacing[4], gap: 2}]}>
+        <View
+          style={[
+            styles.captionRow,
+            {paddingHorizontal: spacing[4], gap: 2},
+          ]}>
           <AppText variant="caption" colour="textSecondary">
-            PRESENCE
+            STORIES
           </AppText>
           <AppText variant="caption" colour="textTertiary">
-            Focus halo · Preview — not Instagram Stories
+            Dial rings · Preview
           </AppText>
         </View>
       ) : null}
@@ -107,7 +121,9 @@ export function PresenceStoriesRail({
           compact ? styles.stageCompact : styles.stageTall,
           {
             backgroundColor:
-              scheme === 'dark' ? 'rgba(10,16,18,0.55)' : 'rgba(243,247,248,0.78)',
+              scheme === 'dark'
+                ? 'rgba(10,16,18,0.55)'
+                : 'rgba(243,247,248,0.78)',
             borderColor: colours.border,
           },
         ]}>
@@ -127,7 +143,7 @@ export function PresenceStoriesRail({
           onScroll={onScroll}
           scrollEventThrottle={16}>
           {people.map((person, index) => (
-            <PresenceStoryNode
+            <StoryNode
               key={person.id}
               person={person}
               index={index}
@@ -144,7 +160,65 @@ export function PresenceStoriesRail({
   )
 }
 
-function PresenceStoryNode({
+function StoryDial({
+  id,
+  size,
+  active,
+  isYou,
+  mutedStroke,
+}: {
+  id: string
+  size: number
+  active: boolean
+  isYou: boolean
+  mutedStroke: string
+}) {
+  const stroke = DIAL_STROKE
+  const r = (size - stroke) / 2
+  const c = size / 2
+  const gradientId = `story-dial-${id}`
+
+  if (!active && !isYou) {
+    return (
+      <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
+        <Circle
+          cx={c}
+          cy={c}
+          r={r}
+          stroke={mutedStroke}
+          strokeWidth={StyleSheet.hairlineWidth * 2}
+          fill="none"
+        />
+      </Svg>
+    )
+  }
+
+  // Full dial ring — continuous stroke (not a filled wedge / partial arc).
+  return (
+    <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
+      <Defs>
+        <SvgLinearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <Stop offset="0%" stopColor="#FF5A7A" />
+          <Stop offset="45%" stopColor="#369CAA" />
+          <Stop offset="100%" stopColor="#E8A838" />
+        </SvgLinearGradient>
+      </Defs>
+      <Circle
+        cx={c}
+        cy={c}
+        r={r}
+        stroke={`url(#${gradientId})`}
+        strokeWidth={stroke}
+        fill="none"
+        strokeLinecap="round"
+        // Slight dash breaks make the ring read as a dial, not a blob.
+        strokeDasharray={isYou ? undefined : `${r * 0.55} ${r * 0.18}`}
+      />
+    </Svg>
+  )
+}
+
+function StoryNode({
   person,
   index,
   scrollX,
@@ -160,12 +234,12 @@ function PresenceStoryNode({
   const {colours} = useThemeTokens()
   const isYou = person.id === 'you'
   const size = isYou ? CENTER_SIZE : SIDE_SIZE + 8
-  const avatarSize = isYou ? CENTER_SIZE - 16 : SIDE_SIZE - 8
+  const avatarSize = isYou ? CENTER_SIZE - 22 : SIDE_SIZE - 14
   const ringPulse = useSharedValue(1)
 
   useEffect(() => {
     if (!person.fresh || reduceMotion) return
-    ringPulse.value = withRepeat(withTiming(1.06, {duration: 1100}), -1, true)
+    ringPulse.value = withRepeat(withTiming(1.04, {duration: 1400}), -1, true)
   }, [person.fresh, reduceMotion, ringPulse])
 
   const pulseStyle = useAnimatedStyle(() => ({
@@ -212,8 +286,18 @@ function PresenceStoryNode({
 
   const addStyle = useAnimatedStyle(() => {
     const distance = Math.abs(scrollX.value - index * ITEM_SLOT)
-    const opacity = interpolate(distance, [0, ITEM_SLOT * 0.4], [1, 0], Extrapolation.CLAMP)
-    const translateY = interpolate(distance, [0, ITEM_SLOT * 0.4], [0, 8], Extrapolation.CLAMP)
+    const opacity = interpolate(
+      distance,
+      [0, ITEM_SLOT * 0.4],
+      [1, 0],
+      Extrapolation.CLAMP,
+    )
+    const translateY = interpolate(
+      distance,
+      [0, ITEM_SLOT * 0.4],
+      [0, 8],
+      Extrapolation.CLAMP,
+    )
     return {
       opacity,
       transform: [{translateY}],
@@ -223,54 +307,50 @@ function PresenceStoryNode({
   return (
     <Animated.View
       entering={
-        reduceMotion ? undefined : FadeInDown.delay(index * 36).springify().damping(18)
+        reduceMotion
+          ? undefined
+          : FadeInDown.delay(index * 36).springify().damping(18)
       }
       style={[styles.slot, animatedStyle]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={
           isYou
-            ? 'Your presence focus. Add Presence.'
-            : `${person.name}. ${person.fresh ? 'Fresh presence.' : 'Open presence.'}`
+            ? 'Your story. Add Story.'
+            : `${person.name}. ${person.fresh ? 'Unread story.' : 'Open story.'}`
         }
         onPress={onPress}
         style={styles.nodePress}>
         <Animated.View
-          style={[styles.ring, pulseStyle, {width: size, height: size, borderRadius: 999}]}>
-          {person.fresh || isYou ? (
-            <LinearGradient
-              colors={
-                isYou
-                  ? ['#FF4D8D', '#369CAA', '#2A6F78', 'transparent']
-                  : ['#369CAA', '#5C9AA8', 'transparent', 'transparent']
-              }
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 1}}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                {
-                  borderWidth: StyleSheet.hairlineWidth,
-                  borderColor: colours.border,
-                  borderRadius: 999,
-                },
-              ]}
-            />
-          )}
+          style={[
+            styles.ring,
+            pulseStyle,
+            {width: size, height: size, borderRadius: size / 2},
+          ]}>
+          <StoryDial
+            id={person.id}
+            size={size}
+            active={person.fresh || isYou}
+            isYou={isYou}
+            mutedStroke={colours.border}
+          />
           <View
             style={[
               styles.avatarInset,
               {
                 backgroundColor: colours.canvas,
-                width: avatarSize + 8,
-                height: avatarSize + 8,
+                width: avatarSize + 6,
+                height: avatarSize + 6,
                 borderRadius: 999,
               },
             ]}>
-            <Avatar name={person.name} uri={person.uri} size={avatarSize} colour={person.colour} />
+            <Avatar
+              name={person.name}
+              uri={person.uri}
+              size={avatarSize}
+              colour={person.colour}
+              style={styles.avatarBare}
+            />
           </View>
         </Animated.View>
 
@@ -281,7 +361,7 @@ function PresenceStoryNode({
               colour="accent"
               numberOfLines={1}
               style={styles.name}>
-              Add Presence
+              Add Story
             </AppText>
           </Animated.View>
         ) : (
@@ -300,33 +380,24 @@ function PresenceStoryNode({
   )
 }
 
-
 const styles = StyleSheet.create({
-  root: {
-    marginBottom: 4,
+  addWrap: {
+    justifyContent: 'center',
+    minHeight: 20,
   },
-  rootCompact: {
-    marginBottom: 0,
+  avatarBare: {
+    borderWidth: 0,
   },
-  captionRow: {},
-  stage: {
-    overflow: 'hidden',
-    borderRadius: 28,
-    marginHorizontal: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  stageTall: {
-    minHeight: 248,
-    paddingBottom: 12,
-  },
-  stageCompact: {
-    minHeight: 196,
-    paddingBottom: 10,
-  },
-  slot: {
-    width: ITEM_SLOT,
+  avatarInset: {
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
+    zIndex: 1,
+  },
+  captionRow: {},
+  name: {
+    maxWidth: ITEM_SLOT - 8,
+    textAlign: 'center',
   },
   nodePress: {
     alignItems: 'center',
@@ -336,19 +407,30 @@ const styles = StyleSheet.create({
   ring: {
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
   },
-  avatarInset: {
+  root: {
+    marginBottom: 4,
+  },
+  rootCompact: {
+    marginBottom: 0,
+  },
+  slot: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: ITEM_SLOT,
+  },
+  stage: {
+    borderRadius: 28,
+    borderWidth: StyleSheet.hairlineWidth,
+    marginHorizontal: 12,
     overflow: 'hidden',
   },
-  name: {
-    textAlign: 'center',
-    maxWidth: ITEM_SLOT - 8,
+  stageCompact: {
+    minHeight: 196,
+    paddingBottom: 10,
   },
-  addWrap: {
-    minHeight: 20,
-    justifyContent: 'center',
+  stageTall: {
+    minHeight: 248,
+    paddingBottom: 12,
   },
 })

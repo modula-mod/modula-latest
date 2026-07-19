@@ -3,15 +3,15 @@ export type PresenceRailPerson = {
   name: string
   /** Optional avatar URL — omitted uses initials. */
   uri?: string
-  /** Fresh / unread presence ring. */
+  /** Fresh / unread story dial. */
   fresh: boolean
   /** Cover / accent fallback for initials avatar. */
   colour?: string
 }
 
 /**
- * Local Preview seed for the Presence rail.
- * Not a live Stories backend — Focus Halo + presence craft only.
+ * Local Preview seed for the Stories rail.
+ * Not a live Stories backend — dial rings + craft only.
  */
 export const PRESENCE_RAIL_SEED: PresenceRailPerson[] = [
   {
