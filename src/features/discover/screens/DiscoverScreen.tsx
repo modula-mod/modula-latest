@@ -12,13 +12,17 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
+import {InspireNextList} from '@/features/discover/components/InspireNextList'
+import {LivePresenceRail} from '@/features/discover/components/LivePresenceRail'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
 import {StackedAvatars} from '@/platform/ui/avatars'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -78,6 +82,8 @@ export function DiscoverScreen() {
                   {id: 'Media', label: 'Media'},
                   {id: 'interests', label: 'Edit interests — Preview'},
                   {id: 'feeds', label: 'Custom feeds — Preview'},
+                  {id: 'inspire', label: 'Inspire next'},
+                  {id: 'live', label: 'Live presence'},
                   {id: 'media-grid', label: 'Media grid'},
                   {id: 'open-marketplace', label: 'Open Marketplace'},
                   {id: 'open-communities', label: 'Open Communities'},
@@ -99,6 +105,14 @@ export function DiscoverScreen() {
                     router.push('/discover/feeds' as Href)
                     return
                   }
+                  if (id === 'inspire') {
+                    router.push('/discover/inspire' as Href)
+                    return
+                  }
+                  if (id === 'live') {
+                    router.push('/discover/live' as Href)
+                    return
+                  }
                   if (id === 'media-grid') {
                     router.push('/discover/media' as Href)
                     return
@@ -107,53 +121,79 @@ export function DiscoverScreen() {
                 }}
               />
             </View>
-            <AppPressable
-              accessibilityLabel="Edit interests Preview"
-              onPress={() => router.push('/discover/interests' as Href)}
-              style={[
-                styles.cta,
-                {
-                  backgroundColor: colours.accentSubtle,
-                  borderRadius: radius.round,
-                },
-              ]}>
-              <AppText variant="label" style={{color: colours.accent}}>
-                Choose interests — Preview
-              </AppText>
-            </AppPressable>
-            <View
-              style={[
-                styles.search,
-                {
-                  backgroundColor: colours.surfaceRaised,
-                  borderColor: colours.border,
-                  borderRadius: radius.round,
-                  paddingHorizontal: spacing[4],
-                },
-              ]}>
-              <AppIcon name="search" colour={colours.textSecondary} />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search people, topics, modules"
-                placeholderTextColor={colours.textTertiary}
-                style={[styles.searchInput, {color: colours.text}]}
-                returnKeyType="search"
-              />
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{gap: spacing[2]}}>
-              {categories.map(item => (
-                <Pill
-                  key={item}
-                  label={item}
-                  selected={category === item}
-                  onPress={() => setCategory(item)}
-                />
-              ))}
-            </ScrollView>
+            <SectionEnter delay={20}>
+              <AppPressable
+                accessibilityLabel="Edit interests Preview"
+                onPress={() => router.push('/discover/interests' as Href)}
+                style={[
+                  styles.cta,
+                  {
+                    backgroundColor: colours.accentSubtle,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <AppText variant="label" style={{color: colours.accent}}>
+                  Choose interests — Preview
+                </AppText>
+              </AppPressable>
+            </SectionEnter>
+            <SectionEnter delay={40}>
+              <LiquidGlassChrome
+                interactive
+                fallback="regular"
+                style={[
+                  styles.searchGlass,
+                  {borderRadius: radius.round, borderColor: colours.border},
+                ]}>
+                <View
+                  style={[
+                    styles.search,
+                    {
+                      borderRadius: radius.round,
+                      paddingHorizontal: spacing[4],
+                    },
+                  ]}>
+                  <AppIcon name="search" colour={colours.textSecondary} />
+                  <TextInput
+                    value={query}
+                    onChangeText={setQuery}
+                    placeholder="Where next — people, topics, modules"
+                    placeholderTextColor={colours.textTertiary}
+                    style={[styles.searchInput, {color: colours.text}]}
+                    returnKeyType="search"
+                  />
+                  <AppPressable
+                    accessibilityLabel="Open inspire destinations"
+                    onPress={() => router.push('/discover/inspire' as Href)}
+                    style={[
+                      styles.searchChip,
+                      {
+                        backgroundColor: colours.accentSubtle,
+                        borderRadius: radius.round,
+                      },
+                    ]}>
+                    <AppText variant="caption" colour="accent">
+                      Inspire
+                    </AppText>
+                  </AppPressable>
+                </View>
+              </LiquidGlassChrome>
+            </SectionEnter>
+            <SectionEnter delay={60} from="right">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{gap: spacing[2]}}>
+                {categories.map(item => (
+                  <Pill
+                    key={item}
+                    label={item}
+                    selected={category === item}
+                    onPress={() => setCategory(item)}
+                  />
+                ))}
+              </ScrollView>
+            </SectionEnter>
           </View>
 
           {discoverQuery.isLoading ? (
@@ -162,23 +202,37 @@ export function DiscoverScreen() {
             <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
           ) : hasResults ? (
             <>
+              {category === 'For You' ? <LivePresenceRail /> : null}
               {(category === 'For You' || category === 'Media') && (
-                <ReelsPreviewRail result={filtered} />
+                <SectionEnter delay={100}>
+                  <ReelsPreviewRail result={filtered} />
+                </SectionEnter>
               )}
               {(category === 'For You' || category === 'People') && (
-                <SuggestedPeople people={filtered.suggestedProfiles} />
+                <SectionEnter delay={120}>
+                  <SuggestedPeople people={filtered.suggestedProfiles} />
+                </SectionEnter>
               )}
+              {category === 'For You' ? <InspireNextList /> : null}
               {(category === 'For You' || category === 'Communities') && (
                 <>
-                  <TrendingTopics topics={filtered.trendingTopics} />
-                  <CommunitiesRail />
+                  <SectionEnter delay={160}>
+                    <TrendingTopics topics={filtered.trendingTopics} />
+                  </SectionEnter>
+                  <SectionEnter delay={180}>
+                    <CommunitiesRail />
+                  </SectionEnter>
                 </>
               )}
               {(category === 'For You' || category === 'Marketplace') && (
-                <FeaturedModules modules={filtered.featuredModules} />
+                <SectionEnter delay={200}>
+                  <FeaturedModules modules={filtered.featuredModules} />
+                </SectionEnter>
               )}
               {(category === 'For You' || category === 'Media') && (
-                <MediaGrid result={filtered} />
+                <SectionEnter delay={220}>
+                  <MediaGrid result={filtered} />
+                </SectionEnter>
               )}
               {category === 'Marketplace' ? (
                 <AppPressable
@@ -581,10 +635,18 @@ const styles = StyleSheet.create({
   },
   search: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     gap: 8,
     minHeight: 46,
+  },
+  searchChip: {
+    justifyContent: 'center',
+    minHeight: 28,
+    paddingHorizontal: 10,
+  },
+  searchGlass: {
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
   },
   searchInput: {
     flex: 1,

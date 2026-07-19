@@ -19,6 +19,7 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
+import {HomeQuickActions} from '@/features/feed/components/HomeQuickActions'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {
@@ -29,6 +30,8 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {
   ShimmerRefreshEdge,
@@ -145,10 +148,16 @@ export function HomeFeedScreen() {
             ListHeaderComponent={
               <View>
                 {!focus.hideNav ? (
-                  <View style={{paddingVertical: spacing[3]}}>
-                    <PresenceStoriesRail compact showCaption />
-                  </View>
+                  <SectionEnter>
+                    <View style={{paddingVertical: spacing[3]}}>
+                      <PresenceStoriesRail compact showCaption />
+                    </View>
+                  </SectionEnter>
                 ) : null}
+
+                <SectionEnter delay={50} from="right">
+                  <HomeQuickActions />
+                </SectionEnter>
 
                 {focusActive ? (
                   <AppPressable
@@ -308,45 +317,61 @@ function ComposerPrompt() {
   const profile = session.status === 'signedIn' ? session.profile : null
 
   return (
-    <View
-      style={[
-        styles.prompt,
-        {
-          borderTopColor: colours.border,
-          borderBottomColor: colours.border,
-          padding: spacing[4],
-          gap: spacing[3],
-        },
-      ]}>
-      <Avatar
-        name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
-        uri={profile?.avatarUri}
-        colour={profile?.coverColour}
-        size={40}
-      />
-      <AppPressable
-        accessibilityLabel="Create a post"
-        onPress={() => router.push('/compose' as Href)}
+    <SectionEnter delay={80}>
+      <View
         style={[
-          styles.promptInput,
+          styles.prompt,
           {
-            backgroundColor: colours.surfaceRaised,
-            borderColor: colours.border,
-            borderRadius: radius.round,
-            paddingHorizontal: spacing[4],
+            borderTopColor: colours.border,
+            borderBottomColor: colours.border,
+            padding: spacing[4],
+            gap: spacing[3],
           },
         ]}>
-        <AppText variant="body" colour="textSecondary">
-          What are you building?
-        </AppText>
-      </AppPressable>
-      <AppPressable
-        accessibilityLabel="Add media to a post"
-        onPress={() => router.push('/compose' as Href)}
-        style={styles.promptIcon}>
-        <AppIcon name="photo" colour={colours.textSecondary} />
-      </AppPressable>
-    </View>
+        <Avatar
+          name={profile?.displayName ?? (session.status === 'guest' ? 'Guest' : 'Modula')}
+          uri={profile?.avatarUri}
+          colour={profile?.coverColour}
+          size={40}
+        />
+        <LiquidGlassChrome
+          interactive
+          fallback="regular"
+          style={[
+            styles.promptGlass,
+            {
+              borderColor: colours.border,
+              borderRadius: radius.round,
+            },
+          ]}>
+          <AppPressable
+            accessibilityLabel="Create a post"
+            onPress={() => router.push('/compose' as Href)}
+            style={[
+              styles.promptInput,
+              {
+                borderRadius: radius.round,
+                paddingHorizontal: spacing[4],
+              },
+            ]}>
+            <AppText variant="body" colour="textSecondary">
+              What are you building?
+            </AppText>
+          </AppPressable>
+        </LiquidGlassChrome>
+        <LiquidGlassChrome
+          interactive
+          fallback="clear"
+          style={[styles.promptIconGlass, {borderColor: colours.border}]}>
+          <AppPressable
+            accessibilityLabel="Add media to a post"
+            onPress={() => router.push('/compose' as Href)}
+            style={styles.promptIcon}>
+            <AppIcon name="photo" colour={colours.textSecondary} />
+          </AppPressable>
+        </LiquidGlassChrome>
+      </View>
+    </SectionEnter>
   )
 }
 
@@ -383,15 +408,23 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
+  promptGlass: {
+    borderWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+    overflow: 'hidden',
+  },
   promptIcon: {
     alignItems: 'center',
     height: 44,
     justifyContent: 'center',
     width: 44,
   },
-  promptInput: {
+  promptIconGlass: {
+    borderRadius: 22,
     borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
+    overflow: 'hidden',
+  },
+  promptInput: {
     justifyContent: 'center',
     minHeight: 44,
   },

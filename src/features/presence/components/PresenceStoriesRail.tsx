@@ -13,9 +13,13 @@ import {
 } from 'react-native'
 import Animated, {
   Extrapolation,
+  FadeIn,
+  FadeInDown,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withRepeat,
+  withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
 
@@ -26,6 +30,7 @@ import {
   PRESENCE_RAIL_SEED,
   type PresenceRailPerson,
 } from '@/features/presence/data/presenceRailSeed'
+import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const ITEM_SLOT = 96
@@ -44,6 +49,7 @@ export function PresenceStoriesRail({
   showCaption = true,
 }: PresenceStoriesRailProps) {
   const {colours, spacing, scheme} = useThemeTokens()
+  const reduceMotion = useReduceMotion()
   const router = useRouter()
   const {width: windowWidth} = useWindowDimensions()
   const [stageWidth, setStageWidth] = useState(windowWidth)
@@ -80,7 +86,9 @@ export function PresenceStoriesRail({
   }
 
   return (
-    <View style={[styles.root, compact && styles.rootCompact, {gap: spacing[2]}]}>
+    <Animated.View
+      entering={reduceMotion ? undefined : FadeIn.duration(280)}
+      style={[styles.root, compact && styles.rootCompact, {gap: spacing[2]}]}>
       {showCaption ? (
         <View style={[styles.captionRow, {paddingHorizontal: spacing[4], gap: 2}]}>
           <AppText variant="caption" colour="textSecondary">
@@ -124,6 +132,7 @@ export function PresenceStoriesRail({
               person={person}
               index={index}
               scrollX={scrollX}
+              reduceMotion={reduceMotion}
               onPress={() => {
                 router.push('/product/presence' as Href)
               }}
@@ -131,7 +140,7 @@ export function PresenceStoriesRail({
           ))}
         </ScrollView>
       </View>
-    </View>
+    </Animated.View>
   )
 }
 
@@ -139,17 +148,29 @@ function PresenceStoryNode({
   person,
   index,
   scrollX,
+  reduceMotion,
   onPress,
 }: {
   person: PresenceRailPerson
   index: number
   scrollX: SharedValue<number>
+  reduceMotion: boolean
   onPress: () => void
 }) {
   const {colours, scheme} = useThemeTokens()
   const isYou = person.id === 'you'
   const size = isYou ? CENTER_SIZE : SIDE_SIZE + 8
   const avatarSize = isYou ? CENTER_SIZE - 16 : SIDE_SIZE - 8
+  const ringPulse = useSharedValue(1)
+
+  useEffect(() => {
+    if (!person.fresh || reduceMotion) return
+    ringPulse.value = withRepeat(withTiming(1.06, {duration: 1100}), -1, true)
+  }, [person.fresh, reduceMotion, ringPulse])
+
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{scale: person.fresh && !reduceMotion ? ringPulse.value : 1}],
+  }))
 
   const animatedStyle = useAnimatedStyle(() => {
     const center = index * ITEM_SLOT
@@ -200,7 +221,11 @@ function PresenceStoryNode({
   })
 
   return (
-    <Animated.View style={[styles.slot, animatedStyle]}>
+    <Animated.View
+      entering={
+        reduceMotion ? undefined : FadeInDown.delay(index * 36).springify().damping(18)
+      }
+      style={[styles.slot, animatedStyle]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={
@@ -210,13 +235,14 @@ function PresenceStoryNode({
         }
         onPress={onPress}
         style={styles.nodePress}>
-        <View style={[styles.ring, {width: size, height: size, borderRadius: 999}]}>
+        <Animated.View
+          style={[styles.ring, pulseStyle, {width: size, height: size, borderRadius: 999}]}>
           {person.fresh || isYou ? (
             <LinearGradient
               colors={
                 isYou
-                  ? ['#FF4D8D', '#A855F7', '#369CAA', 'transparent']
-                  : ['#C084FC', '#F472B6', 'transparent', 'transparent']
+                  ? ['#FF4D8D', '#369CAA', '#2A6F78', 'transparent']
+                  : ['#369CAA', '#5C9AA8', 'transparent', 'transparent']
               }
               start={{x: 0, y: 0}}
               end={{x: 1, y: 1}}
@@ -246,7 +272,7 @@ function PresenceStoryNode({
             ]}>
             <Avatar name={person.name} uri={person.uri} size={avatarSize} colour={person.colour} />
           </View>
-        </View>
+        </Animated.View>
 
         {isYou ? (
           <Animated.View style={[styles.addWrap, addStyle]}>
@@ -283,6 +309,7 @@ function PresenceStoryNode({
     </Animated.View>
   )
 }
+
 
 const styles = StyleSheet.create({
   root: {

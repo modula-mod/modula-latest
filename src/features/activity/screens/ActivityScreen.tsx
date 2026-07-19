@@ -18,6 +18,7 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
+import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReduceMotion} from '@/lib/accessibility'
@@ -25,6 +26,7 @@ import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
@@ -177,18 +179,28 @@ export function ActivityScreen() {
             </View>
           </View>
 
-          <View style={{flexDirection: 'row', gap: spacing[2]}}>
-            <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
-            <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
-            <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
-            <Pill
-              label="Filters"
-              selected={
-                filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
-              }
-              onPress={() => setFilterSheetOpen(true)}
+          <SectionEnter delay={20} from="right">
+            <View style={{flexDirection: 'row', gap: spacing[2]}}>
+              <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
+              <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
+              <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
+              <Pill
+                label="Filters"
+                selected={
+                  filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
+                }
+                onPress={() => setFilterSheetOpen(true)}
+              />
+            </View>
+          </SectionEnter>
+
+          {filter === 'all' ? (
+            <ActivityDigestStrip
+              items={activity}
+              readIds={readIds}
+              onMarkAllRead={markAllRead}
             />
-          </View>
+          ) : null}
 
           {filter !== 'all' && filter !== 'mentions' && filter !== 'replies' ? (
             <AppText variant="caption" colour="textSecondary">
@@ -196,30 +208,40 @@ export function ActivityScreen() {
             </AppText>
           ) : null}
 
-          {groups.map(group => {
+          {groups.map((group, groupIndex) => {
             const items = filtered.filter(item => item.group === group)
             if (!items.length) return null
             return (
-              <View key={group} style={{gap: spacing[3]}}>
-                <AppText variant="headline">{group}</AppText>
-                <View style={{gap: spacing[2]}}>
-                  {items.map(item => (
-                    <ActivityRow
-                      key={item.id}
-                      item={item}
-                      unread={!readIds.has(item.id)}
-                      onOpen={() => {
-                        setReadIds(prev => new Set(prev).add(item.id))
-                        void activityRepository.markRead(item.id).catch(() => undefined)
-                      }}
-                      onMarkRead={() => {
-                        setReadIds(prev => new Set(prev).add(item.id))
-                        void activityRepository.markRead(item.id).catch(() => undefined)
-                      }}
-                    />
-                  ))}
+              <SectionEnter key={group} delay={60 + groupIndex * 50}>
+                <View style={{gap: spacing[3]}}>
+                  <AppText variant="headline">{group}</AppText>
+                  <View style={{gap: spacing[2]}}>
+                    {items.map((item, itemIndex) => (
+                      <SectionEnter key={item.id} delay={80 + groupIndex * 40 + itemIndex * 28}>
+                        <ActivityRow
+                          item={item}
+                          unread={!readIds.has(item.id)}
+                          peers={activity.filter(
+                            peer =>
+                              peer.id !== item.id &&
+                              peer.group === item.group &&
+                              (peer.type === 'like' || peer.type === 'reaction') &&
+                              (item.type === 'like' || item.type === 'reaction'),
+                          )}
+                          onOpen={() => {
+                            setReadIds(prev => new Set(prev).add(item.id))
+                            void activityRepository.markRead(item.id).catch(() => undefined)
+                          }}
+                          onMarkRead={() => {
+                            setReadIds(prev => new Set(prev).add(item.id))
+                            void activityRepository.markRead(item.id).catch(() => undefined)
+                          }}
+                        />
+                      </SectionEnter>
+                    ))}
+                  </View>
                 </View>
-              </View>
+              </SectionEnter>
             )
           })}
         </ScrollView>
@@ -264,11 +286,13 @@ export function ActivityScreen() {
 function ActivityRow({
   item,
   unread,
+  peers,
   onOpen,
   onMarkRead,
 }: {
   item: ActivityItem
   unread: boolean
+  peers: ActivityItem[]
   onOpen: () => void
   onMarkRead: () => void
 }) {
@@ -279,6 +303,16 @@ function ActivityRow({
   const profileRoute = item.actor
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
     : null
+
+  const multiActors = [item, ...peers]
+    .map(entry => entry.actor)
+    .filter((actor): actor is NonNullable<typeof actor> => Boolean(actor))
+  const uniqueActors = multiActors.filter(
+    (actor, index, list) => list.findIndex(face => face.id === actor.id) === index,
+  )
+  const showStack =
+    (item.type === 'like' || item.type === 'reaction' || item.type === 'follow') &&
+    uniqueActors.length > 0
 
   const openDestination = () => {
     onOpen()
@@ -331,8 +365,11 @@ function ActivityRow({
           style={[
             styles.row,
             {
+              backgroundColor: unread ? colours.surfaceRaised : 'transparent',
+              borderRadius: radius.xlarge,
               gap: spacing[3],
               opacity: unread ? 1 : 0.72,
+              paddingHorizontal: spacing[2],
               paddingVertical: spacing[2],
             },
           ]}>
@@ -368,7 +405,11 @@ function ActivityRow({
           <View style={styles.body}>
             {item.actor ? (
               <AppText variant="body">
-                <AppText variant="label">{item.actor.displayName}</AppText>{' '}
+                <AppText variant="label">
+                  {uniqueActors.length > 1
+                    ? `${item.actor.displayName} and ${uniqueActors.length - 1} others`
+                    : item.actor.displayName}
+                </AppText>{' '}
                 {item.description}
               </AppText>
             ) : (
@@ -382,7 +423,7 @@ function ActivityRow({
                 style={[
                   styles.preview,
                   {
-                    backgroundColor: colours.surfaceRaised,
+                    backgroundColor: colours.canvas,
                     borderColor: colours.border,
                     borderRadius: radius.medium,
                     marginTop: spacing[2],
@@ -394,19 +435,17 @@ function ActivityRow({
                 </AppText>
               </View>
             ) : null}
-            {item.type === 'follow' && item.actor ? (
+            {showStack ? (
               <View style={{marginTop: spacing[2]}}>
                 <StackedAvatars
-                  faces={[
-                    {
-                      id: item.actor.id,
-                      name: item.actor.displayName,
-                      uri: item.actor.avatarUri,
-                      colour: item.actor.coverColour,
-                    },
-                  ]}
+                  faces={uniqueActors.map(actor => ({
+                    id: actor.id,
+                    name: actor.displayName,
+                    uri: actor.avatarUri,
+                    colour: actor.coverColour,
+                  }))}
                   size={28}
-                  max={1}
+                  max={4}
                 />
               </View>
             ) : null}
