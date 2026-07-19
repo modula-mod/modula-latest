@@ -1,25 +1,16 @@
-import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ModulaSegmentedScrollRail} from '@/platform/ui/controls/modula-segmented-scroll-rail'
+import type {ModulaSegmentedPickerProps} from '@/platform/ui/controls/modula-segmented-picker.types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export type ModulaSegmentedOption = {
-  value: string
-  label: string
-}
-
-type ModulaSegmentedPickerProps = {
-  options: ModulaSegmentedOption[]
-  value: string
-  onValueChange: (value: string) => void
-  accessibilityLabel?: string
-  style?: StyleProp<ViewStyle>
-  testID?: string
-}
+export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
 /**
- * Web / Android fallback — segmented row matching the Expo UI lab control.
+ * Web / Android — theme-aware segmented control.
+ * `layout="scroll"` shares the progressive near-end reveal rail with iOS.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -28,8 +19,28 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  layout = 'fit',
+  initialVisibleCount,
+  revealBatchSize,
+  onNearEnd,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
+
+  if (layout === 'scroll') {
+    return (
+      <ModulaSegmentedScrollRail
+        options={options}
+        value={value}
+        onValueChange={onValueChange}
+        accessibilityLabel={accessibilityLabel}
+        style={style}
+        testID={testID}
+        initialVisibleCount={initialVisibleCount}
+        revealBatchSize={revealBatchSize}
+        onNearEnd={onNearEnd}
+      />
+    )
+  }
 
   return (
     <View
@@ -41,7 +52,7 @@ export function ModulaSegmentedPicker({
         {
           backgroundColor: colours.surfaceMuted,
           borderRadius: radius.round,
-          padding: 2,
+          padding: 3,
           gap: spacing[1],
         },
         style,
@@ -52,14 +63,16 @@ export function ModulaSegmentedPicker({
           <AppPressable
             key={option.value}
             accessibilityRole="tab"
-            accessibilityState={{selected}}
+            accessibilityState={{selected, disabled: !!option.disabled}}
             accessibilityLabel={option.label}
+            disabled={option.disabled}
             onPress={() => onValueChange(option.value)}
             style={[
               styles.segment,
               {
-                backgroundColor: selected ? colours.surface : 'transparent',
+                backgroundColor: selected ? colours.accent : 'transparent',
                 borderRadius: radius.round,
+                opacity: option.disabled ? 0.45 : 1,
                 paddingHorizontal: spacing[3],
                 paddingVertical: spacing[2],
               },
@@ -67,7 +80,7 @@ export function ModulaSegmentedPicker({
             <AppText
               variant="label"
               style={{
-                color: selected ? colours.text : colours.textSecondary,
+                color: selected ? colours.accentForeground : colours.textSecondary,
                 textAlign: 'center',
               }}
               numberOfLines={1}>
@@ -91,6 +104,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    minHeight: 32,
+    minHeight: 34,
   },
 })

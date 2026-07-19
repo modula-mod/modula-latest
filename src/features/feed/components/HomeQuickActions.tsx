@@ -36,8 +36,8 @@ const ACTIONS: QuickAction[] = [
 ]
 
 /**
- * Home quick destinations — Expo UI segmented picker
- * (Lab → Lists & empty states feed-filter menu).
+ * Home quick destinations — scrollable themed segment rail.
+ * Swipe near the trailing edge to reveal more actions.
  */
 export function HomeQuickActions() {
   const {spacing} = useThemeTokens()
@@ -66,9 +66,16 @@ export function HomeQuickActions() {
 
   return (
     <ShellChromeObscureView direction="up">
-      <View style={[styles.wrap, {paddingHorizontal: spacing[4], paddingBottom: spacing[2]}]}>
+      <View
+        style={[
+          styles.wrap,
+          {paddingHorizontal: spacing[4], paddingBottom: spacing[2]},
+        ]}>
         <ModulaSegmentedPicker
           accessibilityLabel="Home quick actions"
+          layout="scroll"
+          initialVisibleCount={3}
+          revealBatchSize={2}
           options={options}
           value={value}
           onValueChange={next => {
