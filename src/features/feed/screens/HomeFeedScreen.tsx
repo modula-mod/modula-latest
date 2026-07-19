@@ -37,6 +37,7 @@ import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
+import {ShellChromeObscureView} from '@/platform/ui/navigation/shell-chrome-obscure-view'
 import {
   PullActionTray,
   usePullActionGesture,
@@ -369,62 +370,69 @@ function HomeLayoutHeader({
         </AppPressable>
       ) : null,
     'mode-tabs': showBlock('mode-tabs') ? (
-      <View
-        key="mode-tabs"
-        accessibilityRole="tablist"
-        style={[
-          styles.modeRow,
-          {
-            borderBottomColor: colours.border,
-            gap: spacing[2],
-            paddingHorizontal: spacing[4],
-            paddingTop: spacing[1],
-          },
-        ]}>
-        {modeOrder.map(next => {
-          const demoted = focus.quietFeed && next === 'For You'
-          const selected = mode === next
-          return (
-            <AppPressable
-              key={next}
-              accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
-              accessibilityRole="tab"
-              accessibilityState={{selected: mode === next}}
-              onPress={() => {
-                void selectionHaptic()
-                onModeChange(next)
-              }}
-              style={[
-                styles.modeButton,
-                {
-                  backgroundColor: selected ? colours.accentSubtle : 'transparent',
-                  borderColor: selected ? colours.accentBorder : 'transparent',
-                  borderRadius: radius.round,
-                  paddingHorizontal: spacing[3],
-                },
-                demoted ? {opacity: 0.55} : null,
-              ]}>
-              <AppText
-                variant="label"
-                style={{
-                  color: selected ? colours.accent : colours.textSecondary,
-                }}>
-                {next}
-                {demoted ? ' · Quiet' : ''}
-              </AppText>
-              <View
+      <ShellChromeObscureView key="mode-tabs" direction="up">
+        <View
+          accessibilityRole="tablist"
+          style={[
+            styles.modeRow,
+            {
+              borderBottomColor: colours.border,
+              gap: spacing[2],
+              paddingHorizontal: spacing[4],
+              paddingTop: spacing[1],
+            },
+          ]}>
+          {modeOrder.map(next => {
+            const demoted = focus.quietFeed && next === 'For You'
+            const selected = mode === next
+            return (
+              <AppPressable
+                key={next}
+                accessibilityLabel={`${next} feed${demoted ? ', quiet' : ''}`}
+                accessibilityRole="tab"
+                accessibilityState={{selected: mode === next}}
+                onPress={() => {
+                  void selectionHaptic()
+                  onModeChange(next)
+                }}
                 style={[
-                  styles.modeUnderline,
+                  styles.modeButton,
                   {
-                    backgroundColor: selected ? colours.accent : 'transparent',
+                    backgroundColor: selected
+                      ? colours.accentSubtle
+                      : 'transparent',
+                    borderColor: selected
+                      ? colours.accentBorder
+                      : 'transparent',
                     borderRadius: radius.round,
+                    paddingHorizontal: spacing[3],
                   },
-                ]}
-              />
-            </AppPressable>
-          )
-        })}
-      </View>
+                  demoted ? {opacity: 0.55} : null,
+                ]}>
+                <AppText
+                  variant="label"
+                  style={{
+                    color: selected ? colours.accent : colours.textSecondary,
+                  }}>
+                  {next}
+                  {demoted ? ' · Quiet' : ''}
+                </AppText>
+                <View
+                  style={[
+                    styles.modeUnderline,
+                    {
+                      backgroundColor: selected
+                        ? colours.accent
+                        : 'transparent',
+                      borderRadius: radius.round,
+                    },
+                  ]}
+                />
+              </AppPressable>
+            )
+          })}
+        </View>
+      </ShellChromeObscureView>
     ) : null,
     composer: showBlock('composer') ? <ComposerPrompt key="composer" /> : null,
   }

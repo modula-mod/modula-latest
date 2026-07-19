@@ -42,17 +42,18 @@ type ActionSpec = {
 }
 
 const ACTIONS: readonly ActionSpec[] = [
-  {id: 'search', index: 0, label: 'Search', icon: 'search'},
+  {id: 'search', index: 0, label: 'Search', icon: 'search-outline'},
   {id: 'refresh', index: 1, label: 'Refresh', icon: 'refresh'},
   {id: 'close', index: 2, label: 'Close', icon: 'close'},
 ]
 
-const ICON_SIZE = 22
-const HIT = 40
+const ICON_IDLE = 20
+const ICON_FOCUS = 26
+const HIT = 44
 
 /**
  * Simple pull-action chooser: search · refresh · close.
- * Compact icons, light dim, selection scale — no aura / lightning.
+ * Focused icon grows and sharpens — no bubble / selector chrome.
  */
 export function PullActionTray({
   pullDistance,
@@ -80,7 +81,7 @@ export function PullActionTray({
   const dimStyle = useAnimatedStyle(() => {
     const eased = stageProgress(pullDistance.value)
     return {
-      opacity: refreshing ? Math.max(eased, 0.32) : eased * 0.38,
+      opacity: refreshing ? Math.max(eased, 0.55) : eased * 0.62,
     }
   })
 
@@ -105,14 +106,14 @@ export function PullActionTray({
         {
           translateY: reduceMotion
             ? 0
-            : interpolate(boost, [0, 1], [12, 0], Extrapolation.CLAMP),
+            : interpolate(boost, [0, 1], [10, 0], Extrapolation.CLAMP),
         },
         {
           translateX: armed.value
             ? interpolate(
                 swipeX.value,
                 [-100, 0, 100],
-                [-5, 0, 5],
+                [-4, 0, 4],
                 Extrapolation.CLAMP,
               )
             : 0,
@@ -146,8 +147,7 @@ export function PullActionTray({
                 action={action}
                 selectedIndex={selectedIndex}
                 accent={colours.accent}
-                accentForeground={colours.accentForeground}
-                muted={colours.textSecondary}
+                muted={colours.textTertiary}
                 refreshing={refreshing}
                 reduceMotion={reduceMotion}
               />
@@ -156,7 +156,7 @@ export function PullActionTray({
           <SelectionLabel
             selectedIndex={selectedIndex}
             refreshing={refreshing}
-            text={colours.text}
+            text={colours.textSecondary}
           />
         </Animated.View>
       </View>
@@ -168,7 +168,6 @@ function ActionIcon({
   action,
   selectedIndex,
   accent,
-  accentForeground,
   muted,
   refreshing,
   reduceMotion,
@@ -176,7 +175,6 @@ function ActionIcon({
   action: ActionSpec
   selectedIndex: SharedValue<PullActionSelection>
   accent: string
-  accentForeground: string
   muted: string
   refreshing: boolean
   reduceMotion: boolean
@@ -196,21 +194,21 @@ function ActionIcon({
     spin.value = withTiming(0, {duration: 180})
   }, [action.index, reduceMotion, refreshing, spin])
 
-  const bubbleStyle = useAnimatedStyle(() => {
+  const slotStyle = useAnimatedStyle(() => {
     const active = refreshing ? 1 : selectedIndex.value
     const selected = action.index === active
+    const scale = selected
+      ? reduceMotion
+        ? 1.08
+        : ICON_FOCUS / ICON_IDLE
+      : 0.92
     return {
-      backgroundColor: selected ? accent : 'transparent',
-      opacity: selected ? 1 : 0.5,
-      transform: [
-        {
-          scale: selected ? (reduceMotion ? 1.06 : 1.12) : 1,
-        },
-      ],
+      opacity: selected ? 1 : 0.28,
+      transform: [{scale}],
     }
   })
 
-  const selectedIconStyle = useAnimatedStyle(() => {
+  const focusedIconStyle = useAnimatedStyle(() => {
     const active = refreshing ? 1 : selectedIndex.value
     const selected = action.index === active
     return {
@@ -228,12 +226,12 @@ function ActionIcon({
   })
 
   return (
-    <Animated.View style={[styles.bubble, bubbleStyle]}>
+    <Animated.View style={[styles.slot, slotStyle]}>
       <Animated.View style={[styles.iconLayer, idleIconStyle]}>
-        <Ionicons name={action.icon} size={ICON_SIZE} color={muted} />
+        <Ionicons name={action.icon} size={ICON_IDLE} color={muted} />
       </Animated.View>
-      <Animated.View style={[styles.iconLayer, selectedIconStyle]}>
-        <Ionicons name={action.icon} size={ICON_SIZE} color={accentForeground} />
+      <Animated.View style={[styles.iconLayer, focusedIconStyle]}>
+        <Ionicons name={action.icon} size={ICON_FOCUS} color={accent} />
       </Animated.View>
     </Animated.View>
   )
@@ -280,14 +278,6 @@ function SelectionLabel({
 }
 
 const styles = StyleSheet.create({
-  bubble: {
-    alignItems: 'center',
-    borderRadius: HIT / 2,
-    height: HIT,
-    justifyContent: 'center',
-    overflow: 'hidden',
-    width: HIT,
-  },
   chrome: {
     alignItems: 'center',
     width: '100%',
@@ -316,16 +306,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   labelStack: {
-    height: 20,
-    marginTop: 10,
+    height: 18,
+    marginTop: 8,
     width: '100%',
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 28,
-    height: HIT + 4,
+    gap: 36,
+    height: HIT,
     justifyContent: 'center',
+  },
+  slot: {
+    alignItems: 'center',
+    height: HIT,
+    justifyContent: 'center',
+    width: HIT,
   },
   stage: {
     flex: 1,

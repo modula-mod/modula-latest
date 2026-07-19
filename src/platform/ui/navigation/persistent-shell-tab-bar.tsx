@@ -56,12 +56,13 @@ export function PersistentShellTabBar() {
   const {preferences} = useProductPreferences()
   const TabBar = getLiquidGlassTabBar()
   const obscureStyle = useShellChromeObscureStyle('down')
-  const [interactive, setInteractive] = useState(true)
+  const [visible, setVisible] = useState(true)
 
   useAnimatedReaction(
     () => shellChromeObscureAmount(),
     value => {
-      runOnJS(setInteractive)(value < 0.4)
+      // Native liquid-glass often ignores ancestor opacity — unmount when pulled.
+      runOnJS(setVisible)(value < 0.2)
     },
     [],
   )
@@ -92,9 +93,11 @@ export function PersistentShellTabBar() {
 
   return (
     <Animated.View
-      pointerEvents={interactive ? 'box-none' : 'none'}
+      pointerEvents={visible ? 'box-none' : 'none'}
       style={[styles.wrap, obscureStyle]}>
-      <TabBar state={{index, routes}} navigation={navigation} />
+      {visible ? (
+        <TabBar state={{index, routes}} navigation={navigation} />
+      ) : null}
     </Animated.View>
   )
 }

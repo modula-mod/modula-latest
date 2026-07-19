@@ -13,6 +13,7 @@ import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {ShellChromeObscureView} from '@/platform/ui/navigation/shell-chrome-obscure-view'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type QuickAction = {
@@ -56,17 +57,27 @@ export function HomeQuickActions() {
   )
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[
-        styles.row,
-        {gap: spacing[2], paddingHorizontal: spacing[4], paddingBottom: spacing[2]},
-      ]}>
-      {actions.map((action, index) => (
-        <QuickActionPill key={action.id} action={action} primary={index === 0} />
-      ))}
-    </ScrollView>
+    <ShellChromeObscureView direction="up">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.row,
+          {
+            gap: spacing[2],
+            paddingHorizontal: spacing[4],
+            paddingBottom: spacing[2],
+          },
+        ]}>
+        {actions.map((action, index) => (
+          <QuickActionPill
+            key={action.id}
+            action={action}
+            primary={index === 0}
+          />
+        ))}
+      </ScrollView>
+    </ShellChromeObscureView>
   )
 }
 
