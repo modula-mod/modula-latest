@@ -285,12 +285,17 @@ export function ModulaLiquidGlassTabBar({
 
   const Container = useNativeGlass ? LiquidGlassContainerView : View
 
+  // Pin to physical bottom: 0 — safe-area is padding inside the glass so the
+  // chrome reaches the screen edge (no black strip under the home indicator).
+  const bottomPad = Math.max(insets.bottom, spacing[2])
+
   return (
     <Container
       style={[
         styles.container,
         {
-          bottom: Math.max(insets.bottom, spacing[2]),
+          bottom: 0,
+          paddingBottom: bottomPad,
           gap: spacing[3],
         },
       ]}

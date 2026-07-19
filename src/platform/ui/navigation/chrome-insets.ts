@@ -9,8 +9,9 @@ export const CHROME_HEADER_ROW = 54
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
 /**
- * Absolute height of the shell bottom progressive blur from physical
- * `bottom: 0` — never add safe-area or tab-bar height.
+ * Extra rise of the shell bottom progressive blur *above* the tab segment.
+ * Total band height = tab segment + this fade, pinned at physical `bottom: 0`
+ * (safe-area is not added — the tab glass uses internal bottom padding instead).
  */
 export const CHROME_BOTTOM_FADE = 56
 export const CHROME_BOTTOM_BLUR_INTENSITY = 52

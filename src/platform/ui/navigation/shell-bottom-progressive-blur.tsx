@@ -7,14 +7,16 @@ import {
   CHROME_BOTTOM_BLUR_INTENSITY,
   CHROME_BOTTOM_FADE,
 } from '@/platform/ui/navigation/chrome-insets'
+import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visibility'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 /**
- * Progressive blur pinned to the physical screen bottom.
+ * Progressive blur from the physical screen bottom (`bottom: 0`).
  *
- * Full-screen host + `bottom: 0` band — no safe-area inset, no tab-bar offset.
- * Height is exactly `CHROME_BOTTOM_FADE` (56).
+ * Height = tab segment + 56px fade above it. Safe-area is intentionally
+ * omitted — the floating tab glass pads the home indicator internally so
+ * chrome reaches absolute 0 with no black strip underneath.
  */
 export function ShellBottomProgressiveBlur() {
   const segments = useSegments()
@@ -24,13 +26,15 @@ export function ShellBottomProgressiveBlur() {
     return null
   }
 
+  const height = FLOATING_TAB_BAR_SEGMENT_HEIGHT + CHROME_BOTTOM_FADE
+
   return (
     <Animated.View
       pointerEvents="none"
       style={[styles.host, obscureStyle]}>
-      <View style={styles.band}>
+      <View style={[styles.band, {height}]}>
         <ProgressiveBlurBand
-          height={CHROME_BOTTOM_FADE}
+          height={height}
           topHeavy={false}
           intensity={CHROME_BOTTOM_BLUR_INTENSITY}
         />
@@ -42,7 +46,6 @@ export function ShellBottomProgressiveBlur() {
 const styles = StyleSheet.create({
   band: {
     bottom: 0,
-    height: CHROME_BOTTOM_FADE,
     left: 0,
     position: 'absolute',
     right: 0,
