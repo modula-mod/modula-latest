@@ -2,8 +2,11 @@ import {usePathname, useRouter, useSegments, type Href} from 'expo-router'
 import {useState, type ComponentType} from 'react'
 import {StyleSheet} from 'react-native'
 import Animated, {
+  Extrapolation,
+  interpolate,
   runOnJS,
   useAnimatedReaction,
+  useAnimatedStyle,
 } from 'react-native-reanimated'
 
 import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
@@ -11,12 +14,16 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
+import {shellTabBarCompact} from '@/platform/ui/navigation/shell-tab-bar-compact'
 import {
   hrefForShellTab,
   resolveShellTabRouteName,
   shouldHideShellTabBar,
 } from '@/platform/ui/navigation/shell-tab-bar-visibility'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
+
+/** ~25% smaller while scrolling down a feed. */
+const TAB_BAR_COMPACT_SCALE = 0.75
 
 type LiquidGlassTabBarComponent = ComponentType<ModulaLiquidGlassTabBarProps>
 
@@ -67,6 +74,25 @@ export function PersistentShellTabBar() {
     [],
   )
 
+  const compactStyle = useAnimatedStyle(() => {
+    const c = shellTabBarCompact.value
+    return {
+      transform: [
+        {
+          translateY: interpolate(c, [0, 1], [0, 12], Extrapolation.CLAMP),
+        },
+        {
+          scale: interpolate(
+            c,
+            [0, 1],
+            [1, TAB_BAR_COMPACT_SCALE],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
+    }
+  })
+
   if (!TabBar) return null
   if (shouldHideShellTabBar(segments)) return null
 
@@ -95,14 +121,22 @@ export function PersistentShellTabBar() {
     <Animated.View
       pointerEvents={visible ? 'box-none' : 'none'}
       style={[styles.wrap, obscureStyle]}>
-      {visible ? (
-        <TabBar state={{index, routes}} navigation={navigation} />
-      ) : null}
+      <Animated.View
+        pointerEvents={visible ? 'box-none' : 'none'}
+        style={[styles.compactWrap, compactStyle]}>
+        {visible ? (
+          <TabBar state={{index, routes}} navigation={navigation} />
+        ) : null}
+      </Animated.View>
     </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
+  compactWrap: {
+    ...StyleSheet.absoluteFill,
+    justifyContent: 'flex-end',
+  },
   wrap: {
     ...StyleSheet.absoluteFill,
     zIndex: 10,

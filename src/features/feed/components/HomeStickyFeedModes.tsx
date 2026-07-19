@@ -16,6 +16,7 @@ import Animated, {
 import {selectionHaptic} from '@/lib/haptics'
 import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -72,7 +73,7 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {spacing} = useThemeTokens()
+  const {radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
@@ -149,22 +150,35 @@ export function HomeStickyFeedModes({
           },
           shellStyle,
         ]}>
-        <ModulaSegmentedPicker
-          appearance="glass"
-          accessibilityLabel="Feed mode"
-          options={options}
-          value={mode}
-          onValueChange={next => {
-            if (
-              next === 'Following' ||
-              next === 'For You' ||
-              next === 'Modules'
-            ) {
-              void selectionHaptic()
-              onModeChange(next)
-            }
-          }}
-        />
+        <LiquidGlassChrome
+          interactive
+          fallback="clear"
+          contentLayout="flow"
+          blurIntensity={92}
+          style={[
+            styles.stickyGlass,
+            {
+              borderRadius: radius.round,
+              padding: 3,
+            },
+          ]}>
+          <ModulaSegmentedPicker
+            appearance="plain"
+            accessibilityLabel="Feed mode"
+            options={options}
+            value={mode}
+            onValueChange={next => {
+              if (
+                next === 'Following' ||
+                next === 'For You' ||
+                next === 'Modules'
+              ) {
+                void selectionHaptic()
+                onModeChange(next)
+              }
+            }}
+          />
+        </LiquidGlassChrome>
       </Animated.View>
     </Animated.View>
   )
@@ -275,5 +289,9 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
     right: 0,
+  },
+  stickyGlass: {
+    overflow: 'hidden',
+    width: '100%',
   },
 })

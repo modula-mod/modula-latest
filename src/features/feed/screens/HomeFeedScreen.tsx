@@ -47,6 +47,7 @@ import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
+import {shellTabBarCompact} from '@/platform/ui/navigation/shell-tab-bar-compact'
 import {ShellChromeObscureView} from '@/platform/ui/navigation/shell-chrome-obscure-view'
 import {
   PullActionTray,
@@ -181,7 +182,10 @@ export function HomeFeedScreen() {
   }, [refreshing, searchOpen])
 
   useEffect(() => {
-    return () => setShellChromeHoldObscure(false)
+    return () => {
+      setShellChromeHoldObscure(false)
+      shellTabBarCompact.value = 0
+    }
   }, [])
 
   useEffect(() => {

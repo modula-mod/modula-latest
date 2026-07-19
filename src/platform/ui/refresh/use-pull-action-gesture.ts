@@ -15,6 +15,7 @@ import {
   shellChromeHoldObscure,
   syncShellChromePullObscure,
 } from '@/platform/ui/navigation/shell-chrome-obscure'
+import {syncShellTabBarCompactFromScroll} from '@/platform/ui/navigation/shell-tab-bar-compact'
 import {
   PULL_ACTION_ARM_DISTANCE,
   PULL_ACTION_ZONE_DISTANCE,
@@ -64,6 +65,7 @@ export function usePullActionGesture(
   onCommit: (action: PullActionId) => void,
 ): UsePullActionGestureResult {
   const scrollY = useSharedValue(0)
+  const lastScrollY = useSharedValue(0)
   const pullDistance = useSharedValue(0)
   const swipeX = useSharedValue(0)
   const selectedIndex = useSharedValue<PullActionSelection>(1)
@@ -81,7 +83,9 @@ export function usePullActionGesture(
 
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
-      scrollY.value = event.contentOffset.y
+      const y = event.contentOffset.y
+      scrollY.value = y
+      syncShellTabBarCompactFromScroll(y, lastScrollY)
     },
   })
 

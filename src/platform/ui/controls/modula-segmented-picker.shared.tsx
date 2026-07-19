@@ -164,8 +164,8 @@ export function ModulaSegmentedPicker({
     )
   }
 
-  // glass appearance — denser blur; shadow sits on an outer shell (height 0)
-  // so overflow:hidden on the glass doesn’t clip it.
+  // glass appearance — real liquid glass (no opaque fill that kills Callstack glass).
+  // Shadow on an outer shell so overflow:hidden doesn’t clip it.
   const wrapped = (
     <View
       style={[
@@ -179,18 +179,15 @@ export function ModulaSegmentedPicker({
       ]}>
       <LiquidGlassChrome
         interactive
-        fallback="regular"
+        fallback="clear"
         contentLayout="flow"
-        blurIntensity={96}
+        blurIntensity={92}
         style={[
           styles.trackGlass,
           {
             borderRadius: radius.round,
             width: '100%',
             minHeight: TRACK_HEIGHT,
-            backgroundColor: isDark
-              ? 'rgba(18, 24, 28, 0.78)'
-              : 'rgba(245, 247, 248, 0.88)',
           },
         ]}>
         {row}
