@@ -1,14 +1,11 @@
 import {Button, Host, Menu} from '@expo/ui/swift-ui'
 import {
-  buttonBorderShape,
   buttonStyle,
   controlSize,
   labelStyle,
 } from '@expo/ui/swift-ui/modifiers'
 
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
-import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
-import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
 type ChromeOverflowMenuProps = {
   title?: string
@@ -18,15 +15,13 @@ type ChromeOverflowMenuProps = {
 }
 
 /**
- * Native SwiftUI Menu with glass circular ellipsis — not ActionSheet.
+ * Native SwiftUI Menu with a plain ellipsis trigger — no glass / filled disc.
  */
 export function ChromeOverflowMenu({
   actions,
   onAction,
   accessibilityLabel = 'More actions',
 }: ChromeOverflowMenuProps) {
-  const glassOk =
-    isNativeGlassRuntimeAvailable() || isCallstackLiquidGlassNativeAvailable()
   const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
 
   return (
@@ -35,9 +30,8 @@ export function ChromeOverflowMenu({
         label={accessibilityLabel}
         systemImage="ellipsis"
         modifiers={[
-          buttonStyle(glassOk ? 'glass' : 'bordered'),
+          buttonStyle('plain'),
           labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
           controlSize('regular'),
         ]}>
         {visibleActions.map(action => (

@@ -33,6 +33,7 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -506,17 +507,13 @@ function ComposerPrompt() {
             </AppText>
           </AppPressable>
         </LiquidGlassChrome>
-        <LiquidGlassChrome
-          interactive
-          fallback="clear"
-          style={[styles.promptIconGlass, {borderColor: colours.border}]}>
-          <AppPressable
-            accessibilityLabel="Add media to a post"
-            onPress={() => router.push('/compose' as Href)}
-            style={styles.promptIcon}>
-            <AppIcon name="photo" colour={colours.textSecondary} />
-          </AppPressable>
-        </LiquidGlassChrome>
+        <ModulaIconButton
+          icon="photo"
+          accessibilityLabel="Add media to a post"
+          onPress={() => router.push('/compose' as Href)}
+          chrome="plain"
+          colour={colours.textSecondary}
+        />
       </View>
     </SectionEnter>
   )
@@ -558,17 +555,6 @@ const styles = StyleSheet.create({
   promptGlass: {
     borderWidth: StyleSheet.hairlineWidth,
     flex: 1,
-    overflow: 'hidden',
-  },
-  promptIcon: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 44,
-  },
-  promptIconGlass: {
-    borderRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
   promptInput: {

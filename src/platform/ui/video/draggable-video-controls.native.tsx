@@ -9,7 +9,6 @@ import Animated, {
 
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const SPRING = {damping: 28, stiffness: 170}
@@ -29,6 +28,7 @@ export type DraggableVideoControlsProps = {
 
 /**
  * Draggable play control with spring snap + detachable skip buttons.
+ * Plain icon controls — no glass / filled discs.
  * Interaction pattern adapted from Motionary draggable-video-control (MIT).
  */
 export function DraggableVideoControls({
@@ -92,18 +92,18 @@ export function DraggableVideoControls({
   return (
     <View style={[styles.cluster, style]} pointerEvents="box-none">
       <Animated.View style={prevStyle}>
-        <ControlDisc
-          size={64}
+        <PlainIconHit
+          size={56}
           accessibilityLabel="Skip back 10 seconds"
           onPress={onSkipBack}>
           <AppIcon name="skipBack" colour={colours.mediaOverlayIcon} size={22} />
-        </ControlDisc>
+        </PlainIconHit>
       </Animated.View>
 
       <GestureDetector gesture={pan}>
         <Animated.View style={playStyle}>
-          <ControlDisc
-            size={84}
+          <PlainIconHit
+            size={64}
             accessibilityLabel={playing ? 'Pause' : 'Play'}
             onPress={onTogglePlay}>
             <AppIcon
@@ -111,23 +111,23 @@ export function DraggableVideoControls({
               colour={colours.mediaOverlayIcon}
               size={30}
             />
-          </ControlDisc>
+          </PlainIconHit>
         </Animated.View>
       </GestureDetector>
 
       <Animated.View style={nextStyle}>
-        <ControlDisc
-          size={64}
+        <PlainIconHit
+          size={56}
           accessibilityLabel="Skip forward 30 seconds"
           onPress={onSkipForward}>
           <AppIcon name="skipForward" colour={colours.mediaOverlayIcon} size={22} />
-        </ControlDisc>
+        </PlainIconHit>
       </Animated.View>
     </View>
   )
 }
 
-function ControlDisc({
+function PlainIconHit({
   size,
   children,
   onPress,
@@ -142,12 +142,8 @@ function ControlDisc({
     <AppPressable
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
-      style={{width: size, height: size, borderRadius: size}}>
-      <LiquidGlassChrome
-        interactive
-        style={[styles.disc, {width: size, height: size, borderRadius: size}]}>
-        {children}
-      </LiquidGlassChrome>
+      style={[styles.hit, {width: size, height: size}]}>
+      {children}
     </AppPressable>
   )
 }
@@ -159,9 +155,8 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: 'center',
   },
-  disc: {
+  hit: {
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
   },
 })

@@ -13,7 +13,7 @@ export type DraggableVideoControlsProps = {
 }
 
 /**
- * Web / reduced fallback — static glass-adjacent controls without drag physics.
+ * Web / reduced fallback — plain icon controls, no filled discs.
  */
 export function DraggableVideoControls({
   playing,
@@ -29,13 +29,13 @@ export function DraggableVideoControls({
       <AppPressable
         accessibilityLabel="Skip back 10 seconds"
         onPress={onSkipBack}
-        style={[styles.side, {backgroundColor: colours.mediaOverlayControlBackground}]}>
+        style={styles.side}>
         <AppIcon name="skipBack" colour={colours.mediaOverlayIcon} size={22} />
       </AppPressable>
       <AppPressable
         accessibilityLabel={playing ? 'Pause' : 'Play'}
         onPress={onTogglePlay}
-        style={[styles.main, {backgroundColor: colours.mediaOverlayControlBackground}]}>
+        style={styles.main}>
         <AppIcon
           name={playing ? 'pause' : 'play'}
           colour={colours.mediaOverlayIcon}
@@ -45,7 +45,7 @@ export function DraggableVideoControls({
       <AppPressable
         accessibilityLabel="Skip forward 30 seconds"
         onPress={onSkipForward}
-        style={[styles.side, {backgroundColor: colours.mediaOverlayControlBackground}]}>
+        style={styles.side}>
         <AppIcon name="skipForward" colour={colours.mediaOverlayIcon} size={22} />
       </AppPressable>
     </View>
@@ -55,10 +55,9 @@ export function DraggableVideoControls({
 const styles = StyleSheet.create({
   main: {
     alignItems: 'center',
-    borderRadius: 999,
-    height: 72,
+    height: 64,
     justifyContent: 'center',
-    width: 72,
+    width: 64,
   },
   row: {
     alignItems: 'center',
@@ -68,7 +67,6 @@ const styles = StyleSheet.create({
   },
   side: {
     alignItems: 'center',
-    borderRadius: 999,
     height: 56,
     justifyContent: 'center',
     width: 56,

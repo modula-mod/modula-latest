@@ -1,8 +1,7 @@
-import {StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
+import type {StyleProp, ViewStyle} from 'react-native'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {AppIconName} from '@/components/primitives/AppIcon'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 
 type IconButtonProps = {
   icon: AppIconName
@@ -14,42 +13,25 @@ type IconButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
+/**
+ * Legacy primitive — routes to Expo UI plain ModulaIconButton.
+ * Prefer ModulaIconButton / ChromeCircleButton at call sites.
+ */
 export function IconButton({
   icon,
   label,
   onPress,
-  selected,
   disabled,
-  size = 44,
   style,
 }: IconButtonProps) {
-  const {colours} = useThemeTokens()
   return (
-    <AppPressable
+    <ModulaIconButton
+      icon={icon}
       accessibilityLabel={label}
-      accessibilityState={{selected, disabled}}
-      disabled={disabled}
       onPress={onPress}
-      style={[
-        styles.button,
-        {
-          minHeight: size,
-          minWidth: size,
-          backgroundColor: selected ? colours.accentSubtle : 'transparent',
-        },
-        style,
-      ]}>
-      <AppIcon
-        name={icon}
-        colour={selected ? colours.accent : colours.textSecondary}
-      />
-    </AppPressable>
+      disabled={disabled}
+      chrome="plain"
+      style={style}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

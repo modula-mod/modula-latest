@@ -31,6 +31,14 @@ const SF_FOR_ICON: Partial<Record<AppIconName, string>> = {
   settings: 'gearshape',
   messages: 'bubble.left.and.bubble.right',
   menu: 'line.3.horizontal',
+  photo: 'photo',
+  play: 'play.fill',
+  pause: 'pause.fill',
+  skipBack: 'gobackward.10',
+  skipForward: 'goforward.30',
+  like: 'heart',
+  comment: 'bubble.right',
+  bookmark: 'bookmark',
 }
 
 /**

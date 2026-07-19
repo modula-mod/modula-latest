@@ -36,7 +36,6 @@ import {
   type ReelOverflowActionId,
 } from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
@@ -322,9 +321,7 @@ function ReelItem({
 
   const moreTrigger = (
     <View style={styles.railHit}>
-      <LiquidGlassChrome interactive fallback="clear" style={styles.railGlass}>
-        <AppIcon name="more" colour={colours.mediaOverlayIcon} size={22} />
-      </LiquidGlassChrome>
+      <AppIcon name="more" colour={colours.mediaOverlayIcon} size={22} />
     </View>
   )
 
@@ -444,21 +441,16 @@ function ReelItem({
                     if (action.action !== 'more') runAction(action.action)
                   }}
                   style={styles.railHit}>
-                  <LiquidGlassChrome
-                    interactive
-                    fallback="clear"
-                    style={styles.railGlass}>
-                    <AppIcon
-                      name={action.icon}
-                      colour={
-                        (action.action === 'like' && liked) ||
-                        (action.action === 'save' && saved)
-                          ? colours.accent
-                          : colours.mediaOverlayIcon
-                      }
-                      size={22}
-                    />
-                  </LiquidGlassChrome>
+                  <AppIcon
+                    name={action.icon}
+                    colour={
+                      (action.action === 'like' && liked) ||
+                      (action.action === 'save' && saved)
+                        ? colours.accent
+                        : colours.mediaOverlayIcon
+                    }
+                    size={22}
+                  />
                 </AppPressable>
               )}
               {typeof action.count === 'number' ? (
@@ -533,16 +525,11 @@ const styles = StyleSheet.create({
   rail: {
     alignItems: 'center',
   },
-  railGlass: {
-    alignItems: 'center',
-    borderRadius: 24,
-    height: 48,
-    justifyContent: 'center',
-    width: 48,
-  },
   railHit: {
     alignItems: 'center',
+    height: 44,
     justifyContent: 'center',
+    minWidth: 44,
   },
   railItem: {
     alignItems: 'center',
