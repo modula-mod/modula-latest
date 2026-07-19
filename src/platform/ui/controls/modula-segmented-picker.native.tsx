@@ -1,5 +1,6 @@
 import {Host, Picker, Text} from '@expo/ui/swift-ui'
 import {pickerStyle, tag, tint} from '@expo/ui/swift-ui/modifiers'
+import {ScrollView, useWindowDimensions} from 'react-native'
 
 import type {ModulaSegmentedPickerProps} from '@/platform/ui/controls/modula-segmented-picker.types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -8,7 +9,7 @@ export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmente
 
 /**
  * Native Expo UI segmented Picker — theme via Host seedColor + accent tint.
- * Keep option counts small (≤4) so UISegmentedControl stays readable.
+ * Optional `scrollable` gives a wide control inside a horizontal ScrollView.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -17,16 +18,28 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  scrollable = false,
+  segmentMinWidth = 92,
 }: ModulaSegmentedPickerProps) {
   const {colours, scheme} = useThemeTokens()
+  const {width: windowWidth} = useWindowDimensions()
   const allowed = new Set(options.map(option => option.value))
+  const contentWidth = Math.max(
+    windowWidth - 32,
+    options.length * segmentMinWidth,
+  )
 
-  return (
+  const picker = (
     <Host
-      matchContents
+      matchContents={!scrollable}
       colorScheme={scheme}
       seedColor={colours.accent}
-      style={[{alignSelf: 'stretch'}, style]}>
+      style={[
+        scrollable
+          ? {width: contentWidth, minWidth: contentWidth}
+          : {alignSelf: 'stretch', width: '100%'},
+        style,
+      ]}>
       <Picker
         label={accessibilityLabel}
         selection={value}
@@ -44,5 +57,17 @@ export function ModulaSegmentedPicker({
         ))}
       </Picker>
     </Host>
+  )
+
+  if (!scrollable) return picker
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      decelerationRate="fast"
+      contentContainerStyle={{alignItems: 'center', minHeight: 36}}>
+      {picker}
+    </ScrollView>
   )
 }

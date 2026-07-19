@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -8,7 +8,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmented-picker.types'
 
 /**
- * Web / Android fallback — compact theme-aware segmented row.
+ * Web / Android fallback — theme-aware segmented row, optionally scrollable.
  */
 export function ModulaSegmentedPicker({
   options,
@@ -17,10 +17,17 @@ export function ModulaSegmentedPicker({
   accessibilityLabel,
   style,
   testID,
+  scrollable = false,
+  segmentMinWidth = 92,
 }: ModulaSegmentedPickerProps) {
   const {colours, radius, spacing} = useThemeTokens()
+  const {width: windowWidth} = useWindowDimensions()
+  const contentWidth = Math.max(
+    windowWidth - 32,
+    options.length * segmentMinWidth,
+  )
 
-  return (
+  const row = (
     <View
       testID={testID}
       accessibilityRole="tablist"
@@ -32,6 +39,8 @@ export function ModulaSegmentedPicker({
           borderRadius: radius.round,
           padding: 3,
           gap: spacing[1],
+          width: scrollable ? contentWidth : '100%',
+          minWidth: scrollable ? contentWidth : undefined,
         },
         style,
       ]}>
@@ -53,6 +62,8 @@ export function ModulaSegmentedPicker({
                 opacity: option.disabled ? 0.45 : 1,
                 paddingHorizontal: spacing[3],
                 paddingVertical: spacing[2],
+                minWidth: scrollable ? segmentMinWidth - 8 : undefined,
+                flex: scrollable ? undefined : 1,
               },
             ]}>
             <AppText
@@ -71,6 +82,17 @@ export function ModulaSegmentedPicker({
       })}
     </View>
   )
+
+  if (!scrollable) return row
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      decelerationRate="fast">
+      {row}
+    </ScrollView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -78,11 +100,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'stretch',
     flexDirection: 'row',
-    width: '100%',
   },
   segment: {
     alignItems: 'center',
-    flex: 1,
     justifyContent: 'center',
     minHeight: 34,
   },
