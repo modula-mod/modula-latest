@@ -15,15 +15,15 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * When true, the segmented control is laid out wider than the viewport and
-   * wrapped in a horizontal ScrollView so many segments can be panned.
+   * Horizontal overflow mode. Uses a native SwiftUI ScrollView of buttons —
+   * UISegmentedControl itself cannot scroll (it always compresses).
    */
   scrollable?: boolean
-  /** Approximate width per segment when `scrollable` (default 88). */
+  /** Min width per scrollable segment button (default 86). */
   segmentMinWidth?: number
   /**
-   * Max width of the visible control (Host / viewport). Scroll content may be
-   * wider. Defaults to 360 when `scrollable`, otherwise full width.
+   * Max width of the visible viewport. Scroll content may be wider.
+   * Defaults to 340 when `scrollable`.
    */
   maxWidth?: number
 }

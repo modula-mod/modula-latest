@@ -79,8 +79,8 @@ const DEMO_ACTIONS: DemoAction[] = [
 ]
 
 /**
- * Home quick destinations — scrollable native segmented Picker experiment.
- * Each segment runs a real action (navigate or alert).
+ * Home quick destinations — scrollable native Expo UI control experiment.
+ * Uses ScrollView + buttons (true UISegmentedControl cannot scroll).
  */
 export function HomeQuickActions() {
   const {spacing} = useThemeTokens()
