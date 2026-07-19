@@ -3,11 +3,16 @@ import type {ComponentProps, ReactNode} from 'react'
 import {StyleSheet, View} from 'react-native'
 import {BlurView} from 'expo-blur'
 import Animated, {
+  Easing,
   Extrapolation,
   interpolate,
   useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
   type SharedValue,
 } from 'react-native-reanimated'
+import {useEffect} from 'react'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
@@ -207,6 +212,8 @@ export function PullActionTray({
                 accent={colours.accent}
                 textSecondary={colours.textSecondary}
                 accentForeground={colours.accentForeground}
+                refreshing={refreshing}
+                reduceMotion={reduceMotion}
               />
             ))}
           </View>
@@ -231,24 +238,49 @@ function ActionGlyph({
   accent,
   textSecondary,
   accentForeground,
+  refreshing,
+  reduceMotion,
 }: {
   action: ActionSpec
   selectedIndex: SharedValue<PullActionSelection>
   accent: string
   textSecondary: string
   accentForeground: string
+  refreshing: boolean
+  reduceMotion: boolean
 }) {
+  const spin = useSharedValue(0)
+
+  useEffect(() => {
+    if (action.index !== 1) return
+    if (refreshing && !reduceMotion) {
+      spin.value = withRepeat(
+        withTiming(1, {duration: 900, easing: Easing.linear}),
+        -1,
+        false,
+      )
+      return
+    }
+    spin.value = withTiming(0, {duration: 180})
+  }, [action.index, reduceMotion, refreshing, spin])
+
   const slotStyle = useAnimatedStyle(() => {
-    const selected = selectedIndex.value === action.index
+    const selected =
+      refreshing && action.index === 1
+        ? true
+        : selectedIndex.value === action.index
     return {
       transform: [{scale: selected ? 1.06 : 1}],
-      opacity: selected ? 1 : 0.42,
+      opacity: selected ? 1 : refreshing ? 0.28 : 0.42,
     }
   })
 
   // Circle appears only while this action is selected (lock-screen control energy).
   const circleStyle = useAnimatedStyle(() => {
-    const selected = selectedIndex.value === action.index
+    const selected =
+      refreshing && action.index === 1
+        ? true
+        : selectedIndex.value === action.index
     return {
       opacity: selected ? 1 : 0,
       transform: [{scale: selected ? 1 : 0.7}],
@@ -257,12 +289,26 @@ function ActionGlyph({
     }
   })
 
-  const outlineStyle = useAnimatedStyle(() => ({
-    opacity: selectedIndex.value === action.index ? 0 : 1,
-  }))
-  const filledStyle = useAnimatedStyle(() => ({
-    opacity: selectedIndex.value === action.index ? 1 : 0,
-  }))
+  const outlineStyle = useAnimatedStyle(() => {
+    const selected =
+      refreshing && action.index === 1
+        ? true
+        : selectedIndex.value === action.index
+    return {opacity: selected ? 0 : 1}
+  })
+  const filledStyle = useAnimatedStyle(() => {
+    const selected =
+      refreshing && action.index === 1
+        ? true
+        : selectedIndex.value === action.index
+    return {
+      opacity: selected ? 1 : 0,
+      transform:
+        action.index === 1
+          ? [{rotate: `${spin.value * 360}deg`}]
+          : [{rotate: '0deg'}],
+    }
+  })
 
   return (
     <Animated.View style={[styles.glyphSlot, slotStyle]}>
@@ -314,7 +360,7 @@ function SelectionCopy({
           variant="caption"
           colour="textSecondary"
           style={styles.copyHint}>
-          Release to open Discover
+          Release to open search
         </AppText>
       </Animated.View>
       <Animated.View style={[styles.copyLine, refreshStyle]}>
@@ -325,7 +371,7 @@ function SelectionCopy({
           variant="caption"
           colour="textSecondary"
           style={styles.copyHint}>
-          {refreshing ? 'Fetching the latest' : 'Release in the middle'}
+          {refreshing ? 'Syncing your feed' : 'Release in the middle'}
         </AppText>
       </Animated.View>
       <Animated.View style={[styles.copyLine, closeStyle]}>

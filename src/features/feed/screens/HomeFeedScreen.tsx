@@ -20,6 +20,7 @@ import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {HomeQuickActions} from '@/features/feed/components/HomeQuickActions'
+import {HomeSearchModal} from '@/features/feed/components/HomeSearchModal'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {
@@ -102,17 +103,21 @@ export function HomeFeedScreen() {
     [feedQuery.data],
   )
   const [manualRefreshing, setManualRefreshing] = useState(false)
-  const refreshing =
-    manualRefreshing ||
-    (feedQuery.isRefetching && !feedQuery.isFetchingNextPage)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const refreshing = manualRefreshing
 
   const onRefresh = useCallback(() => {
-    if (manualRefreshing || feedQuery.isRefetching) return
+    if (manualRefreshing) return
     setManualRefreshing(true)
+    const started = Date.now()
+    const holdMs = 3000
     void feedQuery
       .refetch()
       .catch(() => undefined)
-      .finally(() => setManualRefreshing(false))
+      .finally(() => {
+        const remaining = Math.max(0, holdMs - (Date.now() - started))
+        setTimeout(() => setManualRefreshing(false), remaining)
+      })
   }, [feedQuery, manualRefreshing])
 
   const onPullAction = useCallback(
@@ -123,12 +128,12 @@ export function HomeFeedScreen() {
       }
       if (action === 'search') {
         void selectionHaptic()
-        router.push('/discover' as Href)
+        setSearchOpen(true)
         return
       }
       onRefresh()
     },
-    [onRefresh, router],
+    [onRefresh],
   )
 
   const {
@@ -154,6 +159,10 @@ export function HomeFeedScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <HomeSearchModal
+        visible={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
       <ResponsiveContent>
         <FeatureErrorBoundary label="Home feed">
           <View style={styles.screen}>
