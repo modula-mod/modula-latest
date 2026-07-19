@@ -10,6 +10,7 @@ type ModulaIconButtonProps = {
   accessibilityLabel: string
   onPress?: () => void
   disabled?: boolean
+  /** Default plain — glyph only. Glass is opt-in for rare surfaces. */
   chrome?: 'glass' | 'bordered' | 'plain'
   style?: StyleProp<ViewStyle>
   testID?: string
@@ -19,15 +20,16 @@ type ModulaIconButtonProps = {
 }
 
 /**
- * Cross-platform icon button. Native uses Expo UI glass Button via
+ * Cross-platform icon button. Native uses Expo UI via
  * modula-icon-button.native.tsx; this file is the RN / web fallback.
+ * Default chrome is plain (no filled background).
  */
 export function ModulaIconButton({
   icon,
   accessibilityLabel,
   onPress,
   disabled,
-  chrome = 'glass',
+  chrome = 'plain',
   style,
   testID,
   colour,
@@ -35,7 +37,7 @@ export function ModulaIconButton({
 }: ModulaIconButtonProps) {
   const {colours} = useThemeTokens()
 
-  if (chrome === 'plain') {
+  if (chrome === 'plain' || chrome === 'bordered') {
     return (
       <AppPressable
         testID={testID}
@@ -45,7 +47,11 @@ export function ModulaIconButton({
         disabled={disabled}
         onPress={onPress}
         style={[styles.target, style]}>
-        <AppIcon name={icon} size={size} colour={colour ?? colours.textSecondary} />
+        <AppIcon
+          name={icon}
+          size={size}
+          colour={colour ?? colours.text}
+        />
       </AppPressable>
     )
   }
@@ -59,10 +65,7 @@ export function ModulaIconButton({
       disabled={disabled}
       onPress={onPress}
       style={[styles.target, style]}>
-      <LiquidGlassChrome
-        interactive
-        fallback="clear"
-        style={styles.glass}>
+      <LiquidGlassChrome interactive fallback="clear" style={styles.glass}>
         <AppIcon name={icon} size={18} colour={colour ?? colours.text} />
       </LiquidGlassChrome>
     </AppPressable>

@@ -6,8 +6,6 @@ import Animated, {
   useAnimatedReaction,
 } from 'react-native-reanimated'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
@@ -73,10 +71,9 @@ export function HomeHeaderTitle() {
   )
 }
 
-/** Plain icon actions — no glass disc behind the glyph. */
+/** Plain Expo UI icon actions — no glass / filled disc. */
 export function HomeHeaderRight() {
   const router = useRouter()
-  const {colours} = useThemeTokens()
   const {obscureStyle, visible} = useShellChromeVisible()
 
   return (
@@ -85,21 +82,21 @@ export function HomeHeaderRight() {
       style={[styles.rightRow, obscureStyle]}>
       {visible ? (
         <>
-          <AppPressable
+          <ModulaIconButton
+            icon="create"
+            chrome="plain"
             accessibilityLabel="Create a post"
             onPress={() => {
               void selectionHaptic()
               router.push('/compose' as Href)
             }}
-            style={styles.iconHit}>
-            <AppIcon name="create" colour={colours.accent} size={22} />
-          </AppPressable>
-          <AppPressable
+          />
+          <ModulaIconButton
+            icon="messages"
+            chrome="plain"
             accessibilityLabel="Open messages"
             onPress={() => router.push('/messages' as Href)}
-            style={styles.iconHit}>
-            <AppIcon name="messages" colour={colours.text} size={22} />
-          </AppPressable>
+          />
         </>
       ) : null}
     </Animated.View>
@@ -107,13 +104,6 @@ export function HomeHeaderRight() {
 }
 
 const styles = StyleSheet.create({
-  iconHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    minWidth: 40,
-    paddingHorizontal: 6,
-  },
   rightRow: {
     alignItems: 'center',
     flexDirection: 'row',

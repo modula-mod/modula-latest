@@ -10,7 +10,7 @@ type ChromeOverflowMenuProps = {
 }
 
 /**
- * Native Menu (SwiftUI) with glass ellipsis trigger — not ActionSheet sheets.
+ * Native Menu (SwiftUI) with plain ellipsis trigger — not ActionSheet sheets.
  */
 export function ChromeOverflowMenu({
   title,
@@ -28,7 +28,7 @@ export function ChromeOverflowMenu({
         <ModulaIconButton
           icon="more"
           accessibilityLabel={accessibilityLabel}
-          chrome="glass"
+          chrome="plain"
         />
       }
     />

@@ -43,12 +43,9 @@ type PresenceStoriesRailProps = {
   showCaption?: boolean
 }
 
-/** Focus line sits left of true center so the dial opens more on the left. */
-const FOCUS_BIAS = 52
-
 /**
  * Home Stories dial — open carousel (no card).
- * First story starts focused; dial only rotates to the right (scroll ≥ 0).
+ * Starts on the literal left; dial only rotates to the right (scroll ≥ 0).
  * Waits for measured width before mounting the scroller so first paint matches.
  */
 export function PresenceStoriesRail({
@@ -64,11 +61,11 @@ export function PresenceStoriesRail({
   const scrollX = useSharedValue(0)
   const ready = stageWidth > 0
 
-  // Focus slot left-of-center; right pad still lets the last story reach focus.
-  const padLeft = ready
-    ? Math.max(spacing[4], (stageWidth - ITEM_SLOT) / 2 - FOCUS_BIAS)
+  // Literal left start — small inset only. Right pad lets the last story reach left focus.
+  const padLeft = ready ? spacing[4] : 0
+  const padRight = ready
+    ? Math.max(0, stageWidth - padLeft - ITEM_SLOT)
     : 0
-  const padRight = ready ? Math.max(0, (stageWidth - ITEM_SLOT) / 2) : 0
   const snapOffsets = useMemo(
     () => people.map((_, index) => index * ITEM_SLOT),
     [people],

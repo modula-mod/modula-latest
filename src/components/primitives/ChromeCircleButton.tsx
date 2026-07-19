@@ -15,7 +15,7 @@ type ChromeCircleButtonProps = {
 }
 
 /**
- * Header back / options control — Expo UI glass Icon Button on native.
+ * Header icon control — Expo UI plain icon button (no glass / filled disc).
  */
 export function ChromeCircleButton({
   icon,
@@ -29,7 +29,7 @@ export function ChromeCircleButton({
       icon={icon}
       accessibilityLabel={accessibilityLabel}
       onPress={pressable ? onPress : undefined}
-      chrome="glass"
+      chrome="plain"
       style={style}
     />
   )

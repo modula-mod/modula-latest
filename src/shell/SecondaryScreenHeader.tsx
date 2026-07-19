@@ -19,7 +19,7 @@ type SecondaryScreenHeaderProps = {
 }
 
 /**
- * Secondary-route chrome: progressive blur overlay + liquid-glass circular back.
+ * Secondary-route chrome: progressive blur overlay + plain Expo UI back icon.
  *
  * In-flow spacer clears the nav row only. The fade is a sibling absolute overlay
  * so it can paint over the top of the body (Android does not clip it to the spacer).

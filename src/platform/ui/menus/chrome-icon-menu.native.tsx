@@ -1,14 +1,11 @@
 import {Button, Host, Menu} from '@expo/ui/swift-ui'
 import {
-  buttonBorderShape,
   buttonStyle,
   controlSize,
   labelStyle,
 } from '@expo/ui/swift-ui/modifiers'
 
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
-import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
-import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
 type ChromeIconMenuProps = {
   systemImage: string
@@ -19,7 +16,7 @@ type ChromeIconMenuProps = {
 }
 
 /**
- * Native SwiftUI Menu with a single glass SF Symbol — never nest ModulaIconButton.
+ * Native SwiftUI Menu with a plain SF Symbol trigger — no glass / filled disc.
  */
 export function ChromeIconMenu({
   systemImage,
@@ -27,9 +24,9 @@ export function ChromeIconMenu({
   onAction,
   accessibilityLabel,
 }: ChromeIconMenuProps) {
-  const glassOk =
-    isNativeGlassRuntimeAvailable() || isCallstackLiquidGlassNativeAvailable()
-  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
+  const visibleActions = actions.filter(
+    action => !action.disabled || action.disabledReason,
+  )
 
   return (
     <Host matchContents>
@@ -37,9 +34,8 @@ export function ChromeIconMenu({
         label={accessibilityLabel}
         systemImage={systemImage as never}
         modifiers={[
-          buttonStyle(glassOk ? 'glass' : 'bordered'),
+          buttonStyle('plain'),
           labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
           controlSize('regular'),
         ]}>
         {visibleActions.map(action => (
@@ -50,7 +46,11 @@ export function ChromeIconMenu({
                 ? `${action.label} unavailable — ${action.disabledReason}`
                 : action.label
             }
-            role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
+            role={
+              !action.disabled && action.style === 'destructive'
+                ? 'destructive'
+                : undefined
+            }
             onPress={() => {
               if (!action.disabled) onAction(action.id)
             }}

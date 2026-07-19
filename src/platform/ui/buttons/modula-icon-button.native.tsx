@@ -34,15 +34,15 @@ const SF_FOR_ICON: Partial<Record<AppIconName, string>> = {
 }
 
 /**
- * Native Expo UI icon button — SwiftUI Button + systemImage + iconOnly + glass circle.
- * Matches Expo docs: label kept for a11y, labelStyle('iconOnly') hides the title.
+ * Native Expo UI icon button — SwiftUI Button + systemImage + iconOnly.
+ * Default chrome is plain (no glass / filled disc).
  */
 export function ModulaIconButton({
   icon,
   accessibilityLabel,
   onPress,
   disabled,
-  chrome = 'glass',
+  chrome = 'plain',
   style,
   testID,
 }: ModulaIconButtonProps) {
