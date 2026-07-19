@@ -24,6 +24,8 @@ import {
 export type PullActionSelection = 0 | 1 | 2
 
 export type UsePullActionGestureResult = {
+  /** Content offset Y — shared so sticky chrome can react to the same scroll. */
+  scrollY: SharedValue<number>
   pullDistance: SharedValue<number>
   swipeX: SharedValue<number>
   selectedIndex: SharedValue<PullActionSelection>
@@ -181,6 +183,7 @@ export function usePullActionGesture(
   )
 
   return {
+    scrollY,
     pullDistance,
     swipeX,
     selectedIndex,

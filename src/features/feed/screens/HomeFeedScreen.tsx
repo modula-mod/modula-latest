@@ -7,7 +7,11 @@ import {
   View,
 } from 'react-native'
 import {GestureDetector} from 'react-native-gesture-handler'
-import Animated, {withTiming} from 'react-native-reanimated'
+import Animated, {
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
@@ -20,6 +24,11 @@ import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {HomeSearchModal} from '@/features/feed/components/HomeSearchModal'
+import {
+  HomeStickyFeedModes,
+  useInlineModeTabsInteractive,
+  useInlineModeTabsStyle,
+} from '@/features/feed/components/HomeStickyFeedModes'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
 import {
@@ -142,6 +151,7 @@ export function HomeFeedScreen() {
   )
 
   const {
+    scrollY,
     pullDistance,
     swipeX,
     selectedIndex,
@@ -149,6 +159,8 @@ export function HomeFeedScreen() {
     onScroll,
     listGesture,
   } = usePullActionGesture(onPullAction)
+  const modeTabsStickAtY = useSharedValue(0)
+  const showModeTabs = isBlockOn(homeBlocks, 'mode-tabs')
 
   useEffect(() => {
     if (focus.quietFeed && mode === 'For You') {
@@ -227,6 +239,8 @@ export function HomeFeedScreen() {
                       focusFeatureOn={isFeatureEnabled(preferences, 'focus')}
                       mergeFeatureOn={isFeatureEnabled(preferences, 'merge')}
                       onModeChange={setMode}
+                      scrollY={scrollY}
+                      modeTabsStickAtY={modeTabsStickAtY}
                     />
                   }
                   ListEmptyComponent={
@@ -265,6 +279,16 @@ export function HomeFeedScreen() {
                 />
               </GestureDetector>
             </PullActionTray>
+            {showModeTabs ? (
+              <HomeStickyFeedModes
+                scrollY={scrollY}
+                stickAtY={modeTabsStickAtY}
+                mode={mode}
+                modeOrder={modeOrder}
+                quietFeed={!!focus.quietFeed}
+                onModeChange={setMode}
+              />
+            ) : null}
           </View>
         </FeatureErrorBoundary>
       </ResponsiveContent>
@@ -283,6 +307,8 @@ function HomeLayoutHeader({
   focusFeatureOn,
   mergeFeatureOn,
   onModeChange,
+  scrollY,
+  modeTabsStickAtY,
 }: {
   homeBlocks: string[]
   focusActive: boolean
@@ -294,10 +320,17 @@ function HomeLayoutHeader({
   focusFeatureOn: boolean
   mergeFeatureOn: boolean
   onModeChange: (mode: FeedModeLabel) => void
+  scrollY: SharedValue<number>
+  modeTabsStickAtY: SharedValue<number>
 }) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const showBlock = (id: string) => isBlockOn(homeBlocks, id)
+  const inlineModeStyle = useInlineModeTabsStyle(scrollY, modeTabsStickAtY)
+  const modeTabsInteractive = useInlineModeTabsInteractive(
+    scrollY,
+    modeTabsStickAtY,
+  )
 
   const nodes: Record<string, ReactNode> = {
     presence:
@@ -373,40 +406,49 @@ function HomeLayoutHeader({
         </ShellChromeObscureView>
       ) : null,
     'mode-tabs': showBlock('mode-tabs') ? (
-      <ShellChromeObscureView key="mode-tabs" direction="up">
-        <View
-          style={[
-            styles.modeRow,
-            {
-              borderBottomColor: colours.border,
-              paddingHorizontal: spacing[4],
-              paddingTop: spacing[1],
-              paddingBottom: spacing[2],
-            },
-          ]}>
-          <ModulaSegmentedPicker
-            accessibilityLabel="Feed mode"
-            options={modeOrder.map(next => ({
-              value: next,
-              label:
-                focus.quietFeed && next === 'For You'
-                  ? 'For You · Quiet'
-                  : next,
-            }))}
-            value={mode}
-            onValueChange={next => {
-              if (
-                next === 'Following' ||
-                next === 'For You' ||
-                next === 'Modules'
-              ) {
-                void selectionHaptic()
-                onModeChange(next)
-              }
-            }}
-          />
-        </View>
-      </ShellChromeObscureView>
+      <View
+        key="mode-tabs"
+        onLayout={event => {
+          // Y relative to ListHeader root = scroll offset when tabs hit the top.
+          modeTabsStickAtY.value = event.nativeEvent.layout.y
+        }}>
+        <ShellChromeObscureView direction="up">
+          <Animated.View
+            pointerEvents={modeTabsInteractive ? 'auto' : 'none'}
+            style={[
+              styles.modeRow,
+              {
+                borderBottomColor: colours.border,
+                paddingHorizontal: spacing[4],
+                paddingTop: spacing[1],
+                paddingBottom: spacing[2],
+              },
+              inlineModeStyle,
+            ]}>
+            <ModulaSegmentedPicker
+              accessibilityLabel="Feed mode"
+              options={modeOrder.map(next => ({
+                value: next,
+                label:
+                  focus.quietFeed && next === 'For You'
+                    ? 'For You · Quiet'
+                    : next,
+              }))}
+              value={mode}
+              onValueChange={next => {
+                if (
+                  next === 'Following' ||
+                  next === 'For You' ||
+                  next === 'Modules'
+                ) {
+                  void selectionHaptic()
+                  onModeChange(next)
+                }
+              }}
+            />
+          </Animated.View>
+        </ShellChromeObscureView>
+      </View>
     ) : null,
     composer: showBlock('composer') ? (
       <ShellChromeObscureView key="composer" direction="up">
