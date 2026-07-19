@@ -301,11 +301,13 @@ function HomeLayoutHeader({
   const nodes: Record<string, ReactNode> = {
     presence:
       !focus.hideNav && showBlock('presence') ? (
-        <SectionEnter key="presence">
-          <View style={{paddingVertical: spacing[3]}}>
-            <PresenceStoriesRail compact showCaption />
-          </View>
-        </SectionEnter>
+        <ShellChromeObscureView key="presence" direction="up">
+          <SectionEnter>
+            <View style={{paddingVertical: spacing[3]}}>
+              <PresenceStoriesRail compact showCaption />
+            </View>
+          </SectionEnter>
+        </ShellChromeObscureView>
       ) : null,
     'quick-actions': showBlock('quick-actions') ? (
       <SectionEnter key="quick-actions" delay={50} from="right">
@@ -345,29 +347,34 @@ function HomeLayoutHeader({
       ) : null,
     'merge-banner':
       mergeCount >= 2 && mergeFeatureOn && showBlock('merge-banner') ? (
-        <AppPressable
-          key="merge-banner"
-          accessibilityLabel="Open Merge Feeds"
-          onPress={() => router.push('/product/merge-feeds' as Href)}
-          style={[
-            styles.focusBanner,
-            {
-              backgroundColor: colours.surface,
-              borderColor: colours.border,
-              borderRadius: radius.medium,
-              marginHorizontal: spacing[4],
-              marginBottom: spacing[2],
-              paddingHorizontal: spacing[3],
-              paddingVertical: spacing[2],
-              gap: spacing[2],
-            },
-          ]}>
-          <AppIcon name="discover" colour={colours.accent} size={16} />
-          <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
-            Merge Feeds · {mergeCount} sources (local Preview)
-          </AppText>
-          <AppIcon name="chevronRight" colour={colours.textTertiary} size={14} />
-        </AppPressable>
+        <ShellChromeObscureView key="merge-banner" direction="up">
+          <AppPressable
+            accessibilityLabel="Open Merge Feeds"
+            onPress={() => router.push('/product/merge-feeds' as Href)}
+            style={[
+              styles.focusBanner,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.medium,
+                marginHorizontal: spacing[4],
+                marginBottom: spacing[2],
+                paddingHorizontal: spacing[3],
+                paddingVertical: spacing[2],
+                gap: spacing[2],
+              },
+            ]}>
+            <AppIcon name="discover" colour={colours.accent} size={16} />
+            <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
+              Merge Feeds · {mergeCount} sources (local Preview)
+            </AppText>
+            <AppIcon
+              name="chevronRight"
+              colour={colours.textTertiary}
+              size={14}
+            />
+          </AppPressable>
+        </ShellChromeObscureView>
       ) : null,
     'mode-tabs': showBlock('mode-tabs') ? (
       <ShellChromeObscureView key="mode-tabs" direction="up">
@@ -434,7 +441,11 @@ function HomeLayoutHeader({
         </View>
       </ShellChromeObscureView>
     ) : null,
-    composer: showBlock('composer') ? <ComposerPrompt key="composer" /> : null,
+    composer: showBlock('composer') ? (
+      <ShellChromeObscureView key="composer" direction="up">
+        <ComposerPrompt />
+      </ShellChromeObscureView>
+    ) : null,
   }
 
   return (

@@ -80,18 +80,25 @@ export function PullActionTray({
 
   const dimStyle = useAnimatedStyle(() => {
     const eased = stageProgress(pullDistance.value)
+    // Stay strong while refreshing even after pullDistance settles to 0.
     return {
-      opacity: refreshing ? Math.max(eased, 0.55) : eased * 0.62,
+      opacity: refreshing ? Math.max(eased, 0.88) : eased * 0.82,
     }
   })
 
   const contentStyle = useAnimatedStyle(() => {
     const eased = stageProgress(pullDistance.value)
-    if (reduceMotion) return {}
+    const fade = refreshing ? Math.max(eased, 1) : eased
+    if (reduceMotion) {
+      return {
+        opacity: interpolate(fade, [0, 1], [1, 0.08], Extrapolation.CLAMP),
+      }
+    }
     return {
+      opacity: interpolate(fade, [0, 1], [1, 0.08], Extrapolation.CLAMP),
       transform: [
         {
-          scale: interpolate(eased, [0, 1], [1, 0.985], Extrapolation.CLAMP),
+          scale: interpolate(fade, [0, 1], [1, 0.98], Extrapolation.CLAMP),
         },
       ],
     }

@@ -157,7 +157,7 @@ function PresenceStoryNode({
   reduceMotion: boolean
   onPress: () => void
 }) {
-  const {colours, scheme} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const isYou = person.id === 'you'
   const size = isYou ? CENTER_SIZE : SIDE_SIZE + 8
   const avatarSize = isYou ? CENTER_SIZE - 16 : SIDE_SIZE - 8
@@ -276,23 +276,13 @@ function PresenceStoryNode({
 
         {isYou ? (
           <Animated.View style={[styles.addWrap, addStyle]}>
-            <View
-              style={[
-                styles.addPill,
-                {
-                  backgroundColor: scheme === 'dark' ? colours.surface : '#FFFFFF',
-                  borderColor: colours.border,
-                },
-              ]}>
-              <AppText variant="label" colour="text">
-                Add Presence
-              </AppText>
-              <View style={[styles.addGlyph, {backgroundColor: colours.text}]}>
-                <AppText variant="label" style={styles.addPlus}>
-                  +
-                </AppText>
-              </View>
-            </View>
+            <AppText
+              variant="caption"
+              colour="accent"
+              numberOfLines={1}
+              style={styles.name}>
+              Add Presence
+            </AppText>
           </Animated.View>
         ) : (
           <Animated.View style={labelStyle}>
@@ -358,34 +348,7 @@ const styles = StyleSheet.create({
     maxWidth: ITEM_SLOT - 8,
   },
   addWrap: {
-    minHeight: 34,
+    minHeight: 20,
     justifyContent: 'center',
-  },
-  addPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingLeft: 14,
-    paddingRight: 6,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: {width: 0, height: 4},
-  },
-  addGlyph: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addPlus: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-    lineHeight: 16,
   },
 })
