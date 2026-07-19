@@ -12,6 +12,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
+import {LightningScreenGlow} from '@/platform/ui/refresh/lightning-screen-glow'
 import {
   PULL_ACTION_ARM_DISTANCE,
   type PullActionId,
@@ -35,7 +36,6 @@ type ActionSpec = {
   id: PullActionId
   index: PullActionSelection
   label: string
-  hint: string
   icon: IoniconName
   iconSelected: IoniconName
 }
@@ -45,7 +45,6 @@ const ACTIONS: readonly ActionSpec[] = [
     id: 'search',
     index: 0,
     label: 'Search',
-    hint: 'Swipe left',
     icon: 'search-outline',
     iconSelected: 'search',
   },
@@ -53,7 +52,6 @@ const ACTIONS: readonly ActionSpec[] = [
     id: 'refresh',
     index: 1,
     label: 'Refresh',
-    hint: 'Release to sync',
     icon: 'refresh-outline',
     iconSelected: 'refresh',
   },
@@ -61,17 +59,18 @@ const ACTIONS: readonly ActionSpec[] = [
     id: 'close',
     index: 2,
     label: 'Close',
-    hint: 'Swipe right',
     icon: 'close-outline',
     iconSelected: 'close',
   },
 ]
 
 const AnimatedBlurView = Animated.createAnimatedComponent(BlurView)
+const ICON_SIZE = 20
+const HIT = 44
 
 /**
- * Pull stage: soft-blurs the feed, floats three icon actions, and follows
- * the horizontal swipe for Search ← · Refresh · → Close.
+ * Pull stage: lightning edge glow, soft page blur, and minimal icons
+ * (circle only on the selected action — no card chrome).
  */
 export function PullActionTray({
   pullDistance,
@@ -82,29 +81,18 @@ export function PullActionTray({
   children,
 }: PullActionTrayProps) {
   const insets = useSafeAreaInsets()
-  const {colours, radius, spacing, scheme} = useThemeTokens()
+  const {colours, spacing, scheme} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {reduceTransparency} = useSystemAccessibility()
-
-  const progressStyle = useAnimatedStyle(() => {
-    const progress = interpolate(
-      pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE * 0.35, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.4, 1],
-      Extrapolation.CLAMP,
-    )
-    return {opacity: refreshing ? Math.max(progress, 0.85) : progress}
-  })
 
   const blurStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [0, PULL_ACTION_ARM_DISTANCE * 0.25, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.45, 1],
+      [0, PULL_ACTION_ARM_DISTANCE * 0.28, PULL_ACTION_ARM_DISTANCE],
+      [0, 0.4, 1],
       Extrapolation.CLAMP,
     )
-    const boost = refreshing ? Math.max(progress, 0.7) : progress
-    return {opacity: boost}
+    return {opacity: refreshing ? Math.max(progress, 0.65) : progress}
   })
 
   const contentStyle = useAnimatedStyle(() => {
@@ -116,17 +104,17 @@ export function PullActionTray({
     )
     if (reduceMotion) {
       return {
-        opacity: interpolate(progress, [0, 1], [1, 0.92], Extrapolation.CLAMP),
+        opacity: interpolate(progress, [0, 1], [1, 0.94], Extrapolation.CLAMP),
       }
     }
     return {
-      opacity: interpolate(progress, [0, 1], [1, 0.88], Extrapolation.CLAMP),
+      opacity: interpolate(progress, [0, 1], [1, 0.9], Extrapolation.CLAMP),
       transform: [
         {
-          scale: interpolate(progress, [0, 1], [1, 0.965], Extrapolation.CLAMP),
+          scale: interpolate(progress, [0, 1], [1, 0.97], Extrapolation.CLAMP),
         },
       ],
-      borderRadius: interpolate(progress, [0, 1], [0, 28], Extrapolation.CLAMP),
+      borderRadius: interpolate(progress, [0, 1], [0, 36], Extrapolation.CLAMP),
       overflow: 'hidden' as const,
     }
   })
@@ -135,7 +123,7 @@ export function PullActionTray({
     const progress = interpolate(
       pullDistance.value,
       [0, PULL_ACTION_ARM_DISTANCE * 0.4, PULL_ACTION_ARM_DISTANCE],
-      [0, 0.5, 1],
+      [0, 0.45, 1],
       Extrapolation.CLAMP,
     )
     const boost = refreshing ? Math.max(progress, 0.9) : progress
@@ -145,19 +133,14 @@ export function PullActionTray({
         {
           translateY: reduceMotion
             ? 0
-            : interpolate(boost, [0, 1], [-28, 0], Extrapolation.CLAMP),
-        },
-        {
-          scale: reduceMotion
-            ? 1
-            : interpolate(boost, [0, 1], [0.92, 1], Extrapolation.CLAMP),
+            : interpolate(boost, [0, 1], [-16, 0], Extrapolation.CLAMP),
         },
         {
           translateX: armed.value
             ? interpolate(
                 swipeX.value,
                 [-140, 0, 140],
-                [-14, 0, 14],
+                [-10, 0, 10],
                 Extrapolation.CLAMP,
               )
             : 0,
@@ -169,7 +152,7 @@ export function PullActionTray({
   const titleStyle = useAnimatedStyle(() => {
     const progress = interpolate(
       pullDistance.value,
-      [PULL_ACTION_ARM_DISTANCE * 0.5, PULL_ACTION_ARM_DISTANCE],
+      [PULL_ACTION_ARM_DISTANCE * 0.45, PULL_ACTION_ARM_DISTANCE],
       [0, 1],
       Extrapolation.CLAMP,
     )
@@ -177,11 +160,16 @@ export function PullActionTray({
   })
 
   const washColor =
-    scheme === 'dark' ? 'rgba(8,10,12,0.45)' : 'rgba(255,255,255,0.28)'
+    scheme === 'dark' ? 'rgba(8,10,12,0.32)' : 'rgba(255,255,255,0.18)'
 
   return (
     <View style={styles.stage}>
       <Animated.View style={[styles.content, contentStyle]}>{children}</Animated.View>
+
+      <LightningScreenGlow
+        pullDistance={pullDistance}
+        refreshing={refreshing}
+      />
 
       <Animated.View
         pointerEvents="none"
@@ -192,11 +180,11 @@ export function PullActionTray({
           />
         ) : (
           <AnimatedBlurView
-            intensity={scheme === 'dark' ? 48 : 56}
+            intensity={scheme === 'dark' ? 36 : 42}
             tint={
               scheme === 'dark'
-                ? 'systemChromeMaterialDark'
-                : 'systemChromeMaterialLight'
+                ? 'systemUltraThinMaterialDark'
+                : 'systemUltraThinMaterialLight'
             }
             style={StyleSheet.absoluteFill}
           />
@@ -208,37 +196,22 @@ export function PullActionTray({
 
       <View
         pointerEvents="none"
-        style={[styles.chromeHost, {paddingTop: insets.top + spacing[3]}]}>
+        style={[styles.chromeHost, {paddingTop: insets.top + spacing[5]}]}>
         <Animated.View style={[styles.chrome, chromeStyle]}>
-          <View
-            style={[
-              styles.orbRow,
-              {
-                backgroundColor:
-                  scheme === 'dark'
-                    ? 'rgba(22,26,28,0.55)'
-                    : 'rgba(255,255,255,0.55)',
-                borderColor: colours.border,
-                borderRadius: radius.xlarge,
-                paddingHorizontal: spacing[3],
-                paddingVertical: spacing[3],
-              },
-            ]}>
+          <View style={styles.iconRow}>
             {ACTIONS.map(action => (
-              <ActionOrb
+              <ActionGlyph
                 key={action.id}
                 action={action}
                 selectedIndex={selectedIndex}
                 accent={colours.accent}
-                accentSubtle={colours.accentSubtle}
-                text={colours.text}
                 textSecondary={colours.textSecondary}
                 accentForeground={colours.accentForeground}
               />
             ))}
           </View>
 
-          <Animated.View style={[styles.copyBlock, titleStyle, progressStyle]}>
+          <Animated.View style={[styles.copyBlock, titleStyle]}>
             <SelectionCopy
               selectedIndex={selectedIndex}
               refreshing={refreshing}
@@ -252,41 +225,35 @@ export function PullActionTray({
   )
 }
 
-function ActionOrb({
+function ActionGlyph({
   action,
   selectedIndex,
   accent,
-  accentSubtle,
-  text,
   textSecondary,
   accentForeground,
 }: {
   action: ActionSpec
   selectedIndex: SharedValue<PullActionSelection>
   accent: string
-  accentSubtle: string
-  text: string
   textSecondary: string
   accentForeground: string
 }) {
-  const orbStyle = useAnimatedStyle(() => {
+  const slotStyle = useAnimatedStyle(() => {
     const selected = selectedIndex.value === action.index
     return {
-      transform: [{scale: selected ? 1.1 : 0.9}],
-      opacity: selected ? 1 : 0.48,
+      transform: [{scale: selected ? 1.06 : 1}],
+      opacity: selected ? 1 : 0.42,
     }
   })
 
-  const ringStyle = useAnimatedStyle(() => {
+  // Circle appears only while this action is selected (lock-screen control energy).
+  const circleStyle = useAnimatedStyle(() => {
     const selected = selectedIndex.value === action.index
-    const filledCenter = selected && action.index === 1
     return {
-      borderColor: selected ? accent : 'rgba(127,127,127,0.16)',
-      backgroundColor: filledCenter
-        ? accent
-        : selected
-          ? accentSubtle
-          : 'rgba(127,127,127,0.10)',
+      opacity: selected ? 1 : 0,
+      transform: [{scale: selected ? 1 : 0.7}],
+      backgroundColor:
+        action.index === 1 ? accent : 'rgba(127,127,127,0.22)',
     }
   })
 
@@ -298,28 +265,20 @@ function ActionOrb({
   }))
 
   return (
-    <Animated.View style={[styles.orbSlot, orbStyle]}>
-      <Animated.View style={[styles.orb, ringStyle]}>
+    <Animated.View style={[styles.glyphSlot, slotStyle]}>
+      <View style={styles.glyphHit}>
+        <Animated.View style={[styles.selectCircle, circleStyle]} />
         <Animated.View style={[styles.iconLayer, outlineStyle]}>
-          <Ionicons name={action.icon} size={26} color={textSecondary} />
+          <Ionicons name={action.icon} size={ICON_SIZE} color={textSecondary} />
         </Animated.View>
         <Animated.View style={[styles.iconLayer, filledStyle]}>
           <Ionicons
             name={action.iconSelected}
-            size={26}
+            size={ICON_SIZE}
             color={action.index === 1 ? accentForeground : accent}
           />
         </Animated.View>
-      </Animated.View>
-      <AppText
-        variant="caption"
-        style={{
-          color: text,
-          fontWeight: '600',
-          marginTop: 8,
-        }}>
-        {action.label}
-      </AppText>
+      </View>
     </Animated.View>
   )
 }
@@ -348,29 +307,29 @@ function SelectionCopy({
   return (
     <View style={styles.copyStack}>
       <Animated.View style={[styles.copyLine, searchStyle]}>
-        <AppText variant="title" style={{color: text, textAlign: 'center'}}>
-          Search Discover
+        <AppText variant="label" style={{color: text, textAlign: 'center'}}>
+          Search
         </AppText>
         <AppText
           variant="caption"
           colour="textSecondary"
           style={styles.copyHint}>
-          Release to open search
+          Release to open Discover
         </AppText>
       </Animated.View>
       <Animated.View style={[styles.copyLine, refreshStyle]}>
-        <AppText variant="title" style={{color: accent, textAlign: 'center'}}>
-          {refreshing ? 'Refreshing…' : 'Refresh feed'}
+        <AppText variant="label" style={{color: accent, textAlign: 'center'}}>
+          {refreshing ? 'Refreshing…' : 'Refresh'}
         </AppText>
         <AppText
           variant="caption"
           colour="textSecondary"
           style={styles.copyHint}>
-          {refreshing ? 'Pulling the latest posts' : 'Release in the middle'}
+          {refreshing ? 'Fetching the latest' : 'Release in the middle'}
         </AppText>
       </Animated.View>
       <Animated.View style={[styles.copyLine, closeStyle]}>
-        <AppText variant="title" style={{color: text, textAlign: 'center'}}>
+        <AppText variant="label" style={{color: text, textAlign: 'center'}}>
           Close
         </AppText>
         <AppText
@@ -400,13 +359,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   copyBlock: {
-    marginTop: 18,
-    minHeight: 56,
+    marginTop: 14,
+    minHeight: 44,
     paddingHorizontal: 24,
     width: '100%',
   },
   copyHint: {
-    marginTop: 4,
+    marginTop: 2,
     textAlign: 'center',
   },
   copyLine: {
@@ -415,37 +374,39 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   copyStack: {
-    height: 56,
+    height: 44,
     width: '100%',
+  },
+  glyphHit: {
+    alignItems: 'center',
+    height: HIT,
+    justifyContent: 'center',
+    width: HIT,
+  },
+  glyphSlot: {
+    alignItems: 'center',
+    flex: 1,
   },
   iconLayer: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  orb: {
+  iconRow: {
     alignItems: 'center',
-    borderRadius: 32,
-    borderWidth: 1.5,
-    height: 64,
-    justifyContent: 'center',
-    overflow: 'hidden',
-    width: 64,
-  },
-  orbRow: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    maxWidth: 360,
-    width: '88%',
-  },
-  orbSlot: {
-    alignItems: 'center',
-    flex: 1,
+    maxWidth: 280,
+    width: '70%',
   },
   overlay: {
     zIndex: 10,
+  },
+  selectCircle: {
+    borderRadius: HIT / 2,
+    height: HIT,
+    position: 'absolute',
+    width: HIT,
   },
   stage: {
     flex: 1,

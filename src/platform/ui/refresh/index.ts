@@ -2,6 +2,10 @@ export {
   ShimmerRefreshEdge,
   type ShimmerRefreshEdgeProps,
 } from '@/platform/ui/refresh/shimmer-refresh-edge'
+export {
+  LightningScreenGlow,
+  type LightningScreenGlowProps,
+} from '@/platform/ui/refresh/lightning-screen-glow'
 export {PullActionTray, type PullActionTrayProps} from '@/platform/ui/refresh/pull-action-tray'
 export {
   PULL_ACTION_ARM_DISTANCE,
