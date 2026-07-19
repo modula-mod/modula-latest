@@ -8,6 +8,8 @@ export function shouldHideShellTabBar(segments: readonly string[]): boolean {
   if (root === '(auth)') return true
   if (root === 'oauth') return true
   if (root === 'compose') return true
+  // Post detail owns its own sticky comment composer — dual bottom chrome collides.
+  if (root === 'post') return true
   // Reels feed keeps the floating pill bar (IG-like). Algorithm prefs hide it.
   if (root === 'reels' && segments[1] === 'algorithm') return true
 

@@ -462,11 +462,12 @@ const styles = StyleSheet.create({
   segmentRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 60,
-    justifyContent: 'space-between',
+    height: FLOATING_TAB_BAR_SEGMENT_HEIGHT,
+    justifyContent: 'space-evenly',
   },
   tabHit: {
     alignItems: 'center',
+    flex: 1,
     height: 44,
     justifyContent: 'center',
     minWidth: 44,
