@@ -17,7 +17,7 @@ export type ModulaSegmentedPickerProps = {
   style?: StyleProp<ViewStyle>
   testID?: string
   /**
-   * `segmented` — liquid-glass track + selected capsule (default).
+   * `segmented` — each option is its own liquid-glass capsule (default).
    * `plain` — label tabs only, no chrome around the menu.
    */
   appearance?: ModulaSegmentedAppearance

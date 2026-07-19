@@ -13,10 +13,12 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const DEFAULT_SCROLL_MAX_WIDTH = 360
 const DEFAULT_SEGMENT_MIN_WIDTH = 88
+const CAPSULE_HEIGHT = 36
 
 /**
- * Segmented control with liquid-glass track + selected capsule.
- * Plain appearance stays label-only (no glass chrome).
+ * Segmented control:
+ * - `segmented` — each option is its own liquid-glass capsule
+ * - `plain` — label tabs only
  */
 export function ModulaSegmentedPicker({
   options,
@@ -36,9 +38,12 @@ export function ModulaSegmentedPicker({
 
   const viewportCap = maxWidth ?? (scrollable ? DEFAULT_SCROLL_MAX_WIDTH : windowWidth)
   const viewportWidth = Math.min(windowWidth - 32, viewportCap)
+  const gap = spacing[2]
   const contentWidth = Math.max(
     viewportWidth,
-    plain ? viewportWidth : options.length * segmentMinWidth,
+    plain
+      ? viewportWidth
+      : options.length * segmentMinWidth + gap * Math.max(0, options.length - 1),
   )
 
   const segments = options.map(option => {
@@ -56,7 +61,31 @@ export function ModulaSegmentedPicker({
       </AppText>
     )
 
-    const pressable = (
+    if (plain) {
+      return (
+        <AppPressable
+          key={option.value}
+          accessibilityRole="button"
+          accessibilityState={{selected, disabled: !!option.disabled}}
+          accessibilityLabel={option.label}
+          disabled={option.disabled}
+          onPress={() => onValueChange(option.value)}
+          style={[
+            styles.segment,
+            {
+              opacity: option.disabled ? 0.45 : 1,
+              paddingHorizontal: spacing[3],
+              paddingVertical: spacing[2],
+              flex: scrollable ? undefined : 1,
+              minWidth: scrollable ? segmentMinWidth - 8 : undefined,
+            },
+          ]}>
+          {label}
+        </AppPressable>
+      )
+    }
+
+    return (
       <AppPressable
         key={option.value}
         accessibilityRole="button"
@@ -65,47 +94,42 @@ export function ModulaSegmentedPicker({
         disabled={option.disabled}
         onPress={() => onValueChange(option.value)}
         style={[
-          styles.segment,
+          styles.capsuleHit,
           {
             opacity: option.disabled ? 0.45 : 1,
-            minWidth: scrollable && !plain ? segmentMinWidth - 8 : undefined,
             flex: scrollable ? undefined : 1,
+            minWidth: scrollable ? segmentMinWidth : undefined,
+            height: CAPSULE_HEIGHT,
             borderRadius: radius.round,
-            ...(plain || !selected
-              ? {
-                  paddingHorizontal: spacing[3],
-                  paddingVertical: spacing[2],
-                }
-              : null),
           },
         ]}>
-        {plain || !selected ? (
-          label
-        ) : (
-          <LiquidGlassChrome
-            interactive
-            fallback="regular"
-            contentLayout="flow"
-            style={[styles.selectedGlass, {borderRadius: radius.round}]}>
-            <View
-              style={[
-                styles.selectedInner,
-                {
-                  paddingHorizontal: spacing[3],
-                  paddingVertical: spacing[2],
-                },
-              ]}>
-              {label}
-            </View>
-          </LiquidGlassChrome>
-        )}
+        <LiquidGlassChrome
+          interactive
+          fallback={selected ? 'regular' : 'clear'}
+          contentLayout="flow"
+          style={[
+            styles.capsuleGlass,
+            {
+              borderRadius: radius.round,
+              height: CAPSULE_HEIGHT,
+            },
+          ]}>
+          <View
+            style={[
+              styles.capsuleInner,
+              {
+                paddingHorizontal: spacing[3],
+                minHeight: CAPSULE_HEIGHT,
+              },
+            ]}>
+            {label}
+          </View>
+        </LiquidGlassChrome>
       </AppPressable>
     )
-
-    return pressable
   })
 
-  const row = plain ? (
+  const row = (
     <View
       testID={testID}
       accessibilityRole="tablist"
@@ -115,39 +139,17 @@ export function ModulaSegmentedPicker({
         {
           width: scrollable ? contentWidth : viewportWidth,
           maxWidth: scrollable ? contentWidth : viewportWidth,
-          gap: spacing[1],
+          gap,
         },
         !scrollable ? style : null,
       ]}>
       {segments}
     </View>
-  ) : (
-    <LiquidGlassChrome
-      interactive
-      fallback="clear"
-      contentLayout="flow"
-      style={[
-        styles.trackGlass,
-        {
-          borderRadius: radius.round,
-          width: scrollable ? contentWidth : viewportWidth,
-          maxWidth: scrollable ? contentWidth : viewportWidth,
-        },
-        !scrollable ? style : null,
-      ]}>
-      <View
-        testID={testID}
-        accessibilityRole="tablist"
-        accessibilityLabel={accessibilityLabel}
-        style={[styles.row, styles.trackRow, {gap: 2}]}>
-        {segments}
-      </View>
-    </LiquidGlassChrome>
   )
 
   if (!scrollable) {
     return (
-      <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, plain ? style : null]}>
+      <View style={[{alignSelf: 'center', maxWidth: viewportWidth}, style]}>
         {row}
       </View>
     )
@@ -171,35 +173,29 @@ export function ModulaSegmentedPicker({
 }
 
 const styles = StyleSheet.create({
+  capsuleGlass: {
+    alignSelf: 'stretch',
+    flex: 1,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  capsuleHit: {
+    overflow: 'hidden',
+  },
+  capsuleInner: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%',
+  },
   row: {
     alignItems: 'center',
+    alignSelf: 'center',
     flexDirection: 'row',
   },
   segment: {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 34,
-  },
-  selectedGlass: {
-    alignSelf: 'stretch',
-    flex: 1,
-    minHeight: 30,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  selectedInner: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 2,
-    paddingVertical: 4,
-  },
-  trackGlass: {
-    alignSelf: 'center',
-    overflow: 'hidden',
-  },
-  trackRow: {
-    padding: 3,
-    width: '100%',
   },
 })
