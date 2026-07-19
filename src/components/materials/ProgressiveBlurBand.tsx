@@ -46,15 +46,17 @@ export function ProgressiveBlurBand({
   const soft = strength === 'soft'
 
   // Mask: black = reveal blur, transparent = hide blur (fade to clear).
+  // Soft bottom: stay clear through most of the band, ramp only at the
+  // literal screen bottom (home indicator) — not up at the tab island.
   const maskColors = topHeavy
     ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
     : soft
-      ? (['transparent', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.55)', 'rgba(0,0,0,0.82)'] as const)
+      ? (['transparent', 'transparent', 'rgba(0,0,0,0.4)', '#000000'] as const)
       : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
   const maskLocations = topHeavy
     ? ([0, 0.35, 0.7, 1] as const)
     : soft
-      ? ([0, 0.35, 0.72, 1] as const)
+      ? ([0, 0.45, 0.78, 1] as const)
       : ([0, 0.22, 0.55, 1] as const)
 
   const tintColors =
@@ -62,20 +64,23 @@ export function ProgressiveBlurBand({
       ? topHeavy
         ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
         : soft
-          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.06)', 'rgba(11,20,22,0.16)'] as const)
+          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.04)', 'rgba(11,20,22,0.22)'] as const)
           : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
       : topHeavy
         ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
         : soft
-          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.08)', 'rgba(255,255,255,0.2)'] as const)
+          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.06)', 'rgba(255,255,255,0.28)'] as const)
           : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
+
+  const tintLocations =
+    soft && !topHeavy ? ([0, 0.7, 1] as const) : ([0, 0.55, 1] as const)
 
   if (!useBlur) {
     return (
       <View pointerEvents="none" style={[{height, overflow: 'hidden'}, style]}>
         <LinearGradient
           colors={[...tintColors]}
-          locations={[0, 0.55, 1]}
+          locations={[...tintLocations]}
           style={StyleSheet.absoluteFill}
         />
       </View>
@@ -102,7 +107,7 @@ export function ProgressiveBlurBand({
       </MaskedView>
       <LinearGradient
         colors={[...tintColors]}
-        locations={[0, 0.55, 1]}
+        locations={[...tintLocations]}
         style={StyleSheet.absoluteFill}
       />
     </View>

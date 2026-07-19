@@ -9,12 +9,12 @@ export const CHROME_HEADER_ROW = 54
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
 /**
- * Short feather above the home-indicator / under the floating tab island.
- * Keep this small — the liquid-glass tab bar is the chrome; a tall muddy
- * progressive band just obscures feed text.
+ * Extra rise above the home-indicator inset for the shell bottom feather.
+ * Must NOT include tab-bar segment height — blur starts at the screen bottom,
+ * not at the bottom of the floating tab island.
  */
-export const CHROME_BOTTOM_FADE = 22
-export const CHROME_BOTTOM_BLUR_INTENSITY = 28
+export const CHROME_BOTTOM_FADE = 12
+export const CHROME_BOTTOM_BLUR_INTENSITY = 40
 
 /**
  * Layout spacer under SecondaryScreenHeader — safe area + nav row only.

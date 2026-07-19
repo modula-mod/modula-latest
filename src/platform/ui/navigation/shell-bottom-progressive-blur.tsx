@@ -12,8 +12,11 @@ import {shouldHideShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-visi
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 
 /**
- * Short soft feather at the very bottom edge (home indicator).
- * Does not cover the floating liquid-glass tab island — that chrome is self-contained.
+ * Progressive blur anchored to the literal bottom of the screen (home indicator).
+ *
+ * Height is safe-area + a tiny feather only — never tab-bar segment height.
+ * The floating liquid-glass tab island sits above this band; feed content
+ * above the tabs must stay clear.
  */
 export function ShellBottomProgressiveBlur() {
   const segments = useSegments()
@@ -24,9 +27,8 @@ export function ShellBottomProgressiveBlur() {
     return null
   }
 
-  const bottomLift = Math.max(insets.bottom, 8)
-  // Feather only the home-indicator strip + a short rise — not the whole tab zone.
-  const height = CHROME_BOTTOM_FADE + bottomLift
+  // Screen bottom → home-indicator inset. Do not add tab-bar height.
+  const height = Math.max(insets.bottom, 12) + CHROME_BOTTOM_FADE
 
   return (
     <Animated.View
