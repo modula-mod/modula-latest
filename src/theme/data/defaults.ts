@@ -17,6 +17,7 @@ export const DEFAULT_APPEARANCE_PREFERENCES: AppearancePreferences = {
   reduceTransparency: false,
   increaseContrast: false,
   showSwitchLabels: false,
+  advancedChromeEffect: 'off',
 }
 
 export const DEFAULT_SYSTEM_ACCESSIBILITY: SystemAccessibilityState = {

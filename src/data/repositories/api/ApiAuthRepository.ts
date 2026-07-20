@@ -27,6 +27,7 @@ import type {
 import {parseAccessToken, parseRefreshToken} from '@/auth/contracts'
 import type {
   AuthRepository,
+  EmailVerificationResult,
   HandleAvailability,
   RepositoryExportJob,
 } from '@/data/repositories/contracts/AuthRepository'
@@ -116,7 +117,7 @@ export class ApiAuthRepository implements AuthRepository {
     )
   }
 
-  async verifyEmail(input: VerifyEmailInput): Promise<AuthResult> {
+  async verifyEmail(input: VerifyEmailInput): Promise<EmailVerificationResult> {
     const verified = await this.client.post(
       {path: '/v1/accounts/verify-email', body: {token: input.token}},
       value => {
@@ -147,9 +148,7 @@ export class ApiAuthRepository implements AuthRepository {
         ),
       })
     }
-    throw Object.assign(new Error('Email verified. Sign in to enter Modula.'), {
-      code: 'verified_sign_in_required',
-    })
+    return {kind: 'verifiedSignInRequired'}
   }
 
   resendVerification(email: string): Promise<{resent: boolean}> {

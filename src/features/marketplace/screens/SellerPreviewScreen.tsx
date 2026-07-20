@@ -6,6 +6,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
+import {MarketplaceStatusBadge} from '@/features/marketplace/components/MarketplaceStatusBadge'
 import {
   getMarketplaceSeller,
   modulesForSeller,
@@ -73,10 +74,11 @@ export function SellerPreviewScreen() {
                 <AppIcon name={module.icon} colour={colours.accent} />
                 <View style={styles.flex}>
                   <AppText variant="label">{module.name}</AppText>
-                  <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                  <AppText variant="caption" colour="textSecondary">
                     {module.description}
                   </AppText>
                 </View>
+                <MarketplaceStatusBadge status={module.status} />
                 <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
               </AppPressable>
             ))}
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
     width: 64,
   },
   row: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
   },
   screen: {

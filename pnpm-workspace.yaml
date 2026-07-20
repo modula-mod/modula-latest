@@ -4,6 +4,7 @@ packages:
   - packages/*
 
 allowBuilds:
+  '@shopify/react-native-skia': true
   core-js: false
   esbuild: true
   unrs-resolver: false
@@ -65,3 +66,4 @@ minimumReleaseAgeExclude:
   - '@atproto/api@0.20.30'
 patchedDependencies:
   '@atproto/oauth-client-expo@0.1.8': patches/@atproto__oauth-client-expo@0.1.8.patch
+  '@shopify/react-native-skia@2.6.2': patches/@shopify__react-native-skia@2.6.2.patch

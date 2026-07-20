@@ -48,8 +48,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   single: {
-    alignSelf: 'center',
-    maxWidth: 820,
+    // Full-bleed on phone — cover goes edge-to-edge (X-style). Wide layouts use expanded.
     width: '100%',
   },
 })

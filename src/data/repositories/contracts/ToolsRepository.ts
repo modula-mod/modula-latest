@@ -9,6 +9,8 @@ export type ComposerToolSection =
 
 export type ComposerToolItem = {
   toolId: string
+  manifestId?: string
+  moduleId?: string
   name: string
   section: ComposerToolSection
   availability: 'active' | 'preview' | 'unavailable'

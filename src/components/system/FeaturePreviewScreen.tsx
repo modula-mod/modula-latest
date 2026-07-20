@@ -5,6 +5,7 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -31,13 +32,14 @@ export function FeaturePreviewScreen({
   aside,
 }: FeaturePreviewScreenProps) {
   const {spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
 
   return (
     <View style={styles.screen}>
       <SecondaryScreenHeader title={title} />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
             <AppText variant="display">{title}</AppText>

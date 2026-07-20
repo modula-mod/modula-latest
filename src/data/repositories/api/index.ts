@@ -1,4 +1,5 @@
 export * from '@/data/repositories/api/ApiActivityRepository'
+export * from '@/data/repositories/api/ApiAppearanceRepository'
 export * from '@/data/repositories/api/ApiAtprotoRepository'
 export * from '@/data/repositories/api/ApiAuthRepository'
 export * from '@/data/repositories/api/ApiDiscoverRepository'

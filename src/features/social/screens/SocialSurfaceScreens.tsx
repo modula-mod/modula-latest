@@ -10,6 +10,11 @@ import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
 import {
+  GLASS_PRIVACY_LABELS,
+  type GlassPrivacyLevel,
+} from '@/features/product/data/glassPrivacyLabels'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {
   getHelpArticle,
   getSeededCollection,
   getSeededCommunity,
@@ -26,11 +31,20 @@ import {
   seededMuteWords,
   whatsNewNotes,
 } from '@/features/social/data/seededSurfaces'
+import {
+  SettingsContextRow,
+  SettingsLinkRow,
+  SettingsOverflowMenu,
+  SettingsScreen as SettingsKitScreen,
+  SettingsSection,
+} from '@/features/settings/components/SettingsRows'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -45,12 +59,13 @@ function ScreenShell({
   right?: React.ReactNode
 }) {
   const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={title} right={right} />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[4]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[4], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
@@ -61,16 +76,81 @@ function ScreenShell({
 
 function PreviewBanner({text}: {text: string}) {
   return (
-    <AppText variant="caption" colour="textSecondary">
+    <AppText variant="caption" colour="textSecondary" style={styles.bannerText}>
       {text}
     </AppText>
   )
+}
+
+function getGlassPrivacyBannerText(level: GlassPrivacyLevel): string {
+  if (level === 'vault-chat') {
+    return 'Glass Privacy is set to Vault Chat. Chat Assist stays off by default, forwarding and export controls are blocked in this Preview, and the future sandbox requirement is made explicit.'
+  }
+
+  if (level === 'protected-chat') {
+    return 'Glass Privacy is set to Protected Chat. Forwarding stays restricted in this Preview, privacy events are logged locally, and future limited-forward checks are clearly marked as planned.'
+  }
+
+  return 'Glass Privacy is set to Disable Sharing. Forwarding and export controls are restricted wherever this local Preview can enforce them.'
+}
+
+function getQuietSendBannerText(): string {
+  return 'Quiet Send is holding non-urgent message drafts locally while Focus or Quiet Send is active. This Preview never sends messages remotely.'
+}
+
+function getChatAssistBannerText(mode: string): string {
+  return `Chat Assist is set to ${mode}. Conversation intelligence is permission-controlled, stays local to this Preview, and remains off unless you choose an assist mode.`
+}
+
+function getForwardRestrictionReason(level: GlassPrivacyLevel): string {
+  if (level === 'vault-chat') {
+    return 'Vault Chat is active, so forwarding is disabled until the planned sandbox and verified-participant flow exist.'
+  }
+
+  if (level === 'protected-chat') {
+    return 'Protected Chat is active, so forwarding stays disabled in this Preview until limited-forward consent and device checks exist.'
+  }
+
+  return 'Disable Sharing is active, so forwarding and export controls are restricted for this local Preview thread.'
+}
+
+function getInboxEmptyState(
+  filter: 'all' | 'unread' | 'pinned',
+  query: string,
+): {title: string; description: string} | null {
+  if (query.trim()) {
+    return {
+      title: 'No conversations match this search.',
+      description: 'Try a different name, handle, or message preview in this seeded inbox.',
+    }
+  }
+
+  if (filter === 'unread') {
+    return {
+      title: 'There are no unread conversations right now.',
+      description: 'Seeded Preview threads are still available when you switch the filter back to All.',
+    }
+  }
+
+  if (filter === 'pinned') {
+    return {
+      title: 'There are no pinned conversations right now.',
+      description: 'Pin a seeded Preview thread from its actions menu, or switch back to All.',
+    }
+  }
+
+  return {
+    title: 'There are no conversations in this local Preview inbox yet.',
+    description: 'Messages remain seeded in this build, and no remote inbox is connected.',
+  }
 }
 
 export function MessagesInboxScreen() {
   const canAccess = useCapability('messages:access')
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
   const [filter, setFilter] = useState<'all' | 'unread' | 'pinned'>('all')
   const [query, setQuery] = useState('')
   const [newMessageOpen, setNewMessageOpen] = useState(false)
@@ -93,6 +173,7 @@ export function MessagesInboxScreen() {
       })
       .sort((a, b) => Number(pinnedIds.has(b.id)) - Number(pinnedIds.has(a.id)))
   }, [filter, pinnedIds, query])
+  const emptyState = threads.length === 0 ? getInboxEmptyState(filter, query) : null
 
   if (!canAccess) {
     return (
@@ -111,7 +192,7 @@ export function MessagesInboxScreen() {
       <SecondaryScreenHeader
         title="Messages"
         right={
-          <ModulaMenu
+          <ChromeOverflowMenu
             accessibilityLabel="Filter messages"
             title="Filter"
             actions={[
@@ -120,7 +201,6 @@ export function MessagesInboxScreen() {
               {id: 'pinned', label: 'Pinned'},
             ]}
             onAction={id => setFilter(id as 'all' | 'unread' | 'pinned')}
-            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
           />
         }
       />
@@ -130,6 +210,82 @@ export function MessagesInboxScreen() {
           keyboardShouldPersistTaps="handled">
           <AppText variant="display">Inbox</AppText>
           <PreviewBanner text="Seeded conversations — Preview. No messages are sent remotely." />
+          <AppPressable
+            accessibilityLabel="Open Glass Privacy levels"
+            onPress={() => router.push('/product/glass-privacy' as Href)}
+            style={[
+              styles.glassBadge,
+              {
+                backgroundColor: colours.accentSubtle,
+                borderColor: colours.accentBorder,
+                borderRadius: radius.medium,
+                paddingHorizontal: spacing[3],
+                paddingVertical: spacing[2],
+                gap: spacing[2],
+              },
+            ]}>
+            <AppIcon name="privacy" colour={colours.accent} size={16} />
+            <View style={styles.flex}>
+              <AppText variant="caption" colour="accent">
+                {glass.short} · local
+              </AppText>
+              <AppText variant="caption" colour="textSecondary">
+                {getGlassPrivacyBannerText(preferences.glassPrivacyLevel)}
+              </AppText>
+            </View>
+          </AppPressable>
+          {(preferences.quietSendEnabled ||
+            preferences.focus.preset === 'deep' ||
+            preferences.focus.preset === 'custom') && (
+            <AppPressable
+              accessibilityLabel="Open Quiet Send and Chat Assist"
+              onPress={() => router.push('/product/chat-assist' as Href)}
+              style={[
+                styles.glassBadge,
+                {
+                  backgroundColor: colours.surface,
+                  borderColor: colours.border,
+                  borderRadius: radius.medium,
+                  paddingHorizontal: spacing[3],
+                  paddingVertical: spacing[2],
+                  gap: spacing[2],
+                },
+              ]}>
+              <AppIcon name="messages" colour={colours.accent} size={16} />
+              <View style={styles.flex}>
+                <AppText variant="caption" colour="accent">
+                  Quiet Send · held locally
+                </AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  {getQuietSendBannerText()}
+                </AppText>
+              </View>
+            </AppPressable>
+          )}
+          <AppPressable
+            accessibilityLabel="Open Chat Assist permissions"
+            onPress={() => router.push('/product/chat-assist' as Href)}
+            style={[
+              styles.glassBadge,
+              {
+                backgroundColor: colours.surface,
+                borderColor: colours.border,
+                borderRadius: radius.medium,
+                paddingHorizontal: spacing[3],
+                paddingVertical: spacing[2],
+                gap: spacing[2],
+              },
+            ]}>
+            <AppIcon name="automation" colour={colours.accent} size={16} />
+            <View style={styles.flex}>
+              <AppText variant="caption" colour="accent">
+                Chat Assist · {preferences.chatAssistMode}
+              </AppText>
+              <AppText variant="caption" colour="textSecondary">
+                {getChatAssistBannerText(preferences.chatAssistMode)}
+              </AppText>
+            </View>
+          </AppPressable>
           <View
             style={[
               styles.searchRow,
@@ -153,10 +309,12 @@ export function MessagesInboxScreen() {
           <AppText variant="caption" colour="textSecondary">
             Filter: {filter === 'all' ? 'All' : filter === 'unread' ? 'Unread' : 'Pinned'}
           </AppText>
-          {threads.length === 0 && query ? (
-            <AppText variant="body" colour="textSecondary">
-              No conversations match this search.
-            </AppText>
+          {emptyState ? (
+            <EmptyState
+              icon="messages"
+              title={emptyState.title}
+              description={emptyState.description}
+            />
           ) : null}
           {threads.map(thread => (
             <ModulaContextMenu
@@ -206,7 +364,7 @@ export function MessagesInboxScreen() {
                     {thread.name}
                     {thread.unread ? ' · Unread' : ''}
                   </AppText>
-                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                  <AppText variant="caption" colour="textSecondary">
                     {thread.preview}
                   </AppText>
                 </View>
@@ -263,7 +421,11 @@ export function MessagesInboxScreen() {
 export function MessageThreadScreen() {
   const {threadId} = useLocalSearchParams<{threadId: string}>()
   const thread = getSeededThread(String(threadId ?? ''))
-  const {colours, spacing} = useThemeTokens()
+  const router = useRouter()
+  const {colours, radius, spacing} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
+  const forwardRestrictionReason = getForwardRestrictionReason(preferences.glassPrivacyLevel)
 
   if (!thread) {
     return (
@@ -271,7 +433,7 @@ export function MessageThreadScreen() {
         <SecondaryScreenHeader title="Conversation" />
         <EmptyState
           icon="messages"
-          title="Conversation not found"
+          title="This conversation was not found."
           description="This seeded thread is not in the local inbox preview."
         />
       </View>
@@ -279,9 +441,58 @@ export function MessageThreadScreen() {
   }
 
   return (
-    <ScreenShell title={thread.name}>
+    <ScreenShell
+      title={thread.name}
+      right={
+        <ChromeOverflowMenu
+          accessibilityLabel="Thread actions"
+          title="Thread actions"
+          actions={[
+            {
+              id: 'forward',
+              label: 'Forward',
+              disabled: true,
+              disabledReason: forwardRestrictionReason,
+            },
+            {id: 'mute', label: 'Mute preview'},
+            {id: 'delete', label: 'Delete preview', style: 'destructive'},
+          ]}
+          onAction={id => {
+            if (id === 'forward') {
+              Alert.alert(
+                'Forward Preview',
+                'Forwarding is not connected to a remote messaging service in this Preview.',
+              )
+            }
+          }}
+        />
+      }>
       <AppText variant="headline">@{thread.handle}</AppText>
       <PreviewBanner text="Conversation Preview — replies are not delivered." />
+      <AppPressable
+        accessibilityLabel="Open Glass Privacy levels"
+        onPress={() => router.push('/product/glass-privacy' as Href)}
+        style={[
+          styles.glassBadge,
+          {
+            backgroundColor: colours.accentSubtle,
+            borderColor: colours.accentBorder,
+            borderRadius: radius.medium,
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[2],
+            gap: spacing[2],
+          },
+        ]}>
+        <AppIcon name="privacy" colour={colours.accent} size={16} />
+        <View style={styles.flex}>
+          <AppText variant="caption" colour="accent">
+            {glass.short}
+          </AppText>
+          <AppText variant="caption" colour="textSecondary">
+            {getGlassPrivacyBannerText(preferences.glassPrivacyLevel)}
+          </AppText>
+        </View>
+      </AppPressable>
       <Surface variant="contained" style={{padding: spacing[4], gap: spacing[2]}}>
         <AppText variant="body">{thread.preview}</AppText>
         <AppText variant="caption" colour="textSecondary">
@@ -556,72 +767,114 @@ export function CommunityTopicScreen() {
 }
 
 export function MuteWordsScreen() {
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Mute words">
-      <AppText variant="display">Mute words</AppText>
-      <PreviewBanner text="Seeded mute list — Preview. Not synced to a backend." />
-      {seededMuteWords.map(word => (
-        <Surface key={word} variant="contained" style={{padding: spacing[4]}}>
-          <AppText variant="label">{word}</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Local mute preview
-          </AppText>
-        </Surface>
-      ))}
-      <ModulaButton label="Add mute word — Preview" role="secondary" onPress={() => undefined} />
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Mute words"
+      caption="Seeded mute list — Preview. Not synced to a backend."
+      right={
+        <SettingsOverflowMenu
+          title="Mute words"
+          actions={[
+            {
+              id: 'add',
+              label: 'Add mute word (Preview)',
+              disabled: true,
+              disabledReason: 'Not wired yet',
+            },
+          ]}
+          onAction={() => undefined}
+        />
+      }>
+      <SettingsSection title="Muted">
+        {seededMuteWords.map((word, index) => (
+          <SettingsContextRow
+            key={word}
+            title={word}
+            actions={[
+              {
+                id: 'remove',
+                label: 'Remove (Preview)',
+                style: 'destructive',
+                disabled: true,
+                disabledReason: 'Not wired yet',
+              },
+            ]}
+            onAction={() => undefined}>
+            <SettingsLinkRow
+              last={index === seededMuteWords.length - 1}
+              row={{
+                title: word,
+                description: 'Local mute preview · long-press for actions',
+                icon: 'text',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+          </SettingsContextRow>
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
 export function BlockedAccountsScreen() {
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Blocked accounts">
-      <AppText variant="display">Blocked accounts</AppText>
-      <PreviewBanner text="Seeded block list — Preview. Blocks are not persisted remotely." />
-      {seededBlockedAccounts.map(account => (
-        <Surface
-          key={account.id}
-          variant="contained"
-          style={[styles.row, {padding: spacing[4], gap: spacing[3]}]}>
-          <AppIcon name="privacy" colour={colours.accent} />
-          <View style={styles.flex}>
-            <AppText variant="label">{account.name}</AppText>
-            <AppText variant="caption" colour="textSecondary">
-              @{account.handle}
-            </AppText>
-          </View>
-        </Surface>
-      ))}
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Blocked accounts"
+      caption="Seeded block list — Preview. Blocks are not persisted remotely.">
+      <SettingsSection title="Blocked">
+        {seededBlockedAccounts.map((account, index) => (
+          <SettingsContextRow
+            key={account.id}
+            title={account.name}
+            actions={[
+              {
+                id: 'unblock',
+                label: 'Unblock (Preview)',
+                disabled: true,
+                disabledReason: 'Not wired yet',
+              },
+            ]}
+            onAction={() => undefined}>
+            <SettingsLinkRow
+              last={index === seededBlockedAccounts.length - 1}
+              row={{
+                title: account.name,
+                description: `@${account.handle} · long-press for actions`,
+                icon: 'privacy',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+          </SettingsContextRow>
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
 export function InnerCircleScreen() {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
   return (
-    <ScreenShell title="Inner circle">
-      <AppText variant="display">Inner circle</AppText>
-      <PreviewBanner text="Close friends style audience — Preview." />
-      {seededInnerCircle.map(person => (
-        <AppPressable
-          key={person.id}
-          accessibilityLabel={`Open @${person.handle}`}
-          onPress={() => router.push(`/profile/${person.handle}` as Href)}
-          style={[styles.row, {gap: spacing[3], minHeight: 52}]}>
-          <AppIcon name="community" colour={colours.accent} />
-          <View style={styles.flex}>
-            <AppText variant="label">{person.name}</AppText>
-            <AppText variant="caption" colour="textSecondary">
-              @{person.handle}
-            </AppText>
-          </View>
-          <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
-        </AppPressable>
-      ))}
-    </ScreenShell>
+    <SettingsKitScreen
+      title="Inner circle"
+      caption="Close friends style audience — Preview.">
+      <SettingsSection title="People">
+        {seededInnerCircle.map((person, index) => (
+          <SettingsLinkRow
+            key={person.id}
+            last={index === seededInnerCircle.length - 1}
+            row={{
+              title: person.name,
+              description: `@${person.handle}`,
+              icon: 'community',
+              preview: true,
+              onPress: () => router.push(`/profile/${person.handle}` as Href),
+            }}
+          />
+        ))}
+      </SettingsSection>
+    </SettingsKitScreen>
   )
 }
 
@@ -994,6 +1247,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 44,
   },
+  bannerText: {
+    flexShrink: 1,
+    lineHeight: 20,
+  },
   content: {
     padding: 16,
     paddingBottom: 40,
@@ -1010,6 +1267,11 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
     minWidth: 0,
+  },
+  glassBadge: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
   },
   row: {
     alignItems: 'center',

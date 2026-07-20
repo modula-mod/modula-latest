@@ -32,18 +32,20 @@ export function ModulaContextMenu({
     return <View style={styles.fill}>{children}</View>
   }
 
-  const actionable = actions.filter(action => !action.disabled)
+  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
 
   return (
     <Host style={styles.fill}>
       <ContextMenu>
         <ContextMenu.Items>
-          {actionable.map(action => (
+          {visibleActions.map(action => (
             <Button
               key={action.id}
-              label={action.accessibilityLabel ?? action.label}
-              role={action.style === 'destructive' ? 'destructive' : undefined}
-              onPress={() => onAction(action.id)}
+              label={action.accessibilityLabel ?? getActionLabel(action)}
+              role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
+              onPress={() => {
+                if (!action.disabled) onAction(action.id)
+              }}
             />
           ))}
         </ContextMenu.Items>
@@ -55,6 +57,11 @@ export function ModulaContextMenu({
       </ContextMenu>
     </Host>
   )
+}
+
+function getActionLabel(action: ModulaActionItem): string {
+  if (!action.disabled || !action.disabledReason) return action.label
+  return `${action.label} unavailable — ${action.disabledReason}`
 }
 
 const styles = StyleSheet.create({

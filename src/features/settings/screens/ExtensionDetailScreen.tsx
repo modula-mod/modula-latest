@@ -17,6 +17,7 @@ export function ExtensionDetailScreen() {
   const {colours, spacing} = useThemeTokens()
   const [item, setItem] = useState<ExtensionCentreItem | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [pendingAction, setPendingAction] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -27,6 +28,29 @@ export function ExtensionDetailScreen() {
       active = false
     }
   }, [extensionId, services.extensionRepository])
+
+  const perform = async (
+    action: 'install' | 'enable' | 'disable' | 'uninstall',
+  ) => {
+    if (!item) return
+    setPendingAction(action)
+    setMessage(null)
+    try {
+      await services.extensionRepository[action](item.extensionId)
+      const status =
+        action === 'uninstall' ? 'available' : action === 'install' || action === 'enable' ? 'enabled' : 'disabled'
+      setItem(current => (current ? {...current, status} : current))
+      setMessage(
+        action === 'uninstall'
+          ? 'Extension uninstalled.'
+          : `Extension ${action === 'install' ? 'installed' : `${action}d`} successfully.`,
+      )
+    } catch {
+      setMessage(`Could not ${action} this extension. Your settings remain available; try again later.`)
+    } finally {
+      setPendingAction(null)
+    }
+  }
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -46,23 +70,28 @@ export function ExtensionDetailScreen() {
                 label="Permissions"
                 value={item.permissions.length ? item.permissions.join(', ') : 'None listed'}
               />
+              {item.status === 'available' ? (
+                <AppButton disabled={pendingAction !== null} onPress={() => void perform('install')}>
+                  {pendingAction === 'install' ? 'Installing…' : 'Install'}
+                </AppButton>
+              ) : null}
+              {item.status === 'disabled' ? (
+                <AppButton disabled={pendingAction !== null} onPress={() => void perform('enable')}>
+                  {pendingAction === 'enable' ? 'Enabling…' : 'Enable'}
+                </AppButton>
+              ) : (
+                <AppButton
+                  variant="secondary"
+                  disabled={pendingAction !== null}
+                  onPress={() => void perform('disable')}>
+                  {pendingAction === 'disable' ? 'Disabling…' : 'Disable'}
+                </AppButton>
+              )}
               <AppButton
                 variant="secondary"
-                onPress={() => {
-                  void services.extensionRepository.disable(item.extensionId).then(() =>
-                    setMessage('Extension disabled for this account.'),
-                  )
-                }}>
-                Disable
-              </AppButton>
-              <AppButton
-                variant="secondary"
-                onPress={() => {
-                  void services.extensionRepository.uninstall(item.extensionId).then(() =>
-                    setMessage('Extension uninstalled for this account.'),
-                  )
-                }}>
-                Uninstall
+                disabled={pendingAction !== null || item.status === 'available'}
+                onPress={() => void perform('uninstall')}>
+                {pendingAction === 'uninstall' ? 'Uninstalling…' : 'Uninstall'}
               </AppButton>
               <AppText variant="caption" colour="textSecondary">
                 Settings for first-party extensions appear here when the extension publishes a

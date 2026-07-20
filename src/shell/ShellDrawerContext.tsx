@@ -3,11 +3,19 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
+  useState,
   type PropsWithChildren,
 } from 'react'
-import {Animated} from 'react-native'
+import {
+  runOnJS,
+  useSharedValue,
+  withSpring,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated'
 
-import {useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type DrawerPhase = 'closed' | 'opening' | 'open' | 'closing'
 
@@ -17,41 +25,101 @@ type CloseDrawerOptions = {
 
 type ShellDrawerContextValue = {
   phase: DrawerPhase
-  progress: Animated.Value
+  progress: SharedValue<number>
   openDrawer: () => void
   closeDrawer: (options?: CloseDrawerOptions) => void
+  /** Settle after a drag — pass velocity (and optional progress snapshot). */
+  settleDrawer: (options?: {velocityX?: number; at?: number}) => void
 }
 
 const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
+const OPEN_SPRING = {damping: 24, stiffness: 260, mass: 0.9}
+const CLOSE_SPRING = {damping: 28, stiffness: 320, mass: 0.85}
+
 /**
- * Compatibility shim over AccountPanelProvider.
- * Prefer openAccountPanel / closeAccountPanel in new code.
+ * Left navigation drawer controller (Reanimated + Modal).
+ * Avatar / shell chrome should call openDrawer — this is the live navigation surface.
  */
 export function ShellDrawerProvider({children}: PropsWithChildren) {
-  const {state, openAccountPanel, closeAccountPanel} = useAccountPanel()
-  const [progress] = useMemo(() => [new Animated.Value(0)], [])
+  const {motion} = useThemeTokens()
+  const progress = useSharedValue(0)
+  const phaseRef = useRef<DrawerPhase>('closed')
+  const afterCloseRef = useRef<(() => void) | undefined>(undefined)
+  const [phase, setPhaseState] = useState<DrawerPhase>('closed')
+
+  const setPhase = useCallback((next: DrawerPhase) => {
+    phaseRef.current = next
+    setPhaseState(next)
+  }, [])
+
+  const finishOpen = useCallback(() => {
+    setPhase('open')
+  }, [setPhase])
+
+  const finishClose = useCallback(() => {
+    setPhase('closed')
+    const afterClose = afterCloseRef.current
+    afterCloseRef.current = undefined
+    afterClose?.()
+  }, [setPhase])
 
   const openDrawer = useCallback(() => {
-    openAccountPanel('shell-drawer-shim')
-  }, [openAccountPanel])
+    if (phaseRef.current === 'opening' || phaseRef.current === 'open') {
+      return
+    }
+    afterCloseRef.current = undefined
+    setPhase('opening')
+    progress.value = withSpring(1, OPEN_SPRING, finished => {
+      if (finished) runOnJS(finishOpen)()
+    })
+  }, [finishOpen, progress, setPhase])
 
   const closeDrawer = useCallback(
     (options?: CloseDrawerOptions) => {
-      closeAccountPanel('explicit')
-      options?.afterClose?.()
+      if (phaseRef.current === 'closing' || phaseRef.current === 'closed') {
+        return
+      }
+      afterCloseRef.current = options?.afterClose
+      setPhase('closing')
+      progress.value = withTiming(0, {duration: motion.fast}, finished => {
+        if (finished) runOnJS(finishClose)()
+      })
     },
-    [closeAccountPanel],
+    [finishClose, motion.fast, progress, setPhase],
+  )
+
+  const settleDrawer = useCallback(
+    (options?: {velocityX?: number; at?: number}) => {
+      if (phaseRef.current === 'closed') return
+      const velocityX = options?.velocityX ?? 0
+      const at = options?.at ?? progress.value
+      const shouldClose = at < 0.55 || velocityX < -600
+      if (shouldClose) {
+        afterCloseRef.current = undefined
+        setPhase('closing')
+        progress.value = withSpring(0, CLOSE_SPRING, finished => {
+          if (finished) runOnJS(finishClose)()
+        })
+        return
+      }
+      setPhase('opening')
+      progress.value = withSpring(1, OPEN_SPRING, finished => {
+        if (finished) runOnJS(finishOpen)()
+      })
+    },
+    [finishClose, finishOpen, progress, setPhase],
   )
 
   const value = useMemo<ShellDrawerContextValue>(
     () => ({
-      phase: state.status,
+      phase,
       progress,
       openDrawer,
       closeDrawer,
+      settleDrawer,
     }),
-    [state.status, progress, openDrawer, closeDrawer],
+    [phase, progress, openDrawer, closeDrawer, settleDrawer],
   )
 
   return (

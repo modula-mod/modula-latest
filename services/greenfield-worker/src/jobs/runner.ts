@@ -4,7 +4,10 @@ import {handleAtprotoDelete} from '../bridges/atproto/delete.js'
 import {handleAtprotoProfilePublish} from '../bridges/atproto/profile.js'
 import {handleAtprotoPublish} from '../bridges/atproto/publish.js'
 import {handleAtprotoUpdate} from '../bridges/atproto/update.js'
+import {handlePluginLifecycle} from '../extensions/plugin-lifecycle.js'
+import {handleFunctionInvoke} from '../functions/invoke.js'
 import {handleNotificationCreate} from '../notifications/create.js'
+import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex} from '../search/index.js'
 import {claimNextJob, completeJob, deadLetterJob, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
@@ -18,6 +21,40 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
     switch (job.job_type) {
       case 'notification.create':
         await handleNotificationCreate(db, job.payload)
+        break
+      case 'notification.reaction':
+        await handleSocialNotification(db, 'reaction', job.payload)
+        break
+      case 'notification.comment':
+        await handleSocialNotification(db, 'comment', job.payload)
+        break
+      case 'notification.reply':
+        await handleSocialNotification(db, 'reply', job.payload)
+        break
+      case 'notification.mention':
+        await handleSocialNotification(db, 'mention', job.payload)
+        break
+      case 'notification.repost':
+        await handleSocialNotification(db, 'repost', job.payload)
+        break
+      case 'notification.quote':
+        await handleSocialNotification(db, 'quote', job.payload)
+        break
+      case 'notification.follow':
+        await handleSocialNotification(db, 'follow', job.payload)
+        break
+      case 'extension.notification':
+        await handleSocialNotification(db, 'extension', job.payload)
+        break
+      case 'plugin.install':
+      case 'plugin.enable':
+      case 'plugin.disable':
+      case 'plugin.configure':
+      case 'plugin.uninstall':
+        await handlePluginLifecycle(db, job.job_type, withBackgroundJobId(job.payload, job.id))
+        break
+      case 'function.invoke':
+        await handleFunctionInvoke(db, job.payload)
         break
       case 'search.index':
       case 'search.index.post':
@@ -58,6 +95,11 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
     }
   }
   return true
+}
+
+function withBackgroundJobId(payload: unknown, backgroundJobId: string): unknown {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return payload
+  return {...payload, backgroundJobId}
 }
 
 function normalizeSearchPayload(jobType: string, payload: unknown): unknown {

@@ -14,6 +14,8 @@ export interface ExtensionRepository {
   listAvailable(): Promise<ExtensionCentreItem[]>
   listInstalled(): Promise<ExtensionCentreItem[]>
   getExtension(extensionId: string): Promise<ExtensionCentreItem | null>
+  install(extensionId: string): Promise<void>
+  enable(extensionId: string): Promise<void>
   uninstall(extensionId: string): Promise<void>
   disable(extensionId: string): Promise<void>
 }

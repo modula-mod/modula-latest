@@ -7,6 +7,7 @@ import {SessionRefreshCoordinator} from '@/auth/runtime/SessionRefreshCoordinato
 import {createSessionStorage} from '@/auth/storage'
 import {
   ApiActivityRepository,
+  ApiAppearanceRepository,
   ApiAtprotoRepository,
   ApiAuthRepository,
   ApiDiscoverRepository,
@@ -80,6 +81,7 @@ export function createAppServices(): AppServices {
     profileRepository: new ApiProfileRepository(client),
     socialGraphRepository: new ApiSocialGraphRepository(client),
     activityRepository: new ApiActivityRepository(client),
+    appearanceRepository: new ApiAppearanceRepository(client),
     discoverRepository: new ApiDiscoverRepository(client),
     reelsRepository: new ApiReelsRepository(client),
     metadataRepository: new ApiMetadataRepository(client),

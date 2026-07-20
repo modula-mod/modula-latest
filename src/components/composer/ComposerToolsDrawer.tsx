@@ -38,14 +38,61 @@ const SECTIONS: ComposerToolSection[] = [
 
 function iconFor(tool: ComposerToolItem): AppIconName {
   if (tool.toolId.includes('camera')) return 'camera'
-  if (tool.toolId.includes('photo') || tool.toolId.includes('gif')) return 'photo'
+  if (tool.toolId.includes('gif')) return 'gif'
+  if (tool.toolId.includes('photo') || tool.toolId.includes('video')) return 'photo'
+  if (tool.toolId.includes('file')) return 'storage'
   if (tool.toolId.includes('poll')) return 'poll'
+  if (tool.toolId.includes('location')) return 'link'
+  if (tool.toolId.includes('schedule')) return 'event'
+  if (tool.toolId.includes('warning')) return 'warning'
+  if (tool.toolId.includes('nft')) return 'security'
+  if (tool.toolId.includes('product')) return 'marketplace'
+  if (tool.toolId.includes('translate')) return 'text'
   if (tool.toolId.includes('link')) return 'link'
   if (tool.toolId.includes('market')) return 'marketplace'
   if (tool.toolId.includes('automation')) return 'automation'
   if (tool.section === 'Modules') return 'modules'
   if (tool.section === 'AI') return 'tools'
   return 'tools'
+}
+
+function isNftAttach(tool: ComposerToolItem): boolean {
+  const key = `${tool.toolId} ${tool.name}`.toLowerCase()
+  return key.includes('nft')
+}
+
+function isAiRewrite(tool: ComposerToolItem): boolean {
+  const key = `${tool.toolId} ${tool.name}`.toLowerCase()
+  return key.includes('airewrite') || key.includes('ai rewrite')
+}
+
+function unavailableTitle(tool: ComposerToolItem): string {
+  if (isAiRewrite(tool)) return 'AI rewrite is unavailable'
+  if (isNftAttach(tool)) return 'NFT attach is unavailable'
+  return tool.requiresModule ? `Requires ${tool.requiresModule}` : 'Tool unavailable'
+}
+
+function availabilitySentence(tool: ComposerToolItem): string {
+  if (tool.availability === 'unavailable') {
+    if (isAiRewrite(tool)) {
+      return 'Unavailable. An Agents manifest must grant composer rewrite scope before this can run.'
+    }
+    if (isNftAttach(tool)) {
+      return 'Unavailable. DIMON is inactive, so Composer will not attach NFT claims.'
+    }
+    if (tool.requiresModule) {
+      return `Unavailable. Enable the ${tool.requiresModule} module before using this tool.`
+    }
+    return 'Unavailable in this Preview build.'
+  }
+  if (tool.availability === 'preview') {
+    return 'Preview. This runs locally or as a stub until a module manifest enables the full action.'
+  }
+  return 'Available from a registered manifest.'
+}
+
+function unavailableMessage(tool: ComposerToolItem): string {
+  return tool.description ?? availabilitySentence(tool)
 }
 
 /**
@@ -88,8 +135,8 @@ export function ComposerToolsDrawer({
   )
 
   const runTool = (tool: ComposerToolItem) => {
-    if (tool.requiresModule && tool.availability === 'unavailable') {
-      Alert.alert(`Requires ${tool.requiresModule}`, `${tool.name} needs the ${tool.requiresModule} module.`)
+    if (tool.availability === 'unavailable') {
+      Alert.alert(unavailableTitle(tool), unavailableMessage(tool))
       return
     }
     if (tool.toolId.includes('photo')) {
@@ -142,12 +189,32 @@ export function ComposerToolsDrawer({
       <ScrollView
         {...keyboardScrollProps}
         contentContainerStyle={{paddingBottom: bottomPad, gap: spacing[4]}}>
-        <AppText variant="headline">Composer Tools</AppText>
-        {invocationState !== 'idle' ? (
+        <View style={{gap: spacing[1]}}>
+          <AppText variant="headline">Composer Tools</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Function: {invocationState}
-            {invocationMessage ? ` · ${invocationMessage}` : ''}
+            Media, create, modules, and agents — honest Preview / Requires module states.
           </AppText>
+          <AppText variant="caption" colour="textSecondary">
+            Tools register via manifests; this drawer shows whether each capability is available,
+            preview-only, or blocked before anything runs.
+          </AppText>
+        </View>
+        {invocationState !== 'idle' ? (
+          <View
+            style={[
+              styles.status,
+              {
+                backgroundColor: colours.accentSubtle,
+                borderColor: colours.accentBorder,
+                borderRadius: radius.medium,
+                padding: spacing[3],
+              },
+            ]}>
+            <AppText variant="caption" colour="accent">
+              Function: {invocationState}
+              {invocationMessage ? ` · ${invocationMessage}` : ''}
+            </AppText>
+          </View>
         ) : null}
         {sections.map(section => (
           <View key={section} style={{gap: spacing[2]}}>
@@ -158,9 +225,11 @@ export function ComposerToolsDrawer({
               {tools
                 .filter(tool => tool.section === section)
                 .map(tool => {
+                  const preview = tool.availability === 'preview'
+                  const unavailable = tool.availability === 'unavailable'
                   const label = tool.requiresModule
                     ? `${tool.name} · Requires ${tool.requiresModule}`
-                    : tool.availability === 'preview'
+                    : preview
                       ? `${tool.name} — Preview`
                       : tool.name
                   return (
@@ -171,15 +240,47 @@ export function ComposerToolsDrawer({
                       style={[
                         styles.tool,
                         {
-                          backgroundColor: colours.surfaceMuted,
+                          backgroundColor: unavailable
+                            ? colours.surfaceMuted
+                            : preview
+                              ? colours.accentSubtle
+                              : colours.surface,
+                          borderColor: unavailable
+                            ? colours.border
+                            : preview
+                              ? colours.accentBorder
+                              : colours.border,
                           borderRadius: radius.medium,
                           padding: spacing[3],
                           gap: spacing[2],
-                          opacity: tool.availability === 'unavailable' ? 0.7 : 1,
+                          opacity: unavailable ? 0.7 : 1,
                         },
                       ]}>
-                      <AppIcon name={iconFor(tool)} colour={colours.accent} size={22} />
-                      <AppText variant="caption">{label}</AppText>
+                      <View style={[styles.toolHeader, {gap: spacing[2]}]}>
+                        <AppIcon
+                          name={iconFor(tool)}
+                          colour={unavailable ? colours.textSecondary : colours.accent}
+                          size={22}
+                        />
+                        <View style={styles.toolText}>
+                          <AppText variant="caption" style={styles.toolName}>
+                            {tool.name}
+                          </AppText>
+                          <AppText
+                            variant="micro"
+                            colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}>
+                            {availabilitySentence(tool)}
+                          </AppText>
+                        </View>
+                      </View>
+                      {tool.description ? (
+                        <AppText
+                          variant="micro"
+                          colour="textSecondary"
+                          style={styles.toolDescription}>
+                          {tool.description}
+                        </AppText>
+                      ) : null}
                     </AppPressable>
                   )
                 })}
@@ -197,7 +298,29 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   tool: {
-    minWidth: '46%',
+    alignItems: 'flex-start',
+    borderWidth: StyleSheet.hairlineWidth,
+    flexBasis: '46%',
     flexGrow: 1,
+    minHeight: 96,
+    minWidth: '46%',
+  },
+  toolDescription: {
+    width: '100%',
+  },
+  toolHeader: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    width: '100%',
+  },
+  toolName: {
+    flexShrink: 1,
+  },
+  toolText: {
+    flex: 1,
+    minWidth: 0,
+  },
+  status: {
+    borderWidth: StyleSheet.hairlineWidth,
   },
 })

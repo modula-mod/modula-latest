@@ -1,14 +1,13 @@
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Surface} from '@/components/primitives/Surface'
 import {
   getMarketplaceModule,
   getMarketplaceSeller,
 } from '@/features/marketplace/data/catalog'
+import {ModulePreScreenHero} from '@/features/modules/screens/ModulePreScreen'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
@@ -19,7 +18,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function ModuleDetailScreen() {
   const {moduleId} = useLocalSearchParams<{moduleId: string}>()
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const module = getMarketplaceModule(String(moduleId ?? ''))
   const seller = module ? getMarketplaceSeller(module.sellerId) : undefined
 
@@ -43,43 +42,7 @@ export function ModuleDetailScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5]}]}
           keyboardShouldPersistTaps="handled">
-          <Surface
-            variant="contained"
-            style={[styles.hero, {gap: spacing[3], padding: spacing[4]}]}>
-            <View
-              style={[
-                styles.icon,
-                {backgroundColor: colours.accentSubtle, borderRadius: radius.large},
-              ]}>
-              <AppIcon name={module.icon} colour={colours.accent} size={28} />
-            </View>
-            <View style={styles.flex}>
-              <AppText variant="display">{module.name}</AppText>
-              <AppText variant="body" colour="textSecondary">
-                {module.description}
-              </AppText>
-              <AppText variant="caption" colour="accent">
-                {module.status} · {module.capability}
-              </AppText>
-            </View>
-          </Surface>
-
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">About</AppText>
-            <AppText variant="body" colour="textSecondary">
-              {module.longDescription}
-            </AppText>
-          </View>
-
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">Capability</AppText>
-            <AppText variant="body" colour="textSecondary">
-              {module.capability}
-            </AppText>
-            <AppText variant="caption" colour="textTertiary">
-              Tags: {module.tags.join(' · ')}
-            </AppText>
-          </View>
+          <ModulePreScreenHero module={module} />
 
           {seller ? (
             <ModulaButton
@@ -94,7 +57,7 @@ export function ModuleDetailScreen() {
             systemImage="ellipsis.circle"
             actions={[
               {id: 'install', label: 'Install Preview', systemImage: 'arrow.down.app'},
-              {id: 'edit', label: 'Edit', systemImage: 'pencil'},
+              {id: 'registry', label: 'Open Extension Centre', systemImage: 'puzzlepiece'},
               {
                 id: 'remove',
                 label: 'Remove Preview',
@@ -103,18 +66,22 @@ export function ModuleDetailScreen() {
               },
             ]}
             onAction={id => {
+              if (id === 'registry') {
+                router.push('/settings/extensions' as Href)
+                return
+              }
               if (id === 'install') {
                 void confirmModulaAction({
                   title: 'Install Preview',
                   message:
-                    `${module.name} will not be installed on a production backend. Local Phase 4.5 Preview only.`,
+                    `${module.name} preview does not download or execute package code yet. Registry runtime arrives with the module standard.`,
                   confirmLabel: 'Acknowledge preview',
                   cancelLabel: 'Cancel',
                 })
                 return
               }
               void confirmModulaAction({
-                title: id === 'remove' ? 'Remove Preview' : 'Edit Preview',
+                title: 'Remove Preview',
                 message: 'This marketplace action is local Preview only.',
                 confirmLabel: 'OK',
                 cancelLabel: 'Cancel',
@@ -122,7 +89,7 @@ export function ModuleDetailScreen() {
             }}
           />
           <AppText variant="caption" colour="textSecondary">
-            Preview — no remote install, billing, or permissions are granted.
+            Honest preview — no remote billing, and no untrusted code execution from GitHub.
           </AppText>
         </ScrollView>
       </ResponsiveContent>
@@ -134,21 +101,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 40,
-  },
-  flex: {
-    flex: 1,
-    gap: 6,
-    minWidth: 0,
-  },
-  hero: {
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  icon: {
-    alignItems: 'center',
-    height: 64,
-    justifyContent: 'center',
-    width: 64,
   },
   screen: {
     flex: 1,

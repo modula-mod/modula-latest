@@ -1,64 +1,78 @@
 import {useRouter, type Href} from 'expo-router'
-import {Pressable} from 'react-native'
+import {View} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {
+  HEADER_ICON_PAIR_GAP,
+  plainHeaderCustomItem,
+  plainHeaderSpacing,
+  supportsPlainHeaderItems,
+} from '@/platform/ui/navigation/plain-header-items'
 
-export function ProfileHeaderRight() {
+function ProfileShareMenu() {
   const router = useRouter()
-  const {colours} = useThemeTokens()
-
   return (
-    <>
-      <Pressable
-        accessibilityLabel="Share profile"
-        onPress={() => {
-          void presentModulaActions({
-            title: 'Share',
-            actions: [
-              {id: 'share', label: 'Share profile'},
-              {id: 'qr', label: 'QR / share sheet — Preview'},
-              {id: 'copy', label: 'Copy profile link'},
-            ],
-          }).then(id => {
-            if (id === 'share' || id === 'qr') {
-              router.push('/share-profile' as Href)
-            }
-          })
-        }}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="share" colour={colours.textSecondary} size={22} />
-      </Pressable>
-      <Pressable
-        accessibilityLabel="Open profile actions"
-        onPress={() => {
-          void presentModulaActions({
-            title: 'Profile',
-            actions: [
-              {id: 'edit', label: 'Edit Profile'},
-              {id: 'customize', label: 'Customize'},
-              {id: 'settings', label: 'Settings'},
-            ],
-          }).then(id => {
-            if (id === 'edit') router.push('/profile/edit' as Href)
-            if (id === 'customize') router.push('/profile/customize' as Href)
-            if (id === 'settings') router.push('/settings' as Href)
-          })
-        }}
-        style={{
-          alignItems: 'center',
-          height: 44,
-          justifyContent: 'center',
-          width: 44,
-        }}>
-        <AppIcon name="more" colour={colours.textSecondary} size={22} />
-      </Pressable>
-    </>
+    <ChromeIconMenu
+      systemImage="square.and.arrow.up"
+      icon="share"
+      accessibilityLabel="Share profile"
+      title="Share"
+      actions={[
+        {id: 'share', label: 'Share profile'},
+        {id: 'qr', label: 'QR / share sheet — Preview'},
+        {id: 'copy', label: 'Copy profile link'},
+      ]}
+      onAction={id => {
+        if (id === 'share' || id === 'qr') {
+          router.push('/share-profile' as Href)
+        }
+      }}
+    />
   )
+}
+
+function ProfileOverflowMenu() {
+  const router = useRouter()
+  return (
+    <ChromeOverflowMenu
+      accessibilityLabel="Open profile actions"
+      title="Profile"
+      actions={[
+        {id: 'edit', label: 'Edit Profile'},
+        {id: 'customize', label: 'Customize'},
+        {id: 'settings', label: 'Settings'},
+      ]}
+      onAction={id => {
+        if (id === 'edit') router.push('/profile/edit' as Href)
+        if (id === 'customize') router.push('/profile/customize' as Href)
+        if (id === 'settings') router.push('/settings' as Href)
+      }}
+    />
+  )
+}
+
+/** Android / web fallback — one slot (may share a capsule on older paths). */
+export function ProfileHeaderRight() {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: HEADER_ICON_PAIR_GAP,
+      }}>
+      <ProfileShareMenu />
+      <ProfileOverflowMenu />
+    </View>
+  )
+}
+
+/** iOS 26+: shared liquid glass with share + more spaced apart inside it. */
+export function profileHeaderRightItems() {
+  if (!supportsPlainHeaderItems()) return undefined
+  return [
+    plainHeaderCustomItem(<ProfileShareMenu />),
+    plainHeaderSpacing(),
+    plainHeaderCustomItem(<ProfileOverflowMenu />),
+  ]
 }

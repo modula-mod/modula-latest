@@ -3,9 +3,14 @@ import {useRouter} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {MaterialSurface} from '@/components/materials/MaterialSurface'
-import {IconButton} from '@/components/primitives/IconButton'
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {AppText} from '@/components/primitives/AppText'
+import {
+  CHROME_BLUR_INTENSITY,
+  CHROME_FADE_EXTENSION,
+  CHROME_HEADER_ROW,
+} from '@/platform/ui/navigation/chrome-insets'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type SecondaryScreenHeaderProps = {
@@ -13,58 +18,94 @@ type SecondaryScreenHeaderProps = {
   right?: ReactNode
 }
 
+/**
+ * Secondary-route chrome: progressive blur overlay + plain Expo UI back icon.
+ *
+ * In-flow spacer clears the nav row only. The fade is a sibling absolute overlay
+ * so it can paint over the top of the body (Android does not clip it to the spacer).
+ */
 export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const {colours, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
+  const rowHeight = insets.top + CHROME_HEADER_ROW
+  const blurHeight = rowHeight + CHROME_FADE_EXTENSION
 
   return (
-    <MaterialSurface
-      role="navigation"
-      style={[
-        styles.wrap,
-        {
-          paddingTop: insets.top,
-          borderBottomColor: colours.border,
-        },
-      ]}>
-      <View style={[styles.row, {paddingHorizontal: spacing[3]}]}>
-        <IconButton
-          icon="back"
-          label="Go back"
-          onPress={() => {
-            if (router.canGoBack()) {
-              router.back()
-            } else {
-              router.replace('/index' as never)
-            }
-          }}
-        />
-        <AppText variant="headline" numberOfLines={1} style={styles.title}>
-          {title}
-        </AppText>
-        <View style={styles.right}>{right}</View>
+    <>
+      <View style={{height: rowHeight}} />
+      <View style={[styles.overlay, {height: blurHeight}]} pointerEvents="box-none">
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ProgressiveBlurBand
+            height={blurHeight}
+            topHeavy
+            intensity={CHROME_BLUR_INTENSITY}
+          />
+        </View>
+        <View
+          style={[
+            styles.row,
+            {
+              paddingTop: insets.top,
+              paddingHorizontal: spacing[3],
+              height: rowHeight,
+            },
+          ]}>
+          <View style={styles.side}>
+            <ChromeCircleButton
+              icon="back"
+              accessibilityLabel="Go back"
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back()
+                } else {
+                  router.replace('/index' as never)
+                }
+              }}
+            />
+          </View>
+          <AppText variant="headline" numberOfLines={1} style={styles.title}>
+            {title}
+          </AppText>
+          <View style={[styles.side, styles.sideEnd]}>
+            {right ?? <View style={styles.slotSpacer} />}
+          </View>
+        </View>
       </View>
-    </MaterialSurface>
+    </>
   )
 }
 
 const styles = StyleSheet.create({
-  right: {
-    alignItems: 'flex-end',
-    minWidth: 44,
+  overlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 4,
   },
   row: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     flexDirection: 'row',
-    height: 54,
+    paddingBottom: 10,
+    width: '100%',
+    zIndex: 2,
+  },
+  side: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    minWidth: 44,
+  },
+  sideEnd: {
+    alignItems: 'flex-end',
+  },
+  slotSpacer: {
+    height: 36,
+    width: 36,
   },
   title: {
     flex: 1,
     minWidth: 0,
     textAlign: 'center',
-  },
-  wrap: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 })

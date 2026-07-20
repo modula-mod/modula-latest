@@ -12,13 +12,24 @@ import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
+import {InspireNextList} from '@/features/discover/components/InspireNextList'
+import {LivePresenceRail} from '@/features/discover/components/LivePresenceRail'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {
+  DEFAULT_DISCOVER_BLOCK_IDS,
+  isBlockOn,
+} from '@/features/product/data/layoutBlocks'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {seededCommunities} from '@/features/social/data/seededSurfaces'
 import {StackedAvatars} from '@/platform/ui/avatars'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -33,11 +44,16 @@ export function DiscoverScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
+  const {preferences, update} = useProductPreferences()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
   const q = query.trim().toLowerCase()
   const result = discoverQuery.data
+  const discoverBlocks = preferences.discoverBlockIds
+  const showBlock = (id: string) => isBlockOn(discoverBlocks, id)
+  const reelsFeatureOn = isFeatureEnabled(preferences, 'reels')
 
   const filtered = useMemo(() => filterDiscover(result, q), [result, q])
   const hasResults =
@@ -46,19 +62,72 @@ export function DiscoverScreen() {
     filtered.trendingTopics.length > 0 ||
     filtered.media.length > 0
 
+  const visibleSectionIds = useMemo(() => {
+    return discoverBlocks.filter(id => {
+      if (!showBlock(id)) return false
+      if (id === 'live') return category === 'For You'
+      if (id === 'reels') {
+        return (
+          reelsFeatureOn &&
+          (category === 'For You' || category === 'Media') &&
+          filtered.reels.length > 0
+        )
+      }
+      if (id === 'people') {
+        return (
+          (category === 'For You' || category === 'People') &&
+          filtered.suggestedProfiles.length > 0
+        )
+      }
+      if (id === 'inspire') return category === 'For You'
+      if (id === 'topics') {
+        return (
+          (category === 'For You' || category === 'Communities') &&
+          filtered.trendingTopics.length > 0
+        )
+      }
+      if (id === 'communities') {
+        return category === 'For You' || category === 'Communities'
+      }
+      if (id === 'modules') {
+        return (
+          (category === 'For You' || category === 'Marketplace') &&
+          filtered.featuredModules.length > 0
+        )
+      }
+      if (id === 'media') {
+        return (
+          (category === 'For You' || category === 'Media') && filtered.media.length > 0
+        )
+      }
+      return false
+    })
+    // showBlock closes over discoverBlocks
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, discoverBlocks, filtered, reelsFeatureOn])
+
+  const layoutEmpty = hasResults && visibleSectionIds.length === 0
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
-              <AppText variant="display">Discover</AppText>
-              <ModulaMenu
+              <AppText variant="body" colour="textSecondary" style={{flex: 1}}>
+                People, topics, modules, and media
+              </AppText>
+              <ChromeOverflowMenu
                 accessibilityLabel="Discover filter menu"
                 title="Discover filters"
                 actions={[
@@ -69,6 +138,9 @@ export function DiscoverScreen() {
                   {id: 'Media', label: 'Media'},
                   {id: 'interests', label: 'Edit interests — Preview'},
                   {id: 'feeds', label: 'Custom feeds — Preview'},
+                  {id: 'inspire', label: 'Inspire next'},
+                  {id: 'live', label: 'Live presence'},
+                  {id: 'customize', label: 'Customize Discover layout'},
                   {id: 'media-grid', label: 'Media grid'},
                   {id: 'open-marketplace', label: 'Open Marketplace'},
                   {id: 'open-communities', label: 'Open Communities'},
@@ -90,88 +162,177 @@ export function DiscoverScreen() {
                     router.push('/discover/feeds' as Href)
                     return
                   }
+                  if (id === 'inspire') {
+                    router.push('/discover/inspire' as Href)
+                    return
+                  }
+                  if (id === 'live') {
+                    router.push('/discover/live' as Href)
+                    return
+                  }
+                  if (id === 'customize') {
+                    router.push('/product/layout-discover' as Href)
+                    return
+                  }
                   if (id === 'media-grid') {
                     router.push('/discover/media' as Href)
                     return
                   }
                   setCategory(id as Category)
                 }}
-                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
               />
             </View>
-            <AppPressable
-              accessibilityLabel="Edit interests Preview"
-              onPress={() => router.push('/discover/interests' as Href)}
-              style={[
-                styles.cta,
-                {
-                  backgroundColor: colours.accentSubtle,
-                  borderRadius: radius.round,
-                },
-              ]}>
-              <AppText variant="label" style={{color: colours.accent}}>
-                Choose interests — Preview
-              </AppText>
-            </AppPressable>
-            <View
-              style={[
-                styles.search,
-                {
-                  backgroundColor: colours.surfaceRaised,
-                  borderColor: colours.border,
-                  borderRadius: radius.round,
-                  paddingHorizontal: spacing[4],
-                },
-              ]}>
-              <AppIcon name="search" colour={colours.textSecondary} />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search people, topics, modules"
-                placeholderTextColor={colours.textTertiary}
-                style={[styles.searchInput, {color: colours.text}]}
-                returnKeyType="search"
-              />
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{gap: spacing[2]}}>
-              {categories.map(item => (
-                <Pill
-                  key={item}
-                  label={item}
-                  selected={category === item}
-                  onPress={() => setCategory(item)}
-                />
-              ))}
-            </ScrollView>
+            <SectionEnter delay={20}>
+              <AppPressable
+                accessibilityLabel="Edit interests Preview"
+                onPress={() => router.push('/discover/interests' as Href)}
+                style={[
+                  styles.cta,
+                  {
+                    backgroundColor: colours.accentSubtle,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <AppText variant="label" style={{color: colours.accent}}>
+                  Choose interests — Preview
+                </AppText>
+              </AppPressable>
+            </SectionEnter>
+            <SectionEnter delay={40}>
+              <LiquidGlassChrome
+                interactive
+                fallback="regular"
+                style={[
+                  styles.searchGlass,
+                  {borderRadius: radius.round, borderColor: colours.border},
+                ]}>
+                <View
+                  style={[
+                    styles.search,
+                    {
+                      borderRadius: radius.round,
+                      paddingHorizontal: spacing[4],
+                    },
+                  ]}>
+                  <AppIcon name="search" colour={colours.textSecondary} />
+                  <TextInput
+                    value={query}
+                    onChangeText={setQuery}
+                    placeholder="Where next — people, topics, modules"
+                    placeholderTextColor={colours.textTertiary}
+                    style={[styles.searchInput, {color: colours.text}]}
+                    returnKeyType="search"
+                  />
+                  <AppPressable
+                    accessibilityLabel="Open inspire destinations"
+                    onPress={() => router.push('/discover/inspire' as Href)}
+                    style={[
+                      styles.searchChip,
+                      {
+                        backgroundColor: colours.accentSubtle,
+                        borderRadius: radius.round,
+                      },
+                    ]}>
+                    <AppText variant="caption" colour="accent">
+                      Inspire
+                    </AppText>
+                  </AppPressable>
+                </View>
+              </LiquidGlassChrome>
+            </SectionEnter>
+            <SectionEnter delay={60} from="right">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{gap: spacing[2]}}>
+                {categories.map(item => (
+                  <Pill
+                    key={item}
+                    label={item}
+                    selected={category === item}
+                    onPress={() => setCategory(item)}
+                  />
+                ))}
+              </ScrollView>
+            </SectionEnter>
           </View>
 
           {discoverQuery.isLoading ? (
             <InitialLoadingState label="Loading discovery" />
           ) : discoverQuery.isError ? (
             <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
+          ) : layoutEmpty ? (
+            <EmptyState
+              icon="discover"
+              title="Discover layout is empty"
+              description="Every Discover section is turned off for this category. Restore defaults or open the layout studio."
+              action={
+                <View style={{gap: spacing[2]}}>
+                  <Pill
+                    label="Restore Discover layout"
+                    selected
+                    onPress={() => void update({discoverBlockIds: [...DEFAULT_DISCOVER_BLOCK_IDS]})}
+                  />
+                  <Pill
+                    label="Customize layout"
+                    onPress={() => router.push('/product/layout-discover' as Href)}
+                  />
+                </View>
+              }
+            />
           ) : hasResults ? (
             <>
-              {(category === 'For You' || category === 'Media') && (
-                <ReelsPreviewRail result={filtered} />
-              )}
-              {(category === 'For You' || category === 'People') && (
-                <SuggestedPeople people={filtered.suggestedProfiles} />
-              )}
-              {(category === 'For You' || category === 'Communities') && (
-                <>
-                  <TrendingTopics topics={filtered.trendingTopics} />
-                  <CommunitiesRail />
-                </>
-              )}
-              {(category === 'For You' || category === 'Marketplace') && (
-                <FeaturedModules modules={filtered.featuredModules} />
-              )}
-              {(category === 'For You' || category === 'Media') && (
-                <MediaGrid result={filtered} />
-              )}
+              {visibleSectionIds.map((id, index) => {
+                if (id === 'live') {
+                  return <LivePresenceRail key={id} />
+                }
+                if (id === 'reels') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <ReelsPreviewRail result={filtered} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'people') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <SuggestedPeople people={filtered.suggestedProfiles} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'inspire') {
+                  return <InspireNextList key={id} />
+                }
+                if (id === 'topics') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <TrendingTopics topics={filtered.trendingTopics} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'communities') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <CommunitiesRail />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'modules') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <FeaturedModules modules={filtered.featuredModules} />
+                    </SectionEnter>
+                  )
+                }
+                if (id === 'media') {
+                  return (
+                    <SectionEnter key={id} delay={80 + index * 24}>
+                      <MediaGrid result={filtered} />
+                    </SectionEnter>
+                  )
+                }
+                return null
+              })}
               {category === 'Marketplace' ? (
                 <AppPressable
                   accessibilityLabel="Browse Marketplace"
@@ -573,10 +734,18 @@ const styles = StyleSheet.create({
   },
   search: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     gap: 8,
     minHeight: 46,
+  },
+  searchChip: {
+    justifyContent: 'center',
+    minHeight: 28,
+    paddingHorizontal: 10,
+  },
+  searchGlass: {
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
   },
   searchInput: {
     flex: 1,

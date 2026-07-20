@@ -6,6 +6,8 @@ export type ReelItem = {
   caption: string
   source: string
   colour: string
+  /** Optional remote/local video URI for the Reels player foundation. */
+  videoUri?: string
   liked: boolean
   likeCount: number
   replyCount: number

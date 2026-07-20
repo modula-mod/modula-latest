@@ -2,11 +2,11 @@ import {FlatList, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
-import {DemoPostItem} from '@/components/feed/DemoPostItem'
 import {parseProfileId} from '@/api/contracts'
 import {useProfileFeedQuery} from '@/features/feed/data'
 import type {ProfileTabRendererProps} from '@/features/profile/contracts/profileTabs'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
+import {SocialPost} from '@/features/social/components/social-post'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PostsProfileTab({profile, viewer}: ProfileTabRendererProps) {
@@ -52,7 +52,7 @@ export function PostsProfileTab({profile, viewer}: ProfileTabRendererProps) {
       <FlatList
         data={profilePosts}
         keyExtractor={item => item.id}
-        renderItem={({item}) => <DemoPostItem post={item} />}
+        renderItem={({item}) => <SocialPost post={item} />}
         scrollEnabled={false}
         onEndReached={() => {
           if (postsQuery.hasNextPage && !postsQuery.isFetchingNextPage) {

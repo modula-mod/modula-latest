@@ -20,6 +20,10 @@ export type HandleAvailability = {
   reason?: string
 }
 
+export type EmailVerificationResult =
+  | AuthResult
+  | {kind: 'verifiedSignInRequired'}
+
 export type RepositoryExportJob = {
   exportId: string
   status: 'queued' | 'running' | 'completed' | 'failed'
@@ -31,7 +35,7 @@ export type RepositoryExportJob = {
 export interface AuthRepository {
   signIn(credentials: SignInCredentials): Promise<AuthResult>
   register(input: RegisterAccountInput): Promise<RegisterPendingResult | AuthResult>
-  verifyEmail(input: VerifyEmailInput): Promise<AuthResult>
+  verifyEmail(input: VerifyEmailInput): Promise<EmailVerificationResult>
   resendVerification(email: string): Promise<{resent: boolean}>
   refresh(refreshToken: RefreshToken): Promise<AuthResult>
   getSession(accessToken: AccessToken): Promise<AuthenticatedSession>

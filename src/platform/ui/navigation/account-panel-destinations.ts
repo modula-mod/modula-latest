@@ -1,5 +1,6 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
-import {isDevelopmentBuild} from '@/lib/platform'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 
 /**
  * Extensible account-panel destinations.
@@ -46,6 +47,50 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     description: 'Browse modules and tools',
   },
   {
+    id: 'product',
+    label: 'Product Hub',
+    route: '/product',
+    icon: 'discover',
+    description: 'Everything Modula offers',
+  },
+  {
+    id: 'focus',
+    label: 'Focus Mode',
+    route: '/product/focus',
+    icon: 'contrast',
+    description: 'Quiet the shell',
+  },
+  ...PRODUCT_LAB_LINKS.map(
+    (link): AccountPanelDestination => ({
+      id: link.id,
+      label: link.label,
+      route: link.route,
+      icon: link.icon,
+      description: link.description,
+    }),
+  ),
+  {
+    id: 'forge',
+    label: 'Forge Builder',
+    route: '/product/forge',
+    icon: 'developer',
+    description: 'Draft module manifests',
+  },
+  {
+    id: 'agents',
+    label: 'Agents',
+    route: '/product/agents',
+    icon: 'automation',
+    description: 'Gaia agent packages',
+  },
+  {
+    id: 'search',
+    label: 'Search',
+    route: '/product/search',
+    icon: 'search',
+    description: 'Capabilities and modules',
+  },
+  {
     id: 'appearance',
     label: 'Appearance',
     route: '/settings/appearance',
@@ -64,7 +109,15 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     label: 'Developer',
     route: '/settings/developer',
     icon: 'developer',
-    description: 'Diagnostics and local tools',
+    description: 'Expo UI Lab, data runtime, session',
+    devOnly: true,
+  },
+  {
+    id: 'expo-ui-lab',
+    label: 'Expo UI Lab',
+    route: '/settings/developer/expo-ui',
+    icon: 'developer',
+    description: 'Pick Expo UI components by context',
     devOnly: true,
   },
 ]
@@ -89,7 +142,7 @@ export function getAccountPanelDestinations(): AccountPanelDestination[] {
   return merged.filter(item => {
     if (seen.has(item.id)) return false
     seen.add(item.id)
-    if (item.devOnly && !isDevelopmentBuild()) return false
+    if (item.devOnly && !canAccessDeveloperLabs()) return false
     return true
   })
 }

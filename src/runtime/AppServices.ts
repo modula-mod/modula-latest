@@ -5,6 +5,7 @@ import type {SessionRefreshCoordinator} from '@/auth/runtime/SessionRefreshCoord
 import type {SessionStorage} from '@/auth/storage'
 import type {
   ActivityRepository,
+  AppearanceRepository,
   AtprotoRepository,
   AuthRepository,
   DiscoverRepository,
@@ -26,6 +27,7 @@ export type AppServices = {
   profileRepository: ProfileRepository
   socialGraphRepository: SocialGraphRepository
   activityRepository: ActivityRepository
+  appearanceRepository: AppearanceRepository
   discoverRepository: DiscoverRepository
   reelsRepository: ReelsRepository
   metadataRepository: MetadataRepository

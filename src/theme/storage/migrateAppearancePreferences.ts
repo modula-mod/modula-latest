@@ -1,5 +1,6 @@
 import type {
   AccentId,
+  AdvancedChromeEffect,
   AppearanceMode,
   AppearancePreferences,
   SurfaceType,
@@ -8,6 +9,7 @@ import type {
 } from '@/theme/contracts'
 import {
   ACCENT_IDS,
+  ADVANCED_CHROME_EFFECTS,
   APPEARANCE_MODES,
   SURFACE_TYPES,
   TEXT_SCALES,
@@ -34,6 +36,12 @@ export function isSurfaceType(value: unknown): value is SurfaceType {
 
 export function isTextScale(value: unknown): value is TextScale {
   return TEXT_SCALES.includes(value as TextScale)
+}
+
+export function isAdvancedChromeEffect(
+  value: unknown,
+): value is AdvancedChromeEffect {
+  return ADVANCED_CHROME_EFFECTS.includes(value as AdvancedChromeEffect)
 }
 
 export function isValidStoredHexColour(value: unknown): value is string {
@@ -92,5 +100,8 @@ export function migrateAppearancePreferences(
       candidate.showSwitchLabels,
       defaults.showSwitchLabels,
     ),
+    advancedChromeEffect: isAdvancedChromeEffect(candidate.advancedChromeEffect)
+      ? candidate.advancedChromeEffect
+      : defaults.advancedChromeEffect,
   }
 }

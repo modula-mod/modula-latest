@@ -46,9 +46,20 @@ export class ApiPostRepository implements PostRepository {
 
   getSavedPosts(input: {cursor?: string | null; limit?: number}) {
     return this.client.get({
-      path: '/v1/posts/saved',
+      path: '/v1/saves',
       query: {cursor: input.cursor ?? undefined, limit: input.limit},
       authenticated: true,
-    }, value => decodeCursorPage(value, decodePost))
+    }, value => {
+      const record = asRecord(value, 'saves')
+      if (Array.isArray(record.items)) {
+        const items = record.items.map(decodePost)
+        return {
+          items,
+          nextCursor: typeof record.nextCursor === 'string' ? record.nextCursor : null,
+          hasMore: Boolean(record.nextCursor),
+        }
+      }
+      return decodeCursorPage(value, decodePost)
+    })
   }
 }

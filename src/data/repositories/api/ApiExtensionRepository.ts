@@ -28,7 +28,9 @@ export class ApiExtensionRepository implements ExtensionRepository {
   constructor(private readonly client: ApiClient) {}
 
   listAvailable(): Promise<ExtensionCentreItem[]> {
-    return this.client.get({path: '/v1/extensions'}, decodeList)
+    return this.client
+      .get({path: '/v1/extensions/catalogue'}, decodeList)
+      .catch(() => this.client.get({path: '/v1/extensions'}, decodeList))
   }
 
   listInstalled(): Promise<ExtensionCentreItem[]> {
@@ -44,7 +46,12 @@ export class ApiExtensionRepository implements ExtensionRepository {
         decodeItem,
       )
     } catch {
-      return null
+      try {
+        const catalogue = await this.listAvailable()
+        return catalogue.find(item => item.extensionId === extensionId) ?? null
+      } catch {
+        return null
+      }
     }
   }
 
@@ -58,14 +65,44 @@ export class ApiExtensionRepository implements ExtensionRepository {
     )
   }
 
+  async install(extensionId: string): Promise<void> {
+    await this.client.post(
+      {
+        path: `/v1/extensions/${encodeURIComponent(extensionId)}/install`,
+        authenticated: true,
+      },
+      () => undefined,
+    )
+  }
+
+  async enable(extensionId: string): Promise<void> {
+    await this.client.post(
+      {
+        path: `/v1/extensions/${encodeURIComponent(extensionId)}/enable`,
+        authenticated: true,
+      },
+      () => undefined,
+    )
+  }
+
   async disable(extensionId: string): Promise<void> {
-    await this.client.patch(
+    await this.client
+      .post(
+        {
+          path: `/v1/extensions/${encodeURIComponent(extensionId)}/disable`,
+          authenticated: true,
+        },
+        () => undefined,
+      )
+      .catch(() =>
+        this.client.patch(
       {
         path: `/v1/extensions/${encodeURIComponent(extensionId)}/preferences`,
         body: {enabled: false},
         authenticated: true,
       },
       () => undefined,
-    )
+        ),
+      )
   }
 }

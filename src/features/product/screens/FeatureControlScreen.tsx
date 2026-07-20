@@ -1,0 +1,109 @@
+import {ScrollView, StyleSheet, Switch, View} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
+
+import {AppButton} from '@/components/primitives/AppButton'
+import {AppText} from '@/components/primitives/AppText'
+import {Surface} from '@/components/primitives/Surface'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+const META: Record<string, {label: string; channel: string; href?: Href}> = {
+  reels: {label: 'Reels / short media', channel: 'Experimental', href: '/reels'},
+  merge: {label: 'Merge Feeds', channel: 'Experimental', href: '/product/merge-feeds'},
+  focus: {label: 'Focus Mode', channel: 'Stable', href: '/product/focus'},
+  gaia: {label: 'Gaia assistants', channel: 'Experimental', href: '/product/gaia'},
+  agents: {label: 'Agents module', channel: 'Preview', href: '/product/agents'},
+  forge: {label: 'Forge Builder', channel: 'Preview', href: '/product/forge'},
+  dimon: {label: 'DIMON wallet UI', channel: 'Inactive', href: '/settings/dimon'},
+  automations: {label: 'Automations runner', channel: 'Experimental', href: '/product/automations'},
+}
+
+export function FeatureControlScreen() {
+  const router = useRouter()
+  const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
+  const {preferences, update} = useProductPreferences()
+
+  return (
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <SecondaryScreenHeader title="Feature Control" />
+      <ResponsiveContent maxWidth={720}>
+        <ScrollView contentContainerStyle={{gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding}}>
+          <View style={{gap: spacing[2]}}>
+            <AppText variant="display">Keep Modula controllable.</AppText>
+            <AppText variant="body" colour="textSecondary">
+              Enable, hide, or lock versions. Choices persist locally and gate entry points
+              (Home quick actions, banners, web rail shortcuts).
+            </AppText>
+            <AppButton onPress={() => router.push('/product/customize' as Href)}>
+              Open Customize hub
+            </AppButton>
+          </View>
+
+          {preferences.featureControl.map((row, index) => {
+            const meta = META[row.id] ?? {label: row.id, channel: 'Preview'}
+            return (
+              <Surface
+                key={row.id}
+                variant="contained"
+                style={[
+                  styles.row,
+                  {
+                    padding: spacing[4],
+                    borderRadius: radius.medium,
+                    borderColor: colours.border,
+                    backgroundColor: colours.surface,
+                    gap: spacing[3],
+                  },
+                ]}>
+                <View style={{flex: 1, gap: spacing[1]}}>
+                  <AppText variant="headline">{meta.label}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Channel · {meta.channel}
+                    {row.locked ? ' · Version locked' : ''}
+                    {row.id === 'dimon' ? ' · DIMON is not active yet' : ''}
+                  </AppText>
+                  {meta.href ? (
+                    <AppButton variant="ghost" onPress={() => router.push(meta.href!)}>
+                      Open surface
+                    </AppButton>
+                  ) : null}
+                </View>
+                <Switch
+                  accessibilityLabel={`Toggle ${meta.label}`}
+                  disabled={row.id === 'dimon' || row.locked}
+                  value={row.enabled}
+                  onValueChange={value => {
+                    const next = preferences.featureControl.map((item, i) =>
+                      i === index ? {...item, enabled: value} : item,
+                    )
+                    void update({featureControl: next})
+                  }}
+                />
+              </Surface>
+            )
+          })}
+
+          <AppButton onPress={() => router.push('/product/sandbox' as Href)}>
+            Module sandbox
+          </AppButton>
+          <AppButton variant="secondary" onPress={() => router.push('/settings/extensions' as Href)}>
+            Extension Centre
+          </AppButton>
+        </ScrollView>
+      </ResponsiveContent>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  screen: {flex: 1},
+  row: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+  },
+})

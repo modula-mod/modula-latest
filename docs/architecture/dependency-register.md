@@ -15,7 +15,7 @@ No package should enter the project merely because an example repository uses it
 | expo-image | ~57.0.1 | Image component (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-linking | ~57.0.3 | Deep linking support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-router | ~57.0.6 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-splash-screen | ~57.0.4 | Native splash screen | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| expo-splash-screen | ~57.0.4 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module | Phase 0 / chrome pass |
 | expo-status-bar | ~57.0.1 | Status bar control | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-symbols | ~57.0.1 | SF Symbols helper (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-system-ui | ~57.0.1 | System UI styling | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
@@ -123,3 +123,33 @@ No new rows in the dependency table — zero packages added for this polish pass
 | @modula/api-contracts | workspace:* | Shared API DTO types for metadata, AT connections, Atmosphere, preferences | No | Types only | `pnpm add -w @modula/api-contracts@workspace:*` | Phase 6 |
 
 Removal path: disconnect AT UI + drop `@atproto/oauth-client-expo` when AT OAuth is retired; contracts remain for backend.
+
+## Phase 6S — video foundation + Appearance Advanced living backdrop
+
+| Package | Version | Purpose | Native | Development-client rebuild required | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| expo-video | ~57.0.1 | Reels / short-media playback foundation (`ModulaReelPlayer`) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
+| expo-camera | ~57.0.3 | Appearance → Advanced camera masked-blur Preview (Motionary-style cutouts) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
+
+Patterns (not packages):
+
+- [draggable-video-control](https://github.com/mahdidavoodi7/draggable-video-control) — MIT Motionary drop; Modula reimplements draggable glass controls under `src/platform/ui/video/` (no vendored demo app).
+- [expo-camera-masked-blur](https://github.com/mahdidavoodi7/expo-camera-masked-blur) — MIT Motionary drop; Modula reimplements via existing MaskedView adapter + `CameraMaskedBlurSurface` (does **not** add `@react-native-masked-view/masked-view`).
+
+Removal path: drop Advanced toggle + Reels `videoUri` playback, then remove `expo-camera` / `expo-video` and native rebuild.
+
+**Stale binary safety:** JS must not statically import `expo-camera` / `expo-video` from the `@/platform/ui` startup barrel. Availability is probed with `requireOptionalNativeModule('ExpoCamera'|'ExpoVideo')` in `src/platform/ui/native-modules/expo-native-availability.ts`. Without a rebuild, UI shows an honest “native rebuild required” fallback instead of crashing.
+
+## Phase 6S — Presence join island (Telegram-style meatball)
+
+| Package | Version | Purpose | Native | Development-client rebuild required | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| @shopify/react-native-skia | 2.6.2 | Presence / Appearance Advanced join-island meta-ball (Motionary telegram-join-animation pattern) | Yes | Yes — `RNSkiaModule` via `getEnforcing` at Skia import | `pnpm exec expo install @shopify/react-native-skia` / `pnpm add -w` | Phase 6S |
+
+Pattern (not a package): [telegram-join-animation](https://github.com/mahdidavoodi7/telegram-join-animation) — MIT Motionary drop. Modula reimplements under `src/platform/ui/motion/modula-join-island*` (Skia file only `require()`’d after `TurboModuleRegistry.get('RNSkiaModule')`). Does **not** admit `react-native-skia-gesture` (unused upstream).
+
+**Metro / pnpm note:** Skia 2.6.x `"react-native": "src/index.ts"` fails under pnpm (`Unable to resolve ./renderer/Offscreen`). Modula applies `patches/@shopify__react-native-skia@2.6.2.patch` so that field points at `lib/module/index.js`, and `metro.config.js` also forces the compiled entry. Import `@shopify/react-native-skia` only — never `/lib/module` (not a public export).
+
+**Owner use cases:** Presence join island + Appearance Advanced motion Preview + Home pull-to-refresh shimmering edge (`src/platform/ui/refresh/`). Reanimated/LinearGradient fallback when Skia is not linked.
+
+Removal path: drop `ModulaJoinIsland` call sites, then remove `@shopify/react-native-skia` and native rebuild.

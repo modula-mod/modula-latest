@@ -1,6 +1,6 @@
-import {useMemo, useState} from 'react'
+import {useEffect, useLayoutEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
-import {useRouter, type Href} from 'expo-router'
+import {useNavigation, useRouter, type Href} from 'expo-router'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -10,14 +10,24 @@ import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
+import {
+  loadProductPreferences,
+  patchProductPreferences,
+} from '@/features/product/storage/productPreferencesStorage'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {
+  plainHeaderCustomItem,
+  supportsPlainHeaderItems,
+} from '@/platform/ui/navigation/plain-header-items'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const ALL_PINNED_SPACES: Array<{
@@ -71,10 +81,22 @@ const ALL_PINNED_SPACES: Array<{
   },
 ]
 
+const BOARD_FOCUS_POLICY_SENTENCES = {
+  off: 'Focus is off, so Board follows normal Modula behavior and does not apply quiet-feed or work-priority rules.',
+  light:
+    'Light Focus policy bundles lower-priority notifications, reduces feed recommendations, quiets the dock, and prioritises active work on Board.',
+  deep:
+    'Deep Focus policy may hide feed and Reels, hold non-urgent chats, block unsolicited GAIA interruptions, and prioritise selected work modules on Board.',
+  custom:
+    'Custom Focus policy uses your saved toggles for feed quieting, navigation, pings, work priority, and Focus Halo on Board.',
+} as const
+
 export function BoardScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const router = useRouter()
+  const navigation = useNavigation()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
   const session = useSession()
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
@@ -85,6 +107,47 @@ export function BoardScreen() {
   const [pinnedIds, setPinnedIds] = useState(() =>
     ALL_PINNED_SPACES.map(space => space.id),
   )
+  const {preferences, update: updatePreferences} = useProductPreferences()
+  const boardWidgets = useMemo(
+    () =>
+      preferences.boardWidgetIds
+        .map(id => BOARD_WIDGET_CATALOG.find(widget => widget.id === id))
+        .filter((widget): widget is (typeof BOARD_WIDGET_CATALOG)[number] => Boolean(widget)),
+    [preferences.boardWidgetIds],
+  )
+
+  const reorderWidget = (id: string, direction: -1 | 1) => {
+    const ids = [...preferences.boardWidgetIds]
+    const index = ids.indexOf(id)
+    const nextIndex = index + direction
+    if (index < 0 || nextIndex < 0 || nextIndex >= ids.length) return
+    ;[ids[index], ids[nextIndex]] = [ids[nextIndex], ids[index]]
+    void updatePreferences({boardWidgetIds: ids})
+  }
+
+  const removeWidget = (id: string) => {
+    void updatePreferences({
+      boardWidgetIds: preferences.boardWidgetIds.filter(item => item !== id),
+    })
+  }
+
+  useEffect(() => {
+    void loadProductPreferences().then(value => {
+      if (value.boardWidgetIds.length === 0) {
+        void patchProductPreferences({
+          boardWidgetIds: [
+            'tasks',
+            'calendar',
+            'gaia-briefing',
+            'dimon-activity',
+            'nft-entitlements',
+            'notes',
+            'crm',
+          ],
+        })
+      }
+    })
+  }, [])
 
   const pinnedSpaces = useMemo(
     () => ALL_PINNED_SPACES.filter(space => pinnedIds.includes(space.id)),
@@ -92,42 +155,67 @@ export function BoardScreen() {
   )
 
   const loading = discoverQuery.isLoading && activityQuery.isLoading
+  const focusHalo = preferences.focus.showHalo
+  const focusPreset = preferences.focus.preset ?? 'off'
+  const focusPresetTitle =
+    focusPreset === 'off'
+      ? 'Off'
+      : focusPreset === 'light'
+        ? 'Light'
+        : focusPreset === 'deep'
+          ? 'Deep'
+          : 'Custom'
+
+  useLayoutEffect(() => {
+    const renderMenu = () => (
+      <ChromeOverflowMenu
+        accessibilityLabel="Board layout menu"
+        title="Board"
+        actions={[
+          {id: 'customize', label: 'Customize pinned spaces'},
+          {id: 'marketplace', label: 'Open Marketplace'},
+          {id: 'saved', label: 'Open Saved'},
+          {id: 'compose', label: 'Quick compose'},
+        ]}
+        onAction={id => {
+          if (id === 'customize') setCustomizeOpen(true)
+          if (id === 'marketplace') router.push('/marketplace' as Href)
+          if (id === 'saved') router.push('/saved' as Href)
+          if (id === 'compose') router.push('/compose' as Href)
+        }}
+      />
+    )
+    navigation.setOptions({
+      headerRight: renderMenu,
+      ...(supportsPlainHeaderItems()
+        ? {
+            unstable_headerRightItems: () => [
+              plainHeaderCustomItem(renderMenu()),
+            ],
+          }
+        : null),
+    })
+  }, [navigation, router])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader
-        title="Board"
-        right={
-          <ModulaMenu
-            accessibilityLabel="Board layout menu"
-            title="Board"
-            actions={[
-              {id: 'customize', label: 'Customize pinned spaces'},
-              {id: 'marketplace', label: 'Open Marketplace'},
-              {id: 'saved', label: 'Open Saved'},
-              {id: 'compose', label: 'Quick compose'},
-            ]}
-            onAction={id => {
-              if (id === 'customize') setCustomizeOpen(true)
-              if (id === 'marketplace') router.push('/marketplace' as Href)
-              if (id === 'saved') router.push('/saved' as Href)
-              if (id === 'compose') router.push('/compose' as Href)
-            }}
-            trigger={<AppIcon name="more" colour={colours.textSecondary} />}
-          />
-        }
-      />
       <ResponsiveContent maxWidth={760}>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Good focus, {ownerName}</AppText>
+            <AppText variant="headline">Good focus, {ownerName}</AppText>
             <AppText variant="body" colour="textSecondary">
-              Your local Modula Board gathers pinned spaces and next useful actions.
+              Board is your private operating dashboard — modules, widgets, and next actions in one
+              place.
             </AppText>
           </View>
 
@@ -142,13 +230,137 @@ export function BoardScreen() {
               <AppIcon name="board" colour={colours.accent} />
             </View>
             <View style={styles.focusBody}>
-              <AppText variant="headline">Current focus</AppText>
-              <AppText variant="body" colour="textSecondary">
-                Validate Phase 4.5 expansion surfaces — Marketplace, Settings, and Saved — before
-                production backends.
+              <AppText variant="headline">
+                {focusHalo
+                  ? `Focus · ${focusPresetTitle}`
+                  : focusPreset === 'off'
+                    ? 'Focus Off'
+                    : 'Current focus'}
               </AppText>
+              <AppText variant="body" colour="textSecondary">
+                {BOARD_FOCUS_POLICY_SENTENCES[focusPreset]}
+              </AppText>
+              <View style={{gap: spacing[2]}}>
+                <AppPressable
+                  accessibilityLabel="Open Profile-OS pre-screen"
+                  onPress={() => router.push('/profile/os' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Explore Profile-OS →
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel="Open Focus Mode"
+                  onPress={() => router.push('/product/focus' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Focus Mode →
+                  </AppText>
+                </AppPressable>
+                <AppPressable
+                  accessibilityLabel="Open Product Hub"
+                  onPress={() => router.push('/product' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    All capabilities →
+                  </AppText>
+                </AppPressable>
+              </View>
             </View>
           </Surface>
+
+          <View style={{gap: spacing[3]}}>
+            <View style={styles.sectionHeader}>
+              <AppText variant="headline">Widgets</AppText>
+              <AppPressable
+                accessibilityLabel="Manage widgets"
+                onPress={() => router.push('/product/widgets' as Href)}>
+                <AppText variant="caption" colour="accent">
+                  Manage
+                </AppText>
+              </AppPressable>
+            </View>
+            {boardWidgets.length === 0 ? (
+              <AppText variant="caption" colour="textSecondary">
+                No widgets on Board — add some in Widgets studio.
+              </AppText>
+            ) : (
+              <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
+                {boardWidgets.map((widget, index) => (
+                  <ModulaContextMenu
+                    key={widget.id}
+                    accessibilityLabel={`${widget.name} widget actions`}
+                    actions={[
+                      {id: 'up', label: 'Move up', disabled: index === 0},
+                      {
+                        id: 'down',
+                        label: 'Move down',
+                        disabled: index === boardWidgets.length - 1,
+                      },
+                      {id: 'remove', label: 'Remove from Board', style: 'destructive'},
+                      {id: 'manage', label: 'Manage widgets'},
+                    ]}
+                    onAction={id => {
+                      if (id === 'up') reorderWidget(widget.id, -1)
+                      if (id === 'down') reorderWidget(widget.id, 1)
+                      if (id === 'remove') removeWidget(widget.id)
+                      if (id === 'manage') router.push('/product/widgets' as Href)
+                    }}>
+                    <Surface
+                      variant="contained"
+                      style={[
+                        styles.widgetCard,
+                        {
+                          backgroundColor: colours.surface,
+                          borderColor: colours.border,
+                          borderRadius: radius.large,
+                          padding: spacing[4],
+                          gap: spacing[2],
+                          flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
+                        },
+                      ]}>
+                      <AppIcon name={widget.icon} colour={colours.accent} />
+                      <AppText variant="headline">{widget.name}</AppText>
+                      <AppText variant="caption" colour="textTertiary">
+                        {widget.size} · {widget.status} · #{index + 1}
+                      </AppText>
+                      <AppText variant="caption" colour="textSecondary">
+                        {widget.description}
+                      </AppText>
+                    </Surface>
+                  </ModulaContextMenu>
+                ))}
+              </View>
+            )}
+          </View>
+
+          <View style={[styles.quickRow, {gap: spacing[2]}]}>
+            {[
+              {label: 'Design Lab', route: '/settings/appearance-lab'},
+              {label: 'Atlas', route: '/product/atlas'},
+              {label: 'Start', route: '/product/start'},
+              {label: 'Intelligence', route: '/product/intelligence'},
+              {label: 'Widgets', route: '/product/widgets'},
+              {label: 'Automations', route: '/product/automations'},
+              {label: 'Merge Feeds', route: '/product/merge-feeds'},
+              {label: 'Forge', route: '/product/forge'},
+              {label: 'Gaia', route: '/product/gaia'},
+            ].map(item => (
+              <AppPressable
+                key={item.route}
+                accessibilityLabel={item.label}
+                onPress={() => router.push(item.route as Href)}
+                style={[
+                  styles.quickChip,
+                  {
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                    borderRadius: radius.round,
+                    paddingHorizontal: spacing[3],
+                    paddingVertical: spacing[2],
+                  },
+                ]}>
+                <AppText variant="caption">{item.label}</AppText>
+              </AppPressable>
+            ))}
+          </View>
 
           <View style={{gap: spacing[3]}}>
             <View style={styles.sectionHeader}>
@@ -164,6 +376,32 @@ export function BoardScreen() {
             </View>
             {loading ? (
               <BoardGridSkeleton />
+            ) : pinnedSpaces.length === 0 ? (
+              <Surface
+                variant="contained"
+                style={[
+                  styles.emptyBoard,
+                  {
+                    gap: spacing[3],
+                    padding: spacing[4],
+                    borderRadius: radius.large,
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                  },
+                ]}>
+                <AppIcon name="board" colour={colours.accent} size={28} />
+                <AppText variant="headline">Pin your daily surfaces</AppText>
+                <AppText variant="body" colour="textSecondary">
+                  Board stays empty until you choose spaces — Marketplace, Saved, Lists, and more.
+                </AppText>
+                <AppPressable
+                  accessibilityLabel="Customize pinned spaces"
+                  onPress={() => setCustomizeOpen(true)}>
+                  <AppText variant="label" colour="accent">
+                    Customize pinned spaces
+                  </AppText>
+                </AppPressable>
+              </Surface>
             ) : (
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {pinnedSpaces.map(space => (
@@ -196,7 +434,7 @@ export function BoardScreen() {
                       <AppIcon name={space.icon} colour={colours.accent} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{space.label}</AppText>
-                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                        <AppText variant="caption" colour="textSecondary">
                           {space.description}
                         </AppText>
                       </View>
@@ -209,7 +447,44 @@ export function BoardScreen() {
 
           <FeatureErrorBoundary label="Board module grid">
             <View style={{gap: spacing[3]}}>
-              <AppText variant="headline">Modules</AppText>
+              <View style={styles.sectionHeader}>
+                <AppText variant="headline">Modules</AppText>
+                <AppPressable
+                  accessibilityLabel="Browse marketplace modules"
+                  onPress={() => router.push('/marketplace' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Browse
+                  </AppText>
+                </AppPressable>
+              </View>
+              {modules.length === 0 ? (
+                <Surface
+                  variant="contained"
+                  style={[
+                    styles.emptyBoard,
+                    {
+                      gap: spacing[3],
+                      padding: spacing[4],
+                      borderRadius: radius.large,
+                      backgroundColor: colours.surfaceRaised,
+                      borderColor: colours.border,
+                    },
+                  ]}>
+                  <AppIcon name="modules" colour={colours.accent} size={28} />
+                  <AppText variant="headline">Install your first capability</AppText>
+                  <AppText variant="body" colour="textSecondary">
+                    Modules like Vault Notes, Tasks, and CRM ship as packages — preview them in the
+                    Marketplace before Registry install lands.
+                  </AppText>
+                  <AppPressable
+                    accessibilityLabel="Open Marketplace"
+                    onPress={() => router.push('/marketplace' as Href)}>
+                    <AppText variant="label" colour="accent">
+                      Open Marketplace
+                    </AppText>
+                  </AppPressable>
+                </Surface>
+              ) : null}
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {modules.map(module => (
                   <View key={module.id} style={styles.moduleCardWrap}>
@@ -228,7 +503,7 @@ export function BoardScreen() {
                       <AppIcon name={module.icon} colour={colours.accent} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{module.name}</AppText>
-                        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+                        <AppText variant="caption" colour="textSecondary">
                           {module.description}
                         </AppText>
                       </View>
@@ -321,8 +596,10 @@ export function BoardScreen() {
                 ]}>
                 <AppIcon name={space.icon} colour={colours.accent} />
                 <View style={styles.focusBody}>
-                  <AppText variant="label">{space.label}</AppText>
-                  <AppText variant="caption" colour="textSecondary">
+                  <AppText variant="label" numberOfLines={1}>
+                    {space.label}
+                  </AppText>
+                  <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
                     {space.description}
                   </AppText>
                 </View>
@@ -347,6 +624,22 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
+  emptyBoard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    width: '100%',
+  },
+  quickRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  quickChip: {
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  widgetCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    flexGrow: 1,
+    minWidth: 140,
+  },
   controlGroup: {
     marginTop: 8,
   },
@@ -356,10 +649,12 @@ const styles = StyleSheet.create({
   },
   customizeRow: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     flexDirection: 'row',
     gap: 12,
     minHeight: 56,
     paddingHorizontal: 12,
+    width: '100%',
   },
   focus: {
     alignItems: 'center',

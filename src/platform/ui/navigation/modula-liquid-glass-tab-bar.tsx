@@ -1,6 +1,7 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState, type ComponentType, type ReactNode} from 'react'
 import {Pressable, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import {BlurView} from 'expo-blur'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,9 +13,15 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
+import {Avatar} from '@/components/primitives/Avatar'
+import {useSession} from '@/auth/runtime'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
+import {FLOATING_TAB_BAR_SEGMENT_HEIGHT} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {expandShellTabBar} from '@/platform/ui/navigation/shell-tab-bar-compact'
 import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {
   MODULA_TABS,
@@ -79,12 +86,37 @@ type ExpandAction = {
   icon: AppIconName
   href?: Href
   compose?: boolean
+  featureId?: string
 }
 
 const EXPAND_ACTIONS: ExpandAction[] = [
   {id: 'compose', label: 'Compose', icon: 'create', compose: true},
   {id: 'messages', label: 'Messages', icon: 'messages', href: '/messages'},
   {id: 'marketplace', label: 'Marketplace', icon: 'marketplace', href: '/marketplace'},
+  {id: 'product', label: 'Product Hub', icon: 'modules', href: '/product'},
+  {id: 'customize', label: 'Customize', icon: 'appearance', href: '/product/customize'},
+  {
+    id: 'forge',
+    label: 'Forge Builder',
+    icon: 'developer',
+    href: '/product/forge',
+    featureId: 'forge',
+  },
+  {
+    id: 'focus',
+    label: 'Focus Mode',
+    icon: 'contrast',
+    href: '/product/focus',
+    featureId: 'focus',
+  },
+  {
+    id: 'agents',
+    label: 'Agents',
+    icon: 'automation',
+    href: '/product/agents',
+    featureId: 'agents',
+  },
+  {id: 'permissions', label: 'Permissions', icon: 'privacy', href: '/product/permissions'},
   {id: 'discover', label: 'Search / Discover', icon: 'search', href: '/discover'},
   {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
 ]
@@ -100,28 +132,50 @@ function GlassSurface({
   interactive?: boolean
   solidFallback: string
 }) {
+  const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const useGlass = isLiquidGlassSupported && !reduceTransparency
+  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
 
-  if (!useGlass) {
+  if (reduceTransparency) {
     return (
-      <View
-        style={[
-          style,
-          {
-            backgroundColor: solidFallback,
-            overflow: 'hidden',
-          },
-        ]}>
+      <View style={[style, {backgroundColor: solidFallback, overflow: 'hidden'}]}>
         {children}
       </View>
     )
   }
 
+  if (useNativeGlass) {
+    return (
+      <LiquidGlassView
+        interactive={interactive}
+        // Clear keeps the pill chrome without a heavy rectangular blur slab
+        // that reads as "bottom progressive blur" tied to the tab bar.
+        effect="clear"
+        style={style}>
+        {children}
+      </LiquidGlassView>
+    )
+  }
+
+  // Soft glass fallback when Callstack liquid glass isn't linked / supported.
+  // Keep intensity low so shell edge dissolve owns the bottom fade.
   return (
-    <LiquidGlassView interactive={interactive} effect="regular" style={style}>
+    <BlurView
+      intensity={42}
+      tint={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
+      style={[style, {overflow: 'hidden', backgroundColor: 'transparent'}]}>
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: '#FFFFFF',
+            opacity: scheme === 'dark' ? 0.06 : 0.1,
+          },
+        ]}
+      />
       {children}
-    </LiquidGlassView>
+    </BlurView>
   )
 }
 
@@ -131,26 +185,32 @@ export function ModulaLiquidGlassTabBar({
 }: ModulaLiquidGlassTabBarProps) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {reduceTransparency} = useSystemAccessibility()
+  const {preferences} = useProductPreferences()
   const [expanded, setExpanded] = useState(false)
   const mainTabScale = useSharedValue(1)
   const plusIconRotate = useSharedValue(0)
+  const expandActions = EXPAND_ACTIONS.filter(
+    action => !action.featureId || isFeatureEnabled(preferences, action.featureId),
+  )
 
   const visibleTabs = MODULA_TABS.filter(tab =>
     state.routes.some(route => route.name === tab.routeName),
   )
 
-  const selectedRouteName = state.routes[state.index]?.name
-  const selectedIndex = Math.max(
-    0,
-    visibleTabs.findIndex(tab => tab.routeName === selectedRouteName),
-  )
+  const selectedRouteName =
+    state.index >= 0 ? state.routes[state.index]?.name : undefined
+  const selectedIndex = selectedRouteName
+    ? visibleTabs.findIndex(tab => tab.routeName === selectedRouteName)
+    : -1
 
   const menuStyle = useAnimatedStyle(() => ({
     height: expanded
-      ? withTiming(reduceMotion ? 300 : 320, {duration: reduceMotion ? 0 : 150})
+      ? withTiming(reduceMotion ? 480 : 520, {duration: reduceMotion ? 0 : 150})
       : withTiming(0, {duration: reduceMotion ? 0 : 150}),
     opacity: expanded
       ? withTiming(1, {duration: reduceMotion ? 0 : 150})
@@ -167,6 +227,7 @@ export function ModulaLiquidGlassTabBar({
   }))
 
   const navigateTab = (tab: ModulaTabDefinition) => {
+    expandShellTabBar()
     const route = state.routes.find(item => item.name === tab.routeName)
     if (!route) return
     const event = navigation.emit({
@@ -182,6 +243,7 @@ export function ModulaLiquidGlassTabBar({
   }
 
   const onPlusPress = () => {
+    expandShellTabBar()
     void selectionHaptic()
     if (reduceMotion) {
       setExpanded(prev => !prev)
@@ -207,6 +269,7 @@ export function ModulaLiquidGlassTabBar({
   }
 
   const onExpandAction = (action: ExpandAction) => {
+    expandShellTabBar()
     setExpanded(false)
     plusIconRotate.value = withTiming(0, {duration: reduceMotion ? 0 : 150})
     void selectionHaptic()
@@ -219,24 +282,26 @@ export function ModulaLiquidGlassTabBar({
     }
   }
 
-  const glassFallback = reduceTransparency
-    ? colours.surface
-    : colours.surfaceRaised
+  const glassFallback = colours.surface
+  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
 
-  const Container = isLiquidGlassSupported && !reduceTransparency
-    ? LiquidGlassContainerView
-    : View
+  const Container = useNativeGlass ? LiquidGlassContainerView : View
+
+  // Pin to physical bottom: 0 — safe-area is padding inside the glass so the
+  // chrome reaches the screen edge (no black strip under the home indicator).
+  const bottomPad = Math.max(insets.bottom, spacing[2])
 
   return (
     <Container
       style={[
         styles.container,
         {
-          bottom: Math.max(insets.bottom, spacing[2]),
+          bottom: 0,
+          paddingBottom: bottomPad,
           gap: spacing[3],
         },
       ]}
-      {...(isLiquidGlassSupported && !reduceTransparency ? {spacing: 16} : {})}>
+      {...(useNativeGlass ? {spacing: 16} : {})}>
       <Animated.View style={[mainTabStyle, styles.mainCluster]}>
         <GlassSurface
           solidFallback={glassFallback}
@@ -244,51 +309,31 @@ export function ModulaLiquidGlassTabBar({
             styles.liquidGlassView,
             {
               borderRadius: radius.xlarge,
-              borderColor: colours.border,
-              borderWidth: isLiquidGlassSupported && !reduceTransparency ? 0 : StyleSheet.hairlineWidth,
+              // Native liquid glass needs no stroke; BlurView fallback stays
+              // borderless too so the pill reads as glass, not a solid card.
+              borderColor: 'transparent',
+              borderWidth: 0,
             },
           ]}>
-          <Animated.View
-            style={[styles.menuContainer, menuStyle]}
-            pointerEvents={expanded ? 'auto' : 'none'}
-            accessibilityElementsHidden={!expanded}
-            importantForAccessibility={expanded ? 'yes' : 'no-hide-descendants'}>
-            {EXPAND_ACTIONS.map((action, index) => (
-              <AppPressable
-                key={action.id}
-                accessibilityLabel={action.label}
-                accessibilityRole="button"
-                onPress={() => onExpandAction(action)}
-                style={[
-                  styles.menuItem,
-                  {
-                    backgroundColor:
-                      action.compose ? colours.accentSubtle : 'transparent',
-                    borderRadius: radius.md,
-                    opacity: expanded ? 1 : 0,
-                  },
-                ]}>
-                <AppIcon
-                  name={action.icon}
-                  colour={action.compose ? colours.accent : colours.text}
-                  size={20}
+          {/* Only mount expand menu when open — avoids ghost icons through glass. */}
+          {expanded ? (
+            <Animated.View
+              style={[styles.menuContainer, menuStyle]}
+              pointerEvents="auto"
+              accessibilityElementsHidden={false}>
+              {expandActions.map(action => (
+                <ModulaTitleIconButton
+                  key={action.id}
+                  icon={action.icon}
+                  label={action.label}
+                  chrome={action.compose ? 'prominent' : 'plain'}
+                  stretch
+                  onPress={() => onExpandAction(action)}
+                  style={styles.menuItem}
                 />
-                <AppText
-                  variant="label"
-                  style={{
-                    color: action.compose ? colours.accent : colours.text,
-                    flex: 1,
-                  }}>
-                  {action.label}
-                </AppText>
-                {action.compose ? (
-                  <AppText variant="caption" colour="textSecondary">
-                    Quick
-                  </AppText>
-                ) : null}
-              </AppPressable>
-            ))}
-          </Animated.View>
+              ))}
+            </Animated.View>
+          ) : null}
 
           <View
             style={[
@@ -299,25 +344,55 @@ export function ModulaLiquidGlassTabBar({
             accessibilityRole="tablist">
             {visibleTabs.map((tab, index) => {
               const selected = index === selectedIndex
+              const isProfile = tab.routeName === 'profile'
               return (
                 <AppPressable
                   key={tab.id}
                   accessibilityLabel={tab.label}
                   accessibilityRole="tab"
                   accessibilityState={{selected}}
+                  onPressIn={expandShellTabBar}
                   onPress={() => navigateTab(tab)}
-                  style={[
-                    styles.tabHit,
-                    selected && {
-                      backgroundColor: colours.accentSubtle,
-                      borderRadius: radius.round,
-                    },
-                  ]}>
-                  <AppIcon
-                    name={TAB_ICONS[tab.routeName] ?? 'home'}
-                    colour={selected ? colours.accent : colours.textSecondary}
-                    size={22}
-                  />
+                  style={styles.tabHit}>
+                  {isProfile ? (
+                    <View
+                      style={[
+                        styles.profileAvatarRing,
+                        selected
+                          ? {
+                              borderColor: colours.accent,
+                              borderWidth: 1.5,
+                            }
+                          : {borderColor: 'transparent', borderWidth: 1.5},
+                      ]}>
+                      <Avatar
+                        name={
+                          profile?.displayName ??
+                          (session.status === 'guest' ? 'Guest' : 'Modula')
+                        }
+                        uri={profile?.avatarUri}
+                        colour={profile?.coverColour}
+                        size={22}
+                        style={styles.profileAvatar}
+                      />
+                    </View>
+                  ) : (
+                    <AppIcon
+                      name={TAB_ICONS[tab.routeName] ?? 'home'}
+                      colour={selected ? colours.accent : colours.textSecondary}
+                      size={22}
+                    />
+                  )}
+                  {selected ? (
+                    <View
+                      style={[
+                        styles.tabIndicator,
+                        {backgroundColor: colours.accent},
+                      ]}
+                    />
+                  ) : (
+                    <View style={styles.tabIndicatorSpacer} />
+                  )}
                 </AppPressable>
               )
             })}
@@ -328,8 +403,10 @@ export function ModulaLiquidGlassTabBar({
       <Pressable
         accessibilityLabel={expanded ? 'Close compose menu' : 'Open compose menu'}
         accessibilityRole="button"
+        onPressIn={expandShellTabBar}
         onPress={onPlusPress}
         onLongPress={() => {
+          expandShellTabBar()
           router.push('/compose' as Href)
           void selectionHaptic()
         }}
@@ -341,19 +418,14 @@ export function ModulaLiquidGlassTabBar({
             styles.plusButtonGlass,
             {
               borderRadius: radius.round,
-              backgroundColor:
-                isLiquidGlassSupported && !reduceTransparency
-                  ? undefined
-                  : colours.accent,
+              backgroundColor: useNativeGlass ? undefined : colours.accent,
             },
           ]}>
           <Animated.View style={plusIconStyle}>
             <AppIcon
               name="create"
               colour={
-                isLiquidGlassSupported && !reduceTransparency
-                  ? colours.text
-                  : colours.accentForeground
+                useNativeGlass ? colours.text : colours.accentForeground
               }
               size={26}
             />
@@ -371,24 +443,27 @@ const styles = StyleSheet.create({
     left: 16,
     position: 'absolute',
     right: 16,
+    // Above ShellBottomProgressiveBlur (zIndex 3).
+    zIndex: 10,
   },
   liquidGlassView: {
     backgroundColor: 'transparent',
+    justifyContent: 'center',
+    minHeight: FLOATING_TAB_BAR_SEGMENT_HEIGHT,
     overflow: 'hidden',
   },
   mainCluster: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   menuContainer: {
     gap: 8,
     overflow: 'hidden',
   },
   menuItem: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 10,
+    alignSelf: 'stretch',
     minHeight: 44,
-    paddingHorizontal: 10,
+    minWidth: '100%',
   },
   plusButtonContainer: {
     marginBottom: 2,
@@ -399,6 +474,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 60,
   },
+  profileAvatar: {
+    borderWidth: 0,
+  },
+  profileAvatarRing: {
+    alignItems: 'center',
+    borderRadius: 999,
+    height: 26,
+    justifyContent: 'center',
+    width: 26,
+  },
   segmentHidden: {
     height: 0,
     opacity: 0,
@@ -407,14 +492,26 @@ const styles = StyleSheet.create({
   segmentRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    height: 60,
-    justifyContent: 'space-between',
+    height: FLOATING_TAB_BAR_SEGMENT_HEIGHT,
+    justifyContent: 'space-evenly',
   },
   tabHit: {
     alignItems: 'center',
+    flex: 1,
     height: 44,
     justifyContent: 'center',
     minWidth: 44,
     paddingHorizontal: 8,
+  },
+  tabIndicator: {
+    borderRadius: 1.5,
+    height: 3,
+    marginTop: 4,
+    width: 16,
+  },
+  tabIndicatorSpacer: {
+    height: 3,
+    marginTop: 4,
+    width: 16,
   },
 })

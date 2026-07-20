@@ -39,9 +39,9 @@ ENV NODE_ENV=production
 WORKDIR /app
 RUN groupadd --system modula && useradd --system --gid modula --create-home modula \
  && corepack enable && corepack prepare pnpm@11.11.0 --activate
-COPY --from=build /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/packages ./packages
-COPY --from=build /app/services/greenfield-worker ./services/greenfield-worker
+COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
+COPY --from=build --chown=modula:modula /app/packages ./packages
+COPY --from=build --chown=modula:modula /app/services/greenfield-worker ./services/greenfield-worker
 USER modula
 CMD ["node", "services/greenfield-worker/dist/main.js"]

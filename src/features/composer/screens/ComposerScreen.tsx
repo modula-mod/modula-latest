@@ -32,6 +32,7 @@ import {
 } from '@/features/atproto/publishing/canCrossPost'
 import {useCreatePostMutation} from '@/features/feed/data'
 import {selectionHaptic, lightImpactHaptic} from '@/lib/haptics'
+import {useAppServices} from '@/runtime/useAppServices'
 import {
   KeyboardSafeScreen,
   captureMediaFromSource,
@@ -187,9 +188,11 @@ export function ComposerScreen() {
     mode?: string
     replyTo?: string
     thread?: string
+    quotePostId?: string
   }>()
   const insets = useSafeAreaInsets()
   const session = useSession()
+  const {apiClient} = useAppServices()
   const createPostMutation = useCreatePostMutation()
   const {colours, radius, spacing} = useThemeTokens()
   const atprotoPublishing = useAtprotoCapability('atprotoPublishing')
@@ -197,6 +200,7 @@ export function ComposerScreen() {
   const preferencesQuery = useAtprotoPreferencesQuery()
 
   const isReplyMode = params.mode === 'reply' || Boolean(params.replyTo)
+  const isQuoteMode = Boolean(params.quotePostId)
   const isThreadPreview = params.thread === '1' || params.mode === 'thread'
 
   const [text, setText] = useState('')
@@ -321,16 +325,30 @@ export function ComposerScreen() {
     }
 
     try {
-      await createPostMutation.mutateAsync({
-        text,
-        audience: apiAudience(audience),
-        replyPermission: apiReplyPermission(replyPermission),
-        media: media ? [media] : [],
-        linkPreview: link ?? undefined,
-        poll: poll ?? undefined,
-        idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
-        publishToAtproto,
-      })
+      if (isQuoteMode && params.quotePostId) {
+        await apiClient.post(
+          {
+            path: `/v1/posts/${params.quotePostId}/quote`,
+            body: {
+              commentary: text,
+              idempotencyKey: `quote-${Date.now()}-${Math.round(Math.random() * 999999)}`,
+            },
+            authenticated: true,
+          },
+          value => value,
+        )
+      } else {
+        await createPostMutation.mutateAsync({
+          text,
+          audience: apiAudience(audience),
+          replyPermission: apiReplyPermission(replyPermission),
+          media: media ? [media] : [],
+          linkPreview: link ?? undefined,
+          poll: poll ?? undefined,
+          idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
+          publishToAtproto,
+        })
+      }
       setPublicationBanner(publishToAtproto ? 'publishingToAtproto' : 'publishedOnModula')
       setText('')
       setMedia(null)
@@ -344,6 +362,8 @@ export function ComposerScreen() {
       Keyboard.dismiss()
       if (isReplyMode && params.replyTo) {
         router.replace(`/post/${params.replyTo}` as Href)
+      } else if (isQuoteMode && params.quotePostId) {
+        router.replace(`/post/${params.quotePostId}` as Href)
       } else {
         router.replace('/index' as Href)
       }
@@ -502,6 +522,11 @@ export function ComposerScreen() {
         {isReplyMode && params.replyTo ? (
           <AppText variant="caption" colour="textSecondary">
             Replying to post {params.replyTo}
+          </AppText>
+        ) : null}
+        {isQuoteMode && params.quotePostId ? (
+          <AppText variant="caption" colour="textSecondary">
+            Quoting a post — add your commentary below.
           </AppText>
         ) : null}
         {isThreadPreview ? (

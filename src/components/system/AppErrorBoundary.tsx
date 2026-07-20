@@ -1,9 +1,6 @@
 import {Component, type ErrorInfo, type ReactNode} from 'react'
 import {Link} from 'expo-router'
-import {StyleSheet, View} from 'react-native'
-
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
+import {Pressable, StyleSheet, Text, View} from 'react-native'
 
 type AppErrorBoundaryProps = {
   children: ReactNode
@@ -13,6 +10,10 @@ type AppErrorBoundaryState = {
   error: Error | null
 }
 
+/**
+ * Root safety net — must not depend on AppearanceProvider / theme primitives.
+ * It wraps the provider tree, so a themed fallback would cascade into a second crash.
+ */
 export class AppErrorBoundary extends Component<
   AppErrorBoundaryProps,
   AppErrorBoundaryState
@@ -37,26 +38,28 @@ export class AppErrorBoundary extends Component<
     return (
       <View style={styles.wrap}>
         <View style={styles.panel}>
-          <AppText variant="title" style={styles.center}>
+          <Text style={[styles.title, styles.center]}>
             Modula could not open this view.
-          </AppText>
-          <AppText variant="body" colour="textSecondary" style={styles.center}>
+          </Text>
+          <Text style={[styles.body, styles.center]}>
             Try again or return home.
-          </AppText>
+          </Text>
           <View style={styles.actions}>
-            <AppPressable
+            <Pressable
+              accessibilityRole="button"
               accessibilityLabel="Try again"
               onPress={() => this.setState({error: null})}
               style={styles.button}>
-              <AppText variant="label">Try again</AppText>
-            </AppPressable>
+              <Text style={styles.label}>Try again</Text>
+            </Pressable>
             <Link href="/index" asChild>
-              <AppPressable
+              <Pressable
+                accessibilityRole="button"
                 accessibilityLabel="Return home"
                 onPress={() => this.setState({error: null})}
                 style={styles.button}>
-                <AppText variant="label">Return home</AppText>
-              </AppPressable>
+                <Text style={styles.label}>Return home</Text>
+              </Pressable>
             </Link>
           </View>
         </View>
@@ -71,20 +74,36 @@ const styles = StyleSheet.create({
     gap: 12,
     justifyContent: 'center',
   },
+  body: {
+    color: '#A8B4B7',
+    fontSize: 16,
+    lineHeight: 22,
+  },
   button: {
+    justifyContent: 'center',
     minHeight: 44,
     paddingHorizontal: 16,
-    justifyContent: 'center',
   },
   center: {
     textAlign: 'center',
+  },
+  label: {
+    color: '#369CAA',
+    fontSize: 16,
+    fontWeight: '600',
   },
   panel: {
     gap: 14,
     maxWidth: 360,
   },
+  title: {
+    color: '#F4FAFB',
+    fontSize: 22,
+    fontWeight: '700',
+  },
   wrap: {
     alignItems: 'center',
+    backgroundColor: '#0B1416',
     flex: 1,
     justifyContent: 'center',
     padding: 24,

@@ -1,10 +1,15 @@
-import {Tabs} from 'expo-router'
+import {Tabs, useRouter, type Href} from 'expo-router'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {Avatar} from '@/components/primitives/Avatar'
+import {useSession} from '@/auth/runtime'
+import {isFeatureEnabled} from '@/features/product/data/featureControl'
+import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -15,6 +20,19 @@ const webIcons: Record<string, AppIconName> = {
   activity: 'activity',
   profile: 'profile',
 }
+
+const RAIL_SHORTCUTS: Array<{
+  label: string
+  icon: AppIconName
+  href: Href
+  featureId?: string
+}> = [
+  {label: 'Product', icon: 'modules', href: '/product'},
+  {label: 'Customize', icon: 'appearance', href: '/product/customize'},
+  {label: 'Forge', icon: 'developer', href: '/product/forge', featureId: 'forge'},
+  {label: 'Agents', icon: 'automation', href: '/product/agents', featureId: 'agents'},
+  {label: 'Focus', icon: 'contrast', href: '/product/focus', featureId: 'focus'},
+]
 
 /**
  * Web adaptive rail / bottom bar using the same ModulaTabDefinition list.
@@ -60,12 +78,24 @@ type WebTabRailProps = {
 
 function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const insets = useSafeAreaInsets()
+  const router = useRouter()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
   const {width} = useWindowDimensions()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
+  const {preferences} = useProductPreferences()
   const rail = width >= 900
+  const selectedRouteName =
+    state.index >= 0 ? state.routes[state.index]?.name : undefined
+  const visibleTabNames = new Set(
+    resolveVisibleModulaTabs(preferences.tabBarIds, {
+      alwaysIncludeRouteName: selectedRouteName,
+    }).map(tab => tab.routeName),
+  )
 
-  const visibleRoutes = state.routes.filter(route =>
-    MODULA_TABS.some(tab => tab.routeName === route.name),
+  const visibleRoutes = state.routes.filter(route => visibleTabNames.has(route.name))
+  const shortcuts = RAIL_SHORTCUTS.filter(
+    item => !item.featureId || isFeatureEnabled(preferences, item.featureId),
   )
 
   return (
@@ -84,6 +114,7 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
         const focused = state.index === index
         const {options} = descriptors[route.key]
         const label = options.title ?? route.name
+        const isProfile = route.name === 'profile'
 
         return (
           <AppPressable
@@ -100,12 +131,34 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
                 navigation.navigate(route.name)
               }
             }}
-            style={[styles.item, rail && styles.railItem]}>
-            <AppIcon
-              name={webIcons[route.name] ?? 'home'}
-              colour={focused ? colours.accent : colours.textSecondary}
-              size={22}
-            />
+            style={[
+              styles.item,
+              rail && styles.railItem,
+              focused && rail
+                ? {
+                    backgroundColor: colours.accentSubtle,
+                    borderRadius: radius.medium,
+                  }
+                : null,
+            ]}>
+            {isProfile ? (
+              <Avatar
+                name={
+                  profile?.displayName ??
+                  (session.status === 'guest' ? 'Guest' : 'Modula')
+                }
+                uri={profile?.avatarUri}
+                colour={profile?.coverColour}
+                size={22}
+                style={styles.profileAvatar}
+              />
+            ) : (
+              <AppIcon
+                name={webIcons[route.name] ?? 'home'}
+                colour={focused ? colours.accent : colours.textSecondary}
+                size={22}
+              />
+            )}
             <AppText
               variant="caption"
               style={{color: focused ? colours.accent : colours.textSecondary}}>
@@ -114,6 +167,26 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
           </AppPressable>
         )
       })}
+
+      {rail ? (
+        <View style={[styles.shortcuts, {gap: spacing[1], marginTop: spacing[3]}]}>
+          <AppText variant="micro" colour="textTertiary">
+            CREATE
+          </AppText>
+          {shortcuts.map(item => (
+            <AppPressable
+              key={item.href.toString()}
+              accessibilityLabel={item.label}
+              onPress={() => router.push(item.href)}
+              style={[styles.item, styles.railItem]}>
+              <AppIcon name={item.icon} colour={colours.textSecondary} size={18} />
+              <AppText variant="caption" colour="textSecondary">
+                {item.label}
+              </AppText>
+            </AppPressable>
+          ))}
+        </View>
+      ) : null}
     </View>
   )
 }
@@ -130,15 +203,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 52,
   },
+  profileAvatar: {
+    borderWidth: 0,
+  },
   rail: {
     borderRightWidth: StyleSheet.hairlineWidth,
     gap: 8,
     paddingHorizontal: 12,
-    width: 96,
+    width: 104,
   },
   railItem: {
     flex: 0,
     minHeight: 56,
+    width: '100%',
+  },
+  shortcuts: {
+    borderTopColor: 'transparent',
     width: '100%',
   },
 })

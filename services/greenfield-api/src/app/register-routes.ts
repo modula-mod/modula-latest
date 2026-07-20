@@ -37,6 +37,7 @@ import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
+import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -439,6 +440,11 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.get('/v1/extensions', profileConfig, async (request, reply) => {
     return reply.send(successEnvelope(await extensions.listPublished(), request.id))
+  })
+  app.get('/v1/extensions/catalogue', profileConfig, async (request, reply) => {
+    const {ExtensionLifecycleService} = await import('../extensions/lifecycle-service.js')
+    const lifecycle = new ExtensionLifecycleService(db)
+    return reply.send(successEnvelope(await lifecycle.listCatalogue(), request.id))
   })
   app.get('/v1/extensions/:extensionId', profileConfig, async (request, reply) => {
     const {extensionId} = request.params as {extensionId: string}
@@ -1125,5 +1131,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Unsafe URL')
     }
+  })
+
+  await registerPhase6sRoutes(app, db, config, {
+    greenfieldSessions,
+    mutationsAllowed,
+    writeConfig,
+    feedConfig,
+    profileConfig,
+    authWriteConfig,
   })
 }
