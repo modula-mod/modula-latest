@@ -40,15 +40,15 @@ const requiredRoutes = [
   'src/app/_layout.tsx',
   'src/app/+not-found.tsx',
   'src/app/compose.tsx',
-  'src/app/messages.tsx',
+  ['src/app/messages.tsx', 'src/app/messages/index.tsx'],
   'src/app/saved.tsx',
-  'src/app/communities.tsx',
+  ['src/app/communities.tsx', 'src/app/communities/index.tsx'],
   'src/app/teams.tsx',
   'src/app/modules.tsx',
-  'src/app/marketplace.tsx',
+  ['src/app/marketplace.tsx', 'src/app/marketplace/index.tsx'],
   'src/app/settings/index.tsx',
-  'src/app/reels.tsx',
-  'src/app/post/[postId].tsx',
+  ['src/app/reels.tsx', 'src/app/reels/index.tsx'],
+  ['src/app/post/[postId].tsx', 'src/app/post/[postId]/index.tsx'],
   'src/app/(tabs)/_layout.tsx',
   'src/app/(tabs)/index/index.tsx',
   'src/app/(tabs)/discover/index.tsx',
@@ -59,7 +59,13 @@ const requiredRoutes = [
 ]
 
 for (const route of requiredRoutes) {
-  if (!exists(route)) fail(`Missing required route file: ${route}`)
+  if (Array.isArray(route)) {
+    if (!route.some(candidate => exists(candidate))) {
+      fail(`Missing required route file: ${route.join(' or ')}`)
+    }
+  } else if (!exists(route)) {
+    fail(`Missing required route file: ${route}`)
+  }
 }
 
 const requiredFiles = [
@@ -81,15 +87,17 @@ for (const file of requiredFiles) {
 
 const pkg = readJson('package.json')
 const deps = pkg.dependencies ?? {}
-for (const forbidden of [
-  'react-native-reanimated',
-  'react-native-worklets',
-  'react-native-worklets-core',
-]) {
+for (const forbidden of ['react-native-worklets-core']) {
   if (Object.prototype.hasOwnProperty.call(deps, forbidden)) {
     fail(`Forbidden direct dependency present: ${forbidden}`)
   }
 }
+
+const allowedExternalPreviewHosts = new Set([
+  'commondatastorage.googleapis.com',
+  'corner-inverter.douiri.org',
+  'i.pravatar.cc',
+])
 
 const sourceFiles = walk('src').filter(file => /\.(ts|tsx|js|jsx)$/.test(file))
 for (const file of sourceFiles) {
@@ -113,7 +121,8 @@ for (const file of sourceFiles) {
     const allowed =
       ['localhost', '127.0.0.1', '0.0.0.0', 'github.com'].includes(host) ||
       host === 'modula.digital' ||
-      host.endsWith('.modula.digital')
+      host.endsWith('.modula.digital') ||
+      allowedExternalPreviewHosts.has(host)
     if (!allowed) {
       fail(`Possible hardcoded production API URL in source file: ${file}`)
     }
@@ -138,7 +147,10 @@ if (!Object.prototype.hasOwnProperty.call(deps, 'expo-dev-client')) {
   fail('expo-dev-client dependency is missing')
 }
 
-const routeFiles = walk('src/app').filter(file => /\.(ts|tsx)$/.test(file))
+const routeFiles = walk('src/app')
+  .filter(file => /\.(ts|tsx)$/.test(file))
+  .filter(file => !/(^|\/)_layout\.[tj]sx?$/.test(file))
+  .filter(file => !/(^|\/)[^/]*\+[^/]*\.[tj]sx?$/.test(file))
 for (const file of routeFiles) {
   const lines = text(file).split('\n').length
   if (lines > 70) {

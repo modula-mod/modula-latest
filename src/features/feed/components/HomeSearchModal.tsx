@@ -9,9 +9,9 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import {BlurView} from 'expo-blur'
 import {useRouter, type Href} from 'expo-router'
 
+import {BlurBackdrop} from '@/components/materials/BlurBackdrop'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -124,7 +124,7 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
               ]}
             />
           ) : (
-            <BlurView
+            <BlurBackdrop
               intensity={36}
               tint={scheme === 'dark' ? 'dark' : 'light'}
               style={StyleSheet.absoluteFill}
@@ -154,7 +154,7 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
               />
             ) : (
               <>
-                <BlurView
+                <BlurBackdrop
                   intensity={64}
                   tint={glassTint}
                   style={[

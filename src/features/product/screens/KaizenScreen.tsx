@@ -1,6 +1,5 @@
 import {useEffect, useState} from 'react'
 import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
@@ -8,6 +7,10 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {
+  getLocalProductValue,
+  setLocalProductValue,
+} from '@/features/product/storage/localProductStorage'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -76,7 +79,7 @@ export function KaizenScreen() {
 
   useEffect(() => {
     let mounted = true
-    void AsyncStorage.getItem(STORAGE_KEY).then(raw => {
+    void getLocalProductValue(STORAGE_KEY).then(raw => {
       if (mounted) setQueue(parseQueue(raw))
     })
     return () => {
@@ -86,7 +89,7 @@ export function KaizenScreen() {
 
   const saveQueue = (next: KaizenItem[]) => {
     setQueue(next)
-    void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    void setLocalProductValue(STORAGE_KEY, JSON.stringify(next))
   }
 
   const submit = () => {

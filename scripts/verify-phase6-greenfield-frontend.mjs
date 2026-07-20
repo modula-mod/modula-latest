@@ -243,8 +243,13 @@ if (
 if (
   mustInclude(
     'src/features/atproto/screens/ConnectionsScreen.tsx',
-    ['External Networks', 'AT Protocol', 'Optional', 'GitHub', 'Drive', 'Nextcloud'],
+    ['External Networks', 'ATPROTO_SETTINGS_TITLE', 'Optional', 'GitHub', 'Drive', 'Nextcloud'],
     '16. Connections',
+  ) &&
+  mustInclude(
+    'src/features/atproto/copy.ts',
+    ['AT Protocol'],
+    '16. Connections copy',
   )
 ) {
   ok('16. AT Protocol is an optional External Network row')

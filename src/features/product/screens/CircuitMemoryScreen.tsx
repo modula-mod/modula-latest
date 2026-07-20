@@ -1,6 +1,5 @@
 import {useEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
@@ -8,6 +7,10 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {
+  getLocalProductValue,
+  setLocalProductValue,
+} from '@/features/product/storage/localProductStorage'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -105,12 +108,12 @@ export function CircuitMemoryScreen() {
 
   useEffect(() => {
     let mounted = true
-    void AsyncStorage.getItem(STORAGE_KEY).then(raw => {
+    void getLocalProductValue(STORAGE_KEY).then(raw => {
       const next = parseItems(raw)
       if (!mounted) return
       setItems(next)
       setSelectedId(next[0]?.id ?? '')
-      if (!raw) void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      if (!raw) void setLocalProductValue(STORAGE_KEY, JSON.stringify(next))
     })
     return () => {
       mounted = false
@@ -127,7 +130,7 @@ export function CircuitMemoryScreen() {
     setItems(next)
     setSelectedId(next[0]?.id ?? '')
     setExportText('')
-    void AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    void setLocalProductValue(STORAGE_KEY, JSON.stringify(next))
   }
 
   return (

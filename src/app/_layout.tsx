@@ -42,7 +42,6 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="compose" options={{presentation: 'modal'}} />
         <Stack.Screen name="reels" />
-        <Stack.Screen name="post/[postId]" />
         <Stack.Screen name="messages" />
         <Stack.Screen name="saved" />
         <Stack.Screen name="lists" />
@@ -56,14 +55,10 @@ function RootNavigator() {
         <Stack.Screen name="creator" />
         <Stack.Screen name="help" />
         <Stack.Screen name="whats-new" />
-        <Stack.Screen name="account/switcher" options={{presentation: 'modal'}} />
         <Stack.Screen name="share-profile" options={{presentation: 'modal'}} />
         <Stack.Screen name="share" options={{presentation: 'modal'}} />
         <Stack.Screen name="report" options={{presentation: 'modal'}} />
         <Stack.Screen name="reactions" options={{presentation: 'modal'}} />
-        <Stack.Screen name="discover/interests" options={{presentation: 'modal'}} />
-        <Stack.Screen name="discover/feeds" options={{presentation: 'modal'}} />
-        <Stack.Screen name="discover/media" />
         <Stack.Screen name="settings" />
       </Stack>
       {/* Live nav chrome: left NavigationDrawer (avatar → openDrawer).
