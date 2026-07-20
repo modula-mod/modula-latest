@@ -199,7 +199,9 @@ export function StartLauncherScreen() {
               ))
             ) : (
               <AppText variant="body" colour="textSecondary">
-                No local Start results for "{query.trim()}".
+                {'No local Start results for "'}
+                {query.trim()}
+                {'".'}
               </AppText>
             )}
           </View>

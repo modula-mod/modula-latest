@@ -22,14 +22,15 @@ function loadSkiaJoinIsland(): ComponentType<ModulaJoinIslandProps> | null {
   }
 }
 
+const SkiaJoinIsland = loadSkiaJoinIsland()
+
 /**
  * Telegram-style join island / meatball (Motionary MIT pattern).
  * Uses Skia when linked; otherwise Reanimated fallback.
  */
 export function ModulaJoinIsland(props: ModulaJoinIslandProps) {
-  const SkiaIsland = loadSkiaJoinIsland()
-  if (SkiaIsland) {
-    return <SkiaIsland {...props} />
+  if (SkiaJoinIsland) {
+    return <SkiaJoinIsland {...props} />
   }
   return <ModulaJoinIslandFallback {...props} />
 }

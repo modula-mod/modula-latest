@@ -105,23 +105,37 @@ export function useModulaCameraPermission(
   )
 
   useEffect(() => {
-    if (!nativeAvailable) {
+    let active = true
+    let id: ReturnType<typeof setTimeout> | null = null
+    const markUnavailable = () => {
+      if (!active) return
       setApiAvailable(false)
       setPermission(null)
-      return
     }
+    if (!nativeAvailable) {
+      id = setTimeout(markUnavailable, 0)
+      return () => {
+        active = false
+        if (id) clearTimeout(id)
+      }
+    }
+
     const api = loadCameraPermissionsApi()
     if (!api) {
-      setApiAvailable(false)
-      setPermission(null)
-      return
+      id = setTimeout(markUnavailable, 0)
+      return () => {
+        active = false
+        if (id) clearTimeout(id)
+      }
     }
-    setApiAvailable(true)
-    let active = true
+
     void api
       .getCameraPermissionsAsync()
       .then(next => {
-        if (active) setPermission(next)
+        if (active) {
+          setApiAvailable(true)
+          setPermission(next)
+        }
       })
       .catch(error => {
         if (__DEV__) {
@@ -134,6 +148,7 @@ export function useModulaCameraPermission(
       })
     return () => {
       active = false
+      if (id) clearTimeout(id)
     }
   }, [nativeAvailable])
 
@@ -157,9 +172,9 @@ export function useModulaCameraPermission(
   const status = statusFromPermission(permission, apiAvailable)
 
   useEffect(() => {
-    if (autoRequest && status === 'denied') {
-      void requestPermission()
-    }
+    if (!autoRequest || status !== 'denied') return undefined
+    const id = setTimeout(() => void requestPermission(), 0)
+    return () => clearTimeout(id)
   }, [autoRequest, requestPermission, status])
 
   return {

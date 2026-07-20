@@ -33,6 +33,8 @@ function loadInner(): ComponentType<InnerProps> | null {
   }
 }
 
+const LoadedInner = loadInner()
+
 /**
  * Full-bleed reel video + draggable glass controls foundation.
  * Falls back safely when ExpoVideo is not linked in the current binary.
@@ -43,7 +45,7 @@ export function ModulaReelPlayer({
   active = true,
   style,
 }: ModulaReelPlayerProps) {
-  const Inner = loadInner()
+  const Inner = LoadedInner
   if (Inner) {
     return <Inner sourceUri={sourceUri} active={active} style={style} />
   }

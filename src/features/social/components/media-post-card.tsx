@@ -82,6 +82,8 @@ function TrayIcon({
       accessibilityState={{selected}}
       onPress={() => {
         if (!reduceMotion) {
+          // Reanimated shared value, not React state.
+          // eslint-disable-next-line react-hooks/immutability
           scale.value = withSequence(
             withSpring(0.86, {damping: 14, stiffness: 320}),
             withSpring(1, {damping: 12, stiffness: 220}),
@@ -182,7 +184,10 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
       reaction: nextLiked ? 'like' : null,
     })
     if (nextLiked && !reduceMotion) {
+      // Reanimated shared values, not React state.
+      // eslint-disable-next-line react-hooks/immutability
       heartScale.value = 0.4
+      // eslint-disable-next-line react-hooks/immutability
       heartOpacity.value = 1
       heartScale.value = withSpring(1.12, {damping: 10, stiffness: 200})
       heartOpacity.value = withTiming(0, {duration: 520})

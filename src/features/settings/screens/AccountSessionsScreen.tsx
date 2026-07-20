@@ -30,7 +30,8 @@ export function AccountSessionsScreen() {
   }, [services.authRepository])
 
   useEffect(() => {
-    void load()
+    const id = setTimeout(() => void load(), 0)
+    return () => clearTimeout(id)
   }, [load])
 
   const revokeOne = async (sessionId: string) => {

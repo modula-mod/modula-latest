@@ -89,7 +89,9 @@ export function UniversalSearchScreen() {
               ))
             ) : (
               <AppText variant="body" colour="textSecondary">
-                No local search results for "{query.trim()}".
+                {'No local search results for "'}
+                {query.trim()}
+                {'".'}
               </AppText>
             )}
           </View>

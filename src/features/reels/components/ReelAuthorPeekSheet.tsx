@@ -44,7 +44,9 @@ export function ReelAuthorPeekSheet({
   const [following, setFollowing] = useState(author?.isFollowing ?? false)
 
   useEffect(() => {
-    setFollowing(author?.isFollowing ?? false)
+    const next = author?.isFollowing ?? false
+    const id = setTimeout(() => setFollowing(next), 0)
+    return () => clearTimeout(id)
   }, [author?.id, author?.isFollowing])
 
   if (!author) {

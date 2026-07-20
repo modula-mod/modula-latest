@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/immutability, react-hooks/refs */
 import {useEffect, useMemo, useRef} from 'react'
 import {Gesture} from 'react-native-gesture-handler'
 import {

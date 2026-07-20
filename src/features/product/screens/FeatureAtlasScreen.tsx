@@ -98,7 +98,7 @@ export function FeatureAtlasScreen() {
             <AppText variant="caption" colour="accent">
               FEATURE ATLAS / {totalFeatures} EXACT CAPABILITY ENTRIES
             </AppText>
-            <AppText variant="display">A map of Modula's surface area.</AppText>
+            <AppText variant="display">{"A map of Modula's surface area."}</AppText>
             <AppText variant="body" colour="textSecondary">
               Atlas maps all {totalFeatures} entries in FEATURE_ATLAS by domain and maturity.
               Preview does not mean production runtime.

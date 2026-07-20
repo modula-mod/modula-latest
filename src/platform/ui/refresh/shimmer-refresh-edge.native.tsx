@@ -21,12 +21,13 @@ function loadSkiaEdge(): ComponentType<ShimmerRefreshEdgeProps> | null {
   }
 }
 
+const SkiaEdge = loadSkiaEdge()
+
 /**
  * Pull-to-refresh shimmering top edge (iPhone edge-glow energy).
  * Skia when linked; Reanimated + LinearGradient otherwise.
  */
 export function ShimmerRefreshEdge(props: ShimmerRefreshEdgeProps) {
-  const SkiaEdge = loadSkiaEdge()
   if (SkiaEdge) {
     return <SkiaEdge {...props} />
   }

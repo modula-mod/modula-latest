@@ -49,6 +49,8 @@ function getLiquidGlassTabBar(): LiquidGlassTabBarComponent | null {
   return cachedLiquidGlassTabBar
 }
 
+const LiquidGlassTabBar = getLiquidGlassTabBar()
+
 /**
  * Root-level floating tab bar so secondary stacks (settings, product, …)
  * keep the same bottom chrome as the main tabs.
@@ -61,7 +63,7 @@ export function PersistentShellTabBar() {
   const segments = useSegments()
   const router = useRouter()
   const {preferences} = useProductPreferences()
-  const TabBar = getLiquidGlassTabBar()
+  const TabBar = LiquidGlassTabBar
   const obscureStyle = useShellChromeObscureStyle('down')
   const [visible, setVisible] = useState(true)
 

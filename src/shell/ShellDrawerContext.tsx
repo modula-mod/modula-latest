@@ -70,6 +70,8 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
     }
     afterCloseRef.current = undefined
     setPhase('opening')
+    // Reanimated shared value, not React state.
+    // eslint-disable-next-line react-hooks/immutability
     progress.value = withSpring(1, OPEN_SPRING, finished => {
       if (finished) runOnJS(finishOpen)()
     })
@@ -82,6 +84,8 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
       }
       afterCloseRef.current = options?.afterClose
       setPhase('closing')
+      // Reanimated shared value, not React state.
+      // eslint-disable-next-line react-hooks/immutability
       progress.value = withTiming(0, {duration: motion.fast}, finished => {
         if (finished) runOnJS(finishClose)()
       })
@@ -98,6 +102,8 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
       if (shouldClose) {
         afterCloseRef.current = undefined
         setPhase('closing')
+        // Reanimated shared value, not React state.
+        // eslint-disable-next-line react-hooks/immutability
         progress.value = withSpring(0, CLOSE_SPRING, finished => {
           if (finished) runOnJS(finishClose)()
         })

@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react'
+import {useEffect, useMemo} from 'react'
 import {Animated, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {useReduceMotion} from '@/lib/accessibility'
@@ -23,7 +23,7 @@ export function SkeletonBlock({
 }: SkeletonBlockProps) {
   const {colours, radius} = useThemeTokens()
   const reduceMotion = useReduceMotion()
-  const opacity = useRef(new Animated.Value(1)).current
+  const opacity = useMemo(() => new Animated.Value(1), [])
 
   useEffect(() => {
     if (reduceMotion) {

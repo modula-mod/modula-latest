@@ -61,7 +61,9 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
   const [query, setQuery] = useState('')
 
   useEffect(() => {
-    if (!visible) setQuery('')
+    if (visible) return undefined
+    const id = setTimeout(() => setQuery(''), 0)
+    return () => clearTimeout(id)
   }, [visible])
 
   const people = useMemo(() => {

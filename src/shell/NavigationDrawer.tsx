@@ -208,6 +208,17 @@ export function NavigationDrawer() {
     })).filter(section => section.items.length > 0)
   }, [])
 
+  const indexedSections = useMemo(() => {
+    let nextIndex = 0
+    return sections.map(section => ({
+      ...section,
+      items: section.items.map(item => ({
+        item,
+        staggerIndex: nextIndex++,
+      })),
+    }))
+  }, [sections])
+
   const backdropStyle = useAnimatedStyle(() => ({
     opacity: interpolate(progress.value, [0, 1], [0, 1]),
   }))
@@ -232,6 +243,8 @@ export function NavigationDrawer() {
         .onUpdate(event => {
           'worklet'
           const next = 1 + event.translationX / drawerWidth
+          // Reanimated shared value, not React state.
+          // eslint-disable-next-line react-hooks/immutability
           progress.value = Math.max(0, Math.min(1, next))
         })
         .onEnd(event => {
@@ -272,8 +285,6 @@ export function NavigationDrawer() {
       afterClose: () => router.push(route as Href),
     })
   }
-
-  let staggerIndex = 0
 
   return (
     <Modal transparent visible animationType="none" onRequestClose={() => closeDrawer()}>
@@ -397,7 +408,7 @@ export function NavigationDrawer() {
                 }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled">
-                {sections.map(section => (
+                {indexedSections.map(section => (
                   <View key={section.id} style={{gap: spacing[1]}}>
                     <AppText
                       variant="caption"
@@ -409,9 +420,8 @@ export function NavigationDrawer() {
                       {section.label.toUpperCase()}
                     </AppText>
                     <View style={{gap: spacing[1]}}>
-                      {section.items.map(item => {
+                      {section.items.map(({item, staggerIndex}) => {
                         const delay = reduceMotion ? 0 : 40 + staggerIndex * 28
-                        staggerIndex += 1
                         return (
                           <Animated.View
                             key={item.route}

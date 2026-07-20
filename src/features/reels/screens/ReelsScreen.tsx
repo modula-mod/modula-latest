@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useRef, useState} from 'react'
+import {useCallback, useMemo, useState} from 'react'
 import {
   Alert,
   FlatList,
@@ -61,7 +61,7 @@ export function ReelsScreen() {
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set())
   const [mode, setMode] = useState<ReelsFeedMode>('reels')
 
-  const onViewableItemsChanged = useRef(
+  const handleViewable = useCallback(
     ({viewableItems}: {viewableItems: ViewToken[]}) => {
       const first = viewableItems.find(item => item.isViewable)
       const id =
@@ -70,12 +70,12 @@ export function ReelsScreen() {
           : null
       setActiveId(id)
     },
-  ).current
-  const viewabilityConfig = useRef({itemVisiblePercentThreshold: 70}).current
-
-  const handleViewable = useCallback(onViewableItemsChanged, [
-    onViewableItemsChanged,
-  ])
+    [],
+  )
+  const viewabilityConfig = useMemo(
+    () => ({itemVisiblePercentThreshold: 70}),
+    [],
+  )
 
   const allVisible = useMemo(
     () => (reelsQuery.data ?? []).filter(reel => !hiddenIds.has(reel.id)),

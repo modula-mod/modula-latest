@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import {useEvent} from 'expo'
 import {useVideoPlayer, VideoView} from 'expo-video'
@@ -26,11 +26,7 @@ export function ModulaReelPlayerInner({
   const {isPlaying} = useEvent(player, 'playingChange', {
     isPlaying: player.playing,
   })
-  const [playing, setPlaying] = useState(false)
-
-  useEffect(() => {
-    setPlaying(isPlaying)
-  }, [isPlaying])
+  const playing = isPlaying
 
   useEffect(() => {
     if (active) {

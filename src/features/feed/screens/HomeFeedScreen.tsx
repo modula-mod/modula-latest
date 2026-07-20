@@ -166,9 +166,9 @@ export function HomeFeedScreen() {
   const modeTabsStickAtY = useSharedValue(0)
 
   useEffect(() => {
-    if (focus.quietFeed && mode === 'For You') {
-      setMode('Following')
-    }
+    if (!focus.quietFeed || mode !== 'For You') return undefined
+    const id = setTimeout(() => setMode('Following'), 0)
+    return () => clearTimeout(id)
   }, [focus.quietFeed, mode])
 
   useEffect(() => {
@@ -476,6 +476,8 @@ function HomeLayoutHeader({
       <View
         collapsable={false}
         onLayout={event => {
+          // Reanimated shared value, not React state.
+          // eslint-disable-next-line react-hooks/immutability
           modeTabsStickAtY.value = event.nativeEvent.layout.height
         }}>
         {beforeIds.map(id => nodes[id] ?? null)}

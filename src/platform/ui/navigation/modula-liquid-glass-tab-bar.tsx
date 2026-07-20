@@ -252,6 +252,8 @@ export function ModulaLiquidGlassTabBar({
     }
 
     if (!expanded) {
+      // Reanimated shared value, not React state.
+      // eslint-disable-next-line react-hooks/immutability
       mainTabScale.value = withSequence(
         withTiming(0.5, {duration: 150}),
         withSpring(1, {stiffness: 900, damping: 60, mass: 8}),

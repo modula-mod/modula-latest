@@ -34,6 +34,8 @@ function loadCameraView(): ComponentType<CameraViewProps> | null {
   }
 }
 
+const LoadedCameraView = loadCameraView()
+
 /**
  * Live camera feed cut through UI glyphs (Motionary masked-blur technique).
  * Uses Modula MaskedView adapter — not a direct `@react-native-masked-view` dep.
@@ -140,7 +142,7 @@ export function CameraMaskedBlurSurface({
     )
   }
 
-  const CameraView = loadCameraView()
+  const CameraView = LoadedCameraView
   if (!CameraView) {
     return (
       <View

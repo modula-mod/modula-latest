@@ -113,6 +113,8 @@ function InspireRow({item, index}: {item: InspireDestination; index: number}) {
             void selectionHaptic()
             setSaved(prev => !prev)
             if (!reduceMotion) {
+              // Reanimated shared value, not React state.
+              // eslint-disable-next-line react-hooks/immutability
               heartScale.value = withSpring(1.25, {damping: 10, stiffness: 280}, () => {
                 heartScale.value = withSpring(1, {damping: 14, stiffness: 220})
               })

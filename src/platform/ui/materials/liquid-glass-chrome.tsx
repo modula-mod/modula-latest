@@ -38,7 +38,15 @@ type CallstackModule = {
   isLiquidGlassSupported: boolean
 }
 
+type ExpoGlassViewComponent = ComponentType<{
+  style?: StyleProp<ViewStyle>
+  glassEffectStyle?: string
+  colorScheme?: 'light' | 'dark'
+  children?: ReactNode
+}>
+
 let cachedCallstack: CallstackModule | null | undefined
+let cachedExpoGlassView: ExpoGlassViewComponent | null | undefined
 
 function loadCallstackLiquidGlass(): CallstackModule | null {
   if (cachedCallstack !== undefined) return cachedCallstack
@@ -55,6 +63,27 @@ function loadCallstackLiquidGlass(): CallstackModule | null {
   }
   return cachedCallstack
 }
+
+function loadExpoGlassView(): ExpoGlassViewComponent | null {
+  if (cachedExpoGlassView !== undefined) return cachedExpoGlassView
+  if (!isNativeGlassRuntimeAvailable()) {
+    cachedExpoGlassView = null
+    return null
+  }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('expo-glass-effect') as {
+      GlassView: ExpoGlassViewComponent
+    }
+    cachedExpoGlassView = mod.GlassView
+  } catch {
+    cachedExpoGlassView = null
+  }
+  return cachedExpoGlassView
+}
+
+const loadedCallstackLiquidGlass = loadCallstackLiquidGlass()
+const LoadedExpoGlassView = loadExpoGlassView()
 
 /**
  * Liquid-glass chrome for circular / pill controls.
@@ -112,7 +141,7 @@ export function LiquidGlassChrome({
     )
   }
 
-  const callstack = loadCallstackLiquidGlass()
+  const callstack = loadedCallstackLiquidGlass
   if (callstack?.isLiquidGlassSupported) {
     const Glass = callstack.LiquidGlassView
     return (
@@ -125,28 +154,15 @@ export function LiquidGlassChrome({
     )
   }
 
-  if (isNativeGlassRuntimeAvailable()) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const {GlassView} = require('expo-glass-effect') as {
-        GlassView: ComponentType<{
-          style?: StyleProp<ViewStyle>
-          glassEffectStyle?: string
-          colorScheme?: 'light' | 'dark'
-          children?: ReactNode
-        }>
-      }
-      return (
-        <GlassView
-          glassEffectStyle={effect}
-          colorScheme={isDark ? 'dark' : 'light'}
-          style={[styles.base, styles.shadow, style]}>
-          {children}
-        </GlassView>
-      )
-    } catch {
-      // fall through
-    }
+  if (LoadedExpoGlassView) {
+    return (
+      <LoadedExpoGlassView
+        glassEffectStyle={effect}
+        colorScheme={isDark ? 'dark' : 'light'}
+        style={[styles.base, styles.shadow, style]}>
+        {children}
+      </LoadedExpoGlassView>
+    )
   }
 
   if (Platform.OS === 'web') {
