@@ -9,12 +9,12 @@ export const CHROME_HEADER_ROW = 54
 export const CHROME_FADE_EXTENSION = 48
 export const CHROME_BLUR_INTENSITY = 58
 /**
- * Extra rise of the shell bottom progressive blur *above* the tab segment.
- * Total band height = tab segment + this fade, pinned at physical `bottom: 0`
- * (safe-area is not added — the tab glass uses internal bottom padding instead).
+ * Soft rise of shell bottom chrome above the home-indicator inset.
+ * ShellBottomProgressiveBlur owns its own strip geometry; this remains a
+ * shared constant for any other bottom-edge fades.
  */
 export const CHROME_BOTTOM_FADE = 56
-export const CHROME_BOTTOM_BLUR_INTENSITY = 52
+export const CHROME_BOTTOM_BLUR_INTENSITY = 48
 
 /**
  * Layout spacer under SecondaryScreenHeader — safe area + nav row only.

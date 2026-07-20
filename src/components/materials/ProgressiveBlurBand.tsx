@@ -15,7 +15,7 @@ type ProgressiveBlurBandProps = {
   /** Max BlurView intensity under the opaque end of the mask. */
   intensity?: number
   /**
-   * `soft` — lighter mask + tint (shell bottom under floating glass tabs).
+   * `soft` — lighter dissolve.
    * `normal` — denser dissolve (headers / drawers).
    */
   strength?: 'normal' | 'soft'
@@ -25,8 +25,9 @@ type ProgressiveBlurBandProps = {
  * Progressive blur — MaskedView + BlurView + gradient mask
  * (same technique as rit3zh/expo-progressive-blur).
  *
- * Opaque mask → blur visible; transparent mask → content clear.
- * Soft canvas tint sits on top so the dissolve reads on light and dark.
+ * Gradients are always painted top-heavy in local coordinates (SwiftUI Mask
+ * composites this correctly). Bottom-anchored bands flip 180° so the opaque
+ * end lands on the physical edge.
  */
 export function ProgressiveBlurBand({
   height,
@@ -45,54 +46,44 @@ export function ProgressiveBlurBand({
     Platform.OS === 'android' ? 'dimezisBlurViewSdk31Plus' : undefined
   const soft = strength === 'soft'
 
-  // Mask: black = reveal blur, transparent = hide blur (fade to clear).
-  // Bottom-heavy: clear at top of band → strongest at physical bottom (y=1).
-  const maskColors = topHeavy
-    ? (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
-    : soft
-      ? (['transparent', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.7)', '#000000'] as const)
-      : (['transparent', 'rgba(0,0,0,0.35)', 'rgba(0,0,0,0.85)', '#000000'] as const)
-  const maskLocations = topHeavy
-    ? ([0, 0.35, 0.7, 1] as const)
-    : soft
-      ? ([0, 0.28, 0.62, 1] as const)
-      : ([0, 0.22, 0.55, 1] as const)
+  const maskColors = soft
+    ? (['#000000', 'rgba(0,0,0,0.75)', 'rgba(0,0,0,0.25)', 'transparent'] as const)
+    : (['#000000', '#000000', 'rgba(0,0,0,0.55)', 'transparent'] as const)
+  const maskLocations = [0, 0.35, 0.7, 1] as const
 
   const tintColors =
     scheme === 'dark'
-      ? topHeavy
-        ? (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
-        : soft
-          ? (['rgba(11,20,22,0)', 'rgba(11,20,22,0.1)', 'rgba(11,20,22,0.28)'] as const)
-          : (['rgba(11,20,22,0)', 'rgba(11,20,22,0.16)', 'rgba(11,20,22,0.38)'] as const)
-      : topHeavy
-        ? (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
-        : soft
-          ? (['rgba(255,255,255,0)', 'rgba(255,255,255,0.12)', 'rgba(255,255,255,0.32)'] as const)
-          : (['rgba(255,255,255,0)', 'rgba(255,255,255,0.18)', 'rgba(255,255,255,0.48)'] as const)
+      ? soft
+        ? (['rgba(11,20,22,0.32)', 'rgba(11,20,22,0.12)', 'rgba(11,20,22,0)'] as const)
+        : (['rgba(11,20,22,0.42)', 'rgba(11,20,22,0.18)', 'rgba(11,20,22,0)'] as const)
+      : soft
+        ? (['rgba(255,255,255,0.36)', 'rgba(255,255,255,0.14)', 'rgba(255,255,255,0)'] as const)
+        : (['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.22)', 'rgba(255,255,255,0)'] as const)
 
   const tintLocations = [0, 0.55, 1] as const
-
-  if (!useBlur) {
-    return (
-      <View pointerEvents="none" style={[{height, overflow: 'hidden'}, style]}>
-        <LinearGradient
-          colors={[...tintColors]}
-          locations={[...tintLocations]}
-          style={StyleSheet.absoluteFill}
-        />
-      </View>
-    )
+  const gradientAxis = {
+    start: {x: 0, y: 0} as const,
+    end: {x: 0, y: 1} as const,
   }
 
-  return (
-    <View pointerEvents="none" style={[{height, overflow: 'hidden'}, style]}>
+  const body = !useBlur ? (
+    <LinearGradient
+      colors={[...tintColors]}
+      locations={[...tintLocations]}
+      start={gradientAxis.start}
+      end={gradientAxis.end}
+      style={StyleSheet.absoluteFill}
+    />
+  ) : (
+    <>
       <MaskedView
         style={StyleSheet.absoluteFill}
         maskElement={
           <LinearGradient
             colors={[...maskColors]}
             locations={[...maskLocations]}
+            start={gradientAxis.start}
+            end={gradientAxis.end}
             style={StyleSheet.absoluteFill}
           />
         }>
@@ -106,8 +97,28 @@ export function ProgressiveBlurBand({
       <LinearGradient
         colors={[...tintColors]}
         locations={[...tintLocations]}
+        start={gradientAxis.start}
+        end={gradientAxis.end}
         style={StyleSheet.absoluteFill}
       />
+    </>
+  )
+
+  return (
+    <View
+      pointerEvents="none"
+      style={[
+        {height, overflow: 'hidden'},
+        !topHeavy ? styles.flip : null,
+        style,
+      ]}>
+      {body}
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  flip: {
+    transform: [{rotate: '180deg'}],
+  },
+})

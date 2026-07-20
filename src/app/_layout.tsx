@@ -70,7 +70,7 @@ function RootNavigator() {
           AdaptiveAccountPanel remains in codebase for sheet Preview / verify,
           but is not mounted — nothing called openAccountPanel after the drawer restore. */}
       <NavigationDrawer />
-      {/* Soft bottom dissolve under the floating tab island. */}
+      {/* Shell edge wash from physical bottom: 0 (not tab-bar geometry). */}
       <ShellBottomProgressiveBlur />
       {/* Floating tab bar at root so secondary stacks keep bottom chrome. */}
       <PersistentShellTabBar />
