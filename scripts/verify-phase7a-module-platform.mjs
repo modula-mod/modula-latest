@@ -36,8 +36,8 @@ function rgMaybe(args, cwd = root) {
   }
 }
 
-check('current branch is Phase 7A', () => {
-  if (sh(['git', 'branch', '--show-current']) !== 'phase7a-greenfield-module-platform') throw new Error('wrong branch')
+check('Phase 7A baseline is contained', () => {
+  sh(['git', 'merge-base', '--is-ancestor', '5e05f3ef1b93c4cc7aeb3c31393abc82239a622e', 'HEAD'])
 })
 check('baseline audit exists', () => file('docs/audits/phase7a-extension-foundation-audit.md'))
 check('frontend boundary verifier passes', () => sh(['node', 'scripts/verify-phase7a-frontend-boundary.mjs']))
