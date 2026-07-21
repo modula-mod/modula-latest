@@ -37,6 +37,7 @@ import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
+import {registerModuleRoutes} from '../modules/routes/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
@@ -120,6 +121,15 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       greenfieldSessions: true,
       greenfieldRepositories: true,
       greenfieldExtensions: true,
+      greenfieldModuleRegistry: config.moduleRegistryEnabled,
+      greenfieldModuleInstallation: config.moduleInstallationEnabled,
+      greenfieldModuleDeclarativeContributions: config.moduleDeclarativeContributionsEnabled,
+      greenfieldModuleFirstPartyExecution: config.moduleFirstPartyExecutionEnabled,
+      greenfieldModuleRemoteFunctions: config.moduleRemoteFunctionsEnabled,
+      greenfieldModuleCommunityExecution: config.moduleCommunityExecutionEnabled,
+      greenfieldModuleGithubSync: config.moduleGithubSyncEnabled,
+      greenfieldVaultNotesReference: config.vaultNotesReferenceEnabled,
+      greenfieldDimon: config.dimonEnabled,
       inviteOnly: config.inviteOnly,
       atproto: config.atprotoEnabled,
       atprotoOAuth: config.atprotoEnabled,
@@ -253,6 +263,8 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return mapDomainError(reply, error, request.id, 'Handle change failed')
     }
   })
+
+  await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
