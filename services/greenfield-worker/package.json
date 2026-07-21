@@ -16,6 +16,8 @@
     "@modula/api-contracts": "workspace:*",
     "@modula/atproto-lexicons": "workspace:*",
     "@modula/greenfield-contracts": "workspace:*",
+    "@modula/greenfield-module-manifest": "workspace:*",
+    "@modula/greenfield-module-registry-contracts": "workspace:*",
     "@modula/greenfield-protocol": "workspace:*",
     "@modula/protocol-contracts": "workspace:*",
     "kysely": "^0.28.2",

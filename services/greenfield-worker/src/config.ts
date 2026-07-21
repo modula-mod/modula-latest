@@ -25,6 +25,18 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_GITHUB_SYNC_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
 })
 
 export type WorkerConfig = {
@@ -45,6 +57,9 @@ export type WorkerConfig = {
   encryptionKeysByVersion: Map<number, Buffer>
   encryptionKeyIsEphemeral: boolean
   ssrfAllowPrivateNetworks: boolean
+  moduleRemoteFunctionsEnabled: boolean
+  moduleCommunityExecutionEnabled: boolean
+  moduleGithubSyncEnabled: boolean
 }
 
 function refuse(message: string): never {
@@ -112,5 +127,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     encryptionKeysByVersion,
     encryptionKeyIsEphemeral: isEphemeral,
     ssrfAllowPrivateNetworks: Boolean(raw.MODULA_ATPROTO_SSRF_ALLOW_PRIVATE_NETWORKS),
+    moduleRemoteFunctionsEnabled: Boolean(raw.GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED),
+    moduleCommunityExecutionEnabled: Boolean(raw.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED),
+    moduleGithubSyncEnabled: Boolean(raw.GREENFIELD_MODULE_GITHUB_SYNC_ENABLED),
   }
 }

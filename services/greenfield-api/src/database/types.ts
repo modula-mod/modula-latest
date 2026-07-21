@@ -12,6 +12,17 @@ export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type GreenfieldModuleReleaseState =
+  | 'draft'
+  | 'pendingReview'
+  | 'verified'
+  | 'published'
+  | 'quarantined'
+  | 'revoked'
+  | 'superseded'
+export type GreenfieldPublisherStatus = 'pending' | 'verified' | 'suspended' | 'revoked'
+export type GreenfieldModuleTrustLevel = 'firstParty' | 'verifiedPublisher' | 'reviewedCommunity' | 'untrustedManifest'
+export type GreenfieldModuleLicenseStatus = 'firstParty' | 'verified' | 'declared' | 'founderOverride' | 'unknown' | 'denied'
 export type AtprotoConnectionStatus =
   | 'pending'
   | 'connected'
@@ -503,4 +514,24 @@ export interface Database {
   greenfield_extension_lifecycle_events: {event_id: string; account_id: string; extension_id: string; event: string; from_status: string | null; to_status: string | null; detail: unknown; created_at: Date}
   greenfield_extension_failures: {failure_id: string; account_id: string; extension_id: string; installation_id: string | null; code: string; message: string; retryable: boolean; created_at: Date}
   greenfield_function_jobs: {job_id: string; account_id: string; function_id: string; status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'expired'; input: unknown; output: unknown | null; error_message: string | null; created_at: Date; started_at: Date | null; completed_at: Date | null; expires_at: Date}
+  greenfield_publishers: {publisher_id: string; display_name: string; website: string | null; status: GreenfieldPublisherStatus; trust_level: GreenfieldModuleTrustLevel; created_at: Date; updated_at: Date; verified_at: Date | null; suspended_at: Date | null; revoked_at: Date | null}
+  greenfield_publisher_namespaces: {namespace: string; publisher_id: string; verification_method: string; verification_evidence: unknown; verified_at: Date | null; revoked_at: Date | null; created_at: Date}
+  greenfield_module_versions: {module_version_id: string; extension_version_id: string; module_id: string; version: string; publisher_id: string; manifest: unknown; status: GreenfieldModuleReleaseState; created_at: Date; updated_at: Date}
+  greenfield_module_releases: {release_id: string; module_version_id: string; extension_id: string; extension_version_id: string; module_id: string; version: string; publisher_id: string; release_state: GreenfieldModuleReleaseState; source_repository: string; source_commit: string; manifest_path: string; manifest_sha256: string; release_sha256: string | null; signature_key_id: string | null; signature: string | null; compatibility: unknown; license_status: GreenfieldModuleLicenseStatus; trust_level: GreenfieldModuleTrustLevel; published_at: Date | null; quarantined_at: Date | null; revoked_at: Date | null; superseded_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_module_sources: {source_id: string; release_id: string; provider: 'github'; repository: string; repository_id: string | null; default_branch: string | null; commit: string; manifest_path: string; release_tag: string | null; release_asset_name: string | null; fetched_at: Date; etag: string | null}
+  greenfield_module_dependencies: {dependency_id: string; release_id: string; module_id: string; dependency_module_id: string; version_range: string; optional: boolean; reason: string | null; created_at: Date}
+  greenfield_module_permissions: {permission_id: string; release_id: string; permission: string; reason: string; risk: 'low' | 'medium' | 'high' | 'restricted'; requested_at: Date}
+  greenfield_module_permission_reviews: {review_id: string; installation_id: string | null; release_id: string; account_id: string; granted_permissions: unknown; denied_permissions: unknown; high_risk_increase: boolean; idempotency_key: string; reviewed_at: Date}
+  greenfield_module_install_plans: {plan_id: string; account_id: string; release_id: string; installation_id: string | null; requested_version: string; resolved_dependencies: unknown; permission_decision: unknown; status: 'created' | 'queued' | 'claimed' | 'completed' | 'failed' | 'cancelled'; idempotency_key: string; created_at: Date; updated_at: Date}
+  greenfield_module_contributions: {contribution_id: string; release_id: string; module_id: string; contribution_type: 'route' | 'profileTab' | 'boardSurface' | 'setting' | 'schema' | 'tool' | 'function' | 'widget' | 'plugin' | 'connector' | 'job' | 'event'; contribution_key: string; manifest: unknown; execution_required: boolean; registration_status: 'declared' | 'registered' | 'disabled' | 'quarantined' | 'revoked'; created_at: Date; updated_at: Date}
+  greenfield_module_license_evidence: {evidence_id: string; release_id: string; evidence_type: 'rootLicense' | 'packageMetadata' | 'readmeDeclaration' | 'registryMetadata' | 'maintainerStatement' | 'founderOverride' | 'firstPartyPolicy'; summary: string; source_path: string | null; checksum: string | null; created_at: Date}
+  greenfield_module_release_integrity: {integrity_id: string; release_id: string; manifest_sha256: string; release_sha256: string | null; schema_sha256: unknown; settings_schema_sha256: string | null; source_commit: string; verified_at: Date | null; mismatch_at: Date | null}
+  greenfield_module_release_signatures: {signature_id: string; release_id: string; signature_key_id: string; signature: string; algorithm: string; verified_at: Date | null; revoked_at: Date | null}
+  greenfield_module_installation_settings: {settings_id: string; installation_id: string; module_id: string; scope: 'account' | 'installation' | 'team'; schema_version: number; values: unknown; secret_refs: unknown; version: number; updated_by: string | null; updated_at: Date}
+  greenfield_module_settings_versions: {settings_version_id: string; settings_id: string; version: number; values: unknown; secret_refs: unknown; changed_by: string | null; created_at: Date}
+  greenfield_module_sync_sources: {sync_source_id: string; provider: 'github'; repository: string; enabled: boolean; config: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_sync_runs: {sync_run_id: string; sync_source_id: string | null; status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'; started_at: Date | null; completed_at: Date | null; summary: unknown; created_at: Date}
+  greenfield_module_sync_failures: {sync_failure_id: string; sync_run_id: string | null; repository: string | null; code: string; message: string; retryable: boolean; created_at: Date}
+  greenfield_module_quarantines: {quarantine_id: string; release_id: string; reason: string; policy_action: 'warn' | 'disableExecutableContributions' | 'block'; created_by: string | null; created_at: Date; lifted_at: Date | null}
+  greenfield_module_revocations: {revocation_id: string; scope: 'release' | 'module' | 'publisher' | 'signingKey'; target_id: string; reason: string; created_by: string | null; created_at: Date}
 }

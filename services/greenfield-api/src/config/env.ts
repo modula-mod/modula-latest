@@ -49,6 +49,42 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_MODULE_REGISTRY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_INSTALLATION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_MODULE_GITHUB_SYNC_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_VAULT_NOTES_REFERENCE_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  GREENFIELD_DIMON_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
 })
@@ -90,6 +126,15 @@ export type AppConfig = {
   atprotoOAuthEncryptionKeysByVersion: Map<number, Buffer>
   atprotoOAuthEncryptionKeyIsEphemeral: boolean
   pdsPilotEnabled: boolean
+  moduleRegistryEnabled: boolean
+  moduleInstallationEnabled: boolean
+  moduleDeclarativeContributionsEnabled: boolean
+  moduleFirstPartyExecutionEnabled: boolean
+  moduleRemoteFunctionsEnabled: boolean
+  moduleCommunityExecutionEnabled: boolean
+  moduleGithubSyncEnabled: boolean
+  vaultNotesReferenceEnabled: boolean
+  dimonEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
 }
@@ -207,6 +252,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     atprotoOAuthEncryptionKeysByVersion: keysByVersion,
     atprotoOAuthEncryptionKeyIsEphemeral: isEphemeral,
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
+    moduleRegistryEnabled: Boolean(raw.GREENFIELD_MODULE_REGISTRY_ENABLED),
+    moduleInstallationEnabled: Boolean(raw.GREENFIELD_MODULE_INSTALLATION_ENABLED),
+    moduleDeclarativeContributionsEnabled: Boolean(raw.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED),
+    moduleFirstPartyExecutionEnabled: Boolean(raw.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED),
+    moduleRemoteFunctionsEnabled: Boolean(raw.GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED),
+    moduleCommunityExecutionEnabled: Boolean(raw.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED),
+    moduleGithubSyncEnabled: Boolean(raw.GREENFIELD_MODULE_GITHUB_SYNC_ENABLED),
+    vaultNotesReferenceEnabled: Boolean(raw.GREENFIELD_VAULT_NOTES_REFERENCE_ENABLED),
+    dimonEnabled: Boolean(raw.GREENFIELD_DIMON_ENABLED),
     adminHandles: (raw.MODULA_ADMIN_HANDLES ?? '')
       .split(',')
       .map(h => h.trim().toLowerCase())

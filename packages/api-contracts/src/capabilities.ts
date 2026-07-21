@@ -11,6 +11,8 @@ export type BackendCapability =
   | 'social:block'
   | 'social:mute'
   | 'saved:manage'
+  | 'module:install'
+  | 'module:admin'
   | 'notifications:manage'
   | 'report:create'
   | 'moderation:report'
@@ -34,6 +36,7 @@ export const PREVIEW_ACTOR_CAPABILITIES: BackendCapability[] = [
   'social:block',
   'social:mute',
   'saved:manage',
+  'module:install',
   'notifications:manage',
   'report:create',
   'moderation:report',
@@ -45,4 +48,4 @@ export const PREVIEW_ACTOR_CAPABILITIES: BackendCapability[] = [
 
 export const STANDARD_SESSION_CAPABILITIES = PREVIEW_ACTOR_CAPABILITIES
 
-export const ADMIN_SESSION_CAPABILITIES: BackendCapability[] = ['admin:moderation', 'admin:ops']
+export const ADMIN_SESSION_CAPABILITIES: BackendCapability[] = ['admin:moderation', 'admin:ops', 'module:admin']

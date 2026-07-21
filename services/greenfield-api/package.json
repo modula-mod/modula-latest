@@ -24,6 +24,8 @@
     "@modula/atproto-lexicons": "workspace:*",
     "@modula/dimon-contracts": "workspace:*",
     "@modula/greenfield-contracts": "workspace:*",
+    "@modula/greenfield-module-manifest": "workspace:*",
+    "@modula/greenfield-module-registry-contracts": "workspace:*",
     "@modula/greenfield-protocol": "workspace:*",
     "@modula/greenfield-schema-registry": "workspace:*",
     "@modula/protocol-contracts": "workspace:*",
