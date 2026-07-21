@@ -6,6 +6,16 @@ import {handleAtprotoPublish} from '../bridges/atproto/publish.js'
 import {handleAtprotoUpdate} from '../bridges/atproto/update.js'
 import {handlePluginLifecycle} from '../extensions/plugin-lifecycle.js'
 import {handleFunctionInvoke} from '../functions/invoke.js'
+import {handleModuleDisable} from '../modules/disable-handler.js'
+import {handleModuleEnable} from '../modules/enable-handler.js'
+import {handleModuleInstall} from '../modules/installation-handler.js'
+import {handleModulePluginLifecycle} from '../modules/plugin-lifecycle-handler.js'
+import {handleModuleGithubJob, handleModuleRegistrySync} from '../modules/registry-sync-handler.js'
+import {handleModuleReleasePublish, handleModuleReleaseVerify} from '../modules/release-verification-handler.js'
+import {registerModuleContributions, unregisterModuleContributions} from '../modules/contribution-registration-handler.js'
+import {registerModuleSchemas, unregisterModuleSchemas} from '../modules/schema-registration-handler.js'
+import {handleModuleUninstall} from '../modules/uninstall-handler.js'
+import {handleModuleUpdate} from '../modules/update-handler.js'
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex} from '../search/index.js'
@@ -55,6 +65,76 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
         break
       case 'function.invoke':
         await handleFunctionInvoke(db, job.payload)
+        break
+      case 'module.registry.sync':
+        await handleModuleRegistrySync(db, config, job.payload)
+        break
+      case 'module.github.syncRepository':
+      case 'module.github.fetchManifest':
+      case 'module.github.fetchLicenseEvidence':
+      case 'module.github.fetchReleaseMetadata':
+      case 'module.github.verifyCommit':
+      case 'module.github.verifyReleaseIntegrity':
+        await handleModuleGithubJob(db, config, job.payload)
+        break
+      case 'module.discovered':
+      case 'module.release.imported':
+      case 'module.release.verified':
+      case 'module.release.published':
+      case 'module.release.quarantined':
+      case 'module.release.revoked':
+      case 'module.install.requested':
+      case 'module.installed':
+      case 'module.enable.requested':
+      case 'module.enabled':
+      case 'module.disable.requested':
+      case 'module.disabled':
+      case 'module.update.requested':
+      case 'module.updated':
+      case 'module.uninstall.requested':
+      case 'module.uninstalled':
+      case 'module.failed':
+        break
+      case 'module.release.verify':
+        await handleModuleReleaseVerify(db, config, job.payload)
+        break
+      case 'module.release.publish':
+        await handleModuleReleasePublish(db, config, job.payload)
+        break
+      case 'module.install':
+        await handleModuleInstall(db, config, job.payload)
+        break
+      case 'module.enable':
+        await handleModuleEnable(db, config, job.payload)
+        break
+      case 'module.disable':
+        await handleModuleDisable(db, job.payload)
+        break
+      case 'module.update':
+        await handleModuleUpdate(db, job.payload)
+        break
+      case 'module.uninstall':
+        await handleModuleUninstall(db, job.payload)
+        break
+      case 'module.schemas.register':
+        await registerModuleSchemas(db, (job.payload as any)?.releaseId)
+        break
+      case 'module.schemas.unregister':
+        await unregisterModuleSchemas(db, (job.payload as any)?.releaseId)
+        break
+      case 'module.settings.migrate':
+        break
+      case 'module.contributions.register':
+        await registerModuleContributions(db, (job.payload as any)?.releaseId, (job.payload as any)?.extensionVersionId, {enableExecutable: false})
+        break
+      case 'module.contributions.unregister':
+        await unregisterModuleContributions(db, (job.payload as any)?.releaseId)
+        break
+      case 'module.plugin.install':
+      case 'module.plugin.enable':
+      case 'module.plugin.disable':
+      case 'module.plugin.uninstall':
+        await handleModulePluginLifecycle(db, config, job.payload)
         break
       case 'search.index':
       case 'search.index.post':
