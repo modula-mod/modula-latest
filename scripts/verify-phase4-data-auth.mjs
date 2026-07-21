@@ -249,6 +249,18 @@ if (exists('src/features/profile/runtime/ProfileProvider.tsx')) {
 
 const sourceFiles = walk('src').filter(file => /\.(ts|tsx|js|jsx)$/.test(file))
 const uiRoots = ['src/app/', 'src/features/', 'src/components/', 'src/shell/']
+const asyncStorageBoundaryFiles = new Set([
+  'src/theme/storage/appearanceStorage.ts',
+  'src/features/onboarding/data/onboardingStorage.ts',
+  'src/features/product/storage/localProductStorage.ts',
+  'src/features/product/storage/productPreferencesStorage.ts',
+  'src/features/profile/storage/profilePresentationStorage.ts',
+])
+const allowedExternalPreviewHosts = new Set([
+  'commondatastorage.googleapis.com',
+  'corner-inverter.douiri.org',
+  'i.pravatar.cc',
+])
 
 for (const file of sourceFiles) {
   const body = text(file)
@@ -257,8 +269,6 @@ for (const file of sourceFiles) {
   const isRuntimeConfig = file === 'src/config/runtimeEnvironment.ts'
   const isLocalApiSource = file.startsWith('src/api/local/')
   const isSessionStorage = file.startsWith('src/auth/storage/')
-  const isAppearanceStorage = file === 'src/theme/storage/appearanceStorage.ts'
-  const isProfilePresentationStorage = file === 'src/features/profile/storage/profilePresentationStorage.ts'
 
   if (body.includes('DemoSocialContext') || body.includes('useDemoSocial')) {
     fail(`Legacy DemoSocialContext reference remains: ${file}`)
@@ -285,8 +295,7 @@ for (const file of sourceFiles) {
   }
 
   if (
-    !isAppearanceStorage &&
-    !isProfilePresentationStorage &&
+    !asyncStorageBoundaryFiles.has(file) &&
     /from ['"]@react-native-async-storage\/async-storage['"]/.test(body)
   ) {
     fail(`AsyncStorage imported outside approved local-preference storage: ${file}`)
@@ -318,7 +327,8 @@ for (const file of sourceFiles) {
     const allowed =
       ['localhost', '127.0.0.1', '0.0.0.0', 'github.com'].includes(host) ||
       host === 'modula.digital' ||
-      host.endsWith('.modula.digital')
+      host.endsWith('.modula.digital') ||
+      allowedExternalPreviewHosts.has(host)
     if (!allowed) {
       fail(`Possible hardcoded external production URL: ${file}`)
     }

@@ -18,17 +18,23 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
+import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
+import {isBlockOn} from '@/features/product/data/layoutBlocks'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ActivityListSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ActivityItem} from '@/domain/activity'
 
@@ -40,22 +46,49 @@ if (
 }
 
 const groups = ['Today', 'This week', 'Earlier'] as const
-type ActivityFilter = 'all' | ActivityItem['type']
+type ActivityFilter = 'all' | 'replies' | 'mentions' | 'reactions' | 'follows' | 'extensions' | 'system'
+const filters: readonly [ActivityFilter, string][] = [
+  ['all', 'All'],
+  ['replies', 'Replies'],
+  ['mentions', 'Mentions'],
+  ['reactions', 'Reactions'],
+  ['follows', 'Follows'],
+  ['extensions', 'Extensions'],
+  ['system', 'System'],
+]
+
+function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
+  if (filter === 'all') return true
+  const types: Record<Exclude<ActivityFilter, 'all'>, ActivityItem['type'][]> = {
+    replies: ['reply'],
+    mentions: ['mention'],
+    reactions: ['reaction', 'like'],
+    follows: ['follow'],
+    extensions: ['extension', 'moduleUpdate'],
+    system: ['system', 'teamInvitation'],
+  }
+  return types[filter].includes(item.type)
+}
 
 export function ActivityScreen() {
   const router = useRouter()
+  const {activityRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
+  const fadePad = useNativeHeaderFadePadding()
   const activityQuery = useActivityQuery()
   const [filter, setFilter] = useState<ActivityFilter>('all')
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set())
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
   const filtered = useMemo(
-    () => (filter === 'all' ? activity : activity.filter(item => item.type === filter)),
+    () => activity.filter(item => matchesFilter(item, filter)),
     [activity, filter],
   )
+  const showBlock = (id: string) => isBlockOn(preferences.activityBlockIds, id)
+  const staggerEnter = showBlock('stagger-enter') && !reduceMotion
 
   useEffect(() => {
     if (!reduceMotion) {
@@ -101,39 +134,46 @@ export function ActivityScreen() {
   const markAllRead = () => {
     setReadIds(new Set(activity.map(item => item.id)))
     void selectionHaptic()
+    void activityRepository.markAllRead().catch(() => undefined)
   }
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[5], paddingBottom: tabPadding},
+            {
+              gap: spacing[5],
+              paddingTop: fadePad,
+              paddingBottom: tabPadding,
+            },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={styles.titleRow}>
-            <AppText variant="display">Activity</AppText>
+            <AppPressable
+              accessibilityLabel="Mark all as read"
+              onPress={markAllRead}
+              style={styles.iconHit}>
+              <AppIcon name="check" colour={colours.textSecondary} />
+            </AppPressable>
             <View style={styles.titleActions}>
-              <AppPressable
-                accessibilityLabel="Mark all as read"
-                onPress={markAllRead}
-                style={styles.iconHit}>
-                <AppIcon name="check" colour={colours.textSecondary} />
-              </AppPressable>
               <AppPressable
                 accessibilityLabel="Filter activity"
                 onPress={() => setFilterSheetOpen(true)}
                 style={styles.iconHit}>
                 <AppIcon name="settings" colour={colours.textSecondary} />
               </AppPressable>
-              <ModulaMenu
+              <ChromeOverflowMenu
                 accessibilityLabel="More activity actions"
                 title="Activity"
                 actions={[
                   {id: 'notifications', label: 'Notification settings'},
                   {id: 'markRead', label: 'Mark all as read'},
                   {id: 'filter', label: 'Open filters'},
+                  {id: 'customize', label: 'Customize Activity'},
+                  {id: 'quiet', label: 'Quiet inbox'},
                 ]}
                 onAction={id => {
                   if (id === 'notifications') {
@@ -141,56 +181,89 @@ export function ActivityScreen() {
                   }
                   if (id === 'markRead') markAllRead()
                   if (id === 'filter') setFilterSheetOpen(true)
+                  if (id === 'customize') router.push('/product/layout-activity' as Href)
+                  if (id === 'quiet') router.push('/product/quiet-inbox' as Href)
                 }}
-                trigger={<AppIcon name="more" colour={colours.textSecondary} />}
               />
             </View>
           </View>
 
-          <View style={{flexDirection: 'row', gap: spacing[2]}}>
-            <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
-            <Pill
-              label="Mentions"
-              selected={filter === 'mention'}
-              onPress={() => applyFilter('mention')}
-            />
-            <Pill
-              label="Filters"
-              selected={
-                filter !== 'all' && filter !== 'mention'
-              }
-              onPress={() => setFilterSheetOpen(true)}
-            />
-          </View>
+          {showBlock('filter-pills') ? (
+            <SectionEnter delay={20} from="right">
+              <View style={{flexDirection: 'row', gap: spacing[2]}}>
+                <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
+                <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
+                <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
+                <Pill
+                  label="Filters"
+                  selected={
+                    filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
+                  }
+                  onPress={() => setFilterSheetOpen(true)}
+                />
+              </View>
+            </SectionEnter>
+          ) : null}
 
-          {filter !== 'all' && filter !== 'mention' ? (
+          {filter === 'all' && showBlock('digest') ? (
+            <ActivityDigestStrip
+              items={activity}
+              readIds={readIds}
+              onMarkAllRead={markAllRead}
+            />
+          ) : null}
+
+          {filter !== 'all' && filter !== 'mentions' && filter !== 'replies' ? (
             <AppText variant="caption" colour="textSecondary">
-              Showing {filter} · local preview filters
+              Showing {filter}
             </AppText>
           ) : null}
 
-          {groups.map(group => {
+          {groups.map((group, groupIndex) => {
             const items = filtered.filter(item => item.group === group)
             if (!items.length) return null
-            return (
-              <View key={group} style={{gap: spacing[3]}}>
+            const groupBody = (
+              <View style={{gap: spacing[3]}}>
                 <AppText variant="headline">{group}</AppText>
                 <View style={{gap: spacing[2]}}>
-                  {items.map(item => (
-                    <ActivityRow
-                      key={item.id}
-                      item={item}
-                      unread={!readIds.has(item.id)}
-                      onOpen={() => {
-                        setReadIds(prev => new Set(prev).add(item.id))
-                      }}
-                      onMarkRead={() => {
-                        setReadIds(prev => new Set(prev).add(item.id))
-                      }}
-                    />
-                  ))}
+                  {items.map((item, itemIndex) => {
+                    const row = (
+                      <ActivityRow
+                        item={item}
+                        unread={!readIds.has(item.id)}
+                        highlightUnread={showBlock('unread-cards')}
+                        peers={activity.filter(
+                          peer =>
+                            peer.id !== item.id &&
+                            peer.group === item.group &&
+                            (peer.type === 'like' || peer.type === 'reaction') &&
+                            (item.type === 'like' || item.type === 'reaction'),
+                        )}
+                        onOpen={() => {
+                          setReadIds(prev => new Set(prev).add(item.id))
+                          void activityRepository.markRead(item.id).catch(() => undefined)
+                        }}
+                        onMarkRead={() => {
+                          setReadIds(prev => new Set(prev).add(item.id))
+                          void activityRepository.markRead(item.id).catch(() => undefined)
+                        }}
+                      />
+                    )
+                    if (!staggerEnter) return <View key={item.id}>{row}</View>
+                    return (
+                      <SectionEnter key={item.id} delay={80 + groupIndex * 40 + itemIndex * 28}>
+                        {row}
+                      </SectionEnter>
+                    )
+                  })}
                 </View>
               </View>
+            )
+            if (!staggerEnter) return <View key={group}>{groupBody}</View>
+            return (
+              <SectionEnter key={group} delay={60 + groupIndex * 50}>
+                {groupBody}
+              </SectionEnter>
             )
           })}
         </ScrollView>
@@ -204,19 +277,9 @@ export function ActivityScreen() {
         <View style={{gap: spacing[3]}}>
           <AppText variant="headline">Filter activity</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Choose a local filter. Nothing is synced remotely.
+            Filter notifications by type.
           </AppText>
-          {(
-            [
-              ['all', 'All'],
-              ['mention', 'Mentions'],
-              ['like', 'Likes'],
-              ['reply', 'Replies'],
-              ['follow', 'Follows'],
-              ['moduleUpdate', 'Modules'],
-              ['teamInvitation', 'Teams'],
-            ] as const
-          ).map(([id, label]) => (
+          {filters.map(([id, label]) => (
             <AppPressable
               key={id}
               accessibilityLabel={`Filter ${label}`}
@@ -245,11 +308,15 @@ export function ActivityScreen() {
 function ActivityRow({
   item,
   unread,
+  highlightUnread,
+  peers,
   onOpen,
   onMarkRead,
 }: {
   item: ActivityItem
   unread: boolean
+  highlightUnread: boolean
+  peers: ActivityItem[]
   onOpen: () => void
   onMarkRead: () => void
 }) {
@@ -260,6 +327,16 @@ function ActivityRow({
   const profileRoute = item.actor
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
     : null
+
+  const multiActors = [item, ...peers]
+    .map(entry => entry.actor)
+    .filter((actor): actor is NonNullable<typeof actor> => Boolean(actor))
+  const uniqueActors = multiActors.filter(
+    (actor, index, list) => list.findIndex(face => face.id === actor.id) === index,
+  )
+  const showStack =
+    (item.type === 'like' || item.type === 'reaction' || item.type === 'follow') &&
+    uniqueActors.length > 0
 
   const openDestination = () => {
     onOpen()
@@ -312,8 +389,12 @@ function ActivityRow({
           style={[
             styles.row,
             {
+              backgroundColor:
+                unread && highlightUnread ? colours.surfaceRaised : 'transparent',
+              borderRadius: radius.xlarge,
               gap: spacing[3],
               opacity: unread ? 1 : 0.72,
+              paddingHorizontal: spacing[2],
               paddingVertical: spacing[2],
             },
           ]}>
@@ -349,7 +430,11 @@ function ActivityRow({
           <View style={styles.body}>
             {item.actor ? (
               <AppText variant="body">
-                <AppText variant="label">{item.actor.displayName}</AppText>{' '}
+                <AppText variant="label">
+                  {uniqueActors.length > 1
+                    ? `${item.actor.displayName} and ${uniqueActors.length - 1} others`
+                    : item.actor.displayName}
+                </AppText>{' '}
                 {item.description}
               </AppText>
             ) : (
@@ -363,31 +448,29 @@ function ActivityRow({
                 style={[
                   styles.preview,
                   {
-                    backgroundColor: colours.surfaceRaised,
+                    backgroundColor: colours.canvas,
                     borderColor: colours.border,
                     borderRadius: radius.medium,
                     marginTop: spacing[2],
                     padding: spacing[3],
                   },
                 ]}>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={3}>
+                <AppText variant="caption" colour="textSecondary">
                   {item.preview}
                 </AppText>
               </View>
             ) : null}
-            {item.type === 'follow' && item.actor ? (
+            {showStack ? (
               <View style={{marginTop: spacing[2]}}>
                 <StackedAvatars
-                  faces={[
-                    {
-                      id: item.actor.id,
-                      name: item.actor.displayName,
-                      uri: item.actor.avatarUri,
-                      colour: item.actor.coverColour,
-                    },
-                  ]}
+                  faces={uniqueActors.map(actor => ({
+                    id: actor.id,
+                    name: actor.displayName,
+                    uri: actor.avatarUri,
+                    colour: actor.coverColour,
+                  }))}
                   size={28}
-                  max={1}
+                  max={4}
                 />
               </View>
             ) : null}

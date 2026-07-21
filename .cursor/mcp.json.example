@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "modula-greenfield": {
+      "command": "pnpm",
+      "args": [
+        "--filter",
+        "@modula/greenfield-mcp",
+        "exec",
+        "node",
+        "dist/stdio.js"
+      ]
+    }
+  }
+}

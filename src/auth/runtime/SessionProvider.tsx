@@ -2,7 +2,14 @@ import {useCallback, useEffect, useMemo, useState, type PropsWithChildren} from 
 import {useRouter, type Href} from 'expo-router'
 import {useQueryClient} from '@tanstack/react-query'
 
-import type {AuthResult, RegisterAccountInput, SessionState, SignInCredentials} from '@/auth/contracts'
+import type {
+  AuthResult,
+  RegisterAccountInput,
+  RegisterPendingResult,
+  SessionState,
+  SignInCredentials,
+  VerifyEmailInput,
+} from '@/auth/contracts'
 import {SessionActionsContext, type SessionActions} from '@/auth/runtime/SessionActionsContext'
 import {SessionStateContext} from '@/auth/runtime/SessionStateContext'
 import {SESSION_BOOTSTRAP_TIMEOUT_MS} from '@/auth/runtime/SessionBootstrap'
@@ -11,6 +18,12 @@ import {sanitizeReturnTo} from '@/auth/navigation/safeReturnTo'
 import {useAppServices} from '@/runtime/useAppServices'
 
 const localPassword = 'modula-local-password'
+const SESSION_REVOKED_MESSAGE =
+  'Your session was revoked for security. Sign in again to continue.'
+
+function isPendingResult(value: RegisterPendingResult | AuthResult): value is RegisterPendingResult {
+  return 'kind' in value && value.kind === 'pendingVerification'
+}
 
 export function SessionProvider({children}: PropsWithChildren) {
   const router = useRouter()
@@ -18,48 +31,134 @@ export function SessionProvider({children}: PropsWithChildren) {
   const services = useAppServices()
   const [session, setSession] = useState<SessionState>({status: 'booting'})
 
+  const persistAuthResult = useCallback(
+    async (result: AuthResult) => {
+      services.accessTokenStore.set(result.tokens.accessToken)
+      await services.sessionStorage.setSessionBundle({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        sessionId: result.session.sessionId,
+        accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+      })
+      setSession(result.session)
+    },
+    [services],
+  )
+
   const acceptAuthResult = useCallback(
     async (result: AuthResult, returnTo = '/') => {
-      services.accessTokenStore.set(result.tokens.accessToken)
-      await services.sessionStorage.setRefreshToken(result.tokens.refreshToken)
-      setSession(result.session)
+      await persistAuthResult(result)
       await queryClient.cancelQueries()
       await queryClient.invalidateQueries()
       router.replace(sanitizeReturnTo(returnTo) as Href)
     },
-    [queryClient, router, services],
+    [persistAuthResult, queryClient, router],
   )
+
+  const clearLocalSession = useCallback(async () => {
+    await services.sessionStorage.clearSessionBundle().catch(() => undefined)
+    services.accessTokenStore.clear()
+    await queryClient.cancelQueries()
+    queryClient.clear()
+  }, [queryClient, services])
 
   const signIn = useCallback(
     async (credentials: SignInCredentials, returnTo = '/') => {
       const email = credentials.email.trim().toLowerCase()
-      const result = await services.authRepository.signIn({...credentials, email})
-      await acceptAuthResult(result, returnTo)
+      try {
+        const result = await services.authRepository.signIn({...credentials, email})
+        await acceptAuthResult(result, returnTo)
+      } catch (error) {
+        const code =
+          error && typeof error === 'object' && 'code' in error
+            ? String((error as {code: string}).code)
+            : undefined
+        if (code === 'pendingVerification' || code === 'FORBIDDEN') {
+          setSession({status: 'pendingVerification', email})
+          router.replace('/verify-email' as Href)
+          return
+        }
+        if (code === 'suspended') {
+          setSession({status: 'suspended'})
+          return
+        }
+        throw error
+      }
     },
-    [acceptAuthResult, services.authRepository],
+    [acceptAuthResult, router, services.authRepository],
   )
 
   const register = useCallback(
-    async (input: RegisterAccountInput, returnTo = '/') => {
+    async (input: RegisterAccountInput, _returnTo = '/') => {
+      const email = input.email.trim().toLowerCase()
       const result = await services.authRepository.register({
         ...input,
-        email: input.email.trim().toLowerCase(),
+        email,
         handle: input.handle.trim().toLowerCase(),
       })
-      await acceptAuthResult(result, returnTo)
+      if (isPendingResult(result)) {
+        setSession({
+          status: 'pendingVerification',
+          email: result.email,
+          accountId: result.accountId,
+          primaryHandle: result.primaryHandle,
+          verificationToken: result.verificationToken,
+        })
+        router.replace(
+          `/verify-email?email=${encodeURIComponent(result.email)}&token=${encodeURIComponent(result.verificationToken ?? '')}` as Href,
+        )
+        return
+      }
+      await acceptAuthResult(result, '/')
     },
-    [acceptAuthResult, services.authRepository],
+    [acceptAuthResult, router, services.authRepository],
+  )
+
+  const verifyEmail = useCallback(
+    async (input: VerifyEmailInput) => {
+      try {
+        const result = await services.authRepository.verifyEmail(input)
+        if (
+          'kind' in result &&
+          (result as {kind?: string}).kind === 'verifiedSignInRequired'
+        ) {
+          setSession({status: 'signedOut'})
+          router.replace(
+            `/sign-in?email=${encodeURIComponent(input.email ?? '')}&verified=1` as Href,
+          )
+          return
+        }
+        await acceptAuthResult(result as AuthResult, '/')
+      } catch (error) {
+        const code =
+          error && typeof error === 'object' && 'code' in error
+            ? String((error as {code: string}).code)
+            : undefined
+        throw error
+      }
+    },
+    [acceptAuthResult, router, services.authRepository],
+  )
+
+  const resendVerification = useCallback(
+    async (email: string) => {
+      await services.authRepository.resendVerification(email)
+    },
+    [services.authRepository],
   )
 
   const continueAsGuest = useCallback(() => {
     services.accessTokenStore.clear()
-    void services.sessionStorage.clearRefreshToken().catch(() => undefined)
+    void services.sessionStorage.clearSessionBundle().catch(() => undefined)
     setSession({status: 'guest'})
     router.replace('/' as Href)
   }, [router, services])
 
   const continueAsDemo = useCallback(
     async (email: 'andrei@modula.local' | 'gaia@modula.local') => {
+      if (runtimeEnvironment.appEnvironment === 'production') {
+        throw new Error('Demo accounts are unavailable in production.')
+      }
       const result = await services.authRepository.signIn({
         email,
         password: localPassword,
@@ -72,22 +171,19 @@ export function SessionProvider({children}: PropsWithChildren) {
   const signOut = useCallback(async () => {
     const refreshToken = await services.sessionStorage.getRefreshToken().catch(() => null)
     await services.authRepository.signOut(refreshToken).catch(() => undefined)
-    await services.sessionStorage.clearRefreshToken().catch(() => undefined)
-    services.accessTokenStore.clear()
-    await queryClient.cancelQueries()
-    queryClient.clear()
+    await clearLocalSession()
     setSession({status: 'signedOut'})
     router.replace('/welcome' as Href)
-  }, [queryClient, router, services])
+  }, [clearLocalSession, router, services])
 
   useEffect(() => {
     services.refreshCoordinator.onFailed(() => {
-      services.accessTokenStore.clear()
-      queryClient.clear()
-      setSession({status: 'signedOut', error: 'Session expired.'})
-      router.replace('/welcome' as Href)
+      void clearLocalSession().then(() => {
+        setSession({status: 'signedOut', error: SESSION_REVOKED_MESSAGE})
+        router.replace('/sign-in' as Href)
+      })
     })
-  }, [queryClient, router, services])
+  }, [clearLocalSession, router, services])
 
   useEffect(() => {
     let active = true
@@ -103,31 +199,39 @@ export function SessionProvider({children}: PropsWithChildren) {
         }
         if (runtimeEnvironment.demoSession === 'signedOut') {
           if (active) setSession({status: 'signedOut'})
-          router.replace('/welcome' as Href)
           return
         }
-        const stored = await services.sessionStorage.getRefreshToken().catch(() => null)
-        if (stored) {
-          const refreshed = await services.authRepository.refresh(stored)
-          services.accessTokenStore.set(refreshed.tokens.accessToken)
-          await services.sessionStorage.setRefreshToken(refreshed.tokens.refreshToken)
-          if (active) setSession(refreshed.session)
-          return
+        const bundle = await services.sessionStorage.getSessionBundle().catch(() => null)
+        if (bundle?.refreshToken) {
+          try {
+            const refreshed = await services.authRepository.refresh(bundle.refreshToken)
+            await persistAuthResult(refreshed)
+            return
+          } catch {
+            await clearLocalSession()
+            if (active) {
+              setSession({status: 'signedOut', error: SESSION_REVOKED_MESSAGE})
+              router.replace('/sign-in' as Href)
+            }
+            return
+          }
         }
-        if (runtimeEnvironment.demoSession === 'owner' && runtimeEnvironment.appEnvironment !== 'production') {
+        // Demo-owner bootstrap is development-only and opt-in via EXPO_PUBLIC_DEMO_SESSION=owner.
+        if (
+          runtimeEnvironment.demoSession === 'owner' &&
+          runtimeEnvironment.appEnvironment !== 'production'
+        ) {
           const result = await services.authRepository.signIn({
             email: 'andrei@modula.local',
             password: localPassword,
           })
-          services.accessTokenStore.set(result.tokens.accessToken)
-          await services.sessionStorage.setRefreshToken(result.tokens.refreshToken)
-          if (active) setSession(result.session)
+          await persistAuthResult(result)
           return
         }
         if (active) setSession({status: 'signedOut'})
       } catch {
         services.accessTokenStore.clear()
-        await services.sessionStorage.clearRefreshToken().catch(() => undefined)
+        await services.sessionStorage.clearSessionBundle().catch(() => undefined)
         if (active) setSession({status: 'signedOut', error: 'Session storage unavailable.'})
       } finally {
         clearTimeout(timeout)
@@ -139,17 +243,27 @@ export function SessionProvider({children}: PropsWithChildren) {
       active = false
       clearTimeout(timeout)
     }
-  }, [router, services])
+  }, [clearLocalSession, persistAuthResult, router, services])
 
   const actions = useMemo<SessionActions>(
     () => ({
       signIn,
       register,
+      verifyEmail,
+      resendVerification,
       continueAsGuest,
       continueAsDemo,
       signOut,
     }),
-    [continueAsDemo, continueAsGuest, register, signIn, signOut],
+    [
+      continueAsDemo,
+      continueAsGuest,
+      register,
+      resendVerification,
+      signIn,
+      signOut,
+      verifyEmail,
+    ],
   )
 
   return (

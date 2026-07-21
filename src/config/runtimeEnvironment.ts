@@ -27,7 +27,8 @@ function readDataSource(
 
 function readDemoSession(value: string | undefined): DemoSessionBootstrap {
   if (value === 'owner' || value === 'guest' || value === 'signedOut') return value
-  return 'owner'
+  // Default signed-out: demo-owner bootstrap is opt-in via EXPO_PUBLIC_DEMO_SESSION=owner.
+  return 'signedOut'
 }
 
 function readApiUrl(value: string | undefined, input: {

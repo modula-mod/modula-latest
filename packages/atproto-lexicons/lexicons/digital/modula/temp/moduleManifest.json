@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "digital.modula.temp.moduleManifest",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Experimental public Modula module manifest. No secrets or installed-user state.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["createdAt", "moduleId", "name", "publicVersion", "publisherDid"],
+        "properties": {
+          "createdAt": {"type": "string", "format": "datetime"},
+          "moduleId": {"type": "string", "maxLength": 128},
+          "name": {"type": "string", "maxLength": 128},
+          "publicDescription": {"type": "string", "maxLength": 2000},
+          "publicVersion": {"type": "string", "maxLength": 64},
+          "publisherDid": {"type": "string", "format": "did"},
+          "repository": {"type": "string", "format": "uri", "maxLength": 512},
+          "homepage": {"type": "string", "format": "uri", "maxLength": 512},
+          "permissionSummary": {"type": "string", "maxLength": 1000},
+          "compatibility": {"type": "string", "maxLength": 256}
+        }
+      }
+    }
+  }
+}

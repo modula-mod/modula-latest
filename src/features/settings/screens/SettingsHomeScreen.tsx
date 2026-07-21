@@ -5,12 +5,14 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
-  SettingsInfoBlock,
   SettingsLinkRow,
   SettingsSection,
   type SettingsNavRow,
 } from '@/features/settings/components/SettingsRows'
+import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useAppearance} from '@/theme/runtime/useAppearance'
@@ -31,9 +33,40 @@ const accountRows: SettingsNavRow[] = [
   },
   {
     title: 'Account',
-    description: 'Session and local prototype account.',
+    description: 'Modula Account, handle, sessions, and export.',
     icon: 'account',
     route: '/settings/account',
+  },
+  {
+    title: 'Connections',
+    description: 'External Networks and optional bridges.',
+    icon: 'integrations',
+    route: '/settings/connections',
+  },
+  {
+    title: 'Extension Centre',
+    description: 'Tools, functions, plugins, modules, and connectors.',
+    icon: 'modules',
+    route: '/settings/extensions',
+  },
+  {
+    title: 'Product Hub',
+    description: 'Full Modula capability map — Social OS catalogue.',
+    icon: 'discover',
+    route: '/product',
+  },
+  {
+    title: 'Feature Control',
+    description: 'Enable, hide, and lock experimental surfaces.',
+    icon: 'settings',
+    route: '/product/feature-control',
+    preview: true,
+  },
+  {
+    title: 'DIMON',
+    description: 'Future economic protocol — not active yet.',
+    icon: 'security',
+    route: '/settings/dimon',
   },
   {
     title: 'Accounts',
@@ -50,6 +83,48 @@ const preferenceRows: SettingsNavRow[] = [
     description: 'Mute, block, inner circle, report.',
     icon: 'privacy',
     route: '/settings/privacy',
+  },
+  {
+    title: 'Glass Privacy',
+    description: 'Disable Sharing, Protected Chat, Vault Chat.',
+    icon: 'privacy',
+    route: '/product/glass-privacy',
+    preview: true,
+  },
+  {
+    title: 'Focus Mode',
+    description: 'Quiet feed, priority modules, Focus Halo.',
+    icon: 'contrast',
+    route: '/product/focus',
+    preview: true,
+  },
+  {
+    title: 'Gaia',
+    description: 'Permission-aware intelligence — planned.',
+    icon: 'automation',
+    route: '/product/gaia',
+    preview: true,
+  },
+  {
+    title: 'Forge',
+    description: 'Module Builder — multi-step Preview.',
+    icon: 'developer',
+    route: '/product/forge',
+    preview: true,
+  },
+  {
+    title: 'Agents',
+    description: 'Gaia agent packages with scopes — Preview.',
+    icon: 'automation',
+    route: '/product/agents',
+    preview: true,
+  },
+  {
+    title: 'Module Standards',
+    description: 'Manifest rules and boilerplate for packages.',
+    icon: 'developer',
+    route: '/product/module-standards',
+    preview: true,
   },
   {
     title: 'Notifications',
@@ -97,6 +172,13 @@ const preferenceRows: SettingsNavRow[] = [
   },
 ]
 
+const productLinkRows: SettingsNavRow[] = PRODUCT_LAB_LINKS.map(link => ({
+  title: link.label,
+  description: link.description,
+  icon: link.icon,
+  route: link.route,
+}))
+
 const supportRows: SettingsNavRow[] = [
   {
     title: 'Help',
@@ -115,6 +197,7 @@ const supportRows: SettingsNavRow[] = [
 export function SettingsHomeScreen() {
   const {preferences, resolved} = useAppearance()
   const {colours, radius, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const [advancedOpen, setAdvancedOpen] = useState(false)
 
@@ -132,6 +215,7 @@ export function SettingsHomeScreen() {
 
   const filteredAccount = accountRows.filter(match)
   const filteredPrefs = preferenceRows.filter(match)
+  const filteredProductLinks = productLinkRows.filter(match)
   const filteredSupport = supportRows.filter(match)
 
   return (
@@ -139,19 +223,16 @@ export function SettingsHomeScreen() {
       <SecondaryScreenHeader title="Settings" />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
-          <SettingsInfoBlock
-            title="Settings"
-            body="Manage the local Modula shell. Every row opens a real screen with usable controls or honest Preview content."
-          />
-
           <View
             style={[
               styles.search,
               {
-                backgroundColor: colours.surfaceMuted,
-                borderRadius: radius.round,
+                backgroundColor: colours.surface,
+                borderColor: colours.separator,
+                borderRadius: radius.large,
+                borderWidth: StyleSheet.hairlineWidth,
                 gap: spacing[2],
                 paddingHorizontal: spacing[3],
               },
@@ -160,7 +241,7 @@ export function SettingsHomeScreen() {
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder="Search settings"
+              placeholder="Search"
               placeholderTextColor={colours.textTertiary}
               accessibilityLabel="Search settings"
               style={[styles.searchInput, {color: colours.text}]}
@@ -171,7 +252,7 @@ export function SettingsHomeScreen() {
             {filteredAccount.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={row}
+                row={{...row, description: undefined}}
                 last={index === filteredAccount.length - 1}
               />
             ))}
@@ -183,6 +264,7 @@ export function SettingsHomeScreen() {
                 key={row.title}
                 row={{
                   ...row,
+                  description: undefined,
                   value:
                     row.title === 'Appearance'
                       ? appearanceValue
@@ -191,6 +273,16 @@ export function SettingsHomeScreen() {
                         : row.value,
                 }}
                 last={index === filteredPrefs.length - 1}
+              />
+            ))}
+          </SettingsSection>
+
+          <SettingsSection title="Product">
+            {filteredProductLinks.map((row, index) => (
+              <SettingsLinkRow
+                key={row.title}
+                row={{...row, description: undefined}}
+                last={index === filteredProductLinks.length - 1}
               />
             ))}
           </SettingsSection>
@@ -212,21 +304,31 @@ export function SettingsHomeScreen() {
             {filteredSupport.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={row}
+                row={{...row, description: undefined}}
                 last={index === filteredSupport.length - 1}
               />
             ))}
           </SettingsSection>
 
-          {runtimeEnvironment.appEnvironment === 'development' ? (
+          {canAccessDeveloperLabs() ? (
             <SettingsSection title="Development">
               <SettingsLinkRow
                 row={{
+                  title: 'Expo UI Lab',
+                  description:
+                    'Pick Expo UI playground components by product context.',
+                  icon: 'developer',
+                  route: '/settings/developer/expo-ui',
+                  value: 'Open',
+                }}
+              />
+              <SettingsLinkRow
+                row={{
                   title: 'Developer',
-                  description: 'Data runtime, session and local tools.',
+                  description: 'Data runtime, session, Expo UI Lab and local tools.',
                   icon: 'developer',
                   route: '/settings/developer',
-                  value: 'Lab available',
+                  value: 'Labs',
                 }}
                 last
               />

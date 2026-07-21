@@ -11,6 +11,8 @@ import {LocalTokenIssuer} from '@/api/local/LocalTokenIssuer'
 
 export type LocalAccountRecord = ModulaAccount & {
   approvedDemo: boolean
+  verificationToken?: string
+  password?: string
 }
 export type LocalProfileRecord = ModulaProfile & {
   accountId: AccountId | null
@@ -272,13 +274,34 @@ export class LocalApiDatabase {
     return clone(this.state.reels)
   }
 
-  createSession(input: {email: string; displayName?: string}): AuthResult {
+  createSession(input: {email: string; displayName?: string; password?: string}): AuthResult {
     const account = this.state.accounts.find(item => item.email === input.email)
     if (!account) throw new Error('Account not found.')
+    if (account.status === 'pendingVerification') {
+      throw Object.assign(new Error('Verify your email before signing in.'), {
+        code: 'pendingVerification',
+      })
+    }
+    if (account.status === 'suspended') {
+      throw Object.assign(new Error('This Modula Account is suspended.'), {code: 'suspended'})
+    }
+    if (account.password && input.password && account.password !== input.password) {
+      throw new Error('Invalid credentials.')
+    }
     return this.createSessionForAccount(account)
   }
 
-  register(input: {email: string; displayName: string; handle: string}): AuthResult {
+  registerPending(input: {
+    email: string
+    displayName: string
+    handle: string
+    password: string
+  }): {
+    accountId: string
+    primaryHandle: string
+    status: 'pendingVerification'
+    verificationToken: string
+  } {
     const normalEmail = input.email.toLowerCase()
     if (this.state.accounts.some(account => account.email === normalEmail)) {
       throw new Error('Email already exists.')
@@ -286,12 +309,21 @@ export class LocalApiDatabase {
     if (this.state.profiles.some(profile => profile.handle === input.handle)) {
       throw new Error('Handle already exists.')
     }
+    const accountId = `account-${input.handle.replace(/[^a-z0-9-]/gi, '-')}`
+    const verificationToken = `verify-${accountId}-${Date.now().toString(36)}`
+    const now = this.clock.iso()
     const account: LocalAccountRecord = {
-      id: parseAccountId(`account-${input.handle.replace(/[^a-z0-9-]/gi, '-')}`),
+      id: parseAccountId(accountId),
+      accountId,
       email: normalEmail,
       displayName: input.displayName,
-      createdAt: this.clock.iso(),
+      primaryHandle: input.handle,
+      status: 'pendingVerification',
+      createdAt: now,
+      updatedAt: now,
       approvedDemo: true,
+      verificationToken,
+      password: input.password,
     }
     const profile: LocalProfileRecord = {
       ...clone(this.state.profiles[0]),
@@ -306,10 +338,94 @@ export class LocalApiDatabase {
       postCount: 0,
       isFollowing: false,
       followsViewer: false,
+      joinedAt: now,
     }
     this.state.accounts.push(account)
     this.state.profiles.push(profile)
-    return this.createSessionForAccount(account)
+    return {
+      accountId,
+      primaryHandle: input.handle,
+      status: 'pendingVerification',
+      verificationToken,
+    }
+  }
+
+  /** Legacy helper used by Phase 4 fixtures — registers and signs in immediately. */
+  register(input: {email: string; displayName: string; handle: string}): AuthResult {
+    const pending = this.registerPending({...input, password: 'modula-local-password'})
+    this.verifyEmail(pending.verificationToken)
+    return this.createSession({email: input.email.toLowerCase(), password: 'modula-local-password'})
+  }
+
+  verifyEmail(token: string): {verified: true; accountId: string} {
+    const account = this.state.accounts.find(item => item.verificationToken === token)
+    if (!account) throw new Error('Invalid or expired verification token.')
+    account.status = 'active'
+    account.updatedAt = this.clock.iso()
+    account.verificationToken = undefined
+    return {verified: true, accountId: account.accountId}
+  }
+
+  getAccountByAccessToken(accessToken: string, expiryEnabled: boolean): LocalAccountRecord | null {
+    const session = this.state.sessions.find(item => item.accessToken === accessToken && !item.revoked)
+    if (!session) return null
+    if (expiryEnabled && Date.parse(session.accessTokenExpiresAt) <= Date.now()) return null
+    return this.state.accounts.find(item => item.id === session.accountId) ?? null
+  }
+
+  changeHandle(accountId: AccountId, handle: string): {handle: string; accountId: string} {
+    const account = this.state.accounts.find(item => item.id === accountId)
+    if (!account) throw new Error('Account not found.')
+    if (this.state.profiles.some(profile => profile.handle === handle && profile.accountId !== accountId)) {
+      throw new Error('Handle already exists.')
+    }
+    const previous = account.primaryHandle
+    account.primaryHandle = handle
+    account.updatedAt = this.clock.iso()
+    const profile = this.state.profiles.find(item => item.accountId === accountId)
+    if (profile) profile.handle = handle
+    void previous
+    return {handle, accountId: account.accountId}
+  }
+
+  listSessionsForAccount(accountId: AccountId) {
+    return this.state.sessions
+      .filter(session => session.accountId === accountId && !session.revoked)
+      .map(session => ({
+        sessionId: session.id,
+        accountId: String(accountId),
+        status: 'active' as const,
+        createdAt: session.accessTokenExpiresAt,
+        lastSeenAt: this.clock.iso(),
+        expiresAt: session.refreshTokenExpiresAt,
+        revokedAt: null,
+        platform: 'unknown' as const,
+      }))
+  }
+
+  revokeSessionById(sessionId: string, accountId: AccountId) {
+    this.state.sessions = this.state.sessions.map(session =>
+      session.id === sessionId && session.accountId === accountId
+        ? {...session, revoked: true}
+        : session,
+    )
+  }
+
+  revokeAllSessions(accountId: AccountId) {
+    this.state.sessions = this.state.sessions.map(session =>
+      session.accountId === accountId ? {...session, revoked: true} : session,
+    )
+  }
+
+  createExport(accountId: AccountId) {
+    return {
+      exportId: `export-${accountId}-${Date.now().toString(36)}`,
+      status: 'completed' as const,
+      createdAt: this.clock.iso(),
+      downloadUrl: `modula://local-export/${accountId}`,
+      integrityNote:
+        'Local simulation export. Production exports include Greenfield integrity metadata and private-record handling.',
+    }
   }
 
   refreshSession(refreshToken: RefreshToken): AuthResult | null {
@@ -398,12 +514,42 @@ export class LocalApiDatabase {
   private sessionPayload(session: LocalSessionRecord): AuthResult['session'] {
     const account = this.state.accounts.find(item => item.id === session.accountId)
     if (!account) throw new Error('Account not found.')
+    const {approvedDemo: _approved, verificationToken: _token, password: _password, ...publicAccount} =
+      account
     return {
       status: 'signedIn',
       sessionId: session.id,
-      account: clone(account),
+      account: clone(publicAccount),
+      greenfieldAccount: {
+        accountId: account.accountId,
+        primaryHandle: account.primaryHandle,
+        status: account.status,
+        createdAt: account.createdAt,
+        updatedAt: account.updatedAt,
+      },
       profile: this.getOwnerProfile(account.id),
       accessTokenExpiresAt: session.accessTokenExpiresAt,
+    }
+  }
+
+  toSessionTokenResponse(result: AuthResult) {
+    return {
+      accessToken: result.tokens.accessToken,
+      refreshToken: result.tokens.refreshToken,
+      sessionId: result.session.sessionId,
+      accessExpiresAt: result.tokens.accessTokenExpiresAt,
+      refreshExpiresAt: this.clock.daysFromNow(30),
+    }
+  }
+
+  toPublicAccount(account: LocalAccountRecord) {
+    return {
+      accountId: account.accountId,
+      primaryHandle: account.primaryHandle,
+      status: account.status,
+      createdAt: account.createdAt,
+      updatedAt: account.updatedAt,
+      email: account.email,
     }
   }
 

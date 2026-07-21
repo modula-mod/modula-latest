@@ -13,5 +13,14 @@ The main application contains the module host.
 - Modules cannot import private host internals.
 - The host must remain launchable when every optional module is disabled.
 
+## Standards & boilerplate
+
+- Standards: `docs/architecture/module-standards.md`
+- Boundary: `docs/architecture/module-boundary.md`
+- Manifest type: `GreenfieldModuleManifest` in `@modula/greenfield-contracts`
+- Boilerplate: `templates/modula-module/`
+- Forge Builder (manifest draft Preview): `/product/forge`
+- Agents module studio (Preview): `/product/agents`
+
 Do not implement dynamic code fetching during Phase 0.
-Do not create Vault Notes, Tasks, or CRM yet.
+Do not create Vault Notes, Tasks, or CRM as host features — they remain external modules.

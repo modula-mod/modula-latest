@@ -1,4 +1,5 @@
 import type {AccountId, PostId, ProfileId} from '@/api/contracts'
+import type {AtmosphereFeedMode} from '@modula/api-contracts'
 import type {FeedMode} from '@/domain/social'
 
 export const queryKeys = {
@@ -19,6 +20,11 @@ export const queryKeys = {
     saved: (accountId?: AccountId | 'guest' | 'signedOut') =>
       ['posts', 'saved', accountId ?? 'public'] as const,
   },
+  comments: {
+    all: ['comments'] as const,
+    post: (postId: PostId) => ['comments', 'post', postId] as const,
+    replies: (commentId: string) => ['comments', 'replies', commentId] as const,
+  },
   profiles: {
     all: ['profiles'] as const,
     byHandle: (handle: string) => ['profiles', 'handle', handle] as const,
@@ -35,5 +41,18 @@ export const queryKeys = {
   },
   reels: {
     all: ['reels'] as const,
+  },
+  metadata: {
+    all: ['metadata'] as const,
+    current: () => ['metadata', 'current'] as const,
+  },
+  atproto: {
+    all: ['atproto'] as const,
+    connections: (accountId?: AccountId | 'guest' | 'signedOut') =>
+      ['atproto', 'connections', accountId ?? 'public'] as const,
+    connection: (connectionId: string) => ['atproto', 'connection', connectionId] as const,
+    preferences: (accountId?: AccountId | 'guest' | 'signedOut') =>
+      ['atproto', 'preferences', accountId ?? 'public'] as const,
+    atmosphere: (mode: AtmosphereFeedMode) => ['atproto', 'atmosphere', mode] as const,
   },
 }

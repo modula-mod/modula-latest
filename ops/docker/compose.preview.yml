@@ -1,7 +1,7 @@
 name: modula-preview
 
 services:
-  postgres:
+  greenfield-postgres:
     image: postgres:16.9-alpine
     restart: unless-stopped
     environment:
@@ -25,17 +25,17 @@ services:
       timeout: 5s
       retries: 10
 
-  api:
+  greenfield-api:
     build:
       context: ../..
-      dockerfile: ops/docker/api.Dockerfile
+      dockerfile: ops/docker/greenfield-api.Dockerfile
     restart: unless-stopped
     env_file:
-      - /etc/modula/api.env
+      - /etc/modula/greenfield-api.env
     ports:
       - '127.0.0.1:4020:4020'
     depends_on:
-      postgres:
+      greenfield-postgres:
         condition: service_healthy
     networks:
       - modula_internal
@@ -44,6 +44,23 @@ services:
       interval: 15s
       timeout: 5s
       retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+  greenfield-worker:
+    build:
+      context: ../..
+      dockerfile: ops/docker/greenfield-worker.Dockerfile
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/greenfield-worker.env
+    depends_on:
+      greenfield-postgres:
+        condition: service_healthy
+      greenfield-api:
+        condition: service_healthy
+    networks:
+      - modula_internal
     security_opt:
       - no-new-privileges:true
 

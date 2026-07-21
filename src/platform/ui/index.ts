@@ -7,7 +7,28 @@
 export * from '@/platform/ui/buttons/button-role'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
-export * from '@/platform/ui/camera'
+export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
+export {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+export type {
+  ModulaSegmentedAppearance,
+  ModulaSegmentedOption,
+  ModulaSegmentedPickerProps,
+} from '@/platform/ui/controls/modula-segmented-picker.types'
+// Camera / video adapters stay out of this startup barrel — they must not
+// pull expo-camera / expo-video into `_layout` before a native rebuild.
+// Import from `@/platform/ui/camera/*` or `@/platform/ui/video` at call sites.
+export {
+  captureMediaFromSource,
+  presentMediaSourceMenu,
+} from '@/platform/ui/camera'
+export type {
+  PresentMediaSourceMenuOptions,
+  MediaSourceMenuResult,
+  MediaCaptureOptions,
+  MediaCaptureResult,
+  MediaCaptureSource,
+  MediaCaptureTarget,
+} from '@/platform/ui/camera'
 export * from '@/platform/ui/keyboard'
 export * from '@/platform/ui/menus'
 export {AccountPanelProvider, useAccountPanel} from '@/platform/ui/navigation/AccountPanelContext'

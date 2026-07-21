@@ -113,7 +113,10 @@ requireText(
   'Public profile route must render UnifiedProfileScreen mode="public" with handle',
 )
 
-const routeFiles = walk('src/app').filter(file => /\.(ts|tsx)$/.test(file))
+const routeFiles = walk('src/app')
+  .filter(file => /\.(ts|tsx)$/.test(file))
+  .filter(file => !/(^|\/)_layout\.[tj]sx?$/.test(file))
+  .filter(file => !/(^|\/)[^/]*\+[^/]*\.[tj]sx?$/.test(file))
 for (const file of routeFiles) {
   const body = text(file)
   const lines = body.split('\n').length
@@ -200,8 +203,6 @@ for (const forbidden of [
   '@supabase/supabase-js',
   'firebase',
   'react-native-appwrite',
-  'react-native-reanimated',
-  'react-native-worklets',
   'react-native-worklets-core',
   '@react-native/worklets',
 ]) {

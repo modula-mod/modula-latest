@@ -1,43 +1,69 @@
 import {useState} from 'react'
 import {View} from 'react-native'
-import {useLocalSearchParams} from 'expo-router'
+import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
 import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
-import {sanitizeReturnTo} from '@/auth/navigation/safeReturnTo'
 import {useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {normaliseHandle, validateDisplayName, validateHandle} from '@/features/profile/utils/validators'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+type Step = 'invite' | 'email' | 'password' | 'handle' | 'terms'
+
 export function CreateAccountScreen() {
-  const params = useLocalSearchParams<{returnTo?: string}>()
+  const params = useLocalSearchParams<{inviteRequired?: string}>()
+  const router = useRouter()
   const {register} = useSessionActions()
   const {spacing} = useThemeTokens()
+  const inviteRequired = params.inviteRequired === '1'
+  const [step, setStep] = useState<Step>(inviteRequired ? 'invite' : 'email')
+  const [inviteCode, setInviteCode] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [handle, setHandle] = useState('')
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
-  const submit = async () => {
-    const nameResult = validateDisplayName(displayName)
-    const handleResult = validateHandle(handle)
-    if (!nameResult.valid || !handleResult.valid) {
-      if (!nameResult.valid) {
-        setError(nameResult.message)
-      } else if (!handleResult.valid) {
-        setError(handleResult.message)
-      }
-      return
-    }
+  const nextFromEmail = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase())) {
       setError('Enter a valid email address.')
       return
     }
-    if (password.length < 8 || password !== confirmation) {
-      setError('Passwords must match and be at least eight characters.')
+    const nameResult = validateDisplayName(displayName)
+    if (!nameResult.valid) {
+      setError(nameResult.message)
+      return
+    }
+    setError(null)
+    setStep('password')
+  }
+
+  const nextFromPassword = () => {
+    if (password.length < 10 || password !== confirmation) {
+      setError('Passwords must match and be at least 10 characters.')
+      return
+    }
+    setError(null)
+    setStep('handle')
+  }
+
+  const nextFromHandle = () => {
+    const handleResult = validateHandle(handle)
+    if (!handleResult.valid) {
+      setError(handleResult.message)
+      return
+    }
+    setError(null)
+    setStep('terms')
+  }
+
+  const submit = async () => {
+    if (!acceptedTerms) {
+      setError('Accept the Terms and Privacy notice to continue.')
       return
     }
     setPending(true)
@@ -48,9 +74,11 @@ export function CreateAccountScreen() {
         email,
         handle: normaliseHandle(handle),
         password,
-      }, sanitizeReturnTo(params.returnTo))
+        inviteCode: inviteCode.trim() || undefined,
+        acceptedTerms: true,
+      })
     } catch {
-      setError('That local email or handle is already in use.')
+      setError('That email or handle is already in use, or the invite is invalid.')
     } finally {
       setPending(false)
     }
@@ -59,18 +87,131 @@ export function CreateAccountScreen() {
   return (
     <AuthShell>
       <View style={{gap: spacing[4]}}>
-        <AppText variant="display">Create account</AppText>
-        <AuthPanel>
+        <View style={{gap: spacing[1]}}>
+          <AppText variant="display">Create Modula Account</AppText>
           <AppText variant="caption" colour="textSecondary">
-            This creates a temporary local prototype account.
+            Your account is owned by Greenfield. External Networks are optional and configured later in
+            Settings.
           </AppText>
-          <AuthField label="Display name" value={displayName} onChangeText={setDisplayName} />
-          <AuthField label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-          <AuthField label="Handle" value={handle} onChangeText={value => setHandle(normaliseHandle(value))} autoCapitalize="none" />
-          <AuthField label="Password" value={password} onChangeText={setPassword} secureTextEntry />
-          <AuthField label="Password confirmation" value={confirmation} onChangeText={setConfirmation} secureTextEntry error={error ?? undefined} />
-          <AppButton disabled={pending} onPress={() => void submit()}>
-            {pending ? 'Creating' : 'Create local account'}
+        </View>
+        <AuthPanel>
+          {step === 'invite' ? (
+            <>
+              <AuthField
+                label="Invite code"
+                value={inviteCode}
+                onChangeText={setInviteCode}
+                autoCapitalize="none"
+                textContentType="oneTimeCode"
+                error={error ?? undefined}
+              />
+              <AppButton
+                onPress={() => {
+                  if (!inviteCode.trim()) {
+                    setError('An invite is required for this environment.')
+                    return
+                  }
+                  setError(null)
+                  setStep('email')
+                }}>
+                Continue
+              </AppButton>
+            </>
+          ) : null}
+
+          {step === 'email' ? (
+            <>
+              <AuthField
+                label="Display name"
+                value={displayName}
+                onChangeText={setDisplayName}
+                textContentType="name"
+                returnKeyType="next"
+              />
+              <AuthField
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                returnKeyType="next"
+                error={error ?? undefined}
+              />
+              <AppButton onPress={nextFromEmail}>Continue</AppButton>
+            </>
+          ) : null}
+
+          {step === 'password' ? (
+            <>
+              <AuthField
+                label="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                textContentType="newPassword"
+                returnKeyType="next"
+              />
+              <AuthField
+                label="Confirm password"
+                value={confirmation}
+                onChangeText={setConfirmation}
+                secureTextEntry
+                textContentType="newPassword"
+                returnKeyType="done"
+                error={error ?? undefined}
+              />
+              <AppButton onPress={nextFromPassword}>Continue</AppButton>
+            </>
+          ) : null}
+
+          {step === 'handle' ? (
+            <>
+              <AuthField
+                label="Handle"
+                value={handle}
+                onChangeText={value => setHandle(normaliseHandle(value))}
+                autoCapitalize="none"
+                textContentType="username"
+                returnKeyType="done"
+                error={error ?? undefined}
+              />
+              <AppText variant="caption" colour="textSecondary">
+                Your handle is public and can change later. Your account ID never changes.
+              </AppText>
+              <AppButton onPress={nextFromHandle}>Continue</AppButton>
+            </>
+          ) : null}
+
+          {step === 'terms' ? (
+            <>
+              <AppText variant="body">
+                By creating a Modula Account you agree to the Terms of Use and acknowledge the Privacy
+                notice. Your Greenfield repository stays under your account.
+              </AppText>
+              <AppPressable
+                accessibilityLabel="Accept terms and privacy"
+                onPress={() => setAcceptedTerms(value => !value)}>
+                <AppText variant="bodyStrong" colour={acceptedTerms ? 'accent' : 'text'}>
+                  {acceptedTerms ? '✓ Terms and Privacy accepted' : 'Accept Terms and Privacy'}
+                </AppText>
+              </AppPressable>
+              {error ? (
+                <AppText variant="caption" colour="destructive">
+                  {error}
+                </AppText>
+              ) : null}
+              <AppButton disabled={pending} onPress={() => void submit()}>
+                {pending ? 'Creating' : 'Create Modula Account'}
+              </AppButton>
+            </>
+          ) : null}
+
+          <AppButton variant="ghost" onPress={() => router.push('/sign-in' as Href)}>
+            Already have an account? Sign in
+          </AppButton>
+          <AppButton variant="ghost" onPress={() => router.back()}>
+            Back
           </AppButton>
         </AuthPanel>
       </View>

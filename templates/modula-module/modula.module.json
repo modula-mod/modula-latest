@@ -1,0 +1,50 @@
+{
+  "moduleId": "digital.modula.example",
+  "name": "Example Module",
+  "description": "Boilerplate Modula module — replace before publishing.",
+  "repositoryUrl": "https://github.com/modula-mod/example-module",
+  "packageVersion": "0.1.0",
+  "hostCompatibility": {
+    "minimumHostVersion": "0.1.0"
+  },
+  "routes": [
+    {
+      "path": "/modules/digital.modula.example",
+      "title": "Example",
+      "capability": "module.route"
+    }
+  ],
+  "profileTabs": [
+    {
+      "tabId": "example",
+      "title": "Example",
+      "route": "/modules/digital.modula.example"
+    }
+  ],
+  "boardSurfaces": [
+    {
+      "surfaceId": "example-card",
+      "title": "Example card"
+    }
+  ],
+  "settings": [
+    {
+      "settingsId": "example-settings",
+      "title": "Example settings",
+      "route": "/settings/extensions/digital.modula.example"
+    }
+  ],
+  "tools": ["composer.example"],
+  "widgets": ["board.example"],
+  "capabilities": [
+    "board.card",
+    "profile.tab",
+    "settings.section",
+    "composer.tool"
+  ],
+  "permissions": [
+    "storage:namespaced",
+    "profile:read"
+  ],
+  "uninstallBehaviour": "exportThenPurge"
+}

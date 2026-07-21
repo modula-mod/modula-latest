@@ -20,8 +20,19 @@ import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import type {DraftLinkPreview, PendingMediaAttachment, PostAudience, ReplyPermission} from '@/domain/social'
+import {PublicationStatusBanner} from '@/features/atproto/components/PublicationStatusBanner'
+import {useAtprotoCapability} from '@/features/atproto/data/useApiMetadataQuery'
+import {usePrimaryAtprotoConnection} from '@/features/atproto/data/useAtprotoConnectionsQuery'
+import {useAtprotoPreferencesQuery} from '@/features/atproto/data/useAtprotoPreferences'
+import {
+  destinationToPublishFlag,
+  evaluateCrossPostEligibility,
+  resolveDefaultDestination,
+  type PublishingDestination,
+} from '@/features/atproto/publishing/canCrossPost'
 import {useCreatePostMutation} from '@/features/feed/data'
 import {selectionHaptic, lightImpactHaptic} from '@/lib/haptics'
+import {useAppServices} from '@/runtime/useAppServices'
 import {
   KeyboardSafeScreen,
   captureMediaFromSource,
@@ -131,6 +142,26 @@ const AUDIENCE_LABEL: Record<PostAudience, string> = {
   modules: 'Modules',
 }
 
+const DESTINATION_OPTIONS = [
+  {
+    id: 'modula' as const,
+    label: 'Modula',
+    description: 'Publish on Modula only. Default destination.',
+    icon: 'home' as AppIconName,
+  },
+  {
+    id: 'modula+atproto' as const,
+    label: 'Modula + External Network',
+    description: 'Optional: also publish a public copy via connected External Networks (AT Protocol).',
+    icon: 'integrations' as AppIconName,
+  },
+]
+
+const DESTINATION_LABEL: Record<PublishingDestination, string> = {
+  modula: 'Modula',
+  'modula+atproto': 'Modula + External Network',
+}
+
 const REPLY_LABEL: Record<ReplyPermission, string> = {
   everyone: 'Everyone can reply',
   followers: 'Followers can reply',
@@ -157,13 +188,19 @@ export function ComposerScreen() {
     mode?: string
     replyTo?: string
     thread?: string
+    quotePostId?: string
   }>()
   const insets = useSafeAreaInsets()
   const session = useSession()
+  const {apiClient} = useAppServices()
   const createPostMutation = useCreatePostMutation()
   const {colours, radius, spacing} = useThemeTokens()
+  const atprotoPublishing = useAtprotoCapability('atprotoPublishing')
+  const {connection} = usePrimaryAtprotoConnection()
+  const preferencesQuery = useAtprotoPreferencesQuery()
 
   const isReplyMode = params.mode === 'reply' || Boolean(params.replyTo)
+  const isQuoteMode = Boolean(params.quotePostId)
   const isThreadPreview = params.thread === '1' || params.mode === 'thread'
 
   const [text, setText] = useState('')
@@ -174,13 +211,35 @@ export function ComposerScreen() {
   const [link, setLink] = useState<DraftLinkPreview | null>(null)
   const [poll, setPoll] = useState<PollPreview | null>(null)
   const [audience, setAudience] = useState<PostAudience>('public')
+  const [destination, setDestination] = useState<PublishingDestination>('modula')
   const [replyPermission, setReplyPermission] = useState<ReplyPermission>('everyone')
   const [contentWarning, setContentWarning] = useState<ContentWarning>('none')
   const [toolsOpen, setToolsOpen] = useState(false)
   const [audienceOpen, setAudienceOpen] = useState(false)
+  const [destinationOpen, setDestinationOpen] = useState(false)
   const [replyOpen, setReplyOpen] = useState(false)
   const [cwOpen, setCwOpen] = useState(false)
   const [permissionMessage, setPermissionMessage] = useState<string | null>(null)
+  const [publicationBanner, setPublicationBanner] = useState<
+    'publishedOnModula' | 'publishingToAtproto' | 'needsAttention' | null
+  >(null)
+
+  const crossPostEligibility = evaluateCrossPostEligibility({
+    atprotoPublishingCapability: atprotoPublishing,
+    connection,
+    preferences: preferencesQuery.data,
+    audience,
+    media: media ? [media] : [],
+    poll,
+    isDraft: false,
+    textLength: text.trim().length,
+    sensitiveInternal: contentWarning !== 'none',
+  })
+
+  const showDestinationSelector = crossPostEligibility.allowed
+  const effectiveDestination: PublishingDestination = showDestinationSelector
+    ? destination
+    : 'modula'
 
   const hasDraft = Boolean(text.trim() || media || link || poll)
   const canPost = hasDraft && !createPostMutation.isPending
@@ -256,29 +315,60 @@ export function ComposerScreen() {
 
   const publish = async () => {
     if (!canPost || session.status !== 'signedIn') return
+
+    // Never silently change audience to Public for AT cross-posting.
+    const publishToAtproto =
+      showDestinationSelector && destinationToPublishFlag(effectiveDestination)
+    if (publishToAtproto && !crossPostEligibility.allowed) {
+      setPermissionMessage('This post cannot be cross-posted to AT Protocol.')
+      return
+    }
+
     try {
-      await createPostMutation.mutateAsync({
-        text,
-        audience: apiAudience(audience),
-        replyPermission: apiReplyPermission(replyPermission),
-        media: media ? [media] : [],
-        linkPreview: link ?? undefined,
-        poll: poll ?? undefined,
-        idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
-      })
+      if (isQuoteMode && params.quotePostId) {
+        await apiClient.post(
+          {
+            path: `/v1/posts/${params.quotePostId}/quote`,
+            body: {
+              commentary: text,
+              idempotencyKey: `quote-${Date.now()}-${Math.round(Math.random() * 999999)}`,
+            },
+            authenticated: true,
+          },
+          value => value,
+        )
+      } else {
+        await createPostMutation.mutateAsync({
+          text,
+          audience: apiAudience(audience),
+          replyPermission: apiReplyPermission(replyPermission),
+          media: media ? [media] : [],
+          linkPreview: link ?? undefined,
+          poll: poll ?? undefined,
+          idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
+          publishToAtproto,
+        })
+      }
+      setPublicationBanner(publishToAtproto ? 'publishingToAtproto' : 'publishedOnModula')
       setText('')
       setMedia(null)
       setLink(null)
       setPoll(null)
       setAltText('')
+      setDestination(
+        resolveDefaultDestination(preferencesQuery.data, crossPostEligibility.allowed),
+      )
       void lightImpactHaptic()
       Keyboard.dismiss()
       if (isReplyMode && params.replyTo) {
         router.replace(`/post/${params.replyTo}` as Href)
+      } else if (isQuoteMode && params.quotePostId) {
+        router.replace(`/post/${params.quotePostId}` as Href)
       } else {
         router.replace('/index' as Href)
       }
     } catch {
+      setPublicationBanner('needsAttention')
       setPermissionMessage('Post failed. Your draft is still here so you can retry.')
     }
   }
@@ -434,6 +524,11 @@ export function ComposerScreen() {
             Replying to post {params.replyTo}
           </AppText>
         ) : null}
+        {isQuoteMode && params.quotePostId ? (
+          <AppText variant="caption" colour="textSecondary">
+            Quoting a post — add your commentary below.
+          </AppText>
+        ) : null}
         {isThreadPreview ? (
           <Surface variant="muted" style={{padding: spacing[3], borderRadius: radius.md}}>
             <AppText variant="caption" colour="textSecondary">
@@ -469,7 +564,39 @@ export function ComposerScreen() {
             </AppText>
             <AppIcon name="arrowDown" colour={colours.accent} size={12} />
           </AppPressable>
+          {showDestinationSelector ? (
+            <AppPressable
+              accessibilityLabel={`Publish to ${DESTINATION_LABEL[effectiveDestination]}`}
+              onPress={() => {
+                Keyboard.dismiss()
+                setDestinationOpen(true)
+              }}
+              style={[
+                styles.audience,
+                {
+                  backgroundColor: colours.surfaceMuted,
+                  borderColor: colours.border,
+                  borderRadius: radius.round,
+                },
+              ]}>
+              <AppIcon name="integrations" colour={colours.accent} size={14} />
+              <AppText variant="label" style={{color: colours.accent}}>
+                {DESTINATION_LABEL[effectiveDestination]}
+              </AppText>
+              <AppIcon name="arrowDown" colour={colours.accent} size={12} />
+            </AppPressable>
+          ) : null}
         </View>
+
+        {publicationBanner ? (
+          <PublicationStatusBanner
+            status={publicationBanner}
+            onKeepModulaOnly={() => {
+              setDestination('modula')
+              setPublicationBanner('publishedOnModula')
+            }}
+          />
+        ) : null}
 
         <TextInput
           value={text}
@@ -705,9 +832,31 @@ export function ComposerScreen() {
         selectedId={audience}
         onSelect={id => {
           setAudience(id)
+          // Private / non-public audiences can never cross-post; never auto-force Public.
+          if (id !== 'public') {
+            setDestination('modula')
+          }
           void selectionHaptic()
         }}
         testID="composer-audience-sheet"
+      />
+      <SelectionSheet
+        isPresented={destinationOpen}
+        onDismiss={() => setDestinationOpen(false)}
+        title="Publish to"
+        subtitle="Default destination is Modula only"
+        options={DESTINATION_OPTIONS}
+        selectedId={effectiveDestination}
+        onSelect={id => {
+          if (id === 'modula+atproto' && !crossPostEligibility.allowed) {
+            setPermissionMessage('AT Protocol cross-post is unavailable for this post.')
+            setDestination('modula')
+            return
+          }
+          setDestination(id)
+          void selectionHaptic()
+        }}
+        testID="composer-destination-sheet"
       />
       <SelectionSheet
         isPresented={replyOpen}
@@ -731,6 +880,9 @@ export function ComposerScreen() {
         selectedId={contentWarning}
         onSelect={id => {
           setContentWarning(id)
+          if (id !== 'none') {
+            setDestination('modula')
+          }
           void selectionHaptic()
         }}
         testID="composer-content-warning-sheet"

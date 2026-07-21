@@ -1,59 +1,151 @@
-import {View, StyleSheet} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
-import {AppScreen} from '@/components/primitives/AppScreen'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {useSession, useSessionActions} from '@/auth/runtime'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {
+  SettingsLinkRow,
+  SettingsOverflowMenu,
+  SettingsScreen,
+  SettingsSection,
+} from '@/features/settings/components/SettingsRows'
+import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 
 export function AccountScreen() {
   const session = useSession()
   const {signOut} = useSessionActions()
-  const {spacing} = useThemeTokens()
-  const profile = session.status === 'signedIn' ? session.profile : null
-  const account = session.status === 'signedIn' ? session.account : null
+  const router = useRouter()
+  const signedIn = session.status === 'signedIn'
+  const account = signedIn ? session.account : null
+  const greenfield = signedIn ? session.greenfieldAccount : null
 
   return (
-    <AppScreen scroll>
-      <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
-        <AppText variant="display">Account</AppText>
-        <Surface variant="contained" style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
-          <Info label="Session" value={session.status} />
-          <Info label="Data source" value={runtimeEnvironment.dataSource} />
-          <Info label="Environment" value={runtimeEnvironment.appEnvironment} />
-          {profile ? <Info label="Profile" value={`${profile.displayName} · @${profile.handle}`} /> : null}
-          {account ? <Info label="Email" value={account.email} /> : null}
-          <Info label="Account type" value={account ? 'Local prototype account' : 'Public browsing'} />
-          {session.status === 'signedIn' ? (
-            <AppButton variant="secondary" onPress={() => void signOut()}>
-              Sign out
-            </AppButton>
-          ) : null}
-        </Surface>
-      </View>
-    </AppScreen>
+    <SettingsScreen
+      title="Account"
+      caption="Your account is owned by Greenfield. Changing your handle does not change your account ID, ownership, followers, repository, modules, or future DIMON linkage."
+      right={
+        signedIn ? (
+          <SettingsOverflowMenu
+            title="Account"
+            actions={[
+              {id: 'sessions', label: 'Active Sessions'},
+              {id: 'export', label: 'Export data'},
+              {id: 'sign-out', label: 'Sign out', style: 'destructive'},
+            ]}
+            onAction={id => {
+              if (id === 'sessions') router.push('/settings/account/sessions' as Href)
+              if (id === 'export') router.push('/settings/account/export' as Href)
+              if (id === 'sign-out') {
+                void confirmModulaAction({
+                  title: 'Sign out?',
+                  message: 'You can sign back in with this Modula Account anytime.',
+                  confirmLabel: 'Sign out',
+                }).then(ok => {
+                  if (ok) void signOut()
+                })
+              }
+            }}
+          />
+        ) : undefined
+      }>
+      {signedIn && account && greenfield ? (
+        <>
+          <SettingsSection title="Identity">
+            <SettingsLinkRow
+              row={{
+                title: 'Handle',
+                description: `@${greenfield.primaryHandle}`,
+                icon: 'account',
+                route: '/settings/account/handle',
+              }}
+            />
+            <SettingsLinkRow
+              row={{
+                title: 'Email',
+                description: account.email,
+                icon: 'info',
+                route: '/settings/account/email',
+              }}
+            />
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Password',
+                description: 'Change your Modula Account password.',
+                icon: 'security',
+                route: '/settings/account/password',
+              }}
+            />
+          </SettingsSection>
+
+          <SettingsSection title="Security">
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Active Sessions',
+                description: 'Review and revoke Greenfield sessions.',
+                icon: 'switch',
+                route: '/settings/account/sessions',
+              }}
+            />
+          </SettingsSection>
+
+          <SettingsSection title="Your Data">
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Export Greenfield Repository',
+                description: 'Integrity-aware export of your repository.',
+                icon: 'storage',
+                route: '/settings/account/export',
+              }}
+            />
+          </SettingsSection>
+
+          <SettingsSection title="Danger zone">
+            <SettingsLinkRow
+              row={{
+                title: 'Deactivate',
+                description: 'Not available in this build.',
+                icon: 'warning',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Delete account',
+                description: 'Not available — exports remain the portable path.',
+                icon: 'warning',
+                preview: true,
+                onPress: () => undefined,
+              }}
+            />
+          </SettingsSection>
+
+          <AppButton
+            variant="secondary"
+            onPress={() => {
+              void confirmModulaAction({
+                title: 'Sign out?',
+                message: 'You can sign back in with this Modula Account anytime.',
+                confirmLabel: 'Sign out',
+              }).then(ok => {
+                if (ok) void signOut()
+              })
+            }}>
+            Sign out
+          </AppButton>
+        </>
+      ) : (
+        <>
+          <AppText variant="body" colour="textSecondary">
+            Sign in to manage your Modula Account.
+          </AppText>
+          <AppButton onPress={() => router.push('/sign-in' as Href)}>Sign in</AppButton>
+        </>
+      )}
+    </SettingsScreen>
   )
 }
-
-function Info({label, value}: {label: string; value: string}) {
-  return (
-    <View style={styles.info}>
-      <AppText variant="caption" colour="textSecondary">{label}</AppText>
-      <AppText variant="bodyStrong">{value}</AppText>
-    </View>
-  )
-}
-
-const styles = StyleSheet.create({
-  info: {
-    gap: 2,
-  },
-  panel: {},
-  wrap: {
-    maxWidth: 760,
-    width: '100%',
-    alignSelf: 'center',
-  },
-})

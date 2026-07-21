@@ -7,13 +7,18 @@ import {SessionRefreshCoordinator} from '@/auth/runtime/SessionRefreshCoordinato
 import {createSessionStorage} from '@/auth/storage'
 import {
   ApiActivityRepository,
+  ApiAppearanceRepository,
+  ApiAtprotoRepository,
   ApiAuthRepository,
   ApiDiscoverRepository,
+  ApiExtensionRepository,
   ApiFeedRepository,
+  ApiMetadataRepository,
   ApiPostRepository,
   ApiProfileRepository,
   ApiReelsRepository,
   ApiSocialGraphRepository,
+  ApiToolsRepository,
 } from '@/data/repositories/api'
 import type {AppServices} from '@/runtime/AppServices'
 
@@ -58,7 +63,7 @@ export function createAppServices(): AppServices {
     getAccessToken: () => accessTokenStore.get(),
     onSessionExpired: () => refreshCoordinator.refresh(),
   })
-  const authRepository = new ApiAuthRepository(client)
+  const authRepository = new ApiAuthRepository(client, accessTokenStore)
   const sessionStorage = createSessionStorage({
     shouldFail: () => secureStoreFailure,
   })
@@ -69,14 +74,20 @@ export function createAppServices(): AppServices {
   )
 
   return {
+    apiClient: client,
     authRepository,
     feedRepository: new ApiFeedRepository(client),
     postRepository: new ApiPostRepository(client),
     profileRepository: new ApiProfileRepository(client),
     socialGraphRepository: new ApiSocialGraphRepository(client),
     activityRepository: new ApiActivityRepository(client),
+    appearanceRepository: new ApiAppearanceRepository(client),
     discoverRepository: new ApiDiscoverRepository(client),
     reelsRepository: new ApiReelsRepository(client),
+    metadataRepository: new ApiMetadataRepository(client),
+    atprotoRepository: new ApiAtprotoRepository(client),
+    extensionRepository: new ApiExtensionRepository(client),
+    toolsRepository: new ApiToolsRepository(client),
     localApiController,
     accessTokenStore,
     sessionStorage,

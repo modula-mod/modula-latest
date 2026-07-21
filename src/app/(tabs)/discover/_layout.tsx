@@ -10,14 +10,12 @@ export default function DiscoverStackLayout() {
     <Stack
       screenOptions={{
         ...nativeScreenHeaderOptions({title: 'Discover'}),
-        headerStyle: {backgroundColor: colours.canvas},
+        headerStyle: {backgroundColor: 'transparent'},
         headerTintColor: colours.text,
         headerTitleStyle: {color: colours.text},
         contentStyle: {backgroundColor: colours.canvas},
-        headerSearchBarOptions: {
-          placeholder: 'Search Modula',
-          hideWhenScrolling: false,
-        },
+        // In-body search lives on DiscoverScreen — native search bar stacked a
+        // second chrome row and pushed the first content into the blur fade.
       }}>
       <Stack.Screen name="index" />
     </Stack>

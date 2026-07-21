@@ -10,6 +10,7 @@ import {useColorScheme} from 'react-native'
 
 import type {
   AccentId,
+  AdvancedChromeEffect,
   AppearanceMode,
   AppearancePreferences,
   SurfaceType,
@@ -17,6 +18,8 @@ import type {
   ThemeFamily,
 } from '@/theme/contracts'
 import {useSystemAccessibility} from '@/theme/accessibility'
+import {useSession} from '@/auth/runtime'
+import {useAppServices} from '@/runtime/useAppServices'
 import {validateCustomAccent} from '@/theme/accents'
 import {DEFAULT_APPEARANCE_PREFERENCES} from '@/theme/data/defaults'
 import {radius} from '@/theme/foundations/radius'
@@ -30,14 +33,15 @@ import {ThemeTokensContext, type ThemeTokenSet} from '@/theme/runtime/ThemeToken
 import {resolveAppearance} from '@/theme/runtime/resolveAppearance'
 import {
   isAccentId,
+  isAdvancedChromeEffect,
   isAppearanceMode,
   isSurfaceType,
   isTextScale,
   isThemeFamily,
 } from '@/theme/storage/migrateAppearancePreferences'
 import {
-  loadAppearancePreferences,
-  saveAppearancePreferences,
+  loadAppearanceCache,
+  saveAppearanceCache,
 } from '@/theme/storage/appearanceStorage'
 import {useSystemUISync} from '@/theme/system'
 
@@ -80,6 +84,8 @@ function safePatch(
 }
 
 export function AppearanceProvider({children}: PropsWithChildren) {
+  const session = useSession()
+  const {appearanceRepository} = useAppServices()
   const systemColourScheme = useColorScheme()
   const systemAccessibility = useSystemAccessibility()
   const [hydrated, setHydrated] = useState(false)
@@ -87,14 +93,23 @@ export function AppearanceProvider({children}: PropsWithChildren) {
     DEFAULT_APPEARANCE_PREFERENCES,
   )
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const preferencesRef = useRef(preferences)
+  const versionRef = useRef(0)
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const warnedSyncFailureRef = useRef(false)
+
+  useEffect(() => {
+    preferencesRef.current = preferences
+  }, [preferences])
 
   useEffect(() => {
     let mounted = true
-    loadAppearancePreferences()
-      .then(next => {
+    loadAppearanceCache()
+      .then(cache => {
         if (!mounted) return
-        if (next) {
-          setPreferences(next)
+        if (cache) {
+          versionRef.current = cache.version
+          setPreferences(cache.preferences)
         }
       })
       .finally(() => {
@@ -130,7 +145,7 @@ export function AppearanceProvider({children}: PropsWithChildren) {
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      void saveAppearancePreferences(preferences)
+      void saveAppearanceCache({preferences, version: versionRef.current})
     }, 160)
 
     return () => {
@@ -140,11 +155,86 @@ export function AppearanceProvider({children}: PropsWithChildren) {
     }
   }, [hydrated, preferences])
 
+  const syncToServer = useCallback(
+    (next: AppearancePreferences) => {
+      if (session.status !== 'signedIn') return
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current)
+      syncTimeoutRef.current = setTimeout(() => {
+        void appearanceRepository
+          .patch({preferences: next, version: versionRef.current})
+          .then(server => {
+            versionRef.current = server.version
+            warnedSyncFailureRef.current = false
+            // Advanced chrome is local Preview — preserve across sync until Greenfield owns it.
+            setPreferences({
+              ...server.preferences,
+              advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+              showSwitchLabels: preferencesRef.current.showSwitchLabels,
+            })
+          })
+          .catch(error => {
+            if (!warnedSyncFailureRef.current) {
+              console.warn('Appearance saved on this device and will retry when available.', error)
+              warnedSyncFailureRef.current = true
+            }
+            syncTimeoutRef.current = setTimeout(() => {
+              void appearanceRepository
+                .patch({preferences: next, version: versionRef.current})
+                .then(server => {
+                  versionRef.current = server.version
+                  warnedSyncFailureRef.current = false
+                  setPreferences({
+                    ...server.preferences,
+                    advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+                    showSwitchLabels: preferencesRef.current.showSwitchLabels,
+                  })
+                })
+                .catch(() => undefined)
+            }, 30_000)
+          })
+      }, 300)
+    },
+    [appearanceRepository, session.status],
+  )
+
+  useEffect(() => {
+    if (!hydrated || session.status !== 'signedIn') return
+    let active = true
+    void appearanceRepository
+      .get()
+      .then(server => {
+        if (!active) return
+        if (server.version >= versionRef.current) {
+          versionRef.current = server.version
+          setPreferences({
+            ...server.preferences,
+            advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
+            showSwitchLabels: preferencesRef.current.showSwitchLabels,
+          })
+        } else {
+          syncToServer(preferencesRef.current)
+        }
+      })
+      .catch(error => {
+        if (!warnedSyncFailureRef.current) {
+          console.warn('Appearance remains available locally and will retry when online.', error)
+          warnedSyncFailureRef.current = true
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [appearanceRepository, hydrated, session.status, syncToServer])
+
   const updatePreferences = useCallback(
     (updater: (previous: AppearancePreferences) => AppearancePreferences) => {
-      setPreferences(safePatch(updater))
+      const next = safePatch(updater)(preferencesRef.current)
+      preferencesRef.current = next
+      setPreferences(next)
+      void saveAppearanceCache({preferences: next, version: versionRef.current})
+      syncToServer(next)
     },
-    [],
+    [syncToServer],
   )
 
   const actions = useMemo<AppearanceActionsContextValue>(
@@ -202,6 +292,11 @@ export function AppearanceProvider({children}: PropsWithChildren) {
       },
       setShowSwitchLabels: (showSwitchLabels: boolean) => {
         updatePreferences(prev => ({...prev, showSwitchLabels}))
+      },
+      setAdvancedChromeEffect: (advancedChromeEffect: AdvancedChromeEffect) => {
+        if (isAdvancedChromeEffect(advancedChromeEffect)) {
+          updatePreferences(prev => ({...prev, advancedChromeEffect}))
+        }
       },
       resetAppearance: () => {
         updatePreferences(() => DEFAULT_APPEARANCE_PREFERENCES)

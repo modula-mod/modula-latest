@@ -2,6 +2,9 @@ import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {useSession} from '@/auth/runtime'
+import {usePrimaryAtprotoConnection} from '@/features/atproto/data/useAtprotoConnectionsQuery'
+import {useAtprotoCapability} from '@/features/atproto/data/useApiMetadataQuery'
 import {
   canViewerSeeProfileField,
   type ProfileKind,
@@ -20,9 +23,17 @@ const kindLabels: Record<ProfileKind, string> = {
 
 export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
   const {spacing} = useThemeTokens()
+  const session = useSession()
+  const oauthEnabled = useAtprotoCapability('atprotoOAuth')
+  const {connection} = usePrimaryAtprotoConnection()
   const visibleClaims = profile.identityClaims.filter(claim =>
     canViewerSeeProfileField(claim.visibility, viewer.relationship),
   )
+  const isOwnProfile =
+    session.status === 'signedIn' &&
+    (session.profile.handle === profile.handle || session.profile.id === profile.id)
+  const showAtConnection =
+    oauthEnabled && isOwnProfile && connection?.status === 'connected' && connection.handle
 
   return (
     <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
@@ -41,12 +52,19 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           <InfoItem label="Website" value={profile.website.domain} />
         ) : null}
         <InfoItem
-          label="Joined"
+          label="Modula member since"
           value={new Date(profile.joinedAt).toLocaleDateString(undefined, {
             month: 'long',
             year: 'numeric',
           })}
         />
+        <InfoItem
+          label="Portability"
+          value="Greenfield repository export available in Settings → Account → Your Data"
+        />
+        {showAtConnection ? (
+          <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />
+        ) : null}
       </Surface>
       {visibleClaims.length ? (
         <View style={{gap: spacing[2]}}>

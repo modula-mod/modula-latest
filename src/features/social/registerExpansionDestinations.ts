@@ -1,11 +1,18 @@
 import {registerAccountPanelDestination} from '@/platform/ui/navigation/account-panel-destinations'
 
 /**
- * Registers Phase 4.5 expansion destinations onto the adaptive account panel.
- * Import once from root layout — do not fork AdaptiveAccountPanel.
+ * Registers Phase 4.5 expansion destinations onto the shared destination registry.
+ * NavigationDrawer merges these at render time; import once from root layout.
  */
 export function registerExpansionAccountPanelDestinations(): void {
   const extras = [
+    {
+      id: 'customize',
+      label: 'Customize',
+      route: '/product/customize',
+      icon: 'appearance' as const,
+      description: 'Layout studios and optional surfaces',
+    },
     {
       id: 'lists',
       label: 'Lists',

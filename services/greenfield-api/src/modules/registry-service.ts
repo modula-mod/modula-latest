@@ -1,0 +1,188 @@
+import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import type {GreenfieldRegistryFilter, GreenfieldRegistryModuleSummary} from '@modula/greenfield-module-registry-contracts'
+import type {ModulaDb} from '../database/client.js'
+import {moduleError} from './module-errors.js'
+import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
+import {GreenfieldModuleReleaseService} from './release-service.js'
+
+export class GreenfieldModuleRegistryService {
+  private readonly releases: GreenfieldModuleReleaseService
+
+  constructor(private readonly db: ModulaDb) {
+    this.releases = new GreenfieldModuleReleaseService(db)
+  }
+
+  async listModules(filters: GreenfieldRegistryFilter = {}): Promise<{items: GreenfieldRegistryModuleSummary[]; nextCursor: string | null}> {
+    const limit = Math.max(1, Math.min(filters.limit ?? 50, 100))
+    const releases = await this.db
+      .selectFrom('greenfield_module_releases')
+      .innerJoin('greenfield_module_versions', 'greenfield_module_versions.module_version_id', 'greenfield_module_releases.module_version_id')
+      .innerJoin('greenfield_publishers', 'greenfield_publishers.publisher_id', 'greenfield_module_releases.publisher_id')
+      .select([
+        'greenfield_module_releases.module_id',
+        'greenfield_module_releases.version',
+        'greenfield_module_releases.release_state',
+        'greenfield_module_releases.license_status',
+        'greenfield_module_releases.trust_level',
+        'greenfield_module_versions.manifest',
+        'greenfield_publishers.publisher_id',
+        'greenfield_publishers.display_name',
+      ])
+      .$if(Boolean(filters.publisher), qb => qb.where('greenfield_module_releases.publisher_id', '=', filters.publisher!))
+      .$if(Boolean(filters.trust), qb => qb.where('greenfield_module_releases.trust_level', '=', filters.trust as any))
+      .$if(Boolean(filters.status), qb => qb.where('greenfield_module_releases.release_state', '=', filters.status as any))
+      .orderBy('greenfield_module_releases.module_id')
+      .orderBy('greenfield_module_releases.version', 'desc')
+      .execute()
+
+    const byModule = new Map<string, GreenfieldRegistryModuleSummary>()
+    for (const row of releases as any[]) {
+      const manifest = row.manifest as GreenfieldModuleManifestV1
+      if (filters.q && !`${manifest.name} ${manifest.description} ${row.module_id}`.toLowerCase().includes(filters.q.toLowerCase())) continue
+      if (filters.platform && !manifest.compatibility.platforms.includes(filters.platform)) continue
+      if (!byModule.has(row.module_id)) {
+        byModule.set(row.module_id, {
+          moduleId: row.module_id,
+          name: manifest.name,
+          description: manifest.description,
+          publisherId: row.publisher_id,
+          publisherName: row.display_name,
+          latestVersion: row.version,
+          trustLevel: row.trust_level,
+          licenseStatus: row.license_status,
+          status: row.release_state,
+          installable: row.release_state === 'published',
+          platforms: manifest.compatibility.platforms,
+        })
+      }
+    }
+
+    const placeholders = await this.db
+      .selectFrom('greenfield_extension_catalogue')
+      .selectAll()
+      .where('kind', '=', 'module')
+      .execute()
+    for (const row of placeholders) {
+      const manifest = (row.manifest ?? {}) as any
+      const moduleId = manifest.moduleId ?? row.slug
+      if (byModule.has(moduleId)) continue
+      if (filters.q && !`${row.name} ${row.description} ${moduleId}`.toLowerCase().includes(filters.q.toLowerCase())) continue
+      if (filters.status && filters.status !== row.catalogue_status && filters.status !== manifest.state) continue
+      byModule.set(moduleId, {
+        moduleId,
+        name: row.name,
+        description: row.description,
+        publisherId: 'modula',
+        publisherName: row.publisher,
+        latestVersion: null,
+        trustLevel: row.trust,
+        licenseStatus: manifest.inactive ? 'unknown' : 'firstParty',
+        status: (manifest.state === 'planned' ? 'planned' : row.catalogue_status) as GreenfieldRegistryModuleSummary['status'],
+        installable: false,
+        platforms: [],
+      })
+    }
+
+    const items = Array.from(byModule.values()).sort((a, b) => a.moduleId.localeCompare(b.moduleId))
+    return {items: items.slice(0, limit), nextCursor: items.length > limit ? String(limit) : null}
+  }
+
+  async getModule(moduleId: string) {
+    const releases = await this.listVersions(moduleId)
+    if (releases.length > 0) {
+      const latest = releases[0]!
+      return {
+        moduleId: latest.moduleId,
+        name: latest.manifest.name,
+        description: latest.manifest.description,
+        publisher: latest.manifest.publisher,
+        latestVersion: latest.version,
+        status: latest.releaseState,
+        trust: latest.trustLevel,
+        license: latest.licenseStatus,
+        compatibility: latest.manifest.compatibility,
+        contributions: latest.manifest.contributions,
+      }
+    }
+    const placeholder = await this.db
+      .selectFrom('greenfield_extension_catalogue')
+      .selectAll()
+      .where('slug', '=', moduleId)
+      .where('kind', '=', 'module')
+      .executeTakeFirst()
+    if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
+    return {
+      moduleId,
+      name: placeholder.name,
+      description: placeholder.description,
+      publisher: {publisherId: 'modula', displayName: placeholder.publisher},
+      latestVersion: null,
+      status: placeholder.catalogue_status,
+      trust: placeholder.trust,
+      license: 'unknown',
+      compatibility: {},
+      contributions: {},
+      placeholder: placeholder.manifest,
+    }
+  }
+
+  async listVersions(moduleId: string): Promise<GreenfieldModuleReleaseRecord[]> {
+    const rows = await this.db
+      .selectFrom('greenfield_module_releases')
+      .innerJoin('greenfield_module_versions', 'greenfield_module_versions.module_version_id', 'greenfield_module_releases.module_version_id')
+      .select([
+        'greenfield_module_releases.release_id',
+        'greenfield_module_releases.extension_id',
+        'greenfield_module_releases.extension_version_id',
+        'greenfield_module_releases.module_id',
+        'greenfield_module_releases.version',
+        'greenfield_module_releases.publisher_id',
+        'greenfield_module_releases.release_state',
+        'greenfield_module_releases.manifest_sha256',
+        'greenfield_module_releases.release_sha256',
+        'greenfield_module_releases.signature_key_id',
+        'greenfield_module_releases.signature',
+        'greenfield_module_releases.source_repository',
+        'greenfield_module_releases.source_commit',
+        'greenfield_module_releases.manifest_path',
+        'greenfield_module_releases.license_status',
+        'greenfield_module_releases.trust_level',
+        'greenfield_module_versions.manifest',
+      ])
+      .where('greenfield_module_releases.module_id', '=', moduleId)
+      .orderBy('greenfield_module_releases.version', 'desc')
+      .execute()
+    return (rows as any[]).map(row => ({
+      releaseId: row.release_id,
+      extensionId: row.extension_id,
+      extensionVersionId: row.extension_version_id,
+      moduleId: row.module_id,
+      version: row.version,
+      publisherId: row.publisher_id,
+      releaseState: row.release_state,
+      manifest: row.manifest,
+      manifestSha256: row.manifest_sha256,
+      releaseSha256: row.release_sha256,
+      signatureKeyId: row.signature_key_id,
+      signature: row.signature,
+      sourceRepository: row.source_repository,
+      sourceCommit: row.source_commit,
+      manifestPath: row.manifest_path,
+      licenseStatus: row.license_status,
+      trustLevel: row.trust_level,
+    }))
+  }
+
+  async getVersion(moduleId: string, version: string): Promise<GreenfieldModuleReleaseRecord> {
+    const release = await this.releases.getRelease(moduleId, version)
+    if (!release) throw moduleError('NOT_FOUND', `Module release ${moduleId}@${version} not found`)
+    return release
+  }
+
+  async latestPublished(moduleId: string): Promise<GreenfieldModuleReleaseRecord> {
+    const releases = await this.listVersions(moduleId)
+    const release = releases.find(item => item.releaseState === 'published')
+    if (!release) throw moduleError('NOT_FOUND', `Published release for ${moduleId} not found`)
+    return release
+  }
+}

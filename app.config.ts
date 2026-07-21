@@ -51,13 +51,35 @@ export default ({config}: ConfigContext): ExpoConfig => ({
           'Modula uses your camera when you choose to capture media for a post.',
       },
     ],
+    [
+      'expo-camera',
+      {
+        cameraPermission:
+          'Modula uses the camera for Appearance Advanced living backdrop Preview. Nothing is recorded or uploaded.',
+        microphonePermission: false,
+        recordAudioAndroid: false,
+      },
+    ],
+    [
+      'expo-video',
+      {
+        supportsBackgroundPlayback: false,
+        supportsPictureInPicture: false,
+      },
+    ],
     'expo-secure-store',
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#369CAA',
+        // Brand ink + Modula mark — JS overlay continues the exit animation.
+        backgroundColor: '#0B1416',
         image: './assets/images/splash-icon.png',
-        imageWidth: 76,
+        imageWidth: 120,
+        dark: {
+          backgroundColor: '#0B1416',
+          image: './assets/images/splash-icon.png',
+          imageWidth: 120,
+        },
       },
     ],
   ],

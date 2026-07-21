@@ -41,6 +41,7 @@ export type ProfileTabManifest = {
 export type ProfileTabRendererProps = {
   profile: ModulaProfile
   viewer: ProfileViewerContext
+  tab: ProfileTabManifest
 }
 
 export type ProfileTabRenderer =

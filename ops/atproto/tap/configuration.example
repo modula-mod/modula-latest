@@ -1,0 +1,5 @@
+# Tap selective synchronisation (Phase 6 preparation)
+# Do not deploy a full Relay or AppView.
+TAP_LISTEN=127.0.0.1:4101
+TAP_ALLOWLIST_DIDS=
+TAP_COLLECTIONS=app.bsky.actor.profile,app.bsky.feed.post,app.bsky.graph.follow,digital.modula.temp.profileExtension,digital.modula.temp.moduleManifest,digital.modula.temp.publication

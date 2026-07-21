@@ -6,6 +6,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {profileTabIdsFromPresentation} from '@/features/product/data/profileTabsSync'
+import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {coreProfileTabs} from '@/features/profile/data/coreProfileTabs'
 import {
   DEFAULT_PROFILE_PRESENTATION,
@@ -44,10 +46,18 @@ const layoutOptions: {
   },
 ]
 
+const tabPreviewDescriptions: Record<string, string> = {
+  shop:
+    'Preview slot for products, services, downloads, and reserved entitlements. The slot does not enable checkout, wallet balances, minting, or live NFT ownership.',
+  agents:
+    'Preview slot for owner-scoped assistants such as summarising, scheduling, research, and CRM support. Agents remain governed by explicit scopes.',
+}
+
 export function CustomizeProfileScreen() {
   const router = useRouter()
   const {presentation} = useProfile()
   const {setProfilePresentation} = useProfileActions()
+  const {update: updateProductPrefs} = useProductPreferences()
   const {colours, spacing} = useThemeTokens()
   const [draft, setDraft] = useState<ProfilePresentationPreferences>(presentation)
   const initial = useMemo(() => JSON.stringify(presentation), [presentation])
@@ -64,13 +74,22 @@ export function CustomizeProfileScreen() {
     ])
   }
 
+  const persistPresentation = (next: ProfilePresentationPreferences) => {
+    const normalised = normalisePresentation(next)
+    setProfilePresentation(normalised)
+    void updateProductPrefs({
+      profileTabIds: profileTabIdsFromPresentation(normalised),
+    })
+    return normalised
+  }
+
   const save = () => {
-    setProfilePresentation(normalisePresentation(draft))
+    persistPresentation(draft)
     router.back()
   }
 
   const preview = () => {
-    setProfilePresentation(normalisePresentation(draft))
+    persistPresentation(draft)
     router.push('/profile/preview' as Href)
   }
 
@@ -114,11 +133,23 @@ export function CustomizeProfileScreen() {
           </Section>
 
           <Section title="Profile tabs">
+            <AppText variant="caption" colour="textSecondary">
+              Choose the tabs visitors can see and the owner-only surfaces you want ready. Shop and
+              Agents are Preview slots until packages install through Registry.
+            </AppText>
             <View style={{gap: spacing[2]}}>
               {draft.tabOrder.map((tabId, index) => {
                 const manifest = coreProfileTabs.find(tab => tab.id === tabId)
                 if (!manifest) return null
                 const enabled = draft.enabledTabIds.includes(tabId)
+                const sourceLabel =
+                  manifest.source === 'module'
+                    ? 'Module · Preview'
+                    : manifest.visibility === 'public'
+                      ? 'Public'
+                      : manifest.visibility === 'followers'
+                        ? 'Followers'
+                        : 'Owner only'
                 return (
                   <Surface
                     key={tabId}
@@ -128,12 +159,13 @@ export function CustomizeProfileScreen() {
                     <View style={styles.tabBody}>
                       <AppText variant="label">{manifest.title}</AppText>
                       <AppText variant="caption" colour="textSecondary">
-                        {manifest.visibility === 'public'
-                          ? 'Public'
-                          : manifest.visibility === 'followers'
-                            ? 'Followers'
-                            : 'Owner only'}
+                        {sourceLabel}
                       </AppText>
+                      {tabPreviewDescriptions[tabId] ? (
+                        <AppText variant="caption" colour="textSecondary">
+                          {tabPreviewDescriptions[tabId]}
+                        </AppText>
+                      ) : null}
                     </View>
                     <Switch
                       value={enabled}
@@ -190,6 +222,7 @@ export function CustomizeProfileScreen() {
             <Surface variant="contained" style={[styles.indicatorPanel, {padding: spacing[3]}]}>
               <IndicatorSwitch
                 label="Show Focus Halo"
+                description="Focus Halo places a small availability ring around your avatar so people understand whether you are available, focused, busy, or offline before they interrupt you. It follows your Focus state and does not reveal private modules or hidden fields."
                 value={draft.showFocusHalo}
                 onValueChange={value =>
                   setDraft(prev => ({...prev, showFocusHalo: value}))
@@ -197,6 +230,7 @@ export function CustomizeProfileScreen() {
               />
               <IndicatorSwitch
                 label="Show follower count"
+                description="Show the follower and following counts already present on the profile. Modula should not invent, estimate, or inflate these numbers."
                 value={draft.showFollowerCount}
                 onValueChange={value =>
                   setDraft(prev => ({...prev, showFollowerCount: value}))
@@ -204,6 +238,7 @@ export function CustomizeProfileScreen() {
               />
               <IndicatorSwitch
                 label="Show module count"
+                description="Show how many modules this profile has made visible in its presentation."
                 value={draft.showModuleCount}
                 onValueChange={value =>
                   setDraft(prev => ({...prev, showModuleCount: value}))
@@ -420,18 +455,26 @@ function ChoiceButton({
 
 function IndicatorSwitch({
   label,
+  description,
   value,
   onValueChange,
 }: {
   label: string
+  description: string
   value: boolean
   onValueChange: (value: boolean) => void
 }) {
+  const {spacing} = useThemeTokens()
   return (
-    <View style={styles.indicatorRow}>
-      <AppText variant="body" style={styles.indicatorLabel}>
-        {label}
-      </AppText>
+    <View style={[styles.indicatorRow, {gap: spacing[3]}]}>
+      <View style={[styles.indicatorCopy, {gap: spacing[1]}]}>
+        <AppText variant="body" style={styles.indicatorLabel}>
+          {label}
+        </AppText>
+        <AppText variant="caption" colour="textSecondary">
+          {description}
+        </AppText>
+      </View>
       <Switch
         value={value}
         onValueChange={onValueChange}
@@ -516,13 +559,17 @@ const styles = StyleSheet.create({
   indicatorLabel: {
     flex: 1,
   },
+  indicatorCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
   indicatorPanel: {
-    gap: 2,
+    gap: 10,
   },
   indicatorRow: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
-    minHeight: 52,
+    minHeight: 68,
   },
   layoutGrid: {
     flexDirection: 'row',

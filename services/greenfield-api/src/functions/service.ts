@@ -1,0 +1,17 @@
+import type {ModulaDb} from '../database/client.js'
+import {requireInstallationCapability} from '../extensions/capability-resolver.js'
+import {safeFetch} from '../security/ssrf.js'
+export class FunctionService {
+  constructor(private readonly db: ModulaDb) {}
+  async invoke(installationId: string, functionId: string, input: unknown) {
+    await requireInstallationCapability(this.db, installationId, 'function:invoke')
+    const fn = await this.db.selectFrom('greenfield_functions').selectAll().where('function_id', '=', functionId).executeTakeFirstOrThrow()
+    if (fn.kind === 'remoteHttp') {
+      const url = (fn.config as {url?: string}).url
+      if (!url) throw Object.assign(new Error('Remote function URL missing'), {code: 'VALIDATION_FAILED'})
+      const response = await safeFetch(url, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify(input), timeoutMs: Math.min(fn.timeout_ms, 10_000), maxResponseBytes: 1_048_576, allowedContentTypes: ['application/json']})
+      return {status: response.status, output: JSON.parse(response.body.toString('utf8'))}
+    }
+    throw Object.assign(new Error('Function is queued for worker execution'), {code: 'CAPABILITY_DISABLED'})
+  }
+}

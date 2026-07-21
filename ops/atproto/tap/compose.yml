@@ -1,0 +1,17 @@
+name: modula-tap-pilot
+
+services:
+  tap:
+    image: ghcr.io/bluesky-social/indigo:2025.11.0
+    profiles: ["manual"]
+    restart: unless-stopped
+    env_file:
+      - ./configuration.example
+    networks:
+      - modula_tap
+    ports:
+      - "127.0.0.1:4101:4101"
+
+networks:
+  modula_tap:
+    driver: bridge

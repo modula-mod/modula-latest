@@ -11,7 +11,7 @@ const VALID_LAYOUT_IDS = new Set<ProfileLayoutId>([
   'minimal',
 ])
 
-const CORE_TAB_IDS = ['posts', 'media', 'about', 'modules', 'links']
+const CORE_TAB_IDS = ['posts', 'media', 'about', 'modules', 'links', 'shop', 'agents']
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(item => typeof item === 'string')

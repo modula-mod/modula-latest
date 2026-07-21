@@ -1,0 +1,11 @@
+{
+  "name": "@modula-mod/example-module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Boilerplate Modula module — copy and rename. Not part of the host workspace.",
+  "main": "src/index.ts",
+  "license": "UNLICENSED",
+  "modula": {
+    "manifest": "./modula.module.json"
+  }
+}

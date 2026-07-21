@@ -33,11 +33,16 @@ export class SessionRefreshCoordinator {
     try {
       const result = await this.authRepository.refresh(refreshToken)
       this.accessTokenStore.set(result.tokens.accessToken)
-      await this.sessionStorage.setRefreshToken(result.tokens.refreshToken)
+      await this.sessionStorage.setSessionBundle({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        sessionId: result.session.sessionId,
+        accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+      })
       return result
     } catch {
       this.accessTokenStore.clear()
-      await this.sessionStorage.clearRefreshToken().catch(() => undefined)
+      await this.sessionStorage.clearSessionBundle().catch(() => undefined)
       this.failedHandler?.()
       return null
     }

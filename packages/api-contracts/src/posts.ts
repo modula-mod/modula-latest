@@ -2,6 +2,8 @@ import type {ModulaProfileDto} from './profiles.js'
 
 export type PostKind = 'text' | 'media' | 'link' | 'module'
 export type FeedMode = 'following' | 'forYou' | 'modules'
+export type PostAudience = 'public' | 'followers' | 'private'
+export type PostReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
 
 export type PostMediaDto = {
   id: string
@@ -39,8 +41,24 @@ export type SocialPostDto = {
   replyCount: number
   repostCount: number
   kind: PostKind
+  audience?: PostAudience
+  version?: number
   media?: PostMediaDto[]
   glowColour?: string
   link?: PostLinkDto
   module?: PostModuleDto
+}
+
+export type CreatePostInput = {
+  text: string
+  feed?: FeedMode
+  audience?: PostAudience
+  replyPermission?: PostReplyPermission
+  idempotencyKey?: string
+  publishToAtproto?: boolean
+}
+
+export type UpdatePostInput = {
+  expectedVersion: number
+  text: string
 }

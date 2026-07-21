@@ -35,7 +35,13 @@ function shouldFail(input: {
 }) {
   if (input.failureMode === 'none') return false
   if (input.failureMode === 'allRequests') return true
-  if (input.failureMode === 'authentication') return input.path.startsWith('/v1/auth')
+  if (input.failureMode === 'authentication') {
+    return (
+      input.path.startsWith('/v1/auth') ||
+      input.path.startsWith('/v1/sessions') ||
+      input.path.startsWith('/v1/accounts')
+    )
+  }
   if (input.failureMode === 'feed') return input.path.startsWith('/v1/feed')
   if (input.failureMode === 'mutations') return input.method !== 'GET'
   if (input.failureMode === 'nextRequest') return true

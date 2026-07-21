@@ -33,6 +33,9 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 |---|---|---|
 | Settings root | `/settings` | Implemented |
 | AccountSettings | `/settings/account` | Implemented |
+| Connected Accounts | `/settings/connections` | Implemented (Phase 6) |
+| AT Protocol connection | `/settings/connections/atproto` | Implemented (Phase 6) |
+| AT Protocol OAuth callback | `/oauth/atproto` | Implemented (Phase 6) |
 | Email (account) | `/settings/account/email` | Stub |
 | Password | `/settings/account/password` | Stub |
 | Export data | `/settings/account/export` | Stub |
@@ -56,7 +59,10 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 | — | `/settings/modules` | Implemented (empty) |
 | — | `/settings/marketplace` | Stub |
 | — | `/settings/developer` | Implemented |
-| — | `/dev/components` | Implemented (`__DEV__`) |
+| — | `/settings/developer/expo-ui` | Implemented (Expo UI Lab catalog) |
+| — | `/settings/developer/expo-ui/playground` | Implemented (full playground) |
+| — | `/settings/developer/expo-ui/[section]` | Implemented (per-section demos) |
+| — | `/dev/components` | Implemented (`__DEV__` → Expo UI Lab) |
 
 ## Shell
 
@@ -68,4 +74,49 @@ Legend: **Implemented** (usable layout + mock/stub) · **Stub** (navigable IA, C
 
 ## Deferred product (explicit)
 
-Login/Signup/Onboarding, Messages, Post thread, Merge Feeds engine, real auth, AT Proto adapter, Gaia, wallet, module runtime.
+Login/Signup/Onboarding, Messages, Post thread, Merge Feeds engine, Gaia, wallet, module runtime.
+AT Protocol connected accounts / Atmosphere Preview: Phase 6 frontend (server-mediated OAuth; no Bluesky shell).
+
+## Product Hub (Phase 6S craft)
+
+| Route | Surface |
+| --- | --- |
+| `/product` | Product Hub catalogue |
+| `/product/focus` | Focus Mode studio |
+| `/product/merge-feeds` | Merge Feeds studio |
+| `/product/automations` | Automations studio |
+| `/product/gaia` | Gaia agents console |
+| `/product/gaia-atlas` | Gaia Atlas schematic |
+| `/product/widgets` | Widgets studio |
+| `/product/feature-control` | Feature Control (gates entry points) |
+| `/product/customize` | Customize hub — layout studios + optional surfaces |
+| `/product/layout-home` | Home layout studio (live) |
+| `/product/layout-discover` | Discover layout studio (live) |
+| `/product/layout-tabs` | Tab bar studio (live) |
+| `/product/layout-activity` | Activity prefs studio (live) |
+| `/product/layout-profile` | Profile tabs studio (syncs presentation) |
+| `/product/status-composer` | Status composer Preview |
+| `/product/saved-hub` | Saved hub Preview |
+| `/product/quiet-inbox` | Quiet inbox Preview |
+| `/product/inner-circle` | Inner Circle Preview |
+| `/product/share-destinations` | Share destinations Preview |
+| `/product/scheduled-posts` | Scheduled posts Preview |
+| `/product/reactions-prefs` | Reactions prefs Preview |
+| `/product/day-agenda` | Day agenda Preview |
+| `/product/automations-inbox` | Automations inbox Preview |
+| `/product/commands-palette` | Commands palette Preview |
+| `/product/motion-prefs` | Motion density (live for SectionEnter) |
+| `/product/chrome-density` | Chrome density (live for tab insets) |
+| `/product/surface-playground` | Surface Type playground Preview |
+| `/product/glass-privacy` | Glass Privacy levels |
+| `/product/forge` | Forge Module Builder |
+| `/product/integrations` | Integrations hub |
+| `/product/search` | Universal search preview |
+| `/product/creator` | Creator economy |
+| `/product/nft` | NFT / digital ownership foreshadow; DIMON inactive |
+| `/product/[slug]` | Capability pre-screen |
+| `/discover/inspire` | Inspire destinations Preview |
+| `/discover/live` | Live Presence rooms Preview |
+| `/onboarding` | First-run onboarding |
+| `/profile/os` | Profile-OS pre-screen |
+

@@ -6,6 +6,7 @@ import {
   MediaProfileTab,
   ModulesProfileTab,
   PostsProfileTab,
+  PreviewModuleProfileTab,
 } from '@/features/profile/tabs'
 
 export function createCoreProfileTabs(registry: ProfileTabRegistry): void {
@@ -15,4 +16,5 @@ export function createCoreProfileTabs(registry: ProfileTabRegistry): void {
   registry.registerRenderer('profile.about', AboutProfileTab)
   registry.registerRenderer('profile.modules', ModulesProfileTab)
   registry.registerRenderer('profile.links', LinksProfileTab)
+  registry.registerRenderer('profile.modulePreview', PreviewModuleProfileTab)
 }

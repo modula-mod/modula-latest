@@ -18,6 +18,7 @@ src/
 ├── social/              # SocialProvider + DevelopmentSocialProvider
 ├── theme/               # Foundations, tokens, runtime
 ├── platform/
+│   └── ui/dev/expo-ui-lab/  # Developer Expo UI playground (swift-ui OK here)
 ├── lib/
 └── types/
 ```

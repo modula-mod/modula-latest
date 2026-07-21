@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "digital.modula.temp.profileExtension",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Experimental public Modula profile extension. Public fields only.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["createdAt"],
+        "properties": {
+          "createdAt": {"type": "string", "format": "datetime"},
+          "profileKind": {"type": "string", "maxLength": 64},
+          "publicWebsite": {"type": "string", "format": "uri", "maxLength": 512},
+          "publicFocusStatus": {"type": "string", "maxLength": 128},
+          "capabilities": {
+            "type": "array",
+            "maxLength": 32,
+            "items": {
+              "type": "object",
+              "required": ["id"],
+              "properties": {
+                "id": {"type": "string", "maxLength": 128},
+                "label": {"type": "string", "maxLength": 128}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

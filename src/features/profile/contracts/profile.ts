@@ -122,6 +122,8 @@ export const DEFAULT_PROFILE_PRESENTATION: ProfilePresentationPreferences = {
     'about',
     'modules',
     'links',
+    'shop',
+    'agents',
   ],
   defaultTabId: 'posts',
   showFocusHalo: true,

@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://modula.digital/schemas/greenfield/module-manifest.v1.schema.json",
+  "title": "Greenfield Module Manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "moduleId",
+    "name",
+    "description",
+    "version",
+    "publisher",
+    "source",
+    "license",
+    "trust",
+    "compatibility",
+    "permissions",
+    "contributions",
+    "integrity"
+  ],
+  "properties": {
+    "manifestVersion": {"const": 1},
+    "moduleId": {
+      "type": "string",
+      "maxLength": 160,
+      "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+    },
+    "name": {"type": "string", "minLength": 1, "maxLength": 120},
+    "description": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "version": {"type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"},
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisherId", "displayName"],
+      "properties": {
+        "publisherId": {"type": "string", "minLength": 1, "maxLength": 160},
+        "displayName": {"type": "string", "minLength": 1, "maxLength": 120},
+        "website": {"type": "string", "format": "uri", "maxLength": 240}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "repository", "commit", "manifestPath"],
+      "properties": {
+        "provider": {"const": "github"},
+        "repository": {"type": "string", "maxLength": 160, "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+        "manifestPath": {"type": "string", "minLength": 1, "maxLength": 240, "pattern": "^[^/\\\\.][^\\\\]*\\.json$"},
+        "releaseTag": {"type": "string", "maxLength": 120},
+        "releaseAssetName": {"type": "string", "maxLength": 160}
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidenceIds"],
+      "properties": {
+        "status": {"enum": ["firstParty", "verified", "declared", "founderOverride", "unknown", "denied"]},
+        "spdx": {"type": "string", "maxLength": 120},
+        "evidenceIds": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {"type": "string", "minLength": 1, "maxLength": 160},
+          "uniqueItems": true
+        }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestedLevel"],
+      "properties": {
+        "requestedLevel": {"enum": ["firstParty", "verifiedPublisher", "reviewedCommunity", "untrustedManifest"]}
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimumGreenfieldVersion", "minimumModulaHostVersion", "protocolVersions", "platforms"],
+      "properties": {
+        "minimumGreenfieldVersion": {"$ref": "#/$defs/semver"},
+        "maximumGreenfieldVersion": {"$ref": "#/$defs/semver"},
+        "minimumModulaHostVersion": {"$ref": "#/$defs/semver"},
+        "maximumModulaHostVersion": {"$ref": "#/$defs/semver"},
+        "protocolVersions": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"type": "string", "maxLength": 80}, "uniqueItems": true},
+        "platforms": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"enum": ["ios", "android", "web", "server"]}, "uniqueItems": true}
+      }
+    },
+    "permissions": {
+      "type": "array",
+      "maxItems": 80,
+      "items": {"$ref": "#/$defs/permission"}
+    },
+    "dependencies": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {"$ref": "#/$defs/dependency"}
+    },
+    "contributions": {"$ref": "#/$defs/contributions"},
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executionMode"],
+      "properties": {
+        "executionMode": {"enum": ["declarative", "builtIn", "backgroundJob", "remoteHttp"]},
+        "installHook": {"type": "string", "maxLength": 160},
+        "enableHook": {"type": "string", "maxLength": 160},
+        "disableHook": {"type": "string", "maxLength": 160},
+        "updateHook": {"type": "string", "maxLength": 160},
+        "uninstallHook": {"type": "string", "maxLength": 160}
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifestSha256"],
+      "properties": {
+        "manifestSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "releaseSha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+        "signatureKeyId": {"type": "string", "maxLength": 160},
+        "signature": {"type": "string", "maxLength": 512}
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "maxProperties": 80
+    }
+  },
+  "$defs": {
+    "semver": {"type": "string", "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"},
+    "semverRange": {"type": "string", "minLength": 1, "maxLength": 80},
+    "permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["permission", "reason"],
+      "properties": {
+        "permission": {"type": "string", "minLength": 3, "maxLength": 240},
+        "reason": {"type": "string", "minLength": 4, "maxLength": 300},
+        "risk": {"enum": ["low", "medium", "high", "restricted"]}
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["moduleId", "versionRange", "optional"],
+      "properties": {
+        "moduleId": {"type": "string", "maxLength": 160, "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)+$"},
+        "versionRange": {"$ref": "#/$defs/semverRange"},
+        "optional": {"type": "boolean"},
+        "reason": {"type": "string", "maxLength": 300}
+      }
+    },
+    "baseContribution": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": {"type": "string", "maxLength": 200, "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)+\\.[a-z0-9-]+$"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 120},
+        "description": {"type": "string", "maxLength": 500},
+        "platforms": {"type": "array", "maxItems": 4, "items": {"enum": ["ios", "android", "web", "server"]}, "uniqueItems": true},
+        "enabledByDefault": {"type": "boolean"}
+      }
+    },
+    "contributions": {
+      "type": "object",
+      "additionalProperties": false,
+      "x-modula-uniqueContributionIds": true,
+      "properties": {
+        "routes": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["path", "routeKind"], "properties": {"path": {"type": "string", "maxLength": 240}, "routeKind": {"enum": ["module", "detail", "settings"]}}}]}},
+        "profileTabs": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["ownerOnly", "disabledByDefault"], "properties": {"ownerOnly": {"type": "boolean"}, "disabledByDefault": {"type": "boolean"}}}]}},
+        "boardSurfaces": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["surface"], "properties": {"surface": {"enum": ["launcher", "summary", "panel"]}}}]}},
+        "settings": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["schemaRef", "scope"], "properties": {"schemaRef": {"type": "string", "maxLength": 240}, "scope": {"enum": ["account", "installation", "team"]}}}]}},
+        "schemas": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["schemaRef", "collection", "defaultVisibility"], "properties": {"schemaRef": {"type": "string", "maxLength": 240}, "collection": {"type": "string", "maxLength": 240}, "defaultVisibility": {"enum": ["private", "teams", "followers", "public", "system"]}}}]}},
+        "tools": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["toolId", "surfaces"], "properties": {"toolId": {"type": "string", "maxLength": 200}, "functionId": {"type": "string", "maxLength": 200}, "surfaces": {"type": "array", "maxItems": 20, "items": {"type": "string", "maxLength": 80}}}}]}},
+        "functions": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"allOf": [{"$ref": "#/$defs/baseContribution"}, {"type": "object", "required": ["functionId", "mode", "inputSchemaRef", "outputSchemaRef", "executionRequired"], "properties": {"functionId": {"type": "string", "maxLength": 200}, "mode": {"enum": ["declarative", "builtIn", "backgroundJob", "remoteHttp"]}, "inputSchemaRef": {"type": "string", "maxLength": 240}, "outputSchemaRef": {"type": "string", "maxLength": 240}, "executionRequired": {"type": "boolean"}}}]}},
+        "widgets": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/baseContribution"}},
+        "plugins": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/baseContribution"}},
+        "connectors": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/baseContribution"}},
+        "jobs": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/baseContribution"}},
+        "events": {"type": "array", "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/baseContribution"}}
+      }
+    }
+  }
+}

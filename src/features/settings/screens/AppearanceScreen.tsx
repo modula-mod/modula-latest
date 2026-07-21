@@ -1,4 +1,5 @@
 import Slider from '@react-native-community/slider'
+import {LinearGradient} from 'expo-linear-gradient'
 import type {ReactNode} from 'react'
 import {useMemo, useState} from 'react'
 import {
@@ -10,17 +11,19 @@ import {
   View,
 } from 'react-native'
 
+import {ProgressiveBlurEdges} from '@/components/materials/ProgressiveBlurEdges'
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Avatar} from '@/components/primitives/Avatar'
+import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
+import {ModulaJoinIsland} from '@/platform/ui/motion'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {validateCustomAccent} from '@/theme/accents'
 import {ACCENT_PRESETS} from '@/theme/accents/resolveAccent'
 import {
-  APPEARANCE_MODES,
   SURFACE_TYPES,
   TEXT_SCALES,
   THEME_FAMILIES,
@@ -33,12 +36,23 @@ import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+/** Primary mode tiles — iOS-like grid; OLED stays in the overflow row. */
+const PRIMARY_MODES: AppearanceMode[] = ['system', 'dark', 'light', 'dim']
+
 const modeLabels: Record<AppearanceMode, string> = {
-  system: 'System',
+  system: 'Default',
   light: 'Light',
   dim: 'Dim',
   dark: 'Dark',
   oled: 'OLED',
+}
+
+const modeIcons: Record<AppearanceMode, 'contrast' | 'appearance' | 'photo' | 'modules'> = {
+  system: 'appearance',
+  light: 'photo',
+  dim: 'modules',
+  dark: 'contrast',
+  oled: 'contrast',
 }
 
 const familyLabels: Record<ThemeFamily, string> = {
@@ -50,21 +64,27 @@ const familyLabels: Record<ThemeFamily, string> = {
   spaceGray: 'Space Gray',
 }
 
-const surfaceCopy: Record<SurfaceType, string> = {
-  native: 'Platform material when available, with safe fallbacks.',
-  solid: 'Opaque, stable hierarchy for every accessibility mode.',
-  glass: 'Selective blur for navigation and floating controls.',
-  glay: 'Soft material colour with modest physical depth.',
-  minimalSpatial: 'Quiet surfaces with subtle separation.',
-  skeuomorphic: 'Tactile controls with restrained highlights.',
-  neomorphic: 'Raised controls where contrast remains safe.',
+const surfaceLabels: Record<SurfaceType, string> = {
+  native: 'Native',
+  solid: 'Solid',
+  glass: 'Glass',
+  glay: 'Glay',
+  minimalSpatial: 'Minimal',
+  skeuomorphic: 'Skeuo',
+  neomorphic: 'Neo',
 }
+
+/** Surfaces shown as chrome bubbles on the wallpaper preview. */
+const PREVIEW_SURFACES: SurfaceType[] = ['glass', 'glay', 'solid']
 
 export function AppearanceScreen() {
   const {preferences, resolved, systemAccessibility} = useAppearance()
   const actions = useAppearanceActions()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [customModalVisible, setCustomModalVisible] = useState(false)
+  const [familiesOpen, setFamiliesOpen] = useState(false)
+  const [surfacesOpen, setSurfacesOpen] = useState(false)
   const [customInput, setCustomInput] = useState(
     preferences.customAccent ?? resolved.accent.base,
   )
@@ -79,54 +99,23 @@ export function AppearanceScreen() {
       <SecondaryScreenHeader title="Appearance" />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
-          keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">Appearance</AppText>
-            <AppText variant="body" colour="textSub">
-              Shape Modula around colour, material, text, and accessibility-safe
-              fallbacks.
-            </AppText>
-          </View>
+          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
+          <AppText variant="caption" colour="textTertiary">
+            Colour, chrome, and accessibility-safe fallbacks — not Apple Settings.
+          </AppText>
 
-          <Section title="Live preview">
-            <LivePreview />
-          </Section>
+          <ChromePreview
+            surfaceType={preferences.surfaceType}
+            onSelectSurface={actions.setSurfaceType}
+          />
 
-          <Section title="Colour mode">
+          <Section title="Accent">
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[styles.tileRow, {gap: spacing[3]}]}>
-              {APPEARANCE_MODES.map(mode => (
-                <ModeTile
-                  key={mode}
-                  mode={mode}
-                  selected={preferences.mode === mode}
-                  onPress={() => actions.setMode(mode)}
-                />
-              ))}
-            </ScrollView>
-          </Section>
-
-          <Section title="Theme family">
-            {preferences.mode === 'light' ? (
-              <InlineNote text="Theme families apply to Dim, Dark and OLED. Your selection will remain saved." />
-            ) : null}
-            <View style={[styles.wrapRow, {gap: spacing[2]}]}>
-              {THEME_FAMILIES.map(family => (
-                <ChoicePill
-                  key={family}
-                  label={familyLabels[family]}
-                  selected={preferences.family === family}
-                  onPress={() => actions.setThemeFamily(family)}
-                />
-              ))}
-            </View>
-          </Section>
-
-          <Section title="Accent">
-            <View style={[styles.swatchGrid, {gap: spacing[3]}]}>
+              contentContainerStyle={[styles.swatchRow, {gap: spacing[3]}]}>
               {ACCENT_PRESETS.map(accent => (
                 <AccentSwatch
                   key={accent.id}
@@ -142,24 +131,118 @@ export function AppearanceScreen() {
                 selected={preferences.accentId === 'custom'}
                 onPress={() => setCustomModalVisible(true)}
               />
-            </View>
+            </ScrollView>
           </Section>
 
-          <Section title="Surface Type">
-            <View style={{gap: spacing[3]}}>
-              {SURFACE_TYPES.map(surfaceType => (
-                <SurfaceTypeCard
-                  key={surfaceType}
-                  surfaceType={surfaceType}
-                  selected={preferences.surfaceType === surfaceType}
-                  onPress={() => actions.setSurfaceType(surfaceType)}
+          <Section title="Colour mode">
+            <View style={[styles.modeGrid, {gap: spacing[3]}]}>
+              {PRIMARY_MODES.map(mode => (
+                <ModeTile
+                  key={mode}
+                  mode={mode}
+                  selected={preferences.mode === mode}
+                  onPress={() => actions.setMode(mode)}
                 />
               ))}
             </View>
+            <AppPressable
+              accessibilityLabel="OLED mode"
+              accessibilityState={{selected: preferences.mode === 'oled'}}
+              onPress={() => actions.setMode('oled')}
+              style={[
+                styles.oledRow,
+                {
+                  borderColor:
+                    preferences.mode === 'oled' ? colours.accent : colours.border,
+                  backgroundColor:
+                    preferences.mode === 'oled' ? colours.accentSubtle : colours.surface,
+                  borderRadius: radius.large,
+                },
+              ]}>
+              <AppIcon
+                name="contrast"
+                colour={preferences.mode === 'oled' ? colours.accent : colours.textSecondary}
+              />
+              <View style={{flex: 1, gap: 2}}>
+                <AppText variant="label">OLED</AppText>
+                <AppText variant="caption" colour="textTertiary">
+                  Pure black canvas when supported
+                </AppText>
+              </View>
+              {preferences.mode === 'oled' ? (
+                <AppIcon name="check" colour={colours.accent} size={18} />
+              ) : null}
+            </AppPressable>
           </Section>
 
+          <MaterialSurface
+            role="card"
+            style={[styles.groupCard, {borderColor: colours.border, borderRadius: radius.large}]}>
+            <LinkRow
+              title="Theme family"
+              value={familyLabels[preferences.family]}
+              onPress={() => setFamiliesOpen(open => !open)}
+            />
+            {familiesOpen ? (
+              <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
+                {preferences.mode === 'light' ? (
+                  <AppText variant="caption" colour="textTertiary">
+                    Families apply to Dim, Dark, and OLED. Selection stays saved.
+                  </AppText>
+                ) : (
+                  <AppText variant="caption" colour="textTertiary">
+                    Non-standard families are Preview palettes.
+                  </AppText>
+                )}
+                <View style={[styles.wrapRow, {gap: spacing[2]}]}>
+                  {THEME_FAMILIES.map(family => (
+                    <ChoicePill
+                      key={family}
+                      label={familyLabels[family]}
+                      selected={preferences.family === family}
+                      onPress={() => actions.setThemeFamily(family)}
+                    />
+                  ))}
+                </View>
+              </View>
+            ) : null}
+
+            <LinkRow
+              title="Surface Type"
+              value={surfaceLabels[preferences.surfaceType]}
+              onPress={() => setSurfacesOpen(open => !open)}
+              last={!surfacesOpen}
+            />
+            {surfacesOpen ? (
+              <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
+                <AppText variant="caption" colour="textTertiary">
+                  Chrome-layer contracts only — full glass engines remain deferred.
+                </AppText>
+                <View style={[styles.wrapRow, {gap: spacing[2]}]}>
+                  {SURFACE_TYPES.map(surfaceType => (
+                    <ChoicePill
+                      key={surfaceType}
+                      label={surfaceLabels[surfaceType]}
+                      selected={preferences.surfaceType === surfaceType}
+                      onPress={() => actions.setSurfaceType(surfaceType)}
+                    />
+                  ))}
+                </View>
+              </View>
+            ) : null}
+          </MaterialSurface>
+
           <Section title="Text size">
-            <MaterialSurface role="card" style={[styles.sliderPanel, {gap: spacing[3]}]}>
+            <MaterialSurface
+              role="card"
+              style={[
+                styles.sliderPanel,
+                {
+                  gap: spacing[3],
+                  borderRadius: radius.large,
+                  borderColor: colours.border,
+                },
+              ]}>
               <View style={styles.sliderLabels}>
                 <AppText variant="caption">A</AppText>
                 <AppText
@@ -190,32 +273,16 @@ export function AppearanceScreen() {
                   actions.setTextScale(scale)
                 }}
               />
-              <View style={styles.scaleLabels}>
-                {TEXT_SCALES.map(scale => (
-                  <AppText key={scale} variant="micro" colour="textMuted">
-                    {Math.round(scale * 100)}%
-                  </AppText>
-                ))}
-              </View>
             </MaterialSurface>
           </Section>
 
-          <Section title="Interface options">
-            <MaterialSurface role="card" style={styles.optionList}>
-              <SwitchRow
-                title="Bold Text"
-                value={resolved.accessibility.boldText}
-                storedValue={preferences.boldText}
-                onValueChange={actions.setBoldText}
-                deviceOverride={systemAccessibility.boldText}
-              />
-              <SwitchRow
-                title="Reduce Motion"
-                value={resolved.accessibility.reduceMotion}
-                storedValue={preferences.reduceMotion}
-                onValueChange={actions.setReduceMotion}
-                deviceOverride={systemAccessibility.reduceMotion}
-              />
+          <Section title="Interface">
+            <MaterialSurface
+              role="card"
+              style={[
+                styles.optionList,
+                {borderRadius: radius.large, borderColor: colours.border},
+              ]}>
               <SwitchRow
                 title="Reduce Transparency"
                 value={resolved.accessibility.reduceTransparency}
@@ -231,12 +298,69 @@ export function AppearanceScreen() {
                 deviceOverride={systemAccessibility.increaseContrast}
               />
               <SwitchRow
+                title="Bold Text"
+                value={resolved.accessibility.boldText}
+                storedValue={preferences.boldText}
+                onValueChange={actions.setBoldText}
+                deviceOverride={systemAccessibility.boldText}
+              />
+              <SwitchRow
+                title="Reduce Motion"
+                value={resolved.accessibility.reduceMotion}
+                storedValue={preferences.reduceMotion}
+                onValueChange={actions.setReduceMotion}
+                deviceOverride={systemAccessibility.reduceMotion}
+              />
+              <SwitchRow
                 title="Show ON/OFF Labels"
                 value={preferences.showSwitchLabels}
                 storedValue={preferences.showSwitchLabels}
                 onValueChange={actions.setShowSwitchLabels}
+                last
               />
             </MaterialSurface>
+            <AppText variant="caption" colour="textTertiary">
+              Reduce Transparency forces opaque chrome and wins over Glass / Glay / Native
+              previews.
+            </AppText>
+          </Section>
+
+          <Section title="Advanced">
+            <MaterialSurface
+              role="card"
+              style={[
+                styles.optionList,
+                {borderRadius: radius.large, borderColor: colours.border},
+              ]}>
+              <SwitchRow
+                title="Camera masked blur"
+                value={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+                storedValue={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+                onValueChange={enabled => {
+                  actions.setAdvancedChromeEffect(
+                    enabled ? 'cameraMaskedBlur' : 'off',
+                  )
+                }}
+                last
+              />
+            </MaterialSurface>
+            <AppText variant="caption" colour="textTertiary">
+              Preview — live camera cut through chrome glyphs. Needs camera permission;
+              nothing is recorded. Reduce Transparency disables the blur layer.
+            </AppText>
+            <AdvancedCameraMaskedBlurPreview
+              active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+              disabledByTransparency={resolved.accessibility.reduceTransparency}
+            />
+            <AppText variant="caption" colour="textTertiary">
+              Join island — Telegram-style avatar meatball (Skia). Same Preview surface as
+              Presence; needs a native rebuild with @shopify/react-native-skia.
+            </AppText>
+            <ModulaJoinIsland
+              name="Modula"
+              avatarColour={colours.accent}
+              caption="Appearance Advanced motion Preview."
+            />
           </Section>
 
           <AppPressable
@@ -244,7 +368,11 @@ export function AppearanceScreen() {
             onPress={actions.resetAppearance}
             style={[
               styles.resetButton,
-              {borderColor: colours.destructive, backgroundColor: colours.destructiveSubtle},
+              {
+                borderColor: colours.destructive,
+                backgroundColor: colours.destructiveSubtle,
+                borderRadius: radius.round,
+              },
             ]}>
             <AppIcon name="reset" colour={colours.destructive} />
             <AppText variant="label" style={{color: colours.destructive}}>
@@ -263,7 +391,7 @@ export function AppearanceScreen() {
           <MaterialSurface role="modal" style={[styles.modal, {gap: spacing[4]}]}>
             <View style={{gap: spacing[1]}}>
               <AppText variant="title2">Custom accent</AppText>
-              <AppText variant="body" colour="textSub">
+              <AppText variant="body" colour="textSecondary">
                 Use #RGB or #RRGGBB. Modula chooses readable text automatically.
               </AppText>
             </View>
@@ -343,47 +471,88 @@ function Section({title, children}: {title: string; children: ReactNode}) {
   const {spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[3]}}>
-      <AppText variant="title2">{title}</AppText>
+      <AppText variant="headline">{title}</AppText>
       {children}
     </View>
   )
 }
 
-function LivePreview() {
-  const {colours, spacing} = useThemeTokens()
+function ChromePreview({
+  surfaceType,
+  onSelectSurface,
+}: {
+  surfaceType: SurfaceType
+  onSelectSurface: (value: SurfaceType) => void
+}) {
+  const {colours, spacing, radius} = useThemeTokens()
+  const selectedPreview = PREVIEW_SURFACES.includes(surfaceType)
+    ? surfaceType
+    : 'glass'
+
   return (
-    <MaterialSurface role="card" style={[styles.preview, {gap: spacing[3]}]}>
-      <View style={styles.previewHeader}>
-        <AppText variant="headline">Modula</AppText>
-        <View style={[styles.previewDot, {backgroundColor: colours.accent}]} />
-      </View>
-      <View style={[styles.previewPost, {gap: spacing[3]}]}>
-        <Avatar name="Ari Modula" size={38} colour={colours.accent} />
-        <View style={{flex: 1, gap: spacing[1]}}>
-          <AppText variant="label">Ari Modula</AppText>
-          <AppText variant="body" colour="textSub">
-            The profile is the centre of the workspace.
-          </AppText>
-          <View
-            style={[
-              styles.previewMedia,
-              {backgroundColor: colours.mediaGlowFallback, borderColor: colours.accentBorder},
-            ]}
-          />
+    <View style={{gap: spacing[2]}}>
+      <View
+        style={[
+          styles.chromeStage,
+          {
+            borderRadius: radius.large,
+            borderColor: colours.border,
+            backgroundColor: colours.surface,
+          },
+        ]}>
+        <LinearGradient
+          colors={[colours.accent, colours.canvas, colours.surfaceRaised]}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+          style={StyleSheet.absoluteFill}
+        />
+        <View
+          pointerEvents="none"
+          style={[styles.chromeShade, {backgroundColor: colours.backdrop, opacity: 0.2}]}
+        />
+        <ProgressiveBlurEdges edgeHeight={48} />
+
+        <View style={styles.bubbleRow}>
+          {PREVIEW_SURFACES.map((surface, index) => {
+            const selected = selectedPreview === surface
+            const opacity = surface === 'solid' ? 0.92 : surface === 'glay' ? 0.62 : 0.4
+            return (
+              <AppPressable
+                key={surface}
+                accessibilityLabel={`${surfaceLabels[surface]} chrome preview`}
+                accessibilityState={{selected}}
+                onPress={() => onSelectSurface(surface)}
+                style={[
+                  styles.bubble,
+                  {
+                    borderColor: selected ? colours.text : colours.borderStrong,
+                    marginLeft: index === 0 ? 0 : -18,
+                    zIndex: PREVIEW_SURFACES.length - index,
+                  },
+                ]}>
+                <View
+                  style={[
+                    StyleSheet.absoluteFill,
+                    {
+                      backgroundColor: colours.surface,
+                      opacity: selected ? Math.max(opacity, 0.85) : opacity,
+                      borderRadius: 999,
+                    },
+                  ]}
+                />
+                {selected ? (
+                  <AppIcon name="check" colour={colours.text} size={20} />
+                ) : null}
+              </AppPressable>
+            )
+          })}
         </View>
       </View>
-      <View style={styles.previewNav}>
-        {['home', 'discover', 'create', 'activity', 'profile'].map((name, index) => (
-          <View
-            key={name}
-            style={[
-              styles.previewNavItem,
-              {backgroundColor: index === 0 ? colours.accentSubtle : colours.surface2},
-            ]}
-          />
-        ))}
-      </View>
-    </MaterialSurface>
+      <AppText variant="caption" colour="textTertiary">
+        Glass is more transparent chrome; Solid increases opacity for contrast. Preview only —
+        not Apple Liquid Glass.
+      </AppText>
+    </View>
   )
 }
 
@@ -396,8 +565,8 @@ function ModeTile({
   selected: boolean
   onPress: () => void
 }) {
-  const {colours, spacing} = useThemeTokens()
-  const previewMode = mode === 'system' ? 'light' : mode
+  const {colours, spacing, radius} = useThemeTokens()
+  const previewMode = mode === 'system' ? 'light' : mode === 'oled' ? 'dark' : mode
   const palette = resolveColourPalette('standard', previewMode)
 
   return (
@@ -405,19 +574,34 @@ function ModeTile({
       accessibilityLabel={`${modeLabels[mode]} mode`}
       accessibilityState={{selected}}
       onPress={onPress}
-      style={[
-        styles.modeTile,
-        {
-          backgroundColor: palette.canvas,
-          borderColor: selected ? colours.accent : colours.border,
-          gap: spacing[2],
-        },
-      ]}>
-      <View style={[styles.modeSurface, {backgroundColor: palette.surface1}]} />
-      <View style={[styles.modeSurfaceSmall, {backgroundColor: palette.surface2}]} />
+      style={[styles.modeTileWrap, {gap: spacing[2]}]}>
+      <View
+        style={[
+          styles.modeTile,
+          {
+            backgroundColor: palette.canvas,
+            borderColor: selected ? colours.accent : colours.border,
+            borderRadius: radius.large,
+            borderWidth: selected ? 2.5 : StyleSheet.hairlineWidth,
+          },
+        ]}>
+        <LinearGradient
+          colors={
+            mode === 'dark' || mode === 'oled'
+              ? [palette.surface1, palette.canvas]
+              : mode === 'dim'
+                ? [palette.surface2, palette.canvas]
+                : [colours.accentSubtle, palette.canvas]
+          }
+          style={[styles.modeSky, {borderTopLeftRadius: radius.large, borderTopRightRadius: radius.large}]}
+        />
+        <View style={styles.modeIconWrap}>
+          <AppIcon name={modeIcons[mode]} colour={palette.textMain} size={22} />
+        </View>
+      </View>
       <AppText
         variant="label"
-        style={{color: selected ? colours.accent : palette.textMain}}>
+        style={{color: selected ? colours.accent : colours.text, textAlign: 'center'}}>
         {modeLabels[mode]}
       </AppText>
     </AppPressable>
@@ -433,7 +617,7 @@ function ChoicePill({
   selected: boolean
   onPress: () => void
 }) {
-  const {colours} = useThemeTokens()
+  const {colours, radius} = useThemeTokens()
   return (
     <AppPressable
       accessibilityLabel={label}
@@ -442,11 +626,12 @@ function ChoicePill({
       style={[
         styles.choicePill,
         {
-          backgroundColor: selected ? colours.accentSubtle : colours.surface1,
+          backgroundColor: selected ? colours.accentSubtle : colours.surfaceRaised,
           borderColor: selected ? colours.accent : colours.border,
+          borderRadius: radius.round,
         },
       ]}>
-      <AppText variant="label" style={{color: selected ? colours.accent : colours.textMain}}>
+      <AppText variant="label" style={{color: selected ? colours.accent : colours.text}}>
         {label}
       </AppText>
     </AppPressable>
@@ -473,63 +658,58 @@ function AccentSwatch({
       style={styles.swatchItem}>
       <View
         style={[
-          styles.swatch,
+          styles.swatchRing,
           {
-            backgroundColor: value,
-            borderColor: selected ? colours.textMain : colours.borderStrong,
+            borderColor: selected ? value : 'transparent',
           },
         ]}>
-        {selected ? <AppIcon name="check" colour={colours.accentForeground} size={18} /> : null}
+        <View
+          style={[
+            styles.swatch,
+            {
+              backgroundColor: value,
+              borderColor: colours.borderStrong,
+            },
+          ]}>
+          {selected ? <AppIcon name="check" colour={colours.accentForeground} size={16} /> : null}
+        </View>
       </View>
-      <AppText variant="caption" numberOfLines={2} style={styles.swatchLabel}>
-        {label}
-      </AppText>
     </AppPressable>
   )
 }
 
-function SurfaceTypeCard({
-  surfaceType,
-  selected,
+function LinkRow({
+  title,
+  value,
   onPress,
+  last = false,
 }: {
-  surfaceType: SurfaceType
-  selected: boolean
+  title: string
+  value: string
   onPress: () => void
+  last?: boolean
 }) {
   const {colours, spacing} = useThemeTokens()
-  const title = labelSurface(surfaceType)
-
   return (
     <AppPressable
-      accessibilityLabel={`${title} Surface Type`}
-      accessibilityState={{selected}}
+      accessibilityLabel={`${title}, ${value}`}
       onPress={onPress}
       style={[
-        styles.surfaceCard,
+        styles.linkRow,
         {
-          borderColor: selected ? colours.accent : colours.border,
-          backgroundColor: selected ? colours.accentSubtle : colours.surface1,
+          borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
+          borderBottomColor: colours.separator,
           gap: spacing[3],
+          paddingHorizontal: spacing[4],
         },
       ]}>
-      <View style={styles.surfacePreview}>
-        <MaterialSurface role="floating" style={styles.surfacePreviewChip}>
-          <View style={[styles.previewLine, {backgroundColor: colours.accent}]} />
-        </MaterialSurface>
-      </View>
-      <View style={{flex: 1, gap: spacing[1]}}>
-        <AppText variant="headline">{title}</AppText>
-        <AppText variant="caption" colour="textSub">
-          {surfaceCopy[surfaceType]}
-        </AppText>
-        {surfaceType === 'native' ? (
-          <AppText variant="micro" colour="textMuted">
-            Native glass is iOS-only and falls back safely elsewhere.
-          </AppText>
-        ) : null}
-      </View>
-      {selected ? <AppIcon name="check" colour={colours.accent} /> : null}
+      <AppText variant="label" style={{flex: 1}}>
+        {title}
+      </AppText>
+      <AppText variant="caption" colour="textSecondary">
+        {value}
+      </AppText>
+      <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
     </AppPressable>
   )
 }
@@ -540,27 +720,38 @@ function SwitchRow({
   storedValue,
   onValueChange,
   deviceOverride = false,
+  last = false,
 }: {
   title: string
   value: boolean
   storedValue: boolean
   onValueChange: (value: boolean) => void
   deviceOverride?: boolean
+  last?: boolean
 }) {
   const {preferences} = useAppearance()
   const {colours, spacing} = useThemeTokens()
   return (
-    <View style={[styles.switchRow, {gap: spacing[3], borderBottomColor: colours.separator}]}>
+    <View
+      style={[
+        styles.switchRow,
+        {
+          gap: spacing[3],
+          borderBottomColor: colours.separator,
+          borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
+          paddingHorizontal: spacing[4],
+        },
+      ]}>
       <View style={{flex: 1, gap: spacing[1]}}>
         <AppText variant="label">{title}</AppText>
         {deviceOverride && !storedValue ? (
-          <AppText variant="micro" colour="textMuted">
+          <AppText variant="micro" colour="textTertiary">
             Enabled by your device. Modula will keep it active.
           </AppText>
         ) : null}
       </View>
       {preferences.showSwitchLabels ? (
-        <AppText variant="micro" colour={value ? 'accent' : 'textMuted'}>
+        <AppText variant="micro" colour={value ? 'accent' : 'textTertiary'}>
           {value ? 'ON' : 'OFF'}
         </AppText>
       ) : null}
@@ -575,32 +766,36 @@ function SwitchRow({
   )
 }
 
-function InlineNote({text}: {text: string}) {
-  const {colours, spacing} = useThemeTokens()
-  return (
-    <MaterialSurface role="content" style={[styles.note, {borderColor: colours.border, gap: spacing[2]}]}>
-      <AppIcon name="info" colour={colours.accent} size={18} />
-      <AppText variant="caption" colour="textSub" style={{flex: 1}}>
-        {text}
-      </AppText>
-    </MaterialSurface>
-  )
-}
-
-function labelSurface(surfaceType: SurfaceType): string {
-  return surfaceType.replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
-}
-
 const styles = StyleSheet.create({
-  choicePill: {
+  bubble: {
+    alignItems: 'center',
     borderRadius: 999,
+    borderWidth: 2,
+    height: 72,
+    justifyContent: 'center',
+    width: 72,
+  },
+  bubbleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 36,
+  },
+  choicePill: {
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
+  chromeShade: {
+    ...StyleSheet.absoluteFill,
+  },
+  chromeStage: {
+    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: 168,
+    overflow: 'hidden',
+  },
   content: {
     padding: 16,
-    paddingBottom: 36,
   },
   customPreview: {
     alignItems: 'center',
@@ -612,6 +807,14 @@ const styles = StyleSheet.create({
     height: 52,
     width: 52,
   },
+  expandBlock: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    padding: 14,
+  },
+  groupCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+  },
   input: {
     borderRadius: 14,
     borderWidth: StyleSheet.hairlineWidth,
@@ -619,6 +822,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 48,
     paddingHorizontal: 14,
+  },
+  linkRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 52,
   },
   modal: {
     margin: 18,
@@ -643,81 +851,47 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingHorizontal: 18,
   },
-  modeSurface: {
-    borderRadius: 12,
-    height: 44,
+  modeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  modeIconWrap: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  modeSky: {
+    height: 54,
     width: '100%',
   },
-  modeSurfaceSmall: {
-    borderRadius: 999,
-    height: 10,
-    width: '64%',
-  },
   modeTile: {
-    borderRadius: 18,
-    borderWidth: 1,
-    minHeight: 130,
-    padding: 12,
-    width: 118,
+    height: 112,
+    overflow: 'hidden',
+    width: '100%',
   },
-  note: {
+  modeTileWrap: {
+    width: '47%',
+  },
+  oledRow: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    padding: 12,
+    gap: 12,
+    minHeight: 64,
+    paddingHorizontal: 14,
   },
   optionList: {
-    overflow: 'hidden',
-  },
-  preview: {
-    padding: 16,
-  },
-  previewDot: {
-    borderRadius: 999,
-    height: 10,
-    width: 10,
-  },
-  previewHeader: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  previewLine: {
-    borderRadius: 999,
-    height: 10,
-    width: 42,
-  },
-  previewMedia: {
-    borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
-    height: 84,
-  },
-  previewNav: {
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'space-between',
-  },
-  previewNavItem: {
-    borderRadius: 999,
-    flex: 1,
-    height: 8,
-  },
-  previewPost: {
-    flexDirection: 'row',
+    overflow: 'hidden',
   },
   resetButton: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     gap: 8,
     minHeight: 46,
     paddingHorizontal: 16,
-  },
-  scaleLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   screen: {
     flex: 1,
@@ -728,55 +902,37 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sliderPanel: {
-    padding: 16,
-  },
-  surfaceCard: {
-    alignItems: 'center',
-    borderRadius: 18,
     borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    minHeight: 92,
-    padding: 14,
-  },
-  surfacePreview: {
-    width: 62,
-  },
-  surfacePreviewChip: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 54,
+    padding: 16,
   },
   swatch: {
     alignItems: 'center',
     borderRadius: 999,
-    borderWidth: 2,
-    height: 52,
+    borderWidth: StyleSheet.hairlineWidth,
+    height: 44,
     justifyContent: 'center',
-    width: 52,
-  },
-  swatchGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    width: 44,
   },
   swatchItem: {
     alignItems: 'center',
-    gap: 6,
-    width: 76,
   },
-  swatchLabel: {
-    textAlign: 'center',
+  swatchRing: {
+    alignItems: 'center',
+    borderRadius: 999,
+    borderWidth: 3,
+    height: 56,
+    justifyContent: 'center',
+    width: 56,
+  },
+  swatchRow: {
+    alignItems: 'center',
+    paddingRight: 8,
   },
   switchRow: {
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    minHeight: 58,
-    paddingHorizontal: 14,
+    minHeight: 56,
     paddingVertical: 10,
-  },
-  tileRow: {
-    paddingRight: 16,
   },
   wrapRow: {
     flexDirection: 'row',

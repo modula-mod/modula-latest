@@ -37,7 +37,7 @@ export function ProfileTabContent({profile, viewer, tab}: ProfileTabContentProps
 
   return (
     <ProfileSectionBoundary key={tab.id}>
-      {React.createElement(Renderer, {profile, viewer})}
+      {React.createElement(Renderer, {profile, viewer, tab})}
     </ProfileSectionBoundary>
   )
 }
