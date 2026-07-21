@@ -64,3 +64,4 @@ packages/*/dist/
 ops/docker/.env
 
 .artifacts/
+services/greenfield-api/backups/*.dump
