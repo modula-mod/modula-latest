@@ -12,6 +12,7 @@ import type {
   ExtensionRepository,
   FeedRepository,
   MetadataRepository,
+  ModuleRepository,
   PostRepository,
   ProfileRepository,
   ReelsRepository,
@@ -31,6 +32,7 @@ export type AppServices = {
   discoverRepository: DiscoverRepository
   reelsRepository: ReelsRepository
   metadataRepository: MetadataRepository
+  moduleRepository: ModuleRepository
   atprotoRepository: AtprotoRepository
   extensionRepository: ExtensionRepository
   toolsRepository: ToolsRepository

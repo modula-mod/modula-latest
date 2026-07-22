@@ -32,7 +32,11 @@ export function resolveProfileTabs({
   presentation: ProfilePresentationPreferences
   viewer: ProfileViewerContext
 }): ProfileTabManifest[] {
-  const enabledIds = new Set(['posts', ...presentation.enabledTabIds])
+  const enabledIds = new Set([
+    'posts',
+    ...presentation.enabledTabIds,
+    ...manifests.filter(manifest => manifest.defaultEnabled).map(manifest => manifest.id),
+  ])
   const order = new Map(
     ['posts', ...presentation.tabOrder].map((tabId, index) => [tabId, index]),
   )

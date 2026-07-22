@@ -818,7 +818,7 @@ export function ComposerScreen() {
               options: ['Board', 'Composer', 'Profile'],
             })
           }}
-          onBrowseMarketplace={() => router.push('/marketplace' as Href)}
+          onBrowseMarketplace={() => router.push('/product' as Href)}
           onPlaceholder={toolName => previewTool(toolName)}
         />
       </FeatureErrorBoundary>

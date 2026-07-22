@@ -11,6 +11,7 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import type {ModuleContribution} from '@/data/repositories/contracts'
 import {
   canViewerSeeProfileField,
   createViewerContext,
@@ -18,6 +19,8 @@ import {
   type ProfileScreenMode,
   type ProfileViewerRelationship,
 } from '@/features/profile/contracts/profile'
+import type {ProfileTabManifest, ProfileTabVisibility} from '@/features/profile/contracts/profileTabs'
+import {useModuleContributionQuery} from '@/features/modules/hooks'
 import {demoProfileModules} from '@/features/profile/data/demoProfileModules'
 import {ProfileHero} from '@/features/profile/components/ProfileHero'
 import {ProfileLayout} from '@/features/profile/components/ProfileLayout'
@@ -41,6 +44,14 @@ type ProfileShellProps = {
   handle?: string
 }
 
+const MODULE_PROFILE_TAB_KINDS: ProfileTabManifest['supportedProfileKinds'] = [
+  'person',
+  'creator',
+  'professional',
+  'organisation',
+  'team',
+]
+
 function relationshipForProfile(
   mode: ProfileScreenMode,
   profile: ModulaProfile,
@@ -55,6 +66,35 @@ function relationshipForProfile(
   return 'visitor'
 }
 
+function moduleProfileTabManifests(contributions: ModuleContribution[]): ProfileTabManifest[] {
+  return contributions
+    .filter(contribution => contribution.available)
+    .map((contribution, index) => {
+      const manifest = contribution.manifest ?? {}
+      const rawVisibility = String(manifest.visibility ?? '')
+      const visibility: ProfileTabVisibility =
+        rawVisibility === 'public' || rawVisibility === 'followers' || rawVisibility === 'owner'
+          ? rawVisibility
+          : 'owner'
+      const id = String(manifest.tabId ?? manifest.id ?? contribution.id)
+      const title = String(manifest.title ?? manifest.label ?? manifest.name ?? id)
+      return {
+        id,
+        title,
+        accessibilityLabel: String(manifest.accessibilityLabel ?? `${title} profile tab`),
+        icon: 'modules',
+        kind: 'custom',
+        source: 'module',
+        rendererKey: 'profile.moduleRuntime',
+        defaultOrder: Number(manifest.defaultOrder ?? 80 + index),
+        defaultEnabled: manifest.defaultEnabled === false ? false : true,
+        visibility,
+        supportedProfileKinds: MODULE_PROFILE_TAB_KINDS,
+        moduleId: contribution.moduleId,
+      }
+    })
+}
+
 export function ProfileShell({mode, handle}: ProfileShellProps) {
   const router = useRouter()
   const {tab} = useLocalSearchParams<{tab?: string}>()
@@ -65,6 +105,10 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {presentation} = useProfile()
   const ownerQuery = useOwnerProfileQuery()
   const publicQuery = useProfileQuery(mode === 'public' ? handle : undefined)
+  const profileTabContributions = useModuleContributionQuery({
+    surface: 'profileTab',
+    enabledOnly: true,
+  })
   const isExpanded = width >= 1100
   const scrollY = useSharedValue(0)
   const onScroll = useAnimatedScrollHandler({
@@ -90,13 +134,17 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
 
   const visibleTabs = useMemo(() => {
     if (!profile) return []
+    const manifests = [
+      ...registry.getAllManifests(),
+      ...moduleProfileTabManifests(profileTabContributions.data ?? []),
+    ]
     return resolveProfileTabs({
-      manifests: registry.getAllManifests(),
+      manifests,
       profile,
       presentation,
       viewer,
     })
-  }, [presentation, profile, registry, viewer])
+  }, [presentation, profile, profileTabContributions.data, registry, viewer])
 
   const [selectedTabRequest, setSelectedTabRequest] = useState<string | null>(null)
   const selectedTabId = resolveSelectedProfileTab(

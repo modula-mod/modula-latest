@@ -13,7 +13,13 @@ export type ComposerToolItem = {
   moduleId?: string
   name: string
   section: ComposerToolSection
-  availability: 'active' | 'preview' | 'unavailable'
+  availability:
+    | 'active'
+    | 'preview'
+    | 'requiresInstall'
+    | 'requiresEnable'
+    | 'requiresConfiguration'
+    | 'unavailable'
   requiresModule?: string
   description?: string
 }

@@ -8,8 +8,10 @@ import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
+import type {ModuleContribution} from '@/data/repositories/contracts'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
+import {useModuleContributionQuery} from '@/features/modules/hooks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
 import {
@@ -30,18 +32,18 @@ import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const ALL_PINNED_SPACES: Array<{
+const ALL_PINNED_SPACES: {
   id: string
   label: string
   icon: AppIconName
   route: string
   description: string
-}> = [
+}[] = [
   {
-    id: 'marketplace',
-    label: 'Marketplace',
+    id: 'product-hub',
+    label: 'Product Hub',
     icon: 'marketplace',
-    route: '/marketplace',
+    route: '/product',
     description: 'Browse modules and tools',
   },
   {
@@ -100,6 +102,7 @@ export function BoardScreen() {
   const session = useSession()
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
+  const boardContributions = useModuleContributionQuery({surface: 'board', enabledOnly: true})
   const ownerName = session.status === 'signedIn' ? session.profile.displayName : 'there'
   const modules = discoverQuery.data?.featuredModules ?? []
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
@@ -173,13 +176,13 @@ export function BoardScreen() {
         title="Board"
         actions={[
           {id: 'customize', label: 'Customize pinned spaces'},
-          {id: 'marketplace', label: 'Open Marketplace'},
+          {id: 'marketplace', label: 'Open Product Hub'},
           {id: 'saved', label: 'Open Saved'},
           {id: 'compose', label: 'Quick compose'},
         ]}
         onAction={id => {
           if (id === 'customize') setCustomizeOpen(true)
-          if (id === 'marketplace') router.push('/marketplace' as Href)
+          if (id === 'marketplace') router.push('/product' as Href)
           if (id === 'saved') router.push('/saved' as Href)
           if (id === 'compose') router.push('/compose' as Href)
         }}
@@ -392,7 +395,7 @@ export function BoardScreen() {
                 <AppIcon name="board" colour={colours.accent} size={28} />
                 <AppText variant="headline">Pin your daily surfaces</AppText>
                 <AppText variant="body" colour="textSecondary">
-                  Board stays empty until you choose spaces — Marketplace, Saved, Lists, and more.
+                  Board stays empty until you choose spaces — Product Hub, Saved, Lists, and more.
                 </AppText>
                 <AppPressable
                   accessibilityLabel="Customize pinned spaces"
@@ -445,13 +448,67 @@ export function BoardScreen() {
             )}
           </View>
 
+          <FeatureErrorBoundary label="Board module contributions">
+            <View style={{gap: spacing[3]}}>
+              <View style={styles.sectionHeader}>
+                <AppText variant="headline">Module contributions</AppText>
+                <AppPressable
+                  accessibilityLabel="Manage modules"
+                  onPress={() => router.push('/settings/modules' as Href)}>
+                  <AppText variant="caption" colour="accent">
+                    Manage
+                  </AppText>
+                </AppPressable>
+              </View>
+              {boardContributions.isPending ? (
+                <AppText variant="caption" colour="textSecondary">
+                  Loading Board module contributions.
+                </AppText>
+              ) : (boardContributions.data ?? []).length ? (
+                <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
+                  {boardContributions.data?.map(contribution => (
+                    <BoardContributionCard
+                      key={`${contribution.moduleId}-${contribution.id}`}
+                      contribution={contribution}
+                      onOpen={() =>
+                        router.push(`/module/${encodeURIComponent(contribution.moduleId)}` as Href)
+                      }
+                      onManage={() =>
+                        router.push(`/settings/modules/${encodeURIComponent(contribution.moduleId)}` as Href)
+                      }
+                    />
+                  ))}
+                </View>
+              ) : (
+                <Surface
+                  variant="contained"
+                  style={[
+                    styles.emptyBoard,
+                    {
+                      gap: spacing[2],
+                      padding: spacing[4],
+                      borderRadius: radius.large,
+                      backgroundColor: colours.surface,
+                      borderColor: colours.border,
+                    },
+                  ]}>
+                  <AppIcon name="modules" colour={colours.accent} size={24} />
+                  <AppText variant="headline">No active Board modules</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Enabled modules can register launcher, summary, card, or list contributions here.
+                  </AppText>
+                </Surface>
+              )}
+            </View>
+          </FeatureErrorBoundary>
+
           <FeatureErrorBoundary label="Board module grid">
             <View style={{gap: spacing[3]}}>
               <View style={styles.sectionHeader}>
                 <AppText variant="headline">Modules</AppText>
                 <AppPressable
-                  accessibilityLabel="Browse marketplace modules"
-                  onPress={() => router.push('/marketplace' as Href)}>
+                  accessibilityLabel="Browse Product Hub modules"
+                  onPress={() => router.push('/product' as Href)}>
                   <AppText variant="caption" colour="accent">
                     Browse
                   </AppText>
@@ -473,14 +530,13 @@ export function BoardScreen() {
                   <AppIcon name="modules" colour={colours.accent} size={28} />
                   <AppText variant="headline">Install your first capability</AppText>
                   <AppText variant="body" colour="textSecondary">
-                    Modules like Vault Notes, Tasks, and CRM ship as packages — preview them in the
-                    Marketplace before Registry install lands.
+                    Modules like Vault Notes, Tasks, and CRM ship as packages through Product Hub.
                   </AppText>
                   <AppPressable
-                    accessibilityLabel="Open Marketplace"
-                    onPress={() => router.push('/marketplace' as Href)}>
+                    accessibilityLabel="Open Product Hub"
+                    onPress={() => router.push('/product' as Href)}>
                     <AppText variant="label" colour="accent">
-                      Open Marketplace
+                      Open Product Hub
                     </AppText>
                   </AppPressable>
                 </Surface>
@@ -490,7 +546,7 @@ export function BoardScreen() {
                   <View key={module.id} style={styles.moduleCardWrap}>
                     <AppPressable
                       accessibilityLabel={`Open ${module.name}`}
-                      onPress={() => router.push(`/marketplace/${module.id}` as Href)}
+                      onPress={() => router.push(moduleMarketplaceHref(module.id))}
                       style={[
                         styles.moduleCard,
                         {
@@ -521,7 +577,7 @@ export function BoardScreen() {
                         ]}
                         onAction={id => {
                           if (id === 'open' || id === 'preview') {
-                            router.push(`/marketplace/${module.id}` as Href)
+                            router.push(moduleMarketplaceHref(module.id))
                           }
                         }}
                       />
@@ -540,7 +596,7 @@ export function BoardScreen() {
                 accessibilityLabel={item.description}
                 onPress={() => {
                   if (item.type === 'moduleUpdate') {
-                    router.push('/marketplace/module-vault-notes' as Href)
+                    router.push('/marketplace/digital.modula.vault-notes' as Href)
                     return
                   }
                   if (item.actor) {
@@ -615,6 +671,76 @@ export function BoardScreen() {
   )
 }
 
+function BoardContributionCard({
+  contribution,
+  onOpen,
+  onManage,
+}: {
+  contribution: ModuleContribution
+  onOpen: () => void
+  onManage: () => void
+}) {
+  const {colours, radius, spacing} = useThemeTokens()
+  const manifest = contribution.manifest ?? {}
+  const title = String(manifest.title ?? manifest.name ?? contribution.id)
+  const description = String(
+    manifest.description ??
+      (contribution.available
+        ? 'Registered module contribution.'
+        : 'This contribution is unavailable without breaking Board.'),
+  )
+  return (
+    <Surface
+      variant="contained"
+      style={[
+        styles.moduleContributionCard,
+        {
+          backgroundColor: contribution.available ? colours.surface : colours.surfaceRaised,
+          borderColor: contribution.available ? colours.border : colours.warning,
+          borderRadius: radius.large,
+          gap: spacing[3],
+          padding: spacing[4],
+        },
+      ]}>
+      <View style={[styles.moduleContributionHeader, {gap: spacing[3]}]}>
+        <View style={[styles.focusIcon, {backgroundColor: colours.accentSubtle, borderRadius: radius.medium}]}>
+          <AppIcon name="modules" colour={colours.accent} />
+        </View>
+        <View style={styles.focusBody}>
+          <AppText variant="headline">{title}</AppText>
+          <AppText variant="caption" colour="textSecondary">
+            {contribution.moduleId} · {contribution.type}
+          </AppText>
+        </View>
+      </View>
+      <AppText variant="caption" colour="textSecondary">{description}</AppText>
+      <View style={[styles.quickRow, {gap: spacing[2]}]}>
+        <AppPressable accessibilityLabel={`Open ${title}`} onPress={onOpen}>
+          <AppText variant="label" colour="accent">Open</AppText>
+        </AppPressable>
+        <AppPressable accessibilityLabel="Open module settings" onPress={onManage}>
+          <AppText variant="label" colour="accent">Settings</AppText>
+        </AppPressable>
+      </View>
+      {!contribution.available ? (
+        <AppText variant="caption" colour="textTertiary">
+          {contribution.disabledReason ?? 'Unavailable'}
+        </AppText>
+      ) : null}
+    </Surface>
+  )
+}
+
+function moduleMarketplaceHref(moduleId: string): Href {
+  const mapped =
+    moduleId === 'module-vault-notes'
+      ? 'digital.modula.vault-notes'
+      : moduleId === 'module-tasks'
+        ? 'digital.modula.tasks'
+        : moduleId
+  return `/marketplace/${encodeURIComponent(mapped)}` as Href
+}
+
 const styles = StyleSheet.create({
   activityRow: {
     alignItems: 'center',
@@ -679,6 +805,16 @@ const styles = StyleSheet.create({
   moduleCardWrap: {
     flexBasis: '48%',
     flexGrow: 1,
+  },
+  moduleContributionCard: {
+    borderWidth: StyleSheet.hairlineWidth,
+    flexBasis: '48%',
+    flexGrow: 1,
+    minWidth: 160,
+  },
+  moduleContributionHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   moduleGrid: {
     flexDirection: 'row',

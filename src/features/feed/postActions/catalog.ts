@@ -6,6 +6,7 @@ export type PostOverflowActionId =
   | 'copyText'
   | 'copyLink'
   | 'share'
+  | 'saveToVault'
   | 'quote'
   | 'viewEngagement'
   | 'openInBrowser'
@@ -47,6 +48,11 @@ export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[]
       id: 'share',
       label: 'Share',
       accessibilityLabel: 'Share post',
+    },
+    {
+      id: 'saveToVault',
+      label: 'Save to Vault',
+      accessibilityLabel: 'Save post to Vault',
     },
     {
       id: 'quote',

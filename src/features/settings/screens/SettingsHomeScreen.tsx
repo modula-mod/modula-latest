@@ -50,6 +50,12 @@ const accountRows: SettingsNavRow[] = [
     route: '/settings/extensions',
   },
   {
+    title: 'Modules',
+    description: 'Installed Greenfield modules, settings, updates and data.',
+    icon: 'modules',
+    route: '/settings/modules',
+  },
+  {
     title: 'Product Hub',
     description: 'Full Modula capability map — Social OS catalogue.',
     icon: 'discover',

@@ -72,13 +72,15 @@ export function ExtensionCentreScreen() {
             {id: 'forge', label: 'Open Forge Builder'},
             {id: 'standards', label: 'Module standards'},
             {id: 'agents', label: 'Agents studio'},
-            {id: 'marketplace', label: 'Browse Marketplace'},
+            {id: 'marketplace', label: 'Browse Product Hub'},
+            {id: 'modules', label: 'Manage Modules'},
           ]}
           onAction={id => {
             if (id === 'forge') router.push('/product/forge' as Href)
             if (id === 'standards') router.push('/product/module-standards' as Href)
             if (id === 'agents') router.push('/product/agents' as Href)
-            if (id === 'marketplace') router.push('/marketplace' as Href)
+            if (id === 'marketplace') router.push('/product' as Href)
+            if (id === 'modules') router.push('/settings/modules' as Href)
           }}
         />
       }>
@@ -111,12 +113,20 @@ export function ExtensionCentreScreen() {
           }}
         />
         <SettingsLinkRow
+          row={{
+            title: 'Browse Product Hub',
+            description: 'Registry-backed catalogue and marketplace sections.',
+            icon: 'marketplace',
+            route: '/product',
+          }}
+        />
+        <SettingsLinkRow
           last
           row={{
-            title: 'Browse Marketplace',
-            description: 'Seeded catalog Preview.',
-            icon: 'marketplace',
-            route: '/marketplace',
+            title: 'Manage Modules',
+            description: 'Installed module settings, updates and data.',
+            icon: 'modules',
+            route: '/settings/modules',
           }}
         />
       </SettingsSection>
