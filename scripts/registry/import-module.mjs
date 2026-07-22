@@ -10,6 +10,11 @@ import {
   stableJson,
   validateGreenfieldModuleManifest,
 } from '@modula/greenfield-module-manifest'
+import {
+  validateGreenfieldModuleAction,
+  validateGreenfieldModuleCollection,
+  validateGreenfieldModuleView,
+} from '@modula/greenfield-module-ui-contracts'
 
 const requireFromApi = createRequire(new URL('../../services/greenfield-api/package.json', import.meta.url))
 const {Pool} = requireFromApi('pg')
@@ -55,10 +60,12 @@ const computedManifestSha = manifestForImport.integrity.manifestSha256
 const manifestResult = validateGreenfieldModuleManifest(manifestForImport)
 if (!manifestResult.valid) fail(`Manifest invalid: ${manifestResult.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
 const evidence = collectLicenseEvidence(modulePath, manifestForImport)
+const collectionDefinitions = collectCollectionDefinitions(modulePath, manifestForImport)
+const viewDeclarations = collectViewDeclarations(modulePath, manifestForImport.moduleId)
 
 const pool = new Pool({connectionString: databaseUrl, max: 1, application_name: 'modula-registry-import'})
 try {
-  await importRelease(pool, manifestForImport, {computedManifestSha, releaseSha256, schemaSha256, evidence})
+  await importRelease(pool, manifestForImport, {computedManifestSha, releaseSha256, schemaSha256, evidence, collectionDefinitions, viewDeclarations})
   console.log(`module: ${manifestForImport.moduleId}`)
   console.log(`version: ${manifestForImport.version}`)
   console.log(`publisher: ${manifestForImport.publisher.displayName}`)
@@ -66,6 +73,8 @@ try {
   console.log('integrity: valid')
   console.log(`licence: ${manifestForImport.license.status}`)
   console.log(`trust: ${manifestForImport.trust.requestedLevel}`)
+  console.log(`collections: ${collectionDefinitions.length}`)
+  console.log(`views: ${viewDeclarations.length}`)
   console.log('release: pendingReview')
   console.log('execution: disabled')
 } finally {
@@ -171,6 +180,72 @@ async function importRelease(pool, manifest, integrity) {
         `INSERT INTO greenfield_module_contributions (contribution_id, release_id, module_id, contribution_type, contribution_key, manifest, execution_required, registration_status, created_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,'declared',$8,$8)`,
         [`module-contribution:${releaseId}:${contribution.key}`, releaseId, manifest.moduleId, contribution.type, contribution.key, JSON.stringify(contribution.manifest), contribution.executionRequired, now],
+      )
+    }
+    for (const collection of integrity.collectionDefinitions) {
+      await client.query(
+        `INSERT INTO greenfield_module_record_collections (
+          collection_id, release_id, module_id, collection, schema_ref, default_visibility, fields,
+          searchable_fields, filterable_fields, sortable_fields, folder_field, reference_fields, schema_definition,
+          retention_policy, registration_status, created_at, updated_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'declared',$15,$15)`,
+        [
+          `module-collection:${releaseId}:${collection.collection}`,
+          releaseId,
+          manifest.moduleId,
+          collection.collection,
+          collection.schemaRef,
+          collection.defaultVisibility,
+          JSON.stringify(collection.fields),
+          JSON.stringify(collection.searchableFields),
+          JSON.stringify(collection.filterableFields),
+          JSON.stringify(collection.sortableFields),
+          collection.folderField ?? null,
+          JSON.stringify(collection.referenceFields ?? []),
+          JSON.stringify(collection.schemaDefinition ?? {}),
+          collection.retentionPolicy ?? 'keepOnUninstall',
+          now,
+        ],
+      )
+    }
+    const actionById = new Map()
+    for (const view of integrity.viewDeclarations) {
+      await client.query(
+        `INSERT INTO greenfield_module_views (
+          view_id, release_id, module_id, view_key, view_kind, collection, title, declaration,
+          required_capabilities, registration_status, created_at, updated_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'declared',$10,$10)`,
+        [
+          `module-view:${releaseId}:${view.viewId}`,
+          releaseId,
+          manifest.moduleId,
+          view.viewId,
+          view.kind,
+          view.collection ?? view.query?.collection ?? null,
+          view.title,
+          JSON.stringify(view),
+          JSON.stringify(view.requiredCapabilities ?? []),
+          now,
+        ],
+      )
+      for (const action of view.toolbar ?? []) actionById.set(action.actionId, action)
+    }
+    for (const action of actionById.values()) {
+      await client.query(
+        `INSERT INTO greenfield_module_actions (
+          action_row_id, release_id, module_id, action_id, action_kind, capability, declaration,
+          registration_status, created_at, updated_at
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,'declared',$8,$8)`,
+        [
+          `module-action:${releaseId}:${action.actionId}`,
+          releaseId,
+          manifest.moduleId,
+          action.actionId,
+          action.kind,
+          action.capability,
+          JSON.stringify(action),
+          now,
+        ],
       )
     }
     for (const item of integrity.evidence) {
@@ -302,6 +377,97 @@ function collectLicenseEvidence(root, manifest) {
     fail('firstParty licence status requires LICENSE-POLICY.md evidence')
   }
   return evidence
+}
+
+function collectCollectionDefinitions(root, manifest) {
+  const definitions = []
+  for (const schema of manifest.contributions.schemas ?? []) {
+    const schemaPath = join(root, schema.schemaRef)
+    let schemaDefinition = {}
+    try {
+      schemaDefinition = JSON.parse(readFileSync(schemaPath, 'utf8'))
+    } catch (error) {
+      fail(`Schema contribution ${schema.schemaRef} could not be read: ${error instanceof Error ? error.message : String(error)}`)
+    }
+    const greenfield = schemaDefinition['x-greenfield'] ?? {}
+    const collection = {
+      collection: schema.collection,
+      schemaRef: schema.schemaRef,
+      defaultVisibility: schema.defaultVisibility,
+      fields: deriveFields(schemaDefinition),
+      searchableFields: boundedStringArray(greenfield.searchableFields ?? []),
+      filterableFields: boundedStringArray(greenfield.filterableFields ?? []),
+      sortableFields: boundedStringArray(greenfield.sortableFields ?? ['createdAt', 'updatedAt']),
+      folderField: typeof greenfield.folderField === 'string' ? greenfield.folderField : undefined,
+      referenceFields: boundedStringArray(greenfield.referenceFields ?? []),
+      retentionPolicy: greenfield.retentionPolicy ?? 'keepOnUninstall',
+      schemaDefinition,
+    }
+    const result = validateGreenfieldModuleCollection(collection, manifest.moduleId)
+    if (!result.valid) fail(`Collection ${schema.collection} invalid: ${result.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
+    definitions.push(collection)
+  }
+  return definitions
+}
+
+function collectViewDeclarations(root, moduleId) {
+  const dir = join(root, 'views')
+  let files = []
+  try {
+    files = readdirSync(dir).filter(file => file.endsWith('.json')).sort()
+  } catch {
+    return []
+  }
+  return files.map(file => {
+    const view = JSON.parse(readFileSync(join(dir, file), 'utf8'))
+    const result = validateGreenfieldModuleView(view)
+    if (!result.valid || result.value?.moduleId !== moduleId) fail(`View ${file} invalid: ${result.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
+    for (const action of result.value.toolbar ?? []) {
+      const actionResult = validateGreenfieldModuleAction(action, moduleId)
+      if (!actionResult.valid) fail(`View ${file} action ${action.actionId} invalid: ${actionResult.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
+    }
+    return result.value
+  })
+}
+
+function deriveFields(schemaDefinition) {
+  const required = new Set(Array.isArray(schemaDefinition.required) ? schemaDefinition.required : [])
+  const properties = schemaDefinition.properties && typeof schemaDefinition.properties === 'object' ? schemaDefinition.properties : {}
+  return Object.entries(properties).map(([name, property]) => {
+    const field = {
+      fieldId: name,
+      name,
+      type: fieldTypeForSchema(property),
+      label: property.title ?? titleize(name),
+      required: required.has(name),
+    }
+    if (Array.isArray(property.enum)) field.options = property.enum.map(value => ({value: String(value), label: titleize(String(value))}))
+    if (property['x-sensitive'] === true) {
+      field.sensitive = true
+      field.secretRefRequired = true
+    }
+    return field
+  })
+}
+
+function fieldTypeForSchema(property) {
+  if (property.type === 'boolean') return 'boolean'
+  if (property.type === 'array') return property.items?.enum ? 'multiSelect' : 'tags'
+  if (property.format === 'uri' || property.format === 'url') return 'url'
+  if (property.format === 'date-time') return 'dateTime'
+  if (property.format === 'date') return 'date'
+  if (property.enum) return 'singleSelect'
+  if (property['x-recordReference'] === true) return 'recordReference'
+  if (property.maxLength && Number(property.maxLength) > 240) return 'multilineText'
+  return 'text'
+}
+
+function boundedStringArray(value) {
+  return Array.isArray(value) ? value.filter(item => typeof item === 'string').slice(0, 100) : []
+}
+
+function titleize(value) {
+  return value.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase())
 }
 
 function sha256(value) {

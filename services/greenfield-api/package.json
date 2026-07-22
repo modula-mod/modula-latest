@@ -26,6 +26,7 @@
     "@modula/greenfield-contracts": "workspace:*",
     "@modula/greenfield-module-manifest": "workspace:*",
     "@modula/greenfield-module-registry-contracts": "workspace:*",
+    "@modula/greenfield-module-ui-contracts": "workspace:*",
     "@modula/greenfield-protocol": "workspace:*",
     "@modula/greenfield-schema-registry": "workspace:*",
     "@modula/protocol-contracts": "workspace:*",

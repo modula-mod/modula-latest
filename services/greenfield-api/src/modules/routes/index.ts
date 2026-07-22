@@ -4,15 +4,19 @@ import type {ModulaDb} from '../../database/client.js'
 import type {GreenfieldSessionService} from '../../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../../transport/envelope.js'
 import {GreenfieldModuleContributionService} from '../contribution-service.js'
+import {GreenfieldModuleActionService} from '../action-service.js'
 import {GreenfieldModuleInstallationService} from '../installation-service.js'
 import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
 import {GreenfieldModulePublisherService} from '../publisher-service.js'
+import {GreenfieldModuleRecordService} from '../record-service.js'
+import type {ModuleRecordQuery} from '../record-service.js'
 import {GreenfieldModuleRegistryService} from '../registry-service.js'
 import {GreenfieldModuleReleaseService} from '../release-service.js'
 import {GreenfieldModuleSettingsService} from '../settings-service.js'
 import {GreenfieldModuleUninstallService} from '../uninstall-service.js'
 import {GreenfieldModuleUpdateService} from '../update-service.js'
+import {GreenfieldModuleViewService} from '../view-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -31,6 +35,9 @@ export async function registerModuleRoutes(
   const uninstall = new GreenfieldModuleUninstallService(db, config)
   const settings = new GreenfieldModuleSettingsService(db, config)
   const contributions = new GreenfieldModuleContributionService(db, config)
+  const views = new GreenfieldModuleViewService(db)
+  const records = new GreenfieldModuleRecordService(db)
+  const actions = new GreenfieldModuleActionService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -236,6 +243,101 @@ export async function registerModuleRoutes(
     return reply.send(successEnvelope(await contributions.list(auth.accountId, request.query as any), request.id))
   })
 
+  app.get('/v1/modules/:moduleId/views', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await views.listViews(auth.accountId, (request.params as any).moduleId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module views lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/views/:viewId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await views.getView(auth.accountId, params.moduleId, params.viewId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module view lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.list(auth.accountId, params.moduleId, params.collection, normalizeRecordQuery(request.query as Record<string, unknown>)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module records lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/records/:collection', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.code(201).send(successEnvelope(await records.create(auth.accountId, params.moduleId, params.collection, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record creation failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/records/:collection/:recordId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.get(auth.accountId, params.moduleId, params.collection, params.recordId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record lookup failed')
+    }
+  })
+
+  app.patch('/v1/modules/:moduleId/records/:collection/:recordId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.patch(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record update failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/records/:collection/:recordId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.delete(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record delete failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/actions/:actionId', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(
+        successEnvelope(
+          await actions.execute(auth.accountId, params.moduleId, params.actionId, {
+            input: (request.body as any)?.input ?? request.body ?? {},
+            idempotencyKey: idempotencyKey(request, request.body),
+          }),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module action failed')
+    }
+  })
+
   app.post('/v1/admin/registry/modules/import', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -351,6 +453,33 @@ function idempotencyKey(request: FastifyRequest, body: unknown): string {
   const fromHeader = Array.isArray(header) ? header[0] : header
   const fromBody = body && typeof body === 'object' ? (body as any).idempotencyKey : undefined
   return String(fromHeader ?? fromBody ?? '').trim()
+}
+
+function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery {
+  const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo'])
+  const filters: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (!reserved.has(key) && typeof value !== 'object') filters[key] = value
+  }
+  const direction: 'asc' | 'desc' | undefined = query.direction === 'asc' ? 'asc' : query.direction === 'desc' ? 'desc' : undefined
+  return {
+    cursor: stringOrUndefined(query.cursor),
+    limit: query.limit === undefined ? undefined : Number(query.limit),
+    sort: stringOrUndefined(query.sort),
+    direction,
+    q: stringOrUndefined(query.q),
+    folder: stringOrUndefined(query.folder),
+    createdFrom: stringOrUndefined(query.createdFrom),
+    createdTo: stringOrUndefined(query.createdTo),
+    updatedFrom: stringOrUndefined(query.updatedFrom),
+    updatedTo: stringOrUndefined(query.updatedTo),
+    filters,
+  }
+}
+
+function stringOrUndefined(value: unknown): string | undefined {
+  if (typeof value === 'string' && value.length > 0) return value
+  return undefined
 }
 
 function sendError(reply: FastifyReply, code: any, message: string, requestId: string) {
