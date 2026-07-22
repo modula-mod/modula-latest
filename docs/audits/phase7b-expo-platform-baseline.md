@@ -5,18 +5,19 @@ Branch: `phase7b-greenfield-module-host`
 
 ## Commands
 
-- `node -p "require('./package.json').dependencies?.expo || require('./package.json').devDependencies?.expo"` -> `~57.0.6`
-- `pnpm why expo` -> one installed version, `expo@57.0.6`
-- `pnpm why expo-router` -> one installed version, `expo-router@57.0.6`
-- `pnpm why @expo/ui` -> one installed version, `@expo/ui@57.0.6`
+- `node -p "require('./package.json').dependencies?.expo || require('./package.json').devDependencies?.expo"` -> `~57.0.7`
+- `pnpm why expo` -> one installed version, `expo@57.0.7`
+- `pnpm why expo-router` -> one installed version, `expo-router@57.0.7`
+- `pnpm why @expo/ui` -> one installed version, `@expo/ui@57.0.7`
+- `pnpm exec expo install --check` -> `Dependencies are up to date`
 
 ## Installed Versions
 
 | Package | Version |
 |---|---:|
-| `expo` | `~57.0.6` |
-| `expo-router` | `~57.0.6` |
-| `@expo/ui` | `~57.0.6` |
+| `expo` | `~57.0.7` |
+| `expo-router` | `~57.0.7` |
+| `@expo/ui` | `~57.0.7` |
 | `react-native` | `0.86.0` |
 | `react` | `19.2.3` |
 | `react-dom` | `19.2.3` |
@@ -120,4 +121,3 @@ Native rebuild remains required for dependency changes involving:
 - other Expo-managed native modules
 
 VPS acceptance for Phase 7B is web/static plus backend/API/worker validation. Native iOS, physical iPhone, TestFlight, and Android native acceptance are deferred.
-
