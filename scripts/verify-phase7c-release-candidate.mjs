@@ -9,10 +9,10 @@ const evidenceFiles = [
 
 for (const rel of evidenceFiles) {
   const source = read(rel)
-  check(`${rel} must be accepted before release candidate`, source.includes('Status: ACCEPTED'))
+  check(`${rel} must be accepted before release candidate`, /^Status:\s+ACCEPTED\s*$/m.test(source))
   check(`${rel} missing build number`, source.includes('Build number:'))
   check(`${rel} missing deployment commit`, source.includes('Deployment commit:'))
-  check(`${rel} missing verification commands`, source.includes('Verification commands'))
+  check(`${rel} missing verification commands`, /^##\s+Verification commands\s*$/im.test(source))
 }
 
 const native = read('docs/validation/phase7c-native-acceptance.md')

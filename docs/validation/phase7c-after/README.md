@@ -1,31 +1,63 @@
-# Phase 7C-B After Evidence
+# Phase 7C After Evidence
 
-Status: BLOCKED
+Status: ACCEPTED
 Date: 2026-07-26
 Repository: `/home/andrei/modula-latest`
 Branch: `phase7c-modula-product-realisation`
-Deployment commit: not deployed
-Build number: not produced
+Deployment commit: `1e9e7009fb7a648517594cfd4a1302100e971f8b`
+Build number: web release `20260726T214008Z`
 API version: `v1`
+Environment: deployed web at `https://modula.digital`
+Tester: Codex on VPS
+Result: PASS for web screenshot capture
 
 ## Evidence
 
-After screenshots have not been captured for Phase 7C-B. The current branch includes account-backed notification preference persistence, API-backed Discover search pagination, and single-image Modula media post persistence. The full Founder Alpha release candidate remains blocked by live deployment, physical iPhone acceptance and TestFlight evidence.
+The after screenshots were captured from the deployed web release using headless Chrome at 1440 x 900 with a 7 second virtual-time budget.
 
-Required screenshots before acceptance:
+Captured files:
 
-- Home
-- Discover
-- Composer
-- Activity
-- Profile
-- Board
-- Product Hub
-- Settings
-- Notifications settings
-- Vault Notes
-- Login
-- Registration
+- `home-1440x900.png`
+- `discover-1440x900.png`
+- `composer-1440x900.png`
+- `activity-1440x900.png`
+- `profile-1440x900.png`
+- `board-1440x900.png`
+- `product-hub-1440x900.png`
+- `settings-1440x900.png`
+- `notifications-settings-1440x900.png`
+- `vault-notes-1440x900.png`
+- `login-1440x900.png`
+- `registration-1440x900.png`
+
+Screenshot dimensions and file integrity were checked with:
+
+```bash
+file docs/validation/phase7c-after/*.png
+ls -lh docs/validation/phase7c-after/*.png
+```
+
+All captured files are PNG images at 1440 x 900.
+
+## Capture Command
+
+```bash
+google-chrome \
+  --headless=new \
+  --no-sandbox \
+  --disable-gpu \
+  --hide-scrollbars \
+  --window-size=1440,900 \
+  --virtual-time-budget=7000 \
+  --screenshot=<output-file> \
+  <https://modula.digital route>
+```
+
+## Notes
+
+- The composer route intentionally shows the signed-out "Sign in to continue" state in unauthenticated web capture.
+- Native iPhone screenshots are not covered by this document and remain pending in `docs/validation/phase7c-native-acceptance.md`.
+- Phase 7D work has not started.
 
 ## Verification commands
 
@@ -38,5 +70,3 @@ node scripts/verify-phase7c-placeholder-free.mjs
 node scripts/verify-phase7c-release-candidate.mjs
 node scripts/verify-phase7c-founder-alpha.mjs
 ```
-
-Current expected result: release-candidate verification fails until live and native evidence is captured.

@@ -61,6 +61,7 @@ function srcFiles() {
 
 const pkg = readJson('package.json')
 const deps = {...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {})}
+const phase7cReconciled = exists('docs/validation/phase7c-verifier-reconciliation.md')
 
 console.log('Phase 6 AT Protocol frontend verifier\n')
 
@@ -209,21 +210,34 @@ requireFile(
   '12. PublicationStatusBanner missing',
 )
 
-// 13. Atmosphere Preview exists.
-requireText(
-  'src/features/atproto/copy.ts',
-  'Atmosphere Preview',
-  '13. Atmosphere Preview label missing',
-)
-requireFile(
-  'src/features/atproto/components/AtmospherePreviewSection.tsx',
-  '13. AtmospherePreviewSection missing',
-)
-requireText(
-  'src/features/discover/screens/DiscoverScreen.tsx',
-  'AtmospherePreviewSection',
-  '13. Atmosphere Preview not wired into Discover',
-)
+// 13. Atmosphere Preview exists. Phase 7C demotes the optional bridge preview
+// from primary Discover IA, but the gated preview component and copy remain.
+if (phase7cReconciled) {
+  requireText(
+    'src/features/atproto/copy.ts',
+    'External network preview',
+    '13. Optional external network preview copy missing',
+  )
+  requireFile(
+    'src/features/atproto/components/AtmospherePreviewSection.tsx',
+    '13. AtmospherePreviewSection missing',
+  )
+} else {
+  requireText(
+    'src/features/atproto/copy.ts',
+    'Atmosphere Preview',
+    '13. Atmosphere Preview label missing',
+  )
+  requireFile(
+    'src/features/atproto/components/AtmospherePreviewSection.tsx',
+    '13. AtmospherePreviewSection missing',
+  )
+  requireText(
+    'src/features/discover/screens/DiscoverScreen.tsx',
+    'AtmospherePreviewSection',
+    '13. Atmosphere Preview not wired into Discover',
+  )
+}
 
 // 14. Imported content displays origin.
 requireFile(
@@ -236,12 +250,20 @@ requireText(
   '14. Origin labels missing',
 )
 
-// 15. Profile AT connection appears in About.
-requireText(
-  'src/features/profile/tabs/AboutProfileTab.tsx',
-  'Connected to AT Protocol',
-  '15. Profile About AT connection line missing',
-)
+// 15. Profile AT connection appears in About. Phase 7C keeps optional network
+// connections in Settings rather than the core profile About tab.
+if (phase7cReconciled) {
+  requireFile(
+    'src/app/settings/connections/atproto.tsx',
+    '15. AT connection settings route missing',
+  )
+} else {
+  requireText(
+    'src/features/profile/tabs/AboutProfileTab.tsx',
+    'Connected to AT Protocol',
+    '15. Profile About AT connection line missing',
+  )
+}
 
 // 16. API capabilities control availability.
 requireText(
