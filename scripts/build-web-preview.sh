@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
+umask 022
 REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
 cd "${REPO}"
 COMMIT="$(git rev-parse HEAD)"
 BRANCH="$(git branch --show-current)"
+BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+CACHE_BUSTER="${COMMIT:0:12}-$(date -u +%Y%m%dT%H%M%SZ)"
 OUT="${REPO}/.web-release"
 rm -rf "${OUT}"
 mkdir -p "${OUT}"
@@ -23,11 +26,13 @@ pnpm verify:phase5
 pnpm exec expo export --platform web
 test -d dist
 cp -a dist/. "${OUT}/"
+find "${OUT}" -type f -name '*.html' -print0 | xargs -0 perl -0pi -e "s#(_expo/static/js/web/entry-[^\"']+\\.js)(?!\\?)#\$1?v=${CACHE_BUSTER}#g"
 cat > "${OUT}/release.json" <<JSON
 {
   "commit": "${COMMIT}",
   "branch": "${BRANCH}",
-  "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "builtAt": "${BUILT_AT}",
+  "assetCacheBuster": "${CACHE_BUSTER}",
   "environment": "preview",
   "dataSource": "remote",
   "apiUrl": "https://api.modula.digital",
