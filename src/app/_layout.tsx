@@ -50,7 +50,6 @@ function RootNavigator() {
         <Stack.Screen name="communities" />
         <Stack.Screen name="teams" />
         <Stack.Screen name="modules" />
-        <Stack.Screen name="module" />
         <Stack.Screen name="marketplace" />
         <Stack.Screen name="product" />
         <Stack.Screen name="creator" />

@@ -7,26 +7,28 @@ No package should enter the project merely because an example repository uses it
 |---|---:|---|---|---|---|---|---|
 | @node-rs/argon2 | ^2.0.2 | Server-side Argon2id password hashing for sovereign accounts | No (Node native binding) | N/A (backend only) | MIT | node-rs maintained package; required for Phase 6R password credentials | Phase 6R |
 | @expo/ui | ~57.0.7 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo | ~57.0.7 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-constants | ~57.0.6 | App config / constants access | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo | ~57.0.8 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-constants | ~57.0.7 | App config / constants access | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-dev-client | ~57.0.9 | Development-client runtime for native validation builds | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
 | expo-device | ~57.0.1 | Device info (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-font | ~57.0.1 | Font loading support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-glass-effect | ~57.0.1 | Template glass effect module (unused in Phase 0 UI) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-image | ~57.0.1 | Image component (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-linking | ~57.0.3 | Deep linking support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-router | ~57.0.7 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-splash-screen | ~57.0.4 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module | Phase 0 / chrome pass |
+| expo-image-picker | ~57.0.6 | Image picker capability for profile/media surfaces | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-linking | ~57.0.4 | Deep linking support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-router | ~57.0.8 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-splash-screen | ~57.0.5 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 / chrome pass |
 | expo-status-bar | ~57.0.1 | Status bar control | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-symbols | ~57.0.1 | SF Symbols helper (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-system-ui | ~57.0.1 | System UI styling | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-web-browser | ~57.0.1 | In-app browser (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| expo-web-browser | ~57.0.2 | In-app browser (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
 | react | 19.2.3 | UI library | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-dom | 19.2.3 | React DOM for web | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native | 0.86.0 | Native UI runtime | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-gesture-handler | ~2.32.0 | Gesture system (Expo Router peer) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-reanimated | 4.5.0 | Animation runtime (Expo Router peer) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-safe-area-context | ~5.7.0 | Safe area insets | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| react-native-screens | 4.25.2 | Native navigation screens | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| react-native-screens | 4.26.2 | Native navigation screens | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
 | react-native-web | ~0.21.0 | Web rendering | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-worklets | 0.10.0 | Worklets peer for Reanimated | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 
@@ -128,7 +130,7 @@ Removal path: disconnect AT UI + drop `@atproto/oauth-client-expo` when AT OAuth
 
 | Package | Version | Purpose | Native | Development-client rebuild required | Evidence | Added in |
 |---|---:|---|---|---|---|---|
-| expo-video | ~57.0.1 | Reels / short-media playback foundation (`ModulaReelPlayer`) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
+| expo-video | ~57.0.2 | Reels / short-media playback foundation (`ModulaReelPlayer`) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root); Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 6S |
 | expo-camera | ~57.0.3 | Appearance → Advanced camera masked-blur Preview (Motionary-style cutouts) | Yes | Yes | `pnpm exec expo install` / `pnpm add -w` (workspace root) | Phase 6S |
 
 Patterns (not packages):

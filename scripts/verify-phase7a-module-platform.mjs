@@ -36,11 +36,35 @@ function rgMaybe(args, cwd = root) {
   }
 }
 
+function phase7bFrontendAllowed() {
+  return (
+    existsSync(join(root, 'scripts/verify-phase7b-module-host.mjs')) &&
+    existsSync(join(root, 'scripts/verify-phase7b-vault-notes.mjs')) &&
+    existsSync(join(root, 'src/features/modules/runtime/module-host.tsx'))
+  )
+}
+
+function verifyFrontendBoundaryForCurrentPhase() {
+  if (phase7bFrontendAllowed()) {
+    sh(['node', 'scripts/verify-phase7b-module-host.mjs'])
+    return
+  }
+  sh(['node', 'scripts/verify-phase7a-frontend-boundary.mjs'])
+}
+
+function verifyVaultBoundaryForCurrentPhase() {
+  if (phase7bFrontendAllowed()) {
+    sh(['node', 'scripts/verify-phase7b-vault-notes.mjs'])
+    return
+  }
+  sh(['node', 'scripts/verify-phase7a-frontend-boundary.mjs'])
+}
+
 check('Phase 7A baseline is contained', () => {
   sh(['git', 'merge-base', '--is-ancestor', '5e05f3ef1b93c4cc7aeb3c31393abc82239a622e', 'HEAD'])
 })
 check('baseline audit exists', () => file('docs/audits/phase7a-extension-foundation-audit.md'))
-check('frontend boundary verifier passes', () => sh(['node', 'scripts/verify-phase7a-frontend-boundary.mjs']))
+check('frontend boundary verifier passes', verifyFrontendBoundaryForCurrentPhase)
 check('Manifest v1 exists', () => file('packages/greenfield-module-manifest/src/manifest.ts').includes('GREENFIELD_MODULE_MANIFEST_VERSION'))
 check('manifest JSON Schema exists', () => file('packages/greenfield-module-manifest/schemas/module-manifest.v1.schema.json').includes('"const": 1'))
 check('Module SDK exists', () => file('packages/greenfield-module-sdk/src/define-module.ts'))
@@ -81,7 +105,7 @@ check('module secret references exist', () => file('services/greenfield-api/src/
 check('Vault Notes is external', () => {
   if (!existsSync(vaultRoot)) throw new Error('external Vault Notes repo missing')
 })
-check('Vault Notes is not implemented in the host', () => sh(['node', 'scripts/verify-phase7a-frontend-boundary.mjs']))
+check('Vault Notes is not implemented in the host', verifyVaultBoundaryForCurrentPhase)
 check('Vault Notes manifest validates', () => {
   const manifestPath = join(vaultRoot, 'module.manifest.json')
   if (!existsSync(manifestPath)) throw new Error('Vault Notes manifest missing')

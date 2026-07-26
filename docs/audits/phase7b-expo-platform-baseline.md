@@ -5,9 +5,9 @@ Branch: `phase7b-greenfield-module-host`
 
 ## Commands
 
-- `node -p "require('./package.json').dependencies?.expo || require('./package.json').devDependencies?.expo"` -> `~57.0.7`
-- `pnpm why expo` -> one installed version, `expo@57.0.7`
-- `pnpm why expo-router` -> one installed version, `expo-router@57.0.7`
+- `node -p "require('./package.json').dependencies?.expo || require('./package.json').devDependencies?.expo"` -> `~57.0.8`
+- `pnpm why expo` -> one installed version, `expo@57.0.8`
+- `pnpm why expo-router` -> one installed version, `expo-router@57.0.8`
 - `pnpm why @expo/ui` -> one installed version, `@expo/ui@57.0.7`
 - `pnpm exec expo install --check` -> `Dependencies are up to date`
 
@@ -15,9 +15,12 @@ Branch: `phase7b-greenfield-module-host`
 
 | Package | Version |
 |---|---:|
-| `expo` | `~57.0.7` |
-| `expo-router` | `~57.0.7` |
+| `expo` | `~57.0.8` |
+| `expo-router` | `~57.0.8` |
 | `@expo/ui` | `~57.0.7` |
+| `expo-constants` | `~57.0.7` |
+| `expo-dev-client` | `~57.0.9` |
+| `react-native-screens` | `4.26.2` |
 | `react-native` | `0.86.0` |
 | `react` | `19.2.3` |
 | `react-dom` | `19.2.3` |
