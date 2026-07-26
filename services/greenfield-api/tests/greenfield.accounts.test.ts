@@ -121,6 +121,32 @@ describeIf('Greenfield native accounts integration', () => {
     expect(me.statusCode).toBe(200)
     expect(me.json().data.primaryHandle).toBe(handle)
 
+    const profile = await app.inject({method: 'GET', url: `/v1/profiles/${handle}`})
+    expect(profile.statusCode).toBe(200)
+    expect(profile.json().data.handle).toBe(handle)
+
+    const notificationPreferences = await app.inject({
+      method: 'GET',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${session.accessToken}`},
+    })
+    expect(notificationPreferences.statusCode).toBe(200)
+    expect(notificationPreferences.json().data.bundleStyle).toBe('focus')
+
+    const patchedNotificationPreferences = await app.inject({
+      method: 'PATCH',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${session.accessToken}`},
+      payload: {
+        bundleStyle: 'digest',
+        reactionEnabled: false,
+        expectedVersion: notificationPreferences.json().data.version,
+      },
+    })
+    expect(patchedNotificationPreferences.statusCode).toBe(200)
+    expect(patchedNotificationPreferences.json().data.bundleStyle).toBe('digest')
+    expect(patchedNotificationPreferences.json().data.reactionEnabled).toBe(false)
+
     const repo = await app.inject({
       method: 'GET',
       url: '/v1/repositories/me',

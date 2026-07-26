@@ -200,6 +200,54 @@ export class AccountService {
         .select('primary_handle')
         .where('account_id', '=', row.account_id)
         .executeTakeFirstOrThrow()
+      const actorId = `actor-${row.account_id}`
+      const profileId = `profile-${row.account_id}`
+      await trx
+        .insertInto('actors')
+        .values({
+          id: actorId,
+          account_id: row.account_id,
+          kind: 'person',
+          created_at: now,
+          updated_at: now,
+          deleted_at: null,
+          version: 1,
+        })
+        .execute()
+      await trx
+        .insertInto('profiles')
+        .values({
+          id: profileId,
+          actor_id: actorId,
+          handle: account.primary_handle,
+          display_name: account.primary_handle,
+          kind: 'person',
+          bio: '',
+          avatar_url: null,
+          cover_url: null,
+          cover_colour: null,
+          pronouns: null,
+          location_label: null,
+          location_visibility: null,
+          website_label: null,
+          website_url: null,
+          website_domain: null,
+          website_visibility: null,
+          focus_status_id: 'available',
+          focus_status_label: 'Available',
+          focus_status_message: 'Ready in Modula',
+          focus_status_updated_at: now,
+          visibility: 'public',
+          module_count: 0,
+          featured_module_ids: [],
+          identity_claims: [],
+          joined_at: now,
+          created_at: now,
+          updated_at: now,
+          deleted_at: null,
+          version: 1,
+        })
+        .execute()
       await trx
         .insertInto('greenfield_records')
         .values({
