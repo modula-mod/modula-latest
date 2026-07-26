@@ -27,9 +27,9 @@ try {
     await client.query(`UPDATE greenfield_extension_versions SET status='published' WHERE extension_version_id=$1`, [row.extension_version_id])
     await client.query(`UPDATE greenfield_extensions SET status='published', updated_at=NOW() WHERE extension_id=$1`, [row.extension_id])
     await client.query(
-      `INSERT INTO greenfield_extension_catalogue (extension_id,slug,kind,name,description,version,publisher,trust,permissions,compatibility,manifest,catalogue_status,executable,created_at,updated_at)
-       VALUES ($1,$1,'module',$2,$3,$4,$5,$6,$7,$8,$9,'active',$10,NOW(),NOW())
-       ON CONFLICT (slug) DO UPDATE SET name=EXCLUDED.name, description=EXCLUDED.description, version=EXCLUDED.version, publisher=EXCLUDED.publisher, trust=EXCLUDED.trust, permissions=EXCLUDED.permissions, compatibility=EXCLUDED.compatibility, manifest=EXCLUDED.manifest, catalogue_status='active', executable=EXCLUDED.executable, updated_at=NOW()`,
+      `INSERT INTO greenfield_extension_catalogue (extension_id,slug,kind,name,description,version,publisher,trust,permissions,compatibility,manifest,catalogue_status,executable,distribution_model,entitlement_id,created_at,updated_at)
+       VALUES ($1,$1,'module',$2,$3,$4,$5,$6,$7,$8,$9,'active',$10,'free',NULL,NOW(),NOW())
+       ON CONFLICT (slug) DO UPDATE SET name=EXCLUDED.name, description=EXCLUDED.description, version=EXCLUDED.version, publisher=EXCLUDED.publisher, trust=EXCLUDED.trust, permissions=EXCLUDED.permissions, compatibility=EXCLUDED.compatibility, manifest=EXCLUDED.manifest, catalogue_status='active', executable=EXCLUDED.executable, distribution_model=EXCLUDED.distribution_model, entitlement_id=EXCLUDED.entitlement_id, updated_at=NOW()`,
       [
         args.module,
         manifest.name,

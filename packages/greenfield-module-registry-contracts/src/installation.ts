@@ -21,7 +21,7 @@ export const GREENFIELD_MODULE_INSTALLATION_TRANSITIONS: Record<GreenfieldModule
   installing: ['installedDisabled', 'failed'],
   installedDisabled: ['enabling', 'quarantined', 'uninstalling'],
   enabling: ['enabled', 'failed', 'quarantined'],
-  enabled: ['disabling', 'updating', 'quarantined'],
+  enabled: ['disabling', 'updating', 'quarantined', 'uninstalling'],
   disabling: ['disabled', 'failed', 'quarantined'],
   disabled: ['enabling', 'updating', 'quarantined', 'uninstalling'],
   updating: ['enabled', 'disabled', 'failed', 'quarantined'],

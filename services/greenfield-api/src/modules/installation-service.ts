@@ -20,6 +20,17 @@ import {GreenfieldModuleRegistryService} from './registry-service.js'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
+function assertTransitionOrConflict(from: GreenfieldModuleInstallationStatus, to: GreenfieldModuleInstallationStatus): void {
+  try {
+    assertInstallationTransition(from, to)
+  } catch (error) {
+    if ((error as any)?.code === 'INVALID_INSTALLATION_TRANSITION') {
+      throw moduleError('CONFLICT', error instanceof Error ? error.message : `Invalid module installation transition ${from} -> ${to}`)
+    }
+    throw error
+  }
+}
+
 export class GreenfieldModuleInstallationService {
   private readonly registry: GreenfieldModuleRegistryService
   private readonly dependencies: GreenfieldModuleDependencyResolver
@@ -218,7 +229,7 @@ export class GreenfieldModuleInstallationService {
     if (!idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     const installed = await this.getInstalled(accountId, moduleId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
-    assertInstallationTransition(installed.status, nextStatus)
+    assertTransitionOrConflict(installed.status, nextStatus)
     const now = new Date()
     await this.db.transaction().execute(async trx => {
       await trx.updateTable('greenfield_extension_installations').set({status: nextStatus, updated_at: now}).where('installation_id', '=', installed.installationId).execute()
@@ -237,7 +248,7 @@ export class GreenfieldModuleInstallationService {
   async setWorkerStatus(installationId: string, status: GreenfieldModuleInstallationStatus) {
     const row = await this.db.selectFrom('greenfield_extension_installations').selectAll().where('installation_id', '=', installationId).executeTakeFirst()
     if (!row) throw moduleError('NOT_FOUND', 'Installation not found')
-    assertInstallationTransition(row.status as GreenfieldModuleInstallationStatus, status)
+    assertTransitionOrConflict(row.status as GreenfieldModuleInstallationStatus, status)
     await this.db.updateTable('greenfield_extension_installations').set({status, updated_at: new Date()}).where('installation_id', '=', installationId).execute()
   }
 

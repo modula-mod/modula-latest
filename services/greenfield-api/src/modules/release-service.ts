@@ -337,6 +337,8 @@ export class GreenfieldModuleReleaseService {
           manifest: release.manifest,
           catalogue_status: 'active',
           executable: release.manifest.lifecycle?.executionMode !== 'declarative' && release.trustLevel === 'firstParty',
+          distribution_model: 'free',
+          entitlement_id: null,
           created_at: now,
           updated_at: now,
         })
@@ -352,6 +354,8 @@ export class GreenfieldModuleReleaseService {
             manifest: release.manifest,
             catalogue_status: 'active',
             executable: release.manifest.lifecycle?.executionMode !== 'declarative' && release.trustLevel === 'firstParty',
+            distribution_model: 'free',
+            entitlement_id: null,
             updated_at: now,
           }),
         )

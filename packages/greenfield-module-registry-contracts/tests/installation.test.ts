@@ -11,6 +11,7 @@ describe('module installation state machine', () => {
     expect(canTransitionInstallation('enabling', 'enabled')).toBe(true)
     expect(canTransitionInstallation('enabled', 'disabling')).toBe(true)
     expect(canTransitionInstallation('disabled', 'updating')).toBe(true)
+    expect(canTransitionInstallation('enabled', 'uninstalling')).toBe(true)
     expect(canTransitionInstallation('enabled', 'quarantined')).toBe(true)
     expect(canTransitionInstallation('quarantined', 'uninstalling')).toBe(true)
   })

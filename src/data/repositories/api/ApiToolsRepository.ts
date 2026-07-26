@@ -114,20 +114,20 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
   {
     toolId: 'modula.tool.saveToVault',
     manifestId: 'composer.productivity.save-to-vault',
-    moduleId: 'module-vault-notes',
+    moduleId: 'digital.modula.vault-notes',
     name: 'Save to Vault',
     section: 'Productivity',
-    availability: 'unavailable',
+    availability: 'requiresInstall',
     requiresModule: 'Vault Notes',
     description: 'Requires Vault Notes before private note capture appears in Composer.',
   },
   {
     toolId: 'modula.tool.createTask',
     manifestId: 'composer.productivity.create-task',
-    moduleId: 'module-tasks',
+    moduleId: 'digital.modula.tasks',
     name: 'Create Task',
     section: 'Productivity',
-    availability: 'unavailable',
+    availability: 'requiresInstall',
     requiresModule: 'Tasks',
     description: 'Requires Tasks module before a draft can become a Board action.',
   },
@@ -195,10 +195,10 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     toolId: 'modula.tool.marketplace',
     manifestId: 'composer.marketplace.browse',
     moduleId: 'module-marketplace',
-    name: 'Browse marketplace',
+    name: 'Browse Product Hub',
     section: 'Marketplace',
     availability: 'active',
-    description: 'Open Marketplace to inspect module pre-screens.',
+    description: 'Open Product Hub to inspect registry modules.',
   },
 ]
 
@@ -255,7 +255,7 @@ function decodeTools(value: unknown): ComposerToolItem[] {
             : undefined,
       name: String(row.display_name ?? row.displayName ?? row.name ?? slug),
       section: sectionFor(slug, typeof row.section === 'string' ? row.section : undefined),
-      availability: (['active', 'preview', 'unavailable'].includes(availability)
+      availability: (['active', 'preview', 'requiresInstall', 'requiresEnable', 'requiresConfiguration', 'unavailable'].includes(availability)
         ? availability
         : 'preview') as ComposerToolItem['availability'],
       requiresModule:
@@ -271,11 +271,44 @@ function decodeTools(value: unknown): ComposerToolItem[] {
   })
 }
 
+function decodeContributionTools(value: unknown): ComposerToolItem[] {
+  if (!Array.isArray(value) || value.length === 0) return []
+  return value.map(item => {
+    const row = (item ?? {}) as Record<string, unknown>
+    const manifest = (row.manifest ?? {}) as Record<string, unknown>
+    const toolId = String(manifest.toolId ?? manifest.actionId ?? row.id ?? row.contribution_key ?? 'module-tool')
+    const moduleId = String(row.moduleId ?? row.module_id ?? manifest.moduleId ?? '')
+    const available = Boolean(row.available)
+    const installationStatus = String(row.installationStatus ?? row.installation_status ?? '')
+    return {
+      toolId,
+      manifestId: String(row.id ?? toolId),
+      moduleId,
+      name: String(manifest.label ?? manifest.name ?? manifest.title ?? toolId),
+      section: sectionFor(toolId, typeof manifest.section === 'string' ? manifest.section : undefined),
+      availability: available
+        ? 'active'
+        : installationStatus === 'installedDisabled' || installationStatus === 'disabled'
+          ? 'requiresEnable'
+          : installationStatus === 'configurationRequired'
+            ? 'requiresConfiguration'
+            : 'requiresInstall',
+      requiresModule: typeof manifest.requiresModule === 'string' ? manifest.requiresModule : moduleId,
+      description: typeof manifest.description === 'string' ? manifest.description : undefined,
+    }
+  })
+}
+
 export class ApiToolsRepository implements ToolsRepository {
   constructor(private readonly client: ApiClient) {}
 
   async listComposerTools(): Promise<ComposerToolItem[]> {
     try {
+      const contributions = await this.client.get(
+        {path: '/v1/modules/contributions', authenticated: true, query: {surface: 'composer'}},
+        decodeContributionTools,
+      )
+      if (contributions.length) return mergeTools(contributions, BUILTIN_TOOLS)
       return await this.client.get({path: '/v1/tools'}, decodeTools)
     } catch {
       return BUILTIN_TOOLS
@@ -309,4 +342,11 @@ export class ApiToolsRepository implements ToolsRepository {
       return {state: 'failed', message: 'Function unavailable'}
     }
   }
+}
+
+function mergeTools(primary: ComposerToolItem[], fallback: ComposerToolItem[]): ComposerToolItem[] {
+  const byId = new Map<string, ComposerToolItem>()
+  for (const item of fallback) byId.set(item.toolId, item)
+  for (const item of primary) byId.set(item.toolId, item)
+  return Array.from(byId.values())
 }

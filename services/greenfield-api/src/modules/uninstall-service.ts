@@ -24,9 +24,10 @@ export class GreenfieldModuleUninstallService {
       .where('greenfield_module_releases.version', '=', installed.version)
       .execute()
     const recordCounts = await this.db
-      .selectFrom('greenfield_records')
+      .selectFrom('greenfield_module_records')
       .select(({fn}) => fn.countAll<number>().as('count'))
-      .where('collection', 'like', `module.${moduleId}.%`)
+      .where('account_id', '=', accountId)
+      .where('module_id', '=', moduleId)
       .where('deleted_at', 'is', null)
       .executeTakeFirst()
     return {

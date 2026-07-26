@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
@@ -73,6 +74,15 @@ function unavailableTitle(tool: ComposerToolItem): string {
 }
 
 function availabilitySentence(tool: ComposerToolItem): string {
+  if (tool.availability === 'requiresInstall') {
+    return `Requires install. Open ${tool.requiresModule ?? 'the module'} to review permissions.`
+  }
+  if (tool.availability === 'requiresEnable') {
+    return `Requires enable. Turn on ${tool.requiresModule ?? 'the module'} in module settings.`
+  }
+  if (tool.availability === 'requiresConfiguration') {
+    return `Requires configuration. Finish ${tool.requiresModule ?? 'module'} settings first.`
+  }
   if (tool.availability === 'unavailable') {
     if (isAiRewrite(tool)) {
       return 'Unavailable. An Agents manifest must grant composer rewrite scope before this can run.'
@@ -109,6 +119,7 @@ export function ComposerToolsDrawer({
   onBrowseMarketplace,
   onPlaceholder,
 }: ComposerToolsDrawerProps) {
+  const router = useRouter()
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
   const {colours, radius, spacing} = useThemeTokens()
@@ -135,6 +146,15 @@ export function ComposerToolsDrawer({
   )
 
   const runTool = (tool: ComposerToolItem) => {
+    if (['requiresInstall', 'requiresEnable', 'requiresConfiguration'].includes(tool.availability)) {
+      onClose()
+      if (tool.moduleId) {
+        router.push(`/marketplace/${encodeURIComponent(tool.moduleId)}` as Href)
+        return
+      }
+      onBrowseMarketplace()
+      return
+    }
     if (tool.availability === 'unavailable') {
       Alert.alert(unavailableTitle(tool), unavailableMessage(tool))
       return
@@ -158,6 +178,11 @@ export function ComposerToolsDrawer({
     if (tool.toolId.includes('market')) {
       onClose()
       onBrowseMarketplace()
+      return
+    }
+    if (tool.toolId.toLowerCase().includes('vault')) {
+      onClose()
+      router.push('/module/digital.modula.vault-notes' as Href)
       return
     }
     setInvocationState('validating')
@@ -226,7 +251,7 @@ export function ComposerToolsDrawer({
                 .filter(tool => tool.section === section)
                 .map(tool => {
                   const preview = tool.availability === 'preview'
-                  const unavailable = tool.availability === 'unavailable'
+                  const unavailable = tool.availability === 'unavailable' || tool.availability.startsWith('requires')
                   const label = tool.requiresModule
                     ? `${tool.name} · Requires ${tool.requiresModule}`
                     : preview

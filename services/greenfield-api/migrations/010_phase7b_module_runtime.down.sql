@@ -1,0 +1,10 @@
+ALTER TABLE greenfield_extension_catalogue DROP COLUMN IF EXISTS entitlement_id;
+ALTER TABLE greenfield_extension_catalogue DROP COLUMN IF EXISTS distribution_model;
+DROP TABLE IF EXISTS greenfield_module_data_retention;
+DROP TABLE IF EXISTS greenfield_module_action_events;
+DROP TABLE IF EXISTS greenfield_module_record_events;
+DROP TABLE IF EXISTS greenfield_module_records;
+DROP TABLE IF EXISTS greenfield_module_record_collections;
+DROP TABLE IF EXISTS greenfield_module_actions;
+DROP TABLE IF EXISTS greenfield_module_views;
+INSERT INTO schema_metadata (key,value) VALUES ('schema_version','009') ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

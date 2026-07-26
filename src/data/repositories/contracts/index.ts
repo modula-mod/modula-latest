@@ -32,6 +32,22 @@ export type {
   GetProfileFeedInput,
 } from '@/data/repositories/contracts/FeedRepository'
 export type {MetadataRepository} from '@/data/repositories/contracts/MetadataRepository'
+export type {
+  InstalledModule,
+  ModuleCatalogueItem,
+  ModuleContribution,
+  ModuleDetail,
+  ModuleInstallPreview,
+  ModuleInstallationState,
+  ModulePriceState,
+  ModuleRecord,
+  ModuleRecordPage,
+  ModuleRepository,
+  ModuleRuntimeView,
+  ModuleSettingsDocument,
+  ProductHubCategory,
+  ProductHubExtensionKind,
+} from '@/data/repositories/contracts/ModuleRepository'
 export type {PostRepository} from '@/data/repositories/contracts/PostRepository'
 export type {ProfileRepository} from '@/data/repositories/contracts/ProfileRepository'
 export type {ReelsRepository} from '@/data/repositories/contracts/ReelsRepository'

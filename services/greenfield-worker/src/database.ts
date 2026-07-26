@@ -293,6 +293,80 @@ export interface Database {
     created_at: Date
     updated_at: Date
   }
+  greenfield_module_views: {
+    view_id: string
+    release_id: string
+    module_id: string
+    view_key: string
+    view_kind: string
+    collection: string | null
+    title: string
+    declaration: unknown
+    required_capabilities: unknown
+    registration_status: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_actions: {
+    action_row_id: string
+    release_id: string
+    module_id: string
+    action_id: string
+    action_kind: string
+    capability: string
+    declaration: unknown
+    registration_status: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_record_collections: {
+    collection_id: string
+    release_id: string
+    module_id: string
+    collection: string
+    schema_ref: string
+    default_visibility: string
+    fields: unknown
+    searchable_fields: unknown
+    filterable_fields: unknown
+    sortable_fields: unknown
+    folder_field: string | null
+    reference_fields: unknown
+    schema_definition: unknown
+    retention_policy: string
+    registration_status: string
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_records: {
+    record_id: string
+    account_id: string
+    module_id: string
+    installation_id: string | null
+    collection: string
+    schema_ref: string
+    visibility: string
+    data: unknown
+    search_text: string
+    folder_ref: string | null
+    source_uri: string | null
+    retained_after_uninstall: boolean
+    revision: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+  }
+  greenfield_module_data_retention: {
+    retention_id: string
+    account_id: string
+    module_id: string
+    installation_id: string | null
+    choice: 'keepData' | 'exportThenDelete' | 'deleteData'
+    record_count: number
+    export_id: string | null
+    completed_at: Date | null
+    created_at: Date
+  }
   greenfield_module_release_integrity: {
     integrity_id: string
     release_id: string

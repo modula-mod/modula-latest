@@ -16,6 +16,7 @@ export async function registerModuleContributions(db: ModulaWorkerDb, releaseId:
     .where('release_id', '=', releaseId)
     .execute()
 
+  await registerModuleRuntimeDeclarations(db, releaseId, 'registered')
   for (const contribution of contributions as ContributionRow[]) {
     const status = contribution.execution_required && !options.enableExecutable ? 'disabled' : 'registered'
     await registerKnownContribution(db, contribution, extensionVersionId, status)
@@ -23,11 +24,19 @@ export async function registerModuleContributions(db: ModulaWorkerDb, releaseId:
 }
 
 export async function unregisterModuleContributions(db: ModulaWorkerDb, releaseId: string) {
+  await registerModuleRuntimeDeclarations(db, releaseId, 'disabled')
   await db
     .updateTable('greenfield_module_contributions')
     .set({registration_status: 'disabled', updated_at: new Date()})
     .where('release_id', '=', releaseId)
     .execute()
+}
+
+export async function registerModuleRuntimeDeclarations(db: ModulaWorkerDb, releaseId: string, status: 'registered' | 'disabled') {
+  const now = new Date()
+  await db.updateTable('greenfield_module_views').set({registration_status: status, updated_at: now}).where('release_id', '=', releaseId).execute()
+  await db.updateTable('greenfield_module_actions').set({registration_status: status, updated_at: now}).where('release_id', '=', releaseId).execute()
+  await db.updateTable('greenfield_module_record_collections').set({registration_status: status, updated_at: now}).where('release_id', '=', releaseId).execute()
 }
 
 async function registerKnownContribution(db: ModulaWorkerDb, contribution: ContributionRow, extensionVersionId: string, status: string) {

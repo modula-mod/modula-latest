@@ -51,6 +51,14 @@ export async function runPostOverflowAction(
       )
       return
     }
+    case 'saveToVault': {
+      const permalink = getPostPermalink(post)
+      const title = post.text?.trim().split('\n')[0]?.slice(0, 80) || `Post by ${post.author.displayName}`
+      router.push(
+        `/module/digital.modula.vault-notes/note-editor?postId=${encodeURIComponent(post.id)}&sourceUri=${encodeURIComponent(permalink)}&title=${encodeURIComponent(title)}` as Href,
+      )
+      return
+    }
     case 'quote': {
       router.push(`/compose?quotePostId=${encodeURIComponent(post.id)}` as Href)
       return

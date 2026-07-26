@@ -12,6 +12,7 @@ import {
   type ProductMaturity,
 } from '@/features/product/data/productCatalogue'
 import {FEATURE_ATLAS} from '@/features/product/data/featureAtlas'
+import {ProductHubMarketplaceContent} from '@/features/modules/screens/ProductHubMarketplaceScreen'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -79,6 +80,8 @@ export function ProductHubScreen() {
               Forge lets the ecosystem grow.
             </AppText>
           </LinearGradient>
+
+          <ProductHubMarketplaceContent compact />
 
           <View style={{gap: spacing[3]}}>
             <AppText variant="headline">Create & extend</AppText>
