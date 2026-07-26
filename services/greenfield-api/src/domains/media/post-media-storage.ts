@@ -33,6 +33,7 @@ export class PostMediaStorage {
     postId: string
     media: CreatePostMediaInput[]
   }): Promise<PersistedPostMedia[]> {
+    if (input.media.length === 0) return []
     if (input.media.length > 1) {
       throw Object.assign(new Error('Only one image attachment is supported in Founder Alpha'), {
         code: 'VALIDATION_FAILED',

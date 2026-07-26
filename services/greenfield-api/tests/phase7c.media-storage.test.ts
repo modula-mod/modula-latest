@@ -16,6 +16,12 @@ afterEach(async () => {
 })
 
 describe('Phase 7C post media storage', () => {
+  it('does not touch the media root for text-only posts', async () => {
+    const storage = new PostMediaStorage(configFor('/proc/modula-unwritable-media-root'))
+
+    await expect(storage.persistPostMedia({postId: 'post-text-only', media: []})).resolves.toEqual([])
+  })
+
   it('persists and reads a bounded uploaded image', async () => {
     const root = await tempRoot()
     const storage = new PostMediaStorage(configFor(root))
