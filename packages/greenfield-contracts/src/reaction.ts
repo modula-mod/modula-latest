@@ -10,11 +10,10 @@
  */
 export type GreenfieldReactionType =
   | 'like'
-  | 'love'
   | 'celebrate'
   | 'insightful'
   | 'support'
-  | 'funny'
+  | 'curious'
 
 export type GreenfieldReaction = {
   reactionId: string
@@ -40,9 +39,8 @@ export type GreenfieldReactionSummary = {
 
 export const GREENFIELD_REACTION_TYPES: readonly GreenfieldReactionType[] = [
   'like',
-  'love',
   'celebrate',
   'insightful',
   'support',
-  'funny',
+  'curious',
 ] as const

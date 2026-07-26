@@ -49,6 +49,11 @@ export type {
   ProductHubExtensionKind,
 } from '@/data/repositories/contracts/ModuleRepository'
 export type {PostRepository} from '@/data/repositories/contracts/PostRepository'
+export type {
+  ProductPreferencesRepository,
+  SyncedBoardLayout,
+  UpdateBoardLayoutInput,
+} from '@/data/repositories/contracts/ProductPreferencesRepository'
 export type {ProfileRepository} from '@/data/repositories/contracts/ProfileRepository'
 export type {ReelsRepository} from '@/data/repositories/contracts/ReelsRepository'
 export type {

@@ -16,7 +16,9 @@ check('Board widget order persistence missing', preferences.includes('boardWidge
 const routes = read('services/greenfield-api/src/app/register-routes.ts')
 check(
   'account-backed Board layout API must be completed for Founder Alpha',
-  routes.includes('/v1/board') || routes.includes('board layout'),
+  routes.includes('/v1/board/layout') &&
+    read('services/greenfield-api/src/domains/board/service.ts').includes('BoardLayoutService') &&
+    read('src/features/product/runtime/ProductPreferencesProvider.tsx').includes('updateBoardLayout'),
 )
 
 finish('Phase 7C board verification')

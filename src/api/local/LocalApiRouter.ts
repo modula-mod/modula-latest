@@ -4,6 +4,7 @@ import type {MutableLocalApiConfiguration} from '@/api/local/LocalApiConfigurati
 import {createActivityRoutes} from '@/api/local/routes/activityRoutes'
 import {createAtprotoRoutes} from '@/api/local/routes/atprotoRoutes'
 import {createAuthRoutes} from '@/api/local/routes/authRoutes'
+import {createBoardRoutes} from '@/api/local/routes/boardRoutes'
 import {createDiscoverRoutes} from '@/api/local/routes/discoverRoutes'
 import {createFeedRoutes} from '@/api/local/routes/feedRoutes'
 import {createMetaRoutes} from '@/api/local/routes/metaRoutes'
@@ -58,6 +59,7 @@ export class LocalApiRouter {
       ...createFeedRoutes(database),
       ...createPostRoutes(database),
       ...createProfileRoutes(database),
+      ...createBoardRoutes(database),
       ...createActivityRoutes(database),
       ...createDiscoverRoutes(database),
       ...createAtprotoRoutes(),

@@ -1,11 +1,12 @@
 import {randomUUID} from 'node:crypto'
+import {GREENFIELD_REACTION_TYPES, type GreenfieldReactionType} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
 
-export type ReactionType = 'like' | 'love' | 'celebrate' | 'insightful' | 'support' | 'funny'
-const TYPES: ReadonlySet<string> = new Set(['like', 'love', 'celebrate', 'insightful', 'support', 'funny'])
+export type ReactionType = GreenfieldReactionType
+const TYPES: ReadonlySet<string> = new Set(GREENFIELD_REACTION_TYPES)
 
 export class ReactionService {
   constructor(private readonly db: ModulaDb) {}

@@ -100,7 +100,7 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
     {id: 'dimon', enabled: false, locked: true},
     {id: 'automations', enabled: false, locked: false},
   ],
-  boardWidgetIds: ['tasks', 'calendar', 'gaia-briefing', 'dimon-activity', 'nft-entitlements', 'notes', 'crm'],
+  boardWidgetIds: ['vault-notes', 'product-hub', 'saved', 'profile', 'settings', 'activity'],
   automationEnabledIds: ['1', '2'],
   forgeDraftName: 'My Module',
   gaiaAllowedScopes: ['composer', 'tasks'],

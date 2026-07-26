@@ -23,6 +23,12 @@ export type LocalLikeRecord = {profileId: ProfileId; postId: PostId}
 export type LocalSaveRecord = {profileId: ProfileId; postId: PostId}
 export type LocalRepostRecord = {profileId: ProfileId; postId: PostId}
 export type LocalActivityRecord = ActivityItem
+export type LocalBoardLayoutRecord = {
+  accountId: AccountId
+  boardWidgetIds: string[]
+  version: number
+  updatedAt: string
+}
 export type LocalSessionRecord = {
   id: SessionId
   accountId: AccountId
@@ -42,6 +48,7 @@ export type LocalApiDatabaseState = {
   saves: LocalSaveRecord[]
   reposts: LocalRepostRecord[]
   activity: LocalActivityRecord[]
+  boardLayouts: LocalBoardLayoutRecord[]
   sessions: LocalSessionRecord[]
   discover: DiscoverResult
   reels: ReelItem[]
@@ -226,6 +233,49 @@ export class LocalApiDatabase {
   toggleRepost(postId: PostId, reposted: boolean): PostEngagement {
     this.toggleEdge('reposts', postId, reposted)
     return this.updatePostEngagement(postId)
+  }
+
+  getBoardLayout(accountId: AccountId): LocalBoardLayoutRecord {
+    let layout = this.state.boardLayouts.find(item => item.accountId === accountId)
+    if (!layout) {
+      layout = {
+        accountId,
+        boardWidgetIds: [
+          'vault-notes',
+          'product-hub',
+          'saved',
+          'profile',
+          'settings',
+          'activity',
+        ],
+        version: 1,
+        updatedAt: this.clock.iso(),
+      }
+      this.state.boardLayouts.push(layout)
+    }
+    return clone(layout)
+  }
+
+  updateBoardLayout(accountId: AccountId, input: Record<string, unknown>): LocalBoardLayoutRecord {
+    const current = this.getBoardLayout(accountId)
+    if (
+      typeof input.expectedVersion === 'number' &&
+      input.expectedVersion !== current.version
+    ) {
+      throw new Error('Board layout version conflict.')
+    }
+    const boardWidgetIds = Array.isArray(input.boardWidgetIds)
+      ? input.boardWidgetIds.filter((item): item is string => typeof item === 'string')
+      : current.boardWidgetIds
+    const next: LocalBoardLayoutRecord = {
+      ...current,
+      boardWidgetIds: Array.from(new Set(boardWidgetIds)),
+      version: current.version + 1,
+      updatedAt: this.clock.iso(),
+    }
+    this.state.boardLayouts = this.state.boardLayouts.filter(item => item.accountId !== accountId)
+    this.state.boardLayouts.push(next)
+    return clone(next)
   }
 
   followProfile(profileId: ProfileId): FollowResult {

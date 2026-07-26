@@ -22,12 +22,27 @@ includes('src/features/social/components/reaction-control.tsx', [
   'Curious',
 ], 'reaction control')
 
-const postActions = read('src/features/feed/postActions/catalog.ts') + read('src/features/feed/postActions/runPostAction.ts')
-for (const action of ['reply', 'react', 'repost', 'quote', 'save', 'share', 'saveToVault']) {
-  check(`post action missing ${action}`, postActions.includes(action))
+const postActions =
+  read('src/features/feed/postActions/catalog.ts') +
+  read('src/features/feed/postActions/runPostAction.ts') +
+  read('src/features/social/components/post-actions.tsx') +
+  read('src/features/social/components/reaction-control.tsx')
+for (const [action, proof] of [
+  ['reply', 'Reply'],
+  ['react', 'ReactionControl'],
+  ['repost', 'useRepostMutation'],
+  ['quote', 'quote'],
+  ['save', 'useSavePostMutation'],
+  ['share', 'share'],
+  ['saveToVault', 'saveToVault'],
+]) {
+  check(`post action missing ${action}`, postActions.includes(proof))
 }
 
-const routes = read('services/greenfield-api/src/app/register-routes.ts')
+const routes =
+  read('services/greenfield-api/src/app/register-routes.ts') +
+  read('services/greenfield-api/src/app/register-phase6s-routes.ts')
+const reactionService = read('services/greenfield-api/src/domains/reactions/service.ts')
 for (const path of [
   '/v1/posts',
   '/v1/feed/home',
@@ -40,11 +55,11 @@ for (const path of [
 
 check(
   'comments/replies backend must be completed for Founder Alpha',
-  routes.includes('/v1/posts/:postId/comments') || routes.includes('/v1/comments'),
+  routes.includes('/v1/posts/:postId/comments') && routes.includes('/v1/comments/:commentId/replies'),
 )
 check(
   'multi-reaction backend must be completed for Founder Alpha',
-  routes.includes('/reactions') && routes.includes('reactionType'),
+  routes.includes('/v1/posts/:postId/reactions') && reactionService.includes('reaction_type'),
 )
 check(
   'account-backed saved list must be completed for Founder Alpha',

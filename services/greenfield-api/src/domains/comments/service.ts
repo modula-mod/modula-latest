@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {GREENFIELD_REACTION_TYPES} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
@@ -76,6 +77,9 @@ export class CommentService {
   }
 
   async setCommentReaction(actorId: string, commentId: string, type: ReactionType | null) {
+    if (type !== null && !GREENFIELD_REACTION_TYPES.includes(type)) {
+      throw Object.assign(new Error('Invalid reaction'), {code: 'VALIDATION_FAILED'})
+    }
     const comment = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).executeTakeFirst()
     if (!comment) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
     const current = await this.db.selectFrom('greenfield_comment_reactions').selectAll().where('actor_id', '=', actorId).where('comment_id', '=', commentId).executeTakeFirst()

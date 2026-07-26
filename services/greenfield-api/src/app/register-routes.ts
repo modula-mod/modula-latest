@@ -23,6 +23,7 @@ import {GreenfieldSessionService} from '../sessions/service.js'
 import {RepositoryService} from '../repositories/service.js'
 import {RecordService} from '../records/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
+import {BoardLayoutService} from '../domains/board/service.js'
 import {DiscoveryRepository} from '../domains/discovery/repository.js'
 import {ModerationRepository} from '../domains/moderation/repository.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
@@ -69,6 +70,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const moderation = new ModerationRepository(db)
   const notifications = new NotificationRepository(db)
   const search = new SearchRepository(db)
+  const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
   const accounts = new AccountService(db, config)
@@ -339,6 +341,27 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const {sessionId} = request.params as {sessionId: string}
     await greenfieldSessions.revokeSession(sessionId, auth.accountId)
     return reply.send(successEnvelope({revoked: true}, request.id))
+  })
+
+  app.get('/v1/board/layout', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await boardLayouts.get(auth.accountId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Board layout lookup failed')
+    }
+  })
+
+  app.patch('/v1/board/layout', writeConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await boardLayouts.patch(auth.accountId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Board layout update failed')
+    }
   })
 
   app.get('/v1/repositories/me', profileConfig, async (request, reply) => {
@@ -730,7 +753,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     try {
       const {profileId} = request.params as {profileId: string}
       await profileWrites.follow(auth.actorId, profileId)
-      return reply.send(successEnvelope({following: true}, request.id))
+      const profile = await profiles.getById(profileId, auth.actorId)
+      if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+      return reply.send(
+        successEnvelope(
+          {profile, isFollowing: profile.isFollowing, followerCount: profile.followerCount},
+          request.id,
+        ),
+      )
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Follow failed')
     }
@@ -743,7 +773,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     try {
       const {profileId} = request.params as {profileId: string}
       await profileWrites.unfollow(auth.actorId, profileId)
-      return reply.send(successEnvelope({following: false}, request.id))
+      const profile = await profiles.getById(profileId, auth.actorId)
+      if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+      return reply.send(
+        successEnvelope(
+          {profile, isFollowing: profile.isFollowing, followerCount: profile.followerCount},
+          request.id,
+        ),
+      )
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Unfollow failed')
     }

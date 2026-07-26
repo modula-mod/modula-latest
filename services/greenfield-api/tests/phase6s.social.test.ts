@@ -203,7 +203,7 @@ describeIf('Phase 6S social product integration', () => {
           reaction_id: `r2-${postId}`,
           actor_id: actorId,
           post_id: postId,
-          reaction_type: 'love',
+          reaction_type: 'curious',
           created_at: new Date(),
           updated_at: new Date(),
         })

@@ -227,6 +227,88 @@ export function NotificationsSettingsScreen() {
   )
 }
 
+export function SecuritySettingsScreen() {
+  const router = useRouter()
+  return (
+    <SettingsScreen
+      title="Security"
+      caption="Sessions, credentials, recovery methods, and account protection. Controls only appear when backed by Greenfield state."
+      right={
+        <SettingsOverflowMenu
+          title="Security"
+          actions={[
+            {id: 'sessions', label: 'Active sessions'},
+            {id: 'password', label: 'Password management'},
+            {id: 'account', label: 'Account settings'},
+          ]}
+          onAction={id => {
+            if (id === 'sessions') router.push('/settings/account/sessions' as Href)
+            if (id === 'password') router.push('/settings/account/password' as Href)
+            if (id === 'account') router.push('/settings/account' as Href)
+          }}
+        />
+      }>
+      <SettingsSection title="Sessions">
+        <SettingsLinkRow
+          row={{
+            title: 'Active sessions',
+            description: 'Current device and signed-in session list.',
+            icon: 'security',
+            route: '/settings/account/sessions',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Sign out other sessions',
+            description: 'Available from Active sessions.',
+            icon: 'switch',
+            route: '/settings/account/sessions',
+          }}
+          last
+        />
+      </SettingsSection>
+      <SettingsSection title="Credentials">
+        <SettingsLinkRow
+          row={{
+            title: 'Password',
+            description: 'Credential management and recovery.',
+            icon: 'privacy',
+            route: '/settings/account/password',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Recovery methods',
+            description: 'Email recovery is handled through account verification.',
+            icon: 'account',
+            route: '/settings/account/email',
+          }}
+          last
+        />
+      </SettingsSection>
+      <SettingsSection title="Protection">
+        <SettingsLinkRow
+          row={{
+            title: 'Recent security activity',
+            description: 'Session events and account changes.',
+            icon: 'activity',
+            route: '/settings/account/sessions',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Account deletion protection',
+            description: 'Deletion remains guarded from Account settings.',
+            icon: 'warning',
+            route: '/settings/account',
+          }}
+          last
+        />
+      </SettingsSection>
+    </SettingsScreen>
+  )
+}
+
 export function ContentMediaScreen() {
   const [autoplay, setAutoplay] = useState(true)
   const [dataSaver, setDataSaver] = useState(false)

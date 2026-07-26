@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useMemo, useState} from 'react'
+import {useLayoutEffect, useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useNavigation, useRouter, type Href} from 'expo-router'
 
@@ -14,10 +14,6 @@ import {useDiscoverQuery} from '@/features/discover/data'
 import {useModuleContributionQuery} from '@/features/modules/hooks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
-import {
-  loadProductPreferences,
-  patchProductPreferences,
-} from '@/features/product/storage/productPreferencesStorage'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
@@ -133,24 +129,6 @@ export function BoardScreen() {
       boardWidgetIds: preferences.boardWidgetIds.filter(item => item !== id),
     })
   }
-
-  useEffect(() => {
-    void loadProductPreferences().then(value => {
-      if (value.boardWidgetIds.length === 0) {
-        void patchProductPreferences({
-          boardWidgetIds: [
-            'tasks',
-            'calendar',
-            'gaia-briefing',
-            'dimon-activity',
-            'nft-entitlements',
-            'notes',
-            'crm',
-          ],
-        })
-      }
-    })
-  }, [])
 
   const pinnedSpaces = useMemo(
     () => ALL_PINNED_SPACES.filter(space => pinnedIds.includes(space.id)),
@@ -628,7 +606,7 @@ export function BoardScreen() {
         <View style={{gap: spacing[3]}}>
           <AppText variant="headline">Customize pinned spaces</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Toggle which spaces appear on your Board. Local only.
+            Toggle which spaces appear on your Board. Signed-in layouts sync through Greenfield.
           </AppText>
           {ALL_PINNED_SPACES.map(space => {
             const pinned = pinnedIds.includes(space.id)

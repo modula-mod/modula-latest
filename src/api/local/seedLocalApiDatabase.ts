@@ -169,6 +169,21 @@ export function seedLocalApiDatabase(): LocalApiDatabaseState {
       .filter(post => post.reposted)
       .map(post => ({profileId: parseProfileId('profile-andrei'), postId: parsePostId(post.id)})),
     activity: seedActivity(posts),
+    boardLayouts: [
+      {
+        accountId: parseAccountId('account-andrei'),
+        boardWidgetIds: [
+          'vault-notes',
+          'product-hub',
+          'saved',
+          'profile',
+          'settings',
+          'activity',
+        ],
+        version: 1,
+        updatedAt: '2026-07-26T00:00:00.000Z',
+      },
+    ],
     sessions: [],
     discover: {
       suggestedProfiles: profiles,
