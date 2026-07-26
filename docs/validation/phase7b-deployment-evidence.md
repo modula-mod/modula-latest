@@ -2,6 +2,7 @@
 
 Date: 2026-07-26
 Branch: `phase7b-greenfield-module-host`
+Latest deployed commit: `cba71b9824bf0bc784e0c53c9a8fc1d3a873545f`
 
 ## Pre-Deployment Backup
 
@@ -37,8 +38,8 @@ Pending migrations: `[]`
 API image:
 
 - Tag: `modula-preview-greenfield-api:latest`
-- Image ID: `sha256:a83f00877c1142bcce1597d6363230ae8fea4e9251a0870107418b4077785efb`
-- Created: `2026-07-26T02:00:30.815513388+01:00`
+- Image ID: `sha256:1fe7ee3616ae779acb55d213966bce95d678ca7c315dbbb758055c167c725ed5`
+- Created: `2026-07-26T02:20:55.026769223+01:00`
 - Container: `modula-preview-greenfield-api-1`
 - Status: `running`, `healthy`
 - Port: `127.0.0.1:4020`
@@ -46,8 +47,8 @@ API image:
 Worker image:
 
 - Tag: `modula-preview-greenfield-worker:latest`
-- Image ID: `sha256:b347ff6ef4f07b3072ef45810074850af992c52402bc7ca8e52ecc83ed4fdbc9`
-- Created: `2026-07-26T02:03:42.681314223+01:00`
+- Image ID: `sha256:6c5e7eee2638ab3a4bbf1c47f39da8947bcff45dc74c915b0d02cf7de3307854`
+- Created: `2026-07-26T02:20:39.948832119+01:00`
 - Container: `modula-preview-greenfield-worker-1`
 - Status: `running`
 
@@ -55,6 +56,45 @@ API smoke:
 
 - `scripts/smoke-api-preview.sh https://api.modula.digital`
 - Result: passed for `/v1/health/live`, `/v1/health/ready`, `/v1/meta`, `/v1/feed/home`, `/v1/profiles/andrei.modula`, `/v1/discover`
+
+## Live Vault Notes Acceptance
+
+Command: process-local Node HTTPS harness against `https://api.modula.digital`; protected invite code was read from `/etc/modula/greenfield-api.env` and not printed.
+
+Preview account:
+
+- Handle: `p7bms14b8gv`
+- Module: `digital.modula.vault-notes`
+- Version: `0.2.0`
+- Restored record: `019f9c08-8099-77f1-ac9f-b85048505447`
+
+Passed checks:
+
+- Register, verify email, sign in.
+- Catalogue search for Vault Notes.
+- Module detail for published `0.2.0`.
+- Permission review with `13` permissions.
+- Install request and worker transition to `installedDisabled`.
+- Enable request and worker transition to `enabled`.
+- Declarative view list with `8` views.
+- Note-list view fetch.
+- Schema-driven settings schema.
+- Folder create, rename, second-folder create.
+- Note create, edit, move, search, folder filter, sort.
+- Empty folder delete.
+- Declarative Save to Vault source-link create action.
+- Post-menu Save to Vault contribution.
+- Composer Create Vault Note contribution.
+- Settings update.
+- Same-version update request and worker return to `enabled`.
+- Disable request, worker transition to `disabled`, disabled record access denied with `403`.
+- Re-enable request and worker transition to `enabled`.
+- Note delete and emptied folder delete.
+- Uninstall preview with default `keepData` and `2` retained records.
+- Uninstall from `enabled` state and worker transition to removed/not found.
+- Reinstall, re-enable, retained saved-post record restored with `retained_after_uninstall=true` and preserved `source_uri`.
+- Settings survived keep-data uninstall/reinstall.
+- Invalid module lookup returned `404`.
 
 ## Web Release
 
