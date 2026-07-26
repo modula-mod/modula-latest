@@ -81,7 +81,7 @@ function LiquidGlassPlatformTabs() {
           }}
         />
       ))}
-      <Tabs.Screen name="create" options={{href: null}} />
+      <Tabs.Screen name="create" options={{title: 'Create'}} />
     </Tabs>
   )
 }
@@ -119,8 +119,6 @@ function NativeTabsFallback() {
           />
         </NativeTabs.Trigger>
       ))}
-      {/* File kept for route presence; never a visible destination. */}
-      <NativeTabs.Trigger name="create" hidden />
     </NativeTabs>
   )
 }

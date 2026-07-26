@@ -75,7 +75,7 @@ const LiquidGlassView = liquidGlass?.LiquidGlassView ?? View
 const TAB_ICONS: Record<string, AppIconName> = {
   index: 'home',
   discover: 'discover',
-  board: 'board',
+  create: 'create',
   activity: 'activity',
   profile: 'profile',
 }
@@ -198,8 +198,8 @@ export function ModulaLiquidGlassTabBar({
     action => !action.featureId || isFeatureEnabled(preferences, action.featureId),
   )
 
-  const visibleTabs = MODULA_TABS.filter(tab =>
-    state.routes.some(route => route.name === tab.routeName),
+  const visibleTabs = MODULA_TABS.filter(
+    tab => tab.routeName !== 'create' && state.routes.some(route => route.name === tab.routeName),
   )
 
   const selectedRouteName =

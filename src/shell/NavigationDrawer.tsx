@@ -25,16 +25,15 @@ import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {useReduceMotion} from '@/lib/accessibility'
 import {isDevelopmentBuild} from '@/lib/platform'
-import {getAccountPanelDestinations} from '@/platform/ui/navigation/account-panel-destinations'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DrawerDestination, DrawerSectionId} from '@/types/navigation'
 
 const SECTION_LABELS: Record<DrawerSectionId, string> = {
-  spaces: 'Spaces',
-  create: 'Create',
-  labs: 'Labs',
+  spaces: 'Personal',
+  create: 'Product',
+  labs: 'Preview',
   system: 'System',
 }
 
@@ -54,96 +53,50 @@ const drawerDestinations: DrawerDestination[] = [
     section: 'spaces',
   },
   {
-    label: 'Messages',
-    route: '/messages',
-    icon: 'messages',
-    section: 'spaces',
-  },
-  {
     label: 'Saved',
     route: '/saved',
     icon: 'saved',
     section: 'spaces',
   },
   {
-    label: 'Modules',
-    route: '/modules',
-    icon: 'modules',
-    description: 'Installed capabilities',
+    label: 'Profile preview',
+    route: '/profile/preview',
+    icon: 'profile',
+    description: 'Review your public surface',
     section: 'spaces',
-  },
-  {
-    label: 'Communities',
-    route: '/communities',
-    icon: 'community',
-    section: 'spaces',
-  },
-  {
-    label: 'Teams',
-    route: '/teams',
-    icon: 'teams',
-    section: 'spaces',
-  },
-  {
-    label: 'Marketplace',
-    route: '/marketplace',
-    icon: 'marketplace',
-    section: 'create',
-  },
-  {
-    label: 'Forge',
-    route: '/product/forge',
-    icon: 'developer',
-    description: 'Build modules',
-    section: 'create',
-  },
-  {
-    label: 'Search',
-    route: '/product/search',
-    icon: 'search',
-    section: 'create',
   },
   {
     label: 'Product Hub',
     route: '/product',
-    icon: 'discover',
-    section: 'labs',
+    icon: 'modules',
+    description: 'Modules, tools and widgets',
+    section: 'create',
   },
   {
-    label: 'Customize',
-    route: '/product/customize',
-    icon: 'appearance',
-    description: 'Layout studios and optional surfaces',
-    section: 'labs',
-  },
-  {
-    label: 'Design Lab',
-    route: '/product/design-lab',
-    icon: 'appearance',
-    section: 'labs',
-  },
-  {
-    label: 'Feature Atlas',
-    route: '/product/atlas',
-    icon: 'discover',
-    section: 'labs',
-  },
-  {
-    label: 'Focus Mode',
-    route: '/product/focus',
-    icon: 'contrast',
-    section: 'labs',
-  },
-  {
-    label: 'Developer Tools',
-    route: '/product/developer',
-    icon: 'tools',
-    section: 'labs',
+    label: 'Installed modules',
+    route: '/modules',
+    icon: 'modules',
+    description: 'Manage enabled capabilities',
+    section: 'create',
   },
   {
     label: 'Settings',
     route: '/settings',
     icon: 'settings',
+    section: 'system',
+  },
+  {
+    label: 'Appearance',
+    route: '/settings/appearance',
+    icon: 'appearance',
+    description: 'Mode, accent and surfaces',
+    section: 'system',
+  },
+  {
+    label: 'Switch account',
+    route: '/account/switcher',
+    icon: 'account',
+    description: 'Account switching placeholder',
     section: 'system',
   },
 ]
@@ -152,28 +105,6 @@ function routeSelected(pathname: string, route: string): boolean {
   if (pathname === route) return true
   if (route !== '/' && pathname.startsWith(`${route}/`)) return true
   return false
-}
-
-/** Map registry-only destinations into drawer sections (Lists, Drafts, Help, …). */
-function sectionForRegistryRoute(route: string): DrawerSectionId {
-  if (
-    route.startsWith('/settings') ||
-    route === '/help' ||
-    route === '/account/switcher'
-  ) {
-    return 'system'
-  }
-  if (
-    route.startsWith('/product') ||
-    route === '/creator' ||
-    route === '/reels'
-  ) {
-    return 'labs'
-  }
-  if (route === '/marketplace' || route === '/product/forge' || route === '/product/search') {
-    return 'create'
-  }
-  return 'spaces'
 }
 
 export function NavigationDrawer() {
@@ -190,17 +121,7 @@ export function NavigationDrawer() {
   const drawerWidth = Math.min(348, Math.max(292, width * 0.82))
 
   const sections = useMemo(() => {
-    const knownRoutes = new Set(drawerDestinations.map(item => item.route))
-    const extras: DrawerDestination[] = getAccountPanelDestinations()
-      .filter(item => !knownRoutes.has(item.route))
-      .map(item => ({
-        label: item.label,
-        route: item.route,
-        icon: item.icon,
-        description: item.description,
-        section: sectionForRegistryRoute(item.route),
-      }))
-    const merged = [...drawerDestinations, ...extras]
+    const merged = [...drawerDestinations]
     return SECTION_ORDER.map(id => ({
       id,
       label: SECTION_LABELS[id],

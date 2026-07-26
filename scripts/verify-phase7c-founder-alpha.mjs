@@ -1,0 +1,88 @@
+#!/usr/bin/env node
+import {check, finish, includes, maybeSh, read, sh} from './phase7c-verifier-utils.mjs'
+
+for (const rel of [
+  'docs/audits/phase7c-starting-baseline.md',
+  'docs/audits/phase7c-expo-native-baseline.md',
+  'docs/product/modula-founder-alpha.md',
+  'docs/product/modula-product-language.md',
+  'docs/design/phase7c-product-inspiration.md',
+  'docs/design/modula-product-principles.md',
+  'docs/architecture/adr/ADR-014-modula-root-navigation.md',
+]) {
+  includes(rel, ['Phase 7C'], rel)
+}
+
+for (const rel of [
+  'scripts/verify-phase7c-product-shell.mjs',
+  'scripts/verify-phase7c-social-core.mjs',
+  'scripts/verify-phase7c-profile.mjs',
+  'scripts/verify-phase7c-board.mjs',
+  'scripts/verify-phase7c-settings.mjs',
+  'scripts/verify-phase7c-native-readiness.mjs',
+]) {
+  read(rel)
+}
+
+for (const verifier of [
+  'verify-phase7c-product-shell.mjs',
+  'verify-phase7c-social-core.mjs',
+  'verify-phase7c-profile.mjs',
+  'verify-phase7c-board.mjs',
+  'verify-phase7c-settings.mjs',
+  'verify-phase7c-native-readiness.mjs',
+]) {
+  const output = maybeSh(['node', `scripts/${verifier}`])
+  check(`${verifier} did not pass`, output.includes('passed'))
+}
+
+const tabs = read('src/platform/ui/navigation/modula-tabs.ts')
+check('one canonical root navigation missing', ['home', 'discover', 'create', 'activity', 'profile'].every(id => tabs.includes(`id: '${id}'`)))
+check('Board is still a root tab', !tabs.includes("id: 'board'"))
+
+const profile = read('src/features/profile/components/ProfileShell.tsx')
+check('one profile architecture missing registry resolver', profile.includes('resolveProfileTabs'))
+
+const productHub = read('src/features/product/screens/ProductHubScreen.tsx') + read('src/features/modules/screens/ProductHubMarketplaceScreen.tsx')
+check('Product Hub architecture missing', productHub.includes('ProductHubMarketplaceContent'))
+
+const auth = read('src/auth/runtime/SessionProvider.tsx') + read('src/data/repositories/api/ApiAuthRepository.ts')
+check('real Greenfield auth missing', auth.includes('Greenfield') || auth.includes('/v1/accounts'))
+check('session restoration missing', auth.includes('restore') || auth.includes('refresh'))
+
+const home = read('src/features/feed/screens/HomeFeedScreen.tsx')
+for (const label of ['Following', 'For You', 'Modules']) check(`feed mode missing ${label}`, home.includes(label))
+
+const postActions = read('src/features/feed/postActions/catalog.ts') + read('src/features/feed/postActions/runPostAction.ts')
+for (const action of ['saveToVault', 'repost', 'quote', 'share']) check(`post action missing ${action}`, postActions.includes(action))
+
+const composer = read('src/components/composer/ComposerToolsDrawer.tsx') + read('src/app/compose.tsx')
+check('composer drafts missing', composer.includes('draft'))
+check('publication flow missing', composer.includes('publish') || composer.includes('Post'))
+
+const search = read('src/features/discover/screens/DiscoverScreen.tsx') + read('src/features/product/data/launcherSearch.ts')
+check('search missing', search.includes('Search'))
+
+const activity = read('src/features/activity/screens/ActivityScreen.tsx')
+check('activity read state missing', activity.includes('read'))
+
+check('profile editing missing', read('src/features/profile/screens/EditProfileScreen.tsx').includes('displayName'))
+check('follow graph missing', read('services/greenfield-api/src/app/register-routes.ts').includes('/follow'))
+check('Board persistence missing', read('src/features/product/storage/productPreferencesStorage.ts').includes('boardWidgetIds'))
+check('module lifecycle missing', read('src/features/modules/screens/ModuleManagementScreen.tsx').includes('Uninstall'))
+check('Vault Notes missing', read('scripts/verify-phase7b-vault-notes.mjs').includes('0.2.0'))
+check('schema-driven settings missing', read('src/features/modules/components/SchemaSettingsRenderer.tsx').includes('schema'))
+
+const directImports = maybeSh(['rg', '-n', '@expo/ui/(swift-ui|jetpack-compose)', 'src', '--glob', '!src/platform/**'])
+check(`direct feature-level SwiftUI/Compose imports:\n${directImports}`, !directImports)
+
+const moduleBoundary = read('docs/architecture/adr/ADR-013-module-execution-boundary.md') + read('docs/architecture/module-host-runtime.md')
+check('arbitrary module execution boundary missing', moduleBoundary.includes('Remote HTTP is disabled') || moduleBoundary.includes('remoteHttp'))
+check('DIMON must remain inactive', read('docs/audits/phase7c-starting-baseline.md').includes('greenfieldDimon` | false'))
+check('AT dependency must remain optional', read('docs/audits/phase7c-starting-baseline.md').includes('atproto` | false'))
+check('native config baseline missing', read('docs/audits/phase7c-expo-native-baseline.md').includes('iOS development-build'))
+
+const status = sh(['git', 'status', '--short'])
+check(`working tree is not clean:\n${status}`, status.length === 0)
+
+finish('Phase 7C Founder Alpha verification')
