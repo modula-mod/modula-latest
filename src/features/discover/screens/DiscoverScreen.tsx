@@ -14,7 +14,7 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Pill} from '@/components/primitives/Pill'
 import {InspireNextList} from '@/features/discover/components/InspireNextList'
 import {LivePresenceRail} from '@/features/discover/components/LivePresenceRail'
-import {useDiscoverQuery} from '@/features/discover/data'
+import {useDiscoverQuery, useDiscoverSearchQuery} from '@/features/discover/data'
 import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {
   DEFAULT_DISCOVER_BLOCK_IDS,
@@ -34,7 +34,9 @@ import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DiscoverResult} from '@/domain/discovery'
+import type {DiscoverSearchResult} from '@/data/repositories/contracts'
 import type {ModulaProfile} from '@/features/profile/contracts'
+import type {SearchType} from '@modula/api-contracts'
 
 type Category = 'For You' | 'People' | 'Communities' | 'Marketplace' | 'Media'
 
@@ -49,18 +51,42 @@ export function DiscoverScreen() {
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<Category>('For You')
-  const q = query.trim().toLowerCase()
+  const rawQuery = query.trim()
+  const q = rawQuery.toLowerCase()
+  const searchQuery = useDiscoverSearchQuery({
+    q: rawQuery,
+    type: searchTypeForCategory(category),
+    limit: 20,
+  })
   const result = discoverQuery.data
+  const searchResult = useMemo(
+    () => mergeSearchPages(searchQuery.data?.pages ?? []),
+    [searchQuery.data?.pages],
+  )
   const discoverBlocks = preferences.discoverBlockIds
   const showBlock = (id: string) => isBlockOn(discoverBlocks, id)
   const reelsFeatureOn = isFeatureEnabled(preferences, 'reels')
 
-  const filtered = useMemo(() => filterDiscover(result, q), [result, q])
+  const filtered = useMemo(() => {
+    const local = filterDiscover(result, q)
+    if (!rawQuery || !searchResult) return local
+    return applySearchResult(local, searchResult)
+  }, [result, q, rawQuery, searchResult])
   const hasResults =
     filtered.suggestedProfiles.length > 0 ||
     filtered.featuredModules.length > 0 ||
     filtered.trendingTopics.length > 0 ||
     filtered.media.length > 0
+  const searchActive = rawQuery.length > 0
+  const contentLoading = discoverQuery.isLoading || (searchActive && searchQuery.isLoading)
+  const contentError = discoverQuery.isError || (searchActive && searchQuery.isError)
+  const retryContent = () => {
+    if (discoverQuery.isError) {
+      void discoverQuery.refetch()
+      return
+    }
+    void searchQuery.refetch()
+  }
 
   const visibleSectionIds = useMemo(() => {
     return discoverBlocks.filter(id => {
@@ -257,10 +283,10 @@ export function DiscoverScreen() {
             </SectionEnter>
           </View>
 
-          {discoverQuery.isLoading ? (
+          {contentLoading ? (
             <InitialLoadingState label="Loading discovery" />
-          ) : discoverQuery.isError ? (
-            <QueryErrorState error={discoverQuery.error} onRetry={() => void discoverQuery.refetch()} />
+          ) : contentError ? (
+            <QueryErrorState error={discoverQuery.error ?? searchQuery.error} onRetry={retryContent} />
           ) : layoutEmpty ? (
             <EmptyState
               icon="discover"
@@ -349,18 +375,81 @@ export function DiscoverScreen() {
                   </AppText>
                 </AppPressable>
               ) : null}
+              {searchActive && searchQuery.hasNextPage ? (
+                <AppPressable
+                  accessibilityLabel="Load more search results"
+                  onPress={() => {
+                    if (!searchQuery.isFetchingNextPage) {
+                      void searchQuery.fetchNextPage()
+                    }
+                  }}
+                  style={[
+                    styles.cta,
+                    {
+                      backgroundColor: colours.surfaceRaised,
+                      borderRadius: radius.round,
+                    },
+                  ]}>
+                  <AppText variant="label" colour="accent">
+                    {searchQuery.isFetchingNextPage ? 'Loading more' : 'Load more results'}
+                  </AppText>
+                </AppPressable>
+              ) : null}
             </>
           ) : (
             <EmptyState
               icon="discover"
-              title="No local results"
-              description="Try a different search across people, topics, modules, or media previews."
+              title="No results"
+              description="Try a different search across people, topics, modules, or media."
             />
           )}
         </ScrollView>
       </ResponsiveContent>
     </View>
   )
+}
+
+function searchTypeForCategory(category: Category): SearchType {
+  if (category === 'People') return 'profiles'
+  if (category === 'Marketplace') return 'modules'
+  return 'all'
+}
+
+function mergeSearchPages(pages: DiscoverSearchResult[]): DiscoverSearchResult | null {
+  if (pages.length === 0) return null
+  const profileMap = new Map<string, DiscoverSearchResult['profiles'][number]>()
+  const postMap = new Map<string, DiscoverSearchResult['posts'][number]>()
+  const moduleMap = new Map<string, DiscoverSearchResult['modules'][number]>()
+  for (const page of pages) {
+    for (const profile of page.profiles) profileMap.set(profile.id, profile)
+    for (const post of page.posts) postMap.set(post.id, post)
+    for (const module of page.modules) moduleMap.set(module.id, module)
+  }
+  const lastPage = pages[pages.length - 1]
+  return {
+    query: lastPage.query,
+    profiles: Array.from(profileMap.values()),
+    posts: Array.from(postMap.values()),
+    modules: Array.from(moduleMap.values()),
+    nextCursor: lastPage.nextCursor,
+    hasMore: lastPage.hasMore,
+  }
+}
+
+function applySearchResult(result: DiscoverResult, search: DiscoverSearchResult): DiscoverResult {
+  return {
+    ...result,
+    suggestedProfiles: search.profiles,
+    featuredModules: search.modules.map(module => ({
+      id: module.id,
+      name: module.name,
+      description: module.description ?? '',
+      icon: 'marketplace',
+      status: 'available',
+      visibility: 'public',
+      actionLabel: 'Open',
+    })),
+  }
 }
 
 function filterDiscover(result: DiscoverResult | undefined, query: string): DiscoverResult {

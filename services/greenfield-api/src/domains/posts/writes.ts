@@ -1,7 +1,9 @@
 import {randomUUID} from 'node:crypto'
 import type {CreatePostInput, SocialPostDto, UpdatePostInput} from '@modula/api-contracts'
+import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
+import {PostMediaStorage} from '../media/post-media-storage.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {PostRepository} from './repository.js'
 
@@ -9,17 +11,25 @@ export class PostWriteService {
   private readonly posts: PostRepository
   private readonly audit: AuditRepository
   private readonly outbox: OutboxRepository
+  private readonly mediaStorage: PostMediaStorage
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, config: AppConfig) {
     this.posts = new PostRepository(db)
     this.audit = new AuditRepository(db)
     this.outbox = new OutboxRepository(db)
+    this.mediaStorage = new PostMediaStorage(config)
   }
 
   async create(actorId: string, input: CreatePostInput): Promise<SocialPostDto> {
     const text = (input.text ?? '').trim()
-    if (!text || text.length > 5000) {
+    const mediaInput = input.media ?? []
+    if ((!text && mediaInput.length === 0) || text.length > 5000) {
       throw Object.assign(new Error('Invalid post text'), {code: 'VALIDATION_FAILED'})
+    }
+    if (input.publishToAtproto && mediaInput.length > 0) {
+      throw Object.assign(new Error('AT Protocol media publishing is not supported'), {
+        code: 'VALIDATION_FAILED',
+      })
     }
     const audience = input.audience ?? 'public'
     const feed = input.feed ?? 'following'
@@ -40,67 +50,94 @@ export class PostWriteService {
 
     const id = randomUUID()
     const now = new Date()
-    await this.db.transaction().execute(async trx => {
-      await trx
-        .insertInto('posts')
-        .values({
-          id,
-          author_actor_id: actorId,
-          kind: 'text',
-          text,
-          feed,
-          audience,
-          reply_permission: input.replyPermission ?? 'everyone',
-          idempotency_key: idempotencyKey,
-          link_domain: null,
-          link_title: null,
-          link_description: null,
-          link_image: null,
-          module_name: null,
-          module_action_label: null,
-          module_status: null,
-          glow_colour: null,
-          like_count: 0,
-          reaction_count: 0,
-          quote_count: 0,
-          reply_count: 0,
-          repost_count: 0,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-          version: 1,
-        })
-        .execute()
-      const outbox = new OutboxRepository(this.db)
-      await outbox.enqueue(trx, {
-        eventType: 'search.index.post',
-        aggregateType: 'post',
-        aggregateId: id,
-        payload: {postId: id},
-      })
-      if (audience === 'public' && input.publishToAtproto) {
+    const persistedMedia = await this.mediaStorage.persistPostMedia({postId: id, media: mediaInput})
+    const kind = persistedMedia.length > 0 ? 'media' : 'text'
+    try {
+      await this.db.transaction().execute(async trx => {
+        await trx
+          .insertInto('posts')
+          .values({
+            id,
+            author_actor_id: actorId,
+            kind,
+            text,
+            feed,
+            audience,
+            reply_permission: input.replyPermission ?? 'everyone',
+            idempotency_key: idempotencyKey,
+            link_domain: null,
+            link_title: null,
+            link_description: null,
+            link_image: null,
+            module_name: null,
+            module_action_label: null,
+            module_status: null,
+            glow_colour: persistedMedia.length > 0 ? '#369CAA' : null,
+            like_count: 0,
+            reaction_count: 0,
+            quote_count: 0,
+            reply_count: 0,
+            repost_count: 0,
+            created_at: now,
+            updated_at: now,
+            deleted_at: null,
+            version: 1,
+          })
+          .execute()
+        for (const [index, media] of persistedMedia.entries()) {
+          await trx
+            .insertInto('post_media')
+            .values({
+              id: media.id,
+              post_id: id,
+              kind: 'image',
+              url: media.url,
+              title: media.title,
+              colour: media.colour,
+              aspect_ratio: media.aspectRatio,
+              alt_text: media.altText,
+              sort_order: index,
+              created_at: now,
+              updated_at: now,
+              deleted_at: null,
+              version: 1,
+            })
+            .execute()
+        }
+        const outbox = new OutboxRepository(this.db)
         await outbox.enqueue(trx, {
-          eventType: 'atproto.publish.create',
+          eventType: 'search.index.post',
           aggregateType: 'post',
           aggregateId: id,
-          payload: {
-            actorId,
-            localRecordType: 'post',
-            localRecordId: id,
-            collection: 'app.bsky.feed.post',
-            record: {
-              text,
-              createdAt: now.toISOString(),
-            },
-          },
+          payload: {postId: id},
         })
-      }
-      await new AuditRepository(trx).append('post.created', {audience, feed}, {
-        type: 'post',
-        id,
-        actorId,
+        if (audience === 'public' && input.publishToAtproto) {
+          await outbox.enqueue(trx, {
+            eventType: 'atproto.publish.create',
+            aggregateType: 'post',
+            aggregateId: id,
+            payload: {
+              actorId,
+              localRecordType: 'post',
+              localRecordId: id,
+              collection: 'app.bsky.feed.post',
+              record: {
+                text,
+                createdAt: now.toISOString(),
+              },
+            },
+          })
+        }
+        await new AuditRepository(trx).append('post.created', {audience, feed, mediaCount: persistedMedia.length}, {
+          type: 'post',
+          id,
+          actorId,
+        })
       })
-    })
+    } catch (error) {
+      await this.mediaStorage.removePersistedMedia(persistedMedia)
+      throw error
+    }
     const created = await this.posts.getByIdForAuthor(id, actorId)
     if (!created) throw new Error('Failed to load created post')
     return created

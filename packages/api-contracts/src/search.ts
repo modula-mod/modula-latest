@@ -9,4 +9,6 @@ export type SearchResultDto = {
   profiles: ModulaProfileDto[]
   posts: SocialPostDto[]
   modules: Array<{id: string; name: string; description?: string}>
+  nextCursor: string | null
+  hasMore: boolean
 }

@@ -26,6 +26,8 @@ import {AuditRepository} from '../domains/audit/repository.js'
 import {BoardLayoutService} from '../domains/board/service.js'
 import {DiscoveryRepository} from '../domains/discovery/repository.js'
 import {ModerationRepository} from '../domains/moderation/repository.js'
+import {PostMediaStorage} from '../domains/media/post-media-storage.js'
+import {NotificationPreferencesService} from '../domains/notifications/preferences.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
@@ -65,10 +67,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const posts = new PostRepository(db)
   const discovery = new DiscoveryRepository(db)
   const sessions = new SessionService(db, config)
-  const postWrites = new PostWriteService(db)
+  const postWrites = new PostWriteService(db, config)
+  const postMediaStorage = new PostMediaStorage(config)
   const profileWrites = new ProfileWriteService(db)
   const moderation = new ModerationRepository(db)
   const notifications = new NotificationRepository(db)
+  const notificationPreferences = new NotificationPreferencesService(db)
   const search = new SearchRepository(db)
   const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
@@ -906,22 +910,78 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return reply.send(successEnvelope({updated: count}, request.id))
   })
 
+  app.get('/v1/accounts/me/notification-preferences', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await notificationPreferences.get(auth.accountId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Notification preferences lookup failed')
+    }
+  })
+
+  app.patch('/v1/accounts/me/notification-preferences', writeConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(
+        successEnvelope(
+          await notificationPreferences.patch(auth.accountId, (request.body as any) ?? {}),
+          request.id,
+        ),
+      )
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Notification preferences update failed')
+    }
+  })
+
   app.get('/v1/search', feedConfig, async (request, reply) => {
     try {
       const query = request.query as Record<string, unknown>
       const q = typeof query.q === 'string' ? query.q : ''
       const type = (typeof query.type === 'string' ? query.type : 'all') as SearchType
       const limit = parseLimit(query.limit)
+      const cursor = decodeCursor(query.cursor)
       const data = await search.search({
         q,
         type,
         limit,
+        cursor,
         viewerActorId: request.auth?.actorId ?? null,
       })
       return reply.send(successEnvelope(data, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Search failed')
     }
+  })
+
+  app.get('/v1/media/:mediaFile', feedConfig, async (request, reply) => {
+    const params = request.params as {mediaFile?: string}
+    const mediaFile = params.mediaFile ?? ''
+    const match = /^([0-9a-f-]{36})\.(jpg|png|webp)$/i.exec(mediaFile)
+    if (!match) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
+    const mediaId = match[1]
+    if (!mediaId) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
+    const row = await db
+      .selectFrom('post_media')
+      .innerJoin('posts', 'posts.id', 'post_media.post_id')
+      .select([
+        'post_media.id as media_id',
+        'posts.author_actor_id as author_actor_id',
+        'posts.audience as audience',
+      ])
+      .where('post_media.id', '=', mediaId)
+      .where('post_media.deleted_at', 'is', null)
+      .where('posts.deleted_at', 'is', null)
+      .executeTakeFirst()
+    if (!row) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
+    if (row.audience !== 'public' && request.auth?.actorId !== row.author_actor_id) {
+      return sendError(reply, 'FORBIDDEN', 'Media unavailable', request.id)
+    }
+    const stored = await postMediaStorage.readPostMedia(mediaFile)
+    if (!stored) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
+    return reply.type(stored.contentType).send(stored.bytes)
   })
 
   app.get('/v1/discover', feedConfig, async (request, reply) => {

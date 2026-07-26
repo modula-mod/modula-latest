@@ -15,6 +15,16 @@ export type PostMediaDto = {
   altText?: string
 }
 
+export type CreatePostMediaInput = {
+  localId?: string
+  kind: 'image'
+  base64: string
+  width?: number
+  height?: number
+  mimeType?: 'image/jpeg' | 'image/jpg' | 'image/png' | 'image/webp'
+  altText?: string
+}
+
 export type PostLinkDto = {
   domain: string
   title: string
@@ -54,6 +64,7 @@ export type CreatePostInput = {
   feed?: FeedMode
   audience?: PostAudience
   replyPermission?: PostReplyPermission
+  media?: CreatePostMediaInput[]
   idempotencyKey?: string
   publishToAtproto?: boolean
 }

@@ -92,13 +92,6 @@ const drawerDestinations: DrawerDestination[] = [
     description: 'Mode, accent and surfaces',
     section: 'system',
   },
-  {
-    label: 'Switch account',
-    route: '/account/switcher',
-    icon: 'account',
-    description: 'Account switching placeholder',
-    section: 'system',
-  },
 ]
 
 function routeSelected(pathname: string, route: string): boolean {

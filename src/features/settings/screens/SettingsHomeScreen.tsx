@@ -143,7 +143,7 @@ const developerRows: SettingsNavRow[] = [
   },
   {
     title: 'Account switcher',
-    description: 'Switcher placeholder for local sessions.',
+    description: 'Local session switcher for development builds.',
     icon: 'switch',
     route: '/account/switcher',
     preview: true,

@@ -11,10 +11,6 @@ import {
 } from '@/features/reels/reelActions/catalog'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {shareProfile} from '@/features/profile/services/shareProfile'
-import {
-  formatTranslatePreviewMessage,
-  previewTranslatePostText,
-} from '@/features/translate'
 import {selectionHaptic} from '@/lib/haptics'
 
 export async function runReelOverflowAction(
@@ -94,11 +90,6 @@ export async function runReelOverflowAction(
     }
     case 'shareProfile': {
       await shareProfile(reel.author)
-      return
-    }
-    case 'translateCaption': {
-      const result = previewTranslatePostText(reel.caption ?? '')
-      Alert.alert('Translate (Preview)', formatTranslatePreviewMessage(result))
       return
     }
     case 'muteAuthor': {

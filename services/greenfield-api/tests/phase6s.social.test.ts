@@ -98,6 +98,54 @@ describeIf('Phase 6S social product integration', () => {
     expect(invalid.statusCode).toBe(400)
   })
 
+  it('persists account notification preferences with version conflicts', async () => {
+    const get = await app.inject({
+      method: 'GET',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${accessToken}`},
+    })
+    expect(get.statusCode).toBe(200)
+    const initial = get.json().data
+    expect(initial.bundleStyle).toBe('focus')
+    expect(initial.moduleEventEnabled).toBe(false)
+
+    const patch = await app.inject({
+      method: 'PATCH',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${accessToken}`},
+      payload: {
+        likeEnabled: false,
+        reactionEnabled: false,
+        moduleEventEnabled: true,
+        extensionEnabled: true,
+        bundleStyle: 'digest',
+        expectedVersion: initial.version,
+      },
+    })
+    expect(patch.statusCode).toBe(200)
+    expect(patch.json().data.likeEnabled).toBe(false)
+    expect(patch.json().data.reactionEnabled).toBe(false)
+    expect(patch.json().data.moduleEventEnabled).toBe(true)
+    expect(patch.json().data.extensionEnabled).toBe(true)
+    expect(patch.json().data.bundleStyle).toBe('digest')
+
+    const reloaded = await app.inject({
+      method: 'GET',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${accessToken}`},
+    })
+    expect(reloaded.statusCode).toBe(200)
+    expect(reloaded.json().data.bundleStyle).toBe('digest')
+
+    const stale = await app.inject({
+      method: 'PATCH',
+      url: '/v1/accounts/me/notification-preferences',
+      headers: {authorization: `Bearer ${accessToken}`},
+      payload: {followEnabled: false, expectedVersion: initial.version},
+    })
+    expect(stale.statusCode).toBe(409)
+  })
+
   it('supports recovery request without email enumeration', async () => {
     const missing = await app.inject({
       method: 'POST',

@@ -1,4 +1,8 @@
-export type {ActivityRepository} from '@/data/repositories/contracts/ActivityRepository'
+export type {
+  ActivityRepository,
+  NotificationPreferences,
+  UpdateNotificationPreferencesInput,
+} from '@/data/repositories/contracts/ActivityRepository'
 export type {
   AppearanceRepository,
   SyncedAppearancePreferences,
@@ -25,7 +29,12 @@ export type {
   FunctionInvocationState,
   ToolsRepository,
 } from '@/data/repositories/contracts/ToolsRepository'
-export type {DiscoverRepository} from '@/data/repositories/contracts/DiscoverRepository'
+export type {
+  DiscoverRepository,
+  DiscoverSearchInput,
+  DiscoverSearchModuleResult,
+  DiscoverSearchResult,
+} from '@/data/repositories/contracts/DiscoverRepository'
 export type {
   FeedRepository,
   GetHomeFeedInput,

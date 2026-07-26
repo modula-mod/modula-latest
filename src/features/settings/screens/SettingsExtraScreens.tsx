@@ -1,7 +1,8 @@
-import {useState} from 'react'
-import {Pressable, StyleSheet, View} from 'react-native'
+import {useCallback, useEffect, useState} from 'react'
+import {Pressable, StyleSheet} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {useSession} from '@/auth/runtime'
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppText} from '@/components/primitives/AppText'
 import {
@@ -13,7 +14,28 @@ import {
   SettingsToggleRow,
 } from '@/features/settings/components/SettingsRows'
 import {canAccessDeveloperLabs} from '@/lib/platform'
+import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import type {
+  NotificationPreferences,
+  UpdateNotificationPreferencesInput,
+} from '@/data/repositories/contracts'
+
+const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  followEnabled: true,
+  likeEnabled: true,
+  reactionEnabled: true,
+  repostEnabled: true,
+  quoteEnabled: true,
+  replyEnabled: true,
+  commentEnabled: true,
+  mentionEnabled: true,
+  moduleEventEnabled: false,
+  extensionEnabled: false,
+  bundleStyle: 'focus',
+  version: 1,
+  updatedAt: '1970-01-01T00:00:00.000Z',
+}
 
 export function PrivacySafetyScreen() {
   const router = useRouter()
@@ -101,24 +123,98 @@ export function PrivacySafetyScreen() {
 
 export function NotificationsSettingsScreen() {
   const router = useRouter()
-  const [likes, setLikes] = useState(true)
-  const [replies, setReplies] = useState(true)
-  const [follows, setFollows] = useState(true)
-  const [modules, setModules] = useState(false)
-  const [bundleStyle, setBundleStyle] = useState<'individual' | 'focus' | 'digest'>('focus')
+  const session = useSession()
+  const {activityRepository} = useAppServices()
+  const [remotePreferences, setRemotePreferences] = useState<NotificationPreferences>(
+    DEFAULT_NOTIFICATION_PREFERENCES,
+  )
+  const [localPreferences, setLocalPreferences] = useState<NotificationPreferences>(
+    DEFAULT_NOTIFICATION_PREFERENCES,
+  )
+  const [status, setStatus] = useState<'loading' | 'ready' | 'saving' | 'local' | 'error'>(
+    'loading',
+  )
+  const [error, setError] = useState<string | null>(null)
   const {colours, radius, spacing} = useThemeTokens()
+  const accountId = session.status === 'signedIn' ? session.account.id : null
+  const preferences = accountId ? remotePreferences : localPreferences
+  const displayStatus = accountId ? status : 'local'
+  const displayError = accountId ? error : null
 
   const bundleLabel =
-    bundleStyle === 'individual'
+    preferences.bundleStyle === 'individual'
       ? 'Individual'
-      : bundleStyle === 'digest'
+      : preferences.bundleStyle === 'digest'
         ? 'Digest'
         : 'Focus-aware'
+
+  useEffect(() => {
+    let mounted = true
+    if (!accountId) {
+      return () => {
+        mounted = false
+      }
+    }
+    const loadPreferences = async () => {
+      setStatus('loading')
+      setError(null)
+      try {
+        const next = await activityRepository.getNotificationPreferences()
+        if (!mounted) return
+        setRemotePreferences(next)
+        setStatus('ready')
+      } catch {
+        if (!mounted) return
+        setStatus('error')
+        setError('Notification preferences could not be loaded. Local defaults are shown.')
+      }
+    }
+    void loadPreferences()
+    return () => {
+      mounted = false
+    }
+  }, [accountId, activityRepository])
+
+  const updatePreference = useCallback(
+    (patch: UpdateNotificationPreferencesInput) => {
+      if (session.status !== 'signedIn') {
+        setLocalPreferences(current => ({
+          ...current,
+          ...patch,
+          updatedAt: new Date().toISOString(),
+        }))
+        return
+      }
+      const previous = preferences
+      setRemotePreferences(current => ({
+        ...current,
+        ...patch,
+        updatedAt: new Date().toISOString(),
+      }))
+      setStatus('saving')
+      setError(null)
+      void activityRepository
+        .updateNotificationPreferences({
+          ...patch,
+          expectedVersion: previous.version,
+        })
+        .then(next => {
+          setRemotePreferences(next)
+          setStatus('ready')
+        })
+        .catch(() => {
+          setRemotePreferences(previous)
+          setStatus('error')
+          setError('Notification preferences were not saved. Retry when the connection is stable.')
+        })
+    },
+    [activityRepository, preferences, session.status],
+  )
 
   return (
     <SettingsScreen
       title="Notifications"
-      caption="Local preference toggles. Device push is not connected yet."
+      caption="Account-backed Activity preferences. Device push remains off until a future native permission flow is enabled."
       right={
         <SettingsOverflowMenu
           title="Notifications"
@@ -151,20 +247,33 @@ export function NotificationsSettingsScreen() {
         </AppText>
       </MaterialSurface>
 
+      {displayStatus === 'loading' || displayStatus === 'saving' || displayStatus === 'local' || displayError ? (
+        <AppText
+          variant="caption"
+          colour={displayError ? 'destructive' : 'textTertiary'}
+          style={{paddingHorizontal: spacing[4]}}>
+          {displayError ??
+            (displayStatus === 'loading'
+              ? 'Loading saved notification preferences.'
+              : displayStatus === 'saving'
+                ? 'Saving notification preferences.'
+                : 'Sign in to sync notification preferences across devices.')}
+        </AppText>
+      ) : null}
+
       <SettingsSection title="Delivery">
         <SettingsMenuRow
           label="Bundling style"
           description="How Activity groups alerts."
           value={bundleLabel}
-          preview
           actions={[
             {id: 'individual', label: 'Individual'},
             {id: 'focus', label: 'Focus-aware'},
-            {id: 'digest', label: 'Daily digest Preview'},
+            {id: 'digest', label: 'Daily digest'},
           ]}
           onAction={id => {
             if (id === 'individual' || id === 'focus' || id === 'digest') {
-              setBundleStyle(id)
+              updatePreference({bundleStyle: id})
             }
           }}
         />
@@ -174,31 +283,27 @@ export function NotificationsSettingsScreen() {
         <SettingsToggleRow
           label="Likes"
           description="Show likes unless Focus Mode bundles them."
-          value={likes}
-          onValueChange={setLikes}
-          preview
+          value={preferences.likeEnabled && preferences.reactionEnabled}
+          onValueChange={next => updatePreference({likeEnabled: next, reactionEnabled: next})}
         />
         <SettingsToggleRow
           label="Replies"
           description="Conversation updates when not held by Focus."
-          value={replies}
-          onValueChange={setReplies}
-          preview
+          value={preferences.replyEnabled && preferences.commentEnabled}
+          onValueChange={next => updatePreference({replyEnabled: next, commentEnabled: next})}
         />
         <SettingsToggleRow
           label="Follows"
           description="New follows and relationship updates."
-          value={follows}
-          onValueChange={setFollows}
-          preview
+          value={preferences.followEnabled}
+          onValueChange={next => updatePreference({followEnabled: next})}
         />
         <SettingsToggleRow
           label="Module updates"
-          description="Module lifecycle and marketplace Preview."
-          value={modules}
-          onValueChange={setModules}
+          description="Module lifecycle and marketplace updates."
+          value={preferences.moduleEventEnabled && preferences.extensionEnabled}
+          onValueChange={next => updatePreference({moduleEventEnabled: next, extensionEnabled: next})}
           last
-          preview
         />
       </SettingsSection>
 

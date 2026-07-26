@@ -1,7 +1,10 @@
 import type {DiscoverResult, ReelItem} from '@/domain/discovery'
+import type {DiscoverSearchResult} from '@/data/repositories/contracts/DiscoverRepository'
 import {decodeProfile} from '@/api/decoding/decodeProfile'
+import {decodePost} from '@/api/decoding/decodePost'
 import {
   asArray,
+  asBoolean,
   asNumber,
   asOptionalString,
   asRecord,
@@ -43,4 +46,23 @@ export function decodeDiscoverResult(value: unknown): DiscoverResult {
 
 export function decodeReels(value: unknown): ReelItem[] {
   return asArray(value, 'reels', decodeReel)
+}
+
+export function decodeSearchResult(value: unknown): DiscoverSearchResult {
+  const result = asRecord(value, 'search result')
+  return {
+    query: asOptionalString(result.query, 'search query'),
+    profiles: asArray(result.profiles, 'search profiles', decodeProfile),
+    posts: asArray(result.posts, 'search posts', decodePost),
+    modules: asArray(result.modules, 'search modules', item => {
+      const module = asRecord(item, 'search module')
+      return {
+        id: asString(module.id, 'search module id'),
+        name: asString(module.name, 'search module name'),
+        description: asOptionalString(module.description, 'search module description'),
+      }
+    }),
+    nextCursor: result.nextCursor === null ? null : asString(result.nextCursor, 'search next cursor'),
+    hasMore: asBoolean(result.hasMore, 'search has more'),
+  }
 }

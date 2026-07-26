@@ -63,16 +63,20 @@ export async function handleSocialNotification(
     .executeTakeFirst()
   if (prefs) {
     const enabled =
-      kind === 'reaction' || kind === 'repost' || kind === 'quote'
-        ? kind === 'reaction'
-          ? prefs.like_enabled
-          : prefs.repost_enabled
+      kind === 'reaction'
+        ? prefs.like_enabled && prefs.reaction_enabled
+        : kind === 'repost'
+          ? prefs.repost_enabled
+          : kind === 'quote'
+            ? prefs.quote_enabled
+            : kind === 'comment'
+              ? prefs.comment_enabled
         : kind === 'follow'
           ? prefs.follow_enabled
           : kind === 'mention'
             ? prefs.mention_enabled
             : kind === 'extension'
-              ? prefs.module_event_enabled
+              ? prefs.module_event_enabled && prefs.extension_enabled
               : prefs.reply_enabled
     if (!enabled) return
   }

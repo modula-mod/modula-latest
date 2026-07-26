@@ -56,7 +56,6 @@ includes('src/shell/NavigationDrawer.tsx', [
   "label: 'Profile preview'",
   "label: 'Appearance'",
   "label: 'Settings'",
-  "label: 'Switch account'",
   'Sign out',
 ], 'drawer contents')
 

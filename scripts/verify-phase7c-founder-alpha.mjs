@@ -21,6 +21,10 @@ for (const rel of [
   'scripts/verify-phase7c-board.mjs',
   'scripts/verify-phase7c-settings.mjs',
   'scripts/verify-phase7c-native-readiness.mjs',
+  'scripts/verify-phase7c-product-complete.mjs',
+  'scripts/verify-phase7c-api-parity.mjs',
+  'scripts/verify-phase7c-placeholder-free.mjs',
+  'scripts/verify-phase7c-release-candidate.mjs',
 ]) {
   read(rel)
 }
@@ -40,6 +44,10 @@ for (const verifier of [
   'verify-phase7c-board.mjs',
   'verify-phase7c-settings.mjs',
   'verify-phase7c-native-readiness.mjs',
+  'verify-phase7c-product-complete.mjs',
+  'verify-phase7c-api-parity.mjs',
+  'verify-phase7c-placeholder-free.mjs',
+  'verify-phase7c-release-candidate.mjs',
 ]) {
   const output = maybeSh(['node', `scripts/${verifier}`])
   check(`${verifier} did not pass`, output.includes('passed'))

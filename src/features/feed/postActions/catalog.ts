@@ -2,7 +2,6 @@ import type {ModulaActionItem} from '@/platform/ui/menus'
 import type {SocialPost} from '@/domain/social'
 
 export type PostOverflowActionId =
-  | 'translate'
   | 'copyText'
   | 'copyLink'
   | 'share'
@@ -27,12 +26,6 @@ export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[]
   const hasLink = post.kind === 'link'
 
   const actions: PostOverflowAction[] = [
-    {
-      id: 'translate',
-      label: 'Translate (Preview)',
-      accessibilityLabel: 'Translate post',
-      disabled: !hasText,
-    },
     {
       id: 'copyText',
       label: 'Copy text',

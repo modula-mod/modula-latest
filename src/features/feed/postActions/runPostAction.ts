@@ -4,10 +4,6 @@ import {Alert} from 'react-native'
 
 import type {SocialPost} from '@/domain/social'
 import {
-  formatTranslatePreviewMessage,
-  previewTranslatePostText,
-} from '@/features/translate'
-import {
   getPostPermalink,
   getPostShareMessage,
   inferPostLinkUrl,
@@ -23,11 +19,6 @@ export async function runPostOverflowAction(
   void selectionHaptic()
 
   switch (actionId) {
-    case 'translate': {
-      const result = previewTranslatePostText(post.text ?? '')
-      Alert.alert('Translate (Preview)', formatTranslatePreviewMessage(result))
-      return
-    }
     case 'copyText': {
       const text = post.text?.trim()
       if (!text) {
