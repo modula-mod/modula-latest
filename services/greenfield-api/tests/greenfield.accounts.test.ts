@@ -147,6 +147,38 @@ describeIf('Greenfield native accounts integration', () => {
     expect(patchedNotificationPreferences.json().data.bundleStyle).toBe('digest')
     expect(patchedNotificationPreferences.json().data.reactionEnabled).toBe(false)
 
+    const boardLayout = await app.inject({
+      method: 'GET',
+      url: '/v1/board/layout',
+      headers: {authorization: `Bearer ${session.accessToken}`},
+    })
+    expect(boardLayout.statusCode).toBe(200)
+    expect(boardLayout.json().data.boardWidgetIds).toContain('vault-notes')
+
+    const boardWidgetIds = [...boardLayout.json().data.boardWidgetIds].reverse()
+    const patchedBoardLayout = await app.inject({
+      method: 'PATCH',
+      url: '/v1/board/layout',
+      headers: {authorization: `Bearer ${session.accessToken}`},
+      payload: {
+        boardWidgetIds,
+        expectedVersion: boardLayout.json().data.version,
+      },
+    })
+    expect(patchedBoardLayout.statusCode).toBe(200)
+    expect(patchedBoardLayout.json().data.boardWidgetIds).toEqual(boardWidgetIds)
+
+    const staleBoardLayout = await app.inject({
+      method: 'PATCH',
+      url: '/v1/board/layout',
+      headers: {authorization: `Bearer ${session.accessToken}`},
+      payload: {
+        boardWidgetIds: boardLayout.json().data.boardWidgetIds,
+        expectedVersion: boardLayout.json().data.version,
+      },
+    })
+    expect(staleBoardLayout.statusCode).toBe(409)
+
     const repo = await app.inject({
       method: 'GET',
       url: '/v1/repositories/me',

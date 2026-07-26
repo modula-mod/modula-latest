@@ -1,3 +1,4 @@
+import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
 import {AuditRepository} from '../audit/repository.js'
@@ -21,6 +22,8 @@ const DEFAULT_BOARD_WIDGET_IDS = [
   'settings',
   'activity',
 ]
+
+const jsonb = (value: unknown) => sql<unknown>`${JSON.stringify(value)}::jsonb`
 
 function sanitizeBoardWidgetIds(value: unknown): string[] {
   if (!Array.isArray(value)) throw Object.assign(new Error('boardWidgetIds must be an array'), {code: 'VALIDATION_FAILED'})
@@ -61,7 +64,7 @@ export class BoardLayoutService {
         .insertInto('greenfield_board_layouts')
         .values({
           account_id: accountId,
-          board_widget_ids: [...DEFAULT_BOARD_WIDGET_IDS],
+          board_widget_ids: jsonb([...DEFAULT_BOARD_WIDGET_IDS]),
           version: 1,
           updated_at: new Date(),
         })
@@ -88,7 +91,7 @@ export class BoardLayoutService {
     const updated = await this.db
       .updateTable('greenfield_board_layouts')
       .set({
-        board_widget_ids: boardWidgetIds,
+        board_widget_ids: jsonb(boardWidgetIds),
         version: current.version + 1,
         updated_at: now,
       })
