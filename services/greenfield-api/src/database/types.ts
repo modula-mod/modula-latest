@@ -61,6 +61,14 @@ export type GreenfieldRuntimeSessionState =
   | 'recovering'
 export type GreenfieldRuntimeCompatibility = 'compatible' | 'degraded' | 'blocked'
 export type GreenfieldRuntimeLaunchPermission = 'allowed' | 'degraded-only' | 'denied'
+export type GreenfieldConnectorProviderType = 'first-party' | 'trusted-provider' | 'generic' | 'metadata-only'
+export type GreenfieldConnectorAuthorisationMethod = 'oauth2' | 'api-key' | 'personal-access-token' | 'signed-webhook' | 'none'
+export type GreenfieldConnectorConfigurationState = 'configured' | 'not-configured' | 'invalid'
+export type GreenfieldConnectorAvailabilityStatus = 'available' | 'unavailable' | 'coming-later'
+export type GreenfieldConnectorHealthStatus = 'not-checked' | 'healthy' | 'degraded' | 'unhealthy' | 'unavailable'
+export type GreenfieldConnectionState = 'available' | 'authorising' | 'connected' | 'refreshing' | 'degraded' | 'expired' | 'revoked' | 'disabled' | 'failed' | 'disconnected'
+export type GreenfieldConnectionPermissionState = 'requested' | 'granted' | 'denied' | 'revoked'
+export type GreenfieldConnectionSyncStatus = 'idle' | 'queued' | 'syncing' | 'succeeded' | 'failed'
 export type AtprotoConnectionStatus =
   | 'pending'
   | 'connected'
@@ -587,4 +595,11 @@ export interface Database {
   greenfield_module_data_retention: {retention_id: string; account_id: string; module_id: string; installation_id: string | null; choice: GreenfieldModuleDataRetentionChoice; record_count: number; export_id: string | null; completed_at: Date | null; created_at: Date}
   greenfield_runtime_sessions: {session_id: string; session_kind: GreenfieldRuntimeSessionKind; account_id: string; module_id: string | null; installation_id: string | null; release_id: string | null; provider_ids: unknown; state: GreenfieldRuntimeSessionState; compatibility: GreenfieldRuntimeCompatibility | null; launch_permission: GreenfieldRuntimeLaunchPermission | null; resolution: unknown; reason_codes: unknown; metadata: unknown; failure_code: string | null; failure_message: string | null; created_at: Date; updated_at: Date; started_at: Date | null; terminated_at: Date | null}
   greenfield_runtime_session_events: {event_id: string; session_id: string; account_id: string; event_type: string; from_state: GreenfieldRuntimeSessionState | null; to_state: GreenfieldRuntimeSessionState | null; reason_codes: unknown; metadata: unknown; created_at: Date}
+  greenfield_connector_providers: {provider_id: string; display_name: string; provider_type: GreenfieldConnectorProviderType; connector_kinds: unknown; capabilities: unknown; authorisation_method: GreenfieldConnectorAuthorisationMethod; required_configuration: unknown; configured_status: GreenfieldConnectorConfigurationState; availability_status: GreenfieldConnectorAvailabilityStatus; health_status: GreenfieldConnectorHealthStatus; icon_ref: string; privacy_summary: string; data_access_summary: string; supported_actions: unknown; sync_support: unknown; webhook_support: unknown; rate_limit_policy: unknown; adapter_trusted: boolean; operational: boolean; created_at: Date; updated_at: Date}
+  greenfield_connections: {connection_id: string; account_id: string; provider_id: string; display_name: string; external_account_id: string | null; external_account_label: string | null; state: GreenfieldConnectionState; enabled: boolean; health_status: GreenfieldConnectorHealthStatus; connected_at: Date | null; last_refreshed_at: Date | null; last_used_at: Date | null; expires_at: Date | null; revoked_at: Date | null; failure_code: string | null; created_at: Date; updated_at: Date}
+  greenfield_connection_credentials: {credential_id: string; connection_id: string; key_version: string; encrypted_access_token: Buffer | null; encrypted_refresh_token: Buffer | null; encrypted_auxiliary_data: Buffer | null; token_type: string | null; expires_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_connection_scopes: {scope_id: string; connection_id: string; scope: string; granted_at: Date; revoked_at: Date | null}
+  greenfield_connection_permissions: {permission_id: string; connection_id: string; capability: string; state: GreenfieldConnectionPermissionState; reason: string | null; granted_at: Date | null; revoked_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_connection_sync_state: {sync_state_id: string; connection_id: string; resource_kind: string; cursor_metadata: unknown; status: GreenfieldConnectionSyncStatus; last_started_at: Date | null; last_completed_at: Date | null; failure_code: string | null; created_at: Date; updated_at: Date}
+  greenfield_connection_events: {event_id: string; account_id: string; provider_id: string; connection_id: string | null; event_type: string; from_state: GreenfieldConnectionState | null; to_state: GreenfieldConnectionState | null; metadata: unknown; created_at: Date}
 }
