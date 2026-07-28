@@ -13,7 +13,7 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const AGENTS: Array<{name: string; icon: AppIconName; scope: string}> = [
+const AGENTS: {name: string; icon: AppIconName; scope: string}[] = [
   {name: 'Summariser', icon: 'text', scope: 'feed'},
   {name: 'Scheduler', icon: 'event', scope: 'calendar'},
   {name: 'CRM Analyst', icon: 'people', scope: 'crm'},

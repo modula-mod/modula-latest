@@ -5,8 +5,6 @@ import {
   StyleSheet,
   View,
   useWindowDimensions,
-  type StyleProp,
-  type ViewStyle,
 } from 'react-native'
 import {
   Blur,

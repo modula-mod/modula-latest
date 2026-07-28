@@ -218,7 +218,6 @@ export function QuietInboxScreen() {
 
 export function InnerCircleScreen() {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
   const faces = seededInnerCircle.map((person, index) => ({
     id: person.id,
     name: person.name,
@@ -558,7 +557,7 @@ export function MotionPrefsScreen() {
 }
 
 export function ChromeDensityScreen() {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, radius} = useThemeTokens()
   const {preferences, update} = useProductPreferences()
   const options: {id: ChromeDensity; label: string; pad: number}[] = [
     {id: 'compact', label: 'Compact', pad: 8},

@@ -2,7 +2,6 @@ import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'

@@ -116,26 +116,18 @@ export function SessionProvider({children}: PropsWithChildren) {
 
   const verifyEmail = useCallback(
     async (input: VerifyEmailInput) => {
-      try {
-        const result = await services.authRepository.verifyEmail(input)
-        if (
-          'kind' in result &&
-          (result as {kind?: string}).kind === 'verifiedSignInRequired'
-        ) {
-          setSession({status: 'signedOut'})
-          router.replace(
-            `/sign-in?email=${encodeURIComponent(input.email ?? '')}&verified=1` as Href,
-          )
-          return
-        }
-        await acceptAuthResult(result as AuthResult, '/')
-      } catch (error) {
-        const code =
-          error && typeof error === 'object' && 'code' in error
-            ? String((error as {code: string}).code)
-            : undefined
-        throw error
+      const result = await services.authRepository.verifyEmail(input)
+      if (
+        'kind' in result &&
+        (result as {kind?: string}).kind === 'verifiedSignInRequired'
+      ) {
+        setSession({status: 'signedOut'})
+        router.replace(
+          `/sign-in?email=${encodeURIComponent(input.email ?? '')}&verified=1` as Href,
+        )
+        return
       }
+      await acceptAuthResult(result as AuthResult, '/')
     },
     [acceptAuthResult, router, services.authRepository],
   )

@@ -11,13 +11,13 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const PATHS: Array<{
+const PATHS: {
   id: string
   label: string
   detail: string
   icon: AppIconName
   href: Href
-}> = [
+}[] = [
   {
     id: 'profile',
     label: 'Configurable creator profiles',

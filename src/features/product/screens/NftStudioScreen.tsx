@@ -10,11 +10,11 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const OWNERSHIP_MEANINGS: Array<{
+const OWNERSHIP_MEANINGS: {
   title: string
   body: string
   icon: AppIconName
-}> = [
+}[] = [
   {
     title: 'Module entitlements',
     body: 'Future proof that an account may access a module, tier, add-on, or private workspace. Nothing here grants paid access while DIMON is inactive.',
@@ -37,11 +37,11 @@ const OWNERSHIP_MEANINGS: Array<{
   },
 ]
 
-const PREVIEW_COLLECTIONS: ReadonlyArray<{
+const PREVIEW_COLLECTIONS: readonly {
   name: string
   status: string
   detail: string
-}> = [
+}[] = [
   {
     name: 'Module Access Pass',
     status: 'Reserved preview stub - no mintable collection exists.',
@@ -79,12 +79,12 @@ const LOCAL_ENTITLEMENTS = [
   'Team badge credential - local Preview only',
 ] as const
 
-const LINKS: Array<{
+const LINKS: {
   label: string
   detail: string
   href: Href
   icon: AppIconName
-}> = [
+}[] = [
   {
     label: 'Design Lab',
     detail: 'Themes and layouts preview where visual identity work can happen before any ownership layer exists.',

@@ -164,10 +164,10 @@ export const FOCUS_SURFACE_ADAPTERS = [
   'PresenceFocusAdapter',
 ] as const
 
-export const FOCUS_POLICY_QUESTIONS: Array<{
+export const FOCUS_POLICY_QUESTIONS: {
   key: keyof FocusPolicyAnswers
   label: string
-}> = [
+}[] = [
   {key: 'notificationsCanInterrupt', label: 'Can notifications interrupt?'},
   {key: 'feedVisible', label: 'Is the feed fully visible?'},
   {key: 'reelsVisible', label: 'Are Reels / discovery available?'},

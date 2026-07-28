@@ -1,13 +1,13 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
 
-export const BOARD_WIDGET_CATALOG: Array<{
+export const BOARD_WIDGET_CATALOG: {
   id: string
   name: string
   icon: AppIconName
   size: string
   status: 'Active' | 'Preview' | 'Inactive' | 'Planned'
   description: string
-}> = [
+}[] = [
   {
     id: 'vault-notes',
     name: 'Vault Notes',

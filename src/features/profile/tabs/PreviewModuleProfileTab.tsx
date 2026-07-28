@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppButton} from '@/components/primitives/AppButton'

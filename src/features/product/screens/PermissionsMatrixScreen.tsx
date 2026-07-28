@@ -19,7 +19,7 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const FILTERS: Array<'all' | PermissionRisk> = ['all', 'low', 'medium', 'high']
+const FILTERS: ('all' | PermissionRisk)[] = ['all', 'low', 'medium', 'high']
 
 export function PermissionsMatrixScreen() {
   const router = useRouter()

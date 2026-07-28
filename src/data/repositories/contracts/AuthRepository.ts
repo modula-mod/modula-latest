@@ -11,8 +11,10 @@ import type {
   SignInCredentials,
   VerifyEmailInput,
 } from '@/auth/contracts'
-import type {GreenfieldAccount} from '@modula/greenfield-contracts'
-import type {GreenfieldSession} from '@modula/greenfield-contracts'
+import type {
+  GreenfieldAccount,
+  GreenfieldSession,
+} from '@modula/greenfield-contracts'
 
 export type HandleAvailability = {
   handle: string

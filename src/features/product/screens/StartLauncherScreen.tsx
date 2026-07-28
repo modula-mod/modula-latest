@@ -16,13 +16,13 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const QUICK_ACTIONS: Array<{
+const QUICK_ACTIONS: {
   id: string
   label: string
   detail: string
   icon: AppIconName
   route: string
-}> = [
+}[] = [
   {
     id: 'design-lab',
     label: 'Design Lab',

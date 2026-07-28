@@ -14,7 +14,7 @@ export type ForgeBuilderStep = 'identity' | 'surfaces' | 'permissions' | 'manife
 
 export type ForgeWorkspaceMode = 'plan' | 'build' | 'widgets' | 'preview' | 'manifest'
 
-export const FORGE_WORKSPACE_MODES: Array<{id: ForgeWorkspaceMode; label: string; hint: string}> = [
+export const FORGE_WORKSPACE_MODES: {id: ForgeWorkspaceMode; label: string; hint: string}[] = [
   {id: 'plan', label: 'Plan', hint: 'Outline before canvas — Lovable/Bolt Plan Mode energy'},
   {id: 'build', label: 'Build', hint: 'Surfaces, capabilities, chat'},
   {id: 'widgets', label: 'Widgets', hint: 'Pick Board widgets and local AI affordances'},
@@ -28,7 +28,7 @@ export const FORGE_INSPIRATION_TIPS = [
   'Apple chrome-layer -> native-feeling controls frame the work without fake glass runtime.',
 ] as const
 
-export const FORGE_STEPS: Array<{id: ForgeBuilderStep; label: string}> = [
+export const FORGE_STEPS: {id: ForgeBuilderStep; label: string}[] = [
   {id: 'identity', label: 'Identity'},
   {id: 'surfaces', label: 'Surfaces'},
   {id: 'permissions', label: 'Permissions'},

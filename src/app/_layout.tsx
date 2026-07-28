@@ -1,10 +1,9 @@
-import 'react-native-gesture-handler'
+import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
 import {Stack} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useEffect} from 'react'
 import {StyleSheet} from 'react-native'
-import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
 import {NetworkStatusBanner} from '@/components/data/NetworkStatusBanner'
 import {AppErrorBoundary} from '@/components/system/AppErrorBoundary'

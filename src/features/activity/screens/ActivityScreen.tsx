@@ -82,7 +82,11 @@ export function ActivityScreen() {
   const [filter, setFilter] = useState<ActivityFilter>('all')
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
   const [readIds, setReadIds] = useState<Set<string>>(() => new Set())
-  const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
+  const activityPages = activityQuery.data?.pages
+  const activity = useMemo(
+    () => activityPages?.flatMap(page => page.items) ?? [],
+    [activityPages],
+  )
   const filtered = useMemo(
     () => activity.filter(item => matchesFilter(item, filter)),
     [activity, filter],

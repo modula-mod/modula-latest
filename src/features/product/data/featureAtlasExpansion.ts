@@ -16,7 +16,7 @@ export type ExpansionSeed = {
 function pair(
   domain: string,
   maturity: ExpansionSeed['maturity'],
-  rows: Array<[string, string, string, string[]]>,
+  rows: [string, string, string, string[]][],
   route?: string,
 ): ExpansionSeed[] {
   return rows.map(([slug, name, summary, tags]) => ({

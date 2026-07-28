@@ -10,12 +10,12 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const CONTROLS: Array<{
+const CONTROLS: {
   label: string
   detail: string
   route: Href
   icon: AppIconName
-}> = [
+}[] = [
   {
     label: 'Export your data',
     detail: 'Download a portable archive of your Modula environment.',
