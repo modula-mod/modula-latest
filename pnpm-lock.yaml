@@ -30,6 +30,9 @@ importers:
       '@modula/greenfield-contracts':
         specifier: workspace:*
         version: link:packages/greenfield-contracts
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:packages/greenfield-module-engine-contracts
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:packages/greenfield-module-manifest
@@ -42,6 +45,9 @@ importers:
       '@modula/greenfield-module-ui-contracts':
         specifier: workspace:*
         version: link:packages/greenfield-module-ui-contracts
+      '@modula/greenfield-runtime':
+        specifier: workspace:*
+        version: link:packages/greenfield-runtime
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))
@@ -203,6 +209,15 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/greenfield-module-engine-contracts:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/greenfield-module-manifest:
     devDependencies:
       '@types/node':
@@ -260,6 +275,22 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/greenfield-runtime:
+    dependencies:
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-module-engine-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.10
+        version: 24.13.3
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/greenfield-schema-registry:
     devDependencies:
       typescript:
@@ -304,6 +335,9 @@ importers:
       '@modula/greenfield-contracts':
         specifier: workspace:*
         version: link:../../packages/greenfield-contracts
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:../../packages/greenfield-module-engine-contracts
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:../../packages/greenfield-module-manifest
@@ -316,6 +350,9 @@ importers:
       '@modula/greenfield-protocol':
         specifier: workspace:*
         version: link:../../packages/greenfield-protocol
+      '@modula/greenfield-runtime':
+        specifier: workspace:*
+        version: link:../../packages/greenfield-runtime
       '@modula/greenfield-schema-registry':
         specifier: workspace:*
         version: link:../../packages/greenfield-schema-registry
