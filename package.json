@@ -114,6 +114,8 @@
     "verify:phase7c-founder-alpha": "node scripts/verify-phase7c-founder-alpha.mjs",
     "verify:phase7d-runtime-platform": "node scripts/verify-phase7d-runtime-platform.mjs",
     "verify:phase7d-connector-platform": "node scripts/verify-phase7d-connector-platform.mjs",
+    "verify:phase7d-connector-security": "node scripts/verify-phase7d-connector-security.mjs",
+    "verify:phase7d-connection-lifecycle": "node scripts/verify-phase7d-connection-lifecycle.mjs",
     "registry:import-module": "node scripts/registry/import-module.mjs",
     "registry:verify-release": "node scripts/registry/verify-release.mjs",
     "registry:publish-release": "node scripts/registry/publish-release.mjs",

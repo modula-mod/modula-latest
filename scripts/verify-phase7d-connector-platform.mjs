@@ -162,15 +162,18 @@ if (!metadata.includes('fetch(') && !metadata.includes('http.request') && !metad
   fail('provider metadata includes external network call markers')
 }
 
-for (const path of ['packages/greenfield-connector-contracts/src', 'services/greenfield-api/src/connectors']) {
-  for (const source of sourceFiles(path)) {
-    const text = readFileSync(join(root, source), 'utf8')
-    for (const forbidden of ['completeAuthorisation', 'refreshCredentials', 'access_token', 'refresh_token', 'oauth-client']) {
-      if (text.includes(forbidden)) fail(`${source} includes deferred OAuth/credential implementation marker: ${forbidden}`)
-    }
-  }
+requireIncludes('services/greenfield-api/src/connectors/adapter-registry.ts', [
+  'TrustedConnectorProviderAdapter',
+  'TrustedConnectorAdapterRegistry',
+  'completeAuthorisation',
+  'refreshCredentials',
+], 'trusted connector adapter boundary')
+
+const metadataOnlyText = readFileSync(join(root, 'services/greenfield-api/src/connectors/provider-metadata.ts'), 'utf8')
+for (const forbidden of ['fetch(', 'http.request', 'axios', 'oauth-client']) {
+  if (metadataOnlyText.includes(forbidden)) fail(`provider metadata includes external implementation marker: ${forbidden}`)
 }
-pass('connector foundation avoids OAuth and credential implementation markers')
+pass('provider metadata remains free of executable provider calls')
 
 if (failures > 0) {
   console.error(`Phase 7D connector platform verifier failed: ${failures} issue(s)`)

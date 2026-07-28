@@ -35,6 +35,14 @@ import {ProfileRepository} from '../domains/profiles/repository.js'
 import {ProfileWriteService} from '../domains/profiles/writes.js'
 import {SearchRepository} from '../domains/search/repository.js'
 import {checkReadiness} from '../domains/system/health.js'
+import {
+  GreenfieldConnectorProviderRegistry,
+  TrustedConnectorAdapterRegistry,
+  loadGreenfieldConnectorProviderDefinitions,
+} from '../connectors/index.js'
+import {ConnectorCredentialService} from '../domains/connectors/credentials/index.js'
+import {ConnectorConnectionService} from '../domains/connectors/connections/index.js'
+import {ConnectorOAuthStateService} from '../domains/connectors/oauth-state/index.js'
 import {attachAuth, requireAuth, requireCapability} from '../security/auth-context.js'
 import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
@@ -84,6 +92,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const extensions = new ExtensionRegistry(db)
   const installations = new InstallationService(db)
   const functions = new FunctionService(db)
+  const connectorProviders = new GreenfieldConnectorProviderRegistry()
+  connectorProviders.registerMany(loadGreenfieldConnectorProviderDefinitions())
+  const connectorAdapters = new TrustedConnectorAdapterRegistry()
+  const connectorCredentials = new ConnectorCredentialService(db, config)
+  const connectorConnections = new ConnectorConnectionService(db, connectorProviders)
+  const connectorOAuthStates = new ConnectorOAuthStateService(db, config, connectorProviders)
 
   app.addHook('preHandler', async (request, reply) => {
     if (request.url.startsWith('/v1/atproto') && !config.atprotoEnabled) {
@@ -565,7 +579,137 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return reply.send(successEnvelope(await db.selectFrom('greenfield_plugins').selectAll().execute(), request.id))
   })
   app.get('/v1/connectors', profileConfig, async (request, reply) => {
-    return reply.send(successEnvelope(await db.selectFrom('greenfield_connectors').selectAll().execute(), request.id))
+    return reply.send(successEnvelope(connectorProviders.list(), request.id))
+  })
+  app.get('/v1/connectors/:providerId', profileConfig, async (request, reply) => {
+    const provider = connectorProviders.get((request.params as any).providerId)
+    if (!provider) return sendError(reply, 'NOT_FOUND', 'Connector provider not found', request.id)
+    return reply.send(successEnvelope(provider, request.id))
+  })
+  app.post('/v1/connectors/:providerId/authorise', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const providerId = (request.params as any).providerId
+      const adapter = connectorAdapters.require(providerId)
+      const body = (request.body as any) ?? {}
+      const initiated = await connectorOAuthStates.initiate({
+        accountId: auth.accountId,
+        providerId,
+        redirectUri: typeof body.redirectUri === 'string' ? body.redirectUri : undefined,
+        idempotencyKey: idempotencyKey(request, body),
+      })
+      const adapterResult = await adapter.getAuthorisationUrl({
+        accountId: auth.accountId,
+        providerId,
+        state: initiated.state,
+        redirectUri: initiated.redirectUri,
+        scopes: arrayOfStrings(body.scopes),
+        pkceChallenge: initiated.pkceChallenge,
+        pkceChallengeMethod: initiated.pkceChallengeMethod,
+      })
+      return reply.code(202).send(
+        successEnvelope(
+          {
+            providerId,
+            stateId: initiated.stateId,
+            status: initiated.status,
+            authorisationUrl: adapterResult.authorisationUrl,
+            redirectUri: initiated.redirectUri,
+            expiresAt: initiated.expiresAt,
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connector authorisation could not be started')
+    }
+  })
+  app.get('/v1/connections', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.list(auth.accountId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection lookup failed')
+    }
+  })
+  app.get('/v1/connections/:connectionId', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.get(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection lookup failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/enable', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.enable(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection enable failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/disable', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.disable(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection disable failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/refresh', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const connection = await connectorConnections.get(auth.accountId, (request.params as any).connectionId)
+      const adapter = connectorAdapters.require(connection.providerId)
+      await connectorConnections.beginRefresh(auth.accountId, connection.connectionId)
+      try {
+        const credentials = await connectorCredentials.decryptForTrustedBackend({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+        })
+        const refreshed = await adapter.refreshCredentials({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+          credentials,
+        })
+        await connectorCredentials.storeEncrypted({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+          credentials: refreshed,
+        })
+        return reply.send(
+          successEnvelope(
+            await connectorConnections.completeRefresh(auth.accountId, connection.connectionId, {
+              expiresAt: refreshed.expiresAt ? new Date(refreshed.expiresAt) : null,
+            }),
+            request.id,
+          ),
+        )
+      } catch (error) {
+        await connectorConnections.fail(auth.accountId, connection.connectionId, {failureCode: 'refresh_failed'})
+        throw error
+      }
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection refresh failed')
+    }
+  })
+  app.delete('/v1/connections/:connectionId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.disconnect(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection disconnect failed')
+    }
   })
   app.get('/v1/widgets', profileConfig, async (request, reply) => {
     return reply.send(successEnvelope(await db.selectFrom('greenfield_widgets').selectAll().execute(), request.id))
@@ -1250,4 +1394,19 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     profileConfig,
     authWriteConfig,
   })
+}
+
+function idempotencyKey(request: any, body: unknown): string | undefined {
+  const header = request.headers?.['idempotency-key'] ?? request.headers?.['x-idempotency-key']
+  if (typeof header === 'string' && header.trim()) return header.trim()
+  if (body && typeof body === 'object' && typeof (body as any).idempotencyKey === 'string') {
+    const value = (body as any).idempotencyKey.trim()
+    return value || undefined
+  }
+  return undefined
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map(item => item.trim())
 }

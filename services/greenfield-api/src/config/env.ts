@@ -49,6 +49,8 @@ const envSchema = z.object({
   MODULA_SESSION_PEPPER: z.string().optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
+  MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY: z.string().min(1).optional(),
+  MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
   MODULA_PDS_PILOT_ENABLED: z
     .string()
     .optional()
@@ -132,6 +134,11 @@ export type AppConfig = {
   /** Older keys kept only for decrypting previously encrypted material during rotation. */
   atprotoOAuthEncryptionKeysByVersion: Map<number, Buffer>
   atprotoOAuthEncryptionKeyIsEphemeral: boolean
+  /** Current key used to encrypt connector credential envelopes. */
+  connectorCredentialEncryptionKey: EncryptionKeyMaterial
+  /** Older connector credential keys kept only for decrypting during rotation. */
+  connectorCredentialEncryptionKeysByVersion: Map<number, Buffer>
+  connectorCredentialEncryptionKeyIsEphemeral: boolean
   pdsPilotEnabled: boolean
   moduleRegistryEnabled: boolean
   moduleInstallationEnabled: boolean
@@ -156,6 +163,10 @@ function decodeBase64Key(label: string, value: string): Buffer {
     refuse(`${label} must decode from base64 to exactly 32 bytes (AES-256)`)
   }
   return buffer
+}
+
+function deterministicTestKey(label: string): Buffer {
+  return Buffer.from(label.padEnd(32, '#').slice(0, 32), 'utf8')
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -232,6 +243,38 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     )
   }
 
+  let connectorCredentialKey: EncryptionKeyMaterial
+  let connectorCredentialKeyIsEphemeral = false
+  const connectorCredentialKeysByVersion = new Map<number, Buffer>()
+  if (raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY) {
+    const key = decodeBase64Key(
+      'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY',
+      raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY,
+    )
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+    if (raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS) {
+      const previous = decodeBase64Key(
+        'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS',
+        raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS,
+      )
+      connectorCredentialKeysByVersion.set(0, previous)
+    }
+  } else if (raw.NODE_ENV === 'test') {
+    const key = deterministicTestKey('modula-connector-credential-tests')
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+  } else if (environment === 'development') {
+    const key = randomBytes(32)
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+    connectorCredentialKeyIsEphemeral = true
+  } else {
+    refuse(
+      'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY is required outside development/test (base64-encoded 32 bytes)',
+    )
+  }
+
   const mutationsEnabled = environment !== 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED
 
   return {
@@ -265,6 +308,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     atprotoOAuthEncryptionKey: currentKey,
     atprotoOAuthEncryptionKeysByVersion: keysByVersion,
     atprotoOAuthEncryptionKeyIsEphemeral: isEphemeral,
+    connectorCredentialEncryptionKey: connectorCredentialKey,
+    connectorCredentialEncryptionKeysByVersion: connectorCredentialKeysByVersion,
+    connectorCredentialEncryptionKeyIsEphemeral: connectorCredentialKeyIsEphemeral,
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
     moduleRegistryEnabled: Boolean(raw.GREENFIELD_MODULE_REGISTRY_ENABLED),
     moduleInstallationEnabled: Boolean(raw.GREENFIELD_MODULE_INSTALLATION_ENABLED),
