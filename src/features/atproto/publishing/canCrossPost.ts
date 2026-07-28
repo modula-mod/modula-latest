@@ -80,7 +80,7 @@ export function evaluateCrossPostEligibility(input: CrossPostEligibilityInput): 
     return {allowed: false, reason: 'draft'}
   }
   if (input.media.length > 0) {
-    // Phase 6: media upload to AT is not enabled (mediaUpload capability false).
+    // Modula media upload is separate from AT Protocol media publishing.
     return {allowed: false, reason: 'unsupportedMedia'}
   }
   if (input.poll) {

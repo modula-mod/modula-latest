@@ -320,7 +320,7 @@ export async function runSeed(connectionString: string): Promise<void> {
     }
     const reactions: Array<[string, string, string, string]> = [
       ['reaction-phase6s-1', 'actor-andrei', 'post-local-owner-media', 'like'],
-      ['reaction-phase6s-2', 'actor-gaia', 'post-local-owner-media', 'love'],
+      ['reaction-phase6s-2', 'actor-gaia', 'post-local-owner-media', 'support'],
       ['reaction-phase6s-3', 'actor-design', 'post-local-gaia-1', 'insightful'],
       ['reaction-phase6s-4', 'actor-builders', 'post-local-gaia-1', 'celebrate'],
       ['reaction-phase6s-5', 'actor-garden', 'post-phase6s-quote-1', 'support'],

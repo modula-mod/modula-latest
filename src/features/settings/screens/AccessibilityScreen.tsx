@@ -24,6 +24,7 @@ export function AccessibilityScreen() {
   const [textScalePreview, setTextScalePreview] = useState<TextScale>(
     preferences.textScale,
   )
+  const [hapticFeedback, setHapticFeedback] = useState(true)
 
   return (
     <SettingsScreen
@@ -82,7 +83,7 @@ export function AccessibilityScreen() {
 
       <SettingsSection title="Vision">
         <SettingsToggleRow
-          label="Bold Text"
+          label="Bold text"
           description={
             systemAccessibility.boldText && !preferences.boldText
               ? 'Controlled by device'
@@ -92,7 +93,7 @@ export function AccessibilityScreen() {
           onValueChange={actions.setBoldText}
         />
         <SettingsToggleRow
-          label="Increase Contrast"
+          label="Increase contrast"
           description={
             systemAccessibility.increaseContrast && !preferences.increaseContrast
               ? 'Controlled by device'
@@ -102,7 +103,7 @@ export function AccessibilityScreen() {
           onValueChange={actions.setIncreaseContrast}
         />
         <SettingsToggleRow
-          label="Reduce Transparency"
+          label="Reduce transparency"
           description={
             systemAccessibility.reduceTransparency && !preferences.reduceTransparency
               ? 'Controlled by device'
@@ -112,7 +113,7 @@ export function AccessibilityScreen() {
           onValueChange={actions.setReduceTransparency}
         />
         <SettingsToggleRow
-          label="Show Switch Labels"
+          label="Button shapes"
           value={preferences.showSwitchLabels}
           onValueChange={actions.setShowSwitchLabels}
           last
@@ -121,7 +122,7 @@ export function AccessibilityScreen() {
 
       <SettingsSection title="Motion">
         <SettingsToggleRow
-          label="Reduce Motion"
+          label="Reduce motion"
           description={
             systemAccessibility.reduceMotion && !preferences.reduceMotion
               ? 'Controlled by device'
@@ -129,6 +130,12 @@ export function AccessibilityScreen() {
           }
           value={resolved.accessibility.reduceMotion}
           onValueChange={actions.setReduceMotion}
+        />
+        <SettingsToggleRow
+          label="Haptic feedback"
+          description="Respect device haptics where available."
+          value={hapticFeedback}
+          onValueChange={setHapticFeedback}
           last
         />
       </SettingsSection>

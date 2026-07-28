@@ -32,6 +32,8 @@ services:
     restart: unless-stopped
     env_file:
       - /etc/modula/greenfield-api.env
+    volumes:
+      - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
     ports:
       - '127.0.0.1:4020:4020'
     depends_on:

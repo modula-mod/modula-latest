@@ -20,7 +20,7 @@ export type PostEngagement = {
   quoteCount?: number
 }
 
-export type ReactionType = 'like' | 'love' | 'celebrate' | 'insightful' | 'support' | 'funny'
+export type ReactionType = 'like' | 'celebrate' | 'insightful' | 'support' | 'curious'
 
 export type SocialComment = {
   id: string

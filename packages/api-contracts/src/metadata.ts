@@ -38,7 +38,7 @@ export const PHASE6_PREVIEW_CAPABILITIES: ApiCapabilities = {
   publicRead: true,
   authentication: true,
   mutations: true,
-  mediaUpload: false,
+  mediaUpload: true,
   atproto: true,
   modules: false,
   atprotoOAuth: true,

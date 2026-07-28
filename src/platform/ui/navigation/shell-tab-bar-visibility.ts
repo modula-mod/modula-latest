@@ -34,7 +34,7 @@ export function resolveShellTabRouteName(pathname: string): string | null {
   ) {
     return 'index'
   }
-  for (const name of ['discover', 'board', 'activity', 'profile'] as const) {
+  for (const name of ['discover', 'create', 'activity', 'profile'] as const) {
     if (pathname === `/${name}` || pathname.startsWith(`/${name}/`)) {
       return name
     }
@@ -43,7 +43,7 @@ export function resolveShellTabRouteName(pathname: string): string | null {
   if (pathname === '/(tabs)' || pathname === '/(tabs)/' || pathname === '/(tabs)/index') {
     return 'index'
   }
-  for (const name of ['discover', 'board', 'activity', 'profile'] as const) {
+  for (const name of ['discover', 'create', 'activity', 'profile'] as const) {
     if (
       pathname === `/(tabs)/${name}` ||
       pathname.startsWith(`/(tabs)/${name}/`)

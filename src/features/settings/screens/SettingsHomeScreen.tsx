@@ -20,6 +20,12 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const accountRows: SettingsNavRow[] = [
   {
+    title: 'Account',
+    description: 'Modula Account, handle, sessions, and export.',
+    icon: 'account',
+    route: '/settings/account',
+  },
+  {
     title: 'Profile',
     description: 'Identity and public presentation.',
     icon: 'account',
@@ -32,22 +38,10 @@ const accountRows: SettingsNavRow[] = [
     route: '/profile/customize',
   },
   {
-    title: 'Account',
-    description: 'Modula Account, handle, sessions, and export.',
-    icon: 'account',
-    route: '/settings/account',
-  },
-  {
-    title: 'Connections',
-    description: 'External Networks and optional bridges.',
-    icon: 'integrations',
-    route: '/settings/connections',
-  },
-  {
-    title: 'Extension Centre',
-    description: 'Tools, functions, plugins, modules, and connectors.',
-    icon: 'modules',
-    route: '/settings/extensions',
+    title: 'Security',
+    description: 'Sessions, credentials, recovery and account protection.',
+    icon: 'security',
+    route: '/settings/security',
   },
   {
     title: 'Modules',
@@ -56,81 +50,19 @@ const accountRows: SettingsNavRow[] = [
     route: '/settings/modules',
   },
   {
-    title: 'Product Hub',
-    description: 'Full Modula capability map — Social OS catalogue.',
-    icon: 'discover',
-    route: '/product',
-  },
-  {
-    title: 'Feature Control',
-    description: 'Enable, hide, and lock experimental surfaces.',
-    icon: 'settings',
-    route: '/product/feature-control',
-    preview: true,
-  },
-  {
-    title: 'DIMON',
-    description: 'Future economic protocol — not active yet.',
-    icon: 'security',
-    route: '/settings/dimon',
-  },
-  {
-    title: 'Accounts',
-    description: 'Switcher Preview for local sessions.',
-    icon: 'switch',
-    route: '/account/switcher',
-    preview: true,
+    title: 'Connections',
+    description: 'External services and optional bridges.',
+    icon: 'integrations',
+    route: '/settings/connections',
   },
 ]
 
 const preferenceRows: SettingsNavRow[] = [
   {
-    title: 'Privacy & Safety',
-    description: 'Mute, block, inner circle, report.',
+    title: 'Privacy',
+    description: 'Profile visibility, post defaults, mute, block and report.',
     icon: 'privacy',
     route: '/settings/privacy',
-  },
-  {
-    title: 'Glass Privacy',
-    description: 'Disable Sharing, Protected Chat, Vault Chat.',
-    icon: 'privacy',
-    route: '/product/glass-privacy',
-    preview: true,
-  },
-  {
-    title: 'Focus Mode',
-    description: 'Quiet feed, priority modules, Focus Halo.',
-    icon: 'contrast',
-    route: '/product/focus',
-    preview: true,
-  },
-  {
-    title: 'Gaia',
-    description: 'Permission-aware intelligence — planned.',
-    icon: 'automation',
-    route: '/product/gaia',
-    preview: true,
-  },
-  {
-    title: 'Forge',
-    description: 'Module Builder — multi-step Preview.',
-    icon: 'developer',
-    route: '/product/forge',
-    preview: true,
-  },
-  {
-    title: 'Agents',
-    description: 'Gaia agent packages with scopes — Preview.',
-    icon: 'automation',
-    route: '/product/agents',
-    preview: true,
-  },
-  {
-    title: 'Module Standards',
-    description: 'Manifest rules and boilerplate for packages.',
-    icon: 'developer',
-    route: '/product/module-standards',
-    preview: true,
   },
   {
     title: 'Notifications',
@@ -170,27 +102,10 @@ const preferenceRows: SettingsNavRow[] = [
     preview: true,
   },
   {
-    title: 'Data & storage',
-    description: 'Saved, drafts, local cache notes.',
+    title: 'Data and storage',
+    description: 'Saved posts, drafts, exports and local cache.',
     icon: 'storage',
     route: '/settings/data',
-    preview: true,
-  },
-]
-
-const productLinkRows: SettingsNavRow[] = PRODUCT_LAB_LINKS.map(link => ({
-  title: link.label,
-  description: link.description,
-  icon: link.icon,
-  route: link.route,
-}))
-
-const supportRows: SettingsNavRow[] = [
-  {
-    title: 'Help',
-    description: 'Articles and shortcuts.',
-    icon: 'info',
-    route: '/settings/help',
   },
   {
     title: 'About',
@@ -198,6 +113,47 @@ const supportRows: SettingsNavRow[] = [
     icon: 'info',
     route: '/settings/about',
   },
+]
+
+const developerRows: SettingsNavRow[] = [
+  {
+    title: 'Product Hub',
+    description: 'Full Modula capability map.',
+    icon: 'modules',
+    route: '/product',
+  },
+  {
+    title: 'Extension Centre',
+    description: 'Tools, functions, plugins, modules, and connectors.',
+    icon: 'modules',
+    route: '/settings/extensions',
+  },
+  {
+    title: 'Feature Control',
+    description: 'Enable, hide, and lock experimental surfaces.',
+    icon: 'settings',
+    route: '/product/feature-control',
+    preview: true,
+  },
+  {
+    title: 'DIMON',
+    description: 'Future economic protocol; inactive.',
+    icon: 'security',
+    route: '/settings/dimon',
+  },
+  {
+    title: 'Account switcher',
+    description: 'Local session switcher for development builds.',
+    icon: 'switch',
+    route: '/account/switcher',
+    preview: true,
+  },
+  ...PRODUCT_LAB_LINKS.map(link => ({
+    title: link.label,
+    description: link.description,
+    icon: link.icon,
+    route: link.route,
+  })),
 ]
 
 export function SettingsHomeScreen() {
@@ -221,8 +177,7 @@ export function SettingsHomeScreen() {
 
   const filteredAccount = accountRows.filter(match)
   const filteredPrefs = preferenceRows.filter(match)
-  const filteredProductLinks = productLinkRows.filter(match)
-  const filteredSupport = supportRows.filter(match)
+  const filteredDeveloper = developerRows.filter(match)
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -254,7 +209,7 @@ export function SettingsHomeScreen() {
             />
           </View>
 
-          <SettingsSection title="You">
+          <SettingsSection title="Account">
             {filteredAccount.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
@@ -283,16 +238,6 @@ export function SettingsHomeScreen() {
             ))}
           </SettingsSection>
 
-          <SettingsSection title="Product">
-            {filteredProductLinks.map((row, index) => (
-              <SettingsLinkRow
-                key={row.title}
-                row={{...row, description: undefined}}
-                last={index === filteredProductLinks.length - 1}
-              />
-            ))}
-          </SettingsSection>
-
           <ModulaDisclosureGroup
             label="Advanced preferences"
             isExpanded={advancedOpen}
@@ -300,24 +245,21 @@ export function SettingsHomeScreen() {
             rows={[
               'Data saver and autoplay live under Content & Media.',
               'Mute words and blocked accounts live under Privacy.',
-              'Developer diagnostics are development-only.',
+              'Developer diagnostics are hidden unless developer labs are enabled.',
             ]}
           >
             {null}
           </ModulaDisclosureGroup>
 
-          <SettingsSection title="Support">
-            {filteredSupport.map((row, index) => (
-              <SettingsLinkRow
-                key={row.title}
-                row={{...row, description: undefined}}
-                last={index === filteredSupport.length - 1}
-              />
-            ))}
-          </SettingsSection>
-
           {canAccessDeveloperLabs() ? (
             <SettingsSection title="Development">
+              {filteredDeveloper.map((row, index) => (
+                <SettingsLinkRow
+                  key={row.title}
+                  row={{...row, description: undefined}}
+                  last={false}
+                />
+              ))}
               <SettingsLinkRow
                 row={{
                   title: 'Expo UI Lab',

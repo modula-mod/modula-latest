@@ -1,8 +1,22 @@
 import {decodeActivityItem, decodeCursorPage} from '@/api/decoding'
+import {
+  asBoolean,
+  asIsoDate,
+  asNumber,
+  asRecord,
+  asString,
+  failInvalidResponse,
+} from '@/api/decoding/validation'
 import type {ApiClient} from '@/api/client'
 import type {CursorPage} from '@/api/contracts'
 import type {ActivityItem} from '@/domain/activity'
-import type {ActivityRepository} from '@/data/repositories/contracts'
+import type {
+  ActivityRepository,
+  NotificationPreferences,
+  UpdateNotificationPreferencesInput,
+} from '@/data/repositories/contracts'
+
+const BUNDLE_STYLES = new Set(['individual', 'focus', 'digest'])
 
 function relativeTime(value: unknown): string {
   const timestamp = typeof value === 'string' ? Date.parse(value) : NaN
@@ -51,6 +65,29 @@ function decodeActivityPage(value: unknown): CursorPage<ActivityItem> {
   return decodeCursorPage(value, decodeActivityItem)
 }
 
+function decodeNotificationPreferences(value: unknown): NotificationPreferences {
+  const record = asRecord(value, 'notification preferences')
+  const bundleStyle = asString(record.bundleStyle, 'notification preferences bundleStyle')
+  if (!BUNDLE_STYLES.has(bundleStyle)) {
+    failInvalidResponse('Invalid notification preferences bundleStyle.')
+  }
+  return {
+    followEnabled: asBoolean(record.followEnabled, 'notification preferences followEnabled'),
+    likeEnabled: asBoolean(record.likeEnabled, 'notification preferences likeEnabled'),
+    reactionEnabled: asBoolean(record.reactionEnabled, 'notification preferences reactionEnabled'),
+    repostEnabled: asBoolean(record.repostEnabled, 'notification preferences repostEnabled'),
+    quoteEnabled: asBoolean(record.quoteEnabled, 'notification preferences quoteEnabled'),
+    replyEnabled: asBoolean(record.replyEnabled, 'notification preferences replyEnabled'),
+    commentEnabled: asBoolean(record.commentEnabled, 'notification preferences commentEnabled'),
+    mentionEnabled: asBoolean(record.mentionEnabled, 'notification preferences mentionEnabled'),
+    moduleEventEnabled: asBoolean(record.moduleEventEnabled, 'notification preferences moduleEventEnabled'),
+    extensionEnabled: asBoolean(record.extensionEnabled, 'notification preferences extensionEnabled'),
+    bundleStyle: bundleStyle as NotificationPreferences['bundleStyle'],
+    version: asNumber(record.version, 'notification preferences version'),
+    updatedAt: asIsoDate(record.updatedAt, 'notification preferences updatedAt'),
+  }
+}
+
 export class ApiActivityRepository implements ActivityRepository {
   constructor(private readonly client: ApiClient) {}
 
@@ -72,6 +109,22 @@ export class ApiActivityRepository implements ActivityRepository {
     await this.client.post(
       {path: '/v1/notifications/read-all', authenticated: true},
       () => undefined,
+    )
+  }
+
+  getNotificationPreferences(): Promise<NotificationPreferences> {
+    return this.client.get(
+      {path: '/v1/accounts/me/notification-preferences', authenticated: true},
+      decodeNotificationPreferences,
+    )
+  }
+
+  updateNotificationPreferences(
+    input: UpdateNotificationPreferencesInput,
+  ): Promise<NotificationPreferences> {
+    return this.client.patch(
+      {path: '/v1/accounts/me/notification-preferences', body: input, authenticated: true},
+      decodeNotificationPreferences,
     )
   }
 }

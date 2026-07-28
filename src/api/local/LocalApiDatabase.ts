@@ -5,7 +5,13 @@ import type {ModulaAccount} from '@/domain/account'
 import type {ActivityItem} from '@/domain/activity'
 import type {DiscoverResult, ReelItem} from '@/domain/discovery'
 import type {ConnectionListInput, CreatePostInput, FeedMode, FollowResult, PostEngagement, SocialPost} from '@/domain/social'
+import type {DiscoverSearchResult} from '@/data/repositories/contracts/DiscoverRepository'
 import type {ModulaProfile, UpdateProfileInput} from '@/features/profile/contracts'
+import type {
+  NotificationBundleStyle,
+  NotificationPreferencesDto,
+  SearchType,
+} from '@modula/api-contracts'
 import {LocalApiClock} from '@/api/local/LocalApiClock'
 import {LocalTokenIssuer} from '@/api/local/LocalTokenIssuer'
 
@@ -23,6 +29,15 @@ export type LocalLikeRecord = {profileId: ProfileId; postId: PostId}
 export type LocalSaveRecord = {profileId: ProfileId; postId: PostId}
 export type LocalRepostRecord = {profileId: ProfileId; postId: PostId}
 export type LocalActivityRecord = ActivityItem
+export type LocalNotificationPreferencesRecord = NotificationPreferencesDto & {
+  accountId: AccountId
+}
+export type LocalBoardLayoutRecord = {
+  accountId: AccountId
+  boardWidgetIds: string[]
+  version: number
+  updatedAt: string
+}
 export type LocalSessionRecord = {
   id: SessionId
   accountId: AccountId
@@ -42,6 +57,8 @@ export type LocalApiDatabaseState = {
   saves: LocalSaveRecord[]
   reposts: LocalRepostRecord[]
   activity: LocalActivityRecord[]
+  notificationPreferences: LocalNotificationPreferencesRecord[]
+  boardLayouts: LocalBoardLayoutRecord[]
   sessions: LocalSessionRecord[]
   discover: DiscoverResult
   reels: ReelItem[]
@@ -228,6 +245,49 @@ export class LocalApiDatabase {
     return this.updatePostEngagement(postId)
   }
 
+  getBoardLayout(accountId: AccountId): LocalBoardLayoutRecord {
+    let layout = this.state.boardLayouts.find(item => item.accountId === accountId)
+    if (!layout) {
+      layout = {
+        accountId,
+        boardWidgetIds: [
+          'vault-notes',
+          'product-hub',
+          'saved',
+          'profile',
+          'settings',
+          'activity',
+        ],
+        version: 1,
+        updatedAt: this.clock.iso(),
+      }
+      this.state.boardLayouts.push(layout)
+    }
+    return clone(layout)
+  }
+
+  updateBoardLayout(accountId: AccountId, input: Record<string, unknown>): LocalBoardLayoutRecord {
+    const current = this.getBoardLayout(accountId)
+    if (
+      typeof input.expectedVersion === 'number' &&
+      input.expectedVersion !== current.version
+    ) {
+      throw new Error('Board layout version conflict.')
+    }
+    const boardWidgetIds = Array.isArray(input.boardWidgetIds)
+      ? input.boardWidgetIds.filter((item): item is string => typeof item === 'string')
+      : current.boardWidgetIds
+    const next: LocalBoardLayoutRecord = {
+      ...current,
+      boardWidgetIds: Array.from(new Set(boardWidgetIds)),
+      version: current.version + 1,
+      updatedAt: this.clock.iso(),
+    }
+    this.state.boardLayouts = this.state.boardLayouts.filter(item => item.accountId !== accountId)
+    this.state.boardLayouts.push(next)
+    return clone(next)
+  }
+
   followProfile(profileId: ProfileId): FollowResult {
     const owner = this.ownerProfileId()
     if (!this.state.follows.some(item => item.followerProfileId === owner && item.followingProfileId === profileId)) {
@@ -266,8 +326,121 @@ export class LocalApiDatabase {
     return pageItems(this.state.activity, input.cursor, input.limit)
   }
 
+  getNotificationPreferences(accountId: AccountId): NotificationPreferencesDto {
+    let preferences = this.state.notificationPreferences.find(item => item.accountId === accountId)
+    if (!preferences) {
+      preferences = {
+        accountId,
+        followEnabled: true,
+        likeEnabled: true,
+        reactionEnabled: true,
+        repostEnabled: true,
+        quoteEnabled: true,
+        replyEnabled: true,
+        commentEnabled: true,
+        mentionEnabled: true,
+        moduleEventEnabled: false,
+        extensionEnabled: false,
+        bundleStyle: 'focus',
+        version: 1,
+        updatedAt: this.clock.iso(),
+      }
+      this.state.notificationPreferences.push(preferences)
+    }
+    const {accountId: _accountId, ...dto} = preferences
+    return clone(dto)
+  }
+
+  updateNotificationPreferences(
+    accountId: AccountId,
+    input: Record<string, unknown>,
+  ): NotificationPreferencesDto {
+    const current = this.getNotificationPreferences(accountId)
+    if (
+      typeof input.expectedVersion === 'number' &&
+      input.expectedVersion !== current.version
+    ) {
+      throw new Error('Notification preferences version conflict.')
+    }
+    const bundleStyle =
+      input.bundleStyle === 'individual' ||
+      input.bundleStyle === 'focus' ||
+      input.bundleStyle === 'digest'
+        ? input.bundleStyle as NotificationBundleStyle
+        : current.bundleStyle
+    const next: LocalNotificationPreferencesRecord = {
+      accountId,
+      followEnabled: typeof input.followEnabled === 'boolean' ? input.followEnabled : current.followEnabled,
+      likeEnabled: typeof input.likeEnabled === 'boolean' ? input.likeEnabled : current.likeEnabled,
+      reactionEnabled: typeof input.reactionEnabled === 'boolean' ? input.reactionEnabled : current.reactionEnabled,
+      repostEnabled: typeof input.repostEnabled === 'boolean' ? input.repostEnabled : current.repostEnabled,
+      quoteEnabled: typeof input.quoteEnabled === 'boolean' ? input.quoteEnabled : current.quoteEnabled,
+      replyEnabled: typeof input.replyEnabled === 'boolean' ? input.replyEnabled : current.replyEnabled,
+      commentEnabled: typeof input.commentEnabled === 'boolean' ? input.commentEnabled : current.commentEnabled,
+      mentionEnabled: typeof input.mentionEnabled === 'boolean' ? input.mentionEnabled : current.mentionEnabled,
+      moduleEventEnabled: typeof input.moduleEventEnabled === 'boolean' ? input.moduleEventEnabled : current.moduleEventEnabled,
+      extensionEnabled: typeof input.extensionEnabled === 'boolean' ? input.extensionEnabled : current.extensionEnabled,
+      bundleStyle,
+      version: current.version + 1,
+      updatedAt: this.clock.iso(),
+    }
+    this.state.notificationPreferences = this.state.notificationPreferences.filter(item => item.accountId !== accountId)
+    this.state.notificationPreferences.push(next)
+    const {accountId: _accountId, ...dto} = next
+    return clone(dto)
+  }
+
   getDiscover(): DiscoverResult {
     return clone(this.state.discover)
+  }
+
+  search(input: {
+    q: string
+    type?: SearchType
+    cursor?: string | null
+    limit?: number
+  }): DiscoverSearchResult {
+    const query = input.q.trim()
+    if (query.length < 1 || query.length > 200) throw new Error('Invalid query.')
+    const q = query.toLowerCase()
+    const type = input.type ?? 'all'
+    const start = decodeCursor(input.cursor)
+    const limit = Math.max(1, Math.min(50, input.limit ?? 20))
+    const includeProfiles = type === 'all' || type === 'profiles'
+    const includePosts = type === 'all' || type === 'posts'
+    const includeModules = type === 'all' || type === 'modules'
+    const profiles = includeProfiles
+      ? this.state.profiles.filter(profile =>
+          `${profile.displayName} ${profile.handle} ${profile.bio}`.toLowerCase().includes(q),
+        )
+      : []
+    const posts = includePosts
+      ? this.state.posts.filter(post =>
+          `${post.text ?? ''} ${post.author.displayName} ${post.author.handle}`.toLowerCase().includes(q),
+        )
+      : []
+    const modules = includeModules
+      ? this.state.discover.featuredModules
+          .filter(module => `${module.name} ${module.description}`.toLowerCase().includes(q))
+          .map(module => ({
+            id: module.id,
+            name: module.name,
+            description: module.description,
+          }))
+      : []
+    const nextIndex = start + limit
+    const hasMore =
+      profiles.length > nextIndex ||
+      posts.length > nextIndex ||
+      modules.length > nextIndex
+    return {
+      query,
+      profiles: clone(profiles.slice(start, nextIndex)),
+      posts: clone(posts.slice(start, nextIndex)),
+      modules: clone(modules.slice(start, nextIndex)),
+      nextCursor: hasMore ? encodeCursor(nextIndex) : null,
+      hasMore,
+    }
   }
 
   getReels(): ReelItem[] {

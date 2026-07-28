@@ -40,7 +40,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 const PRIMARY_MODES: AppearanceMode[] = ['system', 'dark', 'light', 'dim']
 
 const modeLabels: Record<AppearanceMode, string> = {
-  system: 'Default',
+  system: 'System',
   light: 'Light',
   dim: 'Dim',
   dark: 'Dark',
@@ -56,7 +56,7 @@ const modeIcons: Record<AppearanceMode, 'contrast' | 'appearance' | 'photo' | 'm
 }
 
 const familyLabels: Record<ThemeFamily, string> = {
-  standard: 'Standard',
+  standard: 'Default',
   forest: 'Forest',
   ocean: 'Ocean',
   plum: 'Plum',
@@ -69,9 +69,9 @@ const surfaceLabels: Record<SurfaceType, string> = {
   solid: 'Solid',
   glass: 'Glass',
   glay: 'Glay',
-  minimalSpatial: 'Minimal',
-  skeuomorphic: 'Skeuo',
-  neomorphic: 'Neo',
+  minimalSpatial: 'Minimal Spatial',
+  skeuomorphic: 'Skeuomorphic',
+  neomorphic: 'Neomorphic',
 }
 
 /** Surfaces shown as chrome bubbles on the wallpaper preview. */
@@ -134,7 +134,7 @@ export function AppearanceScreen() {
             </ScrollView>
           </Section>
 
-          <Section title="Colour mode">
+          <Section title="Mode">
             <View style={[styles.modeGrid, {gap: spacing[3]}]}>
               {PRIMARY_MODES.map(mode => (
                 <ModeTile

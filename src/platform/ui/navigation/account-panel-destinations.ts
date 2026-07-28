@@ -40,18 +40,11 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     description: 'Private conversations',
   },
   {
-    id: 'marketplace',
-    label: 'Marketplace',
-    route: '/marketplace',
-    icon: 'marketplace',
-    description: 'Browse modules and tools',
-  },
-  {
     id: 'product',
     label: 'Product Hub',
     route: '/product',
-    icon: 'discover',
-    description: 'Everything Modula offers',
+    icon: 'modules',
+    description: 'Modules, tools and widgets',
   },
   {
     id: 'focus',

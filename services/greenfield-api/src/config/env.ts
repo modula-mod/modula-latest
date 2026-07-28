@@ -1,4 +1,5 @@
 import {randomBytes} from 'node:crypto'
+import {resolve} from 'node:path'
 import {z} from 'zod'
 
 const envSchema = z.object({
@@ -26,6 +27,9 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  MODULA_REQUEST_BODY_LIMIT_BYTES: z.coerce.number().int().positive().default(4_194_304),
+  MODULA_MEDIA_ROOT: z.string().min(1).optional(),
+  MODULA_MEDIA_UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(2_097_152),
   MODULA_ENVIRONMENT: z.enum(['development', 'preview', 'production']).default('development'),
   MODULA_MINIMUM_CLIENT_VERSION: z.string().default('0.1.0'),
   MODULA_SESSION_TTL_HOURS: z.coerce.number().int().positive().default(720),
@@ -107,6 +111,9 @@ export type AppConfig = {
   rateLimitEnabled: boolean
   previewWritesEnabled: boolean
   apiDocumentationEnabled: boolean
+  requestBodyLimitBytes: number
+  mediaRoot: string
+  mediaUploadMaxBytes: number
   environment: 'development' | 'preview' | 'production'
   minimumClientVersion: string
   /** Derived: true unless environment is production and previewWritesEnabled is false. */
@@ -190,8 +197,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   ) {
     refuse('API host must bind to loopback in production unless MODULA_ALLOW_DOCKER_BIND=true')
   }
+  if (raw.MODULA_MEDIA_UPLOAD_MAX_BYTES >= raw.MODULA_REQUEST_BODY_LIMIT_BYTES) {
+    refuse('media upload limit must be smaller than request body limit')
+  }
 
   const environment = raw.MODULA_ENVIRONMENT
+  const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
 
   let currentKey: EncryptionKeyMaterial
@@ -236,6 +247,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     rateLimitEnabled: raw.MODULA_RATE_LIMIT_ENABLED !== false,
     previewWritesEnabled: Boolean(raw.MODULA_PREVIEW_WRITES_ENABLED),
     apiDocumentationEnabled: Boolean(raw.MODULA_API_DOCUMENTATION_ENABLED),
+    requestBodyLimitBytes: raw.MODULA_REQUEST_BODY_LIMIT_BYTES,
+    mediaRoot: resolve(mediaRoot),
+    mediaUploadMaxBytes: raw.MODULA_MEDIA_UPLOAD_MAX_BYTES,
     environment,
     minimumClientVersion: raw.MODULA_MINIMUM_CLIENT_VERSION,
     mutationsEnabled,

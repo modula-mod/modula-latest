@@ -311,10 +311,15 @@ export interface Database {
     actor_id: string
     follow_enabled: boolean
     like_enabled: boolean
+    reaction_enabled: boolean
     repost_enabled: boolean
+    quote_enabled: boolean
     reply_enabled: boolean
+    comment_enabled: boolean
     mention_enabled: boolean
     module_event_enabled: boolean
+    extension_enabled: boolean
+    bundle_style: 'individual' | 'focus' | 'digest'
     created_at: Date
     updated_at: Date
     version: number
@@ -518,14 +523,15 @@ export interface Database {
   greenfield_widgets: {widget_id: string; extension_version_id: string | null; manifest: unknown; created_at: Date}
   greenfield_bridges: {bridge_id: string; slug: string; status: string; config: unknown; created_at: Date}
   greenfield_repository_exports: {export_id: string; repository_id: string; status: string; location: string | null; created_at: Date; expires_at: Date | null}
-  greenfield_reactions: {reaction_id: string; actor_id: string; post_id: string; reaction_type: 'like' | 'love' | 'celebrate' | 'insightful' | 'support' | 'funny'; created_at: Date; updated_at: Date}
+  greenfield_reactions: {reaction_id: string; actor_id: string; post_id: string; reaction_type: 'like' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
   greenfield_comments: {comment_id: string; post_id: string; author_actor_id: string; parent_comment_id: string | null; root_comment_id: string | null; text: string; depth: number; reply_count: number; version: number; created_at: Date; updated_at: Date; deleted_at: Date | null; deletion_kind: 'user' | 'moderation' | null}
-  greenfield_comment_reactions: {reaction_id: string; actor_id: string; comment_id: string; reaction_type: 'like' | 'love' | 'celebrate' | 'insightful' | 'support' | 'funny'; created_at: Date; updated_at: Date}
+  greenfield_comment_reactions: {reaction_id: string; actor_id: string; comment_id: string; reaction_type: 'like' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
   greenfield_quote_posts: {post_id: string; quoted_post_id: string; commentary: string; created_at: Date}
   greenfield_mentions: {mention_id: string; source_type: 'post' | 'comment'; source_id: string; mentioned_account_id: string; mentioned_actor_id: string | null; handle_at_mention: string; created_at: Date}
   greenfield_notification_batches: {batch_id: string; recipient_actor_id: string; kind: string; subject_type: string; subject_id: string; batch_key: string; actor_ids: unknown; count: number; preview_text: string | null; created_at: Date; updated_at: Date}
   greenfield_notification_delivery: {delivery_id: string; notification_id: string | null; batch_id: string | null; channel: 'inApp'; status: string; created_at: Date}
   greenfield_appearance_preferences: {account_id: string; mode: 'system' | 'light' | 'dim' | 'dark' | 'oled'; variant: 'standard' | 'forest' | 'ocean' | 'plum' | 'espresso' | 'spaceGray'; surface: 'native' | 'solid' | 'glass' | 'glay' | 'minimalSpatial' | 'skeuomorphic' | 'neomorphic'; accent_id: string; custom_accent: string | null; text_scale: number; bold_text: boolean; reduce_motion: boolean; reduce_transparency: boolean; increase_contrast: boolean; version: number; updated_at: Date}
+  greenfield_board_layouts: {account_id: string; board_widget_ids: unknown; version: number; updated_at: Date}
   greenfield_extension_catalogue: {extension_id: string; slug: string; kind: string; name: string; description: string; version: string; publisher: string; trust: string; permissions: unknown; compatibility: unknown; manifest: unknown; catalogue_status: string; executable: boolean; distribution_model: GreenfieldDistributionModel; entitlement_id: string | null; created_at: Date; updated_at: Date}
   greenfield_extension_lifecycle_events: {event_id: string; account_id: string; extension_id: string; event: string; from_status: string | null; to_status: string | null; detail: unknown; created_at: Date}
   greenfield_extension_failures: {failure_id: string; account_id: string; extension_id: string; installation_id: string | null; code: string; message: string; retryable: boolean; created_at: Date}

@@ -1,4 +1,4 @@
-export type ModulaTabId = 'home' | 'discover' | 'board' | 'activity' | 'profile'
+export type ModulaTabId = 'home' | 'discover' | 'create' | 'activity' | 'profile'
 
 export type ModulaTabDefinition = {
   id: ModulaTabId
@@ -28,11 +28,11 @@ export const MODULA_TABS: readonly ModulaTabDefinition[] = [
     materialSymbol: 'explore',
   },
   {
-    id: 'board',
-    routeName: 'board',
-    label: 'Board',
-    sfSymbol: {default: 'square.grid.2x2', selected: 'square.grid.2x2.fill'},
-    materialSymbol: 'dashboard',
+    id: 'create',
+    routeName: 'create',
+    label: 'Create',
+    sfSymbol: {default: 'plus.circle', selected: 'plus.circle.fill'},
+    materialSymbol: 'add_circle',
   },
   {
     id: 'activity',

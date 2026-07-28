@@ -22,6 +22,25 @@ function readJson(file) {
   return JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'))
 }
 
+function runSupersedingVerifier(script) {
+  const result = spawnSync(process.execPath, [script], {
+    cwd: root,
+    encoding: 'utf8',
+  })
+  if (result.status !== 0) {
+    process.stderr.write(result.stderr || result.stdout)
+    process.exit(result.status ?? 1)
+  }
+}
+
+if (exists('docs/validation/phase7c-verifier-reconciliation.md')) {
+  runSupersedingVerifier('scripts/verify-phase7c-product-shell.mjs')
+  runSupersedingVerifier('scripts/verify-phase7c-native-readiness.mjs')
+  console.log('Phase 4.5 native UI verifier retired for Phase 7C.')
+  console.log('Superseded by verify-phase7c-product-shell.mjs and verify-phase7c-native-readiness.mjs.')
+  process.exit(0)
+}
+
 function fail(message) {
   errors.push(message)
 }

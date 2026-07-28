@@ -128,11 +128,12 @@ export const TAB_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     icon: 'discover',
   },
   {
-    id: 'board',
+    id: 'create',
     slot: 'tabs',
-    label: 'Board',
-    description: 'Operating board with widgets.',
-    icon: 'board',
+    label: 'Create',
+    description: 'Central publishing action.',
+    icon: 'create',
+    required: true,
   },
   {
     id: 'activity',
@@ -140,6 +141,7 @@ export const TAB_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     label: 'Activity',
     description: 'Notifications and digests.',
     icon: 'activity',
+    required: true,
   },
   {
     id: 'profile',

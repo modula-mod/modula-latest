@@ -14,7 +14,6 @@ export type ReelOverflowActionId =
   | 'viewProfile'
   | 'shareProfile'
   | 'muteAuthor'
-  | 'translateCaption'
   | 'remix'
   | 'report'
 
@@ -58,12 +57,6 @@ export function buildReelOverflowActions(reel: ReelItem): ModulaActionItem[] {
     {id: 'yourAlgorithm', label: 'Your algorithm'},
     {id: 'viewProfile', label: `View @${reel.author.handle}`},
     {id: 'shareProfile', label: 'Share creator'},
-    {
-      id: 'translateCaption',
-      label: 'Translate caption',
-      disabled: !reel.caption.trim(),
-      disabledReason: 'No caption',
-    },
     {id: 'notInterested', label: 'Not interested'},
     {id: 'muteAuthor', label: 'Mute creator'},
     {id: 'report', label: 'Report', style: 'destructive'},

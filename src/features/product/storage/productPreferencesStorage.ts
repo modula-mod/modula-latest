@@ -22,10 +22,10 @@ const KEY = 'modula.product.preferences.v1'
 /**
  * Bumped when layout-block fields are introduced or their migration semantics
  * change. Prefs below this version re-seed home/discover/tabs/activity/profile
- * ids to product defaults (fixes the "Home+Profile only" collapse from treating
- * a missing tabBarIds key as required-only).
+ * ids to product defaults. Version 3 migrates the root tabs from
+ * Home/Discover/Board/Activity/Profile to Home/Discover/Create/Activity/Profile.
  */
-export const LAYOUT_SCHEMA_VERSION = 2
+export const LAYOUT_SCHEMA_VERSION = 3
 
 export type FocusPresetId = 'off' | 'light' | 'deep' | 'custom'
 
@@ -65,7 +65,7 @@ export type ProductPreferences = {
   homeBlockIds: string[]
   /** Ordered enabled Discover sections. */
   discoverBlockIds: string[]
-  /** Ordered visible tab bar ids (home + profile always kept). */
+  /** Ordered visible tab bar ids (canonical root tabs are always kept). */
   tabBarIds: string[]
   /** Activity surface blocks (digest, filters, etc.). */
   activityBlockIds: string[]
@@ -100,7 +100,7 @@ export const DEFAULT_PRODUCT_PREFERENCES: ProductPreferences = {
     {id: 'dimon', enabled: false, locked: true},
     {id: 'automations', enabled: false, locked: false},
   ],
-  boardWidgetIds: ['tasks', 'calendar', 'gaia-briefing', 'dimon-activity', 'nft-entitlements', 'notes', 'crm'],
+  boardWidgetIds: ['vault-notes', 'product-hub', 'saved', 'profile', 'settings', 'activity'],
   automationEnabledIds: ['1', '2'],
   forgeDraftName: 'My Module',
   gaiaAllowedScopes: ['composer', 'tasks'],

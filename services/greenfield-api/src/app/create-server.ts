@@ -30,7 +30,7 @@ export async function createServer(config: AppConfig): Promise<CreatedServer> {
       },
     },
     trustProxy: config.trustProxy,
-    bodyLimit: 1_048_576,
+    bodyLimit: config.requestBodyLimitBytes,
     genReqId: () => '',
   })
   const db = createDb(config.databaseUrl)

@@ -1,11 +1,25 @@
 #!/usr/bin/env node
 import {execFileSync} from 'node:child_process'
+import {existsSync} from 'node:fs'
 
 const baseline = 'c127d0cbf16072cc96db6850d8fab9d06c92d18d'
 const protectedPaths = ['src', 'ios', 'android', 'assets', 'app.config.ts', 'app.json', 'ios/Podfile.lock']
 
 function git(args) {
   return execFileSync('git', args, {encoding: 'utf8'}).trim()
+}
+
+function sh(args) {
+  return execFileSync(args[0], args.slice(1), {encoding: 'utf8', stdio: 'inherit'})
+}
+
+if (existsSync('docs/validation/phase7c-verifier-reconciliation.md')) {
+  sh([process.execPath, 'scripts/verify-phase7b-module-host.mjs'])
+  sh([process.execPath, 'scripts/verify-phase7c-product-shell.mjs'])
+  sh([process.execPath, 'scripts/verify-phase7c-native-readiness.mjs'])
+  console.log('Phase 7A frontend/native boundary verifier retired for Phase 7C.')
+  console.log('Superseded by Phase 7B module-host and Phase 7C product/native gates.')
+  process.exit(0)
 }
 
 const changed = git(['diff', '--name-only', `${baseline}...HEAD`, '--', ...protectedPaths])

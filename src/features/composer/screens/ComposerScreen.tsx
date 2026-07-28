@@ -315,6 +315,18 @@ export function ComposerScreen() {
 
   const publish = async () => {
     if (!canPost || session.status !== 'signedIn') return
+    if (media && !media.base64) {
+      setPermissionMessage('Photo data was not available. Remove the photo and select it again before posting.')
+      return
+    }
+    const postMedia = media
+      ? [
+          {
+            ...media,
+            altText: altText.trim() || undefined,
+          },
+        ]
+      : []
 
     // Never silently change audience to Public for AT cross-posting.
     const publishToAtproto =
@@ -342,7 +354,7 @@ export function ComposerScreen() {
           text,
           audience: apiAudience(audience),
           replyPermission: apiReplyPermission(replyPermission),
-          media: media ? [media] : [],
+          media: postMedia,
           linkPreview: link ?? undefined,
           poll: poll ?? undefined,
           idempotencyKey: `post-${Date.now()}-${Math.round(Math.random() * 999999)}`,
@@ -378,12 +390,14 @@ export function ComposerScreen() {
     width?: number,
     height?: number,
     mimeType?: string | null,
+    base64?: string | null,
   ) => {
     setPermissionMessage(null)
     setMedia({
       localId: `local-media-${Date.now()}`,
       kind: 'image',
       localUri,
+      base64: base64 ?? undefined,
       width,
       height,
       mimeType: mimeType ?? undefined,
@@ -398,6 +412,7 @@ export function ComposerScreen() {
         result.asset.width,
         result.asset.height,
         result.asset.mimeType,
+        result.asset.base64,
       )
       return
     }
@@ -414,6 +429,7 @@ export function ComposerScreen() {
         result.asset.width,
         result.asset.height,
         result.asset.mimeType,
+        result.asset.base64,
       )
       return
     }
@@ -819,7 +835,6 @@ export function ComposerScreen() {
             })
           }}
           onBrowseMarketplace={() => router.push('/product' as Href)}
-          onPlaceholder={toolName => previewTool(toolName)}
         />
       </FeatureErrorBoundary>
 

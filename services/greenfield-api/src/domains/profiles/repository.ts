@@ -28,6 +28,18 @@ export class ProfileRepository {
     return this.hydrate(row, viewerActorId)
   }
 
+  async getById(profileId: string, viewerActorId: string | null = null): Promise<ModulaProfileDto | null> {
+    const row = await this.db
+      .selectFrom('profiles')
+      .selectAll()
+      .where('id', '=', profileId)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    if (!row) return null
+    if (!(await this.canView(row, viewerActorId))) return null
+    return this.hydrate(row, viewerActorId)
+  }
+
   async listPublic(): Promise<ModulaProfileDto[]> {
     const rows = await this.db.selectFrom('profiles').selectAll().where('deleted_at', 'is', null).where('visibility', '=', 'public').orderBy('joined_at', 'asc').execute()
     return Promise.all(rows.map(row => this.hydrate(row, null)))

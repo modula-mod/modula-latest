@@ -18,6 +18,22 @@ function fail(msg) {
   failures += 1
 }
 
+function runSupersedingVerifier(script) {
+  try {
+    execSync(`"${process.execPath}" "${script}"`, {cwd: root, stdio: 'inherit'})
+  } catch (error) {
+    process.exit(error && typeof error === 'object' && 'status' in error ? error.status : 1)
+  }
+}
+
+if (fs.existsSync('docs/validation/phase7c-verifier-reconciliation.md')) {
+  runSupersedingVerifier('scripts/verify-phase7c-product-shell.mjs')
+  runSupersedingVerifier('scripts/verify-phase7c-native-readiness.mjs')
+  console.log('Phase 6 frontend boundary verifier retired for Phase 7C.')
+  console.log('Superseded by verify-phase7c-product-shell.mjs and verify-phase7c-native-readiness.mjs.')
+  process.exit(0)
+}
+
 if (!fs.existsSync(startCommitPath)) {
   fail(`${startCommitPath} missing`)
 } else {

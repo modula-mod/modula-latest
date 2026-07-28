@@ -16,7 +16,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 const webIcons: Record<string, AppIconName> = {
   index: 'home',
   discover: 'discover',
-  board: 'board',
+  create: 'create',
   activity: 'activity',
   profile: 'profile',
 }
@@ -27,6 +27,7 @@ const RAIL_SHORTCUTS: Array<{
   href: Href
   featureId?: string
 }> = [
+  {label: 'Board', icon: 'board', href: '/board'},
   {label: 'Product', icon: 'modules', href: '/product'},
   {label: 'Customize', icon: 'appearance', href: '/product/customize'},
   {label: 'Forge', icon: 'developer', href: '/product/forge', featureId: 'forge'},
@@ -171,7 +172,7 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
       {rail ? (
         <View style={[styles.shortcuts, {gap: spacing[1], marginTop: spacing[3]}]}>
           <AppText variant="micro" colour="textTertiary">
-            CREATE
+            MORE
           </AppText>
           {shortcuts.map(item => (
             <AppPressable

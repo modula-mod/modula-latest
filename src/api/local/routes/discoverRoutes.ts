@@ -10,6 +10,26 @@ export function createDiscoverRoutes(database: LocalApiDatabase): LocalApiRoute[
     },
     {
       method: 'GET',
+      path: '/v1/search',
+      handler: ({request}) => {
+        const query = request.query ?? {}
+        const type =
+          query.type === 'profiles' ||
+          query.type === 'posts' ||
+          query.type === 'modules' ||
+          query.type === 'all'
+            ? query.type
+            : 'all'
+        return database.search({
+          q: String(query.q ?? ''),
+          type,
+          cursor: typeof query.cursor === 'string' ? query.cursor : null,
+          limit: Number(query.limit ?? 20),
+        })
+      },
+    },
+    {
+      method: 'GET',
       path: '/v1/reels',
       handler: () => database.getReels(),
     },

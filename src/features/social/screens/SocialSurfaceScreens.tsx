@@ -3,7 +3,7 @@ import {Alert, Platform, ScrollView, StyleSheet, TextInput, View} from 'react-na
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
-import {useCapability} from '@/auth/runtime'
+import {useCapability, useSession} from '@/auth/runtime'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -38,11 +38,9 @@ import {
   SettingsScreen as SettingsKitScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
-import {selectionHaptic} from '@/lib/haptics'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -1081,7 +1079,15 @@ export function AccountSwitcherScreen() {
 export function ShareProfileSheetScreen() {
   const [presented, setPresented] = useState(true)
   const router = useRouter()
+  const session = useSession()
   const {colours, spacing} = useThemeTokens()
+  const handle = session.status === 'signedIn' ? session.profile.handle : 'andrei.modula'
+  const displayName = session.status === 'signedIn' ? session.profile.displayName : 'Modula Founder'
+  const profileUrl = `https://modula.digital/@${handle}`
+  const copyProfileLink = async () => {
+    await import('expo-clipboard').then(mod => mod.setStringAsync(profileUrl))
+    Alert.alert('Profile link copied', profileUrl)
+  }
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title="Share profile" />
@@ -1093,21 +1099,21 @@ export function ShareProfileSheetScreen() {
         }}
         snapPoints={['half', 'full']}>
         <View style={{gap: spacing[3]}}>
-          <AppText variant="headline">Share profile — Preview</AppText>
+          <AppText variant="headline">Share profile</AppText>
           <AppText variant="body" colour="textSecondary">
-            QR and share links use local prototype handles. No remote profile graph is required.
+            Share your current Modula profile link.
           </AppText>
           <Surface variant="contained" style={{padding: spacing[5], alignItems: 'center', gap: spacing[2]}}>
             <AppIcon name="share" colour={colours.accent} size={48} />
-            <AppText variant="label">QR placeholder</AppText>
+            <AppText variant="label">{displayName}</AppText>
             <AppText variant="caption" colour="textSecondary">
-              Scan preview is local-only
+              {profileUrl}
             </AppText>
           </Surface>
           <ModulaButton
-            label="Copy profile link — Preview"
+            label="Copy profile link"
             role="primary"
-            onPress={() => undefined}
+            onPress={() => void copyProfileLink()}
           />
           <ModulaButton
             label="Close"

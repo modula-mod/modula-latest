@@ -1,4 +1,8 @@
-export type {ActivityRepository} from '@/data/repositories/contracts/ActivityRepository'
+export type {
+  ActivityRepository,
+  NotificationPreferences,
+  UpdateNotificationPreferencesInput,
+} from '@/data/repositories/contracts/ActivityRepository'
 export type {
   AppearanceRepository,
   SyncedAppearancePreferences,
@@ -25,7 +29,12 @@ export type {
   FunctionInvocationState,
   ToolsRepository,
 } from '@/data/repositories/contracts/ToolsRepository'
-export type {DiscoverRepository} from '@/data/repositories/contracts/DiscoverRepository'
+export type {
+  DiscoverRepository,
+  DiscoverSearchInput,
+  DiscoverSearchModuleResult,
+  DiscoverSearchResult,
+} from '@/data/repositories/contracts/DiscoverRepository'
 export type {
   FeedRepository,
   GetHomeFeedInput,
@@ -49,6 +58,11 @@ export type {
   ProductHubExtensionKind,
 } from '@/data/repositories/contracts/ModuleRepository'
 export type {PostRepository} from '@/data/repositories/contracts/PostRepository'
+export type {
+  ProductPreferencesRepository,
+  SyncedBoardLayout,
+  UpdateBoardLayoutInput,
+} from '@/data/repositories/contracts/ProductPreferencesRepository'
 export type {ProfileRepository} from '@/data/repositories/contracts/ProfileRepository'
 export type {ReelsRepository} from '@/data/repositories/contracts/ReelsRepository'
 export type {

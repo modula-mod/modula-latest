@@ -7,6 +7,7 @@ import type {
 } from '@/platform/ui/camera/types'
 
 const DEFAULT_QUALITY = 0.88
+const COMPOSER_UPLOAD_QUALITY = 0.68
 
 function editingForTarget(target: MediaCaptureOptions['target']): {
   allowsEditing: boolean
@@ -35,7 +36,9 @@ export async function captureMediaFromSource(
   const editing = editingForTarget(options.target)
   const allowsEditing = options.allowsEditing ?? editing.allowsEditing
   const aspect = options.aspect ?? editing.aspect
-  const quality = options.quality ?? DEFAULT_QUALITY
+  const quality =
+    options.quality ?? (options.target === 'composer' ? COMPOSER_UPLOAD_QUALITY : DEFAULT_QUALITY)
+  const includeUploadPayload = options.target === 'composer'
 
   try {
     if (source === 'library') {
@@ -55,6 +58,7 @@ export async function captureMediaFromSource(
         allowsEditing,
         aspect,
         quality,
+        base64: includeUploadPayload,
         exif: false,
         preferredAssetRepresentationMode:
           ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Current,
@@ -79,6 +83,7 @@ export async function captureMediaFromSource(
       allowsEditing,
       aspect,
       quality,
+      base64: includeUploadPayload,
       exif: false,
       cameraType: ImagePicker.CameraType.back,
       presentationStyle: ImagePicker.UIImagePickerPresentationStyle.FULL_SCREEN,

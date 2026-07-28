@@ -14,6 +14,7 @@ import type {
   MetadataRepository,
   ModuleRepository,
   PostRepository,
+  ProductPreferencesRepository,
   ProfileRepository,
   ReelsRepository,
   SocialGraphRepository,
@@ -25,6 +26,7 @@ export type AppServices = {
   authRepository: AuthRepository
   feedRepository: FeedRepository
   postRepository: PostRepository
+  productPreferencesRepository: ProductPreferencesRepository
   profileRepository: ProfileRepository
   socialGraphRepository: SocialGraphRepository
   activityRepository: ActivityRepository

@@ -19,11 +19,10 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const reactions: {type: ReactionType; emoji: string; label: string}[] = [
   {type: 'like', emoji: '👍', label: 'Like'},
-  {type: 'love', emoji: '❤️', label: 'Love'},
   {type: 'celebrate', emoji: '🎉', label: 'Celebrate'},
   {type: 'insightful', emoji: '💡', label: 'Insightful'},
   {type: 'support', emoji: '🤝', label: 'Support'},
-  {type: 'funny', emoji: '😄', label: 'Funny'},
+  {type: 'curious', emoji: '🤔', label: 'Curious'},
 ]
 
 function BloomOption({

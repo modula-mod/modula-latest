@@ -81,7 +81,7 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
   return (
     <View style={{gap: spacing[5]}}>
       <View style={{gap: spacing[2]}}>
-        <AppText variant="headline">Marketplace</AppText>
+        <AppText variant="headline">Product Hub</AppText>
         <AppText variant="body" colour="textSecondary">
           Registry-backed modules, tools, functions, plugins, widgets and connectors. DIMON commercial distribution is represented as inactive metadata only.
         </AppText>
@@ -103,7 +103,7 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
           onChangeText={setQuery}
           placeholder="Search registry"
           placeholderTextColor={colours.textTertiary}
-          accessibilityLabel="Search module marketplace"
+          accessibilityLabel="Search Product Hub"
           returnKeyType="search"
           style={[styles.searchInput, {color: colours.text}]}
         />

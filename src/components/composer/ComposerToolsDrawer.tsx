@@ -24,7 +24,6 @@ type ComposerToolsDrawerProps = {
   onInsertLink: () => void
   onInsertPoll: () => void
   onBrowseMarketplace: () => void
-  onPlaceholder: (toolName: string) => void
 }
 
 const SECTIONS: ComposerToolSection[] = [
@@ -96,7 +95,7 @@ function availabilitySentence(tool: ComposerToolItem): string {
     return 'Unavailable in this Preview build.'
   }
   if (tool.availability === 'preview') {
-    return 'Preview. This runs locally or as a stub until a module manifest enables the full action.'
+    return 'Preview state. A reviewed module manifest must enable this capability before it can run.'
   }
   return 'Available from a registered manifest.'
 }
@@ -117,7 +116,6 @@ export function ComposerToolsDrawer({
   onInsertLink,
   onInsertPoll,
   onBrowseMarketplace,
-  onPlaceholder,
 }: ComposerToolsDrawerProps) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -159,6 +157,10 @@ export function ComposerToolsDrawer({
       Alert.alert(unavailableTitle(tool), unavailableMessage(tool))
       return
     }
+    if (tool.availability === 'preview') {
+      Alert.alert(`${tool.name} is not available`, availabilitySentence(tool))
+      return
+    }
     if (tool.toolId.includes('photo')) {
       onPhoto()
       return
@@ -197,11 +199,9 @@ export function ComposerToolsDrawer({
       }
       if (result.state === 'failed') {
         setInvocationMessage(result.message ?? 'Failed')
-        onPlaceholder(tool.name)
         return
       }
       setInvocationMessage(result.message ?? 'Completed')
-      onPlaceholder(tool.name)
     })()
   }
 

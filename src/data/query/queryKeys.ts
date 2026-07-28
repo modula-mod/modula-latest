@@ -38,6 +38,8 @@ export const queryKeys = {
   },
   discover: {
     all: ['discover'] as const,
+    search: (q: string, type: string, limit: number) =>
+      ['discover', 'search', q, type, limit] as const,
   },
   reels: {
     all: ['reels'] as const,

@@ -70,10 +70,15 @@ export interface Database {
     actor_id: string
     follow_enabled: boolean
     like_enabled: boolean
+    reaction_enabled: boolean
     repost_enabled: boolean
+    quote_enabled: boolean
     reply_enabled: boolean
+    comment_enabled: boolean
     mention_enabled: boolean
     module_event_enabled: boolean
+    extension_enabled: boolean
+    bundle_style: 'individual' | 'focus' | 'digest'
     created_at: Date
     updated_at: Date
     version: number
