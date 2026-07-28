@@ -1,30 +1,34 @@
-# Phase 7C Native Acceptance
+# Phase 7C Native Packaging Deferral
 
-Status: BLOCKED
-Date: 2026-07-26
+Status: DEFERRED
+Date: 2026-07-28
 Repository: `/home/andrei/modula-latest`
 Branch: `phase7c-modula-product-realisation`
 Deployment commit: `1e9e7009fb7a648517594cfd4a1302100e971f8b`
-Build number: not produced
-Device information: not recorded
-Physical iPhone: not accepted
-TestFlight candidate: not produced
+Build number: intentionally not produced during Phase 7C
+EAS Build: deferred to native packaging phase
+Device information: deferred to native packaging phase
+Physical iPhone: deferred to native packaging phase
+TestFlight candidate: deferred to native packaging phase
 API version: `v1`
 Environment: live Greenfield backend at `https://api.modula.digital`
-Tester: pending physical-device validation
-Result: BLOCKED
+Tester: Codex local and VPS validation
+Result: DEFERRED; not a Phase 7C release blocker
 
 ## Evidence
 
-Native acceptance has not been completed for this branch. The required physical iPhone replay, clean iOS development build installation, and TestFlight candidate installation/upgrade checks are still pending.
+Native packaging is deferred by Phase 7C-C policy. This phase deliberately excludes EAS Build, EAS Submit, TestFlight upload, development-client generation, provisioning profiles, Apple signing and App Store submission.
+
+Phase 7C native scope is limited to readiness checks: dependency alignment, app config presence, platform UI boundaries, and documentation that the later native packaging phase owns physical device and TestFlight acceptance.
 
 Completed supporting evidence:
 
 - Web after screenshots are recorded in `docs/validation/phase7c-after/README.md`.
 - Live Greenfield API acceptance is recorded in `docs/validation/phase7c-live-acceptance.md`.
 - The deployed API, Worker, migrations, media persistence, Board persistence, Product Hub module lifecycle, and Vault Notes install/enable/disable/uninstall flows have passed live VPS validation.
+- `node scripts/verify-phase7c-native-readiness.mjs` verifies the Expo SDK 57 dependency/config baseline and platform UI import boundary.
 
-Pending physical iPhone checks:
+Deferred physical iPhone checks for the native packaging phase:
 
 - Navigation
 - Drawer
@@ -51,7 +55,7 @@ Pending physical iPhone checks:
 - Accessibility preferences
 - Logout
 
-Pending build checks:
+Deferred build checks for the native packaging phase:
 
 - Clean iOS development build
 - Physical iPhone development-build installation
@@ -64,9 +68,11 @@ Pending build checks:
 - TestFlight login
 - TestFlight feed, posting, image upload, Board, Product Hub, Settings and logout
 
-## Current Blocker
+## Phase 7C Release Gate
 
-This environment has completed VPS, deployed web and live API acceptance, but it has not completed physical iPhone validation or TestFlight candidate validation. Phase 7C must remain in Release Candidate status until this document can be updated to `Status: ACCEPTED` with real device and build evidence.
+Phase 7C release-candidate verification must require backend completion, frontend completion, deployment evidence, migration evidence, backup evidence, live product validation and completed documentation.
+
+Phase 7C release-candidate verification must not require physical iPhone acceptance, EAS Build, EAS Submit, development-client generation, TestFlight upload or App Store submission. Those activities are intentionally moved to the later native packaging phase.
 
 Phase 7D work has not started.
 
@@ -76,11 +82,9 @@ Phase 7D work has not started.
 pnpm exec expo install --check
 pnpm typecheck
 pnpm lint
-pnpm exec eas build --platform ios --profile development
-pnpm exec eas build --platform ios --profile preview
 node scripts/verify-phase7c-native-readiness.mjs
 node scripts/verify-phase7c-release-candidate.mjs
 node scripts/verify-phase7c-founder-alpha.mjs
 ```
 
-Do not mark this file accepted until the physical iPhone, development build and TestFlight candidate evidence are recorded.
+Do not convert this file to native acceptance evidence during Phase 7C. Create a separate native packaging acceptance record when physical device, development build and TestFlight validation actually happen.

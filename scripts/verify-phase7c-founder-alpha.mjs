@@ -33,6 +33,8 @@ for (const rel of [
   'docs/validation/phase7c-after/README.md',
   'docs/validation/phase7c-native-acceptance.md',
   'docs/validation/phase7c-live-acceptance.md',
+  'docs/validation/phase7c-final-report.md',
+  'docs/validation/phase7c-verifier-reconciliation.md',
 ]) {
   read(rel)
 }
@@ -108,6 +110,18 @@ check('arbitrary module execution boundary missing', moduleBoundary.includes('Re
 check('DIMON must remain inactive', read('docs/audits/phase7c-starting-baseline.md').includes('greenfieldDimon` | false'))
 check('AT dependency must remain optional', read('docs/audits/phase7c-starting-baseline.md').includes('atproto` | false'))
 check('native config baseline missing', read('docs/audits/phase7c-expo-native-baseline.md').includes('development build'))
+
+const nativeAcceptance = read('docs/validation/phase7c-native-acceptance.md')
+check('Phase 7C must defer native packaging instead of requiring it', /^Status:\s+DEFERRED\s*$/m.test(nativeAcceptance))
+check('Phase 7C native deferral missing TestFlight boundary', nativeAcceptance.includes('TestFlight candidate: deferred to native packaging phase'))
+
+const finalReport = read('docs/validation/phase7c-final-report.md')
+check('final report must be accepted under revised Phase 7C criteria', /^Status:\s+ACCEPTED\s*$/m.test(finalReport))
+check('final report must include deployment record', finalReport.includes('## Deployment Record'))
+check('final report must include backup record', finalReport.includes('## Backup Record'))
+check('final report must include migration record', finalReport.includes('## Migration Versions'))
+check('final report must include live validation record', finalReport.includes('## Live Acceptance'))
+check('final report must explicitly block Phase 7D', finalReport.includes('Phase 7D work has not started'))
 
 const status = sh(['git', 'status', '--short'])
 check(`working tree is not clean:\n${status}`, status.length === 0)

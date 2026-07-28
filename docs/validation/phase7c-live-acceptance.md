@@ -161,7 +161,7 @@ Product Hub and Vault Notes:
 
 - Founder Alpha still uses separate Greenfield account sessions and preview actor sessions for social write flows.
 - Oversized media is rejected at the request boundary with `413`.
-- Physical iPhone and TestFlight acceptance are recorded separately in `docs/validation/phase7c-native-acceptance.md`.
+- Physical iPhone and TestFlight acceptance are intentionally deferred to the later native packaging phase and recorded as deferred in `docs/validation/phase7c-native-acceptance.md`.
 
 ## Verification commands
 

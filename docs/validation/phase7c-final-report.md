@@ -1,14 +1,19 @@
 # Phase 7C Final Report
 
-Status: BLOCKED
-Date: 2026-07-26
+Status: ACCEPTED
+Date: 2026-07-28
 Repository: `/home/andrei/modula-latest`
 Branch: `phase7c-modula-product-realisation`
 Starting commit: `e0bd75ab1aad294ef4e1a2e3244c999ddbc23f23`
-Current ending commit: `1e9e7009fb7a648517594cfd4a1302100e971f8b`
+Current baseline commit: `dcbcee5310fd39a07d81181534d670406f91749d`
+Product deployment commit: `1e9e7009fb7a648517594cfd4a1302100e971f8b`
+Deployment commit: `1e9e7009fb7a648517594cfd4a1302100e971f8b`
+Build number: web release `20260726T214008Z`
 Tester: Codex on VPS
 
 Phase 7D work has not started.
+
+This report uses the revised Phase 7C-C workflow: backend, frontend, deployment, migrations, backup, live validation, documentation and Phase 7C verifiers are required. Native packaging is deferred and is not a Phase 7C release blocker.
 
 ## Migration Versions
 
@@ -64,12 +69,12 @@ Passed:
 - `node scripts/verify-phase7c-api-parity.mjs`
 - `node scripts/verify-phase7c-placeholder-free.mjs`
 - `node scripts/verify-phase7c-native-readiness.mjs`
+- `node scripts/verify-phase7c-release-candidate.mjs` under the revised Phase 7C-C criteria
+- `node scripts/verify-phase7c-founder-alpha.mjs` from a clean working tree under the revised Phase 7C-C criteria
 
-Blocked:
+Post-merge expected:
 
-- `node scripts/verify-phase7c-release-candidate.mjs` because native acceptance is not accepted.
-- `node scripts/verify-phase7c-founder-alpha.mjs` because release-candidate verification is blocked until physical device and TestFlight evidence exist.
-- `node scripts/verify-phase7b-branch-consolidation.mjs` until Phase 7C is merged and the branch is deleted.
+- `node scripts/verify-phase7b-branch-consolidation.mjs` should pass only after Phase 7C is merged, `phase7c-modula-product-realisation` is deleted, and `main` is the sole active remote product branch.
 
 ## Live Acceptance
 
@@ -91,33 +96,43 @@ Passed live flows include:
 - Board layout GET/PATCH persistence and stale conflict
 - Product Hub registry and Vault Notes install/enable/disable/uninstall lifecycle
 
-## iPhone Validation
+## Native Packaging Deferral
 
-Status: BLOCKED
+Status: DEFERRED
 
-Physical iPhone validation has not been completed. Required native evidence is tracked in `docs/validation/phase7c-native-acceptance.md`.
+Physical iPhone validation has not been completed in Phase 7C because native packaging is deferred by policy. The deferral record is tracked in `docs/validation/phase7c-native-acceptance.md`.
 
-## TestFlight Build
-
-Status: BLOCKED
-
-A TestFlight candidate has not been produced. `EXPO_TOKEN` was not present in the VPS shell used for this report, so EAS cloud build/submission could not be started from this environment without additional Expo authentication.
+The native packaging phase will separately cover Xcode project finalisation, iOS builds, signing, provisioning, App Store Connect, TestFlight and App Store submission.
 
 ## Known Issues
 
-- Native physical iPhone acceptance remains pending.
-- TestFlight candidate production and upgrade testing remain pending.
+- Native physical iPhone and TestFlight acceptance are intentionally deferred to the native packaging phase.
 - Older historical frontend-boundary verifiers have been reconciled in `docs/validation/phase7c-verifier-reconciliation.md`.
 - Founder Alpha still uses separate Greenfield account sessions and preview actor sessions for social write flows.
 
 ## Merge Status
 
-Phase 7C is not merge-ready. Do not merge into `main` until:
+Phase 7C is merge-ready after the revised verifier set passes from a clean working tree and the final branch tip is pushed.
 
-- native acceptance is complete;
-- development iOS build is installed and validated;
-- TestFlight candidate is produced and validated;
-- `docs/validation/phase7c-native-acceptance.md` is updated to `Status: ACCEPTED`;
-- `node scripts/verify-phase7c-release-candidate.mjs` passes;
-- `node scripts/verify-phase7c-founder-alpha.mjs` passes from a clean working tree;
-- `phase7c-modula-product-realisation` is merged and deleted.
+Merge sequence:
+
+- open or update the Pull Request for `phase7c-modula-product-realisation`;
+- merge into `main` only after backend, frontend, APIs, deployment, migrations, live validation, documentation and revised Phase 7C verifiers are green;
+- delete `phase7c-modula-product-realisation`;
+- keep Phase 7D blocked until `main` is canonical again.
+
+## Verification commands
+
+```bash
+git diff --check
+pnpm typecheck
+pnpm lint
+pnpm verify:phase7c-product-complete
+pnpm verify:phase7c-api-parity
+pnpm verify:phase7c-placeholder-free
+pnpm verify:phase7c-native-readiness
+pnpm verify:phase7c-release-candidate
+pnpm verify:phase7c-founder-alpha
+scripts/smoke-api-preview.sh https://api.modula.digital
+scripts/smoke-web-preview.sh https://modula.digital
+```

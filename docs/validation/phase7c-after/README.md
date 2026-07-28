@@ -56,7 +56,7 @@ google-chrome \
 ## Notes
 
 - The composer route intentionally shows the signed-out "Sign in to continue" state in unauthenticated web capture.
-- Native iPhone screenshots are not covered by this document and remain pending in `docs/validation/phase7c-native-acceptance.md`.
+- Native iPhone screenshots are not covered by this document; native packaging is deferred in `docs/validation/phase7c-native-acceptance.md`.
 - Phase 7D work has not started.
 
 ## Verification commands
