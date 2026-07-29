@@ -40,6 +40,26 @@ export type ModuleInstallationState =
 
 export type ModulePriceState = 'Free' | 'Included' | 'Coming soon' | 'Not available'
 
+export type ModuleBackendMode =
+  | 'greenfield-managed'
+  | 'module-managed'
+  | 'hybrid'
+  | 'frontend-only'
+
+export type ModuleBackendMetadata = {
+  mode: ModuleBackendMode
+  provider: string
+  deploymentOwnership: string
+  dataLocation: string
+  regions: string[]
+  status: string
+  protocolVersion?: string | null
+  endpoint?: string | null
+  selfHostingSupported: boolean
+  externalDataProcessing: boolean
+  backendPermissions: string[]
+}
+
 export type ModuleCatalogueItem = {
   moduleId: string
   name: string
@@ -59,6 +79,7 @@ export type ModuleCatalogueItem = {
 
 export type ModuleDetail = ModuleCatalogueItem & {
   longDescription: string
+  backend: ModuleBackendMetadata
   permissions: {permission: string; reason: string; risk: 'low' | 'medium' | 'high' | 'restricted'}[]
   contributions: Record<string, unknown>
   sourceRepository?: string
@@ -190,5 +211,9 @@ export interface ModuleRepository {
   getSettings(moduleId: string): Promise<ModuleSettingsDocument>
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument>
   getHealth(moduleId: string): Promise<ModuleHealth | null>
+  getBackendDiagnostics(moduleId: string): Promise<ModuleBackendMetadata | null>
+  reverifyBackend(moduleId: string, origin?: string): Promise<ModuleBackendMetadata | null>
+  checkBackendHealth(moduleId: string): Promise<ModuleBackendMetadata | null>
+  disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null>
   listContributions(input?: {surface?: string; moduleId?: string; enabledOnly?: boolean}): Promise<ModuleContribution[]>
 }

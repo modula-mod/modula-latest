@@ -2,6 +2,7 @@ import type {ApiClient} from '@/api/client'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   InstalledModule,
+  ModuleBackendMetadata,
   ModuleCatalogueItem,
   ModuleContribution,
   ModuleDetail,
@@ -92,7 +93,14 @@ export class ApiModuleRepository implements ModuleRepository {
       return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
     } catch {
       const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
-      return fallback ? {...fallback, longDescription: fallback.description, permissions: [], contributions: {}, privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined} : null
+      return fallback ? {
+        ...fallback,
+        longDescription: fallback.description,
+        backend: defaultBackendMetadata(moduleId),
+        permissions: [],
+        contributions: {},
+        privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
+      } : null
     }
   }
 
@@ -187,6 +195,23 @@ export class ApiModuleRepository implements ModuleRepository {
       .catch(() => null)
   }
 
+  getBackendDiagnostics(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
+      .catch(async () => (await this.getModule(moduleId))?.backend ?? null)
+  }
+
+  reverifyBackend(moduleId: string, origin?: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/discover`, authenticated: true, body: {origin}}, value => decodeBackendMetadata(value, moduleId))
+  }
+
+  checkBackendHealth(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/health`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
+  }
+
+  disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/disable`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
+  }
+
   listContributions(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}): Promise<ModuleContribution[]> {
     return this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
       Array.isArray(value) ? value.map(decodeContribution) : [],
@@ -229,11 +254,13 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
   const placeholder = (row.placeholder ?? {}) as Record<string, unknown>
   const source = (row.source ?? {}) as Record<string, unknown>
   const manifest = (row.manifest ?? row.placeholder ?? {}) as Record<string, unknown>
+  const backendSource = isRecord(manifest.backend) ? manifest.backend : isRecord(row.backend) ? row.backend : undefined
   return {
     ...base,
     publisherId: String(publisher.publisherId ?? base.publisherId),
     publisherName: String(publisher.displayName ?? base.publisherName),
     longDescription: String(row.description ?? base.description),
+    backend: decodeBackendMetadata(backendSource, base.moduleId),
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleDetail['permissions'] : [],
     contributions: (row.contributions ?? {}) as Record<string, unknown>,
     sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),
@@ -243,6 +270,57 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     releaseNotes: Array.isArray(row.releaseNotes) ? row.releaseNotes.map(String) : [],
     privacy: base.moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
   }
+}
+
+function decodeBackendMetadata(value: unknown, moduleId: string): ModuleBackendMetadata {
+  const backend = isRecord(value) ? value : {}
+  const mode = backendMode(backend.mode)
+  const deployment = isRecord(backend.deployment) ? backend.deployment : {}
+  const data = isRecord(backend.data) ? backend.data : {}
+  const trust = isRecord(backend.trust) ? backend.trust : {}
+  const actions = Array.isArray(backend.actions) ? backend.actions.filter(isRecord) : []
+  const diagnosticEndpoint = typeof backend.resolvedEndpoint === 'string' ? backend.resolvedEndpoint : typeof backend.resolvedOrigin === 'string' ? backend.resolvedOrigin : undefined
+  const endpoint = diagnosticEndpoint ?? (Array.isArray(trust.allowedOrigins) ? trust.allowedOrigins.find((origin): origin is string => typeof origin === 'string') : undefined)
+  const ownership = String(deployment.ownership ?? (typeof backend.deployment === 'string' ? backend.deployment : mode === 'greenfield-managed' ? 'modula-hosted' : 'publisher-hosted'))
+  const dataLocation = String(data.primaryStore ?? backend.dataLocation ?? (mode === 'frontend-only' ? 'device' : mode === 'greenfield-managed' ? 'greenfield' : 'module-backend'))
+  const provider = providerFor(mode, ownership)
+  return {
+    mode,
+    provider,
+    deploymentOwnership: ownership,
+    dataLocation,
+    regions: arrayOfStrings(deployment.regions ?? deployment.dataResidency ?? data.residency),
+    status: String(backend.status ?? backend.lifecycleState ?? backend.verificationStatus ?? (mode === 'greenfield-managed' || mode === 'frontend-only' ? 'available' : 'unconfigured')),
+    protocolVersion: typeof backend.protocolVersion === 'string' ? backend.protocolVersion : null,
+    endpoint: endpoint ?? null,
+    selfHostingSupported: Boolean(deployment.selfHostingSupported ?? backend.selfHostingSupported),
+    externalDataProcessing: ['module-managed', 'hybrid'].includes(mode) || dataLocation.includes('module-backend'),
+    backendPermissions: Array.from(new Set(actions.flatMap(action => arrayOfStrings(action.permissions)))),
+  }
+}
+
+function defaultBackendMetadata(moduleId: string): ModuleBackendMetadata {
+  return decodeBackendMetadata(moduleId.includes('dimon') ? {mode: 'frontend-only', deployment: {ownership: 'modula-hosted'}, data: {primaryStore: 'device'}} : {mode: 'greenfield-managed'}, moduleId)
+}
+
+function backendMode(value: unknown): ModuleBackendMetadata['mode'] {
+  return value === 'module-managed' || value === 'hybrid' || value === 'frontend-only' ? value : 'greenfield-managed'
+}
+
+function providerFor(mode: ModuleBackendMetadata['mode'], ownership: string): string {
+  if (mode === 'greenfield-managed') return 'Greenfield'
+  if (mode === 'frontend-only') return 'Device'
+  if (ownership === 'customer-hosted') return 'Customer-hosted'
+  if (ownership === 'modula-hosted') return 'Modula-hosted'
+  return 'Publisher-hosted'
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }
 
 function decodeInstalledModule(value: unknown): InstalledModule {

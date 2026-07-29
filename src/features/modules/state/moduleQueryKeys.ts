@@ -11,5 +11,6 @@ export const moduleQueryKeys = {
   settings: (moduleId: string) => ['modules', 'settings', moduleId] as const,
   settingsSchema: (moduleId: string) => ['modules', 'settings-schema', moduleId] as const,
   health: (moduleId: string) => ['modules', 'health', moduleId] as const,
+  backend: (moduleId: string) => ['modules', 'backend', moduleId] as const,
   contributions: (input: {surface?: string; moduleId?: string}) => ['modules', 'contributions', input] as const,
 }

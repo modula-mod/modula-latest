@@ -112,6 +112,27 @@
         "uninstallHook": {"type": "string", "maxLength": 160}
       }
     },
+    "backend": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["greenfield-managed", "module-managed", "hybrid", "frontend-only"]},
+        "protocolVersion": {"type": "string", "maxLength": 40},
+        "endpoints": {"type": "object"},
+        "authentication": {"type": "object"},
+        "health": {"type": "object"},
+        "events": {"type": "object"},
+        "webhooks": {"type": "object"},
+        "data": {"type": "object"},
+        "deployment": {"type": "object"},
+        "trust": {"type": "object"},
+        "network": {"type": "object"},
+        "lifecycle": {"type": "object"},
+        "actions": {"type": "array", "maxItems": 120},
+        "clientAccess": {"type": "object"}
+      }
+    },
     "integrity": {
       "type": "object",
       "additionalProperties": false,

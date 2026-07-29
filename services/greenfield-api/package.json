@@ -25,6 +25,7 @@
     "@modula/dimon-contracts": "workspace:*",
     "@modula/greenfield-connector-contracts": "workspace:*",
     "@modula/greenfield-contracts": "workspace:*",
+    "@modula/module-backend-protocol": "file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol",
     "@modula/greenfield-module-engine-contracts": "workspace:*",
     "@modula/greenfield-module-manifest": "workspace:*",
     "@modula/greenfield-module-registry-contracts": "workspace:*",

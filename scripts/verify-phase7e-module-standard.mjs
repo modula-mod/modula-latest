@@ -49,8 +49,8 @@ run('git', ['status', '--short'], 'external repository status inspected', standa
 run('pnpm', ['verify'], 'external module-standard repo verifier passes', standardRoot)
 
 const standardPackage = JSON.parse(standardFile('packages/module-standard/package.json') || '{}')
-if (standardPackage.version === '1.0.0') pass('@modula/module-standard version is 1.0.0')
-else fail('@modula/module-standard version must be 1.0.0')
+if (standardPackage.version === '1.1.0') pass('@modula/module-standard version is 1.1.0')
+else fail('@modula/module-standard version must be 1.1.0')
 
 for (const packagePath of [
   'packages/module-sdk/package.json',
@@ -58,10 +58,13 @@ for (const packagePath of [
   'packages/create-module/package.json',
   'packages/module-testing/package.json',
   'packages/module-fixtures/package.json',
+  'packages/module-backend-protocol/package.json',
+  'packages/module-backend-testing/package.json',
+  'packages/module-backend-fixtures/package.json',
 ]) {
   const pkg = JSON.parse(standardFile(packagePath) || '{}')
-  if (pkg.version === '1.0.0') pass(`${pkg.name} version is 1.0.0`)
-  else fail(`${packagePath} must be version 1.0.0`)
+  if (pkg.version === '1.1.0') pass(`${pkg.name} version is 1.1.0`)
+  else fail(`${packagePath} must be version 1.1.0`)
 }
 
 for (const doc of [
@@ -76,14 +79,17 @@ for (const doc of [
   'docs/module-diagnostics.md',
   'docs/module-validator.md',
   'docs/module-sdk.md',
+  'docs/module-backends.md',
 ]) {
   standardFile(doc)
 }
 
 standardFile('schemas/module-manifest-1.0.schema.json')
+standardFile('schemas/module-manifest-1.1.schema.json')
 standardFile('specifications/module-standard-1.0.md')
 standardFile('templates/basic-module/manifest.json')
 standardFile('examples/vault-notes/manifest.json')
+standardFile('examples/reference-module-backend/server.mjs')
 
 const appPackage = file('package.json')
 for (const packageName of ['@modula/module-standard', '@modula/module-validator', '@modula/module-sdk', '@modula/create-module', '@modula/module-testing', '@modula/module-fixtures']) {
@@ -93,13 +99,15 @@ for (const packageName of ['@modula/module-standard', '@modula/module-validator'
 
 const template = JSON.parse(file('templates/modula-module/modula.module.json') || '{}')
 for (const field of ['standardVersion', 'moduleVersion', 'manifestSchemaVersion', 'dataSchemaVersion']) {
-  if (template[field] === '1.0.0') pass(`template exposes ${field}`)
-  else fail(`template missing ${field}=1.0.0`)
+  if (template[field] === '1.0.0') pass(`template remains Standard 1.0 compatible for ${field}`)
+  else fail(`template must remain Standard 1.0 compatible for ${field}`)
 }
 
-const {MODULA_MODULE_STANDARD_VERSION} = await import('@modula/module-standard')
-if (MODULA_MODULE_STANDARD_VERSION === '1.0.0') pass('main app can import @modula/module-standard')
+const {MODULA_MODULE_STANDARD_VERSION, MODULA_MODULE_BACKEND_PROTOCOL_VERSION} = await import('@modula/module-standard')
+if (MODULA_MODULE_STANDARD_VERSION === '1.1.0') pass('main app can import @modula/module-standard 1.1.0')
 else fail('main app imported unexpected module standard version')
+if (MODULA_MODULE_BACKEND_PROTOCOL_VERSION === '1.0.0') pass('main app can import module backend protocol version')
+else fail('main app imported unexpected module backend protocol version')
 
 if (failures.length > 0) {
   console.error(`Phase 7E module standard verifier failed: ${failures.length} issue(s)`)

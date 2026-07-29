@@ -2,6 +2,7 @@ import {
   classifyPermissionRisk,
   contributionCounts,
   CONTRIBUTION_GROUPS,
+  backendModeForManifest,
   manifestChecksum,
   type GreenfieldModuleContributions,
   type GreenfieldModuleManifestV1,
@@ -65,6 +66,7 @@ export class GreenfieldModuleReleaseService {
     const sourceVersion = Math.floor(now.getTime() / 1000)
     const computedManifestSha = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
     const releaseSha = manifest.integrity.releaseSha256 ?? computedManifestSha
+    const backend = manifest.backend ?? {mode: 'greenfield-managed' as const}
 
     await this.db.transaction().execute(async trx => {
       await trx
@@ -209,6 +211,27 @@ export class GreenfieldModuleReleaseService {
           source_commit: manifest.source.commit,
           verified_at: null,
           mismatch_at: null,
+        })
+        .execute()
+      await trx
+        .insertInto('module_backend_definitions')
+        .values({
+          definition_id: `module-backend-definition:${releaseId}`,
+          release_id: releaseId,
+          module_id: manifest.moduleId,
+          mode: backendModeForManifest(manifest),
+          protocol_version: backend.protocolVersion ?? null,
+          endpoint_strategy: backend.endpoints?.baseUrlStrategy ?? null,
+          discovery_path: backend.endpoints?.discoveryPath ?? null,
+          health_path: backend.endpoints?.healthPath ?? null,
+          backend: jsonb(backend),
+          trust: jsonb(backend.trust ?? {}),
+          data: jsonb(backend.data ?? {}),
+          deployment: jsonb(backend.deployment ?? {}),
+          network_policy: jsonb(backend.network ?? {}),
+          actions: jsonb(backend.actions ?? []),
+          created_at: now,
+          updated_at: now,
         })
         .execute()
       if (manifest.integrity.signatureKeyId && manifest.integrity.signature) {

@@ -9,7 +9,7 @@ import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
 import {InstallPreviewSheet, ModuleStatusPill} from '@/features/modules/components'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
-import type {ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
+import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useAppServices} from '@/runtime/useAppServices'
@@ -169,6 +169,20 @@ export function ModuleDetailScreen() {
             <InfoRow label="Publisher ID" value={module.publisherId} />
             <InfoRow label="Trust" value={module.trustLevel} />
           </Section>
+          <Section title="Backend">
+            <InfoRow label="Mode" value={backendModeLabel(module.backend.mode)} />
+            <InfoRow label="Provider" value={module.backend.provider} />
+            <InfoRow label="Deployment" value={ownershipLabel(module.backend.deploymentOwnership)} />
+            <InfoRow label="Endpoint" value={module.backend.endpoint ?? 'Resolved during installation'} />
+            <InfoRow label="Protocol" value={module.backend.protocolVersion ?? 'Not required'} />
+            <InfoRow label="Status" value={statusLabel(module.backend.status)} />
+            <InfoRow label="Self-hosting" value={module.backend.selfHostingSupported ? 'Supported' : 'Not supported'} />
+            <InfoRow label="External data processing" value={module.backend.externalDataProcessing ? 'Yes' : 'No'} />
+          </Section>
+          <Section title="Data location">
+            <InfoRow label="Primary store" value={dataLocationLabel(module.backend.dataLocation)} />
+            <InfoRow label="Regions" value={module.backend.regions.length ? module.backend.regions.join(', ') : 'Not declared'} />
+          </Section>
           <Section title="Trust and provenance">
             <InfoRow label="Module ID" value={module.moduleId} />
             <InfoRow label="Source repository" value={module.sourceRepository || 'Not declared'} />
@@ -180,6 +194,11 @@ export function ModuleDetailScreen() {
             <AppText variant="caption" colour="textSecondary">{summariseObject(module.contributions)}</AppText>
           </Section>
           <Section title="Permissions">
+            <PermissionGroup title="Platform permissions" permissions={platformPermissions(module)} />
+            <PermissionGroup title="Module backend permissions" permissions={backendPermissions(module)} />
+            <PermissionGroup title="External service permissions" permissions={externalPermissions(module)} />
+          </Section>
+          <Section title="All declared permissions">
             {module.permissions.length ? (
               module.permissions.map(permission => (
                 <View key={permission.permission} style={{gap: spacing[1]}}>
@@ -301,6 +320,56 @@ function InfoRow({label, value}: {label: string; value: string}) {
       <AppText variant="caption" colour="textSecondary" selectable>{value}</AppText>
     </View>
   )
+}
+
+function PermissionGroup({title, permissions}: {title: string; permissions: string[]}) {
+  return (
+    <View style={{gap: 4}}>
+      <AppText variant="label">{title}</AppText>
+      <AppText variant="caption" colour="textSecondary">{permissions.length ? permissions.join(', ') : 'None declared'}</AppText>
+    </View>
+  )
+}
+
+function platformPermissions(module: ModuleDetail): string[] {
+  const backend = new Set(module.backend.backendPermissions)
+  return module.permissions
+    .map(permission => permission.permission)
+    .filter(permission => !backend.has(permission) && !isExternalPermission(permission))
+}
+
+function backendPermissions(module: ModuleDetail): string[] {
+  return module.backend.backendPermissions
+}
+
+function externalPermissions(module: ModuleDetail): string[] {
+  return module.permissions.map(permission => permission.permission).filter(isExternalPermission)
+}
+
+function isExternalPermission(permission: string): boolean {
+  return permission.startsWith('network:') || permission.startsWith('connector:') || permission.startsWith('dimon:')
+}
+
+function backendModeLabel(mode: string): string {
+  if (mode === 'greenfield-managed') return 'Greenfield-managed'
+  if (mode === 'module-managed') return 'Module-managed'
+  if (mode === 'frontend-only') return 'Frontend-only'
+  return 'Hybrid'
+}
+
+function ownershipLabel(value: string): string {
+  return value.replace(/-/g, ' ').replace(/^./, char => char.toUpperCase())
+}
+
+function dataLocationLabel(value: string): string {
+  if (value === 'greenfield') return 'Greenfield'
+  if (value === 'module-backend') return 'Module provider'
+  if (value === 'device') return 'Device'
+  return 'Mixed'
+}
+
+function statusLabel(value: string): string {
+  return value.replace(/-/g, ' ').replace(/^./, char => char.toUpperCase())
 }
 
 function summariseObject(value: Record<string, unknown>): string {

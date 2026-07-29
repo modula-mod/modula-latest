@@ -407,6 +407,9 @@ importers:
       '@modula/greenfield-schema-registry':
         specifier: workspace:*
         version: link:../../packages/greenfield-schema-registry
+      '@modula/module-backend-protocol':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol
+        version: file:../modula-mod/modula-module-standard/packages/module-backend-protocol
       '@modula/protocol-contracts':
         specifier: workspace:*
         version: link:../../packages/protocol-contracts
@@ -1557,6 +1560,9 @@ packages:
   '@modula/create-module@file:../modula-mod/modula-module-standard/packages/create-module':
     resolution: {directory: ../modula-mod/modula-module-standard/packages/create-module, type: directory}
     hasBin: true
+
+  '@modula/module-backend-protocol@file:../modula-mod/modula-module-standard/packages/module-backend-protocol':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-backend-protocol, type: directory}
 
   '@modula/module-fixtures@file:../modula-mod/modula-module-standard/packages/module-fixtures':
     resolution: {directory: ../modula-mod/modula-module-standard/packages/module-fixtures, type: directory}
@@ -7068,6 +7074,8 @@ snapshots:
       '@modula/module-sdk': file:../modula-mod/modula-module-standard/packages/module-sdk
       '@modula/module-testing': file:../modula-mod/modula-module-standard/packages/module-testing
       '@modula/module-validator': file:../modula-mod/modula-module-standard/packages/module-validator
+
+  '@modula/module-backend-protocol@file:../modula-mod/modula-module-standard/packages/module-backend-protocol': {}
 
   '@modula/module-fixtures@file:../modula-mod/modula-module-standard/packages/module-fixtures':
     dependencies:

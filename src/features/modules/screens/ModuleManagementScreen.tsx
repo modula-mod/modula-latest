@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
+import {useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -22,12 +22,14 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const services = useAppServices()
   const detail = useModuleDetailQuery(id)
   const health = useModuleHealthQuery(id)
+  const backendDiagnostics = useModuleBackendDiagnosticsQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
   const {colours, radius, spacing} = useThemeTokens()
   const [automaticUpdates, setAutomaticUpdates] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [uninstallPreview, setUninstallPreview] = useState<string | null>(null)
   const module = detail.data
+  const backend = backendDiagnostics.data ?? module?.backend ?? null
 
   const transition = async (kind: 'enable' | 'disable' | 'update' | 'uninstall' | 'preview-uninstall') => {
     if (!module) return
@@ -61,6 +63,28 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
         setUninstallPreview(`${preview.recordCount} records · ${preview.registeredContributions.length} contributions · default: keep data`)
       }
       await detail.refetch()
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const backendAction = async (kind: 'reverify' | 'health' | 'disable') => {
+    if (!module) return
+    if (kind === 'disable') {
+      const confirmed = await confirmModulaAction({
+        title: 'Disable backend connection',
+        message: 'Module metadata and installation state remain intact. Backend actions, events and webhooks are blocked until the connection is reverified.',
+        confirmLabel: 'Disable backend',
+        cancelLabel: 'Cancel',
+      })
+      if (!confirmed) return
+    }
+    setBusy(`backend-${kind}`)
+    try {
+      if (kind === 'reverify') await services.moduleRepository.reverifyBackend(module.moduleId)
+      if (kind === 'health') await services.moduleRepository.checkBackendHealth(module.moduleId)
+      if (kind === 'disable') await services.moduleRepository.disableBackend(module.moduleId)
+      await Promise.all([backendDiagnostics.refetch(), health.refetch()])
     } finally {
       setBusy(null)
     }
@@ -115,6 +139,35 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 </View>
               ) : (
                 <AppText variant="caption" colour="textSecondary">Diagnostics are unavailable for this module.</AppText>
+              )}
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Backend">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {backend ? (
+                <>
+                  <View style={[styles.wrap, {gap: spacing[2]}]}>
+                    <ModuleStatusPill state={backend.mode} />
+                    <ModuleStatusPill state={backend.status} />
+                    <ModuleStatusPill state={backend.dataLocation} />
+                  </View>
+                  <InfoLine label="Provider" value={backend.provider} />
+                  <InfoLine label="Deployment" value={formatLabel(backend.deploymentOwnership)} />
+                  <InfoLine label="Endpoint" value={backend.endpoint ?? 'Resolved during installation'} />
+                  <InfoLine label="Protocol" value={backend.protocolVersion ?? 'Not required'} />
+                  <InfoLine label="Data location" value={formatLabel(backend.dataLocation)} />
+                  <InfoLine label="Regions" value={backend.regions.length ? backend.regions.join(', ') : 'Not declared'} />
+                  <InfoLine label="Self-hosting" value={backend.selfHostingSupported ? 'Supported' : 'Not supported'} />
+                  <InfoLine label="External data processing" value={backend.externalDataProcessing ? 'Yes' : 'No'} />
+                  <View style={[styles.actions, {gap: spacing[2]}]}>
+                    <ModulaButton label="Reverify" role="secondary" accessibilityLabel="Reverify module backend" loading={busy === 'backend-reverify'} onPress={() => void backendAction('reverify')} />
+                    <ModulaButton label="Health check" role="secondary" accessibilityLabel="Check module backend health" loading={busy === 'backend-health'} onPress={() => void backendAction('health')} />
+                    <ModulaButton label="Disable backend" role="secondary" accessibilityLabel="Disable module backend" loading={busy === 'backend-disable'} onPress={() => void backendAction('disable')} />
+                  </View>
+                </>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">Backend diagnostics are unavailable for this module.</AppText>
               )}
             </View>
           </SettingsSection>
@@ -242,4 +295,17 @@ function formatDiagnosticCounts(value: unknown, suffix: string) {
     .slice(0, 4)
     .map(([collection, count]) => `${collection}: ${String(count)}`)
   return entries.length ? entries.join(' · ') : `0 ${suffix}`
+}
+
+function formatLabel(value: string) {
+  return value.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
+}
+
+function InfoLine({label, value}: {label: string; value: string}) {
+  return (
+    <View style={{gap: 2}}>
+      <AppText variant="caption" colour="textSecondary">{label}</AppText>
+      <AppText variant="bodyStrong">{value}</AppText>
+    </View>
+  )
 }

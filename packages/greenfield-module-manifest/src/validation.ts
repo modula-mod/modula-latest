@@ -5,6 +5,7 @@ import {
   type GreenfieldModuleCompatibility,
 } from './compatibility.js'
 import {CONTRIBUTION_GROUPS, flattenContributionIds, type GreenfieldModuleContributions} from './contributions.js'
+import {validateGreenfieldModuleBackend} from './backend.js'
 import {canPublisherUseNamespace, isGreenfieldModuleId} from './identity.js'
 import {isSha256} from './integrity.js'
 import {GREENFIELD_MODULE_MANIFEST_VERSION, type GreenfieldModuleManifestV1} from './manifest.js'
@@ -38,6 +39,7 @@ const ROOT_KEYS = new Set([
   'dependencies',
   'contributions',
   'lifecycle',
+  'backend',
   'integrity',
   'extensions',
 ])
@@ -92,6 +94,9 @@ export function validateGreenfieldModuleManifest(
   validateDependencies(manifest.dependencies, manifest.moduleId, add)
   validateContributions(manifest.contributions, manifest.moduleId, add)
   validateLifecycle(manifest.lifecycle, add)
+  for (const issue of validateGreenfieldModuleBackend(manifest.backend, {moduleId: manifest.moduleId, publisherId: manifest.publisher?.publisherId})) {
+    add(issue.path, issue.code, issue.message)
+  }
   validateIntegrity(manifest.integrity, add)
 
   return {valid: issues.length === 0, manifest: issues.length === 0 ? (manifest as GreenfieldModuleManifestV1) : undefined, issues}

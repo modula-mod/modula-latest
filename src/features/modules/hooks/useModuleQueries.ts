@@ -78,6 +78,15 @@ export function useModuleHealthQuery(moduleId: string) {
   })
 }
 
+export function useModuleBackendDiagnosticsQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.backend(moduleId),
+    queryFn: () => moduleRepository.getBackendDiagnostics(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
 export function useModuleContributionQuery(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}) {
   const {moduleRepository} = useAppServices()
   return useQuery({
@@ -93,6 +102,7 @@ export function useModuleLifecycleMutations(moduleId: string) {
     await Promise.all([
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.installed}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.detail(moduleId)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.backend(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.catalogueRoot}),
     ])
   }

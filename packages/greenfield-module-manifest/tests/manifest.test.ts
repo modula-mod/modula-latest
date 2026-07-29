@@ -100,4 +100,85 @@ describe('Greenfield Module Manifest v1 validation', () => {
     )
     expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(['SELF_DEPENDENCY', 'INVALID_SEMVER_RANGE']))
   })
+
+  it('accepts a module-managed backend declaration', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        moduleId: 'com.example.crm',
+        publisher: {publisherId: 'example', displayName: 'Example'},
+        license: {status: 'verified', evidenceIds: ['license-review']},
+        trust: {requestedLevel: 'verifiedPublisher'},
+        permissions: [{permission: 'network:api.example.com:request', reason: 'Call the verified CRM backend'}],
+        contributions: {},
+        backend: {
+          mode: 'module-managed',
+          protocolVersion: '1.0.0',
+          endpoints: {
+            baseUrlStrategy: 'registry',
+            apiVersion: '1.0.0',
+            discoveryPath: '/.well-known/modula-module',
+            healthPath: '/v1/health',
+            actionsPath: '/v1/actions',
+            allowedHosts: ['api.example.com'],
+          },
+          authentication: {
+            strategy: 'greenfield-signed-jwt',
+            tokenExchangeRequired: true,
+            sessionExchangePath: '/v1/session/exchange',
+            tokenTtlSeconds: 900,
+          },
+          deployment: {
+            ownership: 'publisher-hosted',
+            multiTenant: true,
+            regions: ['eu-west'],
+            dataResidency: ['GB', 'EU'],
+            selfHostingSupported: true,
+          },
+          data: {
+            primaryStore: 'module-backend',
+            categories: [{id: 'contacts', description: 'CRM contacts', location: 'module-backend', classification: 'private', exportable: true, deletable: true}],
+            exportSupported: true,
+            deletionSupported: true,
+            backupResponsibility: 'publisher',
+          },
+          trust: {
+            publisherId: 'example',
+            allowedOrigins: ['https://api.example.com'],
+          },
+          actions: [{
+            actionId: 'com.example.crm.action.contact.read',
+            method: 'POST',
+            path: '/v1/actions/com.example.crm.action.contact.read',
+            inputSchema: 'schemas/contact-read.input.json',
+            outputSchema: 'schemas/contact-read.output.json',
+            permissions: ['crm:contacts:read'],
+            idempotent: true,
+            sideEffects: 'none',
+            confirmation: 'none',
+            timeoutMs: 5000,
+          }],
+        },
+      }),
+    )
+    expect(result.valid).toBe(true)
+  })
+
+  it('rejects unsafe module backend declarations', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        backend: {
+          mode: 'module-managed',
+          protocolVersion: '1.0.0',
+          endpoints: {baseUrlStrategy: 'registry', apiVersion: '1.0.0', healthPath: '/v1/health', allowedHosts: ['localhost']},
+          authentication: {tokenExchangeRequired: false},
+          deployment: {ownership: 'publisher-hosted', multiTenant: true, selfHostingSupported: false},
+          data: {primaryStore: 'module-backend', categories: [], exportSupported: true, deletionSupported: true, backupResponsibility: 'publisher'},
+          trust: {publisherId: 'modula', allowedOrigins: ['https://127.0.0.1']},
+        },
+      }),
+    )
+    expect(result.issues.map(issue => issue.code)).toEqual(
+      expect.arrayContaining(['TOKEN_EXCHANGE_REQUIRED', 'UNSAFE_BACKEND_HOST', 'UNSAFE_BACKEND_ORIGIN']),
+    )
+  })
 })
