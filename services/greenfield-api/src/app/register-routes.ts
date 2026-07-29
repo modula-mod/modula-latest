@@ -777,7 +777,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       if ((body as any)?.authorActorId && (body as any).authorActorId !== auth.actorId) {
         return sendError(reply, 'FORBIDDEN', 'Cross-actor create denied', request.id)
       }
-      const created = await postWrites.create(auth.actorId, body)
+      const created = await postWrites.create(auth.actorId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to create post')

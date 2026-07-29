@@ -2,10 +2,16 @@ import {randomUUID} from 'node:crypto'
 import type {CreatePostInput, SocialPostDto, UpdatePostInput} from '@modula/api-contracts'
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
+import {GreenfieldEventBus} from '../../events/index.js'
 import {AuditRepository} from '../audit/repository.js'
 import {PostMediaStorage} from '../media/post-media-storage.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {PostRepository} from './repository.js'
+
+export type PostWriteContext = {
+  requestId?: string | null
+  correlationId?: string | null
+}
 
 export class PostWriteService {
   private readonly posts: PostRepository
@@ -20,7 +26,7 @@ export class PostWriteService {
     this.mediaStorage = new PostMediaStorage(config)
   }
 
-  async create(actorId: string, input: CreatePostInput): Promise<SocialPostDto> {
+  async create(actorId: string, input: CreatePostInput, context: PostWriteContext = {}): Promise<SocialPostDto> {
     const text = (input.text ?? '').trim()
     const mediaInput = input.media ?? []
     if ((!text && mediaInput.length === 0) || text.length > 5000) {
@@ -50,6 +56,7 @@ export class PostWriteService {
 
     const id = randomUUID()
     const now = new Date()
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     const persistedMedia = await this.mediaStorage.persistPostMedia({postId: id, media: mediaInput})
     const kind = persistedMedia.length > 0 ? 'media' : 'text'
     try {
@@ -132,6 +139,29 @@ export class PostWriteService {
           type: 'post',
           id,
           actorId,
+        })
+        await new GreenfieldEventBus(trx).publish({
+          eventType: 'post.created',
+          aggregateType: 'post',
+          aggregateId: id,
+          accountId: actor?.account_id ?? null,
+          actorId,
+          requestId: context.requestId ?? null,
+          correlationId: context.correlationId ?? context.requestId ?? null,
+          idempotencyKey: idempotencyKey ? `post.create:${actorId}:${idempotencyKey}` : null,
+          payload: {
+            postId: id,
+            actorId,
+            audience,
+            feed,
+            kind,
+            mediaCount: persistedMedia.length,
+          },
+          metadata: {
+            source: 'greenfield.posts',
+            activeSideEffects: ['search.index.post', input.publishToAtproto ? 'atproto.publish.create' : null].filter(Boolean),
+          },
+          occurredAt: now,
         })
       })
     } catch (error) {

@@ -12,6 +12,17 @@ export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type GreenfieldEventDeliveryTargetType =
+  | 'notification'
+  | 'search-index'
+  | 'ai-index'
+  | 'analytics'
+  | 'automation'
+  | 'dimon-anchor'
+  | 'connector-sync'
+  | 'background-job'
+  | 'internal-subscriber'
+export type GreenfieldEventDeliveryStatus = 'pending' | 'leased' | 'delivered' | 'failed' | 'dead_letter' | 'cancelled'
 export type GreenfieldModuleReleaseState =
   | 'draft'
   | 'pendingReview'
@@ -256,6 +267,53 @@ export interface Database {
     published_at: Date | null
     attempt_count: number
     last_error: string | null
+  }
+  greenfield_domain_events: {
+    event_id: string
+    event_type: string
+    event_version: string
+    aggregate_type: string
+    aggregate_id: string
+    account_id: string | null
+    actor_id: string | null
+    request_id: string | null
+    correlation_id: string | null
+    causation_id: string | null
+    idempotency_key: string | null
+    payload: unknown
+    metadata: unknown
+    occurred_at: Date
+    recorded_at: Date
+  }
+  greenfield_event_subscriptions: {
+    subscription_id: string
+    event_type: string
+    subscriber_id: string
+    target_type: GreenfieldEventDeliveryTargetType
+    target_key: string
+    filters: unknown
+    enabled: boolean
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_event_deliveries: {
+    delivery_id: string
+    event_id: string
+    subscriber_id: string
+    target_type: GreenfieldEventDeliveryTargetType
+    target_key: string
+    status: GreenfieldEventDeliveryStatus
+    payload: unknown
+    available_at: Date
+    lease_owner: string | null
+    lease_expires_at: Date | null
+    attempt_count: number
+    maximum_attempts: number
+    failure_code: string | null
+    failure_message: string | null
+    delivered_at: Date | null
+    created_at: Date
+    updated_at: Date
   }
   activity_items: {
     id: string
