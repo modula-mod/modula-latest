@@ -21,15 +21,21 @@ export function failureEnvelope(
   code: ApiErrorCode,
   message: string,
   requestId: string,
-  options?: {retryable?: boolean; fieldErrors?: Record<string, string>},
+  options?: {
+    retryable?: boolean
+    fieldErrors?: Record<string, string>
+    details?: Record<string, unknown>
+  },
 ): ApiEnvelope<never> {
   return {
     ok: false,
     error: {
       code,
       message,
+      requestId,
       retryable: options?.retryable ?? false,
       fieldErrors: options?.fieldErrors,
+      details: options?.details,
     },
     meta: {
       requestId,

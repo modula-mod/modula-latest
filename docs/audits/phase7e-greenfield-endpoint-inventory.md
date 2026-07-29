@@ -10,7 +10,7 @@ Inventory count: 163 registered routes, including six loop-registered post engag
 ## Current Cross-Cutting State
 
 - Response model: most routes use `successEnvelope` and `failureEnvelope`; OAuth client metadata and media streaming are explicit exceptions.
-- Error model gap: `failureEnvelope` exists, but the current error payload is not yet the Phase 7E `GreenfieldErrorResponse.error` shape with `retryable` and structured `details`.
+- Error model: `failureEnvelope` now emits `code`, `message`, `requestId`, `retryable`, optional `details`, and backward-compatible `fieldErrors`. Remaining gap: domain errors do not yet map standardized `retryable` and `details` metadata uniformly.
 - Request correlation: Fastify `request.id` is included in envelopes; propagation into database work, workers, AI, connector calls and DIMON submissions is not yet uniform.
 - Rate limits: four current buckets exist (`healthConfig`, `feedConfig`, `profileConfig`, `writeConfig`) plus `authWriteConfig`; Phase 7E named classes are not yet implemented.
 - Idempotency: implemented only on selected module and connector operations. Posts, comments, automation, AI and DIMON operations still need explicit support.

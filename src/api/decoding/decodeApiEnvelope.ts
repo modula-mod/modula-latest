@@ -66,14 +66,24 @@ export function decodeApiEnvelope<T>(
           ),
         )
       : undefined
+  const details =
+    error.details && typeof error.details === 'object' && !Array.isArray(error.details)
+      ? error.details as Record<string, unknown>
+      : undefined
+  const errorRequestId =
+    typeof error.requestId === 'string' && error.requestId.trim()
+      ? error.requestId
+      : meta.requestId
 
   return {
     ok: false,
     error: {
       code: decodeErrorCode(error.code),
       message: asString(error.message, 'error message'),
+      requestId: errorRequestId,
       fieldErrors,
       retryable: asBoolean(error.retryable, 'error retryable'),
+      details,
     },
     meta,
   }

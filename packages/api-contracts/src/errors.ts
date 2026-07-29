@@ -19,6 +19,8 @@ export type ApiErrorCode =
 export type ApiErrorBody = {
   code: ApiErrorCode
   message: string
+  requestId: string
   fieldErrors?: Record<string, string>
   retryable: boolean
+  details?: Record<string, unknown>
 }

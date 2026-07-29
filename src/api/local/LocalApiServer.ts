@@ -117,8 +117,10 @@ export class LocalApiServer {
         error: {
           code: apiError.code,
           message: apiError.message,
+          requestId,
           fieldErrors: apiError.fieldErrors,
           retryable: apiError.retryable,
+          details: apiError.details,
         },
         meta: {requestId, serverTime},
       }
