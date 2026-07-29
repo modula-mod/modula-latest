@@ -25,6 +25,11 @@ export type GreenfieldEventDeliveryStatus =
   | 'retrying'
   | 'dead_lettered'
   | 'cancelled'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
+export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
+export type GreenfieldSearchReindexMode = 'single-entity' | 'entity-type' | 'account-scope' | 'full-index'
+export type GreenfieldSearchReindexState = 'queued' | 'running' | 'completed' | 'cancelled' | 'failed'
 export type AtprotoConnectionStatus = 'pending' | 'connected' | 'refreshRequired' | 'revoked' | 'disconnected' | 'error'
 export type AtprotoPublicationStatus =
   | 'pending'
@@ -282,29 +287,164 @@ export interface Database {
   posts: {
     id: string
     author_actor_id: string
+    kind: 'text' | 'media' | 'link' | 'module'
     text: string | null
+    feed: 'following' | 'forYou' | 'modules'
+    audience: 'public' | 'followers' | 'private'
+    reply_permission: 'everyone' | 'followers' | 'mentioned' | 'none'
+    idempotency_key: string | null
+    link_domain: string | null
+    link_title: string | null
+    link_description: string | null
+    link_image: string | null
+    module_name: string | null
+    module_action_label: string | null
+    module_status: string | null
+    glow_colour: string | null
+    like_count: number
+    reaction_count: number
+    quote_count: number
+    reply_count: number
+    repost_count: number
     search_vector: unknown
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
+    version: number
+  }
+  post_media: {
+    id: string
+    post_id: string
+    kind: 'image'
+    url: string | null
+    title: string | null
+    colour: string | null
+    aspect_ratio: string | null
+    alt_text: string | null
+    sort_order: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
   }
   profiles: {
     id: string
     actor_id: string
     handle: string
     display_name: string
+    kind: string
     bio: string
+    avatar_url: string | null
+    cover_url: string | null
+    cover_colour: string | null
+    pronouns: string | null
+    location_label: string | null
+    location_visibility: string | null
+    website_label: string | null
+    website_url: string | null
+    website_domain: string | null
+    website_visibility: string | null
+    focus_status_id: string
+    focus_status_label: string
+    focus_status_message: string
+    focus_status_updated_at: Date
+    visibility: 'public' | 'followers' | 'teams' | 'private'
+    module_count: number
+    featured_module_ids: string[]
+    identity_claims: unknown
+    joined_at: Date
     search_vector: unknown
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
+    version: number
+  }
+  profile_links: {
+    id: string
+    profile_id: string
+    label: string
+    url: string
+    domain: string
+    visibility: 'public' | 'followers' | 'teams' | 'private'
+    sort_order: number
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
   }
   actors: {
     id: string
+    account_id: string | null
     kind: string
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
+  }
+  search_documents: {
+    document_id: string
+    schema_version: '1.0.0'
+    entity_type: GreenfieldSearchEntityType
+    entity_id: string
+    source_version: number
+    account_id: string | null
+    owner_id: string | null
+    title: string | null
+    body: string | null
+    summary: string | null
+    keywords: string[]
+    tags: string[]
+    visibility: GreenfieldSearchVisibility
+    status: GreenfieldSearchDocumentStatus
+    language: string | null
+    metadata: unknown
+    created_at: Date
+    updated_at: Date
+    indexed_at: Date
+    search_vector: unknown
+  }
+  search_projection_state: {
+    projector_id: string
+    entity_type: GreenfieldSearchEntityType
+    last_event_id: string | null
+    last_processed_at: Date | null
+    last_success_at: Date | null
+    last_failure_at: Date | null
+    last_failure_code: string | null
+    processed_count: number
+    failed_count: number
+    lag_seconds: number
+  }
+  search_projection_failures: {
+    failure_id: string
+    projector_id: string
+    event_id: string
+    entity_type: GreenfieldSearchEntityType
+    entity_id: string
+    failure_code: string
+    attempt_count: number
+    first_failed_at: Date
+    last_failed_at: Date
+    resolved_at: Date | null
+    sanitised_details: unknown
+  }
+  search_reindex_requests: {
+    reindex_id: string
+    mode: GreenfieldSearchReindexMode
+    entity_type: GreenfieldSearchEntityType | null
+    entity_id: string | null
+    account_id: string | null
+    dry_run: boolean
+    reason: string
+    requested_by_actor_id: string | null
+    request_id: string
+    correlation_id: string
+    state: GreenfieldSearchReindexState
+    processed_count: number
+    failure_code: string | null
+    cancellation_requested_at: Date | null
+    created_at: Date
+    updated_at: Date
+    completed_at: Date | null
   }
   audit_events: {
     id: string
@@ -333,6 +473,13 @@ export interface Database {
     created_at: Date
     updated_at: Date
   }
+  greenfield_accounts: {
+    account_id: string
+    primary_handle: string
+    status: 'pendingVerification' | 'active' | 'suspended' | 'deactivated' | 'deleted'
+    created_at: Date
+    updated_at: Date
+  }
   greenfield_extension_versions: {
     extension_version_id: string
     extension_id: string
@@ -340,6 +487,48 @@ export interface Database {
     manifest: unknown
     status: string
     created_at: Date
+  }
+  greenfield_extension_catalogue: {
+    extension_id: string
+    slug: string
+    kind: string
+    name: string
+    description: string
+    version: string
+    publisher: string
+    trust: string
+    permissions: unknown
+    compatibility: unknown
+    manifest: unknown
+    catalogue_status: string
+    executable: boolean
+    distribution_model: string
+    entitlement_id: string | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_publishers: {
+    publisher_id: string
+    display_name: string
+    website: string | null
+    status: string
+    trust_level: string
+    created_at: Date
+    updated_at: Date
+    verified_at: Date | null
+    suspended_at: Date | null
+    revoked_at: Date | null
+  }
+  greenfield_module_versions: {
+    module_version_id: string
+    extension_version_id: string
+    module_id: string
+    version: string
+    publisher_id: string
+    manifest: unknown
+    status: string
+    created_at: Date
+    updated_at: Date
   }
   greenfield_extension_lifecycle_events: {
     event_id: string

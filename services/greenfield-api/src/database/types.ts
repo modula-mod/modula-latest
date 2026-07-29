@@ -46,6 +46,11 @@ export type GreenfieldEventDeliveryStatus =
   | 'retrying'
   | 'dead_lettered'
   | 'cancelled'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
+export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
+export type GreenfieldSearchReindexMode = 'single-entity' | 'entity-type' | 'account-scope' | 'full-index'
+export type GreenfieldSearchReindexState = 'queued' | 'running' | 'completed' | 'cancelled' | 'failed'
 export type GreenfieldModuleReleaseState =
   | 'draft'
   | 'pendingReview'
@@ -413,6 +418,99 @@ export interface Database {
     planned_count: number
     replayed_count: number
     failure_code: string | null
+    created_at: Date
+    updated_at: Date
+    completed_at: Date | null
+  }
+  search_documents: {
+    document_id: string
+    schema_version: '1.0.0'
+    entity_type: GreenfieldSearchEntityType
+    entity_id: string
+    source_version: number
+    account_id: string | null
+    owner_id: string | null
+    title: string | null
+    body: string | null
+    summary: string | null
+    keywords: string[]
+    tags: string[]
+    visibility: GreenfieldSearchVisibility
+    status: GreenfieldSearchDocumentStatus
+    language: string | null
+    metadata: unknown
+    created_at: Date
+    updated_at: Date
+    indexed_at: Date
+    search_vector: unknown
+  }
+  search_projection_state: {
+    projector_id: string
+    entity_type: GreenfieldSearchEntityType
+    last_event_id: string | null
+    last_processed_at: Date | null
+    last_success_at: Date | null
+    last_failure_at: Date | null
+    last_failure_code: string | null
+    processed_count: number
+    failed_count: number
+    lag_seconds: number
+  }
+  search_projection_failures: {
+    failure_id: string
+    projector_id: string
+    event_id: string
+    entity_type: GreenfieldSearchEntityType
+    entity_id: string
+    failure_code: string
+    attempt_count: number
+    first_failed_at: Date
+    last_failed_at: Date
+    resolved_at: Date | null
+    sanitised_details: unknown
+  }
+  saved_searches: {
+    saved_search_id: string
+    account_id: string
+    name: string
+    query: string
+    filters: unknown
+    created_at: Date
+    updated_at: Date
+  }
+  recent_searches: {
+    recent_search_id: string
+    account_id: string
+    query: string
+    normalized_query: string
+    filters: unknown
+    searched_at: Date
+    created_at: Date
+  }
+  search_query_metrics: {
+    request_id: string
+    account_id: string | null
+    actor_id: string | null
+    entity_types: string[]
+    took_ms: number
+    result_count: number
+    created_at: Date
+  }
+  search_reindex_requests: {
+    reindex_id: string
+    mode: GreenfieldSearchReindexMode
+    entity_type: GreenfieldSearchEntityType | null
+    entity_id: string | null
+    account_id: string | null
+    dry_run: boolean
+    reason: string
+    requested_by_actor_id: string | null
+    request_id: string
+    correlation_id: string
+    state: GreenfieldSearchReindexState
+    processed_count: number
+    failure_code: string | null
+    cancellation_requested_at: Date | null
     created_at: Date
     updated_at: Date
     completed_at: Date | null

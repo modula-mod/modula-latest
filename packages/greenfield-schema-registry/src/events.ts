@@ -50,6 +50,15 @@ const event = (
   replayPolicy,
 })
 
+const searchOperationalEvent = (
+  eventType: string,
+  aggregateType: string,
+  replayPolicy: EventReplayPolicy = 'not-replayable',
+): GreenfieldEventSchemaDefinition => ({
+  ...event(eventType, 'search', aggregateType, 'internal', replayPolicy, 'search-ops-retention'),
+  permittedSubscribers: ['greenfield.audit', 'greenfield.diagnostics'],
+})
+
 export const greenfieldEventSchemas: readonly GreenfieldEventSchemaDefinition[] = [
   event('account.created', 'identity', 'account', 'private'),
   event('account.updated', 'identity', 'account', 'private'),
@@ -86,6 +95,17 @@ export const greenfieldEventSchemas: readonly GreenfieldEventSchemaDefinition[] 
   event('module.quarantined', 'modules', 'moduleRelease', 'sensitive', 'manual-approval-required'),
   event('module.uninstalled', 'modules', 'moduleInstallation', 'private', 'manual-approval-required'),
   event('module.health-changed', 'modules', 'moduleInstallation', 'internal'),
+  event('module.release.imported', 'modules', 'moduleRelease', 'internal'),
+  event('module.release.published', 'modules', 'moduleRelease', 'internal'),
+  event('module.release.quarantined', 'modules', 'moduleRelease', 'sensitive', 'manual-approval-required'),
+  event('module.release.revoked', 'modules', 'moduleRelease', 'sensitive', 'manual-approval-required'),
+
+  searchOperationalEvent('search.document-indexed', 'searchDocument'),
+  searchOperationalEvent('search.document-deleted', 'searchDocument'),
+  searchOperationalEvent('search.projection-failed', 'searchProjectionFailure'),
+  searchOperationalEvent('search.reindex-requested', 'searchReindex', 'manual-approval-required'),
+  searchOperationalEvent('search.reindex-completed', 'searchReindex'),
+  searchOperationalEvent('search.reindex-failed', 'searchReindex'),
 
   event('note.created', 'notes', 'note', 'private'),
   event('note.updated', 'notes', 'note', 'private'),

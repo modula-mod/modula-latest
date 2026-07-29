@@ -28,6 +28,13 @@ const envSchema = z.object({
     .optional()
     .transform(v => v === 'true'),
   MODULA_REQUEST_BODY_LIMIT_BYTES: z.coerce.number().int().positive().default(4_194_304),
+  MODULA_SEARCH_QUERY_MAX_CHARS: z.coerce.number().int().positive().default(500),
+  MODULA_SEARCH_DEFAULT_LIMIT: z.coerce.number().int().positive().default(20),
+  MODULA_SEARCH_MAX_LIMIT: z.coerce.number().int().positive().default(100),
+  MODULA_SEARCH_MAX_ENTITY_TYPES: z.coerce.number().int().positive().default(10),
+  MODULA_SEARCH_MAX_TAGS: z.coerce.number().int().positive().default(20),
+  MODULA_SEARCH_TIMEOUT_MS: z.coerce.number().int().positive().default(1500),
+  MODULA_SEARCH_RECENT_LIMIT: z.coerce.number().int().positive().default(50),
   MODULA_MEDIA_ROOT: z.string().min(1).optional(),
   MODULA_MEDIA_UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(2_097_152),
   MODULA_ENVIRONMENT: z.enum(['development', 'preview', 'production']).default('development'),
@@ -114,6 +121,13 @@ export type AppConfig = {
   previewWritesEnabled: boolean
   apiDocumentationEnabled: boolean
   requestBodyLimitBytes: number
+  searchQueryMaxChars: number
+  searchDefaultLimit: number
+  searchMaxLimit: number
+  searchMaxEntityTypes: number
+  searchMaxTags: number
+  searchTimeoutMs: number
+  searchRecentLimit: number
   mediaRoot: string
   mediaUploadMaxBytes: number
   environment: 'development' | 'preview' | 'production'
@@ -211,6 +225,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (raw.MODULA_MEDIA_UPLOAD_MAX_BYTES >= raw.MODULA_REQUEST_BODY_LIMIT_BYTES) {
     refuse('media upload limit must be smaller than request body limit')
   }
+  if (raw.MODULA_SEARCH_DEFAULT_LIMIT > raw.MODULA_SEARCH_MAX_LIMIT) {
+    refuse('MODULA_SEARCH_DEFAULT_LIMIT must be less than or equal to MODULA_SEARCH_MAX_LIMIT')
+  }
 
   const environment = raw.MODULA_ENVIRONMENT
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
@@ -291,6 +308,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     previewWritesEnabled: Boolean(raw.MODULA_PREVIEW_WRITES_ENABLED),
     apiDocumentationEnabled: Boolean(raw.MODULA_API_DOCUMENTATION_ENABLED),
     requestBodyLimitBytes: raw.MODULA_REQUEST_BODY_LIMIT_BYTES,
+    searchQueryMaxChars: raw.MODULA_SEARCH_QUERY_MAX_CHARS,
+    searchDefaultLimit: raw.MODULA_SEARCH_DEFAULT_LIMIT,
+    searchMaxLimit: raw.MODULA_SEARCH_MAX_LIMIT,
+    searchMaxEntityTypes: raw.MODULA_SEARCH_MAX_ENTITY_TYPES,
+    searchMaxTags: raw.MODULA_SEARCH_MAX_TAGS,
+    searchTimeoutMs: raw.MODULA_SEARCH_TIMEOUT_MS,
+    searchRecentLimit: raw.MODULA_SEARCH_RECENT_LIMIT,
     mediaRoot: resolve(mediaRoot),
     mediaUploadMaxBytes: raw.MODULA_MEDIA_UPLOAD_MAX_BYTES,
     environment,
