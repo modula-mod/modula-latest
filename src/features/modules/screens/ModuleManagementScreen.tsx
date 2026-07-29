@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useModuleContributionQuery, useModuleDetailQuery} from '@/features/modules/hooks'
+import {useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -21,6 +21,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const router = useRouter()
   const services = useAppServices()
   const detail = useModuleDetailQuery(id)
+  const health = useModuleHealthQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
   const {colours, radius, spacing} = useThemeTokens()
   const [automaticUpdates, setAutomaticUpdates] = useState(true)
@@ -95,6 +96,26 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 )}
                 <ModulaButton label="Open module" accessibilityLabel="Open module" role="secondary" onPress={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)} />
               </View>
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Diagnostics">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              <View style={[styles.wrap, {gap: spacing[2]}]}>
+                <ModuleStatusPill state={health.data?.overall ?? 'unknown'} />
+                <ModuleStatusPill state={String(health.data?.runtime?.installationStatus ?? module.installationState)} />
+                <ModuleStatusPill state={String((health.data?.searchProjection as any)?.status ?? 'search')} />
+              </View>
+              {health.data?.diagnostics ? (
+                <View style={{gap: spacing[1]}}>
+                  <AppText variant="caption" colour="textSecondary">{formatDiagnosticCounts(health.data.diagnostics.recordCounts, 'records')}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Versions {String(health.data.diagnostics.versionCount ?? 0)} · failed actions {String(health.data.diagnostics.failedActions ?? 0)} · export failures {String(health.data.diagnostics.exportFailures ?? 0)}
+                  </AppText>
+                </View>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">Diagnostics are unavailable for this module.</AppText>
+              )}
             </View>
           </SettingsSection>
 
@@ -213,3 +234,12 @@ const styles = StyleSheet.create({
   panel: {},
   wrap: {flexDirection: 'row', flexWrap: 'wrap'},
 })
+
+function formatDiagnosticCounts(value: unknown, suffix: string) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return `0 ${suffix}`
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, count]) => Number(count) > 0)
+    .slice(0, 4)
+    .map(([collection, count]) => `${collection}: ${String(count)}`)
+  return entries.length ? entries.join(' · ') : `0 ${suffix}`
+}

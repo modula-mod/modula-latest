@@ -5,6 +5,7 @@ import type {
   ModuleCatalogueItem,
   ModuleContribution,
   ModuleDetail,
+  ModuleHealth,
   ModuleInstallPreview,
   ModuleRecord,
   ModuleRecordPage,
@@ -181,6 +182,11 @@ export class ApiModuleRepository implements ModuleRepository {
     return this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true, body: {values}}, decodeSettings)
   }
 
+  getHealth(moduleId: string): Promise<ModuleHealth | null> {
+    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/health`, authenticated: true}, decodeHealth)
+      .catch(() => null)
+  }
+
   listContributions(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}): Promise<ModuleContribution[]> {
     return this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
       Array.isArray(value) ? value.map(decodeContribution) : [],
@@ -311,6 +317,23 @@ function decodeSettings(value: unknown): ModuleSettingsDocument {
   }
 }
 
+function decodeHealth(value: unknown): ModuleHealth {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    moduleId: String(row.moduleId ?? row.module_id ?? ''),
+    version: String(row.version ?? ''),
+    overall: String(row.overall ?? 'unknown'),
+    runtime: recordOrUndefined(row.runtime),
+    searchProjection: recordOrUndefined(row.searchProjection),
+    exports: recordOrUndefined(row.exports),
+    diagnostics: recordOrUndefined(row.diagnostics),
+  }
+}
+
+function recordOrUndefined(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined
+}
+
 function decodeSettingsSchema(value: unknown): ModuleSettingsSchema {
   const row = (value ?? {}) as Record<string, unknown>
   const defaults = (row.defaults ?? {}) as Record<string, unknown>
@@ -380,6 +403,7 @@ const FIELD_TYPES = new Set<GreenfieldModuleFieldDefinition['type']>([
   'multiSelect',
   'date',
   'dateTime',
+  'number',
   'tags',
   'url',
   'recordReference',
@@ -389,13 +413,13 @@ function typeForField(value: unknown): GreenfieldModuleFieldDefinition['type'] {
   const type = String(value ?? '')
   if (FIELD_TYPES.has(type as GreenfieldModuleFieldDefinition['type'])) return type as GreenfieldModuleFieldDefinition['type']
   if (type === 'multiline') return 'multilineText'
-  if (type === 'number') return 'text'
   if (type === 'URL') return 'url'
   return 'text'
 }
 
 function typeForValue(value: unknown): GreenfieldModuleFieldDefinition['type'] {
   if (typeof value === 'boolean') return 'boolean'
+  if (typeof value === 'number') return 'number'
   if (Array.isArray(value)) return 'multiSelect'
   return 'text'
 }

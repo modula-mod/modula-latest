@@ -158,6 +158,16 @@ export type ModuleSettingsSchema = {
   defaults: Record<string, unknown>
 }
 
+export type ModuleHealth = {
+  moduleId: string
+  version: string
+  overall: string
+  runtime?: Record<string, unknown>
+  searchProjection?: Record<string, unknown>
+  exports?: Record<string, unknown>
+  diagnostics?: Record<string, unknown>
+}
+
 export interface ModuleRepository {
   listCatalogue(input?: {q?: string; category?: ProductHubCategory; limit?: number}): Promise<ModuleCatalogueItem[]>
   getModule(moduleId: string): Promise<ModuleDetail | null>
@@ -179,5 +189,6 @@ export interface ModuleRepository {
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema>
   getSettings(moduleId: string): Promise<ModuleSettingsDocument>
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument>
+  getHealth(moduleId: string): Promise<ModuleHealth | null>
   listContributions(input?: {surface?: string; moduleId?: string; enabledOnly?: boolean}): Promise<ModuleContribution[]>
 }

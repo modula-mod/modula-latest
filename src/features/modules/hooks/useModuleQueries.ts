@@ -69,6 +69,15 @@ export function useModuleSettingsSchemaQuery(moduleId: string) {
   })
 }
 
+export function useModuleHealthQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.health(moduleId),
+    queryFn: () => moduleRepository.getHealth(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
 export function useModuleContributionQuery(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}) {
   const {moduleRepository} = useAppServices()
   return useQuery({
