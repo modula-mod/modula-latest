@@ -4,12 +4,13 @@ import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefiniti
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
 import {AuditRepository} from '../domains/audit/repository.js'
+import {GreenfieldEventBus} from '../events/index.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from './module-errors.js'
 import {collectionPermission, GreenfieldModuleRuntimeAccessService, type GreenfieldModuleRuntimeContext} from './runtime-access.js'
 import {GreenfieldModuleViewService} from './view-service.js'
 
-type ModuleRecordOperation = 'create' | 'update' | 'delete'
+type ModuleRecordOperation = 'create' | 'update' | 'delete' | 'restore' | 'purge'
 
 export type ModuleRecordQuery = {
   cursor?: string
@@ -87,17 +88,21 @@ export class GreenfieldModuleRecordService {
 
   async get(accountId: string, moduleId: string, collection: string, recordId: string) {
     await this.resolveRecordContext(accountId, moduleId, collection, 'read')
-    const record = await this.db
+    const record = await this.findRecord(accountId, moduleId, collection, recordId, false)
+    if (!record) throw moduleError('NOT_FOUND', 'Module record not found')
+    return record
+  }
+
+  private async findRecord(accountId: string, moduleId: string, collection: string, recordId: string, includeDeleted: boolean) {
+    let query = this.db
       .selectFrom('greenfield_module_records')
       .selectAll()
       .where('account_id', '=', accountId)
       .where('module_id', '=', moduleId)
       .where('collection', '=', collection)
       .where('record_id', '=', recordId)
-      .where('deleted_at', 'is', null)
-      .executeTakeFirst()
-    if (!record) throw moduleError('NOT_FOUND', 'Module record not found')
-    return record
+    if (!includeDeleted) query = query.where('deleted_at', 'is', null) as typeof query
+    return query.executeTakeFirst()
   }
 
   async create(accountId: string, moduleId: string, collection: string, input: {data?: unknown; visibility?: string; recordId?: string}) {
@@ -137,6 +142,7 @@ export class GreenfieldModuleRecordService {
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
       await new AuditRepository(trx).append('module.record.created', {moduleId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
+      await this.publishRecordDomainEvent(trx, {accountId, moduleId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null})
     })
     return this.get(accountId, moduleId, collection, recordId)
   }
@@ -144,7 +150,7 @@ export class GreenfieldModuleRecordService {
   async patch(accountId: string, moduleId: string, collection: string, recordId: string, input: {data?: unknown; expectedRevision?: number; visibility?: string}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
     const current = await this.get(accountId, moduleId, collection, recordId)
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('CONFLICT', 'Module record revision conflict')
+    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
     const data = {...(current.data as Record<string, unknown>), ...requireRecordData(input.data)}
     const visibility = normalizeVisibility(input.visibility ?? current.visibility)
     validateRecordData(context.collectionDefinition, data, visibility)
@@ -154,8 +160,47 @@ export class GreenfieldModuleRecordService {
   async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number} = {}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'delete')
     const current = await this.get(accountId, moduleId, collection, recordId)
-    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('CONFLICT', 'Module record revision conflict')
+    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
     return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'delete')
+  }
+
+  async restore(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number} = {}) {
+    const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
+    const current = await this.findRecord(accountId, moduleId, collection, recordId, true)
+    if (!current) throw moduleError('NOT_FOUND', 'Module record not found')
+    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
+    return this.updateExisting(context.runtime, context.collectionDefinition, current, current.data as Record<string, unknown>, current.visibility, 'restore')
+  }
+
+  async purge(accountId: string, moduleId: string, collection: string, recordId: string, input: {confirm?: boolean; expectedRevision?: number} = {}) {
+    if (!input.confirm) throw moduleError('VALIDATION_FAILED', 'Permanent deletion requires confirmation')
+    const context = await this.resolveRecordContext(accountId, moduleId, collection, 'delete')
+    const current = await this.findRecord(accountId, moduleId, collection, recordId, true)
+    if (!current) throw moduleError('NOT_FOUND', 'Module record not found')
+    if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
+    const nextRevision = current.revision + 1
+    const payloadHash = sha256(canonicalJsonStringify({purged: true}))
+    const eventId = uuidv7()
+    const previous = await this.db
+      .selectFrom('greenfield_module_record_events')
+      .select('event_hash')
+      .where('record_id', '=', current.record_id)
+      .orderBy('revision', 'desc')
+      .executeTakeFirst()
+    const eventHash = hashRecordEvent({eventId, recordId: current.record_id, moduleId: context.runtime.moduleId, collection: current.collection, operation: 'purge', revision: nextRevision, payloadHash})
+    await this.db.transaction().execute(async trx => {
+      await this.insertRecordVersion(trx, current, nextRevision, 'delete')
+      await trx
+        .deleteFrom('greenfield_module_records')
+        .where('record_id', '=', current.record_id)
+        .where('account_id', '=', context.runtime.accountId)
+        .where('module_id', '=', context.runtime.moduleId)
+        .execute()
+      await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.runtime.accountId, moduleId: context.runtime.moduleId, collection: current.collection, operation: 'purge', revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {purged: true}})
+      await new AuditRepository(trx).append('module.record.purged', {moduleId: context.runtime.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
+      await this.publishRecordDomainEvent(trx, {accountId: context.runtime.accountId, moduleId: context.runtime.moduleId, collection: current.collection, recordId: current.record_id, operation: 'purge', revision: nextRevision, schemaRef: context.collectionDefinition.schemaRef, data: current.data as Record<string, unknown>, previousData: current.data as Record<string, unknown>})
+    })
+    return {purged: true, recordId: current.record_id, revision: nextRevision}
   }
 
   private async resolveRecordContext(accountId: string, moduleId: string, collection: string, operation: 'read' | 'write' | 'delete') {
@@ -187,6 +232,7 @@ export class GreenfieldModuleRecordService {
       .executeTakeFirst()
     const eventHash = hashRecordEvent({eventId, recordId: current.record_id, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, payloadHash})
     await this.db.transaction().execute(async trx => {
+      if (operation === 'update' || operation === 'restore') await this.insertRecordVersion(trx, current, nextRevision, operation)
       await trx
         .updateTable('greenfield_module_records')
         .set({
@@ -198,7 +244,7 @@ export class GreenfieldModuleRecordService {
           installation_id: context.installationId,
           revision: nextRevision,
           updated_at: now,
-          deleted_at: operation === 'delete' ? now : null,
+          deleted_at: operation === 'delete' ? now : operation === 'restore' ? null : undefined,
         })
         .where('record_id', '=', current.record_id)
         .where('account_id', '=', context.accountId)
@@ -206,6 +252,7 @@ export class GreenfieldModuleRecordService {
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {visibility}})
       await new AuditRepository(trx).append(`module.record.${operation === 'delete' ? 'deleted' : 'updated'}`, {moduleId: context.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
+      await this.publishRecordDomainEvent(trx, {accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, recordId: current.record_id, operation, revision: nextRevision, schemaRef: collectionDefinition.schemaRef, data, previousData: current.data as Record<string, unknown>})
     })
     return operation === 'delete' ? {deleted: true, recordId: current.record_id, revision: nextRevision} : this.get(context.accountId, context.moduleId, current.collection, current.record_id)
   }
@@ -244,6 +291,68 @@ export class GreenfieldModuleRecordService {
       })
       .execute()
   }
+
+  private async insertRecordVersion(trx: any, current: {record_id: string; account_id: string; module_id: string; collection: string; revision: number; data: unknown}, nextRevision: number, changeSource: string) {
+    await trx
+      .insertInto('greenfield_module_record_versions')
+      .values({
+        version_id: uuidv7(),
+        record_id: current.record_id,
+        account_id: current.account_id,
+        module_id: current.module_id,
+        collection: current.collection,
+        revision: current.revision,
+        next_revision: nextRevision,
+        data_snapshot: current.data,
+        payload_hash: sha256(canonicalJsonStringify(current.data)),
+        change_source: changeSource,
+        created_at: new Date(),
+      })
+      .execute()
+    await sql`
+      DELETE FROM greenfield_module_record_versions
+      WHERE version_id IN (
+        SELECT version_id FROM (
+          SELECT version_id, row_number() OVER (PARTITION BY account_id, module_id, collection, record_id ORDER BY revision DESC) AS rn
+          FROM greenfield_module_record_versions
+          WHERE account_id = ${current.account_id}
+            AND module_id = ${current.module_id}
+            AND collection = ${current.collection}
+            AND record_id = ${current.record_id}
+        ) ranked
+        WHERE rn > 25
+      )
+    `.execute(trx)
+  }
+
+  private async publishRecordDomainEvent(
+    trx: any,
+    input: {
+      accountId: string
+      moduleId: string
+      collection: string
+      recordId: string
+      operation: ModuleRecordOperation
+      revision: number
+      schemaRef: string
+      data: Record<string, unknown>
+      previousData: Record<string, unknown> | null
+    },
+  ) {
+    const eventType = moduleRecordEventType(input.moduleId, input.collection, input.operation, input.data, input.previousData)
+    await new GreenfieldEventBus(trx).publish({
+      eventType,
+      aggregateType: input.collection === 'folder' ? 'vault-folder' : input.collection,
+      aggregateId: input.recordId,
+      aggregateVersion: input.revision,
+      accountId: input.accountId,
+      visibility: 'account',
+      classification: input.operation === 'purge' ? 'sensitive' : 'private',
+      idempotencyKey: `${eventType}:${input.accountId}:${input.moduleId}:${input.collection}:${input.recordId}:${input.revision}`,
+      payload: redactedRecordEventPayload(input),
+      metadata: {source: 'greenfield.module-records', schemaRef: input.schemaRef},
+    })
+  }
 }
 
 function validateRecordData(definition: GreenfieldModuleCollectionDefinition, data: Record<string, unknown>, visibility: string): void {
@@ -271,11 +380,13 @@ function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unkno
   if (['text', 'multilineText', 'url', 'recordReference', 'date', 'dateTime'].includes(field.type) && typeof value !== 'string') {
     throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be text`)
   }
+  if (field.type === 'number' && typeof value !== 'number') throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be numeric`)
   if (field.type === 'boolean' && typeof value !== 'boolean') throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be boolean`)
   if (field.type === 'singleSelect' && typeof value !== 'string') throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be a selection`)
   if ((field.type === 'multiSelect' || field.type === 'tags') && (!Array.isArray(value) || !value.every(item => typeof item === 'string'))) {
     throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be a string array`)
   }
+  if (field.type === 'json') validateJsonField(field.name, value)
 }
 
 function requireRecordData(value: unknown): Record<string, unknown> {
@@ -326,4 +437,61 @@ function sha256(value: string): string {
 
 function hashRecordEvent(input: {eventId: string; recordId: string; moduleId: string; collection: string; operation: string; revision: number; payloadHash: string}): string {
   return sha256(canonicalJsonStringify(input))
+}
+
+function validateJsonField(fieldName: string, value: unknown): void {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw moduleError('VALIDATION_FAILED', `Field ${fieldName} must be a JSON object`)
+  const serialized = JSON.stringify(value)
+  if (serialized.length > 250_000) throw moduleError('VALIDATION_FAILED', `Field ${fieldName} exceeds JSON size limit`)
+  if (jsonDepth(value) > 12) throw moduleError('VALIDATION_FAILED', `Field ${fieldName} exceeds JSON nesting limit`)
+}
+
+function jsonDepth(value: unknown, level = 0): number {
+  if (!value || typeof value !== 'object') return level
+  return Math.max(level, ...Object.values(value as Record<string, unknown>).map(child => jsonDepth(child, level + 1)))
+}
+
+function moduleRecordEventType(
+  moduleId: string,
+  collection: string,
+  operation: ModuleRecordOperation,
+  data: Record<string, unknown>,
+  previousData: Record<string, unknown> | null,
+): string {
+  const moduleSlug = moduleId.split('.').at(-1) ?? moduleId
+  const normalizedCollection = collection.replace(/[^a-z0-9-]+/g, '-')
+  if (operation === 'create') return `${moduleSlug}.${normalizedCollection}.created`
+  if (operation === 'delete') return `${moduleSlug}.${normalizedCollection}.deleted`
+  if (operation === 'restore') return `${moduleSlug}.${normalizedCollection}.restored`
+  if (operation === 'purge') return `${moduleSlug}.${normalizedCollection}.permanently-deleted`
+  if (collection === 'note' && previousData) {
+    if (previousData.archived !== true && data.archived === true) return `${moduleSlug}.${normalizedCollection}.archived`
+    if (previousData.archived === true && data.archived !== true) return `${moduleSlug}.${normalizedCollection}.unarchived`
+  }
+  return `${moduleSlug}.${normalizedCollection}.updated`
+}
+
+function redactedRecordEventPayload(input: {
+  moduleId: string
+  collection: string
+  recordId: string
+  operation: ModuleRecordOperation
+  revision: number
+  schemaRef: string
+  data: Record<string, unknown>
+}) {
+  return {
+    moduleId: input.moduleId,
+    collection: input.collection,
+    recordId: input.recordId,
+    revision: input.revision,
+    sourceVersion: input.revision,
+    schemaRef: input.schemaRef,
+    titleLength: typeof input.data.title === 'string' ? input.data.title.length : undefined,
+    tagCount: Array.isArray(input.data.tagIds) ? input.data.tagIds.length : undefined,
+    folderId: typeof input.data.folderId === 'string' ? input.data.folderId : undefined,
+    archived: typeof input.data.archived === 'boolean' ? input.data.archived : undefined,
+    deleted: input.operation === 'delete' || input.operation === 'purge',
+    payloadHash: sha256(canonicalJsonStringify(input.operation === 'purge' ? {purged: true} : input.data)),
+  }
 }

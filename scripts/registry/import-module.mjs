@@ -411,7 +411,7 @@ function collectCollectionDefinitions(root, manifest) {
 }
 
 function collectViewDeclarations(root, moduleId) {
-  const dir = join(root, 'views')
+  const dir = existingDirectory(root, ['views', 'src/views'])
   let files = []
   try {
     files = readdirSync(dir).filter(file => file.endsWith('.json')).sort()
@@ -431,6 +431,8 @@ function collectViewDeclarations(root, moduleId) {
 }
 
 function deriveFields(schemaDefinition) {
+  const explicitFields = schemaDefinition['x-greenfield']?.fields
+  if (Array.isArray(explicitFields)) return explicitFields
   const required = new Set(Array.isArray(schemaDefinition.required) ? schemaDefinition.required : [])
   const properties = schemaDefinition.properties && typeof schemaDefinition.properties === 'object' ? schemaDefinition.properties : {}
   return Object.entries(properties).map(([name, property]) => {
@@ -458,8 +460,20 @@ function fieldTypeForSchema(property) {
   if (property.format === 'date') return 'date'
   if (property.enum) return 'singleSelect'
   if (property['x-recordReference'] === true) return 'recordReference'
+  if (property.type === 'number' || property.type === 'integer') return 'number'
+  if (property.type === 'object') return 'json'
   if (property.maxLength && Number(property.maxLength) > 240) return 'multilineText'
   return 'text'
+}
+
+function existingDirectory(root, candidates) {
+  for (const candidate of candidates) {
+    const dir = join(root, candidate)
+    try {
+      if (statSync(dir).isDirectory()) return dir
+    } catch {}
+  }
+  return join(root, candidates[0])
 }
 
 function boundedStringArray(value) {

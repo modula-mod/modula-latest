@@ -483,6 +483,8 @@ export class SearchRepository {
       profile: entityRankingWeight('profile'),
       module: entityRankingWeight('module'),
       release: entityRankingWeight('module-release'),
+      note: entityRankingWeight('note'),
+      folder: entityRankingWeight('vault-folder'),
     }
     const orderBy = orderBySql(input.sort)
     const createdAfter = input.createdAfter ? new Date(input.createdAfter) : null
@@ -524,6 +526,8 @@ export class SearchRepository {
               WHEN 'profile' THEN ${rankWeights.profile}::float
               WHEN 'module' THEN ${rankWeights.module}::float
               WHEN 'module-release' THEN ${rankWeights.release}::float
+              WHEN 'note' THEN ${rankWeights.note}::float
+              WHEN 'vault-folder' THEN ${rankWeights.folder}::float
               ELSE ${rankWeights.post}::float
             END
             + LEAST(10, GREATEST(0, 10 - EXTRACT(EPOCH FROM (NOW() - updated_at)) / 86400 / 14))::float

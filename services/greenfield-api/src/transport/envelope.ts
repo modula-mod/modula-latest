@@ -59,6 +59,7 @@ export function statusForError(code: ApiErrorCode): number {
     case 'NOT_FOUND':
       return 404
     case 'CONFLICT':
+    case 'NOTE_REVISION_CONFLICT':
       return 409
     case 'RATE_LIMITED':
       return 429

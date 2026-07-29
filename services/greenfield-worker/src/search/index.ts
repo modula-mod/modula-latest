@@ -8,6 +8,7 @@ import {projectPost} from './post-projector.js'
 import {projectProfile} from './profile-projector.js'
 import {entityIdFromEvent, SearchProjector, type SearchProjectionContext} from './projector.js'
 import {isSearchOperationalEvent, SEARCH_PROJECTOR_BY_EVENT} from './subscribers.js'
+import {projectVaultNotesRecord} from './vault-notes-projector.js'
 
 export async function handleSearchIndex(db: ModulaWorkerDb, rawPayload: unknown): Promise<void> {
   const payload = normalizePayload(rawPayload)
@@ -25,7 +26,8 @@ export async function handleSearchIndex(db: ModulaWorkerDb, rawPayload: unknown)
     if (mapping.entityType === 'post') await projectPost(db, projector, context)
     else if (mapping.entityType === 'profile') await projectProfile(db, projector, context)
     else if (mapping.entityType === 'module') await projectModule(db, projector, context)
-    else await projectModuleRelease(db, projector, context)
+    else if (mapping.entityType === 'module-release') await projectModuleRelease(db, projector, context)
+    else await projectVaultNotesRecord(db, projector, context)
     await projector.recordSuccess(context)
   } catch (error) {
     await projector.recordFailure(context, error)
@@ -159,6 +161,18 @@ async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; ent
       FROM profiles
       INNER JOIN actors ON actors.id = profiles.actor_id
       WHERE actors.account_id = ${request.account_id}
+      UNION ALL
+      SELECT 'note'::text AS entity_type, record_id AS entity_id
+      FROM greenfield_module_records
+      WHERE account_id = ${request.account_id}
+        AND module_id = 'modula.vault-notes'
+        AND collection = 'note'
+      UNION ALL
+      SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id
+      FROM greenfield_module_records
+      WHERE account_id = ${request.account_id}
+        AND module_id = 'modula.vault-notes'
+        AND collection = 'folder'
       LIMIT 100
     `.execute(db)
     return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id}))
@@ -168,6 +182,8 @@ async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; ent
     UNION ALL SELECT 'profile'::text AS entity_type, id AS entity_id FROM profiles
     UNION ALL SELECT 'module'::text AS entity_type, slug AS entity_id FROM greenfield_extension_catalogue WHERE kind = 'module'
     UNION ALL SELECT 'module-release'::text AS entity_type, release_id AS entity_id FROM greenfield_module_releases
+    UNION ALL SELECT 'note'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id = 'modula.vault-notes' AND collection = 'note'
+    UNION ALL SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id = 'modula.vault-notes' AND collection = 'folder'
     LIMIT 100
   `.execute(db)
   return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id}))
@@ -182,6 +198,12 @@ async function idsForEntityType(db: ModulaWorkerDb, entityType: GreenfieldSearch
   }
   if (entityType === 'module') {
     return (await db.selectFrom('greenfield_extension_catalogue').select('slug').where('kind', '=', 'module').limit(100).execute()).map(row => ({entityType, entityId: row.slug}))
+  }
+  if (entityType === 'note') {
+    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', '=', 'modula.vault-notes').where('collection', '=', 'note').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
+  }
+  if (entityType === 'vault-folder') {
+    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', '=', 'modula.vault-notes').where('collection', '=', 'folder').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
   }
   return (await db.selectFrom('greenfield_module_releases').select('release_id').limit(100).execute()).map(row => ({entityType, entityId: row.release_id}))
 }
@@ -198,7 +220,11 @@ function syntheticReindexEvent(
       ? 'profile.updated'
       : candidate.entityType === 'module'
         ? 'module.discovered'
-        : 'module.release.published'
+        : candidate.entityType === 'module-release'
+          ? 'module.release.published'
+          : candidate.entityType === 'note'
+            ? 'vault-notes.note.updated'
+            : 'vault-notes.folder.updated'
   return {
     eventId: row.event_id,
     eventType,
@@ -260,7 +286,8 @@ function projectorIdFor(entityType: GreenfieldSearchEntityType): string {
   if (entityType === 'post') return 'search.post-projector'
   if (entityType === 'profile') return 'search.profile-projector'
   if (entityType === 'module') return 'search.module-projector'
-  return 'search.module-release-projector'
+  if (entityType === 'module-release') return 'search.module-release-projector'
+  return 'search.vault-notes-projector'
 }
 
 async function cancellationRequested(db: ModulaWorkerDb, reindexId: string): Promise<boolean> {

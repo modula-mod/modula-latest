@@ -1,6 +1,6 @@
 export const GREENFIELD_SEARCH_DOCUMENT_SCHEMA_VERSION = '1.0.0' as const
 
-export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'
 
 export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
 

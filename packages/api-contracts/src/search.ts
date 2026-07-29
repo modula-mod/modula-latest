@@ -3,7 +3,7 @@ import type {SocialPostDto} from './posts.js'
 
 export type SearchType = 'all' | 'profiles' | 'posts' | 'modules'
 export type SearchScope = SearchType
-export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'
 export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
 export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
 export type GreenfieldSearchSort = 'relevance' | 'recent' | 'oldest'

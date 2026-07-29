@@ -46,7 +46,7 @@ export type GreenfieldEventDeliveryStatus =
   | 'retrying'
   | 'dead_lettered'
   | 'cancelled'
-export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'
 export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
 export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
 export type GreenfieldSearchReindexMode = 'single-entity' | 'entity-type' | 'account-scope' | 'full-index'
@@ -68,6 +68,8 @@ export type GreenfieldModuleActionKind =
   | 'record.create'
   | 'record.update'
   | 'record.delete'
+  | 'record.restore'
+  | 'record.purge'
   | 'record.query'
   | 'function.invoke'
   | 'settings.update'
@@ -868,8 +870,10 @@ export interface Database {
   greenfield_module_actions: {action_row_id: string; release_id: string; module_id: string; action_id: string; action_kind: GreenfieldModuleActionKind; capability: string; declaration: unknown; registration_status: GreenfieldModuleRuntimeRegistrationStatus; created_at: Date; updated_at: Date}
   greenfield_module_record_collections: {collection_id: string; release_id: string; module_id: string; collection: string; schema_ref: string; default_visibility: GreenfieldModuleRuntimeVisibility; fields: unknown; searchable_fields: unknown; filterable_fields: unknown; sortable_fields: unknown; folder_field: string | null; reference_fields: unknown; schema_definition: unknown; retention_policy: GreenfieldModuleRetentionPolicy; registration_status: GreenfieldModuleRuntimeRegistrationStatus; created_at: Date; updated_at: Date}
   greenfield_module_records: {record_id: string; account_id: string; module_id: string; installation_id: string | null; collection: string; schema_ref: string; visibility: GreenfieldModuleRuntimeVisibility; data: unknown; search_text: string; folder_ref: string | null; source_uri: string | null; retained_after_uninstall: boolean; revision: number; created_at: Date; updated_at: Date; deleted_at: Date | null}
-  greenfield_module_record_events: {event_id: string; record_id: string; account_id: string; module_id: string; collection: string; operation: 'create' | 'update' | 'delete' | 'restore' | 'move'; revision: number; previous_hash: string | null; event_hash: string; payload_hash: string; metadata: unknown; created_at: Date}
+  greenfield_module_record_events: {event_id: string; record_id: string; account_id: string; module_id: string; collection: string; operation: 'create' | 'update' | 'delete' | 'restore' | 'move' | 'purge'; revision: number; previous_hash: string | null; event_hash: string; payload_hash: string; metadata: unknown; created_at: Date}
+  greenfield_module_record_versions: {version_id: string; record_id: string; account_id: string; module_id: string; collection: string; revision: number; next_revision: number; data_snapshot: unknown; payload_hash: string; change_source: 'update' | 'restore' | 'import' | 'delete'; created_at: Date}
   greenfield_module_action_events: {event_id: string; account_id: string; module_id: string; action_id: string; action_kind: GreenfieldModuleActionKind; idempotency_key: string | null; status: 'validated' | 'completed' | 'failed' | 'queued' | 'cancelled'; input_hash: string; result: unknown; error_code: string | null; created_at: Date}
+  greenfield_module_export_jobs: {export_id: string; account_id: string; module_id: string; installation_id: string | null; format: 'json' | 'markdown' | 'plain-text' | 'zip'; state: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'; manifest: unknown; record_count: number; output_ref: string | null; failure_code: string | null; created_by: string | null; created_at: Date; updated_at: Date; completed_at: Date | null}
   greenfield_module_data_retention: {retention_id: string; account_id: string; module_id: string; installation_id: string | null; choice: GreenfieldModuleDataRetentionChoice; record_count: number; export_id: string | null; completed_at: Date | null; created_at: Date}
   greenfield_runtime_sessions: {session_id: string; session_kind: GreenfieldRuntimeSessionKind; account_id: string; module_id: string | null; installation_id: string | null; release_id: string | null; provider_ids: unknown; state: GreenfieldRuntimeSessionState; compatibility: GreenfieldRuntimeCompatibility | null; launch_permission: GreenfieldRuntimeLaunchPermission | null; resolution: unknown; reason_codes: unknown; metadata: unknown; failure_code: string | null; failure_message: string | null; created_at: Date; updated_at: Date; started_at: Date | null; terminated_at: Date | null}
   greenfield_runtime_session_events: {event_id: string; session_id: string; account_id: string; event_type: string; from_state: GreenfieldRuntimeSessionState | null; to_state: GreenfieldRuntimeSessionState | null; reason_codes: unknown; metadata: unknown; created_at: Date}

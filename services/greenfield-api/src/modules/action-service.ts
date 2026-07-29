@@ -67,13 +67,21 @@ export class GreenfieldModuleActionService {
     if (action.kind === 'record.update') {
       const recordId = readRecordId(action, input)
       return this.records.patch(accountId, moduleId, requiredTargetCollection(action), recordId, {
-        data: input,
+        data: recordPatchInput(action, input),
         expectedRevision: numberOrUndefined(input.expectedRevision),
       })
     }
     if (action.kind === 'record.delete') {
       const recordId = readRecordId(action, input)
       return this.records.delete(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision)})
+    }
+    if (action.kind === 'record.restore') {
+      const recordId = readRecordId(action, input)
+      return this.records.restore(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision)})
+    }
+    if (action.kind === 'record.purge') {
+      const recordId = readRecordId(action, input)
+      return this.records.purge(accountId, moduleId, requiredTargetCollection(action), recordId, {expectedRevision: numberOrUndefined(input.expectedRevision), confirm: input.confirm === true})
     }
     if (action.kind === 'record.query') {
       return this.records.list(accountId, moduleId, requiredTargetCollection(action), input as any)
@@ -130,6 +138,12 @@ function readRecordId(action: GreenfieldModuleAction, input: Record<string, unkn
   const value = input[field]
   if (typeof value !== 'string' || !value) throw moduleError('VALIDATION_FAILED', `Record action requires ${field}`)
   return value
+}
+
+function recordPatchInput(action: GreenfieldModuleAction, input: Record<string, unknown>): Record<string, unknown> {
+  const recordIdField = action.target?.recordIdField ?? 'recordId'
+  const omitted = new Set([recordIdField, 'recordId', 'expectedRevision', 'idempotencyKey', 'confirm'])
+  return Object.fromEntries(Object.entries(input).filter(([key]) => !omitted.has(key)))
 }
 
 function numberOrUndefined(value: unknown): number | undefined {

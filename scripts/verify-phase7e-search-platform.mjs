@@ -48,7 +48,7 @@ function run(command, args, label, env = process.env) {
 includes('packages/greenfield-contracts/src/search.ts', [
   'interface GreenfieldSearchDocument',
   'schemaVersion: typeof GREENFIELD_SEARCH_DOCUMENT_SCHEMA_VERSION',
-  "'post' | 'profile' | 'module' | 'module-release'",
+  "'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'",
   "'public' | 'followers' | 'private' | 'account' | 'system'",
   "'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'",
 ], 'canonical search document contract')
@@ -76,6 +76,14 @@ includes('services/greenfield-api/migrations/021_phase7e_unified_search.sql', [
   'search.module-release-projector',
   'search.reindex-requested',
 ], 'search migration')
+
+includes('services/greenfield-api/migrations/022_phase7e_module_records_and_vault_notes.sql', [
+  "'note'",
+  "'vault-folder'",
+  'search.vault-notes-projector',
+  'vault-notes.note.created',
+  'vault-notes.note.restored',
+], 'vault-notes search extension migration')
 
 includes('services/greenfield-api/migrations/021_phase7e_unified_search.down.sql', [
   'DROP TABLE IF EXISTS search_documents',
@@ -135,6 +143,7 @@ includes('services/greenfield-worker/src/search/index.ts', [
   'projectProfile',
   'projectModule',
   'projectModuleRelease',
+  'projectVaultNotesRecord',
   'handleSearchReindex',
 ], 'search worker subscriber dispatch')
 
@@ -147,11 +156,23 @@ includes('services/greenfield-api/tests/phase7e.search-platform.test.ts', [
   'search.reindex.requested',
 ], 'search integration tests')
 
+includes('services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts', [
+  'greenfield_domain_events',
+  'NOTE_REVISION_CONFLICT',
+  'expectSearch',
+], 'vault-notes search integration tests')
+
 includes('services/greenfield-worker/tests/phase7e.search-projector.test.ts', [
   'ignores a stale source version',
   'toHaveLength(1)',
   'source_version',
 ], 'search worker tests')
+
+includes('services/greenfield-worker/tests/phase7e.vault-notes-search-projector.test.ts', [
+  'vault-notes.note.created',
+  'visibility',
+  'account',
+], 'vault-notes search worker tests')
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL ?? process.env.MODULA_DATABASE_MIGRATOR_URL ?? process.env.MODULA_DATABASE_URL
 if (!databaseUrl) {
@@ -203,6 +224,19 @@ async function runIsolatedDatabase(baseUrl) {
     const env = {...process.env, MODULA_TEST_DATABASE_URL: testUrl.toString(), MODULA_DATABASE_URL: testUrl.toString(), MODULA_DATABASE_MIGRATOR_URL: testUrl.toString()}
     run('pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.search-platform.test.ts'], 'isolated API search platform tests', env)
     run('pnpm', ['--filter', '@modula/greenfield-worker', 'exec', 'vitest', 'run', 'tests/phase7e.search-projector.test.ts'], 'isolated worker search projector tests', env)
+    run(
+      'pnpm',
+      [
+        '--filter',
+        '@modula/greenfield-api',
+        'exec',
+        'tsx',
+        '-e',
+        "import {migrateDown} from './src/database/migrate.ts'; void (async () => { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); if (down !== '022_phase7e_module_records_and_vault_notes') { console.error(`expected 022 rollback, got ${down}`); process.exit(1) } })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })",
+      ],
+      'isolated migration 022 rollback',
+      env,
+    )
     run(
       'pnpm',
       [

@@ -6,6 +6,7 @@ import {
   type GreenfieldModuleContributions,
   type GreenfieldModuleManifestV1,
 } from '@modula/greenfield-module-manifest'
+import {sql} from 'kysely'
 import type {GreenfieldModuleReleaseState} from '../database/types.js'
 import type {ModulaDb} from '../database/client.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -14,6 +15,8 @@ import {GreenfieldEventBus} from '../events/index.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
+
+const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 type ContributionType =
   | 'route'
@@ -357,9 +360,9 @@ export class GreenfieldModuleReleaseService {
           version: release.version,
           publisher: release.manifest.publisher.displayName,
           trust: release.trustLevel,
-          permissions: release.manifest.permissions,
-          compatibility: release.manifest.compatibility,
-          manifest: release.manifest,
+          permissions: jsonb(release.manifest.permissions),
+          compatibility: jsonb(release.manifest.compatibility),
+          manifest: jsonb(release.manifest),
           catalogue_status: 'active',
           executable: release.manifest.lifecycle?.executionMode !== 'declarative' && release.trustLevel === 'firstParty',
           distribution_model: 'free',
@@ -374,9 +377,9 @@ export class GreenfieldModuleReleaseService {
             version: release.version,
             publisher: release.manifest.publisher.displayName,
             trust: release.trustLevel,
-            permissions: release.manifest.permissions,
-            compatibility: release.manifest.compatibility,
-            manifest: release.manifest,
+            permissions: jsonb(release.manifest.permissions),
+            compatibility: jsonb(release.manifest.compatibility),
+            manifest: jsonb(release.manifest),
             catalogue_status: 'active',
             executable: release.manifest.lifecycle?.executionMode !== 'declarative' && release.trustLevel === 'firstParty',
             distribution_model: 'free',

@@ -5,6 +5,8 @@ import type {GreenfieldSessionService} from '../../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../../transport/envelope.js'
 import {GreenfieldModuleContributionService} from '../contribution-service.js'
 import {GreenfieldModuleActionService} from '../action-service.js'
+import {GreenfieldModuleExportService} from '../export-service.js'
+import {GreenfieldModuleHealthService} from '../health-service.js'
 import {GreenfieldModuleInstallationService} from '../installation-service.js'
 import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
@@ -38,6 +40,8 @@ export async function registerModuleRoutes(
   const views = new GreenfieldModuleViewService(db)
   const records = new GreenfieldModuleRecordService(db)
   const actions = new GreenfieldModuleActionService(db, config)
+  const exports = new GreenfieldModuleExportService(db, config)
+  const health = new GreenfieldModuleHealthService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -319,6 +323,28 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/restore', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.restore(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record restore failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/records/:collection/:recordId/permanent', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.purge(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record permanent delete failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/actions/:actionId', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -335,6 +361,27 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module action failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/export', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await exports.create(auth.accountId, params.moduleId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module export failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/health', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await health.get(auth.accountId, (request.params as any).moduleId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module health lookup failed')
     }
   })
 
@@ -488,7 +535,7 @@ function sendError(reply: FastifyReply, code: any, message: string, requestId: s
 
 function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fallback: string) {
   const code = error && typeof error === 'object' && 'code' in error ? (error as any).code : 'SERVER_ERROR'
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)

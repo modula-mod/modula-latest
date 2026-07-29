@@ -1,7 +1,7 @@
 import type {AppConfig} from '../../config/index.js'
 import type {GreenfieldSearchEntityType, GreenfieldSearchSort, ParsedSearchRequest, SearchCursor, SearchLimits} from './contracts.js'
 
-const ENTITY_TYPES = new Set<GreenfieldSearchEntityType>(['post', 'profile', 'module', 'module-release'])
+const ENTITY_TYPES = new Set<GreenfieldSearchEntityType>(['post', 'profile', 'module', 'module-release', 'note', 'vault-folder'])
 const SORTS = new Set<GreenfieldSearchSort>(['relevance', 'recent', 'oldest'])
 const CONTROL_CHARACTER_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u
 const CURSOR_PATTERN = /^[A-Za-z0-9_-]{8,700}$/
@@ -112,14 +112,15 @@ export function searchValidation(searchCode: string, message: string): Error {
 function normalizeEntityTypes(value: unknown, limits: SearchLimits): GreenfieldSearchEntityType[] {
   const values = valuesFromUnknown(value)
   const mapped = values.flatMap(item => {
-    if (item === 'all') return ['post', 'profile', 'module', 'module-release'] satisfies GreenfieldSearchEntityType[]
+    if (item === 'all') return ['post', 'profile', 'module', 'module-release', 'note', 'vault-folder'] satisfies GreenfieldSearchEntityType[]
     if (item === 'posts') return ['post'] satisfies GreenfieldSearchEntityType[]
     if (item === 'profiles') return ['profile'] satisfies GreenfieldSearchEntityType[]
     if (item === 'modules') return ['module', 'module-release'] satisfies GreenfieldSearchEntityType[]
+    if (item === 'notes') return ['note', 'vault-folder'] satisfies GreenfieldSearchEntityType[]
     return [item]
   })
   const result = Array.from(new Set(mapped)).filter((item): item is GreenfieldSearchEntityType => ENTITY_TYPES.has(item as GreenfieldSearchEntityType))
-  if (result.length === 0) return ['post', 'profile', 'module', 'module-release']
+  if (result.length === 0) return ['post', 'profile', 'module', 'module-release', 'note', 'vault-folder']
   if (result.length > limits.maxEntityTypes) throw searchValidation('SEARCH_FILTER_NOT_ALLOWED', 'Too many search entity types')
   if (result.length !== mapped.length) throw searchValidation('SEARCH_ENTITY_NOT_SUPPORTED', 'Unsupported search entity type')
   return result

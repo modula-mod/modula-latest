@@ -3,6 +3,7 @@ export type ModuleDomainErrorCode =
   | 'NOT_FOUND'
   | 'FORBIDDEN'
   | 'CONFLICT'
+  | 'NOTE_REVISION_CONFLICT'
   | 'CAPABILITY_DISABLED'
   | 'UNAUTHENTICATED'
 

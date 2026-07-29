@@ -25,7 +25,7 @@ export type GreenfieldEventDeliveryStatus =
   | 'retrying'
   | 'dead_lettered'
   | 'cancelled'
-export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release'
+export type GreenfieldSearchEntityType = 'post' | 'profile' | 'module' | 'module-release' | 'note' | 'vault-folder'
 export type GreenfieldSearchVisibility = 'public' | 'followers' | 'private' | 'account' | 'system'
 export type GreenfieldSearchDocumentStatus = 'active' | 'deleted' | 'hidden' | 'quarantined' | 'unavailable'
 export type GreenfieldSearchReindexMode = 'single-entity' | 'entity-type' | 'account-scope' | 'full-index'
@@ -664,6 +664,35 @@ export interface Database {
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
+  }
+  greenfield_module_record_versions: {
+    version_id: string
+    record_id: string
+    account_id: string
+    module_id: string
+    collection: string
+    revision: number
+    next_revision: number
+    data_snapshot: unknown
+    payload_hash: string
+    change_source: 'update' | 'restore' | 'import' | 'delete'
+    created_at: Date
+  }
+  greenfield_module_export_jobs: {
+    export_id: string
+    account_id: string
+    module_id: string
+    installation_id: string | null
+    format: 'json' | 'markdown' | 'plain-text' | 'zip'
+    state: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
+    manifest: unknown
+    record_count: number
+    output_ref: string | null
+    failure_code: string | null
+    created_by: string | null
+    created_at: Date
+    updated_at: Date
+    completed_at: Date | null
   }
   greenfield_module_data_retention: {
     retention_id: string

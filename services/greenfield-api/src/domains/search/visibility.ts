@@ -15,10 +15,13 @@ const METADATA_ALLOWLIST: Record<GreenfieldSearchEntityType, Set<string>> = {
     'checksumState',
     'releaseState',
   ]),
+  note: new Set(['moduleId', 'folderId', 'folderName', 'sourceTitle', 'sourceAuthor', 'archived', 'pinned', 'favourite', 'dataSchemaVersion']),
+  'vault-folder': new Set(['moduleId', 'parentFolderId', 'position']),
 }
 
 export function resourceTypeForSearch(entityType: GreenfieldSearchEntityType): string {
   if (entityType === 'module-release') return 'module'
+  if (entityType === 'note' || entityType === 'vault-folder') return 'module.record'
   return entityType
 }
 

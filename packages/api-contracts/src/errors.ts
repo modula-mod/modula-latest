@@ -6,6 +6,7 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'NOTE_REVISION_CONFLICT'
   | 'RATE_LIMITED'
   | 'OFFLINE'
   | 'TIMEOUT'
