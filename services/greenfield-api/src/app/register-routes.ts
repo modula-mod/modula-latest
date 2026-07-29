@@ -51,6 +51,7 @@ import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
 import {registerModuleRoutes} from '../modules/routes/index.js'
+import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
@@ -154,6 +155,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       greenfieldModuleGithubSync: config.moduleGithubSyncEnabled,
       greenfieldVaultNotesReference: config.vaultNotesReferenceEnabled,
       greenfieldDimon: config.dimonEnabled,
+      greenfieldAiGateway: config.aiGatewayEnabled,
       inviteOnly: config.inviteOnly,
       atproto: config.atprotoEnabled,
       atprotoOAuth: config.atprotoEnabled,
@@ -314,6 +316,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return

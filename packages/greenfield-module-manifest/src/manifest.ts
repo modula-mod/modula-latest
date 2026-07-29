@@ -6,6 +6,7 @@ import type {GreenfieldModuleLifecycleManifest} from './lifecycle.js'
 import type {GreenfieldModulePermission} from './permissions.js'
 import type {GreenfieldGitHubModuleSource} from './source.js'
 import type {GreenfieldModuleBackendDefinition} from './backend.js'
+import type {GreenfieldModuleAiDeclaration} from './ai.js'
 
 export const GREENFIELD_MODULE_MANIFEST_VERSION = 1 as const
 
@@ -56,6 +57,7 @@ export type GreenfieldModuleManifestV1 = {
   contributions: GreenfieldModuleContributions
   lifecycle?: GreenfieldModuleLifecycleManifest
   backend?: GreenfieldModuleBackendDefinition
+  ai?: GreenfieldModuleAiDeclaration
   integrity: GreenfieldModuleIntegrity
   extensions?: Record<string, unknown>
 }

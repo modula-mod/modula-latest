@@ -1,4 +1,5 @@
 export * from './define-function.js'
+export * from './define-ai.js'
 export * from './define-module.js'
 export * from './define-plugin.js'
 export * from './define-schema.js'

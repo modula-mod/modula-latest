@@ -232,9 +232,9 @@ async function runIsolatedDatabase(baseUrl) {
         'exec',
         'tsx',
         '-e',
-        "import {migrateDown} from './src/database/migrate.ts'; void (async () => { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); if (down !== '022_phase7e_module_records_and_vault_notes') { console.error(`expected 022 rollback, got ${down}`); process.exit(1) } })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })",
+        "import {migrateDown} from './src/database/migrate.ts'; void (async () => { const rolledBack = []; for (let i = 0; i < 20; i += 1) { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); rolledBack.push(down); if (down === '022_phase7e_module_records_and_vault_notes') return; if (down === null) break; } console.error(`expected rollback through 022, got ${rolledBack.join(',')}`); process.exit(1) })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })",
       ],
-      'isolated migration 022 rollback',
+      'isolated migration rollback reaches 022 after newer migrations',
       env,
     )
     run(

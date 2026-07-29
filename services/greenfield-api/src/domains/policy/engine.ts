@@ -68,6 +68,14 @@ export class GreenfieldPolicyEngine {
     const connection = await this.evaluateConnection(resolved)
     if (connection) return connection
 
+    if (aiAction(resolved)) {
+      const resource = await this.evaluateResourceVisibility(resolved)
+      if (resource) return resource
+
+      const ai = this.evaluateAiContext(resolved)
+      if (ai) return ai
+    }
+
     const module = await this.evaluateModule(resolved)
     if (module) return module
 

@@ -24,6 +24,8 @@ export async function createServer(config: AppConfig): Promise<CreatedServer> {
           'accessToken',
           'refreshToken',
           'credentials',
+          'providerCredential',
+          'apiKey',
           'pkceVerifier',
           'secret',
           'clientSecret',

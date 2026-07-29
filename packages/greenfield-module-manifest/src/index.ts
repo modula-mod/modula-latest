@@ -1,4 +1,5 @@
 export * from './compatibility.js'
+export * from './ai.js'
 export * from './backend.js'
 export * from './contributions.js'
 export * from './dependencies.js'

@@ -163,6 +163,39 @@ describe('Greenfield Module Manifest v1 validation', () => {
     expect(result.valid).toBe(true)
   })
 
+  it('accepts provider-neutral AI declarations', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        ai: {
+          features: ['summarise', 'extract'],
+          tools: ['note.search', 'note.create'],
+          prompts: ['vault.summary'],
+          requiredCapabilities: ['chat', 'structured-output'],
+          dataAccess: {
+            recordScopes: ['digital.modula.vault-notes.notes'],
+            defaultPolicy: 'account-consent',
+          },
+        },
+      }),
+    )
+    expect(result.valid).toBe(true)
+  })
+
+  it('rejects provider-bound AI declarations', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        ai: {
+          features: ['summarise'],
+          provider: 'openai',
+          modelId: 'gpt-provider-bound',
+        },
+      }),
+    )
+    expect(result.issues.map(issue => issue.code)).toEqual(
+      expect.arrayContaining(['PROVIDER_BOUND_AI_DECLARATION']),
+    )
+  })
+
   it('rejects unsafe module backend declarations', () => {
     const result = validateGreenfieldModuleManifest(
       validManifest({

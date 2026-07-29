@@ -10,7 +10,9 @@ run('pnpm', ['verify'], 'external Vault Notes verifier passes', vaultNotesRoot)
 
 const standardHead = git(standardRoot, ['rev-parse', 'HEAD'])
 const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v1.0.0'])
+const standardHeadContainsV1 = git(standardRoot, ['merge-base', '--is-ancestor', 'ac1bede6e9be6518a21e8248596b99b4099da5c6', 'HEAD']) !== null
 if (standardHead === 'ac1bede6e9be6518a21e8248596b99b4099da5c6') pass('Module Standard HEAD is Standard 1.0 release commit')
+else if (standardHeadContainsV1) pass(`Module Standard HEAD contains Standard 1.0 release commit: ${standardHead}`)
 else fail(`Module Standard HEAD mismatch: ${standardHead ?? 'unknown'}`)
 if (standardTag === 'ac1bede6e9be6518a21e8248596b99b4099da5c6') pass('mms-v1.0.0 resolves to Standard 1.0 release commit')
 else fail(`mms-v1.0.0 mismatch: ${standardTag ?? 'unknown'}`)

@@ -58,6 +58,8 @@ const envSchema = z.object({
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
   MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY: z.string().min(1).optional(),
   MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
+  MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY: z.string().min(1).optional(),
+  MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
   MODULA_PDS_PILOT_ENABLED: z
     .string()
     .optional()
@@ -98,6 +100,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_AI_GATEWAY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
 })
@@ -153,6 +159,11 @@ export type AppConfig = {
   /** Older connector credential keys kept only for decrypting during rotation. */
   connectorCredentialEncryptionKeysByVersion: Map<number, Buffer>
   connectorCredentialEncryptionKeyIsEphemeral: boolean
+  /** Current key used to encrypt AI provider credential envelopes. */
+  aiProviderCredentialEncryptionKey: EncryptionKeyMaterial
+  /** Older AI provider credential keys kept only for decrypting during rotation. */
+  aiProviderCredentialEncryptionKeysByVersion: Map<number, Buffer>
+  aiProviderCredentialEncryptionKeyIsEphemeral: boolean
   pdsPilotEnabled: boolean
   moduleRegistryEnabled: boolean
   moduleInstallationEnabled: boolean
@@ -163,6 +174,7 @@ export type AppConfig = {
   moduleGithubSyncEnabled: boolean
   vaultNotesReferenceEnabled: boolean
   dimonEnabled: boolean
+  aiGatewayEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
 }
@@ -292,6 +304,38 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     )
   }
 
+  let aiProviderCredentialKey: EncryptionKeyMaterial
+  let aiProviderCredentialKeyIsEphemeral = false
+  const aiProviderCredentialKeysByVersion = new Map<number, Buffer>()
+  if (raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY) {
+    const key = decodeBase64Key(
+      'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY',
+      raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY,
+    )
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+    if (raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS) {
+      const previous = decodeBase64Key(
+        'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS',
+        raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS,
+      )
+      aiProviderCredentialKeysByVersion.set(0, previous)
+    }
+  } else if (raw.NODE_ENV === 'test') {
+    const key = deterministicTestKey('modula-ai-provider-credential-test')
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+  } else if (environment === 'development') {
+    const key = randomBytes(32)
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+    aiProviderCredentialKeyIsEphemeral = true
+  } else {
+    refuse(
+      'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY is required outside development/test (base64-encoded 32 bytes)',
+    )
+  }
+
   const mutationsEnabled = environment !== 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED
 
   return {
@@ -335,6 +379,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     connectorCredentialEncryptionKey: connectorCredentialKey,
     connectorCredentialEncryptionKeysByVersion: connectorCredentialKeysByVersion,
     connectorCredentialEncryptionKeyIsEphemeral: connectorCredentialKeyIsEphemeral,
+    aiProviderCredentialEncryptionKey: aiProviderCredentialKey,
+    aiProviderCredentialEncryptionKeysByVersion: aiProviderCredentialKeysByVersion,
+    aiProviderCredentialEncryptionKeyIsEphemeral: aiProviderCredentialKeyIsEphemeral,
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
     moduleRegistryEnabled: Boolean(raw.GREENFIELD_MODULE_REGISTRY_ENABLED),
     moduleInstallationEnabled: Boolean(raw.GREENFIELD_MODULE_INSTALLATION_ENABLED),
@@ -345,6 +392,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     moduleGithubSyncEnabled: Boolean(raw.GREENFIELD_MODULE_GITHUB_SYNC_ENABLED),
     vaultNotesReferenceEnabled: Boolean(raw.GREENFIELD_VAULT_NOTES_REFERENCE_ENABLED),
     dimonEnabled: Boolean(raw.GREENFIELD_DIMON_ENABLED),
+    aiGatewayEnabled: raw.GREENFIELD_AI_GATEWAY_ENABLED !== false,
     adminHandles: (raw.MODULA_ADMIN_HANDLES ?? '')
       .split(',')
       .map(h => h.trim().toLowerCase())

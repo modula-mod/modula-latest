@@ -154,9 +154,9 @@ export async function rollbackLatestMigration(env, expected) {
       'exec',
       'tsx',
       '-e',
-      `import {migrateDown} from './src/database/migrate.ts'; void (async () => { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); if (down !== '${expected}') { console.error(\`expected ${expected} rollback, got \${down}\`); process.exit(1) } })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })`,
+      `import {migrateDown} from './src/database/migrate.ts'; void (async () => { const rolledBack = []; for (let i = 0; i < 20; i += 1) { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); rolledBack.push(down); if (down === '${expected}') return; if (down === null) break; } console.error(\`expected rollback through ${expected}, got \${rolledBack.join(',')}\`); process.exit(1) })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })`,
     ],
-    `isolated migration ${expected} rollback`,
+    `isolated migration rollback reaches ${expected}`,
     root,
     env,
   )
