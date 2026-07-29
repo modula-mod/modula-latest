@@ -17,7 +17,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@modula/greenfield-module-manifest": "workspace:*"
+    "@modula/greenfield-module-manifest": "workspace:*",
+    "@modula/module-sdk": "file:../../../modula-mod/modula-module-standard/packages/module-sdk"
   },
   "devDependencies": {
     "typescript": "~5.9.2",

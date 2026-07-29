@@ -1,7 +1,16 @@
 /**
  * Host-facing module manifest boundary only.
  * Module implementations (e.g. Vault Notes) remain in separate repositories.
+ * Standard 1.0 lives in the independent modula-mod/modula-module-standard repository.
  */
+
+export type {
+  ModulaModuleManifest as ModulaModuleStandardManifest,
+  Capability as ModulaModuleStandardCapability,
+  Compatibility as ModulaModuleStandardCompatibility,
+  HealthDefinitions as ModulaModuleStandardHealth,
+  DiagnosticsDefinitions as ModulaModuleStandardDiagnostics,
+} from '@modula/module-standard'
 
 export type GreenfieldModuleUninstallBehaviour = 'retainData' | 'purgeData' | 'exportThenPurge'
 

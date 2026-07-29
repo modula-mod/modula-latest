@@ -1,0 +1,57 @@
+export {
+  DEFAULT_LIFECYCLE_TRANSITIONS,
+  MODULA_DATA_SCHEMA_VERSION,
+  MODULA_MANIFEST_SCHEMA_VERSION,
+  MODULA_MODULE_STANDARD_SCHEMA_URI,
+  MODULA_MODULE_STANDARD_VERSION,
+  compareSemver as standardCompareSemver,
+  isLifecycleTransitionAllowed,
+  isSemver as standardIsSemver,
+  isSemverRange as standardIsSemverRange,
+  manifestChecksum as standardManifestChecksum,
+  negotiateCapabilities,
+  negotiateCompatibility,
+  parseSemver as standardParseSemver,
+  satisfiesSemverRange as standardSatisfiesSemverRange,
+  sha256Hex as standardSha256Hex,
+  stableJson as standardStableJson,
+} from '@modula/module-standard'
+
+export {
+  assertValidLifecycleTransition,
+  validateModulaModuleManifest,
+} from '@modula/module-validator'
+
+export type {
+  ActionDefinitions,
+  AIIntegrationDefinitions,
+  AutomationDefinitions,
+  Capability,
+  CapabilityNegotiationResult,
+  Compatibility,
+  CompatibilityNegotiationResult,
+  DiagnosticsDefinitions,
+  EventDefinitions,
+  FunctionDefinitions,
+  HealthDefinitions,
+  HostCapability,
+  HostCompatibility,
+  Lifecycle,
+  LifecycleTransition,
+  MigrationDefinitions,
+  ModulaModuleManifest,
+  Permission,
+  Publisher,
+  RecordDefinitions,
+  ReleaseMetadata,
+  SearchDefinitions,
+  SettingsDefinitions,
+  TrustMetadata,
+  ViewDefinitions,
+} from '@modula/module-standard'
+
+export type {
+  ModulaModuleValidationIssue,
+  ModulaModuleValidationOptions,
+  ModulaModuleValidationResult,
+} from '@modula/module-validator'

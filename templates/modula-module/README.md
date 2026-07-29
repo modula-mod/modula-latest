@@ -5,7 +5,7 @@ Copy this folder to start a new **external** Modula module package.
 ## Rules
 
 1. Modules live outside the host app (`modula-latest`).
-2. Declare everything in `modula.module.json` (see `GreenfieldModuleManifest`).
+2. Declare everything in `modula.module.json` using Modula Module Standard 1.0.
 3. Use host design tokens — do not ship a parallel design system.
 4. Use namespaced storage only.
 5. Fail closed behind error boundaries.
@@ -13,10 +13,12 @@ Copy this folder to start a new **external** Modula module package.
 
 ## Checklist
 
-- [ ] Unique `moduleId`
+- [ ] Unique `id`
+- [ ] `standardVersion`, `moduleVersion`, `manifestSchemaVersion`, `dataSchemaVersion`
 - [ ] Honest permissions list
-- [ ] `hostCompatibility.minimumHostVersion`
-- [ ] Uninstall behaviour chosen
+- [ ] Host, runtime, standard, and platform compatibility ranges
+- [ ] Lifecycle and uninstall policy chosen
+- [ ] Records, views, actions, functions, events, diagnostics, health, release, and trust declared
 - [ ] No fake balances / untrusted code execution
 - [ ] README documents user-visible permissions
 
@@ -27,4 +29,4 @@ Use Forge Builder (`/product/forge`) to draft a manifest aligned to this shape.
 
 ## Standards
 
-See `docs/architecture/module-standards.md` and `docs/architecture/module-boundary.md`.
+See the independent standard repository at `/home/andrei/modula-mod/modula-module-standard`.
