@@ -35,7 +35,7 @@ import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
 import {ProfileWriteService} from '../domains/profiles/writes.js'
-import {SearchRepository} from '../domains/search/repository.js'
+import {GreenfieldSearchService} from '../domains/search/index.js'
 import {checkReadiness} from '../domains/system/health.js'
 import {
   GreenfieldConnectorProviderRegistry,
@@ -84,7 +84,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const notifications = new NotificationRepository(db)
   const notificationPreferences = new NotificationPreferencesService(db)
   const policies = new GreenfieldPolicyEngine(db)
-  const search = new SearchRepository(db)
+  const search = new GreenfieldSearchService(db, config)
   const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
@@ -230,6 +230,31 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return null
     }
     return resolved
+  }
+
+  const resolveSearchActorContext = async (request: any) => {
+    const header = request.headers.authorization
+    const resolved = header?.startsWith('Bearer ')
+      ? await greenfieldSessions.resolveAccess(header.slice(7).trim())
+      : null
+    let greenfieldActorId: string | null = null
+    if (resolved?.accountId) {
+      const actor = await db
+        .selectFrom('actors')
+        .select('id')
+        .where('account_id', '=', resolved.accountId)
+        .where('deleted_at', 'is', null)
+        .orderBy('created_at', 'asc')
+        .executeTakeFirst()
+      greenfieldActorId = actor?.id ?? null
+    }
+    return {
+      actorId: greenfieldActorId ?? request.auth?.actorId ?? null,
+      accountId: resolved?.accountId ?? null,
+      capabilities: request.auth?.capabilities ? Array.from(request.auth.capabilities).map(String) : [],
+      requestId: request.id,
+      correlationId: request.id,
+    }
   }
 
   const authWriteConfig = config.rateLimitEnabled
@@ -812,7 +837,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     try {
       const {postId} = request.params as {postId: string}
       const body = request.body as UpdatePostInput
-      const updated = await postWrites.update(auth.actorId, postId, body)
+      const updated = await postWrites.update(auth.actorId, postId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope(updated, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to update post')
@@ -825,7 +853,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     if (!auth) return
     try {
       const {postId} = request.params as {postId: string}
-      await postWrites.delete(auth.actorId, postId)
+      await postWrites.delete(auth.actorId, postId, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope({deleted: true}, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to delete post')
@@ -960,11 +991,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = requireCapability(request, reply, 'profile:update')
     if (!auth) return
     try {
-      const body = request.body as {displayName?: string; bio?: string; expectedVersion?: number; actorId?: string}
+      const body = request.body as {displayName?: string; bio?: string; visibility?: 'public' | 'followers' | 'teams' | 'private'; expectedVersion?: number; actorId?: string}
       if (body.actorId && body.actorId !== auth.actorId) {
         return sendError(reply, 'FORBIDDEN', 'Cross-actor profile edit denied', request.id)
       }
-      const updated = await profileWrites.updateMe(auth.actorId, body)
+      const updated = await profileWrites.updateMe(auth.actorId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope(updated, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Profile update failed')
@@ -1103,21 +1137,91 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.get('/v1/search', feedConfig, async (request, reply) => {
     try {
-      const query = request.query as Record<string, unknown>
-      const q = typeof query.q === 'string' ? query.q : ''
-      const type = (typeof query.type === 'string' ? query.type : 'all') as SearchType
-      const limit = parseLimit(query.limit)
-      const cursor = decodeCursor(query.cursor)
-      const data = await search.search({
-        q,
-        type,
-        limit,
-        cursor,
-        viewerActorId: request.auth?.actorId ?? null,
-      })
+      const data = await search.search(request.query as Record<string, unknown>, await resolveSearchActorContext(request))
       return reply.send(successEnvelope(data, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Search failed')
+    }
+  })
+
+  app.get('/v1/search/suggestions', feedConfig, async (request, reply) => {
+    try {
+      return reply.send(successEnvelope(await search.suggestions(request.query as Record<string, unknown>, await resolveSearchActorContext(request)), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search suggestions failed')
+    }
+  })
+
+  app.get('/v1/search/recent', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.listRecent(await resolveSearchActorContext(request), request.query as Record<string, unknown>), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search lookup failed')
+    }
+  })
+
+  app.post('/v1/search/recent', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.code(201).send(successEnvelope(await search.recordRecent(await resolveSearchActorContext(request), (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search save failed')
+    }
+  })
+
+  app.delete('/v1/search/recent', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const query = {...(request.query as Record<string, unknown>), ...(((request.body as any) ?? {}) as Record<string, unknown>)}
+      return reply.send(successEnvelope(await search.deleteRecent(await resolveSearchActorContext(request), query), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search delete failed')
+    }
+  })
+
+  app.get('/v1/search/saved', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.listSaved(await resolveSearchActorContext(request)), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search lookup failed')
+    }
+  })
+
+  app.post('/v1/search/saved', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.code(201).send(successEnvelope(await search.createSaved(await resolveSearchActorContext(request), (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search create failed')
+    }
+  })
+
+  app.patch('/v1/search/saved/:savedSearchId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const {savedSearchId} = request.params as {savedSearchId: string}
+      return reply.send(successEnvelope(await search.patchSaved(await resolveSearchActorContext(request), savedSearchId, (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search update failed')
+    }
+  })
+
+  app.delete('/v1/search/saved/:savedSearchId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const {savedSearchId} = request.params as {savedSearchId: string}
+      return reply.send(successEnvelope(await search.deleteSaved(await resolveSearchActorContext(request), savedSearchId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search delete failed')
     }
   })
 
@@ -1389,6 +1493,61 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return reply.send(successEnvelope(await eventReplays.inspectSubscriberFailures(query.subscriberId), request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to inspect event subscriber failures')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/health', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.health(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search health lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/projections', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.projectionStates(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/failures', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.projectionFailures(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection failure lookup failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/search/reindex', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      const context = await resolveSearchActorContext(request)
+      context.capabilities = Array.from(auth.capabilities)
+      return reply.code(202).send(successEnvelope(await search.requestReindex(context, (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search reindex request failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/search/failures/:failureId/retry', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      const context = await resolveSearchActorContext(request)
+      context.capabilities = Array.from(auth.capabilities)
+      const {failureId} = request.params as {failureId: string}
+      return reply.send(successEnvelope(await search.retryFailure(context, failureId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection failure retry failed')
     }
   })
 

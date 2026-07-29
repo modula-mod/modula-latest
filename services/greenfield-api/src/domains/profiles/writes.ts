@@ -1,9 +1,15 @@
 import {randomUUID} from 'node:crypto'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
+import {GreenfieldEventBus} from '../../events/index.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {ProfileRepository} from './repository.js'
 import type {ModulaProfileDto} from '@modula/api-contracts'
+
+export type ProfileWriteContext = {
+  requestId?: string | null
+  correlationId?: string | null
+}
 
 export class ProfileWriteService {
   private readonly profiles: ProfileRepository
@@ -89,7 +95,8 @@ export class ProfileWriteService {
 
   async updateMe(
     actorId: string,
-    patch: {displayName?: string; bio?: string; expectedVersion?: number},
+    patch: {displayName?: string; bio?: string; visibility?: 'public' | 'followers' | 'teams' | 'private'; expectedVersion?: number},
+    context: ProfileWriteContext = {},
   ): Promise<ModulaProfileDto> {
     const row = await this.db
       .selectFrom('profiles')
@@ -106,14 +113,19 @@ export class ProfileWriteService {
     if (displayName !== undefined && !displayName) {
       throw Object.assign(new Error('displayName required'), {code: 'VALIDATION_FAILED'})
     }
+    const nextVersion = row.version + 1
+    const visibility = patch.visibility ?? row.visibility
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     await this.db.transaction().execute(async trx => {
+      const now = new Date()
       let query = trx
         .updateTable('profiles')
         .set({
           display_name: displayName ?? row.display_name,
           bio: bio ?? row.bio,
-          updated_at: new Date(),
-          version: row.version + 1,
+          visibility,
+          updated_at: now,
+          version: nextVersion,
         })
         .where('id', '=', row.id)
       if (patch.expectedVersion != null) query = query.where('version', '=', patch.expectedVersion)
@@ -132,6 +144,49 @@ export class ProfileWriteService {
         id: row.id,
         actorId,
       })
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'profile.updated',
+        aggregateType: 'profile',
+        aggregateId: row.id,
+        aggregateVersion: nextVersion,
+        accountId: actor?.account_id ?? null,
+        actorId,
+        requestId: context.requestId ?? null,
+        correlationId: context.correlationId ?? context.requestId ?? null,
+        visibility: visibility === 'public' ? 'public' : 'actor',
+        classification: 'internal',
+        payload: {
+          profileId: row.id,
+          actorId,
+          visibility,
+          sourceVersion: nextVersion,
+        },
+        metadata: {source: 'greenfield.profiles'},
+        occurredAt: now,
+      })
+      if (visibility !== row.visibility) {
+        await new GreenfieldEventBus(trx).publish({
+          eventType: 'profile.visibility-changed',
+          aggregateType: 'profile',
+          aggregateId: row.id,
+          aggregateVersion: nextVersion,
+          accountId: actor?.account_id ?? null,
+          actorId,
+          requestId: context.requestId ?? null,
+          correlationId: context.correlationId ?? context.requestId ?? null,
+          visibility: visibility === 'public' ? 'public' : 'actor',
+          classification: 'internal',
+          payload: {
+            profileId: row.id,
+            actorId,
+            previousVisibility: row.visibility,
+            visibility,
+            sourceVersion: nextVersion,
+          },
+          metadata: {source: 'greenfield.profiles'},
+          occurredAt: now,
+        })
+      }
     })
     const updated = await this.profiles.getByActorId(actorId)
     if (!updated) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})

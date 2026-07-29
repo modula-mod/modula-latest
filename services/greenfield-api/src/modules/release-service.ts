@@ -10,6 +10,7 @@ import type {GreenfieldModuleReleaseState} from '../database/types.js'
 import type {ModulaDb} from '../database/client.js'
 import {AuditRepository} from '../domains/audit/repository.js'
 import {OutboxRepository} from '../domains/outbox/repository.js'
+import {GreenfieldEventBus} from '../events/index.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
@@ -58,6 +59,7 @@ export class GreenfieldModuleReleaseService {
     const moduleVersionId = `module-version:${manifest.moduleId}:${manifest.version}`
     const releaseId = `module-release:${manifest.moduleId}:${manifest.version}`
     const now = new Date()
+    const sourceVersion = Math.floor(now.getTime() / 1000)
     const computedManifestSha = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
     const releaseSha = manifest.integrity.releaseSha256 ?? computedManifestSha
 
@@ -221,6 +223,28 @@ export class GreenfieldModuleReleaseService {
           .execute()
       }
       await new AuditRepository(trx).append('module.release.imported', {moduleId: manifest.moduleId, version: manifest.version}, {type: 'moduleRelease', id: releaseId})
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.release.imported',
+        aggregateType: 'moduleRelease',
+        aggregateId: releaseId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'internal',
+        payload: {releaseId, moduleId: manifest.moduleId, version: manifest.version, releaseState: 'pendingReview'},
+        metadata: {source: 'greenfield.modules'},
+        occurredAt: now,
+      })
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.discovered',
+        aggregateType: 'module',
+        aggregateId: manifest.moduleId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'internal',
+        payload: {releaseId, moduleId: manifest.moduleId, version: manifest.version, releaseState: 'pendingReview'},
+        metadata: {source: 'greenfield.modules'},
+        occurredAt: now,
+      })
       await new OutboxRepository(trx).enqueue(trx, {
         eventType: 'module.release.verify' as any,
         aggregateType: 'moduleRelease',
@@ -312,6 +336,7 @@ export class GreenfieldModuleReleaseService {
       throw moduleError('VALIDATION_FAILED', `Release ${moduleId}@${version} cannot be published from ${release.releaseState}`)
     }
     const now = new Date()
+    const sourceVersion = Math.floor(now.getTime() / 1000)
     await this.db.transaction().execute(async trx => {
       await trx
         .updateTable('greenfield_module_releases')
@@ -361,6 +386,28 @@ export class GreenfieldModuleReleaseService {
         )
         .execute()
       await new AuditRepository(trx).append('module.release.published', {moduleId, version}, {type: 'moduleRelease', id: release.releaseId})
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.release.published',
+        aggregateType: 'moduleRelease',
+        aggregateId: release.releaseId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'internal',
+        payload: {releaseId: release.releaseId, moduleId, version, releaseState: 'published'},
+        metadata: {source: 'greenfield.modules'},
+        occurredAt: now,
+      })
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.updated',
+        aggregateType: 'module',
+        aggregateId: moduleId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'internal',
+        payload: {releaseId: release.releaseId, moduleId, version, releaseState: 'published'},
+        metadata: {source: 'greenfield.modules'},
+        occurredAt: now,
+      })
       await new OutboxRepository(trx).enqueue(trx, {
         eventType: 'module.release.publish' as any,
         aggregateType: 'moduleRelease',
@@ -373,6 +420,13 @@ export class GreenfieldModuleReleaseService {
 
   async quarantineRelease(releaseId: string, reason: string, policyAction: 'warn' | 'disableExecutableContributions' | 'block' = 'block') {
     const now = new Date()
+    const sourceVersion = Math.floor(now.getTime() / 1000)
+    const release = await this.db
+      .selectFrom('greenfield_module_releases')
+      .select(['module_id', 'version'])
+      .where('release_id', '=', releaseId)
+      .executeTakeFirst()
+    if (!release) throw moduleError('NOT_FOUND', 'Release not found')
     await this.db.transaction().execute(async trx => {
       await trx
         .updateTable('greenfield_module_releases')
@@ -397,11 +451,40 @@ export class GreenfieldModuleReleaseService {
         .where('release_id', '=', releaseId)
         .where('execution_required', '=', true)
         .execute()
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.release.quarantined',
+        aggregateType: 'moduleRelease',
+        aggregateId: releaseId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'sensitive',
+        payload: {releaseId, moduleId: release.module_id, version: release.version, releaseState: 'quarantined'},
+        metadata: {source: 'greenfield.modules', reasonCode: 'administrative'},
+        occurredAt: now,
+      })
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.quarantined',
+        aggregateType: 'module',
+        aggregateId: release.module_id,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'sensitive',
+        payload: {releaseId, moduleId: release.module_id, version: release.version, releaseState: 'quarantined'},
+        metadata: {source: 'greenfield.modules', reasonCode: 'administrative'},
+        occurredAt: now,
+      })
     })
   }
 
   async revokeRelease(releaseId: string, reason = 'administrative revocation') {
     const now = new Date()
+    const sourceVersion = Math.floor(now.getTime() / 1000)
+    const release = await this.db
+      .selectFrom('greenfield_module_releases')
+      .select(['module_id', 'version'])
+      .where('release_id', '=', releaseId)
+      .executeTakeFirst()
+    if (!release) throw moduleError('NOT_FOUND', 'Release not found')
     await this.db.transaction().execute(async trx => {
       await trx.updateTable('greenfield_module_releases').set({release_state: 'revoked', revoked_at: now, updated_at: now}).where('release_id', '=', releaseId).execute()
       await trx
@@ -409,6 +492,28 @@ export class GreenfieldModuleReleaseService {
         .values({revocation_id: `module-revocation:${releaseId}`, scope: 'release', target_id: releaseId, reason, created_by: null, created_at: now})
         .onConflict(oc => oc.columns(['scope', 'target_id']).doUpdateSet({reason, created_at: now}))
         .execute()
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.release.revoked',
+        aggregateType: 'moduleRelease',
+        aggregateId: releaseId,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'sensitive',
+        payload: {releaseId, moduleId: release.module_id, version: release.version, releaseState: 'revoked'},
+        metadata: {source: 'greenfield.modules', reasonCode: 'administrative'},
+        occurredAt: now,
+      })
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'module.quarantined',
+        aggregateType: 'module',
+        aggregateId: release.module_id,
+        aggregateVersion: sourceVersion,
+        visibility: 'internal',
+        classification: 'sensitive',
+        payload: {releaseId, moduleId: release.module_id, version: release.version, releaseState: 'revoked'},
+        metadata: {source: 'greenfield.modules', reasonCode: 'administrative'},
+        occurredAt: now,
+      })
     })
   }
 
