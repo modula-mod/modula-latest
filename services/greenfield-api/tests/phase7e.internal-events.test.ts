@@ -30,6 +30,8 @@ describeIfDb('Phase 7E Greenfield internal events', () => {
 
   it('appends idempotent domain events and creates subscriber delivery rows', async () => {
     const events = new GreenfieldDomainEventRepository(db)
+    const postId = `post-phase7e-events-${accountId}`
+    const idempotencyKey = `phase7e-events-idempotent-${accountId}`
     await events.registerSubscription({
       eventType: 'post.created',
       subscriberId: 'greenfield.search.posts',
@@ -40,24 +42,24 @@ describeIfDb('Phase 7E Greenfield internal events', () => {
     const first = await events.append({
       eventType: 'post.created',
       aggregateType: 'post',
-      aggregateId: 'post-phase7e-events',
+      aggregateId: postId,
       accountId,
       actorId,
       requestId: 'req-phase7e-events',
-      idempotencyKey: 'phase7e-events-idempotent',
-      payload: {postId: 'post-phase7e-events', mediaCount: 0},
+      idempotencyKey,
+      payload: {postId, mediaCount: 0},
       metadata: {source: 'test'},
       occurredAt: new Date('2026-07-29T10:00:00.000Z'),
     })
     const second = await events.append({
       eventType: 'post.created',
       aggregateType: 'post',
-      aggregateId: 'post-phase7e-events',
+      aggregateId: postId,
       accountId,
       actorId,
       requestId: 'req-phase7e-events-retry',
-      idempotencyKey: 'phase7e-events-idempotent',
-      payload: {postId: 'post-phase7e-events', mediaCount: 99},
+      idempotencyKey,
+      payload: {postId, mediaCount: 99},
       metadata: {source: 'retry'},
     })
 
@@ -72,14 +74,23 @@ describeIfDb('Phase 7E Greenfield internal events', () => {
       .selectFrom('greenfield_event_deliveries')
       .select(['subscriber_id', 'target_type', 'target_key', 'status'])
       .where('event_id', '=', first.eventId)
+      .orderBy('subscriber_id')
       .execute()
-    expect(deliveries).toHaveLength(1)
-    expect(deliveries[0]).toMatchObject({
-      subscriber_id: 'greenfield.search.posts',
-      target_type: 'search-index',
-      target_key: 'search.index.post',
-      status: 'pending',
-    })
+    expect(deliveries).toHaveLength(2)
+    expect(deliveries).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        subscriber_id: 'greenfield.search.posts',
+        target_type: 'search-index',
+        target_key: 'search.index.post',
+        status: 'pending',
+      }),
+      expect.objectContaining({
+        subscriber_id: 'search.post-projector',
+        target_type: 'search-index',
+        target_key: 'post',
+        status: 'pending',
+      }),
+    ]))
   })
 
   it('registers the required Phase 7E event families with routing metadata', async () => {
