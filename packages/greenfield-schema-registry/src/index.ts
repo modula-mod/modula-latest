@@ -1,4 +1,5 @@
 export type GreenfieldVisibility = 'public' | 'followers' | 'teams' | 'private' | 'system'
+export * from './events.js'
 export type RegistrySchema = {
   id: string
   version: number

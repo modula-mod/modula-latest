@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
-import type {ModulaWorkerDb} from '../database.js'
+import {sql} from 'kysely'
+import type {ModulaWorkerDb, NotificationChannel} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
 
 type SocialNotificationKind =
@@ -34,6 +35,8 @@ const BODIES: Record<SocialNotificationKind, string> = {
   extension: 'sent an extension notification',
 }
 
+const jsonb = (value: unknown) => sql<unknown>`${JSON.stringify(value)}::jsonb`
+
 /**
  * Social notification writer with self-notification suppression.
  * Burst reactions reuse a recent matching notification body when possible.
@@ -56,12 +59,14 @@ export async function handleSocialNotification(
   }
   if (actorId && actorId === recipientActorId) return
 
+  const category = kind === 'extension' ? 'module' : 'social'
   const prefs = await db
     .selectFrom('notification_preferences')
     .selectAll()
     .where('actor_id', '=', recipientActorId)
     .executeTakeFirst()
   if (prefs) {
+    if (!prefs.in_app_enabled || categoryDisabled(prefs.category_preferences, category)) return
     const enabled =
       kind === 'reaction'
         ? prefs.like_enabled && prefs.reaction_enabled
@@ -82,13 +87,15 @@ export async function handleSocialNotification(
   }
 
   const now = new Date()
+  const channels: NotificationChannel[] = ['in-app']
+  const dedupeKey = kind === 'reaction' && resourceId ? `social:reaction:${resourceType}:${resourceId}` : null
   if (kind === 'reaction') {
     const recent = await db
       .selectFrom('notifications')
       .selectAll()
       .where('recipient_actor_id', '=', recipientActorId)
       .where('type', '=', 'like')
-      .where('resource_id', '=', resourceId)
+      .where('dedupe_key', '=', dedupeKey)
       .where('created_at', '>', new Date(now.getTime() - 5 * 60_000))
       .orderBy('created_at', 'desc')
       .executeTakeFirst()
@@ -96,7 +103,9 @@ export async function handleSocialNotification(
       await db
         .updateTable('notifications')
         .set({
-          body: 'And others reacted to your post.',
+          body: `${recent.aggregate_count + 1} people reacted to your post`,
+          aggregate_count: recent.aggregate_count + 1,
+          last_aggregated_at: now,
           updated_at: now,
           version: recent.version + 1,
         })
@@ -113,6 +122,12 @@ export async function handleSocialNotification(
       recipient_actor_id: recipientActorId,
       actor_id: actorId,
       type: KIND_TO_LEGACY[kind],
+      category,
+      channels: jsonb(channels),
+      dedupe_key: dedupeKey,
+      aggregate_count: 1,
+      aggregate_window_started_at: now,
+      last_aggregated_at: now,
       resource_type: resourceType,
       resource_id: resourceId,
       body: BODIES[kind],
@@ -123,4 +138,9 @@ export async function handleSocialNotification(
       version: 1,
     })
     .execute()
+}
+
+function categoryDisabled(value: unknown, category: string): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  return (value as Record<string, unknown>)[category] === false
 }

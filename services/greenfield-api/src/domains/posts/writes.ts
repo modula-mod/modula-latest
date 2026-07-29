@@ -149,6 +149,8 @@ export class PostWriteService {
           requestId: context.requestId ?? null,
           correlationId: context.correlationId ?? context.requestId ?? null,
           idempotencyKey: idempotencyKey ? `post.create:${actorId}:${idempotencyKey}` : null,
+          visibility: audience === 'public' ? 'public' : 'actor',
+          classification: 'internal',
           payload: {
             postId: id,
             actorId,

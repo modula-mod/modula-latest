@@ -12,6 +12,22 @@ export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
+export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
+export type PolicyDecisionCode =
+  | 'ALLOWED'
+  | 'RESOURCE_NOT_VISIBLE'
+  | 'MODULE_NOT_ENABLED'
+  | 'MODULE_PERMISSION_MISSING'
+  | 'AI_CONTEXT_NOT_ALLOWED'
+  | 'CONNECTION_NOT_HEALTHY'
+  | 'REAUTHENTICATION_REQUIRED'
+  | 'TRANSACTION_CONFIRMATION_REQUIRED'
+  | 'ADMIN_ROLE_REQUIRED'
+  | 'FORBIDDEN'
+export type NotificationCategory = 'social' | 'module' | 'AI' | 'connector' | 'automation' | 'security' | 'system' | 'DIMON' | 'marketplace'
+export type NotificationChannel = 'in-app' | 'email' | 'web-push'
+export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'manual'
 export type GreenfieldEventDeliveryTargetType =
   | 'notification'
   | 'search-index'
@@ -22,7 +38,14 @@ export type GreenfieldEventDeliveryTargetType =
   | 'connector-sync'
   | 'background-job'
   | 'internal-subscriber'
-export type GreenfieldEventDeliveryStatus = 'pending' | 'leased' | 'delivered' | 'failed' | 'dead_letter' | 'cancelled'
+export type GreenfieldEventDeliveryStatus =
+  | 'pending'
+  | 'leased'
+  | 'processing'
+  | 'completed'
+  | 'retrying'
+  | 'dead_lettered'
+  | 'cancelled'
 export type GreenfieldModuleReleaseState =
   | 'draft'
   | 'pendingReview'
@@ -250,11 +273,41 @@ export interface Database {
   }
   audit_events: {
     id: string
+    audit_id: string
     event_type: string
+    account_id: string | null
     actor_id: string | null
+    action: string
     resource_type: string | null
     resource_id: string | null
+    result: 'succeeded' | 'denied' | 'failed' | 'cancelled'
+    request_id: string | null
+    correlation_id: string | null
+    ip_classification: 'unknown' | 'local' | 'private' | 'public' | 'trusted-proxy'
+    user_agent_classification: 'unknown' | 'browser' | 'mobile' | 'service' | 'bot' | 'cli'
+    metadata_schema_version: number
     metadata: unknown
+    created_at: Date
+  }
+  greenfield_policy_decision_audit: {
+    decision_id: string
+    actor_id: string | null
+    account_id: string | null
+    action: string
+    capability: string | null
+    resource_type: string | null
+    resource_id: string | null
+    resource_owner_actor_id: string | null
+    module_id: string | null
+    connection_id: string | null
+    allowed: boolean
+    code: PolicyDecisionCode
+    obligations: unknown
+    audit_required: boolean
+    risk_classification: string | null
+    request_id: string | null
+    correlation_id: string | null
+    context: unknown
     created_at: Date
   }
   outbox_events: {
@@ -274,16 +327,34 @@ export interface Database {
     event_version: string
     aggregate_type: string
     aggregate_id: string
+    aggregate_version: number | null
     account_id: string | null
     actor_id: string | null
-    request_id: string | null
-    correlation_id: string | null
+    request_id: string
+    correlation_id: string
     causation_id: string | null
     idempotency_key: string | null
+    visibility: EventVisibility
+    classification: EventDataClassification
     payload: unknown
     metadata: unknown
     occurred_at: Date
     recorded_at: Date
+  }
+  greenfield_event_schema_registry: {
+    event_type: string
+    event_version: string
+    owner: string
+    aggregate_type: string
+    json_schema: unknown
+    compatibility_policy: string
+    retention_policy: string
+    data_classification: EventDataClassification
+    permitted_subscribers: unknown
+    replay_policy: 'safe-idempotent' | 'guarded-idempotent' | 'manual-approval-required' | 'not-replayable'
+    lifecycle_state: 'active' | 'deprecated' | 'retired'
+    created_at: Date
+    updated_at: Date
   }
   greenfield_event_subscriptions: {
     subscription_id: string
@@ -293,6 +364,10 @@ export interface Database {
     target_key: string
     filters: unknown
     enabled: boolean
+    permitted_visibility: EventVisibility[]
+    permitted_classifications: EventDataClassification[]
+    subscriber_timeout_ms: number
+    max_concurrency: number
     created_at: Date
     updated_at: Date
   }
@@ -314,6 +389,33 @@ export interface Database {
     delivered_at: Date | null
     created_at: Date
     updated_at: Date
+  }
+  greenfield_event_inbox: {
+    subscriber_id: string
+    event_id: string
+    processing_state: 'received' | 'processing' | 'completed' | 'failed' | 'skipped'
+    first_received_at: Date
+    last_attempted_at: Date | null
+    completed_at: Date | null
+    attempt_count: number
+    failure_code: string | null
+  }
+  greenfield_event_replay_requests: {
+    replay_id: string
+    mode: 'event' | 'event_type' | 'date_range' | 'aggregate' | 'dead_letters'
+    requested_by_actor_id: string | null
+    reason: string
+    request_id: string
+    correlation_id: string
+    selector: unknown
+    dry_run: boolean
+    state: 'planned' | 'running' | 'completed' | 'cancelled' | 'failed'
+    planned_count: number
+    replayed_count: number
+    failure_code: string | null
+    created_at: Date
+    updated_at: Date
+    completed_at: Date | null
   }
   activity_items: {
     id: string
@@ -386,6 +488,12 @@ export interface Database {
     recipient_actor_id: string
     actor_id: string | null
     type: NotificationType
+    category: NotificationCategory
+    channels: unknown
+    dedupe_key: string | null
+    aggregate_count: number
+    aggregate_window_started_at: Date | null
+    last_aggregated_at: Date | null
     resource_type: string | null
     resource_id: string | null
     body: string
@@ -408,6 +516,19 @@ export interface Database {
     mention_enabled: boolean
     module_event_enabled: boolean
     extension_enabled: boolean
+    in_app_enabled: boolean
+    email_enabled: boolean
+    web_push_enabled: boolean
+    frequency: NotificationFrequency
+    digest_mode: boolean
+    quiet_hours: unknown
+    channel_preferences: unknown
+    category_preferences: unknown
+    module_preferences: unknown
+    connector_failure_enabled: boolean
+    ai_completion_enabled: boolean
+    automation_failure_enabled: boolean
+    dimon_transaction_confirmation_enabled: boolean
     bundle_style: 'individual' | 'focus' | 'digest'
     created_at: Date
     updated_at: Date

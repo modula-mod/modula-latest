@@ -2,6 +2,29 @@ import {Kysely, PostgresDialect} from 'kysely'
 import pg from 'pg'
 
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
+export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
+export type NotificationCategory = 'social' | 'module' | 'AI' | 'connector' | 'automation' | 'security' | 'system' | 'DIMON' | 'marketplace'
+export type NotificationChannel = 'in-app' | 'email' | 'web-push'
+export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'manual'
+export type GreenfieldEventDeliveryTargetType =
+  | 'notification'
+  | 'search-index'
+  | 'ai-index'
+  | 'analytics'
+  | 'automation'
+  | 'dimon-anchor'
+  | 'connector-sync'
+  | 'background-job'
+  | 'internal-subscriber'
+export type GreenfieldEventDeliveryStatus =
+  | 'pending'
+  | 'leased'
+  | 'processing'
+  | 'completed'
+  | 'retrying'
+  | 'dead_lettered'
+  | 'cancelled'
 export type AtprotoConnectionStatus = 'pending' | 'connected' | 'refreshRequired' | 'revoked' | 'disconnected' | 'error'
 export type AtprotoPublicationStatus =
   | 'pending'
@@ -51,11 +74,81 @@ export interface Database {
     attempt_count: number
     last_error: string | null
   }
+  greenfield_domain_events: {
+    event_id: string
+    event_type: string
+    event_version: string
+    aggregate_type: string
+    aggregate_id: string
+    aggregate_version: number | null
+    account_id: string | null
+    actor_id: string | null
+    request_id: string
+    correlation_id: string
+    causation_id: string | null
+    idempotency_key: string | null
+    visibility: EventVisibility
+    classification: EventDataClassification
+    payload: unknown
+    metadata: unknown
+    occurred_at: Date
+    recorded_at: Date
+  }
+  greenfield_event_subscriptions: {
+    subscription_id: string
+    event_type: string
+    subscriber_id: string
+    target_type: GreenfieldEventDeliveryTargetType
+    target_key: string
+    filters: unknown
+    enabled: boolean
+    permitted_visibility: EventVisibility[]
+    permitted_classifications: EventDataClassification[]
+    subscriber_timeout_ms: number
+    max_concurrency: number
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_event_deliveries: {
+    delivery_id: string
+    event_id: string
+    subscriber_id: string
+    target_type: GreenfieldEventDeliveryTargetType
+    target_key: string
+    status: GreenfieldEventDeliveryStatus
+    payload: unknown
+    available_at: Date
+    lease_owner: string | null
+    lease_expires_at: Date | null
+    attempt_count: number
+    maximum_attempts: number
+    failure_code: string | null
+    failure_message: string | null
+    delivered_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_event_inbox: {
+    subscriber_id: string
+    event_id: string
+    processing_state: 'received' | 'processing' | 'completed' | 'failed' | 'skipped'
+    first_received_at: Date
+    last_attempted_at: Date | null
+    completed_at: Date | null
+    attempt_count: number
+    failure_code: string | null
+  }
   notifications: {
     id: string
     recipient_actor_id: string
     actor_id: string | null
     type: 'follow' | 'like' | 'repost' | 'reply' | 'mention' | 'module_event'
+    category: NotificationCategory
+    channels: unknown
+    dedupe_key: string | null
+    aggregate_count: number
+    aggregate_window_started_at: Date | null
+    last_aggregated_at: Date | null
     resource_type: string | null
     resource_id: string | null
     body: string
@@ -78,6 +171,19 @@ export interface Database {
     mention_enabled: boolean
     module_event_enabled: boolean
     extension_enabled: boolean
+    in_app_enabled: boolean
+    email_enabled: boolean
+    web_push_enabled: boolean
+    frequency: NotificationFrequency
+    digest_mode: boolean
+    quiet_hours: unknown
+    channel_preferences: unknown
+    category_preferences: unknown
+    module_preferences: unknown
+    connector_failure_enabled: boolean
+    ai_completion_enabled: boolean
+    automation_failure_enabled: boolean
+    dimon_transaction_confirmation_enabled: boolean
     bundle_style: 'individual' | 'focus' | 'digest'
     created_at: Date
     updated_at: Date
@@ -202,10 +308,19 @@ export interface Database {
   }
   audit_events: {
     id: string
+    audit_id: string
     event_type: string
+    account_id: string | null
     actor_id: string | null
+    action: string
     resource_type: string | null
     resource_id: string | null
+    result: 'succeeded' | 'denied' | 'failed' | 'cancelled'
+    request_id: string | null
+    correlation_id: string | null
+    ip_classification: 'unknown' | 'local' | 'private' | 'public' | 'trusted-proxy'
+    user_agent_classification: 'unknown' | 'browser' | 'mobile' | 'service' | 'bot' | 'cli'
+    metadata_schema_version: number
     metadata: unknown
     created_at: Date
   }

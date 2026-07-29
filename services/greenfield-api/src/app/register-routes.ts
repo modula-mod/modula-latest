@@ -20,6 +20,7 @@ import {ExtensionRegistry} from '../extensions/extension-registry.js'
 import {InstallationService} from '../extensions/installation-service.js'
 import {FunctionService} from '../functions/service.js'
 import {GreenfieldSessionService} from '../sessions/service.js'
+import {GreenfieldEventReplayService} from '../events/index.js'
 import {RepositoryService} from '../repositories/service.js'
 import {RecordService} from '../records/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -29,6 +30,7 @@ import {ModerationRepository} from '../domains/moderation/repository.js'
 import {PostMediaStorage} from '../domains/media/post-media-storage.js'
 import {NotificationPreferencesService} from '../domains/notifications/preferences.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
+import {GreenfieldPolicyEngine} from '../domains/policy/index.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
@@ -81,10 +83,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const moderation = new ModerationRepository(db)
   const notifications = new NotificationRepository(db)
   const notificationPreferences = new NotificationPreferencesService(db)
+  const policies = new GreenfieldPolicyEngine(db)
   const search = new SearchRepository(db)
   const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
+  const eventReplays = new GreenfieldEventReplayService(db)
   const accounts = new AccountService(db, config)
   const authentication = new AuthenticationService(db, greenfieldSessions)
   const repositories = new RepositoryService(db)
@@ -666,6 +670,13 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     if (!auth) return
     try {
       const connection = await connectorConnections.get(auth.accountId, (request.params as any).connectionId)
+      await policies.assertAllowed({
+        accountId: auth.accountId,
+        action: 'connection.refresh',
+        connectionId: connection.connectionId,
+        resource: {type: 'connection', id: connection.connectionId, ownerAccountId: auth.accountId},
+        requestContext: {requestId: request.id, correlationId: request.id},
+      })
       const adapter = connectorAdapters.require(connection.providerId)
       await connectorConnections.beginRefresh(auth.accountId, connection.connectionId)
       try {
@@ -706,6 +717,13 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
     try {
+      await policies.assertAllowed({
+        accountId: auth.accountId,
+        action: 'connection.disconnect',
+        connectionId: (request.params as any).connectionId,
+        resource: {type: 'connection', id: (request.params as any).connectionId, ownerAccountId: auth.accountId},
+        requestContext: {requestId: request.id, correlationId: request.id},
+      })
       return reply.send(successEnvelope(await connectorConnections.disconnect(auth.accountId, (request.params as any).connectionId), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Connection disconnect failed')
@@ -1363,6 +1381,105 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
 
+  app.get('/v1/admin/ops/events/subscriber-failures', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const query = request.query as {subscriberId?: string}
+    try {
+      return reply.send(successEnvelope(await eventReplays.inspectSubscriberFailures(query.subscriberId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to inspect event subscriber failures')
+    }
+  })
+
+  app.post('/v1/admin/ops/policy/evaluate', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = (request.body as Record<string, unknown>) ?? {}
+    try {
+      const decision = await policies.evaluateAndAudit({
+        actorId: textField(body.actorId) ?? auth.actorId,
+        accountId: textField(body.accountId),
+        action: textField(body.action) ?? 'policy.inspect',
+        capability: textField(body.capability),
+        moduleId: textField(body.moduleId),
+        connectionId: textField(body.connectionId),
+        workspaceId: textField(body.workspaceId),
+        teamId: textField(body.teamId),
+        riskClassification: textField(body.riskClassification),
+        currentState: textField(body.currentState),
+        resource: objectField(body.resource),
+        requestContext: {
+          requestId: request.id,
+          correlationId: request.id,
+          userAgentClassification: classifyUserAgent(request.headers['user-agent']),
+          ipClassification: 'unknown',
+        },
+      })
+      return reply.send(successEnvelope({decision}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Policy evaluation failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/replay', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = request.body as Record<string, unknown>
+    try {
+      const result = await eventReplays.replay({
+        eventId: textField(body.eventId),
+        eventType: textField(body.eventType),
+        aggregateType: textField(body.aggregateType),
+        aggregateId: textField(body.aggregateId),
+        subscriberId: textField(body.subscriberId),
+        occurredFrom: dateField(body.occurredFrom),
+        occurredTo: dateField(body.occurredTo),
+        dryRun: Boolean(body.dryRun),
+        reason: textField(body.reason) ?? 'operator event replay',
+        requestedByActorId: auth.actorId,
+        requestId: request.id,
+        correlationId: request.id,
+      })
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to replay event deliveries')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/dead-letters/retry', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = request.body as Record<string, unknown>
+    try {
+      const result = await eventReplays.retryDeadLetters({
+        eventType: textField(body.eventType),
+        subscriberId: textField(body.subscriberId),
+        dryRun: Boolean(body.dryRun),
+        reason: textField(body.reason) ?? 'operator dead-letter retry',
+        requestedByActorId: auth.actorId,
+        requestId: request.id,
+        correlationId: request.id,
+      })
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to retry event dead letters')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/replay/:replayId/cancel', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const {replayId} = request.params as {replayId: string}
+    const body = request.body as {reason?: string}
+    try {
+      const cancelled = await eventReplays.cancelReplay(replayId, auth.actorId, body.reason ?? 'operator cancelled unsafe replay')
+      return reply.send(successEnvelope({replayId, cancelled}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to cancel event replay')
+    }
+  })
+
   app.post('/v1/admin/ops/atproto/lexicons/:collection/disable', writeConfig, async (request, reply) => {
     const auth = requireCapability(request, reply, 'admin:moderation')
     if (!auth) return
@@ -1371,6 +1488,31 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     await setOperationalControl(`atproto.lexicon.${collection}.disabled`, Boolean(body.disabled), auth.actorId)
     return reply.send(successEnvelope({collection, disabled: Boolean(body.disabled)}, request.id))
   })
+
+  function textField(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined
+  }
+
+  function dateField(value: unknown): Date | undefined {
+    if (typeof value !== 'string' || value.trim().length === 0) return undefined
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return undefined
+    return date
+  }
+
+  function objectField(value: unknown): any {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined
+  }
+
+  function classifyUserAgent(value: unknown): 'unknown' | 'browser' | 'mobile' | 'service' | 'bot' | 'cli' {
+    const userAgent = Array.isArray(value) ? value.join(' ') : typeof value === 'string' ? value : ''
+    if (!userAgent) return 'unknown'
+    if (/(curl|httpie|wget|python-requests|go-http-client)/i.test(userAgent)) return 'cli'
+    if (/(bot|crawler|spider)/i.test(userAgent)) return 'bot'
+    if (/(iphone|ipad|android|mobile)/i.test(userAgent)) return 'mobile'
+    if (/(mozilla|safari|chrome|firefox|edge)/i.test(userAgent)) return 'browser'
+    return 'service'
+  }
 
   // SSRF helper exposed only in tests via internal assert
   app.get('/v1/internal/ssrf-check', async (request, reply) => {

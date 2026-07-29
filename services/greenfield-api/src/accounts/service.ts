@@ -4,6 +4,7 @@ import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {hashPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
+import {AuditRepository} from '../domains/audit/repository.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
 
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex')
@@ -101,18 +102,12 @@ export class AccountService {
           created_at: now,
         })
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'account.registered',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: accountId,
-          metadata: {handle},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'account.registered',
+        {handle},
+        {type: 'greenfield_account', id: accountId, actorId: null},
+        {accountId},
+      )
     })
 
     // Preview/dev may return the verification token when SMTP is not configured.
@@ -156,18 +151,12 @@ export class AccountService {
         .where('account_id', '=', row.account_id)
         .where('kind', '=', 'email')
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'email.verified',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: row.account_id,
-          metadata: {},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'email.verified',
+        {},
+        {type: 'greenfield_account', id: row.account_id, actorId: null},
+        {accountId: row.account_id},
+      )
 
       // Create default repository + initial collections + default profile record shell.
       const repositoryId = uuidv7()
@@ -356,18 +345,12 @@ export class AccountService {
         .insertInto('greenfield_handle_history')
         .values({history_id: uuidv7(), account_id: accountId, handle, action: 'changed', created_at: now})
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'handle.changed',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: accountId,
-          metadata: {from: account.primary_handle, to: handle},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'handle.changed',
+        {from: account.primary_handle, to: handle},
+        {type: 'greenfield_account', id: accountId, actorId: null},
+        {accountId},
+      )
     })
     return {handle, accountId}
   }

@@ -1,12 +1,23 @@
 import {randomUUID} from 'node:crypto'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 
 export class SaveService {
-  constructor(private readonly db: ModulaDb) {}
+  private readonly policies: GreenfieldPolicyEngine
+
+  constructor(private readonly db: ModulaDb) {
+    this.policies = new GreenfieldPolicyEngine(db)
+  }
+
   async save(actorId: string, postId: string) {
-    const post = await this.db.selectFrom('posts').select('id').where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
+    const post = await this.db.selectFrom('posts').select(['id', 'author_actor_id', 'audience']).where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({
+      actorId,
+      action: 'post.save',
+      resource: {type: 'post', id: postId, ownerActorId: post.author_actor_id, visibility: post.audience},
+    })
     const existing = await this.db.selectFrom('post_saves').selectAll().where('actor_id', '=', actorId).where('post_id', '=', postId).executeTakeFirst()
     if (existing?.deleted_at) await this.db.updateTable('post_saves').set({deleted_at: null, updated_at: new Date(), version: existing.version + 1}).where('id', '=', existing.id).execute()
     else if (!existing) await this.db.insertInto('post_saves').values({id: randomUUID(), actor_id: actorId, post_id: postId, created_at: new Date(), updated_at: new Date(), deleted_at: null, version: 1}).execute()

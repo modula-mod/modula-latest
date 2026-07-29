@@ -3,6 +3,7 @@ import {canonicalJsonStringify, GREENFIELD_INITIAL_COLLECTIONS} from '@modula/gr
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {validateSchemaRecord} from '../schemas/registry.js'
+import {AuditRepository} from '../domains/audit/repository.js'
 
 type Visibility = 'public' | 'followers' | 'teams' | 'private' | 'system'
 type Operation = 'create' | 'update' | 'delete'
@@ -175,18 +176,12 @@ export class RecordService {
         .where('repository_id', '=', repo.repository_id)
         .execute()
 
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: `greenfield.record.${input.operation}`,
-          actor_id: null,
-          resource_type: 'greenfield_record',
-          resource_id: recordId,
-          metadata: {repositoryId: repo.repository_id, eventHash: hash, collection: input.collection},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        `greenfield.record.${input.operation}`,
+        {repositoryId: repo.repository_id, eventHash: hash, collection: input.collection},
+        {type: 'greenfield_record', id: recordId, actorId: null},
+        {accountId: input.accountId},
+      )
 
       // Never put private record bodies into the public outbox.
       if (input.visibility === 'public') {

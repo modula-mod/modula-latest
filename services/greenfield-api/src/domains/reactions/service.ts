@@ -4,12 +4,17 @@ import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 
 export type ReactionType = GreenfieldReactionType
 const TYPES: ReadonlySet<string> = new Set(GREENFIELD_REACTION_TYPES)
 
 export class ReactionService {
-  constructor(private readonly db: ModulaDb) {}
+  private readonly policies: GreenfieldPolicyEngine
+
+  constructor(private readonly db: ModulaDb) {
+    this.policies = new GreenfieldPolicyEngine(db)
+  }
 
   async setReaction(actorId: string, postId: string, type: ReactionType | null) {
     if (type !== null && !TYPES.has(type)) throw Object.assign(new Error('Invalid reaction'), {code: 'VALIDATION_FAILED'})
@@ -101,7 +106,7 @@ export class ReactionService {
   }
 
   async listReactions(viewerActorId: string | null, postId: string) {
-    if (viewerActorId) await this.resolveVisiblePost(viewerActorId, postId)
+    await this.resolveVisiblePost(viewerActorId, postId)
     const rows = await this.db.selectFrom('greenfield_reactions').select(['reaction_type']).where('post_id', '=', postId).execute()
     const byType: Partial<Record<ReactionType, number>> = {}
     for (const row of rows) byType[row.reaction_type] = (byType[row.reaction_type] ?? 0) + 1
@@ -109,16 +114,14 @@ export class ReactionService {
     return {viewerReaction: viewer?.reaction_type ?? null, total: rows.length, byType}
   }
 
-  private async resolveVisiblePost(actorId: string, postId: string) {
+  private async resolveVisiblePost(actorId: string | null, postId: string) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
-    const blocked = await this.db.selectFrom('blocks').select('id').where('deleted_at', 'is', null).where(({eb, or, and}) => or([and([eb('blocker_actor_id', '=', actorId), eb('blocked_actor_id', '=', post.author_actor_id)]), and([eb('blocker_actor_id', '=', post.author_actor_id), eb('blocked_actor_id', '=', actorId)])])).executeTakeFirst()
-    if (blocked) throw Object.assign(new Error('Post unavailable'), {code: 'FORBIDDEN'})
-    if (post.audience === 'private' && post.author_actor_id !== actorId) throw Object.assign(new Error('Post unavailable'), {code: 'FORBIDDEN'})
-    if (post.audience === 'followers' && post.author_actor_id !== actorId) {
-      const following = await this.db.selectFrom('follows').select('id').where('follower_actor_id', '=', actorId).where('followed_actor_id', '=', post.author_actor_id).where('deleted_at', 'is', null).executeTakeFirst()
-      if (!following) throw Object.assign(new Error('Post unavailable'), {code: 'FORBIDDEN'})
-    }
+    await this.policies.assertAllowed({
+      actorId,
+      action: 'post.engage',
+      resource: {type: 'post', id: postId, ownerActorId: post.author_actor_id, visibility: post.audience},
+    })
     return post
   }
 }
