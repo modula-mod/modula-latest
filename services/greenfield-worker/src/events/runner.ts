@@ -111,10 +111,13 @@ function defaultHandlerFor(delivery: Database['greenfield_event_deliveries']): E
 
 async function handleSearchDelivery(db: ModulaWorkerDb, context: EventSubscriberContext): Promise<void> {
   await handleSearchIndex(db, {
+    event: context.event,
+    projectorId: context.delivery.subscriber_id,
     resourceType: context.event.aggregateType,
     resourceId: context.event.aggregateId,
     eventId: context.event.eventId,
     eventType: context.event.eventType,
+    sourceVersion: context.event.aggregateVersion,
     correlationId: context.event.correlationId,
   })
 }
