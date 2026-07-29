@@ -117,6 +117,7 @@
     "verify:phase7d-connector-security": "node scripts/verify-phase7d-connector-security.mjs",
     "verify:phase7d-connection-lifecycle": "node scripts/verify-phase7d-connection-lifecycle.mjs",
     "verify:phase7e-code-quality": "node scripts/verify-phase7e-code-quality.mjs",
+    "verify:phase7e-search-platform": "node scripts/verify-phase7e-search-platform.mjs",
     "registry:import-module": "node scripts/registry/import-module.mjs",
     "registry:verify-release": "node scripts/registry/verify-release.mjs",
     "registry:publish-release": "node scripts/registry/publish-release.mjs",
