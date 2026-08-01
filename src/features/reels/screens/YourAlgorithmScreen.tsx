@@ -5,12 +5,7 @@ import {useRouter, type Href} from 'expo-router'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {
-  ALGORITHM_LESS_SEEDS,
-  ALGORITHM_MORE_SEEDS,
-  ALGORITHM_SUGGESTIONS,
-  ALGORITHM_SUMMARY,
-} from '@/features/reels/data/algorithmSeeds'
+import {useReelsQuery} from '@/features/reels/data'
 import {
   buildAlgorithmMoreActions,
   runReelChromeAction,
@@ -19,6 +14,7 @@ import {
   SettingsSection,
   SettingsToggleRow,
 } from '@/features/settings/components/SettingsRows'
+import type {ReelItem} from '@/domain/discovery'
 import {selectionHaptic} from '@/lib/haptics'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
@@ -33,15 +29,19 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function YourAlgorithmScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [moreOf, setMoreOf] = useState<string[]>(() => [...ALGORITHM_MORE_SEEDS])
-  const [lessOf, setLessOf] = useState<string[]>(() => [...ALGORITHM_LESS_SEEDS])
-  const [suggestions, setSuggestions] = useState<string[]>(() => [
-    ...ALGORITHM_SUGGESTIONS,
-  ])
+  const reels = useReelsQuery()
+  const availableTags = useMemo(() => tagsFromReels(reels.data ?? []), [reels.data])
+  const [selectedMoreOf, setSelectedMoreOf] = useState<string[]>([])
+  const [lessOf, setLessOf] = useState<string[]>([])
   const [reducePolitical, setReducePolitical] = useState(false)
   const [warnSensitive, setWarnSensitive] = useState(true)
 
   const moreActions = useMemo(() => buildAlgorithmMoreActions(), [])
+  const moreOf = selectedMoreOf.length ? selectedMoreOf : availableTags.slice(0, 5)
+  const suggestions = availableTags.filter(tag => !moreOf.includes(tag)).slice(0, 6)
+  const algorithmSummary = availableTags.length
+    ? 'Reels preferences from your current feed'
+    : 'No Reels ranking preferences available'
 
   const runChrome = (id: string) => {
     runReelChromeAction(id, {
@@ -72,20 +72,20 @@ export function YourAlgorithmScreen() {
 
   const toggleMore = (tag: string) => {
     void selectionHaptic()
-    setMoreOf(prev =>
+    setSelectedMoreOf(prev =>
       prev.includes(tag) ? prev.filter(item => item !== tag) : [...prev, tag],
     )
   }
 
   const addSuggestion = (tag: string) => {
     void selectionHaptic()
-    setSuggestions(prev => prev.filter(item => item !== tag))
-    setMoreOf(prev => (prev.includes(tag) ? prev : [...prev, tag]))
+    setSelectedMoreOf(prev => (prev.includes(tag) ? prev : [...prev, tag]))
   }
 
   const addLess = () => {
     void selectionHaptic()
-    const fallback = 'Clickbait'
+    const fallback = availableTags.find(tag => !lessOf.includes(tag)) ?? null
+    if (!fallback) return
     setLessOf(prev => (prev.includes(fallback) ? prev : [...prev, fallback]))
   }
 
@@ -138,7 +138,7 @@ export function YourAlgorithmScreen() {
           }}
           showsVerticalScrollIndicator={false}>
           <View style={{gap: spacing[2]}}>
-            <AppText variant="title2">{ALGORITHM_SUMMARY}</AppText>
+            <AppText variant="title2">{algorithmSummary}</AppText>
             <AppText variant="caption" colour="textSecondary">
               What you want to see more of. Based on your activity, summarized
               locally ›
@@ -152,11 +152,11 @@ export function YourAlgorithmScreen() {
             chipMenu={chipMenu('more')}
             onChipAction={(tag, id) => {
               if (id === 'remove') {
-                setMoreOf(prev => prev.filter(item => item !== tag))
+                setSelectedMoreOf(prev => prev.filter(item => item !== tag))
                 return
               }
               if (id === 'move') {
-                setMoreOf(prev => prev.filter(item => item !== tag))
+                setSelectedMoreOf(prev => prev.filter(item => item !== tag))
                 setLessOf(prev => (prev.includes(tag) ? prev : [...prev, tag]))
               }
             }}
@@ -212,7 +212,7 @@ export function YourAlgorithmScreen() {
               }
               if (id === 'move') {
                 setLessOf(prev => prev.filter(item => item !== tag))
-                setMoreOf(prev => (prev.includes(tag) ? prev : [...prev, tag]))
+                setSelectedMoreOf(prev => (prev.includes(tag) ? prev : [...prev, tag]))
               }
             }}
             trailing={
@@ -255,6 +255,24 @@ export function YourAlgorithmScreen() {
       </FeatureErrorBoundary>
     </View>
   )
+}
+
+function tagsFromReels(reels: ReelItem[]): string[] {
+  const stopWords = new Set(['the', 'and', 'for', 'with', 'from', 'this', 'that', 'your', 'you'])
+  const tags = new Map<string, number>()
+  for (const reel of reels) {
+    const words = `${reel.caption} ${reel.source}`
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(word => word.length > 3 && !stopWords.has(word))
+    for (const word of words) {
+      const label = word[0].toUpperCase() + word.slice(1)
+      tags.set(label, (tags.get(label) ?? 0) + 1)
+    }
+  }
+  return Array.from(tags.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag]) => tag)
 }
 
 function ChipSection({

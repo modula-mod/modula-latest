@@ -137,12 +137,12 @@ Results:
 - `pnpm verify:phase7e-real-auth`: passed.
 - `pnpm --filter @modula/greenfield-api typecheck`: passed.
 - `pnpm typecheck`: passed.
-- `pnpm verify:phase7e-no-product-mocks`: failed on 29 remaining product-visible demo/seed/fake-refresh issues.
+- `pnpm verify:phase7e-no-product-mocks`: initially failed on 29 remaining product-visible demo/seed/fake-refresh issues; superseded by `docs/validation/phase7e-block11-no-product-mocks-recovery.md`, where the verifier passes.
 
 ## Blockers
 
 - Product no-mock gate is still red.
-- Web acceptance has not been captured because normal product runtime still exposes seed/demo surfaces.
+- Web acceptance has not been captured yet. The no-product-mocks gate is now green in `docs/validation/phase7e-block11-no-product-mocks-recovery.md`; browser acceptance remains separate evidence.
 - Real SMTP acceptance is blocked until SMTP transport/sink is configured and wired.
 - Real AI product acceptance is `BLOCKED_BY_PROVIDER_CONFIGURATION` until OpenAI/Ollama/another real provider is configured and healthy.
 - Phase 7F Mac/iOS acceptance has not been executed.

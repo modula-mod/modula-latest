@@ -5,7 +5,8 @@ import {useRouter} from 'expo-router'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {seededCustomFeeds} from '@/features/social/data/seededSurfaces'
+import {EmptyState} from '@/components/primitives/EmptyState'
+import {useDiscoverQuery} from '@/features/discover/data'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -14,7 +15,14 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function DiscoverFeedsScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [feeds, setFeeds] = useState(seededCustomFeeds)
+  const discover = useDiscoverQuery()
+  const [pinnedIds, setPinnedIds] = useState<string[]>([])
+  const feeds = (discover.data?.trendingTopics ?? []).map(topic => ({
+    id: topic.id,
+    name: topic.label,
+    description: `${topic.postCount.toLocaleString()} indexed posts`,
+    pinned: pinnedIds.includes(topic.id),
+  }))
 
   return (
     <View style={{flex: 1, backgroundColor: colours.canvas}}>
@@ -26,46 +34,54 @@ export function DiscoverFeedsScreen() {
         <ScrollView contentContainerStyle={{gap: spacing[3], paddingBottom: spacing[6]}}>
           <AppText variant="headline">Custom feeds</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Pin feeds for Discover — Preview. Pins are local-only.
+            Pin indexed topics from the Discover service.
           </AppText>
-          {feeds.map(feed => (
-            <AppPressable
-              key={feed.id}
-              accessibilityLabel={`${feed.pinned ? 'Unpin' : 'Pin'} ${feed.name}`}
-              onPress={() => {
-                void selectionHaptic()
-                setFeeds(prev =>
-                  prev.map(item =>
-                    item.id === feed.id ? {...item, pinned: !item.pinned} : item,
-                  ),
-                )
-                Alert.alert(
-                  feed.pinned ? 'Unpinned — Preview' : 'Pinned — Preview',
-                  `${feed.name} pin state is local-only in Phase 4.5.`,
-                )
-              }}
-              style={[
-                styles.row,
-                {
-                  backgroundColor: colours.surfaceRaised,
-                  borderColor: colours.border,
-                  borderRadius: radius.md,
-                  gap: spacing[3],
-                  padding: spacing[3],
-                },
-              ]}>
-              <View style={{flex: 1, gap: 2}}>
-                <AppText variant="label">{feed.name}</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  {feed.description}
-                </AppText>
-              </View>
-              <AppIcon
-                name={feed.pinned ? 'bookmark' : 'saved'}
-                colour={feed.pinned ? colours.accent : colours.textTertiary}
-              />
-            </AppPressable>
-          ))}
+          {feeds.length ? (
+            feeds.map(feed => (
+              <AppPressable
+                key={feed.id}
+                accessibilityLabel={`${feed.pinned ? 'Unpin' : 'Pin'} ${feed.name}`}
+                onPress={() => {
+                  void selectionHaptic()
+                  setPinnedIds(prev =>
+                    prev.includes(feed.id)
+                      ? prev.filter(id => id !== feed.id)
+                      : [...prev, feed.id],
+                  )
+                  Alert.alert(
+                    feed.pinned ? 'Unpinned' : 'Pinned',
+                    `${feed.name} pin state is held locally until custom feed persistence is enabled.`,
+                  )
+                }}
+                style={[
+                  styles.row,
+                  {
+                    backgroundColor: colours.surfaceRaised,
+                    borderColor: colours.border,
+                    borderRadius: radius.md,
+                    gap: spacing[3],
+                    padding: spacing[3],
+                  },
+                ]}>
+                <View style={{flex: 1, gap: 2}}>
+                  <AppText variant="label">{feed.name}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    {feed.description}
+                  </AppText>
+                </View>
+                <AppIcon
+                  name={feed.pinned ? 'bookmark' : 'saved'}
+                  colour={feed.pinned ? colours.accent : colours.textTertiary}
+                />
+              </AppPressable>
+            ))
+          ) : (
+            <EmptyState
+              icon="discover"
+              title="No indexed feeds"
+              description="The Discover service has not returned any topics to pin."
+            />
+          )}
         </ScrollView>
       </ModulaSheet>
     </View>

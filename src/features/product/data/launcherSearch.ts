@@ -1,5 +1,4 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
-import {marketplaceCatalog} from '@/features/marketplace/data/catalog'
 import {COMMAND_CATALOGUE, type ModulaCommand} from '@/features/product/data/commandCatalogue'
 import {ATLAS_DOMAIN_LABELS, atlasSearch} from '@/features/product/data/featureAtlas'
 import {productCatalogue} from '@/features/product/data/productCatalogue'
@@ -91,14 +90,7 @@ export function getLauncherSearchGroups(
     route: item.ctaRoute ?? `/product/${item.id}`,
   }))
 
-  const moduleHits: LauncherSearchHit[] = marketplaceCatalog.map(item => ({
-    id: `module-${item.id}`,
-    title: item.name,
-    subtitle: `Module / ${item.status} / ${item.capability}`,
-    body: `${item.description}\n${item.longDescription}`,
-    icon: item.icon,
-    route: `/marketplace/${item.id}`,
-  }))
+  const moduleHits: LauncherSearchHit[] = []
 
   const atlasHits: LauncherSearchHit[] = atlasSearch(q).map(feature => ({
     id: `atlas-${feature.id}`,

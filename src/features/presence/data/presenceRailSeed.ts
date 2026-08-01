@@ -1,13 +1,4 @@
-export type PresenceRailPerson = {
-  id: string
-  name: string
-  /** Optional avatar URL — omitted uses initials. */
-  uri?: string
-  /** Fresh / unread story dial. */
-  fresh: boolean
-  /** Cover / accent fallback for initials avatar. */
-  colour?: string
-}
+import type {PresenceRailPerson} from '@/features/presence/contracts/presenceRail'
 
 /**
  * Local Preview seed for the Stories dial.

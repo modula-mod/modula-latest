@@ -11,7 +11,7 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
-import type {ModuleContribution} from '@/data/repositories/contracts'
+import type {ModuleCatalogueItem, ModuleContribution} from '@/data/repositories/contracts'
 import {
   canViewerSeeProfileField,
   createViewerContext,
@@ -20,8 +20,7 @@ import {
   type ProfileViewerRelationship,
 } from '@/features/profile/contracts/profile'
 import type {ProfileTabManifest, ProfileTabVisibility} from '@/features/profile/contracts/profileTabs'
-import {useModuleContributionQuery} from '@/features/modules/hooks'
-import {demoProfileModules} from '@/features/profile/data/demoProfileModules'
+import {useModuleCatalogueQuery, useModuleContributionQuery} from '@/features/modules/hooks'
 import {ProfileHero} from '@/features/profile/components/ProfileHero'
 import {ProfileLayout} from '@/features/profile/components/ProfileLayout'
 import {ProfileLinkCard} from '@/features/profile/components/ProfileLinkCard'
@@ -30,6 +29,7 @@ import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {ProfileTabBar} from '@/features/profile/components/ProfileTabBar'
 import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
+import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
@@ -95,6 +95,46 @@ function moduleProfileTabManifests(contributions: ModuleContribution[]): Profile
     })
 }
 
+function catalogueItemToProfileModule(module: ModuleCatalogueItem): ProfileModulePreview {
+  return {
+    id: module.moduleId,
+    name: module.name,
+    description: module.description,
+    icon: module.kind === 'system' ? 'settings' : 'modules',
+    status: module.installationState === 'enabled' || module.installationState === 'installed'
+      ? 'featured'
+      : module.installable
+        ? 'available'
+        : 'preview',
+    visibility: 'public',
+    actionLabel: module.installationState === 'enabled'
+      ? 'Open'
+      : module.installable
+        ? 'Available'
+        : 'Preview',
+  }
+}
+
+function profileFeaturedModules(
+  profile: ModulaProfile,
+  catalogue: ModuleCatalogueItem[],
+  viewer: ProfileViewerRelationship,
+): ProfileModulePreview[] {
+  const byId = new Map(catalogue.map(module => [module.moduleId, module]))
+  return profile.featuredModuleIds
+    .map(moduleId => byId.get(moduleId) ?? byId.get(normalizeLegacyProfileModuleId(moduleId)))
+    .filter((module): module is ModuleCatalogueItem => Boolean(module))
+    .map(catalogueItemToProfileModule)
+    .filter(module => canViewerSeeProfileField(module.visibility, viewer))
+}
+
+function normalizeLegacyProfileModuleId(moduleId: string): string {
+  if (moduleId === 'module-vault-notes') return 'digital.modula.vault-notes'
+  if (moduleId === 'module-tasks') return 'digital.modula.tasks'
+  if (moduleId === 'module-dimon-core') return 'digital.dimon.core'
+  return moduleId
+}
+
 export function ProfileShell({mode, handle}: ProfileShellProps) {
   const router = useRouter()
   const {tab} = useLocalSearchParams<{tab?: string}>()
@@ -109,6 +149,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     surface: 'profileTab',
     enabledOnly: true,
   })
+  const catalogueQuery = useModuleCatalogueQuery()
   const isExpanded = width >= 1100
   const scrollY = useSharedValue(0)
   const onScroll = useAnimatedScrollHandler({
@@ -194,9 +235,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   }
 
   const selectedTab = visibleTabs.find(next => next.id === selectedTabId) ?? visibleTabs[0] ?? null
-  const modules = (demoProfileModules[profile.id] ?? []).filter(module =>
-    canViewerSeeProfileField(module.visibility, viewer.relationship),
-  )
+  const modules = profileFeaturedModules(profile, catalogueQuery.data ?? [], viewer.relationship)
   const links = [
     profile.website,
     ...profile.links,

@@ -69,8 +69,8 @@ Detailed environment notes are in `docs/operations/phase7e-block11-isolated-envi
 | Registration/session/recovery API slice | `PASS_WITH_LIMITATIONS` | Routes registered and isolated tests pass; SMTP delivery remains missing. |
 | Deterministic AI provider exclusion from product runtime | `PASS_WITH_LIMITATIONS` | Adapter/resolver now allow development mock only in `NODE_ENV=test`; full AI acceptance needs real provider. |
 | Remote runtime fallback removal | `PASS_WITH_LIMITATIONS` | Module/activity/tools/extension API fallbacks are local-only; broader product demo imports remain. |
-| No-product-mocks verifier | `BLOCKED` | Verifier fails on 29 remaining production-visible demo/seed/fake-refresh issues. |
-| Web acceptance | `BLOCKED` | Not run because the no-mock gate is still red. |
+| No-product-mocks verifier | `PASS_AFTER_RECOVERY` | Initially failed on 29 issues; resolved in `docs/validation/phase7e-block11-no-product-mocks-recovery.md`. |
+| Web acceptance | `BLOCKED` | Not run yet after no-mock recovery. |
 | SMTP-backed auth/recovery | `BLOCKED` | No SMTP sink/transport configured for isolated product acceptance. |
 | Media upload/object storage | `BLOCKED` | No isolated object storage/media completion in this checkpoint. |
 | Vault Notes full structured editor/history/export | `NOT_IMPLEMENTED` | Inventory records missing editor/history/export acceptance. |
@@ -110,7 +110,7 @@ Removed or constrained in this checkpoint:
 - Remote installed-extension empty fallback is local-simulator only.
 - Deterministic AI provider adapter and resolver path are test-only.
 
-Remaining blockers found by `pnpm verify:phase7e-no-product-mocks`:
+Initial blockers found by `pnpm verify:phase7e-no-product-mocks`, now superseded by `docs/validation/phase7e-block11-no-product-mocks-recovery.md`:
 
 - Demo/seed imports remain in Discover, Profile, Presence Stories, Marketplace/Product, Reels, and Social surfaces.
 - `HomeFeedScreen` still has timed manual refresh state.
@@ -142,14 +142,14 @@ Results:
 - `pnpm --filter @modula/greenfield-api build`: passed.
 - `pnpm --filter @modula/greenfield-worker build`: passed.
 - `pnpm typecheck`: passed.
-- `pnpm verify:phase7e-no-product-mocks`: failed on 29 remaining issues.
+- `pnpm verify:phase7e-no-product-mocks`: initially failed on 29 remaining issues; now passes after recovery.
 - `git diff --check`: passed.
 - Module Standard `pnpm install --frozen-lockfile && pnpm verify`: passed.
 - Vault Notes `pnpm install --frozen-lockfile && pnpm verify`: passed.
 
 ## Web Acceptance
 
-Web acceptance was not run and no screenshots were captured. It remains blocked until normal remote product runtime no longer exposes demo/seed/fake product surfaces.
+Web acceptance was not run and no screenshots were captured. It remains outstanding after the no-product-mocks recovery.
 
 Expected evidence directory when unblocked:
 

@@ -4,8 +4,8 @@ import {useRouter, type Href} from 'expo-router'
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
+import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
-import {seededCommunities} from '@/features/social/data/seededSurfaces'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -156,37 +156,11 @@ export function CommunitiesOsScreen() {
             </View>
           </View>
 
-          {seededCommunities.map(community => (
-            <Surface
-              key={community.id}
-              variant="contained"
-              style={[
-                styles.card,
-                {
-                  padding: spacing[4],
-                  gap: spacing[2],
-                  borderRadius: radius.large,
-                  backgroundColor: colours.surface,
-                  borderColor: colours.border,
-                },
-              ]}>
-              <View style={[styles.row, {gap: spacing[2]}]}>
-                <AppIcon name="community" colour={colours.accent} />
-                <AppText variant="headline">{community.name}</AppText>
-              </View>
-              <AppText variant="body" colour="textSecondary">
-                {community.description}
-              </AppText>
-              <AppText variant="caption" colour="textTertiary">
-                {community.membersLabel} · {community.topic}
-              </AppText>
-              <AppButton
-                variant="secondary"
-                onPress={() => router.push(`/communities/${community.id}` as Href)}>
-                Open
-              </AppButton>
-            </Surface>
-          ))}
+          <EmptyState
+            icon="community"
+            title="No community registry"
+            description="Community records are hidden until a real community service is available."
+          />
 
           <Surface
             variant="contained"

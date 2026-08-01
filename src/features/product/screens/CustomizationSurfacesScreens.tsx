@@ -8,8 +8,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
-import {seededInnerCircle, seededLists} from '@/features/social/data/seededSurfaces'
-import {PRESENCE_RAIL_SEED} from '@/features/presence/data/presenceRailSeed'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import type {
   ChromeDensity,
@@ -218,23 +216,15 @@ export function QuietInboxScreen() {
 
 export function InnerCircleScreen() {
   const router = useRouter()
-  const faces = seededInnerCircle.map((person, index) => ({
-    id: person.id,
-    name: person.name,
-    colour: ['#369CAA', '#2A6F78', '#4A6670', '#5C7A84'][index % 4],
-  }))
+  const faces: {id: string; name: string; colour: string}[] = []
 
   return (
     <SurfaceShell title="Inner Circle">
       <PreviewBanner text="Inner Circle Preview — priority people, not a separate social network." />
-      <PresenceStoriesRail
-        people={PRESENCE_RAIL_SEED.filter(person => person.id !== 'you').slice(0, 5)}
-        compact
-        showCaption={false}
-      />
-      <StackedAvatars faces={faces} size={40} max={5} />
+      <PresenceStoriesRail compact showCaption={false} />
+      {faces.length ? <StackedAvatars faces={faces} size={40} max={5} /> : null}
       <AppText variant="body" colour="textSecondary">
-        Manage who appears in Focus Halo priority and Quiet Inbox allowlists.
+        Priority people require the social graph and messaging backend before they appear here.
       </AppText>
       <AppButton onPress={() => router.push('/settings/inner-circle' as Href)}>
         Inner Circle settings
@@ -288,7 +278,7 @@ export function ShareDestinationsScreen() {
         )
       })}
       <AppText variant="caption" colour="textSecondary">
-        Lists available: {seededLists.length} local Previews
+        Lists available: 0
       </AppText>
     </SurfaceShell>
   )

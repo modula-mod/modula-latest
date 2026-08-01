@@ -23,7 +23,6 @@ import {
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {seededCommunities} from '@/features/social/data/seededSurfaces'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
@@ -339,7 +338,7 @@ export function DiscoverScreen() {
                 if (id === 'communities') {
                   return (
                     <SectionEnter key={id} delay={80 + index * 24}>
-                      <CommunitiesRail />
+                      <CommunitiesRail topics={filtered.trendingTopics} />
                     </SectionEnter>
                   )
                 }
@@ -644,39 +643,37 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
   )
 }
 
-function CommunitiesRail() {
+function CommunitiesRail({topics}: {topics: DiscoverResult['trendingTopics']}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   return (
     <Section title="Communities">
       <View style={{gap: spacing[2]}}>
-        {seededCommunities
-          .filter(item => item.id.startsWith('community-'))
-          .map(community => (
-            <AppPressable
-              key={community.id}
-              accessibilityLabel={`Open ${community.name}`}
-              onPress={() => router.push(`/communities/${community.id}` as Href)}
-              style={[
-                styles.communityRow,
-                {
-                  backgroundColor: colours.surfaceRaised,
-                  borderColor: colours.border,
-                  borderRadius: radius.large,
-                  padding: spacing[3],
-                  gap: spacing[3],
-                },
-              ]}>
-              <AppIcon name="community" colour={colours.accent} />
-              <View style={styles.personBody}>
-                <AppText variant="label">{community.name}</AppText>
-                <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-                  {community.description}
-                </AppText>
-              </View>
-              <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
-            </AppPressable>
-          ))}
+        {topics.map(topic => (
+          <AppPressable
+            key={topic.id}
+            accessibilityLabel={`Open ${topic.label}`}
+            onPress={() => router.push(`/communities/${topic.id}` as Href)}
+            style={[
+              styles.communityRow,
+              {
+                backgroundColor: colours.surfaceRaised,
+                borderColor: colours.border,
+                borderRadius: radius.large,
+                padding: spacing[3],
+                gap: spacing[3],
+              },
+            ]}>
+            <AppIcon name="community" colour={colours.accent} />
+            <View style={styles.personBody}>
+              <AppText variant="label">{topic.label}</AppText>
+              <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                {topic.postCount.toLocaleString()} indexed posts
+              </AppText>
+            </View>
+            <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
+          </AppPressable>
+        ))}
       </View>
     </Section>
   )

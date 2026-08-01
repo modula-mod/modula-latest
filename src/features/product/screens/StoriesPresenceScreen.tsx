@@ -6,7 +6,6 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
-import {PRESENCE_RAIL_SEED} from '@/features/presence/data/presenceRailSeed'
 import {PresenceArc} from '@/features/onboarding/components/PresenceArc'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -56,9 +55,8 @@ export function StoriesPresenceScreen() {
           </View>
           <View style={{paddingHorizontal: spacing[4]}}>
             <ModulaJoinIsland
-              name={PRESENCE_RAIL_SEED[0]?.name ?? 'Maya Okonkwo'}
-              avatarColour={PRESENCE_RAIL_SEED[0]?.colour}
-              caption="Presence join Preview — not a live call surface."
+              name="Presence"
+              caption="Presence join requires live presence data before it appears."
             />
           </View>
 

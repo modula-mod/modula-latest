@@ -125,15 +125,10 @@ export function HomeFeedScreen() {
     if (manualRefreshing) return
     setShellChromeHoldObscure(true)
     setManualRefreshing(true)
-    const started = Date.now()
-    const holdMs = 3000
     void feedQuery
       .refetch()
       .catch(() => undefined)
-      .finally(() => {
-        const remaining = Math.max(0, holdMs - (Date.now() - started))
-        setTimeout(() => setManualRefreshing(false), remaining)
-      })
+      .finally(() => setManualRefreshing(false))
   }, [feedQuery, manualRefreshing])
 
   const onPullAction = useCallback(

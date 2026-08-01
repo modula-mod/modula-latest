@@ -1,4 +1,5 @@
 export * from '@/features/profile/contracts/identity'
 export * from '@/features/profile/contracts/presence'
 export * from '@/features/profile/contracts/profile'
+export * from '@/features/profile/contracts/profileModules'
 export * from '@/features/profile/contracts/profileTabs'

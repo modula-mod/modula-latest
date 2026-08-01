@@ -4,7 +4,8 @@ import {useRouter} from 'expo-router'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {seededInterests} from '@/features/social/data/seededSurfaces'
+import {EmptyState} from '@/components/primitives/EmptyState'
+import {useDiscoverQuery} from '@/features/discover/data'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -13,9 +14,14 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function DiscoverInterestsScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
-  const [selected, setSelected] = useState<string[]>(() => seededInterests.slice(0, 3))
+  const discover = useDiscoverQuery()
+  const options = useMemo(
+    () => (discover.data?.trendingTopics ?? []).map(topic => topic.label),
+    [discover.data?.trendingTopics],
+  )
+  const [selected, setSelected] = useState<string[]>([])
 
-  const options = useMemo(() => seededInterests, [])
+  const visibleSelected = selected.filter(interest => options.includes(interest))
 
   return (
     <View style={{flex: 1, backgroundColor: colours.canvas}}>
@@ -27,37 +33,45 @@ export function DiscoverInterestsScreen() {
         <ScrollView contentContainerStyle={{gap: spacing[3], paddingBottom: spacing[6]}}>
           <AppText variant="headline">Edit interests</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Local Preview — interests are not synced to a backend yet.
+            Interests are derived from indexed Discover topics.
           </AppText>
-          <View style={[styles.wrap, {gap: spacing[2]}]}>
-            {options.map(interest => {
-              const on = selected.includes(interest)
-              return (
-                <AppPressable
-                  key={interest}
-                  accessibilityLabel={`${interest}${on ? ', selected' : ''}`}
-                  accessibilityState={{selected: on}}
-                  onPress={() => {
-                    void selectionHaptic()
-                    setSelected(prev =>
-                      on ? prev.filter(item => item !== interest) : [...prev, interest],
-                    )
-                  }}
-                  style={[
-                    styles.chip,
-                    {
-                      backgroundColor: on ? colours.accentSubtle : colours.surfaceRaised,
-                      borderColor: on ? colours.accent : colours.border,
-                      borderRadius: radius.round,
-                    },
-                  ]}>
-                  <AppText variant="label" style={{color: on ? colours.accent : colours.text}}>
-                    {interest}
-                  </AppText>
-                </AppPressable>
-              )
-            })}
-          </View>
+          {options.length ? (
+            <View style={[styles.wrap, {gap: spacing[2]}]}>
+              {options.map(interest => {
+                const on = visibleSelected.includes(interest)
+                return (
+                  <AppPressable
+                    key={interest}
+                    accessibilityLabel={`${interest}${on ? ', selected' : ''}`}
+                    accessibilityState={{selected: on}}
+                    onPress={() => {
+                      void selectionHaptic()
+                      setSelected(prev =>
+                        on ? prev.filter(item => item !== interest) : [...prev, interest],
+                      )
+                    }}
+                    style={[
+                      styles.chip,
+                      {
+                        backgroundColor: on ? colours.accentSubtle : colours.surfaceRaised,
+                        borderColor: on ? colours.accent : colours.border,
+                        borderRadius: radius.round,
+                      },
+                    ]}>
+                    <AppText variant="label" style={{color: on ? colours.accent : colours.text}}>
+                      {interest}
+                    </AppText>
+                  </AppPressable>
+                )
+              })}
+            </View>
+          ) : (
+            <EmptyState
+              icon="discover"
+              title="No indexed interests"
+              description="The Discover service has not returned any topics to tune."
+            />
+          )}
           <AppPressable
             accessibilityLabel="Done editing interests"
             onPress={() => (router.canGoBack() ? router.back() : router.replace('/discover'))}
