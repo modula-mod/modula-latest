@@ -130,6 +130,7 @@
     "verify:phase7e-module-cli": "node scripts/verify-phase7e-module-cli.mjs",
     "verify:phase7e-module-health": "node scripts/verify-phase7e-module-health.mjs",
     "verify:phase7e-module-security": "node scripts/verify-phase7e-module-security.mjs",
+    "verify:phase7e-standard2-normalization": "node scripts/verify-phase7e-standard2-normalization.mjs",
     "verify:phase7e-module-backend-standard": "node scripts/verify-phase7e-module-backend-standard.mjs",
     "verify:phase7e-module-backend-discovery": "node scripts/verify-phase7e-module-backend-discovery.mjs",
     "verify:phase7e-module-backend-auth": "node scripts/verify-phase7e-module-backend-auth.mjs",

@@ -67,6 +67,14 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
   const standard20Count = items.filter(item => item.standard?.standardVersion === '2.0.0').length
   const serviceCount = items.reduce((total, item) => total + (item.standard?.registries.services ?? 0), 0)
   const apiCount = items.reduce((total, item) => total + (item.standard?.registries.apis ?? 0), 0)
+  const runtimeSupportedCount = items.reduce(
+    (total, item) => total + Object.values(item.standard?.runtimeSupport?.sections ?? {}).filter(state => state === 'SUPPORTED').length,
+    0,
+  )
+  const runtimeDeclarativeCount = items.reduce(
+    (total, item) => total + Object.values(item.standard?.runtimeSupport?.sections ?? {}).filter(state => state === 'DECLARATIVE_ONLY').length,
+    0,
+  )
 
   const sections = useMemo(
     () =>
@@ -123,6 +131,8 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
         <SummaryChip label="Compatible" value={String(items.filter(item => item.installable).length)} />
         <SummaryChip label="Updates" value={String(items.filter(item => item.installationState === 'updateAvailable').length)} />
         <SummaryChip label="Standard 2.0" value={String(standard20Count)} />
+        <SummaryChip label="Runtime supported" value={String(runtimeSupportedCount)} />
+        <SummaryChip label="Declarative only" value={String(runtimeDeclarativeCount)} />
         <SummaryChip label="Services" value={String(serviceCount)} />
         <SummaryChip label="APIs" value={String(apiCount)} />
       </View>

@@ -2,7 +2,10 @@ import {describe, expect, it} from 'vitest'
 import {
   GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION,
   GREENFIELD_MODULE_MANIFEST_VERSION,
+  MODULE_STANDARD_20_SECTION_NAMES,
+  MODULE_STANDARD_RUNTIME_SUPPORT_2_0_0,
   createDefaultModuleSectionVersions,
+  runtimeSupportDiagnosticsForManifest,
   validateGreenfieldModuleManifest,
 } from '../src/index.js'
 
@@ -384,5 +387,35 @@ describe('Greenfield Module Manifest v2 validation', () => {
     })
     const result = validateGreenfieldModuleManifest(manifest)
     expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(['INVALID_MODULE_API_PATH', 'UNKNOWN_PERMISSION_CATEGORY', 'WILDCARD_PERMISSION_DENIED']))
+  })
+
+  it('classifies every Standard 2.0 section in the host runtime support registry', () => {
+    expect(Object.keys(MODULE_STANDARD_RUNTIME_SUPPORT_2_0_0.sections).sort()).toEqual([...MODULE_STANDARD_20_SECTION_NAMES].sort())
+    expect(MODULE_STANDARD_RUNTIME_SUPPORT_2_0_0.sections.services).toBe('DECLARATIVE_ONLY')
+    expect(MODULE_STANDARD_RUNTIME_SUPPORT_2_0_0.sections.dependencies).toBe('PARTIALLY_SUPPORTED')
+    expect(MODULE_STANDARD_RUNTIME_SUPPORT_2_0_0.sections.marketplace).toBe('SUPPORTED')
+  })
+
+  it('reports declared Standard 2.0 sections that are not fully operational', () => {
+    const diagnostics = runtimeSupportDiagnosticsForManifest(validStandard20Manifest())
+    const declaredNonOperational = diagnostics
+      .filter(diagnostic => diagnostic.declared && !diagnostic.operational)
+      .map(diagnostic => diagnostic.section)
+
+    expect(declaredNonOperational).toEqual(expect.arrayContaining([
+      'dependencies',
+      'services',
+      'apis',
+      'hooks',
+      'jobs',
+      'storage',
+      'widgets',
+      'navigation',
+      'ui',
+      'automation',
+      'offline',
+      'realtime',
+    ]))
+    expect(diagnostics.find(diagnostic => diagnostic.section === 'marketplace')?.operational).toBe(true)
   })
 })

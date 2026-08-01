@@ -21,6 +21,7 @@ import type {
   ModuleRuntimeView,
   ModuleSettingsDocument,
   ModuleSettingsSchema,
+  ModuleStandardRuntimeSupportState,
   ModuleUninstallPreview,
   ProductHubCategory,
 } from '@/data/repositories/contracts/ModuleRepository'
@@ -341,6 +342,7 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     ai: decodeAIDeclaration(isRecord(manifest.ai) ? manifest.ai : row.ai),
     standard: decodeStandardMetadata(row.standardMetadata ?? row.standard ?? manifest),
     manifest,
+    normalizedManifest: recordOrUndefined(row.normalizedManifest),
     dependencyGraph: recordOrUndefined(row.dependencyGraph ?? manifest.dependencyGraph),
     serviceRegistry: recordOrUndefined(row.serviceRegistry ?? manifest.serviceRegistry),
     apiRegistry: recordOrUndefined(row.apiRegistry ?? manifest.apiRegistry),
@@ -445,6 +447,7 @@ function decodeStandardMetadata(value: unknown): ModuleDetail['standard'] {
   if (!isRecord(value)) return undefined
   const registries = isRecord(value.registries) ? value.registries : {}
   const dependencies = isRecord(value.dependencies) ? value.dependencies : {}
+  const runtimeSupport = decodeRuntimeSupport(value.runtimeSupport)
   const manifestVersion = typeof value.manifestVersion === 'number' ? value.manifestVersion : null
   const sectionVersions = isRecord(value.sectionVersions) ? Object.fromEntries(Object.entries(value.sectionVersions).filter((entry): entry is [string, string] => typeof entry[1] === 'string')) : {}
   const standardVersion = typeof value.standardVersion === 'string'
@@ -456,6 +459,8 @@ function decodeStandardMetadata(value: unknown): ModuleDetail['standard'] {
     manifestVersion,
     standardVersion,
     sectionVersions,
+    runtimeSupport,
+    runtimeDiagnostics: decodeRuntimeDiagnostics(value.runtimeDiagnostics),
     dependencies: {
       requires: numberValue(dependencies.requires),
       optional: numberValue(dependencies.optional),
@@ -487,12 +492,41 @@ function localStandardMetadata(): ModuleDetail['standard'] {
     manifestVersion: 1,
     standardVersion: null,
     sectionVersions: {},
+    runtimeDiagnostics: [],
     dependencies: {requires: 0, optional: 0, recommended: 0, conflicts: 0, replaces: 0, provides: 0},
     registries: {services: 0, apis: 0, hooks: 0, jobs: 0, storage: 0, widgets: 0, navigation: 0, ui: 0, automation: 0, metrics: 0},
     capabilityFlags: {},
     capabilities: [],
     engines: [],
   }
+}
+
+function decodeRuntimeSupport(value: unknown): NonNullable<ModuleDetail['standard']>['runtimeSupport'] {
+  if (!isRecord(value)) return undefined
+  const sections = isRecord(value.sections)
+    ? Object.fromEntries(Object.entries(value.sections).filter((entry): entry is [string, ModuleStandardRuntimeSupportState] => runtimeSupportState(entry[1]) !== null))
+    : {}
+  return {
+    standardVersion: String(value.standardVersion ?? '2.0.0'),
+    maximumServiceInvocationDepth: Number(value.maximumServiceInvocationDepth ?? 8),
+    sections,
+  }
+}
+
+function decodeRuntimeDiagnostics(value: unknown): NonNullable<ModuleDetail['standard']>['runtimeDiagnostics'] {
+  if (!Array.isArray(value)) return []
+  return value.filter(isRecord).map(item => ({
+    section: String(item.section ?? ''),
+    state: runtimeSupportState(item.state) ?? 'UNSUPPORTED',
+    declared: item.declared === true,
+    operational: item.operational === true,
+    message: String(item.message ?? ''),
+  })).filter(item => item.section.length > 0)
+}
+
+function runtimeSupportState(value: unknown): ModuleStandardRuntimeSupportState | null {
+  if (value === 'SUPPORTED' || value === 'PARTIALLY_SUPPORTED' || value === 'DECLARATIVE_ONLY' || value === 'UNSUPPORTED' || value === 'DEPRECATED') return value
+  return null
 }
 
 function numberValue(value: unknown): number {

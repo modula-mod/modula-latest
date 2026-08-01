@@ -46,6 +46,13 @@ export type ModuleBackendMode =
   | 'hybrid'
   | 'frontend-only'
 
+export type ModuleStandardRuntimeSupportState =
+  | 'SUPPORTED'
+  | 'PARTIALLY_SUPPORTED'
+  | 'DECLARATIVE_ONLY'
+  | 'UNSUPPORTED'
+  | 'DEPRECATED'
+
 export type ModuleBackendMetadata = {
   mode: ModuleBackendMode
   provider: string
@@ -64,6 +71,18 @@ export type ModuleStandardMetadata = {
   manifestVersion: number | null
   standardVersion: string | null
   sectionVersions: Record<string, string>
+  runtimeSupport?: {
+    standardVersion: string
+    maximumServiceInvocationDepth: number
+    sections: Record<string, ModuleStandardRuntimeSupportState>
+  }
+  runtimeDiagnostics: {
+    section: string
+    state: ModuleStandardRuntimeSupportState
+    declared: boolean
+    operational: boolean
+    message: string
+  }[]
   dependencies: Record<'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces' | 'provides', number>
   registries: {
     services: number
@@ -114,6 +133,7 @@ export type ModuleDetail = ModuleCatalogueItem & {
   privacy?: string
   standard?: ModuleStandardMetadata
   manifest?: Record<string, unknown>
+  normalizedManifest?: Record<string, unknown>
   dependencyGraph?: Record<string, unknown>
   serviceRegistry?: Record<string, unknown>
   apiRegistry?: Record<string, unknown>

@@ -194,6 +194,16 @@ export function ModuleDetailScreen() {
               <InfoRow label="Engines" value={module.standard.engines.length ? module.standard.engines.join(', ') : 'Declarative host runtime'} />
             </Section>
           ) : null}
+          {module.standard?.runtimeSupport ? (
+            <Section title="Runtime support">
+              <InfoRow label="Supported sections" value={runtimeSupportCount(module, 'SUPPORTED')} />
+              <InfoRow label="Partial sections" value={runtimeSupportCount(module, 'PARTIALLY_SUPPORTED')} />
+              <InfoRow label="Declarative-only sections" value={runtimeSupportCount(module, 'DECLARATIVE_ONLY')} />
+              <InfoRow label="Unsupported sections" value={runtimeSupportCount(module, 'UNSUPPORTED')} />
+              <InfoRow label="Service invocation depth" value={String(module.standard.runtimeSupport.maximumServiceInvocationDepth)} />
+              <InfoRow label="Declared but not fully operational" value={runtimeDiagnosticSummary(module)} />
+            </Section>
+          ) : null}
           {module.standard && hasRegistryMetadata(module) ? (
             <Section title="Services and APIs">
               <InfoRow label="Services" value={registryPreview(module.serviceRegistry, 'kind')} />
@@ -429,6 +439,24 @@ function standardCapabilitySummary(module: ModuleDetail): string {
     .map(([key]) => key.replace(/^supports/, ''))
   const declared = [...(module.standard?.capabilities ?? []), ...enabled]
   return declared.length ? declared.slice(0, 10).join(', ') : 'Not declared'
+}
+
+function runtimeSupportCount(module: ModuleDetail, state: string): string {
+  const sections = Object.values(module.standard?.runtimeSupport?.sections ?? {})
+  return String(sections.filter(sectionState => sectionState === state).length)
+}
+
+function runtimeDiagnosticSummary(module: ModuleDetail): string {
+  const diagnostics = module.standard?.runtimeDiagnostics ?? []
+  if (!diagnostics.length) return 'None declared'
+  return diagnostics
+    .slice(0, 8)
+    .map(diagnostic => `${diagnostic.section}: ${runtimeStateLabel(diagnostic.state)}`)
+    .join(' · ')
+}
+
+function runtimeStateLabel(value: string): string {
+  return value.toLowerCase().replace(/_/g, ' ')
 }
 
 function hasRegistryMetadata(module: ModuleDetail): boolean {

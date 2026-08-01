@@ -1,8 +1,14 @@
-import {extractModuleStandard20Summary, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
+import {
+  extractModuleStandard20Summary,
+  runtimeSupportDiagnosticsForManifest,
+  runtimeSupportForStandardVersion,
+  type GreenfieldModuleManifest,
+} from '@modula/greenfield-module-manifest'
 import type {GreenfieldRegistryFilter, GreenfieldRegistryModuleSummary, GreenfieldRegistryStandardMetadata} from '@modula/greenfield-module-registry-contracts'
 import type {ModulaDb} from '../database/client.js'
 import {moduleError} from './module-errors.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
+import {normalizeModuleManifest} from './manifest-normalizer.js'
 import {GreenfieldModuleReleaseService} from './release-service.js'
 
 export class GreenfieldModuleRegistryService {
@@ -117,6 +123,10 @@ export class GreenfieldModuleRegistryService {
           manifestPath: latest.manifestPath,
         },
         standardMetadata: standardMetadataForManifest(latest.manifest),
+        normalizedManifest: normalizeModuleManifest(latest.manifest, {
+          manifestSha256: latest.manifestSha256,
+          releaseSha256: latest.releaseSha256,
+        }),
         dependencyGraph: manifestRecord.dependencyGraph,
         serviceRegistry: manifestRecord.serviceRegistry,
         apiRegistry: manifestRecord.apiRegistry,
@@ -212,10 +222,19 @@ export class GreenfieldModuleRegistryService {
 function standardMetadataForManifest(input: unknown): GreenfieldRegistryStandardMetadata {
   const manifest = input && typeof input === 'object' && !Array.isArray(input) ? input as Record<string, unknown> : {}
   const summary = extractModuleStandard20Summary(manifest)
+  const runtimeSupport = runtimeSupportForStandardVersion(summary.standardVersion)
+  const runtimeDiagnostics = runtimeSupportDiagnosticsForManifest(manifest)
+    .filter(diagnostic => diagnostic.declared && !diagnostic.operational)
   return {
     manifestVersion: typeof manifest.manifestVersion === 'number' ? manifest.manifestVersion : null,
     standardVersion: typeof manifest.standardVersion === 'string' ? manifest.standardVersion : null,
     sectionVersions: Object.fromEntries(Object.entries(summary.sectionVersions).filter((entry): entry is [string, string] => typeof entry[1] === 'string')),
+    runtimeSupport: runtimeSupport ? {
+      standardVersion: runtimeSupport.standardVersion,
+      maximumServiceInvocationDepth: runtimeSupport.maximumServiceInvocationDepth,
+      sections: runtimeSupport.sections,
+    } : undefined,
+    runtimeDiagnostics,
     dependencies: summary.dependencies,
     registries: {
       services: summary.services,

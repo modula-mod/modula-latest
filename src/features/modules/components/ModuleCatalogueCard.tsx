@@ -42,7 +42,7 @@ export function ModuleCatalogueCard({item, onPress}: {item: ModuleCatalogueItem;
       </AppText>
       {item.standard?.standardVersion ? (
         <AppText variant="micro" colour="textTertiary">
-          Standard {item.standard.standardVersion} · {item.standard.registries.services} services · {item.standard.registries.apis} APIs
+          Standard {item.standard.standardVersion} · {runtimeSupportSummary(item)} · {item.standard.registries.apis} APIs
         </AppText>
       ) : null}
     </AppPressable>
@@ -62,3 +62,12 @@ const styles = StyleSheet.create({
   icon: {alignItems: 'center', height: 44, justifyContent: 'center', width: 44},
   wrap: {flexDirection: 'row', flexWrap: 'wrap'},
 })
+
+function runtimeSupportSummary(item: ModuleCatalogueItem): string {
+  const sections = Object.values(item.standard?.runtimeSupport?.sections ?? {})
+  if (!sections.length) return `${item.standard?.registries.services ?? 0} services`
+  const supported = sections.filter(state => state === 'SUPPORTED').length
+  const partial = sections.filter(state => state === 'PARTIALLY_SUPPORTED').length
+  const declarative = sections.filter(state => state === 'DECLARATIVE_ONLY').length
+  return `${supported} supported · ${partial} partial · ${declarative} declarative`
+}
