@@ -37,7 +37,7 @@ const CLASSIFICATIONS = [
   'trust-safety',
 ]
 
-const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+const RELATED_LINKS: {label: string; href: Href; variant?: 'secondary' | 'ghost'}[] = [
   {label: 'Automations Studio', href: '/product/automations'},
   {label: 'Ledger Replay', href: '/product/ledger', variant: 'secondary'},
   {label: 'Circuit Memory', href: '/product/circuit-memory', variant: 'secondary'},

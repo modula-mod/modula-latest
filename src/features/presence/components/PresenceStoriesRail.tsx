@@ -24,10 +24,7 @@ import Svg, {
 
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
-import {
-  PRESENCE_RAIL_SEED,
-  type PresenceRailPerson,
-} from '@/features/presence/data/presenceRailSeed'
+import type {PresenceRailPerson} from '@/features/presence/contracts/presenceRail'
 import {useReduceMotion} from '@/lib/accessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -49,7 +46,7 @@ type PresenceStoriesRailProps = {
  * Waits for measured width before mounting the scroller so first paint matches.
  */
 export function PresenceStoriesRail({
-  people = PRESENCE_RAIL_SEED,
+  people = [],
   compact = false,
   showCaption = true,
 }: PresenceStoriesRailProps) {
@@ -100,6 +97,8 @@ export function PresenceStoriesRail({
   }
 
   const stageHeight = compact ? 168 : 196
+
+  if (people.length === 0) return null
 
   return (
     <Animated.View

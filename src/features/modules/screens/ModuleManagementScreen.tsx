@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useModuleContributionQuery, useModuleDetailQuery} from '@/features/modules/hooks'
+import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -21,12 +21,19 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const router = useRouter()
   const services = useAppServices()
   const detail = useModuleDetailQuery(id)
+  const health = useModuleHealthQuery(id)
+  const backendDiagnostics = useModuleBackendDiagnosticsQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
+  const installedModules = useInstalledModulesQuery()
   const {colours, radius, spacing} = useThemeTokens()
   const [automaticUpdates, setAutomaticUpdates] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [uninstallPreview, setUninstallPreview] = useState<string | null>(null)
   const module = detail.data
+  const backend = backendDiagnostics.data ?? module?.backend ?? null
+  const installed = installedModules.data?.find(item => item.moduleId === id)
+  const grantedPermissions = installed?.grantedPermissions ?? []
+  const grantedAiPermissions = grantedPermissions.filter(permission => permission.startsWith('ai.'))
 
   const transition = async (kind: 'enable' | 'disable' | 'update' | 'uninstall' | 'preview-uninstall') => {
     if (!module) return
@@ -65,6 +72,50 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
     }
   }
 
+  const backendAction = async (kind: 'reverify' | 'health' | 'disable') => {
+    if (!module) return
+    if (kind === 'disable') {
+      const confirmed = await confirmModulaAction({
+        title: 'Disable backend connection',
+        message: 'Module metadata and installation state remain intact. Backend actions, events and webhooks are blocked until the connection is reverified.',
+        confirmLabel: 'Disable backend',
+        cancelLabel: 'Cancel',
+      })
+      if (!confirmed) return
+    }
+    setBusy(`backend-${kind}`)
+    try {
+      if (kind === 'reverify') await services.moduleRepository.reverifyBackend(module.moduleId)
+      if (kind === 'health') await services.moduleRepository.checkBackendHealth(module.moduleId)
+      if (kind === 'disable') await services.moduleRepository.disableBackend(module.moduleId)
+      await Promise.all([backendDiagnostics.refetch(), health.refetch()])
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const revokeAI = async () => {
+    if (!module) return
+    const confirmed = await confirmModulaAction({
+      title: 'Revoke AI access',
+      message: 'Vault Notes remains enabled. AI actions stop until the AI permissions are granted again.',
+      confirmLabel: 'Revoke AI access',
+      cancelLabel: 'Cancel',
+    })
+    if (!confirmed) return
+    setBusy('ai-revoke')
+    try {
+      await services.moduleRepository.reviewPermissions(
+        module.moduleId,
+        (installed?.grantedPermissions ?? module.permissions.map(permission => permission.permission))
+          .filter(permission => !permission.startsWith('ai.')),
+      )
+      await Promise.all([detail.refetch(), installedModules.refetch()])
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <SettingsScreen
       title={module?.name ?? 'Module'}
@@ -95,6 +146,86 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 )}
                 <ModulaButton label="Open module" accessibilityLabel="Open module" role="secondary" onPress={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)} />
               </View>
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Diagnostics">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              <View style={[styles.wrap, {gap: spacing[2]}]}>
+                <ModuleStatusPill state={health.data?.overall ?? 'unknown'} />
+                <ModuleStatusPill state={String(health.data?.runtime?.installationStatus ?? module.installationState)} />
+                <ModuleStatusPill state={String((health.data?.searchProjection as any)?.status ?? 'search')} />
+              </View>
+              {health.data?.diagnostics ? (
+                <View style={{gap: spacing[1]}}>
+                  <AppText variant="caption" colour="textSecondary">{formatDiagnosticCounts(health.data.diagnostics.recordCounts, 'records')}</AppText>
+                  <AppText variant="caption" colour="textSecondary">
+                    Versions {String(health.data.diagnostics.versionCount ?? 0)} · failed actions {String(health.data.diagnostics.failedActions ?? 0)} · export failures {String(health.data.diagnostics.exportFailures ?? 0)}
+                  </AppText>
+                </View>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">Diagnostics are unavailable for this module.</AppText>
+              )}
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Backend">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {backend ? (
+                <>
+                  <View style={[styles.wrap, {gap: spacing[2]}]}>
+                    <ModuleStatusPill state={backend.mode} />
+                    <ModuleStatusPill state={backend.status} />
+                    <ModuleStatusPill state={backend.dataLocation} />
+                  </View>
+                  <InfoLine label="Provider" value={backend.provider} />
+                  <InfoLine label="Deployment" value={formatLabel(backend.deploymentOwnership)} />
+                  <InfoLine label="Endpoint" value={backend.endpoint ?? 'Resolved during installation'} />
+                  <InfoLine label="Protocol" value={backend.protocolVersion ?? 'Not required'} />
+                  <InfoLine label="Data location" value={formatLabel(backend.dataLocation)} />
+                  <InfoLine label="Regions" value={backend.regions.length ? backend.regions.join(', ') : 'Not declared'} />
+                  <InfoLine label="Self-hosting" value={backend.selfHostingSupported ? 'Supported' : 'Not supported'} />
+                  <InfoLine label="External data processing" value={backend.externalDataProcessing ? 'Yes' : 'No'} />
+                  <View style={[styles.actions, {gap: spacing[2]}]}>
+                    <ModulaButton label="Reverify" role="secondary" accessibilityLabel="Reverify module backend" loading={busy === 'backend-reverify'} onPress={() => void backendAction('reverify')} />
+                    <ModulaButton label="Health check" role="secondary" accessibilityLabel="Check module backend health" loading={busy === 'backend-health'} onPress={() => void backendAction('health')} />
+                    <ModulaButton label="Disable backend" role="secondary" accessibilityLabel="Disable module backend" loading={busy === 'backend-disable'} onPress={() => void backendAction('disable')} />
+                  </View>
+                </>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">Backend diagnostics are unavailable for this module.</AppText>
+              )}
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="AI">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {module.ai?.productActions.length ? (
+                <>
+                  <View style={[styles.wrap, {gap: spacing[2]}]}>
+                    <ModuleStatusPill state={grantedAiPermissions.length ? 'AI enabled' : 'AI permission required'} />
+                    <ModuleStatusPill state={backend?.status ?? 'provider configured in Greenfield'} />
+                    <ModuleStatusPill state="optional capability" />
+                  </View>
+                  <InfoLine label="Permitted actions" value={module.ai.productActions.map(action => action.name).join(', ')} />
+                  <InfoLine label="Granted AI permissions" value={grantedAiPermissions.length ? grantedAiPermissions.join(', ') : 'No AI grants'} />
+                  <InfoLine label="Data sent to provider" value="Authorised note context, selected content, non-sensitive metadata and action variables only" />
+                  <InfoLine label="Provider retention" value="Controlled by Greenfield AI provider configuration" />
+                  <InfoLine label="Usage" value="Execution metadata, latency, provider/model and token estimates are retained; note text is not written to audit records" />
+                  <View style={[styles.actions, {gap: spacing[2]}]}>
+                    <ModulaButton
+                      label="Revoke AI access"
+                      accessibilityLabel="Revoke module AI access"
+                      role="secondary"
+                      disabled={!grantedAiPermissions.length}
+                      loading={busy === 'ai-revoke'}
+                      onPress={() => void revokeAI()}
+                    />
+                  </View>
+                </>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">This module does not declare AI product actions.</AppText>
+              )}
             </View>
           </SettingsSection>
 
@@ -213,3 +344,25 @@ const styles = StyleSheet.create({
   panel: {},
   wrap: {flexDirection: 'row', flexWrap: 'wrap'},
 })
+
+function formatDiagnosticCounts(value: unknown, suffix: string) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return `0 ${suffix}`
+  const entries = Object.entries(value as Record<string, unknown>)
+    .filter(([, count]) => Number(count) > 0)
+    .slice(0, 4)
+    .map(([collection, count]) => `${collection}: ${String(count)}`)
+  return entries.length ? entries.join(' · ') : `0 ${suffix}`
+}
+
+function formatLabel(value: string) {
+  return value.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
+}
+
+function InfoLine({label, value}: {label: string; value: string}) {
+  return (
+    <View style={{gap: 2}}>
+      <AppText variant="caption" colour="textSecondary">{label}</AppText>
+      <AppText variant="bodyStrong">{value}</AppText>
+    </View>
+  )
+}

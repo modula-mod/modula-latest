@@ -43,6 +43,12 @@ export type {
 export type {MetadataRepository} from '@/data/repositories/contracts/MetadataRepository'
 export type {
   InstalledModule,
+  ApplyAIExecutionRequest,
+  ApplyAIExecutionResponse,
+  ModuleAIDeclaration,
+  ModuleAIActionExecutionRequest,
+  ModuleAIActionExecutionResponse,
+  ModuleAIProductActionDefinition,
   ModuleCatalogueItem,
   ModuleContribution,
   ModuleDetail,

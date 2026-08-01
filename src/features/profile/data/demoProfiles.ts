@@ -1,5 +1,5 @@
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
-import {demoIdentityClaims} from '@/features/profile/data/demoIdentityClaims'
+import {demoIdentityClaims} from './demoIdentityClaims'
 
 const updatedAt = '2026-07-16T09:00:00.000Z'
 

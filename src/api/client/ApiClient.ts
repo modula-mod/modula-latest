@@ -84,9 +84,10 @@ export class ApiClient {
       message: envelope.error.message,
       code: envelope.error.code,
       status: response.status,
-      requestId: envelope.meta.requestId,
+      requestId: envelope.error.requestId,
       retryable: envelope.error.retryable,
       fieldErrors: envelope.error.fieldErrors,
+      details: envelope.error.details,
     })
 
     if (request.authenticated && retry === 0 && isAuthenticationError(error) && this.input.onSessionExpired) {

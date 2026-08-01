@@ -5,6 +5,8 @@ import type {GreenfieldSessionService} from '../../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../../transport/envelope.js'
 import {GreenfieldModuleContributionService} from '../contribution-service.js'
 import {GreenfieldModuleActionService} from '../action-service.js'
+import {GreenfieldModuleExportService} from '../export-service.js'
+import {GreenfieldModuleHealthService} from '../health-service.js'
 import {GreenfieldModuleInstallationService} from '../installation-service.js'
 import {GreenfieldModuleManifestService} from '../manifest-service.js'
 import {moduleError} from '../module-errors.js'
@@ -13,10 +15,16 @@ import {GreenfieldModuleRecordService} from '../record-service.js'
 import type {ModuleRecordQuery} from '../record-service.js'
 import {GreenfieldModuleRegistryService} from '../registry-service.js'
 import {GreenfieldModuleReleaseService} from '../release-service.js'
+import {GreenfieldModuleRuntimeAccessService} from '../runtime-access.js'
 import {GreenfieldModuleSettingsService} from '../settings-service.js'
 import {GreenfieldModuleUninstallService} from '../uninstall-service.js'
 import {GreenfieldModuleUpdateService} from '../update-service.js'
 import {GreenfieldModuleViewService} from '../view-service.js'
+import {ModuleBackendDiscoveryService} from '../backend/discovery-service.js'
+import {ModuleBackendEventService} from '../backend/event-service.js'
+import {ModuleBackendHealthService as GreenfieldModuleBackendHealthService} from '../backend/health-service.js'
+import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
+import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -38,6 +46,14 @@ export async function registerModuleRoutes(
   const views = new GreenfieldModuleViewService(db)
   const records = new GreenfieldModuleRecordService(db)
   const actions = new GreenfieldModuleActionService(db, config)
+  const exports = new GreenfieldModuleExportService(db, config)
+  const health = new GreenfieldModuleHealthService(db, config)
+  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
+  const backendDiscovery = new ModuleBackendDiscoveryService(db)
+  const backendHealth = new GreenfieldModuleBackendHealthService(db, config)
+  const backendLifecycle = new ModuleBackendLifecycleService(db)
+  const backendEvents = new ModuleBackendEventService(db, config)
+  const backendWebhooks = new ModuleBackendWebhookService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -173,6 +189,20 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Update failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/permissions/review', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      return reply.send(successEnvelope(await installations.reviewPermissions(auth.accountId, (request.params as any).moduleId, {
+        approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : [],
+        idempotencyKey: idempotencyKey(request, body),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Permission review failed')
     }
   })
 
@@ -319,6 +349,28 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/records/:collection/:recordId/restore', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.restore(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record restore failed')
+    }
+  })
+
+  app.delete('/v1/modules/:moduleId/records/:collection/:recordId/permanent', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await records.purge(auth.accountId, params.moduleId, params.collection, params.recordId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module record permanent delete failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/actions/:actionId', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -329,12 +381,97 @@ export async function registerModuleRoutes(
           await actions.execute(auth.accountId, params.moduleId, params.actionId, {
             input: (request.body as any)?.input ?? request.body ?? {},
             idempotencyKey: idempotencyKey(request, request.body),
+            actorId: actorIdForAccount(auth.accountId),
+            requestId: request.id,
           }),
           request.id,
         ),
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module action failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/export', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    const params = request.params as any
+    try {
+      return reply.send(successEnvelope(await exports.create(auth.accountId, params.moduleId, (request.body as any) ?? {}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module export failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/health', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await health.get(auth.accountId, (request.params as any).moduleId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module health lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/backend', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      return reply.send(successEnvelope(await backendHealth.diagnostics(context), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend diagnostics failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/backend/discover', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      return reply.send(successEnvelope(await backendDiscovery.discover(context, {origin: stringOrUndefined((request.body as any)?.origin)}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend discovery failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/backend/health', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      return reply.send(successEnvelope(await backendHealth.check(context), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend health failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/backend/disable', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      return reply.send(successEnvelope(await backendLifecycle.disable(context), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend disable failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/backend/events', routeConfig.writeConfig, async (request, reply) => {
+    try {
+      const token = bearerToken(request)
+      return reply.send(successEnvelope(await backendEvents.ingest((request.params as any).moduleId, request.body ?? {}, token, signatureHeader(request, 'x-modula-event-signature')), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend event ingestion failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/backend/webhooks/modula', routeConfig.writeConfig, async (request, reply) => {
+    try {
+      const token = bearerToken(request)
+      return reply.send(successEnvelope(await backendWebhooks.receive((request.params as any).moduleId, request.body ?? {}, token, signatureHeader(request, 'x-modula-webhook-signature')), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module backend webhook receipt failed')
     }
   })
 
@@ -437,15 +574,25 @@ function publisherAdminAction(
 }
 
 async function requireGreenfieldAuth(request: FastifyRequest, reply: FastifyReply, sessions: GreenfieldSessionService) {
-  const rawHeader = request.headers.authorization
-  const header = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
-  const token = header?.startsWith('Bearer ') ? header.slice(7).trim() : ''
+  const token = bearerToken(request)
   const auth = token ? await sessions.resolveAccess(token) : null
   if (!auth) {
     sendError(reply, 'UNAUTHENTICATED', 'Authentication required', request.id)
     return null
   }
   return auth
+}
+
+function bearerToken(request: FastifyRequest): string {
+  const rawHeader = request.headers.authorization
+  const header = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
+  return header?.startsWith('Bearer ') ? header.slice(7).trim() : ''
+}
+
+function signatureHeader(request: FastifyRequest, name: string): string | undefined {
+  const rawHeader = request.headers[name.toLowerCase()]
+  const header = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader
+  return typeof header === 'string' && header.trim().length > 0 ? header.trim() : undefined
 }
 
 function idempotencyKey(request: FastifyRequest, body: unknown): string {
@@ -482,13 +629,17 @@ function stringOrUndefined(value: unknown): string | undefined {
   return undefined
 }
 
+function actorIdForAccount(accountId: string): string {
+  return `actor-${accountId}`
+}
+
 function sendError(reply: FastifyReply, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
 }
 
 function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fallback: string) {
   const code = error && typeof error === 'object' && 'code' in error ? (error as any).code : 'SERVER_ERROR'
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)

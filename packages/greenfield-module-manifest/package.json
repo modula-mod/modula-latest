@@ -17,6 +17,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@modula/module-standard": "file:../../../modula-mod/modula-module-standard/packages/module-standard",
+    "@modula/module-validator": "file:../../../modula-mod/modula-module-standard/packages/module-validator"
+  },
   "devDependencies": {
     "@types/node": "^24.0.10",
     "typescript": "~5.9.2",

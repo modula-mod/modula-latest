@@ -14,12 +14,14 @@ import type {FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AtprotoService} from '../bridges/atproto/service.js'
+import {RecoveryService} from '../accounts/recovery.js'
 import {AccountService} from '../accounts/service.js'
 import {AuthenticationService} from '../authentication/service.js'
 import {ExtensionRegistry} from '../extensions/extension-registry.js'
 import {InstallationService} from '../extensions/installation-service.js'
 import {FunctionService} from '../functions/service.js'
 import {GreenfieldSessionService} from '../sessions/service.js'
+import {GreenfieldEventReplayService} from '../events/index.js'
 import {RepositoryService} from '../repositories/service.js'
 import {RecordService} from '../records/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -29,18 +31,28 @@ import {ModerationRepository} from '../domains/moderation/repository.js'
 import {PostMediaStorage} from '../domains/media/post-media-storage.js'
 import {NotificationPreferencesService} from '../domains/notifications/preferences.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
+import {GreenfieldPolicyEngine} from '../domains/policy/index.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
 import {ProfileWriteService} from '../domains/profiles/writes.js'
-import {SearchRepository} from '../domains/search/repository.js'
+import {GreenfieldSearchService} from '../domains/search/index.js'
 import {checkReadiness} from '../domains/system/health.js'
+import {
+  GreenfieldConnectorProviderRegistry,
+  TrustedConnectorAdapterRegistry,
+  loadGreenfieldConnectorProviderDefinitions,
+} from '../connectors/index.js'
+import {ConnectorCredentialService} from '../domains/connectors/credentials/index.js'
+import {ConnectorConnectionService} from '../domains/connectors/connections/index.js'
+import {ConnectorOAuthStateService} from '../domains/connectors/oauth-state/index.js'
 import {attachAuth, requireAuth, requireCapability} from '../security/auth-context.js'
 import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
 import {registerModuleRoutes} from '../modules/routes/index.js'
+import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
@@ -73,17 +85,26 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const moderation = new ModerationRepository(db)
   const notifications = new NotificationRepository(db)
   const notificationPreferences = new NotificationPreferencesService(db)
-  const search = new SearchRepository(db)
+  const policies = new GreenfieldPolicyEngine(db)
+  const search = new GreenfieldSearchService(db, config)
   const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
+  const eventReplays = new GreenfieldEventReplayService(db)
   const accounts = new AccountService(db, config)
+  const recovery = new RecoveryService(db, config)
   const authentication = new AuthenticationService(db, greenfieldSessions)
   const repositories = new RepositoryService(db)
   const records = new RecordService(db)
   const extensions = new ExtensionRegistry(db)
   const installations = new InstallationService(db)
   const functions = new FunctionService(db)
+  const connectorProviders = new GreenfieldConnectorProviderRegistry()
+  connectorProviders.registerMany(loadGreenfieldConnectorProviderDefinitions())
+  const connectorAdapters = new TrustedConnectorAdapterRegistry()
+  const connectorCredentials = new ConnectorCredentialService(db, config)
+  const connectorConnections = new ConnectorConnectionService(db, connectorProviders)
+  const connectorOAuthStates = new ConnectorOAuthStateService(db, config, connectorProviders)
 
   app.addHook('preHandler', async (request, reply) => {
     if (request.url.startsWith('/v1/atproto') && !config.atprotoEnabled) {
@@ -136,6 +157,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       greenfieldModuleGithubSync: config.moduleGithubSyncEnabled,
       greenfieldVaultNotesReference: config.vaultNotesReferenceEnabled,
       greenfieldDimon: config.dimonEnabled,
+      greenfieldAiGateway: config.aiGatewayEnabled,
       inviteOnly: config.inviteOnly,
       atproto: config.atprotoEnabled,
       atprotoOAuth: config.atprotoEnabled,
@@ -214,6 +236,31 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return resolved
   }
 
+  const resolveSearchActorContext = async (request: any) => {
+    const header = request.headers.authorization
+    const resolved = header?.startsWith('Bearer ')
+      ? await greenfieldSessions.resolveAccess(header.slice(7).trim())
+      : null
+    let greenfieldActorId: string | null = null
+    if (resolved?.accountId) {
+      const actor = await db
+        .selectFrom('actors')
+        .select('id')
+        .where('account_id', '=', resolved.accountId)
+        .where('deleted_at', 'is', null)
+        .orderBy('created_at', 'asc')
+        .executeTakeFirst()
+      greenfieldActorId = actor?.id ?? null
+    }
+    return {
+      actorId: greenfieldActorId ?? request.auth?.actorId ?? null,
+      accountId: resolved?.accountId ?? null,
+      capabilities: request.auth?.capabilities ? Array.from(request.auth.capabilities).map(String) : [],
+      requestId: request.id,
+      correlationId: request.id,
+    }
+  }
+
   const authWriteConfig = config.rateLimitEnabled
     ? {config: {rateLimit: {max: 10, timeWindow: '1 minute'}}}
     : {}
@@ -238,6 +285,22 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return reply.send(successEnvelope(await accounts.resendVerification((request.body as any).email ?? ''), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Resend failed')
+    }
+  })
+  app.post('/v1/accounts/forgot-password', authWriteConfig, async (request, reply) => {
+    try {
+      return reply.send(successEnvelope(await recovery.requestRecovery((request.body as any).email ?? ''), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Recovery request failed')
+    }
+  })
+  app.post('/v1/accounts/reset-password', authWriteConfig, async (request, reply) => {
+    try {
+      const body = ((request.body as any) ?? {}) as {token?: string; newPassword?: string}
+      await recovery.completeRecovery(body.token ?? '', body.newPassword ?? '')
+      return reply.send(successEnvelope({reset: true}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Password reset failed')
     }
   })
   app.get('/v1/accounts/handles/:handle/availability', profileConfig, async (request, reply) => {
@@ -271,6 +334,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
@@ -565,7 +629,151 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return reply.send(successEnvelope(await db.selectFrom('greenfield_plugins').selectAll().execute(), request.id))
   })
   app.get('/v1/connectors', profileConfig, async (request, reply) => {
-    return reply.send(successEnvelope(await db.selectFrom('greenfield_connectors').selectAll().execute(), request.id))
+    return reply.send(successEnvelope(connectorProviders.list(), request.id))
+  })
+  app.get('/v1/connectors/:providerId', profileConfig, async (request, reply) => {
+    const provider = connectorProviders.get((request.params as any).providerId)
+    if (!provider) return sendError(reply, 'NOT_FOUND', 'Connector provider not found', request.id)
+    return reply.send(successEnvelope(provider, request.id))
+  })
+  app.post('/v1/connectors/:providerId/authorise', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const providerId = (request.params as any).providerId
+      const adapter = connectorAdapters.require(providerId)
+      const body = (request.body as any) ?? {}
+      const initiated = await connectorOAuthStates.initiate({
+        accountId: auth.accountId,
+        providerId,
+        redirectUri: typeof body.redirectUri === 'string' ? body.redirectUri : undefined,
+        idempotencyKey: idempotencyKey(request, body),
+      })
+      const adapterResult = await adapter.getAuthorisationUrl({
+        accountId: auth.accountId,
+        providerId,
+        state: initiated.state,
+        redirectUri: initiated.redirectUri,
+        scopes: arrayOfStrings(body.scopes),
+        pkceChallenge: initiated.pkceChallenge,
+        pkceChallengeMethod: initiated.pkceChallengeMethod,
+      })
+      return reply.code(202).send(
+        successEnvelope(
+          {
+            providerId,
+            stateId: initiated.stateId,
+            status: initiated.status,
+            authorisationUrl: adapterResult.authorisationUrl,
+            redirectUri: initiated.redirectUri,
+            expiresAt: initiated.expiresAt,
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connector authorisation could not be started')
+    }
+  })
+  app.get('/v1/connections', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.list(auth.accountId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection lookup failed')
+    }
+  })
+  app.get('/v1/connections/:connectionId', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.get(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection lookup failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/enable', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.enable(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection enable failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/disable', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await connectorConnections.disable(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection disable failed')
+    }
+  })
+  app.post('/v1/connections/:connectionId/refresh', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const connection = await connectorConnections.get(auth.accountId, (request.params as any).connectionId)
+      await policies.assertAllowed({
+        accountId: auth.accountId,
+        action: 'connection.refresh',
+        connectionId: connection.connectionId,
+        resource: {type: 'connection', id: connection.connectionId, ownerAccountId: auth.accountId},
+        requestContext: {requestId: request.id, correlationId: request.id},
+      })
+      const adapter = connectorAdapters.require(connection.providerId)
+      await connectorConnections.beginRefresh(auth.accountId, connection.connectionId)
+      try {
+        const credentials = await connectorCredentials.decryptForTrustedBackend({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+        })
+        const refreshed = await adapter.refreshCredentials({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+          credentials,
+        })
+        await connectorCredentials.storeEncrypted({
+          accountId: auth.accountId,
+          providerId: connection.providerId,
+          connectionId: connection.connectionId,
+          credentials: refreshed,
+        })
+        return reply.send(
+          successEnvelope(
+            await connectorConnections.completeRefresh(auth.accountId, connection.connectionId, {
+              expiresAt: refreshed.expiresAt ? new Date(refreshed.expiresAt) : null,
+            }),
+            request.id,
+          ),
+        )
+      } catch (error) {
+        await connectorConnections.fail(auth.accountId, connection.connectionId, {failureCode: 'refresh_failed'})
+        throw error
+      }
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection refresh failed')
+    }
+  })
+  app.delete('/v1/connections/:connectionId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      await policies.assertAllowed({
+        accountId: auth.accountId,
+        action: 'connection.disconnect',
+        connectionId: (request.params as any).connectionId,
+        resource: {type: 'connection', id: (request.params as any).connectionId, ownerAccountId: auth.accountId},
+        requestContext: {requestId: request.id, correlationId: request.id},
+      })
+      return reply.send(successEnvelope(await connectorConnections.disconnect(auth.accountId, (request.params as any).connectionId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Connection disconnect failed')
+    }
   })
   app.get('/v1/widgets', profileConfig, async (request, reply) => {
     return reply.send(successEnvelope(await db.selectFrom('greenfield_widgets').selectAll().execute(), request.id))
@@ -633,7 +841,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       if ((body as any)?.authorActorId && (body as any).authorActorId !== auth.actorId) {
         return sendError(reply, 'FORBIDDEN', 'Cross-actor create denied', request.id)
       }
-      const created = await postWrites.create(auth.actorId, body)
+      const created = await postWrites.create(auth.actorId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to create post')
@@ -647,7 +858,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     try {
       const {postId} = request.params as {postId: string}
       const body = request.body as UpdatePostInput
-      const updated = await postWrites.update(auth.actorId, postId, body)
+      const updated = await postWrites.update(auth.actorId, postId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope(updated, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to update post')
@@ -660,7 +874,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     if (!auth) return
     try {
       const {postId} = request.params as {postId: string}
-      await postWrites.delete(auth.actorId, postId)
+      await postWrites.delete(auth.actorId, postId, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope({deleted: true}, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to delete post')
@@ -795,11 +1012,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = requireCapability(request, reply, 'profile:update')
     if (!auth) return
     try {
-      const body = request.body as {displayName?: string; bio?: string; expectedVersion?: number; actorId?: string}
+      const body = request.body as {displayName?: string; bio?: string; visibility?: 'public' | 'followers' | 'teams' | 'private'; expectedVersion?: number; actorId?: string}
       if (body.actorId && body.actorId !== auth.actorId) {
         return sendError(reply, 'FORBIDDEN', 'Cross-actor profile edit denied', request.id)
       }
-      const updated = await profileWrites.updateMe(auth.actorId, body)
+      const updated = await profileWrites.updateMe(auth.actorId, body, {
+        requestId: request.id,
+        correlationId: request.id,
+      })
       return reply.send(successEnvelope(updated, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Profile update failed')
@@ -938,21 +1158,91 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.get('/v1/search', feedConfig, async (request, reply) => {
     try {
-      const query = request.query as Record<string, unknown>
-      const q = typeof query.q === 'string' ? query.q : ''
-      const type = (typeof query.type === 'string' ? query.type : 'all') as SearchType
-      const limit = parseLimit(query.limit)
-      const cursor = decodeCursor(query.cursor)
-      const data = await search.search({
-        q,
-        type,
-        limit,
-        cursor,
-        viewerActorId: request.auth?.actorId ?? null,
-      })
+      const data = await search.search(request.query as Record<string, unknown>, await resolveSearchActorContext(request))
       return reply.send(successEnvelope(data, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Search failed')
+    }
+  })
+
+  app.get('/v1/search/suggestions', feedConfig, async (request, reply) => {
+    try {
+      return reply.send(successEnvelope(await search.suggestions(request.query as Record<string, unknown>, await resolveSearchActorContext(request)), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search suggestions failed')
+    }
+  })
+
+  app.get('/v1/search/recent', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.listRecent(await resolveSearchActorContext(request), request.query as Record<string, unknown>), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search lookup failed')
+    }
+  })
+
+  app.post('/v1/search/recent', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.code(201).send(successEnvelope(await search.recordRecent(await resolveSearchActorContext(request), (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search save failed')
+    }
+  })
+
+  app.delete('/v1/search/recent', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const query = {...(request.query as Record<string, unknown>), ...(((request.body as any) ?? {}) as Record<string, unknown>)}
+      return reply.send(successEnvelope(await search.deleteRecent(await resolveSearchActorContext(request), query), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Recent search delete failed')
+    }
+  })
+
+  app.get('/v1/search/saved', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.listSaved(await resolveSearchActorContext(request)), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search lookup failed')
+    }
+  })
+
+  app.post('/v1/search/saved', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      return reply.code(201).send(successEnvelope(await search.createSaved(await resolveSearchActorContext(request), (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search create failed')
+    }
+  })
+
+  app.patch('/v1/search/saved/:savedSearchId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const {savedSearchId} = request.params as {savedSearchId: string}
+      return reply.send(successEnvelope(await search.patchSaved(await resolveSearchActorContext(request), savedSearchId, (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search update failed')
+    }
+  })
+
+  app.delete('/v1/search/saved/:savedSearchId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const {savedSearchId} = request.params as {savedSearchId: string}
+      return reply.send(successEnvelope(await search.deleteSaved(await resolveSearchActorContext(request), savedSearchId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Saved search delete failed')
     }
   })
 
@@ -1216,6 +1506,160 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
 
+  app.get('/v1/admin/ops/events/subscriber-failures', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const query = request.query as {subscriberId?: string}
+    try {
+      return reply.send(successEnvelope(await eventReplays.inspectSubscriberFailures(query.subscriberId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to inspect event subscriber failures')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/health', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.health(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search health lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/projections', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.projectionStates(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/search/failures', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await search.projectionFailures(), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection failure lookup failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/search/reindex', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      const context = await resolveSearchActorContext(request)
+      context.capabilities = Array.from(auth.capabilities)
+      return reply.code(202).send(successEnvelope(await search.requestReindex(context, (request.body as any) ?? {}), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search reindex request failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/search/failures/:failureId/retry', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      const context = await resolveSearchActorContext(request)
+      context.capabilities = Array.from(auth.capabilities)
+      const {failureId} = request.params as {failureId: string}
+      return reply.send(successEnvelope(await search.retryFailure(context, failureId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Search projection failure retry failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/policy/evaluate', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = (request.body as Record<string, unknown>) ?? {}
+    try {
+      const decision = await policies.evaluateAndAudit({
+        actorId: textField(body.actorId) ?? auth.actorId,
+        accountId: textField(body.accountId),
+        action: textField(body.action) ?? 'policy.inspect',
+        capability: textField(body.capability),
+        moduleId: textField(body.moduleId),
+        connectionId: textField(body.connectionId),
+        workspaceId: textField(body.workspaceId),
+        teamId: textField(body.teamId),
+        riskClassification: textField(body.riskClassification),
+        currentState: textField(body.currentState),
+        resource: objectField(body.resource),
+        requestContext: {
+          requestId: request.id,
+          correlationId: request.id,
+          userAgentClassification: classifyUserAgent(request.headers['user-agent']),
+          ipClassification: 'unknown',
+        },
+      })
+      return reply.send(successEnvelope({decision}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Policy evaluation failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/replay', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = request.body as Record<string, unknown>
+    try {
+      const result = await eventReplays.replay({
+        eventId: textField(body.eventId),
+        eventType: textField(body.eventType),
+        aggregateType: textField(body.aggregateType),
+        aggregateId: textField(body.aggregateId),
+        subscriberId: textField(body.subscriberId),
+        occurredFrom: dateField(body.occurredFrom),
+        occurredTo: dateField(body.occurredTo),
+        dryRun: Boolean(body.dryRun),
+        reason: textField(body.reason) ?? 'operator event replay',
+        requestedByActorId: auth.actorId,
+        requestId: request.id,
+        correlationId: request.id,
+      })
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to replay event deliveries')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/dead-letters/retry', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const body = request.body as Record<string, unknown>
+    try {
+      const result = await eventReplays.retryDeadLetters({
+        eventType: textField(body.eventType),
+        subscriberId: textField(body.subscriberId),
+        dryRun: Boolean(body.dryRun),
+        reason: textField(body.reason) ?? 'operator dead-letter retry',
+        requestedByActorId: auth.actorId,
+        requestId: request.id,
+        correlationId: request.id,
+      })
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to retry event dead letters')
+    }
+  })
+
+  app.post('/v1/admin/ops/events/replay/:replayId/cancel', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const {replayId} = request.params as {replayId: string}
+    const body = request.body as {reason?: string}
+    try {
+      const cancelled = await eventReplays.cancelReplay(replayId, auth.actorId, body.reason ?? 'operator cancelled unsafe replay')
+      return reply.send(successEnvelope({replayId, cancelled}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to cancel event replay')
+    }
+  })
+
   app.post('/v1/admin/ops/atproto/lexicons/:collection/disable', writeConfig, async (request, reply) => {
     const auth = requireCapability(request, reply, 'admin:moderation')
     if (!auth) return
@@ -1224,6 +1668,31 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     await setOperationalControl(`atproto.lexicon.${collection}.disabled`, Boolean(body.disabled), auth.actorId)
     return reply.send(successEnvelope({collection, disabled: Boolean(body.disabled)}, request.id))
   })
+
+  function textField(value: unknown): string | undefined {
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined
+  }
+
+  function dateField(value: unknown): Date | undefined {
+    if (typeof value !== 'string' || value.trim().length === 0) return undefined
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return undefined
+    return date
+  }
+
+  function objectField(value: unknown): any {
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined
+  }
+
+  function classifyUserAgent(value: unknown): 'unknown' | 'browser' | 'mobile' | 'service' | 'bot' | 'cli' {
+    const userAgent = Array.isArray(value) ? value.join(' ') : typeof value === 'string' ? value : ''
+    if (!userAgent) return 'unknown'
+    if (/(curl|httpie|wget|python-requests|go-http-client)/i.test(userAgent)) return 'cli'
+    if (/(bot|crawler|spider)/i.test(userAgent)) return 'bot'
+    if (/(iphone|ipad|android|mobile)/i.test(userAgent)) return 'mobile'
+    if (/(mozilla|safari|chrome|firefox|edge)/i.test(userAgent)) return 'browser'
+    return 'service'
+  }
 
   // SSRF helper exposed only in tests via internal assert
   app.get('/v1/internal/ssrf-check', async (request, reply) => {
@@ -1250,4 +1719,19 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     profileConfig,
     authWriteConfig,
   })
+}
+
+function idempotencyKey(request: any, body: unknown): string | undefined {
+  const header = request.headers?.['idempotency-key'] ?? request.headers?.['x-idempotency-key']
+  if (typeof header === 'string' && header.trim()) return header.trim()
+  if (body && typeof body === 'object' && typeof (body as any).idempotencyKey === 'string') {
+    const value = (body as any).idempotencyKey.trim()
+    return value || undefined
+  }
+  return undefined
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map(item => item.trim())
 }

@@ -21,12 +21,12 @@ const webIcons: Record<string, AppIconName> = {
   profile: 'profile',
 }
 
-const RAIL_SHORTCUTS: Array<{
+const RAIL_SHORTCUTS: {
   label: string
   icon: AppIconName
   href: Href
   featureId?: string
-}> = [
+}[] = [
   {label: 'Board', icon: 'board', href: '/board'},
   {label: 'Product', icon: 'modules', href: '/product'},
   {label: 'Customize', icon: 'appearance', href: '/product/customize'},

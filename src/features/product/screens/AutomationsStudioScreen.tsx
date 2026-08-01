@@ -58,7 +58,7 @@ const ACTIONS = [
   'Gaia summary (scoped)',
 ]
 
-const RELATED_LINKS: Array<{label: string; href: Href; variant?: 'secondary' | 'ghost'}> = [
+const RELATED_LINKS: {label: string; href: Href; variant?: 'secondary' | 'ghost'}[] = [
   {label: 'Ledger Replay', href: '/product/ledger'},
   {label: 'Kaizen Queue', href: '/product/kaizen', variant: 'secondary'},
   {label: 'Circuit Memory', href: '/product/circuit-memory', variant: 'secondary'},

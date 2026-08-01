@@ -2,10 +2,16 @@ import {randomUUID} from 'node:crypto'
 import type {CreatePostInput, SocialPostDto, UpdatePostInput} from '@modula/api-contracts'
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
+import {GreenfieldEventBus} from '../../events/index.js'
 import {AuditRepository} from '../audit/repository.js'
 import {PostMediaStorage} from '../media/post-media-storage.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {PostRepository} from './repository.js'
+
+export type PostWriteContext = {
+  requestId?: string | null
+  correlationId?: string | null
+}
 
 export class PostWriteService {
   private readonly posts: PostRepository
@@ -20,7 +26,7 @@ export class PostWriteService {
     this.mediaStorage = new PostMediaStorage(config)
   }
 
-  async create(actorId: string, input: CreatePostInput): Promise<SocialPostDto> {
+  async create(actorId: string, input: CreatePostInput, context: PostWriteContext = {}): Promise<SocialPostDto> {
     const text = (input.text ?? '').trim()
     const mediaInput = input.media ?? []
     if ((!text && mediaInput.length === 0) || text.length > 5000) {
@@ -50,6 +56,7 @@ export class PostWriteService {
 
     const id = randomUUID()
     const now = new Date()
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     const persistedMedia = await this.mediaStorage.persistPostMedia({postId: id, media: mediaInput})
     const kind = persistedMedia.length > 0 ? 'media' : 'text'
     try {
@@ -133,6 +140,32 @@ export class PostWriteService {
           id,
           actorId,
         })
+        await new GreenfieldEventBus(trx).publish({
+          eventType: 'post.created',
+          aggregateType: 'post',
+          aggregateId: id,
+          aggregateVersion: 1,
+          accountId: actor?.account_id ?? null,
+          actorId,
+          requestId: context.requestId ?? null,
+          correlationId: context.correlationId ?? context.requestId ?? null,
+          idempotencyKey: idempotencyKey ? `post.create:${actorId}:${idempotencyKey}` : null,
+          visibility: audience === 'public' ? 'public' : 'actor',
+          classification: 'internal',
+          payload: {
+            postId: id,
+            actorId,
+            audience,
+            feed,
+            kind,
+            mediaCount: persistedMedia.length,
+          },
+          metadata: {
+            source: 'greenfield.posts',
+            activeSideEffects: ['search.index.post', input.publishToAtproto ? 'atproto.publish.create' : null].filter(Boolean),
+          },
+          occurredAt: now,
+        })
       })
     } catch (error) {
       await this.mediaStorage.removePersistedMedia(persistedMedia)
@@ -143,7 +176,7 @@ export class PostWriteService {
     return created
   }
 
-  async update(actorId: string, postId: string, input: UpdatePostInput): Promise<SocialPostDto> {
+  async update(actorId: string, postId: string, input: UpdatePostInput, context: PostWriteContext = {}): Promise<SocialPostDto> {
     const text = (input.text ?? '').trim()
     if (!text || text.length > 5000) {
       throw Object.assign(new Error('Invalid post text'), {code: 'VALIDATION_FAILED'})
@@ -161,10 +194,13 @@ export class PostWriteService {
     if (row.version !== input.expectedVersion) {
       throw Object.assign(new Error('Version conflict'), {code: 'CONFLICT'})
     }
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
+    const nextVersion = row.version + 1
     await this.db.transaction().execute(async trx => {
+      const now = new Date()
       const updated = await trx
         .updateTable('posts')
-        .set({text, updated_at: new Date(), version: row.version + 1})
+        .set({text, updated_at: now, version: nextVersion})
         .where('id', '=', postId)
         .where('version', '=', input.expectedVersion)
         .executeTakeFirst()
@@ -193,13 +229,33 @@ export class PostWriteService {
         {expectedVersion: input.expectedVersion},
         {type: 'post', id: postId, actorId},
       )
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'post.updated',
+        aggregateType: 'post',
+        aggregateId: postId,
+        aggregateVersion: nextVersion,
+        accountId: actor?.account_id ?? null,
+        actorId,
+        requestId: context.requestId ?? null,
+        correlationId: context.correlationId ?? context.requestId ?? null,
+        visibility: row.audience === 'public' ? 'public' : 'actor',
+        classification: 'internal',
+        payload: {
+          postId,
+          actorId,
+          audience: row.audience,
+          sourceVersion: nextVersion,
+        },
+        metadata: {source: 'greenfield.posts'},
+        occurredAt: now,
+      })
     })
     const post = await this.posts.getByIdForAuthor(postId, actorId)
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
     return post
   }
 
-  async delete(actorId: string, postId: string): Promise<void> {
+  async delete(actorId: string, postId: string, context: PostWriteContext = {}): Promise<void> {
     const row = await this.db
       .selectFrom('posts')
       .selectAll()
@@ -210,10 +266,13 @@ export class PostWriteService {
     if (row.author_actor_id !== actorId) {
       throw Object.assign(new Error('Cannot delete another actor post'), {code: 'FORBIDDEN'})
     }
+    const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
+    const nextVersion = row.version + 1
     await this.db.transaction().execute(async trx => {
+      const now = new Date()
       await trx
         .updateTable('posts')
-        .set({deleted_at: new Date(), updated_at: new Date(), version: row.version + 1})
+        .set({deleted_at: now, updated_at: now, version: nextVersion})
         .where('id', '=', postId)
         .execute()
       if (row.audience === 'public') {
@@ -230,6 +289,26 @@ export class PostWriteService {
         })
       }
       await new AuditRepository(trx).append('post.deleted', {}, {type: 'post', id: postId, actorId})
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'post.deleted',
+        aggregateType: 'post',
+        aggregateId: postId,
+        aggregateVersion: nextVersion,
+        accountId: actor?.account_id ?? null,
+        actorId,
+        requestId: context.requestId ?? null,
+        correlationId: context.correlationId ?? context.requestId ?? null,
+        visibility: row.audience === 'public' ? 'public' : 'actor',
+        classification: 'internal',
+        payload: {
+          postId,
+          actorId,
+          audience: row.audience,
+          sourceVersion: nextVersion,
+        },
+        metadata: {source: 'greenfield.posts', tombstone: true},
+        occurredAt: now,
+      })
     })
   }
 

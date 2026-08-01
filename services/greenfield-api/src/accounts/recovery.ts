@@ -18,6 +18,9 @@ export class RecoveryService {
     return this.config.environment === 'production' ? {requested: true} : {requested: true, recoveryToken: token}
   }
   async completeRecovery(token: string, password: string): Promise<void> {
+    if (password.length < 10) {
+      throw Object.assign(new Error('Password must be at least 10 characters'), {code: 'VALIDATION_FAILED'})
+    }
     const recovery = await this.db.selectFrom('greenfield_recovery_tokens').selectAll().where('token_hash', '=', hashToken(token)).where('consumed_at', 'is', null).executeTakeFirst()
     if (!recovery || recovery.expires_at <= new Date()) throw Object.assign(new Error('Invalid or expired recovery token'), {code: 'NOT_FOUND'})
     const now = new Date(), passwordHash = await hashPassword(password)

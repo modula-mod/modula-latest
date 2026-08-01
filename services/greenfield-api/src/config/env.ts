@@ -28,6 +28,13 @@ const envSchema = z.object({
     .optional()
     .transform(v => v === 'true'),
   MODULA_REQUEST_BODY_LIMIT_BYTES: z.coerce.number().int().positive().default(4_194_304),
+  MODULA_SEARCH_QUERY_MAX_CHARS: z.coerce.number().int().positive().default(500),
+  MODULA_SEARCH_DEFAULT_LIMIT: z.coerce.number().int().positive().default(20),
+  MODULA_SEARCH_MAX_LIMIT: z.coerce.number().int().positive().default(100),
+  MODULA_SEARCH_MAX_ENTITY_TYPES: z.coerce.number().int().positive().default(10),
+  MODULA_SEARCH_MAX_TAGS: z.coerce.number().int().positive().default(20),
+  MODULA_SEARCH_TIMEOUT_MS: z.coerce.number().int().positive().default(1500),
+  MODULA_SEARCH_RECENT_LIMIT: z.coerce.number().int().positive().default(50),
   MODULA_MEDIA_ROOT: z.string().min(1).optional(),
   MODULA_MEDIA_UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(2_097_152),
   MODULA_ENVIRONMENT: z.enum(['development', 'preview', 'production']).default('development'),
@@ -49,6 +56,10 @@ const envSchema = z.object({
   MODULA_SESSION_PEPPER: z.string().optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
+  MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY: z.string().min(1).optional(),
+  MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
+  MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY: z.string().min(1).optional(),
+  MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS: z.string().min(1).optional(),
   MODULA_PDS_PILOT_ENABLED: z
     .string()
     .optional()
@@ -89,6 +100,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_AI_GATEWAY_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   /** Comma-separated handles granted admin:* capabilities on preview session mint. Preview/dev only. */
   MODULA_ADMIN_HANDLES: z.string().optional(),
 })
@@ -112,6 +127,13 @@ export type AppConfig = {
   previewWritesEnabled: boolean
   apiDocumentationEnabled: boolean
   requestBodyLimitBytes: number
+  searchQueryMaxChars: number
+  searchDefaultLimit: number
+  searchMaxLimit: number
+  searchMaxEntityTypes: number
+  searchMaxTags: number
+  searchTimeoutMs: number
+  searchRecentLimit: number
   mediaRoot: string
   mediaUploadMaxBytes: number
   environment: 'development' | 'preview' | 'production'
@@ -132,6 +154,16 @@ export type AppConfig = {
   /** Older keys kept only for decrypting previously encrypted material during rotation. */
   atprotoOAuthEncryptionKeysByVersion: Map<number, Buffer>
   atprotoOAuthEncryptionKeyIsEphemeral: boolean
+  /** Current key used to encrypt connector credential envelopes. */
+  connectorCredentialEncryptionKey: EncryptionKeyMaterial
+  /** Older connector credential keys kept only for decrypting during rotation. */
+  connectorCredentialEncryptionKeysByVersion: Map<number, Buffer>
+  connectorCredentialEncryptionKeyIsEphemeral: boolean
+  /** Current key used to encrypt AI provider credential envelopes. */
+  aiProviderCredentialEncryptionKey: EncryptionKeyMaterial
+  /** Older AI provider credential keys kept only for decrypting during rotation. */
+  aiProviderCredentialEncryptionKeysByVersion: Map<number, Buffer>
+  aiProviderCredentialEncryptionKeyIsEphemeral: boolean
   pdsPilotEnabled: boolean
   moduleRegistryEnabled: boolean
   moduleInstallationEnabled: boolean
@@ -142,6 +174,7 @@ export type AppConfig = {
   moduleGithubSyncEnabled: boolean
   vaultNotesReferenceEnabled: boolean
   dimonEnabled: boolean
+  aiGatewayEnabled: boolean
   /** Lower-cased handles granted admin:moderation + admin:ops on preview session mint. */
   adminHandles: string[]
 }
@@ -156,6 +189,10 @@ function decodeBase64Key(label: string, value: string): Buffer {
     refuse(`${label} must decode from base64 to exactly 32 bytes (AES-256)`)
   }
   return buffer
+}
+
+function deterministicTestKey(label: string): Buffer {
+  return Buffer.from(label.padEnd(32, '#').slice(0, 32), 'utf8')
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -200,6 +237,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   if (raw.MODULA_MEDIA_UPLOAD_MAX_BYTES >= raw.MODULA_REQUEST_BODY_LIMIT_BYTES) {
     refuse('media upload limit must be smaller than request body limit')
   }
+  if (raw.MODULA_SEARCH_DEFAULT_LIMIT > raw.MODULA_SEARCH_MAX_LIMIT) {
+    refuse('MODULA_SEARCH_DEFAULT_LIMIT must be less than or equal to MODULA_SEARCH_MAX_LIMIT')
+  }
 
   const environment = raw.MODULA_ENVIRONMENT
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
@@ -232,6 +272,70 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     )
   }
 
+  let connectorCredentialKey: EncryptionKeyMaterial
+  let connectorCredentialKeyIsEphemeral = false
+  const connectorCredentialKeysByVersion = new Map<number, Buffer>()
+  if (raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY) {
+    const key = decodeBase64Key(
+      'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY',
+      raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY,
+    )
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+    if (raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS) {
+      const previous = decodeBase64Key(
+        'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS',
+        raw.MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS,
+      )
+      connectorCredentialKeysByVersion.set(0, previous)
+    }
+  } else if (raw.NODE_ENV === 'test') {
+    const key = deterministicTestKey('modula-connector-credential-tests')
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+  } else if (environment === 'development') {
+    const key = randomBytes(32)
+    connectorCredentialKey = {version: 1, key}
+    connectorCredentialKeysByVersion.set(1, key)
+    connectorCredentialKeyIsEphemeral = true
+  } else {
+    refuse(
+      'MODULA_CONNECTOR_CREDENTIAL_ENCRYPTION_KEY is required outside development/test (base64-encoded 32 bytes)',
+    )
+  }
+
+  let aiProviderCredentialKey: EncryptionKeyMaterial
+  let aiProviderCredentialKeyIsEphemeral = false
+  const aiProviderCredentialKeysByVersion = new Map<number, Buffer>()
+  if (raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY) {
+    const key = decodeBase64Key(
+      'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY',
+      raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY,
+    )
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+    if (raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS) {
+      const previous = decodeBase64Key(
+        'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS',
+        raw.MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY_PREVIOUS,
+      )
+      aiProviderCredentialKeysByVersion.set(0, previous)
+    }
+  } else if (raw.NODE_ENV === 'test') {
+    const key = deterministicTestKey('modula-ai-provider-credential-test')
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+  } else if (environment === 'development') {
+    const key = randomBytes(32)
+    aiProviderCredentialKey = {version: 1, key}
+    aiProviderCredentialKeysByVersion.set(1, key)
+    aiProviderCredentialKeyIsEphemeral = true
+  } else {
+    refuse(
+      'MODULA_AI_PROVIDER_CREDENTIAL_ENCRYPTION_KEY is required outside development/test (base64-encoded 32 bytes)',
+    )
+  }
+
   const mutationsEnabled = environment !== 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED
 
   return {
@@ -248,6 +352,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     previewWritesEnabled: Boolean(raw.MODULA_PREVIEW_WRITES_ENABLED),
     apiDocumentationEnabled: Boolean(raw.MODULA_API_DOCUMENTATION_ENABLED),
     requestBodyLimitBytes: raw.MODULA_REQUEST_BODY_LIMIT_BYTES,
+    searchQueryMaxChars: raw.MODULA_SEARCH_QUERY_MAX_CHARS,
+    searchDefaultLimit: raw.MODULA_SEARCH_DEFAULT_LIMIT,
+    searchMaxLimit: raw.MODULA_SEARCH_MAX_LIMIT,
+    searchMaxEntityTypes: raw.MODULA_SEARCH_MAX_ENTITY_TYPES,
+    searchMaxTags: raw.MODULA_SEARCH_MAX_TAGS,
+    searchTimeoutMs: raw.MODULA_SEARCH_TIMEOUT_MS,
+    searchRecentLimit: raw.MODULA_SEARCH_RECENT_LIMIT,
     mediaRoot: resolve(mediaRoot),
     mediaUploadMaxBytes: raw.MODULA_MEDIA_UPLOAD_MAX_BYTES,
     environment,
@@ -265,6 +376,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     atprotoOAuthEncryptionKey: currentKey,
     atprotoOAuthEncryptionKeysByVersion: keysByVersion,
     atprotoOAuthEncryptionKeyIsEphemeral: isEphemeral,
+    connectorCredentialEncryptionKey: connectorCredentialKey,
+    connectorCredentialEncryptionKeysByVersion: connectorCredentialKeysByVersion,
+    connectorCredentialEncryptionKeyIsEphemeral: connectorCredentialKeyIsEphemeral,
+    aiProviderCredentialEncryptionKey: aiProviderCredentialKey,
+    aiProviderCredentialEncryptionKeysByVersion: aiProviderCredentialKeysByVersion,
+    aiProviderCredentialEncryptionKeyIsEphemeral: aiProviderCredentialKeyIsEphemeral,
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
     moduleRegistryEnabled: Boolean(raw.GREENFIELD_MODULE_REGISTRY_ENABLED),
     moduleInstallationEnabled: Boolean(raw.GREENFIELD_MODULE_INSTALLATION_ENABLED),
@@ -275,6 +392,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     moduleGithubSyncEnabled: Boolean(raw.GREENFIELD_MODULE_GITHUB_SYNC_ENABLED),
     vaultNotesReferenceEnabled: Boolean(raw.GREENFIELD_VAULT_NOTES_REFERENCE_ENABLED),
     dimonEnabled: Boolean(raw.GREENFIELD_DIMON_ENABLED),
+    aiGatewayEnabled: raw.GREENFIELD_AI_GATEWAY_ENABLED !== false,
     adminHandles: (raw.MODULA_ADMIN_HANDLES ?? '')
       .split(',')
       .map(h => h.trim().toLowerCase())

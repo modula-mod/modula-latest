@@ -6,7 +6,6 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -14,7 +13,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const KINDS = ['All', 'CRM', 'Messaging', 'Calendar', 'Knowledge', 'Tasks', 'Social', 'Mail', 'Files', 'Flows'] as const
 
-const TARGETS: Array<{name: string; icon: AppIconName; kind: (typeof KINDS)[number]}> = [
+const TARGETS: {name: string; icon: AppIconName; kind: (typeof KINDS)[number]}[] = [
   {name: 'Salesforce', icon: 'people', kind: 'CRM'},
   {name: 'Perfex CRM', icon: 'people', kind: 'CRM'},
   {name: 'Element / Matrix', icon: 'messages', kind: 'Messaging'},

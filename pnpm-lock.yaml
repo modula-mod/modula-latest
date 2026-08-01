@@ -27,9 +27,18 @@ importers:
       '@modula/api-contracts':
         specifier: workspace:*
         version: link:packages/api-contracts
+      '@modula/create-module':
+        specifier: file:../modula-mod/modula-module-standard/packages/create-module
+        version: file:../modula-mod/modula-module-standard/packages/create-module
+      '@modula/greenfield-connector-contracts':
+        specifier: workspace:*
+        version: link:packages/greenfield-connector-contracts
       '@modula/greenfield-contracts':
         specifier: workspace:*
         version: link:packages/greenfield-contracts
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:packages/greenfield-module-engine-contracts
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:packages/greenfield-module-manifest
@@ -42,6 +51,24 @@ importers:
       '@modula/greenfield-module-ui-contracts':
         specifier: workspace:*
         version: link:packages/greenfield-module-ui-contracts
+      '@modula/greenfield-runtime':
+        specifier: workspace:*
+        version: link:packages/greenfield-runtime
+      '@modula/module-fixtures':
+        specifier: file:../modula-mod/modula-module-standard/packages/module-fixtures
+        version: file:../modula-mod/modula-module-standard/packages/module-fixtures
+      '@modula/module-sdk':
+        specifier: file:../modula-mod/modula-module-standard/packages/module-sdk
+        version: file:../modula-mod/modula-module-standard/packages/module-sdk
+      '@modula/module-standard':
+        specifier: file:../modula-mod/modula-module-standard/packages/module-standard
+        version: file:../modula-mod/modula-module-standard/packages/module-standard
+      '@modula/module-testing':
+        specifier: file:../modula-mod/modula-module-standard/packages/module-testing
+        version: file:../modula-mod/modula-module-standard/packages/module-testing
+      '@modula/module-validator':
+        specifier: file:../modula-mod/modula-module-standard/packages/module-validator
+        version: file:../modula-mod/modula-module-standard/packages/module-validator
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))
@@ -191,7 +218,20 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/greenfield-connector-contracts:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/greenfield-contracts:
+    dependencies:
+      '@modula/module-standard':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-standard
+        version: file:../modula-mod/modula-module-standard/packages/module-standard
     devDependencies:
       typescript:
         specifier: ~5.9.2
@@ -203,7 +243,23 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/greenfield-module-engine-contracts:
+    devDependencies:
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/greenfield-module-manifest:
+    dependencies:
+      '@modula/module-standard':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-standard
+        version: file:../modula-mod/modula-module-standard/packages/module-standard
+      '@modula/module-validator':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-validator
+        version: file:../modula-mod/modula-module-standard/packages/module-validator
     devDependencies:
       '@types/node':
         specifier: ^24.0.10
@@ -233,6 +289,9 @@ importers:
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:../greenfield-module-manifest
+      '@modula/module-sdk':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-sdk
+        version: file:../modula-mod/modula-module-standard/packages/module-sdk
     devDependencies:
       typescript:
         specifier: ~5.9.2
@@ -260,6 +319,22 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
+  packages/greenfield-runtime:
+    dependencies:
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:../greenfield-module-engine-contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^24.0.10
+        version: 24.13.3
+      typescript:
+        specifier: ~5.9.2
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@24.13.3)(lightningcss@1.32.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0)
+
   packages/greenfield-schema-registry:
     devDependencies:
       typescript:
@@ -267,6 +342,10 @@ importers:
         version: 5.9.3
 
   packages/modula-cli:
+    dependencies:
+      '@modula/create-module':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/create-module
+        version: file:../modula-mod/modula-module-standard/packages/create-module
     devDependencies:
       typescript:
         specifier: ~5.9.2
@@ -301,9 +380,15 @@ importers:
       '@modula/dimon-contracts':
         specifier: workspace:*
         version: link:../../packages/dimon-contracts
+      '@modula/greenfield-connector-contracts':
+        specifier: workspace:*
+        version: link:../../packages/greenfield-connector-contracts
       '@modula/greenfield-contracts':
         specifier: workspace:*
         version: link:../../packages/greenfield-contracts
+      '@modula/greenfield-module-engine-contracts':
+        specifier: workspace:*
+        version: link:../../packages/greenfield-module-engine-contracts
       '@modula/greenfield-module-manifest':
         specifier: workspace:*
         version: link:../../packages/greenfield-module-manifest
@@ -316,9 +401,15 @@ importers:
       '@modula/greenfield-protocol':
         specifier: workspace:*
         version: link:../../packages/greenfield-protocol
+      '@modula/greenfield-runtime':
+        specifier: workspace:*
+        version: link:../../packages/greenfield-runtime
       '@modula/greenfield-schema-registry':
         specifier: workspace:*
         version: link:../../packages/greenfield-schema-registry
+      '@modula/module-backend-protocol':
+        specifier: file:../../../modula-mod/modula-module-standard/packages/module-backend-protocol
+        version: file:../modula-mod/modula-module-standard/packages/module-backend-protocol
       '@modula/protocol-contracts':
         specifier: workspace:*
         version: link:../../packages/protocol-contracts
@@ -1465,6 +1556,28 @@ packages:
   '@lukeed/ms@2.0.2':
     resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
     engines: {node: '>=8'}
+
+  '@modula/create-module@file:../modula-mod/modula-module-standard/packages/create-module':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/create-module, type: directory}
+    hasBin: true
+
+  '@modula/module-backend-protocol@file:../modula-mod/modula-module-standard/packages/module-backend-protocol':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-backend-protocol, type: directory}
+
+  '@modula/module-fixtures@file:../modula-mod/modula-module-standard/packages/module-fixtures':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-fixtures, type: directory}
+
+  '@modula/module-sdk@file:../modula-mod/modula-module-standard/packages/module-sdk':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-sdk, type: directory}
+
+  '@modula/module-standard@file:../modula-mod/modula-module-standard/packages/module-standard':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-standard, type: directory}
+
+  '@modula/module-testing@file:../modula-mod/modula-module-standard/packages/module-testing':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-testing, type: directory}
+
+  '@modula/module-validator@file:../modula-mod/modula-module-standard/packages/module-validator':
+    resolution: {directory: ../modula-mod/modula-module-standard/packages/module-validator, type: directory}
 
   '@napi-rs/wasm-runtime@0.2.12':
     resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
@@ -6955,6 +7068,34 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@lukeed/ms@2.0.2': {}
+
+  '@modula/create-module@file:../modula-mod/modula-module-standard/packages/create-module':
+    dependencies:
+      '@modula/module-sdk': file:../modula-mod/modula-module-standard/packages/module-sdk
+      '@modula/module-testing': file:../modula-mod/modula-module-standard/packages/module-testing
+      '@modula/module-validator': file:../modula-mod/modula-module-standard/packages/module-validator
+
+  '@modula/module-backend-protocol@file:../modula-mod/modula-module-standard/packages/module-backend-protocol': {}
+
+  '@modula/module-fixtures@file:../modula-mod/modula-module-standard/packages/module-fixtures':
+    dependencies:
+      '@modula/module-standard': file:../modula-mod/modula-module-standard/packages/module-standard
+
+  '@modula/module-sdk@file:../modula-mod/modula-module-standard/packages/module-sdk':
+    dependencies:
+      '@modula/module-standard': file:../modula-mod/modula-module-standard/packages/module-standard
+      '@modula/module-validator': file:../modula-mod/modula-module-standard/packages/module-validator
+
+  '@modula/module-standard@file:../modula-mod/modula-module-standard/packages/module-standard': {}
+
+  '@modula/module-testing@file:../modula-mod/modula-module-standard/packages/module-testing':
+    dependencies:
+      '@modula/module-standard': file:../modula-mod/modula-module-standard/packages/module-standard
+      '@modula/module-validator': file:../modula-mod/modula-module-standard/packages/module-validator
+
+  '@modula/module-validator@file:../modula-mod/modula-module-standard/packages/module-validator':
+    dependencies:
+      '@modula/module-standard': file:../modula-mod/modula-module-standard/packages/module-standard
 
   '@napi-rs/wasm-runtime@0.2.12':
     dependencies:

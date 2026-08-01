@@ -6,6 +6,14 @@ export type ApiErrorCode =
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'NOTE_REVISION_CONFLICT'
+  | 'AI_ACTION_NOT_DECLARED'
+  | 'AI_ACTION_PERMISSION_REQUIRED'
+  | 'AI_CONTEXT_PERMISSION_REQUIRED'
+  | 'AI_RESULT_EXPIRED'
+  | 'AI_RESULT_ALREADY_APPLIED'
+  | 'AI_RESULT_NOT_APPLICABLE'
+  | 'AI_RESULT_OWNERSHIP_MISMATCH'
   | 'RATE_LIMITED'
   | 'OFFLINE'
   | 'TIMEOUT'
@@ -19,6 +27,8 @@ export type ApiErrorCode =
 export type ApiErrorBody = {
   code: ApiErrorCode
   message: string
+  requestId: string
   fieldErrors?: Record<string, string>
   retryable: boolean
+  details?: Record<string, unknown>
 }

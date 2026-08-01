@@ -1,6 +1,6 @@
 /**
  * Local Preview seed data for expansion surfaces.
- * Self-contained — no `@/demo/*` imports (Phase 4 UI verifier).
+ * Self-contained; local API fixtures own all demo imports.
  */
 
 export type SeededMessageThread = {

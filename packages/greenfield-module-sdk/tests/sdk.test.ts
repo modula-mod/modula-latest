@@ -1,5 +1,14 @@
 import {describe, expect, it} from 'vitest'
-import {defineFunction, defineSchema, defineTool, moduleRecordCollection} from '../src/index.js'
+import {
+  defineFunction,
+  defineModule20,
+  defineSchema,
+  defineStandardApiOperation,
+  defineStandardService,
+  defineStandardVersionedSection,
+  defineTool,
+  moduleRecordCollection,
+} from '../src/index.js'
 
 describe('Greenfield module SDK builders', () => {
   it('builds namespaced contribution contracts without execution helpers', () => {
@@ -28,5 +37,40 @@ describe('Greenfield module SDK builders', () => {
         defaultVisibility: 'private',
       }).collection,
     ).toBe('module.digital.modula.vault-notes.note')
+  })
+
+  it('builds Standard 2.0 manifests and registry contracts', () => {
+    const moduleId = 'digital.modula.vault-notes'
+    const manifest = defineModule20({
+      moduleId,
+      name: 'Vault Notes',
+      description: 'First-party private notes module.',
+      version: '0.1.0',
+      publisher: {publisherId: 'modula', displayName: 'Modula'},
+      source: {
+        provider: 'github',
+        repository: 'modula-mod/modula-vault-notes',
+        commit: '0123456789abcdef0123456789abcdef01234567',
+        manifestPath: 'module.manifest.json',
+      },
+      license: {status: 'firstParty', evidenceIds: ['first-party-policy']},
+      trust: {requestedLevel: 'firstParty'},
+      compatibility: {
+        minimumGreenfieldVersion: '0.1.0',
+        minimumModulaHostVersion: '0.1.0',
+        protocolVersions: ['greenfield.v1'],
+        platforms: ['server', 'ios'],
+      },
+      permissions: [{permission: 'schemas:register', reason: 'Register Vault record schemas'}],
+      contributions: {},
+      integrity: {manifestSha256: 'a'.repeat(64)},
+      serviceRegistry: defineStandardVersionedSection([defineStandardService(moduleId, 'search', {kind: 'search', contract: 'vault-notes.search'})]),
+      apiRegistry: defineStandardVersionedSection([defineStandardApiOperation(moduleId, 'create-note')]),
+    })
+    expect(manifest.manifestVersion).toBe(2)
+    expect(manifest.standardVersion).toBe('2.0.0')
+    expect(manifest.sectionVersions.services).toBe('2.0.0')
+    expect(manifest.serviceRegistry?.items?.[0]?.id).toBe('digital.modula.vault-notes.service.search')
+    expect(manifest.apiRegistry?.items?.[0]?.path).toBe('/api/modula/digital.modula.vault-notes/create-note')
   })
 })

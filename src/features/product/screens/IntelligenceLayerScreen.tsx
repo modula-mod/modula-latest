@@ -176,7 +176,7 @@ function LayerInteractivePreview({
 const PREVIEW_SAMPLES: Partial<
   Record<
     IntelligenceLayerId,
-    {eyebrow: string; title: string; rows: Array<{label: string; detail: string}>}
+    {eyebrow: string; title: string; rows: {label: string; detail: string}[]}
   >
 > = {
   aki: {

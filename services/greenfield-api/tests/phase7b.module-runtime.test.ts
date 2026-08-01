@@ -261,7 +261,7 @@ describeIf('Phase 7B module runtime API', () => {
     const register = await app.inject({
       method: 'POST',
       url: '/v1/accounts/register',
-      payload: {email, password, handle, inviteCode: 'test-invite'},
+      payload: {email, password, handle, displayName: 'Module Runtime User', acceptedTerms: true, inviteCode: 'test-invite'},
     })
     expect(register.statusCode).toBe(201)
     await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token: register.json().data.verificationToken}})

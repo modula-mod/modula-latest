@@ -4,6 +4,7 @@ import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {hashPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
+import {AuditRepository} from '../domains/audit/repository.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
 
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex')
@@ -23,13 +24,27 @@ export class AccountService {
     private readonly config: AppConfig,
   ) {}
 
-  async register(input: {email: string; password: string; handle: string; inviteCode?: string}) {
+  async register(input: {
+    email: string
+    password: string
+    handle: string
+    displayName?: string
+    inviteCode?: string
+    acceptedTerms?: boolean
+  }) {
     const email = input.email.trim().toLowerCase()
+    const displayName = (input.displayName ?? '').trim()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw Object.assign(new Error('Valid email required'), {code: 'VALIDATION_FAILED'})
     }
+    if (displayName.length < 2 || displayName.length > 80) {
+      throw Object.assign(new Error('Display name must be between 2 and 80 characters'), {code: 'VALIDATION_FAILED'})
+    }
     if (input.password.length < 10) {
       throw Object.assign(new Error('Password must be at least 10 characters'), {code: 'VALIDATION_FAILED'})
+    }
+    if (input.acceptedTerms !== true) {
+      throw Object.assign(new Error('Terms and privacy acknowledgement required'), {code: 'VALIDATION_FAILED'})
     }
     if (this.config.inviteOnly && !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')) {
       throw Object.assign(new Error('Valid invitation required'), {code: 'FORBIDDEN'})
@@ -76,7 +91,14 @@ export class AccountService {
           kind: 'email',
           identifier: email,
           verified_at: null,
-          metadata: {},
+          metadata: {
+            displayName,
+            agreements: {
+              terms: true,
+              privacy: true,
+              acceptedAt: now.toISOString(),
+            },
+          },
           created_at: now,
           updated_at: now,
         })
@@ -101,18 +123,12 @@ export class AccountService {
           created_at: now,
         })
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'account.registered',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: accountId,
-          metadata: {handle},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'account.registered',
+        {handle, agreements: {terms: true, privacy: true}},
+        {type: 'greenfield_account', id: accountId, actorId: null},
+        {accountId},
+      )
     })
 
     // Preview/dev may return the verification token when SMTP is not configured.
@@ -156,18 +172,12 @@ export class AccountService {
         .where('account_id', '=', row.account_id)
         .where('kind', '=', 'email')
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'email.verified',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: row.account_id,
-          metadata: {},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'email.verified',
+        {},
+        {type: 'greenfield_account', id: row.account_id, actorId: null},
+        {accountId: row.account_id},
+      )
 
       // Create default repository + initial collections + default profile record shell.
       const repositoryId = uuidv7()
@@ -200,6 +210,16 @@ export class AccountService {
         .select('primary_handle')
         .where('account_id', '=', row.account_id)
         .executeTakeFirstOrThrow()
+      const identity = await trx
+        .selectFrom('greenfield_auth_identities')
+        .select('metadata')
+        .where('account_id', '=', row.account_id)
+        .where('kind', '=', 'email')
+        .executeTakeFirst()
+      const metadata = identity?.metadata as {displayName?: unknown} | null | undefined
+      const displayName = typeof metadata?.displayName === 'string' && metadata.displayName.trim()
+        ? metadata.displayName.trim()
+        : account.primary_handle
       const actorId = `actor-${row.account_id}`
       const profileId = `profile-${row.account_id}`
       await trx
@@ -220,7 +240,7 @@ export class AccountService {
           id: profileId,
           actor_id: actorId,
           handle: account.primary_handle,
-          display_name: account.primary_handle,
+          display_name: displayName,
           kind: 'person',
           bio: '',
           avatar_url: null,
@@ -257,7 +277,7 @@ export class AccountService {
           schema_id: 'modula.identity.profile',
           schema_version: 1,
           visibility: 'public',
-          data: {displayName: account.primary_handle, handle: account.primary_handle},
+          data: {displayName, handle: account.primary_handle},
           revision: 1,
           created_at: now,
           updated_at: now,
@@ -356,18 +376,12 @@ export class AccountService {
         .insertInto('greenfield_handle_history')
         .values({history_id: uuidv7(), account_id: accountId, handle, action: 'changed', created_at: now})
         .execute()
-      await trx
-        .insertInto('audit_events')
-        .values({
-          id: uuidv7(),
-          event_type: 'handle.changed',
-          actor_id: null,
-          resource_type: 'greenfield_account',
-          resource_id: accountId,
-          metadata: {from: account.primary_handle, to: handle},
-          created_at: now,
-        })
-        .execute()
+      await new AuditRepository(trx).append(
+        'handle.changed',
+        {from: account.primary_handle, to: handle},
+        {type: 'greenfield_account', id: accountId, actorId: null},
+        {accountId},
+      )
     })
     return {handle, accountId}
   }

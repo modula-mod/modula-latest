@@ -1,4 +1,5 @@
 import {decodeActivityItem, decodeCursorPage} from '@/api/decoding'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
   asBoolean,
   asIsoDate,
@@ -65,6 +66,15 @@ function decodeActivityPage(value: unknown): CursorPage<ActivityItem> {
   return decodeCursorPage(value, decodeActivityItem)
 }
 
+async function localOnlyActivityFallback<T>(operation: Promise<T>, fallback: () => Promise<T>): Promise<T> {
+  try {
+    return await operation
+  } catch (error) {
+    if (runtimeEnvironment.dataSource === 'local') return fallback()
+    throw error
+  }
+}
+
 function decodeNotificationPreferences(value: unknown): NotificationPreferences {
   const record = asRecord(value, 'notification preferences')
   const bundleStyle = asString(record.bundleStyle, 'notification preferences bundleStyle')
@@ -93,9 +103,10 @@ export class ApiActivityRepository implements ActivityRepository {
 
   getActivity(input: {cursor?: string | null; limit?: number}) {
     const query = {cursor: input.cursor ?? undefined, limit: input.limit}
-    return this.client
-      .get({path: '/v1/notifications', query, authenticated: true}, decodeNotificationPage)
-      .catch(() => this.client.get({path: '/v1/activity', query}, decodeActivityPage))
+    return localOnlyActivityFallback(
+      this.client.get({path: '/v1/notifications', query, authenticated: true}, decodeNotificationPage),
+      () => this.client.get({path: '/v1/activity', query}, decodeActivityPage),
+    )
   }
 
   async markRead(activityId: string): Promise<void> {

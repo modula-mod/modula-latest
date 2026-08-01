@@ -2,7 +2,7 @@ import {
   classifyPermissionRisk,
   isDimonPermission,
   validatePermissionRequest,
-  type GreenfieldModuleManifestV1,
+  type GreenfieldModuleManifest,
   type GreenfieldModulePermission,
 } from '@modula/greenfield-module-manifest'
 import type {ModulaDb} from '../database/client.js'
@@ -11,7 +11,7 @@ import {moduleError} from './module-errors.js'
 export class GreenfieldModulePermissionService {
   constructor(private readonly db: ModulaDb) {}
 
-  review(manifest: GreenfieldModuleManifestV1) {
+  review(manifest: GreenfieldModuleManifest) {
     const firstParty = manifest.trust.requestedLevel === 'firstParty'
     const community = !firstParty
     const errors = manifest.permissions.flatMap(permission => validatePermissionRequest(permission, {firstParty, community}))
@@ -38,7 +38,7 @@ export class GreenfieldModulePermissionService {
     if (!account || account.status !== 'active') throw moduleError('FORBIDDEN', 'module:install capability requires an active Greenfield account')
   }
 
-  assertDimonBoundary(manifest: GreenfieldModuleManifestV1): void {
+  assertDimonBoundary(manifest: GreenfieldModuleManifest): void {
     if (!manifest.moduleId.startsWith('digital.dimon') && manifest.permissions.some(permission => isDimonPermission(permission.permission))) {
       throw moduleError('FORBIDDEN', 'DIMON permissions are reserved and inactive in Phase 7A')
     }

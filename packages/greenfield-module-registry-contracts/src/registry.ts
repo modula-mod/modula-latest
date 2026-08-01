@@ -1,4 +1,4 @@
-import type {GreenfieldModulePlatform} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModulePlatform, ModuleStandardRuntimeSupportState} from '@modula/greenfield-module-manifest'
 import type {GreenfieldModuleReleaseStatus} from './release.js'
 
 export type GreenfieldRegistryModuleSummary = {
@@ -13,6 +13,41 @@ export type GreenfieldRegistryModuleSummary = {
   status: GreenfieldModuleReleaseStatus | 'planned' | 'inactive' | 'unavailable'
   installable: boolean
   platforms: GreenfieldModulePlatform[]
+  standard?: GreenfieldRegistryStandardMetadata
+}
+
+export type GreenfieldRegistryStandardMetadata = {
+  manifestVersion: number | null
+  standardVersion: string | null
+  sectionVersions: Record<string, string>
+  runtimeSupport?: {
+    standardVersion: string
+    maximumServiceInvocationDepth: number
+    sections: Record<string, ModuleStandardRuntimeSupportState>
+  }
+  runtimeDiagnostics: Array<{
+    section: string
+    state: ModuleStandardRuntimeSupportState
+    declared: boolean
+    operational: boolean
+    message: string
+  }>
+  dependencies: Record<'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces' | 'provides', number>
+  registries: {
+    services: number
+    apis: number
+    hooks: number
+    jobs: number
+    storage: number
+    widgets: number
+    navigation: number
+    ui: number
+    automation: number
+    metrics: number
+  }
+  capabilityFlags: Record<string, boolean>
+  capabilities: string[]
+  engines: string[]
 }
 
 export type GreenfieldRegistryFilter = {

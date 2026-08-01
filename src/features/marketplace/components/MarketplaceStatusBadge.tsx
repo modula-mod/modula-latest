@@ -1,10 +1,9 @@
 import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
-import type {MarketplaceModule} from '@/features/marketplace/data/catalog'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type MarketplaceStatus = MarketplaceModule['status']
+export type MarketplaceStatus = 'Preview' | 'Planned' | 'Inactive'
 
 export function MarketplaceStatusBadge({status}: {status: MarketplaceStatus}) {
   const {colours, radius, spacing} = useThemeTokens()

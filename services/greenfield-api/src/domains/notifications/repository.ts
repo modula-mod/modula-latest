@@ -1,4 +1,5 @@
 import type {NotificationDto} from '@modula/api-contracts'
+import type {NotificationChannel} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 
 export class NotificationRepository {
@@ -27,6 +28,10 @@ export class NotificationRepository {
     return rows.map(row => ({
       id: row.id,
       type: row.type as NotificationDto['type'],
+      category: row.category,
+      channels: channels(row.channels),
+      dedupeKey: row.dedupe_key ?? undefined,
+      aggregateCount: row.aggregate_count,
       body: row.body,
       actorId: row.actor_id ?? undefined,
       resourceType: row.resource_type ?? undefined,
@@ -57,4 +62,11 @@ export class NotificationRepository {
       .executeTakeFirst()
     return Number(result.numUpdatedRows ?? 0)
   }
+}
+
+function channels(value: unknown): NotificationChannel[] {
+  if (!Array.isArray(value)) return ['in-app']
+  return value.filter((item): item is NotificationChannel =>
+    item === 'in-app' || item === 'email' || item === 'web-push',
+  )
 }

@@ -4,6 +4,7 @@ import {sql} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 import type {ReactionType} from '../reactions/service.js'
 
 const validateText = (text: string) => {
@@ -13,9 +14,18 @@ const validateText = (text: string) => {
 }
 
 export class CommentService {
-  constructor(private readonly db: ModulaDb) {}
+  private readonly policies: GreenfieldPolicyEngine
+
+  constructor(private readonly db: ModulaDb) {
+    this.policies = new GreenfieldPolicyEngine(db)
+  }
 
   async listComments(viewerActorId: string | null, postId: string) {
+    await this.policies.assertAllowed({
+      actorId: viewerActorId,
+      action: 'comment.list',
+      resource: {type: 'post', id: postId},
+    })
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
     let query = this.db.selectFrom('greenfield_comments').selectAll().where('post_id', '=', postId).where('parent_comment_id', 'is', null).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
@@ -23,6 +33,11 @@ export class CommentService {
   }
 
   async listReplies(viewerActorId: string | null, commentId: string) {
+    await this.policies.assertAllowed({
+      actorId: viewerActorId,
+      action: 'comment.list',
+      resource: {type: 'comment', id: commentId},
+    })
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
     let query = this.db.selectFrom('greenfield_comments').selectAll().where('root_comment_id', '=', commentId).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
@@ -82,6 +97,11 @@ export class CommentService {
     }
     const comment = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).executeTakeFirst()
     if (!comment) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({
+      actorId,
+      action: 'comment.react',
+      resource: {type: 'comment', id: commentId},
+    })
     const current = await this.db.selectFrom('greenfield_comment_reactions').selectAll().where('actor_id', '=', actorId).where('comment_id', '=', commentId).executeTakeFirst()
     if (type === null) { if (current) await this.db.deleteFrom('greenfield_comment_reactions').where('reaction_id', '=', current.reaction_id).execute(); return }
     if (current) await this.db.updateTable('greenfield_comment_reactions').set({reaction_type: type, updated_at: new Date()}).where('reaction_id', '=', current.reaction_id).execute()
@@ -97,6 +117,12 @@ export class CommentService {
   ) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({
+      actorId,
+      action: 'comment.create',
+      capability: 'post:engage',
+      resource: {type: 'post', id: postId, ownerActorId: post.author_actor_id, visibility: post.audience},
+    })
     if (post.reply_permission === 'none') throw Object.assign(new Error('Replies disabled'), {code: 'FORBIDDEN'})
     const id = randomUUID()
     const now = new Date()

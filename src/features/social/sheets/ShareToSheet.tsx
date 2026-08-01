@@ -6,7 +6,6 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
-import {seededMessageThreads} from '@/features/social/data/seededSurfaces'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -19,6 +18,8 @@ export type ShareToSheetProps = {
   shareMessage: string
   testID?: string
 }
+
+const shareTargets: {id: string; name: string; handle: string}[] = []
 
 /**
  * Share-to BottomSheet: search seeded people, Copy link, Share via system, DM Preview.
@@ -37,8 +38,8 @@ export function ShareToSheet({
 
   const people = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return seededMessageThreads
-    return seededMessageThreads.filter(
+    if (!q) return shareTargets
+    return shareTargets.filter(
       thread =>
         thread.name.toLowerCase().includes(q) || thread.handle.toLowerCase().includes(q),
     )

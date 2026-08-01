@@ -1,6 +1,6 @@
 import type {RemoteMediaAsset} from '@/domain/social/media'
 import type {ModulaProfile} from '@/features/profile/contracts'
-import type {ProfileModulePreview} from '@/features/profile/data/demoProfileModules'
+import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import type {ReelItem} from '@/domain/discovery/ReelItem'
 
 export type TrendingTopic = {

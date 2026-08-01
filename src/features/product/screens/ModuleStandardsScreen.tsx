@@ -19,20 +19,20 @@ const RULES = [
     body: 'Never hardcode product modules into the host application tree.',
   },
   {
-    title: 'Complete manifests',
-    body: 'Declare GreenfieldModuleManifest fields — id, version, hostCompatibility, uninstall.',
+    title: 'Standard 2.0 manifests',
+    body: 'Declare versioned contracts for identity, dependencies, services, APIs, events, hooks, permissions, storage, UI, automation, AI, health and marketplace metadata.',
   },
   {
     title: 'skill.md digital DNA',
     body: 'Ship skill.md with commands, AI actions, permissions, network, risk, and audit behaviour for GAIA, AKI, and the Governor.',
   },
   {
-    title: 'Command Layer registration',
-    body: 'Expose capabilities as typed commands (risk, preview, confirmation, undo, Ledger policy) — not hardwired UI-only actions.',
+    title: 'Contract registries',
+    body: 'Expose records, views, actions, functions, jobs, services, hooks and APIs through registries — not hardwired UI-only actions.',
   },
   {
     title: 'Least privilege',
-    body: 'Permissions must match user-visible purpose. High-risk scopes need owner defaults.',
+    body: 'Permissions must match user-visible purpose and use Standard 2.0 categories for data, AI, DIMON, connectors, realtime, media, device and developer scopes.',
   },
   {
     title: 'Error boundaries',
@@ -44,11 +44,11 @@ const RULES = [
   },
   {
     title: 'Honest uninstall',
-    body: 'retainData · purgeData · exportThenPurge — pick one and document it.',
+    body: 'Declare lifecycle hooks, storage policy, migrations, health states, and rollback limits before install, enable, disable, update or uninstall.',
   },
 ]
 
-const PIPELINE = ['Forge', 'SDK', 'Fusion', 'Registry', 'Marketplace']
+const PIPELINE = ['Forge', 'SDK', 'Validate', 'Registry', 'Marketplace']
 
 export function ModuleStandardsScreen() {
   const router = useRouter()
@@ -80,8 +80,8 @@ export function ModuleStandardsScreen() {
             </AppText>
             <AppText variant="display">How Modula modules are built.</AppText>
             <AppText variant="body" colour="textSecondary">
-              Standards for Registry packages. Copy templates/modula-module into a separate
-              repository — the host stays launchable with zero modules.
+              Standards for Registry packages. Standard 1.x modules still work; Standard 2.0
+              modules declare richer contracts so the host stays launchable with zero modules.
             </AppText>
           </LinearGradient>
 

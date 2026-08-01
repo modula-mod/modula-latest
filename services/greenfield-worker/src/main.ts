@@ -1,9 +1,11 @@
 import {loadConfig} from './config.js'
 import {createDb} from './database.js'
 import {processOneJob} from './jobs/runner.js'
+import {processOneEventDelivery} from './events/runner.js'
 import {createLogger} from './observability/logger.js'
 import {drainOutboxOnce} from './outbox/drain.js'
 import {reapExpiredLeases} from './jobs/claim.js'
+import {reapExpiredEventDeliveryLeases} from './events/claim.js'
 import {ingestAllConnections} from './bridges/atproto/ingest.js'
 import {isOperationalFlagSet} from './bridges/atproto/session.js'
 
@@ -30,6 +32,7 @@ async function main() {
     const now = Date.now()
     if (now - lastReap >= config.leaseReapIntervalMs) {
       await reapExpiredLeases(db)
+      await reapExpiredEventDeliveryLeases(db)
       lastReap = now
     }
     if (now - lastDrain >= config.outboxDrainIntervalMs) {
@@ -53,7 +56,7 @@ async function main() {
       continue
     }
 
-    const worked = await processOneJob(db, config)
+    const worked = (await processOneEventDelivery(db, config)) || (await processOneJob(db, config))
     if (!worked) await new Promise(r => setTimeout(r, config.emptyPollBackoffMs))
     else await new Promise(r => setTimeout(r, config.pollIntervalMs))
   }

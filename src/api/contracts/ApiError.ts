@@ -22,6 +22,7 @@ export class ModulaApiError extends Error {
   readonly requestId?: string
   readonly retryable: boolean
   readonly fieldErrors?: Record<string, string>
+  readonly details?: Record<string, unknown>
 
   constructor(input: {
     message: string
@@ -30,6 +31,7 @@ export class ModulaApiError extends Error {
     requestId?: string
     retryable?: boolean
     fieldErrors?: Record<string, string>
+    details?: Record<string, unknown>
   }) {
     super(input.message)
     this.name = 'ModulaApiError'
@@ -38,6 +40,7 @@ export class ModulaApiError extends Error {
     this.requestId = input.requestId
     this.retryable = input.retryable ?? false
     this.fieldErrors = input.fieldErrors
+    this.details = input.details
   }
 }
 

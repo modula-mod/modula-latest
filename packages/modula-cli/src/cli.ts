@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {readFile} from 'node:fs/promises'
+import {run as runModuleCli} from '@modula/create-module'
 
 const VERSION = '0.1.0'
 
@@ -8,22 +9,6 @@ type CommandResult = {
   stderr?: string
   stdout?: string
 }
-
-const REQUIRED_STRING_FIELDS = [
-  'moduleId',
-  'name',
-  'repositoryUrl',
-  'packageVersion',
-] as const
-
-const OPTIONAL_STRING_ARRAY_FIELDS = [
-  'functions',
-  'tools',
-  'widgets',
-  'schemas',
-] as const
-
-const UNINSTALL_BEHAVIOURS = new Set(['retainData', 'purgeData', 'exportThenPurge'])
 
 type FocusPreset = 'off' | 'light' | 'deep' | 'custom'
 
@@ -204,6 +189,36 @@ const FORGE_TEMPLATES = [
     permissions: ['storage:namespaced', 'composer:tool'],
   },
 ] as const
+
+const MODULE_STANDARD_COMMANDS = new Set([
+  'create',
+  'validate',
+  'inspect',
+  'test',
+  'build',
+  'pack',
+  'publish',
+  'release',
+  'doctor',
+  'benchmark',
+  'generate',
+  'schema',
+  'docs',
+  'backend',
+  'ai',
+  'search',
+  'events',
+  'permissions',
+  'health',
+  'telemetry',
+  'sign',
+  'bundle',
+  'install',
+  'diff',
+  'migrate',
+  'rollback',
+  'upgrade-standard',
+])
 
 const COMMAND_CATALOGUE: CommandCatalogueEntry[] = [
   {
@@ -441,7 +456,24 @@ Usage:
   modula atlas count
   modula design principles
   modula mcp info
-  modula module validate <path-to-modula.module.json>
+  modula module create <directory> --id <module-id> --name <name>
+  modula module validate <manifest.json>
+  modula module inspect <manifest.json>
+  modula module test <manifest.json>
+  modula module build <manifest.json>
+  modula module pack <manifest.json>
+  modula module publish <manifest.json>
+  modula module release <manifest.json>
+  modula module doctor <manifest.json>
+  modula module benchmark <manifest.json>
+  modula module schema <manifest.json>
+  modula module docs <manifest.json>
+  modula module bundle <manifest.json>
+  modula module sign <manifest.json>
+  modula module diff <old-manifest.json> <new-manifest.json>
+  modula module migrate <manifest.json> --from <data-schema-version>
+  modula module rollback <manifest.json> --to <data-schema-version>
+  modula module upgrade-standard <manifest.json>
   modula module init [--write]
   modula forge templates
   modula intelligence layers
@@ -488,8 +520,8 @@ export async function run(args: string[]): Promise<CommandResult> {
     return ok(mcpInfoText())
   }
 
-  if (first === 'module' && second === 'validate') {
-    return validateManifest(third)
+  if (first === 'module' && second && MODULE_STANDARD_COMMANDS.has(second)) {
+    return runModuleCli(args)
   }
 
   if (first === 'module' && second === 'init') {
@@ -665,200 +697,6 @@ ${group.bullets.map((bullet) => `  - ${bullet}`).join('\n')}`,
 Boundary:
   Static product guidance only. No publishing, wallet action, network call, or chain RPC.
 `
-}
-
-async function validateManifest(manifestPath: string | undefined): Promise<CommandResult> {
-  if (!manifestPath) {
-    return {
-      exitCode: 1,
-      stderr: 'Missing manifest path. Usage: modula module validate <path-to-modula.module.json>\n',
-    }
-  }
-
-  let source: string
-  try {
-    source = await readFile(manifestPath, 'utf8')
-  } catch (error) {
-    return {
-      exitCode: 1,
-      stderr: `Unable to read manifest: ${formatError(error)}\n`,
-    }
-  }
-
-  let parsed: unknown
-  try {
-    parsed = JSON.parse(source)
-  } catch (error) {
-    return {
-      exitCode: 1,
-      stderr: `Invalid JSON: ${formatError(error)}\n`,
-    }
-  }
-
-  const errors = validateManifestShape(parsed)
-  if (errors.length > 0) {
-    return {
-      exitCode: 1,
-      stderr: `Invalid Modula module manifest: ${manifestPath}\n${errors
-        .map((error) => `  - ${error}`)
-        .join('\n')}\n`,
-    }
-  }
-
-  const manifest = parsed as Record<string, unknown>
-  return ok(`Valid Modula module manifest
-  path: ${manifestPath}
-  moduleId: ${manifest.moduleId}
-  name: ${manifest.name}
-  packageVersion: ${manifest.packageVersion}
-`)
-}
-
-function validateManifestShape(value: unknown): string[] {
-  const errors: string[] = []
-
-  if (!isRecord(value)) {
-    return ['manifest must be a JSON object']
-  }
-
-  for (const field of REQUIRED_STRING_FIELDS) {
-    requireNonEmptyString(value, field, errors)
-  }
-
-  if (!isRecord(value.hostCompatibility)) {
-    errors.push('hostCompatibility must be an object')
-  } else {
-    requireNonEmptyString(value.hostCompatibility, 'minimumHostVersion', errors, 'hostCompatibility.')
-    optionalString(value.hostCompatibility, 'maximumHostVersion', errors, 'hostCompatibility.')
-  }
-
-  requireStringArray(value, 'capabilities', errors)
-  requireStringArray(value, 'permissions', errors)
-
-  if (typeof value.uninstallBehaviour !== 'string' || !UNINSTALL_BEHAVIOURS.has(value.uninstallBehaviour)) {
-    errors.push('uninstallBehaviour must be one of retainData, purgeData, exportThenPurge')
-  }
-
-  optionalString(value, 'description', errors)
-
-  for (const field of OPTIONAL_STRING_ARRAY_FIELDS) {
-    optionalStringArray(value, field, errors)
-  }
-
-  optionalContributionArray(value, 'routes', ['path', 'title'], errors, ['capability'])
-  optionalContributionArray(value, 'profileTabs', ['tabId', 'title', 'route'], errors)
-  optionalContributionArray(value, 'boardSurfaces', ['surfaceId', 'title'], errors)
-  optionalContributionArray(value, 'settings', ['settingsId', 'title', 'route'], errors)
-  optionalMigrationMetadata(value, errors)
-
-  return errors
-}
-
-function requireNonEmptyString(
-  record: Record<string, unknown>,
-  field: string,
-  errors: string[],
-  prefix = '',
-): void {
-  if (typeof record[field] !== 'string' || record[field].trim().length === 0) {
-    errors.push(`${prefix}${field} must be a non-empty string`)
-  }
-}
-
-function optionalString(
-  record: Record<string, unknown>,
-  field: string,
-  errors: string[],
-  prefix = '',
-): void {
-  if (record[field] !== undefined && typeof record[field] !== 'string') {
-    errors.push(`${prefix}${field} must be a string when provided`)
-  }
-}
-
-function requireStringArray(record: Record<string, unknown>, field: string, errors: string[]): void {
-  if (!Array.isArray(record[field])) {
-    errors.push(`${field} must be an array of strings`)
-    return
-  }
-
-  validateStringArray(record[field], field, errors)
-}
-
-function optionalStringArray(record: Record<string, unknown>, field: string, errors: string[]): void {
-  if (record[field] === undefined) {
-    return
-  }
-
-  if (!Array.isArray(record[field])) {
-    errors.push(`${field} must be an array of strings when provided`)
-    return
-  }
-
-  validateStringArray(record[field], field, errors)
-}
-
-function validateStringArray(value: unknown[], field: string, errors: string[]): void {
-  value.forEach((item, index) => {
-    if (typeof item !== 'string' || item.trim().length === 0) {
-      errors.push(`${field}[${index}] must be a non-empty string`)
-    }
-  })
-}
-
-function optionalContributionArray(
-  record: Record<string, unknown>,
-  field: string,
-  requiredFields: string[],
-  errors: string[],
-  optionalFields: string[] = [],
-): void {
-  const value = record[field]
-  if (value === undefined) {
-    return
-  }
-
-  if (!Array.isArray(value)) {
-    errors.push(`${field} must be an array when provided`)
-    return
-  }
-
-  value.forEach((item, index) => {
-    if (!isRecord(item)) {
-      errors.push(`${field}[${index}] must be an object`)
-      return
-    }
-
-    for (const requiredField of requiredFields) {
-      requireNonEmptyString(item, requiredField, errors, `${field}[${index}].`)
-    }
-
-    for (const optionalField of optionalFields) {
-      optionalString(item, optionalField, errors, `${field}[${index}].`)
-    }
-  })
-}
-
-function optionalMigrationMetadata(record: Record<string, unknown>, errors: string[]): void {
-  const value = record.migrationMetadata
-  if (value === undefined) {
-    return
-  }
-
-  if (!isRecord(value)) {
-    errors.push('migrationMetadata must be an object of string values when provided')
-    return
-  }
-
-  for (const [key, metadataValue] of Object.entries(value)) {
-    if (typeof metadataValue !== 'string') {
-      errors.push(`migrationMetadata.${key} must be a string`)
-    }
-  }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 function moduleInitText(writeRequested: boolean): string {
@@ -1116,14 +954,6 @@ Run from the workspace root when you want the full frontend check:
 This command prints the instruction only; it does not shell out or mutate the
 working tree.
 `
-}
-
-function formatError(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return String(error)
 }
 
 const result = await run(process.argv.slice(2))

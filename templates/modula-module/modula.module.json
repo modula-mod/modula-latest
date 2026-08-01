@@ -1,50 +1,120 @@
 {
-  "moduleId": "digital.modula.example",
-  "name": "Example Module",
-  "description": "Boilerplate Modula module — replace before publishing.",
-  "repositoryUrl": "https://github.com/modula-mod/example-module",
-  "packageVersion": "0.1.0",
-  "hostCompatibility": {
-    "minimumHostVersion": "0.1.0"
+  "schemaVersion": "1.0.0",
+  "standardVersion": "1.0.0",
+  "moduleVersion": "1.0.0",
+  "manifestSchemaVersion": "1.0.0",
+  "dataSchemaVersion": "1.0.0",
+  "id": "com.example.modula-module",
+  "slug": "modula-module",
+  "name": "Example Modula Module",
+  "description": "Boilerplate Modula Module Standard 1.0 manifest. Replace before publishing.",
+  "publisher": {
+    "id": "example",
+    "name": "Example Publisher",
+    "website": "https://example.com"
   },
-  "routes": [
+  "compatibility": {
+    "host": "^1.0.0",
+    "runtime": "^1.0.0",
+    "standard": "^1.0.0",
+    "platforms": ["web", "ios", "android"]
+  },
+  "lifecycle": {
+    "executionMode": "declarative",
+    "defaultState": "installed",
+    "allowedTransitions": [
+      {"from": "discovered", "to": "installed", "auditEvent": "module.installed"},
+      {"from": "installed", "to": "enabled", "requiresConfirmation": true, "auditEvent": "module.enabled"},
+      {"from": "enabled", "to": "disabled", "auditEvent": "module.disabled"},
+      {"from": "disabled", "to": "uninstalled", "requiresConfirmation": true, "auditEvent": "module.uninstalled"}
+    ],
+    "uninstall": {"dataPolicy": "retain", "requiresConfirmation": true}
+  },
+  "permissions": [
+    {"id": "records:item:read", "reason": "Read account-owned item records.", "required": true, "risk": "low", "policyMode": "observe"}
+  ],
+  "capabilities": [
+    {"id": "records", "required": true, "reason": "Store module records."},
+    {"id": "views", "required": true, "reason": "Render declarative module views."},
+    {"id": "functions", "required": true, "reason": "Expose function contracts."},
+    {"id": "search", "required": false, "reason": "Index item projections.", "degradedBehavior": "Module remains browsable without universal search."}
+  ],
+  "records": [
     {
-      "path": "/modules/digital.modula.example",
-      "title": "Example",
-      "capability": "module.route"
+      "id": "com.example.modula-module.record.item",
+      "schema": {"type": "object", "required": ["id", "title"], "properties": {"id": {"type": "string"}, "title": {"type": "string"}}},
+      "ownership": "account",
+      "visibility": "private",
+      "indexes": [{"fields": ["title"]}],
+      "uniqueness": {"keys": ["id"], "scope": "account"},
+      "retention": {"policy": "retain"},
+      "aiPolicy": {"allowed": false, "context": "none", "policyMode": "block"},
+      "searchPolicy": {"searchable": true, "indexedFields": ["title"], "sensitiveFields": [], "visibility": "private"},
+      "auditPolicy": {"events": ["item.created"], "includeRecordBody": false},
+      "exportPolicy": {"allowed": true, "formats": ["json"]}
     }
   ],
-  "profileTabs": [
-    {
-      "tabId": "example",
-      "title": "Example",
-      "route": "/modules/digital.modula.example"
-    }
+  "views": [
+    {"id": "com.example.modula-module.view.collection", "type": "collection", "title": "Example Items", "recordId": "com.example.modula-module.record.item", "permissions": ["records:item:read"], "layout": {"kind": "list", "primaryField": "title"}}
   ],
-  "boardSurfaces": [
-    {
-      "surfaceId": "example-card",
-      "title": "Example card"
-    }
+  "actions": [
+    {"id": "com.example.modula-module.action.create-item", "title": "Create Item", "functionId": "com.example.modula-module.function.create-item", "permissions": [], "confirmationPolicy": {"required": false, "policyMode": "observe"}, "sideEffects": ["record.create"], "audit": {"event": "item.create-requested", "includeInput": false}}
+  ],
+  "functions": [
+    {"id": "com.example.modula-module.function.create-item", "title": "Create Item", "inputSchema": {"type": "object"}, "outputSchema": {"type": "object"}, "permissions": [], "aiCallable": false, "automationCallable": false, "idempotent": true, "sideEffects": ["record.create"], "timeoutMs": 10000, "rateLimit": {"windowSeconds": 60, "maxCalls": 30}, "audit": {"event": "item.created", "includeInput": false, "includeOutput": false}, "confirmationPolicy": {"required": false, "risk": "low"}}
   ],
   "settings": [
-    {
-      "settingsId": "example-settings",
-      "title": "Example settings",
-      "route": "/settings/extensions/digital.modula.example"
-    }
+    {"id": "com.example.modula-module.settings.main", "scope": "installation", "schema": {"type": "object"}, "defaults": {}}
   ],
-  "tools": ["composer.example"],
-  "widgets": ["board.example"],
-  "capabilities": [
-    "board.card",
-    "profile.tab",
-    "settings.section",
-    "composer.tool"
+  "events": [
+    {"id": "com.example.modula-module.event.item-created", "type": "item.created", "direction": "emitted", "schemaVersion": "1.0.0", "schema": {"type": "object"}, "permissions": [], "replaySupport": true}
   ],
-  "permissions": [
-    "storage:namespaced",
-    "profile:read"
+  "automations": [],
+  "search": [
+    {"id": "com.example.modula-module.search.items", "recordId": "com.example.modula-module.record.item", "indexedFields": ["title"], "rankingHints": {}, "sensitiveFields": [], "visibility": "private", "projectionHandler": {"kind": "declarative", "projection": {"title": "title"}}}
   ],
-  "uninstallBehaviour": "exportThenPurge"
+  "ai": [],
+  "diagnostics": {
+    "components": ["startup", "runtime", "permissions", "dependencies", "search", "ai", "connector", "health"],
+    "warnings": [],
+    "errors": [],
+    "startup": {},
+    "runtime": {},
+    "permissions": {},
+    "dependencies": {},
+    "search": {},
+    "ai": {},
+    "connector": {},
+    "health": {}
+  },
+  "health": {
+    "status": "healthy",
+    "components": [{"id": "manifest", "status": "healthy"}],
+    "checkDefinitions": [{"id": "manifest-validate", "component": "startup", "timeoutMs": 1000, "required": true}]
+  },
+  "migrations": {
+    "dataSchemaVersion": "1.0.0",
+    "steps": [{"id": "com.example.modula-module.migration.1-0-0", "from": "0.0.0", "to": "1.0.0", "reversible": true, "checksum": "1111111111111111111111111111111111111111111111111111111111111111"}]
+  },
+  "release": {
+    "repository": "modula-mod/example-module",
+    "commitSha": "0123456789abcdef0123456789abcdef01234567",
+    "checksum": "2222222222222222222222222222222222222222222222222222222222222222",
+    "licenseEvidence": ["LICENSE"],
+    "signing": {"signed": false},
+    "channel": "dev",
+    "reviewStatus": "unreviewed",
+    "securityAdvisories": []
+  },
+  "trust": {
+    "publisher": {
+      "id": "example",
+      "name": "Example Publisher",
+      "website": "https://example.com"
+    },
+    "level": "untrusted",
+    "provenance": {"sourceVerified": false, "checksumVerified": false, "signatureVerified": false},
+    "review": {"status": "unreviewed", "evidence": []},
+    "security": {"advisories": []}
+  }
 }

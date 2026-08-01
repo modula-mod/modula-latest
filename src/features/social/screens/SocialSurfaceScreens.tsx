@@ -15,23 +15,6 @@ import {
 } from '@/features/product/data/glassPrivacyLabels'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {
-  getHelpArticle,
-  getSeededCollection,
-  getSeededCommunity,
-  getSeededList,
-  getSeededThread,
-  helpArticles,
-  seededBlockedAccounts,
-  seededCollections,
-  seededCommunities,
-  seededDrafts,
-  seededInnerCircle,
-  seededLists,
-  seededMessageThreads,
-  seededMuteWords,
-  whatsNewNotes,
-} from '@/features/social/data/seededSurfaces'
-import {
   SettingsContextRow,
   SettingsLinkRow,
   SettingsOverflowMenu,
@@ -46,6 +29,77 @@ import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+type LocalThread = {
+  id: string
+  name: string
+  handle: string
+  preview: string
+  timestamp: string
+  unread: boolean
+  pinned?: boolean
+}
+
+type LocalList = {
+  id: string
+  name: string
+  description: string
+  memberCount: number
+  kind: 'people' | 'feed'
+}
+
+type LocalCollection = {
+  id: string
+  name: string
+  description: string
+  itemCount: number
+}
+
+type LocalCommunity = {
+  id: string
+  name: string
+  description: string
+  membersLabel: string
+  topic: string
+}
+
+type LocalHelpArticle = {
+  id: string
+  title: string
+  summary: string
+  body: string[]
+}
+
+const seededMessageThreads: LocalThread[] = []
+const seededLists: LocalList[] = []
+const seededCollections: LocalCollection[] = []
+const seededDrafts: {id: string; title: string; excerpt: string; updatedAt: string}[] = []
+const seededCommunities: LocalCommunity[] = []
+const seededMuteWords: string[] = []
+const seededBlockedAccounts: {id: string; name: string; handle: string}[] = []
+const seededInnerCircle: {id: string; name: string; handle: string}[] = []
+const helpArticles: LocalHelpArticle[] = []
+const whatsNewNotes: {version: string; items: string[]}[] = []
+
+function getSeededThread(id: string) {
+  return seededMessageThreads.find(thread => thread.id === id)
+}
+
+function getSeededList(id: string) {
+  return seededLists.find(list => list.id === id)
+}
+
+function getSeededCollection(id: string) {
+  return seededCollections.find(collection => collection.id === id)
+}
+
+function getSeededCommunity(id: string) {
+  return seededCommunities.find(community => community.id === id)
+}
+
+function getHelpArticle(id: string) {
+  return helpArticles.find(article => article.id === id)
+}
 
 function ScreenShell({
   title,

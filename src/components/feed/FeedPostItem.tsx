@@ -24,7 +24,7 @@ import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {SocialPost} from '@/domain/social'
 
-type DemoPostItemProps = {
+type FeedPostItemProps = {
   post: SocialPost
 }
 
@@ -49,7 +49,7 @@ function marketplaceIdForModuleName(name: string): string {
   return 'module-vault-notes'
 }
 
-export function DemoPostItem({post}: DemoPostItemProps) {
+export function FeedPostItem({post}: FeedPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
   const session = useSession()

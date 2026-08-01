@@ -12,6 +12,7 @@ const envSchema = z.object({
   MODULA_WORKER_LEASE_REAP_INTERVAL_MS: z.coerce.number().int().positive().default(30_000),
   MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS: z.coerce.number().int().positive().default(2_000),
   MODULA_WORKER_OUTBOX_BATCH_SIZE: z.coerce.number().int().positive().default(50),
+  MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
   MODULA_WORKER_INGEST_INTERVAL_MS: z.coerce.number().int().positive().default(60_000),
   MODULA_WORKER_INGEST_ENABLED: z
     .string()
@@ -51,6 +52,7 @@ export type WorkerConfig = {
   leaseReapIntervalMs: number
   outboxDrainIntervalMs: number
   outboxBatchSize: number
+  eventSubscriberTimeoutMs: number
   ingestIntervalMs: number
   ingestEnabled: boolean
   /** version -> 32-byte key. Version 1 is "current"; version 0 is the previous key kept for rotation. */
@@ -122,6 +124,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     leaseReapIntervalMs: raw.MODULA_WORKER_LEASE_REAP_INTERVAL_MS,
     outboxDrainIntervalMs: raw.MODULA_WORKER_OUTBOX_DRAIN_INTERVAL_MS,
     outboxBatchSize: raw.MODULA_WORKER_OUTBOX_BATCH_SIZE,
+    eventSubscriberTimeoutMs: raw.MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS,
     ingestIntervalMs: raw.MODULA_WORKER_INGEST_INTERVAL_MS,
     ingestEnabled: Boolean(raw.MODULA_WORKER_INGEST_ENABLED),
     encryptionKeysByVersion,

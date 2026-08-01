@@ -2,9 +2,15 @@ import {randomUUID} from 'node:crypto'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import type {ModulaDb} from '../../database/client.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 
 export class QuoteService {
-  constructor(private readonly db: ModulaDb) {}
+  private readonly policies: GreenfieldPolicyEngine
+
+  constructor(private readonly db: ModulaDb) {
+    this.policies = new GreenfieldPolicyEngine(db)
+  }
+
   async createQuote(actorId: string, quotedPostId: string, commentary: string, audience: 'public' | 'followers' | 'private' = 'public') {
     const quoted = await this.getQuotedPreview(actorId, quotedPostId)
     if (!quoted) throw Object.assign(new Error('Quoted post unavailable'), {code: 'NOT_FOUND'})
@@ -34,7 +40,13 @@ export class QuoteService {
   }
   async getQuotedPreview(viewerActorId: string | null, postId: string) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
-    if (!post || (post.audience === 'private' && post.author_actor_id !== viewerActorId)) return null
+    if (!post) return null
+    const decision = await this.policies.evaluateAndAudit({
+      actorId: viewerActorId,
+      action: 'post.quote',
+      resource: {type: 'post', id: postId, ownerActorId: post.author_actor_id, visibility: post.audience},
+    })
+    if (!decision.allowed) return null
     return post
   }
 }

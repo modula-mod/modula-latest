@@ -1,4 +1,5 @@
 import type {ApiClient} from '@/api/client'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import type {
   ComposerToolItem,
   ComposerToolSection,
@@ -234,7 +235,7 @@ function sectionFor(slug: string, explicit?: string): ComposerToolSection {
 }
 
 function decodeTools(value: unknown): ComposerToolItem[] {
-  if (!Array.isArray(value) || value.length === 0) return BUILTIN_TOOLS
+  if (!Array.isArray(value) || value.length === 0) return []
   return value.map(item => {
     const row = item as Record<string, unknown>
     const slug = String(row.slug ?? row.tool_id ?? row.toolId ?? 'tool')
@@ -308,10 +309,11 @@ export class ApiToolsRepository implements ToolsRepository {
         {path: '/v1/modules/contributions', authenticated: true, query: {surface: 'composer'}},
         decodeContributionTools,
       )
-      if (contributions.length) return mergeTools(contributions, BUILTIN_TOOLS)
-      return await this.client.get({path: '/v1/tools'}, decodeTools)
+      const coreTools = await this.client.get({path: '/v1/tools'}, decodeTools)
+      return mergeTools(contributions, coreTools)
     } catch {
-      return BUILTIN_TOOLS
+      if (runtimeEnvironment.dataSource === 'local') return BUILTIN_TOOLS
+      throw new Error('Composer tools are unavailable.')
     }
   }
 

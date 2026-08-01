@@ -1,4 +1,4 @@
-import {compareSemver, satisfiesSemverRange, type GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import {compareSemver, satisfiesSemverRange, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import type {AppConfig} from '../config/index.js'
 import {GREENFIELD_PROTOCOL_VERSION, GREENFIELD_VERSION, MODULA_HOST_VERSION, type GreenfieldModuleReleaseRecord} from './module-domain.js'
 
@@ -17,7 +17,7 @@ export type GreenfieldModuleIncompatibilityReason =
   | 'PERMISSION_RESTRICTED'
 
 export type CompatibilityContext = {
-  platform: 'ios' | 'android' | 'web' | 'server'
+  platform: 'ios' | 'android' | 'web' | 'desktop' | 'server'
   trustPolicy?: 'firstPartyOnly' | 'reviewed'
   requiredCapabilities?: string[]
   unavailableDependencies?: boolean
@@ -48,19 +48,19 @@ export class GreenfieldModuleCompatibilityService {
     return {compatible: reasons.length === 0, reasons: Array.from(new Set(reasons))}
   }
 
-  private licenseApproved(manifest: GreenfieldModuleManifestV1): boolean {
+  private licenseApproved(manifest: GreenfieldModuleManifest): boolean {
     return ['firstParty', 'verified', 'founderOverride'].includes(manifest.license.status)
   }
 
-  private greenfieldVersionAllowed(manifest: GreenfieldModuleManifestV1): boolean {
+  private greenfieldVersionAllowed(manifest: GreenfieldModuleManifest): boolean {
     return compareSemver(GREENFIELD_VERSION, manifest.compatibility.minimumGreenfieldVersion) >= 0
   }
 
-  private hostMinimumAllowed(manifest: GreenfieldModuleManifestV1): boolean {
+  private hostMinimumAllowed(manifest: GreenfieldModuleManifest): boolean {
     return compareSemver(MODULA_HOST_VERSION, manifest.compatibility.minimumModulaHostVersion) >= 0
   }
 
-  private hostMaximumAllowed(manifest: GreenfieldModuleManifestV1): boolean {
+  private hostMaximumAllowed(manifest: GreenfieldModuleManifest): boolean {
     return manifest.compatibility.maximumModulaHostVersion
       ? satisfiesSemverRange(MODULA_HOST_VERSION, `<=${manifest.compatibility.maximumModulaHostVersion}`)
       : true

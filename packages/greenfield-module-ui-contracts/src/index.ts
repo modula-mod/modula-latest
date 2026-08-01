@@ -38,6 +38,8 @@ export const GREENFIELD_MODULE_ACTION_KINDS = [
   'record.create',
   'record.update',
   'record.delete',
+  'record.restore',
+  'record.purge',
   'record.query',
   'function.invoke',
   'settings.update',
@@ -55,9 +57,11 @@ export const GREENFIELD_MODULE_FIELD_TYPES = [
   'multiSelect',
   'date',
   'dateTime',
+  'number',
   'tags',
   'url',
   'recordReference',
+  'json',
 ] as const
 
 export type GreenfieldModuleFieldType = (typeof GREENFIELD_MODULE_FIELD_TYPES)[number]

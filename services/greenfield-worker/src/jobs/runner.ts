@@ -18,7 +18,7 @@ import {handleModuleUninstall} from '../modules/uninstall-handler.js'
 import {handleModuleUpdate} from '../modules/update-handler.js'
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
-import {handleSearchIndex} from '../search/index.js'
+import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
 import {claimNextJob, completeJob, deadLetterJob, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
@@ -140,6 +140,9 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
       case 'search.index.post':
       case 'search.index.profile':
         await handleSearchIndex(db, normalizeSearchPayload(job.job_type, job.payload))
+        break
+      case 'search.reindex':
+        await handleSearchReindex(db, job.payload)
         break
       case 'atproto.publish':
       case 'atproto.publish.create':

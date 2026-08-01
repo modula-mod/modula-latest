@@ -111,6 +111,7 @@ export class ApiAuthRepository implements AuthRepository {
           handle: input.handle.trim().toLowerCase(),
           inviteCode: input.inviteCode,
           displayName: input.displayName,
+          acceptedTerms: input.acceptedTerms === true,
         },
       },
       value => decodeRegisterPending(value, email),

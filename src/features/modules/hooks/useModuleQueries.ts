@@ -69,6 +69,24 @@ export function useModuleSettingsSchemaQuery(moduleId: string) {
   })
 }
 
+export function useModuleHealthQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.health(moduleId),
+    queryFn: () => moduleRepository.getHealth(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
+export function useModuleBackendDiagnosticsQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.backend(moduleId),
+    queryFn: () => moduleRepository.getBackendDiagnostics(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
 export function useModuleContributionQuery(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}) {
   const {moduleRepository} = useAppServices()
   return useQuery({
@@ -84,6 +102,7 @@ export function useModuleLifecycleMutations(moduleId: string) {
     await Promise.all([
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.installed}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.detail(moduleId)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.backend(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.catalogueRoot}),
     ])
   }
@@ -110,6 +129,33 @@ export function useModuleRecordMutations(moduleId: string, collection: string) {
     remove: useMutation({
       mutationFn: (input: {recordId: string; expectedRevision?: number}) =>
         moduleRepository.deleteRecord(moduleId, collection, input.recordId, input.expectedRevision),
+      onSuccess: invalidate,
+    }),
+  }
+}
+
+export function useModuleAIMutations(moduleId: string, collection: string) {
+  const {moduleRepository} = useAppServices()
+  const queryClient = useQueryClient()
+  const invalidate = () => queryClient.invalidateQueries({queryKey: moduleQueryKeys.recordsCollection(moduleId, collection)})
+  return {
+    execute: useMutation({
+      mutationFn: (input: {actionId: string; recordId: string; expectedRevision: number; selection?: {blockIds?: string[]; text?: string}; variables?: Record<string, unknown>; streaming?: boolean}) =>
+        moduleRepository.executeAIAction(moduleId, input.actionId, {
+          recordId: input.recordId,
+          expectedRevision: input.expectedRevision,
+          selection: input.selection,
+          variables: input.variables,
+          streaming: input.streaming,
+        }),
+    }),
+    apply: useMutation({
+      mutationFn: (input: {executionId: string; recordId: string; expectedRevision: number; selectedResult?: Record<string, unknown>}) =>
+        moduleRepository.applyAIExecution(moduleId, input.executionId, {
+          recordId: input.recordId,
+          expectedRevision: input.expectedRevision,
+          selectedResult: input.selectedResult,
+        }),
       onSuccess: invalidate,
     }),
   }

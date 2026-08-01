@@ -1,10 +1,19 @@
 import type {ApiClient} from '@/api/client'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   InstalledModule,
+  ApplyAIExecutionRequest,
+  ApplyAIExecutionResponse,
+  ModuleAIDeclaration,
+  ModuleAIActionExecutionRequest,
+  ModuleAIActionExecutionResponse,
+  ModuleAIProductActionDefinition,
+  ModuleBackendMetadata,
   ModuleCatalogueItem,
   ModuleContribution,
   ModuleDetail,
+  ModuleHealth,
   ModuleInstallPreview,
   ModuleRecord,
   ModuleRecordPage,
@@ -12,6 +21,7 @@ import type {
   ModuleRuntimeView,
   ModuleSettingsDocument,
   ModuleSettingsSchema,
+  ModuleStandardRuntimeSupportState,
   ModuleUninstallPreview,
   ProductHubCategory,
 } from '@/data/repositories/contracts/ModuleRepository'
@@ -32,6 +42,7 @@ const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
     installationState: 'available',
     priceState: 'Included',
     featured: true,
+    standard: localStandardMetadata(),
   },
   {
     moduleId: 'digital.modula.tasks',
@@ -67,38 +78,61 @@ const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
 
 const LOCAL_RECORD_STORE = new Map<string, ModuleRecord[]>()
 
+async function localOnlyFallback<T>(operation: Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
+  try {
+    return await operation
+  } catch (error) {
+    if (runtimeEnvironment.dataSource === 'local') return fallback()
+    throw error
+  }
+}
+
 export class ApiModuleRepository implements ModuleRepository {
   constructor(private readonly client: ApiClient) {}
 
   async listCatalogue(input: {q?: string; category?: ProductHubCategory; limit?: number} = {}): Promise<ModuleCatalogueItem[]> {
-    try {
-      const remote = await this.client.get(
+    return localOnlyFallback(
+      this.client.get(
         {path: '/v1/registry/modules', query: {q: input.q, limit: input.limit ?? 50}},
         decodeCataloguePage,
-      )
+      ),
+      () => filterCatalogue(LOCAL_CATALOGUE, input),
+    ).then(async remote => {
+      if (runtimeEnvironment.dataSource === 'local' && remote === LOCAL_CATALOGUE) return remote
       const installed = await this.listInstalled()
       const byId = new Map(installed.map(item => [item.moduleId, item]))
       return filterCatalogue(remote.map(item => applyInstalledState(item, byId.get(item.moduleId))), input)
-    } catch {
-      return filterCatalogue(LOCAL_CATALOGUE, input)
-    }
+    })
   }
 
   async getModule(moduleId: string): Promise<ModuleDetail | null> {
-    try {
-      const item = await this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail)
+    return localOnlyFallback(
+      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
+      () => {
+        const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
+        return fallback ? {
+          ...fallback,
+          longDescription: fallback.description,
+          backend: defaultBackendMetadata(moduleId),
+          permissions: [],
+          contributions: {},
+          privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
+        } : null
+      },
+    ).then(async item => {
+      if (!item) return null
       const installed = await this.listInstalled()
       return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
-    } catch {
-      const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
-      return fallback ? {...fallback, longDescription: fallback.description, permissions: [], contributions: {}, privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined} : null
-    }
+    })
   }
 
   listInstalled(): Promise<InstalledModule[]> {
-    return this.client.get({path: '/v1/modules/installed', authenticated: true}, value =>
-      Array.isArray(value) ? value.map(decodeInstalledModule) : [],
-    ).catch(() => [])
+    return localOnlyFallback(
+      this.client.get({path: '/v1/modules/installed', authenticated: true}, value =>
+        Array.isArray(value) ? value.map(decodeInstalledModule) : [],
+      ),
+      () => [],
+    )
   }
 
   installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview> {
@@ -121,6 +155,14 @@ export class ApiModuleRepository implements ModuleRepository {
     return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/update`, authenticated: true, body: {version, approvedPermissionIncrease: false, idempotencyKey: idempotencyKey('update', moduleId)}}, value => value)
   }
 
+  reviewPermissions(moduleId: string, approvedPermissions: string[]): Promise<unknown> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/permissions/review`,
+      authenticated: true,
+      body: {approvedPermissions, idempotencyKey: idempotencyKey('permissions-review', moduleId)},
+    }, value => value)
+  }
+
   uninstall(moduleId: string, choice: 'keepData' | 'exportThenDelete' | 'deleteData' = 'keepData'): Promise<unknown> {
     return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {choice, recentAuth: false, confirmDelete: false, idempotencyKey: idempotencyKey('uninstall', moduleId)}}, value => value)
   }
@@ -130,61 +172,124 @@ export class ApiModuleRepository implements ModuleRepository {
   }
 
   async listViews(moduleId: string): Promise<ModuleRuntimeView[]> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views`, authenticated: true}, value => {
-      const row = value as {views?: unknown}
-      return Array.isArray(row.views) ? row.views.map(decodeRuntimeView) : []
-    }).catch(() => localViews(moduleId))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views`, authenticated: true}, value => {
+        const row = value as {views?: unknown}
+        return Array.isArray(row.views) ? row.views.map(decodeRuntimeView) : []
+      }),
+      () => localViews(moduleId),
+    )
   }
 
   async getView(moduleId: string, viewId: string): Promise<ModuleRuntimeView | null> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}`, authenticated: true}, decodeRuntimeView).catch(async () => {
-      const views = await this.listViews(moduleId)
-      return views.find(view => view.viewId === viewId) ?? views[0] ?? null
-    })
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}`, authenticated: true}, decodeRuntimeView),
+      async () => {
+        const views = await this.listViews(moduleId)
+        return views.find(view => view.viewId === viewId) ?? views[0] ?? null
+      },
+    )
   }
 
   listRecords(moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number} = {}): Promise<ModuleRecordPage> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: input}, decodeRecordPage)
-      .catch(() => ({moduleId, collection, items: localRecords(moduleId, collection, input.q), nextCursor: null, limit: input.limit ?? 25}))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: input}, decodeRecordPage),
+      () => ({moduleId, collection, items: localRecords(moduleId, collection, input.q), nextCursor: null, limit: input.limit ?? 25}),
+    )
   }
 
   createRecord(moduleId: string, collection: string, data: Record<string, unknown>): Promise<ModuleRecord> {
-    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data}}, decodeRecord)
-      .catch(() => createLocalRecord(moduleId, collection, data))
+    return localOnlyFallback(
+      this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data}}, decodeRecord),
+      () => createLocalRecord(moduleId, collection, data),
+    )
   }
 
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord> {
-    return this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision}}, decodeRecord)
-      .catch(() => updateLocalRecord(moduleId, collection, recordId, data, expectedRevision))
+    return localOnlyFallback(
+      this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision}}, decodeRecord),
+      () => updateLocalRecord(moduleId, collection, recordId, data, expectedRevision),
+    )
   }
 
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown> {
-    return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value)
-      .catch(() => deleteLocalRecord(moduleId, collection, recordId, expectedRevision))
+    return localOnlyFallback(
+      this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value),
+      () => deleteLocalRecord(moduleId, collection, recordId, expectedRevision),
+    )
   }
 
   runAction(moduleId: string, actionId: string, input: Record<string, unknown> = {}): Promise<unknown> {
     return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/actions/${encodeURIComponent(actionId)}`, authenticated: true, body: {input, idempotencyKey: idempotencyKey(actionId, moduleId)}}, value => value)
   }
 
+  executeAIAction(moduleId: string, actionId: string, input: ModuleAIActionExecutionRequest): Promise<ModuleAIActionExecutionResponse> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/ai/actions/${encodeURIComponent(actionId)}/executions`,
+      authenticated: true,
+      body: {...input, idempotencyKey: input.idempotencyKey ?? idempotencyKey(actionId, moduleId)},
+    }, decodeAIExecution)
+  }
+
+  applyAIExecution(moduleId: string, executionId: string, input: ApplyAIExecutionRequest): Promise<ApplyAIExecutionResponse> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/ai/executions/${encodeURIComponent(executionId)}/apply`,
+      authenticated: true,
+      body: {...input, idempotencyKey: input.idempotencyKey ?? idempotencyKey('ai-apply', moduleId)},
+    }, decodeAIApplication)
+  }
+
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings-schema`, authenticated: true}, decodeSettingsSchema)
-      .catch(() => localSettingsSchema(moduleId))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings-schema`, authenticated: true}, decodeSettingsSchema),
+      () => localSettingsSchema(moduleId),
+    )
   }
 
   getSettings(moduleId: string): Promise<ModuleSettingsDocument> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true}, decodeSettings)
-      .catch(() => ({moduleId, installationId: `local:${moduleId}`, version: 0, values: localSettingsSchema(moduleId).defaults}))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true}, decodeSettings),
+      () => ({moduleId, installationId: `local:${moduleId}`, version: 0, values: localSettingsSchema(moduleId).defaults}),
+    )
   }
 
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument> {
     return this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true, body: {values}}, decodeSettings)
   }
 
+  getHealth(moduleId: string): Promise<ModuleHealth | null> {
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/health`, authenticated: true}, decodeHealth),
+      () => null,
+    )
+  }
+
+  getBackendDiagnostics(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend`, authenticated: true}, value => decodeBackendMetadata(value, moduleId)),
+      async () => (await this.getModule(moduleId))?.backend ?? null,
+    )
+  }
+
+  reverifyBackend(moduleId: string, origin?: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/discover`, authenticated: true, body: {origin}}, value => decodeBackendMetadata(value, moduleId))
+  }
+
+  checkBackendHealth(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/health`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
+  }
+
+  disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend/disable`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
+  }
+
   listContributions(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}): Promise<ModuleContribution[]> {
-    return this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
-      Array.isArray(value) ? value.map(decodeContribution) : [],
-    ).catch(() => [])
+    return localOnlyFallback(
+      this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
+        Array.isArray(value) ? value.map(decodeContribution) : [],
+      ),
+      () => [],
+    )
   }
 }
 
@@ -198,6 +303,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
   const moduleId = String(row.moduleId ?? row.module_id ?? row.slug ?? 'unknown')
   const status = String(row.status ?? 'published')
   const installable = Boolean(row.installable)
+  const manifest = isRecord(row.manifest) ? row.manifest : {}
   return {
     moduleId,
     name: String(row.name ?? moduleId),
@@ -213,6 +319,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     installationState: status === 'quarantined' ? 'quarantined' : installable ? 'available' : status === 'planned' ? 'comingSoon' : 'notAvailable',
     priceState: installable ? 'Free' : status === 'planned' ? 'Coming soon' : 'Not available',
     featured: moduleId.includes('vault-notes') || moduleId.includes('tasks'),
+    standard: decodeStandardMetadata(row.standard ?? row.standardMetadata ?? manifest),
   }
 }
 
@@ -223,13 +330,25 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
   const placeholder = (row.placeholder ?? {}) as Record<string, unknown>
   const source = (row.source ?? {}) as Record<string, unknown>
   const manifest = (row.manifest ?? row.placeholder ?? {}) as Record<string, unknown>
+  const backendSource = isRecord(manifest.backend) ? manifest.backend : isRecord(row.backend) ? row.backend : undefined
   return {
     ...base,
     publisherId: String(publisher.publisherId ?? base.publisherId),
     publisherName: String(publisher.displayName ?? base.publisherName),
     longDescription: String(row.description ?? base.description),
+    backend: decodeBackendMetadata(backendSource, base.moduleId),
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleDetail['permissions'] : [],
     contributions: (row.contributions ?? {}) as Record<string, unknown>,
+    ai: decodeAIDeclaration(isRecord(manifest.ai) ? manifest.ai : row.ai),
+    standard: decodeStandardMetadata(row.standardMetadata ?? row.standard ?? manifest),
+    manifest,
+    normalizedManifest: recordOrUndefined(row.normalizedManifest),
+    dependencyGraph: recordOrUndefined(row.dependencyGraph ?? manifest.dependencyGraph),
+    serviceRegistry: recordOrUndefined(row.serviceRegistry ?? manifest.serviceRegistry),
+    apiRegistry: recordOrUndefined(row.apiRegistry ?? manifest.apiRegistry),
+    eventBus: recordOrUndefined(row.eventBus ?? manifest.eventBus),
+    hookRegistry: recordOrUndefined(row.hookRegistry ?? manifest.hookRegistry),
+    capabilityDiscovery: recordOrUndefined(row.capabilityDiscovery ?? manifest.capabilityDiscovery),
     sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),
     sourceCommit: typeof source.commit === 'string' ? source.commit : undefined,
     manifestChecksum: typeof row.manifestSha256 === 'string' ? row.manifestSha256 : undefined,
@@ -237,6 +356,57 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     releaseNotes: Array.isArray(row.releaseNotes) ? row.releaseNotes.map(String) : [],
     privacy: base.moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
   }
+}
+
+function decodeBackendMetadata(value: unknown, moduleId: string): ModuleBackendMetadata {
+  const backend = isRecord(value) ? value : {}
+  const mode = backendMode(backend.mode)
+  const deployment = isRecord(backend.deployment) ? backend.deployment : {}
+  const data = isRecord(backend.data) ? backend.data : {}
+  const trust = isRecord(backend.trust) ? backend.trust : {}
+  const actions = Array.isArray(backend.actions) ? backend.actions.filter(isRecord) : []
+  const diagnosticEndpoint = typeof backend.resolvedEndpoint === 'string' ? backend.resolvedEndpoint : typeof backend.resolvedOrigin === 'string' ? backend.resolvedOrigin : undefined
+  const endpoint = diagnosticEndpoint ?? (Array.isArray(trust.allowedOrigins) ? trust.allowedOrigins.find((origin): origin is string => typeof origin === 'string') : undefined)
+  const ownership = String(deployment.ownership ?? (typeof backend.deployment === 'string' ? backend.deployment : mode === 'greenfield-managed' ? 'modula-hosted' : 'publisher-hosted'))
+  const dataLocation = String(data.primaryStore ?? backend.dataLocation ?? (mode === 'frontend-only' ? 'device' : mode === 'greenfield-managed' ? 'greenfield' : 'module-backend'))
+  const provider = providerFor(mode, ownership)
+  return {
+    mode,
+    provider,
+    deploymentOwnership: ownership,
+    dataLocation,
+    regions: arrayOfStrings(deployment.regions ?? deployment.dataResidency ?? data.residency),
+    status: String(backend.status ?? backend.lifecycleState ?? backend.verificationStatus ?? (mode === 'greenfield-managed' || mode === 'frontend-only' ? 'available' : 'unconfigured')),
+    protocolVersion: typeof backend.protocolVersion === 'string' ? backend.protocolVersion : null,
+    endpoint: endpoint ?? null,
+    selfHostingSupported: Boolean(deployment.selfHostingSupported ?? backend.selfHostingSupported),
+    externalDataProcessing: ['module-managed', 'hybrid'].includes(mode) || dataLocation.includes('module-backend'),
+    backendPermissions: Array.from(new Set(actions.flatMap(action => arrayOfStrings(action.permissions)))),
+  }
+}
+
+function defaultBackendMetadata(moduleId: string): ModuleBackendMetadata {
+  return decodeBackendMetadata(moduleId.includes('dimon') ? {mode: 'frontend-only', deployment: {ownership: 'modula-hosted'}, data: {primaryStore: 'device'}} : {mode: 'greenfield-managed'}, moduleId)
+}
+
+function backendMode(value: unknown): ModuleBackendMetadata['mode'] {
+  return value === 'module-managed' || value === 'hybrid' || value === 'frontend-only' ? value : 'greenfield-managed'
+}
+
+function providerFor(mode: ModuleBackendMetadata['mode'], ownership: string): string {
+  if (mode === 'greenfield-managed') return 'Greenfield'
+  if (mode === 'frontend-only') return 'Device'
+  if (ownership === 'customer-hosted') return 'Customer-hosted'
+  if (ownership === 'modula-hosted') return 'Modula-hosted'
+  return 'Publisher-hosted'
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }
 
 function decodeInstalledModule(value: unknown): InstalledModule {
@@ -251,6 +421,7 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     health: typeof row.health === 'string' ? row.health : 'Healthy',
     updateState: typeof row.updateState === 'string' ? row.updateState : 'Current',
     configurationState: typeof row.configurationState === 'string' ? row.configurationState : 'Configured',
+    grantedPermissions: arrayOfStrings(row.grantedPermissions ?? row.granted_permissions),
   }
 }
 
@@ -263,15 +434,185 @@ function decodeInstallPreview(value: unknown): ModuleInstallPreview {
     incompatibilityReasons: Array.isArray(row.incompatibilityReasons) ? row.incompatibilityReasons.map(String) : [],
     trust: (row.trust ?? {level: 'unknown', publisherStatus: 'pending', releaseStatus: 'unknown'}) as ModuleInstallPreview['trust'],
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleInstallPreview['permissions'] : [],
-    dependencies: Array.isArray(row.dependencies) ? row.dependencies : [],
+    dependencies: Array.isArray(row.dependencies) ? row.dependencies as ModuleInstallPreview['dependencies'] : [],
+    dependencyWarnings: Array.isArray(row.dependencyWarnings) ? row.dependencyWarnings.map(String) : [],
+    provides: Array.isArray(row.provides) ? row.provides as ModuleInstallPreview['provides'] : [],
     contributions: (row.contributions ?? {}) as Record<string, number>,
     migrationsRequired: Boolean(row.migrationsRequired),
     permissionIncrease: Boolean(row.permissionIncrease),
   }
 }
 
+function decodeStandardMetadata(value: unknown): ModuleDetail['standard'] {
+  if (!isRecord(value)) return undefined
+  const registries = isRecord(value.registries) ? value.registries : {}
+  const dependencies = isRecord(value.dependencies) ? value.dependencies : {}
+  const runtimeSupport = decodeRuntimeSupport(value.runtimeSupport)
+  const manifestVersion = typeof value.manifestVersion === 'number' ? value.manifestVersion : null
+  const sectionVersions = isRecord(value.sectionVersions) ? Object.fromEntries(Object.entries(value.sectionVersions).filter((entry): entry is [string, string] => typeof entry[1] === 'string')) : {}
+  const standardVersion = typeof value.standardVersion === 'string'
+    ? value.standardVersion
+    : typeof value.versioning === 'object' && value.versioning !== null && typeof (value.versioning as Record<string, unknown>).standardVersion === 'string'
+      ? String((value.versioning as Record<string, unknown>).standardVersion)
+      : null
+  return {
+    manifestVersion,
+    standardVersion,
+    sectionVersions,
+    runtimeSupport,
+    runtimeDiagnostics: decodeRuntimeDiagnostics(value.runtimeDiagnostics),
+    dependencies: {
+      requires: numberValue(dependencies.requires),
+      optional: numberValue(dependencies.optional),
+      recommended: numberValue(dependencies.recommended),
+      conflicts: numberValue(dependencies.conflicts),
+      replaces: numberValue(dependencies.replaces),
+      provides: numberValue(dependencies.provides),
+    },
+    registries: {
+      services: numberValue(registries.services),
+      apis: numberValue(registries.apis),
+      hooks: numberValue(registries.hooks),
+      jobs: numberValue(registries.jobs),
+      storage: numberValue(registries.storage),
+      widgets: numberValue(registries.widgets),
+      navigation: numberValue(registries.navigation),
+      ui: numberValue(registries.ui),
+      automation: numberValue(registries.automation),
+      metrics: numberValue(registries.metrics),
+    },
+    capabilityFlags: isRecord(value.capabilityFlags) ? Object.fromEntries(Object.entries(value.capabilityFlags).filter((entry): entry is [string, boolean] => typeof entry[1] === 'boolean')) : {},
+    capabilities: arrayOfStrings(value.capabilities),
+    engines: arrayOfStrings(value.engines),
+  }
+}
+
+function localStandardMetadata(): ModuleDetail['standard'] {
+  return {
+    manifestVersion: 1,
+    standardVersion: null,
+    sectionVersions: {},
+    runtimeDiagnostics: [],
+    dependencies: {requires: 0, optional: 0, recommended: 0, conflicts: 0, replaces: 0, provides: 0},
+    registries: {services: 0, apis: 0, hooks: 0, jobs: 0, storage: 0, widgets: 0, navigation: 0, ui: 0, automation: 0, metrics: 0},
+    capabilityFlags: {},
+    capabilities: [],
+    engines: [],
+  }
+}
+
+function decodeRuntimeSupport(value: unknown): NonNullable<ModuleDetail['standard']>['runtimeSupport'] {
+  if (!isRecord(value)) return undefined
+  const sections = isRecord(value.sections)
+    ? Object.fromEntries(Object.entries(value.sections).filter((entry): entry is [string, ModuleStandardRuntimeSupportState] => runtimeSupportState(entry[1]) !== null))
+    : {}
+  return {
+    standardVersion: String(value.standardVersion ?? '2.0.0'),
+    maximumServiceInvocationDepth: Number(value.maximumServiceInvocationDepth ?? 8),
+    sections,
+  }
+}
+
+function decodeRuntimeDiagnostics(value: unknown): NonNullable<ModuleDetail['standard']>['runtimeDiagnostics'] {
+  if (!Array.isArray(value)) return []
+  return value.filter(isRecord).map(item => ({
+    section: String(item.section ?? ''),
+    state: runtimeSupportState(item.state) ?? 'UNSUPPORTED',
+    declared: item.declared === true,
+    operational: item.operational === true,
+    message: String(item.message ?? ''),
+  })).filter(item => item.section.length > 0)
+}
+
+function runtimeSupportState(value: unknown): ModuleStandardRuntimeSupportState | null {
+  if (value === 'SUPPORTED' || value === 'PARTIALLY_SUPPORTED' || value === 'DECLARATIVE_ONLY' || value === 'UNSUPPORTED' || value === 'DEPRECATED') return value
+  return null
+}
+
+function numberValue(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
+}
+
 function decodeRuntimeView(value: unknown): ModuleRuntimeView {
   return value as ModuleRuntimeView
+}
+
+function decodeAIDeclaration(value: unknown): ModuleAIDeclaration | undefined {
+  if (!isRecord(value)) return undefined
+  return {
+    features: arrayOfStrings(value.features),
+    productActions: Array.isArray(value.productActions)
+      ? value.productActions.filter(isRecord).map(decodeAIProductAction)
+      : [],
+  }
+}
+
+function decodeAIProductAction(value: Record<string, unknown>): ModuleAIProductActionDefinition {
+  const context = isRecord(value.context) ? value.context : {}
+  const execution = isRecord(value.execution) ? value.execution : {}
+  const application = isRecord(value.application) ? value.application : {}
+  return {
+    id: String(value.id ?? ''),
+    name: String(value.name ?? value.id ?? 'AI action'),
+    description: String(value.description ?? ''),
+    promptId: String(value.promptId ?? ''),
+    promptVersionRange: String(value.promptVersionRange ?? ''),
+    inputSchema: String(value.inputSchema ?? ''),
+    outputSchema: String(value.outputSchema ?? ''),
+    requiredPermissions: arrayOfStrings(value.requiredPermissions),
+    requiredCapabilities: arrayOfStrings(value.requiredCapabilities),
+    context: {
+      sources: arrayOfStrings(context.sources) as ModuleAIProductActionDefinition['context']['sources'],
+      maximumRecords: Number(context.maximumRecords ?? 1),
+      maximumCharacters: Number(context.maximumCharacters ?? 0),
+      allowedClassifications: arrayOfStrings(context.allowedClassifications) as ModuleAIProductActionDefinition['context']['allowedClassifications'],
+    },
+    execution: {
+      streaming: Boolean(execution.streaming),
+      structuredOutput: Boolean(execution.structuredOutput),
+      maximumToolCalls: Number(execution.maximumToolCalls ?? 0),
+      timeoutMs: Number(execution.timeoutMs ?? 30_000),
+    },
+    application: {
+      mode: applicationMode(application.mode),
+      explicitConfirmation: application.explicitConfirmation === true,
+      createsRecordRevision: application.createsRecordRevision === true,
+    },
+  }
+}
+
+function applicationMode(value: unknown): ModuleAIProductActionDefinition['application']['mode'] {
+  if (value === 'replace-selection' || value === 'replace-document' || value === 'insert' || value === 'metadata-suggestion') return value
+  return 'preview-only'
+}
+
+function decodeAIExecution(value: unknown): ModuleAIActionExecutionResponse {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    executionId: String(row.executionId ?? ''),
+    status: aiExecutionStatus(row.status),
+    streamPath: typeof row.streamPath === 'string' ? row.streamPath : undefined,
+    requestId: String(row.requestId ?? ''),
+    result: recordOrUndefined(row.result),
+    expiresAt: String(row.expiresAt ?? ''),
+    usage: recordOrUndefined(row.usage),
+  }
+}
+
+function decodeAIApplication(value: unknown): ApplyAIExecutionResponse {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    executionId: String(row.executionId ?? ''),
+    status: 'applied',
+    recordId: String(row.recordId ?? ''),
+    revision: Number(row.revision ?? 0),
+    applicationId: String(row.applicationId ?? ''),
+  }
+}
+
+function aiExecutionStatus(value: unknown): ModuleAIActionExecutionResponse['status'] {
+  if (value === 'queued' || value === 'running' || value === 'completed' || value === 'failed' || value === 'cancelled' || value === 'expired') return value
+  return 'failed'
 }
 
 function decodeRecordPage(value: unknown): ModuleRecordPage {
@@ -309,6 +650,23 @@ function decodeSettings(value: unknown): ModuleSettingsDocument {
     version: Number(row.version ?? 0),
     values: (row.values ?? {}) as Record<string, unknown>,
   }
+}
+
+function decodeHealth(value: unknown): ModuleHealth {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    moduleId: String(row.moduleId ?? row.module_id ?? ''),
+    version: String(row.version ?? ''),
+    overall: String(row.overall ?? 'unknown'),
+    runtime: recordOrUndefined(row.runtime),
+    searchProjection: recordOrUndefined(row.searchProjection),
+    exports: recordOrUndefined(row.exports),
+    diagnostics: recordOrUndefined(row.diagnostics),
+  }
+}
+
+function recordOrUndefined(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined
 }
 
 function decodeSettingsSchema(value: unknown): ModuleSettingsSchema {
@@ -380,6 +738,7 @@ const FIELD_TYPES = new Set<GreenfieldModuleFieldDefinition['type']>([
   'multiSelect',
   'date',
   'dateTime',
+  'number',
   'tags',
   'url',
   'recordReference',
@@ -389,13 +748,13 @@ function typeForField(value: unknown): GreenfieldModuleFieldDefinition['type'] {
   const type = String(value ?? '')
   if (FIELD_TYPES.has(type as GreenfieldModuleFieldDefinition['type'])) return type as GreenfieldModuleFieldDefinition['type']
   if (type === 'multiline') return 'multilineText'
-  if (type === 'number') return 'text'
   if (type === 'URL') return 'url'
   return 'text'
 }
 
 function typeForValue(value: unknown): GreenfieldModuleFieldDefinition['type'] {
   if (typeof value === 'boolean') return 'boolean'
+  if (typeof value === 'number') return 'number'
   if (Array.isArray(value)) return 'multiSelect'
   return 'text'
 }

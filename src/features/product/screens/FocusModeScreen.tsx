@@ -24,7 +24,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const PRESETS: FocusPreset[] = ['off', 'light', 'deep', 'custom']
 
-const CUSTOM_ROWS: Array<{id: keyof FocusPreferences; label: string; description: string}> = [
+const CUSTOM_ROWS: {id: keyof FocusPreferences; label: string; description: string}[] = [
   {
     id: 'quietFeed',
     label: 'Quiet the feed',

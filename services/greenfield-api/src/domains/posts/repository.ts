@@ -1,15 +1,18 @@
 import type {SocialPostDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 import {ProfileRepository} from '../profiles/repository.js'
 
 type PostRow = Database['posts']
 
 export class PostRepository {
   private readonly profiles: ProfileRepository
+  private readonly policies: GreenfieldPolicyEngine
 
   constructor(private readonly db: ModulaDb) {
     this.profiles = new ProfileRepository(db)
+    this.policies = new GreenfieldPolicyEngine(db)
   }
 
   async getById(postId: string, viewerActorId: string | null = null): Promise<SocialPostDto | null> {
@@ -18,13 +21,14 @@ export class PostRepository {
       .selectAll()
       .where('id', '=', postId)
       .where('deleted_at', 'is', null)
-      .where('audience', '=', 'public')
       .executeTakeFirst()
     if (!row) return null
-    if (viewerActorId) {
-      const blocked = await this.profiles.blockedActorIds(viewerActorId)
-      if (blocked.includes(row.author_actor_id)) return null
-    }
+    const decision = await this.policies.evaluateAndAudit({
+      actorId: viewerActorId,
+      action: 'post.read',
+      resource: {type: 'post', id: postId, ownerActorId: row.author_actor_id, visibility: row.audience},
+    })
+    if (!decision.allowed) return null
     return this.hydrate(row)
   }
 

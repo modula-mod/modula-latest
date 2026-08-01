@@ -13,7 +13,7 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const MODES: Array<{id: ChatAssistMode; label: string; detail: string}> = [
+const MODES: {id: ChatAssistMode; label: string; detail: string}[] = [
   {id: 'off', label: 'Off', detail: 'No assist suggestions.'},
   {
     id: 'on-device',

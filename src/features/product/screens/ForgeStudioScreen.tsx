@@ -39,13 +39,13 @@ import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const CANVAS: Array<{
+const CANVAS: {
   id: ForgeCanvasNodeId
   label: string
   icon: AppIconName
   x: number
   y: number
-}> = [
+}[] = [
   {id: 'route', label: 'Route', icon: 'link', x: 16, y: 16},
   {id: 'board', label: 'Board', icon: 'board', x: 140, y: 24},
   {id: 'tab', label: 'Profile tab', icon: 'profile', x: 260, y: 16},
@@ -64,13 +64,13 @@ export function ForgeStudioScreen() {
   const [description, setDescription] = useState(
     'A Modula module draft — Plan Mode first, then Build.',
   )
-  const [repoUrl, setRepoUrl] = useState('https://github.com/modula-mod/my-module')
+  const repoUrl = 'https://github.com/modula-mod/my-module'
   const [surfaces, setSurfaces] = useState<ForgeCanvasNodeId[]>(['route', 'board', 'tab'])
   const [caps, setCaps] = useState<string[]>(['board.card', 'profile.tab'])
   const [perms, setPerms] = useState<string[]>(['storage:namespaced', 'profile:read'])
   const [selected, setSelected] = useState<ForgeCanvasNodeId>('route')
   const [chat, setChat] = useState('')
-  const [chatLog, setChatLog] = useState<Array<{role: 'you' | 'forge'; text: string}>>([
+  const [chatLog, setChatLog] = useState<{role: 'you' | 'forge'; text: string}[]>([
     {
       role: 'forge',
       text: 'Plan Mode ready. Describe the module — or pick a template. Preview replies only (not a model).',

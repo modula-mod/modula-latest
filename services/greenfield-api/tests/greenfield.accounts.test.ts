@@ -81,7 +81,7 @@ describeIf('Greenfield native accounts integration', () => {
     const register = await app.inject({
       method: 'POST',
       url: '/v1/accounts/register',
-      payload: {email, password, handle, inviteCode: 'test-invite'},
+      payload: {email, password, handle, displayName: 'Test User', acceptedTerms: true, inviteCode: 'test-invite'},
     })
     expect(register.statusCode).toBe(201)
     const registered = register.json().data
@@ -91,7 +91,7 @@ describeIf('Greenfield native accounts integration', () => {
     const dupEmail = await app.inject({
       method: 'POST',
       url: '/v1/accounts/register',
-      payload: {email, password, handle: `${handle}x`, inviteCode: 'test-invite'},
+      payload: {email, password, handle: `${handle}x`, displayName: 'Duplicate User', acceptedTerms: true, inviteCode: 'test-invite'},
     })
     expect(dupEmail.statusCode).toBe(409)
 
@@ -124,6 +124,7 @@ describeIf('Greenfield native accounts integration', () => {
     const profile = await app.inject({method: 'GET', url: `/v1/profiles/${handle}`})
     expect(profile.statusCode).toBe(200)
     expect(profile.json().data.handle).toBe(handle)
+    expect(profile.json().data.displayName).toBe('Test User')
 
     const notificationPreferences = await app.inject({
       method: 'GET',
@@ -224,6 +225,60 @@ describeIf('Greenfield native accounts integration', () => {
 
     // New refresh token from successful rotation should also work once.
     expect(refreshed.refreshToken).toBeTruthy()
+  })
+
+  it('requests recovery, resets password, and revokes active sessions', async () => {
+    const suffix = `recover${Date.now().toString(36)}`.slice(0, 18)
+    const email = `${suffix}@example.com`
+    const handle = suffix
+    const password = 'secure-pass-word-1'
+    const nextPassword = 'secure-pass-word-2'
+
+    const register = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/register',
+      payload: {email, password, handle, displayName: 'Recovery User', acceptedTerms: true, inviteCode: 'test-invite'},
+    })
+    expect(register.statusCode).toBe(201)
+    await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/verify-email',
+      payload: {token: register.json().data.verificationToken},
+    })
+
+    const login = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password}})
+    expect(login.statusCode).toBe(200)
+    const accessToken = login.json().data.accessToken
+
+    const recovery = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/forgot-password',
+      payload: {email},
+    })
+    expect(recovery.statusCode).toBe(200)
+    expect(recovery.json().data.requested).toBe(true)
+    expect(recovery.json().data.recoveryToken).toBeTruthy()
+
+    const reset = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/reset-password',
+      payload: {token: recovery.json().data.recoveryToken, newPassword: nextPassword},
+    })
+    expect(reset.statusCode).toBe(200)
+    expect(reset.json().data.reset).toBe(true)
+
+    const revoked = await app.inject({
+      method: 'GET',
+      url: '/v1/accounts/me',
+      headers: {authorization: `Bearer ${accessToken}`},
+    })
+    expect(revoked.statusCode).toBe(401)
+
+    const oldLogin = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password}})
+    expect(oldLogin.statusCode).toBe(401)
+
+    const newLogin = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password: nextPassword}})
+    expect(newLogin.statusCode).toBe(200)
   })
 
   it('Greenfield meta works with AT disabled', async () => {

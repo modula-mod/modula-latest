@@ -1,4 +1,4 @@
-import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {getNamespacePrefix, usesReservedNamespace} from '@modula/greenfield-module-manifest'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
@@ -14,7 +14,7 @@ export class GreenfieldModulePublisherService {
     return this.db.selectFrom('greenfield_publishers').selectAll().where('publisher_id', '=', publisherId).executeTakeFirst()
   }
 
-  async ensurePublisherForManifest(manifest: GreenfieldModuleManifestV1): Promise<void> {
+  async ensurePublisherForManifest(manifest: GreenfieldModuleManifest): Promise<void> {
     const now = new Date()
     const firstParty = manifest.trust.requestedLevel === 'firstParty' || manifest.license.status === 'firstParty'
     await this.db
@@ -43,7 +43,7 @@ export class GreenfieldModulePublisherService {
     await this.ensureNamespace(manifest)
   }
 
-  async ensureNamespace(manifest: GreenfieldModuleManifestV1): Promise<void> {
+  async ensureNamespace(manifest: GreenfieldModuleManifest): Promise<void> {
     const namespace = getNamespacePrefix(manifest.moduleId)
     const existing = await this.db
       .selectFrom('greenfield_publisher_namespaces')

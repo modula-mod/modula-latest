@@ -13,13 +13,13 @@ import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const AGENTS: Array<{
+const AGENTS: {
   id: string
   name: string
   role: string
   icon: AppIconName
   scopes: string[]
-}> = [
+}[] = [
   {
     id: 'summariser',
     name: 'Summariser',

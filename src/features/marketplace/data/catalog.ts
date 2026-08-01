@@ -2,7 +2,7 @@ import type {AppIconName} from '@/components/primitives/AppIcon'
 
 /**
  * Seeded marketplace catalog for Phase 4.5 Preview surfaces.
- * Kept self-contained (no `@/demo/*` imports) so Phase 4 UI-source
+ * Kept self-contained with no app demo imports so Phase 4 UI-source
  * verifiers stay green — demo seeds remain local-API only.
  */
 
@@ -33,7 +33,7 @@ export type MarketplaceModule = {
   capability: string
   sellerId: string
   tags: string[]
-  section: Array<'featured' | 'new' | 'forYou'>
+  section: ('featured' | 'new' | 'forYou')[]
 }
 
 export const marketplaceSellers: MarketplaceSeller[] = [
@@ -1029,10 +1029,10 @@ export const marketplaceCatalog: MarketplaceModule[] = [
   },
 ]
 
-export const marketplaceCategories: Array<{
+export const marketplaceCategories: {
   id: MarketplaceCategory | 'all'
   label: string
-}> = [
+}[] = [
   {id: 'all', label: 'All'},
   {id: 'productivity', label: 'Productivity'},
   {id: 'intelligence', label: 'Intelligence'},

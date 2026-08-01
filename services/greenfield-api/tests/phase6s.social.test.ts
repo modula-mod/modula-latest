@@ -40,7 +40,7 @@ describeIf('Phase 6S social product integration', () => {
     const register = await app.inject({
       method: 'POST',
       url: '/v1/accounts/register',
-      payload: {email, password, handle, inviteCode: 'test-invite'},
+      payload: {email, password, handle, displayName: 'Phase 6S User', acceptedTerms: true, inviteCode: 'test-invite'},
     })
     expect(register.statusCode).toBe(201)
     const token = register.json().data.verificationToken

@@ -40,6 +40,67 @@ export type ModuleInstallationState =
 
 export type ModulePriceState = 'Free' | 'Included' | 'Coming soon' | 'Not available'
 
+export type ModuleBackendMode =
+  | 'greenfield-managed'
+  | 'module-managed'
+  | 'hybrid'
+  | 'frontend-only'
+
+export type ModuleStandardRuntimeSupportState =
+  | 'SUPPORTED'
+  | 'PARTIALLY_SUPPORTED'
+  | 'DECLARATIVE_ONLY'
+  | 'UNSUPPORTED'
+  | 'DEPRECATED'
+
+export type ModuleBackendMetadata = {
+  mode: ModuleBackendMode
+  provider: string
+  deploymentOwnership: string
+  dataLocation: string
+  regions: string[]
+  status: string
+  protocolVersion?: string | null
+  endpoint?: string | null
+  selfHostingSupported: boolean
+  externalDataProcessing: boolean
+  backendPermissions: string[]
+}
+
+export type ModuleStandardMetadata = {
+  manifestVersion: number | null
+  standardVersion: string | null
+  sectionVersions: Record<string, string>
+  runtimeSupport?: {
+    standardVersion: string
+    maximumServiceInvocationDepth: number
+    sections: Record<string, ModuleStandardRuntimeSupportState>
+  }
+  runtimeDiagnostics: {
+    section: string
+    state: ModuleStandardRuntimeSupportState
+    declared: boolean
+    operational: boolean
+    message: string
+  }[]
+  dependencies: Record<'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces' | 'provides', number>
+  registries: {
+    services: number
+    apis: number
+    hooks: number
+    jobs: number
+    storage: number
+    widgets: number
+    navigation: number
+    ui: number
+    automation: number
+    metrics: number
+  }
+  capabilityFlags: Record<string, boolean>
+  capabilities: string[]
+  engines: string[]
+}
+
 export type ModuleCatalogueItem = {
   moduleId: string
   name: string
@@ -55,18 +116,30 @@ export type ModuleCatalogueItem = {
   installationState: ModuleInstallationState
   priceState: ModulePriceState
   featured?: boolean
+  standard?: ModuleStandardMetadata
 }
 
 export type ModuleDetail = ModuleCatalogueItem & {
   longDescription: string
+  backend: ModuleBackendMetadata
   permissions: {permission: string; reason: string; risk: 'low' | 'medium' | 'high' | 'restricted'}[]
   contributions: Record<string, unknown>
+  ai?: ModuleAIDeclaration
   sourceRepository?: string
   sourceCommit?: string
   manifestChecksum?: string
   releaseChecksum?: string | null
   releaseNotes?: string[]
   privacy?: string
+  standard?: ModuleStandardMetadata
+  manifest?: Record<string, unknown>
+  normalizedManifest?: Record<string, unknown>
+  dependencyGraph?: Record<string, unknown>
+  serviceRegistry?: Record<string, unknown>
+  apiRegistry?: Record<string, unknown>
+  eventBus?: Record<string, unknown>
+  hookRegistry?: Record<string, unknown>
+  capabilityDiscovery?: Record<string, unknown>
 }
 
 export type InstalledModule = {
@@ -79,6 +152,7 @@ export type InstalledModule = {
   health?: string
   updateState?: string
   configurationState?: string
+  grantedPermissions?: string[]
 }
 
 export type ModuleInstallPreview = {
@@ -88,7 +162,21 @@ export type ModuleInstallPreview = {
   incompatibilityReasons: string[]
   trust: {level: string; publisherStatus: string; releaseStatus: string}
   permissions: ModuleDetail['permissions']
-  dependencies: unknown[]
+  dependencies: {
+    moduleId: string
+    provides: string | null
+    relation: 'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces'
+    requestedRange: string
+    resolvedVersion: string | null
+    resolvedModuleId: string | null
+    installed: boolean
+    optional: boolean
+    blocking: boolean
+    satisfied: boolean
+    reason?: string
+  }[]
+  dependencyWarnings?: string[]
+  provides?: {id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}[]
   contributions: Record<string, number>
   migrationsRequired: boolean
   permissionIncrease: boolean
@@ -158,6 +246,94 @@ export type ModuleSettingsSchema = {
   defaults: Record<string, unknown>
 }
 
+export type ModuleHealth = {
+  moduleId: string
+  version: string
+  overall: string
+  runtime?: Record<string, unknown>
+  searchProjection?: Record<string, unknown>
+  exports?: Record<string, unknown>
+  diagnostics?: Record<string, unknown>
+}
+
+export type ModuleAIProductActionApplicationMode =
+  | 'preview-only'
+  | 'replace-selection'
+  | 'replace-document'
+  | 'insert'
+  | 'metadata-suggestion'
+
+export type ModuleAIProductActionDefinition = {
+  id: string
+  name: string
+  description: string
+  promptId: string
+  promptVersionRange: string
+  inputSchema: string
+  outputSchema: string
+  requiredPermissions: string[]
+  requiredCapabilities: string[]
+  context: {
+    sources: ('current-record' | 'selected-content' | 'record-metadata' | 'module-settings')[]
+    maximumRecords: number
+    maximumCharacters: number
+    allowedClassifications: ('public' | 'internal' | 'private' | 'sensitive')[]
+  }
+  execution: {
+    streaming: boolean
+    structuredOutput: boolean
+    maximumToolCalls: number
+    timeoutMs: number
+  }
+  application: {
+    mode: ModuleAIProductActionApplicationMode
+    explicitConfirmation: boolean
+    createsRecordRevision: boolean
+  }
+}
+
+export type ModuleAIDeclaration = {
+  features: string[]
+  productActions: ModuleAIProductActionDefinition[]
+}
+
+export type ModuleAIActionExecutionRequest = {
+  recordId: string
+  expectedRevision: number
+  selection?: {
+    blockIds?: string[]
+    text?: string
+  }
+  variables?: Record<string, unknown>
+  streaming?: boolean
+  idempotencyKey?: string
+}
+
+export type ModuleAIActionExecutionResponse = {
+  executionId: string
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'expired'
+  streamPath?: string
+  requestId: string
+  result?: Record<string, unknown>
+  expiresAt: string
+  usage?: Record<string, unknown>
+}
+
+export type ApplyAIExecutionRequest = {
+  recordId: string
+  expectedRevision: number
+  selectedResult?: Record<string, unknown>
+  idempotencyKey?: string
+}
+
+export type ApplyAIExecutionResponse = {
+  executionId: string
+  status: 'applied'
+  recordId: string
+  revision: number
+  applicationId: string
+}
+
 export interface ModuleRepository {
   listCatalogue(input?: {q?: string; category?: ProductHubCategory; limit?: number}): Promise<ModuleCatalogueItem[]>
   getModule(moduleId: string): Promise<ModuleDetail | null>
@@ -167,6 +343,7 @@ export interface ModuleRepository {
   enable(moduleId: string): Promise<unknown>
   disable(moduleId: string): Promise<unknown>
   update(moduleId: string, version?: string): Promise<unknown>
+  reviewPermissions(moduleId: string, approvedPermissions: string[]): Promise<unknown>
   uninstall(moduleId: string, choice?: 'keepData' | 'exportThenDelete' | 'deleteData'): Promise<unknown>
   uninstallPreview(moduleId: string): Promise<ModuleUninstallPreview>
   listViews(moduleId: string): Promise<ModuleRuntimeView[]>
@@ -176,8 +353,15 @@ export interface ModuleRepository {
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord>
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown>
   runAction(moduleId: string, actionId: string, input?: Record<string, unknown>): Promise<unknown>
+  executeAIAction(moduleId: string, actionId: string, input: ModuleAIActionExecutionRequest): Promise<ModuleAIActionExecutionResponse>
+  applyAIExecution(moduleId: string, executionId: string, input: ApplyAIExecutionRequest): Promise<ApplyAIExecutionResponse>
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema>
   getSettings(moduleId: string): Promise<ModuleSettingsDocument>
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument>
+  getHealth(moduleId: string): Promise<ModuleHealth | null>
+  getBackendDiagnostics(moduleId: string): Promise<ModuleBackendMetadata | null>
+  reverifyBackend(moduleId: string, origin?: string): Promise<ModuleBackendMetadata | null>
+  checkBackendHealth(moduleId: string): Promise<ModuleBackendMetadata | null>
+  disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null>
   listContributions(input?: {surface?: string; moduleId?: string; enabledOnly?: boolean}): Promise<ModuleContribution[]>
 }

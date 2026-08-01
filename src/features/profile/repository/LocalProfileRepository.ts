@@ -3,7 +3,7 @@ import {
   demoProfileList,
   demoProfileRelations,
   ownerProfileId,
-} from '@/features/profile/data/demoProfiles'
+} from '../data/demoProfiles'
 import type {
   ModulaProfile,
   ProfileHandle,
@@ -24,7 +24,7 @@ function cloneProfile(profile: ModulaProfile): ModulaProfile {
   }
 }
 
-export class DemoProfileRepository implements ProfileRepository {
+export class LocalProfileRepository implements ProfileRepository {
   private profiles: Record<ProfileHandle, ModulaProfile>
 
   constructor(seedProfiles: ModulaProfile[] = demoProfileList) {

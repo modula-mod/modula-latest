@@ -1,6 +1,6 @@
 export const GREENFIELD_PROTOCOL_VERSION = 'greenfield.v1' as const
 
-export type GreenfieldModulePlatform = 'ios' | 'android' | 'web' | 'server'
+export type GreenfieldModulePlatform = 'ios' | 'android' | 'web' | 'desktop' | 'server'
 
 export type GreenfieldModuleCompatibility = {
   minimumGreenfieldVersion: string

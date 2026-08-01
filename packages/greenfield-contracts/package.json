@@ -15,6 +15,9 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@modula/module-standard": "file:../../../modula-mod/modula-module-standard/packages/module-standard"
+  },
   "devDependencies": {
     "typescript": "~5.9.2"
   }
