@@ -705,6 +705,94 @@ export interface Database {
     completed_at: Date | null
     created_at: Date
   }
+  greenfield_module_resolved_dependencies: {
+    resolution_id: string
+    plan_id: string | null
+    installation_id: string | null
+    account_id: string
+    release_id: string
+    module_id: string
+    relation: string
+    target_module_id: string | null
+    provided_contract: string | null
+    requested_range: string
+    resolved_module_id: string | null
+    resolved_version: string | null
+    installed: boolean
+    satisfied: boolean
+    blocking: boolean
+    degraded: boolean
+    reason: string | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_permission_states: {
+    permission_state_id: string
+    installation_id: string
+    account_id: string
+    release_id: string
+    module_id: string
+    permission: string
+    state: string
+    required: boolean
+    risk: string
+    policy_mode: string
+    reason: string
+    granted_at: Date | null
+    denied_at: Date | null
+    revoked_at: Date | null
+    updated_at: Date
+  }
+  greenfield_module_capability_registry: {
+    capability_registration_id: string
+    installation_id: string
+    account_id: string
+    release_id: string
+    module_id: string
+    capability: string
+    provider_kind: string
+    provider_module_id: string | null
+    provider_installation_id: string | null
+    state: string
+    required: boolean
+    health_state: string
+    declaration: unknown
+    reason: string | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_service_registrations: {
+    service_registration_id: string
+    installation_id: string
+    account_id: string
+    release_id: string
+    module_id: string
+    service_id: string
+    service_kind: string
+    version: string
+    contract_ref: string
+    permissions: unknown
+    capabilities: unknown
+    input_schema_ref: string | null
+    output_schema_ref: string | null
+    status: string
+    health_state: string
+    timeout_ms: number
+    rate_limit_per_minute: number
+    invocation_depth_limit: number
+    declaration: unknown
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_module_api_registrations: {api_registration_id: string; installation_id: string; account_id: string; release_id: string; module_id: string; api_id: string; method: string; path: string; input_schema_ref: string | null; output_schema_ref: string | null; permissions: unknown; side_effects: string; idempotent: boolean; status: string; declaration: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_hook_registrations: {hook_registration_id: string; installation_id: string; account_id: string; release_id: string; module_id: string; hook_id: string; hook: string; phase: string; target: string; order_index: number; timeout_ms: number; failure_policy: string; status: string; declaration: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_lifecycle_transactions: {transaction_id: string; installation_id: string | null; account_id: string; release_id: string | null; module_id: string; action: string; status: string; idempotency_key: string | null; rollback_policy: string; data_retention_choice: string | null; metadata: unknown; started_at: Date; completed_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_module_lifecycle_stages: {stage_id: string; transaction_id: string; stage: string; order_index: number; status: string; failure_code: string | null; metadata: unknown; started_at: Date | null; completed_at: Date | null; created_at: Date}
+  greenfield_module_storage_allocations: {allocation_id: string; installation_id: string; account_id: string; release_id: string; module_id: string; storage_key: string; storage_kind: string; scope: string; quota_bytes: number | null; retention_policy: string; encrypted: boolean; export_supported: boolean; deletion_supported: boolean; status: string; declaration: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_secret_refs: {secret_ref: string; installation_id: string; account_id: string; module_id: string; secret_key: string; encrypted_value: Buffer; nonce: Buffer; auth_tag: Buffer; key_version: string; status: string; redacted_descriptor: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_job_registrations: {job_registration_id: string; installation_id: string; account_id: string; release_id: string; module_id: string; job_key: string; job_kind: string; function_id: string | null; schedule: string | null; retry_policy: unknown; paused: boolean; status: string; declaration: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_ui_contribution_registrations: {ui_registration_id: string; installation_id: string; account_id: string; release_id: string; module_id: string; contribution_key: string; surface: string; status: string; declaration: unknown; created_at: Date; updated_at: Date}
+  greenfield_module_service_invocations: {invocation_id: string; caller_installation_id: string; provider_installation_id: string; service_registration_id: string; account_id: string; caller_module_id: string; provider_module_id: string; service_id: string; idempotency_key: string; invocation_depth: number; status: string; input_hash: string; output_hash: string | null; policy_code: string; failure_code: string | null; latency_ms: number | null; redacted_input: unknown; redacted_output: unknown; created_at: Date; completed_at: Date | null}
   greenfield_module_release_integrity: {
     integrity_id: string
     release_id: string

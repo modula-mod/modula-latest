@@ -59,7 +59,6 @@ export function PlatformTabs() {
           }}
         />
       ))}
-      <Tabs.Screen name="create" options={{href: null}} />
     </Tabs>
   )
 }

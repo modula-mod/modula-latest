@@ -16,6 +16,7 @@ import type {ModuleRecordQuery} from '../record-service.js'
 import {GreenfieldModuleRegistryService} from '../registry-service.js'
 import {GreenfieldModuleReleaseService} from '../release-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../runtime-access.js'
+import {GreenfieldModuleRuntime2Service} from '../runtime2-service.js'
 import {GreenfieldModuleSettingsService} from '../settings-service.js'
 import {GreenfieldModuleUninstallService} from '../uninstall-service.js'
 import {GreenfieldModuleUpdateService} from '../update-service.js'
@@ -49,6 +50,7 @@ export async function registerModuleRoutes(
   const exports = new GreenfieldModuleExportService(db, config)
   const health = new GreenfieldModuleHealthService(db, config)
   const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
+  const runtime2 = new GreenfieldModuleRuntime2Service(db)
   const backendDiscovery = new ModuleBackendDiscoveryService(db)
   const backendHealth = new GreenfieldModuleBackendHealthService(db, config)
   const backendLifecycle = new ModuleBackendLifecycleService(db)
@@ -119,6 +121,37 @@ export async function registerModuleRoutes(
     const installed = await installations.getInstalled(auth.accountId, (request.params as any).moduleId)
     if (!installed) return sendError(reply, 'NOT_FOUND', 'Module installation not found', request.id)
     return reply.send(successEnvelope(installed, request.id))
+  })
+
+  app.get('/v1/modules/:moduleId/runtime', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await runtime2.runtimeSummary(auth.accountId, (request.params as any).moduleId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module runtime lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/services/:serviceId/invoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      return reply.send(successEnvelope(await runtime2.invokeService({
+        accountId: auth.accountId,
+        actorId: actorIdForAccount(auth.accountId),
+        providerModuleId: (request.params as any).moduleId,
+        serviceId: (request.params as any).serviceId,
+        callerModuleId: typeof body.callerModuleId === 'string' ? body.callerModuleId : (request.params as any).moduleId,
+        payload: body.input ?? {},
+        idempotencyKey: idempotencyKey(request, body),
+        depth: Number.isInteger(body.depth) ? body.depth : 1,
+        requestId: request.id,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module service invocation failed')
+    }
   })
 
   app.post('/v1/modules/:moduleId/install-preview', routeConfig.writeConfig, async (request, reply) => {

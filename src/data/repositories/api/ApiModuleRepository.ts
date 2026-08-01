@@ -18,6 +18,7 @@ import type {
   ModuleRecord,
   ModuleRecordPage,
   ModuleRepository,
+  ModuleRuntimeSummary,
   ModuleRuntimeView,
   ModuleSettingsDocument,
   ModuleSettingsSchema,
@@ -291,6 +292,13 @@ export class ApiModuleRepository implements ModuleRepository {
       () => [],
     )
   }
+
+  getRuntimeSummary(moduleId: string): Promise<ModuleRuntimeSummary | null> {
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/runtime`, authenticated: true}, decodeRuntimeSummary),
+      () => null,
+    )
+  }
 }
 
 function decodeCataloguePage(value: unknown): ModuleCatalogueItem[] {
@@ -407,6 +415,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+}
+
+function arrayOfRecords(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value.filter(isRecord) : []
 }
 
 function decodeInstalledModule(value: unknown): InstalledModule {
@@ -662,6 +674,24 @@ function decodeHealth(value: unknown): ModuleHealth {
     searchProjection: recordOrUndefined(row.searchProjection),
     exports: recordOrUndefined(row.exports),
     diagnostics: recordOrUndefined(row.diagnostics),
+  }
+}
+
+function decodeRuntimeSummary(value: unknown): ModuleRuntimeSummary {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    installationId: String(row.installationId ?? row.installation_id ?? ''),
+    moduleId: String(row.moduleId ?? row.module_id ?? ''),
+    status: String(row.status ?? 'unknown'),
+    dependencies: arrayOfRecords(row.dependencies),
+    permissions: arrayOfRecords(row.permissions),
+    capabilities: arrayOfRecords(row.capabilities),
+    services: arrayOfRecords(row.services),
+    apis: arrayOfRecords(row.apis),
+    hooks: arrayOfRecords(row.hooks),
+    storage: arrayOfRecords(row.storage),
+    jobs: arrayOfRecords(row.jobs),
+    ui: arrayOfRecords(row.ui),
   }
 }
 

@@ -17,6 +17,7 @@ import {INSTALLED_MODULE_STATES, type GreenfieldModuleInstallationRow, type Gree
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePermissionService} from './permission-service.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
+import {allRuntimePermissionKeys, GreenfieldModuleRuntime2Service} from './runtime2-service.js'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -35,6 +36,7 @@ export class GreenfieldModuleInstallationService {
   private readonly registry: GreenfieldModuleRegistryService
   private readonly dependencies: GreenfieldModuleDependencyResolver
   private readonly permissions: GreenfieldModulePermissionService
+  private readonly runtime2: GreenfieldModuleRuntime2Service
 
   constructor(
     private readonly db: ModulaDb,
@@ -43,6 +45,7 @@ export class GreenfieldModuleInstallationService {
     this.registry = new GreenfieldModuleRegistryService(db)
     this.dependencies = new GreenfieldModuleDependencyResolver(db)
     this.permissions = new GreenfieldModulePermissionService(db)
+    this.runtime2 = new GreenfieldModuleRuntime2Service(db)
   }
 
   async listInstalled(accountId: string): Promise<GreenfieldModuleInstallationRow[]> {
@@ -155,9 +158,16 @@ export class GreenfieldModuleInstallationService {
 
     const release = input.version ? await this.registry.getVersion(moduleId, input.version) : await this.registry.latestPublished(moduleId)
     const preview = await this.installPreview(accountId, moduleId, release.version)
+    const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
     if (!preview.compatible) throw moduleError('VALIDATION_FAILED', `Module is incompatible: ${preview.incompatibilityReasons.join(', ')}`)
-    const grantedPermissions = input.approvedPermissions?.length ? input.approvedPermissions : preview.permissions.map(permission => permission.permission)
-    const deniedPermissions = preview.permissions.map(permission => permission.permission).filter(permission => !grantedPermissions.includes(permission))
+    const declaredPermissions = Array.from(new Set([
+      ...preview.permissions.map(permission => permission.permission),
+      ...allRuntimePermissionKeys(release.manifest),
+    ])).sort()
+    const grantedPermissions = input.approvedPermissions?.length
+      ? input.approvedPermissions.filter(permission => declaredPermissions.includes(permission)).sort()
+      : declaredPermissions
+    const deniedPermissions = declaredPermissions.filter(permission => !grantedPermissions.includes(permission))
 
     const now = new Date()
     const installationId = uuidv7()
@@ -214,6 +224,15 @@ export class GreenfieldModuleInstallationService {
           updated_at: now,
         })
         .execute()
+      await this.runtime2.persistInstallPlanState(trx, {
+        planId,
+        installationId: installed.installation_id,
+        accountId,
+        release,
+        dependencyPlan,
+        grantedPermissions,
+        deniedPermissions,
+      })
       await this.recordLifecycle(trx, accountId, moduleId, 'module.install.requested', 'permissionReview', 'installing', {planId, releaseId: release.releaseId})
       await new AuditRepository(trx).append('module.install.requested', {moduleId, version: release.version, grantedPermissions}, {type: 'module', id: moduleId})
       await new OutboxRepository(trx).enqueue(trx, {
@@ -227,6 +246,7 @@ export class GreenfieldModuleInstallationService {
   }
 
   async enable(accountId: string, moduleId: string, idempotencyKey: string) {
+    await this.runtime2.assertActivationAllowed(accountId, moduleId)
     return this.enqueueTransition(accountId, moduleId, 'enabling', 'module.enable.requested', 'module.enable', idempotencyKey)
   }
 
@@ -239,7 +259,10 @@ export class GreenfieldModuleInstallationService {
     const installed = await this.getInstalled(accountId, moduleId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
     const release = await this.registry.getVersion(moduleId, installed.version)
-    const declared = release.manifest.permissions.map(permission => permission.permission)
+    const declared = Array.from(new Set([
+      ...release.manifest.permissions.map(permission => permission.permission),
+      ...allRuntimePermissionKeys(release.manifest),
+    ])).sort()
     const grantedPermissions = Array.from(new Set(input.approvedPermissions ?? []))
       .filter(permission => declared.includes(permission))
       .sort()
@@ -260,6 +283,13 @@ export class GreenfieldModuleInstallationService {
           reviewed_at: now,
         })
         .execute()
+      await this.runtime2.persistPermissionReviewState(trx, {
+        installationId: installed.installationId,
+        accountId,
+        release,
+        grantedPermissions,
+        deniedPermissions,
+      })
       await this.recordLifecycle(trx, accountId, moduleId, 'module.permissions.reviewed', installed.status, installed.status, {
         grantedCount: grantedPermissions.length,
         deniedCount: deniedPermissions.length,

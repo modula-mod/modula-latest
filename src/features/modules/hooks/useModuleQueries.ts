@@ -78,6 +78,15 @@ export function useModuleHealthQuery(moduleId: string) {
   })
 }
 
+export function useModuleRuntimeQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.runtime(moduleId),
+    queryFn: () => moduleRepository.getRuntimeSummary(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
 export function useModuleBackendDiagnosticsQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
   return useQuery({
@@ -102,6 +111,7 @@ export function useModuleLifecycleMutations(moduleId: string) {
     await Promise.all([
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.installed}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.detail(moduleId)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.runtime(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.backend(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.catalogueRoot}),
     ])

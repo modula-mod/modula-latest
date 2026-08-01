@@ -232,6 +232,21 @@ export type ModuleContribution = {
   installationStatus: string
 }
 
+export type ModuleRuntimeSummary = {
+  installationId: string
+  moduleId: string
+  status: string
+  dependencies: Record<string, unknown>[]
+  permissions: Record<string, unknown>[]
+  capabilities: Record<string, unknown>[]
+  services: Record<string, unknown>[]
+  apis: Record<string, unknown>[]
+  hooks: Record<string, unknown>[]
+  storage: Record<string, unknown>[]
+  jobs: Record<string, unknown>[]
+  ui: Record<string, unknown>[]
+}
+
 export type ModuleSettingsDocument = {
   moduleId: string
   installationId: string
@@ -364,4 +379,5 @@ export interface ModuleRepository {
   checkBackendHealth(moduleId: string): Promise<ModuleBackendMetadata | null>
   disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null>
   listContributions(input?: {surface?: string; moduleId?: string; enabledOnly?: boolean}): Promise<ModuleContribution[]>
+  getRuntimeSummary(moduleId: string): Promise<ModuleRuntimeSummary | null>
 }
