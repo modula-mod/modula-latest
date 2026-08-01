@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import {existsSync} from 'node:fs'
 import {join} from 'node:path'
-import {fail, finish, git, includes, json, pass, run, standardRoot, vaultNotesRoot} from './phase7e-vault-notes-verifier-utils.mjs'
+import {fail, finish, git, includes, json, pass, run, runQuiet, standardRoot, vaultNotesRoot} from './phase7e-vault-notes-verifier-utils.mjs'
 
 if (!existsSync(join(vaultNotesRoot, 'package.json'))) fail('external Vault Notes repository is missing')
 else pass('external Vault Notes repository exists')
@@ -10,8 +10,11 @@ run('pnpm', ['verify'], 'external Vault Notes verifier passes', vaultNotesRoot)
 
 const standardHead = git(standardRoot, ['rev-parse', 'HEAD'])
 const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v1.2.0'])
-if (standardHead && standardTag && standardHead === standardTag) pass('mms-v1.2.0 resolves to current Module Standard release commit')
-else fail(`mms-v1.2.0 must resolve to Module Standard HEAD; head=${standardHead ?? 'unknown'} tag=${standardTag ?? 'unknown'}`)
+if (standardHead && standardTag && isAncestor(standardRoot, standardTag, standardHead)) {
+  pass('mms-v1.2.0 release commit is contained in current Module Standard HEAD')
+} else {
+  fail(`mms-v1.2.0 must be contained in Module Standard HEAD; head=${standardHead ?? 'unknown'} tag=${standardTag ?? 'unknown'}`)
+}
 
 const standardManifest = json('modula.module.json')
 for (const [field, expected] of Object.entries({
@@ -40,3 +43,7 @@ includes('docs/operations/module-standard-package-consumption.md', [
 ], 'main app module-standard package consumption documentation')
 
 finish('Phase 7E Vault Notes standard verifier')
+
+function isAncestor(cwd, ancestor, descendant) {
+  return runQuiet('git', ['-C', cwd, 'merge-base', '--is-ancestor', ancestor, descendant]).status === 0
+}

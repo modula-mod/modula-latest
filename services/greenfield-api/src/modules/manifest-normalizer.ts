@@ -16,6 +16,9 @@ import {
   type ModuleStandardRuntimeSupportDiagnostic,
 } from '@modula/greenfield-module-manifest'
 
+const STANDARD_2_VERSION = '2.0.0'
+type ModuleStandard20JsonObject = Record<string, unknown>
+
 export type NormalizedModuleManifest = {
   identity: {
     moduleId: string
@@ -99,7 +102,7 @@ export function normalizeModuleManifest(
 ): NormalizedModuleManifest {
   const source = cloneJson(manifest)
   const standardVersion = standardVersionForManifest(source)
-  const runtimeStandardVersion = '2.0.0'
+  const runtimeStandardVersion = STANDARD_2_VERSION
   const runtimeSupport = runtimeSupportForStandardVersion(runtimeStandardVersion)!
   const runtimeDiagnostics = runtimeSupportDiagnosticsForManifest({
     ...source,
@@ -136,12 +139,12 @@ export function normalizeModuleManifest(
     },
     dependencies: cloneJson(dependencyGraphFromManifest(source)),
     capabilities: {
-      discovery: cloneJson(standard20Object(source, 'capabilityDiscovery', {version: '2.0.0'})),
+      discovery: cloneJson(standard20Object<ModuleStandard20CapabilityDiscovery>(source, 'capabilityDiscovery', {version: STANDARD_2_VERSION})),
       provides: cloneJson(dependencyGraphFromManifest(source).provides ?? []),
     },
     permissions: {
       legacy: cloneJson(source.permissions),
-      model: cloneJson(standard20Object(source, 'permissionModel', {version: '2.0.0', categories: {}})),
+      model: cloneJson(standard20Object<ModuleStandard20PermissionModel>(source, 'permissionModel', {version: STANDARD_2_VERSION, categories: {}})),
     },
     services: cloneJson(versionedSection(source, 'serviceRegistry')),
     apis: cloneJson(versionedSection(source, 'apiRegistry')),
@@ -154,7 +157,7 @@ export function normalizeModuleManifest(
       defaults: {},
     },
     search: {
-      enabled: standard20Object(source, 'capabilityDiscovery', {}).supportsSearch === true,
+      enabled: standard20Object<ModuleStandard20CapabilityDiscovery>(source, 'capabilityDiscovery', {version: STANDARD_2_VERSION}).supportsSearch === true,
       declarations: cloneJson(versionedSection(source, 'search')),
     },
     ai: cloneJson(source.ai ?? {}),
@@ -176,8 +179,8 @@ export function normalizeModuleManifest(
     },
     compatibility: {
       host: cloneJson(source.compatibility),
-      matrix: cloneJson(standard20Object(source, 'compatibilityMatrix', {
-        version: '2.0.0',
+      matrix: cloneJson(standard20Object<ModuleStandard20CompatibilityMatrix>(source, 'compatibilityMatrix', {
+        version: STANDARD_2_VERSION,
         greenfieldVersion: `>=${source.compatibility.minimumGreenfieldVersion}`,
         platforms: source.compatibility.platforms,
       })),
@@ -189,7 +192,7 @@ export function normalizeModuleManifest(
       evidenceIds: cloneJson(source.license.evidenceIds),
     },
     marketplace: cloneJson(standard20Object(source, 'marketplace', {})),
-    engineReadiness: cloneJson(standard20Object(source, 'engineReadiness', {version: '2.0.0', engines: []})),
+    engineReadiness: cloneJson(standard20Object<ModuleStandard20EngineReadiness>(source, 'engineReadiness', {version: STANDARD_2_VERSION, engines: []})),
     extensions: cloneJson(source.extensions ?? {}),
   }
 }
@@ -208,33 +211,51 @@ function sectionVersionsForManifest(
   if (manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION && manifest.sectionVersions) {
     return cloneJson(manifest.sectionVersions)
   }
-  return createDefaultModuleSectionVersions(standardVersion === '2.0.0' ? '2.0.0' : '1.0.0')
+  if (standardVersion === STANDARD_2_VERSION) return createDefaultModuleSectionVersions(STANDARD_2_VERSION)
+  return Object.fromEntries(
+    Object.keys(createDefaultModuleSectionVersions(STANDARD_2_VERSION)).map(section => [section, '1.0.0']),
+  ) as ModuleStandard20SectionVersions
 }
 
 function versionedSection(
   manifest: GreenfieldModuleManifest,
   key: keyof GreenfieldModuleManifest | string,
-  fallbackItems: unknown[] = [],
+  fallbackItems: ModuleStandard20JsonObject[] = [],
 ): ModuleStandard20VersionedSection {
-  const value = standard20Object(manifest, key, undefined)
+  const value = standard20Object<ModuleStandard20VersionedSection>(manifest, key, undefined)
   if (value) return value as ModuleStandard20VersionedSection
-  return {version: '2.0.0', items: cloneJson(fallbackItems)}
+  return {version: STANDARD_2_VERSION, items: cloneJson(fallbackItems)}
 }
 
-function standard20Object(
+function standard20Object<T extends Record<string, unknown>>(
   manifest: GreenfieldModuleManifest,
   key: keyof GreenfieldModuleManifest | string,
-  fallback: Record<string, unknown> | undefined,
-): Record<string, unknown> {
+  fallback: T,
+): T
+function standard20Object<T extends Record<string, unknown>>(
+  manifest: GreenfieldModuleManifest,
+  key: keyof GreenfieldModuleManifest | string,
+  fallback: undefined,
+): T | undefined
+function standard20Object<T extends Record<string, unknown>>(
+  manifest: GreenfieldModuleManifest,
+  key: keyof GreenfieldModuleManifest | string,
+  fallback: T | undefined,
+): T | undefined {
   const value = (manifest as Record<string, unknown>)[key]
-  if (value && typeof value === 'object' && !Array.isArray(value)) return cloneJson(value)
-  return cloneJson(fallback ?? {})
+  if (isJsonObject(value)) return cloneJson(value) as T
+  return fallback ? cloneJson(fallback) : undefined
 }
 
-function legacyContributionItems(manifest: GreenfieldModuleManifest, key: string): unknown[] {
+function legacyContributionItems(manifest: GreenfieldModuleManifest, key: string): ModuleStandard20JsonObject[] {
   const contributions = manifest.contributions as Record<string, unknown>
   const items = contributions[key]
-  return Array.isArray(items) ? items : []
+  if (!Array.isArray(items)) return []
+  return items.filter(isJsonObject).map(item => cloneJson(item))
+}
+
+function isJsonObject(value: unknown): value is ModuleStandard20JsonObject {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value))
 }
 
 function cloneJson<T>(value: T): T {
