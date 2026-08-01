@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
+import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery, useModuleRuntimeQuery} from '@/features/modules/hooks'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -22,6 +22,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const services = useAppServices()
   const detail = useModuleDetailQuery(id)
   const health = useModuleHealthQuery(id)
+  const runtime = useModuleRuntimeQuery(id)
   const backendDiagnostics = useModuleBackendDiagnosticsQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
   const installedModules = useInstalledModulesQuery()
@@ -66,7 +67,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
         const preview = await services.moduleRepository.uninstallPreview(module.moduleId)
         setUninstallPreview(`${preview.recordCount} records · ${preview.registeredContributions.length} contributions · default: keep data`)
       }
-      await detail.refetch()
+      await Promise.all([detail.refetch(), installedModules.refetch(), health.refetch(), runtime.refetch()])
     } finally {
       setBusy(null)
     }
@@ -165,6 +166,32 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 </View>
               ) : (
                 <AppText variant="caption" colour="textSecondary">Diagnostics are unavailable for this module.</AppText>
+              )}
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Runtime">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {runtime.isPending ? (
+                <AppText variant="caption" colour="textSecondary">Loading runtime records.</AppText>
+              ) : runtime.data ? (
+                <>
+                  <View style={[styles.wrap, {gap: spacing[2]}]}>
+                    <ModuleStatusPill state={runtime.data.status} />
+                    <ModuleStatusPill state={`${runtime.data.services.length} services`} />
+                    <ModuleStatusPill state={`${runtime.data.jobs.length} jobs`} />
+                    <ModuleStatusPill state={`${runtime.data.ui.length} UI`} />
+                  </View>
+                  <InfoLine label="Dependencies" value={groupSummary(runtime.data.dependencies, 'relation')} />
+                  <InfoLine label="Permissions" value={groupSummary(runtime.data.permissions, 'state')} />
+                  <InfoLine label="Capabilities" value={groupSummary(runtime.data.capabilities, 'health_state')} />
+                  <InfoLine label="Services" value={groupSummary(runtime.data.services, 'status')} />
+                  <InfoLine label="Storage" value={groupSummary(runtime.data.storage, 'storage_kind')} />
+                  <InfoLine label="Jobs" value={groupSummary(runtime.data.jobs, 'status')} />
+                  <InfoLine label="UI contributions" value={groupSummary(runtime.data.ui, 'surface')} />
+                </>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">No Standard 2 runtime records are registered for this module.</AppText>
               )}
             </View>
           </SettingsSection>
@@ -356,6 +383,19 @@ function formatDiagnosticCounts(value: unknown, suffix: string) {
 
 function formatLabel(value: string) {
   return value.replace(/-/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase())
+}
+
+function groupSummary(rows: Record<string, unknown>[], key: string) {
+  if (!rows.length) return '0'
+  const counts = rows.reduce<Record<string, number>>((acc, row) => {
+    const value = typeof row[key] === 'string' && row[key] ? String(row[key]) : 'unknown'
+    acc[value] = (acc[value] ?? 0) + 1
+    return acc
+  }, {})
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([value, count]) => `${formatLabel(value)}: ${count}`)
+    .join(' · ')
 }
 
 function InfoLine({label, value}: {label: string; value: string}) {

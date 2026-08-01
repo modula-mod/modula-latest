@@ -1,6 +1,7 @@
 import type {ModulaWorkerDb} from '../database.js'
 import {registerModuleContributions, unregisterModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
+import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 
 export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -14,6 +15,14 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
       if (oldRelease) await unregisterModuleContributions(trx as any, oldRelease.release_id)
     }
     await registerModuleContributions(trx as any, release.release_id, release.extension_version_id, {enableExecutable: p.previousStatus === 'enabled'})
+    await projectStandard2Runtime(trx as any, {
+      installationId: p.installationId,
+      accountId: p.accountId,
+      moduleId: release.module_id,
+      releaseId: release.release_id,
+      status: p.previousStatus === 'enabled' ? 'registered' : 'disabled',
+      jobsPaused: p.previousStatus !== 'enabled',
+    })
     await trx
       .updateTable('greenfield_extension_installations')
       .set({extension_version_id: release.extension_version_id, status: p.previousStatus === 'enabled' ? 'enabled' : 'disabled', updated_at: new Date()})

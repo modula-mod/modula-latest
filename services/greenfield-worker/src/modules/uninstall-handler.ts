@@ -1,6 +1,7 @@
 import type {ModulaWorkerDb} from '../database.js'
 import {unregisterModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
+import {removeStandard2Runtime, setStandard2RuntimeStatus} from './standard2-runtime-registration.js'
 
 export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -19,6 +20,15 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
   await db.transaction().execute(async trx => {
     if (release) await unregisterModuleContributions(trx as any, release.release_id)
     const moduleId = p.moduleId ?? installed.extension_version_id.split('@')[0]
+    await setStandard2RuntimeStatus(trx as any, {
+      installationId: p.installationId,
+      accountId: installed.account_id,
+      moduleId,
+      releaseId: release?.release_id ?? null,
+      action: 'uninstall',
+      status: 'removed',
+      jobsPaused: true,
+    })
     if (choice === 'deleteData') {
       await trx
         .updateTable('greenfield_module_records')
@@ -36,6 +46,7 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
         .where('deleted_at', 'is', null)
         .execute()
     }
+    await removeStandard2Runtime(trx as any, p.installationId)
     await trx
       .insertInto('greenfield_module_data_retention')
       .values({
