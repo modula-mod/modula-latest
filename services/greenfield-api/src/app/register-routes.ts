@@ -14,6 +14,7 @@ import type {FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AtprotoService} from '../bridges/atproto/service.js'
+import {RecoveryService} from '../accounts/recovery.js'
 import {AccountService} from '../accounts/service.js'
 import {AuthenticationService} from '../authentication/service.js'
 import {ExtensionRegistry} from '../extensions/extension-registry.js'
@@ -91,6 +92,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const greenfieldSessions = new GreenfieldSessionService(db, config)
   const eventReplays = new GreenfieldEventReplayService(db)
   const accounts = new AccountService(db, config)
+  const recovery = new RecoveryService(db, config)
   const authentication = new AuthenticationService(db, greenfieldSessions)
   const repositories = new RepositoryService(db)
   const records = new RecordService(db)
@@ -283,6 +285,22 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return reply.send(successEnvelope(await accounts.resendVerification((request.body as any).email ?? ''), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Resend failed')
+    }
+  })
+  app.post('/v1/accounts/forgot-password', authWriteConfig, async (request, reply) => {
+    try {
+      return reply.send(successEnvelope(await recovery.requestRecovery((request.body as any).email ?? ''), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Recovery request failed')
+    }
+  })
+  app.post('/v1/accounts/reset-password', authWriteConfig, async (request, reply) => {
+    try {
+      const body = ((request.body as any) ?? {}) as {token?: string; newPassword?: string}
+      await recovery.completeRecovery(body.token ?? '', body.newPassword ?? '')
+      return reply.send(successEnvelope({reset: true}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Password reset failed')
     }
   })
   app.get('/v1/accounts/handles/:handle/availability', profileConfig, async (request, reply) => {

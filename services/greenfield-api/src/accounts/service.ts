@@ -24,13 +24,27 @@ export class AccountService {
     private readonly config: AppConfig,
   ) {}
 
-  async register(input: {email: string; password: string; handle: string; inviteCode?: string}) {
+  async register(input: {
+    email: string
+    password: string
+    handle: string
+    displayName?: string
+    inviteCode?: string
+    acceptedTerms?: boolean
+  }) {
     const email = input.email.trim().toLowerCase()
+    const displayName = (input.displayName ?? '').trim()
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       throw Object.assign(new Error('Valid email required'), {code: 'VALIDATION_FAILED'})
     }
+    if (displayName.length < 2 || displayName.length > 80) {
+      throw Object.assign(new Error('Display name must be between 2 and 80 characters'), {code: 'VALIDATION_FAILED'})
+    }
     if (input.password.length < 10) {
       throw Object.assign(new Error('Password must be at least 10 characters'), {code: 'VALIDATION_FAILED'})
+    }
+    if (input.acceptedTerms !== true) {
+      throw Object.assign(new Error('Terms and privacy acknowledgement required'), {code: 'VALIDATION_FAILED'})
     }
     if (this.config.inviteOnly && !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')) {
       throw Object.assign(new Error('Valid invitation required'), {code: 'FORBIDDEN'})
@@ -77,7 +91,14 @@ export class AccountService {
           kind: 'email',
           identifier: email,
           verified_at: null,
-          metadata: {},
+          metadata: {
+            displayName,
+            agreements: {
+              terms: true,
+              privacy: true,
+              acceptedAt: now.toISOString(),
+            },
+          },
           created_at: now,
           updated_at: now,
         })
@@ -104,7 +125,7 @@ export class AccountService {
         .execute()
       await new AuditRepository(trx).append(
         'account.registered',
-        {handle},
+        {handle, agreements: {terms: true, privacy: true}},
         {type: 'greenfield_account', id: accountId, actorId: null},
         {accountId},
       )
@@ -189,6 +210,16 @@ export class AccountService {
         .select('primary_handle')
         .where('account_id', '=', row.account_id)
         .executeTakeFirstOrThrow()
+      const identity = await trx
+        .selectFrom('greenfield_auth_identities')
+        .select('metadata')
+        .where('account_id', '=', row.account_id)
+        .where('kind', '=', 'email')
+        .executeTakeFirst()
+      const metadata = identity?.metadata as {displayName?: unknown} | null | undefined
+      const displayName = typeof metadata?.displayName === 'string' && metadata.displayName.trim()
+        ? metadata.displayName.trim()
+        : account.primary_handle
       const actorId = `actor-${row.account_id}`
       const profileId = `profile-${row.account_id}`
       await trx
@@ -209,7 +240,7 @@ export class AccountService {
           id: profileId,
           actor_id: actorId,
           handle: account.primary_handle,
-          display_name: account.primary_handle,
+          display_name: displayName,
           kind: 'person',
           bio: '',
           avatar_url: null,
@@ -246,7 +277,7 @@ export class AccountService {
           schema_id: 'modula.identity.profile',
           schema_version: 1,
           visibility: 'public',
-          data: {displayName: account.primary_handle, handle: account.primary_handle},
+          data: {displayName, handle: account.primary_handle},
           revision: 1,
           created_at: now,
           updated_at: now,

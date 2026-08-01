@@ -326,7 +326,11 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
 
   async function registerAccount(email: string, handle: string) {
     const password = 'secure-pass-word-1'
-    const register = await app.inject({method: 'POST', url: '/v1/accounts/register', payload: {email, password, handle, inviteCode: 'test-invite'}})
+    const register = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/register',
+      payload: {email, password, handle, displayName: 'Vault Notes User', acceptedTerms: true, inviteCode: 'test-invite'},
+    })
     expect(register.statusCode).toBe(201)
     await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token: register.json().data.verificationToken}})
     const session = await app.inject({method: 'POST', url: '/v1/sessions', payload: {email, password}})
