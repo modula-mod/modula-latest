@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
+import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery} from '@/features/modules/hooks'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -24,12 +24,16 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const health = useModuleHealthQuery(id)
   const backendDiagnostics = useModuleBackendDiagnosticsQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
+  const installedModules = useInstalledModulesQuery()
   const {colours, radius, spacing} = useThemeTokens()
   const [automaticUpdates, setAutomaticUpdates] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [uninstallPreview, setUninstallPreview] = useState<string | null>(null)
   const module = detail.data
   const backend = backendDiagnostics.data ?? module?.backend ?? null
+  const installed = installedModules.data?.find(item => item.moduleId === id)
+  const grantedPermissions = installed?.grantedPermissions ?? []
+  const grantedAiPermissions = grantedPermissions.filter(permission => permission.startsWith('ai.'))
 
   const transition = async (kind: 'enable' | 'disable' | 'update' | 'uninstall' | 'preview-uninstall') => {
     if (!module) return
@@ -85,6 +89,28 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
       if (kind === 'health') await services.moduleRepository.checkBackendHealth(module.moduleId)
       if (kind === 'disable') await services.moduleRepository.disableBackend(module.moduleId)
       await Promise.all([backendDiagnostics.refetch(), health.refetch()])
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const revokeAI = async () => {
+    if (!module) return
+    const confirmed = await confirmModulaAction({
+      title: 'Revoke AI access',
+      message: 'Vault Notes remains enabled. AI actions stop until the AI permissions are granted again.',
+      confirmLabel: 'Revoke AI access',
+      cancelLabel: 'Cancel',
+    })
+    if (!confirmed) return
+    setBusy('ai-revoke')
+    try {
+      await services.moduleRepository.reviewPermissions(
+        module.moduleId,
+        (installed?.grantedPermissions ?? module.permissions.map(permission => permission.permission))
+          .filter(permission => !permission.startsWith('ai.')),
+      )
+      await Promise.all([detail.refetch(), installedModules.refetch()])
     } finally {
       setBusy(null)
     }
@@ -168,6 +194,37 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 </>
               ) : (
                 <AppText variant="caption" colour="textSecondary">Backend diagnostics are unavailable for this module.</AppText>
+              )}
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="AI">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {module.ai?.productActions.length ? (
+                <>
+                  <View style={[styles.wrap, {gap: spacing[2]}]}>
+                    <ModuleStatusPill state={grantedAiPermissions.length ? 'AI enabled' : 'AI permission required'} />
+                    <ModuleStatusPill state={backend?.status ?? 'provider configured in Greenfield'} />
+                    <ModuleStatusPill state="optional capability" />
+                  </View>
+                  <InfoLine label="Permitted actions" value={module.ai.productActions.map(action => action.name).join(', ')} />
+                  <InfoLine label="Granted AI permissions" value={grantedAiPermissions.length ? grantedAiPermissions.join(', ') : 'No AI grants'} />
+                  <InfoLine label="Data sent to provider" value="Authorised note context, selected content, non-sensitive metadata and action variables only" />
+                  <InfoLine label="Provider retention" value="Controlled by Greenfield AI provider configuration" />
+                  <InfoLine label="Usage" value="Execution metadata, latency, provider/model and token estimates are retained; note text is not written to audit records" />
+                  <View style={[styles.actions, {gap: spacing[2]}]}>
+                    <ModulaButton
+                      label="Revoke AI access"
+                      accessibilityLabel="Revoke module AI access"
+                      role="secondary"
+                      disabled={!grantedAiPermissions.length}
+                      loading={busy === 'ai-revoke'}
+                      onPress={() => void revokeAI()}
+                    />
+                  </View>
+                </>
+              ) : (
+                <AppText variant="caption" colour="textSecondary">This module does not declare AI product actions.</AppText>
               )}
             </View>
           </SettingsSection>

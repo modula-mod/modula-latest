@@ -61,7 +61,7 @@ export async function runIsolatedProviderRuntimeTest() {
         'exec',
         'tsx',
         '-e',
-        "import {migrateDown, migrateUp} from './src/database/migrate.ts'; void (async () => { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); if (down !== '025_phase7e_ai_provider_runtime') { console.error(`expected 025 rollback, got ${down}`); process.exit(1) } const applied = await migrateUp(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('025_phase7e_ai_provider_runtime')) { console.error(`025 migration did not reapply: ${applied.join(',')}`); process.exit(1) } })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })",
+        "import {migrateDown, migrateUp} from './src/database/migrate.ts'; void (async () => { const rolledBack = []; for (let i = 0; i < 20; i += 1) { const down = await migrateDown(process.env.MODULA_TEST_DATABASE_URL); rolledBack.push(down); if (down === '025_phase7e_ai_provider_runtime') break; if (down === null) break; } if (!rolledBack.includes('025_phase7e_ai_provider_runtime')) { console.error(`expected rollback through 025, got ${rolledBack.join(',')}`); process.exit(1) } const applied = await migrateUp(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('025_phase7e_ai_provider_runtime')) { console.error(`025 migration did not reapply: ${applied.join(',')}`); process.exit(1) } })().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exit(1) })",
       ],
       'AI provider runtime migration rolls back and reapplies',
       testEnv,

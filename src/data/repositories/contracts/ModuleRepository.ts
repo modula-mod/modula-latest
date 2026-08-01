@@ -82,6 +82,7 @@ export type ModuleDetail = ModuleCatalogueItem & {
   backend: ModuleBackendMetadata
   permissions: {permission: string; reason: string; risk: 'low' | 'medium' | 'high' | 'restricted'}[]
   contributions: Record<string, unknown>
+  ai?: ModuleAIDeclaration
   sourceRepository?: string
   sourceCommit?: string
   manifestChecksum?: string
@@ -100,6 +101,7 @@ export type InstalledModule = {
   health?: string
   updateState?: string
   configurationState?: string
+  grantedPermissions?: string[]
 }
 
 export type ModuleInstallPreview = {
@@ -189,6 +191,84 @@ export type ModuleHealth = {
   diagnostics?: Record<string, unknown>
 }
 
+export type ModuleAIProductActionApplicationMode =
+  | 'preview-only'
+  | 'replace-selection'
+  | 'replace-document'
+  | 'insert'
+  | 'metadata-suggestion'
+
+export type ModuleAIProductActionDefinition = {
+  id: string
+  name: string
+  description: string
+  promptId: string
+  promptVersionRange: string
+  inputSchema: string
+  outputSchema: string
+  requiredPermissions: string[]
+  requiredCapabilities: string[]
+  context: {
+    sources: ('current-record' | 'selected-content' | 'record-metadata' | 'module-settings')[]
+    maximumRecords: number
+    maximumCharacters: number
+    allowedClassifications: ('public' | 'internal' | 'private' | 'sensitive')[]
+  }
+  execution: {
+    streaming: boolean
+    structuredOutput: boolean
+    maximumToolCalls: number
+    timeoutMs: number
+  }
+  application: {
+    mode: ModuleAIProductActionApplicationMode
+    explicitConfirmation: boolean
+    createsRecordRevision: boolean
+  }
+}
+
+export type ModuleAIDeclaration = {
+  features: string[]
+  productActions: ModuleAIProductActionDefinition[]
+}
+
+export type ModuleAIActionExecutionRequest = {
+  recordId: string
+  expectedRevision: number
+  selection?: {
+    blockIds?: string[]
+    text?: string
+  }
+  variables?: Record<string, unknown>
+  streaming?: boolean
+  idempotencyKey?: string
+}
+
+export type ModuleAIActionExecutionResponse = {
+  executionId: string
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'expired'
+  streamPath?: string
+  requestId: string
+  result?: Record<string, unknown>
+  expiresAt: string
+  usage?: Record<string, unknown>
+}
+
+export type ApplyAIExecutionRequest = {
+  recordId: string
+  expectedRevision: number
+  selectedResult?: Record<string, unknown>
+  idempotencyKey?: string
+}
+
+export type ApplyAIExecutionResponse = {
+  executionId: string
+  status: 'applied'
+  recordId: string
+  revision: number
+  applicationId: string
+}
+
 export interface ModuleRepository {
   listCatalogue(input?: {q?: string; category?: ProductHubCategory; limit?: number}): Promise<ModuleCatalogueItem[]>
   getModule(moduleId: string): Promise<ModuleDetail | null>
@@ -198,6 +278,7 @@ export interface ModuleRepository {
   enable(moduleId: string): Promise<unknown>
   disable(moduleId: string): Promise<unknown>
   update(moduleId: string, version?: string): Promise<unknown>
+  reviewPermissions(moduleId: string, approvedPermissions: string[]): Promise<unknown>
   uninstall(moduleId: string, choice?: 'keepData' | 'exportThenDelete' | 'deleteData'): Promise<unknown>
   uninstallPreview(moduleId: string): Promise<ModuleUninstallPreview>
   listViews(moduleId: string): Promise<ModuleRuntimeView[]>
@@ -207,6 +288,8 @@ export interface ModuleRepository {
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord>
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown>
   runAction(moduleId: string, actionId: string, input?: Record<string, unknown>): Promise<unknown>
+  executeAIAction(moduleId: string, actionId: string, input: ModuleAIActionExecutionRequest): Promise<ModuleAIActionExecutionResponse>
+  applyAIExecution(moduleId: string, executionId: string, input: ApplyAIExecutionRequest): Promise<ApplyAIExecutionResponse>
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema>
   getSettings(moduleId: string): Promise<ModuleSettingsDocument>
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument>

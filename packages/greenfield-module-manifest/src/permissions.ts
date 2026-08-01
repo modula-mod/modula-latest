@@ -35,6 +35,12 @@ const STATIC_PERMISSIONS = new Set([
   'search:index',
   'files:temporary:read',
   'files:temporary:write',
+  'ai.request',
+  'ai.stream',
+  'ai.structured-output',
+  'ai.context.public',
+  'ai.context.private',
+  'ai.context.sensitive',
 ])
 
 const RECORD_PERMISSION_PATTERN =

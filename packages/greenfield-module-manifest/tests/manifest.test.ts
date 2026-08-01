@@ -181,6 +181,48 @@ describe('Greenfield Module Manifest v1 validation', () => {
     expect(result.valid).toBe(true)
   })
 
+  it('accepts provider-neutral AI product actions', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        ai: {
+          features: ['summarise', 'extract', 'generate'],
+          prompts: ['vault-notes.summarise.v1'],
+          requiredCapabilities: ['text-generation', 'streaming', 'structured-output'],
+          dataAccess: {
+            recordScopes: ['digital.modula.vault-notes.note'],
+            defaultPolicy: 'account-consent',
+          },
+          productActions: [{
+            id: 'vault-notes.ai.summarise',
+            name: 'Summarise note',
+            description: 'Generate a preview-only summary from one authorised note revision.',
+            promptId: 'vault-notes.summarise.v1',
+            promptVersionRange: '^1.0.0',
+            inputSchema: 'schemas/ai/summarise-note-input.schema.json',
+            outputSchema: 'schemas/ai/note-summary-result.schema.json',
+            requiredPermissions: ['ai.request', 'ai.stream', 'ai.structured-output', 'ai.context.private'],
+            requiredCapabilities: ['text-generation', 'streaming', 'structured-output'],
+            context: {
+              sources: ['current-record', 'record-metadata'],
+              maximumRecords: 1,
+              maximumCharacters: 12000,
+              allowedClassifications: ['private'],
+            },
+            execution: {streaming: true, structuredOutput: true, maximumToolCalls: 0, timeoutMs: 30000},
+            application: {mode: 'preview-only', explicitConfirmation: true, createsRecordRevision: false},
+          }],
+        },
+        permissions: [
+          {permission: 'ai.request', reason: 'Request optional AI actions'},
+          {permission: 'ai.stream', reason: 'Stream optional AI suggestions'},
+          {permission: 'ai.structured-output', reason: 'Validate structured AI suggestions'},
+          {permission: 'ai.context.private', reason: 'Use current private note context'},
+        ],
+      }),
+    )
+    expect(result.valid, result.issues.map(issue => `${issue.code} ${issue.path}`).join('\n')).toBe(true)
+  })
+
   it('rejects provider-bound AI declarations', () => {
     const result = validateGreenfieldModuleManifest(
       validManifest({
@@ -193,6 +235,34 @@ describe('Greenfield Module Manifest v1 validation', () => {
     )
     expect(result.issues.map(issue => issue.code)).toEqual(
       expect.arrayContaining(['PROVIDER_BOUND_AI_DECLARATION']),
+    )
+  })
+
+  it('rejects provider-bound AI product actions', () => {
+    const result = validateGreenfieldModuleManifest(
+      validManifest({
+        ai: {
+          features: ['summarise'],
+          productActions: [{
+            id: 'vault-notes.ai.summarise',
+            name: 'Summarise note',
+            description: 'Bad provider-bound action.',
+            promptId: 'vault-notes.summarise.v1',
+            promptVersionRange: '^1.0.0',
+            inputSchema: 'schemas/ai/summarise-note-input.schema.json',
+            outputSchema: 'schemas/ai/note-summary-result.schema.json',
+            requiredPermissions: ['ai.request'],
+            requiredCapabilities: ['text-generation'],
+            context: {sources: ['current-record'], maximumRecords: 1, maximumCharacters: 12000, allowedClassifications: ['private']},
+            execution: {streaming: false, structuredOutput: true, maximumToolCalls: 0, timeoutMs: 30000},
+            application: {mode: 'preview-only', explicitConfirmation: true, createsRecordRevision: false},
+            providerId: 'provider:openai',
+          }],
+        },
+      }),
+    )
+    expect(result.issues.map(issue => issue.code)).toEqual(
+      expect.arrayContaining(['PROVIDER_BOUND_AI_PRODUCT_ACTION']),
     )
   })
 

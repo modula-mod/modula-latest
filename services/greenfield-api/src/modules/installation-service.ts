@@ -53,6 +53,7 @@ export class GreenfieldModuleInstallationService {
         'greenfield_extension_installations.installation_id',
         'greenfield_extension_installations.account_id',
         'greenfield_extension_installations.status',
+        'greenfield_module_releases.release_id',
         'greenfield_module_releases.module_id',
         'greenfield_module_releases.version',
         'greenfield_module_releases.extension_version_id',
@@ -61,14 +62,26 @@ export class GreenfieldModuleInstallationService {
       .where('greenfield_extension_installations.status', '!=', 'removed')
       .orderBy('greenfield_module_releases.module_id')
       .execute()
-    return rows.map(row => ({
+    const installations = await Promise.all(rows.map(async row => {
+      const review = await this.db
+        .selectFrom('greenfield_module_permission_reviews')
+        .select(['granted_permissions'])
+        .where('account_id', '=', accountId)
+        .where('installation_id', '=', row.installation_id)
+        .where('release_id', '=', row.release_id)
+        .orderBy('reviewed_at', 'desc')
+        .executeTakeFirst()
+      return {
       installationId: row.installation_id,
       accountId: row.account_id,
       status: row.status as GreenfieldModuleInstallationStatus,
       moduleId: row.module_id,
       version: row.version,
       extensionVersionId: row.extension_version_id,
+      grantedPermissions: arrayOfStrings(review?.granted_permissions),
+      }
     }))
+    return installations
   }
 
   async getInstalled(accountId: string, moduleId: string): Promise<GreenfieldModuleInstallationRow | undefined> {
@@ -217,6 +230,41 @@ export class GreenfieldModuleInstallationService {
     return this.enqueueTransition(accountId, moduleId, 'disabling', 'module.disable.requested', 'module.disable', idempotencyKey)
   }
 
+  async reviewPermissions(accountId: string, moduleId: string, input: {approvedPermissions?: string[]; idempotencyKey: string}) {
+    if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
+    const installed = await this.getInstalled(accountId, moduleId)
+    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    const release = await this.registry.getVersion(moduleId, installed.version)
+    const declared = release.manifest.permissions.map(permission => permission.permission)
+    const grantedPermissions = Array.from(new Set(input.approvedPermissions ?? []))
+      .filter(permission => declared.includes(permission))
+      .sort()
+    const deniedPermissions = declared.filter(permission => !grantedPermissions.includes(permission)).sort()
+    const now = new Date()
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .insertInto('greenfield_module_permission_reviews')
+        .values({
+          review_id: uuidv7(),
+          installation_id: installed.installationId,
+          release_id: release.releaseId,
+          account_id: accountId,
+          granted_permissions: jsonb(grantedPermissions),
+          denied_permissions: jsonb(deniedPermissions),
+          high_risk_increase: false,
+          idempotency_key: input.idempotencyKey,
+          reviewed_at: now,
+        })
+        .execute()
+      await this.recordLifecycle(trx, accountId, moduleId, 'module.permissions.reviewed', installed.status, installed.status, {
+        grantedCount: grantedPermissions.length,
+        deniedCount: deniedPermissions.length,
+      })
+      await new AuditRepository(trx).append('module.permissions.reviewed', {moduleId, grantedPermissions, deniedPermissions}, {type: 'moduleInstallation', id: installed.installationId})
+    })
+    return {installationId: installed.installationId, moduleId, grantedPermissions, deniedPermissions}
+  }
+
   async enqueueTransition(
     accountId: string,
     moduleId: string,
@@ -275,4 +323,8 @@ export class GreenfieldModuleInstallationService {
       })
       .execute()
   }
+}
+
+function arrayOfStrings(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }

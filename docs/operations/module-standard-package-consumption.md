@@ -1,10 +1,10 @@
 # Module Standard Package Consumption
 
-Phase 7E Block 6 starts with the main application consuming Modula Module Standard 1.0 through local `file:../modula-mod/modula-module-standard/...` dependencies. This is development-only. It preserves fast local iteration while the Standard, validators, SDK and reference modules are still evolving together, but it is not an immutable production dependency.
+Phase 7E Block 6 started with the main application consuming Modula Module Standard 1.0 through local `file:../modula-mod/modula-module-standard/...` dependencies. Block 10 advances the development target to Standard 1.2 so provider-neutral AI product actions are owned by the external Standard repository. This remains development-only. It preserves fast local iteration while the Standard, validators, SDK and reference modules are still evolving together, but it is not an immutable production dependency.
 
 ## Current Development Links
 
-The main app currently consumes these local Standard 1.0 packages:
+The main app currently consumes these local Standard 1.2 packages:
 
 - `@modula/module-standard`
 - `@modula/module-validator`
@@ -13,11 +13,12 @@ The main app currently consumes these local Standard 1.0 packages:
 - `@modula/module-testing`
 - `@modula/module-fixtures`
 
-The source location is `/home/andrei/modula-mod/modula-module-standard`. The accepted Standard 1.0 release identity is:
+The source location is `/home/andrei/modula-mod/modula-module-standard`. The accepted Standard 1.2 release identity is:
 
-- release tag: `mms-v1.0.0`
-- release commit: `ac1bede6e9be6518a21e8248596b99b4099da5c6`
-- required package version: `1.0.0`
+- release tag: `mms-v1.2.0`
+- release commit: recorded in the Module Standard 1.2 release provenance and tag
+- required package version: `1.2.0`
+- contract addition: provider-neutral AI product actions
 
 ## Production Requirement
 
@@ -46,7 +47,7 @@ The package checksum must be calculated from the immutable artifact that product
 
 ## Migration Path
 
-1. Build and verify the Standard repository at `mms-v1.0.0`.
+1. Build and verify the Standard repository at `mms-v1.2.0`.
 2. Publish or attach immutable package artifacts for the six Standard packages.
 3. Replace the main app `file:` specifiers with exact immutable package references.
 4. Refresh `pnpm-lock.yaml` and record artifact checksums in release evidence.
@@ -71,14 +72,14 @@ If an external Standard package is unavailable, mutable, unsigned where signing 
 
 Local `file:` links remain acceptable only for Phase 7E development and verifier work. Block 6 must preserve this workflow while producing immutable Vault Notes release metadata that can later be consumed without branch or filesystem identity.
 
-## Vault Notes 1.0 Reference Artifact
+## Vault Notes 1.1 Reference Artifact
 
-Vault Notes 1.0 proves the same transition pattern for an external module:
+Vault Notes 1.1 proves the same transition pattern for an external module:
 
 - repository: `modula-mod/modula-vault-notes`;
-- release tag: `vault-notes-v1.0.0`;
-- release commit: `4b11dcb6c10d195692a0ea47425ee6bbcd7e196b`;
-- package artifact: `modula-vault-notes-1.0.0.tgz`;
-- package checksum: `sha256:218ac984ee7ebd50565fb5481e67969ad0d5204cea859e096a4256b0274be122`;
-- Standard tag: `mms-v1.0.0`;
-- Standard commit: `ac1bede6e9be6518a21e8248596b99b4099da5c6`.
+- release tag: `vault-notes-v1.1.0`;
+- release commit: recorded in the release provenance and tag;
+- package artifact: `modula-vault-notes-1.1.0.tgz`;
+- package checksum: recorded in `release/vault-notes-v1.1.0.provenance.json`;
+- Standard tag: `mms-v1.2.0`;
+- Standard commit: recorded in the release provenance and tag.

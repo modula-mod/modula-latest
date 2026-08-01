@@ -9,8 +9,8 @@ import type {
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import type {ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
-import {SchemaSettingsRenderer} from '@/features/modules/components'
+import type {ModuleAIProductActionDefinition, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
+import {ModuleAIActionMenu, SchemaSettingsRenderer} from '@/features/modules/components'
 import {useModuleRecordMutations, useModuleRecordsQuery} from '@/features/modules/hooks'
 import {ModuleEmptyState} from '@/features/modules/runtime/module-empty-state'
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
@@ -20,7 +20,7 @@ import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function ModuleViewRenderer({moduleId, view}: {moduleId: string; view: ModuleRuntimeView}) {
+export function ModuleViewRenderer({moduleId, view, aiActions = []}: {moduleId: string; view: ModuleRuntimeView; aiActions?: ModuleAIProductActionDefinition[]}) {
   const router = useRouter()
   const {moduleRepository} = useAppServices()
   const {colours, radius, spacing} = useThemeTokens()
@@ -170,6 +170,9 @@ export function ModuleViewRenderer({moduleId, view}: {moduleId: string; view: Mo
               key={record.record_id}
               record={record}
               fields={fields}
+              moduleId={moduleId}
+              collection={collection}
+              aiActions={aiActions}
               onEdit={() => {
                 setEditing(record)
                 setDraft(record.data)
@@ -229,11 +232,17 @@ function LayoutNode({
 function RecordRow({
   record,
   fields,
+  moduleId,
+  collection,
+  aiActions,
   onEdit,
   onDelete,
 }: {
   record: ModuleRecord
   fields: GreenfieldModuleFieldDefinition[]
+  moduleId: string
+  collection: string
+  aiActions: ModuleAIProductActionDefinition[]
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -248,13 +257,19 @@ function RecordRow({
         <AppText variant="caption" colour="textSecondary" numberOfLines={3}>{String(record.data[body.name])}</AppText>
       ) : null}
       <AppText variant="micro" colour="textTertiary">Revision {record.revision}</AppText>
-      <View style={{flexDirection: 'row', gap: spacing[2]}}>
+      <View style={{alignItems: 'center', flexDirection: 'row', gap: spacing[2]}}>
         <AppPressable accessibilityLabel="Edit note" onPress={onEdit}>
           <AppText variant="label" colour="accent">Edit</AppText>
         </AppPressable>
         <AppPressable accessibilityLabel="Delete note" onPress={onDelete}>
           <AppText variant="label" colour="destructive">Delete</AppText>
         </AppPressable>
+        <ModuleAIActionMenu
+          moduleId={moduleId}
+          collection={collection}
+          record={record}
+          actions={aiActions}
+        />
       </View>
     </View>
   )

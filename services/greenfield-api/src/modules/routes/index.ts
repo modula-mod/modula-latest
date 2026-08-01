@@ -192,6 +192,20 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/modules/:moduleId/permissions/review', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      return reply.send(successEnvelope(await installations.reviewPermissions(auth.accountId, (request.params as any).moduleId, {
+        approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : [],
+        idempotencyKey: idempotencyKey(request, body),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Permission review failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/uninstall-preview', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return

@@ -28,13 +28,13 @@ const describeIfDb = databaseUrl ? describe : describe.skip
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const vaultNotesRoot = resolve(workspaceRoot, '../modula-mod/modula-vault-notes')
 const moduleId = 'modula.vault-notes'
-const moduleVersion = '1.0.0'
+const moduleVersion = '1.1.0'
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 describe('Phase 7E Vault Notes external module declarations', () => {
   it('keeps Vault Notes outside hardcoded app feature paths', () => {
     expect(readJson('modula.module.json').id).toBe(moduleId)
-    expect(readJson('modula.module.json').standardVersion).toBe('1.0.0')
+    expect(readJson('modula.module.json').standardVersion).toBe('1.2.0')
     expect(() => readFileSync(join(workspaceRoot, 'src/features/vault-notes/index.ts'), 'utf8')).toThrow()
     expect(() => readFileSync(join(workspaceRoot, 'app/vault-notes.tsx'), 'utf8')).toThrow()
   })
@@ -211,7 +211,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       payload: {format: 'json'},
     })
     expect(exportResult.statusCode).toBe(200)
-    expect(exportResult.json().data.manifest).toMatchObject({moduleId, moduleVersion, standardVersion: '1.0.0', dataSchemaVersion: '1.0.0'})
+    expect(exportResult.json().data.manifest).toMatchObject({moduleId, moduleVersion, standardVersion: '1.2.0', dataSchemaVersion: '1.0.0'})
 
     const health = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/health`, headers: {authorization: `Bearer ${token}`}})
     expect(health.statusCode).toBe(200)

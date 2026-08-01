@@ -9,19 +9,15 @@ else pass('external Vault Notes repository exists')
 run('pnpm', ['verify'], 'external Vault Notes verifier passes', vaultNotesRoot)
 
 const standardHead = git(standardRoot, ['rev-parse', 'HEAD'])
-const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v1.0.0'])
-const standardHeadContainsV1 = git(standardRoot, ['merge-base', '--is-ancestor', 'ac1bede6e9be6518a21e8248596b99b4099da5c6', 'HEAD']) !== null
-if (standardHead === 'ac1bede6e9be6518a21e8248596b99b4099da5c6') pass('Module Standard HEAD is Standard 1.0 release commit')
-else if (standardHeadContainsV1) pass(`Module Standard HEAD contains Standard 1.0 release commit: ${standardHead}`)
-else fail(`Module Standard HEAD mismatch: ${standardHead ?? 'unknown'}`)
-if (standardTag === 'ac1bede6e9be6518a21e8248596b99b4099da5c6') pass('mms-v1.0.0 resolves to Standard 1.0 release commit')
-else fail(`mms-v1.0.0 mismatch: ${standardTag ?? 'unknown'}`)
+const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v1.2.0'])
+if (standardHead && standardTag && standardHead === standardTag) pass('mms-v1.2.0 resolves to current Module Standard release commit')
+else fail(`mms-v1.2.0 must resolve to Module Standard HEAD; head=${standardHead ?? 'unknown'} tag=${standardTag ?? 'unknown'}`)
 
 const standardManifest = json('modula.module.json')
 for (const [field, expected] of Object.entries({
-  standardVersion: '1.0.0',
-  moduleVersion: '1.0.0',
-  manifestSchemaVersion: '1.0.0',
+  standardVersion: '1.2.0',
+  moduleVersion: '1.1.0',
+  manifestSchemaVersion: '1.2.0',
   dataSchemaVersion: '1.0.0',
 })) {
   if (standardManifest[field] === expected) pass(`${field} is ${expected}`)
@@ -34,12 +30,12 @@ includes('package.json', [
   '@modula/module-standard',
   '@modula/module-validator',
   '@modula/module-sdk',
-], 'external Standard 1.0 package dependencies', vaultNotesRoot)
+], 'external Standard 1.2 package dependencies', vaultNotesRoot)
 includes('scripts/verify-release.mjs', ['validateModulaModuleManifest', 'Standard source is not copied'], 'Vault Notes release verifier', vaultNotesRoot)
 includes('docs/operations/module-standard-package-consumption.md', [
   'development-only',
-  'mms-v1.0.0',
-  'ac1bede6e9be6518a21e8248596b99b4099da5c6',
+  'mms-v1.2.0',
+  'provider-neutral AI product actions',
   'fail closed',
 ], 'main app module-standard package consumption documentation')
 

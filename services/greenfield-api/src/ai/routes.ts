@@ -10,6 +10,7 @@ import {failureEnvelope, statusForError, successEnvelope} from '../transport/env
 import {AIProviderCredentialService} from './credential-service.js'
 import {GreenfieldAIGatewayService} from './gateway-service.js'
 import {GreenfieldAIProviderRuntimeService} from './provider-runtime-service.js'
+import {GreenfieldAIProductActionService} from './product-action-service.js'
 import {GreenfieldAIRepository} from './repository.js'
 import {GreenfieldAIStreamingRuntime} from './streaming-runtime.js'
 import {GreenfieldAIToolBroker} from './tool-broker.js'
@@ -26,6 +27,7 @@ export async function registerAiRoutes(
   const repository = new GreenfieldAIRepository(db)
   const gateway = new GreenfieldAIGatewayService(db)
   const providerRuntime = new GreenfieldAIProviderRuntimeService(db, config)
+  const productActions = new GreenfieldAIProductActionService(db, config)
   const credentials = new AIProviderCredentialService(db, config)
   const streaming = new GreenfieldAIStreamingRuntime(db)
   const tools = new GreenfieldAIToolBroker(db)
@@ -54,6 +56,38 @@ export async function registerAiRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     return reply.send(successEnvelope(await repository.listModels(), request.id))
+  })
+
+  app.post('/v1/modules/:moduleId/ai/actions/:actionId/executions', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const params = request.params as {moduleId: string; actionId: string}
+      const body = ((request.body as any) ?? {}) as Record<string, unknown>
+      return reply.send(successEnvelope(await productActions.execute(auth.accountId, params.moduleId, params.actionId, {
+        ...body,
+        idempotencyKey: idempotencyKey(request, body),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'AI product action execution failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/ai/executions/:executionId/apply', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireGateway(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const params = request.params as {moduleId: string; executionId: string}
+      const body = ((request.body as any) ?? {}) as Record<string, unknown>
+      return reply.send(successEnvelope(await productActions.apply(auth.accountId, params.moduleId, params.executionId, {
+        ...body,
+        idempotencyKey: idempotencyKey(request, body),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'AI product action application failed')
+    }
   })
 
   app.post('/v1/modules/:moduleId/ai/requests', routeConfig.writeConfig, async (request, reply) => {
@@ -302,6 +336,12 @@ function cursorFromRequest(request: FastifyRequest): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0
 }
 
+function idempotencyKey(request: FastifyRequest, body: Record<string, unknown>): string | null {
+  const header = request.headers['idempotency-key']
+  const headerValue = Array.isArray(header) ? header[0] : header
+  return stringOrNull(body.idempotencyKey) ?? stringOrNull(headerValue)
+}
+
 function sendError(reply: FastifyReply, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
 }
@@ -311,13 +351,16 @@ function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fall
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
   }
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED', 'NOTE_REVISION_CONFLICT'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
 }
 
 function statusForAiError(code: string): number {
+  if (code === 'AI_ACTION_NOT_DECLARED') return 404
+  if (code === 'AI_ACTION_PERMISSION_REQUIRED' || code === 'AI_CONTEXT_PERMISSION_REQUIRED' || code === 'AI_RESULT_OWNERSHIP_MISMATCH') return 403
+  if (code === 'AI_RESULT_ALREADY_APPLIED') return 409
   if (code === 'AI_PROVIDER_AUTH_FAILED' || code === 'AI_CAPABILITY_UNAVAILABLE') return 403
   if (code === 'AI_QUOTA_EXCEEDED' || code === 'AI_PROVIDER_RATE_LIMITED') return 429
   if (code === 'AI_MODEL_UNAVAILABLE' || code === 'AI_PROVIDER_UNAVAILABLE') return 503

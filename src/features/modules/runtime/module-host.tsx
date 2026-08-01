@@ -77,7 +77,7 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
         />
       }>
       <ModulePermissionGate available={view.available !== false} reason="Permission required">
-        <ModuleViewRenderer moduleId={moduleId} view={view} />
+        <ModuleViewRenderer moduleId={moduleId} view={view} aiActions={detail.data.ai?.productActions ?? []} />
       </ModulePermissionGate>
     </ModuleErrorBoundary>
   )

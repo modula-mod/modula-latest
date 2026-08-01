@@ -11,6 +11,7 @@ import {collectionPermission, GreenfieldModuleRuntimeAccessService, type Greenfi
 import {GreenfieldModuleViewService} from './view-service.js'
 
 type ModuleRecordOperation = 'create' | 'update' | 'delete' | 'restore' | 'purge'
+type ModuleRecordVersionChangeSource = 'update' | 'restore' | 'import' | 'delete' | 'ai-assisted'
 
 export type ModuleRecordQuery = {
   cursor?: string
@@ -147,14 +148,14 @@ export class GreenfieldModuleRecordService {
     return this.get(accountId, moduleId, collection, recordId)
   }
 
-  async patch(accountId: string, moduleId: string, collection: string, recordId: string, input: {data?: unknown; expectedRevision?: number; visibility?: string}) {
+  async patch(accountId: string, moduleId: string, collection: string, recordId: string, input: {data?: unknown; expectedRevision?: number; visibility?: string; changeSource?: ModuleRecordVersionChangeSource; versionMetadata?: Record<string, unknown>}) {
     const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
     const current = await this.get(accountId, moduleId, collection, recordId)
     if (input.expectedRevision !== undefined && current.revision !== input.expectedRevision) throw moduleError('NOTE_REVISION_CONFLICT', 'Module record revision conflict')
     const data = {...(current.data as Record<string, unknown>), ...requireRecordData(input.data)}
     const visibility = normalizeVisibility(input.visibility ?? current.visibility)
     validateRecordData(context.collectionDefinition, data, visibility)
-    return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update')
+    return this.updateExisting(context.runtime, context.collectionDefinition, current, data, visibility, 'update', input.changeSource ?? 'update', input.versionMetadata)
   }
 
   async delete(accountId: string, moduleId: string, collection: string, recordId: string, input: {expectedRevision?: number} = {}) {
@@ -219,6 +220,8 @@ export class GreenfieldModuleRecordService {
     data: Record<string, unknown>,
     visibility: 'private' | 'teams' | 'followers' | 'public' | 'system',
     operation: ModuleRecordOperation,
+    changeSource: ModuleRecordVersionChangeSource = operation === 'restore' ? 'restore' : operation === 'delete' ? 'delete' : 'update',
+    versionMetadata: Record<string, unknown> = {},
   ) {
     const nextRevision = current.revision + 1
     const now = new Date()
@@ -232,7 +235,7 @@ export class GreenfieldModuleRecordService {
       .executeTakeFirst()
     const eventHash = hashRecordEvent({eventId, recordId: current.record_id, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, payloadHash})
     await this.db.transaction().execute(async trx => {
-      if (operation === 'update' || operation === 'restore') await this.insertRecordVersion(trx, current, nextRevision, operation)
+      if (operation === 'update' || operation === 'restore') await this.insertRecordVersion(trx, current, nextRevision, changeSource, versionMetadata)
       await trx
         .updateTable('greenfield_module_records')
         .set({
@@ -250,7 +253,7 @@ export class GreenfieldModuleRecordService {
         .where('account_id', '=', context.accountId)
         .where('module_id', '=', context.moduleId)
         .execute()
-      await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {visibility}})
+      await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {visibility, changeSource, provenance: redactedVersionMetadata(versionMetadata)}})
       await new AuditRepository(trx).append(`module.record.${operation === 'delete' ? 'deleted' : 'updated'}`, {moduleId: context.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
       await this.publishRecordDomainEvent(trx, {accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, recordId: current.record_id, operation, revision: nextRevision, schemaRef: collectionDefinition.schemaRef, data, previousData: current.data as Record<string, unknown>})
     })
@@ -292,7 +295,7 @@ export class GreenfieldModuleRecordService {
       .execute()
   }
 
-  private async insertRecordVersion(trx: any, current: {record_id: string; account_id: string; module_id: string; collection: string; revision: number; data: unknown}, nextRevision: number, changeSource: string) {
+  private async insertRecordVersion(trx: any, current: {record_id: string; account_id: string; module_id: string; collection: string; revision: number; data: unknown}, nextRevision: number, changeSource: ModuleRecordVersionChangeSource, metadata: Record<string, unknown> = {}) {
     await trx
       .insertInto('greenfield_module_record_versions')
       .values({
@@ -306,6 +309,7 @@ export class GreenfieldModuleRecordService {
         data_snapshot: current.data,
         payload_hash: sha256(canonicalJsonStringify(current.data)),
         change_source: changeSource,
+        metadata,
         created_at: new Date(),
       })
       .execute()
@@ -494,4 +498,13 @@ function redactedRecordEventPayload(input: {
     deleted: input.operation === 'delete' || input.operation === 'purge',
     payloadHash: sha256(canonicalJsonStringify(input.operation === 'purge' ? {purged: true} : input.data)),
   }
+}
+
+function redactedVersionMetadata(metadata: Record<string, unknown>): Record<string, unknown> {
+  const allowed = ['aiExecutionId', 'aiActionId', 'promptId', 'promptVersion', 'changeSource']
+  return Object.fromEntries(
+    allowed
+      .filter(key => typeof metadata[key] === 'string')
+      .map(key => [key, metadata[key]]),
+  )
 }

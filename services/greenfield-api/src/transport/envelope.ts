@@ -55,12 +55,20 @@ export function statusForError(code: ApiErrorCode): number {
       return 401
     case 'FORBIDDEN':
     case 'CAPABILITY_DISABLED':
+    case 'AI_ACTION_PERMISSION_REQUIRED':
+    case 'AI_CONTEXT_PERMISSION_REQUIRED':
+    case 'AI_RESULT_OWNERSHIP_MISMATCH':
       return 403
     case 'NOT_FOUND':
+    case 'AI_ACTION_NOT_DECLARED':
       return 404
     case 'CONFLICT':
     case 'NOTE_REVISION_CONFLICT':
+    case 'AI_RESULT_ALREADY_APPLIED':
       return 409
+    case 'AI_RESULT_EXPIRED':
+    case 'AI_RESULT_NOT_APPLICABLE':
+      return 400
     case 'RATE_LIMITED':
       return 429
     default:

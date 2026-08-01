@@ -133,3 +133,30 @@ export function useModuleRecordMutations(moduleId: string, collection: string) {
     }),
   }
 }
+
+export function useModuleAIMutations(moduleId: string, collection: string) {
+  const {moduleRepository} = useAppServices()
+  const queryClient = useQueryClient()
+  const invalidate = () => queryClient.invalidateQueries({queryKey: moduleQueryKeys.recordsCollection(moduleId, collection)})
+  return {
+    execute: useMutation({
+      mutationFn: (input: {actionId: string; recordId: string; expectedRevision: number; selection?: {blockIds?: string[]; text?: string}; variables?: Record<string, unknown>; streaming?: boolean}) =>
+        moduleRepository.executeAIAction(moduleId, input.actionId, {
+          recordId: input.recordId,
+          expectedRevision: input.expectedRevision,
+          selection: input.selection,
+          variables: input.variables,
+          streaming: input.streaming,
+        }),
+    }),
+    apply: useMutation({
+      mutationFn: (input: {executionId: string; recordId: string; expectedRevision: number; selectedResult?: Record<string, unknown>}) =>
+        moduleRepository.applyAIExecution(moduleId, input.executionId, {
+          recordId: input.recordId,
+          expectedRevision: input.expectedRevision,
+          selectedResult: input.selectedResult,
+        }),
+      onSuccess: invalidate,
+    }),
+  }
+}

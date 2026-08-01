@@ -2,6 +2,12 @@ import type {ApiClient} from '@/api/client'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   InstalledModule,
+  ApplyAIExecutionRequest,
+  ApplyAIExecutionResponse,
+  ModuleAIDeclaration,
+  ModuleAIActionExecutionRequest,
+  ModuleAIActionExecutionResponse,
+  ModuleAIProductActionDefinition,
   ModuleBackendMetadata,
   ModuleCatalogueItem,
   ModuleContribution,
@@ -130,6 +136,14 @@ export class ApiModuleRepository implements ModuleRepository {
     return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/update`, authenticated: true, body: {version, approvedPermissionIncrease: false, idempotencyKey: idempotencyKey('update', moduleId)}}, value => value)
   }
 
+  reviewPermissions(moduleId: string, approvedPermissions: string[]): Promise<unknown> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/permissions/review`,
+      authenticated: true,
+      body: {approvedPermissions, idempotencyKey: idempotencyKey('permissions-review', moduleId)},
+    }, value => value)
+  }
+
   uninstall(moduleId: string, choice: 'keepData' | 'exportThenDelete' | 'deleteData' = 'keepData'): Promise<unknown> {
     return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {choice, recentAuth: false, confirmDelete: false, idempotencyKey: idempotencyKey('uninstall', moduleId)}}, value => value)
   }
@@ -174,6 +188,22 @@ export class ApiModuleRepository implements ModuleRepository {
 
   runAction(moduleId: string, actionId: string, input: Record<string, unknown> = {}): Promise<unknown> {
     return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/actions/${encodeURIComponent(actionId)}`, authenticated: true, body: {input, idempotencyKey: idempotencyKey(actionId, moduleId)}}, value => value)
+  }
+
+  executeAIAction(moduleId: string, actionId: string, input: ModuleAIActionExecutionRequest): Promise<ModuleAIActionExecutionResponse> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/ai/actions/${encodeURIComponent(actionId)}/executions`,
+      authenticated: true,
+      body: {...input, idempotencyKey: input.idempotencyKey ?? idempotencyKey(actionId, moduleId)},
+    }, decodeAIExecution)
+  }
+
+  applyAIExecution(moduleId: string, executionId: string, input: ApplyAIExecutionRequest): Promise<ApplyAIExecutionResponse> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/ai/executions/${encodeURIComponent(executionId)}/apply`,
+      authenticated: true,
+      body: {...input, idempotencyKey: input.idempotencyKey ?? idempotencyKey('ai-apply', moduleId)},
+    }, decodeAIApplication)
   }
 
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema> {
@@ -263,6 +293,7 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     backend: decodeBackendMetadata(backendSource, base.moduleId),
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleDetail['permissions'] : [],
     contributions: (row.contributions ?? {}) as Record<string, unknown>,
+    ai: decodeAIDeclaration(isRecord(manifest.ai) ? manifest.ai : row.ai),
     sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),
     sourceCommit: typeof source.commit === 'string' ? source.commit : undefined,
     manifestChecksum: typeof row.manifestSha256 === 'string' ? row.manifestSha256 : undefined,
@@ -335,6 +366,7 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     health: typeof row.health === 'string' ? row.health : 'Healthy',
     updateState: typeof row.updateState === 'string' ? row.updateState : 'Current',
     configurationState: typeof row.configurationState === 'string' ? row.configurationState : 'Configured',
+    grantedPermissions: arrayOfStrings(row.grantedPermissions ?? row.granted_permissions),
   }
 }
 
@@ -356,6 +388,84 @@ function decodeInstallPreview(value: unknown): ModuleInstallPreview {
 
 function decodeRuntimeView(value: unknown): ModuleRuntimeView {
   return value as ModuleRuntimeView
+}
+
+function decodeAIDeclaration(value: unknown): ModuleAIDeclaration | undefined {
+  if (!isRecord(value)) return undefined
+  return {
+    features: arrayOfStrings(value.features),
+    productActions: Array.isArray(value.productActions)
+      ? value.productActions.filter(isRecord).map(decodeAIProductAction)
+      : [],
+  }
+}
+
+function decodeAIProductAction(value: Record<string, unknown>): ModuleAIProductActionDefinition {
+  const context = isRecord(value.context) ? value.context : {}
+  const execution = isRecord(value.execution) ? value.execution : {}
+  const application = isRecord(value.application) ? value.application : {}
+  return {
+    id: String(value.id ?? ''),
+    name: String(value.name ?? value.id ?? 'AI action'),
+    description: String(value.description ?? ''),
+    promptId: String(value.promptId ?? ''),
+    promptVersionRange: String(value.promptVersionRange ?? ''),
+    inputSchema: String(value.inputSchema ?? ''),
+    outputSchema: String(value.outputSchema ?? ''),
+    requiredPermissions: arrayOfStrings(value.requiredPermissions),
+    requiredCapabilities: arrayOfStrings(value.requiredCapabilities),
+    context: {
+      sources: arrayOfStrings(context.sources) as ModuleAIProductActionDefinition['context']['sources'],
+      maximumRecords: Number(context.maximumRecords ?? 1),
+      maximumCharacters: Number(context.maximumCharacters ?? 0),
+      allowedClassifications: arrayOfStrings(context.allowedClassifications) as ModuleAIProductActionDefinition['context']['allowedClassifications'],
+    },
+    execution: {
+      streaming: Boolean(execution.streaming),
+      structuredOutput: Boolean(execution.structuredOutput),
+      maximumToolCalls: Number(execution.maximumToolCalls ?? 0),
+      timeoutMs: Number(execution.timeoutMs ?? 30_000),
+    },
+    application: {
+      mode: applicationMode(application.mode),
+      explicitConfirmation: application.explicitConfirmation === true,
+      createsRecordRevision: application.createsRecordRevision === true,
+    },
+  }
+}
+
+function applicationMode(value: unknown): ModuleAIProductActionDefinition['application']['mode'] {
+  if (value === 'replace-selection' || value === 'replace-document' || value === 'insert' || value === 'metadata-suggestion') return value
+  return 'preview-only'
+}
+
+function decodeAIExecution(value: unknown): ModuleAIActionExecutionResponse {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    executionId: String(row.executionId ?? ''),
+    status: aiExecutionStatus(row.status),
+    streamPath: typeof row.streamPath === 'string' ? row.streamPath : undefined,
+    requestId: String(row.requestId ?? ''),
+    result: recordOrUndefined(row.result),
+    expiresAt: String(row.expiresAt ?? ''),
+    usage: recordOrUndefined(row.usage),
+  }
+}
+
+function decodeAIApplication(value: unknown): ApplyAIExecutionResponse {
+  const row = (value ?? {}) as Record<string, unknown>
+  return {
+    executionId: String(row.executionId ?? ''),
+    status: 'applied',
+    recordId: String(row.recordId ?? ''),
+    revision: Number(row.revision ?? 0),
+    applicationId: String(row.applicationId ?? ''),
+  }
+}
+
+function aiExecutionStatus(value: unknown): ModuleAIActionExecutionResponse['status'] {
+  if (value === 'queued' || value === 'running' || value === 'completed' || value === 'failed' || value === 'cancelled' || value === 'expired') return value
+  return 'failed'
 }
 
 function decodeRecordPage(value: unknown): ModuleRecordPage {
