@@ -2,7 +2,7 @@
 
 **Status:** Living standard for external modules (GitHub packages / Registry)  
 **Host boundary:** `docs/architecture/module-boundary.md`  
-**Manifest contract:** `GreenfieldModuleManifest` in `@modula/greenfield-contracts`  
+**Manifest contract:** `GreenfieldModuleManifest` in `@modula/greenfield-module-manifest` and Modula Module Standard 2.0 in `../modula-mod/modula-module-standard`
 **Boilerplate:** `templates/modula-module/`
 
 ---
@@ -38,7 +38,26 @@ Every module publishes a manifest compatible with `GreenfieldModuleManifest`:
 | `permissions` | yes | Least privilege; host enforces |
 | `uninstallBehaviour` | yes | `retainData` \| `purgeData` \| `exportThenPurge` |
 
-Optional contribution arrays: `routes`, `profileTabs`, `boardSurfaces`, `settings`, `functions`, `tools`, `widgets`, `schemas`.
+Legacy Greenfield v1 manifests continue to validate unchanged. Standard 2.0 manifests opt into `manifestVersion: 2`, `standardVersion: "2.0.0"`, and `sectionVersions`.
+
+Standard 2.0 adds independently versioned declarations for identity, lifecycle, backend, engines, AI, permissions, settings, routes, views, records, actions, functions, jobs, events, notifications, search, exports, imports, synchronization, dependencies, optional dependencies, integrations, billing, telemetry, diagnostics, accessibility, localization, appearance, onboarding, migrations, capabilities, services, APIs, hooks, metrics, storage, widgets, navigation, UI contributions, automation, offline, realtime, versioning, compatibility, marketplace, and future engines.
+
+Optional contribution arrays remain supported: `routes`, `profileTabs`, `boardSurfaces`, `settings`, `functions`, `tools`, `widgets`, `schemas`.
+
+## Standard 2.0 registries
+
+Standard 2.0 modules can publish generic registries that Greenfield can inspect without module-specific code:
+
+- `dependencyGraph`: `requires`, `optional`, `recommended`, `conflicts`, `replaces`, and `provides`
+- `serviceRegistry`: discoverable services such as search, export, autosave, revision, history, markdown, storage, AI, and automation
+- `apiRegistry`: module-owned operations under `/api/modula/{module-id}/...`
+- `eventBus`: published and subscribed event contracts
+- `hookRegistry`: before/after/around lifecycle and record hooks
+- `capabilityDiscovery`: boolean support flags for search, export, AI, offline, realtime, notifications, widgets, automation, sync, history, sharing, encryption, media, comments, presence, voice, video, backend, custom backend, and self-hosting
+- `permissionModel`: split grant categories for data, filesystem, media, AI, automation, DIMON, connectors, notifications, search, background, realtime, widgets, presence, voice, camera, location, Bluetooth, NFC, clipboard, health, calendar, contacts, mail, storage, backend, admin, and developer
+- `jobRegistry`, `storageModel`, `widgetRegistry`, `navigationRegistry`, `uiContributions`, `automationRegistry`, `offline`, `realtime`, `versioning`, `compatibilityMatrix`, `marketplace`, and `engineReadiness`
+
+Greenfield validates Standard 2.0 fields as contracts only. It does not execute module code, patch another module, or grant permissions automatically.
 
 ---
 
@@ -122,3 +141,9 @@ Start from `templates/modula-module/`:
 6. Document permissions in README
 
 See also: `src/modules/README.md`, ADR-008 (extension kernel).
+
+External Standard 2.0 docs:
+
+- `../modula-mod/modula-module-standard/docs/module-standard-2.0.md`
+- `../modula-mod/modula-module-standard/docs/migration-standard-2.0.md`
+- `../modula-mod/modula-module-standard/schemas/module-manifest-2.0.schema.json`

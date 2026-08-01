@@ -4,12 +4,17 @@ import {
   type GreenfieldModulePlatform,
   type GreenfieldModuleCompatibility,
 } from './compatibility.js'
+import {
+  MODULA_MODULE_STANDARD_2_VERSION,
+  MODULE_STANDARD_20_PERMISSION_CATEGORIES,
+  MODULE_STANDARD_20_SECTION_NAMES,
+} from '@modula/module-standard'
 import {CONTRIBUTION_GROUPS, flattenContributionIds, type GreenfieldModuleContributions} from './contributions.js'
 import {validateGreenfieldModuleBackend} from './backend.js'
 import {validateGreenfieldModuleAi} from './ai.js'
 import {canPublisherUseNamespace, isGreenfieldModuleId} from './identity.js'
 import {isSha256} from './integrity.js'
-import {GREENFIELD_MODULE_MANIFEST_VERSION, type GreenfieldModuleManifestV1} from './manifest.js'
+import {GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION, GREENFIELD_MODULE_MANIFEST_VERSION, type GreenfieldModuleManifest} from './manifest.js'
 import {validatePermissionRequest} from './permissions.js'
 import {isGitHubRepository, isImmutableGitCommit, isMutableGitReference, isSafeManifestPath} from './source.js'
 
@@ -21,7 +26,7 @@ export type GreenfieldManifestValidationIssue = {
 
 export type GreenfieldManifestValidationResult = {
   valid: boolean
-  manifest?: GreenfieldModuleManifestV1
+  manifest?: GreenfieldModuleManifest
   issues: GreenfieldManifestValidationIssue[]
 }
 
@@ -44,9 +49,44 @@ const ROOT_KEYS = new Set([
   'ai',
   'integrity',
   'extensions',
+  'standardVersion',
+  'sectionVersions',
+  'identity',
+  'dependencyGraph',
+  'serviceRegistry',
+  'apiRegistry',
+  'eventBus',
+  'hookRegistry',
+  'capabilityDiscovery',
+  'healthModel',
+  'diagnosticsModel',
+  'metrics',
+  'permissionModel',
+  'jobRegistry',
+  'storageModel',
+  'widgetRegistry',
+  'navigationRegistry',
+  'uiContributions',
+  'automationRegistry',
+  'offline',
+  'realtime',
+  'versioning',
+  'compatibilityMatrix',
+  'marketplace',
+  'engineReadiness',
+  'exports',
+  'imports',
+  'synchronization',
+  'integrations',
+  'billing',
+  'telemetry',
+  'accessibility',
+  'localization',
+  'appearance',
+  'onboarding',
 ])
 
-const PLATFORMS = new Set<GreenfieldModulePlatform>(['ios', 'android', 'web', 'server'])
+const PLATFORMS = new Set<GreenfieldModulePlatform>(['ios', 'android', 'web', 'desktop', 'server'])
 
 export function validateGreenfieldModuleManifest(
   input: unknown,
@@ -65,8 +105,14 @@ export function validateGreenfieldModuleManifest(
     if (!ROOT_KEYS.has(key)) add(`$.${key}`, 'UNKNOWN_ROOT_PROPERTY', `Unknown critical root property ${key}`)
   }
 
-  if (manifest.manifestVersion !== GREENFIELD_MODULE_MANIFEST_VERSION) {
-    add('$.manifestVersion', 'UNSUPPORTED_MANIFEST_VERSION', 'Only Greenfield Module Manifest v1 is supported')
+  if (manifest.manifestVersion !== GREENFIELD_MODULE_MANIFEST_VERSION && manifest.manifestVersion !== GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION) {
+    add('$.manifestVersion', 'UNSUPPORTED_MANIFEST_VERSION', 'Only Greenfield Module Manifest v1 and v2 are supported')
+  }
+  if (manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_VERSION && hasStandard20RootFields(manifest)) {
+    add('$.standardVersion', 'STANDARD_2_REQUIRES_MANIFEST_V2', 'Standard 2.0 contract fields require Greenfield Module Manifest v2')
+  }
+  if (manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION && manifest.standardVersion !== MODULA_MODULE_STANDARD_2_VERSION) {
+    add('$.standardVersion', 'UNSUPPORTED_STANDARD_VERSION', 'Greenfield Module Manifest v2 requires Modula Module Standard 2.0.0')
   }
   if (!isGreenfieldModuleId(manifest.moduleId)) {
     add('$.moduleId', 'INVALID_MODULE_ID', 'Module ID must be a lowercase reverse-domain identifier')
@@ -103,8 +149,9 @@ export function validateGreenfieldModuleManifest(
     add(issue.path, issue.code, issue.message)
   }
   validateIntegrity(manifest.integrity, add)
+  validateStandard20Extensions(manifest, add)
 
-  return {valid: issues.length === 0, manifest: issues.length === 0 ? (manifest as GreenfieldModuleManifestV1) : undefined, issues}
+  return {valid: issues.length === 0, manifest: issues.length === 0 ? (manifest as GreenfieldModuleManifest) : undefined, issues}
 }
 
 function validateSource(source: any, add: (path: string, code: string, message: string) => void) {
@@ -243,6 +290,307 @@ function validateIntegrity(integrity: any, add: (path: string, code: string, mes
   if (!isSha256(integrity.manifestSha256)) add('$.integrity.manifestSha256', 'INVALID_SHA256', 'Manifest checksum must be SHA-256 hex')
   if (integrity.releaseSha256 !== undefined && !isSha256(integrity.releaseSha256)) {
     add('$.integrity.releaseSha256', 'INVALID_SHA256', 'Release checksum must be SHA-256 hex')
+  }
+}
+
+const STANDARD_20_ROOT_FIELDS = new Set([
+  'standardVersion',
+  'sectionVersions',
+  'identity',
+  'dependencyGraph',
+  'serviceRegistry',
+  'apiRegistry',
+  'eventBus',
+  'hookRegistry',
+  'capabilityDiscovery',
+  'healthModel',
+  'diagnosticsModel',
+  'metrics',
+  'permissionModel',
+  'jobRegistry',
+  'storageModel',
+  'widgetRegistry',
+  'navigationRegistry',
+  'uiContributions',
+  'automationRegistry',
+  'offline',
+  'realtime',
+  'versioning',
+  'compatibilityMatrix',
+  'marketplace',
+  'engineReadiness',
+  'exports',
+  'imports',
+  'synchronization',
+  'integrations',
+  'billing',
+  'telemetry',
+  'accessibility',
+  'localization',
+  'appearance',
+  'onboarding',
+])
+
+const VERSIONED_STANDARD_20_SECTIONS = [
+  'identity',
+  'serviceRegistry',
+  'apiRegistry',
+  'eventBus',
+  'hookRegistry',
+  'healthModel',
+  'diagnosticsModel',
+  'metrics',
+  'jobRegistry',
+  'storageModel',
+  'widgetRegistry',
+  'navigationRegistry',
+  'uiContributions',
+  'automationRegistry',
+  'exports',
+  'imports',
+  'synchronization',
+  'integrations',
+  'billing',
+  'telemetry',
+  'accessibility',
+  'localization',
+  'appearance',
+  'onboarding',
+] as const
+
+function hasStandard20RootFields(manifest: Record<string, any>): boolean {
+  return Object.keys(manifest).some(key => STANDARD_20_ROOT_FIELDS.has(key))
+}
+
+function validateStandard20Extensions(manifest: Record<string, any>, add: (path: string, code: string, message: string) => void) {
+  if (manifest.manifestVersion !== GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION) return
+  validateSectionVersions(manifest.sectionVersions, add)
+  validateDependencyGraph(manifest.dependencyGraph, manifest.moduleId, add)
+  for (const section of VERSIONED_STANDARD_20_SECTIONS) {
+    validateVersionedSection(manifest[section], `$.${section}`, add)
+  }
+  validateNamespacedItems(manifest.serviceRegistry, '$.serviceRegistry', manifest.moduleId, add)
+  validateApiRegistry(manifest.apiRegistry, manifest.moduleId, add)
+  validateNamespacedItems(manifest.eventBus, '$.eventBus', manifest.moduleId, add)
+  validateHookRegistry(manifest.hookRegistry, manifest.moduleId, add)
+  validateCapabilityDiscovery(manifest.capabilityDiscovery, add)
+  validatePermissionModel(manifest.permissionModel, add)
+  validateNamespacedItems(manifest.jobRegistry, '$.jobRegistry', manifest.moduleId, add)
+  validateNamespacedItems(manifest.storageModel, '$.storageModel', manifest.moduleId, add)
+  validateNamespacedItems(manifest.widgetRegistry, '$.widgetRegistry', manifest.moduleId, add)
+  validateNamespacedItems(manifest.navigationRegistry, '$.navigationRegistry', manifest.moduleId, add)
+  validateNamespacedItems(manifest.uiContributions, '$.uiContributions', manifest.moduleId, add)
+  validateNamespacedItems(manifest.automationRegistry, '$.automationRegistry', manifest.moduleId, add)
+  validateVersionedObject(manifest.offline, '$.offline', add)
+  validateVersionedObject(manifest.realtime, '$.realtime', add)
+  validateVersionedObject(manifest.versioning, '$.versioning', add)
+  validateCompatibilityMatrix(manifest.compatibilityMatrix, add)
+  validateVersionedObject(manifest.marketplace, '$.marketplace', add)
+  validateEngineReadiness(manifest.engineReadiness, add)
+}
+
+function validateSectionVersions(value: any, add: (path: string, code: string, message: string) => void) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add('$.sectionVersions', 'MISSING_SECTION_VERSIONS', 'Standard 2.0 manifests must independently version every section')
+    return
+  }
+  for (const section of MODULE_STANDARD_20_SECTION_NAMES) {
+    if (!isSemver(value[section])) add(`$.sectionVersions.${section}`, 'INVALID_SECTION_VERSION', `${section} must declare a semantic section version`)
+  }
+  for (const section of Object.keys(value)) {
+    if (!MODULE_STANDARD_20_SECTION_NAMES.includes(section as any)) add(`$.sectionVersions.${section}`, 'UNKNOWN_SECTION_VERSION', `${section} is not a Standard 2.0 section`)
+  }
+}
+
+function validateVersionedSection(value: any, path: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  validateVersionedObject(value, path, add)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return
+  if (value.items !== undefined && (!Array.isArray(value.items) || value.items.length > 200)) {
+    add(`${path}.items`, 'INVALID_SECTION_ITEMS', 'Versioned section items must be a bounded array')
+  }
+}
+
+function validateVersionedObject(value: any, path: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add(path, 'INVALID_VERSIONED_SECTION', 'Standard 2.0 sections must be objects')
+    return
+  }
+  if (!isSemver(value.version)) add(`${path}.version`, 'INVALID_SEMVER', 'Standard 2.0 section version must be semantic')
+}
+
+function validateDependencyGraph(value: any, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add('$.dependencyGraph', 'INVALID_DEPENDENCY_GRAPH', 'dependencyGraph must be an object')
+    return
+  }
+  if (!isSemver(value.version)) add('$.dependencyGraph.version', 'INVALID_SEMVER', 'dependencyGraph version must be semantic')
+  for (const key of ['requires', 'optional', 'recommended'] as const) {
+    validateDependencyRefs(value[key], `$.dependencyGraph.${key}`, moduleId, add)
+  }
+  for (const key of ['conflicts', 'replaces'] as const) {
+    validateConflictRefs(value[key], `$.dependencyGraph.${key}`, moduleId, add)
+  }
+  if (value.provides !== undefined) {
+    if (!Array.isArray(value.provides) || value.provides.length > 100) {
+      add('$.dependencyGraph.provides', 'INVALID_PROVIDES', 'provides must be a bounded array')
+    } else {
+      value.provides.forEach((entry: any, index: number) => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+          add(`$.dependencyGraph.provides[${index}]`, 'INVALID_PROVIDE', 'provides entries must be objects')
+          return
+        }
+        checkBoundedString(entry.id, `$.dependencyGraph.provides[${index}].id`, 1, 200, add)
+        checkBoundedString(entry.title, `$.dependencyGraph.provides[${index}].title`, 1, 160, add)
+        checkBoundedString(entry.kind, `$.dependencyGraph.provides[${index}].kind`, 1, 80, add)
+        if (!isSemver(entry.version)) add(`$.dependencyGraph.provides[${index}].version`, 'INVALID_SEMVER', 'provided contracts must have semantic versions')
+      })
+    }
+  }
+}
+
+function validateDependencyRefs(value: any, path: string, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!Array.isArray(value) || value.length > 100) {
+    add(path, 'INVALID_DEPENDENCY_REFS', 'Dependency relation must be a bounded array')
+    return
+  }
+  value.forEach((dependency: any, index: number) => {
+    if (!dependency || typeof dependency !== 'object' || Array.isArray(dependency)) {
+      add(`${path}[${index}]`, 'INVALID_DEPENDENCY_REF', 'Dependency entries must be objects')
+      return
+    }
+    if (!dependency.moduleId && !dependency.provides) add(`${path}[${index}]`, 'MISSING_DEPENDENCY_TARGET', 'Dependency must target a moduleId or provided contract')
+    if (dependency.moduleId !== undefined && !isGreenfieldModuleId(dependency.moduleId)) add(`${path}[${index}].moduleId`, 'INVALID_MODULE_ID', 'Invalid dependency module ID')
+    if (dependency.moduleId === moduleId) add(`${path}[${index}].moduleId`, 'SELF_DEPENDENCY', 'Module cannot depend on itself')
+    if (dependency.provides !== undefined) checkBoundedString(dependency.provides, `${path}[${index}].provides`, 1, 200, add)
+    if (!isSemverRange(dependency.versionRange)) add(`${path}[${index}].versionRange`, 'INVALID_SEMVER_RANGE', 'Dependency version range must be semantic')
+  })
+}
+
+function validateConflictRefs(value: any, path: string, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!Array.isArray(value) || value.length > 100) {
+    add(path, 'INVALID_CONFLICT_REFS', 'Conflict relation must be a bounded array')
+    return
+  }
+  value.forEach((dependency: any, index: number) => {
+    if (!dependency || typeof dependency !== 'object' || Array.isArray(dependency)) {
+      add(`${path}[${index}]`, 'INVALID_CONFLICT_REF', 'Conflict entries must be objects')
+      return
+    }
+    if (!dependency.moduleId && !dependency.provides) add(`${path}[${index}]`, 'MISSING_CONFLICT_TARGET', 'Conflict must target a moduleId or provided contract')
+    if (dependency.moduleId !== undefined && !isGreenfieldModuleId(dependency.moduleId)) add(`${path}[${index}].moduleId`, 'INVALID_MODULE_ID', 'Invalid conflict module ID')
+    if (dependency.moduleId === moduleId) add(`${path}[${index}].moduleId`, 'SELF_CONFLICT', 'Module cannot conflict with itself')
+    if (dependency.provides !== undefined) checkBoundedString(dependency.provides, `${path}[${index}].provides`, 1, 200, add)
+    if (!isSemverRange(dependency.versionRange)) add(`${path}[${index}].versionRange`, 'INVALID_SEMVER_RANGE', 'Conflict version range must be semantic')
+  })
+}
+
+function validateNamespacedItems(value: any, path: string, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  const items = value?.items
+  if (!Array.isArray(items)) return
+  items.forEach((item: any, index: number) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      add(`${path}.items[${index}]`, 'INVALID_REGISTRY_ITEM', 'Registry items must be objects')
+      return
+    }
+    if (typeof item.id !== 'string' || !item.id.startsWith(`${moduleId}.`)) {
+      add(`${path}.items[${index}].id`, 'ITEM_OUTSIDE_NAMESPACE', 'Registry item IDs must stay inside the module namespace')
+    }
+    if (item.version !== undefined && !isSemver(item.version)) add(`${path}.items[${index}].version`, 'INVALID_SEMVER', 'Registry item version must be semantic')
+  })
+}
+
+function validateApiRegistry(value: any, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  validateNamespacedItems(value, '$.apiRegistry', moduleId, add)
+  const items = value?.items
+  if (!Array.isArray(items)) return
+  items.forEach((item: any, index: number) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return
+    if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(String(item.method))) {
+      add(`$.apiRegistry.items[${index}].method`, 'INVALID_API_METHOD', 'Module API methods must be standard HTTP verbs')
+    }
+    if (typeof item.path !== 'string' || !item.path.startsWith(`/api/modula/${moduleId}/`)) {
+      add(`$.apiRegistry.items[${index}].path`, 'INVALID_MODULE_API_PATH', 'Module API paths must live under /api/modula/{moduleId}/')
+    }
+  })
+}
+
+function validateHookRegistry(value: any, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  validateNamespacedItems(value, '$.hookRegistry', moduleId, add)
+  const items = value?.items
+  if (!Array.isArray(items)) return
+  items.forEach((item: any, index: number) => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return
+    if (!['before', 'after', 'around'].includes(String(item.phase))) add(`$.hookRegistry.items[${index}].phase`, 'INVALID_HOOK_PHASE', 'Hook phase must be before, after, or around')
+    checkBoundedString(item.hook, `$.hookRegistry.items[${index}].hook`, 1, 160, add)
+  })
+}
+
+function validateCapabilityDiscovery(value: any, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  validateVersionedObject(value, '$.capabilityDiscovery', add)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return
+  for (const [key, entry] of Object.entries(value)) {
+    if (key.startsWith('supports') && typeof entry !== 'boolean') add(`$.capabilityDiscovery.${key}`, 'INVALID_CAPABILITY_FLAG', 'Capability discovery flags must be boolean')
+  }
+}
+
+function validatePermissionModel(value: any, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  validateVersionedObject(value, '$.permissionModel', add)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return
+  if (!value.categories || typeof value.categories !== 'object' || Array.isArray(value.categories)) {
+    add('$.permissionModel.categories', 'INVALID_PERMISSION_CATEGORIES', 'permissionModel.categories must be an object')
+    return
+  }
+  for (const [category, permissions] of Object.entries(value.categories)) {
+    if (!MODULE_STANDARD_20_PERMISSION_CATEGORIES.includes(category as any)) {
+      add(`$.permissionModel.categories.${category}`, 'UNKNOWN_PERMISSION_CATEGORY', 'Unknown Standard 2.0 permission category')
+    }
+    if (!Array.isArray(permissions) || permissions.length > 100) {
+      add(`$.permissionModel.categories.${category}`, 'INVALID_PERMISSION_CATEGORY', 'Permission categories must be bounded arrays')
+      continue
+    }
+    permissions.forEach((permission: any, index: number) => {
+      if (!permission || typeof permission !== 'object' || Array.isArray(permission)) {
+        add(`$.permissionModel.categories.${category}[${index}]`, 'INVALID_PERMISSION_DECLARATION', 'Permission declarations must be objects')
+        return
+      }
+      checkBoundedString(permission.id, `$.permissionModel.categories.${category}[${index}].id`, 1, 200, add)
+      checkBoundedString(permission.reason, `$.permissionModel.categories.${category}[${index}].reason`, 1, 400, add)
+      if (typeof permission.id === 'string' && permission.id.includes('*')) add(`$.permissionModel.categories.${category}[${index}].id`, 'WILDCARD_PERMISSION_DENIED', 'Wildcard permissions are not allowed')
+    })
+  }
+}
+
+function validateCompatibilityMatrix(value: any, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  validateVersionedObject(value, '$.compatibilityMatrix', add)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return
+  for (const key of ['modulaVersion', 'greenfieldVersion', 'moduleStandardVersion', 'runtimeVersion', 'backendRuntime', 'connectorRuntime', 'aiRuntime', 'engineRuntime'] as const) {
+    if (value[key] !== undefined && !isSemverRange(value[key])) add(`$.compatibilityMatrix.${key}`, 'INVALID_SEMVER_RANGE', `${key} must be a semantic version range`)
+  }
+  if (value.platforms !== undefined) {
+    if (!Array.isArray(value.platforms) || value.platforms.length < 1 || value.platforms.length > 10) {
+      add('$.compatibilityMatrix.platforms', 'INVALID_PLATFORMS', 'compatibilityMatrix.platforms must be a bounded array')
+    } else {
+      value.platforms.forEach((platform: unknown, index: number) => {
+        if (!PLATFORMS.has(platform as GreenfieldModulePlatform)) add(`$.compatibilityMatrix.platforms[${index}]`, 'UNSUPPORTED_PLATFORM', `Unsupported platform ${String(platform)}`)
+      })
+    }
+  }
+}
+
+function validateEngineReadiness(value: any, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  validateVersionedObject(value, '$.engineReadiness', add)
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return
+  if (value.engines !== undefined && (!Array.isArray(value.engines) || value.engines.some((engine: unknown) => typeof engine !== 'string'))) {
+    add('$.engineReadiness.engines', 'INVALID_ENGINES', 'engineReadiness.engines must be a string array')
   }
 }
 

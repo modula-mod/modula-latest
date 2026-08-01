@@ -1,5 +1,10 @@
 import {describe, expect, it} from 'vitest'
-import {GREENFIELD_MODULE_MANIFEST_VERSION, validateGreenfieldModuleManifest} from '../src/index.js'
+import {
+  GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION,
+  GREENFIELD_MODULE_MANIFEST_VERSION,
+  createDefaultModuleSectionVersions,
+  validateGreenfieldModuleManifest,
+} from '../src/index.js'
 
 function validManifest(overrides: Record<string, unknown> = {}) {
   return {
@@ -43,6 +48,78 @@ function validManifest(overrides: Record<string, unknown> = {}) {
   }
 }
 
+function validStandard20Manifest(overrides: Record<string, unknown> = {}) {
+  return validManifest({
+    manifestVersion: GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION,
+    standardVersion: '2.0.0',
+    sectionVersions: createDefaultModuleSectionVersions(),
+    dependencyGraph: {
+      version: '2.0.0',
+      requires: [{moduleId: 'digital.modula.contacts', versionRange: '^1.0.0', reason: 'Resolve people linked to notes'}],
+      optional: [{provides: 'calendar.api', versionRange: '^1.0.0', reason: 'Link dated notes'}],
+      recommended: [{moduleId: 'digital.modula.notifications', versionRange: '^1.0.0', reason: 'Notify on shared notes'}],
+      conflicts: [{moduleId: 'digital.modula.legacy-notes', versionRange: '*', reason: 'Legacy storage conflict'}],
+      replaces: [],
+      provides: [{id: 'notes.records', title: 'Notes Records', version: '1.0.0', kind: 'record'}],
+    },
+    serviceRegistry: {
+      version: '2.0.0',
+      items: [{id: 'digital.modula.vault-notes.service.search', title: 'Search Service', version: '1.0.0', kind: 'search', contract: 'vault-notes.search'}],
+    },
+    apiRegistry: {
+      version: '2.0.0',
+      items: [{id: 'digital.modula.vault-notes.api.create-note', title: 'Create Note', version: '1.0.0', method: 'POST', path: '/api/modula/digital.modula.vault-notes/notes'}],
+    },
+    hookRegistry: {
+      version: '2.0.0',
+      items: [{id: 'digital.modula.vault-notes.hook.before-create', hook: 'BeforeCreateRecord', phase: 'before', target: 'digital.modula.vault-notes'}],
+    },
+    capabilityDiscovery: {
+      version: '2.0.0',
+      supportsSearch: true,
+      supportsExport: true,
+      supportsAI: true,
+      supportsOffline: false,
+      supportsRealtime: false,
+      supportsNotifications: true,
+      supportsWidgets: true,
+      supportsAutomation: true,
+      supportsSync: false,
+      supportsHistory: true,
+      supportsSharing: true,
+      supportsEncryption: true,
+      supportsMedia: false,
+      supportsComments: false,
+      supportsPresence: false,
+      supportsVoice: false,
+      supportsVideo: false,
+      supportsBackend: true,
+      supportsCustomBackend: false,
+      supportsSelfHosted: true,
+    },
+    permissionModel: {
+      version: '2.0.0',
+      categories: {
+        data: [{id: 'records:module.digital.modula.vault-notes.notes:write', reason: 'Create private note records', required: true, risk: 'medium'}],
+        search: [{id: 'search:index:module.digital.modula.vault-notes', reason: 'Index note metadata', required: false, risk: 'low'}],
+      },
+    },
+    jobRegistry: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.job.reindex', title: 'Reindex', kind: 'reindex'}]},
+    storageModel: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.storage.notes', kind: 'structured-records', version: '1.0.0'}]},
+    widgetRegistry: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.widget.board', title: 'Recent Notes', surface: 'board'}]},
+    navigationRegistry: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.navigation.route', title: 'Vault Notes', kind: 'route', target: '/module/digital.modula.vault-notes'}]},
+    uiContributions: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.ui.board-card', title: 'Vault Note Card', kind: 'board-card', target: 'board', contract: 'vault-notes.card'}]},
+    automationRegistry: {version: '2.0.0', items: [{id: 'digital.modula.vault-notes.automation.create-note', title: 'Create Note', triggers: [], actions: []}]},
+    offline: {version: '2.0.0', capable: false, syncStrategy: 'none'},
+    realtime: {version: '2.0.0', events: []},
+    versioning: {version: '2.0.0', moduleVersion: '0.1.0', standardVersion: '2.0.0'},
+    compatibilityMatrix: {version: '2.0.0', greenfieldVersion: '^0.1.0', moduleStandardVersion: '^2.0.0', platforms: ['server', 'ios', 'desktop']},
+    marketplace: {version: '2.0.0', verifiedBadge: true, requiredRuntimes: ['greenfield-api'], aiSupport: true},
+    engineReadiness: {version: '2.0.0', engines: ['declarative-ui', 'records', 'actions', 'functions', 'ai', 'automation']},
+    ...overrides,
+  })
+}
+
 describe('Greenfield Module Manifest v1 validation', () => {
   it('accepts a valid first-party module', () => {
     expect(validateGreenfieldModuleManifest(validManifest()).valid).toBe(true)
@@ -50,7 +127,7 @@ describe('Greenfield Module Manifest v1 validation', () => {
 
   it('rejects unsupported versions, malformed ids, mutable commits and unknown root fields', () => {
     const result = validateGreenfieldModuleManifest(
-      validManifest({manifestVersion: 2, moduleId: 'Digital.Modula.Bad@1', source: {...validManifest().source, commit: 'main'}, unexpected: true}),
+      validManifest({manifestVersion: 3, moduleId: 'Digital.Modula.Bad@1', source: {...validManifest().source, commit: 'main'}, unexpected: true}),
     )
     expect(result.issues.map(issue => issue.code)).toEqual(
       expect.arrayContaining(['UNSUPPORTED_MANIFEST_VERSION', 'INVALID_MODULE_ID', 'INVALID_SOURCE_COMMIT', 'UNKNOWN_ROOT_PROPERTY']),
@@ -283,5 +360,29 @@ describe('Greenfield Module Manifest v1 validation', () => {
     expect(result.issues.map(issue => issue.code)).toEqual(
       expect.arrayContaining(['TOKEN_EXCHANGE_REQUIRED', 'UNSAFE_BACKEND_HOST', 'UNSAFE_BACKEND_ORIGIN']),
     )
+  })
+})
+
+describe('Greenfield Module Manifest v2 validation', () => {
+  it('accepts Standard 2.0 contract-driven registries and dependency graphs', () => {
+    const result = validateGreenfieldModuleManifest(validStandard20Manifest())
+    expect(result.valid, result.issues.map(issue => `${issue.code} ${issue.path}`).join('\n')).toBe(true)
+  })
+
+  it('requires v2 when Standard 2.0 fields are present on a legacy manifest', () => {
+    const result = validateGreenfieldModuleManifest(validManifest({standardVersion: '2.0.0', sectionVersions: createDefaultModuleSectionVersions()}))
+    expect(result.issues.map(issue => issue.code)).toContain('STANDARD_2_REQUIRES_MANIFEST_V2')
+  })
+
+  it('rejects module API paths and permission categories outside the Standard 2.0 contract', () => {
+    const manifest = validStandard20Manifest({
+      apiRegistry: {
+        version: '2.0.0',
+        items: [{id: 'digital.modula.vault-notes.api.bad', title: 'Bad API', version: '1.0.0', method: 'POST', path: '/api/modula/digital.modula.tasks/notes'}],
+      },
+      permissionModel: {version: '2.0.0', categories: {unknown: [{id: 'bad:*', reason: 'Bad wildcard'}]}},
+    })
+    const result = validateGreenfieldModuleManifest(manifest)
+    expect(result.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(['INVALID_MODULE_API_PATH', 'UNKNOWN_PERMISSION_CATEGORY', 'WILDCARD_PERMISSION_DENIED']))
   })
 })

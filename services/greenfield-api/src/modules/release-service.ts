@@ -3,9 +3,10 @@ import {
   contributionCounts,
   CONTRIBUTION_GROUPS,
   backendModeForManifest,
+  dependencyRequestsFromManifest,
   manifestChecksum,
   type GreenfieldModuleContributions,
-  type GreenfieldModuleManifestV1,
+  type GreenfieldModuleManifest,
 } from '@modula/greenfield-module-manifest'
 import {sql} from 'kysely'
 import type {GreenfieldModuleReleaseState} from '../database/types.js'
@@ -51,7 +52,7 @@ const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, Co
 export class GreenfieldModuleReleaseService {
   constructor(private readonly db: ModulaDb) {}
 
-  async importPendingReview(manifest: GreenfieldModuleManifestV1): Promise<GreenfieldModuleReleaseRecord> {
+  async importPendingReview(manifest: GreenfieldModuleManifest): Promise<GreenfieldModuleReleaseRecord> {
     const publisher = new GreenfieldModulePublisherService(this.db)
     await publisher.ensurePublisherForManifest(manifest)
 
@@ -67,6 +68,8 @@ export class GreenfieldModuleReleaseService {
     const computedManifestSha = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
     const releaseSha = manifest.integrity.releaseSha256 ?? computedManifestSha
     const backend = manifest.backend ?? {mode: 'greenfield-managed' as const}
+    const dependencyRows = dependencyRequestsFromManifest(manifest)
+      .filter(dependency => dependency.moduleId && (dependency.relation === 'requires' || dependency.relation === 'optional' || dependency.relation === 'recommended'))
 
     await this.db.transaction().execute(async trx => {
       await trx
@@ -152,18 +155,18 @@ export class GreenfieldModuleReleaseService {
           etag: null,
         })
         .execute()
-      if (manifest.dependencies?.length) {
+      if (dependencyRows.length) {
         await trx
           .insertInto('greenfield_module_dependencies')
           .values(
-            manifest.dependencies.map(dependency => ({
-              dependency_id: `module-dependency:${releaseId}:${dependency.moduleId}`,
+            dependencyRows.map((dependency, index) => ({
+              dependency_id: `module-dependency:${releaseId}:${dependency.relation}:${dependency.moduleId}:${index}`,
               release_id: releaseId,
               module_id: manifest.moduleId,
-              dependency_module_id: dependency.moduleId,
+              dependency_module_id: dependency.moduleId!,
               version_range: dependency.versionRange,
               optional: dependency.optional,
-              reason: dependency.reason ?? null,
+              reason: dependency.reason ? `${dependency.relation}: ${dependency.reason}` : dependency.relation,
               created_at: now,
             })),
           )

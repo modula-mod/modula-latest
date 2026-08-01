@@ -36,10 +36,10 @@ const manifest = sdk.defineModule({
   id: moduleId,
   slug: 'sdk-module',
   name: 'SDK Module',
-  description: 'SDK generated Standard 1.0 manifest.',
+  description: 'SDK generated Standard 2.0 manifest.',
   moduleVersion: '1.0.0',
   publisher,
-  compatibility: {host: '^1.0.0', runtime: '^1.0.0', standard: '^1.0.0', platforms: ['web']},
+  compatibility: {host: '^1.0.0', runtime: '^1.0.0', standard: '^2.0.0', platforms: ['web']},
   lifecycle: sdk.defineLifecycle(),
   permissions: [sdk.definePermission('records:item:read', 'Read item records.', {risk: 'low', policyMode: 'observe'})],
   capabilities: [
@@ -59,6 +59,30 @@ const manifest = sdk.defineModule({
   ai: [],
   diagnostics: sdk.defineDiagnostics(),
   health: sdk.defineHealth(),
+  dependencyGraph: sdk.defineDependencyGraph({
+    requires: [{moduleId: 'com.example.contacts', versionRange: '^1.0.0', reason: 'Resolve record owners.'}],
+    optional: [{provides: 'calendar.api', versionRange: '^1.0.0', reason: 'Link calendar context.'}],
+    recommended: [],
+    conflicts: [{moduleId: 'com.example.legacy-sdk-module', versionRange: '*', reason: 'Legacy storage format conflict.'}],
+    provides: [{id: 'sdk.records', title: 'SDK Records', version: '1.0.0', kind: 'record'}],
+  }),
+  serviceRegistry: sdk.defineVersionedSection([sdk.defineService(moduleId, 'search', {kind: 'search', contract: 'sdk.search'})]),
+  apiRegistry: sdk.defineVersionedSection([sdk.defineApiOperation(moduleId, 'create-item')]),
+  hookRegistry: sdk.defineVersionedSection([sdk.defineHook(moduleId, 'BeforeCreateRecord')]),
+  capabilityDiscovery: sdk.defineCapabilityDiscovery({supportsSearch: true, supportsExport: true, supportsAI: false, supportsBackend: true}),
+  permissionModel: sdk.definePermissionModel({data: [{id: 'records:item:read', reason: 'Read item records.', required: true, risk: 'low', policyMode: 'observe'}]}),
+  jobRegistry: sdk.defineVersionedSection([sdk.defineJob(moduleId, 'reindex', {kind: 'reindex'})]),
+  storageModel: sdk.defineVersionedSection([sdk.defineStorage(moduleId, 'items')]),
+  widgetRegistry: sdk.defineVersionedSection([sdk.defineWidget(moduleId, 'board')]),
+  navigationRegistry: sdk.defineVersionedSection([sdk.defineNavigationContribution(moduleId, 'route')]),
+  uiContributions: sdk.defineVersionedSection([sdk.defineUiContribution(moduleId, 'board-card')]),
+  automationRegistry: sdk.defineVersionedSection([sdk.defineAutomationContract(moduleId, 'create-item')]),
+  offline: sdk.defineOffline({capable: false}),
+  realtime: sdk.defineRealtime({events: [`${moduleId}.event.item-created`]}),
+  versioning: sdk.defineVersioning({moduleVersion: '1.0.0', standardVersion: '2.0.0'}),
+  compatibilityMatrix: sdk.defineCompatibilityMatrix({moduleStandardVersion: '^2.0.0', platforms: ['web']}),
+  marketplace: sdk.defineMarketplace({verifiedBadge: false, requiredRuntimes: ['greenfield-api']}),
+  engineReadiness: sdk.defineEngineReadiness({engines: ['declarative-ui', 'records', 'actions', 'functions', 'automation']}),
   migrations: {dataSchemaVersion: '1.0.0', steps: [{id: `${moduleId}.migration.1-0-0`, from: '0.0.0', to: '1.0.0', reversible: true, checksum: '1'.repeat(64)}]},
   release: {repository: 'modula-mod/sdk-module', commitSha: '0123456789abcdef0123456789abcdef01234567', checksum: '2'.repeat(64), licenseEvidence: ['LICENSE'], signing: {signed: false}, channel: 'dev', reviewStatus: 'unreviewed', securityAdvisories: []},
   trust: sdk.defineTrust(publisher),
@@ -67,8 +91,42 @@ const manifest = sdk.defineModule({
 const validation = validateModulaModuleManifest(manifest)
 if (validation.valid) pass('SDK generated manifest validates')
 else fail(`SDK generated manifest failed validation: ${validation.issues.map(issue => issue.code).join(', ')}`)
+if (manifest.standardVersion === '2.0.0') pass('SDK generated manifest uses Standard 2.0')
+else fail('SDK generated manifest did not use Standard 2.0')
+if (Object.keys(manifest.sectionVersions ?? {}).length >= 40) pass('SDK generated manifest declares section versions')
+else fail('SDK generated manifest did not declare Standard 2.0 section versions')
 
-for (const helper of ['defineRecord', 'defineView', 'defineAction', 'defineFunction', 'defineEvent', 'definePermission', 'defineDiagnostics', 'defineHealth', 'defineSearch', 'defineAutomation', 'defineAIIntegration']) {
+for (const helper of [
+  'defineRecord',
+  'defineView',
+  'defineAction',
+  'defineFunction',
+  'defineEvent',
+  'definePermission',
+  'defineDiagnostics',
+  'defineHealth',
+  'defineSearch',
+  'defineAutomation',
+  'defineAIIntegration',
+  'defineDependencyGraph',
+  'defineService',
+  'defineApiOperation',
+  'defineHook',
+  'defineCapabilityDiscovery',
+  'definePermissionModel',
+  'defineJob',
+  'defineStorage',
+  'defineWidget',
+  'defineNavigationContribution',
+  'defineUiContribution',
+  'defineAutomationContract',
+  'defineOffline',
+  'defineRealtime',
+  'defineVersioning',
+  'defineCompatibilityMatrix',
+  'defineMarketplace',
+  'defineEngineReadiness',
+]) {
   if (typeof sdk[helper] === 'function') pass(`SDK exports ${helper}`)
   else fail(`SDK missing ${helper}`)
 }

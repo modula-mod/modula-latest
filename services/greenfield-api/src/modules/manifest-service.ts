@@ -1,8 +1,8 @@
-import {validateGreenfieldModuleManifest, type GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import {validateGreenfieldModuleManifest, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {moduleError} from './module-errors.js'
 
 export class GreenfieldModuleManifestService {
-  parse(input: unknown): GreenfieldModuleManifestV1 {
+  parse(input: unknown): GreenfieldModuleManifest {
     const result = validateGreenfieldModuleManifest(input)
     if (!result.valid || !result.manifest) {
       throw moduleError(

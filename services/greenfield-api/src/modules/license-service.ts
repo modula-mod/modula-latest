@@ -1,4 +1,4 @@
-import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 
 export type LicenseEvidenceSummary = {
   status: string
@@ -7,7 +7,7 @@ export type LicenseEvidenceSummary = {
 }
 
 export class GreenfieldModuleLicenseService {
-  summarize(manifest: GreenfieldModuleManifestV1): LicenseEvidenceSummary {
+  summarize(manifest: GreenfieldModuleManifest): LicenseEvidenceSummary {
     const evidenceSummary = manifest.license.evidenceIds.map(id => {
       if (id.includes('first-party')) return 'Modula first-party ownership policy'
       if (id.includes('founder')) return 'Founder override evidence'

@@ -1,4 +1,4 @@
-import type {GreenfieldModuleManifestV1, GreenfieldModulePermission} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModuleManifest, GreenfieldModulePermission} from '@modula/greenfield-module-manifest'
 import {
   GREENFIELD_MODULE_INSTALLATION_TRANSITIONS,
   type GreenfieldModuleInstallationStatus,
@@ -65,7 +65,7 @@ export type GreenfieldModuleReleaseRecord = {
   version: string
   publisherId: string
   releaseState: string
-  manifest: GreenfieldModuleManifestV1
+  manifest: GreenfieldModuleManifest
   manifestSha256: string
   releaseSha256: string | null
   signatureKeyId: string | null

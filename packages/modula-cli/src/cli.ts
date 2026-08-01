@@ -198,8 +198,25 @@ const MODULE_STANDARD_COMMANDS = new Set([
   'build',
   'pack',
   'publish',
+  'release',
+  'doctor',
+  'benchmark',
+  'generate',
+  'schema',
+  'docs',
+  'backend',
+  'ai',
+  'search',
+  'events',
+  'permissions',
+  'health',
+  'telemetry',
+  'sign',
+  'bundle',
+  'install',
   'diff',
   'migrate',
+  'rollback',
   'upgrade-standard',
 ])
 
@@ -446,8 +463,16 @@ Usage:
   modula module build <manifest.json>
   modula module pack <manifest.json>
   modula module publish <manifest.json>
+  modula module release <manifest.json>
+  modula module doctor <manifest.json>
+  modula module benchmark <manifest.json>
+  modula module schema <manifest.json>
+  modula module docs <manifest.json>
+  modula module bundle <manifest.json>
+  modula module sign <manifest.json>
   modula module diff <old-manifest.json> <new-manifest.json>
   modula module migrate <manifest.json> --from <data-schema-version>
+  modula module rollback <manifest.json> --to <data-schema-version>
   modula module upgrade-standard <manifest.json>
   modula module init [--write]
   modula forge templates

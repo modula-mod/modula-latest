@@ -24,8 +24,9 @@ function run(command, args, label, cwd = root) {
 
 run('pnpm', ['build'], 'external module-standard packages build', standardRoot)
 
-const {vaultNotesManifestFixture} = await import('@modula/module-fixtures')
+const {vaultNotesManifestFixture, vaultNotesStandard20ManifestFixture} = await import('@modula/module-fixtures')
 const {validateModulaModuleManifest, negotiateCapabilities, negotiateCompatibility} = await import('@modula/module-validator')
+const {extractModuleStandard20Summary} = await import('@modula/module-standard')
 const template = JSON.parse(readFileSync('templates/modula-module/modula.module.json', 'utf8'))
 
 function expect(condition, message) {
@@ -34,6 +35,7 @@ function expect(condition, message) {
 }
 
 expect(validateModulaModuleManifest(vaultNotesManifestFixture).valid, 'fixture manifest validates')
+expect(validateModulaModuleManifest(vaultNotesStandard20ManifestFixture).valid, 'Standard 2.0 fixture manifest validates')
 expect(validateModulaModuleManifest(template).valid, 'app template manifest validates')
 
 const host = {hostVersion: '1.0.0', runtimeVersion: '1.0.0', standardVersion: '1.0.0', platform: 'web'}
@@ -51,6 +53,11 @@ expect(requiredMissing.issues.some(issue => issue.code === 'REQUIRED_CAPABILITY_
 for (const marker of ['records', 'views', 'actions', 'functions', 'settings', 'events', 'automations', 'search', 'ai', 'diagnostics', 'health', 'release', 'trust']) {
   expect(Array.isArray(vaultNotesManifestFixture[marker]) || typeof vaultNotesManifestFixture[marker] === 'object', `validator fixture includes ${marker}`)
 }
+
+const standard20Summary = extractModuleStandard20Summary(vaultNotesStandard20ManifestFixture)
+expect(standard20Summary.services >= 6, 'Standard 2.0 fixture declares Vault Notes services')
+expect(standard20Summary.apis >= 7, 'Standard 2.0 fixture declares Vault Notes APIs')
+expect(standard20Summary.dependencies.provides >= 2, 'Standard 2.0 fixture declares provided contracts')
 
 if (failures.length > 0) {
   console.error(`Phase 7E module validator verifier failed: ${failures.length} issue(s)`)

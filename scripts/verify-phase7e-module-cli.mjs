@@ -28,12 +28,18 @@ run('pnpm', ['--filter', '@modula/modula-cli', 'build'], 'app modula CLI builds'
 run('pnpm', ['modula', '--', 'module', 'validate', 'templates/modula-module/modula.module.json'], 'app CLI validates Standard 1.0 template')
 run('pnpm', ['modula', '--', 'module', 'inspect', 'templates/modula-module/modula.module.json'], 'app CLI inspects Standard 1.0 template')
 run('pnpm', ['modula', '--', 'module', 'test', 'templates/modula-module/modula.module.json'], 'app CLI runs module sandbox test')
-run('pnpm', ['modula', '--', 'module', 'publish', 'templates/modula-module/modula.module.json'], 'app CLI publish remains disabled without registry target', root, 1)
+run('pnpm', ['modula', '--', 'module', 'publish', 'templates/modula-module/modula.module.json'], 'app CLI publish runs validation-only preflight')
+run('pnpm', ['modula', '--', 'module', 'doctor', 'templates/modula-module/modula.module.json'], 'app CLI runs module doctor')
+run('pnpm', ['modula', '--', 'module', 'schema', 'templates/modula-module/modula.module.json'], 'app CLI prints manifest schema metadata')
+run('pnpm', ['modula', '--', 'module', 'docs', 'templates/modula-module/modula.module.json'], 'app CLI prints generated docs summary')
+run('pnpm', ['modula', '--', 'module', 'bundle', 'templates/modula-module/modula.module.json'], 'app CLI runs bundle preflight')
+run('pnpm', ['modula', '--', 'module', 'release', 'templates/modula-module/modula.module.json'], 'app CLI runs release preflight')
 
 const tempDir = await mkdtemp(join(tmpdir(), 'modula-module-cli-'))
 try {
   run('pnpm', ['modula', '--', 'module', 'create', tempDir, '--id', 'com.example.cli-module', '--name', 'CLI Module'], 'app CLI creates module template')
   run('pnpm', ['modula', '--', 'module', 'validate', join(tempDir, 'manifest.json')], 'generated CLI template validates')
+  run('pnpm', ['modula', '--', 'module', 'doctor', join(tempDir, 'manifest.json')], 'generated CLI template passes doctor')
 } finally {
   await rm(tempDir, {recursive: true, force: true})
 }
