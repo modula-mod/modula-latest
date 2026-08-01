@@ -64,6 +64,9 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
   const items = useMemo(() => catalogue.data ?? [], [catalogue.data])
   const featured = items.filter(item => item.featured).slice(0, compact ? 3 : 6)
   const installedCount = installed.data?.length ?? 0
+  const standard20Count = items.filter(item => item.standard?.standardVersion === '2.0.0').length
+  const serviceCount = items.reduce((total, item) => total + (item.standard?.registries.services ?? 0), 0)
+  const apiCount = items.reduce((total, item) => total + (item.standard?.registries.apis ?? 0), 0)
 
   const sections = useMemo(
     () =>
@@ -119,6 +122,9 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
         <SummaryChip label="Installed" value={String(installedCount)} />
         <SummaryChip label="Compatible" value={String(items.filter(item => item.installable).length)} />
         <SummaryChip label="Updates" value={String(items.filter(item => item.installationState === 'updateAvailable').length)} />
+        <SummaryChip label="Standard 2.0" value={String(standard20Count)} />
+        <SummaryChip label="Services" value={String(serviceCount)} />
+        <SummaryChip label="APIs" value={String(apiCount)} />
       </View>
 
       {catalogue.isPending ? (

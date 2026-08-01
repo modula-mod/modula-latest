@@ -60,6 +60,28 @@ export type ModuleBackendMetadata = {
   backendPermissions: string[]
 }
 
+export type ModuleStandardMetadata = {
+  manifestVersion: number | null
+  standardVersion: string | null
+  sectionVersions: Record<string, string>
+  dependencies: Record<'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces' | 'provides', number>
+  registries: {
+    services: number
+    apis: number
+    hooks: number
+    jobs: number
+    storage: number
+    widgets: number
+    navigation: number
+    ui: number
+    automation: number
+    metrics: number
+  }
+  capabilityFlags: Record<string, boolean>
+  capabilities: string[]
+  engines: string[]
+}
+
 export type ModuleCatalogueItem = {
   moduleId: string
   name: string
@@ -75,6 +97,7 @@ export type ModuleCatalogueItem = {
   installationState: ModuleInstallationState
   priceState: ModulePriceState
   featured?: boolean
+  standard?: ModuleStandardMetadata
 }
 
 export type ModuleDetail = ModuleCatalogueItem & {
@@ -89,6 +112,14 @@ export type ModuleDetail = ModuleCatalogueItem & {
   releaseChecksum?: string | null
   releaseNotes?: string[]
   privacy?: string
+  standard?: ModuleStandardMetadata
+  manifest?: Record<string, unknown>
+  dependencyGraph?: Record<string, unknown>
+  serviceRegistry?: Record<string, unknown>
+  apiRegistry?: Record<string, unknown>
+  eventBus?: Record<string, unknown>
+  hookRegistry?: Record<string, unknown>
+  capabilityDiscovery?: Record<string, unknown>
 }
 
 export type InstalledModule = {
@@ -111,7 +142,21 @@ export type ModuleInstallPreview = {
   incompatibilityReasons: string[]
   trust: {level: string; publisherStatus: string; releaseStatus: string}
   permissions: ModuleDetail['permissions']
-  dependencies: unknown[]
+  dependencies: {
+    moduleId: string
+    provides: string | null
+    relation: 'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces'
+    requestedRange: string
+    resolvedVersion: string | null
+    resolvedModuleId: string | null
+    installed: boolean
+    optional: boolean
+    blocking: boolean
+    satisfied: boolean
+    reason?: string
+  }[]
+  dependencyWarnings?: string[]
+  provides?: {id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}[]
   contributions: Record<string, number>
   migrationsRequired: boolean
   permissionIncrease: boolean

@@ -40,6 +40,11 @@ export function ModuleCatalogueCard({item, onPress}: {item: ModuleCatalogueItem;
       <AppText variant="micro" colour="textTertiary">
         {item.category} · {item.trustLevel} · {item.latestVersion ? `v${item.latestVersion}` : item.compatibility}
       </AppText>
+      {item.standard?.standardVersion ? (
+        <AppText variant="micro" colour="textTertiary">
+          Standard {item.standard.standardVersion} · {item.standard.registries.services} services · {item.standard.registries.apis} APIs
+        </AppText>
+      ) : null}
     </AppPressable>
   )
 }

@@ -13,6 +13,29 @@ export type GreenfieldRegistryModuleSummary = {
   status: GreenfieldModuleReleaseStatus | 'planned' | 'inactive' | 'unavailable'
   installable: boolean
   platforms: GreenfieldModulePlatform[]
+  standard?: GreenfieldRegistryStandardMetadata
+}
+
+export type GreenfieldRegistryStandardMetadata = {
+  manifestVersion: number | null
+  standardVersion: string | null
+  sectionVersions: Record<string, string>
+  dependencies: Record<'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces' | 'provides', number>
+  registries: {
+    services: number
+    apis: number
+    hooks: number
+    jobs: number
+    storage: number
+    widgets: number
+    navigation: number
+    ui: number
+    automation: number
+    metrics: number
+  }
+  capabilityFlags: Record<string, boolean>
+  capabilities: string[]
+  engines: string[]
 }
 
 export type GreenfieldRegistryFilter = {

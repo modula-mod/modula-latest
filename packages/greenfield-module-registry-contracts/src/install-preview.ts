@@ -20,11 +20,19 @@ export type GreenfieldModuleInstallPreview = {
   }>
   dependencies: Array<{
     moduleId: string
+    provides: string | null
+    relation: 'requires' | 'optional' | 'recommended' | 'conflicts' | 'replaces'
     requestedRange: string
     resolvedVersion: string | null
+    resolvedModuleId: string | null
     installed: boolean
     optional: boolean
+    blocking: boolean
+    satisfied: boolean
+    reason?: string
   }>
+  dependencyWarnings?: string[]
+  provides?: Array<{id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}>
   contributions: {
     routes: number
     profileTabs: number
@@ -36,6 +44,8 @@ export type GreenfieldModuleInstallPreview = {
     widgets: number
     plugins: number
     connectors: number
+    jobs: number
+    events: number
   }
   migrationsRequired: boolean
   permissionIncrease: boolean

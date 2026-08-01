@@ -1,5 +1,5 @@
-import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
-import type {GreenfieldRegistryFilter, GreenfieldRegistryModuleSummary} from '@modula/greenfield-module-registry-contracts'
+import {extractModuleStandard20Summary, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
+import type {GreenfieldRegistryFilter, GreenfieldRegistryModuleSummary, GreenfieldRegistryStandardMetadata} from '@modula/greenfield-module-registry-contracts'
 import type {ModulaDb} from '../database/client.js'
 import {moduleError} from './module-errors.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
@@ -37,7 +37,7 @@ export class GreenfieldModuleRegistryService {
 
     const byModule = new Map<string, GreenfieldRegistryModuleSummary>()
     for (const row of releases as any[]) {
-      const manifest = row.manifest as GreenfieldModuleManifestV1
+      const manifest = row.manifest as GreenfieldModuleManifest
       if (filters.q && !`${manifest.name} ${manifest.description} ${row.module_id}`.toLowerCase().includes(filters.q.toLowerCase())) continue
       if (filters.platform && !manifest.compatibility.platforms.includes(filters.platform)) continue
       if (!byModule.has(row.module_id)) {
@@ -53,6 +53,7 @@ export class GreenfieldModuleRegistryService {
           status: row.release_state,
           installable: row.release_state === 'published',
           platforms: manifest.compatibility.platforms,
+          standard: standardMetadataForManifest(manifest),
         })
       }
     }
@@ -80,6 +81,7 @@ export class GreenfieldModuleRegistryService {
         status: (manifest.state === 'planned' ? 'planned' : row.catalogue_status) as GreenfieldRegistryModuleSummary['status'],
         installable: false,
         platforms: [],
+        standard: standardMetadataForManifest(manifest),
       })
     }
 
@@ -91,6 +93,7 @@ export class GreenfieldModuleRegistryService {
     const releases = await this.listVersions(moduleId)
     if (releases.length > 0) {
       const latest = releases[0]!
+      const manifestRecord = latest.manifest as Record<string, unknown>
       return {
         moduleId: latest.moduleId,
         name: latest.manifest.name,
@@ -102,6 +105,24 @@ export class GreenfieldModuleRegistryService {
         license: latest.licenseStatus,
         compatibility: latest.manifest.compatibility,
         contributions: latest.manifest.contributions,
+        permissions: latest.manifest.permissions,
+        backend: latest.manifest.backend,
+        ai: latest.manifest.ai,
+        manifest: latest.manifest,
+        manifestSha256: latest.manifestSha256,
+        releaseSha256: latest.releaseSha256,
+        source: {
+          repository: latest.sourceRepository,
+          commit: latest.sourceCommit,
+          manifestPath: latest.manifestPath,
+        },
+        standardMetadata: standardMetadataForManifest(latest.manifest),
+        dependencyGraph: manifestRecord.dependencyGraph,
+        serviceRegistry: manifestRecord.serviceRegistry,
+        apiRegistry: manifestRecord.apiRegistry,
+        eventBus: manifestRecord.eventBus,
+        hookRegistry: manifestRecord.hookRegistry,
+        capabilityDiscovery: manifestRecord.capabilityDiscovery,
       }
     }
     const placeholder = await this.db
@@ -123,6 +144,7 @@ export class GreenfieldModuleRegistryService {
       compatibility: {},
       contributions: {},
       placeholder: placeholder.manifest,
+      standardMetadata: standardMetadataForManifest(placeholder.manifest),
     }
   }
 
@@ -184,5 +206,37 @@ export class GreenfieldModuleRegistryService {
     const release = releases.find(item => item.releaseState === 'published')
     if (!release) throw moduleError('NOT_FOUND', `Published release for ${moduleId} not found`)
     return release
+  }
+}
+
+function standardMetadataForManifest(input: unknown): GreenfieldRegistryStandardMetadata {
+  const manifest = input && typeof input === 'object' && !Array.isArray(input) ? input as Record<string, unknown> : {}
+  const summary = extractModuleStandard20Summary(manifest)
+  return {
+    manifestVersion: typeof manifest.manifestVersion === 'number' ? manifest.manifestVersion : null,
+    standardVersion: typeof manifest.standardVersion === 'string' ? manifest.standardVersion : null,
+    sectionVersions: Object.fromEntries(Object.entries(summary.sectionVersions).filter((entry): entry is [string, string] => typeof entry[1] === 'string')),
+    dependencies: summary.dependencies,
+    registries: {
+      services: summary.services,
+      apis: summary.apis,
+      hooks: summary.hooks,
+      jobs: summary.jobs,
+      storage: summary.storage,
+      widgets: summary.widgets,
+      navigation: summary.navigation,
+      ui: summary.ui,
+      automation: summary.automation,
+      metrics: summary.metrics,
+    },
+    capabilityFlags: summary.capabilityFlags,
+    capabilities: Array.isArray(manifest.capabilities)
+      ? manifest.capabilities.map(capability => {
+          if (typeof capability === 'string') return capability
+          if (capability && typeof capability === 'object' && typeof (capability as Record<string, unknown>).id === 'string') return (capability as Record<string, string>).id
+          return null
+        }).filter((capability): capability is string => Boolean(capability))
+      : [],
+    engines: summary.engines,
   }
 }

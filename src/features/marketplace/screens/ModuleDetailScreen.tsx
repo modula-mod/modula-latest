@@ -183,6 +183,25 @@ export function ModuleDetailScreen() {
             <InfoRow label="Primary store" value={dataLocationLabel(module.backend.dataLocation)} />
             <InfoRow label="Regions" value={module.backend.regions.length ? module.backend.regions.join(', ') : 'Not declared'} />
           </Section>
+          {module.standard ? (
+            <Section title="Module standard">
+              <InfoRow label="Manifest" value={module.standard.manifestVersion ? `Greenfield v${module.standard.manifestVersion}` : 'Not declared'} />
+              <InfoRow label="Standard" value={module.standard.standardVersion ?? 'Legacy'} />
+              <InfoRow label="Section versions" value={String(Object.keys(module.standard.sectionVersions).length)} />
+              <InfoRow label="Dependencies" value={standardDependencySummary(module)} />
+              <InfoRow label="Registries" value={standardRegistrySummary(module)} />
+              <InfoRow label="Capabilities" value={standardCapabilitySummary(module)} />
+              <InfoRow label="Engines" value={module.standard.engines.length ? module.standard.engines.join(', ') : 'Declarative host runtime'} />
+            </Section>
+          ) : null}
+          {module.standard && hasRegistryMetadata(module) ? (
+            <Section title="Services and APIs">
+              <InfoRow label="Services" value={registryPreview(module.serviceRegistry, 'kind')} />
+              <InfoRow label="APIs" value={apiRegistryPreview(module.apiRegistry)} />
+              <InfoRow label="Hooks" value={registryPreview(module.hookRegistry, 'hook')} />
+              <InfoRow label="Events" value={registryPreview(module.eventBus, 'type')} />
+            </Section>
+          ) : null}
           <Section title="Trust and provenance">
             <InfoRow label="Module ID" value={module.moduleId} />
             <InfoRow label="Source repository" value={module.sourceRepository || 'Not declared'} />
@@ -376,6 +395,73 @@ function summariseObject(value: Record<string, unknown>): string {
   const entries = Object.entries(value ?? {})
   if (!entries.length) return 'No contributions are declared for this release.'
   return entries.map(([key, item]) => `${key}: ${Array.isArray(item) ? item.length : 1}`).join(' · ')
+}
+
+function standardDependencySummary(module: ModuleDetail): string {
+  const dependencies = module.standard?.dependencies
+  if (!dependencies) return 'Not declared'
+  return [
+    `requires ${dependencies.requires}`,
+    `optional ${dependencies.optional}`,
+    `recommended ${dependencies.recommended}`,
+    `conflicts ${dependencies.conflicts}`,
+    `provides ${dependencies.provides}`,
+  ].join(' · ')
+}
+
+function standardRegistrySummary(module: ModuleDetail): string {
+  const registries = module.standard?.registries
+  if (!registries) return 'Not declared'
+  return [
+    `services ${registries.services}`,
+    `APIs ${registries.apis}`,
+    `hooks ${registries.hooks}`,
+    `jobs ${registries.jobs}`,
+    `widgets ${registries.widgets}`,
+    `automation ${registries.automation}`,
+  ].join(' · ')
+}
+
+function standardCapabilitySummary(module: ModuleDetail): string {
+  const flags = module.standard?.capabilityFlags ?? {}
+  const enabled = Object.entries(flags)
+    .filter(([, value]) => value)
+    .map(([key]) => key.replace(/^supports/, ''))
+  const declared = [...(module.standard?.capabilities ?? []), ...enabled]
+  return declared.length ? declared.slice(0, 10).join(', ') : 'Not declared'
+}
+
+function hasRegistryMetadata(module: ModuleDetail): boolean {
+  const registries = module.standard?.registries
+  if (!registries) return false
+  return registries.services + registries.apis + registries.hooks + registryItemCount(module.eventBus) > 0
+}
+
+function registryPreview(value: Record<string, unknown> | undefined, field: string): string {
+  const items = registryItems(value)
+  if (!items.length) return 'Not declared'
+  return items
+    .slice(0, 6)
+    .map(item => String(item[field] ?? item.title ?? item.id ?? 'registry item'))
+    .join(', ')
+}
+
+function apiRegistryPreview(value: Record<string, unknown> | undefined): string {
+  const items = registryItems(value)
+  if (!items.length) return 'Not declared'
+  return items
+    .slice(0, 6)
+    .map(item => `${String(item.method ?? 'API')} ${String(item.path ?? item.id ?? '')}`)
+    .join(', ')
+}
+
+function registryItemCount(value: Record<string, unknown> | undefined): number {
+  return registryItems(value).length
+}
+
+function registryItems(value: Record<string, unknown> | undefined): Record<string, unknown>[] {
+  const items = value?.items
+  return Array.isArray(items) ? items.filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null && !Array.isArray(item)) : []
 }
 
 const styles = StyleSheet.create({

@@ -91,7 +91,7 @@ export class GreenfieldModuleInstallationService {
   async installPreview(accountId: string, moduleId: string, version?: string): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status']).where('publisher_id', '=', release.publisherId).executeTakeFirst()
-    const dependencyPlan = await this.dependencies.resolve({moduleId, dependencies: release.manifest.dependencies ?? [], accountId})
+    const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
     const compatibility = new GreenfieldModuleCompatibilityService(this.config).evaluate(release, {
       platform: 'server',
       publisherStatus: publisher?.status,
@@ -117,6 +117,8 @@ export class GreenfieldModuleInstallationService {
       },
       permissions,
       dependencies: dependencyPlan.dependencies,
+      dependencyWarnings: dependencyPlan.warnings,
+      provides: dependencyPlan.provides,
       contributions: {
         routes: counts.routes,
         profileTabs: counts.profileTabs,
@@ -128,6 +130,8 @@ export class GreenfieldModuleInstallationService {
         widgets: counts.widgets,
         plugins: counts.plugins,
         connectors: counts.connectors,
+        jobs: counts.jobs,
+        events: counts.events,
       },
       migrationsRequired: counts.schemas > 0,
       permissionIncrease: false,

@@ -1,4 +1,5 @@
 import type {ApiClient} from '@/api/client'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   InstalledModule,
@@ -40,6 +41,7 @@ const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
     installationState: 'available',
     priceState: 'Included',
     featured: true,
+    standard: localStandardMetadata(),
   },
   {
     moduleId: 'digital.modula.tasks',
@@ -75,45 +77,61 @@ const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
 
 const LOCAL_RECORD_STORE = new Map<string, ModuleRecord[]>()
 
+async function localOnlyFallback<T>(operation: Promise<T>, fallback: () => T | Promise<T>): Promise<T> {
+  try {
+    return await operation
+  } catch (error) {
+    if (runtimeEnvironment.dataSource === 'local') return fallback()
+    throw error
+  }
+}
+
 export class ApiModuleRepository implements ModuleRepository {
   constructor(private readonly client: ApiClient) {}
 
   async listCatalogue(input: {q?: string; category?: ProductHubCategory; limit?: number} = {}): Promise<ModuleCatalogueItem[]> {
-    try {
-      const remote = await this.client.get(
+    return localOnlyFallback(
+      this.client.get(
         {path: '/v1/registry/modules', query: {q: input.q, limit: input.limit ?? 50}},
         decodeCataloguePage,
-      )
+      ),
+      () => filterCatalogue(LOCAL_CATALOGUE, input),
+    ).then(async remote => {
+      if (runtimeEnvironment.dataSource === 'local' && remote === LOCAL_CATALOGUE) return remote
       const installed = await this.listInstalled()
       const byId = new Map(installed.map(item => [item.moduleId, item]))
       return filterCatalogue(remote.map(item => applyInstalledState(item, byId.get(item.moduleId))), input)
-    } catch {
-      return filterCatalogue(LOCAL_CATALOGUE, input)
-    }
+    })
   }
 
   async getModule(moduleId: string): Promise<ModuleDetail | null> {
-    try {
-      const item = await this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail)
+    return localOnlyFallback(
+      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
+      () => {
+        const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
+        return fallback ? {
+          ...fallback,
+          longDescription: fallback.description,
+          backend: defaultBackendMetadata(moduleId),
+          permissions: [],
+          contributions: {},
+          privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
+        } : null
+      },
+    ).then(async item => {
+      if (!item) return null
       const installed = await this.listInstalled()
       return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
-    } catch {
-      const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
-      return fallback ? {
-        ...fallback,
-        longDescription: fallback.description,
-        backend: defaultBackendMetadata(moduleId),
-        permissions: [],
-        contributions: {},
-        privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
-      } : null
-    }
+    })
   }
 
   listInstalled(): Promise<InstalledModule[]> {
-    return this.client.get({path: '/v1/modules/installed', authenticated: true}, value =>
-      Array.isArray(value) ? value.map(decodeInstalledModule) : [],
-    ).catch(() => [])
+    return localOnlyFallback(
+      this.client.get({path: '/v1/modules/installed', authenticated: true}, value =>
+        Array.isArray(value) ? value.map(decodeInstalledModule) : [],
+      ),
+      () => [],
+    )
   }
 
   installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview> {
@@ -153,37 +171,51 @@ export class ApiModuleRepository implements ModuleRepository {
   }
 
   async listViews(moduleId: string): Promise<ModuleRuntimeView[]> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views`, authenticated: true}, value => {
-      const row = value as {views?: unknown}
-      return Array.isArray(row.views) ? row.views.map(decodeRuntimeView) : []
-    }).catch(() => localViews(moduleId))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views`, authenticated: true}, value => {
+        const row = value as {views?: unknown}
+        return Array.isArray(row.views) ? row.views.map(decodeRuntimeView) : []
+      }),
+      () => localViews(moduleId),
+    )
   }
 
   async getView(moduleId: string, viewId: string): Promise<ModuleRuntimeView | null> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}`, authenticated: true}, decodeRuntimeView).catch(async () => {
-      const views = await this.listViews(moduleId)
-      return views.find(view => view.viewId === viewId) ?? views[0] ?? null
-    })
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}`, authenticated: true}, decodeRuntimeView),
+      async () => {
+        const views = await this.listViews(moduleId)
+        return views.find(view => view.viewId === viewId) ?? views[0] ?? null
+      },
+    )
   }
 
   listRecords(moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number} = {}): Promise<ModuleRecordPage> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: input}, decodeRecordPage)
-      .catch(() => ({moduleId, collection, items: localRecords(moduleId, collection, input.q), nextCursor: null, limit: input.limit ?? 25}))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: input}, decodeRecordPage),
+      () => ({moduleId, collection, items: localRecords(moduleId, collection, input.q), nextCursor: null, limit: input.limit ?? 25}),
+    )
   }
 
   createRecord(moduleId: string, collection: string, data: Record<string, unknown>): Promise<ModuleRecord> {
-    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data}}, decodeRecord)
-      .catch(() => createLocalRecord(moduleId, collection, data))
+    return localOnlyFallback(
+      this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, body: {data}}, decodeRecord),
+      () => createLocalRecord(moduleId, collection, data),
+    )
   }
 
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord> {
-    return this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision}}, decodeRecord)
-      .catch(() => updateLocalRecord(moduleId, collection, recordId, data, expectedRevision))
+    return localOnlyFallback(
+      this.client.patch({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {data, expectedRevision}}, decodeRecord),
+      () => updateLocalRecord(moduleId, collection, recordId, data, expectedRevision),
+    )
   }
 
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown> {
-    return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value)
-      .catch(() => deleteLocalRecord(moduleId, collection, recordId, expectedRevision))
+    return localOnlyFallback(
+      this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value),
+      () => deleteLocalRecord(moduleId, collection, recordId, expectedRevision),
+    )
   }
 
   runAction(moduleId: string, actionId: string, input: Record<string, unknown> = {}): Promise<unknown> {
@@ -207,13 +239,17 @@ export class ApiModuleRepository implements ModuleRepository {
   }
 
   getSettingsSchema(moduleId: string): Promise<ModuleSettingsSchema> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings-schema`, authenticated: true}, decodeSettingsSchema)
-      .catch(() => localSettingsSchema(moduleId))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings-schema`, authenticated: true}, decodeSettingsSchema),
+      () => localSettingsSchema(moduleId),
+    )
   }
 
   getSettings(moduleId: string): Promise<ModuleSettingsDocument> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true}, decodeSettings)
-      .catch(() => ({moduleId, installationId: `local:${moduleId}`, version: 0, values: localSettingsSchema(moduleId).defaults}))
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/settings`, authenticated: true}, decodeSettings),
+      () => ({moduleId, installationId: `local:${moduleId}`, version: 0, values: localSettingsSchema(moduleId).defaults}),
+    )
   }
 
   updateSettings(moduleId: string, values: Record<string, unknown>): Promise<ModuleSettingsDocument> {
@@ -221,13 +257,17 @@ export class ApiModuleRepository implements ModuleRepository {
   }
 
   getHealth(moduleId: string): Promise<ModuleHealth | null> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/health`, authenticated: true}, decodeHealth)
-      .catch(() => null)
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/health`, authenticated: true}, decodeHealth),
+      () => null,
+    )
   }
 
   getBackendDiagnostics(moduleId: string): Promise<ModuleBackendMetadata | null> {
-    return this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend`, authenticated: true}, value => decodeBackendMetadata(value, moduleId))
-      .catch(async () => (await this.getModule(moduleId))?.backend ?? null)
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/backend`, authenticated: true}, value => decodeBackendMetadata(value, moduleId)),
+      async () => (await this.getModule(moduleId))?.backend ?? null,
+    )
   }
 
   reverifyBackend(moduleId: string, origin?: string): Promise<ModuleBackendMetadata | null> {
@@ -243,9 +283,12 @@ export class ApiModuleRepository implements ModuleRepository {
   }
 
   listContributions(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}): Promise<ModuleContribution[]> {
-    return this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
-      Array.isArray(value) ? value.map(decodeContribution) : [],
-    ).catch(() => [])
+    return localOnlyFallback(
+      this.client.get({path: '/v1/modules/contributions', authenticated: true, query: input}, value =>
+        Array.isArray(value) ? value.map(decodeContribution) : [],
+      ),
+      () => [],
+    )
   }
 }
 
@@ -259,6 +302,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
   const moduleId = String(row.moduleId ?? row.module_id ?? row.slug ?? 'unknown')
   const status = String(row.status ?? 'published')
   const installable = Boolean(row.installable)
+  const manifest = isRecord(row.manifest) ? row.manifest : {}
   return {
     moduleId,
     name: String(row.name ?? moduleId),
@@ -274,6 +318,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     installationState: status === 'quarantined' ? 'quarantined' : installable ? 'available' : status === 'planned' ? 'comingSoon' : 'notAvailable',
     priceState: installable ? 'Free' : status === 'planned' ? 'Coming soon' : 'Not available',
     featured: moduleId.includes('vault-notes') || moduleId.includes('tasks'),
+    standard: decodeStandardMetadata(row.standard ?? row.standardMetadata ?? manifest),
   }
 }
 
@@ -294,6 +339,14 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleDetail['permissions'] : [],
     contributions: (row.contributions ?? {}) as Record<string, unknown>,
     ai: decodeAIDeclaration(isRecord(manifest.ai) ? manifest.ai : row.ai),
+    standard: decodeStandardMetadata(row.standardMetadata ?? row.standard ?? manifest),
+    manifest,
+    dependencyGraph: recordOrUndefined(row.dependencyGraph ?? manifest.dependencyGraph),
+    serviceRegistry: recordOrUndefined(row.serviceRegistry ?? manifest.serviceRegistry),
+    apiRegistry: recordOrUndefined(row.apiRegistry ?? manifest.apiRegistry),
+    eventBus: recordOrUndefined(row.eventBus ?? manifest.eventBus),
+    hookRegistry: recordOrUndefined(row.hookRegistry ?? manifest.hookRegistry),
+    capabilityDiscovery: recordOrUndefined(row.capabilityDiscovery ?? manifest.capabilityDiscovery),
     sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),
     sourceCommit: typeof source.commit === 'string' ? source.commit : undefined,
     manifestChecksum: typeof row.manifestSha256 === 'string' ? row.manifestSha256 : undefined,
@@ -379,11 +432,71 @@ function decodeInstallPreview(value: unknown): ModuleInstallPreview {
     incompatibilityReasons: Array.isArray(row.incompatibilityReasons) ? row.incompatibilityReasons.map(String) : [],
     trust: (row.trust ?? {level: 'unknown', publisherStatus: 'pending', releaseStatus: 'unknown'}) as ModuleInstallPreview['trust'],
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleInstallPreview['permissions'] : [],
-    dependencies: Array.isArray(row.dependencies) ? row.dependencies : [],
+    dependencies: Array.isArray(row.dependencies) ? row.dependencies as ModuleInstallPreview['dependencies'] : [],
+    dependencyWarnings: Array.isArray(row.dependencyWarnings) ? row.dependencyWarnings.map(String) : [],
+    provides: Array.isArray(row.provides) ? row.provides as ModuleInstallPreview['provides'] : [],
     contributions: (row.contributions ?? {}) as Record<string, number>,
     migrationsRequired: Boolean(row.migrationsRequired),
     permissionIncrease: Boolean(row.permissionIncrease),
   }
+}
+
+function decodeStandardMetadata(value: unknown): ModuleDetail['standard'] {
+  if (!isRecord(value)) return undefined
+  const registries = isRecord(value.registries) ? value.registries : {}
+  const dependencies = isRecord(value.dependencies) ? value.dependencies : {}
+  const manifestVersion = typeof value.manifestVersion === 'number' ? value.manifestVersion : null
+  const sectionVersions = isRecord(value.sectionVersions) ? Object.fromEntries(Object.entries(value.sectionVersions).filter((entry): entry is [string, string] => typeof entry[1] === 'string')) : {}
+  const standardVersion = typeof value.standardVersion === 'string'
+    ? value.standardVersion
+    : typeof value.versioning === 'object' && value.versioning !== null && typeof (value.versioning as Record<string, unknown>).standardVersion === 'string'
+      ? String((value.versioning as Record<string, unknown>).standardVersion)
+      : null
+  return {
+    manifestVersion,
+    standardVersion,
+    sectionVersions,
+    dependencies: {
+      requires: numberValue(dependencies.requires),
+      optional: numberValue(dependencies.optional),
+      recommended: numberValue(dependencies.recommended),
+      conflicts: numberValue(dependencies.conflicts),
+      replaces: numberValue(dependencies.replaces),
+      provides: numberValue(dependencies.provides),
+    },
+    registries: {
+      services: numberValue(registries.services),
+      apis: numberValue(registries.apis),
+      hooks: numberValue(registries.hooks),
+      jobs: numberValue(registries.jobs),
+      storage: numberValue(registries.storage),
+      widgets: numberValue(registries.widgets),
+      navigation: numberValue(registries.navigation),
+      ui: numberValue(registries.ui),
+      automation: numberValue(registries.automation),
+      metrics: numberValue(registries.metrics),
+    },
+    capabilityFlags: isRecord(value.capabilityFlags) ? Object.fromEntries(Object.entries(value.capabilityFlags).filter((entry): entry is [string, boolean] => typeof entry[1] === 'boolean')) : {},
+    capabilities: arrayOfStrings(value.capabilities),
+    engines: arrayOfStrings(value.engines),
+  }
+}
+
+function localStandardMetadata(): ModuleDetail['standard'] {
+  return {
+    manifestVersion: 1,
+    standardVersion: null,
+    sectionVersions: {},
+    dependencies: {requires: 0, optional: 0, recommended: 0, conflicts: 0, replaces: 0, provides: 0},
+    registries: {services: 0, apis: 0, hooks: 0, jobs: 0, storage: 0, widgets: 0, navigation: 0, ui: 0, automation: 0, metrics: 0},
+    capabilityFlags: {},
+    capabilities: [],
+    engines: [],
+  }
+}
+
+function numberValue(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0
 }
 
 function decodeRuntimeView(value: unknown): ModuleRuntimeView {
