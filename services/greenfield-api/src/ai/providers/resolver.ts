@@ -19,6 +19,7 @@ export type GreenfieldAIProviderResolutionInput = {
   structuredOutput?: boolean
   streaming?: boolean
   openCircuitDurationMs?: number
+  allowDevelopmentMock?: boolean
 }
 
 type Candidate = {
@@ -51,6 +52,7 @@ export class GreenfieldAIProviderResolver {
       const provider = await this.repository.requireProvider(model.providerId)
       if (provider.status !== 'available') continue
       if (provider.configurationMode === 'disabled') continue
+      if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue
       if (permittedProviders && !permittedProviders.has(provider.providerId)) continue
       if (input.preferredProviderId && input.routingStrategy === 'fixed' && provider.providerId !== input.preferredProviderId) continue
       const health = await this.runtime.latestProviderHealth(provider.providerId, model.modelId)

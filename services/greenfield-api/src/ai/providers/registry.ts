@@ -22,9 +22,11 @@ export class GreenfieldAIProviderAdapterRegistry {
   }
 }
 
-export function createDefaultProviderAdapterRegistry(): GreenfieldAIProviderAdapterRegistry {
+export function createDefaultProviderAdapterRegistry(input: {allowDevelopmentMock?: boolean} = {}): GreenfieldAIProviderAdapterRegistry {
   const registry = new GreenfieldAIProviderAdapterRegistry()
-  registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))
+  if (input.allowDevelopmentMock) {
+    registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))
+  }
   registry.register(new OpenAIGreenfieldAIProviderAdapter('provider:openai'))
   registry.register(new OllamaGreenfieldAIProviderAdapter('provider:ollama'))
   registry.register(new OllamaGreenfieldAIProviderAdapter('provider:local'))

@@ -160,6 +160,8 @@
     "verify:phase7e-vault-notes-ai-standard": "node scripts/verify-phase7e-vault-notes-ai-standard.mjs",
     "verify:phase7e-vault-notes-ai-integration": "node scripts/verify-phase7e-vault-notes-ai-integration.mjs",
     "verify:phase7e-ai-product-integration": "node scripts/verify-phase7e-ai-product-integration.mjs",
+    "verify:phase7e-real-auth": "node scripts/verify-phase7e-real-auth.mjs",
+    "verify:phase7e-no-product-mocks": "node scripts/verify-phase7e-no-product-mocks.mjs",
     "smoke:phase7e-openai-provider": "node scripts/smoke-phase7e-openai-provider.mjs",
     "smoke:phase7e-vault-notes-ai": "node scripts/smoke-phase7e-vault-notes-ai.mjs",
     "verify:phase7e-vault-notes-standard": "node scripts/verify-phase7e-vault-notes-standard.mjs",

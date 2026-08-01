@@ -1,4 +1,5 @@
 import type {ApiClient} from '@/api/client'
+import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import type {
   ExtensionCentreItem,
   ExtensionRepository,
@@ -36,7 +37,10 @@ export class ApiExtensionRepository implements ExtensionRepository {
   listInstalled(): Promise<ExtensionCentreItem[]> {
     return this.client
       .get({path: '/v1/extensions/installed', authenticated: true}, decodeList)
-      .catch(() => [])
+      .catch(error => {
+        if (runtimeEnvironment.dataSource === 'local') return []
+        throw error
+      })
   }
 
   async getExtension(extensionId: string): Promise<ExtensionCentreItem | null> {

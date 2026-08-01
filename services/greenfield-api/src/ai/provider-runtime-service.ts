@@ -106,7 +106,9 @@ export class GreenfieldAIProviderRuntimeService {
     this.contextBuilder = new GreenfieldAIContextBuilder(db)
     this.quotas = new GreenfieldAIQuotaService(db)
     this.tools = new GreenfieldAIToolBroker(db)
-    this.adapters = options.adapterRegistry ?? createDefaultProviderAdapterRegistry()
+    this.adapters = options.adapterRegistry ?? createDefaultProviderAdapterRegistry({
+      allowDevelopmentMock: config.nodeEnv === 'test',
+    })
     this.limits = {
       maxInputUnits: 12_000,
       maxOutputUnits: 2_000,
@@ -220,6 +222,7 @@ export class GreenfieldAIProviderRuntimeService {
       routingStrategy: input.routingStrategy ?? routingStrategyFromManifest(input.manifest),
       structuredOutput,
       streaming,
+      allowDevelopmentMock: this.config.nodeEnv === 'test',
     })
 
     try {
