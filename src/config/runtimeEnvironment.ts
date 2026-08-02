@@ -9,10 +9,21 @@ export type RuntimeEnvironment = {
   demoSession: DemoSessionBootstrap
 }
 
+const PRODUCTION_API_ORIGIN = 'https://api.modula.digital'
+const PRODUCTION_WEB_HOSTS = new Set(['modula.digital', 'www.modula.digital'])
+
+function isProductionWebHost(): boolean {
+  const hostname = typeof globalThis.location?.hostname === 'string'
+    ? globalThis.location.hostname.toLowerCase()
+    : null
+  return hostname !== null && PRODUCTION_WEB_HOSTS.has(hostname)
+}
+
 function readAppEnvironment(value: string | undefined): AppEnvironment {
   if (value === 'development' || value === 'preview' || value === 'production') {
     return value
   }
+  if (isProductionWebHost()) return 'production'
   return 'development'
 }
 
@@ -44,6 +55,7 @@ function readApiUrl(value: string | undefined, input: {
   }
 
   if (!trimmed.length) {
+    if (input.appEnvironment === 'production') return PRODUCTION_API_ORIGIN
     throw new Error('Remote data source requires EXPO_PUBLIC_API_URL.')
   }
 

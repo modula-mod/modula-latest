@@ -12,6 +12,7 @@ const currentLink = join(productionRoot, 'current')
 const apex = 'https://modula.digital'
 const www = 'https://www.modula.digital'
 const apiHealth = 'https://api.modula.digital/v1/meta'
+const localUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0)(?::\d+)?|(?:localhost|127\.0\.0\.1|0\.0\.0\.0):\d+/i
 
 const routePaths = [
   '/',
@@ -109,7 +110,7 @@ async function verifyApex(localMarker) {
   ])
   expect(!/Open WebUI/i.test(html), 'apex OpenWebUI signature absent')
   expect(/_expo\/static|id="root"|Modula/i.test(html), 'apex returns Modula app shell')
-  expect(!/localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(html), 'apex shell does not contain localhost URLs')
+  expect(!localUrlPattern.test(html), 'apex shell does not contain localhost URLs')
   let remoteMarker = {}
   try {
     remoteMarker = JSON.parse(markerText)
@@ -132,7 +133,9 @@ async function verifyWwwRedirect() {
 }
 
 async function verifyAssets(html) {
-  const assets = [...html.matchAll(/(?:src|href)="([^"]*\/_expo\/static\/[^"]+)"/g)].map(match => match[1]!)
+  const assets = [...html.matchAll(/(?:src|href)="([^"]*\/_expo\/static\/[^"]+)"/g)]
+    .map(match => match[1])
+    .filter(Boolean)
   expect(assets.length > 0, 'JavaScript/CSS assets discovered from app shell')
   for (const asset of assets.slice(0, 8)) {
     const url = asset.startsWith('http') ? asset : `${apex}${asset.startsWith('/') ? asset : `/${asset}`}`
@@ -141,7 +144,7 @@ async function verifyAssets(html) {
       expect(response.ok, `asset responds ${url}`)
       const text = await response.text()
       expect(!/Open WebUI/i.test(text), `asset ${url} does not contain OpenWebUI signature`)
-      expect(!/localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(text), `asset ${url} does not contain localhost URLs`)
+      expect(!localUrlPattern.test(text), `asset ${url} does not contain localhost URLs`)
     } catch (error) {
       fail(`asset fetch failed ${url}: ${error instanceof Error ? error.message : String(error)}`)
     }
@@ -155,7 +158,7 @@ async function verifyRoutes() {
       const text = await response.text()
       expect(response.ok, `route responds ${path}`)
       expect(!/Open WebUI/i.test(text), `route ${path} OpenWebUI signature absent`)
-      expect(!/localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(text), `route ${path} does not contain localhost URLs`)
+      expect(!localUrlPattern.test(text), `route ${path} does not contain localhost URLs`)
     } catch (error) {
       fail(`route fetch failed ${path}: ${error instanceof Error ? error.message : String(error)}`)
     }
@@ -179,7 +182,7 @@ function verifyNoDevelopmentProviders(releaseDir) {
   const checksums = readFileSync(join(releaseDir, 'checksums.sha256'), 'utf8')
   expect(!/deterministic|mock-ai|dev-provider/i.test(checksums), 'checksum manifest contains no development provider names')
   const marker = readFileSync(join(releaseDir, 'version.json'), 'utf8')
-  expect(!/localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(marker), 'version marker has no local API origin')
+  expect(!localUrlPattern.test(marker), 'version marker has no local API origin')
 }
 
 async function fetchText(url, init = {}) {
