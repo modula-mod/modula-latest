@@ -68,7 +68,11 @@ includes('src/features/marketplace/screens/ModuleDetailScreen.tsx', [
 
 run('pnpm', ['--filter', '@modula/greenfield-module-manifest', 'build'], 'manifest package builds')
 run('pnpm', ['--filter', '@modula/greenfield-module-manifest', 'test'], 'manifest package tests pass')
-run('pnpm', ['--filter', '@modula/greenfield-api', 'test', '--', 'phase7e.standard2-normalization'], 'normalizer API tests pass')
+run(
+  'pnpm',
+  ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.standard2-normalization.test.ts'],
+  'normalizer API tests pass',
+)
 
 const {
   MODULE_STANDARD_20_SECTION_NAMES,
