@@ -19,7 +19,7 @@
 | --- | --- |
 | Bundle identifier | `digital.modula.app` |
 | Display name | Modula |
-| URL schemes | `modula`, `digital.modula.app` |
+| URL schemes | `modula`, `digital.modula.app`, `exp+modula` |
 | Associated domains | none in entitlements |
 | Entitlements | empty `Modula.entitlements` |
 | Keychain / SecureStore | via `expo-secure-store` plugin |

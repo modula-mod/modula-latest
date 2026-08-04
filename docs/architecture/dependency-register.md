@@ -41,6 +41,7 @@ No package should enter the project merely because an example repository uses it
 | eslint-config-expo | ~57.0.0 | Expo ESLint flat config | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | expo-doctor | ^1.20.0 | Expo project health checks | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | typescript | ~6.0.3 | TypeScript compiler | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
+| babel-preset-expo | ~57.0.4 | Expo Babel preset for Metro / Release `export:embed` under pnpm | No | N/A | See package LICENSE | Required as direct workspace root dep so Release Simulator bundling resolves the preset (transitive-only was insufficient under pnpm) | Phase 7F-A |
 
 ## Phase 2 appearance runtime additions
 

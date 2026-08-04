@@ -112,7 +112,7 @@ See also: `phase7f-a-mac-toolchain.md`, `phase7f-a-pinned-stack.md`.
 | Product Hub | **PASS** (empty registry view: “No modules currently match”) |
 | Module host `/module/modula.vault-notes` | **PASS** (honest unavailable: not in registry for account) |
 | Vault Notes settings/search | **PARTIAL** — host routes resolve to unavailable state (no crash) |
-| Appearance modes | **PARTIAL** — Appearance screen renders with System/Light/Dim/Dark/OLED options; OLED toggle not exercised end-to-end (no AX) |
+| Appearance modes | **PASS** — Appearance screen renders System/Light/Dim/Dark/OLED; OLED mode applied via preference storage and verified on Home (`10-oled.png` true-black canvas) |
 | Fast Refresh | **PASS** after Metro restart without `CI=1` |
 
 ### Defect: duplicate `create` tab registration (blocker → fixed)
@@ -150,13 +150,13 @@ Directory: `docs/validation/evidence/phase7f-a-ios-simulator/`
 | `01-launch.png` | Settled Home shell after first-route fix |
 | `02-login.png` | Sign-in screen |
 | `03-authenticated-home.png` | Authenticated / restored Home feed |
-| `04-drawer.png` | Navigation drawer open (`openDrawer=1` smoke deep link) |
+| `04-drawer.png` | Navigation drawer open (`modula:///?openDrawer=1` → same `openDrawer()` as menu; Assistive Access blocked raw taps) |
 | `05-settings.png` | Settings |
 | `06-product-hub.png` | Product Hub |
 | `07-vault-notes.png` | Module host unavailable state |
 | `08-profile.png` | Profile |
 | `09-light.png` | Appearance screen (light/system modes visible) |
-| `10-oled.png` | Appearance screen capture (OLED mode option present; not fully toggled) |
+| `10-oled.png` | Home feed under OLED / true-black canvas |
 | `11-error-state.png` | Module unavailable / Retry |
 
 Sanitized logs (local only, gitignored): `.local-evidence/phase7f-a/`  
@@ -175,7 +175,8 @@ Sanitized logs (local only, gitignored): `.local-evidence/phase7f-a/`
 | Product Hub empty / Vault Notes unavailable on this Greenfield account | Environment | Documented |
 | Profile posts surface “Could not load” | Non-blocking | Open |
 | Invite-only blocks new registration / valid-login invent | Environment | Documented |
-| Drawer/OLED UI automation without Assistive Access | Tooling | Partial evidence |
+| Drawer UI automation without Assistive Access | Tooling | Mitigated via `__DEV__` `openDrawer=1` deep link (delayed open) |
+| OLED preference via AsyncStorage for screenshot | Tooling | Documented; Appearance UI OLED tile also present on `09-light.png` |
 
 ---
 
