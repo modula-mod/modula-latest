@@ -328,7 +328,24 @@ function HomeLayoutHeader({
 }) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const session = useSession()
   const storiesRail = useStoriesRailQuery()
+  const storiesPeople =
+    storiesRail.data && storiesRail.data.length > 0
+      ? storiesRail.data
+      : session.status === 'signedIn'
+        ? [
+            {
+              id: 'you',
+              name: 'You',
+              fresh: false,
+              groupId: `add:${session.account.id}`,
+              ringState: 'owner' as const,
+              isOwner: true,
+              itemCount: 0,
+            },
+          ]
+        : []
   const showBlock = (id: string) => isBlockOn(homeBlocks, id)
   const inlineModeStyle = useInlineModeTabsStyle(
     scrollY,
@@ -347,7 +364,7 @@ function HomeLayoutHeader({
           <SectionEnter>
             <View style={{paddingVertical: spacing[3]}}>
               <PresenceStoriesRail
-                people={storiesRail.data ?? []}
+                people={storiesPeople}
                 compact
                 showCaption={false}
               />

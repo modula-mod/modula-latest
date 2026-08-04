@@ -9,20 +9,30 @@ export function createStoryRoutes(database: LocalApiDatabase): LocalApiRoute[] {
       method: 'GET',
       path: '/v1/stories/rail',
       handler: ({accessToken, configuration}) => {
-        const session = accessToken
-          ? requireSession({database, configuration, accessToken})
-          : null
-        return {items: database.listStoryRail(session?.account.id ?? null)}
+        let accountId = null as null | ReturnType<typeof requireSession>['account']['id']
+        if (accessToken) {
+          try {
+            accountId = requireSession({database, configuration, accessToken}).account.id
+          } catch {
+            accountId = null
+          }
+        }
+        return {items: database.listStoryRail(accountId)}
       },
     },
     {
       method: 'GET',
       path: '/v1/stories/:groupId',
       handler: ({params, accessToken, configuration}) => {
-        const session = accessToken
-          ? requireSession({database, configuration, accessToken})
-          : null
-        const group = database.getStoryGroup(params.groupId, session?.account.id ?? null)
+        let accountId = null as null | ReturnType<typeof requireSession>['account']['id']
+        if (accessToken) {
+          try {
+            accountId = requireSession({database, configuration, accessToken}).account.id
+          } catch {
+            accountId = null
+          }
+        }
+        const group = database.getStoryGroup(params.groupId, accountId)
         if (!group) return notFound('Story group not found.')
         return group
       },
