@@ -8,6 +8,7 @@
     "@expo/ui": "~57.0.7",
     "@expo/vector-icons": "^15.1.1",
     "@modula/api-contracts": "workspace:*",
+    "@modula/create-module": "file:../modula-mod/modula-module-standard/packages/create-module",
     "@modula/greenfield-connector-contracts": "workspace:*",
     "@modula/greenfield-contracts": "workspace:*",
     "@modula/greenfield-module-engine-contracts": "workspace:*",
@@ -16,7 +17,6 @@
     "@modula/greenfield-module-sdk": "workspace:*",
     "@modula/greenfield-module-ui-contracts": "workspace:*",
     "@modula/greenfield-runtime": "workspace:*",
-    "@modula/create-module": "file:../modula-mod/modula-module-standard/packages/create-module",
     "@modula/module-fixtures": "file:../modula-mod/modula-module-standard/packages/module-fixtures",
     "@modula/module-sdk": "file:../modula-mod/modula-module-standard/packages/module-sdk",
     "@modula/module-standard": "file:../modula-mod/modula-module-standard/packages/module-standard",
@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "babel-preset-expo": "~57.0.4",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.0",
     "expo-doctor": "^1.20.0",

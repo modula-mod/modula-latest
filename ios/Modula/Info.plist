@@ -29,6 +29,7 @@
 			<array>
 				<string>modula</string>
 				<string>digital.modula.app</string>
+				<string>exp+modula</string>
 			</array>
 		</dict>
 	</array>
@@ -45,6 +46,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Modula uses the camera for Appearance Advanced living backdrop Preview. Nothing is recorded or uploaded.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Modula uses your photo library when you choose media for a post.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Modula saves media you explicitly choose to keep in your photo library.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
