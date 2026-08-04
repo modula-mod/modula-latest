@@ -5,8 +5,9 @@ import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
 import {useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {normaliseHandle, validateDisplayName, validateHandle} from '@/features/profile/utils/validators'
+import {ModulaCheckbox} from '@/platform/ui/controls/modula-checkbox'
+import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type Step = 'invite' | 'email' | 'password' | 'handle' | 'terms'
@@ -15,6 +16,7 @@ export function CreateAccountScreen() {
   const params = useLocalSearchParams<{inviteRequired?: string}>()
   const router = useRouter()
   const {register} = useSessionActions()
+  const {authRepository} = useAppServices()
   const {spacing} = useThemeTokens()
   const inviteRequired = params.inviteRequired === '1'
   const [step, setStep] = useState<Step>(inviteRequired ? 'invite' : 'email')
@@ -25,6 +27,7 @@ export function CreateAccountScreen() {
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
@@ -51,18 +54,30 @@ export function CreateAccountScreen() {
     setStep('handle')
   }
 
-  const nextFromHandle = () => {
+  const nextFromHandle = async () => {
     const handleResult = validateHandle(handle)
     if (!handleResult.valid) {
       setError(handleResult.message)
       return
     }
+    setPending(true)
     setError(null)
-    setStep('terms')
+    try {
+      const availability = await authRepository.checkHandleAvailability(normaliseHandle(handle))
+      if (!availability.available) {
+        setError('That username is not available.')
+        return
+      }
+      setStep('terms')
+    } catch {
+      setError('Unable to check username availability. Try again.')
+    } finally {
+      setPending(false)
+    }
   }
 
   const submit = async () => {
-    if (!acceptedTerms) {
+    if (!acceptedTerms || !acceptedPrivacy) {
       setError('Accept the Terms and Privacy notice to continue.')
       return
     }
@@ -168,7 +183,7 @@ export function CreateAccountScreen() {
           {step === 'handle' ? (
             <>
               <AuthField
-                label="Handle"
+                label="Username"
                 value={handle}
                 onChangeText={value => setHandle(normaliseHandle(value))}
                 autoCapitalize="none"
@@ -177,25 +192,28 @@ export function CreateAccountScreen() {
                 error={error ?? undefined}
               />
               <AppText variant="caption" colour="textSecondary">
-                Your handle is public and can change later. Your account ID never changes.
+                Your username is public and can change later. Your account ID never changes.
               </AppText>
-              <AppButton onPress={nextFromHandle}>Continue</AppButton>
+              <AppButton disabled={pending} onPress={() => void nextFromHandle()}>
+                {pending ? 'Checking' : 'Continue'}
+              </AppButton>
             </>
           ) : null}
 
           {step === 'terms' ? (
             <>
-              <AppText variant="body">
-                By creating a Modula Account you agree to the Terms of Use and acknowledge the Privacy
-                notice. Your Greenfield repository stays under your account.
-              </AppText>
-              <AppPressable
-                accessibilityLabel="Accept terms and privacy"
-                onPress={() => setAcceptedTerms(value => !value)}>
-                <AppText variant="bodyStrong" colour={acceptedTerms ? 'accent' : 'text'}>
-                  {acceptedTerms ? '✓ Terms and Privacy accepted' : 'Accept Terms and Privacy'}
-                </AppText>
-              </AppPressable>
+              <ModulaCheckbox
+                value={acceptedTerms}
+                onValueChange={setAcceptedTerms}
+                label="I agree to the Terms of Use"
+                testID="create-account-terms"
+              />
+              <ModulaCheckbox
+                value={acceptedPrivacy}
+                onValueChange={setAcceptedPrivacy}
+                label="I acknowledge the Privacy notice"
+                testID="create-account-privacy"
+              />
               {error ? (
                 <AppText variant="caption" colour="destructive">
                   {error}
