@@ -144,12 +144,19 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
   // Same openDrawer() path as the header menu button: modula:///?openDrawer=1
   useEffect(() => {
     if (!__DEV__) return
+    let timer: ReturnType<typeof setTimeout> | undefined
     const maybeOpen = (url: string | null) => {
-      if (urlRequestsDrawer(url)) openDrawer()
+      if (!urlRequestsDrawer(url)) return
+      // Delay past splash / route settle so the drawer is not immediately closed.
+      clearTimeout(timer)
+      timer = setTimeout(() => openDrawer(), 600)
     }
     void Linking.getInitialURL().then(maybeOpen)
     const sub = Linking.addEventListener('url', ({url}) => maybeOpen(url))
-    return () => sub.remove()
+    return () => {
+      clearTimeout(timer)
+      sub.remove()
+    }
   }, [openDrawer])
 
   return (

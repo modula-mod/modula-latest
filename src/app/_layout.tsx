@@ -1,6 +1,6 @@
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
-import {Stack} from 'expo-router'
+import {Stack, useGlobalSearchParams} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useEffect} from 'react'
 import {StyleSheet} from 'react-native'
@@ -20,7 +20,7 @@ import {ModulaSplashOverlay} from '@/platform/ui/splash/ModulaSplashOverlay'
 import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
-import {ShellDrawerProvider} from '@/shell/ShellDrawerContext'
+import {ShellDrawerProvider, useShellDrawer} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -28,6 +28,16 @@ void prepareModulaSplash()
 
 function RootNavigator() {
   const {scheme, colours} = useThemeTokens()
+  const {openDrawer} = useShellDrawer()
+  const params = useGlobalSearchParams<{openDrawer?: string | string[]}>()
+
+  useEffect(() => {
+    if (!__DEV__) return
+    const flag = Array.isArray(params.openDrawer) ? params.openDrawer[0] : params.openDrawer
+    if (flag !== '1') return
+    const timer = setTimeout(() => openDrawer(), 600)
+    return () => clearTimeout(timer)
+  }, [openDrawer, params.openDrawer])
 
   return (
     <>
