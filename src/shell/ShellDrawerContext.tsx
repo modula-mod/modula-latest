@@ -2,11 +2,13 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
   type PropsWithChildren,
 } from 'react'
+import {Linking} from 'react-native'
 import {
   runOnJS,
   useSharedValue,
@@ -16,6 +18,16 @@ import {
 } from 'react-native-reanimated'
 
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+function urlRequestsDrawer(url: string | null): boolean {
+  if (!url) return false
+  try {
+    const parsed = new URL(url)
+    return parsed.searchParams.get('openDrawer') === '1'
+  } catch {
+    return /[?&]openDrawer=1(?:&|$)/.test(url)
+  }
+}
 
 export type DrawerPhase = 'closed' | 'opening' | 'open' | 'closing'
 
@@ -127,6 +139,18 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
     }),
     [phase, progress, openDrawer, closeDrawer, settleDrawer],
   )
+
+  // Dev-only deep link for Simulator smoke when UI automation lacks assistive access.
+  // Same openDrawer() path as the header menu button: modula:///?openDrawer=1
+  useEffect(() => {
+    if (!__DEV__) return
+    const maybeOpen = (url: string | null) => {
+      if (urlRequestsDrawer(url)) openDrawer()
+    }
+    void Linking.getInitialURL().then(maybeOpen)
+    const sub = Linking.addEventListener('url', ({url}) => maybeOpen(url))
+    return () => sub.remove()
+  }, [openDrawer])
 
   return (
     <ShellDrawerContext.Provider value={value}>{children}</ShellDrawerContext.Provider>
