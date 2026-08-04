@@ -6,6 +6,7 @@ import type {ActivityItem} from '@/domain/activity'
 import type {DiscoverResult, ReelItem} from '@/domain/discovery'
 import type {ConnectionListInput, CreatePostInput, FeedMode, FollowResult, PostEngagement, SocialPost} from '@/domain/social'
 import type {DiscoverSearchResult} from '@/data/repositories/contracts/DiscoverRepository'
+import type {CreateStoryInput, StoryGroup, StoryItem, StoryRailEntry, StoryRingState} from '@/domain/stories'
 import type {ModulaProfile, UpdateProfileInput} from '@/features/profile/contracts'
 import type {
   NotificationBundleStyle,
@@ -48,6 +49,36 @@ export type LocalSessionRecord = {
   revoked: boolean
 }
 
+export type LocalStoryItemRecord = {
+  itemId: string
+  groupId: string
+  mediaKind: 'image' | 'video'
+  mediaUrl: string | null
+  caption: string | null
+  status: 'uploading' | 'ready' | 'failed'
+  durationMs: number | null
+  sortOrder: number
+  createdAt: string
+  deletedAt: string | null
+}
+
+export type LocalStoryGroupRecord = {
+  groupId: string
+  ownerProfileId: ProfileId
+  visibility: 'public' | 'followers' | 'close'
+  expiresAt: string
+  createdAt: string
+  updatedAt: string
+  deletedAt: string | null
+  items: LocalStoryItemRecord[]
+}
+
+export type LocalStoryViewRecord = {
+  itemId: string
+  viewerProfileId: ProfileId
+  viewedAt: string
+}
+
 export type LocalApiDatabaseState = {
   accounts: LocalAccountRecord[]
   profiles: LocalProfileRecord[]
@@ -62,6 +93,8 @@ export type LocalApiDatabaseState = {
   sessions: LocalSessionRecord[]
   discover: DiscoverResult
   reels: ReelItem[]
+  storyGroups: LocalStoryGroupRecord[]
+  storyViews: LocalStoryViewRecord[]
 }
 
 function clone<T>(value: T): T {
@@ -782,6 +815,219 @@ export class LocalApiDatabase {
       isFollowing,
       followerCount,
     }
+  }
+
+  listStoryRail(viewerAccountId: AccountId | null): StoryRailEntry[] {
+    const now = Date.now()
+    const viewerProfile = viewerAccountId
+      ? this.state.profiles.find(profile => profile.accountId === viewerAccountId) ?? null
+      : null
+    const viewerProfileId = viewerProfile?.id ?? null
+    const activeGroups = this.state.storyGroups.filter(
+      group => !group.deletedAt && Date.parse(group.expiresAt) > now && group.items.some(item => !item.deletedAt),
+    )
+
+    const entries: StoryRailEntry[] = []
+    for (const group of activeGroups) {
+      const owner = this.state.profiles.find(profile => profile.id === group.ownerProfileId)
+      if (!owner) continue
+      if (!this.canViewLocalStory(viewerProfileId as ProfileId | null, group)) continue
+      const items = group.items.filter(item => !item.deletedAt)
+      const readyItems = items.filter(item => item.status === 'ready')
+      const viewedCount = readyItems.filter(item =>
+        this.state.storyViews.some(
+          view => view.itemId === item.itemId && view.viewerProfileId === viewerProfileId,
+        ),
+      ).length
+      const isOwner = viewerProfileId === group.ownerProfileId
+      let ringState: StoryRingState = 'unviewed'
+      if (isOwner) {
+        ringState = items.some(item => item.status === 'failed')
+          ? 'failed'
+          : items.some(item => item.status === 'uploading')
+            ? 'uploading'
+            : 'owner'
+      } else if (viewedCount === 0) ringState = 'unviewed'
+      else if (viewedCount < readyItems.length) ringState = 'partial'
+      else ringState = 'viewed'
+
+      entries.push({
+        groupId: group.groupId,
+        ownerActorId: String(owner.id),
+        ownerProfileId: String(owner.id),
+        displayName: owner.displayName,
+        handle: owner.handle,
+        avatarUrl: owner.avatarUri ?? null,
+        ringState,
+        itemCount: items.length,
+        unviewedCount: Math.max(0, readyItems.length - viewedCount),
+        expiresAt: group.expiresAt,
+        isOwner,
+      })
+    }
+
+    if (viewerProfile) {
+      const existing = entries.find(entry => entry.ownerProfileId === String(viewerProfile.id))
+      if (existing) {
+        entries.splice(entries.indexOf(existing), 1)
+        entries.unshift(existing)
+      } else {
+        entries.unshift({
+          groupId: `add:${viewerProfile.id}`,
+          ownerActorId: String(viewerProfile.id),
+          ownerProfileId: String(viewerProfile.id),
+          displayName: viewerProfile.displayName,
+          handle: viewerProfile.handle,
+          avatarUrl: viewerProfile.avatarUri ?? null,
+          ringState: 'owner',
+          itemCount: 0,
+          unviewedCount: 0,
+          expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
+          isOwner: true,
+        })
+      }
+    }
+    return clone(entries)
+  }
+
+  getStoryGroup(groupId: string, viewerAccountId: AccountId | null): StoryGroup | null {
+    const group = this.state.storyGroups.find(item => item.groupId === groupId && !item.deletedAt)
+    if (!group || Date.parse(group.expiresAt) <= Date.now()) return null
+    const viewerProfile = viewerAccountId
+      ? this.state.profiles.find(profile => profile.accountId === viewerAccountId) ?? null
+      : null
+    if (!this.canViewLocalStory((viewerProfile?.id as ProfileId | undefined) ?? null, group)) {
+      return null
+    }
+    const owner = this.state.profiles.find(profile => profile.id === group.ownerProfileId)
+    if (!owner) return null
+    const items: StoryItem[] = group.items
+      .filter(item => !item.deletedAt)
+      .filter(item => item.status === 'ready' || viewerProfile?.id === group.ownerProfileId)
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map(item => ({
+        itemId: item.itemId,
+        groupId: item.groupId,
+        mediaKind: item.mediaKind,
+        mediaUrl: item.mediaUrl,
+        caption: item.caption,
+        status: item.status,
+        durationMs: item.durationMs,
+        viewed: this.state.storyViews.some(
+          view => view.itemId === item.itemId && view.viewerProfileId === viewerProfile?.id,
+        ),
+        createdAt: item.createdAt,
+      }))
+    return clone({
+      groupId: group.groupId,
+      ownerActorId: String(owner.id),
+      ownerProfileId: String(owner.id),
+      displayName: owner.displayName,
+      handle: owner.handle,
+      avatarUrl: owner.avatarUri ?? null,
+      visibility: group.visibility,
+      expiresAt: group.expiresAt,
+      items,
+      isOwner: viewerProfile?.id === group.ownerProfileId,
+    })
+  }
+
+  createStory(accountId: AccountId, input: CreateStoryInput): StoryGroup {
+    const owner = this.getOwnerProfile(accountId)
+    const now = this.clock.iso()
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    let group = this.state.storyGroups.find(
+      item =>
+        item.ownerProfileId === owner.id &&
+        !item.deletedAt &&
+        Date.parse(item.expiresAt) > Date.now(),
+    )
+    if (!group) {
+      group = {
+        groupId: `story-group-${Date.now()}`,
+        ownerProfileId: owner.id as ProfileId,
+        visibility: input.visibility ?? 'followers',
+        expiresAt,
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: null,
+        items: [],
+      }
+      this.state.storyGroups.push(group)
+    } else {
+      group.updatedAt = now
+      group.expiresAt = expiresAt
+      group.visibility = input.visibility ?? group.visibility
+    }
+    const itemId = `story-item-${Date.now()}`
+    const mediaUrl = `data:${input.contentType};base64,${input.base64}`
+    group.items.push({
+      itemId,
+      groupId: group.groupId,
+      mediaKind: input.mediaKind,
+      mediaUrl,
+      caption: input.caption?.trim() ? input.caption.trim().slice(0, 500) : null,
+      status: 'ready',
+      durationMs: input.mediaKind === 'video' ? input.durationMs ?? 15_000 : 5_000,
+      sortOrder: group.items.length,
+      createdAt: now,
+      deletedAt: null,
+    })
+    const dto = this.getStoryGroup(group.groupId, accountId)
+    if (!dto) throw new Error('Story group missing after create.')
+    return dto
+  }
+
+  markStoryViewed(accountId: AccountId, itemId: string) {
+    const viewer = this.getOwnerProfile(accountId)
+    const group = this.state.storyGroups.find(entry =>
+      entry.items.some(item => item.itemId === itemId && !item.deletedAt),
+    )
+    if (!group || !this.canViewLocalStory(viewer.id as ProfileId, group)) {
+      throw new Error('Story item not found.')
+    }
+    const exists = this.state.storyViews.some(
+      view => view.itemId === itemId && view.viewerProfileId === viewer.id,
+    )
+    if (!exists) {
+      this.state.storyViews.push({
+        itemId,
+        viewerProfileId: viewer.id as ProfileId,
+        viewedAt: this.clock.iso(),
+      })
+    }
+  }
+
+  deleteStoryItem(accountId: AccountId, itemId: string) {
+    const owner = this.getOwnerProfile(accountId)
+    const group = this.state.storyGroups.find(entry =>
+      entry.items.some(item => item.itemId === itemId && !item.deletedAt),
+    )
+    if (!group || group.ownerProfileId !== owner.id) {
+      throw new Error('Story item not found.')
+    }
+    const now = this.clock.iso()
+    for (const item of group.items) {
+      if (item.itemId === itemId) item.deletedAt = now
+    }
+    if (group.items.every(item => item.deletedAt)) {
+      group.deletedAt = now
+      group.updatedAt = now
+    }
+  }
+
+  private canViewLocalStory(
+    viewerProfileId: ProfileId | null,
+    group: LocalStoryGroupRecord,
+  ): boolean {
+    if (viewerProfileId === group.ownerProfileId) return true
+    if (group.visibility === 'public') return true
+    if (!viewerProfileId) return false
+    return this.state.follows.some(
+      follow =>
+        follow.followerProfileId === viewerProfileId &&
+        follow.followingProfileId === group.ownerProfileId,
+    )
   }
 
   private withRelationship(profile: LocalProfileRecord): ModulaProfile {

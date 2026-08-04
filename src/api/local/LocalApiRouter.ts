@@ -11,6 +11,7 @@ import {createMetaRoutes} from '@/api/local/routes/metaRoutes'
 import {createNotificationRoutes} from '@/api/local/routes/notificationRoutes'
 import {createPostRoutes} from '@/api/local/routes/postRoutes'
 import {createProfileRoutes} from '@/api/local/routes/profileRoutes'
+import {createStoryRoutes} from '@/api/local/routes/storyRoutes'
 
 export type LocalApiRouteContext = {
   database: LocalApiDatabase
@@ -64,6 +65,7 @@ export class LocalApiRouter {
       ...createActivityRoutes(database),
       ...createNotificationRoutes(database),
       ...createDiscoverRoutes(database),
+      ...createStoryRoutes(database),
       ...createAtprotoRoutes(),
     ]
   }

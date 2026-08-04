@@ -228,6 +228,8 @@ export function seedLocalApiDatabase(): LocalApiDatabaseState {
       reels,
     },
     reels,
+    storyGroups: [],
+    storyViews: [],
   }
 }
 

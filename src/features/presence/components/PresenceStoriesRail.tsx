@@ -148,7 +148,12 @@ export function PresenceStoriesRail({
                 reduceMotion={reduceMotion}
                 onPress={() => {
                   snapToIndex(index, !reduceMotion)
-                  router.push('/product/presence' as Href)
+                  const groupId = person.groupId
+                  if (!groupId || groupId.startsWith('add:') || (person.isOwner && (person.itemCount ?? 0) === 0)) {
+                    router.push('/stories/create' as Href)
+                    return
+                  }
+                  router.push(`/stories/${encodeURIComponent(groupId)}` as Href)
                 }}
               />
             ))}

@@ -18,6 +18,7 @@ import type {
   ProfileRepository,
   ReelsRepository,
   SocialGraphRepository,
+  StoriesRepository,
   ToolsRepository,
 } from '@/data/repositories/contracts'
 
@@ -29,6 +30,7 @@ export type AppServices = {
   productPreferencesRepository: ProductPreferencesRepository
   profileRepository: ProfileRepository
   socialGraphRepository: SocialGraphRepository
+  storiesRepository: StoriesRepository
   activityRepository: ActivityRepository
   appearanceRepository: AppearanceRepository
   discoverRepository: DiscoverRepository

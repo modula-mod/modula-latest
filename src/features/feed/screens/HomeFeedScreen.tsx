@@ -31,6 +31,7 @@ import {
 } from '@/features/feed/components/HomeStickyFeedModes'
 import {useHomeFeedQuery} from '@/features/feed/data'
 import {PresenceStoriesRail} from '@/features/presence/components/PresenceStoriesRail'
+import {useStoriesRailQuery} from '@/features/presence/data/useStoriesRailQuery'
 import {
   FOCUS_PRESET_META,
   isFocusActive,
@@ -327,6 +328,7 @@ function HomeLayoutHeader({
 }) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
+  const storiesRail = useStoriesRailQuery()
   const showBlock = (id: string) => isBlockOn(homeBlocks, id)
   const inlineModeStyle = useInlineModeTabsStyle(
     scrollY,
@@ -344,7 +346,11 @@ function HomeLayoutHeader({
         <ShellChromeObscureView key="presence" direction="up">
           <SectionEnter>
             <View style={{paddingVertical: spacing[3]}}>
-              <PresenceStoriesRail compact showCaption={false} />
+              <PresenceStoriesRail
+                people={storiesRail.data ?? []}
+                compact
+                showCaption={false}
+              />
             </View>
           </SectionEnter>
         </ShellChromeObscureView>
