@@ -103,7 +103,15 @@ export function SignInScreen() {
           {showDemo ? (
             <AppButton
               variant="secondary"
-              onPress={() => void continueAsDemo('andrei@modula.local').catch(() => undefined)}>
+              onPress={() =>
+                void continueAsDemo('andrei@modula.local').catch(error => {
+                  setError(
+                    error instanceof Error
+                      ? error.message
+                      : 'Development demo sign-in failed. Use a Greenfield account on remote.',
+                  )
+                })
+              }>
               Use development demo account
             </AppButton>
           ) : null}

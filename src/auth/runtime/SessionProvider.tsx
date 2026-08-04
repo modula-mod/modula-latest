@@ -151,11 +151,26 @@ export function SessionProvider({children}: PropsWithChildren) {
       if (runtimeEnvironment.appEnvironment === 'production') {
         throw new Error('Demo accounts are unavailable in production.')
       }
-      const result = await services.authRepository.signIn({
-        email,
-        password: localPassword,
-      })
-      await acceptAuthResult(result, '/')
+      try {
+        const result = await services.authRepository.signIn({
+          email,
+          password: localPassword,
+        })
+        await acceptAuthResult(result, '/')
+      } catch (error) {
+        const code =
+          error && typeof error === 'object' && 'code' in error
+            ? String((error as {code: string}).code)
+            : undefined
+        // Remote Greenfield rejects local-only demo passwords with UNAUTHENTICATED.
+        // Surface a clear handled error instead of an uncaught ModulaApiError.
+        if (code === 'UNAUTHENTICATED') {
+          throw new Error(
+            'Development demo accounts work only against the local API. Sign in with a Greenfield account, or use EXPO_PUBLIC_DATA_SOURCE=local.',
+          )
+        }
+        throw error
+      }
     },
     [acceptAuthResult, services.authRepository],
   )

@@ -1,3 +1,4 @@
+import {useState} from 'react'
 import {StyleSheet, View} from 'react-native'
 
 import {AppButton} from '@/components/primitives/AppButton'
@@ -14,6 +15,18 @@ export function SessionRuntimeScreen() {
   const services = useAppServices()
   const {spacing} = useThemeTokens()
   const controller = services.localApiController
+  const [actionError, setActionError] = useState<string | null>(null)
+
+  const runDemo = (email: 'andrei@modula.local' | 'gaia@modula.local') => {
+    setActionError(null)
+    void actions.continueAsDemo(email).catch(error => {
+      setActionError(
+        error instanceof Error
+          ? error.message
+          : 'Demo sign-in failed. Local demo passwords are rejected by remote Greenfield.',
+      )
+    })
+  }
 
   return (
     <AppScreen scroll>
@@ -22,10 +35,15 @@ export function SessionRuntimeScreen() {
         <Surface variant="contained" style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
           <Info label="State" value={session.status} />
           <Info label="SecureStore failure" value={controller?.isSecureStoreFailureSimulated() ? 'enabled' : 'disabled'} />
-          <AppButton onPress={() => void actions.continueAsDemo('andrei@modula.local')}>
+          {actionError ? (
+            <AppText variant="caption" colour="destructive">
+              {actionError}
+            </AppText>
+          ) : null}
+          <AppButton onPress={() => runDemo('andrei@modula.local')}>
             Continue as Andrei
           </AppButton>
-          <AppButton variant="secondary" onPress={() => void actions.continueAsDemo('gaia@modula.local')}>
+          <AppButton variant="secondary" onPress={() => runDemo('gaia@modula.local')}>
             Continue as Gaia
           </AppButton>
           <AppButton variant="secondary" onPress={actions.continueAsGuest}>
