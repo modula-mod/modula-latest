@@ -426,16 +426,11 @@ function HomeLayoutHeader({
             inlineModeStyle,
           ]}>
           <ModulaSegmentedPicker
-            appearance="plain"
-            scrollable
-            segmentMinWidth={96}
+            appearance="segmented"
             accessibilityLabel="Feed mode"
             options={modeOrder.map(next => ({
               value: next,
-              label:
-                focus.quietFeed && next === 'For You'
-                  ? 'For You · Quiet'
-                  : next,
+              label: next,
             }))}
             value={mode}
             onValueChange={next => {

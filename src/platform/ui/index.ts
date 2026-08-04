@@ -14,6 +14,27 @@ export type {
   ModulaSegmentedOption,
   ModulaSegmentedPickerProps,
 } from '@/platform/ui/controls/modula-segmented-picker.types'
+export {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
+export type {ModulaSwitchProps} from '@/platform/ui/controls/modula-switch'
+export {ModulaCheckbox} from '@/platform/ui/controls/modula-checkbox'
+export type {ModulaCheckboxProps} from '@/platform/ui/controls/modula-checkbox'
+export {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
+export type {ModulaTextInputProps} from '@/platform/ui/controls/modula-text-input'
+export {ModulaSecureInput} from '@/platform/ui/controls/modula-secure-input'
+export {
+  ModulaList,
+  ModulaListItem,
+  ModulaFieldGroup,
+  ModulaFieldSection,
+} from '@/platform/ui/controls/modula-list'
+export type {
+  ModulaListProps,
+  ModulaListItemProps,
+  ModulaFieldGroupProps,
+  ModulaFieldSectionProps,
+} from '@/platform/ui/controls/modula-list'
+export {ModulaProgress} from '@/platform/ui/controls/modula-progress'
+export type {ModulaProgressProps} from '@/platform/ui/controls/modula-progress'
 // Camera / video adapters stay out of this startup barrel — they must not
 // pull expo-camera / expo-video into `_layout` before a native rebuild.
 // Import from `@/platform/ui/camera/*` or `@/platform/ui/video` at call sites.

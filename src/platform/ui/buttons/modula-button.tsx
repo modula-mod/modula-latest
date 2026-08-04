@@ -35,10 +35,11 @@ export function ModulaButton({
       ? colours.accent
       : role === 'destructive'
         ? colours.destructive
-        : role === 'secondary'
+        : role === 'secondary' || role === 'glass'
           ? colours.surface
           : 'transparent'
-  const borderColor = role === 'secondary' ? colours.border : 'transparent'
+  const borderColor =
+    role === 'secondary' || role === 'glass' ? colours.border : 'transparent'
   const labelColour =
     role === 'primary' || role === 'destructive'
       ? colours.accentForeground

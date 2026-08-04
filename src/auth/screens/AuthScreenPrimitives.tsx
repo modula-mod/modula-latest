@@ -1,10 +1,13 @@
-import type {PropsWithChildren} from 'react'
-import {StyleSheet, TextInput, type TextInputProps, View} from 'react-native'
+import type {PropsWithChildren, ReactNode} from 'react'
+import {StyleSheet, View} from 'react-native'
 
-import {AppButton} from '@/components/primitives/AppButton'
 import {AppScreen} from '@/components/primitives/AppScreen'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import type {ModulaButtonRole} from '@/platform/ui/buttons/button-role'
+import {ModulaSecureInput} from '@/platform/ui/controls/modula-secure-input'
+import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function AuthShell({children}: PropsWithChildren) {
@@ -25,30 +28,66 @@ export function AuthPanel({children}: PropsWithChildren) {
   )
 }
 
+type AuthFieldProps = {
+  label: string
+  error?: string
+  value: string
+  onChangeText: (text: string) => void
+  placeholder?: string
+  secureTextEntry?: boolean
+  autoFocus?: boolean
+  editable?: boolean
+  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad' | 'url'
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
+  autoCorrect?: boolean
+  autoComplete?: string
+  /** RN textContentType — mapped to Expo UI autoComplete when possible. */
+  textContentType?: string
+  returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send'
+  onSubmitEditing?: () => void
+  testID?: string
+}
+
+function mapTextContentType(textContentType?: string): string | undefined {
+  switch (textContentType) {
+    case 'emailAddress':
+      return 'email'
+    case 'username':
+      return 'username'
+    case 'password':
+      return 'password'
+    case 'newPassword':
+      return 'new-password'
+    case 'oneTimeCode':
+      return 'one-time-code'
+    case 'name':
+      return 'name'
+    default:
+      return undefined
+  }
+}
+
 export function AuthField({
   label,
   error,
+  secureTextEntry,
+  textContentType,
+  autoComplete,
   ...props
-}: TextInputProps & {label: string; error?: string}) {
-  const {colours, radius, spacing} = useThemeTokens()
+}: AuthFieldProps) {
+  const {colours, spacing} = useThemeTokens()
+  const Input = secureTextEntry ? ModulaSecureInput : ModulaTextInput
+
   return (
     <View style={{gap: spacing[2]}}>
       <AppText variant="label">{label}</AppText>
-      <TextInput
+      <Input
         {...props}
+        autoComplete={autoComplete ?? mapTextContentType(textContentType)}
         accessibilityLabel={label}
-        placeholderTextColor={colours.textTertiary}
-        style={[
-          styles.input,
-          {
-            borderColor: error ? colours.destructive : colours.border,
-            backgroundColor: colours.surfaceRaised,
-            borderRadius: radius.medium,
-            color: colours.text,
-            paddingHorizontal: spacing[3],
-          },
-          props.style,
-        ]}
+        style={{
+          borderColor: error ? colours.destructive : colours.border,
+        }}
       />
       {error ? (
         <AppText variant="caption" colour="destructive">
@@ -59,13 +98,44 @@ export function AuthField({
   )
 }
 
-export {AppButton}
+/** Children-compatible auth CTA wrapping ModulaButton. */
+export function AppButton({
+  children,
+  onPress,
+  disabled,
+  loading,
+  variant = 'primary',
+  testID,
+}: {
+  children: ReactNode
+  onPress?: () => void
+  disabled?: boolean
+  loading?: boolean
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'
+  testID?: string
+}) {
+  const role: ModulaButtonRole =
+    variant === 'ghost'
+      ? 'quiet'
+      : variant === 'secondary'
+        ? 'secondary'
+        : variant === 'destructive'
+          ? 'destructive'
+          : 'primary'
+
+  return (
+    <ModulaButton
+      label={typeof children === 'string' ? children : String(children)}
+      onPress={onPress}
+      role={role}
+      disabled={disabled}
+      loading={loading}
+      testID={testID}
+    />
+  )
+}
 
 const styles = StyleSheet.create({
-  input: {
-    borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 48,
-  },
   panel: {
     width: '100%',
   },
