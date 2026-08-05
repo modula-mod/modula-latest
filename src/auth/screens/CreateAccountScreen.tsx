@@ -2,7 +2,13 @@ import {useState} from 'react'
 import {View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
+import {
+  AuthField,
+  AuthLink,
+  AuthPanel,
+  AuthShell,
+  AppButton,
+} from '@/auth/screens/AuthScreenPrimitives'
 import {useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
 import {normaliseHandle, validateDisplayName, validateHandle} from '@/features/profile/utils/validators'
@@ -225,12 +231,12 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          <AppButton variant="ghost" onPress={() => router.push('/sign-in' as Href)}>
-            Already have an account? Sign in
-          </AppButton>
-          <AppButton variant="ghost" onPress={() => router.back()}>
-            Back
-          </AppButton>
+          <View style={{gap: spacing[2], marginTop: spacing[1]}}>
+            <AuthLink onPress={() => router.push('/sign-in' as Href)}>
+              Already have an account? Sign in
+            </AuthLink>
+            <AuthLink onPress={() => router.back()}>Back</AuthLink>
+          </View>
         </AuthPanel>
       </View>
     </AuthShell>

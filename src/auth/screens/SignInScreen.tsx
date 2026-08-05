@@ -2,11 +2,16 @@ import {useState} from 'react'
 import {View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
+import {
+  AuthField,
+  AuthLink,
+  AuthPanel,
+  AuthShell,
+  AppButton,
+} from '@/auth/screens/AuthScreenPrimitives'
 import {sanitizeReturnTo} from '@/auth/navigation/safeReturnTo'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -84,40 +89,37 @@ export function SignInScreen() {
             onSubmitEditing={() => void submit()}
             error={error ?? undefined}
           />
-          <AppPressable
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+          <AuthLink
             onPress={() => setShowPassword(value => !value)}>
-            <AppText variant="caption" colour="accent">
-              {showPassword ? 'Hide password' : 'Show password'}
-            </AppText>
-          </AppPressable>
+            {showPassword ? 'Hide password' : 'Show password'}
+          </AuthLink>
           <AppButton disabled={pending} onPress={() => void submit()}>
             {pending ? 'Signing in' : 'Sign in'}
           </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/forgot-password' as Href)}>
-            Forgot password
-          </AppButton>
-          <AppButton variant="ghost" onPress={() => router.push('/register' as Href)}>
-            Create Modula Account
-          </AppButton>
-          {showDemo ? (
-            <AppButton
-              variant="secondary"
-              onPress={() =>
-                void continueAsDemo('andrei@modula.local').catch(error => {
-                  setError(
-                    error instanceof Error
-                      ? error.message
-                      : 'Development demo sign-in failed. Use a Greenfield account on remote.',
-                  )
-                })
-              }>
-              Use development demo account
-            </AppButton>
-          ) : null}
-          <AppButton variant="ghost" onPress={() => router.back()}>
-            Back
-          </AppButton>
+          <View style={{gap: spacing[2], marginTop: spacing[1]}}>
+            <AuthLink onPress={() => router.push('/forgot-password' as Href)}>
+              Forgot password
+            </AuthLink>
+            <AuthLink onPress={() => router.push('/register' as Href)}>
+              Create Modula Account
+            </AuthLink>
+            {showDemo ? (
+              <AppButton
+                variant="secondary"
+                onPress={() =>
+                  void continueAsDemo('andrei@modula.local').catch(error => {
+                    setError(
+                      error instanceof Error
+                        ? error.message
+                        : 'Development demo sign-in failed. Use a Greenfield account on remote.',
+                    )
+                  })
+                }>
+                Use development demo account
+              </AppButton>
+            ) : null}
+            <AuthLink onPress={() => router.back()}>Back</AuthLink>
+          </View>
         </AuthPanel>
       </View>
     </AuthShell>

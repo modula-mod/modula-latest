@@ -44,7 +44,6 @@ import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
@@ -359,10 +358,16 @@ function HomeLayoutHeader({
 
   const nodes: Record<string, ReactNode> = {
     presence:
-      !focus.hideNav && showBlock('presence') ? (
+      !focus.hideNav &&
+      (showBlock('presence') || session.status === 'signedIn') &&
+      storiesPeople.length > 0 ? (
         <ShellChromeObscureView key="presence" direction="up">
           <SectionEnter>
-            <View style={{paddingVertical: spacing[3]}}>
+            <View
+              style={{
+                paddingTop: spacing[2],
+                paddingBottom: spacing[1],
+              }}>
               <PresenceStoriesRail
                 people={storiesPeople}
                 compact
@@ -477,9 +482,21 @@ function HomeLayoutHeader({
     ) : null,
   }
 
-  const orderedIds = homeBlocks.includes('mode-tabs')
-    ? homeBlocks
-    : [...homeBlocks, 'mode-tabs']
+  // Prefer Stories → modes → composer. Keep Focus/Merge banners after Stories
+  // so the rail is never buried under chrome.
+  const preferredOrder = [
+    'presence',
+    'focus-banner',
+    'merge-banner',
+    'mode-tabs',
+    'composer',
+  ]
+  const orderedIds = preferredOrder.filter(
+    id =>
+      homeBlocks.includes(id) ||
+      id === 'mode-tabs' ||
+      (id === 'presence' && session.status === 'signedIn'),
+  )
   const modeIndex = orderedIds.indexOf('mode-tabs')
   const beforeIds = modeIndex >= 0 ? orderedIds.slice(0, modeIndex) : orderedIds
   const afterIds = modeIndex >= 0 ? orderedIds.slice(modeIndex + 1) : []
@@ -528,31 +545,26 @@ function ComposerPrompt() {
           colour={profile?.coverColour}
           size={40}
         />
-        <LiquidGlassChrome
-          interactive
-          fallback="regular"
+        <AppPressable
+          accessibilityLabel="Create a post"
+          onPress={() => router.push('/compose' as Href)}
           style={[
-            styles.promptGlass,
+            styles.promptInput,
             {
-              borderColor: colours.border,
+              flex: 1,
               borderRadius: radius.round,
+              paddingHorizontal: spacing[4],
+              backgroundColor: colours.surfaceRaised,
+              borderColor: colours.border,
+              borderWidth: StyleSheet.hairlineWidth,
+              minHeight: 44,
+              justifyContent: 'center',
             },
           ]}>
-          <AppPressable
-            accessibilityLabel="Create a post"
-            onPress={() => router.push('/compose' as Href)}
-            style={[
-              styles.promptInput,
-              {
-                borderRadius: radius.round,
-                paddingHorizontal: spacing[4],
-              },
-            ]}>
-            <AppText variant="body" colour="textSecondary">
-              What are you building?
-            </AppText>
-          </AppPressable>
-        </LiquidGlassChrome>
+          <AppText variant="body" colour="textSecondary">
+            What are you building?
+          </AppText>
+        </AppPressable>
         <ModulaIconButton
           icon="photo"
           accessibilityLabel="Add media to a post"

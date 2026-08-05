@@ -1,9 +1,12 @@
-import {Host, TextInput, useNativeState, type TextInputRef} from '@expo/ui'
-import {useEffect, useImperativeHandle, useRef, type Ref} from 'react'
+import {useImperativeHandle, useRef, type Ref} from 'react'
 import {
+  StyleSheet,
+  TextInput,
+  View,
   type KeyboardTypeOptions,
   type ReturnKeyTypeOptions,
   type StyleProp,
+  type TextInput as RNTextInput,
   type TextStyle,
   type ViewStyle,
 } from 'react-native'
@@ -33,12 +36,16 @@ export type ModulaTextInputProps = {
   style?: StyleProp<ViewStyle>
   textStyle?: StyleProp<TextStyle>
   testID?: string
-  ref?: Ref<TextInputRef>
+  ref?: Ref<RNTextInput>
 }
 
 /**
- * Bridges RN string state to Expo UI ObservableState TextInput.
- * Only this adapter may import `@expo/ui` TextInput/Host.
+ * Native text field adapter.
+ *
+ * `@expo/ui` universal TextInput inside Host+`matchContents` collapses to an
+ * invisible hit target on SDK 57.0.7 (labels only, no field chrome). Product
+ * forms need a reliable, bordered field — so this adapter uses RN TextInput
+ * with theme chrome while remaining the only import surface for screens.
  */
 export function ModulaTextInput({
   value,
@@ -63,40 +70,31 @@ export function ModulaTextInput({
   testID,
   ref,
 }: ModulaTextInputProps) {
-  const {colours, scheme} = useThemeTokens()
-  const state = useNativeState(value)
-  const innerRef = useRef<TextInputRef>(null)
+  const {colours, radius, spacing} = useThemeTokens()
+  const inputRef = useRef<RNTextInput>(null)
 
-  useEffect(() => {
-    if (state.value !== value) {
-      state.value = value
-    }
-  }, [state, value])
-
-  useImperativeHandle(ref, () => ({
-    focus: () => innerRef.current?.focus(),
-    blur: () => innerRef.current?.blur(),
-    clear: () => {
-      state.value = ''
-      innerRef.current?.clear()
-    },
-    isFocused: () => innerRef.current?.isFocused() ?? false,
-    setSelection: (start, end) =>
-      innerRef.current?.setSelection(start, end) ?? Promise.resolve(),
-  }))
+  useImperativeHandle(ref, () => inputRef.current as RNTextInput)
 
   return (
-    <Host
-      matchContents
-      colorScheme={scheme}
-      seedColor={colours.accent}
-      style={[{minHeight: multiline ? 96 : 48, alignSelf: 'stretch'}, style]}
-      accessibilityLabel={accessibilityLabel}>
+    <View
+      style={[
+        styles.shell,
+        {
+          minHeight: multiline ? 112 : 48,
+          borderColor: colours.border,
+          backgroundColor: colours.surfaceRaised,
+          borderRadius: radius.medium,
+          paddingHorizontal: spacing[3],
+          paddingVertical: multiline ? spacing[3] : 0,
+        },
+        style,
+      ]}>
       <TextInput
-        ref={innerRef}
-        value={state}
+        ref={inputRef}
+        value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
+        placeholderTextColor={colours.textTertiary}
         secureTextEntry={secureTextEntry}
         autoFocus={autoFocus}
         editable={editable}
@@ -110,10 +108,35 @@ export function ModulaTextInput({
         onFocus={onFocus}
         onBlur={onBlur}
         maxLength={maxLength}
-        placeholderTextColor={colours.textTertiary}
-        textStyle={textStyle as never}
+        accessibilityLabel={accessibilityLabel}
         testID={testID}
+        style={[
+          styles.field,
+          {
+            color: colours.text,
+            minHeight: multiline ? 88 : 48,
+            paddingVertical: multiline ? 0 : spacing[3],
+          },
+          textStyle,
+        ]}
       />
-    </Host>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  field: {
+    fontSize: 17,
+    lineHeight: 22,
+    margin: 0,
+    padding: 0,
+    width: '100%',
+  },
+  shell: {
+    alignSelf: 'stretch',
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+    overflow: 'hidden',
+    width: '100%',
+  },
+})

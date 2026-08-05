@@ -750,6 +750,8 @@ function SwitchRow({
           borderBottomColor: colours.separator,
           borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
           paddingHorizontal: spacing[4],
+          minHeight: 52,
+          alignItems: 'center',
         },
       ]}>
       <View style={{flex: 1, gap: spacing[1]}}>

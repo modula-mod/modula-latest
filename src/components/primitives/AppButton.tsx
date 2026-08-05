@@ -48,6 +48,9 @@ export function AppButton({
           paddingHorizontal: spacing.lg,
           paddingVertical: spacing.md,
           borderWidth: variant === 'secondary' ? 1 : 0,
+          minHeight: 48,
+          width: '100%',
+          alignSelf: 'stretch',
         },
         style,
       ]}>
