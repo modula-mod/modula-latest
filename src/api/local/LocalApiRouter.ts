@@ -2,6 +2,7 @@ import type {ApiMethod, ApiRequest} from '@/api/contracts'
 import type {LocalApiDatabase} from '@/api/local/LocalApiDatabase'
 import type {MutableLocalApiConfiguration} from '@/api/local/LocalApiConfiguration'
 import {createActivityRoutes} from '@/api/local/routes/activityRoutes'
+import {createAppearanceRoutes} from '@/api/local/routes/appearanceRoutes'
 import {createAtprotoRoutes} from '@/api/local/routes/atprotoRoutes'
 import {createAuthRoutes} from '@/api/local/routes/authRoutes'
 import {createBoardRoutes} from '@/api/local/routes/boardRoutes'
@@ -64,6 +65,7 @@ export class LocalApiRouter {
       ...createBoardRoutes(database),
       ...createActivityRoutes(database),
       ...createNotificationRoutes(database),
+      ...createAppearanceRoutes(database),
       ...createDiscoverRoutes(database),
       ...createStoryRoutes(database),
       ...createAtprotoRoutes(),

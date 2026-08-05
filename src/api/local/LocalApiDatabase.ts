@@ -13,6 +13,13 @@ import type {
   NotificationPreferencesDto,
   SearchType,
 } from '@modula/api-contracts'
+import type {
+  AppearanceMode,
+  AppearancePreferences,
+  SurfaceType,
+  TextScale,
+  ThemeFamily,
+} from '@/theme/contracts'
 import {LocalApiClock} from '@/api/local/LocalApiClock'
 import {LocalTokenIssuer} from '@/api/local/LocalTokenIssuer'
 
@@ -32,6 +39,21 @@ export type LocalRepostRecord = {profileId: ProfileId; postId: PostId}
 export type LocalActivityRecord = ActivityItem
 export type LocalNotificationPreferencesRecord = NotificationPreferencesDto & {
   accountId: AccountId
+}
+export type LocalAppearancePreferencesRecord = {
+  accountId: AccountId
+  mode: AppearanceMode
+  variant: ThemeFamily
+  surface: SurfaceType
+  accentId: string
+  customAccent: string | null
+  textScale: TextScale
+  boldText: boolean
+  reduceMotion: boolean
+  reduceTransparency: boolean
+  increaseContrast: boolean
+  version: number
+  updatedAt: string
 }
 export type LocalBoardLayoutRecord = {
   accountId: AccountId
@@ -89,6 +111,7 @@ export type LocalApiDatabaseState = {
   reposts: LocalRepostRecord[]
   activity: LocalActivityRecord[]
   notificationPreferences: LocalNotificationPreferencesRecord[]
+  appearancePreferences: LocalAppearancePreferencesRecord[]
   boardLayouts: LocalBoardLayoutRecord[]
   sessions: LocalSessionRecord[]
   discover: DiscoverResult
@@ -419,6 +442,91 @@ export class LocalApiDatabase {
     }
     this.state.notificationPreferences = this.state.notificationPreferences.filter(item => item.accountId !== accountId)
     this.state.notificationPreferences.push(next)
+    const {accountId: _accountId, ...dto} = next
+    return clone(dto)
+  }
+
+  getAppearancePreferences(accountId: AccountId): Record<string, unknown> {
+    let row = this.state.appearancePreferences.find(item => item.accountId === accountId)
+    if (!row) {
+      row = {
+        accountId,
+        mode: 'system',
+        variant: 'standard',
+        surface: 'native',
+        accentId: 'modulaTeal',
+        customAccent: null,
+        textScale: 1,
+        boldText: false,
+        reduceMotion: false,
+        reduceTransparency: false,
+        increaseContrast: false,
+        version: 1,
+        updatedAt: this.clock.iso(),
+      }
+      this.state.appearancePreferences.push(row)
+    }
+    const {accountId: _accountId, ...dto} = row
+    return clone(dto)
+  }
+
+  updateAppearancePreferences(
+    accountId: AccountId,
+    input: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const current = this.getAppearancePreferences(accountId) as Omit<
+      LocalAppearancePreferencesRecord,
+      'accountId'
+    > & {accountId?: AccountId}
+    if (
+      typeof input.expectedVersion === 'number' &&
+      input.expectedVersion !== current.version
+    ) {
+      throw new Error('Appearance preferences version conflict.')
+    }
+    const next: LocalAppearancePreferencesRecord = {
+      accountId,
+      mode:
+        typeof input.mode === 'string' ? (input.mode as AppearanceMode) : current.mode,
+      variant:
+        typeof input.variant === 'string'
+          ? (input.variant as ThemeFamily)
+          : current.variant,
+      surface:
+        typeof input.surface === 'string'
+          ? (input.surface as SurfaceType)
+          : current.surface,
+      accentId:
+        typeof input.accentId === 'string' ? input.accentId : current.accentId,
+      customAccent:
+        input.customAccent === null || typeof input.customAccent === 'string'
+          ? (input.customAccent as string | null)
+          : current.customAccent,
+      textScale:
+        typeof input.textScale === 'number'
+          ? (input.textScale as TextScale)
+          : current.textScale,
+      boldText:
+        typeof input.boldText === 'boolean' ? input.boldText : current.boldText,
+      reduceMotion:
+        typeof input.reduceMotion === 'boolean'
+          ? input.reduceMotion
+          : current.reduceMotion,
+      reduceTransparency:
+        typeof input.reduceTransparency === 'boolean'
+          ? input.reduceTransparency
+          : current.reduceTransparency,
+      increaseContrast:
+        typeof input.increaseContrast === 'boolean'
+          ? input.increaseContrast
+          : current.increaseContrast,
+      version: current.version + 1,
+      updatedAt: this.clock.iso(),
+    }
+    this.state.appearancePreferences = this.state.appearancePreferences.filter(
+      item => item.accountId !== accountId,
+    )
+    this.state.appearancePreferences.push(next)
     const {accountId: _accountId, ...dto} = next
     return clone(dto)
   }
