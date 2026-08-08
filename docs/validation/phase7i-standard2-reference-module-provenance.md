@@ -150,7 +150,7 @@ The fixture is intentionally local to the canonical app source tree. Tests no lo
 | Source origin | Independently recreated from Standard 2 contracts after reviewing the old copy as evidence only |
 | Canonical repository | `modula-mod/modula-latest` |
 | Canonical path | `fixtures/modules/standard2-reference/` |
-| Immutable SHA | Git commit containing this fixture; record with `git rev-parse HEAD` after commit |
+| Immutable SHA | `b782e1031c66bfbe45e5dac00876e89d99fe66d6` |
 | Licence | `LicenseRef-Modula-First-Party-Test-Fixture` |
 | Purpose | Standard 2 Greenfield runtime integration-test fixture |
 | Production/test classification | Test-only, not Marketplace authority, not production runtime source |
@@ -178,3 +178,9 @@ Aggregate verifier attempt:
 | `node scripts/verify-phase7e-module-runtime-2.mjs` | Reference fixture and source checks passed, then failed on broader non-provenance gates: pnpm non-TTY module purge guard without `CI=true`, missing DB URL for isolated runtime DB verification, branch/deployment mismatch in web production cutover verifier |
 
 The reference-module provenance gate is closed. Broader Phase 7I source self-containment, DB-backed runtime verification, deployment parity, and production rebuild gates remain pending.
+
+Pushed checkpoint:
+
+```text
+b782e1031c66bfbe45e5dac00876e89d99fe66d6 docs: resolve Standard 2 reference module provenance
+```
