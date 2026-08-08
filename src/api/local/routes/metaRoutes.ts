@@ -1,6 +1,17 @@
-import {PHASE5_PREVIEW_CAPABILITIES} from '@modula/api-contracts'
-
 import type {LocalApiRoute} from '@/api/local/LocalApiRouter'
+
+const LOCAL_META_CAPABILITIES = {
+  publicRead: true,
+  authentication: true,
+  mutations: true,
+  mediaUpload: false,
+  atproto: false,
+  modules: false,
+  atprotoOAuth: false,
+  atprotoPublishing: false,
+  atprotoImport: false,
+  pdsPilot: false,
+} as const
 
 export function createMetaRoutes(): LocalApiRoute[] {
   return [
@@ -17,11 +28,7 @@ export function createMetaRoutes(): LocalApiRoute[] {
           emailVerificationRequired: true,
         },
         // Local prototype keeps AT Protocol UI gated off until remote preview.
-        capabilities: {
-          ...PHASE5_PREVIEW_CAPABILITIES,
-          authentication: true,
-          mutations: true,
-        },
+        capabilities: LOCAL_META_CAPABILITIES,
       }),
     },
   ]
