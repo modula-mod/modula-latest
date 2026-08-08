@@ -46,6 +46,7 @@ import {
 import {ConnectorCredentialService} from '../domains/connectors/credentials/index.js'
 import {ConnectorConnectionService} from '../domains/connectors/connections/index.js'
 import {ConnectorOAuthStateService} from '../domains/connectors/oauth-state/index.js'
+import {MailService} from '../mail/service.js'
 import {attachAuth, requireAuth, requireCapability} from '../security/auth-context.js'
 import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
@@ -92,9 +93,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
   const eventReplays = new GreenfieldEventReplayService(db)
-  const accounts = new AccountService(db, config)
-  const recovery = new RecoveryService(db, config)
-  const authentication = new AuthenticationService(db, greenfieldSessions)
+  const mail = new MailService(db, config)
+  const accounts = new AccountService(db, config, mail)
+  const recovery = new RecoveryService(db, config, mail)
+  const authentication = new AuthenticationService(db, greenfieldSessions, mail)
   const repositories = new RepositoryService(db)
   const records = new RecordService(db)
   const extensions = new ExtensionRegistry(db)
@@ -272,7 +274,8 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.post('/v1/accounts/register', authWriteConfig, async (request, reply) => {
     try {
-      return reply.code(201).send(successEnvelope(await accounts.register(request.body as any), request.id))
+      const body = ((request.body as any) ?? {}) as Record<string, unknown>
+      return reply.code(201).send(successEnvelope(await accounts.register({...body, correlationId: request.id} as any), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Registration failed')
     }
@@ -287,14 +290,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   app.post('/v1/accounts/resend-verification', authWriteConfig, async (request, reply) => {
     try {
-      return reply.send(successEnvelope(await accounts.resendVerification((request.body as any).email ?? ''), request.id))
+      return reply.send(successEnvelope(await accounts.resendVerification((request.body as any).email ?? '', {correlationId: request.id}), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Resend failed')
     }
   })
   app.post('/v1/accounts/forgot-password', authWriteConfig, async (request, reply) => {
     try {
-      return reply.send(successEnvelope(await recovery.requestRecovery((request.body as any).email ?? ''), request.id))
+      return reply.send(successEnvelope(await recovery.requestRecovery((request.body as any).email ?? '', {correlationId: request.id}), request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Recovery request failed')
     }
@@ -302,7 +305,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.post('/v1/accounts/reset-password', authWriteConfig, async (request, reply) => {
     try {
       const body = ((request.body as any) ?? {}) as {token?: string; newPassword?: string}
-      await recovery.completeRecovery(body.token ?? '', body.newPassword ?? '')
+      await recovery.completeRecovery(body.token ?? '', body.newPassword ?? '', {correlationId: request.id})
       return reply.send(successEnvelope({reset: true}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Password reset failed')
@@ -366,6 +369,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const body = request.body as any
       const issued = await authentication.login(body.email, body.password, {
         userAgent: request.headers['user-agent'],
+        correlationId: request.id,
       })
       return reply.send(
         successEnvelope(
@@ -1465,6 +1469,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const body = request.body as {drained?: boolean}
     await setOperationalControl('jobs.queue.drained', Boolean(body.drained), auth.actorId)
     return reply.send(successEnvelope({queueDrained: Boolean(body.drained)}, request.id))
+  })
+
+  app.get('/v1/admin/ops/mail/summary', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    return reply.send(successEnvelope(await mail.summary(), request.id))
   })
 
   app.post('/v1/admin/ops/queue/dead-letters/:deadLetterId/retry', writeConfig, async (request, reply) => {

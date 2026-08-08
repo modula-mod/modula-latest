@@ -7,6 +7,7 @@ const envSchema = z.object({
   MODULA_API_HOST: z.string().default('127.0.0.1'),
   MODULA_API_PORT: z.coerce.number().int().positive().default(4020),
   MODULA_PUBLIC_API_URL: z.string().url(),
+  MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
@@ -53,6 +54,7 @@ const envSchema = z.object({
   MODULA_ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   MODULA_REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   MODULA_EMAIL_VERIFICATION_TTL_HOURS: z.coerce.number().int().positive().default(24),
+  MODULA_SUPPORT_EMAIL: z.string().email().default('support@modula.digital'),
   MODULA_CHECKPOINT_SIGNING_KEY: z.string().optional(),
   MODULA_SESSION_PEPPER: z.string().optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
@@ -121,6 +123,7 @@ export type AppConfig = {
   host: string
   port: number
   publicApiUrl: string
+  publicWebUrl: string
   databaseUrl: string
   migratorDatabaseUrl: string
   allowedOrigins: string[]
@@ -151,6 +154,7 @@ export type AppConfig = {
   accessTokenTtlMinutes: number
   refreshTokenTtlDays: number
   emailVerificationTtlHours: number
+  mailSupportEmail: string
   checkpointSigningKey?: string
   sessionPepper?: string
   /** Current (highest version) key used to encrypt new AT Protocol OAuth session material. */
@@ -222,6 +226,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     !raw.MODULA_PUBLIC_API_URL.startsWith('https://')
   ) {
     refuse('public API URL must be HTTPS outside local development')
+  }
+  const publicWebUrl =
+    raw.MODULA_PUBLIC_WEB_URL ?? (raw.MODULA_ENVIRONMENT === 'development' ? 'http://localhost:8081' : 'https://modula.digital')
+  if (
+    (raw.NODE_ENV === 'production' || raw.MODULA_ENVIRONMENT === 'production' || raw.MODULA_ENVIRONMENT === 'preview') &&
+    !publicWebUrl.startsWith('https://')
+  ) {
+    refuse('public web URL must be HTTPS outside local development')
   }
   // Preview containers often run with NODE_ENV=production while MODULA_ENVIRONMENT=preview.
   // Authenticated preview writes are allowed in that mode; only true production forbids them.
@@ -356,6 +368,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     host: raw.MODULA_API_HOST,
     port: raw.MODULA_API_PORT,
     publicApiUrl: raw.MODULA_PUBLIC_API_URL,
+    publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
     allowedOrigins,
@@ -385,6 +398,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     accessTokenTtlMinutes: raw.MODULA_ACCESS_TOKEN_TTL_MINUTES,
     refreshTokenTtlDays: raw.MODULA_REFRESH_TOKEN_TTL_DAYS,
     emailVerificationTtlHours: raw.MODULA_EMAIL_VERIFICATION_TTL_HOURS,
+    mailSupportEmail: raw.MODULA_SUPPORT_EMAIL,
     checkpointSigningKey: raw.MODULA_CHECKPOINT_SIGNING_KEY,
     sessionPepper: raw.MODULA_SESSION_PEPPER,
     atprotoOAuthEncryptionKey: currentKey,

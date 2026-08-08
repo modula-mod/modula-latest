@@ -193,6 +193,7 @@
     "verify:phase7e-vault-notes-release": "node scripts/verify-phase7e-vault-notes-release.mjs",
     "verify:phase7e-vault-notes": "node scripts/verify-phase7e-vault-notes.mjs",
     "verify:phase7e-web-production-cutover": "node scripts/verify-phase7e-web-production-cutover.mjs",
+    "verify:phase7h-mail": "node scripts/verify-phase7h-mail.mjs",
     "registry:import-module": "node scripts/registry/import-module.mjs",
     "registry:verify-release": "node scripts/registry/verify-release.mjs",
     "registry:publish-release": "node scripts/registry/publish-release.mjs",

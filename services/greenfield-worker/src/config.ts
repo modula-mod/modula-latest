@@ -18,6 +18,24 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  MODULA_MAIL_TRANSPORT: z.enum(['disabled', 'log', 'smtp']).optional(),
+  MODULA_MAIL_REQUIRED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  MODULA_MAIL_FROM: z.string().min(1).optional(),
+  MODULA_SMTP_HOST: z.string().min(1).optional(),
+  MODULA_SMTP_PORT: z.coerce.number().int().positive().optional(),
+  MODULA_SMTP_USER: z.string().min(1).optional(),
+  MODULA_SMTP_PASSWORD: z.string().min(1).optional(),
+  MODULA_SMTP_SECURE: z
+    .string()
+    .optional()
+    .transform(v => (v === undefined ? undefined : v === 'true')),
+  MODULA_SMTP_REQUIRE_TLS: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   // Same key material / env var names as services/api (see security/crypto.ts there) so a
   // single secret can be shared across /etc/modula/api.env and /etc/modula/worker.env.
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
@@ -55,6 +73,15 @@ export type WorkerConfig = {
   eventSubscriberTimeoutMs: number
   ingestIntervalMs: number
   ingestEnabled: boolean
+  mailTransport: 'disabled' | 'log' | 'smtp'
+  mailRequired: boolean
+  mailFrom: string
+  smtpHost?: string
+  smtpPort: number
+  smtpUser?: string
+  smtpPassword?: string
+  smtpSecure: boolean
+  smtpRequireTls: boolean
   /** version -> 32-byte key. Version 1 is "current"; version 0 is the previous key kept for rotation. */
   encryptionKeysByVersion: Map<number, Buffer>
   encryptionKeyIsEphemeral: boolean
@@ -90,6 +117,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   }
 
   const environment = raw.MODULA_ENVIRONMENT
+  const mailTransport = raw.MODULA_MAIL_TRANSPORT ?? (environment === 'production' ? 'smtp' : 'disabled')
+  const mailRequired = raw.MODULA_MAIL_REQUIRED === true || environment === 'production'
+  const smtpPort = raw.MODULA_SMTP_PORT ?? 587
+  const smtpSecure = raw.MODULA_SMTP_SECURE ?? smtpPort === 465
+  if (mailRequired && mailTransport !== 'smtp') {
+    refuse('MODULA_MAIL_TRANSPORT=smtp is required when mail is required')
+  }
+  if (mailTransport === 'smtp') {
+    if (!raw.MODULA_SMTP_HOST) refuse('MODULA_SMTP_HOST is required when MODULA_MAIL_TRANSPORT=smtp')
+    if (!raw.MODULA_MAIL_FROM) refuse('MODULA_MAIL_FROM is required when MODULA_MAIL_TRANSPORT=smtp')
+    if (!raw.MODULA_SMTP_USER || !raw.MODULA_SMTP_PASSWORD) {
+      refuse('MODULA_SMTP_USER and MODULA_SMTP_PASSWORD are required for authenticated SMTP relay delivery')
+    }
+  }
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
   const encryptionKeysByVersion = new Map<number, Buffer>()
   let isEphemeral = false
@@ -127,6 +168,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     eventSubscriberTimeoutMs: raw.MODULA_WORKER_EVENT_SUBSCRIBER_TIMEOUT_MS,
     ingestIntervalMs: raw.MODULA_WORKER_INGEST_INTERVAL_MS,
     ingestEnabled: Boolean(raw.MODULA_WORKER_INGEST_ENABLED),
+    mailTransport,
+    mailRequired,
+    mailFrom: raw.MODULA_MAIL_FROM ?? 'Modula <no-reply@modula.digital>',
+    smtpHost: raw.MODULA_SMTP_HOST,
+    smtpPort,
+    smtpUser: raw.MODULA_SMTP_USER,
+    smtpPassword: raw.MODULA_SMTP_PASSWORD,
+    smtpSecure,
+    smtpRequireTls: raw.MODULA_SMTP_REQUIRE_TLS !== false,
     encryptionKeysByVersion,
     encryptionKeyIsEphemeral: isEphemeral,
     ssrfAllowPrivateNetworks: Boolean(raw.MODULA_ATPROTO_SSRF_ALLOW_PRIVATE_NETWORKS),

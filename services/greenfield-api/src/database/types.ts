@@ -12,6 +12,8 @@ export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type MailJobStatus = 'queued' | 'sending' | 'sent' | 'failed' | 'retrying' | 'dead-letter'
+export type MailFailureCategory = 'temporary' | 'permanent' | 'authentication' | 'rate-limit' | 'DNS' | 'TLS' | 'invalid-recipient'
 export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
 export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
 export type PolicyDecisionCode =
@@ -736,6 +738,35 @@ export interface Database {
     created_at: Date
     updated_at: Date
     completed_at: Date | null
+  }
+  greenfield_mail_jobs: {
+    mail_job_id: string
+    template_id: string
+    recipient_account_id: string | null
+    recipient_address: string
+    recipient_hash: string
+    recipient_domain: string
+    recipient_safe: string
+    locale: string
+    variables: unknown
+    subject: string
+    text_body: string
+    html_body: string
+    status: MailJobStatus
+    attempt_count: number
+    maximum_attempts: number
+    provider_message_id: string | null
+    failure_category: MailFailureCategory | null
+    failure_message: string | null
+    correlation_id: string | null
+    available_at: Date
+    queued_at: Date
+    sending_at: Date | null
+    sent_at: Date | null
+    failed_at: Date | null
+    dead_lettered_at: Date | null
+    created_at: Date
+    updated_at: Date
   }
   job_failures: {
     id: string

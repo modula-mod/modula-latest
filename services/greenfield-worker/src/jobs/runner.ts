@@ -6,6 +6,7 @@ import {handleAtprotoPublish} from '../bridges/atproto/publish.js'
 import {handleAtprotoUpdate} from '../bridges/atproto/update.js'
 import {handlePluginLifecycle} from '../extensions/plugin-lifecycle.js'
 import {handleFunctionInvoke} from '../functions/invoke.js'
+import {handleMailDeliver} from '../mail/handler.js'
 import {handleModuleDisable} from '../modules/disable-handler.js'
 import {handleModuleEnable} from '../modules/enable-handler.js'
 import {handleModuleInstall} from '../modules/installation-handler.js'
@@ -65,6 +66,9 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
         break
       case 'function.invoke':
         await handleFunctionInvoke(db, job.payload)
+        break
+      case 'mail.deliver':
+        await handleMailDeliver(db, config, job.payload)
         break
       case 'module.registry.sync':
         await handleModuleRegistrySync(db, config, job.payload)
