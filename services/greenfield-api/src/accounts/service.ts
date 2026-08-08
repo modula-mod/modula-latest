@@ -46,7 +46,13 @@ export class AccountService {
     if (input.acceptedTerms !== true) {
       throw Object.assign(new Error('Terms and privacy acknowledgement required'), {code: 'VALIDATION_FAILED'})
     }
-    if (this.config.inviteOnly && !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')) {
+    if (this.config.registrationMode === 'closed') {
+      throw Object.assign(new Error('Registration is closed'), {code: 'FORBIDDEN'})
+    }
+    if (
+      this.config.registrationMode === 'invite-only' &&
+      !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')
+    ) {
       throw Object.assign(new Error('Valid invitation required'), {code: 'FORBIDDEN'})
     }
 

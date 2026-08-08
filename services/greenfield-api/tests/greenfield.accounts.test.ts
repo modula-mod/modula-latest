@@ -11,6 +11,22 @@ import {canonicalJsonStringify} from '@modula/greenfield-protocol'
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
 
+function configEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  return {
+    NODE_ENV: 'test',
+    MODULA_ENVIRONMENT: 'development',
+    MODULA_API_HOST: '127.0.0.1',
+    MODULA_API_PORT: '4022',
+    MODULA_PUBLIC_API_URL: 'http://127.0.0.1:4022',
+    MODULA_DATABASE_URL: 'postgres://modula:modula@127.0.0.1:5432/modula_test',
+    MODULA_ALLOWED_ORIGINS: 'http://localhost:8081',
+    MODULA_PREVIEW_WRITES_ENABLED: 'true',
+    MODULA_ATPROTO_ENABLED: 'false',
+    MODULA_RATE_LIMIT_ENABLED: 'false',
+    ...overrides,
+  }
+}
+
 describe('Greenfield unit primitives', () => {
   it('validates handles and rejects reserved patterns', () => {
     expect(validateHandle('andrei')).toBe('andrei')
@@ -36,6 +52,28 @@ describe('Greenfield unit primitives', () => {
 
   it('uses deterministic canonical JSON', () => {
     expect(canonicalJsonStringify({b: 2, a: 1})).toBe('{"a":1,"b":2}')
+  })
+
+  it('derives explicit registration modes from server policy', () => {
+    expect(loadConfig(configEnv()).registrationMode).toBe('open')
+    expect(loadConfig(configEnv()).inviteOnly).toBe(false)
+    expect(loadConfig(configEnv({MODULA_INVITE_ONLY: 'true'})).registrationMode).toBe('invite-only')
+    expect(loadConfig(configEnv({MODULA_INVITE_ONLY: 'false'})).registrationMode).toBe('open')
+    expect(
+      loadConfig({
+        ...configEnv({MODULA_INVITE_ONLY: 'false'}),
+        MODULA_REGISTRATION_MODE: 'closed',
+      }).registrationMode,
+    ).toBe('closed')
+    expect(
+      loadConfig(
+        configEnv({
+          MODULA_ENVIRONMENT: 'production',
+          MODULA_PUBLIC_API_URL: 'https://api.modula.digital',
+          MODULA_PREVIEW_WRITES_ENABLED: 'false',
+        }),
+      ).registrationMode,
+    ).toBe('invite-only')
   })
 })
 
@@ -74,6 +112,14 @@ describeIf('Greenfield native accounts integration', () => {
     const email = `user-${suffix}@example.com`
     const handle = `user${suffix}`.slice(0, 20)
     const password = 'secure-pass-word-1'
+
+    const meta = await app.inject({method: 'GET', url: '/v1/meta'})
+    expect(meta.statusCode).toBe(200)
+    expect(meta.json().data.registration).toEqual({
+      mode: 'invite-only',
+      emailVerificationRequired: true,
+    })
+    expect(meta.json().data.capabilities.inviteOnly).toBe(true)
 
     const reserved = await app.inject({method: 'GET', url: '/v1/accounts/handles/admin/availability'})
     expect(reserved.json().data.available).toBe(false)
