@@ -102,7 +102,8 @@ const allowedExternalPreviewHosts = new Set([
 const sourceFiles = walk('src').filter(file => /\.(ts|tsx|js|jsx)$/.test(file))
 for (const file of sourceFiles) {
   const body = text(file)
-  if (body.includes('/home/andrei/modula')) {
+  const oldRepositoryPath = ['/home', 'andrei', 'modula'].join('/')
+  if (body.includes(oldRepositoryPath)) {
     fail(`Source file references old repository path: ${file}`)
   }
   if (/^\s*import\s+.*(?:bsky|bluesky|@atproto)/im.test(body)) {

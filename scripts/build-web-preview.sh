@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 umask 022
-REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
+REPO="${MODULA_REPO:-/root/modula-latest}"
 cd "${REPO}"
 COMMIT="$(git rev-parse HEAD)"
 BRANCH="$(git branch --show-current)"

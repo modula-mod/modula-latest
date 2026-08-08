@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="${MODULA_BACKUP_ROOT:-/home/andrei/backups/modula-postgres}"
+ROOT_DIR="${MODULA_BACKUP_ROOT:-/var/backups/modula/greenfield}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 OUT_DIR="${ROOT_DIR}/${STAMP}"
-COMPOSE_FILE="${MODULA_COMPOSE_FILE:-/home/andrei/modula-latest/ops/docker/compose.preview.yml}"
+COMPOSE_FILE="${MODULA_COMPOSE_FILE:-/root/modula-latest/ops/docker/compose.preview.yml}"
+POSTGRES_SERVICE="${MODULA_POSTGRES_SERVICE:-greenfield-postgres}"
 mkdir -p "${OUT_DIR}"
 
 if [[ ! -f /etc/modula/api.env ]]; then
@@ -19,7 +20,7 @@ set +a
 : "${MODULA_BACKUP_DATABASE_URL:?MODULA_BACKUP_DATABASE_URL required}"
 
 DUMP_FILE="${OUT_DIR}/modula.dump"
-docker compose -f "${COMPOSE_FILE}" exec -T postgres \
+docker compose -f "${COMPOSE_FILE}" exec -T "${POSTGRES_SERVICE}" \
   pg_dump --format=custom --no-owner --no-privileges \
   "postgresql://modula_backup@localhost/modula" > "${DUMP_FILE}" 2>/dev/null || \
   pg_dump --format=custom --no-owner --no-privileges "${MODULA_BACKUP_DATABASE_URL}" > "${DUMP_FILE}"

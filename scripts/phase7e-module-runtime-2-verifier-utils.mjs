@@ -7,7 +7,6 @@ import {
   includes,
   pass,
   root,
-  run,
 } from './phase7e-module-backend-verifier-utils.mjs'
 
 export {
@@ -16,7 +15,16 @@ export {
   includes,
   pass,
   root,
-  run,
+}
+
+export function run(command, args, label, env = process.env, cwd = root) {
+  runClassified(command, args, label, 'SOURCE_FAILURE', env, cwd)
+}
+
+export function runClassified(command, args, label, classification, env = process.env, cwd = root) {
+  const result = spawnSync(command, args, {cwd, env: childProcessEnv(env), stdio: 'inherit', shell: false})
+  if (result.status === 0) pass(label)
+  else fail(`${classification} ${label} exited ${result.status ?? 'without status'}`)
 }
 
 export const referenceModuleRoot = resolve(root, 'fixtures/modules/standard2-reference')
@@ -251,20 +259,22 @@ export function verifyReferenceModule() {
 export async function runIsolatedRuntime2Test() {
   const env = {...process.env}
   loadEnvFile('services/greenfield-api/.env', env)
-  const baseUrl = env.MODULA_TEST_DATABASE_URL ?? env.MODULA_DATABASE_MIGRATOR_URL ?? env.MODULA_DATABASE_URL
+  const baseUrl = env.MODULA_TEST_DATABASE_URL
   if (!baseUrl) {
-    fail('isolated Standard 2 runtime verifier requires MODULA_TEST_DATABASE_URL, MODULA_DATABASE_MIGRATOR_URL, or MODULA_DATABASE_URL')
+    fail('isolated Standard 2 runtime verifier requires MODULA_TEST_DATABASE_URL pointed at a disposable test Postgres server')
     return
   }
   const parsed = new URL(baseUrl)
   const dbName = `modula_runtime2_verify_${process.pid}_${Date.now()}`.toLowerCase()
-  const create = spawnSync(
-    'docker',
-    ['compose', '-f', 'ops/docker/compose.preview.yml', 'exec', '-T', 'greenfield-postgres', 'createdb', '-U', 'modula_admin', '-O', parsed.username || 'modula_migrator', dbName],
-    {cwd: root, encoding: 'utf8', shell: false},
-  )
+  const adminUrl = adminDatabaseUrl(parsed, env)
+  const create = spawnSync('createdb', ['--owner', parsed.username || 'modula_migrator', dbName], {
+    cwd: root,
+    encoding: 'utf8',
+    env: pgCommandEnv(adminUrl, env),
+    shell: false,
+  })
   if (create.status !== 0) {
-    fail('unable to create isolated Standard 2 runtime verifier database through preview Postgres container')
+    fail('unable to create isolated Standard 2 runtime verifier database through supplied test Postgres server')
     return
   }
   try {
@@ -286,15 +296,47 @@ export async function runIsolatedRuntime2Test() {
       GREENFIELD_AI_GATEWAY_ENABLED: 'true',
       MODULA_MODULE_SECRETS_KEY: 'phase7e-runtime2-verifier-secret-key',
     }
-    run('pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.module-runtime-2.test.ts'], 'isolated Standard 2 runtime integration tests', testEnv)
-  } finally {
-    spawnSync(
-      'docker',
-      ['compose', '-f', 'ops/docker/compose.preview.yml', 'exec', '-T', 'greenfield-postgres', 'dropdb', '-U', 'modula_admin', '--if-exists', dbName],
-      {cwd: root, stdio: 'ignore', shell: false},
+    runClassified(
+      'pnpm',
+      ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.module-runtime-2.test.ts'],
+      'isolated Standard 2 runtime integration tests',
+      'TEST_ENV_FAILURE',
+      testEnv,
     )
+  } finally {
+    spawnSync('dropdb', ['--if-exists', dbName], {
+      cwd: root,
+      env: pgCommandEnv(adminUrl, env),
+      stdio: 'ignore',
+      shell: false,
+    })
     pass('dropped isolated Standard 2 runtime verifier database')
   }
+}
+
+function childProcessEnv(env) {
+  return {
+    ...env,
+    CI: env.CI ?? process.env.CI ?? 'true',
+  }
+}
+
+function adminDatabaseUrl(baseUrl, env) {
+  if (env.MODULA_TEST_DATABASE_ADMIN_URL) return new URL(env.MODULA_TEST_DATABASE_ADMIN_URL)
+  const adminUrl = new URL(baseUrl.toString())
+  adminUrl.pathname = `/${env.MODULA_TEST_DATABASE_ADMIN_DB ?? 'postgres'}`
+  return adminUrl
+}
+
+function pgCommandEnv(url, env) {
+  return childProcessEnv({
+    ...env,
+    PGHOST: url.hostname,
+    PGPORT: url.port || '5432',
+    PGUSER: decodeURIComponent(url.username),
+    PGPASSWORD: decodeURIComponent(url.password),
+    PGDATABASE: decodeURIComponent(url.pathname.replace(/^\//, '') || 'postgres'),
+  })
 }
 
 function loadEnvFile(path, env) {

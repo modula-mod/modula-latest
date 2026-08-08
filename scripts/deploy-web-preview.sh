@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 umask 022
-REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
+REPO="${MODULA_REPO:-/root/modula-latest}"
 SRC="${1:-${REPO}/.web-release}"
-ROOT="/home/andrei/deployments/modula-web"
+ROOT="${MODULA_WEB_ROOT:-/var/www/modula}"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 RELEASE="${ROOT}/releases/${STAMP}"
 test -f "${SRC}/release.json"
