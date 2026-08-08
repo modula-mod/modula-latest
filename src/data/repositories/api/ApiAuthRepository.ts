@@ -2,7 +2,6 @@ import type {GreenfieldAccount, GreenfieldSession} from '@modula/greenfield-cont
 
 import {
   buildAuthenticatedSession,
-  decodeAuthenticatedSession,
   decodeSessionTokenResponse,
   profileFromGreenfieldAccount,
 } from '@/api/decoding'
@@ -171,24 +170,17 @@ export class ApiAuthRepository implements AuthRepository {
   }
 
   async getSession(_accessToken: AccessToken): Promise<AuthenticatedSession> {
-    try {
-      const account = await this.client.get(
-        {path: '/v1/accounts/me', authenticated: true},
-        decodeGreenfieldAccount,
-      )
-      const profile = await this.fetchProfile(account)
-      return buildAuthenticatedSession({
-        sessionId: 'current',
-        account,
-        profile,
-        accessTokenExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
-      })
-    } catch {
-      return this.client.get(
-        {path: '/v1/auth/session', authenticated: true},
-        decodeAuthenticatedSession,
-      )
-    }
+    const account = await this.client.get(
+      {path: '/v1/accounts/me', authenticated: true},
+      decodeGreenfieldAccount,
+    )
+    const profile = await this.fetchProfile(account)
+    return buildAuthenticatedSession({
+      sessionId: 'current',
+      account,
+      profile,
+      accessTokenExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
+    })
   }
 
   getMe(): Promise<GreenfieldAccount & {email?: string}> {

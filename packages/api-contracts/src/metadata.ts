@@ -1,4 +1,10 @@
 export type ApiEnvironment = 'preview' | 'production' | 'development'
+export type ApiRegistrationMode = 'open' | 'invite-only' | 'closed'
+
+export type ApiRegistrationCapability = {
+  mode: ApiRegistrationMode
+  emailVerificationRequired: boolean
+}
 
 export type ApiCapabilities = {
   publicRead: boolean
@@ -18,6 +24,7 @@ export type ApiMetadata = {
   protocolVersion: '0.1'
   environment: ApiEnvironment
   minimumClientVersion: string
+  registration: ApiRegistrationCapability
   capabilities: ApiCapabilities
 }
 

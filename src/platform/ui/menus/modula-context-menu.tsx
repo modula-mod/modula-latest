@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react'
+import {Pressable} from 'react-native'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
@@ -26,7 +26,7 @@ export function ModulaContextMenu({
   disabled,
 }: ModulaContextMenuProps) {
   return (
-    <AppPressable
+    <Pressable
       accessibilityLabel={accessibilityLabel}
       disabled={disabled}
       onLongPress={() => {
@@ -35,6 +35,6 @@ export function ModulaContextMenu({
         })
       }}>
       {children}
-    </AppPressable>
+    </Pressable>
   )
 }

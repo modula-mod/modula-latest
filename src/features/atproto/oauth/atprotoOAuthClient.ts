@@ -1,7 +1,7 @@
 /**
  * Default / web-safe AT Protocol OAuth helpers.
- * Native Metro resolves `atprotoOAuthClient.native.ts` which loads
- * `@atproto/oauth-client-expo`.
+ * Native Metro resolves `atprotoOAuthClient.native.ts`; both surfaces keep AT
+ * OAuth server-mediated in Phase 7H.
  */
 export {
   ATPROTO_NATIVE_METADATA_URL,

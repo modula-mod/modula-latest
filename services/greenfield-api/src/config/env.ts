@@ -7,6 +7,7 @@ const envSchema = z.object({
   MODULA_API_HOST: z.string().default('127.0.0.1'),
   MODULA_API_PORT: z.coerce.number().int().positive().default(4020),
   MODULA_PUBLIC_API_URL: z.string().url(),
+  MODULA_PUBLIC_WEB_URL: z.string().url().optional(),
   MODULA_DATABASE_URL: z.string().min(1),
   MODULA_DATABASE_MIGRATOR_URL: z.string().min(1).optional(),
   MODULA_ALLOWED_ORIGINS: z.string().min(1),
@@ -47,11 +48,13 @@ const envSchema = z.object({
   MODULA_INVITE_ONLY: z
     .string()
     .optional()
-    .transform(v => v !== 'false'),
+    .transform(v => (v === undefined ? undefined : v !== 'false')),
+  MODULA_REGISTRATION_MODE: z.enum(['open', 'invite-only', 'closed']).optional(),
   MODULA_REGISTRATION_INVITE_CODES: z.string().optional(),
   MODULA_ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   MODULA_REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   MODULA_EMAIL_VERIFICATION_TTL_HOURS: z.coerce.number().int().positive().default(24),
+  MODULA_SUPPORT_EMAIL: z.string().email().default('support@modula.digital'),
   MODULA_CHECKPOINT_SIGNING_KEY: z.string().optional(),
   MODULA_SESSION_PEPPER: z.string().optional(),
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
@@ -113,11 +116,14 @@ export type EncryptionKeyMaterial = {
   key: Buffer
 }
 
+export type RegistrationMode = 'open' | 'invite-only' | 'closed'
+
 export type AppConfig = {
   nodeEnv: 'development' | 'test' | 'production'
   host: string
   port: number
   publicApiUrl: string
+  publicWebUrl: string
   databaseUrl: string
   migratorDatabaseUrl: string
   allowedOrigins: string[]
@@ -142,11 +148,13 @@ export type AppConfig = {
   mutationsEnabled: boolean
   sessionTtlHours: number
   atprotoEnabled: boolean
+  registrationMode: RegistrationMode
   inviteOnly: boolean
   registrationInviteCodes: string[]
   accessTokenTtlMinutes: number
   refreshTokenTtlDays: number
   emailVerificationTtlHours: number
+  mailSupportEmail: string
   checkpointSigningKey?: string
   sessionPepper?: string
   /** Current (highest version) key used to encrypt new AT Protocol OAuth session material. */
@@ -219,6 +227,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   ) {
     refuse('public API URL must be HTTPS outside local development')
   }
+  const publicWebUrl =
+    raw.MODULA_PUBLIC_WEB_URL ?? (raw.MODULA_ENVIRONMENT === 'development' ? 'http://localhost:8081' : 'https://modula.digital')
+  if (
+    (raw.NODE_ENV === 'production' || raw.MODULA_ENVIRONMENT === 'production' || raw.MODULA_ENVIRONMENT === 'preview') &&
+    !publicWebUrl.startsWith('https://')
+  ) {
+    refuse('public web URL must be HTTPS outside local development')
+  }
   // Preview containers often run with NODE_ENV=production while MODULA_ENVIRONMENT=preview.
   // Authenticated preview writes are allowed in that mode; only true production forbids them.
   if (raw.MODULA_ENVIRONMENT === 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED) {
@@ -244,6 +260,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const environment = raw.MODULA_ENVIRONMENT
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
+  const registrationMode: RegistrationMode =
+    raw.MODULA_REGISTRATION_MODE ??
+    (raw.MODULA_INVITE_ONLY === true
+      ? 'invite-only'
+      : raw.MODULA_INVITE_ONLY === false
+        ? 'open'
+        : environment === 'production'
+          ? 'invite-only'
+          : 'open')
 
   let currentKey: EncryptionKeyMaterial
   let isEphemeral = false
@@ -343,6 +368,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     host: raw.MODULA_API_HOST,
     port: raw.MODULA_API_PORT,
     publicApiUrl: raw.MODULA_PUBLIC_API_URL,
+    publicWebUrl,
     databaseUrl: raw.MODULA_DATABASE_URL,
     migratorDatabaseUrl: raw.MODULA_DATABASE_MIGRATOR_URL ?? raw.MODULA_DATABASE_URL,
     allowedOrigins,
@@ -366,11 +392,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     mutationsEnabled,
     sessionTtlHours: raw.MODULA_SESSION_TTL_HOURS,
     atprotoEnabled: raw.MODULA_ATPROTO_ENABLED === true,
-    inviteOnly: raw.MODULA_INVITE_ONLY !== false,
+    registrationMode,
+    inviteOnly: registrationMode === 'invite-only',
     registrationInviteCodes: (raw.MODULA_REGISTRATION_INVITE_CODES ?? '').split(',').map(code => code.trim()).filter(Boolean),
     accessTokenTtlMinutes: raw.MODULA_ACCESS_TOKEN_TTL_MINUTES,
     refreshTokenTtlDays: raw.MODULA_REFRESH_TOKEN_TTL_DAYS,
     emailVerificationTtlHours: raw.MODULA_EMAIL_VERIFICATION_TTL_HOURS,
+    mailSupportEmail: raw.MODULA_SUPPORT_EMAIL,
     checkpointSigningKey: raw.MODULA_CHECKPOINT_SIGNING_KEY,
     sessionPepper: raw.MODULA_SESSION_PEPPER,
     atprotoOAuthEncryptionKey: currentKey,

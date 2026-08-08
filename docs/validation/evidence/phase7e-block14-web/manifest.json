@@ -1,0 +1,266 @@
+{
+  "capturedAt": "2026-08-02T00:38:05.858Z",
+  "baseUrl": "https://modula.digital",
+  "scenarios": [
+    {
+      "name": "login-light-wide",
+      "url": "https://modula.digital/sign-in",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/login-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "registration-dark-narrow",
+      "url": "https://modula.digital/register",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/registration-dark-narrow.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "home-oled-wide",
+      "url": "https://modula.digital/",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/home-oled-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "oled",
+      "textScale": 1
+    },
+    {
+      "name": "drawer-dark-wide",
+      "url": "https://modula.digital/",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/drawer-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "composer-light-wide",
+      "url": "https://modula.digital/compose",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/composer-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "discover-dark-wide",
+      "url": "https://modula.digital/discover",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/discover-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "activity-light-wide",
+      "url": "https://modula.digital/activity",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/activity-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "profile-dark-narrow",
+      "url": "https://modula.digital/profile",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/profile-dark-narrow.png",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "board-light-wide",
+      "url": "https://modula.digital/board",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/board-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "product-hub-dark-wide",
+      "url": "https://modula.digital/product",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/product-hub-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "module-detail-light-wide",
+      "url": "https://modula.digital/marketplace/modula.vault-notes",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/module-detail-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "standard2-reference-module-dark-wide",
+      "url": "https://modula.digital/module/digital.modula.standard2-reference",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/standard2-reference-module-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "vault-notes-dark-wide",
+      "url": "https://modula.digital/module/modula.vault-notes",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/vault-notes-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "vault-notes-editor-light-wide",
+      "url": "https://modula.digital/module/modula.vault-notes/editor",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/vault-notes-editor-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "vault-notes-settings-dark-wide",
+      "url": "https://modula.digital/module/modula.vault-notes/settings",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/vault-notes-settings-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "ai-configuration-state-oled",
+      "url": "https://modula.digital/module/modula.vault-notes/ai",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/ai-configuration-state-oled.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "oled",
+      "textScale": 1
+    },
+    {
+      "name": "settings-light-wide",
+      "url": "https://modula.digital/settings",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/settings-light-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1
+    },
+    {
+      "name": "settings-larger-text",
+      "url": "https://modula.digital/settings",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/settings-larger-text.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "light",
+      "reducedMotion": false,
+      "appearanceMode": "light",
+      "textScale": 1.2
+    },
+    {
+      "name": "home-reduced-motion",
+      "url": "https://modula.digital/",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/home-reduced-motion.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": true,
+      "appearanceMode": "dark",
+      "textScale": 1
+    },
+    {
+      "name": "error-state-dark-wide",
+      "url": "https://modula.digital/phase7e-block14-missing-route",
+      "file": "/home/andrei/modula-latest/docs/validation/evidence/phase7e-block14-web/error-state-dark-wide.png",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "colorScheme": "dark",
+      "reducedMotion": false,
+      "appearanceMode": "dark",
+      "textScale": 1
+    }
+  ]
+}

@@ -12,6 +12,10 @@ export function createMetaRoutes(): LocalApiRoute[] {
         protocolVersion: '0.1' as const,
         environment: 'development' as const,
         minimumClientVersion: '0.1.0',
+        registration: {
+          mode: 'open' as const,
+          emailVerificationRequired: true,
+        },
         // Local prototype keeps AT Protocol UI gated off until remote preview.
         capabilities: {
           ...PHASE5_PREVIEW_CAPABILITIES,

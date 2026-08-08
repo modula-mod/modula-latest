@@ -5,7 +5,6 @@ import type {AtprotoRepository} from '@/data/repositories/contracts'
 import {
   ATPROTO_NATIVE_REDIRECT_URI,
   expectedAtprotoClientKind,
-  getAtprotoExpoOAuthClient,
 } from '@/features/atproto/oauth/atprotoOAuthClient'
 import {
   clearPendingAtprotoOAuthFlow,
@@ -27,9 +26,9 @@ export type StartAtprotoOAuthResult =
   | {status: 'failed'; message: string}
 
 /**
- * Starts Modula-mediated AT Protocol OAuth using the official Expo OAuth client
- * surface and expo-web-browser auth session (same stack as ExpoOAuthClient.signIn).
- * Provider tokens are never returned to or stored by the app.
+ * Starts Modula-mediated AT Protocol OAuth using the backend OAuth contract and
+ * Expo WebBrowser auth session. Provider tokens are never returned to or stored
+ * by the app.
  */
 export async function startAtprotoOAuth(
   input: StartAtprotoOAuthInput,
@@ -37,11 +36,6 @@ export async function startAtprotoOAuth(
   const returnRoute = input.returnRoute ?? '/settings/connections/atproto'
   const requestScope = input.requestScope ?? 'atproto'
   const clientKind = expectedAtprotoClientKind()
-
-  // Ensure the official Expo client is constructed on native (crypto / scheme validation).
-  if (clientKind === 'native') {
-    getAtprotoExpoOAuthClient()
-  }
 
   try {
     const started = await input.atprotoRepository.startOAuth({

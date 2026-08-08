@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
+import {getUserFacingErrorMessage, isModulaApiError} from '@/api/contracts/ApiError'
 import {
   AuthField,
   AuthLink,
@@ -11,6 +12,7 @@ import {
 } from '@/auth/screens/AuthScreenPrimitives'
 import {useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
+import {useApiMetadataQuery} from '@/data/query/useApiMetadataQuery'
 import {normaliseHandle, validateDisplayName, validateHandle} from '@/features/profile/utils/validators'
 import {ModulaCheckbox} from '@/platform/ui/controls/modula-checkbox'
 import {useAppServices} from '@/runtime'
@@ -25,7 +27,15 @@ export function CreateAccountScreen() {
   const {authRepository} = useAppServices()
   const {spacing} = useThemeTokens()
   const inviteRequired = params.inviteRequired === '1'
+  const metadataQuery = useApiMetadataQuery()
+  const advertisedRegistrationMode = metadataQuery.data?.registration.mode
+  const registrationMode = advertisedRegistrationMode ?? (inviteRequired ? 'invite-only' : null)
+  const registrationPending = !registrationMode && !metadataQuery.isError
+  const registrationUnavailable = !registrationMode && metadataQuery.isError
+  const requiresInvite = registrationMode === 'invite-only'
+  const registrationClosed = registrationMode === 'closed'
   const [step, setStep] = useState<Step>(inviteRequired ? 'invite' : 'email')
+  const [inviteAccepted, setInviteAccepted] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
@@ -36,6 +46,12 @@ export function CreateAccountScreen() {
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const activeStep: Step =
+    requiresInvite && !inviteAccepted
+      ? 'invite'
+      : !requiresInvite && step === 'invite'
+        ? 'email'
+        : step
 
   const nextFromEmail = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase())) {
@@ -83,6 +99,14 @@ export function CreateAccountScreen() {
   }
 
   const submit = async () => {
+    if (registrationClosed) {
+      setError('Registration is closed on this server.')
+      return
+    }
+    if (requiresInvite && !inviteCode.trim()) {
+      setError('An invite is required for this environment.')
+      return
+    }
     if (!acceptedTerms || !acceptedPrivacy) {
       setError('Accept the Terms and Privacy notice to continue.')
       return
@@ -98,11 +122,84 @@ export function CreateAccountScreen() {
         inviteCode: inviteCode.trim() || undefined,
         acceptedTerms: true,
       })
-    } catch {
-      setError('That email or handle is already in use, or the invite is invalid.')
+    } catch (caught) {
+      if (isModulaApiError(caught)) {
+        if (caught.code === 'FORBIDDEN') {
+          setError(
+            requiresInvite
+              ? 'Enter a valid invitation to create an account.'
+              : 'Registration is not available on this server.',
+          )
+          return
+        }
+        if (caught.code === 'CONFLICT') {
+          setError('That email or username is already registered.')
+          return
+        }
+        setError(getUserFacingErrorMessage(caught))
+        return
+      }
+      setError('Modula could not create the account. Try again.')
     } finally {
       setPending(false)
     }
+  }
+
+  const footerLinks = (
+    <View style={{gap: spacing[2], marginTop: spacing[1]}}>
+      <AuthLink onPress={() => router.push('/sign-in' as Href)}>
+        Already have an account? Sign in
+      </AuthLink>
+      <AuthLink onPress={() => router.back()}>Back</AuthLink>
+    </View>
+  )
+
+  if (registrationPending) {
+    return (
+      <AuthShell>
+        <View style={{gap: spacing[4]}}>
+          <View style={{gap: spacing[1]}}>
+            <AppText variant="display">Checking registration</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              Modula is confirming account creation policy with the server.
+            </AppText>
+          </View>
+          <AuthPanel>{footerLinks}</AuthPanel>
+        </View>
+      </AuthShell>
+    )
+  }
+
+  if (registrationUnavailable) {
+    return (
+      <AuthShell>
+        <View style={{gap: spacing[4]}}>
+          <View style={{gap: spacing[1]}}>
+            <AppText variant="display">Registration unavailable</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              Modula could not verify whether this server accepts new accounts.
+            </AppText>
+          </View>
+          <AuthPanel>{footerLinks}</AuthPanel>
+        </View>
+      </AuthShell>
+    )
+  }
+
+  if (registrationClosed) {
+    return (
+      <AuthShell>
+        <View style={{gap: spacing[4]}}>
+          <View style={{gap: spacing[1]}}>
+            <AppText variant="display">Sign in only</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              This Modula server is not accepting new account registrations.
+            </AppText>
+          </View>
+          <AuthPanel>{footerLinks}</AuthPanel>
+        </View>
+      </AuthShell>
+    )
   }
 
   return (
@@ -111,12 +208,13 @@ export function CreateAccountScreen() {
         <View style={{gap: spacing[1]}}>
           <AppText variant="display">Create Modula Account</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Your account is owned by Greenfield. External Networks are optional and configured later in
-            Settings.
+            {requiresInvite
+              ? 'Enter your invitation to create a Greenfield account on this server.'
+              : 'Your account is owned by Greenfield. External Networks are optional and configured later in Settings.'}
           </AppText>
         </View>
         <AuthPanel>
-          {step === 'invite' ? (
+          {activeStep === 'invite' ? (
             <>
               <AuthField
                 label="Invite code"
@@ -126,12 +224,16 @@ export function CreateAccountScreen() {
                 textContentType="oneTimeCode"
                 error={error ?? undefined}
               />
+              <AppText variant="caption" colour="textSecondary">
+                Request access from the server operator if you do not have an invitation.
+              </AppText>
               <AppButton
                 onPress={() => {
-                  if (!inviteCode.trim()) {
+                  if (requiresInvite && !inviteCode.trim()) {
                     setError('An invite is required for this environment.')
                     return
                   }
+                  setInviteAccepted(true)
                   setError(null)
                   setStep('email')
                 }}>
@@ -140,7 +242,7 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          {step === 'email' ? (
+          {activeStep === 'email' ? (
             <>
               <AuthField
                 label="Display name"
@@ -163,7 +265,7 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          {step === 'password' ? (
+          {activeStep === 'password' ? (
             <>
               <AuthField
                 label="Password"
@@ -186,7 +288,7 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          {step === 'handle' ? (
+          {activeStep === 'handle' ? (
             <>
               <AuthField
                 label="Username"
@@ -206,7 +308,7 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          {step === 'terms' ? (
+          {activeStep === 'terms' ? (
             <>
               <ModulaCheckbox
                 value={acceptedTerms}
@@ -231,12 +333,7 @@ export function CreateAccountScreen() {
             </>
           ) : null}
 
-          <View style={{gap: spacing[2], marginTop: spacing[1]}}>
-            <AuthLink onPress={() => router.push('/sign-in' as Href)}>
-              Already have an account? Sign in
-            </AuthLink>
-            <AuthLink onPress={() => router.back()}>Back</AuthLink>
-          </View>
+          {footerLinks}
         </AuthPanel>
       </View>
     </AuthShell>

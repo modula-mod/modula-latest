@@ -29,6 +29,12 @@ export function ModulaSegmentedPicker({
   const {colours, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
   const viewportWidth = Math.min(windowWidth - 32, maxWidth ?? windowWidth)
+  const values = useMemo(() => options.map(option => option.label), [options])
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex(option => option.value === value),
+  )
+  const enabled = options.every(option => !option.disabled)
 
   // Sticky / glass / track / scrollable → shared RN (Host Picker historically brittle in overlays).
   if (appearance !== 'segmented' || scrollable || embedded) {
@@ -48,13 +54,6 @@ export function ModulaSegmentedPicker({
       />
     )
   }
-
-  const values = useMemo(() => options.map(option => option.label), [options])
-  const selectedIndex = Math.max(
-    0,
-    options.findIndex(option => option.value === value),
-  )
-  const enabled = options.every(option => !option.disabled)
 
   return (
     <SegmentedControl

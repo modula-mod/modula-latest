@@ -141,6 +141,38 @@ The exact root cause is:
 4. The www alias is attached to the same Hestia domain and currently does not
    perform a canonical redirect.
 
+## Cutover Result
+
+The durable Hestia proxy template for `modula.digital` is now `modula-static`.
+
+Persistent templates:
+
+- `/usr/local/hestia/data/templates/web/nginx/modula-static.tpl`
+- `/usr/local/hestia/data/templates/web/nginx/modula-static.stpl`
+
+Generated domain config:
+
+- `/home/andrei/conf/web/modula.digital/nginx.conf`
+- `/home/andrei/conf/web/modula.digital/nginx.ssl.conf`
+
+Active document root:
+
+- `/var/www/modula/current`
+
+Final routing behavior verified on 2026-08-02:
+
+- `http://modula.digital/` returns `301` to `https://modula.digital/`
+- `https://modula.digital/` returns the Modula static app
+- `https://www.modula.digital/` returns `301` to `https://modula.digital/`
+- `grep -qi 'Open WebUI' /tmp/modula-home.html` is absent
+
+TLS remained valid:
+
+- subject: `CN = modula.digital`
+- issuer: `Google Trust Services WE1`
+- valid from `Jun 15 14:20:12 2026 GMT`
+- valid to `Sep 13 15:16:14 2026 GMT`
+
 ## OpenWebUI Preservation
 
 Preservation artifacts created before routing changes:
@@ -162,3 +194,13 @@ Preserved mounts:
 
 OpenWebUI may remain running internally after the cutover, but it must not
 answer for `modula.digital` or `www.modula.digital`.
+
+Post-cutover preservation state:
+
+- Docker container `open-webui` remains running and healthy.
+- Docker volume and bind-mount backups remain under
+  `/var/backups/modula/openwebui-volumes-20260801T222601Z/`.
+- A persistent firewall service blocks raw public access to Docker's published
+  OpenWebUI port while preserving the service internally:
+  `/etc/systemd/system/modula-openwebui-firewall.service`.
+- Active rule: `DOCKER-USER -i ens6 --ctorigdstport 3000 -j DROP`.

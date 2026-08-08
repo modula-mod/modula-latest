@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {View} from 'react-native'
-import {useRouter, type Href} from 'expo-router'
+import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
 import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
 import {AppText} from '@/components/primitives/AppText'
@@ -8,10 +8,11 @@ import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ResetPasswordScreen() {
+  const params = useLocalSearchParams<{token?: string}>()
   const router = useRouter()
   const services = useAppServices()
   const {spacing} = useThemeTokens()
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState(params.token ?? '')
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [error, setError] = useState<string | null>(null)

@@ -3,8 +3,8 @@ import {Platform} from 'react-native'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 
 /**
- * Shared AT Protocol OAuth constants. Native constructs the official Expo client;
- * web uses Modula server-mediated OAuth only.
+ * Shared AT Protocol OAuth constants. Web and native both use Modula
+ * server-mediated OAuth in Phase 7H.
  */
 
 export const ATPROTO_NATIVE_REDIRECT_URI = 'modula://oauth/atproto'
@@ -14,8 +14,8 @@ export const ATPROTO_WEB_METADATA_URL =
   'https://api.modula.digital/oauth/atproto/web-client-metadata.json'
 
 /**
- * Matches `@atproto/oauth-client-expo` native custom-scheme rule
- * (`scheme:/path` with a single slash after the colon).
+ * Keeps Modula's native redirect in the AT custom-scheme form:
+ * `scheme:/path` with a single slash after the colon.
  */
 export const CUSTOM_URI_SCHEME_REGEX = /^(?:[^.]+(?:\.[^.]+)+):\/(?:[^/].*)?$/
 

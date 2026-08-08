@@ -77,19 +77,19 @@ requireFile(
   '2. AT settings route missing (src/app/settings/connections/atproto.tsx)',
 )
 
-// 3. Official Expo OAuth client is used.
-if (!Object.prototype.hasOwnProperty.call(deps, '@atproto/oauth-client-expo')) {
-  fail('3. Missing dependency @atproto/oauth-client-expo')
+// 3. AT Protocol OAuth is optional and isolated from the native runtime.
+if (Object.prototype.hasOwnProperty.call(deps, '@atproto/oauth-client-expo')) {
+  fail('3. @atproto/oauth-client-expo must remain outside the core runtime')
 }
 requireText(
   'src/features/atproto/oauth/atprotoOAuthClient.native.ts',
-  /from '@atproto\/oauth-client-expo'/,
-  '3. Official Expo OAuth client is not imported',
+  'server-mediated',
+  '3. Native AT OAuth boundary is not documented as server-mediated',
 )
 requireText(
-  'src/features/atproto/oauth/atprotoOAuthClient.native.ts',
-  'ExpoOAuthClient',
-  '3. ExpoOAuthClient is not referenced',
+  'src/features/atproto/oauth/startAtprotoOAuth.ts',
+  'atprotoRepository.startOAuth',
+  '3. AT OAuth start must remain server-mediated',
 )
 
 // 4. Native callback exists.
@@ -309,13 +309,13 @@ if (customOauthHits.length) {
 }
 requireText(
   'src/features/atproto/oauth/startAtprotoOAuth.ts',
-  'getAtprotoExpoOAuthClient',
-  '18. OAuth start path must initialize the official Expo client surface',
+  'atprotoRepository.startOAuth',
+  '18. OAuth start path must delegate to the server-mediated OAuth contract',
 )
 requireText(
   'src/features/atproto/oauth/atprotoOAuthClient.native.ts',
-  "from '@atproto/oauth-client-expo'",
-  '18. Custom OAuth client is forbidden; official Expo package required',
+  'getAtprotoExpoOAuthClient(): null',
+  '18. Native AT OAuth client must remain isolated from the core runtime',
 )
 
 // 19. Previous verifiers remain.

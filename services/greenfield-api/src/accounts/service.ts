@@ -2,8 +2,9 @@ import {createHash, randomBytes} from 'node:crypto'
 import {GREENFIELD_INITIAL_COLLECTIONS} from '@modula/greenfield-protocol'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
-import {hashPassword} from '../lib/password.js'
+import {hashPassword, verifyPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
+import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
 
@@ -22,6 +23,7 @@ export class AccountService {
   constructor(
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
+    private readonly mail?: MailService,
   ) {}
 
   async register(input: {
@@ -31,6 +33,7 @@ export class AccountService {
     displayName?: string
     inviteCode?: string
     acceptedTerms?: boolean
+    correlationId?: string
   }) {
     const email = input.email.trim().toLowerCase()
     const displayName = (input.displayName ?? '').trim()
@@ -46,7 +49,13 @@ export class AccountService {
     if (input.acceptedTerms !== true) {
       throw Object.assign(new Error('Terms and privacy acknowledgement required'), {code: 'VALIDATION_FAILED'})
     }
-    if (this.config.inviteOnly && !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')) {
+    if (this.config.registrationMode === 'closed') {
+      throw Object.assign(new Error('Registration is closed'), {code: 'FORBIDDEN'})
+    }
+    if (
+      this.config.registrationMode === 'invite-only' &&
+      !this.config.registrationInviteCodes.includes(input.inviteCode ?? '')
+    ) {
       throw Object.assign(new Error('Valid invitation required'), {code: 'FORBIDDEN'})
     }
 
@@ -62,6 +71,7 @@ export class AccountService {
     const accountId = uuidv7()
     const verificationToken = randomBytes(32).toString('base64url')
     const now = new Date()
+    const verificationExpiresAt = new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000)
     const passwordHash = await hashPassword(input.password)
 
     await this.db.transaction().execute(async trx => {
@@ -118,11 +128,19 @@ export class AccountService {
           verification_id: uuidv7(),
           account_id: accountId,
           token_hash: tokenHash(verificationToken),
-          expires_at: new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000),
+          expires_at: verificationExpiresAt,
           consumed_at: null,
           created_at: now,
         })
         .execute()
+      await this.mail?.queueVerification(trx, {
+        accountId,
+        email,
+        displayName,
+        token: verificationToken,
+        expiresAt: verificationExpiresAt,
+        correlationId: input.correlationId,
+      })
       await new AuditRepository(trx).append(
         'account.registered',
         {handle, agreements: {terms: true, privacy: true}},
@@ -291,13 +309,19 @@ export class AccountService {
     return account
   }
 
-  async resendVerification(email: string): Promise<{resent: boolean}> {
+  async resendVerification(email: string, options: {correlationId?: string} = {}): Promise<{resent: boolean}> {
+    const normalizedEmail = email.trim().toLowerCase()
     const identity = await this.db
       .selectFrom('greenfield_auth_identities')
       .innerJoin('greenfield_accounts', 'greenfield_accounts.account_id', 'greenfield_auth_identities.account_id')
-      .select(['greenfield_auth_identities.account_id', 'greenfield_accounts.status'])
+      .select([
+        'greenfield_auth_identities.account_id',
+        'greenfield_auth_identities.metadata',
+        'greenfield_accounts.status',
+        'greenfield_accounts.primary_handle',
+      ])
       .where('kind', '=', 'email')
-      .where('identifier', '=', email.trim().toLowerCase())
+      .where('identifier', '=', normalizedEmail)
       .executeTakeFirst()
     if (!identity || identity.status !== 'pendingVerification') {
       // Do not leak account existence.
@@ -305,18 +329,90 @@ export class AccountService {
     }
     const token = randomBytes(32).toString('base64url')
     const now = new Date()
-    await this.db
-      .insertInto('greenfield_email_verifications')
-      .values({
-        verification_id: uuidv7(),
-        account_id: identity.account_id,
-        token_hash: tokenHash(token),
-        expires_at: new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000),
-        consumed_at: null,
-        created_at: now,
+    const expiresAt = new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000)
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .updateTable('greenfield_email_verifications')
+        .set({consumed_at: now})
+        .where('account_id', '=', identity.account_id)
+        .where('consumed_at', 'is', null)
+        .execute()
+      await trx
+        .insertInto('greenfield_email_verifications')
+        .values({
+          verification_id: uuidv7(),
+          account_id: identity.account_id,
+          token_hash: tokenHash(token),
+          expires_at: expiresAt,
+          consumed_at: null,
+          created_at: now,
+        })
+        .execute()
+      await this.mail?.queueVerification(trx, {
+        accountId: identity.account_id,
+        email: normalizedEmail,
+        displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
+        token,
+        expiresAt,
+        correlationId: options.correlationId,
       })
-      .execute()
+    })
     return {resent: true}
+  }
+
+  async changePassword(
+    accountId: string,
+    input: {currentPassword?: string; newPassword?: string},
+    options: {correlationId?: string} = {},
+  ): Promise<{changed: true}> {
+    const currentPassword = input.currentPassword ?? ''
+    const newPassword = input.newPassword ?? ''
+    if (newPassword.length < 10) {
+      throw Object.assign(new Error('Password must be at least 10 characters'), {code: 'VALIDATION_FAILED'})
+    }
+    const identity = await this.db
+      .selectFrom('greenfield_auth_identities')
+      .innerJoin('greenfield_password_credentials', 'greenfield_password_credentials.account_id', 'greenfield_auth_identities.account_id')
+      .innerJoin('greenfield_accounts', 'greenfield_accounts.account_id', 'greenfield_auth_identities.account_id')
+      .select([
+        'greenfield_auth_identities.identifier',
+        'greenfield_auth_identities.metadata',
+        'greenfield_password_credentials.password_hash',
+        'greenfield_accounts.primary_handle',
+      ])
+      .where('greenfield_auth_identities.account_id', '=', accountId)
+      .where('greenfield_auth_identities.kind', '=', 'email')
+      .executeTakeFirst()
+    if (!identity || !(await verifyPassword(currentPassword, identity.password_hash))) {
+      throw Object.assign(new Error('Current password is invalid'), {code: 'UNAUTHENTICATED'})
+    }
+    const now = new Date()
+    const passwordHash = await hashPassword(newPassword)
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .updateTable('greenfield_password_credentials')
+        .set({password_hash: passwordHash, params: {algorithm: 'argon2id'}, updated_at: now})
+        .where('account_id', '=', accountId)
+        .execute()
+      await trx
+        .insertInto('greenfield_session_events')
+        .values({
+          event_id: uuidv7(),
+          session_id: null,
+          account_id: accountId,
+          event_type: 'password.changed',
+          metadata: {},
+          created_at: now,
+        })
+        .execute()
+      await this.mail?.queuePasswordChanged(trx, {
+        accountId,
+        email: identity.identifier,
+        displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
+        correlationId: options.correlationId,
+      })
+    })
+    return {changed: true}
   }
 
   async getMe(accountId: string): Promise<PublicAccount | null> {

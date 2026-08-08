@@ -14,24 +14,14 @@ import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-async function readAsBase64(uri: string): Promise<string> {
-  const response = await fetch(uri)
-  const buffer = await response.arrayBuffer()
-  const bytes = new Uint8Array(buffer)
-  let binary = ''
-  for (let i = 0; i < bytes.length; i += 1) {
-    binary += String.fromCharCode(bytes[i]!)
-  }
-  return btoa(binary)
-}
-
 export function StoryCreateScreen() {
   const router = useRouter()
   const session = useSession()
   const {storiesRepository} = useAppServices()
   const queryClient = useQueryClient()
-  const {spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const [previewUri, setPreviewUri] = useState<string | null>(null)
+  const [selectedBase64, setSelectedBase64] = useState<string | null>(null)
   const [contentType, setContentType] = useState('image/jpeg')
   const [caption, setCaption] = useState('')
   const [visibility, setVisibility] = useState<'followers' | 'public'>('followers')
@@ -42,24 +32,28 @@ export function StoryCreateScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       quality: 0.85,
-      base64: false,
+      base64: true,
     })
     if (result.canceled || !result.assets[0]) return
     const asset = result.assets[0]
     setPreviewUri(asset.uri)
+    setSelectedBase64(asset.base64 ?? null)
     setContentType(asset.mimeType ?? 'image/jpeg')
-    setError(null)
+    setError(asset.base64 ? null : 'Photo data was not available. Choose a different photo and try again.')
   }
 
   const publish = async () => {
     if (!previewUri || session.status !== 'signedIn') return
+    if (!selectedBase64) {
+      setError('Photo data was not available. Choose a different photo and try again.')
+      return
+    }
     setBusy(true)
     setError(null)
     try {
-      const base64 = await readAsBase64(previewUri)
       const group = await storiesRepository.create({
         mediaKind: 'image',
-        base64,
+        base64: selectedBase64,
         contentType,
         caption,
         visibility,
@@ -82,9 +76,16 @@ export function StoryCreateScreen() {
         Choose a photo from your library. Stories expire after 24 hours.
       </AppText>
       {previewUri ? (
-        <Image source={{uri: previewUri}} style={styles.preview} />
+        <Image
+          source={{uri: previewUri}}
+          style={[styles.preview, {backgroundColor: colours.surfaceMuted}]}
+        />
       ) : (
-        <View style={styles.placeholder}>
+        <View
+          style={[
+            styles.placeholder,
+            {backgroundColor: colours.surfaceMuted},
+          ]}>
           <AppText colour="textSecondary">No photo selected</AppText>
         </View>
       )}
@@ -130,7 +131,6 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 9 / 16,
     borderRadius: 16,
-    backgroundColor: '#111',
   },
   placeholder: {
     width: '100%',
@@ -138,6 +138,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(127,127,127,0.12)',
   },
 })

@@ -71,19 +71,29 @@ function LiquidGlassPlatformTabs() {
         headerShown: false,
         sceneStyle: {backgroundColor: colours.canvas},
       }}>
-      {MODULA_TABS.map(tab => (
-        <Tabs.Screen
-          key={tab.id}
-          name={tab.routeName}
-          options={{
-            title: tab.label,
-            tabBarAccessibilityLabel: tab.label,
-            // Create stays a file route (redirects to compose) but is not a
-            // tab destination — the liquid-glass plus control owns compose.
-            ...(tab.id === 'create' ? {href: null} : {}),
-          }}
-        />
-      ))}
+      {MODULA_TABS.map(tab => {
+        const options =
+          tab.id === 'create'
+            ? {
+                title: 'Create',
+                tabBarAccessibilityLabel: tab.label,
+                // Create stays a file route (redirects to compose) but is not a
+                // tab destination — the liquid-glass plus control owns compose.
+                href: null,
+              }
+            : {
+                title: tab.label,
+                tabBarAccessibilityLabel: tab.label,
+              }
+
+        return (
+          <Tabs.Screen
+            key={tab.id}
+            name={tab.routeName}
+            options={options}
+          />
+        )
+      })}
       {/* Board lives under (tabs)/ but is opened from drawer / shortcuts. */}
       <Tabs.Screen name="board" options={{href: null, title: 'Board'}} />
     </Tabs>
