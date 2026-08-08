@@ -1,0 +1,375 @@
+{
+  "manifestVersion": 2,
+  "moduleId": "digital.modula.standard2-reference",
+  "name": "Standard 2 Reference",
+  "description": "Test-only Standard 2 module fixture for host-mediated text analysis and runtime registration acceptance.",
+  "version": "2.0.0",
+  "standardVersion": "2.0.0",
+  "sectionVersions": {
+    "identity": "2.0.0",
+    "lifecycle": "2.0.0",
+    "backend": "2.0.0",
+    "engines": "2.0.0",
+    "ai": "2.0.0",
+    "permissions": "2.0.0",
+    "settings": "2.0.0",
+    "routes": "2.0.0",
+    "views": "2.0.0",
+    "records": "2.0.0",
+    "actions": "2.0.0",
+    "functions": "2.0.0",
+    "jobs": "2.0.0",
+    "events": "2.0.0",
+    "notifications": "2.0.0",
+    "search": "2.0.0",
+    "exports": "2.0.0",
+    "imports": "2.0.0",
+    "synchronization": "2.0.0",
+    "dependencies": "2.0.0",
+    "optionalDependencies": "2.0.0",
+    "integrations": "2.0.0",
+    "billing": "2.0.0",
+    "telemetry": "2.0.0",
+    "diagnostics": "2.0.0",
+    "accessibility": "2.0.0",
+    "localization": "2.0.0",
+    "appearance": "2.0.0",
+    "onboarding": "2.0.0",
+    "migrations": "2.0.0",
+    "capabilities": "2.0.0",
+    "services": "2.0.0",
+    "apis": "2.0.0",
+    "hooks": "2.0.0",
+    "metrics": "2.0.0",
+    "storage": "2.0.0",
+    "widgets": "2.0.0",
+    "navigation": "2.0.0",
+    "ui": "2.0.0",
+    "automation": "2.0.0",
+    "offline": "2.0.0",
+    "realtime": "2.0.0",
+    "versioning": "2.0.0",
+    "compatibilityMatrix": "2.0.0",
+    "marketplace": "2.0.0"
+  },
+  "publisher": {
+    "publisherId": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital"
+  },
+  "source": {
+    "provider": "github",
+    "repository": "modula-mod/modula-latest",
+    "commit": "1ce28c422458dc024c67a45a5fb42454629679b4",
+    "manifestPath": "fixtures/modules/standard2-reference/greenfield.manifest.json"
+  },
+  "license": {
+    "status": "firstParty",
+    "spdx": "LicenseRef-Modula-First-Party-Test-Fixture",
+    "evidenceIds": ["phase7i-standard2-reference-fixture-policy"]
+  },
+  "trust": {
+    "requestedLevel": "firstParty"
+  },
+  "compatibility": {
+    "minimumGreenfieldVersion": "0.1.0",
+    "minimumModulaHostVersion": "0.1.0",
+    "protocolVersions": ["greenfield.v2", "greenfield.v1"],
+    "platforms": ["server", "web"]
+  },
+  "permissions": [
+    {
+      "permission": "records:module.digital.modula.standard2-reference.analysis:read",
+      "reason": "Read installation-scoped analysis records.",
+      "risk": "low"
+    },
+    {
+      "permission": "records:module.digital.modula.standard2-reference.analysis:write",
+      "reason": "Write installation-scoped analysis records.",
+      "risk": "medium"
+    }
+  ],
+  "dependencies": [],
+  "contributions": {
+    "routes": [
+      {
+        "id": "digital.modula.standard2-reference.route.home",
+        "title": "Standard 2 Reference",
+        "path": "/module/digital.modula.standard2-reference",
+        "routeKind": "module"
+      }
+    ],
+    "settings": [
+      {
+        "id": "digital.modula.standard2-reference.settings.main",
+        "title": "Reference settings",
+        "schemaRef": "schemas/settings.schema.json",
+        "scope": "installation"
+      }
+    ],
+    "widgets": [
+      {
+        "id": "digital.modula.standard2-reference.widget.board",
+        "title": "Text analysis",
+        "surface": "board"
+      }
+    ],
+    "events": [
+      {
+        "id": "digital.modula.standard2-reference.event.analysis-created",
+        "type": "standard2-reference.analysis.created"
+      }
+    ]
+  },
+  "dependencyGraph": {
+    "version": "2.0.0",
+    "requires": [
+      {
+        "moduleId": "digital.modula.reference-provider",
+        "versionRange": "^1.0.0",
+        "reason": "Resolve a required provider dependency before activation.",
+        "capabilityIds": ["modula.reference.provider"]
+      }
+    ],
+    "optional": [
+      {
+        "provides": "modula.reference.calendar",
+        "versionRange": "^1.0.0",
+        "reason": "Attach dated analysis when a calendar provider exists.",
+        "capabilityIds": ["modula.reference.calendar"]
+      }
+    ],
+    "recommended": [
+      {
+        "moduleId": "digital.modula.reference-recommender",
+        "versionRange": "^1.0.0",
+        "reason": "Improve analysis suggestions when installed."
+      }
+    ],
+    "conflicts": [
+      {
+        "moduleId": "digital.modula.reference-conflict",
+        "versionRange": "^1.0.0",
+        "reason": "Conflicting provider contract must be rejected."
+      }
+    ],
+    "replaces": [
+      {
+        "moduleId": "digital.modula.reference-legacy",
+        "versionRange": "<2.0.0",
+        "reason": "Reference module replaces the legacy text analyzer."
+      }
+    ],
+    "provides": [
+      {
+        "id": "modula.reference.text-analysis",
+        "title": "Reference text analysis service",
+        "version": "1.0.0",
+        "kind": "service"
+      },
+      {
+        "id": "modula.reference.widget",
+        "title": "Reference Board widget",
+        "version": "1.0.0",
+        "kind": "ui"
+      }
+    ]
+  },
+  "capabilityDiscovery": {
+    "version": "2.0.0",
+    "supportsServices": true,
+    "supportsApis": true,
+    "supportsHooks": true,
+    "supportsJobs": true,
+    "supportsStorage": true,
+    "supportsWidgets": true,
+    "supportsSearch": true,
+    "supportsAi": false
+  },
+  "permissionModel": {
+    "version": "2.0.0",
+    "categories": {
+      "data": [
+        {
+          "id": "records:module.digital.modula.standard2-reference.analysis:read",
+          "reason": "Read installation-scoped analysis records.",
+          "required": true,
+          "risk": "low",
+          "policyMode": "observe"
+        },
+        {
+          "id": "records:module.digital.modula.standard2-reference.analysis:write",
+          "reason": "Write installation-scoped analysis records.",
+          "required": true,
+          "risk": "medium",
+          "policyMode": "warn"
+        }
+      ],
+      "search": [
+        {
+          "id": "search:index",
+          "reason": "Index analysis summaries.",
+          "required": false,
+          "risk": "medium",
+          "policyMode": "warn"
+        }
+      ],
+      "storage": [
+        {
+          "id": "requires-reauthorisation:module.digital.modula.standard2-reference.secret-rotation",
+          "reason": "Secret rotation requires explicit reauthorisation.",
+          "required": false,
+          "risk": "high",
+          "policyMode": "require-confirmation"
+        }
+      ]
+    }
+  },
+  "serviceRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.service.analyze-text",
+        "title": "Analyze Text",
+        "version": "1.0.0",
+        "kind": "markdown",
+        "contract": "modula.reference.text-analysis.v1",
+        "permissions": ["records:module.digital.modula.standard2-reference.analysis:write"],
+        "capabilities": ["modula.reference.text-analysis"],
+        "inputSchema": "schemas/analyze.input.schema.json",
+        "outputSchema": "schemas/analyze.output.schema.json",
+        "timeoutMs": 4000,
+        "rateLimitPerMinute": 30,
+        "invocationDepthLimit": 2
+      }
+    ]
+  },
+  "apiRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.api.analyze",
+        "title": "Analyze Text API",
+        "version": "1.0.0",
+        "method": "POST",
+        "path": "/api/modula/digital.modula.standard2-reference/analyze",
+        "permissions": ["records:module.digital.modula.standard2-reference.analysis:write"],
+        "inputSchema": "schemas/analyze.input.schema.json",
+        "outputSchema": "schemas/analyze.output.schema.json",
+        "sideEffects": "write",
+        "idempotent": true
+      }
+    ]
+  },
+  "hookRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.hook.before-enable",
+        "hook": "module.before-enable",
+        "phase": "before",
+        "target": "digital.modula.standard2-reference",
+        "timeoutMs": 1200,
+        "policyMode": "warn"
+      },
+      {
+        "id": "digital.modula.standard2-reference.hook.after-enable",
+        "hook": "module.after-enable",
+        "phase": "after",
+        "target": "digital.modula.standard2-reference",
+        "timeoutMs": 1200,
+        "policyMode": "observe"
+      }
+    ]
+  },
+  "jobRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.job.health",
+        "title": "Reference health check",
+        "kind": "health",
+        "functionId": "digital.modula.standard2-reference.function.analyze-text",
+        "schedule": "*/15 * * * *",
+        "retryPolicy": {"maxAttempts": 2}
+      },
+      {
+        "id": "digital.modula.standard2-reference.job.cleanup",
+        "title": "Reference cleanup",
+        "kind": "cleanup",
+        "schedule": "0 3 * * *",
+        "retryPolicy": {"maxAttempts": 1}
+      }
+    ]
+  },
+  "storageModel": {
+    "version": "2.0.0",
+    "items": [
+      {"id": "digital.modula.standard2-reference.storage.analysis-records", "kind": "structured-records", "scope": "installation", "quota": {"bytes": 1048576}, "retention": "retain", "exportSupported": true, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.settings", "kind": "settings", "scope": "installation", "quota": {"bytes": 65536}, "retention": "retain", "exportSupported": true, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.cache", "kind": "cache", "scope": "installation", "quota": {"bytes": 262144}, "retention": "purge", "exportSupported": false, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.temporary", "kind": "temporary-storage", "scope": "installation", "quota": {"bytes": 262144}, "retention": "purge", "exportSupported": false, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.objects", "kind": "object-storage", "scope": "installation", "quota": {"bytes": 1048576}, "retention": "retain", "exportSupported": true, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.attachments", "kind": "attachments", "scope": "installation", "quota": {"bytes": 1048576}, "retention": "retain", "exportSupported": true, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.secrets", "kind": "secrets", "scope": "installation", "quota": {"bytes": 16384}, "retention": "purge", "encrypted": true, "exportSupported": false, "deletionSupported": true},
+      {"id": "digital.modula.standard2-reference.storage.history", "kind": "history", "scope": "account", "quota": {"bytes": 1048576}, "retention": "retain", "exportSupported": true, "deletionSupported": true}
+    ]
+  },
+  "widgetRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.widget.board",
+        "title": "Text Analysis",
+        "surface": "board",
+        "contract": "modula.reference.widget.v1"
+      }
+    ]
+  },
+  "navigationRegistry": {
+    "version": "2.0.0",
+    "items": [
+      {"id": "digital.modula.standard2-reference.navigation.route", "title": "Reference", "kind": "route", "target": "/module/digital.modula.standard2-reference"},
+      {"id": "digital.modula.standard2-reference.navigation.composer", "title": "Analyze", "kind": "composer-tool", "target": "digital.modula.standard2-reference.service.analyze-text"},
+      {"id": "digital.modula.standard2-reference.navigation.context", "title": "Analyze selection", "kind": "context-menu", "target": "digital.modula.standard2-reference.service.analyze-text"},
+      {"id": "digital.modula.standard2-reference.navigation.search", "title": "Reference search", "kind": "search-provider", "target": "digital.modula.standard2-reference.search.analysis"}
+    ]
+  },
+  "uiContributions": {
+    "version": "2.0.0",
+    "items": [
+      {"id": "digital.modula.standard2-reference.ui.board", "title": "Reference Board", "kind": "board-card", "target": "board", "contract": "modula.reference.card.v1"},
+      {"id": "digital.modula.standard2-reference.ui.profile", "title": "Reference Profile", "kind": "profile-tab", "target": "profile", "contract": "modula.reference.profile.v1"},
+      {"id": "digital.modula.standard2-reference.ui.settings", "title": "Reference Settings", "kind": "settings-section", "target": "settings", "contract": "modula.reference.settings.v1"},
+      {"id": "digital.modula.standard2-reference.ui.composer", "title": "Analyze", "kind": "composer-action", "target": "composer", "contract": "modula.reference.composer.v1"},
+      {"id": "digital.modula.standard2-reference.ui.context", "title": "Analyze selection", "kind": "context-menu", "target": "context", "contract": "modula.reference.context.v1"},
+      {"id": "digital.modula.standard2-reference.ui.search", "title": "Reference search", "kind": "search-provider", "target": "search", "contract": "modula.reference.search.v1"},
+      {"id": "digital.modula.standard2-reference.ui.widget", "title": "Reference Widget", "kind": "widget", "target": "module", "contract": "modula.reference.widget.v1"}
+    ]
+  },
+  "eventBus": {
+    "version": "2.0.0",
+    "items": [
+      {
+        "id": "digital.modula.standard2-reference.event.analysis-created",
+        "type": "standard2-reference.analysis.created",
+        "direction": "emitted",
+        "schemaRef": "schemas/analysis-created.schema.json"
+      }
+    ]
+  },
+  "marketplace": {
+    "version": "2.0.0",
+    "verifiedBadge": false,
+    "requiredRuntimes": ["greenfield-api", "greenfield-worker"],
+    "publication": "test-fixture-only"
+  },
+  "engineReadiness": {
+    "version": "2.0.0",
+    "engines": ["greenfield-service-gateway"]
+  },
+  "integrity": {
+    "manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "releaseSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  }
+}

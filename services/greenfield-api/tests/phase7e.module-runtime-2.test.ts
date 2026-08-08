@@ -28,7 +28,7 @@ import {handleModuleUninstall} from '../../greenfield-worker/src/modules/uninsta
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const referenceModuleRoot = resolve(workspaceRoot, '../modula-mod/modula-standard2-reference-module')
+const referenceModuleRoot = resolve(workspaceRoot, 'fixtures/modules/standard2-reference')
 const moduleId = 'digital.modula.standard2-reference'
 const serviceId = 'digital.modula.standard2-reference.service.analyze-text'
 const writePermission = 'records:module.digital.modula.standard2-reference.analysis:write'
@@ -378,8 +378,8 @@ function configureTestEnv(): void {
 }
 
 function referenceManifest(): GreenfieldModuleManifest {
-  const manifest = JSON.parse(readFileSync(join(referenceModuleRoot, 'dist/greenfield.manifest.json'), 'utf8')) as GreenfieldModuleManifest
-  const head = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: referenceModuleRoot, encoding: 'utf8'}).trim()
+  const manifest = JSON.parse(readFileSync(join(referenceModuleRoot, 'greenfield.manifest.json'), 'utf8')) as GreenfieldModuleManifest
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: workspaceRoot, encoding: 'utf8'}).trim()
   manifest.source.commit = head
   manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
   return manifest

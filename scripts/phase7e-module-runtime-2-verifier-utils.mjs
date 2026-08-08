@@ -19,7 +19,7 @@ export {
   run,
 }
 
-export const referenceModuleRoot = resolve(root, '../modula-mod/modula-standard2-reference-module')
+export const referenceModuleRoot = resolve(root, 'fixtures/modules/standard2-reference')
 
 export function verifyDependencyRuntimeSource() {
   includes('services/greenfield-api/migrations/027_phase7e_module_runtime_2.sql', [
@@ -242,10 +242,10 @@ export function verifyRuntimeSecuritySource() {
 
 export function verifyReferenceModule() {
   if (!existsSync(referenceModuleRoot)) {
-    fail(`missing Standard 2 reference module repository ${referenceModuleRoot}`)
+    fail(`missing Standard 2 reference fixture ${referenceModuleRoot}`)
     return
   }
-  run('pnpm', ['verify'], 'Standard 2 reference module self-verifier passes', process.env, referenceModuleRoot)
+  run('node', ['fixtures/modules/standard2-reference/scripts/verify-reference-module.mjs'], 'Standard 2 reference fixture self-verifier passes', process.env, root)
 }
 
 export async function runIsolatedRuntime2Test() {
