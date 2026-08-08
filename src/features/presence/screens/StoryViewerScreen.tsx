@@ -98,12 +98,24 @@ export function StoryViewerScreen() {
   }
 
   return (
-    <View style={[styles.root, {backgroundColor: '#000'}]}>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, {width: `${Math.round(progress * 100)}%`}]} />
+    <View style={[styles.root, {backgroundColor: colours.surface1}]}>
+      <View
+        style={[
+          styles.progressTrack,
+          {backgroundColor: colours.mediaOverlayControlBackground},
+        ]}>
+        <View
+          style={[
+            styles.progressFill,
+            {
+              backgroundColor: colours.mediaOverlayText,
+              width: `${Math.round(progress * 100)}%`,
+            },
+          ]}
+        />
       </View>
       <View style={[styles.header, {paddingHorizontal: spacing[4], paddingTop: spacing[6]}]}>
-        <AppText style={{color: '#fff'}} variant="label">
+        <AppText style={{color: colours.mediaOverlayText}} variant="label">
           {groupQuery.data.displayName}
         </AppText>
         <ModulaButton label="Close" role="quiet" onPress={() => router.back()} />
@@ -124,7 +136,9 @@ export function StoryViewerScreen() {
         ) : null}
       </Pressable>
       {current.caption ? (
-        <AppText style={{color: '#fff', padding: spacing[4]}}>{current.caption}</AppText>
+        <AppText style={{color: colours.mediaOverlayText, padding: spacing[4]}}>
+          {current.caption}
+        </AppText>
       ) : null}
       {groupQuery.data.isOwner ? (
         <View style={{padding: spacing[4]}}>
@@ -139,11 +153,9 @@ const styles = StyleSheet.create({
   root: {flex: 1},
   progressTrack: {
     height: 3,
-    backgroundColor: 'rgba(255,255,255,0.25)',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',

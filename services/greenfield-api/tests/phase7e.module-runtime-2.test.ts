@@ -261,8 +261,12 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
   })
 
   it('rolls the Standard 2 runtime migration down and back up on the isolated database', async () => {
-    const down = await migrateDown(databaseUrl!)
-    expect(down).toBe('027_phase7e_module_runtime_2')
+    const rolledDown: string[] = []
+    while (!rolledDown.includes('027_phase7e_module_runtime_2')) {
+      const down = await migrateDown(databaseUrl!)
+      expect(down).not.toBeNull()
+      rolledDown.push(down!)
+    }
     const removed = await (db as any)
       .selectFrom('information_schema.tables')
       .select('table_name')
@@ -271,7 +275,7 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
       .execute()
     expect(removed).toHaveLength(0)
     const up = await migrateUp(databaseUrl!)
-    expect(up).toContain('027_phase7e_module_runtime_2')
+    expect(up).toEqual(expect.arrayContaining(['027_phase7e_module_runtime_2']))
   })
 
   async function importRuntimeFixtures() {
