@@ -242,6 +242,19 @@ export class GreenfieldSessionService {
     }
   }
 
+  async revokeOtherSessions(accountId: string, currentSessionId: string): Promise<void> {
+    const rows = await this.db
+      .selectFrom('greenfield_sessions')
+      .selectAll()
+      .where('account_id', '=', accountId)
+      .where('session_id', '!=', currentSessionId)
+      .where('status', '=', 'active')
+      .execute()
+    for (const row of rows) {
+      await this.revokeFamily(row.family_id, row.session_id, accountId, 'session.revokedAfterPasswordChange')
+    }
+  }
+
   private async revokeFamily(familyId: string, sessionId: string, accountId: string, eventType: string): Promise<void> {
     const now = new Date()
     await this.db.transaction().execute(async trx => {

@@ -340,6 +340,18 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return mapDomainError(reply, error, request.id, 'Handle change failed')
     }
   })
+  app.post('/v1/accounts/me/password', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const body = ((request.body as any) ?? {}) as {currentPassword?: string; newPassword?: string}
+      const changed = await accounts.changePassword(auth.accountId, body, {correlationId: request.id})
+      await greenfieldSessions.revokeOtherSessions(auth.accountId, auth.sessionId)
+      return reply.send(successEnvelope(changed, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Password change failed')
+    }
+  })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
@@ -831,6 +843,28 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return reply.send(successEnvelope(page, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to load feed')
+    }
+  })
+
+  app.get('/v1/feed/profile/:profileId', feedConfig, async (request, reply) => {
+    try {
+      const {profileId} = request.params as {profileId: string}
+      const query = request.query as Record<string, unknown>
+      const limit = parseLimit(query.limit)
+      const cursor = decodeCursor(query.cursor)
+      const profile = await db
+        .selectFrom('profiles')
+        .select('handle')
+        .where('id', '=', profileId)
+        .where('deleted_at', 'is', null)
+        .executeTakeFirst()
+      if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+      const items = await posts.listForHandle(profile.handle, limit, cursor, request.auth?.actorId ?? null)
+      if (!items) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+      const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
+      return reply.send(successEnvelope(page, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to load profile feed')
     }
   })
 

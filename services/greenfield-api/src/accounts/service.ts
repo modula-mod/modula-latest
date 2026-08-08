@@ -2,7 +2,7 @@ import {createHash, randomBytes} from 'node:crypto'
 import {GREENFIELD_INITIAL_COLLECTIONS} from '@modula/greenfield-protocol'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
-import {hashPassword} from '../lib/password.js'
+import {hashPassword, verifyPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -358,6 +358,61 @@ export class AccountService {
       })
     })
     return {resent: true}
+  }
+
+  async changePassword(
+    accountId: string,
+    input: {currentPassword?: string; newPassword?: string},
+    options: {correlationId?: string} = {},
+  ): Promise<{changed: true}> {
+    const currentPassword = input.currentPassword ?? ''
+    const newPassword = input.newPassword ?? ''
+    if (newPassword.length < 10) {
+      throw Object.assign(new Error('Password must be at least 10 characters'), {code: 'VALIDATION_FAILED'})
+    }
+    const identity = await this.db
+      .selectFrom('greenfield_auth_identities')
+      .innerJoin('greenfield_password_credentials', 'greenfield_password_credentials.account_id', 'greenfield_auth_identities.account_id')
+      .innerJoin('greenfield_accounts', 'greenfield_accounts.account_id', 'greenfield_auth_identities.account_id')
+      .select([
+        'greenfield_auth_identities.identifier',
+        'greenfield_auth_identities.metadata',
+        'greenfield_password_credentials.password_hash',
+        'greenfield_accounts.primary_handle',
+      ])
+      .where('greenfield_auth_identities.account_id', '=', accountId)
+      .where('greenfield_auth_identities.kind', '=', 'email')
+      .executeTakeFirst()
+    if (!identity || !(await verifyPassword(currentPassword, identity.password_hash))) {
+      throw Object.assign(new Error('Current password is invalid'), {code: 'UNAUTHENTICATED'})
+    }
+    const now = new Date()
+    const passwordHash = await hashPassword(newPassword)
+    await this.db.transaction().execute(async trx => {
+      await trx
+        .updateTable('greenfield_password_credentials')
+        .set({password_hash: passwordHash, params: {algorithm: 'argon2id'}, updated_at: now})
+        .where('account_id', '=', accountId)
+        .execute()
+      await trx
+        .insertInto('greenfield_session_events')
+        .values({
+          event_id: uuidv7(),
+          session_id: null,
+          account_id: accountId,
+          event_type: 'password.changed',
+          metadata: {},
+          created_at: now,
+        })
+        .execute()
+      await this.mail?.queuePasswordChanged(trx, {
+        accountId,
+        email: identity.identifier,
+        displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
+        correlationId: options.correlationId,
+      })
+    })
+    return {changed: true}
   }
 
   async getMe(accountId: string): Promise<PublicAccount | null> {
