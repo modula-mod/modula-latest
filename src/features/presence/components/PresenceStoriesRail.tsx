@@ -40,16 +40,193 @@ type PresenceStoriesRailProps = {
   showCaption?: boolean
 }
 
+const COMPACT_RING = 68
+const COMPACT_AVATAR = 56
+const COMPACT_SLOT = 76
+
 /**
- * Home Stories dial — open carousel (no card).
- * Starts on the literal left; dial only rotates to the right (scroll ≥ 0).
- * Waits for measured width before mounting the scroller so first paint matches.
+ * Home Stories — compact flat rail on Home; dial carousel when not compact.
  */
 export function PresenceStoriesRail({
   people = [],
   compact = false,
   showCaption = true,
 }: PresenceStoriesRailProps) {
+  if (people.length === 0) return null
+
+  if (compact) {
+    return <CompactStoriesRail people={people} showCaption={showCaption} />
+  }
+
+  return <DialStoriesRail people={people} showCaption={showCaption} />
+}
+
+function openStory(person: PresenceRailPerson, router: ReturnType<typeof useRouter>) {
+  const groupId = person.groupId
+  if (
+    !groupId ||
+    groupId.startsWith('add:') ||
+    (person.isOwner && (person.itemCount ?? 0) === 0)
+  ) {
+    router.push('/stories/create' as Href)
+    return
+  }
+  router.push(`/stories/${encodeURIComponent(groupId)}` as Href)
+}
+
+function CompactStoriesRail({
+  people,
+  showCaption,
+}: {
+  people: PresenceRailPerson[]
+  showCaption: boolean
+}) {
+  const {colours, spacing, scheme} = useThemeTokens()
+  const reduceMotion = useReduceMotion()
+  const router = useRouter()
+
+  return (
+    <Animated.View
+      entering={reduceMotion ? undefined : FadeIn.duration(180)}
+      style={[styles.compactRoot, {gap: spacing[2]}]}>
+      {showCaption ? (
+        <View style={{paddingHorizontal: spacing[4]}}>
+          <AppText variant="caption" colour="textSecondary">
+            STORIES
+          </AppText>
+        </View>
+      ) : null}
+      <Animated.ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: spacing[4],
+          gap: spacing[3],
+          alignItems: 'flex-start',
+        }}>
+        {people.map(person => {
+          const isYou = person.id === 'you' || person.isOwner
+          const isAdd =
+            isYou &&
+            (!person.groupId ||
+              person.groupId.startsWith('add:') ||
+              (person.itemCount ?? 0) === 0)
+          const showRing =
+            person.ringState === 'unviewed' ||
+            person.ringState === 'partial' ||
+            person.fresh ||
+            (isYou && !isAdd)
+          const viewed =
+            person.ringState === 'viewed' || (!person.fresh && !isYou && !isAdd)
+
+          return (
+            <Pressable
+              key={person.id}
+              accessibilityRole="button"
+              accessibilityLabel={
+                isAdd
+                  ? 'Add Story'
+                  : `${person.name}. ${
+                      person.fresh || person.ringState === 'unviewed'
+                        ? 'Unread story'
+                        : 'Open story'
+                    }`
+              }
+              onPress={() => openStory(person, router)}
+              style={[styles.compactSlot, {width: COMPACT_SLOT}]}>
+              <View
+                style={[
+                  styles.compactRing,
+                  {
+                    width: COMPACT_RING,
+                    height: COMPACT_RING,
+                    borderRadius: COMPACT_RING / 2,
+                    backgroundColor: colours.canvas,
+                  },
+                ]}>
+                {showRing && !viewed ? (
+                  <StoryDial id={`${person.id}-c`} size={COMPACT_RING} mode="ring" />
+                ) : (
+                  <View
+                    style={[
+                      StyleSheet.absoluteFill,
+                      {
+                        borderRadius: COMPACT_RING / 2,
+                        borderWidth: 2,
+                        borderColor: isAdd
+                          ? colours.border
+                          : viewed
+                            ? colours.border
+                            : colours.accent,
+                      },
+                    ]}
+                  />
+                )}
+                <View
+                  style={{
+                    width: COMPACT_AVATAR,
+                    height: COMPACT_AVATAR,
+                    borderRadius: COMPACT_AVATAR / 2,
+                    overflow: 'hidden',
+                    backgroundColor: colours.surface,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Avatar
+                    name={person.name}
+                    uri={person.uri}
+                    size={COMPACT_AVATAR}
+                    colour={person.colour}
+                    style={styles.avatarBare}
+                  />
+                </View>
+                {isAdd || isYou ? (
+                  <View
+                    style={[
+                      styles.compactPlus,
+                      {
+                        backgroundColor: colours.accent,
+                        borderColor: colours.canvas,
+                      },
+                    ]}>
+                    <AppText
+                      variant="caption"
+                      style={{
+                        color: colours.accentForeground,
+                        fontWeight: '700',
+                        fontSize: 14,
+                        lineHeight: 16,
+                      }}>
+                      +
+                    </AppText>
+                  </View>
+                ) : null}
+              </View>
+              <AppText
+                variant="caption"
+                colour="text"
+                numberOfLines={1}
+                style={[
+                  styles.compactName,
+                  {color: scheme === 'dark' ? colours.text : colours.text},
+                ]}>
+                {isAdd ? 'Your story' : person.name}
+              </AppText>
+            </Pressable>
+          )
+        })}
+      </Animated.ScrollView>
+    </Animated.View>
+  )
+}
+
+function DialStoriesRail({
+  people,
+  showCaption,
+}: {
+  people: PresenceRailPerson[]
+  showCaption: boolean
+}) {
   const {spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const router = useRouter()
@@ -59,7 +236,6 @@ export function PresenceStoriesRail({
   const ready = stageWidth > 0
 
   // Nudge right so the Add Story pill isn’t clipped off the left edge.
-  // Pill is wider than ITEM_SLOT (~128 vs 76) and sits under the first node.
   const padLeft = ready ? Math.max(spacing[4], 28) : 0
   const padRight = ready
     ? Math.max(0, stageWidth - padLeft - ITEM_SLOT)
@@ -82,7 +258,6 @@ export function PresenceStoriesRail({
     }
   }
 
-  // After measure, force offset 0 so focus math matches the first story immediately.
   useLayoutEffect(() => {
     if (!ready) return
     scrollX.value = 0
@@ -96,14 +271,12 @@ export function PresenceStoriesRail({
     })
   }
 
-  const stageHeight = compact ? 168 : 196
-
-  if (people.length === 0) return null
+  const stageHeight = 196
 
   return (
     <Animated.View
       entering={reduceMotion ? undefined : FadeIn.duration(180)}
-      style={[styles.root, compact && styles.rootCompact, {gap: spacing[1]}]}>
+      style={[styles.root, {gap: spacing[1]}]}>
       {showCaption ? (
         <View
           style={[
@@ -148,7 +321,7 @@ export function PresenceStoriesRail({
                 reduceMotion={reduceMotion}
                 onPress={() => {
                   snapToIndex(index, !reduceMotion)
-                  router.push('/product/presence' as Href)
+                  openStory(person, router)
                 }}
               />
             ))}
@@ -443,6 +616,33 @@ function StoryNode({
 }
 
 const styles = StyleSheet.create({
+  compactName: {
+    maxWidth: COMPACT_SLOT,
+    textAlign: 'center',
+  },
+  compactPlus: {
+    alignItems: 'center',
+    borderRadius: 11,
+    borderWidth: 2,
+    bottom: 0,
+    height: 22,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 0,
+    width: 22,
+  },
+  compactRing: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compactRoot: {
+    marginBottom: 4,
+    width: '100%',
+  },
+  compactSlot: {
+    alignItems: 'center',
+    gap: 6,
+  },
   addPill: {
     alignItems: 'center',
     alignSelf: 'center',

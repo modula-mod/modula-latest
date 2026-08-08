@@ -11,6 +11,7 @@ type ModulaButtonProps = {
   role?: ModulaButtonRole
   disabled?: boolean
   loading?: boolean
+  fullWidth?: boolean
   accessibilityLabel?: string
   style?: StyleProp<ViewStyle>
   testID?: string
@@ -23,6 +24,7 @@ export function ModulaButton({
   role = 'primary',
   disabled = false,
   loading = false,
+  fullWidth = false,
   accessibilityLabel,
   style,
   testID,
@@ -35,14 +37,17 @@ export function ModulaButton({
       ? colours.accent
       : role === 'destructive'
         ? colours.destructive
-        : role === 'secondary'
+        : role === 'secondary' || role === 'glass'
           ? colours.surface
           : 'transparent'
-  const borderColor = role === 'secondary' ? colours.border : 'transparent'
+  const borderColor =
+    role === 'secondary' || role === 'glass' ? colours.border : 'transparent'
   const labelColour =
     role === 'primary' || role === 'destructive'
       ? colours.accentForeground
-      : colours.text
+      : role === 'quiet'
+        ? colours.accent
+        : colours.text
 
   return (
     <AppPressable
@@ -60,11 +65,19 @@ export function ModulaButton({
           paddingHorizontal: spacing[4],
           paddingVertical: spacing[3],
           opacity: isDisabled ? 0.45 : 1,
-          minHeight: 44,
+          minHeight: role === 'quiet' ? 40 : 48,
+          alignSelf: fullWidth ? 'stretch' : 'flex-start',
+          width: fullWidth ? '100%' : undefined,
         },
         style,
       ]}>
-      <AppText variant="label" style={{color: labelColour}}>
+      <AppText
+        variant="label"
+        style={{
+          color: labelColour,
+          textAlign: 'center',
+          fontWeight: role === 'quiet' ? '500' : '600',
+        }}>
         {loading ? `${label}…` : label}
       </AppText>
     </AppPressable>

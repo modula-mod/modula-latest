@@ -1,4 +1,4 @@
-import {Switch, View} from 'react-native'
+import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 
 type SystemSwitchProps = {
   value: boolean
@@ -8,7 +8,7 @@ type SystemSwitchProps = {
   testID?: string
 }
 
-/** Thin adapter over the React Native Switch. */
+/** Settings switch — Expo UI Switch on native via ModulaSwitch adapter. */
 export function SystemSwitch({
   value,
   onValueChange,
@@ -17,14 +17,13 @@ export function SystemSwitch({
   testID,
 }: SystemSwitchProps) {
   return (
-    <View style={{minHeight: 44, justifyContent: 'center'}}>
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-        accessibilityLabel={label}
-        disabled={disabled}
-        testID={testID}
-      />
-    </View>
+    <ModulaSwitch
+      value={value}
+      onValueChange={onValueChange}
+      label={label}
+      disabled={disabled}
+      accessibilityLabel={label}
+      testID={testID}
+    />
   )
 }

@@ -14,6 +14,16 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'digital.modula.app',
     supportsTablet: true,
     icon: './assets/expo.icon',
+    // Tracked ios/ does not auto-merge plugin permission strings; keep Info.plist in sync.
+    infoPlist: {
+      ...(config.ios?.infoPlist ?? {}),
+      NSCameraUsageDescription:
+        'Modula uses the camera for Appearance Advanced living backdrop Preview. Nothing is recorded or uploaded.',
+      NSPhotoLibraryUsageDescription:
+        'Modula uses your photo library when you choose media for a post.',
+      NSPhotoLibraryAddUsageDescription:
+        'Modula saves media you explicitly choose to keep in your photo library.',
+    },
   },
   android: {
     ...config.android,

@@ -20,6 +20,7 @@ import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {isBlockOn} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
@@ -194,14 +195,29 @@ export function ActivityScreen() {
 
           {showBlock('filter-pills') ? (
             <SectionEnter delay={20} from="right">
-              <View style={{flexDirection: 'row', gap: spacing[2]}}>
-                <Pill label="All" selected={filter === 'all'} onPress={() => applyFilter('all')} />
-                <Pill label="Replies" selected={filter === 'replies'} onPress={() => applyFilter('replies')} />
-                <Pill label="Mentions" selected={filter === 'mentions'} onPress={() => applyFilter('mentions')} />
+              <View style={{gap: spacing[2]}}>
+                <ModulaSegmentedPicker
+                  appearance="segmented"
+                  accessibilityLabel="Activity filter"
+                  testID="activity-filter-segments"
+                  options={[
+                    {value: 'all', label: 'All'},
+                    {value: 'mentions', label: 'Mentions'},
+                    {value: 'extensions', label: 'Modules'},
+                  ]}
+                  value={
+                    filter === 'mentions' || filter === 'extensions' ? filter : 'all'
+                  }
+                  onValueChange={next => {
+                    if (next === 'all' || next === 'mentions' || next === 'extensions') {
+                      applyFilter(next)
+                    }
+                  }}
+                />
                 <Pill
-                  label="Filters"
+                  label="More filters"
                   selected={
-                    filter !== 'all' && filter !== 'mentions' && filter !== 'replies'
+                    filter !== 'all' && filter !== 'mentions' && filter !== 'extensions'
                   }
                   onPress={() => setFilterSheetOpen(true)}
                 />

@@ -20,6 +20,7 @@ import {
   ApiProfileRepository,
   ApiReelsRepository,
   ApiSocialGraphRepository,
+  ApiStoriesRepository,
   ApiToolsRepository,
 } from '@/data/repositories/api'
 import type {AppServices} from '@/runtime/AppServices'
@@ -83,6 +84,7 @@ export function createAppServices(): AppServices {
     productPreferencesRepository: new ApiProductPreferencesRepository(client),
     profileRepository: new ApiProfileRepository(client),
     socialGraphRepository: new ApiSocialGraphRepository(client),
+    storiesRepository: new ApiStoriesRepository(client),
     activityRepository: new ApiActivityRepository(client),
     appearanceRepository: new ApiAppearanceRepository(client),
     discoverRepository: new ApiDiscoverRepository(client),

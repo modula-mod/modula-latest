@@ -3,6 +3,10 @@ import type {AtmosphereFeedMode} from '@modula/api-contracts'
 import type {FeedMode} from '@/domain/social'
 
 export const queryKeys = {
+  stories: {
+    rail: (accountId: string) => ['stories', 'rail', accountId] as const,
+    group: (groupId: string) => ['stories', 'group', groupId] as const,
+  },
   session: {
     all: ['session'] as const,
     current: () => ['session', 'current'] as const,

@@ -54,6 +54,7 @@ import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js
 import {registerModuleRoutes} from '../modules/routes/index.js'
 import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
+import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -1718,6 +1719,12 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     feedConfig,
     profileConfig,
     authWriteConfig,
+  })
+
+  await registerPhase7fStoriesRoutes(app, db, config, {
+    sessions,
+    feedConfig,
+    writeConfig,
   })
 }
 

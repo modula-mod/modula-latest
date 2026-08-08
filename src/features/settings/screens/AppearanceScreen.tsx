@@ -6,7 +6,6 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
-  Switch,
   TextInput,
   View,
 } from 'react-native'
@@ -17,6 +16,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -36,8 +37,12 @@ import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Primary mode tiles — iOS-like grid; OLED stays in the overflow row. */
-const PRIMARY_MODES: AppearanceMode[] = ['system', 'dark', 'light', 'dim']
+/** Primary mode tiles — dark depth (Dim/Dark/OLED) uses a native segmented control. */
+const PRIMARY_MODES: AppearanceMode[] = ['system', 'light', 'dark']
+
+function isDarkDepth(mode: AppearanceMode): boolean {
+  return mode === 'dim' || mode === 'dark' || mode === 'oled'
+}
 
 const modeLabels: Record<AppearanceMode, string> = {
   system: 'System',
@@ -140,39 +145,44 @@ export function AppearanceScreen() {
                 <ModeTile
                   key={mode}
                   mode={mode}
-                  selected={preferences.mode === mode}
-                  onPress={() => actions.setMode(mode)}
+                  selected={
+                    mode === 'dark'
+                      ? isDarkDepth(preferences.mode)
+                      : preferences.mode === mode
+                  }
+                  onPress={() => {
+                    if (mode === 'dark') {
+                      actions.setMode(isDarkDepth(preferences.mode) ? preferences.mode : 'dark')
+                      return
+                    }
+                    actions.setMode(mode)
+                  }}
                 />
               ))}
             </View>
-            <AppPressable
-              accessibilityLabel="OLED mode"
-              accessibilityState={{selected: preferences.mode === 'oled'}}
-              onPress={() => actions.setMode('oled')}
-              style={[
-                styles.oledRow,
-                {
-                  borderColor:
-                    preferences.mode === 'oled' ? colours.accent : colours.border,
-                  backgroundColor:
-                    preferences.mode === 'oled' ? colours.accentSubtle : colours.surface,
-                  borderRadius: radius.large,
-                },
-              ]}>
-              <AppIcon
-                name="contrast"
-                colour={preferences.mode === 'oled' ? colours.accent : colours.textSecondary}
-              />
-              <View style={{flex: 1, gap: 2}}>
-                <AppText variant="label">OLED</AppText>
+            {isDarkDepth(preferences.mode) ? (
+              <View style={{gap: spacing[2]}}>
                 <AppText variant="caption" colour="textTertiary">
-                  Pure black canvas when supported
+                  Dark depth
                 </AppText>
+                <ModulaSegmentedPicker
+                  appearance="segmented"
+                  accessibilityLabel="Dark depth"
+                  testID="appearance-dark-depth"
+                  options={[
+                    {value: 'dim', label: 'Dim'},
+                    {value: 'dark', label: 'Dark'},
+                    {value: 'oled', label: 'OLED'},
+                  ]}
+                  value={preferences.mode}
+                  onValueChange={next => {
+                    if (next === 'dim' || next === 'dark' || next === 'oled') {
+                      actions.setMode(next)
+                    }
+                  }}
+                />
               </View>
-              {preferences.mode === 'oled' ? (
-                <AppIcon name="check" colour={colours.accent} size={18} />
-              ) : null}
-            </AppPressable>
+            ) : null}
           </Section>
 
           <MaterialSurface
@@ -740,6 +750,8 @@ function SwitchRow({
           borderBottomColor: colours.separator,
           borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
           paddingHorizontal: spacing[4],
+          minHeight: 52,
+          alignItems: 'center',
         },
       ]}>
       <View style={{flex: 1, gap: spacing[1]}}>
@@ -755,12 +767,10 @@ function SwitchRow({
           {value ? 'ON' : 'OFF'}
         </AppText>
       ) : null}
-      <Switch
+      <ModulaSwitch
         accessibilityLabel={title}
         value={value}
         onValueChange={onValueChange}
-        trackColor={{false: colours.surface3, true: colours.accentSubtle}}
-        thumbColor={value ? colours.accent : colours.textMuted}
       />
     </View>
   )

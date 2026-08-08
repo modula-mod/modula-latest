@@ -973,4 +973,32 @@ export interface Database {
   greenfield_connection_sync_state: {sync_state_id: string; connection_id: string; resource_kind: string; cursor_metadata: unknown; status: GreenfieldConnectionSyncStatus; last_started_at: Date | null; last_completed_at: Date | null; failure_code: string | null; created_at: Date; updated_at: Date}
   greenfield_connection_events: {event_id: string; account_id: string; provider_id: string; connection_id: string | null; event_type: string; from_state: GreenfieldConnectionState | null; to_state: GreenfieldConnectionState | null; metadata: unknown; created_at: Date}
   greenfield_connector_oauth_states: {state_id: string; account_id: string; provider_id: string; state_hash: string; status: GreenfieldConnectorOAuthStateStatus; redirect_uri: string; pkce_challenge: string | null; pkce_challenge_method: 'S256' | null; pkce_verifier_key_version: string | null; pkce_verifier_nonce: Buffer | null; pkce_verifier_auth_tag: Buffer | null; pkce_verifier_ciphertext: Buffer | null; idempotency_key: string | null; failure_code: string | null; failure_message: string | null; created_at: Date; authorising_at: Date | null; expires_at: Date; consumed_at: Date | null; cancelled_at: Date | null; failed_at: Date | null; replay_detected_at: Date | null; consume_attempt_count: number}
+  greenfield_story_groups: {
+    group_id: string
+    owner_actor_id: string
+    visibility: 'public' | 'followers' | 'close'
+    expires_at: Date
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+  }
+  greenfield_story_items: {
+    item_id: string
+    group_id: string
+    media_kind: 'image' | 'video'
+    media_url: string | null
+    media_file_name: string | null
+    caption: string | null
+    status: 'uploading' | 'ready' | 'failed'
+    sort_order: number
+    duration_ms: number | null
+    created_at: Date
+    deleted_at: Date | null
+  }
+  greenfield_story_views: {
+    view_id: string
+    item_id: string
+    viewer_actor_id: string
+    viewed_at: Date
+  }
 }

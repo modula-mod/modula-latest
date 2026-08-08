@@ -187,6 +187,7 @@ export function seedLocalApiDatabase(): LocalApiDatabaseState {
         updatedAt: '2026-07-26T00:00:00.000Z',
       },
     ],
+    appearancePreferences: [],
     boardLayouts: [
       {
         accountId: parseAccountId('account-andrei'),
@@ -228,6 +229,8 @@ export function seedLocalApiDatabase(): LocalApiDatabaseState {
       reels,
     },
     reels,
+    storyGroups: [],
+    storyViews: [],
   }
 }
 

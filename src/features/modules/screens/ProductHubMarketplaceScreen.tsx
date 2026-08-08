@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react'
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -13,6 +13,8 @@ import type {
   ProductHubExtensionKind,
 } from '@/data/repositories/contracts'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaCurvedSectionTabs} from '@/platform/ui/tabs'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -54,14 +56,33 @@ export function ProductHubMarketplaceScreen() {
   )
 }
 
+type HubMode = 'discover' | 'installed' | 'updates'
+
 export function ProductHubMarketplaceContent({compact = false}: {compact?: boolean}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
+  const [hubMode, setHubMode] = useState<HubMode>('discover')
   const [category, setCategory] = useState<ProductHubCategory>('All')
-  const catalogue = useModuleCatalogueQuery({q: query, category})
+  const catalogue = useModuleCatalogueQuery({
+    q: query,
+    category: hubMode === 'discover' ? category : 'All',
+  })
   const installed = useInstalledModulesQuery()
-  const items = useMemo(() => catalogue.data ?? [], [catalogue.data])
+  const items = useMemo(() => {
+    const catalogueItems = catalogue.data ?? []
+    if (hubMode === 'installed') {
+      return catalogueItems.filter(item =>
+        ['installed', 'enabled', 'disabled', 'updateAvailable', 'configurationRequired'].includes(
+          item.installationState,
+        ),
+      )
+    }
+    if (hubMode === 'updates') {
+      return catalogueItems.filter(item => item.installationState === 'updateAvailable')
+    }
+    return catalogueItems
+  }, [catalogue.data, hubMode])
   const featured = items.filter(item => item.featured).slice(0, compact ? 3 : 6)
   const installedCount = installed.data?.length ?? 0
   const standard20Count = items.filter(item => item.standard?.standardVersion === '2.0.0').length
@@ -98,6 +119,23 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
         </AppText>
       </View>
 
+      <ModulaSegmentedPicker
+        appearance="segmented"
+        accessibilityLabel="Product Hub mode"
+        testID="product-hub-mode-segments"
+        options={[
+          {value: 'discover', label: 'Discover'},
+          {value: 'installed', label: 'Installed'},
+          {value: 'updates', label: 'Updates'},
+        ]}
+        value={hubMode}
+        onValueChange={next => {
+          if (next === 'discover' || next === 'installed' || next === 'updates') {
+            setHubMode(next)
+          }
+        }}
+      />
+
       <View
         style={[
           styles.search,
@@ -109,22 +147,26 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
           },
         ]}>
         <AppIcon name="search" colour={colours.textTertiary} size={18} />
-        <TextInput
+        <ModulaTextInput
           value={query}
           onChangeText={setQuery}
           placeholder="Search registry"
-          placeholderTextColor={colours.textTertiary}
           accessibilityLabel="Search Product Hub"
           returnKeyType="search"
-          style={[styles.searchInput, {color: colours.text}]}
+          style={[styles.searchInput, {flex: 1}]}
         />
       </View>
 
-      <ModulaCurvedSectionTabs
-        tabs={CATEGORIES.map(label => ({id: label, label}))}
-        selectedId={category}
-        onSelect={id => setCategory(id as ProductHubCategory)}
-      />
+      {hubMode === 'discover' ? (
+        <ModulaCurvedSectionTabs
+          tabs={CATEGORIES.filter(label => label !== 'Installed').map(label => ({
+            id: label,
+            label,
+          }))}
+          selectedId={category}
+          onSelect={id => setCategory(id as ProductHubCategory)}
+        />
+      ) : null}
 
       <View style={[styles.summaryRow, {gap: spacing[2]}]}>
         <SummaryChip label="Installed" value={String(installedCount)} />

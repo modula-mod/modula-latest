@@ -1,5 +1,5 @@
-import {Host, Picker, Text} from '@expo/ui/swift-ui'
-import {frame, pickerStyle, tag, tint} from '@expo/ui/swift-ui/modifiers'
+import {SegmentedControl} from '@expo/ui/community/segmented-control'
+import {useMemo} from 'react'
 import {useWindowDimensions} from 'react-native'
 
 import {ModulaSegmentedPicker as SharedModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker.shared'
@@ -10,8 +10,8 @@ export type {ModulaSegmentedOption} from '@/platform/ui/controls/modula-segmente
 
 /**
  * Native adapter:
- * - `segmented` — real UISegmentedControl via Expo UI `Picker`
- * - `glass` / `plain` / `scrollable` — shared RN implementation
+ * - `segmented` — `@expo/ui/community/segmented-control` (SwiftUI segmented Picker)
+ * - `glass` / `plain` / `scrollable` / sticky overlays — shared RN implementation
  */
 export function ModulaSegmentedPicker({
   options,
@@ -28,10 +28,9 @@ export function ModulaSegmentedPicker({
 }: ModulaSegmentedPickerProps) {
   const {colours, scheme} = useThemeTokens()
   const {width: windowWidth} = useWindowDimensions()
-  const allowed = new Set(options.map(option => option.value))
   const viewportWidth = Math.min(windowWidth - 32, maxWidth ?? windowWidth)
 
-  // Sticky / glass / track / scrollable → shared RN (Host Picker breaks inside overlays).
+  // Sticky / glass / track / scrollable → shared RN (Host Picker historically brittle in overlays).
   if (appearance !== 'segmented' || scrollable || embedded) {
     return (
       <SharedModulaSegmentedPicker
@@ -50,11 +49,20 @@ export function ModulaSegmentedPicker({
     )
   }
 
+  const values = useMemo(() => options.map(option => option.label), [options])
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex(option => option.value === value),
+  )
+  const enabled = options.every(option => !option.disabled)
+
   return (
-    <Host
-      matchContents
-      colorScheme={scheme}
-      seedColor={colours.accent}
+    <SegmentedControl
+      values={values}
+      selectedIndex={selectedIndex}
+      enabled={enabled}
+      appearance={scheme === 'dark' ? 'dark' : 'light'}
+      tintColor={colours.accent}
       style={[
         {
           alignSelf: 'stretch',
@@ -63,27 +71,14 @@ export function ModulaSegmentedPicker({
           maxWidth: viewportWidth,
         },
         style,
-      ]}>
-      <Picker
-        label={accessibilityLabel}
-        selection={value}
-        onSelectionChange={selection => {
-          if (typeof selection === 'string' && allowed.has(selection)) {
-            onValueChange(selection)
-          }
-        }}
-        modifiers={[
-          pickerStyle('segmented'),
-          tint(colours.accent),
-          frame({width: viewportWidth, maxWidth: viewportWidth, height: 34}),
-        ]}
-        testID={testID}>
-        {options.map(option => (
-          <Text key={option.value} modifiers={[tag(option.value)]}>
-            {option.label}
-          </Text>
-        ))}
-      </Picker>
-    </Host>
+      ]}
+      testID={testID ?? accessibilityLabel}
+      onValueChange={label => {
+        const match = options.find(option => option.label === label)
+        if (match && !match.disabled) {
+          onValueChange(match.value)
+        }
+      }}
+    />
   )
 }

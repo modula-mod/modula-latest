@@ -76,3 +76,4 @@ export type {
   FollowResult,
   SocialGraphRepository,
 } from '@/data/repositories/contracts/SocialGraphRepository'
+export type {StoriesRepository} from '@/data/repositories/contracts/StoriesRepository'

@@ -78,10 +78,14 @@ function LiquidGlassPlatformTabs() {
           options={{
             title: tab.label,
             tabBarAccessibilityLabel: tab.label,
+            // Create stays a file route (redirects to compose) but is not a
+            // tab destination — the liquid-glass plus control owns compose.
+            ...(tab.id === 'create' ? {href: null} : {}),
           }}
         />
       ))}
-      <Tabs.Screen name="create" options={{title: 'Create'}} />
+      {/* Board lives under (tabs)/ but is opened from drawer / shortcuts. */}
+      <Tabs.Screen name="board" options={{href: null, title: 'Board'}} />
     </Tabs>
   )
 }
