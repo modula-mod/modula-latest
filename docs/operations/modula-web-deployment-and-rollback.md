@@ -138,6 +138,30 @@ Required vhost behavior:
 - There is no proxy to OpenWebUI.
 - HSTS remains disabled until both apex and www are verified.
 
+## OpenWebUI Port Guard
+
+OpenWebUI is preserved, but raw public access to its Docker-published port is
+blocked outside the Modula vhost path.
+
+Persistent guard:
+
+```bash
+systemctl status modula-openwebui-firewall.service
+iptables -S DOCKER-USER
+ip6tables -S DOCKER-USER
+```
+
+Expected rules:
+
+```text
+-A DOCKER-USER -i ens6 -p tcp -m conntrack --ctorigdstport 3000 -j DROP
+-A DOCKER-USER -i ens6 -p tcp -m tcp --dport 3000 -j DROP
+```
+
+Do not remove the `open-webui` container, volumes, database, configuration or
+model links as part of a web rollback. Rollback only changes
+`/var/www/modula/current` and reloads Nginx.
+
 ## Native Status
 
 Phase 7F Mac/iOS acceptance has not been executed.
