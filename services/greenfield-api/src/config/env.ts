@@ -47,7 +47,8 @@ const envSchema = z.object({
   MODULA_INVITE_ONLY: z
     .string()
     .optional()
-    .transform(v => v !== 'false'),
+    .transform(v => (v === undefined ? undefined : v !== 'false')),
+  MODULA_REGISTRATION_MODE: z.enum(['open', 'invite-only', 'closed']).optional(),
   MODULA_REGISTRATION_INVITE_CODES: z.string().optional(),
   MODULA_ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   MODULA_REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
@@ -113,6 +114,8 @@ export type EncryptionKeyMaterial = {
   key: Buffer
 }
 
+export type RegistrationMode = 'open' | 'invite-only' | 'closed'
+
 export type AppConfig = {
   nodeEnv: 'development' | 'test' | 'production'
   host: string
@@ -142,6 +145,7 @@ export type AppConfig = {
   mutationsEnabled: boolean
   sessionTtlHours: number
   atprotoEnabled: boolean
+  registrationMode: RegistrationMode
   inviteOnly: boolean
   registrationInviteCodes: string[]
   accessTokenTtlMinutes: number
@@ -244,6 +248,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const environment = raw.MODULA_ENVIRONMENT
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
+  const registrationMode: RegistrationMode =
+    raw.MODULA_REGISTRATION_MODE ??
+    (raw.MODULA_INVITE_ONLY === true
+      ? 'invite-only'
+      : raw.MODULA_INVITE_ONLY === false
+        ? 'open'
+        : environment === 'production'
+          ? 'invite-only'
+          : 'open')
 
   let currentKey: EncryptionKeyMaterial
   let isEphemeral = false
@@ -366,7 +379,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     mutationsEnabled,
     sessionTtlHours: raw.MODULA_SESSION_TTL_HOURS,
     atprotoEnabled: raw.MODULA_ATPROTO_ENABLED === true,
-    inviteOnly: raw.MODULA_INVITE_ONLY !== false,
+    registrationMode,
+    inviteOnly: registrationMode === 'invite-only',
     registrationInviteCodes: (raw.MODULA_REGISTRATION_INVITE_CODES ?? '').split(',').map(code => code.trim()).filter(Boolean),
     accessTokenTtlMinutes: raw.MODULA_ACCESS_TOKEN_TTL_MINUTES,
     refreshTokenTtlDays: raw.MODULA_REFRESH_TOKEN_TTL_DAYS,

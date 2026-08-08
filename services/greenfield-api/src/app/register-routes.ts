@@ -175,6 +175,10 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
           backend: 'greenfield',
           environment,
           minimumClientVersion: config.minimumClientVersion,
+          registration: {
+            mode: config.registrationMode,
+            emailVerificationRequired: true,
+          },
           capabilities,
         },
         request.id,
