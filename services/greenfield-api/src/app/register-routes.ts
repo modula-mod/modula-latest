@@ -76,6 +76,12 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
 }
 
+function bodyString(body: unknown, key: string): string {
+  if (!body || typeof body !== 'object') return ''
+  const value = (body as Record<string, unknown>)[key]
+  return typeof value === 'string' ? value : ''
+}
+
 export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db)
@@ -275,14 +281,27 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.post('/v1/accounts/register', authWriteConfig, async (request, reply) => {
     try {
       const body = ((request.body as any) ?? {}) as Record<string, unknown>
-      return reply.code(201).send(successEnvelope(await accounts.register({...body, correlationId: request.id} as any), request.id))
+      return reply.code(201).send(
+        successEnvelope(
+          await accounts.register({
+            ...body,
+            email: bodyString(body, 'email'),
+            password: bodyString(body, 'password'),
+            handle: bodyString(body, 'handle'),
+            displayName: bodyString(body, 'displayName'),
+            inviteCode: bodyString(body, 'inviteCode'),
+            correlationId: request.id,
+          } as any),
+          request.id,
+        ),
+      )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Registration failed')
     }
   })
   app.post('/v1/accounts/verify-email', authWriteConfig, async (request, reply) => {
     try {
-      const account = await accounts.verifyEmail((request.body as any).token)
+      const account = await accounts.verifyEmail(bodyString(request.body, 'token'))
       return reply.send(successEnvelope({verified: true, account}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Verification failed')
@@ -378,8 +397,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   app.post('/v1/sessions', authWriteConfig, async (request, reply) => {
     try {
-      const body = request.body as any
-      const issued = await authentication.login(body.email, body.password, {
+      const issued = await authentication.login(bodyString(request.body, 'email'), bodyString(request.body, 'password'), {
         userAgent: request.headers['user-agent'],
         correlationId: request.id,
       })

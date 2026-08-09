@@ -196,6 +196,7 @@
     "verify:phase7h-mail": "node scripts/verify-phase7h-mail.mjs",
     "verify:phase7h-registration": "node scripts/verify-phase7h-registration.mjs",
     "verify:phase7h-api-contract-parity": "node scripts/verify-phase7h-api-contract-parity.mjs",
+    "verify:phase7i-live-api-parity": "node scripts/verify-phase7i-live-api-parity.mjs",
     "verify:phase7i-canonical-source": "node scripts/verify-phase7i-canonical-source.mjs",
     "registry:import-module": "node scripts/registry/import-module.mjs",
     "registry:verify-release": "node scripts/registry/verify-release.mjs",

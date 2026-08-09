@@ -1,0 +1,101 @@
+name: modula-production
+
+services:
+  greenfield-postgres:
+    image: postgres:16.9-alpine
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/greenfield-postgres.env
+    volumes:
+      - greenfield_pg_data:/var/lib/postgresql/data
+      - ./postgres/init-roles.sh:/docker-entrypoint-initdb.d/10-init-roles.sh:ro
+    networks:
+      - greenfield_internal
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  greenfield-redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command:
+      - sh
+      - -ceu
+      - exec redis-server --appendonly no --save "" --requirepass "$$REDIS_PASSWORD"
+    env_file:
+      - /etc/modula/greenfield-redis.env
+    networks:
+      - greenfield_internal
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  greenfield-api:
+    build:
+      context: ../..
+      dockerfile: ops/docker/greenfield-api.Dockerfile
+      labels:
+        org.opencontainers.image.source: /root/modula-latest
+        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
+        org.opencontainers.image.created: ${SOURCE_BUILT_AT}
+        org.opencontainers.image.title: modula-greenfield-api
+    image: modula-greenfield-api:${SOURCE_RELEASE_SHA}
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/greenfield-api.env
+      - /etc/modula/backend-fabric.env
+    volumes:
+      - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
+    ports:
+      - '127.0.0.1:4020:4020'
+    depends_on:
+      greenfield-postgres:
+        condition: service_healthy
+      greenfield-redis:
+        condition: service_healthy
+    networks:
+      - greenfield_internal
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:4020/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+  greenfield-worker:
+    build:
+      context: ../..
+      dockerfile: ops/docker/greenfield-worker.Dockerfile
+      labels:
+        org.opencontainers.image.source: /root/modula-latest
+        org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
+        org.opencontainers.image.created: ${SOURCE_BUILT_AT}
+        org.opencontainers.image.title: modula-greenfield-worker
+    image: modula-greenfield-worker:${SOURCE_RELEASE_SHA}
+    restart: unless-stopped
+    env_file:
+      - /etc/modula/greenfield-worker.env
+      - /etc/modula/backend-fabric.env
+    depends_on:
+      greenfield-postgres:
+        condition: service_healthy
+      greenfield-redis:
+        condition: service_healthy
+      greenfield-api:
+        condition: service_healthy
+    networks:
+      - greenfield_internal
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  greenfield_internal:
+    driver: bridge
+
+volumes:
+  greenfield_pg_data:

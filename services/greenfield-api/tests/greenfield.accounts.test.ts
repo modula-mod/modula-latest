@@ -75,6 +75,36 @@ describe('Greenfield unit primitives', () => {
       ).registrationMode,
     ).toBe('invite-only')
   })
+
+  it('requires an explicit production write gate for open registration', () => {
+    expect(() =>
+      loadConfig(
+        configEnv({
+          MODULA_ENVIRONMENT: 'production',
+          MODULA_PUBLIC_API_URL: 'https://api.modula.digital',
+          MODULA_PUBLIC_WEB_URL: 'https://modula.digital',
+          MODULA_PREVIEW_WRITES_ENABLED: 'false',
+          MODULA_REGISTRATION_MODE: 'open',
+        }),
+      ),
+    ).toThrow(/MODULA_PRODUCTION_WRITES_ENABLED/)
+
+    const config = loadConfig(
+      configEnv({
+        MODULA_ENVIRONMENT: 'production',
+        MODULA_PUBLIC_API_URL: 'https://api.modula.digital',
+        MODULA_PUBLIC_WEB_URL: 'https://modula.digital',
+        MODULA_PREVIEW_WRITES_ENABLED: 'false',
+        MODULA_PRODUCTION_WRITES_ENABLED: 'true',
+        MODULA_REGISTRATION_MODE: 'open',
+      }),
+    )
+    expect(config.registrationMode).toBe('open')
+    expect(config.inviteOnly).toBe(false)
+    expect(config.previewWritesEnabled).toBe(false)
+    expect(config.productionWritesEnabled).toBe(true)
+    expect(config.mutationsEnabled).toBe(true)
+  })
 })
 
 describeIf('Greenfield native accounts integration', () => {

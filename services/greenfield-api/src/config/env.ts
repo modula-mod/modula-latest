@@ -24,6 +24,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v !== 'false'),
+  MODULA_PRODUCTION_WRITES_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   MODULA_API_DOCUMENTATION_ENABLED: z
     .string()
     .optional()
@@ -131,6 +135,7 @@ export type AppConfig = {
   trustProxy: boolean
   rateLimitEnabled: boolean
   previewWritesEnabled: boolean
+  productionWritesEnabled: boolean
   apiDocumentationEnabled: boolean
   requestBodyLimitBytes: number
   searchQueryMaxChars: number
@@ -144,7 +149,7 @@ export type AppConfig = {
   mediaUploadMaxBytes: number
   environment: 'development' | 'preview' | 'production'
   minimumClientVersion: string
-  /** Derived: true unless environment is production and previewWritesEnabled is false. */
+  /** Derived: true when the explicit write gate for the current environment is enabled. */
   mutationsEnabled: boolean
   sessionTtlHours: number
   atprotoEnabled: boolean
@@ -269,6 +274,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
         : environment === 'production'
           ? 'invite-only'
           : 'open')
+  const productionWritesEnabled = Boolean(raw.MODULA_PRODUCTION_WRITES_ENABLED)
+  if (environment === 'production' && registrationMode === 'open' && !productionWritesEnabled) {
+    refuse('open production registration requires MODULA_PRODUCTION_WRITES_ENABLED=true')
+  }
 
   let currentKey: EncryptionKeyMaterial
   let isEphemeral = false
@@ -361,7 +370,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     )
   }
 
-  const mutationsEnabled = environment !== 'production' && raw.MODULA_PREVIEW_WRITES_ENABLED
+  const mutationsEnabled =
+    environment === 'production' ? productionWritesEnabled : raw.MODULA_PREVIEW_WRITES_ENABLED
 
   return {
     nodeEnv: raw.NODE_ENV,
@@ -376,6 +386,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     trustProxy: Boolean(raw.MODULA_TRUST_PROXY),
     rateLimitEnabled: raw.MODULA_RATE_LIMIT_ENABLED !== false,
     previewWritesEnabled: Boolean(raw.MODULA_PREVIEW_WRITES_ENABLED),
+    productionWritesEnabled,
     apiDocumentationEnabled: Boolean(raw.MODULA_API_DOCUMENTATION_ENABLED),
     requestBodyLimitBytes: raw.MODULA_REQUEST_BODY_LIMIT_BYTES,
     searchQueryMaxChars: raw.MODULA_SEARCH_QUERY_MAX_CHARS,
