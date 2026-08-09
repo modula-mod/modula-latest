@@ -38,6 +38,8 @@ services:
     build:
       context: ../..
       dockerfile: ops/docker/greenfield-api.Dockerfile
+      additional_contexts:
+        modula-module-standard: /root/modula-mod/modula-module-standard
       labels:
         org.opencontainers.image.source: /root/modula-latest
         org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
@@ -71,6 +73,8 @@ services:
     build:
       context: ../..
       dockerfile: ops/docker/greenfield-worker.Dockerfile
+      additional_contexts:
+        modula-module-standard: /root/modula-mod/modula-module-standard
       labels:
         org.opencontainers.image.source: /root/modula-latest
         org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
