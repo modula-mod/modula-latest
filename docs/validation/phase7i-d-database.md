@@ -10,7 +10,7 @@ Captured: 2026-08-09
 - `git status --short`: clean before D1 source edits
 - `git diff --check`: clean before D1 source edits
 - D1 introduced source changes for the production topology, production write gate, route-validation hardening, role separation, runtime inventory docs, and live API parity verification.
-- A new pushed source SHA is required before building production images.
+- Current D1 source SHA after runtime build/schema grant repairs: `c47d20b1be57dab8f3f28274926e67cc008d847c`
 
 ## Write Freeze
 
@@ -118,7 +118,7 @@ Applied migrations:
 }
 ```
 
-Post-migration status:
+Disposable post-migration status:
 
 - Pending migrations: `[]`
 - Max schema migration: `029_phase7h_mail`
@@ -195,6 +195,17 @@ Tests and verifiers:
 
 ## Gate Result
 
-Phase 7I-D database dump, disposable restore, pending migration rehearsal, direct current API acceptance, current Worker startup, and DB-backed test gate passed.
+Fresh production runtime post-migration status:
+
+- Applied through: `030_phase7i_runtime_role_grants`
+- Pending migrations: `[]`
+- Schema migration count: `30`
+- Public tables: `178`
+- Public indexes: `439`
+- Unvalidated constraints: `0`
+- `GET http://127.0.0.1:4020/v1/stories/rail`: `200`, after `030` granted new Stories tables to `modula_api`
+- `MODULA_LIVE_API_BASE_URL=http://127.0.0.1:4020 pnpm verify:phase7i-live-api-parity`: pass after `030`
+
+Phase 7I-D database dump, disposable restore, pending migration rehearsal, fresh production restore, production migration through `030`, direct current API acceptance, current Worker startup, and DB-backed test gate passed.
 
 Production PostgreSQL replacement is now permitted by the D1 sequence, but old production data/runtime must still be preserved until the fresh production runtime restore and acceptance pass.
