@@ -27,6 +27,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
 COPY packages ./packages
 COPY services/greenfield-worker ./services/greenfield-worker
+COPY --from=modula-module-standard / /modula-mod/modula-module-standard
 RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/protocol-contracts build \
  && pnpm --filter @modula/atproto-lexicons build \
@@ -45,5 +46,6 @@ COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /a
 COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
 COPY --from=build --chown=modula:modula /app/packages ./packages
 COPY --from=build --chown=modula:modula /app/services/greenfield-worker ./services/greenfield-worker
+COPY --from=build --chown=modula:modula /modula-mod /modula-mod
 USER modula
 CMD ["node", "services/greenfield-worker/dist/main.js"]

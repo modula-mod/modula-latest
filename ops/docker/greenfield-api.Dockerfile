@@ -27,6 +27,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
 COPY packages ./packages
 COPY services/greenfield-api ./services/greenfield-api
+COPY --from=modula-module-standard / /modula-mod/modula-module-standard
 RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/protocol-contracts build \
  && pnpm --filter @modula/atproto-lexicons build \
@@ -45,6 +46,7 @@ COPY --from=build --chown=modula:modula /app/package.json /app/pnpm-lock.yaml /a
 COPY --from=build --chown=modula:modula /app/node_modules ./node_modules
 COPY --from=build --chown=modula:modula /app/packages ./packages
 COPY --from=build --chown=modula:modula /app/services/greenfield-api ./services/greenfield-api
+COPY --from=build --chown=modula:modula /modula-mod /modula-mod
 USER modula
 EXPOSE 4020
 HEALTHCHECK --interval=15s --timeout=5s --retries=5 CMD node -e "fetch('http://127.0.0.1:4020/v1/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
