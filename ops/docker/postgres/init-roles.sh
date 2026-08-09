@@ -30,7 +30,7 @@ END
 ALTER ROLE modula_migrator NOSUPERUSER NOCREATEDB NOCREATEROLE BYPASSRLS;
 ALTER ROLE modula_api NOSUPERUSER NOCREATEDB NOCREATEROLE;
 ALTER ROLE modula_readonly NOSUPERUSER NOCREATEDB NOCREATEROLE;
-# Backup must read FORCE RLS tables (e.g. post_saves) for pg_dump.
+-- Backup must read FORCE RLS tables (e.g. post_saves) for pg_dump.
 ALTER ROLE modula_backup NOSUPERUSER NOCREATEDB NOCREATEROLE BYPASSRLS;
 ALTER ROLE modula_worker NOSUPERUSER NOCREATEDB NOCREATEROLE;
 GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO modula_migrator, modula_api, modula_readonly, modula_backup, modula_worker;
