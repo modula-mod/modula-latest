@@ -2,7 +2,9 @@
 
 Date: 2026-08-09
 
-Source checkpoint: `3cc108d2413689ca4aa0ef37fab161811b3829d3`
+Mail relay code checkpoint: `3cc108d2413689ca4aa0ef37fab161811b3829d3`
+
+The production images were rebuilt again after documentation commits. Use `docker inspect modula-production-greenfield-api-1 modula-production-greenfield-worker-1` to verify the current OCI revision on the host.
 
 ## Status
 
