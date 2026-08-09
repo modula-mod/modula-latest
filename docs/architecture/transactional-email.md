@@ -40,6 +40,7 @@ The API does not connect to SMTP.
 - `MODULA_SMTP_PASSWORD`
 - `MODULA_SMTP_SECURE`
 - `MODULA_SMTP_REQUIRE_TLS`
+- `MODULA_SMTP_TLS_REJECT_UNAUTHORIZED`: defaults to `true`; set `false` only for a deliberately private relay whose certificate chain is controlled out of band.
 
 Production defaults to SMTP and refuses to start without authenticated relay credentials.
 

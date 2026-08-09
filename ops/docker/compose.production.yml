@@ -85,6 +85,8 @@ services:
     env_file:
       - /etc/modula/greenfield-worker.env
       - /etc/modula/backend-fabric.env
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     depends_on:
       greenfield-postgres:
         condition: service_healthy

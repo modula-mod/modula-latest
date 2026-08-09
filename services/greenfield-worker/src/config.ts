@@ -36,6 +36,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v !== 'false'),
+  MODULA_SMTP_TLS_REJECT_UNAUTHORIZED: z
+    .string()
+    .optional()
+    .transform(v => v !== 'false'),
   // Same key material / env var names as services/api (see security/crypto.ts there) so a
   // single secret can be shared across /etc/modula/api.env and /etc/modula/worker.env.
   MODULA_ATPROTO_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
@@ -82,6 +86,7 @@ export type WorkerConfig = {
   smtpPassword?: string
   smtpSecure: boolean
   smtpRequireTls: boolean
+  smtpTlsRejectUnauthorized: boolean
   /** version -> 32-byte key. Version 1 is "current"; version 0 is the previous key kept for rotation. */
   encryptionKeysByVersion: Map<number, Buffer>
   encryptionKeyIsEphemeral: boolean
@@ -177,6 +182,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     smtpPassword: raw.MODULA_SMTP_PASSWORD,
     smtpSecure,
     smtpRequireTls: raw.MODULA_SMTP_REQUIRE_TLS !== false,
+    smtpTlsRejectUnauthorized: raw.MODULA_SMTP_TLS_REJECT_UNAUTHORIZED !== false,
     encryptionKeysByVersion,
     encryptionKeyIsEphemeral: isEphemeral,
     ssrfAllowPrivateNetworks: Boolean(raw.MODULA_ATPROTO_SSRF_ALLOW_PRIVATE_NETWORKS),
