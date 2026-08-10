@@ -52,13 +52,45 @@ export function PresenceStoriesRail({
   compact = false,
   showCaption = true,
 }: PresenceStoriesRailProps) {
-  if (people.length === 0) return null
+  // Honest empty state — never invent demo stories. Home injects an owner stub when signed in.
+  if (people.length === 0) {
+    return <EmptyStoriesRail compact={compact} showCaption={showCaption} />
+  }
 
   if (compact) {
     return <CompactStoriesRail people={people} showCaption={showCaption} />
   }
 
   return <DialStoriesRail people={people} showCaption={showCaption} />
+}
+
+function EmptyStoriesRail({
+  compact,
+  showCaption,
+}: {
+  compact: boolean
+  showCaption: boolean
+}) {
+  const {spacing} = useThemeTokens()
+  return (
+    <View
+      accessibilityRole="summary"
+      accessibilityLabel="No stories yet"
+      style={{
+        paddingHorizontal: spacing[4],
+        paddingVertical: compact ? spacing[2] : spacing[3],
+        gap: spacing[1],
+      }}>
+      <AppText variant="body" colour="textSecondary">
+        No stories yet
+      </AppText>
+      {showCaption ? (
+        <AppText variant="caption" colour="textTertiary">
+          When people you follow share a story, it will appear here.
+        </AppText>
+      ) : null}
+    </View>
+  )
 }
 
 function openStory(person: PresenceRailPerson, router: ReturnType<typeof useRouter>) {

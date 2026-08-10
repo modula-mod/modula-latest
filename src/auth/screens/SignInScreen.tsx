@@ -34,8 +34,9 @@ export function SignInScreen() {
   const [pending, setPending] = useState(false)
   const returnTo = sanitizeReturnTo(params.returnTo)
   const showDemo =
-    runtimeEnvironment.appEnvironment === 'development' ||
-    runtimeEnvironment.appEnvironment === 'preview'
+    runtimeEnvironment.dataSource === 'local' &&
+    (runtimeEnvironment.appEnvironment === 'development' ||
+      runtimeEnvironment.appEnvironment === 'preview')
 
   const submit = async () => {
     const nextEmail = email.trim().toLowerCase()
