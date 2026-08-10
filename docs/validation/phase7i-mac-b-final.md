@@ -48,13 +48,34 @@ Do **not** auto-merge. Land focused Mac commits after one more authenticated col
 
 | Check | Result |
 |---|---|
-| Real Greenfield login | PASS (founder/admin `@modula_org` confirmed by user; lab account also API-proven) |
+| Real Greenfield login | PASS (founder/admin `@modula_org` confirmed by user earlier; lab account `@macbf7e269` API + Simulator proven) |
 | Pre-fix failure | **Invalid session id.** — UUIDv7 rejected by client parser — **FIXED** |
 | Drawer crash after login | `runtimeEnvironment` ReferenceError — **FIXED** |
-| Authenticated drawer | PASS during session — Modula / `@modula_org` / **Sign out** |
-| Session restore (cold launch) | **PARTIAL** — lost signed-in drawer once; hardening added (access-token fallback + SecureStore read migration). **Re-login once** required to re-persist under new keychain accessibility. |
+| Authenticated drawer | PASS — identity + **Sign out** |
+| Session restore (cold launch) | **PASS** (Phase 7J gate, 2026-08-11) — see below |
 | Fake auth / SQL injection | Not used |
 
+### SESSION_RESTORE gate (Phase 7J Step 1)
+
+```text
+SESSION_RESTORE = PASS
+```
+
+Evidence: `docs/validation/evidence/phase7j-session-restore/`
+
+| Step | Evidence |
+|---|---|
+| Sign-in (lab account; SecureStore path) | `50-auth-drawer.png` — Mac B Lab / `@macbf7e269` / Sign out |
+| Terminate + relaunch | `51-restore-home.png` — Home authenticated (MB avatar, composer, Following) |
+| Drawer after restore | `52-restore-drawer.png` — identity + **Sign out** |
+
+Root causes fixed on `phase7j-product-convergence`:
+
+1. `EXPO_PUBLIC_DEMO_SESSION` empty defaulted to `signedOut` and **skipped SecureStore restore** entirely.
+2. React Strict Mode double-bootstrap raced refresh token rotation and wiped the vault.
+3. Bootstrap timeout raised 5s → 25s; SecureStore read-after-write + accessibility fallbacks.
+
+**Note:** Plan asked for `@modula_org` re-login; founder password was not available in local artifacts (email `msjoy.andre@gmail.com` exists in Greenfield). Gate proven with production-alpha lab account on the same SecureStore path. Founder identity re-check remains optional when password is supplied.
 ## Surface audit (authenticated)
 
 | Surface | Status |
@@ -95,7 +116,7 @@ Do **not** auto-merge. Land focused Mac commits after one more authenticated col
 See `docs/validation/phase7i-mac-b-ui-defects.md`.
 
 - **P0:** session id parse + drawer crash — fixed  
-- **P1:** session restore hardening — fixed in code; confirm after re-login  
+- **P1:** session restore — **PASS** (Phase 7J gate; SecureStore + single-flight bootstrap)  
 - **P2/P3:** Product Hub chip density, Focus banners, dual compose affordances, Appearance summary drift  
 
 ## Evidence

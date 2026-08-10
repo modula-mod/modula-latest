@@ -22,8 +22,29 @@ const localPassword = 'modula-local-password'
 const SESSION_REVOKED_MESSAGE =
   'Your session was revoked for security. Sign in again to continue.'
 
+/** Prevent React Strict Mode double-mount from racing two refresh calls and wiping the vault. */
+let bootstrapInFlight: Promise<SessionState> | null = null
+
 function isPendingResult(value: RegisterPendingResult | AuthResult): value is RegisterPendingResult {
   return 'kind' in value && value.kind === 'pendingVerification'
+}
+
+function isLikelyTransientAuthError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const code =
+    'code' in error && typeof (error as {code: unknown}).code === 'string'
+      ? (error as {code: string}).code
+      : ''
+  const message = error instanceof Error ? error.message.toLowerCase() : ''
+  return (
+    code === 'NETWORK' ||
+    code === 'TIMEOUT' ||
+    code === 'UNAVAILABLE' ||
+    message.includes('network') ||
+    message.includes('timeout') ||
+    message.includes('failed to fetch') ||
+    message.includes('network request failed')
+  )
 }
 
 export function SessionProvider({children}: PropsWithChildren) {
@@ -196,83 +217,127 @@ export function SessionProvider({children}: PropsWithChildren) {
   useEffect(() => {
     let active = true
     const timeout = setTimeout(() => {
-      if (active) setSession({status: 'signedOut', error: 'Session bootstrap timed out.'})
+      // Only leave booting if bootstrap is still unresolved — never wipe storage on timeout.
+      if (!active) return
+      setSession(current =>
+        current.status === 'booting'
+          ? {status: 'signedOut', error: 'Session bootstrap timed out.'}
+          : current,
+      )
     }, SESSION_BOOTSTRAP_TIMEOUT_MS)
+
+    async function resolveBootstrapState(): Promise<SessionState> {
+      // `guest` forces a guest shell for demos. `signedOut` / empty only means
+      // "do not auto-login the local demo owner" — never skip SecureStore restore.
+      if (runtimeEnvironment.demoSession === 'guest') {
+        return {status: 'guest'}
+      }
+
+      const bundle = await services.sessionStorage.getSessionBundle().catch(() => null)
+      if (__DEV__) {
+        console.info(
+          `Session bootstrap: bundle=${bundle ? 'present' : 'missing'} refresh=${bundle?.refreshToken ? 'yes' : 'no'}`,
+        )
+      }
+
+      if (bundle?.refreshToken) {
+        const refreshed = await services.refreshCoordinator.refreshSession()
+        if (refreshed) {
+          services.accessTokenStore.set(refreshed.tokens.accessToken)
+          await services.sessionStorage.setSessionBundle({
+            accessToken: refreshed.tokens.accessToken,
+            refreshToken: refreshed.tokens.refreshToken,
+            sessionId: refreshed.session.sessionId,
+            accessTokenExpiresAt: refreshed.tokens.accessTokenExpiresAt,
+          })
+          if (__DEV__) console.info('Session bootstrap: refresh restored')
+          return refreshed.session
+        }
+
+        const latest = await services.sessionStorage.getSessionBundle().catch(() => null)
+        const accessToken = latest?.accessToken || bundle.accessToken
+        if (accessToken) {
+          try {
+            services.accessTokenStore.set(accessToken)
+            const session = await services.authRepository.getSession(accessToken)
+            if (__DEV__) console.info('Session bootstrap: access-token fallback restored')
+            return {
+              ...session,
+              sessionId: parseSessionId(
+                (latest?.sessionId || bundle.sessionId).length > 0
+                  ? latest?.sessionId || bundle.sessionId
+                  : session.sessionId,
+              ),
+              accessTokenExpiresAt:
+                latest?.accessTokenExpiresAt ||
+                bundle.accessTokenExpiresAt ||
+                session.accessTokenExpiresAt,
+            }
+          } catch (accessError) {
+            if (__DEV__) {
+              console.info(
+                'Session bootstrap: refresh+access fallback failed',
+                accessError instanceof Error ? accessError.message : 'unknown',
+              )
+            }
+            if (isLikelyTransientAuthError(accessError)) {
+              return {
+                status: 'signedOut',
+                error: 'Could not restore session (network). Try again.',
+              }
+            }
+          }
+        }
+
+        const still = await services.sessionStorage.getSessionBundle().catch(() => null)
+        if (still?.refreshToken && still.refreshToken === bundle.refreshToken) {
+          await clearLocalSession()
+          return {status: 'signedOut', error: SESSION_REVOKED_MESSAGE}
+        }
+        const raced = await services.refreshCoordinator.refreshSession()
+        if (raced) {
+          services.accessTokenStore.set(raced.tokens.accessToken)
+          if (__DEV__) console.info('Session bootstrap: refresh restored after race')
+          return raced.session
+        }
+        return {status: 'signedOut', error: SESSION_REVOKED_MESSAGE}
+      }
+
+      if (
+        runtimeEnvironment.demoSession === 'owner' &&
+        runtimeEnvironment.appEnvironment !== 'production'
+      ) {
+        const result = await services.authRepository.signIn({
+          email: 'andrei@modula.local',
+          password: localPassword,
+        })
+        services.accessTokenStore.set(result.tokens.accessToken)
+        await services.sessionStorage.setSessionBundle({
+          accessToken: result.tokens.accessToken,
+          refreshToken: result.tokens.refreshToken,
+          sessionId: result.session.sessionId,
+          accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+        })
+        return result.session
+      }
+      return {status: 'signedOut'}
+    }
 
     async function bootstrap() {
       try {
-        if (runtimeEnvironment.demoSession === 'guest') {
-          if (active) setSession({status: 'guest'})
-          return
-        }
-        if (runtimeEnvironment.demoSession === 'signedOut') {
-          if (active) setSession({status: 'signedOut'})
-          return
-        }
-        const bundle = await services.sessionStorage.getSessionBundle().catch(() => null)
-        if (__DEV__) {
-          console.info(
-            `Session bootstrap: bundle=${bundle ? 'present' : 'missing'} refresh=${bundle?.refreshToken ? 'yes' : 'no'}`,
-          )
-        }
-        if (bundle?.refreshToken) {
-          try {
-            const refreshed = await services.authRepository.refresh(bundle.refreshToken)
-            await persistAuthResult(refreshed)
-            if (__DEV__) console.info('Session bootstrap: refresh restored')
-            return
-          } catch (refreshError) {
-            // Prefer keeping a still-valid access token over wiping the vault on a
-            // transient refresh failure (common on Simulator + tunnel restarts).
-            if (bundle.accessToken) {
-              try {
-                services.accessTokenStore.set(bundle.accessToken)
-                const session = await services.authRepository.getSession(bundle.accessToken)
-                if (active) {
-                  setSession({
-                    ...session,
-                    sessionId: parseSessionId(
-                      bundle.sessionId.length > 0 ? bundle.sessionId : session.sessionId,
-                    ),
-                    accessTokenExpiresAt:
-                      bundle.accessTokenExpiresAt || session.accessTokenExpiresAt,
-                  })
-                }
-                if (__DEV__) console.info('Session bootstrap: access-token fallback restored')
-                return
-              } catch {
-                if (__DEV__) {
-                  console.info(
-                    'Session bootstrap: refresh+access fallback failed',
-                    refreshError instanceof Error ? refreshError.message : 'unknown',
-                  )
-                }
-              }
-            }
-            await clearLocalSession()
-            if (active) {
-              setSession({status: 'signedOut', error: SESSION_REVOKED_MESSAGE})
-              router.replace('/sign-in' as Href)
-            }
-            return
-          }
-        }
-        // Demo-owner bootstrap is development-only and opt-in via EXPO_PUBLIC_DEMO_SESSION=owner.
-        if (
-          runtimeEnvironment.demoSession === 'owner' &&
-          runtimeEnvironment.appEnvironment !== 'production'
-        ) {
-          const result = await services.authRepository.signIn({
-            email: 'andrei@modula.local',
-            password: localPassword,
+        if (!bootstrapInFlight) {
+          bootstrapInFlight = resolveBootstrapState().finally(() => {
+            bootstrapInFlight = null
           })
-          await persistAuthResult(result)
-          return
         }
-        if (active) setSession({status: 'signedOut'})
+        const next = await bootstrapInFlight
+        if (!active) return
+        setSession(next)
+        if (next.status === 'signedOut' && next.error === SESSION_REVOKED_MESSAGE) {
+          router.replace('/sign-in' as Href)
+        }
       } catch {
         services.accessTokenStore.clear()
-        await services.sessionStorage.clearSessionBundle().catch(() => undefined)
         if (active) setSession({status: 'signedOut', error: 'Session storage unavailable.'})
       } finally {
         clearTimeout(timeout)
@@ -284,7 +349,7 @@ export function SessionProvider({children}: PropsWithChildren) {
       active = false
       clearTimeout(timeout)
     }
-  }, [clearLocalSession, persistAuthResult, router, services])
+  }, [clearLocalSession, router, services])
 
   const actions = useMemo<SessionActions>(
     () => ({

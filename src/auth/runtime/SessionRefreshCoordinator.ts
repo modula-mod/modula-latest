@@ -18,13 +18,32 @@ export class SessionRefreshCoordinator {
   }
 
   async refresh(): Promise<AccessToken | null> {
+    const before = await this.sessionStorage.getRefreshToken()
+    if (!before) {
+      this.failedHandler?.()
+      return null
+    }
+    const result = await this.refreshSession()
+    if (result) return result.tokens.accessToken
+
+    // Mid-session 401 recovery: wipe only if the vault still holds the dead token.
+    const after = await this.sessionStorage.getRefreshToken()
+    if (!after || after === before) {
+      this.accessTokenStore.clear()
+      await this.sessionStorage.clearSessionBundle().catch(() => undefined)
+      this.failedHandler?.()
+    }
+    return null
+  }
+
+  /** Single-flight session refresh used by HTTP 401 recovery and cold-start bootstrap. */
+  async refreshSession(): Promise<AuthResult | null> {
     if (!this.inFlight) {
       this.inFlight = this.runRefresh().finally(() => {
         this.inFlight = null
       })
     }
-    const result = await this.inFlight
-    return result?.tokens.accessToken ?? null
+    return this.inFlight
   }
 
   private async runRefresh(): Promise<AuthResult | null> {
@@ -41,9 +60,7 @@ export class SessionRefreshCoordinator {
       })
       return result
     } catch {
-      this.accessTokenStore.clear()
-      await this.sessionStorage.clearSessionBundle().catch(() => undefined)
-      this.failedHandler?.()
+      // Callers decide whether the failure is definitive (avoid Strict Mode wipe races).
       return null
     }
   }
