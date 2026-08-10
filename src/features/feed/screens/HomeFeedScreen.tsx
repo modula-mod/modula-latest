@@ -45,6 +45,7 @@ import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {shellTabBarCompact} from '@/platform/ui/navigation/shell-tab-bar-compact'
@@ -79,6 +80,10 @@ export function HomeFeedScreen() {
   const {colours} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
+  // Transparent header + nested Animated.FlatList does not reliably get UIKit
+  // automatic top inset; clear the nav row explicitly, then keep the fade zone.
+  const headerClearance = useSecondaryChromeSpacerHeight()
+  const fadePad = useNativeHeaderFadePadding()
   const {preferences} = useProductPreferences()
   const focus = preferences.focus
   const focusPreset = focus.preset ?? 'off'
@@ -212,7 +217,7 @@ export function HomeFeedScreen() {
                   data={posts}
                   keyExtractor={item => item.id}
                   renderItem={({item}) => <SocialPost post={item} />}
-                  contentInsetAdjustmentBehavior="automatic"
+                  contentInsetAdjustmentBehavior="never"
                   bounces
                   alwaysBounceVertical
                   onScroll={onScroll}
@@ -275,7 +280,10 @@ export function HomeFeedScreen() {
                       <PaginationIndicator label="Loading more" />
                     ) : null
                   }
-                  contentContainerStyle={{paddingBottom: tabPadding}}
+                  contentContainerStyle={{
+                    paddingTop: headerClearance + fadePad,
+                    paddingBottom: tabPadding,
+                  }}
                 />
               </GestureDetector>
             </PullActionTray>

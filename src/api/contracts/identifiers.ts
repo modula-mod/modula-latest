@@ -10,7 +10,8 @@ export type ProfileId = string & {readonly [profileIdBrand]: true}
 export type PostId = string & {readonly [postIdBrand]: true}
 export type SessionId = string & {readonly [sessionIdBrand]: true}
 
-const idPattern = /^[a-z][a-z0-9-]{2,80}$/i
+// Accept local prefixed ids (`session-…`) and Greenfield UUIDv7 ids (`019f…`).
+const idPattern = /^[a-z0-9][a-z0-9-]{2,80}$/i
 
 function parseIdentifier<T extends string>(value: unknown, label: string): T {
   if (typeof value !== 'string' || !idPattern.test(value)) {

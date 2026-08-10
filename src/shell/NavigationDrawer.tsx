@@ -270,7 +270,7 @@ export function NavigationDrawer() {
                         ? `@${ownerProfile.handle}`
                         : session.status === 'guest'
                           ? 'Browsing Modula'
-                          : 'Local prototype account'}
+                          : 'Sign in for your Greenfield account'}
                     </AppText>
                   </View>
                 </AppPressable>

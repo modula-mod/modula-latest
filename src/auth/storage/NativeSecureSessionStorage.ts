@@ -9,9 +9,17 @@ import {
   type StoredSessionBundle,
 } from '@/auth/storage/SessionStorage'
 
-const options: SecureStore.SecureStoreOptions = {
-  keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+const writeOptions: SecureStore.SecureStoreOptions = {
+  // AFTER_FIRST_UNLOCK survives cold launches more reliably than WHEN_UNLOCKED
+  // on Simulator while still remaining device-local.
+  keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
 }
+
+const readOptionCandidates: SecureStore.SecureStoreOptions[] = [
+  writeOptions,
+  {keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY},
+  {},
+]
 
 function parseBundle(raw: string): StoredSessionBundle | null {
   try {
@@ -37,6 +45,14 @@ function parseBundle(raw: string): StoredSessionBundle | null {
   }
 }
 
+async function readSecureItem(key: string): Promise<string | null> {
+  for (const options of readOptionCandidates) {
+    const value = await SecureStore.getItemAsync(key, options).catch(() => null)
+    if (value) return value
+  }
+  return null
+}
+
 export class NativeSecureSessionStorage implements SessionStorage {
   constructor(private readonly shouldFail?: () => boolean) {}
 
@@ -50,10 +66,10 @@ export class NativeSecureSessionStorage implements SessionStorage {
     this.assertAvailable()
     const available = await SecureStore.isAvailableAsync()
     if (!available) return null
-    const bundled = await SecureStore.getItemAsync(SECURE_SESSION_BUNDLE_KEY, options)
+    const bundled = await readSecureItem(SECURE_SESSION_BUNDLE_KEY)
     if (bundled) return parseBundle(bundled)
     // Migrate legacy refresh-token-only storage.
-    const legacy = await SecureStore.getItemAsync(SECURE_REFRESH_TOKEN_KEY, options)
+    const legacy = await readSecureItem(SECURE_REFRESH_TOKEN_KEY)
     if (!legacy) return null
     return {
       accessToken: parseAccessToken(''),
@@ -65,14 +81,19 @@ export class NativeSecureSessionStorage implements SessionStorage {
 
   async setSessionBundle(bundle: StoredSessionBundle): Promise<void> {
     this.assertAvailable()
-    await SecureStore.setItemAsync(SECURE_SESSION_BUNDLE_KEY, JSON.stringify(bundle), options)
-    await SecureStore.deleteItemAsync(SECURE_REFRESH_TOKEN_KEY, options).catch(() => undefined)
+    await SecureStore.setItemAsync(SECURE_SESSION_BUNDLE_KEY, JSON.stringify(bundle), writeOptions)
+    await SecureStore.deleteItemAsync(SECURE_REFRESH_TOKEN_KEY, writeOptions).catch(() => undefined)
+    await SecureStore.deleteItemAsync(SECURE_REFRESH_TOKEN_KEY, {
+      keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    }).catch(() => undefined)
   }
 
   async clearSessionBundle(): Promise<void> {
     this.assertAvailable()
-    await SecureStore.deleteItemAsync(SECURE_SESSION_BUNDLE_KEY, options).catch(() => undefined)
-    await SecureStore.deleteItemAsync(SECURE_REFRESH_TOKEN_KEY, options).catch(() => undefined)
+    for (const options of readOptionCandidates) {
+      await SecureStore.deleteItemAsync(SECURE_SESSION_BUNDLE_KEY, options).catch(() => undefined)
+      await SecureStore.deleteItemAsync(SECURE_REFRESH_TOKEN_KEY, options).catch(() => undefined)
+    }
   }
 
   async getRefreshToken(): Promise<RefreshToken | null> {

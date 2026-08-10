@@ -28,7 +28,8 @@ export function SignInScreen() {
   const [email, setEmail] = useState(typeof params.email === 'string' ? params.email : '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>(
     session.status === 'signedOut' && session.error ? session.error : null,
   )
   const [pending, setPending] = useState(false)
@@ -41,20 +42,27 @@ export function SignInScreen() {
   const submit = async () => {
     const nextEmail = email.trim().toLowerCase()
     if (!validEmail(nextEmail)) {
-      setError('Enter a valid email address.')
+      setEmailError('Enter a valid email address.')
+      setFormError(null)
       return
     }
     if (password.length < 8) {
-      setError('Password must be at least eight characters.')
+      setEmailError(null)
+      setFormError('Password must be at least eight characters.')
       return
     }
     setPending(true)
-    setError(null)
+    setEmailError(null)
+    setFormError(null)
     try {
       await signIn({email: nextEmail, password}, returnTo)
       setPassword('')
-    } catch {
-      setError('Check your email and password, or verify your email first.')
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message
+          : 'Check your email and password, or verify your email first.'
+      setFormError(message)
     } finally {
       setPending(false)
     }
@@ -74,27 +82,36 @@ export function SignInScreen() {
           <AuthField
             label="Email"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={text => {
+              setEmail(text)
+              if (emailError) setEmailError(null)
+            }}
             autoCapitalize="none"
+            autoCorrect={false}
             keyboardType="email-address"
             textContentType="emailAddress"
             returnKeyType="next"
+            error={emailError ?? undefined}
+            testID="sign-in-email"
           />
           <AuthField
             label="Password"
             value={password}
-            onChangeText={setPassword}
+            onChangeText={text => {
+              setPassword(text)
+              if (formError) setFormError(null)
+            }}
             secureTextEntry={!showPassword}
             textContentType="password"
             returnKeyType="done"
             onSubmitEditing={() => void submit()}
-            error={error ?? undefined}
+            error={formError ?? undefined}
+            testID="sign-in-password"
           />
-          <AuthLink
-            onPress={() => setShowPassword(value => !value)}>
+          <AuthLink testID="sign-in-toggle-password" onPress={() => setShowPassword(value => !value)}>
             {showPassword ? 'Hide password' : 'Show password'}
           </AuthLink>
-          <AppButton disabled={pending} onPress={() => void submit()}>
+          <AppButton testID="sign-in-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Signing in' : 'Sign in'}
           </AppButton>
           <View style={{gap: spacing[2], marginTop: spacing[1]}}>
@@ -109,7 +126,7 @@ export function SignInScreen() {
                 variant="secondary"
                 onPress={() =>
                   void continueAsDemo('andrei@modula.local').catch(error => {
-                    setError(
+                    setFormError(
                       error instanceof Error
                         ? error.message
                         : 'Development demo sign-in failed. Use a Greenfield account on remote.',
@@ -119,7 +136,6 @@ export function SignInScreen() {
                 Use development demo account
               </AppButton>
             ) : null}
-            <AuthLink onPress={() => router.back()}>Back</AuthLink>
           </View>
         </AuthPanel>
       </View>

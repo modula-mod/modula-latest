@@ -57,6 +57,19 @@ export function createAppServices(): AppServices {
     if (!runtimeEnvironment.apiUrl) {
       throw new Error('Remote API URL is required for remote data source.')
     }
+    if (__DEV__) {
+      try {
+        const host = new URL(runtimeEnvironment.apiUrl).host
+        console.info(
+          `Greenfield environment: ${runtimeEnvironment.appEnvironment}`,
+        )
+        console.info(`Greenfield host: ${host}`)
+      } catch {
+        console.info(
+          `Greenfield environment: ${runtimeEnvironment.appEnvironment}`,
+        )
+      }
+    }
     transport = new HttpApiTransport(runtimeEnvironment.apiUrl)
   }
 

@@ -2,6 +2,7 @@ import {useCallback, useEffect, useMemo, useState, type PropsWithChildren} from 
 import {useRouter, type Href} from 'expo-router'
 import {useQueryClient} from '@tanstack/react-query'
 
+import {parseSessionId} from '@/api/contracts/identifiers'
 import type {
   AuthResult,
   RegisterAccountInput,
@@ -209,12 +210,45 @@ export function SessionProvider({children}: PropsWithChildren) {
           return
         }
         const bundle = await services.sessionStorage.getSessionBundle().catch(() => null)
+        if (__DEV__) {
+          console.info(
+            `Session bootstrap: bundle=${bundle ? 'present' : 'missing'} refresh=${bundle?.refreshToken ? 'yes' : 'no'}`,
+          )
+        }
         if (bundle?.refreshToken) {
           try {
             const refreshed = await services.authRepository.refresh(bundle.refreshToken)
             await persistAuthResult(refreshed)
+            if (__DEV__) console.info('Session bootstrap: refresh restored')
             return
-          } catch {
+          } catch (refreshError) {
+            // Prefer keeping a still-valid access token over wiping the vault on a
+            // transient refresh failure (common on Simulator + tunnel restarts).
+            if (bundle.accessToken) {
+              try {
+                services.accessTokenStore.set(bundle.accessToken)
+                const session = await services.authRepository.getSession(bundle.accessToken)
+                if (active) {
+                  setSession({
+                    ...session,
+                    sessionId: parseSessionId(
+                      bundle.sessionId.length > 0 ? bundle.sessionId : session.sessionId,
+                    ),
+                    accessTokenExpiresAt:
+                      bundle.accessTokenExpiresAt || session.accessTokenExpiresAt,
+                  })
+                }
+                if (__DEV__) console.info('Session bootstrap: access-token fallback restored')
+                return
+              } catch {
+                if (__DEV__) {
+                  console.info(
+                    'Session bootstrap: refresh+access fallback failed',
+                    refreshError instanceof Error ? refreshError.message : 'unknown',
+                  )
+                }
+              }
+            }
             await clearLocalSession()
             if (active) {
               setSession({status: 'signedOut', error: SESSION_REVOKED_MESSAGE})
