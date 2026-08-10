@@ -22,6 +22,8 @@ Do **not** auto-merge. Land focused Mac commits after one more authenticated col
 |---|---|
 | Upstream `origin/phase7i-trusted-production-alpha` | `0f9708bbaa1896e438dc3a9f5b28ec6d1327c353` |
 | Mac branch start / prior checkpoint | `77156e39fbb685b4ec1c302f85f11c9e6ebe1cec` |
+| Mac branch HEAD (this phase) | `2791ba01381a940b468878a7eff49c7a00ca59e5` |
+| Xcode Simulator build | **BUILD SUCCEEDED** |
 | Upstream classification | **UPSTREAM_UNCHANGED** + **MAC_BRANCH_AHEAD_ONLY** |
 | Expo SDK | 57 (`expo ~57.0.11`) |
 | React Native | `0.86.2` |
