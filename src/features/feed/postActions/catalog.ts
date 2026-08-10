@@ -7,6 +7,8 @@ export type PostOverflowActionId =
   | 'share'
   | 'saveToVault'
   | 'quote'
+  | 'edit'
+  | 'delete'
   | 'viewEngagement'
   | 'openInBrowser'
   | 'mute'
@@ -21,9 +23,13 @@ export type PostOverflowAction = ModulaActionItem & {
  * Overflow / More catalog — keeps engagement row lean.
  * Reply / Repost / Like / Share / Save stay on the row; extras live here.
  */
-export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[] {
+export function buildPostOverflowActions(
+  post: SocialPost,
+  options?: {isOwner?: boolean},
+): PostOverflowAction[] {
   const hasText = Boolean(post.text?.trim())
   const hasLink = post.kind === 'link'
+  const isOwner = Boolean(options?.isOwner)
 
   const actions: PostOverflowAction[] = [
     {
@@ -49,8 +55,8 @@ export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[]
     },
     {
       id: 'quote',
-      label: 'Quote (Preview)',
-      accessibilityLabel: 'Quote post preview',
+      label: 'Quote',
+      accessibilityLabel: 'Quote post',
     },
     {
       id: 'viewEngagement',
@@ -58,6 +64,23 @@ export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[]
       accessibilityLabel: 'View post engagement preview',
     },
   ]
+
+  if (isOwner) {
+    actions.splice(4, 0,
+      {
+        id: 'edit',
+        label: 'Edit',
+        accessibilityLabel: 'Edit post',
+        disabled: !hasText || typeof post.version !== 'number',
+      },
+      {
+        id: 'delete',
+        label: 'Delete',
+        accessibilityLabel: 'Delete post',
+        style: 'destructive',
+      },
+    )
+  }
 
   if (hasLink) {
     actions.push({
@@ -67,24 +90,26 @@ export function buildPostOverflowActions(post: SocialPost): PostOverflowAction[]
     })
   }
 
-  actions.push(
-    {
-      id: 'mute',
-      label: 'Mute (Preview)',
-      accessibilityLabel: 'Mute author preview',
-    },
-    {
-      id: 'hide',
-      label: 'Hide post (Preview)',
-      accessibilityLabel: 'Hide post preview',
-    },
-    {
-      id: 'report',
-      label: 'Report (Preview)',
-      accessibilityLabel: 'Report post preview',
-      style: 'destructive',
-    },
-  )
+  if (!isOwner) {
+    actions.push(
+      {
+        id: 'mute',
+        label: 'Mute (Preview)',
+        accessibilityLabel: 'Mute author preview',
+      },
+      {
+        id: 'hide',
+        label: 'Hide post (Preview)',
+        accessibilityLabel: 'Hide post preview',
+      },
+      {
+        id: 'report',
+        label: 'Report (Preview)',
+        accessibilityLabel: 'Report post preview',
+        style: 'destructive',
+      },
+    )
+  }
 
   return actions.filter(action => !action.disabled)
 }

@@ -1,6 +1,6 @@
-import {useState} from 'react'
-import {useLocalSearchParams} from 'expo-router'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {useEffect, useState} from 'react'
+import {Alert, ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {parsePostId, type PostId} from '@/api/contracts'
@@ -11,7 +11,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {usePostQuery} from '@/features/feed/data'
+import {useDeletePostMutation, usePostQuery} from '@/features/feed/data'
 import {CommentPreview} from '@/features/social/components/comment-preview'
 import {SocialPost} from '@/features/social/components/social-post'
 import {
@@ -25,7 +25,10 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PostDetailScreen() {
-  const {postId} = useLocalSearchParams<{postId: string}>()
+  const {postId, confirmDelete} = useLocalSearchParams<{postId: string; confirmDelete?: string}>()
+  const router = useRouter()
+  const session = useSession()
+  const deletePost = useDeletePostMutation()
   const insets = useSafeAreaInsets()
   const {colours, spacing} = useThemeTokens()
   let parsedPostId = null
@@ -37,6 +40,29 @@ export function PostDetailScreen() {
   const postQuery = usePostQuery(parsedPostId ?? parsePostId('post-local-1'))
   const post = parsedPostId ? postQuery.data : null
   const commentsQuery = useCommentsQuery(parsedPostId)
+
+  useEffect(() => {
+    if (confirmDelete !== '1' || !post || session.status !== 'signedIn') return
+    if (session.profile.id !== post.author.id) return
+    Alert.alert('Delete post', 'Delete this post permanently?', [
+      {text: 'Cancel', style: 'cancel', onPress: () => router.replace(`/post/${post.id}` as Href)},
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          void deletePost
+            .mutateAsync(post.id)
+            .then(() => router.replace('/' as Href))
+            .catch(error => {
+              Alert.alert(
+                'Delete failed',
+                error instanceof Error ? error.message : 'Could not delete post.',
+              )
+            })
+        },
+      },
+    ])
+  }, [confirmDelete, deletePost, post, router, session])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>

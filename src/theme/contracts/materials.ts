@@ -39,6 +39,15 @@ export type MotionTokens = {
   normal: number
   slow: number
   pressScale: number
+  /** Semantic springs used by drawer / selection / celebration. */
+  springs: {
+    press: {damping: number; stiffness: number; mass: number}
+    selection: {damping: number; stiffness: number; mass: number}
+    sheet: {damping: number; stiffness: number; mass: number}
+    drawer: {damping: number; stiffness: number; mass: number}
+    navigation: {damping: number; stiffness: number; mass: number}
+    celebration: {damping: number; stiffness: number; mass: number}
+  }
 }
 
 export const SURFACE_ROLES = [

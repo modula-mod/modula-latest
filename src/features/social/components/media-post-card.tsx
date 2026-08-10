@@ -125,7 +125,9 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
     post.author,
     session.status === 'signedIn' ? session.profile.id : '',
   )
-  const overflowActions = buildPostOverflowActions(post)
+  const overflowActions = buildPostOverflowActions(post, {
+    isOwner: session.status === 'signedIn' && session.profile.id === post.author.id,
+  })
   const liked = Boolean(post.liked || post.viewerReaction)
   const audioLabel = media?.title?.trim() || `Original audio · @${post.author.handle}`
   const likedRed = colours.destructive

@@ -63,12 +63,19 @@ export type CreatePostInput = {
 
 export type OptimisticPostState = 'pending' | 'confirmed' | 'failed'
 
+export type UpdatePostInput = {
+  expectedVersion: number
+  text: string
+}
+
 export type BaseSocialPost = PostEngagement & {
   id: PostId
   author: ModulaProfile
   createdAt: string
   feed: FeedMode
   text?: string
+  /** Optimistic concurrency token from Greenfield (`posts.version`). */
+  version?: number
   /** Embedded quote data is optional so providers without quote support remain compatible. */
   quotedPost?: SocialPost | null
   optimisticState?: OptimisticPostState

@@ -54,6 +54,29 @@ export async function runPostOverflowAction(
       router.push(`/compose?quotePostId=${encodeURIComponent(post.id)}` as Href)
       return
     }
+    case 'edit': {
+      if (typeof post.version !== 'number') {
+        Alert.alert('Edit post', 'This post cannot be edited yet (missing version).')
+        return
+      }
+      router.push(
+        `/compose?editPostId=${encodeURIComponent(post.id)}&expectedVersion=${post.version}` as Href,
+      )
+      return
+    }
+    case 'delete': {
+      Alert.alert('Delete post', 'Delete this post permanently?', [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            router.push(`/post/${post.id}?confirmDelete=1` as Href)
+          },
+        },
+      ])
+      return
+    }
     case 'viewEngagement': {
       router.push(`/post/${post.id}/analytics` as Href)
       return

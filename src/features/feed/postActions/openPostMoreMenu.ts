@@ -7,8 +7,11 @@ import {runPostOverflowAction} from '@/features/feed/postActions/runPostAction'
 import {presentModulaActions} from '@/platform/ui/menus'
 
 /** Opens the native More / overflow menu for a post. */
-export async function openPostMoreMenu(post: SocialPost): Promise<void> {
-  const actions = buildPostOverflowActions(post)
+export async function openPostMoreMenu(
+  post: SocialPost,
+  options?: {isOwner?: boolean},
+): Promise<void> {
+  const actions = buildPostOverflowActions(post, options)
   const selected = await presentModulaActions({
     title: 'Post options',
     message: `@${post.author.handle}`,

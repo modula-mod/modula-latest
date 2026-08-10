@@ -22,6 +22,7 @@ export function decodePost(value: unknown): SocialPost {
     ),
     reactionCount: optional(record.reactionCount, item => asNumber(item, 'post reaction count')),
     quoteCount: optional(record.quoteCount, item => asNumber(item, 'post quote count')),
+    version: optional(record.version, item => asNumber(item, 'post version')),
     quotedPost:
       record.quotedPost === null
         ? null

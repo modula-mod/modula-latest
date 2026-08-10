@@ -55,7 +55,8 @@ export function FeedPostItem({post}: FeedPostItemProps) {
   const session = useSession()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(post.author, ownerProfileId)
-  const overflowActions = buildPostOverflowActions(post)
+  const isOwner = Boolean(ownerProfileId) && post.author.id === ownerProfileId
+  const overflowActions = buildPostOverflowActions(post, {isOwner})
   const runOverflow = (id: string) => {
     void runPostOverflowAction(id as PostOverflowActionId, post)
   }
