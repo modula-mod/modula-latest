@@ -1,0 +1,61 @@
+{
+  "mcpServers": {
+    "expo": {
+      "type": "http",
+      "url": "https://mcp.expo.dev/mcp"
+    },
+    "mobile-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mobilenext/mobile-mcp@latest"
+      ],
+      "env": {
+        "MOBILEMCP_ALLOW_UNSAFE_URLS": "1"
+      }
+    },
+    "metro-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "metro-mcp"
+      ],
+      "env": {}
+    },
+    "figma-console": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://figma-console-mcp.southleft.com/sse"
+      ],
+      "env": {}
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--no-usage-statistics"
+      ],
+      "env": {}
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp/oauth"
+    }
+  }
+}

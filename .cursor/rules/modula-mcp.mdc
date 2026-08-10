@@ -1,0 +1,23 @@
+---
+description: MCP authority hierarchy for Modula coding agents (Expo, Mobile, Metro, Context7, Figma, GitHub, browser)
+alwaysApply: true
+---
+
+# Modula MCP authority
+
+Full rules: `CLAUDE.md`. Do not duplicate large policy here.
+
+## Authority order
+
+1. Installed versions in this repo (`package.json` / lockfile)
+2. Modula architecture + dependency skills under `.cursor/skills/`
+3. Expo MCP for Expo/EAS guidance; Context7 for third-party library docs
+4. Runtime debug: Metro MCP → Expo local MCP → Mobile MCP → Chrome DevTools / Playwright
+5. Figma Console MCP for design context (read-only default); no mass token migration
+6. GitHub MCP read-first; never commit PATs
+
+## Scope guardrails
+
+- Prefer docs/config/rules over app refactors for tooling missions
+- Preserve uncommitted work and running tunnels (e.g. port 4020)
+- Apple Docs/HIG MCP is optional; use apple.com docs unless a team-approved MCP exists
