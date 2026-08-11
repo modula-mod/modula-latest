@@ -1,0 +1,27 @@
+=== me ===
+{"ok":true,"data":{"accountId":"019ff2ff-a54b-7b95-a594-84fb3d9b7274","primaryHandle":"p7j488267","status":"active","createdAt":"2026-08-11T22:44:28.107Z","updatedAt":"2026-08-11T22:45:13.541Z","email":"phase7j.mac.a.1786488267@modula.test"},"meta":{"requestId":"fc6dcb46-7665-4800-8e4c-23bbf7677a76","serverTime":"2026-08-11T22:46:03.458Z"}}
+HTTP=200
+
+=== refresh ===
+ok True http 200
+accessToken len 43
+refreshToken len 64
+sessionId len 36
+
+=== me after refresh ===
+http 200 ok True handle p7j488267 status active
+
+=== logout ===
+{"ok":true,"data":{"revoked":true},"meta":{"requestId":"0f4f7c05-c48d-453a-b866-257519b2efb5","serverTime":"2026-08-11T22:46:03.875Z"}}
+HTTP=200
+
+=== me after logout ===
+{"ok":false,"error":{"code":"UNAUTHENTICATED","message":"Authentication required","requestId":"dbcfbf99-a6f2-4396-ae6f-88ed5e7d1610","retryable":false},"meta":{"requestId":"dbcfbf99-a6f2-4396-ae6f-88ed5e7d1610","serverTime":"2026-08-11T22:46:03.955Z"}}
+HTTP=401
+
+=== re-login ===
+http 200 ok True session True
+
+=== wrong otp ===
+{"ok":false,"error":{"code":"CHALLENGE_INVALID","message":"Challenge invalid","requestId":"3881d613-d7be-48c1-8966-699ecc93fe0c","retryable":false},"meta":{"requestId":"3881d613-d7be-48c1-8966-699ecc93fe0c","serverTime":"2026-08-11T22:46:04.210Z"}}
+HTTP=401

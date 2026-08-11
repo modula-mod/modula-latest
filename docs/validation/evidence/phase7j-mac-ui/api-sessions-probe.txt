@@ -1,0 +1,47 @@
+=== GET /v1/meta or health variants ===
+GET /v1/health/live -> 200
+GET /v1/metadata -> 404
+GET /metadata -> 404
+GET /v1/system/metadata -> 404
+GET /.well-known/modula.json -> 404
+
+=== POST /v1/sessions wrong password ===
+{"ok":false,"error":{"code":"INVALID_CREDENTIALS","message":"Invalid credentials","requestId":"b35d1fb1-abcc-42c0-af3f-7a9f4edba1b5","retryable":false},"meta":{"requestId":"b35d1fb1-abcc-42c0-af3f-7a9f4edba1b5","serverTime":"2026-08-11T22:40:11.486Z"}}
+HTTP=401
+
+36:function decodeRegisterPending(value: unknown, email: string): RegisterPendingResult {
+40:    email,
+56:            channel: 'email' as const,
+60:                : email,
+84:  const list = Array.isArray(value) ? value : asRecord(value, 'sessions').items
+116:      {path: '/v1/sessions', body: credentials},
+122:  requestEmailSignInCode(email: string): Promise<EmailCodeRequestResult> {
+125:        path: '/v1/sessions/email-code/request',
+126:        body: {email: email.trim().toLowerCase()},
+129:        const row = asRecord(value, 'email code request')
+130:        const delivery = asRecord(row.delivery, 'email code delivery')
+136:            channel: 'email',
+147:        path: '/v1/sessions/email-code',
+149:          email: input.email.trim().toLowerCase(),
+160:    const email = input.email.trim().toLowerCase()
+165:          email,
+166:          password: input.password,
+173:      value => decodeRegisterPending(value, email),
+180:        path: '/v1/accounts/verify-email',
+186:        const row = asRecord(value, 'verify email')
+216:  resendVerification(email: string): Promise<{resent: boolean}> {
+218:      {path: '/v1/accounts/resend-verification', body: {email: email.trim().toLowerCase()}},
+228:      {path: '/v1/sessions/refresh', body: {refreshToken}},
+248:  getMe(): Promise<GreenfieldAccount & {email?: string}> {
+281:      {path: '/v1/accounts/me/sessions', authenticated: true},
+288:      {path: `/v1/sessions/${encodeURIComponent(sessionId)}`, authenticated: true},
+295:      {path: '/v1/accounts/me/sessions', authenticated: true},
+302:      {path: '/v1/accounts/me/password', body: input, authenticated: true},
+308:    return this.client.post({path: '/v1/accounts/forgot-password', body: input}, value => {
+309:      const row = asRecord(value ?? {accepted: true}, 'forgot password')
+315:    return this.client.post({path: '/v1/accounts/reset-password', body: input}, value => {
+316:      const row = asRecord(value ?? {reset: true}, 'reset password')
+340:      .delete({path: '/v1/sessions/current', authenticated: true}, () => undefined)
+362:      throw Object.assign(new Error('Verify your email before signing in.'), {
+364:        email: account.email,
+383:  private async fetchProfile(account: GreenfieldAccount & {email?: string}) {

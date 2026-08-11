@@ -1,0 +1,7 @@
+=== POST /v1/accounts/register (expect closed or validation) ===
+{"ok":true,"data":{"accountId":"019ff2ff-a54b-7b95-a594-84fb3d9b7274","primaryHandle":"p7j488267","status":"pendingVerification","verificationChallengeId":"019ff2ff-a56c-791b-9696-39fcb6f0e2ab","verificationExpiresAt":"2026-08-12T22:44:28.140Z","verificationDelivery":{"channel":"email","recipient":"p•••••@modula.test"}},"meta":{"requestId":"6fc345d3-cf15-46bf-84f5-f4491f850ffc","serverTime":"2026-08-11T22:44:28.152Z"}}
+HTTP=201
+
+=== email code request unknown ===
+{"ok":true,"data":{"requested":true,"challengeId":"019ff2ff-a5ea-72f1-a843-cc7942750b60","expiresAt":"2026-08-11T22:54:28.266Z","delivery":{"channel":"email","recipient":"n•••••@example.com"}},"meta":{"requestId":"60751704-7288-4ae8-bb8a-8b47599fb237","serverTime":"2026-08-11T22:44:28.268Z"}}
+HTTP=200
