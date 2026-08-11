@@ -28,22 +28,22 @@ Mission C consolidates Phase 7I Mac acceptance + Phase 7J product convergence in
 
 | Gate | Command | Result | Notes |
 |---|---|---|---|
-| Frozen install | `pnpm install --frozen-lockfile` | _see CI log_ | Lockfile integrity |
-| Expo deps check | `pnpm exec expo install --check` | _see CI log_ | SDK alignment |
-| Expo doctor | `pnpm exec expo-doctor` | _see CI log_ | Project health |
-| Lint | `pnpm lint` | _see CI log_ | |
-| Typecheck | `pnpm typecheck` | _see CI log_ | |
-| Web build | `pnpm build:web` | _see CI log_ | Production export |
-| Web build verify | `pnpm verify:web-build` | _see CI log_ | |
-| Phase 7J verify | `pnpm verify:phase7j` | _see CI log_ | Aggregator |
-| Phase 7I source gates | `pnpm verify:phase7i-source` (if present) | _see CI log_ | |
+| Frozen install | `pnpm install --frozen-lockfile` | **PASS** | Already up to date |
+| Expo deps check | `pnpm exec expo install --check` | **PASS** | Dependencies up to date |
+| Expo doctor | `pnpm exec expo-doctor` | **PARTIAL** | 18/20 — duplicate `expo-constants` patch level (57.0.9 vs 57.0.10); prebuild/CNG config advisory (pre-existing) |
+| Lint | `pnpm lint` | **PASS** | |
+| Typecheck | `pnpm typecheck` | **PASS** | |
+| Web build | `pnpm build:web` | **PASS** | `dist/` 199 routes, marker `d540db1` |
+| Web build verify | `pnpm verify:web-build` | **PASS** | 200 files scanned |
+| Phase 7J verify | `pnpm verify:phase7j` | **PASS** | |
+| Phase 7I canonical source | `pnpm verify:phase7i-canonical-source` | **PASS** | 1644 files |
 
 ## Native build gate (§144)
 
 | Gate | Command | Result | Notes |
 |---|---|---|---|
-| Pod install | `pnpm exec pod-install` (ios/) | _see log_ | |
-| Xcode build | `xcodebuild … -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` | _see log_ | Debug simulator |
+| Pod install | `pod install` (ios/) | **PASS** | |
+| Xcode build | `xcodebuild -workspace Modula.xcworkspace -scheme Modula -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build` | **PASS** | Debug simulator, exit 0 (~2.5 min) |
 
 ## Product gates (Phase 7J — pre-consolidation)
 
