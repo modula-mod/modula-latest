@@ -50,6 +50,8 @@ export type SocialPostDto = {
   likeCount: number
   replyCount: number
   repostCount: number
+  quoteCount: number
+  quotedPost?: SocialPostDto | null
   kind: PostKind
   audience?: PostAudience
   version?: number

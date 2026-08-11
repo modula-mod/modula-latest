@@ -873,7 +873,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const blocked = await moderation.blockedSet(viewerActorId)
       const muted = await moderation.mutedSet(viewerActorId)
       const excluded = Array.from(new Set([...blocked, ...muted]))
-      const items = await posts.listHome(mode, limit, cursor, excluded)
+      const items = await posts.listHome(mode, limit, cursor, excluded, viewerActorId)
       const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
       return reply.send(successEnvelope(page, request.id))
     } catch (error: any) {
