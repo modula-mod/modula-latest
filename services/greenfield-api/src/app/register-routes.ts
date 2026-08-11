@@ -103,6 +103,34 @@ function requestIpHash(request: {ip?: string}, config: AppConfig): string | unde
   return createHash('sha256').update(`${config.sessionPepper ?? ''}:ip:${ip}`).digest('hex')
 }
 
+function releaseIdentity(config: AppConfig) {
+  const releaseSha = process.env.MODULA_RELEASE_SHA ?? 'unknown'
+  const workerReleaseSha = process.env.MODULA_WORKER_RELEASE_SHA ?? releaseSha
+  const mailProvisionerReleaseSha = process.env.MODULA_MAIL_PROVISIONER_RELEASE_SHA ?? workerReleaseSha
+  const mailProvisionerMode =
+    process.env.MODULA_MAIL_PROVISIONER_MODE ?? (config.environment === 'production' ? 'disabled' : 'dry-run')
+
+  return {
+    app: 'modula',
+    service: 'greenfield-api',
+    version: '0.1.0',
+    phase: 'phase7i-f5b',
+    commit: releaseSha,
+    builtAt: process.env.MODULA_RELEASE_BUILT_AT ?? null,
+    environment: config.environment,
+    apiOrigin: config.publicApiUrl,
+    worker: {
+      service: 'greenfield-worker',
+      expectedCommit: workerReleaseSha,
+    },
+    mailProvisioner: {
+      service: 'modula-mail-provisioner',
+      expectedCommit: mailProvisionerReleaseSha,
+      mode: mailProvisionerMode,
+    },
+  }
+}
+
 export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db)
@@ -172,6 +200,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const writeConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 30, timeWindow: '1 minute'}}} : {}
 
   const mutationsAllowed = config.mutationsEnabled
+
+  app.get('/version.json', healthConfig, async (_request, reply) => {
+    return reply.header('Cache-Control', 'no-store').send(releaseIdentity(config))
+  })
+
+  app.get('/v1/version', healthConfig, async (request, reply) => {
+    return reply.header('Cache-Control', 'no-store').send(successEnvelope(releaseIdentity(config), request.id))
+  })
 
   app.get('/v1/health/live', healthConfig, async (request, reply) => {
     return reply.send(successEnvelope({status: 'live'}, request.id))

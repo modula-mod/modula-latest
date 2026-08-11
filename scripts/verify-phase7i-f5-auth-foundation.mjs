@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs'
 import path from 'node:path'
-import {execSync} from 'node:child_process'
+import {execFileSync, execSync} from 'node:child_process'
 
 const repoRoot = process.cwd()
 const target = process.argv[2] ?? 'all'
@@ -178,6 +178,9 @@ const checks = {
   'live-web-release': [
     currentReleaseSymlinkMatchesHead(),
     publicVersionMatchesHead('https://modula.digital/version.json'),
+    publicApiVersionMatchesHead('https://api.modula.digital/version.json'),
+    dockerContainerRevisionMatchesHead('modula-production-greenfield-api-1', 'greenfield-api'),
+    dockerContainerRevisionMatchesHead('modula-production-greenfield-worker-1', 'greenfield-worker'),
     publicJsonDocument('https://modula.digital/.well-known/apple-app-site-association', 'AASA', json =>
       Array.isArray(json?.applinks?.details) &&
       json.applinks.details.some(detail => Array.isArray(detail.appIDs) && detail.appIDs.includes('M29V4ZGUNK.digital.modula.app')) &&
@@ -286,6 +289,53 @@ function publicVersionMatchesHead(url) {
     return commit === head
       ? {ok: true, message: `${url} commit ${commit}`}
       : {ok: false, message: `${url} commit ${String(commit)} does not match ${head}`}
+  }
+}
+
+function publicApiVersionMatchesHead(url) {
+  return async () => {
+    const head = currentHead()
+    const fetched = await fetchJson(url)
+    if (!fetched.ok) return fetched
+    const payload = fetched.json?.data ?? fetched.json
+    const mismatches = []
+    if (payload?.commit !== head) mismatches.push(`api commit ${String(payload?.commit)}`)
+    if (payload?.worker?.expectedCommit !== head) {
+      mismatches.push(`worker expectedCommit ${String(payload?.worker?.expectedCommit)}`)
+    }
+    if (payload?.mailProvisioner?.expectedCommit !== head) {
+      mismatches.push(`mailProvisioner expectedCommit ${String(payload?.mailProvisioner?.expectedCommit)}`)
+    }
+    if (!payload?.mailProvisioner?.mode) mismatches.push('mailProvisioner mode missing')
+    return mismatches.length === 0
+      ? {
+          ok: true,
+          message: `${url} api/worker/mail-provisioner commit ${head} mode ${payload.mailProvisioner.mode}`,
+        }
+      : {ok: false, message: `${url} release identity mismatch: ${mismatches.join(', ')}; expected ${head}`}
+  }
+}
+
+function dockerContainerRevisionMatchesHead(containerName, serviceName) {
+  return () => {
+    const head = currentHead()
+    try {
+      const raw = execFileSync('docker', ['inspect', containerName, '--format', '{{json .Config.Labels}}'], {
+        encoding: 'utf8',
+      }).trim()
+      const labels = JSON.parse(raw || '{}')
+      const revision = labels?.['org.opencontainers.image.revision']
+      return revision === head
+        ? {ok: true, message: `${serviceName} container ${containerName} revision ${revision}`}
+        : {ok: false, message: `${serviceName} container ${containerName} revision ${String(revision)} expected ${head}`}
+    } catch (error) {
+      return {
+        ok: false,
+        message: `${serviceName} container ${containerName} inspect failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      }
+    }
   }
 }
 

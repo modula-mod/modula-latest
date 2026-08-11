@@ -50,6 +50,11 @@ services:
     env_file:
       - /etc/modula/greenfield-api.env
       - /etc/modula/backend-fabric.env
+    environment:
+      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
+      MODULA_WORKER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
     volumes:
       - /var/lib/modula/greenfield-media:/var/lib/modula/greenfield-media
     ports:
@@ -85,6 +90,10 @@ services:
     env_file:
       - /etc/modula/greenfield-worker.env
       - /etc/modula/backend-fabric.env
+    environment:
+      MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
+      MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
+      MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     depends_on:

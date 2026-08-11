@@ -22,6 +22,10 @@ describeIf('Modula API integration', () => {
     process.env.MODULA_ALLOWED_ORIGINS = 'https://modula.digital,http://localhost:8081'
     process.env.MODULA_PREVIEW_WRITES_ENABLED = 'true'
     process.env.MODULA_RATE_LIMIT_ENABLED = 'true'
+    process.env.MODULA_RELEASE_SHA = 'test-api-sha'
+    process.env.MODULA_RELEASE_BUILT_AT = '2026-08-11T00:00:00.000Z'
+    process.env.MODULA_WORKER_RELEASE_SHA = 'test-worker-sha'
+    process.env.MODULA_MAIL_PROVISIONER_RELEASE_SHA = 'test-provisioner-sha'
     await migrateUp(databaseUrl!)
     await runSeed(databaseUrl!)
     const created = await createServer(loadConfig())
@@ -58,6 +62,23 @@ describeIf('Modula API integration', () => {
     const res = await app.inject({method: 'GET', url: '/v1/health/ready'})
     expect(res.statusCode).toBe(200)
     expect(res.json().data.status).toBe('ready')
+  })
+
+  it('exposes release identity without secrets', async () => {
+    const plain = await app.inject({method: 'GET', url: '/version.json'})
+    expect(plain.statusCode).toBe(200)
+    expect(plain.json()).toMatchObject({
+      app: 'modula',
+      service: 'greenfield-api',
+      commit: 'test-api-sha',
+      worker: {service: 'greenfield-worker', expectedCommit: 'test-worker-sha'},
+      mailProvisioner: {service: 'modula-mail-provisioner', expectedCommit: 'test-provisioner-sha'},
+    })
+    expect(JSON.stringify(plain.json())).not.toMatch(/token|password|secret/i)
+
+    const version = await app.inject({method: 'GET', url: '/v1/version'})
+    expect(version.statusCode).toBe(200)
+    expect(version.json().data.commit).toBe('test-api-sha')
   })
 
   it('returns metadata capabilities', async () => {
