@@ -31,9 +31,9 @@ Status: **PASS** | **PARTIAL** | **FAIL / MISSING** | **BLOCKED_BACKEND**
 
 | Feature | Client | API | Priority | Notes |
 |---|---|---|---|---|
-| Product Hub / modules / Vault Notes | PASS | PASS | P0 | Registry-backed catalogue/install; Board widget honest install state; install errors surfaced (`f34c288`) |
-| Appearance / Settings | PARTIAL | PASS | P1 | Theme sync real; some Preview rows remain labs-visible |
-| Drawer | PASS | N/A | P1 | Crash + restore fixed; Preview profile gated |
+| Product Hub / modules / Vault Notes | PASS | PASS | P0 | Install + enable E2E: `019fefb7…` → `enabled`; records CRUD after enable; Board widget honest state (`f34c288`) |
+| Appearance / Settings | PARTIAL | PASS | P1 | Theme sync real; MotionTokens in drawer/feed/modals (`b52cded`); some Preview rows remain labs-visible |
+| Drawer | PASS | N/A | P1 | MotionTokens springs + cancelAnimation stress fix; Reduce Motion fade-only path |
 | UI Lab `/dev/ui-lab` | PARTIAL | N/A | P2 | Present as `/settings/developer/expo-ui`; rename/route |
 | Production Preview mocks | PASS | N/A | P0 | Expansion/lab destinations `devOnly`; engagement Preview overflow labs-only |
 
@@ -52,7 +52,7 @@ Greenfield account session tokens (`POST /v1/sessions`) previously authenticated
 7. ~~Notification generation proof~~ **PASS**
 8. ~~Quote acceptance~~ **PASS**
 9. ~~Vault Notes / Product Hub honesty~~ **PASS**
-10. MotionTokens adoption (springs + Reduce Motion) across drawer/feed — started earlier
+10. ~~MotionTokens adoption (springs + Reduce Motion) across drawer/feed~~ **PASS**
 
 ## Evidence
 
@@ -61,7 +61,9 @@ Greenfield account session tokens (`POST /v1/sessions`) previously authenticated
 - Reactions: post `794da78d-266c-4ceb-9220-cb0b8f69a94e` transition log (like→celebrate→insightful→like→curious→clear, `total` stayed ≤1)
 - Stories: group `c2639656-ec3f-48d9-b233-f4e277348ebb` / item `48932789-5a3d-4219-aa1e-568c918d0c62`
 - Notifications: follow → `0b4a774e-…` then mark-read set `readAt`
-- Commits (this queue): `e7c2dd4` edit · `2141c59` moderation+auth bridge · `1e58586` Preview gate · `cbb6bb7` reactions · `3660958` stories · `947f218` matrix · `c4c1d5a` comment replies · `e29b789` quote hydrate · `f34c288` product hub honesty
+- Commits (this queue): `e7c2dd4` edit · `2141c59` moderation+auth bridge · `1e58586` Preview gate · `cbb6bb7` reactions · `3660958` stories · `947f218` matrix · `c4c1d5a` comment replies · `e29b789` quote hydrate · `f34c288` product hub honesty · `b52cded` motion tokens
 - Comments E2E: post `acd445d1…` → comment `a15431e1…` → reply `05ef7541…` depth 1
 - Quote E2E: source `9e68b640…` quoted by post with embedded `quotedPost.id` + source `quoteCount=1`
-- Vault Notes: `POST /v1/modules/digital.modula.vault-notes/install` → `installationId` `019fefb7…`; registry lists 11 modules
+- Vault Notes: install `019fefb7…` → enable → `GET records/note` ok → create `019fefbd-51d3…`; views `available=true`
+- Motion: `useMotionEntering` + drawer `cancelAnimation` rapid toggle; feed sticky modes use `motion.springs.navigation`
+- Simulator reply thread screenshots: **SKIPPED** (no booted iOS Simulator; Mobile MCP unavailable)
