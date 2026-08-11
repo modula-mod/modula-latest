@@ -1,0 +1,4 @@
+=== homepage ===
+HTTP=200
+asset_candidates 1
+checked 1 bad 0

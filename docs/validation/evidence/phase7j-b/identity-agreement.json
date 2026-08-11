@@ -1,0 +1,33 @@
+{
+  "sha": "b5252d5f7654547ff8aa75498bd205336692cd99",
+  "web": {
+    "app": "modula",
+    "version": "0.1.0",
+    "phase": "phase7e-block14",
+    "commit": "b5252d5f7654547ff8aa75498bd205336692cd99",
+    "branch": "phase7j-product-convergence",
+    "builtAt": "2026-08-11T22:56:05.458Z",
+    "environment": "production",
+    "dataSource": "remote",
+    "apiOrigin": "https://api.modula.digital"
+  },
+  "api": {
+    "app": "modula",
+    "service": "greenfield-api",
+    "version": "0.1.0",
+    "phase": "phase7i-f5b",
+    "commit": "b5252d5f7654547ff8aa75498bd205336692cd99",
+    "builtAt": "2026-08-11T22:57:07Z",
+    "environment": "production",
+    "apiOrigin": "https://api.modula.digital",
+    "worker": {
+      "service": "greenfield-worker",
+      "expectedCommit": "b5252d5f7654547ff8aa75498bd205336692cd99"
+    },
+    "mailProvisioner": {
+      "service": "modula-mail-provisioner",
+      "expectedCommit": "b5252d5f7654547ff8aa75498bd205336692cd99",
+      "mode": "disabled"
+    }
+  }
+}

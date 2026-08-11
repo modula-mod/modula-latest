@@ -1,0 +1,43 @@
+A macbf7e269 019fedb3-9ec4-7f7a-8555-06c02421832e
+B p7jb489287 019ff30f-3327-79bb-8903-c9267184dd11
+profileB 200 ['id', 'handle', 'displayName', 'kind', 'bio', 'followerCount', 'followingCount', 'moduleCount', 'postCount', 'joinedAt', 'focusStatus', 'identityClaims']
+profile_id profile-019ff30f-3327-79bb-8903-c9267184dd11
+follow 200 True {'profile': {'id': 'profile-019ff30f-3327-79bb-8903-c9267184dd11', 'handle': 'p7jb489287', 'displayName': 'Phase7JB B', 'kind': 'person', 'bio': '', 'followerCount': 1, 'followingCount': 0, 'moduleCount': 0, 'postCount': 0, 'joinedAt': '2026-08-11T23:01:41.422Z', 'focusStatus': {'id': 'available', 'label': 'Available', 'message': 'Ready in Modula', 'updatedAt': '2026-08-11T23:01:41.422Z'}, 'identityClaims': [], 'links': [], 'featuredModuleIds': [], 'isFollowing': True, 'followsViewer': False, 'version': 1}, 'isFollowing': True, 'followerCount': 1}
+text_post 201 True dict_keys(['id', 'author', 'createdAt', 'feed', 'text', 'liked', 'saved', 'reposted', 'likeCount', 'replyCount', 'repostCount', 'quoteCount', 'kind'])
+POST_ID 8bec6b58-c7b2-47e8-8a21-0461cf7916a8
+react2 like 200 True ['viewerReaction', 'total', 'byType']
+react2 love 200 True ['viewerReaction', 'total', 'byType']
+react2 laugh 200 True ['viewerReaction', 'total', 'byType']
+react2 fire 200 True ['viewerReaction', 'total', 'byType']
+react2 Like 200 True ['viewerReaction', 'total', 'byType']
+react2 Love 200 True ['viewerReaction', 'total', 'byType']
+react2 Laugh 200 True ['viewerReaction', 'total', 'byType']
+react2 Fire 200 True ['viewerReaction', 'total', 'byType']
+like 200 True {'ok': True}
+comment 201 True ['comment_id', 'post_id', 'author_actor_id', 'parent_comment_id', 'root_comment_id', 'text', 'depth', 'reply_count']
+save 200 True {'ok': True}
+repost 200 True {'ok': True}
+share 404 None Not Found
+story 400 False {'code': 'VALIDATION_FAILED', 'message': 'Story media payload is required', 'requestId': '51f7cd2f-b340-4e68-a0ce-8e7b98e08321', 'retryable': False}
+rail 200 count 2 first p7jb489287
+notif /v1/notifications 200 True items
+notif /v1/activity 200 True items
+pids profile-019fedb3-9ec4-7f7a-8555-06c02421832e profile-019ff30f-3327-79bb-8903-c9267184dd11
+disp_post ddf51347-5072-47e1-b3d6-925287f03c12
+comment 201 True {'comment_id': '64f228fd-1911-4120-ad03-fc8cf45276f4', 'post_id': 'ddf51347-5072-47e1-b3d6-925287f03c12', 'author_actor_id': 'actor-019ff30f-3327-79bb-8903-c9267184dd11', 'parent_comment_id': None, 'root_comment_id': None, 'text': 'B comment', 'depth': 0, 'reply_count': 0, 'version': 1, 'created_at': '2026-08-11T23:02:55.232Z', 'updated_at': '2026-08-11T23:02:55.232Z', 'deleted_at': None, 'deletion_kind': None}
+reply 201 True {'comment_id': '152ec6bb-2463-4ecf-a309-7bdf3556ff27', 'post_id': 'ddf51347-5072-47e1-b3d6-925287f03c12', 'author_actor_id': 'actor-019fedb3-9ec4-7f7a-8555-06c02421832e', 'parent_comment_id': None, 'root_comment_id': None, 'text': 'A reply', 'depth': 0, 'reply_count': 0, 'version': 1, 'created_at': '2026-08-11T23:02:55.313Z', 'updated_at': '2026-08-11T23:02:55.313Z', 'deleted_at': None, 'deletion_kind': None}
+mute 200 True {'muted': True}
+unmute 400 None Bad Request
+block 200 True {'blocked': True}
+unblock 400 None Bad Request
+report 500 False {'code': 'SERVER_ERROR', 'message': 'Report failed', 'requestId': 'c5af5e20-0846-4cbc-a78a-5ec5bf0861ff', 'retryable': False}
+report alt 500 False {'code': 'SERVER_ERROR', 'message': 'Report failed', 'requestId': 'a3880f44-a0f6-4491-bc25-42ce0dd4c773', 'retryable': False}
+report alt 500 False {'code': 'SERVER_ERROR', 'message': 'Report failed', 'requestId': '28b98317-a168-4231-b4d6-5e6ebff8761f', 'retryable': False}
+report alt 500 False {'code': 'SERVER_ERROR', 'message': 'Report failed', 'requestId': '27b3b808-8475-4d73-a687-aa35e1802920', 'retryable': False}
+media /v1/media 404 None Not Found
+media /v1/media/upload 404 None Not Found
+media /v1/stories/media 404 None Not Found
+media /v1/uploads 404 None Not Found
+final_react_fire 403 False None
+notifA 200 n 8 sample {'id': '4b342987-2f33-44c6-8a3e-3f7c2faa2f3e', 'type': 'repost', 'category': 'social', 'channels': ['in-app'], 'aggregateCount': 1, 'body': 'reposted your post', 'actorId': 'actor-019ff30f-3327-79bb-8903-c9267184dd11', 'resourceType': 'post', 'resourceId': '8bec6b58-c7b2-47e8-8a21-0461cf7916a8', 'readAt': None, 'createdAt': '2026-08-11T23:02:43.564Z'}
+GOLDEN_CONTINUE_DONE

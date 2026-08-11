@@ -1,0 +1,31 @@
+=== git candidate ===
+b5252d5f7654547ff8aa75498bd205336692cd99
+
+=== web version.json ===
+{
+  "app": "modula",
+  "version": "0.1.0",
+  "phase": "phase7e-block14",
+  "commit": "b5252d5f7654547ff8aa75498bd205336692cd99",
+  "branch": "phase7j-product-convergence",
+  "builtAt": "2026-08-11T22:56:05.458Z",
+  "environment": "production",
+  "dataSource": "remote",
+  "apiOrigin": "https://api.modula.digital"
+}
+
+
+=== api version.json ===
+{"app":"modula","service":"greenfield-api","version":"0.1.0","phase":"phase7i-f5b","commit":"b5252d5f7654547ff8aa75498bd205336692cd99","builtAt":"2026-08-11T22:57:07Z","environment":"production","apiOrigin":"https://api.modula.digital","worker":{"service":"greenfield-worker","expectedCommit":"b5252d5f7654547ff8aa75498bd205336692cd99"},"mailProvisioner":{"service":"modula-mail-provisioner","expectedCommit":"b5252d5f7654547ff8aa75498bd205336692cd99","mode":"disabled"}}
+
+=== health live ===
+{"ok":true,"data":{"status":"live"},"meta":{"requestId":"81ea1715-e576-4c2c-9a77-c0d6df896bf8","serverTime":"2026-08-11T22:59:36.311Z"}}
+
+=== health ready ===
+{"ok":true,"data":{"status":"ready"},"meta":{"requestId":"c68dcfdd-dc13-495a-8860-a73a35cfbfc8","serverTime":"2026-08-11T22:59:36.446Z"}}
+
+=== meta ===
+{"ok":true,"data":{"apiVersion":"v1","protocolVersion":"0.1","backend":"greenfield","environment":"production","minimumClientVersion":"0.1.0","registration":{"mode":"open","emailVerificationRequired":true},"capabilities":{"publicRead":true,"authentication":true,"mutations":true,"mediaUpload":true,"atproto":false,"modules":false,"atprotoOAuth":false,"atprotoPublishing":false,"atprotoImport":false,"pdsPilot":false,"greenfieldAccounts":true,"greenfieldSessions":true,"greenfieldRepositories":true,"greenfieldExtensions":true,"greenfieldModuleRegistry":true,"greenfieldModuleInstallation":true,"greenfieldModuleDeclarativeContributions":true,"greenfieldModuleFirstPartyExecution":true,"greenfieldModuleRemoteFunctions":false,"greenfieldModuleCommunityExecution":false,"greenfieldModuleGithubSync":false,"greenfieldVaultNotesReference":true,"greenfieldDimon":false,"greenfieldAiGateway":true,"modulaMail":true,"inviteOnly":false,"atprotoBridgeOptional":true}},"meta":{"requestId":"1cd7cdf4-9f8e-4b2b-b22a-42b2202e1ff8","serverTime":"2026-08-11T22:59:36.572Z"}}
+
+=== stories rail ===
+{"ok":true,"data":{"items":[{"groupId":"c2639656-ec3f-48d9-b233-f4e277348ebb","ownerActorId":"actor-019fedb3-9ec4-7f7a-8555-06c02421832e","ownerProfileId":"profile-019fedb3-9ec4-7f7a-8555-06c02421832e","displayName":"Mac B Lab","handle":"macbf7e269","avatarUrl":null,"ringState":"unviewed","itemCount":1,"unviewedCount":1,"expiresAt":"2026-08-12T00:08:01.185Z","isOwner":false}]},"meta":{"requestId":"8b39848e-c693-4dcb-98e7-2f1d5d162ade","serverTime":"2026-08-11T22:59:36.695Z"}}

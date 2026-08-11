@@ -1,0 +1,24 @@
+$ node scripts/verify-phase7j-b.mjs
+Phase 7J-B cutover verifier
+cwd=/Users/msjoy/Developer/modula-latest
+PASS: docs/validation/phase7j-b-cutover-status.md contains "b5252d5"
+PASS: docs/validation/phase7j-b-cutover-status.md contains "Public identity agreement"
+PASS: docs/validation/evidence/phase7j-b/public-identity-proof.txt contains "b5252d5f7654547ff8aa75498bd205336692cd99"
+PASS: docs/validation/evidence/phase7j-b/vps-source-gates.txt contains "TYPECHECK_EXIT=0"
+PASS: docs/validation/evidence/phase7j-b/vps-source-gates.txt contains "VERIFY_PHASE7J_MAC_EXIT=0"
+PASS: docs/validation/evidence/phase7j-b/founder-otp-login.txt contains "handle modula_org"
+PASS: docs/validation/evidence/phase7j-b/ui-logout-otp.txt contains "welcome"
+PASS: docs/validation/evidence/phase7j-b/moderation-report.txt contains "report 201"
+PASS: docs/validation/evidence/phase7j-b/golden-path-api.txt contains "follow 200 True"
+PASS: docs/validation/evidence/phase7j-b/surface-http-smoke.txt contains "200 /sign-in"
+PASS: web commit b5252d5f7654547ff8aa75498bd205336692cd99
+PASS: api commit b5252d5f7654547ff8aa75498bd205336692cd99
+PASS: worker expectedCommit b5252d5f7654547ff8aa75498bd205336692cd99
+PASS: health live
+PASS: health ready
+PASS: SOURCE_FAILURE=0 recorded
+PASS: LIVE_DEPLOYMENT_FAILURE=0 recorded
+PASS: Phase 7K next-phase note present
+PASS: home screenshot evidence present
+---
+Phase 7J-B verifier PASS

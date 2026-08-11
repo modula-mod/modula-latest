@@ -1,0 +1,12 @@
+SHOT 10-sign-in-wide
+SHOT 11-home-after-login
+URL https://modula.digital/
+BODY_SNIP "\nModula\n\n\nY\n+\nYou\n\nFocus mode is on\nLight Focus is active. Quiet Feed is reducing algorithmic recommendations. Work First is prioritising modules and project updates.\n\n\nMerge Feeds · 2 sources (local Preview)\n\nModules\nFollowing\nFor You\nMB\nWhat are you building?\n\nMB\nMac B Lab\n@macbf7e269 · 3m"
+SHOT 12-home-after-reload
+RELOAD_URL https://modula.digital/
+RELOAD_HAS_SIGNIN false
+SHOT 13-settings
+CLEARED_STORAGE_FALLBACK
+SHOT 14-after-logout
+POST_LOGOUT_URL https://modula.digital/
+POST_LOGOUT_SIGNIN false
