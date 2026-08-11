@@ -74,7 +74,10 @@ export function useCommentMutations(postId: PostId) {
         {path: `/v1/comments/${encodeURIComponent(commentId)}/replies`, body: {text}, authenticated: true},
         decodeComment,
       ),
-    onSuccess: refresh,
+    onSuccess: (_data, variables) => {
+      refresh()
+      queryClient.invalidateQueries({queryKey: queryKeys.comments.replies(variables.commentId)})
+    },
   })
   const edit = useMutation({
     mutationFn: ({commentId, text, expectedVersion}: {commentId: string; text: string; expectedVersion: number}) =>
