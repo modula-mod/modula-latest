@@ -77,7 +77,7 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
 
 export function HomeFeedScreen() {
   const router = useRouter()
-  const {colours} = useThemeTokens()
+  const {colours, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
   // Transparent header + nested Animated.FlatList does not reliably get UIKit
@@ -191,10 +191,10 @@ export function HomeFeedScreen() {
   useEffect(() => {
     if (!refreshing) return
     const id = setTimeout(() => {
-      pullDistance.value = withTiming(0, {duration: 480})
+      pullDistance.value = withTiming(0, {duration: motion.slow})
     }, 100)
     return () => clearTimeout(id)
-  }, [pullDistance, refreshing])
+  }, [motion.slow, pullDistance, refreshing])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -334,7 +334,7 @@ function HomeLayoutHeader({
   reduceMotion: boolean
 }) {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, radius, spacing, motion} = useThemeTokens()
   const session = useSession()
   const storiesRail = useStoriesRailQuery()
   const storiesPeople =
@@ -358,6 +358,7 @@ function HomeLayoutHeader({
     scrollY,
     modeTabsStickAtY,
     reduceMotion,
+    motion.springs.selection,
   )
   const modeTabsInteractive = useInlineModeTabsInteractive(
     scrollY,

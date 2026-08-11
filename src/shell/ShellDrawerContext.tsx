@@ -14,6 +14,7 @@ import {
   useSharedValue,
   withSpring,
   withTiming,
+  cancelAnimation,
   type SharedValue,
 } from 'react-native-reanimated'
 
@@ -76,11 +77,12 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
   }, [setPhase])
 
   const openDrawer = useCallback(() => {
-    if (phaseRef.current === 'opening' || phaseRef.current === 'open') {
+    if (phaseRef.current === 'open') {
       return
     }
     afterCloseRef.current = undefined
     setPhase('opening')
+    cancelAnimation(progress)
     // Reanimated shared value, not React state.
     // eslint-disable-next-line react-hooks/immutability
     progress.value = withSpring(1, drawerSpring, finished => {
@@ -90,13 +92,19 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
 
   const closeDrawer = useCallback(
     (options?: CloseDrawerOptions) => {
-      if (phaseRef.current === 'closing' || phaseRef.current === 'closed') {
+      if (phaseRef.current === 'closed') {
         return
       }
       afterCloseRef.current = options?.afterClose
       setPhase('closing')
-      // Reanimated shared value, not React state.
-      // eslint-disable-next-line react-hooks/immutability
+      cancelAnimation(progress)
+      if (motion.fast === 0) {
+        // Reduce Motion: snap closed without travel.
+        // eslint-disable-next-line react-hooks/immutability
+        progress.value = 0
+        finishClose()
+        return
+      }
       progress.value = withTiming(0, {duration: motion.fast}, finished => {
         if (finished) runOnJS(finishClose)()
       })
@@ -110,11 +118,16 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
       const velocityX = options?.velocityX ?? 0
       const at = options?.at ?? progress.value
       const shouldClose = at < 0.55 || velocityX < -600
+      cancelAnimation(progress)
       if (shouldClose) {
         afterCloseRef.current = undefined
         setPhase('closing')
-        // Reanimated shared value, not React state.
-        // eslint-disable-next-line react-hooks/immutability
+        if (motion.fast === 0) {
+          // eslint-disable-next-line react-hooks/immutability
+          progress.value = 0
+          finishClose()
+          return
+        }
         progress.value = withSpring(0, closeSpring, finished => {
           if (finished) runOnJS(finishClose)()
         })
@@ -125,7 +138,7 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
         if (finished) runOnJS(finishOpen)()
       })
     },
-    [closeSpring, drawerSpring, finishClose, finishOpen, progress, setPhase],
+    [closeSpring, drawerSpring, finishClose, finishOpen, motion.fast, progress, setPhase],
   )
 
   const value = useMemo<ShellDrawerContextValue>(

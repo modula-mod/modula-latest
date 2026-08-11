@@ -28,10 +28,6 @@ const COMPACT_SCALE = 0.94
 /** Unstick slightly before the stick line so snap-back doesn’t chatter. */
 const UNSTICK_SLOP = 18
 
-const ENTER_SPRING = {damping: 22, stiffness: 280, mass: 0.82}
-const SNAP_BACK_SPRING = {damping: 20, stiffness: 320, mass: 0.75}
-const EXIT_TIMING = {duration: 140, easing: Easing.out(Easing.cubic)}
-
 /**
  * Sticky handoff waits until ListHeader measures a real stick line.
  * `stickAtY === 0` means “not measured yet” — never latch (0 >= 0) into sticky.
@@ -85,8 +81,10 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {colours, radius, spacing, scheme} = useThemeTokens()
+  const {colours, radius, spacing, scheme, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const enterSpring = motion.springs.navigation
+  const exitTiming = {duration: motion.fast, easing: Easing.out(Easing.cubic)}
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
@@ -103,13 +101,13 @@ export function HomeStickyFeedModes({
       if (reduceMotion) {
         handoff.value = next
       } else if (next === 1) {
-        handoff.value = withSpring(1, ENTER_SPRING)
+        handoff.value = withSpring(1, enterSpring)
       } else {
-        handoff.value = withTiming(0, EXIT_TIMING)
+        handoff.value = withTiming(0, exitTiming)
       }
       runOnJS(setInteractive)(next === 1)
     },
-    [reduceMotion],
+    [enterSpring, exitTiming, reduceMotion],
   )
 
   const shellStyle = useAnimatedStyle(() => {
@@ -205,6 +203,7 @@ export function useInlineModeTabsStyle(
   scrollY: SharedValue<number>,
   stickAtY: SharedValue<number>,
   reduceMotion: boolean,
+  snapBackSpring = {damping: 24, stiffness: 320, mass: 0.8},
 ) {
   const visible = useSharedValue(1)
   const settleScale = useSharedValue(1)
@@ -223,10 +222,10 @@ export function useInlineModeTabsStyle(
       } else {
         visible.value = 1
         settleScale.value = COMPACT_SCALE
-        settleScale.value = withSpring(1, SNAP_BACK_SPRING)
+        settleScale.value = withSpring(1, snapBackSpring)
       }
     },
-    [reduceMotion],
+    [reduceMotion, snapBackSpring],
   )
 
   return useAnimatedStyle(() => {
