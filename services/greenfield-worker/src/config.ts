@@ -19,6 +19,11 @@ const envSchema = z.object({
     .optional()
     .transform(v => v === 'true'),
   MODULA_MAIL_TRANSPORT: z.enum(['disabled', 'log', 'smtp']).optional(),
+  MODULA_MAIL_PROVISIONER_MODE: z.enum(['disabled', 'dry-run', 'hestia']).optional(),
+  MODULA_MAIL_DOMAIN: z.string().min(1).default('modula.digital'),
+  MODULA_MAIL_HESTIA_USER: z.string().min(1).optional(),
+  MODULA_MAIL_PROVISIONER_COMMAND_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
+  MODULA_MAIL_DEFAULT_QUOTA_BYTES: z.coerce.number().int().positive().default(1_073_741_824),
   MODULA_MAIL_REQUIRED: z
     .string()
     .optional()
@@ -78,6 +83,11 @@ export type WorkerConfig = {
   ingestIntervalMs: number
   ingestEnabled: boolean
   mailTransport: 'disabled' | 'log' | 'smtp'
+  mailProvisionerMode: 'disabled' | 'dry-run' | 'hestia'
+  mailDomain: string
+  mailHestiaUser?: string
+  mailProvisionerCommandTimeoutMs: number
+  mailDefaultQuotaBytes: number
   mailRequired: boolean
   mailFrom: string
   smtpHost?: string
@@ -123,6 +133,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
 
   const environment = raw.MODULA_ENVIRONMENT
   const mailTransport = raw.MODULA_MAIL_TRANSPORT ?? (environment === 'production' ? 'smtp' : 'disabled')
+  const mailProvisionerMode = raw.MODULA_MAIL_PROVISIONER_MODE ?? (environment === 'production' ? 'disabled' : 'dry-run')
   const mailRequired = raw.MODULA_MAIL_REQUIRED === true || environment === 'production'
   const smtpPort = raw.MODULA_SMTP_PORT ?? 587
   const smtpSecure = raw.MODULA_SMTP_SECURE ?? smtpPort === 465
@@ -135,6 +146,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     if (!raw.MODULA_SMTP_USER || !raw.MODULA_SMTP_PASSWORD) {
       refuse('MODULA_SMTP_USER and MODULA_SMTP_PASSWORD are required for authenticated SMTP relay delivery')
     }
+  }
+  if (mailProvisionerMode === 'hestia' && !raw.MODULA_MAIL_HESTIA_USER) {
+    refuse('MODULA_MAIL_HESTIA_USER is required when MODULA_MAIL_PROVISIONER_MODE=hestia')
   }
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
   const encryptionKeysByVersion = new Map<number, Buffer>()
@@ -174,6 +188,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     ingestIntervalMs: raw.MODULA_WORKER_INGEST_INTERVAL_MS,
     ingestEnabled: Boolean(raw.MODULA_WORKER_INGEST_ENABLED),
     mailTransport,
+    mailProvisionerMode,
+    mailDomain: raw.MODULA_MAIL_DOMAIN,
+    mailHestiaUser: raw.MODULA_MAIL_HESTIA_USER,
+    mailProvisionerCommandTimeoutMs: raw.MODULA_MAIL_PROVISIONER_COMMAND_TIMEOUT_MS,
+    mailDefaultQuotaBytes: raw.MODULA_MAIL_DEFAULT_QUOTA_BYTES,
     mailRequired,
     mailFrom: raw.MODULA_MAIL_FROM ?? 'Modula <no-reply@modula.digital>',
     smtpHost: raw.MODULA_SMTP_HOST,

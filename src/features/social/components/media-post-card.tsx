@@ -407,7 +407,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
               onPress={() => toggleLike()}
               onLongPress={() => {
                 void selectionHaptic()
-                reaction.mutate({postId: post.id, reaction: 'celebrate'})
+                reaction.mutate({postId: post.id, reaction: 'fire'})
               }}
             />
             <TrayIcon

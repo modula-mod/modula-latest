@@ -213,7 +213,25 @@
     "api:dev": "pnpm --filter @modula/greenfield-api dev",
     "api:test": "pnpm --filter @modula/greenfield-api test",
     "worker:dev": "pnpm --filter @modula/greenfield-worker dev",
-    "worker:test": "pnpm --filter @modula/greenfield-worker test"
+    "worker:test": "pnpm --filter @modula/greenfield-worker test",
+    "verify:associated-domains": "node scripts/verify-associated-domains.mjs",
+    "verify:associated-domains:public": "node scripts/verify-associated-domains.mjs --public",
+    "verify:phase7i-f5": "node scripts/verify-phase7i-f5-auth-foundation.mjs phase7i-f5",
+    "verify:auth-password": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-password",
+    "verify:auth-email-otp": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-email-otp",
+    "verify:auth-totp": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-totp",
+    "verify:auth-passkeys": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-passkeys",
+    "verify:auth-recovery": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-recovery",
+    "verify:auth-sessions": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-sessions",
+    "verify:auth-step-up": "node scripts/verify-phase7i-f5-auth-foundation.mjs auth-step-up",
+    "verify:transactional-mail": "node scripts/verify-phase7i-f5-auth-foundation.mjs transactional-mail",
+    "verify:mail-identity": "node scripts/verify-phase7i-f5-auth-foundation.mjs mail-identity",
+    "verify:mail-provisioner": "node scripts/verify-phase7i-f5-auth-foundation.mjs mail-provisioner",
+    "verify:social": "node scripts/verify-phase7i-f5-auth-foundation.mjs social",
+    "verify:stories": "node scripts/verify-phase7i-f5-auth-foundation.mjs stories",
+    "verify:marketplace": "node scripts/verify-phase7i-f5-auth-foundation.mjs marketplace",
+    "verify:live-web-release": "node scripts/verify-phase7i-f5-auth-foundation.mjs live-web-release",
+    "verify:mainline": "node scripts/verify-phase7i-f5-auth-foundation.mjs mainline"
   },
   "private": true
 }

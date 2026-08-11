@@ -23,10 +23,13 @@ export function SignInScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{returnTo?: string; email?: string}>()
   const session = useSession()
-  const {signIn, continueAsDemo} = useSessionActions()
+  const {signIn, requestEmailSignInCode, signInWithEmailCode, continueAsDemo} = useSessionActions()
   const {spacing} = useThemeTokens()
   const [email, setEmail] = useState(typeof params.email === 'string' ? params.email : '')
   const [password, setPassword] = useState('')
+  const [emailCode, setEmailCode] = useState('')
+  const [emailCodeChallengeId, setEmailCodeChallengeId] = useState('')
+  const [emailCodeMessage, setEmailCodeMessage] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [emailError, setEmailError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(
@@ -63,6 +66,51 @@ export function SignInScreen() {
           ? error.message
           : 'Check your email and password, or verify your email first.'
       setFormError(message)
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const requestEmailCode = async () => {
+    const nextEmail = email.trim().toLowerCase()
+    if (!validEmail(nextEmail)) {
+      setError('Enter a valid email address.')
+      return
+    }
+    setPending(true)
+    setError(null)
+    try {
+      const requested = await requestEmailSignInCode(nextEmail)
+      setEmailCodeChallengeId(requested.challengeId)
+      setEmailCode('')
+      setEmailCodeMessage(`If available, a code was sent to ${requested.delivery.recipient}.`)
+    } catch {
+      setError('Modula could not request a sign-in code. Try again.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  const submitEmailCode = async () => {
+    const nextEmail = email.trim().toLowerCase()
+    if (!validEmail(nextEmail)) {
+      setError('Enter a valid email address.')
+      return
+    }
+    if (!emailCodeChallengeId || !emailCode.trim()) {
+      setError('Enter the sign-in code from your email.')
+      return
+    }
+    setPending(true)
+    setError(null)
+    try {
+      await signInWithEmailCode(
+        {email: nextEmail, challengeId: emailCodeChallengeId, code: emailCode.trim()},
+        returnTo,
+      )
+      setEmailCode('')
+    } catch {
+      setError('That sign-in code is invalid or expired.')
     } finally {
       setPending(false)
     }
@@ -114,6 +162,31 @@ export function SignInScreen() {
           <AppButton testID="sign-in-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Signing in' : 'Sign in'}
           </AppButton>
+          <AppButton variant="secondary" disabled={pending} onPress={() => void requestEmailCode()}>
+            Email me a sign-in code
+          </AppButton>
+          {emailCodeChallengeId ? (
+            <>
+              <AuthField
+                label="Email code"
+                value={emailCode}
+                onChangeText={setEmailCode}
+                autoCapitalize="none"
+                keyboardType="numeric"
+                textContentType="oneTimeCode"
+                returnKeyType="done"
+                onSubmitEditing={() => void submitEmailCode()}
+              />
+              <AppButton disabled={pending} onPress={() => void submitEmailCode()}>
+                {pending ? 'Checking code' : 'Continue with email code'}
+              </AppButton>
+            </>
+          ) : null}
+          {emailCodeMessage ? (
+            <AppText variant="caption" colour="textSecondary">
+              {emailCodeMessage}
+            </AppText>
+          ) : null}
           <View style={{gap: spacing[2], marginTop: spacing[1]}}>
             <AuthLink onPress={() => router.push('/forgot-password' as Href)}>
               Forgot password

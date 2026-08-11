@@ -418,6 +418,7 @@ export class StoryService {
     visibility: 'public' | 'followers' | 'close',
   ): Promise<boolean> {
     if (viewerActorId === ownerActorId) return true
+    if (viewerActorId && (await this.isBlockedEitherDirection(viewerActorId, ownerActorId))) return false
     if (visibility === 'public') return true
     if (!viewerActorId) return false
     if (visibility === 'close' || visibility === 'followers') {
@@ -431,5 +432,20 @@ export class StoryService {
       return Boolean(follow)
     }
     return false
+  }
+
+  private async isBlockedEitherDirection(actorA: string, actorB: string): Promise<boolean> {
+    const row = await this.db
+      .selectFrom('blocks')
+      .select('id')
+      .where('deleted_at', 'is', null)
+      .where(({eb, or, and}) =>
+        or([
+          and([eb('blocker_actor_id', '=', actorA), eb('blocked_actor_id', '=', actorB)]),
+          and([eb('blocker_actor_id', '=', actorB), eb('blocked_actor_id', '=', actorA)]),
+        ]),
+      )
+      .executeTakeFirst()
+    return Boolean(row)
   }
 }

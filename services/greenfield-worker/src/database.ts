@@ -4,6 +4,10 @@ import pg from 'pg'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
 export type MailJobStatus = 'queued' | 'sending' | 'sent' | 'failed' | 'retrying' | 'dead-letter'
 export type MailFailureCategory = 'temporary' | 'permanent' | 'authentication' | 'rate-limit' | 'DNS' | 'TLS' | 'invalid-recipient'
+export type MailIdentityState = 'pending' | 'queued' | 'provisioning' | 'active' | 'suspended' | 'released' | 'failed' | 'adoption_required'
+export type MailIdentityRequestType = 'provision' | 'adopt' | 'suspend' | 'resume' | 'forward' | 'release'
+export type MailIdentityRequestState = 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled'
+export type MailboxCredentialKind = 'imap_smtp_password'
 export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
 export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
 export type NotificationCategory = 'social' | 'module' | 'AI' | 'connector' | 'automation' | 'security' | 'system' | 'DIMON' | 'marketplace'
@@ -98,6 +102,85 @@ export interface Database {
     dead_lettered_at: Date | null
     created_at: Date
     updated_at: Date
+  }
+  greenfield_reserved_identifiers: {
+    identifier: string
+    registry_version: string
+    applies_to: string[]
+    reason: string
+    created_at: Date
+  }
+  greenfield_mail_identities: {
+    mail_identity_id: string
+    account_id: string
+    contact_identity_id: string | null
+    local_part: string
+    domain: string
+    address: string
+    state: MailIdentityState
+    provider: string | null
+    provider_reference: string | null
+    forwarding_enabled: boolean
+    forwarding_destination: string | null
+    forwarding_destination_hash: string | null
+    keep_local_copy: boolean
+    quota_bytes: number | null
+    storage_used_bytes: number | null
+    retry_count: number
+    last_error_code: string | null
+    last_error_message: string | null
+    adopted_at: Date | null
+    provisioned_at: Date | null
+    activated_at: Date | null
+    suspended_at: Date | null
+    resumed_at: Date | null
+    released_at: Date | null
+    failed_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  greenfield_mail_identity_requests: {
+    request_id: string
+    mail_identity_id: string
+    account_id: string
+    request_type: MailIdentityRequestType
+    state: MailIdentityRequestState
+    idempotency_key: string
+    provider: string
+    payload: unknown
+    requested_by_account_id: string | null
+    service_actor: string | null
+    operator_intent: boolean
+    attempt_count: number
+    maximum_attempts: number
+    last_error_code: string | null
+    last_error_message: string | null
+    created_at: Date
+    updated_at: Date
+    completed_at: Date | null
+    failed_at: Date | null
+  }
+  greenfield_mailbox_credentials: {
+    credential_id: string
+    mail_identity_id: string
+    account_id: string
+    credential_kind: MailboxCredentialKind
+    secret_hash: string
+    encrypted_secret: Buffer | null
+    encryption_key_version: string | null
+    created_at: Date
+    rotated_at: Date | null
+    revoked_at: Date | null
+  }
+  greenfield_mail_identity_events: {
+    event_id: string
+    mail_identity_id: string | null
+    account_id: string | null
+    event_type: string
+    actor_account_id: string | null
+    service_actor: string | null
+    metadata: unknown
+    created_at: Date
   }
   outbox_events: {
     id: string

@@ -1,11 +1,26 @@
 export const MAIL_TEMPLATE_IDS = [
   'verification',
+  'verification-code',
+  'verify-email',
   'password-reset',
   'password-changed',
+  'passwordless-login',
   'new-sign-in',
   'email-changed',
+  'contact-email-changed',
+  'passkey-added',
+  'passkey-removed',
+  'authenticator-enabled',
+  'authenticator-disabled',
+  'recovery-used',
+  'recovery-code-used',
+  'sessions-revoked',
+  'mail-forwarding-changed',
+  'forwarding-changed',
+  'modula-mail-activated',
   'invite',
   'account-deletion',
+  'account-deletion-requested',
 ] as const
 
 export type MailTemplateId = (typeof MAIL_TEMPLATE_IDS)[number]
