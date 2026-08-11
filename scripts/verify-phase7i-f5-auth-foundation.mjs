@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs'
 import path from 'node:path'
+import {execSync} from 'node:child_process'
 
 const repoRoot = process.cwd()
 const target = process.argv[2] ?? 'all'
@@ -174,7 +175,25 @@ const checks = {
     fileNotContains('src/data/repositories/api/ApiModuleRepository.ts', 'local-vault-note'),
     fileNotContains('src/data/repositories/api/ApiModuleRepository.ts', "includes('vault-notes')"),
   ],
-  'live-web-release': [blocked('Live web SHA deployment verification is outside this auth-foundation slice.')],
+  'live-web-release': [
+    currentReleaseSymlinkMatchesHead(),
+    publicVersionMatchesHead('https://modula.digital/version.json'),
+    publicJsonDocument('https://modula.digital/.well-known/apple-app-site-association', 'AASA', json =>
+      Array.isArray(json?.applinks?.details) &&
+      json.applinks.details.some(detail => Array.isArray(detail.appIDs) && detail.appIDs.includes('M29V4ZGUNK.digital.modula.app')) &&
+      Array.isArray(json?.webcredentials?.apps) &&
+      json.webcredentials.apps.includes('M29V4ZGUNK.digital.modula.app'),
+    ),
+    publicJsonDocument('https://modula.digital/.well-known/assetlinks.json', 'assetlinks', json =>
+      Array.isArray(json) &&
+      json.some(entry =>
+        Array.isArray(entry?.relation) &&
+        entry.relation.includes('delegate_permission/common.get_login_creds') &&
+        entry?.target?.namespace === 'android_app' &&
+        entry?.target?.package_name === 'digital.modula.app',
+      ),
+    ),
+  ],
   mainline: [blocked('Branch audit, convergence branch, fresh-main clone/build are outside this auth-foundation slice.')],
 }
 
@@ -207,7 +226,7 @@ for (const name of targets) {
   }
   console.log(`\n${name}`)
   for (const check of targetChecks) {
-    const result = check()
+    const result = await check()
     console.log(`${result.ok ? 'PASS' : 'BLOCKED'} ${result.message}`)
     if (!result.ok) failures += 1
   }
@@ -244,4 +263,61 @@ function fileNotContains(relativePath, text) {
 
 function blocked(message) {
   return () => ({ok: false, message})
+}
+
+function currentReleaseSymlinkMatchesHead() {
+  return () => {
+    const head = currentHead()
+    const symlinkPath = '/var/www/modula/current'
+    if (!fs.existsSync(symlinkPath)) return {ok: false, message: `${symlinkPath} missing`}
+    const targetPath = fs.realpathSync(symlinkPath)
+    return targetPath.endsWith(`/releases/${head}`)
+      ? {ok: true, message: `${symlinkPath} points at ${head}`}
+      : {ok: false, message: `${symlinkPath} points at ${targetPath}, expected ${head}`}
+  }
+}
+
+function publicVersionMatchesHead(url) {
+  return async () => {
+    const head = currentHead()
+    const fetched = await fetchJson(url)
+    if (!fetched.ok) return fetched
+    const commit = fetched.json?.commit
+    return commit === head
+      ? {ok: true, message: `${url} commit ${commit}`}
+      : {ok: false, message: `${url} commit ${String(commit)} does not match ${head}`}
+  }
+}
+
+function publicJsonDocument(url, name, assertShape) {
+  return async () => {
+    const fetched = await fetchJson(url)
+    if (!fetched.ok) return fetched
+    return assertShape(fetched.json)
+      ? {ok: true, message: `${url} ${name} JSON valid`}
+      : {ok: false, message: `${url} ${name} JSON shape invalid`}
+  }
+}
+
+async function fetchJson(url) {
+  try {
+    const response = await fetch(url, {headers: {accept: 'application/json,*/*'}})
+    const contentType = response.headers.get('content-type') ?? ''
+    const body = await response.text()
+    if (!response.ok) return {ok: false, message: `${url} returned HTTP ${response.status}`}
+    if (/text\/html/i.test(contentType) || body.trimStart().startsWith('<')) {
+      return {ok: false, message: `${url} returned HTML instead of JSON`}
+    }
+    try {
+      return {ok: true, json: JSON.parse(body)}
+    } catch (error) {
+      return {ok: false, message: `${url} invalid JSON: ${error instanceof Error ? error.message : String(error)}`}
+    }
+  } catch (error) {
+    return {ok: false, message: `${url} fetch failed: ${error instanceof Error ? error.message : String(error)}`}
+  }
+}
+
+function currentHead() {
+  return execSync('git rev-parse HEAD', {cwd: repoRoot, encoding: 'utf8'}).trim()
 }
