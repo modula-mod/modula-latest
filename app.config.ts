@@ -14,6 +14,7 @@ export default ({config}: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'digital.modula.app',
     supportsTablet: true,
     icon: './assets/expo.icon',
+    associatedDomains: ['applinks:modula.digital', 'webcredentials:modula.digital'],
     // Tracked ios/ does not auto-merge plugin permission strings; keep Info.plist in sync.
     infoPlist: {
       ...(config.ios?.infoPlist ?? {}),
@@ -28,6 +29,20 @@ export default ({config}: ConfigContext): ExpoConfig => ({
   android: {
     ...config.android,
     package: 'digital.modula.app',
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [
+          {
+            scheme: 'https',
+            host: 'modula.digital',
+            pathPrefix: '/',
+          },
+        ],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/images/android-icon-foreground.png',

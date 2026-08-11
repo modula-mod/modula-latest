@@ -266,6 +266,35 @@ export class GreenfieldSessionService {
       .execute()
   }
 
+  async markRecentlyAuthenticated(
+    sessionId: string,
+    accountId: string,
+    context: {
+      authenticationMethodId: string
+      authenticationStrength: AuthenticationStrength
+    },
+  ): Promise<void> {
+    const now = new Date()
+    await this.db.transaction().execute(async trx => {
+      const updated = await trx
+        .updateTable('greenfield_sessions')
+        .set({
+          recent_authentication_at: now,
+          authentication_strength: context.authenticationStrength,
+          authentication_method_id: context.authenticationMethodId,
+          last_seen_at: now,
+        })
+        .where('session_id', '=', sessionId)
+        .where('account_id', '=', accountId)
+        .where('status', '=', 'active')
+        .executeTakeFirst()
+      if (Number(updated.numUpdatedRows) === 0) {
+        throw Object.assign(new Error('Authentication required'), {code: 'UNAUTHENTICATED'})
+      }
+      await this.insertEvent(trx, sessionId, accountId, 'session.stepUpCompleted')
+    })
+  }
+
   async revokeSession(sessionId: string, accountId?: string): Promise<void> {
     const row = await this.db
       .selectFrom('greenfield_sessions')

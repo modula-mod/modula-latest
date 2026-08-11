@@ -4,6 +4,7 @@ import {useQueryClient} from '@tanstack/react-query'
 
 import type {
   AuthResult,
+  EmailCodeSignInInput,
   RegisterAccountInput,
   RegisterPendingResult,
   SessionState,
@@ -88,6 +89,23 @@ export function SessionProvider({children}: PropsWithChildren) {
     [acceptAuthResult, router, services.authRepository],
   )
 
+  const requestEmailSignInCode = useCallback(
+    async (email: string) =>
+      services.authRepository.requestEmailSignInCode(email.trim().toLowerCase()),
+    [services.authRepository],
+  )
+
+  const signInWithEmailCode = useCallback(
+    async (input: EmailCodeSignInInput, returnTo = '/') => {
+      const result = await services.authRepository.signInWithEmailCode({
+        ...input,
+        email: input.email.trim().toLowerCase(),
+      })
+      await acceptAuthResult(result, returnTo)
+    },
+    [acceptAuthResult, services.authRepository],
+  )
+
   const register = useCallback(
     async (input: RegisterAccountInput, _returnTo = '/') => {
       const email = input.email.trim().toLowerCase()
@@ -103,10 +121,14 @@ export function SessionProvider({children}: PropsWithChildren) {
           accountId: result.accountId,
           primaryHandle: result.primaryHandle,
           verificationToken: result.verificationToken,
+          verificationChallengeId: result.verificationChallengeId,
+          verificationExpiresAt: result.verificationExpiresAt,
+          verificationDelivery: result.verificationDelivery,
         })
-        router.replace(
-          `/verify-email?t=${encodeURIComponent(result.verificationToken ?? '')}` as Href,
-        )
+        const verifyParam = result.verificationToken
+          ? `t=${encodeURIComponent(result.verificationToken)}`
+          : `c=${encodeURIComponent(result.verificationChallengeId ?? '')}&email=${encodeURIComponent(result.email)}`
+        router.replace(`/verify-email?${verifyParam}` as Href)
         return
       }
       await acceptAuthResult(result, '/')
@@ -255,6 +277,8 @@ export function SessionProvider({children}: PropsWithChildren) {
   const actions = useMemo<SessionActions>(
     () => ({
       signIn,
+      requestEmailSignInCode,
+      signInWithEmailCode,
       register,
       verifyEmail,
       resendVerification,
@@ -268,6 +292,8 @@ export function SessionProvider({children}: PropsWithChildren) {
       register,
       resendVerification,
       signIn,
+      requestEmailSignInCode,
+      signInWithEmailCode,
       signOut,
       verifyEmail,
     ],

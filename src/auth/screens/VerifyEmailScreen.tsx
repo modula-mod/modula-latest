@@ -8,7 +8,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function VerifyEmailScreen() {
-  const params = useLocalSearchParams<{email?: string; token?: string; t?: string}>()
+  const params = useLocalSearchParams<{email?: string; token?: string; t?: string; c?: string; challengeId?: string}>()
   const session = useSession()
   const {verifyEmail, resendVerification} = useSessionActions()
   const router = useRouter()
@@ -21,20 +21,33 @@ export function VerifyEmailScreen() {
     params.token ||
     (session.status === 'pendingVerification' ? session.verificationToken : '') ||
     ''
-  const [token, setToken] = useState(pendingToken)
+  const challengeId =
+    params.c ||
+    params.challengeId ||
+    (session.status === 'pendingVerification' ? session.verificationChallengeId : '') ||
+    ''
+  const [code, setCode] = useState(pendingToken)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
 
   const submit = async () => {
-    if (!token.trim()) {
+    if (!code.trim()) {
       setError('Enter the verification code from your email.')
+      return
+    }
+    if (!challengeId && !pendingToken) {
+      setError('Request a new verification code to continue.')
       return
     }
     setPending(true)
     setError(null)
     try {
-      await verifyEmail({token: token.trim(), email})
+      await verifyEmail(
+        challengeId
+          ? {challengeId, code: code.trim(), email}
+          : {token: code.trim(), email},
+      )
     } catch {
       setError('That verification code is invalid or expired.')
     } finally {
@@ -54,8 +67,8 @@ export function VerifyEmailScreen() {
         <AuthPanel>
           <AuthField
             label="Verification code"
-            value={token}
-            onChangeText={setToken}
+            value={code}
+            onChangeText={setCode}
             autoCapitalize="none"
             textContentType="oneTimeCode"
             returnKeyType="done"

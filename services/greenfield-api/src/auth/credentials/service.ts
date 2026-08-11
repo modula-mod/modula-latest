@@ -136,6 +136,114 @@ export class CredentialRegistryService {
     return methodId
   }
 
+  async createTotpMethod(input: {
+    accountId: string
+    state: 'pending' | 'active'
+    verifiedAt?: Date | null
+    createdAt: Date
+    metadata?: Record<string, unknown>
+  }): Promise<string> {
+    const methodId = `totp-${uuidv7()}`
+    const now = input.createdAt
+    await this.db
+      .insertInto('greenfield_authentication_methods')
+      .values({
+        method_id: methodId,
+        account_id: input.accountId,
+        method_type: 'totp',
+        display_label: 'Authenticator app',
+        state: input.state,
+        strength: input.state === 'active' ? 'strong' : 'medium',
+        verified_at: input.verifiedAt ?? null,
+        last_used_at: null,
+        created_at: now,
+        updated_at: now,
+        revoked_at: null,
+        metadata: jsonb(input.metadata ?? {algorithm: 'SHA1', digits: 6, periodSeconds: 30}),
+      })
+      .execute()
+    return methodId
+  }
+
+  async createRecoveryCodeMethod(input: {
+    accountId: string
+    state: 'active' | 'disabled' | 'revoked'
+    verifiedAt?: Date | null
+    createdAt: Date
+    metadata?: Record<string, unknown>
+  }): Promise<string> {
+    const now = input.createdAt
+    const existing = await this.db
+      .selectFrom('greenfield_authentication_methods')
+      .select('method_id')
+      .where('account_id', '=', input.accountId)
+      .where('method_type', '=', 'recovery_code')
+      .where('revoked_at', 'is', null)
+      .executeTakeFirst()
+    if (existing) {
+      await this.db
+        .updateTable('greenfield_authentication_methods')
+        .set({
+          state: input.state,
+          strength: 'recovery',
+          verified_at: input.verifiedAt ?? now,
+          updated_at: now,
+          metadata: jsonb(input.metadata ?? {}),
+        })
+        .where('method_id', '=', existing.method_id)
+        .execute()
+      return existing.method_id
+    }
+    const methodId = `recovery-code-${input.accountId}`
+    await this.db
+      .insertInto('greenfield_authentication_methods')
+      .values({
+        method_id: methodId,
+        account_id: input.accountId,
+        method_type: 'recovery_code',
+        display_label: 'Recovery codes',
+        state: input.state,
+        strength: 'recovery',
+        verified_at: input.verifiedAt ?? now,
+        last_used_at: null,
+        created_at: now,
+        updated_at: now,
+        revoked_at: null,
+        metadata: jsonb(input.metadata ?? {}),
+      })
+      .execute()
+    return methodId
+  }
+
+  async createPasskeyMethod(input: {
+    accountId: string
+    passkeyId: string
+    label?: string | null
+    verifiedAt: Date
+    metadata?: Record<string, unknown>
+  }): Promise<string> {
+    const now = input.verifiedAt
+    const methodId = `passkey-${input.passkeyId}`
+    await this.db
+      .insertInto('greenfield_authentication_methods')
+      .values({
+        method_id: methodId,
+        account_id: input.accountId,
+        method_type: 'passkey',
+        display_label: input.label?.trim() || 'Passkey',
+        state: 'active',
+        strength: 'phishing_resistant',
+        verified_at: now,
+        last_used_at: null,
+        created_at: now,
+        updated_at: now,
+        revoked_at: null,
+        metadata: jsonb(input.metadata ?? {}),
+      })
+      .execute()
+    return methodId
+  }
+
   async activateEmailOtpMethod(accountId: string, verifiedAt: Date): Promise<void> {
     await this.db
       .updateTable('greenfield_authentication_methods')

@@ -2,6 +2,7 @@ import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
+import {handleSocialNotification} from '../../greenfield-worker/src/notifications/social.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -12,6 +13,7 @@ describeIf('Phase 6S social product integration', () => {
   let accessToken = ''
   let actorId = ''
   let postId = ''
+  let runSuffix = ''
 
   beforeAll(async () => {
     process.env.NODE_ENV = 'test'
@@ -33,37 +35,10 @@ describeIf('Phase 6S social product integration', () => {
     db = created.db
     await app.ready()
 
-    const suffix = Date.now().toString(36)
-    const email = `p6s-${suffix}@example.com`
-    const handle = `p6s${suffix}`.slice(0, 20)
-    const password = 'secure-pass-word-1'
-    const register = await app.inject({
-      method: 'POST',
-      url: '/v1/accounts/register',
-      payload: {email, password, handle, displayName: 'Phase 6S User', acceptedTerms: true, inviteCode: 'test-invite'},
-    })
-    expect(register.statusCode).toBe(201)
-    const token = register.json().data.verificationToken
-    await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token}})
-    const session = await app.inject({
-      method: 'POST',
-      url: '/v1/sessions',
-      payload: {email, password},
-    })
-    expect([200, 201]).toContain(session.statusCode)
-    accessToken = session.json().data.accessToken
-    const me = await app.inject({
-      method: 'GET',
-      url: '/v1/accounts/me',
-      headers: {authorization: `Bearer ${accessToken}`},
-    })
-    const accountId = me.json().data.accountId
-    const actor = await db
-      .selectFrom('actors')
-      .select('id')
-      .where('account_id', '=', accountId)
-      .executeTakeFirst()
-    actorId = actor?.id ?? ''
+    runSuffix = Date.now().toString(36)
+    const user = await createVerifiedUser(`p6s${runSuffix}`.slice(0, 20), 'Phase 6S User')
+    accessToken = user.accessToken
+    actorId = user.actorId
   })
 
   afterAll(async () => {
@@ -198,6 +173,135 @@ describeIf('Phase 6S social product integration', () => {
     expect(result.json().data.output.label).toBe('Preview')
   })
 
+  it('exercises the Phase 7I-F5 two-account social golden path with durable persistence', async () => {
+    const alpha = await createVerifiedUser(`f5ba${runSuffix}`.slice(0, 20), 'F5B Social Alpha')
+    const beta = await createVerifiedUser(`f5bb${runSuffix}`.slice(0, 20), 'F5B Social Beta')
+
+    const follow = await authed(beta.accessToken, 'POST', `/v1/profiles/${alpha.profileId}/follow`)
+    expect(follow.statusCode).toBe(200)
+    expect(follow.json().data.isFollowing).toBe(true)
+    expect(follow.json().data.followerCount).toBe(1)
+
+    const reloadedFollow = await authed(beta.accessToken, 'GET', `/v1/profiles/${alpha.handle}`)
+    expect(reloadedFollow.statusCode).toBe(200)
+    expect(reloadedFollow.json().data.isFollowing).toBe(true)
+
+    const unfollow = await authed(beta.accessToken, 'DELETE', `/v1/profiles/${alpha.profileId}/follow`)
+    expect(unfollow.statusCode).toBe(200)
+    expect(unfollow.json().data.isFollowing).toBe(false)
+
+    const refollow = await authed(beta.accessToken, 'POST', `/v1/profiles/${alpha.profileId}/follow`)
+    expect(refollow.statusCode).toBe(200)
+
+    const post = await authed(alpha.accessToken, 'POST', '/v1/posts', {
+      text: `F5B social persistence post ${runSuffix}`,
+      audience: 'public',
+      feed: 'following',
+      idempotencyKey: `f5b-social-text-${runSuffix}`,
+    })
+    expect(post.statusCode).toBe(201)
+    const socialPostId = post.json().data.id
+
+    const imagePost = await authed(alpha.accessToken, 'POST', '/v1/posts', {
+      text: `F5B social image post ${runSuffix}`,
+      audience: 'public',
+      feed: 'following',
+      idempotencyKey: `f5b-social-image-${runSuffix}`,
+      media: [
+        {
+          kind: 'image',
+          mimeType: 'image/png',
+          base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
+          width: 1,
+          height: 1,
+          altText: 'F5B acceptance image',
+        },
+      ],
+    })
+    expect(imagePost.statusCode).toBe(201)
+    expect(imagePost.json().data.kind).toBe('media')
+    expect(imagePost.json().data.media).toHaveLength(1)
+
+    const mediaUrl = new URL(imagePost.json().data.media[0].url)
+    const mediaReload = await app.inject({
+      method: 'GET',
+      url: mediaUrl.pathname,
+      headers: {authorization: `Bearer ${beta.accessToken}`},
+    })
+    expect(mediaReload.statusCode).toBe(200)
+
+    for (const reaction of ['like', 'love', 'laugh', 'fire'] as const) {
+      const reacted = await authed(beta.accessToken, 'PUT', `/v1/posts/${socialPostId}/reaction`, {type: reaction})
+      expect(reacted.statusCode).toBe(200)
+      expect(reacted.json().data.viewerReaction).toBe(reaction)
+      expect(reacted.json().data.byType[reaction]).toBe(1)
+      const reloaded = await authed(beta.accessToken, 'GET', `/v1/posts/${socialPostId}/reactions`)
+      expect(reloaded.statusCode).toBe(200)
+      expect(reloaded.json().data.viewerReaction).toBe(reaction)
+    }
+
+    const comment = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/comments`, {
+      text: `F5B comment ${runSuffix}`,
+    })
+    expect(comment.statusCode).toBe(201)
+    const commentId = comment.json().data.comment_id
+
+    const reply = await authed(alpha.accessToken, 'POST', `/v1/comments/${commentId}/replies`, {
+      text: `F5B reply ${runSuffix}`,
+    })
+    expect(reply.statusCode).toBe(201)
+    const replies = await authed(beta.accessToken, 'GET', `/v1/comments/${commentId}/replies`)
+    expect(replies.statusCode).toBe(200)
+    expect(replies.json().data.items.some((item: any) => item.text === `F5B reply ${runSuffix}`)).toBe(true)
+
+    const bookmark = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/save`)
+    expect(bookmark.statusCode).toBe(200)
+    const saves = await authed(beta.accessToken, 'GET', '/v1/saves')
+    expect(saves.statusCode).toBe(200)
+    expect(saves.json().data.items.some((item: any) => item.id === socialPostId)).toBe(true)
+
+    const repost = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/repost`)
+    expect(repost.statusCode).toBe(200)
+    const quoteShare = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/quote`, {
+      commentary: `F5B quote share ${runSuffix}`,
+    })
+    expect(quoteShare.statusCode).toBe(201)
+
+    await processSocialNotification('reaction', socialPostId)
+    const notifications = await authed(alpha.accessToken, 'GET', '/v1/notifications')
+    expect(notifications.statusCode).toBe(200)
+    expect(notifications.json().data.items.some((item: any) => item.resourceId === socialPostId)).toBe(true)
+
+    const mute = await authed(alpha.accessToken, 'POST', `/v1/profiles/${beta.profileId}/mute`)
+    expect(mute.statusCode).toBe(200)
+    const feedAfterMute = await authed(alpha.accessToken, 'GET', '/v1/feed/home?mode=forYou&limit=50')
+    expect(feedAfterMute.statusCode).toBe(200)
+    expect(feedAfterMute.json().data.items.some((item: any) => item.id === quoteShare.json().data.postId)).toBe(false)
+    const unmute = await authed(alpha.accessToken, 'DELETE', `/v1/profiles/${beta.profileId}/mute`)
+    expect(unmute.statusCode).toBe(200)
+
+    const block = await authed(alpha.accessToken, 'POST', `/v1/profiles/${beta.profileId}/block`)
+    expect(block.statusCode).toBe(200)
+    const blockedProfile = await authed(beta.accessToken, 'GET', `/v1/profiles/${alpha.handle}`)
+    expect(blockedProfile.statusCode).toBe(404)
+    const unblock = await authed(alpha.accessToken, 'DELETE', `/v1/profiles/${beta.profileId}/block`)
+    expect(unblock.statusCode).toBe(200)
+
+    const report = await authed(beta.accessToken, 'POST', '/v1/reports', {
+      targetType: 'post',
+      targetId: socialPostId,
+      category: 'spam',
+      details: `F5B report ${runSuffix}`,
+    })
+    expect(report.statusCode).toBe(201)
+    expect(report.json().data.targetId).toBe(socialPostId)
+
+    const finalPostReload = await authed(beta.accessToken, 'GET', `/v1/posts/${socialPostId}`)
+    expect(finalPostReload.statusCode).toBe(200)
+    expect(finalPostReload.json().data.replyCount).toBeGreaterThanOrEqual(1)
+    expect(finalPostReload.json().data.repostCount).toBeGreaterThanOrEqual(1)
+  })
+
   // Keep a lightweight DB-level reaction uniqueness check when actor wiring is present.
   it('enforces reaction uniqueness at the database layer', async () => {
     if (!actorId) return
@@ -258,4 +362,61 @@ describeIf('Phase 6S social product integration', () => {
         .execute(),
     ).rejects.toThrow()
   })
+
+  async function createVerifiedUser(handle: string, displayName: string) {
+    const password = 'secure-pass-word-1'
+    const email = `${handle}@example.com`
+    const register = await app.inject({
+      method: 'POST',
+      url: '/v1/accounts/register',
+      payload: {email, password, handle, displayName, acceptedTerms: true, inviteCode: 'test-invite'},
+    })
+    expect(register.statusCode).toBe(201)
+    const token = register.json().data.verificationToken
+    const verified = await app.inject({method: 'POST', url: '/v1/accounts/verify-email', payload: {token}})
+    expect(verified.statusCode).toBe(200)
+    const session = await app.inject({
+      method: 'POST',
+      url: '/v1/sessions',
+      payload: {email, password},
+    })
+    expect([200, 201]).toContain(session.statusCode)
+    const accessToken = session.json().data.accessToken
+    const me = await app.inject({
+      method: 'GET',
+      url: '/v1/accounts/me',
+      headers: {authorization: `Bearer ${accessToken}`},
+    })
+    expect(me.statusCode).toBe(200)
+    const accountId = me.json().data.accountId
+    const profile = await db
+      .selectFrom('actors')
+      .innerJoin('profiles', 'profiles.actor_id', 'actors.id')
+      .select(['profiles.id as profile_id', 'actors.id as actor_id'])
+      .where('actors.account_id', '=', accountId)
+      .executeTakeFirstOrThrow()
+    return {accountId, actorId: profile.actor_id, profileId: profile.profile_id, handle, accessToken}
+  }
+
+  async function authed(accessToken: string, method: string, url: string, payload?: unknown) {
+    return app.inject({
+      method: method as any,
+      url,
+      headers: {authorization: `Bearer ${accessToken}`},
+      ...(payload === undefined ? {} : {payload}),
+    })
+  }
+
+  async function processSocialNotification(kind: 'reaction' | 'comment' | 'reply' | 'repost' | 'quote' | 'follow', resourceId: string) {
+    const job = await db
+      .selectFrom('background_jobs')
+      .select(['payload'])
+      .where('job_type', '=', `notification.${kind}`)
+      .where('status', '=', 'pending')
+      .orderBy('created_at', 'desc')
+      .execute()
+    const payload = job.find(row => (row.payload as any)?.resourceId === resourceId)?.payload
+    expect(payload).toBeTruthy()
+    await handleSocialNotification(db as any, kind, payload)
+  }
 })

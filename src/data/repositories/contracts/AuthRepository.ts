@@ -3,6 +3,8 @@ import type {
   AuthResult,
   AuthenticatedSession,
   ChangePasswordInput,
+  EmailCodeRequestResult,
+  EmailCodeSignInInput,
   ForgotPasswordInput,
   RefreshToken,
   RegisterAccountInput,
@@ -36,6 +38,8 @@ export type RepositoryExportJob = {
 
 export interface AuthRepository {
   signIn(credentials: SignInCredentials): Promise<AuthResult>
+  requestEmailSignInCode(email: string): Promise<EmailCodeRequestResult>
+  signInWithEmailCode(input: EmailCodeSignInInput): Promise<AuthResult>
   register(input: RegisterAccountInput): Promise<RegisterPendingResult | AuthResult>
   verifyEmail(input: VerifyEmailInput): Promise<EmailVerificationResult>
   resendVerification(email: string): Promise<{resent: boolean}>

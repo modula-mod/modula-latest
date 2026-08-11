@@ -18,6 +18,11 @@ type MailButtonInput = {
   href: string
 }
 
+type MailCodeInput = {
+  code: string
+  label: string
+}
+
 type MailInfoBoxInput = {
   items: Array<{label: string; value: string}>
 }
@@ -94,6 +99,17 @@ export function MailButton(input: MailButtonInput): string {
   <tr>
     <td>
       <a class="modula-button" href="${href}" style="display:inline-block;background:#171717;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;line-height:1.2;border-radius:8px;padding:13px 18px;">${escapeHtml(input.label)}</a>
+    </td>
+  </tr>
+</table>`
+}
+
+export function MailCode(input: MailCodeInput): string {
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width:100%;margin:0 0 20px;">
+  <tr>
+    <td class="modula-panel" style="background:#f7f5f1;border:1px solid #dedad2;border-radius:8px;padding:18px 16px;text-align:center;">
+      <div class="modula-muted" style="font-size:12px;line-height:1.4;color:#6d6a64;text-transform:uppercase;margin:0 0 8px;">${escapeHtml(input.label)}</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:4px;color:#171717;">${escapeHtml(input.code)}</div>
     </td>
   </tr>
 </table>`

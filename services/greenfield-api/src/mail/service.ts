@@ -48,6 +48,18 @@ export class MailService {
     return url.toString()
   }
 
+  signInUrl(): string {
+    const url = new URL(this.config.publicWebUrl)
+    url.pathname = '/sign-in'
+    return url.toString()
+  }
+
+  modulaMailUrl(): string {
+    const url = new URL(this.config.publicWebUrl)
+    url.pathname = '/settings/account/modula-mail'
+    return url.toString()
+  }
+
   async queue(message: MailMessage): Promise<QueuedMailJob> {
     return this.db.transaction().execute(trx => this.queueInTransaction(trx, message))
   }
@@ -63,13 +75,13 @@ export class MailService {
       email: string
       displayName: string
       handle?: string
-      token: string
+      code: string
       expiresAt: Date
       correlationId?: string
     },
   ): Promise<QueuedMailJob> {
     return this.queueInTransaction(db, {
-      templateId: 'verification',
+      templateId: 'verification-code',
       recipientAccountId: input.accountId,
       to: input.email,
       locale: 'en',
@@ -77,7 +89,36 @@ export class MailService {
       variables: {
         displayName: input.displayName,
         handle: input.handle ?? '',
-        actionUrl: this.verificationUrl(input.email, input.token),
+        actionUrl: this.signInUrl(),
+        code: input.code,
+        expiresIn: expiresIn(input.expiresAt),
+      },
+    })
+  }
+
+  async queuePasswordlessLogin(
+    db: Transaction<Database>,
+    input: {
+      accountId: string
+      email: string
+      displayName: string
+      handle?: string
+      code: string
+      expiresAt: Date
+      correlationId?: string
+    },
+  ): Promise<QueuedMailJob> {
+    return this.queueInTransaction(db, {
+      templateId: 'passwordless-login',
+      recipientAccountId: input.accountId,
+      to: input.email,
+      locale: 'en',
+      correlationId: input.correlationId,
+      variables: {
+        displayName: input.displayName,
+        handle: input.handle ?? '',
+        actionUrl: this.signInUrl(),
+        code: input.code,
         expiresIn: expiresIn(input.expiresAt),
       },
     })
@@ -142,7 +183,7 @@ export class MailService {
   async queueRecoveryUsed(
     input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
   ): Promise<QueuedMailJob> {
-    return this.queueSecurityAlert('recovery-used', input, this.securityUrl())
+    return this.queueSecurityAlert('recovery-code-used', input, this.securityUrl())
   }
 
   async queueSessionsRevoked(
@@ -154,7 +195,44 @@ export class MailService {
   async queueMailForwardingChanged(
     input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
   ): Promise<QueuedMailJob> {
-    return this.queueSecurityAlert('mail-forwarding-changed', input, this.accountUrl())
+    return this.queueSecurityAlert('forwarding-changed', input, this.modulaMailUrl())
+  }
+
+  async queueAuthenticatorEnabled(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('authenticator-enabled', input, this.securityUrl())
+  }
+
+  async queueAuthenticatorDisabled(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('authenticator-disabled', input, this.securityUrl())
+  }
+
+  async queueModulaMailActivated(
+    input: {
+      accountId: string
+      email: string
+      displayName: string
+      handle?: string
+      mailAddress: string
+      correlationId?: string
+    },
+  ): Promise<QueuedMailJob> {
+    return this.queue({
+      templateId: 'modula-mail-activated',
+      recipientAccountId: input.accountId,
+      to: input.email,
+      locale: 'en',
+      correlationId: input.correlationId,
+      variables: {
+        displayName: input.displayName,
+        handle: input.handle ?? '',
+        mailAddress: input.mailAddress,
+        actionUrl: this.modulaMailUrl(),
+      },
+    })
   }
 
   async queueNewSignIn(
@@ -178,7 +256,7 @@ export class MailService {
     input: {accountId: string; email: string; displayName: string; correlationId?: string},
   ): Promise<QueuedMailJob> {
     return this.queueInTransaction(db, {
-      templateId: 'email-changed',
+      templateId: 'contact-email-changed',
       recipientAccountId: input.accountId,
       to: input.email,
       locale: 'en',
@@ -227,7 +305,7 @@ export class MailService {
     },
   ): Promise<QueuedMailJob> {
     return this.queueInTransaction(db, {
-      templateId: 'account-deletion',
+      templateId: 'account-deletion-requested',
       recipientAccountId: input.accountId,
       to: input.email,
       locale: 'en',
@@ -268,7 +346,13 @@ export class MailService {
   private async queueSecurityAlert(
     templateId: Extract<
       MailMessage['templateId'],
-      'passkey-added' | 'passkey-removed' | 'recovery-used' | 'sessions-revoked' | 'mail-forwarding-changed'
+      | 'passkey-added'
+      | 'passkey-removed'
+      | 'authenticator-enabled'
+      | 'authenticator-disabled'
+      | 'recovery-code-used'
+      | 'sessions-revoked'
+      | 'forwarding-changed'
     >,
     input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
     actionUrl: string,
@@ -382,6 +466,10 @@ function maskRecipient(email: string): string {
 
 function expiresIn(expiresAt: Date): string {
   const millis = Math.max(0, expiresAt.getTime() - Date.now())
+  if (millis <= 90 * 60_000) {
+    const minutes = Math.max(1, Math.ceil(millis / 60_000))
+    return minutes === 1 ? 'This code expires in 1 minute.' : `This code expires in ${minutes} minutes.`
+  }
   const hours = Math.max(1, Math.ceil(millis / 3_600_000))
   return hours === 1 ? 'This link expires in 1 hour.' : `This link expires in ${hours} hours.`
 }

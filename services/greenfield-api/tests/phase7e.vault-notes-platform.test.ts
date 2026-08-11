@@ -37,6 +37,10 @@ describe('Phase 7E Vault Notes external module declarations', () => {
     expect(readJson('modula.module.json').standardVersion).toBe('1.2.0')
     expect(() => readFileSync(join(workspaceRoot, 'src/features/vault-notes/index.ts'), 'utf8')).toThrow()
     expect(() => readFileSync(join(workspaceRoot, 'app/vault-notes.tsx'), 'utf8')).toThrow()
+    const moduleRepository = readFileSync(join(workspaceRoot, 'src/data/repositories/api/ApiModuleRepository.ts'), 'utf8')
+    expect(moduleRepository).not.toContain("'digital.modula.vault-notes'")
+    expect(moduleRepository).not.toContain('local-vault-note')
+    expect(moduleRepository).not.toContain("includes('vault-notes')")
   })
 })
 
@@ -59,6 +63,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     app = created.app
     db = created.db
     workerDb = createWorkerDb(databaseUrl!)
+    await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute()
     search = new GreenfieldSearchService(db, loadConfig())
     await app.ready()
     await importVaultNotesRelease()
@@ -77,6 +82,26 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
   })
 
   it('installs, enables, edits, exports, disables and re-enables through generic module host APIs', async () => {
+    const discover = await app.inject({
+      method: 'GET',
+      url: '/v1/registry/modules?q=vault',
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(discover.statusCode).toBe(200)
+    expect(discover.json().data.items.map((item: any) => item.moduleId)).toContain(moduleId)
+
+    const detail = await app.inject({
+      method: 'GET',
+      url: `/v1/registry/modules/${moduleId}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(detail.statusCode).toBe(200)
+    expect(detail.json().data).toMatchObject({
+      moduleId,
+      latestVersion: moduleVersion,
+      source: expect.objectContaining({commit: expect.any(String)}),
+    })
+
     const preview = await app.inject({
       method: 'POST',
       url: `/v1/modules/${moduleId}/install-preview`,
@@ -94,8 +119,12 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     })
     expect(install.statusCode).toBe(202)
     installationId = install.json().data.installationId
+    expect(install.json().data.status).toBe('installing')
     const installations = new GreenfieldModuleInstallationService(db, loadConfig())
     await installations.setWorkerStatus(installationId, 'installedDisabled')
+    const installing = await app.inject({method: 'GET', url: `/v1/modules/installed/${moduleId}`, headers: {authorization: `Bearer ${token}`}})
+    expect(installing.statusCode).toBe(200)
+    expect(installing.json().data.status).toBe('installedDisabled')
     const enable = await app.inject({
       method: 'POST',
       url: `/v1/modules/${moduleId}/enable`,
@@ -252,8 +281,14 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
 
   async function importVaultNotesRelease() {
     const manifest = manifestForTest()
-    const release = await new GreenfieldModuleReleaseService(db).importPendingReview(manifest)
-    const published = await new GreenfieldModuleReleaseService(db).publishRelease(moduleId, moduleVersion)
+    const releases = new GreenfieldModuleReleaseService(db)
+    const existing = await releases.getRelease(moduleId, moduleVersion)
+    if (existing) {
+      await registerRuntimeSurface(existing.releaseId, manifest)
+      return existing
+    }
+    const release = await releases.importPendingReview(manifest)
+    const published = await releases.publishRelease(moduleId, moduleVersion)
     await registerRuntimeSurface(published.releaseId, manifest)
     return release
   }
@@ -282,6 +317,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
           created_at: new Date(),
           updated_at: new Date(),
         })
+        .onConflict(oc => oc.column('collection_id').doNothing())
         .execute()
     }
     const actions = new Map<string, GreenfieldModuleAction>()
@@ -302,6 +338,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
           created_at: new Date(),
           updated_at: new Date(),
         })
+        .onConflict(oc => oc.column('view_id').doNothing())
         .execute()
       for (const action of view.toolbar ?? []) actions.set(action.actionId, action)
     }
@@ -320,6 +357,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
           created_at: new Date(),
           updated_at: new Date(),
         })
+        .onConflict(oc => oc.column('action_row_id').doNothing())
         .execute()
     }
   }
@@ -379,7 +417,8 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
   }
 
   async function drainSearchDeliveries(max = 12): Promise<void> {
-    for (let i = 0; i < max; i += 1) {
+    const attempts = Math.max(max, 100)
+    for (let i = 0; i < attempts; i += 1) {
       const worked = await processOneEventDelivery(workerDb, workerConfig())
       if (!worked) return
     }
@@ -422,6 +461,18 @@ function workerConfig(): WorkerConfig {
     eventSubscriberTimeoutMs: 10_000,
     ingestIntervalMs: 60_000,
     ingestEnabled: false,
+    mailTransport: 'disabled',
+    mailProvisionerMode: 'dry-run',
+    mailDomain: 'modula.digital',
+    mailHestiaUser: undefined,
+    mailProvisionerCommandTimeoutMs: 10_000,
+    mailDefaultQuotaBytes: 1_073_741_824,
+    mailRequired: false,
+    mailFrom: 'Modula <no-reply@modula.digital>',
+    smtpPort: 587,
+    smtpSecure: false,
+    smtpRequireTls: true,
+    smtpTlsRejectUnauthorized: true,
     encryptionKeysByVersion: new Map([[1, Buffer.alloc(32, 7)]]),
     encryptionKeyIsEphemeral: true,
     ssrfAllowPrivateNetworks: false,

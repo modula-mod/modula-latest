@@ -9,6 +9,7 @@ import {
   type SearchType,
   type UpdatePostInput,
 } from '@modula/api-contracts'
+import {createHash} from 'node:crypto'
 import {MODULA_PROTOCOL_VERSION} from '@modula/protocol-contracts'
 import type {FastifyInstance} from 'fastify'
 import type {AppConfig} from '../config/index.js'
@@ -46,10 +47,15 @@ import {
 import {ConnectorCredentialService} from '../domains/connectors/credentials/index.js'
 import {ConnectorConnectionService} from '../domains/connectors/connections/index.js'
 import {ConnectorOAuthStateService} from '../domains/connectors/oauth-state/index.js'
-import {MailService} from '../mail/service.js'
+import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
+import {MailIdentityService} from '../mail/identity-service.js'
 import {attachAuth, attachGreenfieldAccountAuth, requireAuth, requireCapability} from '../security/auth-context.js'
 import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
+import {TotpService} from '../auth/mfa/totp.js'
+import {RecoveryCodeService} from '../auth/mfa/recovery-codes.js'
+import {PasskeyService} from '../auth/passkeys/service.js'
+import {evaluateStepUpRequirement, type SensitiveAuthAction} from '../auth/step-up/policy.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
 import {registerModuleRoutes} from '../modules/routes/index.js'
@@ -91,6 +97,12 @@ function bodyString(body: unknown, key: string): string {
   return typeof value === 'string' ? value : ''
 }
 
+function requestIpHash(request: {ip?: string}, config: AppConfig): string | undefined {
+  const ip = request.ip?.trim()
+  if (!ip) return undefined
+  return createHash('sha256').update(`${config.sessionPepper ?? ''}:ip:${ip}`).digest('hex')
+}
+
 export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db)
@@ -109,9 +121,13 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const greenfieldSessions = new GreenfieldSessionService(db, config)
   const eventReplays = new GreenfieldEventReplayService(db)
   const mail = new MailService(db, config)
+  const mailIdentities = new MailIdentityService(db)
   const accounts = new AccountService(db, config, mail)
   const recovery = new RecoveryService(db, config, mail)
-  const authentication = new AuthenticationService(db, greenfieldSessions, mail)
+  const authentication = new AuthenticationService(db, config, greenfieldSessions, mail)
+  const totp = new TotpService(db, config)
+  const recoveryCodes = new RecoveryCodeService(db, config)
+  const passkeys = new PasskeyService(db, config)
   const repositories = new RepositoryService(db)
   const records = new RecordService(db)
   const extensions = new ExtensionRegistry(db)
@@ -193,6 +209,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       greenfieldVaultNotesReference: config.vaultNotesReferenceEnabled,
       greenfieldDimon: config.dimonEnabled,
       greenfieldAiGateway: config.aiGatewayEnabled,
+      modulaMail: true,
       inviteOnly: config.inviteOnly,
       atproto: config.atprotoEnabled,
       atprotoOAuth: config.atprotoEnabled,
@@ -275,6 +292,35 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return resolved
   }
 
+  const requireStepUp = (action: SensitiveAuthAction, auth: Awaited<ReturnType<typeof requireGreenfieldAuth>>, reply: any, requestId: string) => {
+    if (!auth) return false
+    const evaluation = evaluateStepUpRequirement(action, {
+      recentAuthenticationAt: auth.recentAuthenticationAt,
+      authenticationStrength: auth.authenticationStrength,
+    })
+    if (!evaluation.allowed) {
+      sendError(reply, 'STEP_UP_REQUIRED', 'Recent stronger authentication required', requestId)
+      return false
+    }
+    return true
+  }
+
+  const accountPrimaryEmail = async (accountId: string) => {
+    return db
+      .selectFrom('greenfield_auth_identities')
+      .innerJoin('greenfield_accounts', 'greenfield_accounts.account_id', 'greenfield_auth_identities.account_id')
+      .select([
+        'greenfield_auth_identities.identifier',
+        'greenfield_auth_identities.metadata',
+        'greenfield_accounts.primary_handle',
+      ])
+      .where('greenfield_auth_identities.account_id', '=', accountId)
+      .where('greenfield_auth_identities.kind', '=', 'email')
+      .where('greenfield_auth_identities.verified_at', 'is not', null)
+      .orderBy('greenfield_auth_identities.created_at', 'asc')
+      .executeTakeFirst()
+  }
+
   const resolveSearchActorContext = async (request: any) => {
     const header = request.headers.authorization
     const resolved = header?.startsWith('Bearer ')
@@ -317,6 +363,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
             displayName: bodyString(body, 'displayName'),
             inviteCode: bodyString(body, 'inviteCode'),
             correlationId: request.id,
+            ipHash: requestIpHash(request, config),
           } as any),
           request.id,
         ),
@@ -327,7 +374,13 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   app.post('/v1/accounts/verify-email', authWriteConfig, async (request, reply) => {
     try {
-      const account = await accounts.verifyEmail(bodyString(request.body, 'token'))
+      const token = bodyString(request.body, 'token')
+      const account = token
+        ? await accounts.verifyEmail(token)
+        : await accounts.verifyEmailCode({
+            challengeId: bodyString(request.body, 'challengeId'),
+            code: bodyString(request.body, 'code'),
+          })
       return reply.send(successEnvelope({verified: true, account}, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Verification failed')
@@ -335,7 +388,15 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
   app.post('/v1/accounts/resend-verification', authWriteConfig, async (request, reply) => {
     try {
-      return reply.send(successEnvelope(await accounts.resendVerification((request.body as any).email ?? '', {correlationId: request.id}), request.id))
+      return reply.send(
+        successEnvelope(
+          await accounts.resendVerification((request.body as any).email ?? '', {
+            correlationId: request.id,
+            ipHash: requestIpHash(request, config),
+          }),
+          request.id,
+        ),
+      )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Resend failed')
     }
@@ -360,10 +421,59 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const {handle} = request.params as {handle: string}
     return reply.send(successEnvelope(await accounts.handleAvailability(handle), request.id))
   })
+  app.get('/v1/accounts/mail-local-parts/:localPart/availability', profileConfig, async (request, reply) => {
+    try {
+      const {localPart} = request.params as {localPart: string}
+      return reply.send(successEnvelope(await mailIdentities.availability(localPart), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Modula Mail availability lookup failed')
+    }
+  })
   app.get('/v1/accounts/me', profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
     return reply.send(successEnvelope(await accounts.getMe(auth.accountId), request.id))
+  })
+  app.get('/v1/accounts/me/modula-mail', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    return reply.send(successEnvelope(await mailIdentities.getForAccount(auth.accountId), request.id))
+  })
+  app.post('/v1/accounts/me/modula-mail/provision', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const result = await db.transaction().execute(trx => mailIdentities.queueProvisioningForVerifiedAccount(trx, auth.accountId))
+      return reply.code(202).send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Modula Mail provisioning request failed')
+    }
+  })
+  app.post('/v1/accounts/me/modula-mail/forwarding', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('change_mail_forwarding', auth, reply, request.id)) return
+    try {
+      const body = ((request.body as any) ?? {}) as {enabled?: boolean; destination?: string | null; keepLocalCopy?: boolean}
+      const result = await mailIdentities.updateForwarding(auth.accountId, {
+        enabled: Boolean(body.enabled),
+        destination: body.destination ?? null,
+        keepLocalCopy: body.keepLocalCopy ?? true,
+        requestedByAccountId: auth.accountId,
+      })
+      const email = await accountPrimaryEmail(auth.accountId)
+      if (email) {
+        await mail.queueMailForwardingChanged({
+          accountId: auth.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Modula Mail forwarding update failed')
+    }
   })
   app.patch('/v1/accounts/me', writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
@@ -417,8 +527,185 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.delete('/v1/accounts/me/sessions', writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
+    if (!requireStepUp('revoke_all_sessions', auth, reply, request.id)) return
     await greenfieldSessions.revokeAllForAccount(auth.accountId)
     return reply.send(successEnvelope({revoked: true}, request.id))
+  })
+
+  app.post('/v1/auth/totp/enroll', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('enable_totp', auth, reply, request.id)) return
+    try {
+      return reply.send(
+        successEnvelope(
+          await totp.beginEnrollment(auth.accountId, {label: bodyString(request.body, 'label')}),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'TOTP enrollment failed')
+    }
+  })
+  app.post('/v1/auth/totp/verify', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const result = await totp.verifyEnrollment({
+        accountId: auth.accountId,
+        challengeId: bodyString(request.body, 'challengeId'),
+        code: bodyString(request.body, 'code'),
+        sessionId: auth.sessionId,
+        ipHash: requestIpHash(request, config) ?? null,
+        userAgent: request.headers['user-agent'],
+      })
+      const email = await accountPrimaryEmail(auth.accountId)
+      if (email) {
+        await mail.queueAuthenticatorEnabled({
+          accountId: auth.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'TOTP verification failed')
+    }
+  })
+  app.post('/v1/auth/totp/disable', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('disable_totp', auth, reply, request.id)) return
+    try {
+      const result = await totp.disable({
+        accountId: auth.accountId,
+        sessionId: auth.sessionId,
+        ipHash: requestIpHash(request, config) ?? null,
+        userAgent: request.headers['user-agent'],
+      })
+      const email = await accountPrimaryEmail(auth.accountId)
+      if (email) {
+        await mail.queueAuthenticatorDisabled({
+          accountId: auth.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'TOTP disable failed')
+    }
+  })
+  app.post('/v1/auth/step-up/totp', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const result = await totp.verifyActiveTotp({
+        accountId: auth.accountId,
+        code: bodyString(request.body, 'code'),
+        sessionId: auth.sessionId,
+        ipHash: requestIpHash(request, config) ?? null,
+        userAgent: request.headers['user-agent'],
+      })
+      await greenfieldSessions.markRecentlyAuthenticated(auth.sessionId, auth.accountId, {
+        authenticationMethodId: result.methodId,
+        authenticationStrength: 'strong',
+      })
+      return reply.send(successEnvelope({stepUp: true, authenticationStrength: 'strong'}, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Step-up failed')
+    }
+  })
+  app.get('/v1/auth/passkeys', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    return reply.send(successEnvelope(await passkeys.list(auth.accountId), request.id))
+  })
+  app.post('/v1/auth/passkeys/registration/options', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('add_passkey', auth, reply, request.id)) return
+    try {
+      return reply.send(
+        successEnvelope(
+          await passkeys.beginRegistration(auth.accountId, {label: bodyString(request.body, 'label')}),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Passkey registration failed')
+    }
+  })
+  app.post('/v1/auth/passkeys/registration/verify', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    try {
+      const body = ((request.body as any) ?? {}) as {challengeId?: string; response?: any; label?: string}
+      const result = await passkeys.verifyRegistration({
+        accountId: auth.accountId,
+        challengeId: body.challengeId ?? '',
+        response: body.response,
+        label: body.label ?? null,
+        sessionId: auth.sessionId,
+        ipHash: requestIpHash(request, config) ?? null,
+        userAgent: request.headers['user-agent'],
+      })
+      const email = await accountPrimaryEmail(auth.accountId)
+      if (email) {
+        await mail.queuePasskeyAdded({
+          accountId: auth.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Passkey verification failed')
+    }
+  })
+  app.delete('/v1/auth/passkeys/:passkeyId', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('remove_passkey', auth, reply, request.id)) return
+    try {
+      const {passkeyId} = request.params as {passkeyId: string}
+      const result = await passkeys.revoke(auth.accountId, passkeyId, {sessionId: auth.sessionId})
+      const email = await accountPrimaryEmail(auth.accountId)
+      if (email) {
+        await mail.queuePasskeyRemoved({
+          accountId: auth.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(successEnvelope(result, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Passkey removal failed')
+    }
+  })
+  app.get('/v1/auth/recovery-codes', profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    return reply.send(successEnvelope(await recoveryCodes.remaining(auth.accountId), request.id))
+  })
+  app.post('/v1/auth/recovery-codes/regenerate', writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('regenerate_recovery_codes', auth, reply, request.id)) return
+    try {
+      return reply.send(
+        successEnvelope(
+          await recoveryCodes.regenerate(auth.accountId, {sessionId: auth.sessionId, reason: 'manual'}),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Recovery-code regeneration failed')
+    }
   })
 
   app.post('/v1/sessions', authWriteConfig, async (request, reply) => {
@@ -441,6 +728,133 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Sign-in failed')
+    }
+  })
+  app.post('/v1/sessions/email-code/request', authWriteConfig, async (request, reply) => {
+    try {
+      return reply.send(
+        successEnvelope(
+          await authentication.requestEmailLoginCode(bodyString(request.body, 'email'), {
+            ipHash: requestIpHash(request, config),
+            correlationId: request.id,
+          }),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Email code request failed')
+    }
+  })
+  app.post('/v1/sessions/email-code', authWriteConfig, async (request, reply) => {
+    try {
+      const issued = await authentication.loginWithEmailCode(
+        bodyString(request.body, 'email'),
+        bodyString(request.body, 'challengeId'),
+        bodyString(request.body, 'code'),
+        {
+          userAgent: request.headers['user-agent'],
+          ipHash: requestIpHash(request, config),
+          correlationId: request.id,
+        },
+      )
+      return reply.send(
+        successEnvelope(
+          {
+            accessToken: issued.accessToken,
+            refreshToken: issued.refreshToken,
+            sessionId: issued.sessionId,
+            accessExpiresAt: issued.accessExpiresAt.toISOString(),
+            refreshExpiresAt: issued.refreshExpiresAt.toISOString(),
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Email code sign-in failed')
+    }
+  })
+  app.post('/v1/sessions/recovery-code', authWriteConfig, async (request, reply) => {
+    try {
+      const issued = await authentication.loginWithRecoveryCode(
+        bodyString(request.body, 'email'),
+        bodyString(request.body, 'code'),
+        {
+          userAgent: request.headers['user-agent'],
+          ipHash: requestIpHash(request, config),
+          correlationId: request.id,
+        },
+      )
+      return reply.send(
+        successEnvelope(
+          {
+            accessToken: issued.accessToken,
+            refreshToken: issued.refreshToken,
+            sessionId: issued.sessionId,
+            accessExpiresAt: issued.accessExpiresAt.toISOString(),
+            refreshExpiresAt: issued.refreshExpiresAt.toISOString(),
+            recoveryCodesRemaining: issued.recoveryCodesRemaining,
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Recovery-code sign-in failed')
+    }
+  })
+  app.post('/v1/sessions/passkey/options', authWriteConfig, async (request, reply) => {
+    try {
+      return reply.send(
+        successEnvelope(
+          await passkeys.beginAuthentication({
+            email: bodyString(request.body, 'email') || null,
+            ipHash: requestIpHash(request, config),
+          }),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Passkey authentication failed')
+    }
+  })
+  app.post('/v1/sessions/passkey', authWriteConfig, async (request, reply) => {
+    try {
+      const body = ((request.body as any) ?? {}) as {challengeId?: string; response?: any}
+      const verified = await passkeys.verifyAuthentication({
+        challengeId: body.challengeId ?? '',
+        response: body.response,
+        ipHash: requestIpHash(request, config) ?? null,
+        userAgent: request.headers['user-agent'],
+      })
+      const issued = await greenfieldSessions.issue(verified.accountId, {
+        userAgent: request.headers['user-agent'],
+        ipHash: requestIpHash(request, config),
+        authenticationMethodId: verified.methodId,
+        authenticationStrength: 'phishing_resistant',
+        recentAuthenticationAt: new Date(),
+      })
+      const email = await accountPrimaryEmail(verified.accountId)
+      if (email) {
+        await mail.queueNewSignIn({
+          accountId: verified.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(
+        successEnvelope(
+          {
+            accessToken: issued.accessToken,
+            refreshToken: issued.refreshToken,
+            sessionId: issued.sessionId,
+            accessExpiresAt: issued.accessExpiresAt.toISOString(),
+            refreshExpiresAt: issued.refreshExpiresAt.toISOString(),
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Passkey sign-in failed')
     }
   })
   app.post('/v1/sessions/refresh', authWriteConfig, async (request, reply) => {
@@ -1553,6 +1967,35 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = requireCapability(request, reply, 'admin:ops')
     if (!auth) return
     return reply.send(successEnvelope(await mail.summary(), request.id))
+  })
+
+  app.post('/v1/admin/ops/mail/identities/adopt', writeConfig, async (request, reply) => {
+    const greenfieldAuth = await requireGreenfieldAuth(request, reply)
+    if (!greenfieldAuth) return
+    const adminAuth = requireCapability(request, reply, 'admin:ops')
+    if (!adminAuth) return
+    try {
+      const body = ((request.body as any) ?? {}) as {
+        accountId?: string
+        address?: string
+        providerReference?: string
+        operatorIntent?: boolean
+      }
+      return reply.send(
+        successEnvelope(
+          await mailIdentities.adopt({
+            accountId: body.accountId ?? '',
+            address: body.address ?? '',
+            providerReference: body.providerReference ?? '',
+            operatorIntent: body.operatorIntent === true,
+            operatorAccountId: greenfieldAuth.accountId,
+          }),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Modula Mail adoption failed')
+    }
   })
 
   app.post('/v1/admin/ops/queue/dead-letters/:deadLetterId/retry', writeConfig, async (request, reply) => {

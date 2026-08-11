@@ -32,7 +32,7 @@ export const AUTHENTICATION_CHALLENGE_PURPOSES: AuthenticationChallengePurpose[]
   'email_verification',
   'email_login',
   'password_reset',
-  'email_change',
+  'contact_email_change',
   'passkey_registration',
   'passkey_authentication',
   'totp_enrollment',

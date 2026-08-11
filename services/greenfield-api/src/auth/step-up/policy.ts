@@ -35,7 +35,7 @@ const ACTION_POLICIES: Record<
   SensitiveAuthAction,
   {requiredStrength: AuthenticationStrength; acceptableMethods: AuthenticationMethodType[][]; recentWindowSeconds: number}
 > = {
-  add_passkey: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
+  add_passkey: {requiredStrength: 'medium', acceptableMethods: [['passkey'], ['password'], ['apple']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   remove_passkey: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   change_password: {requiredStrength: 'medium', acceptableMethods: [['passkey'], ['password'], ['apple']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   change_contact_email: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
