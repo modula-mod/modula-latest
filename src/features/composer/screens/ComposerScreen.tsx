@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useMemo, useState} from 'react'
 import {Image} from 'expo-image'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {
@@ -226,6 +226,7 @@ export function ComposerScreen() {
   const [text, setText] = useState('')
   const [history, setHistory] = useState<string[]>([''])
   const [historyIndex, setHistoryIndex] = useState(0)
+  const [hydratedEditPostId, setHydratedEditPostId] = useState<string | null>(null)
   const [media, setMedia] = useState<PendingMediaAttachment | null>(null)
   const [altText, setAltText] = useState('')
   const [link, setLink] = useState<DraftLinkPreview | null>(null)
@@ -243,6 +244,23 @@ export function ComposerScreen() {
   const [publicationBanner, setPublicationBanner] = useState<
     'publishedOnModula' | 'publishingToAtproto' | 'needsAttention' | null
   >(null)
+
+  if (
+    isEditMode &&
+    editPostId &&
+    editPostQuery.data &&
+    hydratedEditPostId !== editPostId
+  ) {
+    const next = editPostQuery.data.text?.trim() ?? ''
+    setHydratedEditPostId(editPostId)
+    setText(next)
+    setHistory([next])
+    setHistoryIndex(0)
+    // Edit mode is text-only against Greenfield UpdatePostInput.
+    setMedia(null)
+    setLink(null)
+    setPoll(null)
+  }
 
   const crossPostEligibility = evaluateCrossPostEligibility({
     atprotoPublishingCapability: atprotoPublishing,
@@ -276,18 +294,6 @@ export function ComposerScreen() {
     if (isThreadPreview) return 'Thread — Preview'
     return 'New Post'
   }, [isEditMode, isReplyMode, isThreadPreview])
-
-  useEffect(() => {
-    if (!isEditMode || !editPostQuery.data) return
-    const next = editPostQuery.data.text?.trim() ?? ''
-    setText(next)
-    setHistory([next])
-    setHistoryIndex(0)
-    // Edit mode is text-only against Greenfield UpdatePostInput.
-    setMedia(null)
-    setLink(null)
-    setPoll(null)
-  }, [editPostQuery.data, isEditMode])
 
   const pushHistory = useCallback(
     (next: string) => {
