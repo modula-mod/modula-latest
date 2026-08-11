@@ -74,18 +74,20 @@ export function SignInScreen() {
   const requestEmailCode = async () => {
     const nextEmail = email.trim().toLowerCase()
     if (!validEmail(nextEmail)) {
-      setError('Enter a valid email address.')
+      setEmailError('Enter a valid email address.')
+      setFormError(null)
       return
     }
     setPending(true)
-    setError(null)
+    setEmailError(null)
+    setFormError(null)
     try {
       const requested = await requestEmailSignInCode(nextEmail)
       setEmailCodeChallengeId(requested.challengeId)
       setEmailCode('')
       setEmailCodeMessage(`If available, a code was sent to ${requested.delivery.recipient}.`)
     } catch {
-      setError('Modula could not request a sign-in code. Try again.')
+      setFormError('Modula could not request a sign-in code. Try again.')
     } finally {
       setPending(false)
     }
@@ -94,15 +96,18 @@ export function SignInScreen() {
   const submitEmailCode = async () => {
     const nextEmail = email.trim().toLowerCase()
     if (!validEmail(nextEmail)) {
-      setError('Enter a valid email address.')
+      setEmailError('Enter a valid email address.')
+      setFormError(null)
       return
     }
     if (!emailCodeChallengeId || !emailCode.trim()) {
-      setError('Enter the sign-in code from your email.')
+      setEmailError(null)
+      setFormError('Enter the sign-in code from your email.')
       return
     }
     setPending(true)
-    setError(null)
+    setEmailError(null)
+    setFormError(null)
     try {
       await signInWithEmailCode(
         {email: nextEmail, challengeId: emailCodeChallengeId, code: emailCode.trim()},
@@ -110,7 +115,7 @@ export function SignInScreen() {
       )
       setEmailCode('')
     } catch {
-      setError('That sign-in code is invalid or expired.')
+      setFormError('That sign-in code is invalid or expired.')
     } finally {
       setPending(false)
     }
