@@ -4,6 +4,7 @@ import {Divider} from '@/components/primitives/Divider'
 import type {SocialPost as SocialPostModel} from '@/domain/social'
 import {openPostMoreMenu} from '@/features/feed/postActions/openPostMoreMenu'
 import {MediaPostCard} from '@/features/social/components/media-post-card'
+import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {PostActions} from './post-actions'
 import {PostBody} from './post-body'
@@ -18,6 +19,7 @@ type SocialPostProps = {
 /** Provider-neutral presentation for feed rows, post detail, and embedded posts. */
 export function SocialPost({post, compact = false, showDivider = true}: SocialPostProps) {
   const {spacing} = useThemeTokens()
+  const {moderationRepository} = useAppServices()
 
   if (post.kind === 'media') {
     return (
@@ -37,7 +39,10 @@ export function SocialPost({post, compact = false, showDivider = true}: SocialPo
   return (
     <View>
       <View style={[styles.content, {gap: spacing[2], padding: compact ? spacing[3] : spacing[4]}]}>
-        <PostHeader post={post} onMore={() => void openPostMoreMenu(post)} />
+        <PostHeader
+          post={post}
+          onMore={() => void openPostMoreMenu(post, {moderationRepository})}
+        />
         <PostBody post={post} />
         <PostActions post={post} />
       </View>

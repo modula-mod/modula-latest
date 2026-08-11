@@ -12,6 +12,7 @@ export type PostOverflowActionId =
   | 'viewEngagement'
   | 'openInBrowser'
   | 'mute'
+  | 'block'
   | 'hide'
   | 'report'
 
@@ -94,18 +95,19 @@ export function buildPostOverflowActions(
     actions.push(
       {
         id: 'mute',
-        label: 'Mute (Preview)',
-        accessibilityLabel: 'Mute author preview',
+        label: 'Mute account',
+        accessibilityLabel: 'Mute author',
       },
       {
-        id: 'hide',
-        label: 'Hide post (Preview)',
-        accessibilityLabel: 'Hide post preview',
+        id: 'block',
+        label: 'Block account',
+        accessibilityLabel: 'Block author',
+        style: 'destructive',
       },
       {
         id: 'report',
-        label: 'Report (Preview)',
-        accessibilityLabel: 'Report post preview',
+        label: 'Report post',
+        accessibilityLabel: 'Report post',
         style: 'destructive',
       },
     )

@@ -1,4 +1,8 @@
 import type {BackendCapability, ModulaSession} from '@modula/api-contracts'
+import {
+  ADMIN_SESSION_CAPABILITIES,
+  STANDARD_SESSION_CAPABILITIES,
+} from '@modula/api-contracts'
 import type {FastifyReply, FastifyRequest} from 'fastify'
 import type {SessionService} from './session.js'
 import {failureEnvelope, statusForError} from '../transport/envelope.js'
@@ -33,6 +37,49 @@ export async function attachAuth(request: FastifyRequest, sessions: SessionServi
       lastSeenAt: new Date().toISOString(),
       revokedAt: null,
       capabilities: resolved.capabilities,
+    },
+  }
+}
+
+/**
+ * Bridge Greenfield account access tokens into the legacy `request.auth` shape
+ * used by social write routes (`requireCapability`).
+ */
+export async function attachGreenfieldAccountAuth(
+  request: FastifyRequest,
+  input: {
+    resolveAccess: (token: string) => Promise<{accountId: string; sessionId: string} | null>
+    resolveActorForAccount: (
+      accountId: string,
+    ) => Promise<{actorId: string; handle: string | null} | null>
+    adminHandles: string[]
+  },
+): Promise<void> {
+  if (request.auth) return
+  const header = request.headers.authorization
+  if (!header?.startsWith('Bearer ')) return
+  const token = header.slice('Bearer '.length).trim()
+  const resolved = await input.resolveAccess(token)
+  if (!resolved) return
+  const actor = await input.resolveActorForAccount(resolved.accountId)
+  if (!actor) return
+  const handle = actor.handle?.toLowerCase() ?? ''
+  const isAdmin = Boolean(handle) && input.adminHandles.includes(handle)
+  const capabilities: BackendCapability[] = isAdmin
+    ? Array.from(new Set([...STANDARD_SESSION_CAPABILITIES, ...ADMIN_SESSION_CAPABILITIES]))
+    : [...STANDARD_SESSION_CAPABILITIES]
+  request.auth = {
+    actorId: actor.actorId,
+    capabilities: new Set(capabilities),
+    session: {
+      id: resolved.sessionId,
+      actorId: actor.actorId,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      revokedAt: null,
+      capabilities,
     },
   }
 }
