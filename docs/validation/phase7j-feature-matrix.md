@@ -3,7 +3,7 @@
 Date: 2026-08-11  
 Branch: `phase7j-product-convergence`  
 API under test: private Greenfield via `127.0.0.1:4020`  
-API image (tunnel): `modula-greenfield-api:2141c59-authbridge`
+API image (tunnel): `modula-greenfield-api:e29b789-quotehydrate`
 
 Status: **PASS** | **PARTIAL** | **FAIL / MISSING** | **BLOCKED_BACKEND**
 
@@ -16,12 +16,12 @@ Status: **PASS** | **PARTIAL** | **FAIL / MISSING** | **BLOCKED_BACKEND**
 | Posts edit | PASS | PASS | P0 | Composer edit mode → `useUpdatePostMutation` / `PATCH /v1/posts/:id` |
 | Posts delete | PASS | PASS | P0 | Owner overflow → confirm on post detail → `DELETE /v1/posts/:id` |
 | Reactions | PASS | PASS | P0 | Taxonomy locked: like/celebrate/insightful/support/curious (not Love/Laugh/Fire). One active per actor+post; transitions proven on post `794da78d` |
-| Comments / replies | PARTIAL | PASS | P0 | Create/list wired; reply UI thin |
+| Comments / replies | PASS | PASS | P0 | Create/list/reply E2E on `:4020`; PostDetail inline reply UI wired (`c4c1d5a`) |
 | Follow | PASS | PASS | P0 | |
 | Block / mute / report | PASS | PASS | P0 | Real client `ModerationRepository`; mute-words + blocked-list UIs honestly unavailable (no list APIs). API proof mute/block/report + unblock/unmute |
 | Bookmarks | PASS | PASS | P1 | |
 | Repost | PASS | PASS | P0 | |
-| Quote | PARTIAL | PASS | P1 | |
+| Quote | PASS | PASS | P1 | `POST /v1/posts/:id/quote` + `GET` embeds `quotedPost` + `quoteCount` (`e29b789-quotehydrate`) |
 | Share | PARTIAL | N/A | P2 | OS share sheet |
 | Stories | PASS | PASS | P0 | Create→rail E2E after media root perms fix (`groupId` `c2639656…`, `itemCount=1`) |
 | Search | PASS | PASS | P1 | |
@@ -31,7 +31,7 @@ Status: **PASS** | **PARTIAL** | **FAIL / MISSING** | **BLOCKED_BACKEND**
 
 | Feature | Client | API | Priority | Notes |
 |---|---|---|---|---|
-| Product Hub / modules / Vault Notes | PARTIAL | PASS | P0 | Honesty gaps; Vault Notes generic host |
+| Product Hub / modules / Vault Notes | PASS | PASS | P0 | Registry-backed catalogue/install; Board widget honest install state; install errors surfaced (`f34c288`) |
 | Appearance / Settings | PARTIAL | PASS | P1 | Theme sync real; some Preview rows remain labs-visible |
 | Drawer | PASS | N/A | P1 | Crash + restore fixed; Preview profile gated |
 | UI Lab `/dev/ui-lab` | PARTIAL | N/A | P2 | Present as `/settings/developer/expo-ui`; rename/route |
@@ -47,11 +47,11 @@ Greenfield account session tokens (`POST /v1/sessions`) previously authenticated
 2. ~~Real block / mute / report (or hide Preview)~~ **PASS**
 3. ~~Reaction product decision (Love/Laugh/Fire vs current taxonomy)~~ **PASS** (keep shipped taxonomy)
 4. ~~Gate Preview destinations behind dev-only~~ **PASS**
-5. Comments reply E2E — remaining
+5. ~~Comments reply E2E~~ **PASS**
 6. ~~Stories create → rail E2E on VPS~~ **PASS**
 7. ~~Notification generation proof~~ **PASS**
-8. Quote acceptance
-9. Vault Notes / Product Hub honesty
+8. ~~Quote acceptance~~ **PASS**
+9. ~~Vault Notes / Product Hub honesty~~ **PASS**
 10. MotionTokens adoption (springs + Reduce Motion) across drawer/feed — started earlier
 
 ## Evidence
@@ -61,4 +61,7 @@ Greenfield account session tokens (`POST /v1/sessions`) previously authenticated
 - Reactions: post `794da78d-266c-4ceb-9220-cb0b8f69a94e` transition log (like→celebrate→insightful→like→curious→clear, `total` stayed ≤1)
 - Stories: group `c2639656-ec3f-48d9-b233-f4e277348ebb` / item `48932789-5a3d-4219-aa1e-568c918d0c62`
 - Notifications: follow → `0b4a774e-…` then mark-read set `readAt`
-- Commits (this queue): `e7c2dd4` edit · `2141c59` moderation+auth bridge · `1e58586` Preview gate · `cbb6bb7` reactions · `3660958` stories · (matrix update)
+- Commits (this queue): `e7c2dd4` edit · `2141c59` moderation+auth bridge · `1e58586` Preview gate · `cbb6bb7` reactions · `3660958` stories · `947f218` matrix · `c4c1d5a` comment replies · `e29b789` quote hydrate · `f34c288` product hub honesty
+- Comments E2E: post `acd445d1…` → comment `a15431e1…` → reply `05ef7541…` depth 1
+- Quote E2E: source `9e68b640…` quoted by post with embedded `quotedPost.id` + source `quoteCount=1`
+- Vault Notes: `POST /v1/modules/digital.modula.vault-notes/install` → `installationId` `019fefb7…`; registry lists 11 modules
