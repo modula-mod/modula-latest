@@ -24,7 +24,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {useReduceMotion} from '@/lib/accessibility'
-import {isDevelopmentBuild} from '@/lib/platform'
+import {isDevelopmentBuild, canAccessDeveloperLabs} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -114,7 +114,10 @@ export function NavigationDrawer() {
   const drawerWidth = Math.min(348, Math.max(292, width * 0.82))
 
   const sections = useMemo(() => {
-    const merged = [...drawerDestinations]
+    const merged = drawerDestinations.filter(item => {
+      if (item.route === '/profile/preview' && !canAccessDeveloperLabs()) return false
+      return true
+    })
     return SECTION_ORDER.map(id => ({
       id,
       label: SECTION_LABELS[id],

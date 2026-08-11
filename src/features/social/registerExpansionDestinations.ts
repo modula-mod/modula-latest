@@ -3,6 +3,7 @@ import {registerAccountPanelDestination} from '@/platform/ui/navigation/account-
 /**
  * Registers Phase 4.5 expansion destinations onto the shared destination registry.
  * NavigationDrawer merges these at render time; import once from root layout.
+ * Preview-only entries are `devOnly` so production builds do not surface fake paths.
  */
 export function registerExpansionAccountPanelDestinations(): void {
   const extras = [
@@ -12,6 +13,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/product/customize',
       icon: 'appearance' as const,
       description: 'Layout studios and optional surfaces',
+      devOnly: true,
     },
     {
       id: 'lists',
@@ -19,6 +21,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/lists',
       icon: 'people' as const,
       description: 'Custom lists and feeds Preview',
+      devOnly: true,
     },
     {
       id: 'collections',
@@ -26,6 +29,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/collections',
       icon: 'bookmark' as const,
       description: 'Saved collections Preview',
+      devOnly: true,
     },
     {
       id: 'drafts',
@@ -33,6 +37,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/drafts',
       icon: 'text' as const,
       description: 'Composer drafts Preview',
+      devOnly: true,
     },
     {
       id: 'creator',
@@ -40,6 +45,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/creator',
       icon: 'poll' as const,
       description: 'Insights and monetization Preview',
+      devOnly: true,
     },
     {
       id: 'help',
@@ -47,6 +53,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/help',
       icon: 'info' as const,
       description: 'Local help articles',
+      devOnly: true,
     },
     {
       id: 'accounts',
@@ -54,6 +61,7 @@ export function registerExpansionAccountPanelDestinations(): void {
       route: '/account/switcher',
       icon: 'switch' as const,
       description: 'Account switcher Preview',
+      devOnly: true,
     },
   ]
 

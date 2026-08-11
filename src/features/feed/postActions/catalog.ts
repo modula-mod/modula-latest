@@ -1,5 +1,6 @@
 import type {ModulaActionItem} from '@/platform/ui/menus'
 import type {SocialPost} from '@/domain/social'
+import {canAccessDeveloperLabs} from '@/lib/platform'
 
 export type PostOverflowActionId =
   | 'copyText'
@@ -31,6 +32,7 @@ export function buildPostOverflowActions(
   const hasText = Boolean(post.text?.trim())
   const hasLink = post.kind === 'link'
   const isOwner = Boolean(options?.isOwner)
+  const showLabs = canAccessDeveloperLabs()
 
   const actions: PostOverflowAction[] = [
     {
@@ -59,15 +61,20 @@ export function buildPostOverflowActions(
       label: 'Quote',
       accessibilityLabel: 'Quote post',
     },
-    {
+  ]
+
+  if (showLabs) {
+    actions.push({
       id: 'viewEngagement',
       label: 'View engagement (Preview)',
       accessibilityLabel: 'View post engagement preview',
-    },
-  ]
+    })
+  }
 
   if (isOwner) {
-    actions.splice(4, 0,
+    actions.splice(
+      4,
+      0,
       {
         id: 'edit',
         label: 'Edit',
