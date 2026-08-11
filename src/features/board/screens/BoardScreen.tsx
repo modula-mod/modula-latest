@@ -11,7 +11,7 @@ import {useSession} from '@/auth/runtime'
 import type {ModuleContribution} from '@/data/repositories/contracts'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
-import {useModuleContributionQuery} from '@/features/modules/hooks'
+import {useInstalledModulesQuery, useModuleContributionQuery} from '@/features/modules/hooks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
@@ -99,6 +99,7 @@ export function BoardScreen() {
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
   const boardContributions = useModuleContributionQuery({surface: 'board', enabledOnly: true})
+  const installedModules = useInstalledModulesQuery()
   const ownerName = session.status === 'signedIn' ? session.profile.displayName : 'there'
   const modules = discoverQuery.data?.featuredModules ?? []
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
@@ -111,9 +112,53 @@ export function BoardScreen() {
     () =>
       preferences.boardWidgetIds
         .map(id => BOARD_WIDGET_CATALOG.find(widget => widget.id === id))
-        .filter((widget): widget is (typeof BOARD_WIDGET_CATALOG)[number] => Boolean(widget)),
-    [preferences.boardWidgetIds],
+        .filter((widget): widget is (typeof BOARD_WIDGET_CATALOG)[number] => Boolean(widget))
+        .map(widget => {
+          if (widget.id !== 'vault-notes') return widget
+          const installed = installedModules.data?.find(item => item.moduleId === 'digital.modula.vault-notes')
+          if (installed?.status === 'enabled') {
+            return {...widget, status: 'Active' as const, description: 'Open private notes from the enabled Vault Notes module.'}
+          }
+          if (installed) {
+            return {...widget, status: 'Disabled' as const, description: 'Vault Notes is installed but disabled. Enable it from Product Hub or Settings.'}
+          }
+          return widget
+        }),
+    [installedModules.data, preferences.boardWidgetIds],
   )
+
+  const openBoardWidget = (widgetId: string) => {
+    if (widgetId === 'vault-notes') {
+      const installed = installedModules.data?.find(item => item.moduleId === 'digital.modula.vault-notes')
+      if (installed?.status === 'enabled') {
+        router.push('/module/digital.modula.vault-notes' as Href)
+        return
+      }
+      router.push('/marketplace/digital.modula.vault-notes' as Href)
+      return
+    }
+    if (widgetId === 'product-hub') {
+      router.push('/product' as Href)
+      return
+    }
+    if (widgetId === 'saved') {
+      router.push('/saved' as Href)
+      return
+    }
+    if (widgetId === 'profile') {
+      router.push('/profile' as Href)
+      return
+    }
+    if (widgetId === 'settings') {
+      router.push('/settings' as Href)
+      return
+    }
+    if (widgetId === 'activity') {
+      router.push('/activity' as Href)
+      return
+    }
+    router.push('/product/widgets' as Href)
+  }
 
   const reorderWidget = (id: string, direction: -1 | 1) => {
     const ids = [...preferences.boardWidgetIds]
@@ -284,6 +329,9 @@ export function BoardScreen() {
                       if (id === 'remove') removeWidget(widget.id)
                       if (id === 'manage') router.push('/product/widgets' as Href)
                     }}>
+                    <AppPressable
+                      accessibilityLabel={`Open ${widget.name}`}
+                      onPress={() => openBoardWidget(widget.id)}>
                     <Surface
                       variant="contained"
                       style={[
@@ -306,6 +354,7 @@ export function BoardScreen() {
                         {widget.description}
                       </AppText>
                     </Surface>
+                    </AppPressable>
                   </ModulaContextMenu>
                 ))}
               </View>

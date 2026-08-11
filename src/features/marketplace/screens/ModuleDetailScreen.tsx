@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react'
 import {useState} from 'react'
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet, View, Alert} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -35,6 +35,11 @@ export function ModuleDetailScreen() {
     try {
       setPreview(await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined))
       setInstallSheetOpen(true)
+    } catch (error) {
+      Alert.alert(
+        'Install preview unavailable',
+        error instanceof Error ? error.message : 'Could not load install preview for this module.',
+      )
     } finally {
       setBusy(null)
     }
@@ -48,6 +53,11 @@ export function ModuleDetailScreen() {
       if (enable) await services.moduleRepository.enable(module.moduleId)
       setInstallSheetOpen(false)
       await detail.refetch()
+    } catch (error) {
+      Alert.alert(
+        'Install failed',
+        error instanceof Error ? error.message : 'Registry install did not complete. Check Product Hub and try again.',
+      )
     } finally {
       setBusy(null)
     }
@@ -81,6 +91,11 @@ export function ModuleDetailScreen() {
       if (kind === 'update') await services.moduleRepository.update(module.moduleId)
       if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData')
       await detail.refetch()
+    } catch (error) {
+      Alert.alert(
+        'Module action failed',
+        error instanceof Error ? error.message : 'The registry rejected this module action.',
+      )
     } finally {
       setBusy(null)
     }

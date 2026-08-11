@@ -5,7 +5,7 @@ export const BOARD_WIDGET_CATALOG: {
   name: string
   icon: AppIconName
   size: string
-  status: 'Active' | 'Preview' | 'Inactive' | 'Planned'
+  status: 'Active' | 'Preview' | 'Inactive' | 'Planned' | 'Install required' | 'Disabled'
   description: string
 }[] = [
   {
@@ -13,8 +13,8 @@ export const BOARD_WIDGET_CATALOG: {
     name: 'Vault Notes',
     icon: 'saved',
     size: '2×1',
-    status: 'Active',
-    description: 'Private in Modula notes from the installed Vault Notes module.',
+    status: 'Install required',
+    description: 'Private notes via the Vault Notes module. Install and enable from Product Hub.',
   },
   {
     id: 'product-hub',
