@@ -1,7 +1,7 @@
 # Phase 7J — Mainline consolidation validation
 
 Date: 2026-08-11  
-Branch: `phase7j-product-convergence` @ `903c4a7`  
+Branch: `phase7j-product-convergence` @ `4c1f1f4`  
 Target: `main` @ `dbc4bbf` (pre-merge)
 
 ## Scope
@@ -22,7 +22,7 @@ Mission C consolidates Phase 7I Mac acceptance + Phase 7J product convergence in
 | `archive/main/2026-08-11` | `dbc4bbf` | Pre-7J main tip |
 | `archive/phase7i-trusted-production-alpha/2026-08-11` | `0f9708b` | Phase 7I production alpha |
 | `archive/phase7i-mac-native-ui-acceptance/2026-08-11` | `3fe0486` | Mac-B native UI acceptance |
-| `archive/phase7j-product-convergence/2026-08-11` | `903c4a7` | Phase 7J PR head |
+| `archive/phase7j-product-convergence/2026-08-11` | `4c1f1f4` | Phase 7J PR head |
 
 ## Pre-main gate suite (§143)
 
@@ -51,7 +51,7 @@ All PASS on `:4020` tunnel — see `docs/validation/phase7j-feature-matrix.md`.
 
 ## PR
 
-- **URL:** _filled after `gh pr create`_
+- **URL:** https://github.com/modula-mod/modula-latest/pull/14
 - **Merge policy:** Do not merge until pre-main suite green on PR checks.
 
 ## Remaining after merge

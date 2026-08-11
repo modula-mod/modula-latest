@@ -10,7 +10,7 @@ Mac host: `/Users/msjoy/Developer/modula-latest`
 | `origin/main` | `dbc4bbfa73f1f87b502a9d59fbd76fdb28f0d6c7` | 0 |
 | `origin/phase7i-trusted-production-alpha` | `0f9708bbaa1896e438dc3a9f5b28ec6d1327c353` | 15 |
 | `origin/phase7i-mac-native-ui-acceptance` | `3fe04860677ad032b92c7282a5dd1ce3336fc45f` | 18 |
-| `phase7j-product-convergence` (local → PR) | `903c4a75d28cf03b9fa7cfe99fce84a7aabddbc0` | 33 |
+| `phase7j-product-convergence` (local → PR) | `4c1f1f41051115cb8d9df0baab57047c892c9607` | 35 |
 
 ## Relationship
 
@@ -18,7 +18,7 @@ Mac host: `/Users/msjoy/Developer/modula-latest`
 origin/main (dbc4bbf)
   └── origin/phase7i-trusted-production-alpha (0f9708b)
         └── origin/phase7i-mac-native-ui-acceptance (3fe0486)
-              └── phase7j-product-convergence (903c4a7)  ← PR to main
+              └── phase7j-product-convergence (4c1f1f4)  ← PR #14 to main
 ```
 
 ## Remote heads (GitHub)

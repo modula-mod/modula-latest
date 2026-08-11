@@ -1,8 +1,9 @@
 # Phase 7J — Branch convergence decisions
 
 Date: 2026-08-11  
-Consolidation branch: `phase7j-product-convergence` @ `903c4a7`  
+Consolidation branch: `phase7j-product-convergence` @ `4c1f1f4`  
 Merge target: `origin/main` @ `dbc4bbf`  
+PR: https://github.com/modula-mod/modula-latest/pull/14  
 Auditor: Mission C automation (Mac host)
 
 ## Remote inventory (post `git fetch origin --prune --tags`)
@@ -14,7 +15,7 @@ Only **three** remote heads exist after prune. No additional feature branches on
 | `origin/main` | `dbc4bbf` | `dbc4bbf` | 0 | 0 | **MERGE_TARGET** | n/a (receives PR) | `archive/main/2026-08-11` | Updated by PR `#TBD` merge |
 | `origin/phase7i-trusted-production-alpha` | `0f9708b` | `dbc4bbf` | 15 | 58 | **ALREADY_INTEGRATED** | all 15 commits ∈ `phase7j-product-convergence` | `archive/phase7i-trusted-production-alpha/2026-08-11` | Retire after PR merge; ops/mail/runtime docs only |
 | `origin/phase7i-mac-native-ui-acceptance` | `3fe0486` | `dbc4bbf` | 18 | 147 | **ALREADY_INTEGRATED** | all 18 commits ∈ `phase7j-product-convergence` | `archive/phase7i-mac-native-ui-acceptance/2026-08-11` | Retire after PR merge; session restore + native UI audit |
-| `phase7j-product-convergence` (local) | `903c4a7` | `dbc4bbf` | 33 | 229 | **MERGE_FULL** | self | `archive/phase7j-product-convergence/2026-08-11` | Open PR → `main`; do not force-push main |
+| `phase7j-product-convergence` (local) | `4c1f1f4` | `dbc4bbf` | 35 | 231 | **MERGE_FULL** | self | `archive/phase7j-product-convergence/2026-08-11` | PR #14 → `main`; do not force-push main |
 
 ## Classification summary
 
@@ -34,7 +35,7 @@ Only **three** remote heads exist after prune. No additional feature branches on
 origin/main (dbc4bbf)
   └── phase7i-trusted-production-alpha (0f9708b)  +15 commits — ops/mail/runtime/7I gates
         └── phase7i-mac-native-ui-acceptance (3fe0486)  +3 commits — session restore, native UI audit
-              └── phase7j-product-convergence (903c4a7)  +15 commits — product convergence gates
+              └── phase7j-product-convergence (4c1f1f4)  +17 commits — product convergence + Mission C
 ```
 
 ## Security / architectural age notes
