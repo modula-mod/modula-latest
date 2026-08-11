@@ -6,6 +6,8 @@ import {hashPassword, verifyPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
+import {CredentialRegistryService} from '../auth/credentials/service.js'
+import {SecurityEventService} from '../auth/security-events/service.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
 
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex')
@@ -24,6 +26,8 @@ export class AccountService {
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
     private readonly mail?: MailService,
+    private readonly credentials = new CredentialRegistryService(db),
+    private readonly securityEvents = new SecurityEventService(db),
   ) {}
 
   async register(input: {
@@ -122,6 +126,19 @@ export class AccountService {
           updated_at: now,
         })
         .execute()
+      const credentialRegistry = this.credentials.forDb(trx)
+      await credentialRegistry.createPasswordMethod({
+        accountId,
+        verifiedAt: now,
+        metadata: {algorithm: 'argon2id'},
+      })
+      await credentialRegistry.createEmailOtpMethod({
+        accountId,
+        email,
+        state: 'pending',
+        verifiedAt: null,
+        createdAt: now,
+      })
       await trx
         .insertInto('greenfield_email_verifications')
         .values({
@@ -148,6 +165,14 @@ export class AccountService {
         {type: 'greenfield_account', id: accountId, actorId: null},
         {accountId},
       )
+      await this.securityEvents.forDb(trx).record({
+        accountId,
+        eventType: 'account.registered',
+        methodType: 'password',
+        methodId: `password-${accountId}`,
+        severity: 'notice',
+        metadata: {handle, emailVerificationRequired: true},
+      })
     })
 
     // Preview/dev may return the verification token when SMTP is not configured.
@@ -191,12 +216,21 @@ export class AccountService {
         .where('account_id', '=', row.account_id)
         .where('kind', '=', 'email')
         .execute()
+      await this.credentials.forDb(trx).activateEmailOtpMethod(row.account_id, now)
       await new AuditRepository(trx).append(
         'email.verified',
         {},
         {type: 'greenfield_account', id: row.account_id, actorId: null},
         {accountId: row.account_id},
       )
+      await this.securityEvents.forDb(trx).record({
+        accountId: row.account_id,
+        eventType: 'contact_email.verified',
+        methodType: 'email_otp',
+        methodId: `email-otp-${row.account_id}`,
+        severity: 'notice',
+        metadata: {},
+      })
 
       // Create default repository + initial collections + default profile record shell.
       const repositoryId = uuidv7()
@@ -396,6 +430,11 @@ export class AccountService {
         .set({password_hash: passwordHash, params: {algorithm: 'argon2id'}, updated_at: now})
         .where('account_id', '=', accountId)
         .execute()
+      await this.credentials.forDb(trx).createPasswordMethod({
+        accountId,
+        verifiedAt: now,
+        metadata: {algorithm: 'argon2id'},
+      })
       await trx
         .insertInto('greenfield_session_events')
         .values({
@@ -407,6 +446,14 @@ export class AccountService {
           created_at: now,
         })
         .execute()
+      await this.securityEvents.forDb(trx).record({
+        accountId,
+        eventType: 'password.changed',
+        methodType: 'password',
+        methodId: `password-${accountId}`,
+        severity: 'warning',
+        metadata: {sessionsRevoked: true},
+      })
       await this.mail?.queuePasswordChanged(trx, {
         accountId,
         email: identity.identifier,

@@ -4,6 +4,8 @@ import type {ModulaDb} from '../database/client.js'
 import {hashPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
+import {CredentialRegistryService} from '../auth/credentials/service.js'
+import {SecurityEventService} from '../auth/security-events/service.js'
 
 const hashToken = (token: string) => createHash('sha256').update(token).digest('hex')
 export class RecoveryService {
@@ -11,6 +13,8 @@ export class RecoveryService {
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
     private readonly mail?: MailService,
+    private readonly credentials = new CredentialRegistryService(db),
+    private readonly securityEvents = new SecurityEventService(db),
   ) {}
   async requestRecovery(email: string, options: {correlationId?: string} = {}): Promise<{requested: true; recoveryToken?: string}> {
     const normalizedEmail = email.trim().toLowerCase()
@@ -67,8 +71,21 @@ export class RecoveryService {
     await this.db.transaction().execute(async trx => {
       await trx.updateTable('greenfield_recovery_tokens').set({consumed_at: now}).where('token_id', '=', recovery.token_id).execute()
       await trx.updateTable('greenfield_password_credentials').set({password_hash: passwordHash, params: {algorithm: 'argon2id'}, updated_at: now}).where('account_id', '=', recovery.account_id).execute()
+      await this.credentials.forDb(trx).createPasswordMethod({
+        accountId: recovery.account_id,
+        verifiedAt: now,
+        metadata: {algorithm: 'argon2id', source: 'password_reset'},
+      })
       await trx.updateTable('greenfield_sessions').set({status: 'revoked', revoked_at: now}).where('account_id', '=', recovery.account_id).where('status', '=', 'active').execute()
       await trx.insertInto('greenfield_session_events').values({event_id: uuidv7(), session_id: null, account_id: recovery.account_id, event_type: 'recovery.completed', metadata: {}, created_at: now}).execute()
+      await this.securityEvents.forDb(trx).record({
+        accountId: recovery.account_id,
+        eventType: 'password.reset.completed',
+        methodType: 'password',
+        methodId: `password-${recovery.account_id}`,
+        severity: 'warning',
+        metadata: {sessionsRevoked: true},
+      })
       await this.mail?.queuePasswordChanged(trx, {
         accountId: recovery.account_id,
         email: identity.identifier,

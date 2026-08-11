@@ -7,6 +7,23 @@ export type Audience = 'public' | 'followers' | 'private'
 export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
+export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
+export type AuthenticationMethodState = 'pending' | 'active' | 'disabled' | 'revoked'
+export type AuthenticationStrength = 'low' | 'medium' | 'strong' | 'phishing_resistant' | 'recovery'
+export type AuthenticationChallengePurpose =
+  | 'email_verification'
+  | 'email_login'
+  | 'password_reset'
+  | 'email_change'
+  | 'passkey_registration'
+  | 'passkey_authentication'
+  | 'totp_enrollment'
+  | 'step_up'
+  | 'account_recovery'
+export type AuthenticationChallengeState = 'pending' | 'verified' | 'consumed' | 'expired' | 'superseded' | 'locked'
+export type AuthenticationChallengeResult = 'succeeded' | 'failed' | 'expired' | 'replayed' | 'rate_limited' | 'locked'
+export type AuthenticationDeliveryChannel = 'email' | 'authenticator' | 'webauthn' | 'recovery' | 'internal'
+export type SecurityEventSeverity = 'info' | 'notice' | 'warning' | 'critical'
 export type NotificationType = 'follow' | 'like' | 'repost' | 'reply' | 'mention' | 'module_event'
 export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
@@ -887,10 +904,19 @@ export interface Database {
   greenfield_reserved_handles: {handle: string; reason: string; created_at: Date}
   greenfield_auth_identities: {identity_id: string; account_id: string; kind: 'email' | 'passkey' | 'oidc'; identifier: string; verified_at: Date | null; metadata: unknown; created_at: Date; updated_at: Date}
   greenfield_password_credentials: {account_id: string; password_hash: string; params: unknown; updated_at: Date}
-  greenfield_passkeys: {passkey_id: string; account_id: string; credential_id: string; public_key: Buffer; counter: number; transports: unknown; created_at: Date; last_used_at: Date | null}
+  greenfield_authentication_methods: {method_id: string; account_id: string; method_type: AuthenticationMethodType; display_label: string | null; state: AuthenticationMethodState; strength: AuthenticationStrength; verified_at: Date | null; last_used_at: Date | null; created_at: Date; updated_at: Date; revoked_at: Date | null; metadata: unknown}
+  greenfield_auth_challenges: {challenge_id: string; purpose: AuthenticationChallengePurpose; account_id: string | null; method_id: string | null; subject_identifier: string | null; challenge_hash: string; verifier_hash: string | null; verifier_hint: string | null; delivery_channel: AuthenticationDeliveryChannel | null; state: AuthenticationChallengeState; attempt_limit: number; attempt_count: number; rate_limit_key: string | null; expires_at: Date; verified_at: Date | null; consumed_at: Date | null; superseded_at: Date | null; last_attempt_at: Date | null; created_at: Date; metadata: unknown}
+  greenfield_auth_challenge_attempts: {attempt_id: string; challenge_id: string | null; account_id: string | null; purpose: string; result: AuthenticationChallengeResult; failure_code: string | null; created_at: Date; metadata: unknown}
+  greenfield_auth_rate_limits: {rate_limit_key: string; purpose: string; window_started_at: Date; attempt_count: number; blocked_until: Date | null; updated_at: Date}
+  greenfield_passkeys: {passkey_id: string; account_id: string; credential_id: string; public_key: Buffer; counter: number; transports: unknown; created_at: Date; last_used_at: Date | null; method_id: string | null; algorithm: string | null; backup_eligible: boolean | null; backup_state: boolean | null; label: string | null; revoked_at: Date | null}
+  greenfield_totp_credentials: {totp_id: string; method_id: string; account_id: string; secret_ciphertext: string; secret_key_id: string; algorithm: string; digits: number; period_seconds: number; state: AuthenticationMethodState; confirmed_at: Date | null; last_used_at: Date | null; created_at: Date; updated_at: Date; revoked_at: Date | null; metadata: unknown}
+  greenfield_recovery_code_sets: {set_id: string; method_id: string; account_id: string; state: 'active' | 'invalidated' | 'exhausted' | 'revoked'; generated_at: Date; invalidated_at: Date | null; created_at: Date}
+  greenfield_recovery_codes: {code_id: string; set_id: string; account_id: string; code_hash: string; used_at: Date | null; created_at: Date}
+  greenfield_external_identities: {external_identity_id: string; method_id: string; account_id: string; provider: 'apple' | 'oidc'; provider_subject: string; provider_issuer: string | null; email: string | null; email_verified: boolean | null; linked_at: Date; last_used_at: Date | null; revoked_at: Date | null; metadata: unknown}
+  greenfield_security_events: {event_id: string; account_id: string; session_id: string | null; event_type: string; method_type: AuthenticationMethodType | null; method_id: string | null; severity: SecurityEventSeverity; ip_hash: string | null; user_agent: string | null; metadata: unknown; created_at: Date}
   greenfield_email_verifications: {verification_id: string; account_id: string; token_hash: string; expires_at: Date; consumed_at: Date | null; created_at: Date}
   greenfield_recovery_tokens: {token_id: string; account_id: string; token_hash: string; expires_at: Date; consumed_at: Date | null; created_at: Date}
-  greenfield_sessions: {session_id: string; account_id: string; status: 'active' | 'revoked' | 'expired'; family_id: string; created_at: Date; expires_at: Date; revoked_at: Date | null; last_seen_at: Date; user_agent: string | null; ip_hash: string | null}
+  greenfield_sessions: {session_id: string; account_id: string; status: 'active' | 'revoked' | 'expired'; family_id: string; created_at: Date; expires_at: Date; revoked_at: Date | null; last_seen_at: Date; user_agent: string | null; ip_hash: string | null; recent_authentication_at: Date | null; authentication_strength: AuthenticationStrength; authentication_method_id: string | null; client_name: string | null; platform: string | null}
   greenfield_session_tokens: {token_id: string; session_id: string; kind: 'access' | 'refresh'; token_hash: string; family_id: string; expires_at: Date; rotated_at: Date | null; reused_at: Date | null; revoked_at: Date | null; created_at: Date}
   greenfield_session_events: {event_id: string; session_id: string | null; account_id: string; event_type: string; metadata: unknown; created_at: Date}
   greenfield_repositories: {repository_id: string; account_id: string; name: string; head_hash: string | null; revision: number; created_at: Date; updated_at: Date}

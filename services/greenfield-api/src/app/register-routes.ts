@@ -69,6 +69,15 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
     code === 'FORBIDDEN' ||
     code === 'CONFLICT' ||
     code === 'UNAUTHENTICATED' ||
+    code === 'INVALID_CREDENTIALS' ||
+    code === 'CHALLENGE_EXPIRED' ||
+    code === 'CHALLENGE_INVALID' ||
+    code === 'CHALLENGE_REPLAYED' ||
+    code === 'RATE_LIMITED' ||
+    code === 'STEP_UP_REQUIRED' ||
+    code === 'PASSKEY_NOT_FOUND' ||
+    code === 'AUTH_METHOD_UNAVAILABLE' ||
+    code === 'ACCOUNT_SUSPENDED' ||
     code === 'CAPABILITY_DISABLED'
   ) {
     return sendError(reply, code, error.message ?? fallback, requestId)

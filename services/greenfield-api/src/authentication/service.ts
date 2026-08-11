@@ -2,12 +2,17 @@ import type {ModulaDb} from '../database/client.js'
 import {verifyPassword} from '../lib/password.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
 import {GreenfieldSessionService} from '../sessions/service.js'
+import {authError} from '../auth/errors.js'
+import {CredentialRegistryService} from '../auth/credentials/service.js'
+import {SecurityEventService} from '../auth/security-events/service.js'
 
 export class AuthenticationService {
   constructor(
     private readonly db: ModulaDb,
     private readonly sessions: GreenfieldSessionService,
     private readonly mail?: MailService,
+    private readonly credentials = new CredentialRegistryService(db),
+    private readonly securityEvents = new SecurityEventService(db),
   ) {}
   async login(email: string, password: string, context?: {userAgent?: string; ipHash?: string; correlationId?: string}) {
     const identity = await this.db
@@ -25,10 +30,31 @@ export class AuthenticationService {
       .where('greenfield_auth_identities.kind', '=', 'email')
       .where('greenfield_auth_identities.identifier', '=', email.trim().toLowerCase())
       .executeTakeFirst()
-    if (!identity || identity.status !== 'active' || !(await verifyPassword(password, identity.password_hash))) {
-      throw Object.assign(new Error('Invalid credentials'), {code: 'UNAUTHENTICATED'})
+    if (!identity || !(await verifyPassword(password, identity.password_hash))) {
+      throw authError('INVALID_CREDENTIALS')
     }
-    const issued = await this.sessions.issue(identity.account_id, context)
+    if (identity.status === 'suspended') throw authError('ACCOUNT_SUSPENDED')
+    if (identity.status !== 'active') throw authError('INVALID_CREDENTIALS')
+    const passwordMethod = await this.credentials.findActivePasswordMethod(identity.account_id)
+    if (!passwordMethod) throw authError('AUTH_METHOD_UNAVAILABLE')
+    const issued = await this.sessions.issue(identity.account_id, {
+      ...context,
+      authenticationMethodId: passwordMethod.methodId,
+      authenticationStrength: passwordMethod.strength,
+      recentAuthenticationAt: new Date(),
+    })
+    await this.credentials.markMethodUsed(passwordMethod.methodId)
+    await this.securityEvents.record({
+      accountId: identity.account_id,
+      sessionId: issued.sessionId,
+      eventType: 'sign_in',
+      methodType: 'password',
+      methodId: passwordMethod.methodId,
+      severity: 'notice',
+      ipHash: context?.ipHash ?? null,
+      userAgent: context?.userAgent ?? null,
+      metadata: {},
+    })
     await this.mail?.queueNewSignIn({
       accountId: identity.account_id,
       email: identity.identifier,

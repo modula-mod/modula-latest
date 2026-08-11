@@ -7,6 +7,8 @@ import {validateHandle} from '../src/accounts/handle.js'
 import {hashPassword, verifyPassword} from '../src/lib/password.js'
 import {createCheckpointSigner} from '../src/checkpoints/service.js'
 import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {ChallengeService} from '../src/auth/challenges/service.js'
+import {evaluateStepUpRequirement} from '../src/auth/step-up/policy.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
@@ -105,6 +107,31 @@ describe('Greenfield unit primitives', () => {
     expect(config.productionWritesEnabled).toBe(true)
     expect(config.mutationsEnabled).toBe(true)
   })
+
+  it('evaluates sensitive-action step-up policy on the server', () => {
+    const now = new Date('2026-08-11T12:00:00.000Z')
+    expect(
+      evaluateStepUpRequirement(
+        'change_mail_forwarding',
+        {recentAuthenticationAt: new Date(now.getTime() - 60_000), authenticationStrength: 'medium'},
+        now,
+      ),
+    ).toMatchObject({allowed: false, code: 'STEP_UP_REQUIRED', reason: 'authentication_strength_insufficient'})
+    expect(
+      evaluateStepUpRequirement(
+        'change_mail_forwarding',
+        {recentAuthenticationAt: new Date(now.getTime() - 60_000), authenticationStrength: 'strong'},
+        now,
+      ),
+    ).toMatchObject({allowed: true, code: 'ALLOWED'})
+    expect(
+      evaluateStepUpRequirement(
+        'dimon_operation',
+        {recentAuthenticationAt: new Date(now.getTime() - 60_000), authenticationStrength: 'strong'},
+        now,
+      ),
+    ).toMatchObject({allowed: false, requiredStrength: 'phishing_resistant'})
+  })
 })
 
 describeIf('Greenfield native accounts integration', () => {
@@ -188,6 +215,70 @@ describeIf('Greenfield native accounts integration', () => {
     const session = login.json().data
     expect(session.accessToken).toBeTruthy()
     expect(session.refreshToken).toBeTruthy()
+
+    const methods = await db
+      .selectFrom('greenfield_authentication_methods')
+      .select(['method_type', 'state', 'strength', 'verified_at'])
+      .where('account_id', '=', registered.accountId)
+      .orderBy('method_type', 'asc')
+      .execute()
+    expect(methods).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({method_type: 'email_otp', state: 'active', strength: 'low'}),
+        expect.objectContaining({method_type: 'password', state: 'active', strength: 'medium'}),
+      ]),
+    )
+
+    const storedSession = await db
+      .selectFrom('greenfield_sessions')
+      .select(['authentication_method_id', 'authentication_strength', 'recent_authentication_at'])
+      .where('session_id', '=', session.sessionId)
+      .executeTakeFirstOrThrow()
+    expect(storedSession.authentication_method_id).toBe(`password-${registered.accountId}`)
+    expect(storedSession.authentication_strength).toBe('medium')
+    expect(storedSession.recent_authentication_at).toBeTruthy()
+
+    const signInEvent = await db
+      .selectFrom('greenfield_security_events')
+      .select(['event_type', 'method_type', 'method_id', 'severity'])
+      .where('account_id', '=', registered.accountId)
+      .where('event_type', '=', 'sign_in')
+      .executeTakeFirstOrThrow()
+    expect(signInEvent).toMatchObject({
+      event_type: 'sign_in',
+      method_type: 'password',
+      method_id: `password-${registered.accountId}`,
+      severity: 'notice',
+    })
+
+    const challenges = new ChallengeService(db, loadConfig())
+    const firstChallenge = await challenges.create({
+      purpose: 'email_login',
+      subjectIdentifier: email,
+      deliveryChannel: 'email',
+      ttlSeconds: 600,
+      supersedeExisting: true,
+    })
+    const secondChallenge = await challenges.create({
+      purpose: 'email_login',
+      subjectIdentifier: email,
+      deliveryChannel: 'email',
+      ttlSeconds: 600,
+      supersedeExisting: true,
+    })
+    await expect(challenges.verifyCode(firstChallenge.challengeId, firstChallenge.code)).rejects.toMatchObject({
+      code: 'CHALLENGE_INVALID',
+    })
+    await expect(challenges.verifyCode(secondChallenge.challengeId, secondChallenge.code === '000000' ? '000001' : '000000')).rejects.toMatchObject({
+      code: 'CHALLENGE_INVALID',
+    })
+    await expect(challenges.verifyCode(secondChallenge.challengeId, secondChallenge.code)).resolves.toMatchObject({
+      challengeId: secondChallenge.challengeId,
+      purpose: 'email_login',
+    })
+    await expect(challenges.verifyCode(secondChallenge.challengeId, secondChallenge.code)).rejects.toMatchObject({
+      code: 'CHALLENGE_REPLAYED',
+    })
 
     const me = await app.inject({
       method: 'GET',

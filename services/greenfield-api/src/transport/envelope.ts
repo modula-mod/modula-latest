@@ -50,10 +50,18 @@ export function statusForError(code: ApiErrorCode): number {
     case 'VALIDATION_FAILED':
       return 400
     case 'UNAUTHENTICATED':
+    case 'INVALID_CREDENTIALS':
+    case 'CHALLENGE_EXPIRED':
+    case 'CHALLENGE_INVALID':
+    case 'CHALLENGE_REPLAYED':
     case 'SESSION_EXPIRED':
+    case 'STEP_UP_REQUIRED':
+    case 'PASSKEY_NOT_FOUND':
+    case 'AUTH_METHOD_UNAVAILABLE':
     case 'AUTHENTICATION_NOT_AVAILABLE':
       return 401
     case 'FORBIDDEN':
+    case 'ACCOUNT_SUSPENDED':
     case 'CAPABILITY_DISABLED':
     case 'AI_ACTION_PERMISSION_REQUIRED':
     case 'AI_CONTEXT_PERMISSION_REQUIRED':
