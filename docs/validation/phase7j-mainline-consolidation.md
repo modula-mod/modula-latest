@@ -1,7 +1,7 @@
 # Phase 7J — Mainline consolidation validation
 
 Date: 2026-08-11  
-Branch: `phase7j-product-convergence` @ `4c1f1f4`  
+Branch: `phase7j-product-convergence` @ `cf14ec7`  
 Target: `main` @ `dbc4bbf` (pre-merge)
 
 ## Scope
@@ -30,7 +30,7 @@ Mission C consolidates Phase 7I Mac acceptance + Phase 7J product convergence in
 |---|---|---|---|
 | Frozen install | `pnpm install --frozen-lockfile` | **PASS** | Already up to date |
 | Expo deps check | `pnpm exec expo install --check` | **PASS** | Dependencies up to date |
-| Expo doctor | `pnpm exec expo-doctor` | **PARTIAL** | 18/20 — duplicate `expo-constants` patch level (57.0.9 vs 57.0.10); prebuild/CNG config advisory (pre-existing) |
+| Expo doctor | `pnpm exec expo-doctor` | **PASS** (19/20) | Duplicate `expo-constants` fixed via `pnpm-workspace.yaml` override (`cf14ec7`); prebuild/CNG advisory remains (expected with committed ios/android) |
 | Lint | `pnpm lint` | **PASS** | |
 | Typecheck | `pnpm typecheck` | **PASS** | |
 | Web build | `pnpm build:web` | **PASS** | `dist/` 199 routes, marker `d540db1` |
@@ -52,7 +52,7 @@ All PASS on `:4020` tunnel — see `docs/validation/phase7j-feature-matrix.md`.
 ## PR
 
 - **URL:** https://github.com/modula-mod/modula-latest/pull/14
-- **Merge policy:** Do not merge until pre-main suite green on PR checks.
+- **Merge policy:** Do not merge until reviewer approves. **GitHub Actions CI is not configured** on this repo (`workflows: 0`); local pre-main gates are the verification source.
 
 ## Remaining after merge
 
