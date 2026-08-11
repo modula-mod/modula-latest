@@ -38,6 +38,8 @@ function assertFile(rel, needle) {
 console.log('Phase 7J verify aggregator')
 
 assertFile('docs/engineering/phase7j-branch-inventory.md', 'phase7j-product-convergence')
+assertFile('docs/engineering/phase7j-branch-convergence.md', 'MERGE_FULL')
+assertFile('docs/validation/phase7j-mainline-consolidation.md', 'Mission C')
 assertFile('docs/engineering/phase7j-mac-drift-classification.md', 'REQUIRED_PRODUCT')
 assertFile('docs/research/phase7j-design-skills.md', 'modula-ui')
 assertFile('docs/research/phase7j-native-runtime-baseline.md', 'expo')
@@ -52,4 +54,4 @@ run('lint', 'pnpm', ['lint'])
 run('typecheck', 'pnpm', ['typecheck'])
 
 console.log('\nPhase 7J automated gates PASS')
-console.log('Remaining: Simulator golden paths, VPS social E2E, branch consolidation, PR to main.')
+console.log('Remaining: PR CI green, optional Simulator golden paths, VPS deploy parity.')
