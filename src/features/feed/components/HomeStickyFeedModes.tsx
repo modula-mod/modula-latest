@@ -28,28 +28,36 @@ const COMPACT_SCALE = 0.94
 /** Unstick slightly before the stick line so snap-back doesn’t chatter. */
 const UNSTICK_SLOP = 18
 
-const ENTER_SPRING = {damping: 22, stiffness: 280, mass: 0.82}
-const SNAP_BACK_SPRING = {damping: 20, stiffness: 320, mass: 0.75}
-const EXIT_TIMING = {duration: 140, easing: Easing.out(Easing.cubic)}
-
-function stickThreshold(stickAtY: number): number {
+/**
+ * Sticky handoff waits until ListHeader measures a real stick line.
+ * `stickAtY === 0` means “not measured yet” — never latch (0 >= 0) into sticky.
+ */
+function stickThreshold(stickAtY: number): number | null {
   'worklet'
-  return Math.max(0, stickAtY)
+  if (stickAtY <= 0) return null
+  return stickAtY
 }
 
 function approachProgress(scrollY: number, stickAtY: number): number {
   'worklet'
   const start = stickThreshold(stickAtY)
-  if (start <= 0) {
-    return interpolate(
-      scrollY,
-      [0, MORPH_DISTANCE],
-      [0, 1],
-      Extrapolation.CLAMP,
-    )
-  }
+  if (start == null) return 0
   const from = Math.max(0, start - MORPH_DISTANCE)
   return interpolate(scrollY, [from, start], [0, 1], Extrapolation.CLAMP)
+}
+
+function handoffLatched(
+  scrollY: number,
+  stickAtY: number,
+  currentlyLatched: number,
+): number {
+  'worklet'
+  const start = stickThreshold(stickAtY)
+  if (start == null) return 0
+  if (currentlyLatched === 1) {
+    return scrollY >= start - UNSTICK_SLOP ? 1 : 0
+  }
+  return scrollY >= start ? 1 : 0
 }
 
 type Props = {
@@ -73,8 +81,10 @@ export function HomeStickyFeedModes({
   quietFeed,
   onModeChange,
 }: Props) {
-  const {colours, radius, spacing, scheme} = useThemeTokens()
+  const {colours, radius, spacing, scheme, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const enterSpring = motion.springs.navigation
+  const exitTiming = {duration: motion.fast, easing: Easing.out(Easing.cubic)}
   const headerOffset = useSecondaryChromeSpacerHeight()
   const obscureStyle = useShellChromeObscureStyle('up')
   const [interactive, setInteractive] = useState(false)
@@ -84,27 +94,20 @@ export function HomeStickyFeedModes({
   const latched = useSharedValue(0)
 
   useAnimatedReaction(
-    () => {
-      const start = stickThreshold(stickAtY.value)
-      const y = scrollY.value
-      if (latched.value === 1) {
-        return y >= start - UNSTICK_SLOP ? 1 : 0
-      }
-      return y >= start ? 1 : 0
-    },
+    () => handoffLatched(scrollY.value, stickAtY.value, latched.value),
     (next, prev) => {
       if (next === prev) return
       latched.value = next
       if (reduceMotion) {
         handoff.value = next
       } else if (next === 1) {
-        handoff.value = withSpring(1, ENTER_SPRING)
+        handoff.value = withSpring(1, enterSpring)
       } else {
-        handoff.value = withTiming(0, EXIT_TIMING)
+        handoff.value = withTiming(0, exitTiming)
       }
       runOnJS(setInteractive)(next === 1)
     },
-    [reduceMotion],
+    [enterSpring, exitTiming, reduceMotion],
   )
 
   const shellStyle = useAnimatedStyle(() => {
@@ -200,20 +203,14 @@ export function useInlineModeTabsStyle(
   scrollY: SharedValue<number>,
   stickAtY: SharedValue<number>,
   reduceMotion: boolean,
+  snapBackSpring = {damping: 24, stiffness: 320, mass: 0.8},
 ) {
   const visible = useSharedValue(1)
   const settleScale = useSharedValue(1)
   const latched = useSharedValue(0)
 
   useAnimatedReaction(
-    () => {
-      const start = stickThreshold(stickAtY.value)
-      const y = scrollY.value
-      if (latched.value === 1) {
-        return y >= start - UNSTICK_SLOP ? 1 : 0
-      }
-      return y >= start ? 1 : 0
-    },
+    () => handoffLatched(scrollY.value, stickAtY.value, latched.value),
     (next, prev) => {
       if (next === prev) return
       latched.value = next
@@ -225,10 +222,10 @@ export function useInlineModeTabsStyle(
       } else {
         visible.value = 1
         settleScale.value = COMPACT_SCALE
-        settleScale.value = withSpring(1, SNAP_BACK_SPRING)
+        settleScale.value = withSpring(1, snapBackSpring)
       }
     },
-    [reduceMotion],
+    [reduceMotion, snapBackSpring],
   )
 
   return useAnimatedStyle(() => {
@@ -262,14 +259,7 @@ export function useInlineModeTabsInteractive(
   const latched = useSharedValue(0)
 
   useAnimatedReaction(
-    () => {
-      const start = stickThreshold(stickAtY.value)
-      const y = scrollY.value
-      if (latched.value === 1) {
-        return y >= start - UNSTICK_SLOP ? 1 : 0
-      }
-      return y >= start ? 1 : 0
-    },
+    () => handoffLatched(scrollY.value, stickAtY.value, latched.value),
     (next, prev) => {
       if (next === prev) return
       latched.value = next

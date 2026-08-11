@@ -9,6 +9,59 @@
         "node",
         "dist/stdio.js"
       ]
+    },
+    "expo": {
+      "url": "https://mcp.expo.dev/mcp"
+    },
+    "mobile-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mobilenext/mobile-mcp@latest"
+      ],
+      "env": {
+        "MOBILEMCP_ALLOW_UNSAFE_URLS": "1"
+      }
+    },
+    "metro-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "metro-mcp"
+      ]
+    },
+    "figma-console": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://figma-console-mcp.southleft.com/sse"
+      ]
+    },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp/oauth"
+    },
+    "github": {
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${env:GITHUB_PERSONAL_ACCESS_TOKEN}",
+        "X-MCP-Readonly": "true"
+      }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--no-usage-statistics"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }

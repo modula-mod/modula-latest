@@ -1,0 +1,23 @@
+installed 200 ok=True err=None dataType=list
+probe /v1/modules/digital.modula.vault-notes 404 ok=None err=Not Found dataType=NoneType
+probe /v1/modules/catalogue 404 ok=None err=Not Found dataType=NoneType
+probe /v1/marketplace/modules 404 ok=None err=Not Found dataType=NoneType
+install-preview 404 ok=False err=NOT_FOUND dataType=NoneType
+install 1.0.0 404 ok=False err=NOT_FOUND dataType=NoneType
+install 0.1.0 202 ok=True err=None dataType=dict
+enable 409 ok=False err=CONFLICT dataType=NoneType
+views 200 ok=True err=None dataType=dict
+list notes 403 ok=False err=FORBIDDEN dataType=NoneType
+list note 200 ok=True err=None dataType=dict
+create note 400 ok=False err=VALIDATION_FAILED dataType=NoneType
+list vaultNotes 400 ok=False err=VALIDATION_FAILED dataType=NoneType
+list items 403 ok=False err=FORBIDDEN dataType=NoneType
+disable 409 ok=False err=CONFLICT dataType=NoneType
+enable2 409 ok=False err=CONFLICT dataType=NoneType
+uninstall-preview 200 ok=True err=None dataType=dict
+uninstall keepData 409 ok=False err=CONFLICT dataType=NoneType
+reinstall 202 ok=True err=None dataType=dict
+enable3 409 ok=False err=CONFLICT dataType=NoneType
+restore list 200 ok=True err=None dataType=dict
+RESTORE_COUNT 1
+VAULT_DONE

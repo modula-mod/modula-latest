@@ -1,0 +1,9 @@
+SHOT 01-sign-in
+SHOT 02-filled
+SHOT 03-after-login
+URL_AFTER_LOGIN https://modula.digital/
+STILL_SIGN_IN false
+SHOT 04-after-reload
+URL_AFTER_RELOAD https://modula.digital/
+SHOT 05-drawer-or-home
+NO_SIGNOUT_VISIBLE

@@ -3,11 +3,17 @@ packages:
   - services/*
   - packages/*
 
+overrides:
+  expo-constants: ~57.0.10
+
 allowBuilds:
   '@shopify/react-native-skia': true
   core-js: false
   esbuild: true
   unrs-resolver: false
+# Temporary: Expo SDK 57.0.12 patch train published <24h before Phase 7J upgrade.
+# Restore a non-zero age (e.g. 1440) once packages mature past the cutoff.
+minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@expo/cli@57.0.8'
   - '@expo/config-plugins@57.0.5'
@@ -64,5 +70,42 @@ minimumReleaseAgeExclude:
   - expo-linear-gradient@57.0.1
   - expo-navigation-bar@57.0.2
   - '@atproto/api@0.20.30'
+  - '@expo/cli@57.0.14'
+  - '@expo/fingerprint@0.20.7'
+  - '@expo/inline-modules@0.1.5'
+  - '@expo/local-build-cache-provider@57.0.6'
+  - '@expo/metro-config@57.0.8'
+  - '@expo/metro-runtime@57.0.9'
+  - '@expo/prebuild-config@57.0.11'
+  - '@expo/ui@57.0.10'
+  - expo-asset@57.0.10
+  - expo-constants@57.0.10
+  - expo-dev-client@57.0.11
+  - expo-dev-launcher@57.0.11
+  - expo-dev-menu@57.0.11
+  - expo-image-picker@57.0.9
+  - expo-router@57.0.12
+  - expo-server@57.0.2
+  - expo-splash-screen@57.0.6
+  - expo@57.0.12
+  # Package-name excludes (required for lockfile supply-chain verification)
+  - '@expo/cli'
+  - '@expo/fingerprint'
+  - '@expo/inline-modules'
+  - '@expo/local-build-cache-provider'
+  - '@expo/metro-config'
+  - '@expo/metro-runtime'
+  - '@expo/prebuild-config'
+  - '@expo/ui'
+  - expo
+  - expo-asset
+  - expo-constants
+  - expo-dev-client
+  - expo-dev-launcher
+  - expo-dev-menu
+  - expo-image-picker
+  - expo-router
+  - expo-server
+  - expo-splash-screen
 patchedDependencies:
   '@shopify/react-native-skia@2.6.2': patches/@shopify__react-native-skia@2.6.2.patch

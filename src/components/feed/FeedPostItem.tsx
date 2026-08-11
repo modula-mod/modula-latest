@@ -21,6 +21,7 @@ import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProf
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {SocialPost} from '@/domain/social'
 
@@ -53,11 +54,13 @@ export function FeedPostItem({post}: FeedPostItemProps) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
   const session = useSession()
+  const {moderationRepository} = useAppServices()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = getProfileRouteForIdentity(post.author, ownerProfileId)
-  const overflowActions = buildPostOverflowActions(post)
+  const isOwner = Boolean(ownerProfileId) && post.author.id === ownerProfileId
+  const overflowActions = buildPostOverflowActions(post, {isOwner})
   const runOverflow = (id: string) => {
-    void runPostOverflowAction(id as PostOverflowActionId, post)
+    void runPostOverflowAction(id as PostOverflowActionId, post, {moderationRepository})
   }
 
   return (
@@ -256,6 +259,7 @@ function PostActions({post, onReply}: {post: SocialPost; onReply: () => void}) {
   const likeMutation = useLikePostMutation()
   const saveMutation = useSavePostMutation()
   const repostMutation = useRepostMutation()
+  const {moderationRepository} = useAppServices()
   const {colours} = useThemeTokens()
 
   const protectedRun = (action: () => void) => {
@@ -306,7 +310,7 @@ function PostActions({post, onReply}: {post: SocialPost; onReply: () => void}) {
     {
       label: 'Share',
       icon: 'share',
-      onPress: () => void runPostOverflowAction('share', post),
+      onPress: () => void runPostOverflowAction('share', post, {moderationRepository}),
     },
     {
       label: 'Save',

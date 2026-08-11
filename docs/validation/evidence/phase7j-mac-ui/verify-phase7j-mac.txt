@@ -1,0 +1,123 @@
+$ node scripts/verify-phase7j-mac.mjs
+Phase 7J-Mac-A verify aggregator
+cwd=/Users/msjoy/Developer/modula-latest
+PASS: docs/engineering/phase7j-branch-convergence.md contains "MERGE_FULL"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "phase7i-trusted-production-alpha"
+PASS: docs/engineering/phase7j-branch-inventory.md contains "7632e03"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "ALREADY_INTEGRATED"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "SUPERSEDED"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "CHERRY_PICK_VALID"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "ssh modula-vps"
+PASS: SOURCE CONVERGENCE branch phase7j-product-convergence
+PASS: docs/architecture/phase3-unified-profile.md contains "No Identity Centre"
+PASS: VAULT NOTES external package boundary (no src/features/vault-notes)
+
+==> LINT
+$ expo lint -- --max-warnings=0
+PASS: LINT
+
+==> TYPECHECK
+$ tsc --noEmit && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+Scope: 12 of 19 workspace projects
+packages/greenfield-module-manifest typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck: Done
+packages/greenfield-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck: Done
+packages/dimon-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck: Done
+packages/greenfield-mcp typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-manifest typecheck: Done
+packages/modula-cli typecheck$ tsc -p tsconfig.json --noEmit
+packages/dimon-contracts typecheck: Done
+packages/greenfield-contracts typecheck: Done
+packages/greenfield-mcp typecheck: Done
+packages/modula-cli typecheck: Done
+packages/greenfield-module-sdk typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-runtime typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-protocol typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck: Done
+packages/greenfield-module-sdk typecheck: Done
+packages/greenfield-protocol typecheck: Done
+packages/greenfield-runtime typecheck: Done
+PASS: TYPECHECK
+
+==> EXPO DOCTOR
+PASS: EXPO DOCTOR 19/20 with expected committed ios/android CNG advisory
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "BUILD_WEB_EXIT=0"
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "VERIFY_WEB_EXIT=0"
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "EXPO_CHECK_EXIT=0"
+PASS: WEB BUILD evidence recorded
+PASS: docs/validation/evidence/phase7j-mac-ui/ios-xcodebuild.txt contains "BUILD SUCCEEDED"
+PASS: IOS BUILD SUCCEEDED evidence
+PASS: AUTH/API live health
+PASS: API ready health
+PASS: API version commit=7632e03 phase=phase7i-f5b
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "=== me after refresh ==="
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "http 200 ok True handle"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains ""revoked":true"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "UNAUTHENTICATED"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "=== re-login ==="
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-golden-path.txt contains "INVALID_CREDENTIALS"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-golden-path.txt contains ""verified":true"
+PASS: AUTH + SESSION RESTORE (API lifecycle) evidence
+PASS: docs/validation/phase7i-mac-b-final.md contains "SESSION_RESTORE = PASS"
+PASS: docs/validation/phase7j-feature-matrix.md contains "SESSION_RESTORE gate PASS"
+PASS: src/auth/runtime/SessionProvider.tsx contains "refreshSession"
+PASS: src/auth/screens/SignInScreen.tsx contains "setFormError"
+PASS: src/auth/screens/SignInScreen.tsx contains "requestEmailSignInCode"
+PASS: packages/api-contracts/src/identifiers.ts contains "UUIDv7"
+PASS: src/components/materials/ProgressiveBlurBand.tsx contains "ProgressiveBlur"
+PASS: src/platform/ui/navigation/shell-bottom-progressive-blur.tsx contains "ShellBottomProgressiveBlur"
+PASS: src/theme/contracts/materials.ts contains "springs"
+PASS: docs/architecture/phase3-unified-profile.md contains "No Identity Centre"
+PASS: src/features/profile/screens/UnifiedProfileScreen.tsx contains "export function UnifiedProfileScreen"
+PASS: PROFILE canonical (architecture + UnifiedProfileScreen)
+PASS: src/theme/contracts/materials.ts contains "Surface"
+PASS: src/features/settings/screens/AppearanceScreen.tsx contains "export function AppearanceScreen"
+PASS: SURFACE TYPES materials + Appearance screen
+PASS: docs/validation/phase7j-feature-matrix.md contains "Stories"
+PASS: STORIES matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Posts create"
+PASS: POSTS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reactions"
+PASS: REACTIONS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Comments / replies"
+PASS: COMMENTS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Appearance / Settings"
+PASS: SETTINGS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Appearance"
+PASS: APPEARANCE matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Product Hub"
+PASS: PRODUCT HUB matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Drawer"
+PASS: DRAWER matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reduce Motion"
+PASS: REDUCE MOTION matrix+source
+PASS: docs/validation/phase7i-mac-b-final.md contains "PASS"
+PASS: ICONS abstraction present (AppIcon / platform icons)
+PASS: IMAGES evidence present (phase7i-mac-b-authenticated screenshots)
+PASS: docs/validation/phase7j-feature-matrix.md contains "P0 queue"
+PASS: P0/P1 = 0 (all P0 queue items struck through)
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reduce Motion"
+PASS: docs/design/modula-native-ui-principles.md
+PASS: docs/research/phase7j-expo-ui-component-map.md
+PASS: docs/research/phase7j-ui-component-candidates.md
+PASS: docs/validation/phase7j-ui-screen-matrix.md
+PASS: evidence dir has 12 artifacts
+
+---
+Phase 7J-Mac-A automated + evidence gates PASS
+Note: full Simulator golden-path UI redesign acceptance may still be outstanding; missing UI docs fail this verifier intentionally.

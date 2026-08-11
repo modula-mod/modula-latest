@@ -1,10 +1,11 @@
 import type {ReactNode} from 'react'
-import {ScrollView, StyleSheet, Switch, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {SystemSwitch} from '@/components/system/SystemSwitch'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
@@ -202,12 +203,10 @@ export function SettingsToggleRow({
           </AppText>
         ) : null}
       </View>
-      <Switch
+      <SystemSwitch
         value={value}
         onValueChange={onValueChange}
-        accessibilityLabel={title}
-        trackColor={{false: colours.border, true: colours.accentSubtle}}
-        thumbColor={value ? colours.accent : colours.textMuted}
+        label={title}
       />
     </View>
   )

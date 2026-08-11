@@ -7,13 +7,35 @@ export type Audience = 'public' | 'followers' | 'private'
 export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
+export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
+export type AuthenticationMethodState = 'pending' | 'active' | 'disabled' | 'revoked'
+export type AuthenticationStrength = 'low' | 'medium' | 'strong' | 'phishing_resistant' | 'recovery'
+export type AuthenticationChallengePurpose =
+  | 'email_verification'
+  | 'email_login'
+  | 'password_reset'
+  | 'email_change'
+  | 'contact_email_change'
+  | 'passkey_registration'
+  | 'passkey_authentication'
+  | 'totp_enrollment'
+  | 'step_up'
+  | 'account_recovery'
+export type AuthenticationChallengeState = 'pending' | 'verified' | 'consumed' | 'expired' | 'superseded' | 'locked'
+export type AuthenticationChallengeResult = 'succeeded' | 'failed' | 'expired' | 'replayed' | 'rate_limited' | 'locked'
+export type AuthenticationDeliveryChannel = 'email' | 'authenticator' | 'webauthn' | 'recovery' | 'internal'
+export type SecurityEventSeverity = 'info' | 'notice' | 'warning' | 'critical'
 export type NotificationType = 'follow' | 'like' | 'repost' | 'reply' | 'mention' | 'module_event'
-export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
+export type ReportTargetType = 'profile' | 'post' | 'story' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
 export type MailJobStatus = 'queued' | 'sending' | 'sent' | 'failed' | 'retrying' | 'dead-letter'
 export type MailFailureCategory = 'temporary' | 'permanent' | 'authentication' | 'rate-limit' | 'DNS' | 'TLS' | 'invalid-recipient'
+export type MailIdentityState = 'pending' | 'queued' | 'provisioning' | 'active' | 'suspended' | 'released' | 'failed' | 'adoption_required'
+export type MailIdentityRequestType = 'provision' | 'adopt' | 'suspend' | 'resume' | 'forward' | 'release'
+export type MailIdentityRequestState = 'queued' | 'leased' | 'completed' | 'failed' | 'cancelled'
+export type MailboxCredentialKind = 'imap_smtp_password'
 export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
 export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
 export type PolicyDecisionCode =
@@ -885,12 +907,26 @@ export interface Database {
   greenfield_handles: {handle: string; account_id: string; status: 'active' | 'released' | 'reserved'; created_at: Date}
   greenfield_handle_history: {history_id: string; account_id: string; handle: string; action: string; created_at: Date}
   greenfield_reserved_handles: {handle: string; reason: string; created_at: Date}
+  greenfield_reserved_identifiers: {identifier: string; registry_version: string; applies_to: string[]; reason: string; created_at: Date}
   greenfield_auth_identities: {identity_id: string; account_id: string; kind: 'email' | 'passkey' | 'oidc'; identifier: string; verified_at: Date | null; metadata: unknown; created_at: Date; updated_at: Date}
+  greenfield_mail_identities: {mail_identity_id: string; account_id: string; contact_identity_id: string | null; local_part: string; domain: string; address: string; state: MailIdentityState; provider: string | null; provider_reference: string | null; forwarding_enabled: boolean; forwarding_destination: string | null; forwarding_destination_hash: string | null; keep_local_copy: boolean; quota_bytes: number | null; storage_used_bytes: number | null; retry_count: number; last_error_code: string | null; last_error_message: string | null; adopted_at: Date | null; provisioned_at: Date | null; activated_at: Date | null; suspended_at: Date | null; resumed_at: Date | null; released_at: Date | null; failed_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_mail_identity_requests: {request_id: string; mail_identity_id: string; account_id: string; request_type: MailIdentityRequestType; state: MailIdentityRequestState; idempotency_key: string; provider: string; payload: unknown; requested_by_account_id: string | null; service_actor: string | null; operator_intent: boolean; attempt_count: number; maximum_attempts: number; last_error_code: string | null; last_error_message: string | null; created_at: Date; updated_at: Date; completed_at: Date | null; failed_at: Date | null}
+  greenfield_mailbox_credentials: {credential_id: string; mail_identity_id: string; account_id: string; credential_kind: MailboxCredentialKind; secret_hash: string; encrypted_secret: Buffer | null; encryption_key_version: string | null; created_at: Date; rotated_at: Date | null; revoked_at: Date | null}
+  greenfield_mail_identity_events: {event_id: string; mail_identity_id: string | null; account_id: string | null; event_type: string; actor_account_id: string | null; service_actor: string | null; metadata: unknown; created_at: Date}
   greenfield_password_credentials: {account_id: string; password_hash: string; params: unknown; updated_at: Date}
-  greenfield_passkeys: {passkey_id: string; account_id: string; credential_id: string; public_key: Buffer; counter: number; transports: unknown; created_at: Date; last_used_at: Date | null}
+  greenfield_authentication_methods: {method_id: string; account_id: string; method_type: AuthenticationMethodType; display_label: string | null; state: AuthenticationMethodState; strength: AuthenticationStrength; verified_at: Date | null; last_used_at: Date | null; created_at: Date; updated_at: Date; revoked_at: Date | null; metadata: unknown}
+  greenfield_auth_challenges: {challenge_id: string; purpose: AuthenticationChallengePurpose; account_id: string | null; method_id: string | null; subject_identifier: string | null; target_hash: string | null; challenge_hash: string; verifier_hash: string | null; verifier_hint: string | null; delivery_channel: AuthenticationDeliveryChannel | null; state: AuthenticationChallengeState; attempt_limit: number; attempt_count: number; rate_limit_key: string | null; expires_at: Date; verified_at: Date | null; consumed_at: Date | null; superseded_at: Date | null; last_attempt_at: Date | null; created_at: Date; metadata: unknown}
+  greenfield_auth_challenge_attempts: {attempt_id: string; challenge_id: string | null; account_id: string | null; purpose: string; result: AuthenticationChallengeResult; failure_code: string | null; created_at: Date; metadata: unknown}
+  greenfield_auth_rate_limits: {rate_limit_key: string; purpose: string; window_started_at: Date; attempt_count: number; blocked_until: Date | null; updated_at: Date}
+  greenfield_passkeys: {passkey_id: string; account_id: string; credential_id: string; public_key: Buffer; counter: number; transports: unknown; created_at: Date; last_used_at: Date | null; method_id: string | null; algorithm: string | null; backup_eligible: boolean | null; backup_state: boolean | null; label: string | null; revoked_at: Date | null}
+  greenfield_totp_credentials: {totp_id: string; method_id: string; account_id: string; secret_ciphertext: string; secret_key_id: string; algorithm: string; digits: number; period_seconds: number; state: AuthenticationMethodState; confirmed_at: Date | null; last_used_at: Date | null; created_at: Date; updated_at: Date; revoked_at: Date | null; metadata: unknown}
+  greenfield_recovery_code_sets: {set_id: string; method_id: string; account_id: string; state: 'active' | 'invalidated' | 'exhausted' | 'revoked'; generated_at: Date; invalidated_at: Date | null; created_at: Date}
+  greenfield_recovery_codes: {code_id: string; set_id: string; account_id: string; code_hash: string; used_at: Date | null; created_at: Date}
+  greenfield_external_identities: {external_identity_id: string; method_id: string; account_id: string; provider: 'apple' | 'oidc'; provider_subject: string; provider_issuer: string | null; email: string | null; email_verified: boolean | null; linked_at: Date; last_used_at: Date | null; revoked_at: Date | null; metadata: unknown}
+  greenfield_security_events: {event_id: string; account_id: string; session_id: string | null; event_type: string; method_type: AuthenticationMethodType | null; method_id: string | null; severity: SecurityEventSeverity; ip_hash: string | null; user_agent: string | null; metadata: unknown; created_at: Date}
   greenfield_email_verifications: {verification_id: string; account_id: string; token_hash: string; expires_at: Date; consumed_at: Date | null; created_at: Date}
   greenfield_recovery_tokens: {token_id: string; account_id: string; token_hash: string; expires_at: Date; consumed_at: Date | null; created_at: Date}
-  greenfield_sessions: {session_id: string; account_id: string; status: 'active' | 'revoked' | 'expired'; family_id: string; created_at: Date; expires_at: Date; revoked_at: Date | null; last_seen_at: Date; user_agent: string | null; ip_hash: string | null}
+  greenfield_sessions: {session_id: string; account_id: string; status: 'active' | 'revoked' | 'expired'; family_id: string; created_at: Date; expires_at: Date; revoked_at: Date | null; last_seen_at: Date; user_agent: string | null; ip_hash: string | null; recent_authentication_at: Date | null; authentication_strength: AuthenticationStrength; authentication_method_id: string | null; client_name: string | null; platform: string | null}
   greenfield_session_tokens: {token_id: string; session_id: string; kind: 'access' | 'refresh'; token_hash: string; family_id: string; expires_at: Date; rotated_at: Date | null; reused_at: Date | null; revoked_at: Date | null; created_at: Date}
   greenfield_session_events: {event_id: string; session_id: string | null; account_id: string; event_type: string; metadata: unknown; created_at: Date}
   greenfield_repositories: {repository_id: string; account_id: string; name: string; head_hash: string | null; revision: number; created_at: Date; updated_at: Date}
@@ -911,9 +947,9 @@ export interface Database {
   greenfield_widgets: {widget_id: string; extension_version_id: string | null; manifest: unknown; created_at: Date}
   greenfield_bridges: {bridge_id: string; slug: string; status: string; config: unknown; created_at: Date}
   greenfield_repository_exports: {export_id: string; repository_id: string; status: string; location: string | null; created_at: Date; expires_at: Date | null}
-  greenfield_reactions: {reaction_id: string; actor_id: string; post_id: string; reaction_type: 'like' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
+  greenfield_reactions: {reaction_id: string; actor_id: string; post_id: string; reaction_type: 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
   greenfield_comments: {comment_id: string; post_id: string; author_actor_id: string; parent_comment_id: string | null; root_comment_id: string | null; text: string; depth: number; reply_count: number; version: number; created_at: Date; updated_at: Date; deleted_at: Date | null; deletion_kind: 'user' | 'moderation' | null}
-  greenfield_comment_reactions: {reaction_id: string; actor_id: string; comment_id: string; reaction_type: 'like' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
+  greenfield_comment_reactions: {reaction_id: string; actor_id: string; comment_id: string; reaction_type: 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
   greenfield_quote_posts: {post_id: string; quoted_post_id: string; commentary: string; created_at: Date}
   greenfield_mentions: {mention_id: string; source_type: 'post' | 'comment'; source_id: string; mentioned_account_id: string; mentioned_actor_id: string | null; handle_at_mention: string; created_at: Date}
   greenfield_notification_batches: {batch_id: string; recipient_actor_id: string; kind: string; subject_type: string; subject_id: string; batch_key: string; actor_ids: unknown; count: number; preview_text: string | null; created_at: Date; updated_at: Date}

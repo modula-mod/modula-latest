@@ -25,6 +25,12 @@ export type PendingVerificationSession = {
   primaryHandle?: string
   /** Dev/preview only — never shown in production UI copy as a secret. */
   verificationToken?: string
+  verificationChallengeId?: string
+  verificationExpiresAt?: string
+  verificationDelivery?: {
+    channel: 'email'
+    recipient: string
+  }
 }
 export type SuspendedSession = {status: 'suspended'}
 export type ExpiredSession = {status: 'expired'}

@@ -1,3 +1,4 @@
+import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
 
 /** 3–30 chars, lowercase, letters/numbers/single separators, no leading/trailing/consecutive separators. */
@@ -23,16 +24,22 @@ export function validateHandle(value: string): string {
 
 export async function assertHandleAvailable(db: ModulaDb, value: string): Promise<string> {
   const handle = validateHandle(value)
-  const [claimed, reserved] = await Promise.all([
+  const [claimed, reserved, legacyReserved] = await Promise.all([
     db
       .selectFrom('greenfield_handles')
       .select('handle')
       .where('handle', '=', handle)
       .where('status', '=', 'active')
       .executeTakeFirst(),
+    db
+      .selectFrom('greenfield_reserved_identifiers')
+      .select('identifier')
+      .where('identifier', '=', handle)
+      .where(sql<boolean>`'handle' = ANY(applies_to)`)
+      .executeTakeFirst(),
     db.selectFrom('greenfield_reserved_handles').select('handle').where('handle', '=', handle).executeTakeFirst(),
   ])
-  if (reserved) throw Object.assign(new Error('Handle is reserved'), {code: 'CONFLICT'})
+  if (reserved || legacyReserved) throw Object.assign(new Error('Handle is reserved'), {code: 'CONFLICT'})
   if (claimed) throw Object.assign(new Error('Handle is unavailable'), {code: 'CONFLICT'})
   return handle
 }

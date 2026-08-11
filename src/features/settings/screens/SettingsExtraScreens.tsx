@@ -45,19 +45,17 @@ export function PrivacySafetyScreen() {
   return (
     <SettingsScreen
       title="Privacy"
-      caption="Audience and trust controls for this local Modula build. Mute and block lists are Preview pages."
+      caption="Audience controls. Mute/block accounts from post overflow. Mute words and blocked lists are unavailable until Greenfield exposes them."
       right={
         <SettingsOverflowMenu
           title="Privacy"
           actions={[
-            {id: 'mute', label: 'Mute words'},
-            {id: 'blocked', label: 'Blocked accounts'},
-            {id: 'report', label: 'Open report flow'},
+            {id: 'mute', label: 'Mute words status'},
+            {id: 'blocked', label: 'Blocked accounts status'},
           ]}
           onAction={id => {
             if (id === 'mute') router.push('/settings/mute-words' as Href)
             if (id === 'blocked') router.push('/settings/blocked' as Href)
-            if (id === 'report') router.push('/report' as Href)
           }}
         />
       }>
@@ -82,19 +80,17 @@ export function PrivacySafetyScreen() {
         <SettingsLinkRow
           row={{
             title: 'Mute words',
-            description: 'Seeded mute list Preview.',
+            description: 'Unavailable — no mute-words API.',
             icon: 'text',
             route: '/settings/mute-words',
-            preview: true,
           }}
         />
         <SettingsLinkRow
           row={{
             title: 'Blocked accounts',
-            description: 'Seeded block list Preview.',
+            description: 'Block from posts; list API not shipped.',
             icon: 'privacy',
             route: '/settings/blocked',
-            preview: true,
           }}
         />
         <SettingsLinkRow
@@ -103,15 +99,6 @@ export function PrivacySafetyScreen() {
             description: 'Close friends style audience.',
             icon: 'community',
             route: '/settings/inner-circle',
-            preview: true,
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Report flow',
-            description: 'Multi-step report explanation.',
-            icon: 'warning',
-            route: '/report',
             preview: true,
           }}
           last

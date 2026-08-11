@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ROOT="/home/andrei/deployments/modula-web"
+ROOT="${MODULA_WEB_ROOT:-/var/www/modula}"
 test -e "${ROOT}/previous"
 CURRENT="$(readlink -f "${ROOT}/current" || true)"
 PREV="$(readlink -f "${ROOT}/previous")"

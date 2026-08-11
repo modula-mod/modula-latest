@@ -76,4 +76,9 @@ export type {
   FollowResult,
   SocialGraphRepository,
 } from '@/data/repositories/contracts/SocialGraphRepository'
+export type {
+  BlockResult,
+  ModerationRepository,
+  MuteResult,
+} from '@/data/repositories/contracts/ModerationRepository'
 export type {StoriesRepository} from '@/data/repositories/contracts/StoriesRepository'

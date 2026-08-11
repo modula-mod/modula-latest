@@ -23,12 +23,13 @@ import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config
 import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
 import {handleModuleEnable} from '../../greenfield-worker/src/modules/enable-handler.js'
 import {handleModuleDisable} from '../../greenfield-worker/src/modules/disable-handler.js'
+import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 import {handleModuleUninstall} from '../../greenfield-worker/src/modules/uninstall-handler.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const referenceModuleRoot = resolve(workspaceRoot, '../modula-mod/modula-standard2-reference-module')
+const referenceModuleRoot = resolve(workspaceRoot, 'fixtures/modules/standard2-reference')
 const moduleId = 'digital.modula.standard2-reference'
 const serviceId = 'digital.modula.standard2-reference.service.analyze-text'
 const writePermission = 'records:module.digital.modula.standard2-reference.analysis:write'
@@ -72,6 +73,7 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     app = created.app
     db = created.db
     workerDb = createWorkerDb(databaseUrl!)
+    await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute()
     await app.ready()
 
     const registered = await registerAccount(`runtime2-${suffix}@example.com`, `runtime2${suffix}`.slice(0, 20))
@@ -237,6 +239,26 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     await handleModuleEnable(workerDb, loadWorkerConfig(), {installationId, releaseId, moduleId, accountId})
     expect((await invokeService('invoke-reenabled', {text: 'reenabled service'})).statusCode).toBe(200)
 
+    const updateRelease = await ensurePublishedRelease(referenceManifest('2.0.1'))
+    const update = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/update`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `update-runtime2-${suffix}`},
+      payload: {version: '2.0.1'},
+    })
+    expect(update.statusCode).toBe(202)
+    expect(update.json().data.status).toBe('updating')
+    await handleModuleUpdate(workerDb, {installationId, targetReleaseId: updateRelease.releaseId, previousStatus: 'enabled', moduleId, accountId})
+    const updatedInstallation = await db
+      .selectFrom('greenfield_extension_installations')
+      .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
+      .select(['greenfield_extension_installations.status', 'greenfield_module_releases.version'])
+      .where('greenfield_extension_installations.installation_id', '=', installationId)
+      .executeTakeFirstOrThrow()
+    expect(updatedInstallation).toMatchObject({status: 'enabled', version: '2.0.1'})
+    runtime = await runtimeSummary()
+    expect(runtime.status).toBe('enabled')
+
     const uninstall = await app.inject({
       method: 'DELETE',
       url: `/v1/modules/${moduleId}/install`,
@@ -279,30 +301,24 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
   })
 
   async function importRuntimeFixtures() {
-    const releases = new GreenfieldModuleReleaseService(db)
     const provider = await seedInstalledRelease(accountId, fixtureManifest('digital.modula.reference-provider', '1.0.0', {
       dependencyGraph: graph({
         provides: [{id: 'modula.reference.provider', title: 'Reference dependency provider', version: '1.0.0', kind: 'capability'}],
       }),
     }), 'enabled')
     expect(provider.releaseId).toBeTruthy()
-    await releases.importPendingReview(fixtureManifest('digital.modula.reference-legacy', '1.5.0'))
-    await releases.publishRelease('digital.modula.reference-legacy', '1.5.0')
-    const imported = await releases.importPendingReview(referenceManifest())
-    const published = await releases.publishRelease(moduleId, '2.0.0')
-    expect(imported.releaseId).toBe(published.releaseId)
+    await ensurePublishedRelease(fixtureManifest('digital.modula.reference-legacy', '1.5.0'))
+    const published = await ensurePublishedRelease(referenceManifest())
     releaseId = published.releaseId
   }
 
   async function seedInstalledRelease(targetAccountId: string, manifest: GreenfieldModuleManifest, status: 'enabled' | 'disabled') {
-    const releases = new GreenfieldModuleReleaseService(db)
-    const imported = await releases.importPendingReview(manifest)
-    const published = await releases.publishRelease(manifest.moduleId, manifest.version)
+    const published = await ensurePublishedRelease(manifest)
     await db
       .insertInto('greenfield_extension_installations')
       .values({
         installation_id: `installation:${manifest.moduleId}:${targetAccountId}`,
-        extension_version_id: imported.extensionVersionId,
+        extension_version_id: published.extensionVersionId,
         account_id: targetAccountId,
         status,
         config: {},
@@ -311,6 +327,14 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
       })
       .execute()
     return published
+  }
+
+  async function ensurePublishedRelease(manifest: GreenfieldModuleManifest) {
+    const releases = new GreenfieldModuleReleaseService(db)
+    const existing = await releases.getRelease(manifest.moduleId, manifest.version)
+    if (existing) return existing
+    await releases.importPendingReview(manifest)
+    return releases.publishRelease(manifest.moduleId, manifest.version)
   }
 
   async function registerAccount(email: string, handle: string) {
@@ -377,9 +401,10 @@ function configureTestEnv(): void {
   process.env.MODULA_MODULE_SECRETS_KEY = 'phase7e-module-runtime-2-secret-key'
 }
 
-function referenceManifest(): GreenfieldModuleManifest {
-  const manifest = JSON.parse(readFileSync(join(referenceModuleRoot, 'dist/greenfield.manifest.json'), 'utf8')) as GreenfieldModuleManifest
-  const head = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: referenceModuleRoot, encoding: 'utf8'}).trim()
+function referenceManifest(version = '2.0.0'): GreenfieldModuleManifest {
+  const manifest = JSON.parse(readFileSync(join(referenceModuleRoot, 'greenfield.manifest.json'), 'utf8')) as GreenfieldModuleManifest
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: workspaceRoot, encoding: 'utf8'}).trim()
+  manifest.version = version
   manifest.source.commit = head
   manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
   return manifest

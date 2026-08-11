@@ -1,4 +1,5 @@
 import type {SocialPost} from '@/domain/social'
+import type {ModerationRepository} from '@/data/repositories/contracts'
 import {
   buildPostOverflowActions,
   type PostOverflowActionId,
@@ -7,8 +8,11 @@ import {runPostOverflowAction} from '@/features/feed/postActions/runPostAction'
 import {presentModulaActions} from '@/platform/ui/menus'
 
 /** Opens the native More / overflow menu for a post. */
-export async function openPostMoreMenu(post: SocialPost): Promise<void> {
-  const actions = buildPostOverflowActions(post)
+export async function openPostMoreMenu(
+  post: SocialPost,
+  options?: {isOwner?: boolean; moderationRepository?: ModerationRepository},
+): Promise<void> {
+  const actions = buildPostOverflowActions(post, options)
   const selected = await presentModulaActions({
     title: 'Post options',
     message: `@${post.author.handle}`,
@@ -16,5 +20,11 @@ export async function openPostMoreMenu(post: SocialPost): Promise<void> {
   })
 
   if (!selected) return
-  await runPostOverflowAction(selected as PostOverflowActionId, post)
+  await runPostOverflowAction(
+    selected as PostOverflowActionId,
+    post,
+    options?.moderationRepository
+      ? {moderationRepository: options.moderationRepository}
+      : undefined,
+  )
 }

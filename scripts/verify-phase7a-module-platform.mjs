@@ -6,7 +6,7 @@ import {validateGreenfieldModuleManifest} from '@modula/greenfield-module-manife
 
 const checks = []
 const root = process.cwd()
-const vaultRoot = '/home/andrei/modules/modula-module-vault-notes'
+const vaultRoot = process.env.MODULA_VAULT_NOTES_ROOT ?? '/root/modula-mod/modula-vault-notes'
 
 function check(name, fn) {
   try {

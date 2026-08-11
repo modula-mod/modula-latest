@@ -37,7 +37,8 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     label: 'Messages',
     route: '/messages',
     icon: 'messages',
-    description: 'Private conversations',
+    description: 'Private conversations Preview',
+    devOnly: true,
   },
   {
     id: 'product',
@@ -60,6 +61,7 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
       route: link.route,
       icon: link.icon,
       description: link.description,
+      devOnly: true,
     }),
   ),
   {
@@ -68,6 +70,7 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     route: '/product/forge',
     icon: 'developer',
     description: 'Draft module manifests',
+    devOnly: true,
   },
   {
     id: 'agents',
@@ -75,6 +78,7 @@ const CORE_ACCOUNT_PANEL_DESTINATIONS: readonly AccountPanelDestination[] = [
     route: '/product/agents',
     icon: 'automation',
     description: 'Gaia agent packages',
+    devOnly: true,
   },
   {
     id: 'search',

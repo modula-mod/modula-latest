@@ -1,11 +1,18 @@
 import {createHash, randomBytes} from 'node:crypto'
 import {GREENFIELD_INITIAL_COLLECTIONS} from '@modula/greenfield-protocol'
+import type {Transaction} from 'kysely'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
+import type {Database} from '../database/types.js'
 import {hashPassword, verifyPassword} from '../lib/password.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {displayNameFromIdentityMetadata, MailService} from '../mail/service.js'
+import {MailIdentityService} from '../mail/identity-service.js'
 import {AuditRepository} from '../domains/audit/repository.js'
+import {CredentialRegistryService} from '../auth/credentials/service.js'
+import {SecurityEventService} from '../auth/security-events/service.js'
+import {ChallengeService} from '../auth/challenges/service.js'
+import {authError} from '../auth/errors.js'
 import {assertHandleAvailable, canonicalHandle, validateHandle} from './handle.js'
 
 const tokenHash = (token: string) => createHash('sha256').update(token).digest('hex')
@@ -24,6 +31,10 @@ export class AccountService {
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
     private readonly mail?: MailService,
+    private readonly credentials = new CredentialRegistryService(db),
+    private readonly securityEvents = new SecurityEventService(db),
+    private readonly challenges = new ChallengeService(db, config),
+    private readonly mailIdentities = new MailIdentityService(db),
   ) {}
 
   async register(input: {
@@ -34,6 +45,7 @@ export class AccountService {
     inviteCode?: string
     acceptedTerms?: boolean
     correlationId?: string
+    ipHash?: string | null
   }) {
     const email = input.email.trim().toLowerCase()
     const displayName = (input.displayName ?? '').trim()
@@ -69,10 +81,13 @@ export class AccountService {
     if (existing) throw Object.assign(new Error('Email is already registered'), {code: 'CONFLICT'})
 
     const accountId = uuidv7()
-    const verificationToken = randomBytes(32).toString('base64url')
     const now = new Date()
     const verificationExpiresAt = new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000)
+    const legacyVerificationToken =
+      this.config.environment === 'production' ? null : randomBytes(32).toString('base64url')
     const passwordHash = await hashPassword(input.password)
+    let verificationChallengeId = ''
+    let verificationChallengeExpiresAt = verificationExpiresAt
 
     await this.db.transaction().execute(async trx => {
       await trx
@@ -113,6 +128,7 @@ export class AccountService {
           updated_at: now,
         })
         .execute()
+      await this.mailIdentities.ensurePendingIdentityInTransaction(trx, accountId, now)
       await trx
         .insertInto('greenfield_password_credentials')
         .values({
@@ -122,23 +138,60 @@ export class AccountService {
           updated_at: now,
         })
         .execute()
-      await trx
-        .insertInto('greenfield_email_verifications')
-        .values({
-          verification_id: uuidv7(),
-          account_id: accountId,
-          token_hash: tokenHash(verificationToken),
-          expires_at: verificationExpiresAt,
-          consumed_at: null,
-          created_at: now,
-        })
-        .execute()
+      const credentialRegistry = this.credentials.forDb(trx)
+      await credentialRegistry.createPasswordMethod({
+        accountId,
+        verifiedAt: now,
+        metadata: {algorithm: 'argon2id'},
+      })
+      await credentialRegistry.createEmailOtpMethod({
+        accountId,
+        email,
+        state: 'pending',
+        verifiedAt: null,
+        createdAt: now,
+      })
+      if (legacyVerificationToken) {
+        await trx
+          .insertInto('greenfield_email_verifications')
+          .values({
+            verification_id: uuidv7(),
+            account_id: accountId,
+            token_hash: tokenHash(legacyVerificationToken),
+            expires_at: verificationExpiresAt,
+            consumed_at: null,
+            created_at: now,
+          })
+          .execute()
+      }
+      const verificationChallenge = await this.challenges.forDb(trx).create({
+        purpose: 'email_verification',
+        accountId,
+        methodId: `email-otp-${accountId}`,
+        subjectIdentifier: email,
+        deliveryChannel: 'email',
+        ttlSeconds: Math.max(10 * 60, this.config.emailVerificationTtlHours * 3_600),
+        attemptLimit: 5,
+        rateLimitKeys: [
+          `account:${accountId}`,
+          `email:${email}`,
+          ...(input.ipHash ? [`ip:${input.ipHash}`] : []),
+        ],
+        supersedeExisting: true,
+        metadata: {
+          issuedFor: 'registration_verification',
+          recipient: maskEmail(email),
+        },
+      })
+      verificationChallengeId = verificationChallenge.challengeId
+      verificationChallengeExpiresAt = verificationChallenge.expiresAt
       await this.mail?.queueVerification(trx, {
         accountId,
         email,
         displayName,
-        token: verificationToken,
-        expiresAt: verificationExpiresAt,
+        handle,
+        code: verificationChallenge.code,
+        expiresAt: verificationChallenge.expiresAt,
         correlationId: input.correlationId,
       })
       await new AuditRepository(trx).append(
@@ -147,16 +200,34 @@ export class AccountService {
         {type: 'greenfield_account', id: accountId, actorId: null},
         {accountId},
       )
+      await this.securityEvents.forDb(trx).record({
+        accountId,
+        eventType: 'account.registered',
+        methodType: 'password',
+        methodId: `password-${accountId}`,
+        severity: 'notice',
+        metadata: {handle, emailVerificationRequired: true},
+      })
     })
 
-    // Preview/dev may return the verification token when SMTP is not configured.
-    const result: {accountId: string; primaryHandle: string; status: string; verificationToken?: string} = {
+    const result: {
+      accountId: string
+      primaryHandle: string
+      status: string
+      verificationChallengeId: string
+      verificationExpiresAt: string
+      verificationDelivery: {channel: 'email'; recipient: string}
+      verificationToken?: string
+    } = {
       accountId,
       primaryHandle: handle,
       status: 'pendingVerification',
+      verificationChallengeId,
+      verificationExpiresAt: verificationChallengeExpiresAt.toISOString(),
+      verificationDelivery: {channel: 'email', recipient: maskEmail(email)},
     }
-    if (this.config.environment !== 'production') {
-      result.verificationToken = verificationToken
+    if (legacyVerificationToken) {
+      result.verificationToken = legacyVerificationToken
     }
     return result
   }
@@ -179,31 +250,95 @@ export class AccountService {
         .set({consumed_at: now})
         .where('verification_id', '=', row.verification_id)
         .execute()
-      await trx
-        .updateTable('greenfield_accounts')
-        .set({status: 'active', updated_at: now})
-        .where('account_id', '=', row.account_id)
-        .execute()
-      await trx
-        .updateTable('greenfield_auth_identities')
-        .set({verified_at: now, updated_at: now})
-        .where('account_id', '=', row.account_id)
-        .where('kind', '=', 'email')
-        .execute()
-      await new AuditRepository(trx).append(
-        'email.verified',
-        {},
-        {type: 'greenfield_account', id: row.account_id, actorId: null},
-        {accountId: row.account_id},
-      )
+      await this.activateVerifiedEmailInTransaction(trx, row.account_id, now)
+    })
 
-      // Create default repository + initial collections + default profile record shell.
-      const repositoryId = uuidv7()
+    const account = await this.getMe(row.account_id)
+    if (!account) throw Object.assign(new Error('Account not found'), {code: 'NOT_FOUND'})
+    return account
+  }
+
+  async verifyEmailCode(input: {challengeId: string; code: string}): Promise<PublicAccount> {
+    const verified = await this.challenges.verifyCode({
+      challengeId: input.challengeId,
+      code: input.code,
+      purpose: 'email_verification',
+    })
+    if (!verified.accountId) throw authError('CHALLENGE_INVALID')
+    const accountId = verified.accountId
+    await this.db.transaction().execute(async trx => {
+      await this.activateVerifiedEmailInTransaction(trx, accountId, verified.consumedAt)
+    })
+    const account = await this.getMe(accountId)
+    if (!account) throw Object.assign(new Error('Account not found'), {code: 'NOT_FOUND'})
+    return account
+  }
+
+  private async activateVerifiedEmailInTransaction(
+    trx: Transaction<Database>,
+    accountId: string,
+    now: Date,
+  ): Promise<void> {
+    await trx
+      .updateTable('greenfield_accounts')
+      .set({status: 'active', updated_at: now})
+      .where('account_id', '=', accountId)
+      .execute()
+    await trx
+      .updateTable('greenfield_auth_identities')
+      .set({verified_at: now, updated_at: now})
+      .where('account_id', '=', accountId)
+      .where('kind', '=', 'email')
+      .execute()
+    await this.credentials.forDb(trx).activateEmailOtpMethod(accountId, now)
+    await new AuditRepository(trx).append(
+      'email.verified',
+      {},
+      {type: 'greenfield_account', id: accountId, actorId: null},
+      {accountId},
+    )
+    await this.securityEvents.forDb(trx).record({
+      accountId,
+      eventType: 'contact_email.verified',
+      methodType: 'email_otp',
+      methodId: `email-otp-${accountId}`,
+      severity: 'notice',
+      metadata: {},
+    })
+    await this.mailIdentities.queueProvisioningForVerifiedAccount(trx, accountId, now)
+
+    const existingRepository = await trx
+      .selectFrom('greenfield_repositories')
+      .select('repository_id')
+      .where('account_id', '=', accountId)
+      .where('name', '=', 'default')
+      .executeTakeFirst()
+
+    const account = await trx
+      .selectFrom('greenfield_accounts')
+      .select('primary_handle')
+      .where('account_id', '=', accountId)
+      .executeTakeFirstOrThrow()
+    const identity = await trx
+      .selectFrom('greenfield_auth_identities')
+      .select('metadata')
+      .where('account_id', '=', accountId)
+      .where('kind', '=', 'email')
+      .executeTakeFirst()
+    const metadata = identity?.metadata as {displayName?: unknown} | null | undefined
+    const displayName =
+      typeof metadata?.displayName === 'string' && metadata.displayName.trim()
+        ? metadata.displayName.trim()
+        : account.primary_handle
+
+    let repositoryId = existingRepository?.repository_id
+    if (!repositoryId) {
+      repositoryId = uuidv7()
       await trx
         .insertInto('greenfield_repositories')
         .values({
           repository_id: repositoryId,
-          account_id: row.account_id,
+          account_id: accountId,
           name: 'default',
           head_hash: null,
           revision: 0,
@@ -223,69 +358,6 @@ export class AccountService {
           })
           .execute()
       }
-      const account = await trx
-        .selectFrom('greenfield_accounts')
-        .select('primary_handle')
-        .where('account_id', '=', row.account_id)
-        .executeTakeFirstOrThrow()
-      const identity = await trx
-        .selectFrom('greenfield_auth_identities')
-        .select('metadata')
-        .where('account_id', '=', row.account_id)
-        .where('kind', '=', 'email')
-        .executeTakeFirst()
-      const metadata = identity?.metadata as {displayName?: unknown} | null | undefined
-      const displayName = typeof metadata?.displayName === 'string' && metadata.displayName.trim()
-        ? metadata.displayName.trim()
-        : account.primary_handle
-      const actorId = `actor-${row.account_id}`
-      const profileId = `profile-${row.account_id}`
-      await trx
-        .insertInto('actors')
-        .values({
-          id: actorId,
-          account_id: row.account_id,
-          kind: 'person',
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-          version: 1,
-        })
-        .execute()
-      await trx
-        .insertInto('profiles')
-        .values({
-          id: profileId,
-          actor_id: actorId,
-          handle: account.primary_handle,
-          display_name: displayName,
-          kind: 'person',
-          bio: '',
-          avatar_url: null,
-          cover_url: null,
-          cover_colour: null,
-          pronouns: null,
-          location_label: null,
-          location_visibility: null,
-          website_label: null,
-          website_url: null,
-          website_domain: null,
-          website_visibility: null,
-          focus_status_id: 'available',
-          focus_status_label: 'Available',
-          focus_status_message: 'Ready in Modula',
-          focus_status_updated_at: now,
-          visibility: 'public',
-          module_count: 0,
-          featured_module_ids: [],
-          identity_claims: [],
-          joined_at: now,
-          created_at: now,
-          updated_at: now,
-          deleted_at: null,
-          version: 1,
-        })
-        .execute()
       await trx
         .insertInto('greenfield_records')
         .values({
@@ -302,14 +374,61 @@ export class AccountService {
           deleted_at: null,
         })
         .execute()
-    })
+    }
 
-    const account = await this.getMe(row.account_id)
-    if (!account) throw Object.assign(new Error('Account not found'), {code: 'NOT_FOUND'})
-    return account
+    const actorId = `actor-${accountId}`
+    const profileId = `profile-${accountId}`
+    await trx
+      .insertInto('actors')
+      .values({
+        id: actorId,
+        account_id: accountId,
+        kind: 'person',
+        created_at: now,
+        updated_at: now,
+        deleted_at: null,
+        version: 1,
+      })
+      .onConflict(oc => oc.column('id').doNothing())
+      .execute()
+    await trx
+      .insertInto('profiles')
+      .values({
+        id: profileId,
+        actor_id: actorId,
+        handle: account.primary_handle,
+        display_name: displayName,
+        kind: 'person',
+        bio: '',
+        avatar_url: null,
+        cover_url: null,
+        cover_colour: null,
+        pronouns: null,
+        location_label: null,
+        location_visibility: null,
+        website_label: null,
+        website_url: null,
+        website_domain: null,
+        website_visibility: null,
+        focus_status_id: 'available',
+        focus_status_label: 'Available',
+        focus_status_message: 'Ready in Modula',
+        focus_status_updated_at: now,
+        visibility: 'public',
+        module_count: 0,
+        featured_module_ids: [],
+        identity_claims: [],
+        joined_at: now,
+        created_at: now,
+        updated_at: now,
+        deleted_at: null,
+        version: 1,
+      })
+      .onConflict(oc => oc.column('id').doNothing())
+      .execute()
   }
 
-  async resendVerification(email: string, options: {correlationId?: string} = {}): Promise<{resent: boolean}> {
+  async resendVerification(email: string, options: {correlationId?: string; ipHash?: string | null} = {}): Promise<{resent: boolean}> {
     const normalizedEmail = email.trim().toLowerCase()
     const identity = await this.db
       .selectFrom('greenfield_auth_identities')
@@ -327,33 +446,33 @@ export class AccountService {
       // Do not leak account existence.
       return {resent: true}
     }
-    const token = randomBytes(32).toString('base64url')
-    const now = new Date()
-    const expiresAt = new Date(now.getTime() + this.config.emailVerificationTtlHours * 3_600_000)
     await this.db.transaction().execute(async trx => {
-      await trx
-        .updateTable('greenfield_email_verifications')
-        .set({consumed_at: now})
-        .where('account_id', '=', identity.account_id)
-        .where('consumed_at', 'is', null)
-        .execute()
-      await trx
-        .insertInto('greenfield_email_verifications')
-        .values({
-          verification_id: uuidv7(),
-          account_id: identity.account_id,
-          token_hash: tokenHash(token),
-          expires_at: expiresAt,
-          consumed_at: null,
-          created_at: now,
-        })
-        .execute()
+      const verificationChallenge = await this.challenges.forDb(trx).create({
+        purpose: 'email_verification',
+        accountId: identity.account_id,
+        methodId: `email-otp-${identity.account_id}`,
+        subjectIdentifier: normalizedEmail,
+        deliveryChannel: 'email',
+        ttlSeconds: Math.max(10 * 60, this.config.emailVerificationTtlHours * 3_600),
+        attemptLimit: 5,
+        rateLimitKeys: [
+          `account:${identity.account_id}`,
+          `email:${normalizedEmail}`,
+          ...(options.ipHash ? [`ip:${options.ipHash}`] : []),
+        ],
+        supersedeExisting: true,
+        metadata: {
+          issuedFor: 'registration_verification_resend',
+          recipient: maskEmail(normalizedEmail),
+        },
+      })
       await this.mail?.queueVerification(trx, {
         accountId: identity.account_id,
         email: normalizedEmail,
         displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
-        token,
-        expiresAt,
+        handle: identity.primary_handle,
+        code: verificationChallenge.code,
+        expiresAt: verificationChallenge.expiresAt,
         correlationId: options.correlationId,
       })
     })
@@ -394,6 +513,11 @@ export class AccountService {
         .set({password_hash: passwordHash, params: {algorithm: 'argon2id'}, updated_at: now})
         .where('account_id', '=', accountId)
         .execute()
+      await this.credentials.forDb(trx).createPasswordMethod({
+        accountId,
+        verifiedAt: now,
+        metadata: {algorithm: 'argon2id'},
+      })
       await trx
         .insertInto('greenfield_session_events')
         .values({
@@ -405,6 +529,14 @@ export class AccountService {
           created_at: now,
         })
         .execute()
+      await this.securityEvents.forDb(trx).record({
+        accountId,
+        eventType: 'password.changed',
+        methodType: 'password',
+        methodId: `password-${accountId}`,
+        severity: 'warning',
+        metadata: {sessionsRevoked: true},
+      })
       await this.mail?.queuePasswordChanged(trx, {
         accountId,
         email: identity.identifier,
@@ -500,4 +632,10 @@ export class AccountService {
       .orderBy('created_at', 'desc')
       .execute()
   }
+}
+
+function maskEmail(email: string): string {
+  const [local = '', domain = 'unknown'] = email.split('@')
+  if (local.length <= 1) return `*@${domain}`
+  return `${local[0]}${'•'.repeat(Math.min(5, Math.max(1, local.length - 1)))}@${domain}`
 }

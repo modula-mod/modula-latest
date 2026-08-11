@@ -1,0 +1,90 @@
+=== pnpm install --frozen-lockfile ===
+Scope: all 19 workspace projects
+Already up to date
+Done in 251ms using pnpm v11.3.0
+FROZEN_EXIT=0
+
+=== pnpm lint ===
+$ expo lint -- --max-warnings=0
+LINT_EXIT=0
+
+=== pnpm typecheck ===
+$ tsc --noEmit && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+packages/greenfield-module-registry-contracts/src/publisher.ts(1,42): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-registry-contracts/src/publisher.ts(28,42): error TS7006: Parameter 'reserved' implicitly has an 'any' type.
+packages/greenfield-module-registry-contracts/src/registry.ts(1,80): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-registry-contracts/src/release.ts(1,106): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-ai.ts(1,50): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-function.ts(1,57): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-module.ts(7,8): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-module.ts(14,78): error TS7006: Parameter 'issue' implicitly has an 'any' type.
+packages/greenfield-module-sdk/src/define-module.ts(32,78): error TS7006: Parameter 'issue' implicitly has an 'any' type.
+packages/greenfield-module-sdk/src/define-plugin.ts(1,55): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-schema.ts(1,55): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-settings.ts(1,57): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-tool.ts(1,53): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/define-widget.ts(1,55): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-module-sdk/src/identifiers.ts(1,40): error TS2307: Cannot find module '@modula/greenfield-module-manifest' or its corresponding type declarations.
+packages/greenfield-runtime/src/built-in-providers.ts(1,74): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/compatibility-resolver.ts(12,8): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/compatibility-resolver.ts(13,62): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/compatibility-resolver.ts(161,59): error TS7006: Parameter 'capability' implicitly has an 'any' type.
+packages/greenfield-runtime/src/provider-adapter.ts(6,8): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/provider-registry.ts(1,93): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/runtime-manager.ts(9,8): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/src/runtime-manager.ts(59,53): error TS7006: Parameter 'provider' implicitly has an 'any' type.
+packages/greenfield-runtime/src/session-store.ts(5,8): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+packages/greenfield-runtime/tests/runtime-manager.test.ts(2,59): error TS2307: Cannot find module '@modula/greenfield-module-engine-contracts' or its corresponding type declarations.
+src/api/decoding/decodeAtproto.ts(10,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/api/decoding/decodeGreenfieldAccount.ts(1,63): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/api/decoding/decodeMetadata.ts(7,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/api/decoding/decodeSession.ts(1,38): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/api/local/LocalApiDatabase.ts(15,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/auth/contracts/ModulaAuthState.ts(1,38): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/auth/contracts/Session.ts(1,38): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/auth/screens/SignInScreen.tsx(77,7): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(81,5): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(88,7): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(97,7): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(101,7): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(105,5): error TS2304: Cannot find name 'setError'.
+src/auth/screens/SignInScreen.tsx(113,7): error TS2304: Cannot find name 'setError'.
+src/data/query/queryKeys.ts(2,39): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/query/useApiMetadataQuery.ts(2,36): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/api/ApiAtprotoRepository.ts(18,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/api/ApiAuthRepository.ts(1,57): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/data/repositories/api/ApiModerationRepository.ts(1,49): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/api/ApiModuleRepository.ts(3,52): error TS2307: Cannot find module '@modula/greenfield-module-ui-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/ActivityRepository.ts(7,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/AtprotoRepository.ts(9,8): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/AuthRepository.ts(19,8): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/DiscoverRepository.ts(4,31): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/MetadataRepository.ts(1,32): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/ModerationRepository.ts(1,49): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/data/repositories/contracts/ModuleRepository.ts(5,8): error TS2307: Cannot find module '@modula/greenfield-module-ui-contracts' or its corresponding type declarations.
+src/domain/account/ModulaAccount.ts(1,44): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/features/atproto/components/OriginLabel.tsx(2,39): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/components/OriginLabel.tsx(23,10): error TS7053: Element implicitly has an 'any' type because expression of type 'SocialRecordOrigin' can't be used to index type '{ readonly modula: "Modula"; readonly atproto: "AT Protocol"; readonly 'modula+atproto': "Modula + AT Protocol"; }'.
+src/features/atproto/data/useAtmosphereFeedQuery.ts(2,39): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/data/useAtprotoPreferences.ts(2,60): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/oauth/completeAtprotoOAuth.ts(1,41): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/publishing/canCrossPost.ts(1,71): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/publishing/canCrossPost.ts(40,5): error TS7006: Parameter 'scope' implicitly has an 'any' type.
+src/features/atproto/publishing/publicationStatus.ts(1,67): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/atproto/screens/AtprotoConnectionScreen.tsx(5,43): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/discover/screens/DiscoverScreen.tsx(38,31): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+src/features/modules/runtime/module-action-runner.ts(1,43): error TS2307: Cannot find module '@modula/greenfield-module-ui-contracts' or its corresponding type declarations.
+src/features/modules/runtime/module-field-renderer.tsx(2,52): error TS2307: Cannot find module '@modula/greenfield-module-ui-contracts' or its corresponding type declarations.
+src/features/modules/runtime/module-view-renderer.tsx(8,8): error TS2307: Cannot find module '@modula/greenfield-module-ui-contracts' or its corresponding type declarations.
+src/features/modules/runtime/module-view-renderer.tsx(122,28): error TS7006: Parameter 'node' implicitly has an 'any' type.
+src/features/modules/runtime/module-view-renderer.tsx(128,26): error TS7006: Parameter 'action' implicitly has an 'any' type.
+src/features/modules/runtime/module-view-renderer.tsx(130,30): error TS7006: Parameter 'action' implicitly has an 'any' type.
+src/features/modules/runtime/module-view-renderer.tsx(130,77): error TS7006: Parameter 'action' implicitly has an 'any' type.
+src/features/modules/runtime/module-view-renderer.tsx(144,23): error TS7006: Parameter 'field' implicitly has an 'any' type.
+src/features/modules/runtime/module-view-renderer.tsx(206,29): error TS7006: Parameter 'child' implicitly has an 'any' type.
+src/features/settings/screens/AccountSessionsScreen.tsx(3,38): error TS2307: Cannot find module '@modula/greenfield-contracts' or its corresponding type declarations.
+src/features/settings/screens/SettingsExtraScreens.tsx(168,29): error TS7006: Parameter 'current' implicitly has an 'any' type.
+src/features/settings/screens/SettingsExtraScreens.tsx(176,28): error TS7006: Parameter 'current' implicitly has an 'any' type.
+src/features/social/screens/SocialSurfaceScreens.tsx(4,53): error TS2307: Cannot find module '@modula/api-contracts' or its corresponding type declarations.
+[ELIFECYCLE] Command failed with exit code 2.
+TYPECHECK_EXIT=2

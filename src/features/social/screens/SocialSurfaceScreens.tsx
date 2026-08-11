@@ -1,6 +1,7 @@
 import {useMemo, useState} from 'react'
 import {Alert, Platform, ScrollView, StyleSheet, TextInput, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import type {ReportCategory, ReportTargetType} from '@modula/api-contracts'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability, useSession} from '@/auth/runtime'
@@ -15,9 +16,7 @@ import {
 } from '@/features/product/data/glassPrivacyLabels'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {
-  SettingsContextRow,
   SettingsLinkRow,
-  SettingsOverflowMenu,
   SettingsScreen as SettingsKitScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
@@ -26,6 +25,7 @@ import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {useAppServices} from '@/runtime'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -75,8 +75,6 @@ const seededLists: LocalList[] = []
 const seededCollections: LocalCollection[] = []
 const seededDrafts: {id: string; title: string; excerpt: string; updatedAt: string}[] = []
 const seededCommunities: LocalCommunity[] = []
-const seededMuteWords: string[] = []
-const seededBlockedAccounts: {id: string; name: string; handle: string}[] = []
 const seededInnerCircle: {id: string; name: string; handle: string}[] = []
 const helpArticles: LocalHelpArticle[] = []
 const whatsNewNotes: {version: string; items: string[]}[] = []
@@ -822,48 +820,12 @@ export function MuteWordsScreen() {
   return (
     <SettingsKitScreen
       title="Mute words"
-      caption="Seeded mute list — Preview. Not synced to a backend."
-      right={
-        <SettingsOverflowMenu
-          title="Mute words"
-          actions={[
-            {
-              id: 'add',
-              label: 'Add mute word (Preview)',
-              disabled: true,
-              disabledReason: 'Not wired yet',
-            },
-          ]}
-          onAction={() => undefined}
+      caption="Mute words are not available yet. There is no Greenfield mute-words API. Use Mute account on a post to mute a profile.">
+      <SettingsSection title="Status">
+        <EmptyState
+          title="Unavailable"
+          description="Word mutes are not shipped. No local preview list is shown so this cannot look like a working feature."
         />
-      }>
-      <SettingsSection title="Muted">
-        {seededMuteWords.map((word, index) => (
-          <SettingsContextRow
-            key={word}
-            title={word}
-            actions={[
-              {
-                id: 'remove',
-                label: 'Remove (Preview)',
-                style: 'destructive',
-                disabled: true,
-                disabledReason: 'Not wired yet',
-              },
-            ]}
-            onAction={() => undefined}>
-            <SettingsLinkRow
-              last={index === seededMuteWords.length - 1}
-              row={{
-                title: word,
-                description: 'Local mute preview · long-press for actions',
-                icon: 'text',
-                preview: true,
-                onPress: () => undefined,
-              }}
-            />
-          </SettingsContextRow>
-        ))}
       </SettingsSection>
     </SettingsKitScreen>
   )
@@ -873,33 +835,12 @@ export function BlockedAccountsScreen() {
   return (
     <SettingsKitScreen
       title="Blocked accounts"
-      caption="Seeded block list — Preview. Blocks are not persisted remotely.">
-      <SettingsSection title="Blocked">
-        {seededBlockedAccounts.map((account, index) => (
-          <SettingsContextRow
-            key={account.id}
-            title={account.name}
-            actions={[
-              {
-                id: 'unblock',
-                label: 'Unblock (Preview)',
-                disabled: true,
-                disabledReason: 'Not wired yet',
-              },
-            ]}
-            onAction={() => undefined}>
-            <SettingsLinkRow
-              last={index === seededBlockedAccounts.length - 1}
-              row={{
-                title: account.name,
-                description: `@${account.handle} · long-press for actions`,
-                icon: 'privacy',
-                preview: true,
-                onPress: () => undefined,
-              }}
-            />
-          </SettingsContextRow>
-        ))}
+      caption="Blocking works from post overflow (Block account). A blocked-accounts list endpoint is not available yet, so this screen does not invent entries.">
+      <SettingsSection title="Status">
+        <EmptyState
+          title="List unavailable"
+          description="Use Block account on someone else's post. When a list API ships, blocked profiles will appear here."
+        />
       </SettingsSection>
     </SettingsKitScreen>
   )
@@ -1184,27 +1125,108 @@ export function ShareProfileSheetScreen() {
 }
 
 export function ReportFlowScreen() {
-  const [step, setStep] = useState(0)
-  const reasons = ['Spam', 'Harassment', 'Misinformation', 'Other']
-  const [reason, setReason] = useState<string | null>(null)
+  const params = useLocalSearchParams<{
+    targetType?: string
+    targetId?: string
+  }>()
   const router = useRouter()
+  const session = useSession()
+  const {moderationRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
+  const [step, setStep] = useState(0)
+  const [category, setCategory] = useState<ReportCategory | null>(null)
+  const [details, setDetails] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [submittedReportId, setSubmittedReportId] = useState<string | null>(null)
+
+  const targetType: ReportTargetType =
+    params.targetType === 'profile' ||
+    params.targetType === 'post' ||
+    params.targetType === 'message' ||
+    params.targetType === 'other'
+      ? params.targetType
+      : 'post'
+  const targetId = typeof params.targetId === 'string' ? params.targetId.trim() : ''
+
+  const categories: {id: ReportCategory; label: string}[] = [
+    {id: 'spam', label: 'Spam'},
+    {id: 'harassment', label: 'Harassment'},
+    {id: 'impersonation', label: 'Impersonation'},
+    {id: 'illegal-content', label: 'Illegal content'},
+    {id: 'privacy', label: 'Privacy'},
+    {id: 'other', label: 'Other'},
+  ]
+
+  const submit = async () => {
+    if (!category || !targetId || session.status !== 'signedIn') return
+    setSubmitting(true)
+    setErrorMessage(null)
+    try {
+      const report = await moderationRepository.createReport({
+        targetType,
+        targetId,
+        category,
+        details: details.trim() || undefined,
+      })
+      setSubmittedReportId(report.id)
+      setStep(2)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Report failed.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (session.status !== 'signedIn') {
+    return (
+      <ScreenShell title="Report">
+        <EmptyState
+          title="Sign in to report"
+          description="Reports are submitted to Greenfield and require an authenticated session."
+          action={
+            <ModulaButton label="Sign in" role="primary" onPress={() => router.push('/sign-in' as Href)} />
+          }
+        />
+      </ScreenShell>
+    )
+  }
+
+  if (!targetId) {
+    return (
+      <ScreenShell title="Report">
+        <EmptyState
+          title="Nothing to report"
+          description="Open Report from a post. This screen does not invent a target."
+        />
+        <ModulaButton
+          label="Close"
+          role="secondary"
+          onPress={() => {
+            if (router.canGoBack()) router.back()
+          }}
+        />
+      </ScreenShell>
+    )
+  }
 
   return (
     <ScreenShell title="Report">
-      <AppText variant="display">Report — Preview</AppText>
-      <PreviewBanner text="Multi-step report explanation. Nothing is submitted remotely." />
+      <AppText variant="display">Report</AppText>
       <AppText variant="caption" colour="textSecondary">
-        Step {step + 1} of 3
+        {targetType} · {targetId}
+      </AppText>
+      <AppText variant="caption" colour="textSecondary">
+        Step {Math.min(step + 1, 3)} of 3
       </AppText>
       {step === 0 ? (
         <View style={{gap: spacing[2]}}>
-          {reasons.map(item => (
+          {categories.map(item => (
             <AppPressable
-              key={item}
-              accessibilityLabel={item}
+              key={item.id}
+              accessibilityLabel={item.label}
               onPress={() => {
-                setReason(item)
+                setCategory(item.id)
                 setStep(1)
               }}
               style={[
@@ -1215,7 +1237,7 @@ export function ReportFlowScreen() {
                   borderBottomColor: colours.separator,
                 },
               ]}>
-              <AppText variant="body">{item}</AppText>
+              <AppText variant="body">{item.label}</AppText>
             </AppPressable>
           ))}
         </View>
@@ -1223,16 +1245,42 @@ export function ReportFlowScreen() {
       {step === 1 ? (
         <View style={{gap: spacing[3]}}>
           <AppText variant="body">
-            You selected “{reason}”. In production this would collect optional details.
+            Category: {categories.find(item => item.id === category)?.label ?? category}
           </AppText>
-          <ModulaButton label="Continue" role="primary" onPress={() => setStep(2)} />
+          <TextInput
+            value={details}
+            onChangeText={setDetails}
+            placeholder="Optional details"
+            placeholderTextColor={colours.textTertiary}
+            multiline
+            accessibilityLabel="Report details"
+            style={{
+              minHeight: 96,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colours.border,
+              borderRadius: 12,
+              padding: spacing[3],
+              color: colours.text,
+            }}
+          />
+          {errorMessage ? (
+            <AppText variant="caption" colour="textSecondary">
+              {errorMessage}
+            </AppText>
+          ) : null}
+          <ModulaButton
+            label={submitting ? 'Submitting…' : 'Submit report'}
+            role="primary"
+            disabled={submitting || !category}
+            onPress={() => void submit()}
+          />
           <ModulaButton label="Back" role="secondary" onPress={() => setStep(0)} />
         </View>
       ) : null}
       {step === 2 ? (
         <View style={{gap: spacing[3]}}>
           <AppText variant="body">
-            Preview complete. No report was sent from this Phase 4.5 build.
+            Report submitted{submittedReportId ? ` (${submittedReportId})` : ''}.
           </AppText>
           <ModulaButton
             label="Done"

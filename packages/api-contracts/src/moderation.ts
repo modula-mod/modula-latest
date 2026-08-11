@@ -12,7 +12,7 @@ export type MuteDto = {
   createdAt: string
 }
 
-export type ReportTargetType = 'profile' | 'post' | 'message' | 'other'
+export type ReportTargetType = 'profile' | 'post' | 'story' | 'message' | 'other'
 
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 

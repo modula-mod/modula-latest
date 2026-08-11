@@ -9,12 +9,14 @@ import {useRepostMutation, useSavePostMutation} from '@/features/feed/data'
 import {runPostOverflowAction} from '@/features/feed/postActions'
 import {selectionHaptic} from '@/lib/haptics'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {ReactionControl} from './reaction-control'
 
 export function PostActions({post}: {post: SocialPost}) {
   const router = useRouter()
   const {colours} = useThemeTokens()
+  const {moderationRepository} = useAppServices()
   const save = useSavePostMutation()
   const repost = useRepostMutation()
   const action = (
@@ -69,7 +71,7 @@ export function PostActions({post}: {post: SocialPost}) {
       {action('Reply', 'comment', post.replyCount, false, () => router.push(`/post/${post.id}` as Href), 'Comment on post')}
       {action('Repost', 'repost', post.repostCount, post.reposted, openRepostMenu, 'Repost or quote')}
       <ReactionControl post={post} />
-      {action('Share', 'share', undefined, false, () => void runPostOverflowAction('share', post), 'Open post actions')}
+      {action('Share', 'share', undefined, false, () => void runPostOverflowAction('share', post, {moderationRepository}), 'Open post actions')}
       {action('Save', 'bookmark', undefined, post.saved, () => save.mutate({postId: post.id, saved: !post.saved}), 'Save post')}
     </View>
   )

@@ -2,13 +2,10 @@
 import {execFileSync} from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import {
-  validateGreenfieldModuleView,
-} from '@modula/greenfield-module-ui-contracts'
 import {validateGreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 
 const root = process.cwd()
-const vaultRoot = '/home/andrei/modules/modula-module-vault-notes'
+const vaultRoot = process.env.MODULA_VAULT_NOTES_ROOT ?? '/root/modula-mod/modula-vault-notes'
 const errors = []
 
 function read(abs) {
@@ -52,24 +49,48 @@ if (forbiddenHostDir.length) errors.push(`host contains Vault-specific feature f
 if (fs.existsSync(vaultRoot)) {
   const manifestPath = path.join(vaultRoot, 'module.manifest.json')
   const manifest = json(manifestPath)
+  const moduleDescriptor = json(path.join(vaultRoot, 'modula.module.json'))
   const manifestResult = validateGreenfieldModuleManifest(manifest)
   if (!manifestResult.valid) errors.push(`Vault manifest invalid: ${manifestResult.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
-  if (manifest.version !== '0.2.0') errors.push(`Vault Notes version is ${manifest.version}, expected 0.2.0`)
+  if (manifest.version !== '1.1.0') errors.push(`Vault Notes version is ${manifest.version}, expected 1.1.0`)
+  if (moduleDescriptor.standardVersion !== '1.2.0') errors.push(`Vault Notes Standard is ${moduleDescriptor.standardVersion}, expected 1.2.0`)
+  if (moduleDescriptor.moduleVersion !== '1.1.0') errors.push(`Vault Notes moduleVersion is ${moduleDescriptor.moduleVersion}, expected 1.1.0`)
 
-  const requiredViews = [
-    'vault-home.v1.json',
-    'note-list.v1.json',
-    'note-detail.v1.json',
-    'note-editor.v1.json',
-    'folder-list.v1.json',
-    'folder-editor.v1.json',
-    'search.v1.json',
-    'empty-state.v1.json',
-  ]
-  for (const viewFile of requiredViews) {
-    const view = json(path.join(vaultRoot, 'views', viewFile))
-    const result = validateGreenfieldModuleView(view)
-    if (!result.valid) errors.push(`${viewFile} invalid: ${result.issues.map(issue => `${issue.code} ${issue.path}`).join('; ')}`)
+  const recordIds = new Set((moduleDescriptor.records ?? []).map(record => String(record.id ?? '')))
+  for (const id of [
+    'modula.vault-notes.record.note',
+    'modula.vault-notes.record.folder',
+    'modula.vault-notes.record.tag',
+    'modula.vault-notes.record.note-link',
+    'modula.vault-notes.record.note-version',
+    'modula.vault-notes.record.saved-source',
+  ]) {
+    if (!recordIds.has(id)) errors.push(`Vault Notes descriptor missing record ${id}`)
+  }
+
+  const viewIds = new Set((moduleDescriptor.views ?? []).map(view => String(view.id ?? '')))
+  for (const id of [
+    'modula.vault-notes.view.home',
+    'modula.vault-notes.view.collection',
+    'modula.vault-notes.view.detail',
+    'modula.vault-notes.view.editor',
+    'modula.vault-notes.view.search',
+    'modula.vault-notes.view.settings',
+  ]) {
+    if (!viewIds.has(id)) errors.push(`Vault Notes descriptor missing view ${id}`)
+  }
+
+  const functionIds = new Set((moduleDescriptor.functions ?? []).map(fn => String(fn.id ?? '')))
+  const actionIds = new Set((moduleDescriptor.actions ?? []).map(action => String(action.id ?? '')))
+  for (const id of ['create', 'open', 'update', 'archive', 'restore', 'delete-permanently']) {
+    if (!functionIds.has(`modula.vault-notes.function.note.${id}`)) errors.push(`Vault Notes descriptor missing note function ${id}`)
+    if (!actionIds.has(`modula.vault-notes.action.note.${id}`)) errors.push(`Vault Notes descriptor missing note action ${id}`)
+  }
+
+  try {
+    sh(['node', 'scripts/verify-release.mjs'], vaultRoot)
+  } catch {
+    errors.push('Vault Notes external release verifier failed')
   }
 
   const repoText = maybeRg(['rg', '-n', 'end-to-end encrypted|zero knowledge|cryptographically private', '.'], vaultRoot)
@@ -81,8 +102,9 @@ if (fs.existsSync(vaultRoot)) {
     errors.push('Vault Notes declares forbidden network or DIMON permissions')
   }
 
-  const schemaText = maybeRg(['rg', '-n', 'defaultVisibility|visibility|searchableFields|sourceUri|source URI|tags', 'schemas', 'views'], vaultRoot)
-  for (const needle of ['private', 'searchableFields', 'sourceUri', 'tags']) {
+  const schemaTargets = ['schemas', 'module.manifest.json', 'modula.module.json'].filter(target => fs.existsSync(path.join(vaultRoot, target)))
+  const schemaText = maybeRg(['rg', '-n', 'defaultVisibility|visibility|searchableFields|sourceUrl|source URI|tags', ...schemaTargets], vaultRoot)
+  for (const needle of ['private', 'searchableFields', 'sourceUrl', 'tags']) {
     if (!schemaText.includes(needle)) errors.push(`Vault Notes declarations missing ${needle}`)
   }
 }

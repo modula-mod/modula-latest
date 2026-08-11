@@ -1,0 +1,35 @@
+$ tsc --noEmit && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+Scope: 12 of 19 workspace projects
+packages/greenfield-module-manifest typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck: Done
+packages/greenfield-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck: Done
+packages/dimon-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck: Done
+packages/greenfield-mcp typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-manifest typecheck: Done
+packages/modula-cli typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-contracts typecheck: Done
+packages/dimon-contracts typecheck: Done
+packages/greenfield-mcp typecheck: Done
+packages/modula-cli typecheck: Done
+packages/greenfield-module-sdk typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-runtime typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-protocol typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck: Done
+packages/greenfield-module-sdk typecheck: Done
+packages/greenfield-runtime typecheck: Done
+packages/greenfield-protocol typecheck: Done

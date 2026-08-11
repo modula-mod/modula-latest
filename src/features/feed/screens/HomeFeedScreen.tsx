@@ -45,6 +45,7 @@ import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {shellTabBarCompact} from '@/platform/ui/navigation/shell-tab-bar-compact'
@@ -76,9 +77,13 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
 
 export function HomeFeedScreen() {
   const router = useRouter()
-  const {colours} = useThemeTokens()
+  const {colours, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
+  // Transparent header + nested Animated.FlatList does not reliably get UIKit
+  // automatic top inset; clear the nav row explicitly, then keep the fade zone.
+  const headerClearance = useSecondaryChromeSpacerHeight()
+  const fadePad = useNativeHeaderFadePadding()
   const {preferences} = useProductPreferences()
   const focus = preferences.focus
   const focusPreset = focus.preset ?? 'off'
@@ -186,10 +191,10 @@ export function HomeFeedScreen() {
   useEffect(() => {
     if (!refreshing) return
     const id = setTimeout(() => {
-      pullDistance.value = withTiming(0, {duration: 480})
+      pullDistance.value = withTiming(0, {duration: motion.slow})
     }, 100)
     return () => clearTimeout(id)
-  }, [pullDistance, refreshing])
+  }, [motion.slow, pullDistance, refreshing])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -212,7 +217,7 @@ export function HomeFeedScreen() {
                   data={posts}
                   keyExtractor={item => item.id}
                   renderItem={({item}) => <SocialPost post={item} />}
-                  contentInsetAdjustmentBehavior="automatic"
+                  contentInsetAdjustmentBehavior="never"
                   bounces
                   alwaysBounceVertical
                   onScroll={onScroll}
@@ -275,7 +280,10 @@ export function HomeFeedScreen() {
                       <PaginationIndicator label="Loading more" />
                     ) : null
                   }
-                  contentContainerStyle={{paddingBottom: tabPadding}}
+                  contentContainerStyle={{
+                    paddingTop: headerClearance + fadePad,
+                    paddingBottom: tabPadding,
+                  }}
                 />
               </GestureDetector>
             </PullActionTray>
@@ -326,7 +334,7 @@ function HomeLayoutHeader({
   reduceMotion: boolean
 }) {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, radius, spacing, motion} = useThemeTokens()
   const session = useSession()
   const storiesRail = useStoriesRailQuery()
   const storiesPeople =
@@ -350,6 +358,7 @@ function HomeLayoutHeader({
     scrollY,
     modeTabsStickAtY,
     reduceMotion,
+    motion.springs.selection,
   )
   const modeTabsInteractive = useInlineModeTabsInteractive(
     scrollY,

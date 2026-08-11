@@ -3,6 +3,22 @@ export type SignInCredentials = {
   password: string
 }
 
+export type EmailCodeRequestResult = {
+  requested: true
+  challengeId: string
+  expiresAt: string
+  delivery: {
+    channel: 'email'
+    recipient: string
+  }
+}
+
+export type EmailCodeSignInInput = {
+  email: string
+  challengeId: string
+  code: string
+}
+
 export type RegisterAccountInput = {
   displayName: string
   email: string
@@ -18,10 +34,18 @@ export type RegisterPendingResult = {
   accountId: string
   primaryHandle: string
   verificationToken?: string
+  verificationChallengeId?: string
+  verificationExpiresAt?: string
+  verificationDelivery?: {
+    channel: 'email'
+    recipient: string
+  }
 }
 
 export type VerifyEmailInput = {
-  token: string
+  token?: string
+  challengeId?: string
+  code?: string
   email?: string
 }
 

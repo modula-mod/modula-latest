@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
+REPO="${MODULA_REPO:-/root/modula-latest}"
 COMPOSE="${REPO}/ops/docker/compose.preview.yml"
 cd "${REPO}"
 # Prefer Greenfield env files; fall back to legacy paths during transition.

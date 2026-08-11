@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-REPO="${MODULA_REPO:-/home/andrei/modula-latest}"
+REPO="${MODULA_REPO:-/root/modula-latest}"
 COMPOSE="${REPO}/ops/docker/compose.preview.yml"
 IMAGE_REF="${1:?image digest or tag required}"
 docker compose -f "${COMPOSE}" up -d --no-deps greenfield-api

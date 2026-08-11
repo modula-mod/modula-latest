@@ -48,6 +48,9 @@ export async function sendTransactionalMail(
     port: config.smtpPort,
     secure: config.smtpSecure,
     requireTLS: config.smtpRequireTls,
+    tls: {
+      rejectUnauthorized: config.smtpTlsRejectUnauthorized,
+    },
     auth: {
       user: config.smtpUser,
       pass: config.smtpPassword,

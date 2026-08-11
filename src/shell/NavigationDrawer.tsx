@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef} from 'react'
+import {useEffect, useMemo, useRef, type ReactNode} from 'react'
 import {
   BackHandler,
   Modal,
@@ -10,7 +10,6 @@ import {
 import {usePathname, useRouter, type Href} from 'expo-router'
 import {Gesture, GestureDetector} from 'react-native-gesture-handler'
 import Animated, {
-  FadeInDown,
   interpolate,
   runOnJS,
   useAnimatedStyle,
@@ -24,7 +23,8 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {useReduceMotion} from '@/lib/accessibility'
-import {isDevelopmentBuild} from '@/lib/platform'
+import {useMotionEntering} from '@/platform/ui/motion/useMotionEntering'
+import {isDevelopmentBuild, canAccessDeveloperLabs} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -105,7 +105,7 @@ export function NavigationDrawer() {
   const pathname = usePathname()
   const {width} = useWindowDimensions()
   const insets = useSafeAreaInsets()
-  const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
+  const {colours, spacing, radius, resolvedColourMode, motion} = useThemeTokens()
   const {phase, progress, closeDrawer, settleDrawer} = useShellDrawer()
   const reduceMotion = useReduceMotion()
   const session = useSession()
@@ -114,7 +114,10 @@ export function NavigationDrawer() {
   const drawerWidth = Math.min(348, Math.max(292, width * 0.82))
 
   const sections = useMemo(() => {
-    const merged = [...drawerDestinations]
+    const merged = drawerDestinations.filter(item => {
+      if (item.route === '/profile/preview' && !canAccessDeveloperLabs()) return false
+      return true
+    })
     return SECTION_ORDER.map(id => ({
       id,
       label: SECTION_LABELS[id],
@@ -138,15 +141,19 @@ export function NavigationDrawer() {
   }))
 
   const drawerStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: interpolate(progress.value, [0, 1], [-drawerWidth, 0]),
-      },
-      {
-        scale: interpolate(progress.value, [0, 1], [0.97, 1]),
-      },
-    ],
-    opacity: interpolate(progress.value, [0, 0.2, 1], [0.85, 1, 1]),
+    transform: reduceMotion
+      ? []
+      : [
+          {
+            translateX: interpolate(progress.value, [0, 1], [-drawerWidth, 0]),
+          },
+          {
+            scale: interpolate(progress.value, [0, 1], [0.97, 1]),
+          },
+        ],
+    opacity: reduceMotion
+      ? interpolate(progress.value, [0, 1], [0, 1])
+      : interpolate(progress.value, [0, 0.2, 1], [0.85, 1, 1]),
   }))
 
   const pan = useMemo(
@@ -270,7 +277,7 @@ export function NavigationDrawer() {
                         ? `@${ownerProfile.handle}`
                         : session.status === 'guest'
                           ? 'Browsing Modula'
-                          : 'Local prototype account'}
+                          : 'Sign in for your Greenfield account'}
                     </AppText>
                   </View>
                 </AppPressable>
@@ -335,22 +342,16 @@ export function NavigationDrawer() {
                     </AppText>
                     <View style={{gap: spacing[1]}}>
                       {section.items.map(({item, staggerIndex}) => {
-                        const delay = reduceMotion ? 0 : 40 + staggerIndex * 28
+                        const delay = reduceMotion ? 0 : motion.fast / 3 + staggerIndex * (motion.fast / 5)
                         return (
-                          <Animated.View
-                            key={item.route}
-                            entering={
-                              reduceMotion
-                                ? undefined
-                                : FadeInDown.delay(delay).springify().damping(20)
-                            }>
+                          <DrawerRowEnter key={item.route} delay={delay}>
                             <DrawerItem
                               item={item}
                               dense={section.id === 'system' || section.id === 'labs'}
                               selected={routeSelected(pathname, item.route)}
                               onPress={() => navigate(item.route)}
                             />
-                          </Animated.View>
+                          </DrawerRowEnter>
                         )
                       })}
                     </View>
@@ -399,6 +400,14 @@ export function NavigationDrawer() {
       </View>
     </Modal>
   )
+}
+
+function DrawerRowEnter({delay, children}: {delay: number; children: ReactNode}) {
+  const entering = useMotionEntering('down', delay)
+  if (!entering) {
+    return <>{children}</>
+  }
+  return <Animated.View entering={entering}>{children}</Animated.View>
 }
 
 const styles = StyleSheet.create({

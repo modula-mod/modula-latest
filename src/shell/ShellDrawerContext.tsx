@@ -14,6 +14,7 @@ import {
   useSharedValue,
   withSpring,
   withTiming,
+  cancelAnimation,
   type SharedValue,
 } from 'react-native-reanimated'
 
@@ -46,9 +47,6 @@ type ShellDrawerContextValue = {
 
 const ShellDrawerContext = createContext<ShellDrawerContextValue | null>(null)
 
-const OPEN_SPRING = {damping: 24, stiffness: 260, mass: 0.9}
-const CLOSE_SPRING = {damping: 28, stiffness: 320, mass: 0.85}
-
 /**
  * Left navigation drawer controller (Reanimated + Modal).
  * Avatar / shell chrome should call openDrawer — this is the live navigation surface.
@@ -59,6 +57,8 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
   const phaseRef = useRef<DrawerPhase>('closed')
   const afterCloseRef = useRef<(() => void) | undefined>(undefined)
   const [phase, setPhaseState] = useState<DrawerPhase>('closed')
+  const drawerSpring = motion.springs.drawer
+  const closeSpring = motion.springs.navigation
 
   const setPhase = useCallback((next: DrawerPhase) => {
     phaseRef.current = next
@@ -77,27 +77,34 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
   }, [setPhase])
 
   const openDrawer = useCallback(() => {
-    if (phaseRef.current === 'opening' || phaseRef.current === 'open') {
+    if (phaseRef.current === 'open') {
       return
     }
     afterCloseRef.current = undefined
     setPhase('opening')
+    cancelAnimation(progress)
     // Reanimated shared value, not React state.
     // eslint-disable-next-line react-hooks/immutability
-    progress.value = withSpring(1, OPEN_SPRING, finished => {
+    progress.value = withSpring(1, drawerSpring, finished => {
       if (finished) runOnJS(finishOpen)()
     })
-  }, [finishOpen, progress, setPhase])
+  }, [drawerSpring, finishOpen, progress, setPhase])
 
   const closeDrawer = useCallback(
     (options?: CloseDrawerOptions) => {
-      if (phaseRef.current === 'closing' || phaseRef.current === 'closed') {
+      if (phaseRef.current === 'closed') {
         return
       }
       afterCloseRef.current = options?.afterClose
       setPhase('closing')
-      // Reanimated shared value, not React state.
-      // eslint-disable-next-line react-hooks/immutability
+      cancelAnimation(progress)
+      if (motion.fast === 0) {
+        // Reduce Motion: snap closed without travel.
+        // eslint-disable-next-line react-hooks/immutability
+        progress.value = 0
+        finishClose()
+        return
+      }
       progress.value = withTiming(0, {duration: motion.fast}, finished => {
         if (finished) runOnJS(finishClose)()
       })
@@ -111,22 +118,27 @@ export function ShellDrawerProvider({children}: PropsWithChildren) {
       const velocityX = options?.velocityX ?? 0
       const at = options?.at ?? progress.value
       const shouldClose = at < 0.55 || velocityX < -600
+      cancelAnimation(progress)
       if (shouldClose) {
         afterCloseRef.current = undefined
         setPhase('closing')
-        // Reanimated shared value, not React state.
-        // eslint-disable-next-line react-hooks/immutability
-        progress.value = withSpring(0, CLOSE_SPRING, finished => {
+        if (motion.fast === 0) {
+          // eslint-disable-next-line react-hooks/immutability
+          progress.value = 0
+          finishClose()
+          return
+        }
+        progress.value = withSpring(0, closeSpring, finished => {
           if (finished) runOnJS(finishClose)()
         })
         return
       }
       setPhase('opening')
-      progress.value = withSpring(1, OPEN_SPRING, finished => {
+      progress.value = withSpring(1, drawerSpring, finished => {
         if (finished) runOnJS(finishOpen)()
       })
     },
-    [finishClose, finishOpen, progress, setPhase],
+    [closeSpring, drawerSpring, finishClose, finishOpen, motion.fast, progress, setPhase],
   )
 
   const value = useMemo<ShellDrawerContextValue>(

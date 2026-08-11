@@ -1,0 +1,8 @@
+=== registration policy / open ===
+GET /v1/accounts/registration-policy -> 404 {"message":"Route GET:/v1/accounts/registration-policy not found","error":"Not Found","statusCode":404}
+GET /v1/registration/policy -> 404 {"message":"Route GET:/v1/registration/policy not found","error":"Not Found","statusCode":404}
+GET /v1/accounts/policy -> 404 {"message":"Route GET:/v1/accounts/policy not found","error":"Not Found","statusCode":404}
+GET /v1/meta/registration -> 404 {"message":"Route GET:/v1/meta/registration not found","error":"Not Found","statusCode":404}
+=== attempt register phase7j-mac-a-1786488256@example.com ===
+{"message":"Route POST:/v1/accounts not found","error":"Not Found","statusCode":404}
+HTTP=404

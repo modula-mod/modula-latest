@@ -29,23 +29,6 @@ import type {
 
 const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
   {
-    moduleId: 'digital.modula.vault-notes',
-    name: 'Vault Notes',
-    description: 'Private in Modula notes for posts, folders, tags and Board summaries.',
-    publisherId: 'modula',
-    publisherName: 'Modula',
-    kind: 'module',
-    category: 'Productivity',
-    trustLevel: 'firstParty',
-    latestVersion: '0.2.0',
-    compatibility: 'Compatible',
-    installable: true,
-    installationState: 'available',
-    priceState: 'Included',
-    featured: true,
-    standard: localStandardMetadata(),
-  },
-  {
     moduleId: 'digital.modula.tasks',
     name: 'Tasks',
     description: 'Planned first-party task module for social and Board workflows.',
@@ -117,7 +100,7 @@ export class ApiModuleRepository implements ModuleRepository {
           backend: defaultBackendMetadata(moduleId),
           permissions: [],
           contributions: {},
-          privacy: moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
+          privacy: undefined,
         } : null
       },
     ).then(async item => {
@@ -326,7 +309,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     installable,
     installationState: status === 'quarantined' ? 'quarantined' : installable ? 'available' : status === 'planned' ? 'comingSoon' : 'notAvailable',
     priceState: installable ? 'Free' : status === 'planned' ? 'Coming soon' : 'Not available',
-    featured: moduleId.includes('vault-notes') || moduleId.includes('tasks'),
+    featured: Boolean(row.featured),
     standard: decodeStandardMetadata(row.standard ?? row.standardMetadata ?? manifest),
   }
 }
@@ -362,7 +345,7 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     manifestChecksum: typeof row.manifestSha256 === 'string' ? row.manifestSha256 : undefined,
     releaseChecksum: typeof row.releaseSha256 === 'string' ? row.releaseSha256 : null,
     releaseNotes: Array.isArray(row.releaseNotes) ? row.releaseNotes.map(String) : [],
-    privacy: base.moduleId.includes('vault-notes') ? 'Private in Modula' : undefined,
+    privacy: typeof row.privacy === 'string' ? row.privacy : typeof manifest.privacy === 'string' ? manifest.privacy : undefined,
   }
 }
 
@@ -496,20 +479,6 @@ function decodeStandardMetadata(value: unknown): ModuleDetail['standard'] {
     capabilityFlags: isRecord(value.capabilityFlags) ? Object.fromEntries(Object.entries(value.capabilityFlags).filter((entry): entry is [string, boolean] => typeof entry[1] === 'boolean')) : {},
     capabilities: arrayOfStrings(value.capabilities),
     engines: arrayOfStrings(value.engines),
-  }
-}
-
-function localStandardMetadata(): ModuleDetail['standard'] {
-  return {
-    manifestVersion: 1,
-    standardVersion: null,
-    sectionVersions: {},
-    runtimeDiagnostics: [],
-    dependencies: {requires: 0, optional: 0, recommended: 0, conflicts: 0, replaces: 0, provides: 0},
-    registries: {services: 0, apis: 0, hooks: 0, jobs: 0, storage: 0, widgets: 0, navigation: 0, ui: 0, automation: 0, metrics: 0},
-    capabilityFlags: {},
-    capabilities: [],
-    engines: [],
   }
 }
 
@@ -842,27 +811,7 @@ function filterCatalogue(items: ModuleCatalogueItem[], input: {q?: string; categ
 }
 
 function localSettingsSchema(moduleId: string): ModuleSettingsSchema {
-  if (!moduleId.includes('vault-notes')) return {moduleId, version: 'local', fields: [], defaults: {}}
-  return {
-    moduleId,
-    version: '0.2.0',
-    defaults: {
-      defaultFolder: 'inbox',
-      autoCreateTitle: true,
-      saveSourceLink: true,
-      confirmBeforeSavingPost: true,
-      defaultNoteSort: 'updatedAt',
-      showRecentNotesOnBoard: true,
-    },
-    fields: [
-      {fieldId: `${moduleId}.settings.defaultFolder`, name: 'defaultFolder', type: 'text', label: 'Default folder'},
-      {fieldId: `${moduleId}.settings.autoCreateTitle`, name: 'autoCreateTitle', type: 'boolean', label: 'Auto-create title'},
-      {fieldId: `${moduleId}.settings.saveSourceLink`, name: 'saveSourceLink', type: 'boolean', label: 'Save source link'},
-      {fieldId: `${moduleId}.settings.confirmBeforeSavingPost`, name: 'confirmBeforeSavingPost', type: 'boolean', label: 'Confirm before saving a post'},
-      {fieldId: `${moduleId}.settings.defaultNoteSort`, name: 'defaultNoteSort', type: 'singleSelect', label: 'Default note sort', options: [{value: 'updatedAt', label: 'Updated'}, {value: 'createdAt', label: 'Created'}, {value: 'title', label: 'Title'}]},
-      {fieldId: `${moduleId}.settings.showRecentNotesOnBoard`, name: 'showRecentNotesOnBoard', type: 'boolean', label: 'Show recent notes on Board'},
-    ],
-  }
+  return {moduleId, version: 'local', fields: [], defaults: {}}
 }
 
 function categoryFor(moduleId: string, description: string): ProductHubCategory {
@@ -881,52 +830,12 @@ function idempotencyKey(action: string, moduleId: string) {
 }
 
 function localViews(moduleId: string): ModuleRuntimeView[] {
-  if (!moduleId.includes('vault-notes')) return []
-  return [
-    {
-      viewId: `${moduleId}.views.note-list`,
-      moduleId,
-      kind: 'collection',
-      title: 'Vault Notes',
-      collection: 'note',
-      requiredCapabilities: [`records:module.${moduleId}.note:read`],
-      layout: [{id: 'notes', component: 'recordList', collection: 'note'}],
-      toolbar: [
-        {
-          actionId: `${moduleId}.actions.create-note`,
-          kind: 'record.create',
-          label: 'Create note',
-          inputSchema: {
-            fields: [
-              {fieldId: `${moduleId}.fields.title`, name: 'title', type: 'text', label: 'Title', required: true},
-              {fieldId: `${moduleId}.fields.body`, name: 'body', type: 'multilineText', label: 'Body'},
-              {fieldId: `${moduleId}.fields.tags`, name: 'tags', type: 'tags', label: 'Tags'},
-              {fieldId: `${moduleId}.fields.folderId`, name: 'folderId', type: 'text', label: 'Folder'},
-              {fieldId: `${moduleId}.fields.sourceUri`, name: 'sourceUri', type: 'url', label: 'Source link'},
-            ],
-          },
-          capability: `records:module.${moduleId}.note:write`,
-          confirmationPolicy: 'none',
-          destructive: false,
-          successDestination: {kind: 'stay'},
-          errorPresentation: {kind: 'inline'},
-          requiresIdempotencyKey: true,
-          target: {collection: 'note'},
-        },
-      ],
-      available: true,
-    },
-  ]
+  void moduleId
+  return []
 }
 
 function localRecords(moduleId: string, collection: string, q?: string): ModuleRecord[] {
-  if (!moduleId.includes('vault-notes') || collection !== 'note') return []
   const key = localRecordKey(moduleId, collection)
-  if (!LOCAL_RECORD_STORE.has(key)) {
-    LOCAL_RECORD_STORE.set(key, [
-      {record_id: 'local-vault-note-1', collection: 'note', moduleId, data: {title: 'Private in Modula', body: 'Vault Notes declarations render through the generic module host.', tags: ['vault'], folderId: 'inbox', sourceUri: 'https://modula.digital'}, revision: 1, visibility: 'private'},
-    ])
-  }
   const items = LOCAL_RECORD_STORE.get(key) ?? []
   return q ? items.filter(item => JSON.stringify(item.data).toLowerCase().includes(q.toLowerCase())) : items
 }

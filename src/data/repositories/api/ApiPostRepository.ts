@@ -3,7 +3,7 @@ import {asRecord} from '@/api/decoding/validation'
 import type {ApiClient} from '@/api/client'
 import type {PostRepository} from '@/data/repositories/contracts'
 import type {PostId} from '@/api/contracts'
-import type {CreatePostInput, PostEngagement, SocialPost} from '@/domain/social'
+import type {CreatePostInput, PostEngagement, SocialPost, UpdatePostInput} from '@/domain/social'
 
 function decodeEngagement(value: unknown): PostEngagement {
   return asRecord(value, 'post engagement') as PostEngagement
@@ -18,6 +18,24 @@ export class ApiPostRepository implements PostRepository {
 
   createPost(input: CreatePostInput): Promise<SocialPost> {
     return this.client.post({path: '/v1/posts', body: input, authenticated: true}, decodePost)
+  }
+
+  updatePost(postId: PostId, input: UpdatePostInput): Promise<SocialPost> {
+    return this.client.patch(
+      {
+        path: `/v1/posts/${encodeURIComponent(postId)}`,
+        body: input,
+        authenticated: true,
+      },
+      decodePost,
+    )
+  }
+
+  async deletePost(postId: PostId): Promise<void> {
+    await this.client.delete(
+      {path: `/v1/posts/${encodeURIComponent(postId)}`, authenticated: true},
+      () => undefined,
+    )
   }
 
   likePost(postId: PostId): Promise<PostEngagement> {

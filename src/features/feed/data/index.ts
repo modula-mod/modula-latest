@@ -1,5 +1,6 @@
 export * from '@/features/feed/data/updatePostAcrossCache'
 export * from '@/features/feed/data/useCreatePostMutation'
+export * from '@/features/feed/data/useUpdatePostMutation'
 export * from '@/features/feed/data/useHomeFeedQuery'
 export * from '@/features/feed/data/useLikePostMutation'
 export * from '@/features/feed/data/usePostQuery'

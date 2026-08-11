@@ -20,6 +20,7 @@ import {useSession} from '@/auth/runtime'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
+import {useReduceMotion} from '@/lib/accessibility'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -57,6 +58,7 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
     session.status === 'signedIn' ? session.profile.id : null
   const {colours, spacing, radius, scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
+  const reduceMotion = useReduceMotion()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
 
@@ -105,7 +107,7 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType={reduceMotion ? 'none' : 'fade'}
       onRequestClose={onClose}
       statusBarTranslucent>
       <KeyboardAvoidingView

@@ -17,6 +17,7 @@ import type {
   ProductPreferencesRepository,
   ProfileRepository,
   ReelsRepository,
+  ModerationRepository,
   SocialGraphRepository,
   StoriesRepository,
   ToolsRepository,
@@ -30,6 +31,7 @@ export type AppServices = {
   productPreferencesRepository: ProductPreferencesRepository
   profileRepository: ProfileRepository
   socialGraphRepository: SocialGraphRepository
+  moderationRepository: ModerationRepository
   storiesRepository: StoriesRepository
   activityRepository: ActivityRepository
   appearanceRepository: AppearanceRepository

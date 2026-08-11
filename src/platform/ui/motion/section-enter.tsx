@@ -1,8 +1,9 @@
 import type {ReactNode} from 'react'
-import Animated, {FadeIn, FadeInDown, FadeInRight} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useReduceMotion} from '@/lib/accessibility'
+import {useMotionEntering} from '@/platform/ui/motion/useMotionEntering'
 
 type SectionEnterProps = {
   children: ReactNode
@@ -27,18 +28,18 @@ export function SectionEnter({
   const reduceMotion = useReduceMotion()
   const {preferences} = useProductPreferences()
   const density = preferences.motionDensity
+  const scaledDelay = density === 'reduced' ? Math.round(delay * 0.35) : delay
+  const fadeEntering = useMotionEntering('fade', scaledDelay)
+  const directionalEntering = useMotionEntering(from, scaledDelay)
 
   if (reduceMotion || density === 'minimal') {
     return <>{children}</>
   }
 
-  const scaledDelay = density === 'reduced' ? Math.round(delay * 0.35) : delay
-  const entering =
-    density === 'reduced'
-      ? FadeIn.delay(scaledDelay).duration(160)
-      : from === 'right'
-        ? FadeInRight.delay(scaledDelay).springify().damping(18).stiffness(180)
-        : FadeInDown.delay(scaledDelay).springify().damping(18).stiffness(180)
+  const entering = density === 'reduced' ? fadeEntering : directionalEntering
+  if (!entering) {
+    return <>{children}</>
+  }
 
   return (
     <Animated.View entering={entering} style={style}>

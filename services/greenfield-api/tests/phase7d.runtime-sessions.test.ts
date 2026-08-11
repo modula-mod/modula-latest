@@ -36,7 +36,7 @@ describeIf('Phase 7D runtime session persistence', () => {
     const manager = new GreenfieldRuntimeManager({
       registry: new GreenfieldRuntimeProviderRegistry(),
       sessionStore: store,
-      idFactory: () => 'runtime-session-persisted',
+      idFactory: () => `runtime-session-persisted-${accountId}`,
       clock: () => new Date('2026-07-28T12:00:00.000Z'),
     })
 
@@ -72,7 +72,7 @@ describeIf('Phase 7D runtime session persistence', () => {
     const store = new GreenfieldRuntimeSessionRepository(db)
     await expect(
       store.create({
-        sessionId: 'runtime-session-provider-handle',
+        sessionId: `runtime-session-provider-handle-${accountId}`,
         sessionKind: 'ai-tool-run',
         accountId,
         providerIds: ['modula.ai'],

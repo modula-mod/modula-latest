@@ -29,6 +29,7 @@ import {useReactionMutation} from '@/features/social/data/useReactionMutation'
 import {useSession} from '@/auth/runtime'
 import {useReduceMotion} from '@/lib/accessibility'
 import {lightImpactHaptic, selectionHaptic} from '@/lib/haptics'
+import {useAppServices} from '@/runtime'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import type {AvatarFace} from '@/platform/ui/avatars/types'
 import {
@@ -108,6 +109,7 @@ function TrayIcon({
 export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const router = useRouter()
   const session = useSession()
+  const {moderationRepository} = useAppServices()
   const {colours, spacing, scheme} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const reaction = useReactionMutation()
@@ -125,7 +127,9 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
     post.author,
     session.status === 'signedIn' ? session.profile.id : '',
   )
-  const overflowActions = buildPostOverflowActions(post)
+  const overflowActions = buildPostOverflowActions(post, {
+    isOwner: session.status === 'signedIn' && session.profile.id === post.author.id,
+  })
   const liked = Boolean(post.liked || post.viewerReaction)
   const audioLabel = media?.title?.trim() || `Original audio · @${post.author.handle}`
   const likedRed = colours.destructive
@@ -173,7 +177,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
   const audioStyle = useAnimatedStyle(() => ({opacity: audioPulse.value}))
 
   const runOverflow = (id: string) => {
-    void runPostOverflowAction(id as PostOverflowActionId, post)
+    void runPostOverflowAction(id as PostOverflowActionId, post, {moderationRepository})
   }
 
   const toggleLike = (forceLike = false) => {
@@ -403,7 +407,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
               onPress={() => toggleLike()}
               onLongPress={() => {
                 void selectionHaptic()
-                reaction.mutate({postId: post.id, reaction: 'celebrate'})
+                reaction.mutate({postId: post.id, reaction: 'fire'})
               }}
             />
             <TrayIcon
@@ -416,7 +420,7 @@ export function MediaPostCard({post}: {post: MediaSocialPost}) {
               label="Share post"
               icon="share"
               colour={colours.text}
-              onPress={() => void runPostOverflowAction('share', post)}
+              onPress={() => void runPostOverflowAction('share', post, {moderationRepository})}
             />
             <TrayIcon
               label={post.saved ? 'Unsave post' : 'Save for later'}

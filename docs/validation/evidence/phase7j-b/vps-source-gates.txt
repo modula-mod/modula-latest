@@ -1,0 +1,475 @@
+HEAD=b5252d5f7654547ff8aa75498bd205336692cd99
+BRANCH=phase7j-product-convergence
+STARTED=2026-08-11T22:54:33Z
+
+=== CI=true pnpm install --frozen-lockfile ===
+Scope: all 19 workspace projects
+? Verifying lockfile against supply-chain policies (1189 entries)...
+✓ Lockfile passes supply-chain policies (1189 entries in 6ms)
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +108 -56
+++++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------
+Progress: resolved 108, reused 61, downloaded 47, added 106, done
+
+dependencies:
+- @expo/metro-runtime 57.0.8
++ @expo/metro-runtime 57.0.9
+- @expo/ui 57.0.9
++ @expo/ui 57.0.10
+- expo 57.0.11
++ expo 57.0.12
+- expo-apple-authentication 57.0.1
+- expo-constants 57.0.9
++ expo-constants 57.0.10
+- expo-dev-client 57.0.10
++ expo-dev-client 57.0.11
+- expo-image-picker 57.0.8
++ expo-image-picker 57.0.9
+- expo-router 57.0.11
++ expo-router 57.0.12
+- expo-splash-screen 57.0.5
++ expo-splash-screen 57.0.6
+
+devDependencies:
+- @playwright/test 1.62.1
++ expo-mcp 0.2.4
+
+Done in 1.9s using pnpm v11.11.0
+INSTALL_EXIT=0
+
+=== CI=true pnpm lint ===
+$ expo lint -- --max-warnings=0
+LINT_EXIT=0
+
+=== CI=true pnpm typecheck ===
+$ tsc --noEmit && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+Scope: 12 of 19 workspace projects
+packages/greenfield-module-manifest typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck: Done
+packages/greenfield-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck: Done
+packages/dimon-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck: Done
+packages/greenfield-mcp typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-manifest typecheck: Done
+packages/modula-cli typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-contracts typecheck: Done
+packages/dimon-contracts typecheck: Done
+packages/greenfield-mcp typecheck: Done
+packages/modula-cli typecheck: Done
+packages/greenfield-module-sdk typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-runtime typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-protocol typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck: Done
+packages/greenfield-module-sdk typecheck: Done
+packages/greenfield-protocol typecheck: Done
+packages/greenfield-runtime typecheck: Done
+TYPECHECK_EXIT=0
+
+=== CI=true pnpm --filter @modula/greenfield-api build ===
+$ tsc -p tsconfig.json
+API_BUILD_EXIT=0
+
+=== CI=true pnpm --filter @modula/greenfield-api test ===
+$ vitest run
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/root/modula-latest/services/greenfield-api[39m
+
+ [32m✓[39m tests/greenfield.accounts.test.ts [2m([22m[2m13 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m[32m 70[2mms[22m[39m
+ [32m✓[39m tests/phase7d.connectors.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/phase7e.module-runtime-2.test.ts [2m([22m[2m5 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/phase7c.media-storage.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m tests/mail.templates.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/phase7e.module-backend-runtime.test.ts [2m([22m[2m6 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m tests/phase7e.standard2-normalization.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/phase7d.connector-security.test.ts [2m([22m[2m5 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/api.integration.test.ts [2m([22m[2m12 tests[22m[2m | [22m[33m11 skipped[39m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/phase7a.modules.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/phase7b.module-runtime.test.ts [2m([22m[2m7 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/phase7e.vault-notes-platform.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/phase7e.ai-platform-foundation.test.ts [2m([22m[2m7 tests[22m[2m | [22m[33m6 skipped[39m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/phase7e.error-envelope.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/phase7e.ai-provider-runtime.test.ts [2m([22m[2m10 tests[22m[2m | [22m[33m9 skipped[39m[2m)[22m[32m 2[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/phase6.security.test.ts [2m([22m[2m13 tests[22m[2m | [22m[33m13 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase6s.social.test.ts [2m([22m[2m8 tests[22m[2m | [22m[33m8 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7d.connection-lifecycle.test.ts [2m([22m[2m4 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7d.runtime-sessions.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7e.ai-product-actions.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7e.internal-events.test.ts [2m([22m[2m5 tests[22m[2m | [22m[33m5 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7e.policy-audit-notifications.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7e.search-platform.test.ts [2m([22m[2m4 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m
+ [2m[90m↓[39m[22m tests/phase7i.f5-stories.test.ts [2m([22m[2m1 test[22m[2m | [22m[33m1 skipped[39m[2m)[22m
+
+[2m Test Files [22m [1m[32m15 passed[39m[22m[2m | [22m[33m9 skipped[39m[90m (24)[39m
+[2m      Tests [22m [1m[32m38 passed[39m[22m[2m | [22m[33m92 skipped[39m[90m (130)[39m
+[2m   Start at [22m 23:55:21
+[2m   Duration [22m 10.50s[2m (transform 1.34s, setup 0ms, collect 6.62s, tests 161ms, environment 3ms, prepare 1.09s)[22m
+
+API_TEST_EXIT=0
+
+=== CI=true pnpm --filter @modula/greenfield-worker build ===
+$ tsc -p tsconfig.json
+WORKER_BUILD_EXIT=0
+
+=== CI=true pnpm --filter @modula/greenfield-worker test ===
+$ vitest run
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/root/modula-latest/services/greenfield-worker[39m
+
+ [32m✓[39m tests/checkpoint.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/phase7a.module-jobs.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m tests/retry.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/lease.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m2 skipped[39m[2m)[22m[32m 2[2mms[22m[39m
+ [2m[90m↓[39m[22m tests/phase7e.notifications.test.ts [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+ [32m✓[39m tests/phase7e.search-projector.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/phase7e.vault-notes-search-projector.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/phase7e.event-delivery.test.ts [2m([22m[2m2 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 2[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m7 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (8)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[2m | [22m[33m8 skipped[39m[90m (17)[39m
+[2m   Start at [22m 23:55:35
+[2m   Duration [22m 480ms[2m (transform 380ms, setup 0ms, collect 1.33s, tests 18ms, environment 1ms, prepare 497ms)[22m
+
+WORKER_TEST_EXIT=0
+
+=== CI=true pnpm build:web ===
+$ EXPO_PUBLIC_APP_ENV=production EXPO_PUBLIC_DATA_SOURCE=remote EXPO_PUBLIC_API_URL=https://api.modula.digital sh -c 'expo export --platform web && node scripts/write-web-version.mjs'
+Using src/app as the root directory for Expo Router.
+Starting Metro Bundler
+
+Static rendering is enabled. Learn more: https://docs.expo.dev/router/web/static-rendering/
+λ Bundled 14023ms node_modules/.pnpm/@expo+router-server@57.0.5_@expo+metro-runtime@57.0.9_expo-constants@57.0.10_expo-font@_43629d4f23898aa0a3ea4c39f6527240/node_modules/@expo/router-server/node/render.js (2195 modules)
+Web Bundled 14807ms node_modules/.pnpm/expo-router@57.0.12_1b8ca5f7bff7307a5cfdad1ad2c59b12/node_modules/expo-router/entry.js (2201 modules)
+
+› web bundles (1):
+_expo/static/js/web/entry-c56be356e1a8d2c778391d4d0481229e.js (4MB)
+
+› Static routes (174):
+/saved (25KB)
+/share (23KB)
+/teams (60KB)
+/ (index) (51KB)
+/drafts (26KB)
+/report (26KB)
+/create (27KB)
+/compose (23KB)
+/modules (46KB)
+/recover (28KB)
+/sign-in (30KB)
+/welcome (28KB)
+/_sitemap (23KB)
+/register (26KB)
+/reactions (29KB)
+/whats-new (26KB)
+/+not-found (24KB)
+/onboarding (30KB)
+/help (29KB)
+/profile/os (49KB)
+/board (58KB)
+/lists (28KB)
+/product/aki (26KB)
+/product/nft (61KB)
+/reels (28KB)
+/verify-email (29KB)
+/(tabs) (51KB)
+/product/gaia (54KB)
+/profile/edit (27KB)
+/share-profile (25KB)
+/(tabs)/create (27KB)
+/profile (33KB)
+/creator (30KB)
+/discover/live (38KB)
+/oauth/atproto (27KB)
+/post/[postId] (27KB)
+/product/atlas (1.1MB)
+/product/focus (49KB)
+/product/forge (61KB)
+/product (109KB)
+/product/start (57KB)
+/settings/data (36KB)
+/settings/help (34KB)
+/create-account (26KB)
+/(auth)/recover (28KB)
+/reset-password (29KB)
+/(auth)/sign-in (30KB)
+/(auth)/welcome (28KB)
+/activity (35KB)
+/discover (37KB)
+/discover/feeds (25KB)
+/discover/media (28KB)
+/help/shortcuts (33KB)
+/lists/[listId] (28KB)
+/messages (27KB)
+/product/[slug] (28KB)
+/product/agents (42KB)
+/product/kaizen (45KB)
+/product/ledger (41KB)
+/product/search (46KB)
+/product/themes (43KB)
+/settings/about (32KB)
+/settings/dimon (57KB)
+/settings (46KB)
+/stories/create (35KB)
+/forgot-password (28KB)
+/(auth)/register (26KB)
+/product/creator (38KB)
+/product/foundry (26KB)
+/product/sandbox (39KB)
+/product/widgets (66KB)
+/profile/preview (29KB)
+/reels/algorithm (34KB)
+/account/switcher (29KB)
+/creator/insights (31KB)
+/discover/inspire (38KB)
+/help/[articleId] (28KB)
+/product/commands (53KB)
+/product/governor (26KB)
+/product/presence (47KB)
+/profile/[handle] (29KB)
+/settings/account (30KB)
+/settings/blocked (31KB)
+/settings/content (36KB)
+/settings/privacy (38KB)
+/(auth)/onboarding (30KB)
+/collections (29KB)
+/communities (46KB)
+/marketplace (48KB)
+/module/[moduleId] (27KB)
+/product/customize (61KB)
+/product/developer (41KB)
+/product/ownership (43KB)
+/product/saved-hub (34KB)
+/profile/customize (27KB)
+/settings/language (36KB)
+/settings/security (39KB)
+/stories/[groupId] (28KB)
+/(tabs)/board (58KB)
+/discover/interests (25KB)
+/product/day-agenda (32KB)
+/product/design-lab (46KB)
+/product/gaia-atlas (38KB)
+/product/quiet-send (27KB)
+/(auth)/verify-email (29KB)
+/messages/[threadId] (28KB)
+/product/automations (65KB)
+/product/chat-assist (53KB)
+/product/communities (46KB)
+/product/layout-home (47KB)
+/product/layout-tabs (47KB)
+/product/merge-feeds (41KB)
+/product/permissions (51KB)
+/product/quiet-inbox (34KB)
+/settings/appearance (66KB)
+/settings/mute-words (31KB)
+/(tabs)/profile (33KB)
+/creator/monetization (29KB)
+/product/claims-graph (26KB)
+/product/inner-circle (30KB)
+/product/integrations (49KB)
+/product/motion-prefs (32KB)
+/settings/marketplace (36KB)
+/(auth)/create-account (26KB)
+/(auth)/reset-password (29KB)
+/(tabs)/activity (35KB)
+/(tabs)/discover (37KB)
+/communities/[topicId] (28KB)
+/product/glass-privacy (35KB)
+/settings/inner-circle (30KB)
+/(auth)/forgot-password (28KB)
+/marketplace/[moduleId] (28KB)
+/product/chrome-density (32KB)
+/product/circuit-memory (43KB)
+/product/layout-profile (50KB)
+/settings/accessibility (44KB)
+/settings/notifications (42KB)
+/settings/account/email (30KB)
+/settings/modules (33KB)
+/post/[postId]/analytics (32KB)
+/product/feature-control (50KB)
+/product/layout-activity (44KB)
+/product/layout-discover (56KB)
+/product/reactions-prefs (33KB)
+/product/scheduled-posts (32KB)
+/product/status-composer (33KB)
+/settings/appearance-lab (109KB)
+/settings/account/export (33KB)
+/settings/account/handle (32KB)
+/product/commands-palette (34KB)
+/product/module-standards (51KB)
+/settings/developer (30KB)
+/product/automations-inbox (32KB)
+/settings/account/password (34KB)
+/settings/account/sessions (32KB)
+/settings/extensions (49KB)
+/collections/[collectionId] (28KB)
+/product/share-destinations (34KB)
+/product/surface-playground (33KB)
+/product/intelligence (45KB)
+/profile/[handle]/followers (29KB)
+/profile/[handle]/following (29KB)
+/settings/connections (36KB)
+/settings/developer/session (33KB)
+/module/[moduleId]/[...path] (27KB)
+/product/intelligence/[slug] (29KB)
+/settings/modules/[moduleId] (31KB)
+/settings/connections/atproto (30KB)
+/marketplace/seller/[sellerId] (29KB)
+/settings/developer/data-runtime (31KB)
+/settings/developer/expo-ui (30KB)
+/settings/extensions/[extensionId] (30KB)
+/settings/developer/expo-ui/[section] (30KB)
+/settings/developer/expo-ui/playground (30KB)
+
+Exported: dist
+Something prevented Expo from exiting, forcefully exiting now.
+web_version_marker_ok b5252d5f7654547ff8aa75498bd205336692cd99 files=201
+BUILD_WEB_EXIT=0
+
+=== CI=true pnpm verify:web-build ===
+$ node scripts/verify-web-build.mjs
+{"status":"ok","artifact":"dist","files":202,"scannedBytes":11375946,"commit":"b5252d5f7654547ff8aa75498bd205336692cd99","apiOrigin":"https://api.modula.digital"}
+VERIFY_WEB_EXIT=0
+
+=== CI=true pnpm verify:phase7j-mac ===
+$ node scripts/verify-phase7j-mac.mjs
+Phase 7J-Mac-A verify aggregator
+cwd=/root/modula-latest
+PASS: docs/engineering/phase7j-branch-convergence.md contains "MERGE_FULL"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "phase7i-trusted-production-alpha"
+PASS: docs/engineering/phase7j-branch-inventory.md contains "7632e03"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "ALREADY_INTEGRATED"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "SUPERSEDED"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "CHERRY_PICK_VALID"
+PASS: docs/engineering/phase7j-branch-convergence.md contains "ssh modula-vps"
+PASS: SOURCE CONVERGENCE branch phase7j-product-convergence
+PASS: docs/architecture/phase3-unified-profile.md contains "No Identity Centre"
+PASS: VAULT NOTES external package boundary (no src/features/vault-notes)
+
+==> LINT
+$ expo lint -- --max-warnings=0
+PASS: LINT
+
+==> TYPECHECK
+$ tsc --noEmit && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && pnpm --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+$ tsc -p tsconfig.json
+Scope: 12 of 19 workspace projects
+packages/greenfield-module-manifest typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-engine-contracts typecheck: Done
+packages/greenfield-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-connector-contracts typecheck: Done
+packages/dimon-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-ui-contracts typecheck: Done
+packages/greenfield-mcp typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-manifest typecheck: Done
+packages/modula-cli typecheck$ tsc -p tsconfig.json --noEmit
+packages/dimon-contracts typecheck: Done
+packages/greenfield-contracts typecheck: Done
+packages/greenfield-mcp typecheck: Done
+packages/modula-cli typecheck: Done
+.../greenfield-module-registry-contracts typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-module-sdk typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-protocol typecheck$ tsc -p tsconfig.json --noEmit
+packages/greenfield-runtime typecheck$ tsc -p tsconfig.json --noEmit
+.../greenfield-module-registry-contracts typecheck: Done
+packages/greenfield-module-sdk typecheck: Done
+packages/greenfield-protocol typecheck: Done
+packages/greenfield-runtime typecheck: Done
+PASS: TYPECHECK
+
+==> EXPO DOCTOR
+PASS: EXPO DOCTOR 19/20 with expected committed ios/android CNG advisory
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "BUILD_WEB_EXIT=0"
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "VERIFY_WEB_EXIT=0"
+PASS: docs/validation/evidence/phase7j-mac-ui/part12-web-expo.txt contains "EXPO_CHECK_EXIT=0"
+PASS: WEB BUILD evidence recorded
+PASS: docs/validation/evidence/phase7j-mac-ui/ios-xcodebuild.txt contains "BUILD SUCCEEDED"
+PASS: IOS BUILD SUCCEEDED evidence
+PASS: AUTH/API live health
+PASS: API ready health
+PASS: API version commit=7632e03 phase=phase7i-f5b
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "=== me after refresh ==="
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "http 200 ok True handle"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains ""revoked":true"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "UNAUTHENTICATED"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-session-lifecycle.txt contains "=== re-login ==="
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-golden-path.txt contains "INVALID_CREDENTIALS"
+PASS: docs/validation/evidence/phase7j-mac-ui/api-auth-golden-path.txt contains ""verified":true"
+PASS: AUTH + SESSION RESTORE (API lifecycle) evidence
+PASS: docs/validation/phase7i-mac-b-final.md contains "SESSION_RESTORE = PASS"
+PASS: docs/validation/phase7j-feature-matrix.md contains "SESSION_RESTORE gate PASS"
+PASS: src/auth/runtime/SessionProvider.tsx contains "refreshSession"
+PASS: src/auth/screens/SignInScreen.tsx contains "setFormError"
+PASS: src/auth/screens/SignInScreen.tsx contains "requestEmailSignInCode"
+PASS: packages/api-contracts/src/identifiers.ts contains "UUIDv7"
+PASS: src/components/materials/ProgressiveBlurBand.tsx contains "ProgressiveBlur"
+PASS: src/platform/ui/navigation/shell-bottom-progressive-blur.tsx contains "ShellBottomProgressiveBlur"
+PASS: src/theme/contracts/materials.ts contains "springs"
+PASS: docs/architecture/phase3-unified-profile.md contains "No Identity Centre"
+PASS: src/features/profile/screens/UnifiedProfileScreen.tsx contains "export function UnifiedProfileScreen"
+PASS: PROFILE canonical (architecture + UnifiedProfileScreen)
+PASS: src/theme/contracts/materials.ts contains "Surface"
+PASS: src/features/settings/screens/AppearanceScreen.tsx contains "export function AppearanceScreen"
+PASS: SURFACE TYPES materials + Appearance screen
+PASS: docs/validation/phase7j-feature-matrix.md contains "Stories"
+PASS: STORIES matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Posts create"
+PASS: POSTS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reactions"
+PASS: REACTIONS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Comments / replies"
+PASS: COMMENTS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Appearance / Settings"
+PASS: SETTINGS matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Appearance"
+PASS: APPEARANCE matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Product Hub"
+PASS: PRODUCT HUB matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Drawer"
+PASS: DRAWER matrix+source
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reduce Motion"
+PASS: REDUCE MOTION matrix+source
+PASS: docs/validation/phase7i-mac-b-final.md contains "PASS"
+PASS: ICONS abstraction present (AppIcon / platform icons)
+PASS: IMAGES evidence present (phase7i-mac-b-authenticated screenshots)
+PASS: docs/validation/phase7j-feature-matrix.md contains "P0 queue"
+PASS: P0/P1 = 0 (all P0 queue items struck through)
+PASS: docs/validation/phase7j-feature-matrix.md contains "Reduce Motion"
+PASS: docs/design/modula-native-ui-principles.md
+PASS: docs/research/phase7j-expo-ui-component-map.md
+PASS: docs/research/phase7j-ui-component-candidates.md
+PASS: docs/validation/phase7j-ui-screen-matrix.md
+PASS: evidence dir has 12 artifacts
+
+---
+Phase 7J-Mac-A automated + evidence gates PASS
+Note: full Simulator golden-path UI redesign acceptance may still be outstanding; missing UI docs fail this verifier intentionally.
+VERIFY_PHASE7J_MAC_EXIT=0
+
+=== git diff --check ===
+DIFF_CHECK_EXIT=0
+FINISHED=2026-08-11T22:56:34Z

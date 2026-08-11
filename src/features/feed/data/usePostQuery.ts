@@ -5,14 +5,19 @@ import {queryKeys, queryNetworkMode} from '@/data/query'
 import type {SocialPost} from '@/domain/social'
 import {useAppServices} from '@/runtime'
 
-export function usePostQuery(postId: PostId) {
+export function usePostQuery(postId: PostId | null) {
   const {postRepository} = useAppServices()
   const queryClient = useQueryClient()
   return useQuery({
-    queryKey: queryKeys.posts.detail(postId),
+    queryKey: queryKeys.posts.detail(postId ?? ('post-pending' as PostId)),
     networkMode: queryNetworkMode(),
-    queryFn: () => postRepository.getPost(postId),
+    enabled: postId !== null,
+    queryFn: () => {
+      if (!postId) throw new Error('Post id required')
+      return postRepository.getPost(postId)
+    },
     initialData: () => {
+      if (!postId) return undefined
       const feeds = queryClient.getQueriesData<{pages: CursorPage<SocialPost>[]}>({
         queryKey: queryKeys.feed.all,
       })

@@ -1,0 +1,8 @@
+SHOT 20-home
+SHOT 21-after-menu-click
+SIGNOUT_COUNT 1
+SHOT 22-after-signout-attempt
+URL https://modula.digital/welcome
+SHOT 23-otp-mode
+SHOT 24-otp-requested
+OTP_UI_DONE

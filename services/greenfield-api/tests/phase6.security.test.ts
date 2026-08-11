@@ -217,7 +217,9 @@ describeIf('Phase 6 security', () => {
       headers: {authorization: `Bearer ${andreiToken}`},
     })
     expect(search.statusCode).toBe(200)
-    const handles = search.json().data.profiles.map((p: any) => p.handle)
+    const handles = search.json().data.results
+      .filter((item: any) => item.entityType === 'profile')
+      .map((item: any) => item.metadata.handle)
     expect(handles).not.toContain('gaia.modula')
     await app.inject({
       method: 'DELETE',

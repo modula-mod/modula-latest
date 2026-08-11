@@ -1,0 +1,12 @@
+200 /
+200 /sign-in
+301 /discover
+301 /activity
+301 /profile
+301 /settings
+200 /settings/appearance
+200 /settings/security
+301 /board
+301 /product
+200 /stories/create
+301 /marketplace

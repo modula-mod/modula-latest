@@ -17,8 +17,12 @@ import {useReduceMotion} from '@/lib/accessibility'
 import {lightImpactHaptic, selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+/** Shipped Greenfield taxonomy — not Love/Laugh/Fire. One active reaction per actor+post. */
 const reactions: {type: ReactionType; emoji: string; label: string}[] = [
   {type: 'like', emoji: '👍', label: 'Like'},
+  {type: 'love', emoji: '❤️', label: 'Love'},
+  {type: 'laugh', emoji: '😂', label: 'Laugh'},
+  {type: 'fire', emoji: '🔥', label: 'Fire'},
   {type: 'celebrate', emoji: '🎉', label: 'Celebrate'},
   {type: 'insightful', emoji: '💡', label: 'Insightful'},
   {type: 'support', emoji: '🤝', label: 'Support'},

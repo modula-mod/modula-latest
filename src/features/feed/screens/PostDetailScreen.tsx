@@ -1,6 +1,6 @@
-import {useState} from 'react'
-import {useLocalSearchParams} from 'expo-router'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {useEffect, useState} from 'react'
+import {Alert, ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {parsePostId, type PostId} from '@/api/contracts'
@@ -11,7 +11,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {usePostQuery} from '@/features/feed/data'
+import {useDeletePostMutation, usePostQuery} from '@/features/feed/data'
 import {CommentPreview} from '@/features/social/components/comment-preview'
 import {SocialPost} from '@/features/social/components/social-post'
 import {
@@ -25,7 +25,10 @@ import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PostDetailScreen() {
-  const {postId} = useLocalSearchParams<{postId: string}>()
+  const {postId, confirmDelete} = useLocalSearchParams<{postId: string; confirmDelete?: string}>()
+  const router = useRouter()
+  const session = useSession()
+  const deletePost = useDeletePostMutation()
   const insets = useSafeAreaInsets()
   const {colours, spacing} = useThemeTokens()
   let parsedPostId = null
@@ -37,6 +40,29 @@ export function PostDetailScreen() {
   const postQuery = usePostQuery(parsedPostId ?? parsePostId('post-local-1'))
   const post = parsedPostId ? postQuery.data : null
   const commentsQuery = useCommentsQuery(parsedPostId)
+
+  useEffect(() => {
+    if (confirmDelete !== '1' || !post || session.status !== 'signedIn') return
+    if (session.profile.id !== post.author.id) return
+    Alert.alert('Delete post', 'Delete this post permanently?', [
+      {text: 'Cancel', style: 'cancel', onPress: () => router.replace(`/post/${post.id}` as Href)},
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          void deletePost
+            .mutateAsync(post.id)
+            .then(() => router.replace('/' as Href))
+            .catch(error => {
+              Alert.alert(
+                'Delete failed',
+                error instanceof Error ? error.message : 'Could not delete post.',
+              )
+            })
+        },
+      },
+    ])
+  }, [confirmDelete, deletePost, post, router, session])
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -57,7 +83,9 @@ export function PostDetailScreen() {
                 {commentsQuery.isError ? (
                   <QueryErrorState error={commentsQuery.error} onRetry={() => void commentsQuery.refetch()} />
                 ) : null}
-                {commentsQuery.data?.map(comment => <CommentThread key={comment.id} comment={comment} />)}
+                {commentsQuery.data?.map(comment => (
+                  <CommentThread key={comment.id} comment={comment} postId={post.id} />
+                ))}
                 {!commentsQuery.isLoading && !commentsQuery.isError && !commentsQuery.data?.length ? (
                   <AppText variant="body" colour="textSecondary">Start the conversation.</AppText>
                 ) : null}
@@ -77,13 +105,75 @@ export function PostDetailScreen() {
   )
 }
 
-function CommentThread({comment}: {comment: SocialComment}) {
+function CommentThread({comment, postId}: {comment: SocialComment; postId: PostId}) {
   const [collapsed, setCollapsed] = useState(false)
+  const [replying, setReplying] = useState(false)
   const replies = useCommentRepliesQuery(comment.id, !collapsed && comment.replyCount > 0)
+  const {reply} = useCommentMutations(postId)
+  const sendReply = (text: string) => {
+    reply.mutate(
+      {commentId: comment.id, text},
+      {
+        onSuccess: () => {
+          setReplying(false)
+          void replies.refetch()
+        },
+      },
+    )
+  }
   return (
     <View>
-      <CommentPreview comment={comment} collapsed={collapsed} onToggleReplies={() => setCollapsed(value => !value)} />
-      {!collapsed ? replies.data?.map(reply => <CommentPreview key={reply.id} comment={reply} />) : null}
+      <CommentPreview
+        comment={comment}
+        collapsed={collapsed}
+        onToggleReplies={() => setCollapsed(value => !value)}
+        onReply={() => setReplying(value => !value)}
+      />
+      {replying ? (
+        <InlineReplyComposer pending={reply.isPending} onCancel={() => setReplying(false)} onSend={sendReply} />
+      ) : null}
+      {!collapsed ? replies.data?.map(replyComment => <CommentPreview key={replyComment.id} comment={replyComment} />) : null}
+    </View>
+  )
+}
+
+function InlineReplyComposer({
+  pending,
+  onCancel,
+  onSend,
+}: {
+  pending: boolean
+  onCancel: () => void
+  onSend: (text: string) => void
+}) {
+  const [text, setText] = useState('')
+  const {colours, radius, spacing} = useThemeTokens()
+  const submit = () => {
+    const value = text.trim()
+    if (!value || pending) return
+    onSend(value)
+    setText('')
+  }
+  return (
+    <View style={[styles.inlineReply, {gap: spacing[2], paddingLeft: spacing[4]}]}>
+      <TextInput
+        value={text}
+        onChangeText={setText}
+        placeholder="Write a reply…"
+        placeholderTextColor={colours.textTertiary}
+        accessibilityLabel="Write a reply"
+        multiline
+        autoFocus
+        style={[styles.input, {backgroundColor: colours.surfaceMuted, borderRadius: radius.medium, color: colours.text, paddingHorizontal: spacing[3]}]}
+      />
+      <View style={[styles.inlineReplyActions, {gap: spacing[2]}]}>
+        <AppPressable accessibilityLabel="Cancel reply" onPress={onCancel}>
+          <AppText variant="caption" colour="textSecondary">Cancel</AppText>
+        </AppPressable>
+        <AppPressable accessibilityLabel="Send reply" disabled={!text.trim() || pending} onPress={submit}>
+          <AppText variant="caption" colour={text.trim() ? 'accent' : 'textTertiary'}>Reply</AppText>
+        </AppPressable>
+      </View>
     </View>
   )
 }
@@ -122,6 +212,8 @@ function CommentComposer({postId}: {postId: PostId}) {
 
 const styles = StyleSheet.create({
   composer: {alignItems: 'center', borderTopWidth: StyleSheet.hairlineWidth, bottom: 0, flexDirection: 'row', left: 0, minHeight: 60, paddingTop: 8, position: 'absolute', right: 0},
+  inlineReply: {paddingBottom: 8, paddingTop: 4},
+  inlineReplyActions: {flexDirection: 'row', justifyContent: 'flex-end'},
   input: {flex: 1, maxHeight: 100, minHeight: 44, paddingVertical: 10},
   screen: {flex: 1},
   send: {alignItems: 'center', justifyContent: 'center'},

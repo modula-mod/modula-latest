@@ -1,0 +1,14 @@
+=== metadata ===
+curl: (56) The requested URL returned error: 404
+
+
+=== wrong password (expect 401/INVALID) ===
+{"message":"Route POST:/v1/auth/login not found","error":"Not Found","statusCode":404}
+HTTP=404
+
+
+=== auth path probe ===
+/v1/auth/login -> 404 {"message":"Route POST:/v1/auth/login not found","error":"Not Found","statusCode":404}
+/v1/sessions -> 401 {"ok":false,"error":{"code":"INVALID_CREDENTIALS","message":"Invalid credentials","requestId":"b591a088-2250-4424-9881-8
+/v1/accounts/login -> 404 {"message":"Route POST:/v1/accounts/login not found","error":"Not Found","statusCode":404}
+/v1/authentication/login -> 404 {"message":"Route POST:/v1/authentication/login not found","error":"Not Found","statusCode":404}

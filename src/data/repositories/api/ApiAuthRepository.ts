@@ -15,6 +15,8 @@ import type {
   AuthResult,
   AuthenticatedSession,
   ChangePasswordInput,
+  EmailCodeRequestResult,
+  EmailCodeSignInInput,
   ForgotPasswordInput,
   RefreshToken,
   RegisterAccountInput,
@@ -40,6 +42,24 @@ function decodeRegisterPending(value: unknown, email: string): RegisterPendingRe
     primaryHandle: asString(result.primaryHandle, 'primaryHandle'),
     verificationToken:
       typeof result.verificationToken === 'string' ? result.verificationToken : undefined,
+    verificationChallengeId:
+      typeof result.verificationChallengeId === 'string'
+        ? result.verificationChallengeId
+        : undefined,
+    verificationExpiresAt:
+      typeof result.verificationExpiresAt === 'string'
+        ? result.verificationExpiresAt
+        : undefined,
+    verificationDelivery:
+      result.verificationDelivery && typeof result.verificationDelivery === 'object'
+        ? {
+            channel: 'email' as const,
+            recipient:
+              typeof (result.verificationDelivery as {recipient?: unknown}).recipient === 'string'
+                ? (result.verificationDelivery as {recipient: string}).recipient
+                : email,
+          }
+        : undefined,
   }
 }
 
@@ -99,6 +119,43 @@ export class ApiAuthRepository implements AuthRepository {
     return this.hydrateSession(tokens)
   }
 
+  requestEmailSignInCode(email: string): Promise<EmailCodeRequestResult> {
+    return this.client.post(
+      {
+        path: '/v1/sessions/email-code/request',
+        body: {email: email.trim().toLowerCase()},
+      },
+      value => {
+        const row = asRecord(value, 'email code request')
+        const delivery = asRecord(row.delivery, 'email code delivery')
+        return {
+          requested: true,
+          challengeId: asString(row.challengeId, 'challengeId'),
+          expiresAt: asString(row.expiresAt, 'expiresAt'),
+          delivery: {
+            channel: 'email',
+            recipient: asString(delivery.recipient, 'recipient'),
+          },
+        }
+      },
+    )
+  }
+
+  async signInWithEmailCode(input: EmailCodeSignInInput): Promise<AuthResult> {
+    const tokens = await this.client.post(
+      {
+        path: '/v1/sessions/email-code',
+        body: {
+          email: input.email.trim().toLowerCase(),
+          challengeId: input.challengeId,
+          code: input.code,
+        },
+      },
+      decodeSessionTokenResponse,
+    )
+    return this.hydrateSession(tokens)
+  }
+
   register(input: RegisterAccountInput): Promise<RegisterPendingResult | AuthResult> {
     const email = input.email.trim().toLowerCase()
     return this.client.post(
@@ -119,7 +176,12 @@ export class ApiAuthRepository implements AuthRepository {
 
   async verifyEmail(input: VerifyEmailInput): Promise<EmailVerificationResult> {
     const verified = await this.client.post(
-      {path: '/v1/accounts/verify-email', body: {token: input.token}},
+      {
+        path: '/v1/accounts/verify-email',
+        body: input.token
+          ? {token: input.token}
+          : {challengeId: input.challengeId, code: input.code},
+      },
       value => {
         const row = asRecord(value, 'verify email')
         if (row.session && row.tokens) {

@@ -1,6 +1,7 @@
 import {createHash, randomBytes} from 'node:crypto'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
+import type {AuthenticationStrength} from '../database/types.js'
 import {uuidv7} from '../lib/uuidv7.js'
 
 export type IssuedSessionTokens = {
@@ -9,6 +10,24 @@ export type IssuedSessionTokens = {
   sessionId: string
   accessExpiresAt: Date
   refreshExpiresAt: Date
+}
+
+export type SessionIssueContext = {
+  userAgent?: string
+  ipHash?: string
+  authenticationMethodId?: string | null
+  authenticationStrength?: AuthenticationStrength
+  recentAuthenticationAt?: Date | null
+  clientName?: string | null
+  platform?: string | null
+}
+
+export type ResolvedGreenfieldAccess = {
+  accountId: string
+  sessionId: string
+  recentAuthenticationAt: Date | null
+  authenticationStrength: AuthenticationStrength
+  authenticationMethodId: string | null
 }
 
 /**
@@ -25,7 +44,7 @@ export class GreenfieldSessionService {
     return createHash('sha256').update(`${this.config.sessionPepper ?? ''}:${token}`).digest('hex')
   }
 
-  async issue(accountId: string, context: {userAgent?: string; ipHash?: string} = {}): Promise<IssuedSessionTokens> {
+  async issue(accountId: string, context: SessionIssueContext = {}): Promise<IssuedSessionTokens> {
     const accessToken = randomBytes(32).toString('base64url')
     const refreshToken = randomBytes(48).toString('base64url')
     const now = new Date()
@@ -48,6 +67,11 @@ export class GreenfieldSessionService {
           last_seen_at: now,
           user_agent: context.userAgent ?? null,
           ip_hash: context.ipHash ?? null,
+          recent_authentication_at: context.recentAuthenticationAt ?? now,
+          authentication_strength: context.authenticationStrength ?? 'medium',
+          authentication_method_id: context.authenticationMethodId ?? null,
+          client_name: context.clientName ?? null,
+          platform: context.platform ?? null,
         })
         .execute()
       await trx
@@ -186,7 +210,7 @@ export class GreenfieldSessionService {
     }
   }
 
-  async resolveAccess(accessToken: string): Promise<{accountId: string; sessionId: string} | null> {
+  async resolveAccess(accessToken: string): Promise<ResolvedGreenfieldAccess | null> {
     if (!accessToken || accessToken.length < 16 || accessToken.length > 512) return null
     const token = await this.db
       .selectFrom('greenfield_session_tokens')
@@ -195,6 +219,9 @@ export class GreenfieldSessionService {
         'greenfield_sessions.account_id',
         'greenfield_sessions.session_id',
         'greenfield_sessions.status',
+        'greenfield_sessions.recent_authentication_at',
+        'greenfield_sessions.authentication_strength',
+        'greenfield_sessions.authentication_method_id',
         'greenfield_session_tokens.expires_at',
         'greenfield_session_tokens.revoked_at',
       ])
@@ -208,16 +235,64 @@ export class GreenfieldSessionService {
       .set({last_seen_at: new Date()})
       .where('session_id', '=', token.session_id)
       .execute()
-    return {accountId: token.account_id, sessionId: token.session_id}
+    return {
+      accountId: token.account_id,
+      sessionId: token.session_id,
+      recentAuthenticationAt: token.recent_authentication_at,
+      authenticationStrength: token.authentication_strength,
+      authenticationMethodId: token.authentication_method_id,
+    }
   }
 
   async listSessions(accountId: string) {
     return this.db
       .selectFrom('greenfield_sessions')
-      .select(['session_id', 'status', 'created_at', 'expires_at', 'last_seen_at', 'revoked_at', 'user_agent'])
+      .select([
+        'session_id',
+        'status',
+        'created_at',
+        'expires_at',
+        'last_seen_at',
+        'revoked_at',
+        'user_agent',
+        'recent_authentication_at',
+        'authentication_strength',
+        'authentication_method_id',
+        'client_name',
+        'platform',
+      ])
       .where('account_id', '=', accountId)
       .orderBy('created_at', 'desc')
       .execute()
+  }
+
+  async markRecentlyAuthenticated(
+    sessionId: string,
+    accountId: string,
+    context: {
+      authenticationMethodId: string
+      authenticationStrength: AuthenticationStrength
+    },
+  ): Promise<void> {
+    const now = new Date()
+    await this.db.transaction().execute(async trx => {
+      const updated = await trx
+        .updateTable('greenfield_sessions')
+        .set({
+          recent_authentication_at: now,
+          authentication_strength: context.authenticationStrength,
+          authentication_method_id: context.authenticationMethodId,
+          last_seen_at: now,
+        })
+        .where('session_id', '=', sessionId)
+        .where('account_id', '=', accountId)
+        .where('status', '=', 'active')
+        .executeTakeFirst()
+      if (Number(updated.numUpdatedRows) === 0) {
+        throw Object.assign(new Error('Authentication required'), {code: 'UNAUTHENTICATED'})
+      }
+      await this.insertEvent(trx, sessionId, accountId, 'session.stepUpCompleted')
+    })
   }
 
   async revokeSession(sessionId: string, accountId?: string): Promise<void> {

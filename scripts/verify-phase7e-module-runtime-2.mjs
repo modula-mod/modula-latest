@@ -2,6 +2,7 @@
 import {
   finish,
   run,
+  runClassified,
   runIsolatedRuntime2Test,
   verifyCapabilityRegistrySource,
   verifyDependencyRuntimeSource,
@@ -31,6 +32,6 @@ run('pnpm', ['--filter', '@modula/greenfield-api', 'build'], 'Greenfield API bui
 run('pnpm', ['--filter', '@modula/greenfield-worker', 'build'], 'Greenfield worker builds with Standard 2 runtime')
 run('node', ['scripts/verify-phase7e-no-product-mocks.mjs'], 'no-product-mocks verifier remains green')
 await runIsolatedRuntime2Test()
-run('node', ['scripts/verify-phase7e-web-production-cutover.mjs'], 'web production cutover verifier passes')
+runClassified('node', ['scripts/verify-phase7e-web-production-cutover.mjs'], 'web production cutover verifier passes', 'LIVE_DEPLOYMENT_FAILURE')
 
 finish('Phase 7E module runtime 2 verifier')

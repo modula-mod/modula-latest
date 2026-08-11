@@ -19,6 +19,7 @@ import {
   ApiProductPreferencesRepository,
   ApiProfileRepository,
   ApiReelsRepository,
+  ApiModerationRepository,
   ApiSocialGraphRepository,
   ApiStoriesRepository,
   ApiToolsRepository,
@@ -57,6 +58,19 @@ export function createAppServices(): AppServices {
     if (!runtimeEnvironment.apiUrl) {
       throw new Error('Remote API URL is required for remote data source.')
     }
+    if (__DEV__) {
+      try {
+        const host = new URL(runtimeEnvironment.apiUrl).host
+        console.info(
+          `Greenfield environment: ${runtimeEnvironment.appEnvironment}`,
+        )
+        console.info(`Greenfield host: ${host}`)
+      } catch {
+        console.info(
+          `Greenfield environment: ${runtimeEnvironment.appEnvironment}`,
+        )
+      }
+    }
     transport = new HttpApiTransport(runtimeEnvironment.apiUrl)
   }
 
@@ -84,6 +98,7 @@ export function createAppServices(): AppServices {
     productPreferencesRepository: new ApiProductPreferencesRepository(client),
     profileRepository: new ApiProfileRepository(client),
     socialGraphRepository: new ApiSocialGraphRepository(client),
+    moderationRepository: new ApiModerationRepository(client),
     storiesRepository: new ApiStoriesRepository(client),
     activityRepository: new ApiActivityRepository(client),
     appearanceRepository: new ApiAppearanceRepository(client),

@@ -1,4 +1,5 @@
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {sql} from 'kysely'
 import {manifestChecksum, type GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
 import {
   validateGreenfieldModuleAction,
@@ -16,6 +17,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIf = databaseUrl ? describe : describe.skip
 
 const baseModuleId = 'digital.modula.phase7b-notes'
+const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 describe('Phase 7B declarative module contract guards', () => {
   it('rejects unsupported components and executable UI declarations', () => {
@@ -80,6 +82,7 @@ describeIf('Phase 7B module runtime API', () => {
     const created = await createServer(loadConfig())
     app = created.app
     db = created.db
+    await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute()
     await app.ready()
 
     const suffix = Date.now().toString(36)
@@ -182,7 +185,7 @@ describeIf('Phase 7B module runtime API', () => {
 
     await db
       .updateTable('greenfield_module_permission_reviews')
-      .set({granted_permissions: [`records:module.${moduleId}.note:read`]})
+      .set({granted_permissions: jsonb([`records:module.${moduleId}.note:read`])})
       .where('installation_id', '=', installationId)
       .execute()
     const denied = await app.inject({
@@ -298,8 +301,8 @@ describeIf('Phase 7B module runtime API', () => {
         module_id: seedModuleId,
         scope: 'installation',
         schema_version: 1,
-        values: {defaultSort: 'updatedAt'},
-        secret_refs: {},
+        values: jsonb({defaultSort: 'updatedAt'}),
+        secret_refs: jsonb({}),
         version: 1,
         updated_by: seedAccountId,
         updated_at: new Date(),
@@ -315,12 +318,12 @@ describeIf('Phase 7B module runtime API', () => {
         installation_id: installationId,
         release_id: releaseId,
         account_id: accountId,
-        granted_permissions: [
+        granted_permissions: jsonb([
           `records:module.${moduleId}.note:read`,
           `records:module.${moduleId}.note:write`,
           `records:module.${moduleId}.note:delete`,
-        ],
-        denied_permissions: [],
+        ]),
+        denied_permissions: jsonb([]),
         high_risk_increase: false,
         idempotency_key: `review-${Date.now()}`,
         reviewed_at: new Date(),
@@ -434,13 +437,13 @@ function collectionRow(releaseId: string, moduleId: string, collection: Greenfie
     collection: collection.collection,
     schema_ref: collection.schemaRef,
     default_visibility: collection.defaultVisibility,
-    fields: collection.fields,
-    searchable_fields: collection.searchableFields,
-    filterable_fields: collection.filterableFields,
-    sortable_fields: collection.sortableFields,
+    fields: jsonb(collection.fields),
+    searchable_fields: jsonb(collection.searchableFields),
+    filterable_fields: jsonb(collection.filterableFields),
+    sortable_fields: jsonb(collection.sortableFields),
     folder_field: collection.folderField ?? null,
-    reference_fields: collection.referenceFields ?? [],
-    schema_definition: {},
+    reference_fields: jsonb(collection.referenceFields ?? []),
+    schema_definition: jsonb({}),
     retention_policy: collection.retentionPolicy ?? 'keepOnUninstall',
     registration_status: 'registered' as const,
     created_at: new Date(),
@@ -457,8 +460,8 @@ function viewRow(releaseId: string, moduleId: string, view: GreenfieldModuleView
     view_kind: view.kind,
     collection: view.collection ?? null,
     title: view.title,
-    declaration: view,
-    required_capabilities: view.requiredCapabilities,
+    declaration: jsonb(view),
+    required_capabilities: jsonb(view.requiredCapabilities),
     registration_status: 'registered' as const,
     created_at: new Date(),
     updated_at: new Date(),
@@ -473,7 +476,7 @@ function actionRow(releaseId: string, moduleId: string, action: GreenfieldModule
     action_id: action.actionId,
     action_kind: action.kind,
     capability: action.capability,
-    declaration: action,
+    declaration: jsonb(action),
     registration_status: 'registered' as const,
     created_at: new Date(),
     updated_at: new Date(),

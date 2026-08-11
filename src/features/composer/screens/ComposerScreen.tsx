@@ -30,7 +30,8 @@ import {
   resolveDefaultDestination,
   type PublishingDestination,
 } from '@/features/atproto/publishing/canCrossPost'
-import {useCreatePostMutation} from '@/features/feed/data'
+import {useCreatePostMutation, usePostQuery, useUpdatePostMutation} from '@/features/feed/data'
+import {parsePostId} from '@/api/contracts'
 import {selectionHaptic, lightImpactHaptic} from '@/lib/haptics'
 import {useAppServices} from '@/runtime/useAppServices'
 import {
@@ -189,11 +190,14 @@ export function ComposerScreen() {
     replyTo?: string
     thread?: string
     quotePostId?: string
+    editPostId?: string
+    expectedVersion?: string
   }>()
   const insets = useSafeAreaInsets()
   const session = useSession()
   const {apiClient} = useAppServices()
   const createPostMutation = useCreatePostMutation()
+  const updatePostMutation = useUpdatePostMutation()
   const {colours, radius, spacing} = useThemeTokens()
   const atprotoPublishing = useAtprotoCapability('atprotoPublishing')
   const {connection} = usePrimaryAtprotoConnection()
@@ -201,11 +205,28 @@ export function ComposerScreen() {
 
   const isReplyMode = params.mode === 'reply' || Boolean(params.replyTo)
   const isQuoteMode = Boolean(params.quotePostId)
+  const isEditMode = Boolean(params.editPostId)
   const isThreadPreview = params.thread === '1' || params.mode === 'thread'
+  const editPostId = (() => {
+    if (!params.editPostId) return null
+    try {
+      return parsePostId(params.editPostId)
+    } catch {
+      return null
+    }
+  })()
+  const editPostQuery = usePostQuery(editPostId)
+  const editExpectedVersion = (() => {
+    const raw = params.expectedVersion
+    if (typeof raw === 'string' && /^\d+$/.test(raw)) return Number(raw)
+    if (typeof editPostQuery.data?.version === 'number') return editPostQuery.data.version
+    return null
+  })()
 
   const [text, setText] = useState('')
   const [history, setHistory] = useState<string[]>([''])
   const [historyIndex, setHistoryIndex] = useState(0)
+  const [hydratedEditPostId, setHydratedEditPostId] = useState<string | null>(null)
   const [media, setMedia] = useState<PendingMediaAttachment | null>(null)
   const [altText, setAltText] = useState('')
   const [link, setLink] = useState<DraftLinkPreview | null>(null)
@@ -223,6 +244,23 @@ export function ComposerScreen() {
   const [publicationBanner, setPublicationBanner] = useState<
     'publishedOnModula' | 'publishingToAtproto' | 'needsAttention' | null
   >(null)
+
+  if (
+    isEditMode &&
+    editPostId &&
+    editPostQuery.data &&
+    hydratedEditPostId !== editPostId
+  ) {
+    const next = editPostQuery.data.text?.trim() ?? ''
+    setHydratedEditPostId(editPostId)
+    setText(next)
+    setHistory([next])
+    setHistoryIndex(0)
+    // Edit mode is text-only against Greenfield UpdatePostInput.
+    setMedia(null)
+    setLink(null)
+    setPoll(null)
+  }
 
   const crossPostEligibility = evaluateCrossPostEligibility({
     atprotoPublishingCapability: atprotoPublishing,
@@ -242,15 +280,20 @@ export function ComposerScreen() {
     : 'modula'
 
   const hasDraft = Boolean(text.trim() || media || link || poll)
-  const canPost = hasDraft && !createPostMutation.isPending
+  const isPublishing = createPostMutation.isPending || updatePostMutation.isPending
+  const canPost =
+    Boolean(text.trim()) &&
+    !isPublishing &&
+    (!isEditMode || (editPostId !== null && editExpectedVersion !== null))
   const canUndo = historyIndex > 0
   const canRedo = historyIndex < history.length - 1
 
   const headerTitle = useMemo(() => {
+    if (isEditMode) return 'Edit post'
     if (isReplyMode) return 'Reply'
     if (isThreadPreview) return 'Thread — Preview'
     return 'New Post'
-  }, [isReplyMode, isThreadPreview])
+  }, [isEditMode, isReplyMode, isThreadPreview])
 
   const pushHistory = useCallback(
     (next: string) => {
@@ -315,6 +358,28 @@ export function ComposerScreen() {
 
   const publish = async () => {
     if (!canPost || session.status !== 'signedIn') return
+    if (isEditMode) {
+      if (!editPostId || editExpectedVersion === null) {
+        setPermissionMessage('This post cannot be edited (missing version).')
+        return
+      }
+      try {
+        const updated = await updatePostMutation.mutateAsync({
+          postId: editPostId,
+          expectedVersion: editExpectedVersion,
+          text: text.trim(),
+        })
+        void lightImpactHaptic()
+        Keyboard.dismiss()
+        router.replace(`/post/${updated.id}` as Href)
+      } catch (error) {
+        setPublicationBanner('needsAttention')
+        setPermissionMessage(
+          error instanceof Error ? error.message : 'Edit failed. Your draft is still here so you can retry.',
+        )
+      }
+      return
+    }
     if (media && !media.base64) {
       setPermissionMessage('Photo data was not available. Remove the photo and select it again before posting.')
       return
@@ -527,7 +592,7 @@ export function ComposerScreen() {
             style={{
               color: canPost ? colours.accentForeground : colours.textTertiary,
             }}>
-            {isReplyMode ? 'Reply' : 'Post'}
+            {isEditMode ? 'Save' : isReplyMode ? 'Reply' : 'Post'}
           </AppText>
         </AppPressable>
       </View>
@@ -535,6 +600,18 @@ export function ComposerScreen() {
       <ScrollView
         {...keyboardScrollProps}
         contentContainerStyle={[styles.content, {gap: spacing[3], padding: spacing[4]}]}>
+        {isEditMode ? (
+          <Surface variant="muted" style={{padding: spacing[3], borderRadius: radius.md}}>
+            <AppText variant="caption" colour="textSecondary">
+              Editing post text. Media and audience cannot be changed here.
+            </AppText>
+            {editPostQuery.isError ? (
+              <AppText variant="caption" colour="textSecondary">
+                Could not load the post for editing.
+              </AppText>
+            ) : null}
+          </Surface>
+        ) : null}
         {isReplyMode && params.replyTo ? (
           <AppText variant="caption" colour="textSecondary">
             Replying to post {params.replyTo}
@@ -560,27 +637,33 @@ export function ComposerScreen() {
             colour={session.status === 'signedIn' ? session.profile.coverColour : undefined}
             size={42}
           />
-          <AppPressable
-            accessibilityLabel={`Audience ${AUDIENCE_LABEL[audience]}`}
-            onPress={() => {
-              Keyboard.dismiss()
-              setAudienceOpen(true)
-            }}
-            style={[
-              styles.audience,
-              {
-                backgroundColor: colours.accentSubtle,
-                borderColor: colours.accent,
-                borderRadius: radius.round,
-              },
-            ]}>
-            <AppIcon name="people" colour={colours.accent} size={14} />
-            <AppText variant="label" style={{color: colours.accent}}>
-              {AUDIENCE_LABEL[audience]}
+          {!isEditMode ? (
+            <AppPressable
+              accessibilityLabel={`Audience ${AUDIENCE_LABEL[audience]}`}
+              onPress={() => {
+                Keyboard.dismiss()
+                setAudienceOpen(true)
+              }}
+              style={[
+                styles.audience,
+                {
+                  backgroundColor: colours.accentSubtle,
+                  borderColor: colours.accent,
+                  borderRadius: radius.round,
+                },
+              ]}>
+              <AppIcon name="people" colour={colours.accent} size={14} />
+              <AppText variant="label" style={{color: colours.accent}}>
+                {AUDIENCE_LABEL[audience]}
+              </AppText>
+              <AppIcon name="arrowDown" colour={colours.accent} size={12} />
+            </AppPressable>
+          ) : (
+            <AppText variant="label" colour="textSecondary">
+              Text edit
             </AppText>
-            <AppIcon name="arrowDown" colour={colours.accent} size={12} />
-          </AppPressable>
-          {showDestinationSelector ? (
+          )}
+          {!isEditMode && showDestinationSelector ? (
             <AppPressable
               accessibilityLabel={`Publish to ${DESTINATION_LABEL[effectiveDestination]}`}
               onPress={() => {
@@ -731,20 +814,49 @@ export function ComposerScreen() {
           </Surface>
         ) : null}
 
-        <View style={[styles.replyRow, {gap: spacing[2]}]}>
-          <AppPressable
-            accessibilityLabel={REPLY_LABEL[replyPermission]}
-            onPress={() => {
-              Keyboard.dismiss()
-              setReplyOpen(true)
-            }}
-            style={[styles.replyPill, {gap: spacing[2]}]}>
-            <AppIcon name="messages" colour={colours.accent} size={16} />
-            <AppText variant="label" style={{color: colours.accent}}>
-              {REPLY_LABEL[replyPermission]}
-            </AppText>
-          </AppPressable>
-          <View style={[styles.undoRedo, {gap: spacing[1]}]}>
+        {!isEditMode ? (
+          <View style={[styles.replyRow, {gap: spacing[2]}]}>
+            <AppPressable
+              accessibilityLabel={REPLY_LABEL[replyPermission]}
+              onPress={() => {
+                Keyboard.dismiss()
+                setReplyOpen(true)
+              }}
+              style={[styles.replyPill, {gap: spacing[2]}]}>
+              <AppIcon name="messages" colour={colours.accent} size={16} />
+              <AppText variant="label" style={{color: colours.accent}}>
+                {REPLY_LABEL[replyPermission]}
+              </AppText>
+            </AppPressable>
+            <View style={[styles.undoRedo, {gap: spacing[1]}]}>
+              <AppPressable
+                accessibilityLabel="Undo"
+                accessibilityState={{disabled: !canUndo}}
+                disabled={!canUndo}
+                onPress={undo}
+                style={styles.iconHit}>
+                <AppIcon
+                  name="back"
+                  colour={canUndo ? colours.textSecondary : colours.textTertiary}
+                  size={18}
+                />
+              </AppPressable>
+              <AppPressable
+                accessibilityLabel="Redo"
+                accessibilityState={{disabled: !canRedo}}
+                disabled={!canRedo}
+                onPress={redo}
+                style={styles.iconHit}>
+                <AppIcon
+                  name="chevronRight"
+                  colour={canRedo ? colours.textSecondary : colours.textTertiary}
+                  size={18}
+                />
+              </AppPressable>
+            </View>
+          </View>
+        ) : (
+          <View style={[styles.undoRedo, {gap: spacing[1], alignSelf: 'flex-end'}]}>
             <AppPressable
               accessibilityLabel="Undo"
               accessibilityState={{disabled: !canUndo}}
@@ -770,9 +882,10 @@ export function ComposerScreen() {
               />
             </AppPressable>
           </View>
-        </View>
+        )}
       </ScrollView>
 
+      {!isEditMode ? (
       <View
         style={[
           styles.toolbar,
@@ -816,6 +929,9 @@ export function ComposerScreen() {
           </AppPressable>
         </ScrollView>
       </View>
+      ) : (
+        <View style={{paddingBottom: Math.max(insets.bottom, spacing[2])}} />
+      )}
 
       <FeatureErrorBoundary label="Composer Tools">
         <ComposerToolsDrawer

@@ -38,7 +38,7 @@ function readDataSource(
 
 function readDemoSession(value: string | undefined): DemoSessionBootstrap {
   if (value === 'owner' || value === 'guest' || value === 'signedOut') return value
-  // Default signed-out: demo-owner bootstrap is opt-in via EXPO_PUBLIC_DEMO_SESSION=owner.
+  // Default signed-out: skip demo-owner auto-login only. SecureStore restore still runs.
   return 'signedOut'
 }
 
