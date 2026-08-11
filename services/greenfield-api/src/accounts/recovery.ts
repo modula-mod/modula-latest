@@ -37,6 +37,7 @@ export class RecoveryService {
         accountId: identity.account_id,
         email: normalizedEmail,
         displayName: displayNameFromIdentityMetadata(identity.metadata, identity.primary_handle),
+        handle: identity.primary_handle,
         token,
         expiresAt,
         correlationId: options.correlationId,

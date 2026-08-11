@@ -8,11 +8,11 @@ import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ResetPasswordScreen() {
-  const params = useLocalSearchParams<{token?: string}>()
+  const params = useLocalSearchParams<{token?: string; t?: string}>()
   const router = useRouter()
   const services = useAppServices()
   const {spacing} = useThemeTokens()
-  const [token, setToken] = useState(params.token ?? '')
+  const [token, setToken] = useState(params.t ?? params.token ?? '')
   const [password, setPassword] = useState('')
   const [confirmation, setConfirmation] = useState('')
   const [error, setError] = useState<string | null>(null)

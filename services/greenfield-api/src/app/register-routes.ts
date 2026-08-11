@@ -47,7 +47,7 @@ import {ConnectorCredentialService} from '../domains/connectors/credentials/inde
 import {ConnectorConnectionService} from '../domains/connectors/connections/index.js'
 import {ConnectorOAuthStateService} from '../domains/connectors/oauth-state/index.js'
 import {MailService} from '../mail/service.js'
-import {attachAuth, requireAuth, requireCapability} from '../security/auth-context.js'
+import {attachAuth, attachGreenfieldAccountAuth, requireAuth, requireCapability} from '../security/auth-context.js'
 import {SessionService} from '../security/session.js'
 import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
@@ -122,6 +122,23 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
         .send(failureEnvelope('CAPABILITY_DISABLED', 'AT Protocol bridge is disabled', request.id))
     }
     await attachAuth(request, sessions)
+    await attachGreenfieldAccountAuth(request, {
+      resolveAccess: token => greenfieldSessions.resolveAccess(token),
+      resolveActorForAccount: async accountId => {
+        const actor = await db
+          .selectFrom('actors')
+          .innerJoin('profiles', 'profiles.actor_id', 'actors.id')
+          .select(['actors.id as actorId', 'profiles.handle as handle'])
+          .where('actors.account_id', '=', accountId)
+          .where('actors.deleted_at', 'is', null)
+          .where('profiles.deleted_at', 'is', null)
+          .orderBy('actors.created_at', 'asc')
+          .executeTakeFirst()
+        if (!actor) return null
+        return {actorId: actor.actorId, handle: actor.handle ?? null}
+      },
+      adminHandles: config.adminHandles,
+    })
   })
 
   const healthConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
@@ -856,7 +873,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const blocked = await moderation.blockedSet(viewerActorId)
       const muted = await moderation.mutedSet(viewerActorId)
       const excluded = Array.from(new Set([...blocked, ...muted]))
-      const items = await posts.listHome(mode, limit, cursor, excluded)
+      const items = await posts.listHome(mode, limit, cursor, excluded, viewerActorId)
       const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
       return reply.send(successEnvelope(page, request.id))
     } catch (error: any) {

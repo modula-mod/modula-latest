@@ -4,6 +4,11 @@ export const MAIL_TEMPLATE_IDS = [
   'password-changed',
   'new-sign-in',
   'email-changed',
+  'passkey-added',
+  'passkey-removed',
+  'recovery-used',
+  'sessions-revoked',
+  'mail-forwarding-changed',
   'invite',
   'account-deletion',
 ] as const

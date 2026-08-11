@@ -29,7 +29,7 @@ export class PostRepository {
       resource: {type: 'post', id: postId, ownerActorId: row.author_actor_id, visibility: row.audience},
     })
     if (!decision.allowed) return null
-    return this.hydrate(row)
+    return this.hydrate(row, viewerActorId)
   }
 
   async getByIdForAuthor(postId: string, authorActorId: string): Promise<SocialPostDto | null> {
@@ -41,10 +41,10 @@ export class PostRepository {
       .where('deleted_at', 'is', null)
       .executeTakeFirst()
     if (!row) return null
-    return this.hydrate(row)
+    return this.hydrate(row, authorActorId)
   }
 
-  async listHome(mode: string, limit: number, cursor: string | null, excludedActorIds: string[] = []): Promise<SocialPostDto[]> {
+  async listHome(mode: string, limit: number, cursor: string | null, excludedActorIds: string[] = [], viewerActorId: string | null = null): Promise<SocialPostDto[]> {
     let query = this.db
       .selectFrom('posts')
       .selectAll()
@@ -67,7 +67,7 @@ export class PostRepository {
       )
     }
     const rows = await query.execute()
-    return Promise.all(rows.map(row => this.hydrate(row)))
+    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
 
   async listForHandle(
@@ -105,10 +105,10 @@ export class PostRepository {
       )
     }
     const rows = await query.execute()
-    return Promise.all(rows.map(row => this.hydrate(row)))
+    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
 
-  private async hydrate(row: PostRow): Promise<SocialPostDto> {
+  private async hydrate(row: PostRow, viewerActorId: string | null = null, depth = 0): Promise<SocialPostDto> {
     const author = await this.profiles.getByActorId(row.author_actor_id)
     if (!author) {
       throw new Error(`Missing author for post ${row.id}`)
@@ -120,6 +120,38 @@ export class PostRepository {
       .where('deleted_at', 'is', null)
       .orderBy('sort_order', 'asc')
       .execute()
+
+    let quotedPost: SocialPostDto | null | undefined
+    if (depth === 0) {
+      const quoteLink = await this.db
+        .selectFrom('greenfield_quote_posts')
+        .select(['quoted_post_id'])
+        .where('post_id', '=', row.id)
+        .executeTakeFirst()
+      if (quoteLink) {
+        const quotedRow = await this.db
+          .selectFrom('posts')
+          .selectAll()
+          .where('id', '=', quoteLink.quoted_post_id)
+          .where('deleted_at', 'is', null)
+          .executeTakeFirst()
+        if (!quotedRow) {
+          quotedPost = null
+        } else {
+          const quotedDecision = await this.policies.evaluateAndAudit({
+            actorId: viewerActorId,
+            action: 'post.read',
+            resource: {
+              type: 'post',
+              id: quotedRow.id,
+              ownerActorId: quotedRow.author_actor_id,
+              visibility: quotedRow.audience,
+            },
+          })
+          quotedPost = quotedDecision.allowed ? await this.hydrate(quotedRow, viewerActorId, depth + 1) : null
+        }
+      }
+    }
 
     const base = {
       id: row.id,
@@ -133,6 +165,8 @@ export class PostRepository {
       likeCount: row.like_count,
       replyCount: row.reply_count,
       repostCount: row.repost_count,
+      quoteCount: row.quote_count,
+      ...(quotedPost !== undefined ? {quotedPost} : {}),
     }
 
     if (row.kind === 'media') {

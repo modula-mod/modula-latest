@@ -105,7 +105,7 @@ export function SessionProvider({children}: PropsWithChildren) {
           verificationToken: result.verificationToken,
         })
         router.replace(
-          `/verify-email?email=${encodeURIComponent(result.email)}&token=${encodeURIComponent(result.verificationToken ?? '')}` as Href,
+          `/verify-email?t=${encodeURIComponent(result.verificationToken ?? '')}` as Href,
         )
         return
       }

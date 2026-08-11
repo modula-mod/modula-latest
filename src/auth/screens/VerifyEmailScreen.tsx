@@ -8,7 +8,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function VerifyEmailScreen() {
-  const params = useLocalSearchParams<{email?: string; token?: string}>()
+  const params = useLocalSearchParams<{email?: string; token?: string; t?: string}>()
   const session = useSession()
   const {verifyEmail, resendVerification} = useSessionActions()
   const router = useRouter()
@@ -17,6 +17,7 @@ export function VerifyEmailScreen() {
     params.email ??
     (session.status === 'pendingVerification' ? session.email : '')
   const pendingToken =
+    params.t ||
     params.token ||
     (session.status === 'pendingVerification' ? session.verificationToken : '') ||
     ''

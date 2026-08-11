@@ -20,18 +20,19 @@ export class MailService {
     private readonly config: AppConfig,
   ) {}
 
-  verificationUrl(email: string, token: string): string {
+  verificationUrl(_email: string, token: string): string {
     const url = new URL(this.config.publicWebUrl)
     url.pathname = '/verify-email'
-    url.searchParams.set('email', email.trim().toLowerCase())
-    url.searchParams.set('token', token)
+    url.search = ''
+    url.searchParams.set('t', token)
     return url.toString()
   }
 
   passwordResetUrl(token: string): string {
     const url = new URL(this.config.publicWebUrl)
     url.pathname = '/reset-password'
-    url.searchParams.set('token', token)
+    url.search = ''
+    url.searchParams.set('t', token)
     return url.toString()
   }
 
@@ -61,6 +62,7 @@ export class MailService {
       accountId: string
       email: string
       displayName: string
+      handle?: string
       token: string
       expiresAt: Date
       correlationId?: string
@@ -74,6 +76,7 @@ export class MailService {
       correlationId: input.correlationId,
       variables: {
         displayName: input.displayName,
+        handle: input.handle ?? '',
         actionUrl: this.verificationUrl(input.email, input.token),
         expiresIn: expiresIn(input.expiresAt),
       },
@@ -86,6 +89,7 @@ export class MailService {
       accountId: string
       email: string
       displayName: string
+      handle?: string
       token: string
       expiresAt: Date
       correlationId?: string
@@ -99,6 +103,7 @@ export class MailService {
       correlationId: input.correlationId,
       variables: {
         displayName: input.displayName,
+        handle: input.handle ?? '',
         actionUrl: this.passwordResetUrl(input.token),
         expiresIn: expiresIn(input.expiresAt),
       },
@@ -120,6 +125,36 @@ export class MailService {
         actionUrl: this.securityUrl(),
       },
     })
+  }
+
+  async queuePasskeyAdded(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('passkey-added', input, this.securityUrl())
+  }
+
+  async queuePasskeyRemoved(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('passkey-removed', input, this.securityUrl())
+  }
+
+  async queueRecoveryUsed(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('recovery-used', input, this.securityUrl())
+  }
+
+  async queueSessionsRevoked(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('sessions-revoked', input, this.securityUrl())
+  }
+
+  async queueMailForwardingChanged(
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+  ): Promise<QueuedMailJob> {
+    return this.queueSecurityAlert('mail-forwarding-changed', input, this.accountUrl())
   }
 
   async queueNewSignIn(
@@ -228,6 +263,28 @@ export class MailService {
       retrying: counts.get('retrying') ?? 0,
       deadLetter: counts.get('dead-letter') ?? 0,
     }
+  }
+
+  private async queueSecurityAlert(
+    templateId: Extract<
+      MailMessage['templateId'],
+      'passkey-added' | 'passkey-removed' | 'recovery-used' | 'sessions-revoked' | 'mail-forwarding-changed'
+    >,
+    input: {accountId: string; email: string; displayName: string; handle?: string; correlationId?: string},
+    actionUrl: string,
+  ): Promise<QueuedMailJob> {
+    return this.queue({
+      templateId,
+      recipientAccountId: input.accountId,
+      to: input.email,
+      locale: 'en',
+      correlationId: input.correlationId,
+      variables: {
+        displayName: input.displayName,
+        handle: input.handle ?? '',
+        actionUrl,
+      },
+    })
   }
 }
 
