@@ -66,7 +66,7 @@ export class ApiClient {
       query: request.query,
       body: request.body,
       signal: request.signal,
-      headers: createJsonHeaders({accessToken, requestId}),
+      headers: createJsonHeaders({accessToken, requestId, hasBody: request.body !== undefined}),
     })
     this.input.log?.({
       method,

@@ -49,6 +49,7 @@ export function HomeHeaderLeft() {
           icon="menu"
           chrome="plain"
           accessibilityLabel="Open navigation drawer"
+          testID="home-open-drawer"
           onPress={() => {
             void selectionHaptic()
             openDrawer()

@@ -2,10 +2,26 @@ export type ApiErrorCode =
   | 'BAD_REQUEST'
   | 'VALIDATION_FAILED'
   | 'UNAUTHENTICATED'
+  | 'INVALID_CREDENTIALS'
+  | 'CHALLENGE_EXPIRED'
+  | 'CHALLENGE_INVALID'
+  | 'CHALLENGE_REPLAYED'
   | 'SESSION_EXPIRED'
+  | 'STEP_UP_REQUIRED'
+  | 'PASSKEY_NOT_FOUND'
+  | 'AUTH_METHOD_UNAVAILABLE'
+  | 'ACCOUNT_SUSPENDED'
   | 'FORBIDDEN'
   | 'NOT_FOUND'
   | 'CONFLICT'
+  | 'NOTE_REVISION_CONFLICT'
+  | 'AI_ACTION_NOT_DECLARED'
+  | 'AI_ACTION_PERMISSION_REQUIRED'
+  | 'AI_CONTEXT_PERMISSION_REQUIRED'
+  | 'AI_RESULT_EXPIRED'
+  | 'AI_RESULT_ALREADY_APPLIED'
+  | 'AI_RESULT_NOT_APPLICABLE'
+  | 'AI_RESULT_OWNERSHIP_MISMATCH'
   | 'RATE_LIMITED'
   | 'OFFLINE'
   | 'TIMEOUT'
@@ -63,11 +79,21 @@ export function getUserFacingErrorMessage(error: unknown): string {
   if (!isModulaApiError(error)) {
     return 'Something went wrong. Please try again.'
   }
+  if (error.code === 'INVALID_CREDENTIALS') return 'Invalid credentials'
+  if (
+    error.code === 'CHALLENGE_EXPIRED' ||
+    error.code === 'CHALLENGE_INVALID' ||
+    error.code === 'CHALLENGE_REPLAYED'
+  ) {
+    return 'That code is invalid or expired.'
+  }
   if (error.code === 'OFFLINE') return 'You appear to be offline.'
   if (error.code === 'TIMEOUT') return 'The request took too long. Please retry.'
   if (error.code === 'UNAUTHENTICATED' || error.code === 'SESSION_EXPIRED') {
     return 'Sign in to continue.'
   }
+  if (error.code === 'STEP_UP_REQUIRED') return 'Confirm your identity to continue.'
+  if (error.code === 'ACCOUNT_SUSPENDED') return 'This Modula Account is suspended.'
   if (error.code === 'FORBIDDEN') return 'This action is not available for this session.'
   if (
     error.code === 'AUTHENTICATION_NOT_AVAILABLE' ||

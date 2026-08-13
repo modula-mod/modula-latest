@@ -13,7 +13,7 @@ Current register counts:
 
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 12 | 9 | 0 | 2 | 0 | 1 | 0 |
+| P0 | 12 | 4 | 0 | 0 | 7 | 1 | 0 |
 | P1 | 35 | 10 | 0 | 0 | 24 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
@@ -55,9 +55,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/auth/screens/SignInScreen.tsx`; `src/auth/runtime/SessionProvider.tsx`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/sessions/service.ts`
 - Backend dependency: `POST /v1/sessions`; `GET /v1/accounts/me`; mail security alert queue.
 - Fix strategy: Repair canonical web storage, then add browser E2E proving password login, `/v1/accounts/me`, Home transition, reload restore, logout, and re-login.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Fresh private browser on `https://modula.digital/sign-in` reaches Home after password submit and remains authenticated after reload.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-004 - Email OTP Login Handoff
 
@@ -68,48 +68,48 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/auth/screens/SignInScreen.tsx`; `src/auth/runtime/SessionProvider.tsx`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/challenges/service.ts`; `services/greenfield-api/src/sessions/service.ts`
 - Backend dependency: `POST /v1/sessions/email-code/request`; `POST /v1/sessions/email-code`; `GET /v1/accounts/me`.
 - Fix strategy: Repair web storage and add controlled OTP browser E2E with correct challenge handoff and reload restore.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_OTP_SOURCE=<controlled> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Fresh private browser completes OTP sign-in, reaches Home, reloads to Home, and leaves no usable session after logout.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-005 - Wrong Password UI
 
 - Severity: P0
 - Feature/domain: Wrong password / Auth
 - Symptom: API returns `INVALID_CREDENTIALS`, but browser wrong-password no-session behavior is not proven.
-- Root cause: Phase 7L-A validated the backend error domain but did not run authenticated browser failure-state proof.
-- Source files: `src/auth/screens/SignInScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/errors.ts`; `services/greenfield-api/src/authentication/service.ts`; `services/greenfield-api/src/sessions/service.ts`
+- Root cause: Phase 7L-A validated the backend error domain but did not run authenticated browser failure-state proof; the frontend API decoder also rejected the backend `INVALID_CREDENTIALS` code as unknown.
+- Source files: `src/auth/screens/SignInScreen.tsx`; `src/api/contracts/ApiError.ts`; `src/api/decoding/decodeApiEnvelope.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/errors.ts`; `services/greenfield-api/src/authentication/service.ts`; `services/greenfield-api/src/sessions/service.ts`
 - Backend dependency: `POST /v1/sessions`.
 - Fix strategy: Add browser E2E asserting exact password-domain error and no stored/restored session.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_BAD_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public browser shows the correct wrong-password error and `/v1/accounts/me` remains unauthenticated.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-006 - Wrong OTP UI
 
 - Severity: P0
 - Feature/domain: Wrong OTP / Auth
 - Symptom: API returns `CHALLENGE_INVALID`, but browser wrong-OTP no-session behavior is not proven.
-- Root cause: Phase 7L-A validated backend challenge errors but did not run controlled browser OTP failure proof.
-- Source files: `src/auth/screens/SignInScreen.tsx`; `src/auth/screens/VerifyEmailScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/challenges/service.ts`; `services/greenfield-api/src/auth/errors.ts`
+- Root cause: Phase 7L-A validated backend challenge errors but did not run controlled browser OTP failure proof; the frontend API decoder also lacked the backend challenge error codes.
+- Source files: `src/auth/screens/SignInScreen.tsx`; `src/auth/screens/VerifyEmailScreen.tsx`; `src/api/contracts/ApiError.ts`; `src/api/decoding/decodeApiEnvelope.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/challenges/service.ts`; `services/greenfield-api/src/auth/errors.ts`
 - Backend dependency: `POST /v1/sessions/email-code`; challenge state tables.
 - Fix strategy: Add browser E2E asserting exact OTP-domain error and no persisted session.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_BAD_OTP=000000 pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public browser rejects wrong OTP, does not enter Home, and does not persist credentials.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-007 - Logout
 
 - Severity: P0
 - Feature/domain: Logout / Auth
 - Symptom: API logout revokes current session, but browser credentials removal and protected-route denial after logout are not proven.
-- Root cause: Browser storage is memory-only and the Phase 7L-A crawl did not exercise logged-in logout.
-- Source files: `src/auth/runtime/SessionProvider.tsx`; `src/auth/runtime/useSessionActions.ts`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/sessions/service.ts`
+- Root cause: Browser storage was memory-only, Phase 7L-A did not exercise logged-in logout, API CORS did not allow browser `DELETE`, and the web client sent `Content-Type: application/json` on empty DELETE requests.
+- Source files: `src/auth/runtime/SessionProvider.tsx`; `src/auth/runtime/useSessionActions.ts`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/data/repositories/api/ApiAuthRepository.ts`; `src/api/client/ApiClient.ts`; `src/api/client/requestHeaders.ts`; `services/greenfield-api/src/app/register-plugins.ts`; `services/greenfield-api/src/sessions/service.ts`
 - Backend dependency: `DELETE /v1/sessions/current`; `GET /v1/accounts/me`.
 - Fix strategy: Make logout clear the canonical web session store and prove protected routes reject after logout/reload.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public browser logout removes credentials, redirects/gates protected routes, and prevents reload restore.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-008 - Web Reload Restore
 
@@ -120,9 +120,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/auth/storage/createSessionStorage.ts`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/auth/storage/SessionStorage.ts`; `src/auth/runtime/SessionProvider.tsx`; `src/auth/runtime/SessionRefreshCoordinator.ts`
 - Backend dependency: `POST /v1/sessions/refresh`; `GET /v1/accounts/me`; session revocation state.
 - Fix strategy: Implement one documented canonical web session persistence model, restore through `/v1/accounts/me`, clear on expiry/revoke/logout, and avoid duplicate stores.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public browser password login reaches Home, hard reload stays on Home, and `/v1/accounts/me` succeeds.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P0-009 - Web Cold Browser Restore
 
@@ -133,9 +133,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/auth/storage/createSessionStorage.ts`; `src/auth/storage/WebPersistentSessionStorage.ts`; `src/auth/runtime/SessionProvider.tsx`; `src/auth/runtime/AccessTokenStore.ts`; `src/data/repositories/api/ApiAuthRepository.ts`
 - Backend dependency: Session refresh endpoint and session expiry/revocation checks.
 - Fix strategy: Persist the selected web session bundle with explicit security contract, load it during bootstrap, refresh safely, and clear on invalid session.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Close/reopen browser context with persisted state, load `https://modula.digital/`, and reach authenticated Home while session remains valid.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P0-010 - Password Reset Browser Proof
 

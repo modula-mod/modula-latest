@@ -381,6 +381,7 @@ export function NavigationDrawer() {
                 </AppText>
                 {session.status === 'signedIn' ? (
                   <AppPressable
+                    testID="drawer-sign-out"
                     accessibilityLabel="Sign out"
                     onPress={() => {
                       closeDrawer({afterClose: () => void signOut()})

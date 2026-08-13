@@ -167,7 +167,11 @@ export function SignInScreen() {
           <AppButton testID="sign-in-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Signing in' : 'Sign in'}
           </AppButton>
-          <AppButton variant="secondary" disabled={pending} onPress={() => void requestEmailCode()}>
+          <AppButton
+            testID="sign-in-email-code-request"
+            variant="secondary"
+            disabled={pending}
+            onPress={() => void requestEmailCode()}>
             Email me a sign-in code
           </AppButton>
           {emailCodeChallengeId ? (
@@ -181,8 +185,12 @@ export function SignInScreen() {
                 textContentType="oneTimeCode"
                 returnKeyType="done"
                 onSubmitEditing={() => void submitEmailCode()}
+                testID="sign-in-email-code"
               />
-              <AppButton disabled={pending} onPress={() => void submitEmailCode()}>
+              <AppButton
+                testID="sign-in-email-code-submit"
+                disabled={pending}
+                onPress={() => void submitEmailCode()}>
                 {pending ? 'Checking code' : 'Continue with email code'}
               </AppButton>
             </>
