@@ -98,6 +98,8 @@ scanFiles(
 
 const arbitraryExecutionAllowed = new Set([
   'services/greenfield-api/src/extensions/trust-policy.ts',
+  // Reviewed host integration boundary: fixed Hestia CLI commands via execFile.
+  'services/greenfield-worker/src/mail/provisioner.ts',
   'packages/greenfield-module-ui-contracts/src/index.ts',
 ])
 
