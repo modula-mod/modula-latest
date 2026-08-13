@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://modula.digital/_expo/static/js/web/entry-c56be356e1a8d2c778391d4d0481229e.js",
+    "status": 200,
+    "resourceType": "script",
+    "contentType": "application/javascript; charset=utf-8",
+    "cacheControl": "public, max-age=31536000, immutable",
+    "etag": "W/\"6a7bad5c-3c7d01\"",
+    "contentLength": null
+  },
+  {
+    "url": "https://modula.digital/assets/node_modules/.pnpm/@expo+vector-icons@15.1.1_expo-font@57.0.1_react-native@0.86.2_@babel+core@7.29.7_@reac_a2cced9f5fc9a0226abee289b85e5221/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.b4eb097d35f44ed943676fd56f6bdc51.ttf",
+    "status": 200,
+    "resourceType": "font",
+    "contentType": "font/ttf",
+    "cacheControl": "public, max-age=31536000, immutable",
+    "etag": "W/\"6a7bad5c-5f25c\"",
+    "contentLength": null
+  },
+  {
+    "url": "https://api.modula.digital/v1/notifications?limit=12",
+    "status": 401,
+    "resourceType": "fetch",
+    "contentType": "application/json; charset=utf-8",
+    "cacheControl": "no-store",
+    "etag": null,
+    "contentLength": "252"
+  },
+  {
+    "url": "https://api.modula.digital/v1/modules/contributions?surface=profileTab&enabledOnly=true",
+    "status": 401,
+    "resourceType": "fetch",
+    "contentType": "application/json; charset=utf-8",
+    "cacheControl": "no-store",
+    "etag": null,
+    "contentLength": "252"
+  },
+  {
+    "url": "https://api.modula.digital/v1/modules/installed",
+    "status": 401,
+    "resourceType": "fetch",
+    "contentType": "application/json; charset=utf-8",
+    "cacheControl": "no-store",
+    "etag": null,
+    "contentLength": "252"
+  }
+]

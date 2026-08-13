@@ -1,0 +1,324 @@
+[
+  {
+    "ts": "2026-08-13T15:29:05.205Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:05.537Z",
+    "type": "route",
+    "name": "login",
+    "requestedUrl": "https://modula.digital/sign-in",
+    "finalUrl": "https://modula.digital/sign-in",
+    "status": 200,
+    "durationMs": 749,
+    "tofuTextMatches": 0,
+    "buttons": 2,
+    "inputs": 2,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:05.684Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/register"
+  },
+  {
+    "ts": "2026-08-13T15:29:06.329Z",
+    "type": "route",
+    "name": "register",
+    "requestedUrl": "https://modula.digital/register",
+    "finalUrl": "https://modula.digital/register",
+    "status": 200,
+    "durationMs": 792,
+    "tofuTextMatches": 0,
+    "buttons": 1,
+    "inputs": 2,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:06.426Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/forgot-password"
+  },
+  {
+    "ts": "2026-08-13T15:29:06.935Z",
+    "type": "route",
+    "name": "forgot-password",
+    "requestedUrl": "https://modula.digital/forgot-password",
+    "finalUrl": "https://modula.digital/forgot-password",
+    "status": 200,
+    "durationMs": 606,
+    "tofuTextMatches": 0,
+    "buttons": 3,
+    "inputs": 1,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:07.023Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/verify-email"
+  },
+  {
+    "ts": "2026-08-13T15:29:07.523Z",
+    "type": "route",
+    "name": "verify-email",
+    "requestedUrl": "https://modula.digital/verify-email",
+    "finalUrl": "https://modula.digital/verify-email",
+    "status": 200,
+    "durationMs": 588,
+    "tofuTextMatches": 0,
+    "buttons": 3,
+    "inputs": 1,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:07.670Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/"
+  },
+  {
+    "ts": "2026-08-13T15:29:07.681Z",
+    "type": "console.warning",
+    "text": "Animated: `useNativeDriver` is not supported because the native animated module is missing. Falling back to JS-based animation. To resolve this, add `RCTAnimation` module to this app, or remove `useNativeDriver`. Make sure to run `bundle exec pod install` first. Read more about autolinking: https://github.com/react-native-community/cli/blob/master/docs/autolinking.md",
+    "url": "https://modula.digital/"
+  },
+  {
+    "ts": "2026-08-13T15:29:07.918Z",
+    "type": "requestfailed",
+    "url": "https://api.modula.digital/v1/media/3a058370-a6fe-43ef-b318-e0579599cfa0.png",
+    "method": "GET",
+    "resourceType": "image",
+    "failure": "net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin",
+    "pageUrl": "https://modula.digital/"
+  },
+  {
+    "ts": "2026-08-13T15:29:07.918Z",
+    "type": "console.error",
+    "text": "Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin",
+    "url": "https://modula.digital/"
+  },
+  {
+    "ts": "2026-08-13T15:29:08.510Z",
+    "type": "route",
+    "name": "home",
+    "requestedUrl": "https://modula.digital/",
+    "finalUrl": "https://modula.digital/",
+    "status": 200,
+    "durationMs": 987,
+    "tofuTextMatches": 0,
+    "buttons": 68,
+    "inputs": 0,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:08.645Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/discover/"
+  },
+  {
+    "ts": "2026-08-13T15:29:09.280Z",
+    "type": "route",
+    "name": "discover",
+    "requestedUrl": "https://modula.digital/discover",
+    "finalUrl": "https://modula.digital/discover/",
+    "status": 200,
+    "durationMs": 770,
+    "tofuTextMatches": 0,
+    "buttons": 252,
+    "inputs": 1,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:09.406Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/activity/"
+  },
+  {
+    "ts": "2026-08-13T15:29:09.407Z",
+    "type": "console.warning",
+    "text": "Animated: `useNativeDriver` is not supported because the native animated module is missing. Falling back to JS-based animation. To resolve this, add `RCTAnimation` module to this app, or remove `useNativeDriver`. Make sure to run `bundle exec pod install` first. Read more about autolinking: https://github.com/react-native-community/cli/blob/master/docs/autolinking.md",
+    "url": "https://modula.digital/activity/"
+  },
+  {
+    "ts": "2026-08-13T15:29:09.461Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/activity/"
+  },
+  {
+    "ts": "2026-08-13T15:29:09.490Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.050Z",
+    "type": "route",
+    "name": "activity",
+    "requestedUrl": "https://modula.digital/activity",
+    "finalUrl": "https://modula.digital/sign-in",
+    "status": 200,
+    "durationMs": 770,
+    "tofuTextMatches": 0,
+    "buttons": 2,
+    "inputs": 2,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:10.176Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/profile/"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.178Z",
+    "type": "console.warning",
+    "text": "Animated: `useNativeDriver` is not supported because the native animated module is missing. Falling back to JS-based animation. To resolve this, add `RCTAnimation` module to this app, or remove `useNativeDriver`. Make sure to run `bundle exec pod install` first. Read more about autolinking: https://github.com/react-native-community/cli/blob/master/docs/autolinking.md",
+    "url": "https://modula.digital/profile/"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.229Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/profile/"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.260Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.306Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.333Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:10.889Z",
+    "type": "route",
+    "name": "profile",
+    "requestedUrl": "https://modula.digital/profile",
+    "finalUrl": "https://modula.digital/sign-in",
+    "status": 200,
+    "durationMs": 839,
+    "tofuTextMatches": 0,
+    "buttons": 2,
+    "inputs": 2,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:11.569Z",
+    "type": "route",
+    "name": "settings",
+    "requestedUrl": "https://modula.digital/settings",
+    "finalUrl": "https://modula.digital/settings/",
+    "status": 200,
+    "durationMs": 680,
+    "tofuTextMatches": 0,
+    "buttons": 17,
+    "inputs": 1,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:11.693Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/settings/appearance"
+  },
+  {
+    "ts": "2026-08-13T15:29:12.287Z",
+    "type": "route",
+    "name": "appearance",
+    "requestedUrl": "https://modula.digital/settings/appearance",
+    "finalUrl": "https://modula.digital/settings/appearance",
+    "status": 200,
+    "durationMs": 718,
+    "tofuTextMatches": 0,
+    "buttons": 20,
+    "inputs": 6,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:12.381Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/settings/security"
+  },
+  {
+    "ts": "2026-08-13T15:29:12.944Z",
+    "type": "route",
+    "name": "security",
+    "requestedUrl": "https://modula.digital/settings/security",
+    "finalUrl": "https://modula.digital/settings/security",
+    "status": 200,
+    "durationMs": 657,
+    "tofuTextMatches": 0,
+    "buttons": 9,
+    "inputs": 0,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:13.095Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/marketplace/"
+  },
+  {
+    "ts": "2026-08-13T15:29:13.147Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/sign-in"
+  },
+  {
+    "ts": "2026-08-13T15:29:13.698Z",
+    "type": "route",
+    "name": "product-hub",
+    "requestedUrl": "https://modula.digital/marketplace",
+    "finalUrl": "https://modula.digital/sign-in",
+    "status": 200,
+    "durationMs": 754,
+    "tofuTextMatches": 0,
+    "buttons": 2,
+    "inputs": 2,
+    "images": []
+  },
+  {
+    "ts": "2026-08-13T15:29:13.799Z",
+    "type": "pageerror",
+    "text": "Minified React error #418; visit https://react.dev/errors/418?args[]=HTML&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.",
+    "url": "https://modula.digital/marketplace/digital.modula.vault-notes"
+  },
+  {
+    "ts": "2026-08-13T15:29:13.893Z",
+    "type": "console.error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()",
+    "url": "https://modula.digital/marketplace/digital.modula.vault-notes"
+  },
+  {
+    "ts": "2026-08-13T15:29:14.452Z",
+    "type": "route",
+    "name": "vault-notes",
+    "requestedUrl": "https://modula.digital/marketplace/digital.modula.vault-notes",
+    "finalUrl": "https://modula.digital/sign-in",
+    "status": 200,
+    "durationMs": 754,
+    "tofuTextMatches": 0,
+    "buttons": 2,
+    "inputs": 2,
+    "images": []
+  }
+]
