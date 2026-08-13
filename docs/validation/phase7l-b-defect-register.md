@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 2 | 0 | 0 | 9 | 1 | 0 |
-| P1 | 35 | 8 | 0 | 0 | 26 | 1 | 0 |
+| P1 | 35 | 7 | 0 | 0 | 27 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -404,13 +404,13 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Search recent/saved / Search
 - Symptom: Search recent/saved persistence and browser UI proof are incomplete.
-- Root cause: Phase 7L-A did not run authenticated search journeys.
-- Source files: `src/features/product/screens/UniversalSearchScreen.tsx`; `src/features/feed/components/HomeSearchModal.tsx`; `src/data/repositories/api/ApiDiscoverRepository.ts`; `services/greenfield-api/src/domains/search/repository.ts`; `services/greenfield-api/src/domains/search/service.ts`
+- Root cause: `/product/search` was a local launcher preview and the frontend repository exposed only the legacy Discover search decoder, so the real typed `/v1/search`, `/v1/search/recent`, and `/v1/search/saved` lifecycle was not wired to browser UI.
+- Source files: `src/features/product/screens/UniversalSearchScreen.tsx`; `src/features/product/data/useUniversalSearch.ts`; `src/data/repositories/api/ApiDiscoverRepository.ts`; `src/data/repositories/contracts/DiscoverRepository.ts`; `src/data/repositories/contracts/index.ts`; `src/api/decoding/decodeDiscover.ts`; `src/data/query/queryKeys.ts`; `tests/phase7l-b-auth-regression.test.ts`; `services/greenfield-api/src/domains/search/repository.ts`; `services/greenfield-api/src/domains/search/service.ts`
 - Backend dependency: Search documents, recent/saved search persistence, visibility policy.
-- Fix strategy: Prove people/posts/modules search with recent/saved state, loading, empty, pagination, failures, and block policy.
-- Verification command: `pnpm --filter @modula/greenfield-api test -- phase7e.search-platform`; `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Replace the local preview with an authenticated typed Search UI; consume real people/post/module results from `/v1/search`; show persisted recent/saved searches from the API; support save/delete/replay/load-more/empty/error states without raw metadata exposure; prove block policy through backend security tests.
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth` -> 9/9 browser tests passed, including Search recent/saved/reload/pagination/empty proof; `MODULA_TEST_DATABASE_URL=<isolated> MODULA_DATABASE_MIGRATOR_URL=<isolated> pnpm --filter @modula/greenfield-api exec vitest run tests/phase7e.search-platform.test.ts tests/phase6.security.test.ts` -> 17/17 backend tests passed.
 - Live verification: Public authenticated browser search returns real results, persists recent/saved state, and filters blocked content.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-019 - Profile Owner Public
 

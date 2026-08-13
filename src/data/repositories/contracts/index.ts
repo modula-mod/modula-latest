@@ -34,6 +34,11 @@ export type {
   DiscoverSearchInput,
   DiscoverSearchModuleResult,
   DiscoverSearchResult,
+  SaveSearchInput,
+  UniversalRecentSearch,
+  UniversalSavedSearch,
+  UniversalSearchInput,
+  UniversalSearchPage,
 } from '@/data/repositories/contracts/DiscoverRepository'
 export type {
   FeedRepository,

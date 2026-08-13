@@ -45,6 +45,14 @@ export const queryKeys = {
     search: (q: string, type: string, limit: number) =>
       ['discover', 'search', q, type, limit] as const,
   },
+  search: {
+    results: (q: string, type: string, limit: number) =>
+      ['search', 'results', q, type, limit] as const,
+    recent: (accountId?: AccountId | 'guest' | 'signedOut') =>
+      ['search', 'recent', accountId ?? 'public'] as const,
+    saved: (accountId?: AccountId | 'guest' | 'signedOut') =>
+      ['search', 'saved', accountId ?? 'public'] as const,
+  },
   reels: {
     all: ['reels'] as const,
   },

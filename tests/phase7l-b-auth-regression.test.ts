@@ -87,6 +87,18 @@ function matchesApiResponse(path: string, method: string) {
   }
 }
 
+function matchesSearchQueryResponse(query: string) {
+  return (response: {url(): string; request(): {method(): string}}) => {
+    const url = new URL(response.url())
+    return (
+      url.origin === apiOrigin &&
+      url.pathname === '/v1/search' &&
+      url.searchParams.get('query') === query &&
+      response.request().method() === 'GET'
+    )
+  }
+}
+
 function sqlLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`
 }
@@ -119,6 +131,178 @@ function queryScalar(sql: string): string {
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim()
+}
+
+function executeSql(sql: string): void {
+  const {args, env} = psqlArgsFromDatabaseUrl()
+  execFileSync('psql', [...args, '-v', 'ON_ERROR_STOP=1', '-c', sql], {
+    env,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+}
+
+function sqlJson(value: unknown): string {
+  return `${sqlLiteral(JSON.stringify(value))}::jsonb`
+}
+
+function sqlTextArray(values: string[]): string {
+  return `ARRAY[${values.map(sqlLiteral).join(',')}]::text[]`
+}
+
+type SearchFixture = {
+  query: string
+  profileTitle: string
+  firstPostTitle: string
+  moduleTitle: string
+}
+
+function seedUniversalSearchDocuments(account: TestAccount): SearchFixture {
+  const actorId = queryScalar(`
+    select id
+    from actors
+    where account_id = ${sqlLiteral(account.accountId)}
+      and deleted_at is null
+    order by created_at asc
+    limit 1
+  `)
+  if (!actorId) throw new Error(`No actor row exists for ${account.accountId}.`)
+  const profileId = queryScalar(`
+    select id
+    from profiles
+    where actor_id = ${sqlLiteral(actorId)}
+      and deleted_at is null
+    limit 1
+  `)
+  if (!profileId) throw new Error(`No profile row exists for ${actorId}.`)
+
+  const query = `routeatlas${account.handle}`
+  const profileTitle = `Phase 7L Search Profile ${query}`
+  const firstPostTitle = `Phase 7L Search Post 1 ${query}`
+  const moduleTitle = `Phase 7L Search Module ${query}`
+  const documents = [
+    {
+      entityType: 'profile',
+      entityId: profileId,
+      ownerId: actorId,
+      title: profileTitle,
+      body: `Public profile proof for ${query}.`,
+      summary: `Profile search proof ${query}.`,
+      keywords: [query, account.handle, 'profile'],
+      tags: ['phase7lb', 'search'],
+      metadata: {handle: account.handle, kind: 'person'},
+      updatedAt: new Date(Date.now() - 1_000).toISOString(),
+    },
+    {
+      entityType: 'module',
+      entityId: `digital.modula.routeatlas.${account.handle}`,
+      ownerId: actorId,
+      title: moduleTitle,
+      body: `Module catalogue proof for ${query}.`,
+      summary: `Module search proof ${query}.`,
+      keywords: [query, 'module'],
+      tags: ['phase7lb', 'search'],
+      metadata: {
+        publisher: 'Modula',
+        trustState: 'firstParty',
+        status: 'published',
+        installable: true,
+      },
+      updatedAt: new Date(Date.now() - 2_000).toISOString(),
+    },
+    ...Array.from({length: 5}, (_, index) => ({
+      entityType: 'post',
+      entityId: `phase7lb-search-post-${account.handle}-${index + 1}`,
+      ownerId: actorId,
+      title: index === 0 ? firstPostTitle : `Phase 7L Search Post ${index + 1} ${query}`,
+      body: `Search pagination proof post ${index + 1} for ${query}.`,
+      summary: `Post search proof ${query} ${index + 1}.`,
+      keywords: [query, 'post', `page${index + 1}`],
+      tags: ['phase7lb', 'search'],
+      metadata: {
+        handle: account.handle,
+        authorDisplayName: 'Phase 7L Search User',
+        kind: 'text',
+        feed: 'following',
+        audience: 'public',
+      },
+      updatedAt: new Date(Date.now() - (index + 3) * 1_000).toISOString(),
+    })),
+  ]
+
+  for (const document of documents) {
+    const searchableText = [
+      document.title,
+      document.summary,
+      document.body,
+      document.keywords.join(' '),
+      document.tags.join(' '),
+    ].join(' ')
+    executeSql(`
+      insert into search_documents (
+        document_id,
+        schema_version,
+        entity_type,
+        entity_id,
+        source_version,
+        account_id,
+        owner_id,
+        title,
+        body,
+        summary,
+        keywords,
+        tags,
+        visibility,
+        status,
+        language,
+        metadata,
+        created_at,
+        updated_at,
+        indexed_at,
+        search_vector
+      )
+      values (
+        ${sqlLiteral(`${document.entityType}:${document.entityId}`)},
+        '1.0.0',
+        ${sqlLiteral(document.entityType)},
+        ${sqlLiteral(document.entityId)},
+        1,
+        ${sqlLiteral(account.accountId)},
+        ${sqlLiteral(document.ownerId)},
+        ${sqlLiteral(document.title)},
+        ${sqlLiteral(document.body)},
+        ${sqlLiteral(document.summary)},
+        ${sqlTextArray(document.keywords)},
+        ${sqlTextArray(document.tags)},
+        'public',
+        'active',
+        'en',
+        ${sqlJson(document.metadata)},
+        ${sqlLiteral(document.updatedAt)}::timestamptz,
+        ${sqlLiteral(document.updatedAt)}::timestamptz,
+        now(),
+        to_tsvector('english', ${sqlLiteral(searchableText)})
+      )
+      on conflict (entity_type, entity_id) do update set
+        source_version = excluded.source_version,
+        account_id = excluded.account_id,
+        owner_id = excluded.owner_id,
+        title = excluded.title,
+        body = excluded.body,
+        summary = excluded.summary,
+        keywords = excluded.keywords,
+        tags = excluded.tags,
+        visibility = excluded.visibility,
+        status = excluded.status,
+        language = excluded.language,
+        metadata = excluded.metadata,
+        updated_at = excluded.updated_at,
+        indexed_at = excluded.indexed_at,
+        search_vector = excluded.search_vector
+    `)
+  }
+
+  return {query, profileTitle, firstPostTitle, moduleTitle}
 }
 
 async function latestMailCode(accountId: string, templateId: 'verification-code' | 'passwordless-login') {
@@ -666,6 +850,58 @@ test('password reset browser flow revokes old session and accepts only the new p
 
   await passwordLogin(page, {...account, password: nextPassword})
   expectNoCriticalEvents(events, [{status: 401, method: 'POST', path: '/v1/sessions'}])
+})
+
+test('universal search uses real API results, pagination, recent, saved, reload, and empty state', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const account = await createVerifiedAccount('search')
+  const fixture = seedUniversalSearchDocuments(account)
+
+  await passwordLogin(page, account)
+  await gotoProtectedRoute(page, '/product/search')
+  await expect(page.getByTestId('universal-search-input')).toBeVisible()
+
+  const searchResponse = page.waitForResponse(matchesSearchQueryResponse(fixture.query))
+  await page.getByTestId('universal-search-input').fill(fixture.query)
+  expect((await searchResponse).status()).toBe(200)
+  await expect(page.getByText(fixture.profileTitle)).toBeVisible()
+  await expect(page.getByText(fixture.firstPostTitle)).toBeVisible()
+  await expect(page.getByText(fixture.moduleTitle)).toBeVisible()
+  await expect(page.getByTestId('universal-search-result')).toHaveCount(6)
+  await expectNoFallbackGlyphText(page)
+
+  const nextPageResponse = page.waitForResponse(response => {
+    const url = new URL(response.url())
+    return matchesSearchQueryResponse(fixture.query)(response) && Boolean(url.searchParams.get('cursor'))
+  })
+  await page.getByLabel('Load more search results').click()
+  expect((await nextPageResponse).status()).toBe(200)
+  await expect(page.getByTestId('universal-search-result')).toHaveCount(7)
+
+  const saveResponse = page.waitForResponse(matchesApiResponse('/v1/search/saved', 'POST'))
+  await page.getByLabel('Save current search').click()
+  expect((await saveResponse).status()).toBe(201)
+
+  await page.getByTestId('universal-search-input').fill('')
+  await expect(page.getByTestId('universal-search-library')).toBeVisible()
+  await expect(page.getByLabel(`Run search ${fixture.query}`).first()).toBeVisible()
+
+  await page.reload({waitUntil: 'networkidle'})
+  await expect(page.getByTestId('universal-search-library')).toBeVisible()
+  await expect(page.getByLabel(`Run search ${fixture.query}`).first()).toBeVisible()
+
+  const replayResponse = page.waitForResponse(matchesSearchQueryResponse(fixture.query))
+  await page.getByLabel(`Run search ${fixture.query}`).first().click()
+  expect((await replayResponse).status()).toBe(200)
+  await expect(page.getByTestId('universal-search-result')).toHaveCount(6)
+
+  const emptyQuery = `nomatches${account.handle}`
+  const emptyResponse = page.waitForResponse(matchesSearchQueryResponse(emptyQuery))
+  await page.getByTestId('universal-search-input').fill(emptyQuery)
+  expect((await emptyResponse).status()).toBe(200)
+  await expect(page.getByTestId('universal-search-empty')).toBeVisible()
+
+  expectNoCriticalEvents(events)
 })
 
 test('authenticated Home, Activity, Profile, Product Hub, and Settings render cleanly', async ({page}) => {
