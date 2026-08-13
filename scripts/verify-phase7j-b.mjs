@@ -12,8 +12,17 @@ import path from 'node:path'
 const root = process.cwd()
 const evidence = path.join(root, 'docs/validation/evidence/phase7j-b')
 const statusDoc = path.join(root, 'docs/validation/phase7j-b-cutover-status.md')
-const expectedSha = 'b5252d5f7654547ff8aa75498bd205336692cd99'
+const expectedSha = process.env.MODULA_PHASE7J_B_EXPECTED_SHA?.trim() || currentHead()
 let failed = 0
+
+function currentHead() {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], {encoding: 'utf8', cwd: root})
+  if (result.status !== 0) {
+    console.error(result.stderr || result.stdout || 'git rev-parse HEAD failed')
+    process.exit(result.status ?? 1)
+  }
+  return result.stdout.trim()
+}
 
 function pass(msg) {
   console.log(`PASS: ${msg}`)
@@ -60,6 +69,7 @@ function curlJson(url) {
 
 console.log('Phase 7J-B cutover verifier')
 console.log(`cwd=${root}`)
+console.log(`expectedSha=${expectedSha}`)
 
 assertFile('docs/validation/phase7j-b-cutover-status.md', expectedSha.slice(0, 7))
 assertFile('docs/validation/phase7j-b-cutover-status.md', 'Public identity agreement')

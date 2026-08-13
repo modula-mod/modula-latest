@@ -1,6 +1,6 @@
 # Phase 7J-B — Production Cutover Status
 
-Date: 2026-08-11 / 2026-08-12 UTC  
+Date: 2026-08-11 / 2026-08-12 / 2026-08-13 UTC
 Mission: Production Cutover, Live Beta Acceptance & Mainline Finalization  
 Critical rule: Do **not** merge to `main` until the exact convergence build is proven live.
 
@@ -9,7 +9,8 @@ Critical rule: Do **not** merge to `main` until the exact convergence build is p
 | Role | Value |
 | --- | --- |
 | Candidate branch | `phase7j-product-convergence` |
-| Deployed / proven SHA | `b5252d5f7654547ff8aa75498bd205336692cd99` |
+| Deployed / proven SHA | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Earlier accepted candidate | `b5252d5f7654547ff8aa75498bd205336692cd99` |
 | Pre-cutover production | `7632e03cd904569eb71b68f93a60eab83100b2a1` on `phase7i-trusted-production-alpha` |
 | Public web | `https://modula.digital` |
 | Public API | `https://api.modula.digital` |
@@ -121,11 +122,41 @@ Classification counts for this mission:
 - `TEST_ENV_FAILURE=0` (founder password absence recorded as credential gap, not test harness failure)
 - `LIVE_DEPLOYMENT_FAILURE=0`
 
-## 13. Production repairs
+## 13. 2026-08-13 final live identity refresh
 
-**None.** Final proven SHA remains `b5252d5f7654547ff8aa75498bd205336692cd99`.
+GitHub contains a newer convergence head than the original written mission target `b5252d5...`; per the mission rule, the VPS must not use an old local checkout when GitHub has a newer accepted convergence commit. Current source and live production now agree on:
 
-## 14–16. Mainline / fresh Mac / final rebuild
+`6517d521a57f065ca569b0a74c3aa2744df5c0ed`
+
+Evidence refreshed:
+
+- `docs/validation/evidence/phase7j-b/public-identity-proof.txt`
+- `docs/validation/evidence/phase7j-b/identity-agreement.json`
+- `CI=true pnpm verify:phase7j-b`
+
+Runtime identity:
+
+| Surface | Identity |
+| --- | --- |
+| Web `/version.json` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| API `/version.json` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Worker `expectedCommit` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Web release | `/var/www/modula/releases/6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Previous release | `/var/www/modula/releases/41ef513c0974f2887c630676fec80860b0d4db72` |
+| API image ID | `sha256:2d8a6951b7e8c0d86201f2903498c0b46ff81eec6a9ec9c4ced076fd5e8169ae` |
+| Worker image ID | `sha256:81acf70cf21fc73e824f1f172f20e856ab66a14845b55f1db79e88e987762f8c` |
+
+Production database status from the running API container:
+
+- Applied migrations: `001` through `037_phase7i_f5b_rollback_compatibility`
+- Pending migrations: `[]`
+- No `038` or later migration exists in current source.
+
+## 14. Production repairs
+
+**None.** Final proven SHA is `6517d521a57f065ca569b0a74c3aa2744df5c0ed`.
+
+## 15–16. Mainline / fresh Mac / final rebuild
 
 Tracked in timeline below after merge + fresh clone + final redeploy.
 
@@ -140,6 +171,9 @@ Tracked in timeline below after merge + fresh clone + final redeploy.
 | 2026-08-11T22:57–59Z | API/Worker + web deploy | PASS |
 | 2026-08-11T22:59Z | Identity agreement | PASS |
 | 2026-08-11T23:00–06Z | Auth / golden path / UI / vault | PASS_WITH_NON_BLOCKING |
+| 2026-08-13T13:58Z | Final convergence web/API/worker redeploy to `6517d52` | PASS |
+| 2026-08-13T14:04–14:11Z | Public web/API identity + health/meta/stories refresh | PASS |
+| 2026-08-13T15:04–15:18Z | VPS source + DB-backed verifier refresh | PASS_WITH_KNOWN_MAINLINE_GUARD |
 
 ## Verdict
 
@@ -151,5 +185,6 @@ Non-blocking:
 2. Vault Notes enable/disable CONFLICT when already transitioned; create payload schema needs product polish
 3. Nested comment `parentCommentId` not always persisted as parent
 4. Deep Runtime 2 UI walk deferred to Phase 7K polish track
+5. `verify:phase7e-module-runtime-2` has one expected pre-Part-14 guard while running from `phase7j-product-convergence`: its embedded web-production verifier requires local `main` to equal `origin/main`.
 
 **Phase 7K — Modula Beta UI / Native Design System** starts next **from `main`** — not started in this mission.
