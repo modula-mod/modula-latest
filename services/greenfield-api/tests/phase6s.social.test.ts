@@ -229,6 +229,8 @@ describeIf('Phase 6S social product integration', () => {
       headers: {authorization: `Bearer ${beta.accessToken}`},
     })
     expect(mediaReload.statusCode).toBe(200)
+    expect(mediaReload.headers['cache-control']).toBe('private, no-store')
+    expect(mediaReload.headers['cross-origin-resource-policy']).toBe('same-site')
 
     for (const reaction of ['like', 'love', 'laugh', 'fire'] as const) {
       const reacted = await authed(beta.accessToken, 'PUT', `/v1/posts/${socialPostId}/reaction`, {type: reaction})

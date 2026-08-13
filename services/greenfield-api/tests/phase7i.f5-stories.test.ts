@@ -83,6 +83,8 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
       headers: {authorization: `Bearer ${beta.accessToken}`},
     })
     expect(media.statusCode).toBe(200)
+    expect(media.headers['cache-control']).toBe('private, no-store')
+    expect(media.headers['cross-origin-resource-policy']).toBe('same-site')
 
     const seen = await authed(beta.accessToken, 'POST', `/v1/stories/items/${itemId}/viewed`)
     expect(seen.statusCode).toBe(200)

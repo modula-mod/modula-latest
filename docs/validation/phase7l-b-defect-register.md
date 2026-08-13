@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 9 | 0 | 2 | 0 | 1 | 0 |
-| P1 | 35 | 32 | 0 | 0 | 2 | 1 | 0 |
+| P1 | 35 | 31 | 0 | 0 | 3 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -222,13 +222,13 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Media rendering / Media/API
 - Symptom: API-hosted image returns HTTP 200 but Chrome blocks it as `ERR_BLOCKED_BY_RESPONSE.NotSameOrigin`.
-- Root cause: Media endpoint responds from `api.modula.digital` with `Cross-Origin-Resource-Policy: same-origin` while web origin is `modula.digital`.
-- Source files: `services/greenfield-api/src/app/register-routes.ts`; `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`; `services/greenfield-api/src/domains/media/post-media-storage.ts`; `services/greenfield-api/src/domains/stories/service.ts`; `services/greenfield-api/src/config/env.ts`
+- Root cause: Media endpoint responded from `api.modula.digital` with `Cross-Origin-Resource-Policy: same-origin` while web origin is `modula.digital`.
+- Source files: `services/greenfield-api/src/app/media-response.ts`; `services/greenfield-api/src/app/register-routes.ts`; `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`; `services/greenfield-api/tests/phase7l.media-headers.test.ts`; `services/greenfield-api/tests/phase6s.social.test.ts`; `services/greenfield-api/tests/phase7i.f5-stories.test.ts`
 - Backend dependency: Media file serving, authorization, CORS/CORP/CSP headers.
-- Fix strategy: Define the media security contract, emit the least broad CORS/CORP headers that permit `https://modula.digital`, and keep private media protected.
-- Verification command: `pnpm --filter @modula/greenfield-api test -- phase7c.media-storage`; `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Successful post and Story media responses now emit `Cross-Origin-Resource-Policy: same-site` and `Cache-Control: private, no-store`, preserving route authorization and existing narrow CORS origins.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.media-headers.test.ts tests/phase7c.media-storage.test.ts`
 - Live verification: Public browser renders API media from `https://api.modula.digital/v1/media/...` with CORS/CORP/CSP/mixed-content failures equal to zero.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-005 - Browser Runtime Hydration
 

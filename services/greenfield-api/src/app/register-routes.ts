@@ -62,6 +62,7 @@ import {registerModuleRoutes} from '../modules/routes/index.js'
 import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
+import {sendBrowserVisibleMedia} from './media-response.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -1808,7 +1809,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
     const stored = await postMediaStorage.readPostMedia(mediaFile)
     if (!stored) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
-    return reply.type(stored.contentType).send(stored.bytes)
+    return sendBrowserVisibleMedia(reply, stored.contentType, stored.bytes)
   })
 
   app.get('/v1/discover', feedConfig, async (request, reply) => {

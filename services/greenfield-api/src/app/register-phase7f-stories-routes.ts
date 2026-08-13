@@ -9,6 +9,7 @@ import {StoryService} from '../domains/stories/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import type {SessionService} from '../security/session.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
+import {sendBrowserVisibleMedia} from './media-response.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -144,7 +145,7 @@ export async function registerPhase7fStoriesRoutes(
             : ext === 'mp4'
               ? 'video/mp4'
               : 'image/jpeg'
-      return reply.type(contentType).send(bytes)
+      return sendBrowserVisibleMedia(reply, contentType, bytes)
     } catch {
       return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
     }
