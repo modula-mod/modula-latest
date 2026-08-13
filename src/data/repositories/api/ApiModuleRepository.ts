@@ -78,7 +78,7 @@ export class ApiModuleRepository implements ModuleRepository {
   async listCatalogue(input: {q?: string; category?: ProductHubCategory; limit?: number} = {}): Promise<ModuleCatalogueItem[]> {
     return localOnlyFallback(
       this.client.get(
-        {path: '/v1/registry/modules', query: {q: input.q, limit: input.limit ?? 50}},
+        {path: '/v1/registry/modules', authenticated: true, query: {q: input.q, limit: input.limit ?? 50}},
         decodeCataloguePage,
       ),
       () => filterCatalogue(LOCAL_CATALOGUE, input),
@@ -92,7 +92,7 @@ export class ApiModuleRepository implements ModuleRepository {
 
   async getModule(moduleId: string): Promise<ModuleDetail | null> {
     return localOnlyFallback(
-      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
+      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`, authenticated: true}, decodeModuleDetail),
       () => {
         const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
         return fallback ? {

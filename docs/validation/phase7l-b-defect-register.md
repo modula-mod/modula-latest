@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 2 | 0 | 0 | 9 | 1 | 0 |
-| P1 | 35 | 10 | 0 | 0 | 24 | 1 | 0 |
+| P1 | 35 | 8 | 0 | 0 | 26 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -209,13 +209,13 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Authenticated icon rendering / Rendering
 - Symptom: Authenticated Home/Activity/Profile/Product Hub icon rendering is not proven.
-- Root cause: Phase 7L-A public crawl redirected protected routes to sign-in, so authenticated icon surfaces were not exercised.
-- Source files: `src/components/primitives/AppIcon.tsx`; `src/components/primitives/IconButton.tsx`; `src/features/activity/screens/ActivityScreen.tsx`; `src/features/modules/screens/ProductHubMarketplaceScreen.tsx`; `src/features/profile/screens/UnifiedProfileScreen.tsx`
+- Root cause: Phase 7L-A public crawl redirected protected routes to sign-in, so authenticated icon surfaces were not exercised; the first authenticated route verifier also exposed protected data hooks firing before signed-in session ownership and a module acceptance server missing the Product Hub feature flags.
+- Source files: `src/components/primitives/AppIcon.tsx`; `src/components/primitives/IconButton.tsx`; `src/features/activity/screens/ActivityScreen.tsx`; `src/features/activity/data/useActivityQuery.ts`; `src/features/modules/hooks/useModuleQueries.ts`; `src/features/modules/screens/ProductHubMarketplaceScreen.tsx`; `src/features/profile/screens/UnifiedProfileScreen.tsx`; `src/features/profile/data-query/useProfileQuery.ts`; `src/data/repositories/api/ApiModuleRepository.ts`; `tests/phase7l-b-auth-regression.test.ts`; `playwright.phase7l-b-auth.config.ts`; `scripts/verify-phase7l-b-auth-regression.mjs`
 - Backend dependency: Auth session for protected route access.
-- Fix strategy: After session persistence, run authenticated browser and native route crawl checking missing glyphs/tofu/font failures.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Fix strategy: Gate session-dependent route queries until `signedIn`, send module registry reads through the authenticated API client in beta route contexts, enable module flags in the disposable acceptance server, and run an authenticated browser crawl checking Ionicons font readiness, static asset health, tofu/fallback glyphs, hydration errors, page errors, failed requests, and HTTP 4xx/5xx.
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Authenticated public browser has zero missing glyphs or font failures on Home, Activity, Profile, Settings, Product Hub, and Vault Notes.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-004 - Media Rendering
 
@@ -248,13 +248,13 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Home / Home/feed
 - Symptom: Home renders with defects; media fails and authenticated reload proof is missing.
-- Root cause: API media is blocked by CORP and the session persistence defect prevents protected/authenticated Home proof.
-- Source files: `src/features/feed/screens/HomeFeedScreen.tsx`; `src/features/feed/FeedPostRow.tsx`; `src/features/social/components/social-post.tsx`; `src/data/repositories/api/ApiPostRepository.ts`; `services/greenfield-api/src/domains/posts/repository.ts`
+- Root cause: API media was blocked by CORP, the session persistence defect prevented protected/authenticated Home proof, and boot-time protected hooks could emit unauthenticated background requests before signed-in state was restored.
+- Source files: `src/features/feed/screens/HomeFeedScreen.tsx`; `src/features/feed/FeedPostRow.tsx`; `src/features/social/components/social-post.tsx`; `src/features/activity/data/useActivityQuery.ts`; `src/features/modules/hooks/useModuleQueries.ts`; `src/features/profile/data-query/useProfileQuery.ts`; `src/data/repositories/api/ApiPostRepository.ts`; `services/greenfield-api/src/domains/posts/repository.ts`; `tests/phase7l-b-auth-regression.test.ts`
 - Backend dependency: Feed/posts/media endpoints.
-- Fix strategy: Repair auth persistence and media headers, then prove Home load, reload, feed scroll, and zero critical console errors.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Fix strategy: Repair auth persistence and media headers, gate protected background queries by session state, then prove authenticated Home load/reload and zero critical console, HTTP, hydration, asset, or icon failures in the route crawl.
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Authenticated public Home renders posts/media and survives reload with console critical errors equal to zero.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-007 - Stories
 
@@ -417,10 +417,10 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Profile owner/public / Profile
 - Symptom: Owner/public profile proof is incomplete; owner route redirected during unauthenticated crawl.
-- Root cause: Auth/session defect blocked protected profile verification.
-- Source files: `src/features/profile/screens/UnifiedProfileScreen.tsx`; `src/features/profile/components/ProfileHero.tsx`; `src/features/profile/tabs/PostsProfileTab.tsx`; `src/features/profile/tabs/MediaProfileTab.tsx`; `src/data/repositories/api/ApiProfileRepository.ts`; `services/greenfield-api/src/domains/profiles/repository.ts`
+- Root cause: Auth/session defect blocked protected profile verification; the owner profile query also fell back to the stale demo handle `andrei.modula` while session state was not signed in, causing a 404 in disposable authenticated route acceptance.
+- Source files: `src/features/profile/screens/UnifiedProfileScreen.tsx`; `src/features/profile/components/ProfileHero.tsx`; `src/features/profile/tabs/PostsProfileTab.tsx`; `src/features/profile/tabs/MediaProfileTab.tsx`; `src/features/profile/data-query/useProfileQuery.ts`; `src/data/repositories/api/ApiProfileRepository.ts`; `services/greenfield-api/src/domains/profiles/repository.ts`
 - Backend dependency: Profile, follow counts, post/media/module/link profile data.
-- Fix strategy: Prove avatar, name, handle, bio, counts, Posts, Media, About, Modules, Links, Focus Halo, and reload behavior.
+- Fix strategy: Keep the owner query tied to the signed-in session handle, then prove avatar, name, handle, bio, counts, Posts, Media, About, Modules, Links, Focus Halo, public second-account view, and reload behavior.
 - Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
 - Live verification: Public browser validates owner and second-account profile views with media/avatar fallbacks.
 - Status: OPEN

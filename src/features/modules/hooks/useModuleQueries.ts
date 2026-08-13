@@ -1,40 +1,47 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 
+import {useSession} from '@/auth/runtime'
 import type {ProductHubCategory} from '@/data/repositories/contracts'
 import {useAppServices} from '@/runtime/useAppServices'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 
 export function useModuleCatalogueQuery(input: {q?: string; category?: ProductHubCategory} = {}) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.catalogue(input),
+    enabled: session.status === 'signedIn',
     queryFn: () => moduleRepository.listCatalogue(input),
   })
 }
 
 export function useInstalledModulesQuery() {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.installed,
+    enabled: session.status === 'signedIn',
     queryFn: () => moduleRepository.listInstalled(),
   })
 }
 
 export function useModuleDetailQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.detail(moduleId),
     queryFn: () => moduleRepository.getModule(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleViewsQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.views(moduleId),
     queryFn: () => moduleRepository.listViews(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
@@ -44,62 +51,70 @@ export function useModuleRecordsQuery(
   input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'} = {},
 ) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.records(moduleId, collection, input),
     queryFn: () => moduleRepository.listRecords(moduleId, collection, input),
-    enabled: Boolean(moduleId && collection),
+    enabled: Boolean(moduleId && collection) && session.status === 'signedIn',
   })
 }
 
 export function useModuleSettingsQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.settings(moduleId),
     queryFn: () => moduleRepository.getSettings(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleSettingsSchemaQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.settingsSchema(moduleId),
     queryFn: () => moduleRepository.getSettingsSchema(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleHealthQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.health(moduleId),
     queryFn: () => moduleRepository.getHealth(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleRuntimeQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.runtime(moduleId),
     queryFn: () => moduleRepository.getRuntimeSummary(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleBackendDiagnosticsQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.backend(moduleId),
     queryFn: () => moduleRepository.getBackendDiagnostics(moduleId),
-    enabled: Boolean(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
   })
 }
 
 export function useModuleContributionQuery(input: {surface?: string; moduleId?: string; enabledOnly?: boolean} = {}) {
   const {moduleRepository} = useAppServices()
+  const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.contributions(input),
+    enabled: session.status === 'signedIn',
     queryFn: () => moduleRepository.listContributions(input),
   })
 }

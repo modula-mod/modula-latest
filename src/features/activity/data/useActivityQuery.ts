@@ -16,6 +16,7 @@ export function useActivityQuery() {
   return useInfiniteQuery({
     queryKey: queryKeys.activity.pages(accountId),
     networkMode: queryNetworkMode(),
+    enabled: session.status === 'signedIn',
     initialPageParam: null as string | null,
     queryFn: ({pageParam}) =>
       activityRepository.getActivity({cursor: pageParam, limit: 12}),

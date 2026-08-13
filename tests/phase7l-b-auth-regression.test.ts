@@ -62,6 +62,12 @@ type BrowserEvent = {
   text: string
 }
 
+type AssetResponse = {
+  contentType: string
+  status: number
+  url: string
+}
+
 type AllowedHttpError = {
   status: number
   method: string
@@ -250,6 +256,89 @@ function expectNoCriticalEvents(events: BrowserEvent[], allowedHttpErrors: Allow
     return false
   })
   expect(critical, JSON.stringify(critical, null, 2)).toEqual([])
+}
+
+function collectAssetResponses(page: Page): AssetResponse[] {
+  const responses: AssetResponse[] = []
+  page.on('response', response => {
+    const pathname = new URL(response.url()).pathname
+    if (!/\.(?:ttf|otf|woff2?|png|jpe?g|webp|svg)(?:$|\?)/i.test(pathname)) return
+    responses.push({
+      contentType: response.headers()['content-type'] ?? '',
+      status: response.status(),
+      url: response.url(),
+    })
+  })
+  return responses
+}
+
+function expectStaticAssetResponsesHealthy(responses: AssetResponse[]) {
+  const failures = responses.filter(response => response.status !== 200)
+  expect(failures, JSON.stringify(failures, null, 2)).toEqual([])
+
+  const mimeFailures = responses.filter(response => {
+    const path = new URL(response.url).pathname
+    const contentType = response.contentType.toLowerCase()
+    if (/\.(?:ttf|otf|woff2?)$/i.test(path)) {
+      return !/(font|application\/octet-stream|application\/x-font)/.test(contentType)
+    }
+    if (/\.svg$/i.test(path)) return !contentType.includes('image/svg')
+    if (/\.png$/i.test(path)) return !contentType.includes('image/png')
+    if (/\.jpe?g$/i.test(path)) return !contentType.includes('image/jpeg')
+    if (/\.webp$/i.test(path)) return !contentType.includes('image/webp')
+    return false
+  })
+  expect(mimeFailures, JSON.stringify(mimeFailures, null, 2)).toEqual([])
+
+  const ioniconsFont = responses.find(response => {
+    const path = new URL(response.url).pathname
+    return /ionicons/i.test(path) && /\.(?:ttf|otf|woff2?)$/i.test(path)
+  })
+  expect(ioniconsFont, JSON.stringify(responses, null, 2)).toBeTruthy()
+}
+
+async function expectIoniconsReady(page: Page) {
+  const audit = await page.evaluate(async () => {
+    if (!('fonts' in document)) {
+      return {
+        fontsApiAvailable: false,
+        ioniconsReady: false,
+        loadedIoniconsFamilies: [],
+        privateUseGlyphCount: 0,
+      }
+    }
+
+    await document.fonts.ready
+    const loadedIoniconsFamilies = Array.from(document.fonts)
+      .filter(fontFace => fontFace.status === 'loaded' && /ionicons/i.test(fontFace.family))
+      .map(fontFace => fontFace.family)
+    const privateUseGlyphCount =
+      (document.body.innerText.match(/[\ue000-\uf8ff]/g) ?? []).length
+
+    return {
+      fontsApiAvailable: true,
+      ioniconsReady: loadedIoniconsFamilies.some(family =>
+        document.fonts.check(`16px ${JSON.stringify(family)}`),
+      ),
+      loadedIoniconsFamilies,
+      privateUseGlyphCount,
+    }
+  })
+
+  expect(audit.fontsApiAvailable).toBe(true)
+  expect(audit.ioniconsReady).toBe(true)
+  expect(audit.loadedIoniconsFamilies, JSON.stringify(audit, null, 2)).not.toHaveLength(0)
+  expect(audit.privateUseGlyphCount, JSON.stringify(audit, null, 2)).toBeGreaterThan(0)
+}
+
+async function expectNoFallbackGlyphText(page: Page) {
+  const bodyText = await page.locator('body').innerText()
+  expect(bodyText).not.toMatch(/(?:\u25a1|\ufffd)/)
+}
+
+async function gotoProtectedRoute(page: Page, path: string) {
+  await page.goto(path, {waitUntil: 'networkidle'})
+  await expect(page).toHaveURL(new RegExp(`${path.replaceAll('/', '\\/')}$`))
 }
 
 async function readStoredSession(page: Page): Promise<StoredSessionBundle | null> {
@@ -577,4 +666,46 @@ test('password reset browser flow revokes old session and accepts only the new p
 
   await passwordLogin(page, {...account, password: nextPassword})
   expectNoCriticalEvents(events, [{status: 401, method: 'POST', path: '/v1/sessions'}])
+})
+
+test('authenticated Home, Activity, Profile, Product Hub, and Settings render cleanly', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const assetResponses = collectAssetResponses(page)
+  const account = await createVerifiedAccount('routes')
+
+  await passwordLogin(page, account)
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  await reloadAndExpectRestored(page, account)
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  await gotoProtectedRoute(page, '/activity')
+  await expect(page.getByText('No activity yet').or(page.getByText('Today')).first()).toBeVisible()
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  await gotoProtectedRoute(page, '/profile')
+  await expect(page.getByText(`@${account.handle}`).first()).toBeVisible({timeout: 15_000})
+  await expect(page.getByText('Posts').first()).toBeVisible()
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  await gotoProtectedRoute(page, '/marketplace')
+  await expect(page.getByText('Product Hub').first()).toBeVisible()
+  await expect(page.getByLabel('Search Product Hub')).toBeVisible()
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  await gotoProtectedRoute(page, '/settings')
+  await expect(page.getByText('Settings').first()).toBeVisible()
+  await expect(page.getByText('Account').first()).toBeVisible()
+  await expect(page.getByText('Security').first()).toBeVisible()
+  await expect(page.getByText('Appearance').first()).toBeVisible()
+  await expectIoniconsReady(page)
+  await expectNoFallbackGlyphText(page)
+
+  expectStaticAssetResponsesHealthy(assetResponses)
+  expectNoCriticalEvents(events)
 })
