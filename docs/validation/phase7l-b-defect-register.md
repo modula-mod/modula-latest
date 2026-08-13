@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 9 | 0 | 2 | 0 | 1 | 0 |
-| P1 | 35 | 31 | 0 | 0 | 3 | 1 | 0 |
+| P1 | 35 | 27 | 0 | 4 | 3 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -469,39 +469,39 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Product Hub route / Product Hub
 - Symptom: Product Hub is protected in public crawl and shows duplicate/misleading entries when authenticated/API-inspected.
-- Root cause: UI consumes registry rows/release rows without a canonical beta installability projection.
-- Source files: `src/features/modules/screens/ProductHubMarketplaceScreen.tsx`; `src/features/marketplace/screens/MarketplaceScreen.tsx`; `src/data/repositories/api/ApiModuleRepository.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/src/modules/routes/index.ts`
+- Root cause: UI consumed registry rows/release rows without a canonical beta classification or installability projection.
+- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/tests/phase7l.product-hub-policy.test.ts`; `packages/greenfield-module-registry-contracts/src/registry.ts`; `src/data/repositories/api/ApiModuleRepository.ts`; `src/data/repositories/contracts/ModuleRepository.ts`; `src/features/modules/components/ModuleCatalogueCard.tsx`; `src/features/modules/components/ModuleStatusPill.tsx`
 - Backend dependency: Registry modules/releases/installations/install preview.
-- Fix strategy: Add authoritative backend installability projection and make Product Hub display one product per canonical module ID.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Add deterministic beta classification and installability projection to registry summaries/details, hide non-beta duplicate/internal/test fixture records from normal Product Hub registry output, and dedupe contradictory UI status pills.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`; `pnpm lint`
 - Live verification: Public authenticated Product Hub shows one coherent card per beta product and no duplicate stale records.
-- Status: OPEN
+- Status: FIXED_SOURCE
 
 ### P7LB-P1-024 - Canonical Vault Notes Product
 
 - Severity: P1
 - Feature/domain: Product Hub canonical Vault Notes / Product Hub
 - Symptom: Canonical Vault Notes is published/installable but UI lifecycle copy can imply unavailable.
-- Root cause: Duplicate stale identity and UI-side status recomputation create contradictory badges/buttons.
-- Source files: `src/features/marketplace/screens/ModuleDetailScreen.tsx`; `src/features/marketplace/components/MarketplaceStatusBadge.tsx`; `src/data/repositories/api/ApiModuleRepository.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/src/modules/installation-service.ts`
+- Root cause: Duplicate stale identity and UI-side status recomputation created contradictory badges/buttons.
+- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `src/data/repositories/api/ApiModuleRepository.ts`; `src/features/modules/components/ModuleCatalogueCard.tsx`; `src/features/modules/components/ModuleStatusPill.tsx`
 - Backend dependency: Module detail, install preview, installation state, release selection.
-- Fix strategy: Use one backend installability projection for `digital.modula.vault-notes` with selected compatible release and clean status copy.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Registry emits `CANONICAL_PRODUCT` and `installability.status=available` for published `digital.modula.vault-notes`; frontend decodes that projection and displays non-duplicated human status copy.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`; `pnpm lint`
 - Live verification: Public Product Hub shows Vault Notes as Available/Installed/Update/Unavailable exactly once, with coherent details.
-- Status: OPEN
+- Status: FIXED_SOURCE
 
 ### P7LB-P1-025 - Stale Vault Notes Duplicate
 
 - Severity: P1
 - Feature/domain: Product Hub stale Vault Notes duplicate / Product Hub
 - Symptom: Registry exposes both `digital.modula.vault-notes` and stale duplicate `modula.module.vaultNotes`.
-- Root cause: Legacy/placeholder module identities are not classified away from beta UI/search/install surfaces.
-- Source files: `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/src/domains/search/serializers/module.ts`; `services/greenfield-api/src/domains/search/serializers/module-release.ts`; `src/data/repositories/api/ApiModuleRepository.ts`; `src/features/modules/screens/ProductHubMarketplaceScreen.tsx`
+- Root cause: Legacy/placeholder module identities were not classified away from beta UI/search/install surfaces.
+- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/tests/phase7l.product-hub-policy.test.ts`; `src/data/repositories/api/ApiModuleRepository.ts`
 - Backend dependency: Registry records, search projections, install preview.
-- Fix strategy: Classify stale duplicate as `DUPLICATE`/hidden or quarantine for beta UI while preserving data provenance.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Classify `modula.module.vaultNotes` as `DUPLICATE` with canonical replacement `digital.modula.vault-notes` and hide it from normal beta registry listing/detail/version catalogue.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`
 - Live verification: Public Product Hub, registry search, module detail, search, and install paths expose only canonical Vault Notes.
-- Status: OPEN
+- Status: FIXED_SOURCE
 
 ### P7LB-P1-026 - Vault Notes Install Enable
 
@@ -547,13 +547,13 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Severity: P1
 - Feature/domain: Search generated modules / Product Hub
 - Symptom: Quarantined generated search modules are visible in registry output.
-- Root cause: Test/internal/quarantined generated module records are not excluded from beta Product Hub/search/install catalogue.
-- Source files: `services/greenfield-api/src/modules/quarantine-service.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/src/domains/search/serializers/module.ts`; `src/features/modules/screens/ProductHubMarketplaceScreen.tsx`; `docs/product/modula-beta-feature-manifest.md`
+- Root cause: Test/internal/quarantined generated module records were not excluded from beta Product Hub/search/install catalogue.
+- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/tests/phase7l.product-hub-policy.test.ts`
 - Backend dependency: Registry/search projections and quarantine classifications.
-- Fix strategy: Classify generated search modules as `INTERNAL_ONLY`/`QUARANTINED` and remove them from normal beta UI/search/install.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Classify `digital.modula.search-*` generated records as `TEST_ONLY` and hide them from normal beta registry listing/detail/version catalogue; existing search projector tests already hide quarantined modules from normal search.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`
 - Live verification: Public Product Hub, registry search, global search, install preview, and release catalogue omit generated search fixtures from beta UI.
-- Status: OPEN
+- Status: FIXED_SOURCE
 
 ### P7LB-P1-030 - Module Host Declarative States
 

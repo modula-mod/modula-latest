@@ -9,6 +9,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleCatalogueCard({item, onPress}: {item: ModuleCatalogueItem; onPress: () => void}) {
   const {colours, radius, spacing} = useThemeTokens()
+  const statusPills = catalogueStatusPills(item)
   return (
     <AppPressable
       accessibilityLabel={`Open ${item.name}`}
@@ -34,8 +35,9 @@ export function ModuleCatalogueCard({item, onPress}: {item: ModuleCatalogueItem;
       </View>
       <AppText variant="caption" colour="textSecondary" numberOfLines={3}>{item.description}</AppText>
       <View style={[styles.wrap, {gap: spacing[2]}]}>
-        <ModuleStatusPill state={item.installationState} />
-        <ModuleStatusPill state={item.priceState} />
+        {statusPills.map(state => (
+          <ModuleStatusPill key={state} state={state} />
+        ))}
       </View>
       <AppText variant="micro" colour="textTertiary">
         {item.category} · {item.trustLevel} · {item.latestVersion ? `v${item.latestVersion}` : item.compatibility}
@@ -47,6 +49,19 @@ export function ModuleCatalogueCard({item, onPress}: {item: ModuleCatalogueItem;
       ) : null}
     </AppPressable>
   )
+}
+
+function catalogueStatusPills(item: ModuleCatalogueItem): string[] {
+  const states = [item.installationState, item.priceState]
+  const labels = new Set<string>()
+  return states.filter(state => {
+    const label = String(state).toLowerCase().replace(/[_\s-]+/g, '')
+    if (label === 'notavailable' && item.installationState === 'notAvailable') return false
+    if (label === 'comingsoon' && item.installationState === 'comingSoon') return false
+    if (labels.has(label)) return false
+    labels.add(label)
+    return true
+  })
 }
 
 const styles = StyleSheet.create({

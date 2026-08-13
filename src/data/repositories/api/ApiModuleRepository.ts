@@ -15,6 +15,7 @@ import type {
   ModuleDetail,
   ModuleHealth,
   ModuleInstallPreview,
+  ModuleInstallabilityProjection,
   ModuleRecord,
   ModuleRecordPage,
   ModuleRepository,
@@ -295,6 +296,14 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
   const status = String(row.status ?? 'published')
   const installable = Boolean(row.installable)
   const manifest = isRecord(row.manifest) ? row.manifest : {}
+  const latestVersion = typeof row.latestVersion === 'string' ? row.latestVersion : typeof row.version === 'string' ? row.version : null
+  const installability = decodeInstallability(row.installability, {
+    moduleId,
+    status,
+    installable,
+    latestVersion,
+  })
+  const installationState = installationStateForInstallability(installability)
   return {
     moduleId,
     name: String(row.name ?? moduleId),
@@ -304,13 +313,15 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     kind: moduleId.includes('dimon') ? 'system' : 'module',
     category: categoryFor(moduleId, String(row.description ?? '')),
     trustLevel: String(row.trustLevel ?? row.trust ?? 'untrustedManifest'),
-    latestVersion: typeof row.latestVersion === 'string' ? row.latestVersion : typeof row.version === 'string' ? row.version : null,
+    latestVersion,
     compatibility: Array.isArray(row.platforms) ? `Platforms ${row.platforms.join(', ')}` : 'Compatible',
     installable,
-    installationState: status === 'quarantined' ? 'quarantined' : installable ? 'available' : status === 'planned' ? 'comingSoon' : 'notAvailable',
-    priceState: installable ? 'Free' : status === 'planned' ? 'Coming soon' : 'Not available',
+    installationState,
+    priceState: priceStateForInstallability(installability),
     featured: Boolean(row.featured),
     standard: decodeStandardMetadata(row.standard ?? row.standardMetadata ?? manifest),
+    betaClassification: betaClassification(row.betaClassification),
+    installability,
   }
 }
 
@@ -418,6 +429,104 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     configurationState: typeof row.configurationState === 'string' ? row.configurationState : 'Configured',
     grantedPermissions: arrayOfStrings(row.grantedPermissions ?? row.granted_permissions),
   }
+}
+
+function decodeInstallability(
+  value: unknown,
+  fallback: {moduleId: string; status: string; installable: boolean; latestVersion: string | null},
+): ModuleInstallabilityProjection {
+  const row = isRecord(value) ? value : {}
+  const status = installabilityStatus(row.status)
+    ?? (fallback.status === 'quarantined'
+      ? 'quarantined'
+      : fallback.installable
+        ? 'available'
+        : fallback.status === 'planned'
+          ? 'coming_soon'
+          : 'unavailable')
+  return {
+    moduleId: String(row.moduleId ?? fallback.moduleId),
+    release: isRecord(row.release)
+      ? {
+          version: String(row.release.version ?? fallback.latestVersion ?? ''),
+          releaseId: typeof row.release.releaseId === 'string' ? row.release.releaseId : null,
+        }
+      : fallback.latestVersion
+        ? {version: fallback.latestVersion, releaseId: null}
+        : null,
+    status,
+    reasonCode: String(row.reasonCode ?? reasonCodeForInstallability(status)),
+    reason: String(row.reason ?? labelForInstallability(status)),
+  }
+}
+
+function installabilityStatus(value: unknown): ModuleInstallabilityProjection['status'] | null {
+  if (
+    value === 'available' ||
+    value === 'installed' ||
+    value === 'update_available' ||
+    value === 'coming_soon' ||
+    value === 'incompatible' ||
+    value === 'quarantined' ||
+    value === 'unavailable'
+  ) {
+    return value
+  }
+  return null
+}
+
+function installationStateForInstallability(value: ModuleInstallabilityProjection): ModuleCatalogueItem['installationState'] {
+  if (value.status === 'available') return 'available'
+  if (value.status === 'installed') return 'installed'
+  if (value.status === 'update_available') return 'updateAvailable'
+  if (value.status === 'coming_soon') return 'comingSoon'
+  if (value.status === 'incompatible') return 'incompatible'
+  if (value.status === 'quarantined') return 'quarantined'
+  return 'notAvailable'
+}
+
+function priceStateForInstallability(value: ModuleInstallabilityProjection): ModuleCatalogueItem['priceState'] {
+  if (value.status === 'available' || value.status === 'installed' || value.status === 'update_available') return 'Free'
+  if (value.status === 'coming_soon') return 'Coming soon'
+  return 'Not available'
+}
+
+function labelForInstallability(value: ModuleInstallabilityProjection['status']) {
+  if (value === 'available') return 'Available'
+  if (value === 'installed') return 'Installed'
+  if (value === 'update_available') return 'Update available'
+  if (value === 'coming_soon') return 'Coming Soon'
+  if (value === 'incompatible') return 'Requires newer Modula version'
+  if (value === 'quarantined') return 'Security review required'
+  return 'Unavailable'
+}
+
+function reasonCodeForInstallability(value: ModuleInstallabilityProjection['status']) {
+  if (value === 'available') return 'module.available'
+  if (value === 'installed') return 'module.installed'
+  if (value === 'update_available') return 'module.update_available'
+  if (value === 'coming_soon') return 'module.coming_soon'
+  if (value === 'incompatible') return 'module.incompatible'
+  if (value === 'quarantined') return 'module.security_review_required'
+  return 'module.unavailable'
+}
+
+function betaClassification(value: unknown): ModuleCatalogueItem['betaClassification'] {
+  if (
+    value === 'CANONICAL_PRODUCT' ||
+    value === 'VALID_OLDER_RELEASE' ||
+    value === 'PLACEHOLDER' ||
+    value === 'COMING_SOON' ||
+    value === 'INTERNAL_ONLY' ||
+    value === 'TEST_ONLY' ||
+    value === 'DUPLICATE' ||
+    value === 'STALE' ||
+    value === 'QUARANTINED' ||
+    value === 'BROKEN'
+  ) {
+    return value
+  }
+  return undefined
 }
 
 function decodeInstallPreview(value: unknown): ModuleInstallPreview {
@@ -793,7 +902,23 @@ function decodeUninstallPreview(value: unknown): ModuleUninstallPreview {
 function applyInstalledState(item: ModuleCatalogueItem, installed?: InstalledModule): ModuleCatalogueItem {
   if (!installed) return item
   const state = installed.status === 'enabled' ? 'enabled' : installed.status === 'disabled' || installed.status === 'installedDisabled' ? 'disabled' : 'installed'
-  return {...item, installationState: state, latestVersion: installed.version || item.latestVersion}
+  return {
+    ...item,
+    installationState: state,
+    latestVersion: installed.version || item.latestVersion,
+    installability: {
+      ...(item.installability ?? {
+        moduleId: item.moduleId,
+        release: item.latestVersion ? {version: item.latestVersion, releaseId: null} : null,
+        status: 'available',
+        reasonCode: 'module.available',
+        reason: 'Available',
+      }),
+      status: state === 'enabled' || state === 'installed' || state === 'disabled' ? 'installed' : item.installability?.status ?? 'available',
+      reasonCode: 'module.installed',
+      reason: state === 'enabled' ? 'Enabled' : state === 'disabled' ? 'Disabled' : 'Installed',
+    },
+  }
 }
 
 function filterCatalogue(items: ModuleCatalogueItem[], input: {q?: string; category?: ProductHubCategory}) {

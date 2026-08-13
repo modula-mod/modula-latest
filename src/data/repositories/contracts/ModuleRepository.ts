@@ -40,6 +40,35 @@ export type ModuleInstallationState =
 
 export type ModulePriceState = 'Free' | 'Included' | 'Coming soon' | 'Not available'
 
+export type ModuleBetaClassification =
+  | 'CANONICAL_PRODUCT'
+  | 'VALID_OLDER_RELEASE'
+  | 'PLACEHOLDER'
+  | 'COMING_SOON'
+  | 'INTERNAL_ONLY'
+  | 'TEST_ONLY'
+  | 'DUPLICATE'
+  | 'STALE'
+  | 'QUARANTINED'
+  | 'BROKEN'
+
+export type ModuleInstallabilityStatus =
+  | 'available'
+  | 'installed'
+  | 'update_available'
+  | 'coming_soon'
+  | 'incompatible'
+  | 'quarantined'
+  | 'unavailable'
+
+export type ModuleInstallabilityProjection = {
+  moduleId: string
+  release: {version: string; releaseId?: string | null} | null
+  status: ModuleInstallabilityStatus
+  reasonCode: string
+  reason: string
+}
+
 export type ModuleBackendMode =
   | 'greenfield-managed'
   | 'module-managed'
@@ -117,6 +146,8 @@ export type ModuleCatalogueItem = {
   priceState: ModulePriceState
   featured?: boolean
   standard?: ModuleStandardMetadata
+  betaClassification?: ModuleBetaClassification
+  installability?: ModuleInstallabilityProjection
 }
 
 export type ModuleDetail = ModuleCatalogueItem & {

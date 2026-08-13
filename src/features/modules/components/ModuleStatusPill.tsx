@@ -36,8 +36,12 @@ function labelForState(state: string): string {
   if (state === 'disabled') return 'Disabled'
   if (state === 'updateAvailable') return 'Update available'
   if (state === 'configurationRequired') return 'Configuration required'
-  if (state === 'comingSoon') return 'Coming soon'
-  if (state === 'notAvailable') return 'Not available'
+  if (state === 'comingSoon') return 'Coming Soon'
+  if (state === 'incompatible') return 'Requires newer Modula version'
+  if (state === 'quarantined') return 'Security review required'
+  if (state === 'notAvailable') return 'Unavailable'
+  if (state === 'Not available') return 'Unavailable'
+  if (state === 'Coming soon') return 'Coming Soon'
   return state
 }
 

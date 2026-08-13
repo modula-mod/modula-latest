@@ -14,6 +14,37 @@ export type GreenfieldRegistryModuleSummary = {
   installable: boolean
   platforms: GreenfieldModulePlatform[]
   standard?: GreenfieldRegistryStandardMetadata
+  betaClassification?: GreenfieldModuleBetaClassification
+  installability?: GreenfieldModuleInstallabilityProjection
+}
+
+export type GreenfieldModuleBetaClassification =
+  | 'CANONICAL_PRODUCT'
+  | 'VALID_OLDER_RELEASE'
+  | 'PLACEHOLDER'
+  | 'COMING_SOON'
+  | 'INTERNAL_ONLY'
+  | 'TEST_ONLY'
+  | 'DUPLICATE'
+  | 'STALE'
+  | 'QUARANTINED'
+  | 'BROKEN'
+
+export type GreenfieldModuleInstallabilityStatus =
+  | 'available'
+  | 'installed'
+  | 'update_available'
+  | 'coming_soon'
+  | 'incompatible'
+  | 'quarantined'
+  | 'unavailable'
+
+export type GreenfieldModuleInstallabilityProjection = {
+  moduleId: string
+  release: {version: string; releaseId?: string | null} | null
+  status: GreenfieldModuleInstallabilityStatus
+  reasonCode: string
+  reason: string
 }
 
 export type GreenfieldRegistryStandardMetadata = {

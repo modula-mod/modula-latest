@@ -10,6 +10,7 @@ import {moduleError} from './module-errors.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {normalizeModuleManifest} from './manifest-normalizer.js'
 import {GreenfieldModuleReleaseService} from './release-service.js'
+import {classifyBetaModule, installabilityForBetaModule} from './beta-catalogue-policy.js'
 
 export class GreenfieldModuleRegistryService {
   private readonly releases: GreenfieldModuleReleaseService
@@ -46,7 +47,10 @@ export class GreenfieldModuleRegistryService {
       const manifest = row.manifest as GreenfieldModuleManifest
       if (filters.q && !`${manifest.name} ${manifest.description} ${row.module_id}`.toLowerCase().includes(filters.q.toLowerCase())) continue
       if (filters.platform && !manifest.compatibility.platforms.includes(filters.platform)) continue
+      const beta = classifyBetaModule({moduleId: row.module_id, status: row.release_state, manifest: manifest as any})
+      if (!beta.visibleInBeta) continue
       if (!byModule.has(row.module_id)) {
+        const installable = row.release_state === 'published'
         byModule.set(row.module_id, {
           moduleId: row.module_id,
           name: manifest.name,
@@ -57,10 +61,18 @@ export class GreenfieldModuleRegistryService {
           trustLevel: row.trust_level,
           licenseStatus: row.license_status,
           status: row.release_state,
-          installable: row.release_state === 'published',
+          installable,
           platforms: manifest.compatibility.platforms,
           standard: standardMetadataForManifest(manifest),
-        })
+          betaClassification: beta.classification,
+          installability: installabilityForBetaModule({
+            moduleId: row.module_id,
+            version: row.version,
+            releaseState: row.release_state,
+            classification: beta.classification,
+            installable,
+          }),
+        } as any)
       }
     }
 
@@ -72,6 +84,9 @@ export class GreenfieldModuleRegistryService {
     for (const row of placeholders) {
       const manifest = (row.manifest ?? {}) as any
       const moduleId = manifest.moduleId ?? row.slug
+      const status = (manifest.state === 'planned' ? 'planned' : row.catalogue_status) as GreenfieldRegistryModuleSummary['status']
+      const beta = classifyBetaModule({moduleId, status, manifest})
+      if (!beta.visibleInBeta) continue
       if (byModule.has(moduleId)) continue
       if (filters.q && !`${row.name} ${row.description} ${moduleId}`.toLowerCase().includes(filters.q.toLowerCase())) continue
       if (filters.status && filters.status !== row.catalogue_status && filters.status !== manifest.state) continue
@@ -84,11 +99,19 @@ export class GreenfieldModuleRegistryService {
         latestVersion: null,
         trustLevel: row.trust,
         licenseStatus: manifest.inactive ? 'unknown' : 'firstParty',
-        status: (manifest.state === 'planned' ? 'planned' : row.catalogue_status) as GreenfieldRegistryModuleSummary['status'],
+        status,
         installable: false,
         platforms: [],
         standard: standardMetadataForManifest(manifest),
-      })
+        betaClassification: beta.classification,
+        installability: installabilityForBetaModule({
+          moduleId,
+          version: null,
+          releaseState: status,
+          classification: beta.classification,
+          installable: false,
+        }),
+      } as any)
     }
 
     const items = Array.from(byModule.values()).sort((a, b) => a.moduleId.localeCompare(b.moduleId))
@@ -99,6 +122,9 @@ export class GreenfieldModuleRegistryService {
     const releases = await this.listVersions(moduleId)
     if (releases.length > 0) {
       const latest = releases[0]!
+      const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
+      if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
+      const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
       return {
         moduleId: latest.moduleId,
@@ -127,6 +153,15 @@ export class GreenfieldModuleRegistryService {
           manifestSha256: latest.manifestSha256,
           releaseSha256: latest.releaseSha256,
         }),
+        betaClassification: beta.classification,
+        installability: installabilityForBetaModule({
+          moduleId: latest.moduleId,
+          version: latest.version,
+          releaseId: latest.releaseId,
+          releaseState: latest.releaseState,
+          classification: beta.classification,
+          installable,
+        }),
         dependencyGraph: manifestRecord.dependencyGraph,
         serviceRegistry: manifestRecord.serviceRegistry,
         apiRegistry: manifestRecord.apiRegistry,
@@ -142,23 +177,37 @@ export class GreenfieldModuleRegistryService {
       .where('kind', '=', 'module')
       .executeTakeFirst()
     if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
+    const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>
+    const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']
+    const beta = classifyBetaModule({moduleId, status, manifest})
+    if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
     return {
       moduleId,
       name: placeholder.name,
       description: placeholder.description,
       publisher: {publisherId: 'modula', displayName: placeholder.publisher},
       latestVersion: null,
-      status: placeholder.catalogue_status,
+      status,
       trust: placeholder.trust,
       license: 'unknown',
       compatibility: {},
       contributions: {},
-      placeholder: placeholder.manifest,
-      standardMetadata: standardMetadataForManifest(placeholder.manifest),
+      placeholder: manifest,
+      standardMetadata: standardMetadataForManifest(manifest),
+      betaClassification: beta.classification,
+      installability: installabilityForBetaModule({
+        moduleId,
+        version: null,
+        releaseState: status,
+        classification: beta.classification,
+        installable: false,
+      }),
     }
   }
 
   async listVersions(moduleId: string): Promise<GreenfieldModuleReleaseRecord[]> {
+    const preflight = classifyBetaModule({moduleId, status: 'published'})
+    if (!preflight.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
     const rows = await this.db
       .selectFrom('greenfield_module_releases')
       .innerJoin('greenfield_module_versions', 'greenfield_module_versions.module_version_id', 'greenfield_module_releases.module_version_id')
