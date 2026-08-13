@@ -1,12 +1,12 @@
 {
-  "sha": "6517d521a57f065ca569b0a74c3aa2744df5c0ed",
+  "sha": "eccd228abde2a444f12df5ae30191119181f4504",
   "web": {
     "app": "modula",
     "version": "0.1.0",
     "phase": "phase7e-block14",
-    "commit": "6517d521a57f065ca569b0a74c3aa2744df5c0ed",
+    "commit": "eccd228abde2a444f12df5ae30191119181f4504",
     "branch": "phase7j-product-convergence",
-    "builtAt": "2026-08-13T13:58:01.163Z",
+    "builtAt": "2026-08-13T14:22:13.830Z",
     "environment": "production",
     "dataSource": "remote",
     "apiOrigin": "https://api.modula.digital"
@@ -16,17 +16,17 @@
     "service": "greenfield-api",
     "version": "0.1.0",
     "phase": "phase7i-f5b",
-    "commit": "6517d521a57f065ca569b0a74c3aa2744df5c0ed",
-    "builtAt": "2026-08-13T13:58:46Z",
+    "commit": "eccd228abde2a444f12df5ae30191119181f4504",
+    "builtAt": "2026-08-13T14:22:25Z",
     "environment": "production",
     "apiOrigin": "https://api.modula.digital",
     "worker": {
       "service": "greenfield-worker",
-      "expectedCommit": "6517d521a57f065ca569b0a74c3aa2744df5c0ed"
+      "expectedCommit": "eccd228abde2a444f12df5ae30191119181f4504"
     },
     "mailProvisioner": {
       "service": "modula-mail-provisioner",
-      "expectedCommit": "6517d521a57f065ca569b0a74c3aa2744df5c0ed",
+      "expectedCommit": "eccd228abde2a444f12df5ae30191119181f4504",
       "mode": "disabled"
     }
   }

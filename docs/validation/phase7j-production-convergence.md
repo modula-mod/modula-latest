@@ -3,8 +3,9 @@
 Date: 2026-08-13 UTC
 Host checkout: `/root/modula-latest`
 Branch: `phase7j-product-convergence`
-Source SHA: `6517d521a57f065ca569b0a74c3aa2744df5c0ed`
+Source SHA: `eccd228abde2a444f12df5ae30191119181f4504`
 Production baseline before Phase 7J deployment: `7632e03cd904569eb71b68f93a60eab83100b2a1`
+Runtime-equivalent predecessor: `6517d521a57f065ca569b0a74c3aa2744df5c0ed`
 Earlier accepted candidate: `b5252d5f7654547ff8aa75498bd205336692cd99`
 
 ## Source and GitHub State
@@ -13,38 +14,38 @@ Earlier accepted candidate: `b5252d5f7654547ff8aa75498bd205336692cd99`
 | --- | --- |
 | `git status --short` | clean before verification |
 | `git fetch origin --prune --tags` | PASS |
-| `origin/phase7j-product-convergence` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| `origin/phase7j-product-convergence` | `eccd228abde2a444f12df5ae30191119181f4504` |
 | `origin/main` | `41ef513c0974f2887c630676fec80860b0d4db72` |
 | `origin/phase7i-trusted-production-alpha` | `7632e03cd904569eb71b68f93a60eab83100b2a1` |
 | Local branch | `phase7j-product-convergence`, up to date with origin |
 | Pre-production tag | `phase7j-pre-production-convergence-6517d52` exists on origin |
 
-The written mission expected `b5252d5...`, but GitHub now contains newer convergence head `6517d52...`. Per the mission rule, the newer remote convergence head is the active candidate.
+The written mission expected `b5252d5...`, but GitHub now contains newer convergence head `eccd228...`. Per the mission rule, the newer remote convergence head is the active candidate. `6517d52...eccd228` is proof/report-only for runtime paths: `services/greenfield-api/migrations`, `services/greenfield-api/src`, `services/greenfield-worker/src`, `src`, `packages`, `public`, and `ops` are unchanged.
 
 ## Runtime Identity
 
 | Item | Value |
 | --- | --- |
-| `SOURCE_SHA` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| `API_IMAGE` | `modula-greenfield-api:6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| `SOURCE_SHA` | `eccd228abde2a444f12df5ae30191119181f4504` |
+| `API_IMAGE` | `modula-greenfield-api:eccd228abde2a444f12df5ae30191119181f4504` |
 | `API_IMAGE_ID` | `sha256:2d8a6951b7e8c0d86201f2903498c0b46ff81eec6a9ec9c4ced076fd5e8169ae` |
 | `API_IMAGE_DIGEST` | local image, no repo digest recorded |
-| `WORKER_IMAGE` | `modula-greenfield-worker:6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| `WORKER_IMAGE` | `modula-greenfield-worker:eccd228abde2a444f12df5ae30191119181f4504` |
 | `WORKER_IMAGE_ID` | `sha256:81acf70cf21fc73e824f1f172f20e856ab66a14845b55f1db79e88e987762f8c` |
 | `WORKER_IMAGE_DIGEST` | local image, no repo digest recorded |
-| `SOURCE_BUILT_AT` | `2026-08-13T13:58:46Z` for API/worker; web marker `2026-08-13T13:58:01.163Z` |
+| `SOURCE_BUILT_AT` | `2026-08-13T14:22:25Z` for API/worker; web marker `2026-08-13T14:22:13.830Z` |
 | API container | `modula-production-greenfield-api-1`, user `modula`, status `running`, health `healthy` |
 | Worker container | `modula-production-greenfield-worker-1`, user `modula`, status `running` |
-| Web release | `/var/www/modula/releases/6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Web release | `/var/www/modula/releases/eccd228abde2a444f12df5ae30191119181f4504` |
 | Previous web release | `/var/www/modula/releases/41ef513c0974f2887c630676fec80860b0d4db72` |
 
 Public identity agreement:
 
 | Surface | Result |
 | --- | --- |
-| `https://modula.digital/version.json` | commit `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| `https://api.modula.digital/version.json` | commit `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| API worker `expectedCommit` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| `https://modula.digital/version.json` | commit `eccd228abde2a444f12df5ae30191119181f4504` |
+| `https://api.modula.digital/version.json` | commit `eccd228abde2a444f12df5ae30191119181f4504` |
+| API worker `expectedCommit` | `eccd228abde2a444f12df5ae30191119181f4504` |
 | `https://api.modula.digital/v1/health/live` | 200, `status=live` |
 | `https://api.modula.digital/v1/health/ready` | 200, `status=ready` |
 | `https://api.modula.digital/v1/meta` | 200, Greenfield production capabilities |
@@ -203,4 +204,4 @@ Source verifier `verify:marketplace` passed. It covers registry routes, install/
 
 `PASS_WITH_DOCUMENTED_NON_BLOCKING_LIMITATIONS`
 
-Track B / MDHS remains intentionally not started. The next Track A step is Part 14: promote `6517d521a57f065ca569b0a74c3aa2744df5c0ed` to `main`, then rerun the mainline-dependent verifier and fresh-main proof before creating the beta baseline tag.
+Track B / MDHS remains intentionally not started. The next Track A step is Part 14: promote `eccd228abde2a444f12df5ae30191119181f4504` to `main`, then rerun the mainline-dependent verifier and fresh-main proof before creating the beta baseline tag.

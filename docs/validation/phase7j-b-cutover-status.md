@@ -2,14 +2,15 @@
 
 Date: 2026-08-11 / 2026-08-12 / 2026-08-13 UTC
 Mission: Production Cutover, Live Beta Acceptance & Mainline Finalization  
-Critical rule: Do **not** merge to `main` until the exact convergence build is proven live.
+Critical rule: do not claim live acceptance unless public web/API identity agrees with the exact checked-out source SHA.
 
 ## Canonical refs
 
 | Role | Value |
 | --- | --- |
 | Candidate branch | `phase7j-product-convergence` |
-| Deployed / proven SHA | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Deployed / proven SHA | `eccd228abde2a444f12df5ae30191119181f4504` |
+| Runtime-equivalent predecessor | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
 | Earlier accepted candidate | `b5252d5f7654547ff8aa75498bd205336692cd99` |
 | Pre-cutover production | `7632e03cd904569eb71b68f93a60eab83100b2a1` on `phase7i-trusted-production-alpha` |
 | Public web | `https://modula.digital` |
@@ -126,7 +127,9 @@ Classification counts for this mission:
 
 GitHub contains a newer convergence head than the original written mission target `b5252d5...`; per the mission rule, the VPS must not use an old local checkout when GitHub has a newer accepted convergence commit. Current source and live production now agree on:
 
-`6517d521a57f065ca569b0a74c3aa2744df5c0ed`
+`eccd228abde2a444f12df5ae30191119181f4504`
+
+`6517d521a57f065ca569b0a74c3aa2744df5c0ed` remains the runtime-equivalent predecessor. The `6517d52...eccd228` delta contains only production proof/evidence/report changes plus verifier bookkeeping; backend/frontend/worker/public/ops/migration runtime paths are unchanged.
 
 Evidence refreshed:
 
@@ -138,10 +141,10 @@ Runtime identity:
 
 | Surface | Identity |
 | --- | --- |
-| Web `/version.json` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| API `/version.json` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| Worker `expectedCommit` | `6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
-| Web release | `/var/www/modula/releases/6517d521a57f065ca569b0a74c3aa2744df5c0ed` |
+| Web `/version.json` | `eccd228abde2a444f12df5ae30191119181f4504` |
+| API `/version.json` | `eccd228abde2a444f12df5ae30191119181f4504` |
+| Worker `expectedCommit` | `eccd228abde2a444f12df5ae30191119181f4504` |
+| Web release | `/var/www/modula/releases/eccd228abde2a444f12df5ae30191119181f4504` |
 | Previous release | `/var/www/modula/releases/41ef513c0974f2887c630676fec80860b0d4db72` |
 | API image ID | `sha256:2d8a6951b7e8c0d86201f2903498c0b46ff81eec6a9ec9c4ced076fd5e8169ae` |
 | Worker image ID | `sha256:81acf70cf21fc73e824f1f172f20e856ab66a14845b55f1db79e88e987762f8c` |
@@ -154,7 +157,7 @@ Production database status from the running API container:
 
 ## 14. Production repairs
 
-**None.** Final proven SHA is `6517d521a57f065ca569b0a74c3aa2744df5c0ed`.
+**None.** Final proven SHA is `eccd228abde2a444f12df5ae30191119181f4504`.
 
 ## 15–16. Mainline / fresh Mac / final rebuild
 

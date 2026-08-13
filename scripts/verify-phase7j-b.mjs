@@ -12,7 +12,8 @@ import path from 'node:path'
 const root = process.cwd()
 const evidence = path.join(root, 'docs/validation/evidence/phase7j-b')
 const statusDoc = path.join(root, 'docs/validation/phase7j-b-cutover-status.md')
-const expectedSha = process.env.MODULA_PHASE7J_B_EXPECTED_SHA?.trim() || currentHead()
+const headSha = currentHead()
+const expectedSha = process.env.MODULA_PHASE7J_B_EXPECTED_SHA?.trim() || recordedIdentitySha() || headSha
 let failed = 0
 
 function currentHead() {
@@ -22,6 +23,16 @@ function currentHead() {
     process.exit(result.status ?? 1)
   }
   return result.stdout.trim()
+}
+
+function recordedIdentitySha() {
+  try {
+    const text = readFileSync(path.join(evidence, 'identity-agreement.json'), 'utf8')
+    const json = JSON.parse(text)
+    return typeof json?.sha === 'string' && json.sha.trim() ? json.sha.trim() : ''
+  } catch {
+    return ''
+  }
 }
 
 function pass(msg) {
@@ -67,13 +78,54 @@ function curlJson(url) {
   }
 }
 
+function assertExpectedShaIsSafeForHead() {
+  if (expectedSha === headSha) {
+    pass(`expected SHA matches HEAD ${headSha}`)
+    return
+  }
+
+  const exists = spawnSync('git', ['cat-file', '-e', `${expectedSha}^{commit}`], {cwd: root})
+  if (exists.status !== 0) {
+    fail(`expected SHA ${expectedSha} is not a local commit`)
+    return
+  }
+
+  const ancestor = spawnSync('git', ['merge-base', '--is-ancestor', expectedSha, headSha], {cwd: root})
+  if (ancestor.status !== 0) {
+    fail(`expected SHA ${expectedSha} is not an ancestor of HEAD ${headSha}`)
+    return
+  }
+
+  const runtimePaths = [
+    'services/greenfield-api/migrations',
+    'services/greenfield-api/src',
+    'services/greenfield-worker/src',
+    'src',
+    'packages',
+    'public',
+    'ops',
+  ]
+  const diff = spawnSync('git', ['diff', '--quiet', `${expectedSha}..${headSha}`, '--', ...runtimePaths], {cwd: root})
+  if (diff.status === 0) {
+    pass(`HEAD ${headSha} is proof-only relative to deployed SHA ${expectedSha}`)
+  } else {
+    fail(`HEAD ${headSha} has runtime/source delta after deployed SHA ${expectedSha}`)
+  }
+}
+
 console.log('Phase 7J-B cutover verifier')
 console.log(`cwd=${root}`)
+console.log(`headSha=${headSha}`)
 console.log(`expectedSha=${expectedSha}`)
+assertExpectedShaIsSafeForHead()
 
-assertFile('docs/validation/phase7j-b-cutover-status.md', expectedSha.slice(0, 7))
+assertFile('docs/validation/phase7j-b-cutover-status.md', 'Deployed / proven SHA')
+assertFile('docs/validation/phase7j-b-cutover-status.md', expectedSha)
 assertFile('docs/validation/phase7j-b-cutover-status.md', 'Public identity agreement')
+assertFile('docs/validation/evidence/phase7j-b/public-identity-proof.txt', '=== web version.json ===')
+assertFile('docs/validation/evidence/phase7j-b/public-identity-proof.txt', '=== api version.json ===')
 assertFile('docs/validation/evidence/phase7j-b/public-identity-proof.txt', expectedSha)
+assertFile('docs/validation/evidence/phase7j-b/identity-agreement.json', expectedSha)
 assertFile('docs/validation/evidence/phase7j-b/vps-source-gates.txt', 'TYPECHECK_EXIT=0')
 assertFile('docs/validation/evidence/phase7j-b/vps-source-gates.txt', 'VERIFY_PHASE7J_MAC_EXIT=0')
 assertFile('docs/validation/evidence/phase7j-b/founder-otp-login.txt', 'handle modula_org')

@@ -1,30 +1,30 @@
 === git candidate ===
-6517d521a57f065ca569b0a74c3aa2744df5c0ed
+eccd228abde2a444f12df5ae30191119181f4504
 
 === web version.json ===
 {
   "app": "modula",
   "version": "0.1.0",
   "phase": "phase7e-block14",
-  "commit": "6517d521a57f065ca569b0a74c3aa2744df5c0ed",
+  "commit": "eccd228abde2a444f12df5ae30191119181f4504",
   "branch": "phase7j-product-convergence",
-  "builtAt": "2026-08-13T13:58:01.163Z",
+  "builtAt": "2026-08-13T14:22:13.830Z",
   "environment": "production",
   "dataSource": "remote",
   "apiOrigin": "https://api.modula.digital"
 }
 
 === api version.json ===
-{"app":"modula","service":"greenfield-api","version":"0.1.0","phase":"phase7i-f5b","commit":"6517d521a57f065ca569b0a74c3aa2744df5c0ed","builtAt":"2026-08-13T13:58:46Z","environment":"production","apiOrigin":"https://api.modula.digital","worker":{"service":"greenfield-worker","expectedCommit":"6517d521a57f065ca569b0a74c3aa2744df5c0ed"},"mailProvisioner":{"service":"modula-mail-provisioner","expectedCommit":"6517d521a57f065ca569b0a74c3aa2744df5c0ed","mode":"disabled"}}
+{"app":"modula","service":"greenfield-api","version":"0.1.0","phase":"phase7i-f5b","commit":"eccd228abde2a444f12df5ae30191119181f4504","builtAt":"2026-08-13T14:22:25Z","environment":"production","apiOrigin":"https://api.modula.digital","worker":{"service":"greenfield-worker","expectedCommit":"eccd228abde2a444f12df5ae30191119181f4504"},"mailProvisioner":{"service":"modula-mail-provisioner","expectedCommit":"eccd228abde2a444f12df5ae30191119181f4504","mode":"disabled"}}
 
 === health live ===
-{"ok":true,"data":{"status":"live"},"meta":{"requestId":"56bab8a4-5143-4f19-b2f4-153417c72872","serverTime":"2026-08-13T14:04:53.667Z"}}
+{"ok":true,"data":{"status":"live"},"meta":{"requestId":"8c1bc734-d02f-4ae4-bb37-e8086a3e25cc","serverTime":"2026-08-13T14:33:11.501Z"}}
 
 === health ready ===
-{"ok":true,"data":{"status":"ready"},"meta":{"requestId":"e53e77ca-2eab-47f1-a994-deade6ad2f14","serverTime":"2026-08-13T14:04:53.772Z"}}
+{"ok":true,"data":{"status":"ready"},"meta":{"requestId":"1c3ef228-e3e5-4db7-86b7-9296c3d3f2d6","serverTime":"2026-08-13T14:33:11.518Z"}}
 
 === meta ===
-{"ok":true,"data":{"apiVersion":"v1","protocolVersion":"0.1","backend":"greenfield","environment":"production","minimumClientVersion":"0.1.0","registration":{"mode":"open","emailVerificationRequired":true},"capabilities":{"publicRead":true,"authentication":true,"mutations":true,"mediaUpload":true,"atproto":false,"modules":false,"atprotoOAuth":false,"atprotoPublishing":false,"atprotoImport":false,"pdsPilot":false,"greenfieldAccounts":true,"greenfieldSessions":true,"greenfieldRepositories":true,"greenfieldExtensions":true,"greenfieldModuleRegistry":true,"greenfieldModuleInstallation":true,"greenfieldModuleDeclarativeContributions":true,"greenfieldModuleFirstPartyExecution":true,"greenfieldModuleRemoteFunctions":false,"greenfieldModuleCommunityExecution":false,"greenfieldModuleGithubSync":false,"greenfieldVaultNotesReference":true,"greenfieldDimon":false,"greenfieldAiGateway":true,"modulaMail":true,"inviteOnly":false,"atprotoBridgeOptional":true}},"meta":{"requestId":"7862b24d-dacd-4f51-b4f8-fc8e860a53e9","serverTime":"2026-08-13T14:11:11.196Z"}}
+{"ok":true,"data":{"apiVersion":"v1","protocolVersion":"0.1","backend":"greenfield","environment":"production","minimumClientVersion":"0.1.0","registration":{"mode":"open","emailVerificationRequired":true},"capabilities":{"publicRead":true,"authentication":true,"mutations":true,"mediaUpload":true,"atproto":false,"modules":false,"atprotoOAuth":false,"atprotoPublishing":false,"atprotoImport":false,"pdsPilot":false,"greenfieldAccounts":true,"greenfieldSessions":true,"greenfieldRepositories":true,"greenfieldExtensions":true,"greenfieldModuleRegistry":true,"greenfieldModuleInstallation":true,"greenfieldModuleDeclarativeContributions":true,"greenfieldModuleFirstPartyExecution":true,"greenfieldModuleRemoteFunctions":false,"greenfieldModuleCommunityExecution":false,"greenfieldModuleGithubSync":false,"greenfieldVaultNotesReference":true,"greenfieldDimon":false,"greenfieldAiGateway":true,"modulaMail":true,"inviteOnly":false,"atprotoBridgeOptional":true}},"meta":{"requestId":"a997ad1d-62f4-4488-8d24-c1ebbee5a310","serverTime":"2026-08-13T14:33:11.509Z"}}
 
 === stories rail ===
-{"ok":true,"data":{"items":[]},"meta":{"requestId":"36292840-abd5-4797-b363-18b7b633cec3","serverTime":"2026-08-13T14:11:11.242Z"}}
+{"ok":true,"data":{"items":[]},"meta":{"requestId":"31dfd7cf-5acf-47f6-9084-ee82a3bc4cc4","serverTime":"2026-08-13T14:33:11.536Z"}}
