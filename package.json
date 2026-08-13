@@ -62,6 +62,7 @@
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "~57.0.4",
     "eslint": "^9.39.5",
@@ -87,6 +88,7 @@
     "verify:phase7k": "node scripts/verify-mdhs-0.1.mjs --phase7k",
     "verify:phase7l-a": "node scripts/verify-phase7l-a.mjs",
     "verify:phase7l-b:session": "node scripts/verify-phase7l-b-session.mjs",
+    "verify:phase7l-b:hydration": "playwright test tests/phase7l-b-public-routes.test.ts",
     "typecheck": "pnpm --filter @modula/avatar-contracts build && pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-connector-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build && pnpm --filter @modula/greenfield-module-sdk build && pnpm --filter @modula/greenfield-module-engine-contracts build && pnpm --filter @modula/greenfield-runtime build && tsc --noEmit && pnpm --filter @modula/avatar-contracts --filter @modula/greenfield-module-manifest --filter @modula/greenfield-module-ui-contracts --filter @modula/greenfield-module-registry-contracts --filter @modula/greenfield-module-sdk --filter @modula/greenfield-module-engine-contracts --filter @modula/greenfield-runtime --filter @modula/greenfield-connector-contracts --filter @modula/greenfield-contracts --filter @modula/greenfield-protocol --filter @modula/dimon-contracts --filter @modula/greenfield-mcp --filter @modula/modula-cli typecheck",
     "lint": "expo lint -- --max-warnings=0",
     "doctor": "expo-doctor",

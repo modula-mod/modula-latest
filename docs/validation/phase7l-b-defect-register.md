@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 9 | 0 | 2 | 0 | 1 | 0 |
-| P1 | 35 | 34 | 0 | 0 | 0 | 1 | 0 |
+| P1 | 35 | 32 | 0 | 0 | 2 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -182,14 +182,14 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 
 - Severity: P1
 - Feature/domain: Auth UI public routes / Auth UI
-- Symptom: Login/register/forgot/verify routes render but emit React hydration/runtime `#418`.
-- Root cause: Public auth routes have deterministic server/client first-render mismatch in the Expo web bundle; exact component isolation remains part of repair.
-- Source files: `src/auth/screens/SignInScreen.tsx`; `src/auth/screens/CreateAccountScreen.tsx`; `src/auth/screens/ForgotPasswordScreen.tsx`; `src/auth/screens/VerifyEmailScreen.tsx`; `src/theme/runtime/AppearanceProvider.tsx`
+- Symptom: Login/register/forgot/verify routes rendered but emitted React hydration/runtime `#418` during the Phase 7L-A crawl.
+- Root cause: Header overflow controls rendered nested web pressables (`button` inside `button`) through `ChromeOverflowMenu` -> `ModulaMenu` -> `ModulaIconButton`; tab routes also rendered desktop rail markup on the first client render while static HTML used the unknown-width mobile bar.
+- Source files: `src/platform/ui/menus/chrome-overflow-menu.tsx`; `src/platform/ui/navigation/platform-tabs.web.tsx`; `src/components/primitives/AppIcon.tsx`; `src/platform/ui/motion/section-enter.tsx`; `src/platform/ui/refresh/pull-action-tray.tsx`; `tests/phase7l-b-public-routes.test.ts`
 - Backend dependency: None for render; auth endpoints for golden path proof.
-- Fix strategy: Reproduce in local production web build, isolate mismatched component, and add hydration browser gate.
-- Verification command: `pnpm build:web`; `pnpm verify:web-build`; `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Use a visual-only overflow icon inside the menu pressable, keep web tab rail/bar first render server-compatible until hydration, and add a localhost-only API fixture boundary so route rendering can be verified without local-origin CORS noise.
+- Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b:hydration`
 - Live verification: Fresh browser loads `/sign-in`, `/register`, `/forgot-password`, and `/verify-email` with hydration warnings/errors/pageerrors equal to zero.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-002 - Public Icon Font
 
@@ -234,14 +234,14 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 
 - Severity: P1
 - Feature/domain: Browser runtime / Web runtime
-- Symptom: Production public routes log React hydration/runtime error `#418`.
-- Root cause: Expo web production markup differs between server HTML and client hydration on public routes; candidate classes include theme/session/time/platform first-render state.
-- Source files: `src/theme/runtime/AppearanceProvider.tsx`; `src/auth/runtime/SessionProvider.tsx`; `src/components/feed/FeedPostItem.tsx`; `src/features/social/components/post-header.tsx`; `src/features/social/components/media-post-card.tsx`; `src/features/profile/tabs/AboutProfileTab.tsx`
+- Symptom: Production public routes logged React hydration/runtime error `#418`.
+- Root cause: Two deterministic web mismatches were isolated locally: nested button markup in header overflow menus, and tab-route width-dependent markup (`rail` vs `bar`) before hydration.
+- Source files: `src/platform/ui/menus/chrome-overflow-menu.tsx`; `src/platform/ui/navigation/platform-tabs.web.tsx`; `tests/phase7l-b-public-routes.test.ts`; `playwright.config.ts`; `scripts/serve-web-dist.mjs`
 - Backend dependency: None for public render; auth/session for authenticated hydration route.
-- Fix strategy: Reproduce locally in production build with non-minified diagnostics where possible, remove nondeterministic first-render output, and add browser console/pageerror gate.
-- Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b`
+- Fix strategy: Remove invalid nested pressable HTML, delay desktop rail selection until after hydration, and keep a browser console/pageerror gate over public routes.
+- Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b:hydration`
 - Live verification: Fresh browser loads `/`, `/sign-in`, `/register`, `/profile`, `/settings`, `/marketplace`, and Vault Notes with `pageerror=0`, hydration warnings `0`, and React `#418=0`.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-006 - Home Feed
 

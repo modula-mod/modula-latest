@@ -10,6 +10,7 @@ import {useSession} from '@/auth/runtime'
 import {isFeatureEnabled} from '@/features/product/data/featureControl'
 import {resolveVisibleModulaTabs} from '@/features/product/data/resolveTabBar'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
+import {useHydrated} from '@/lib/useHydrated'
 import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -82,9 +83,11 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const session = useSession()
   const profile = session.status === 'signedIn' ? session.profile : null
   const {width} = useWindowDimensions()
+  const hydrated = useHydrated()
   const {colours, spacing, radius} = useThemeTokens()
   const {preferences} = useProductPreferences()
-  const rail = width >= 900
+  const rail = hydrated && width >= 900
+
   const selectedRouteName =
     state.index >= 0 ? state.routes[state.index]?.name : undefined
   const visibleTabNames = new Set(

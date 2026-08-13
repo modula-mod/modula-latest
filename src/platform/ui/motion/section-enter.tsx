@@ -1,4 +1,5 @@
 import type {ReactNode} from 'react'
+import {Platform} from 'react-native'
 import Animated from 'react-native-reanimated'
 
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
@@ -31,6 +32,10 @@ export function SectionEnter({
   const scaledDelay = density === 'reduced' ? Math.round(delay * 0.35) : delay
   const fadeEntering = useMotionEntering('fade', scaledDelay)
   const directionalEntering = useMotionEntering(from, scaledDelay)
+
+  if (Platform.OS === 'web' || typeof document === 'undefined') {
+    return <>{children}</>
+  }
 
   if (reduceMotion || density === 'minimal') {
     return <>{children}</>

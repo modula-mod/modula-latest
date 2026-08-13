@@ -1,6 +1,9 @@
-import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {StyleSheet, View} from 'react-native'
+
+import {AppIcon} from '@/components/primitives/AppIcon'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ChromeOverflowMenuProps = {
   title?: string
@@ -18,6 +21,8 @@ export function ChromeOverflowMenu({
   onAction,
   accessibilityLabel = 'More actions',
 }: ChromeOverflowMenuProps) {
+  const {colours} = useThemeTokens()
+
   return (
     <ModulaMenu
       title={title}
@@ -25,12 +30,19 @@ export function ChromeOverflowMenu({
       onAction={onAction}
       accessibilityLabel={accessibilityLabel}
       trigger={
-        <ModulaIconButton
-          icon="more"
-          accessibilityLabel={accessibilityLabel}
-          chrome="plain"
-        />
+        <View pointerEvents="none" style={styles.target}>
+          <AppIcon name="more" colour={colours.text} />
+        </View>
       }
     />
   )
 }
+
+const styles = StyleSheet.create({
+  target: {
+    alignItems: 'center',
+    height: 44,
+    justifyContent: 'center',
+    minWidth: 44,
+  },
+})

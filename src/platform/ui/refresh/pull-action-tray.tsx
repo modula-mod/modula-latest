@@ -1,5 +1,4 @@
-import Ionicons from '@expo/vector-icons/Ionicons'
-import type {ComponentProps, ReactNode} from 'react'
+import type {ReactNode} from 'react'
 import {useEffect} from 'react'
 import {StyleSheet, View} from 'react-native'
 import Animated, {
@@ -15,6 +14,7 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
+import {HydrationStableIonicon, type AppIoniconName} from '@/components/primitives/AppIcon'
 import {useReduceMotion} from '@/lib/accessibility'
 import {
   PULL_ACTION_ARM_DISTANCE,
@@ -32,13 +32,11 @@ export type PullActionTrayProps = {
   children?: ReactNode
 }
 
-type IoniconName = ComponentProps<typeof Ionicons>['name']
-
 type ActionSpec = {
   id: PullActionId
   index: PullActionSelection
   label: string
-  icon: IoniconName
+  icon: AppIoniconName
 }
 
 const ACTIONS: readonly ActionSpec[] = [
@@ -235,10 +233,10 @@ function ActionIcon({
   return (
     <Animated.View style={[styles.slot, slotStyle]}>
       <Animated.View style={[styles.iconLayer, idleIconStyle]}>
-        <Ionicons name={action.icon} size={ICON_IDLE} color={muted} />
+        <HydrationStableIonicon name={action.icon} size={ICON_IDLE} colour={muted} />
       </Animated.View>
       <Animated.View style={[styles.iconLayer, focusedIconStyle]}>
-        <Ionicons name={action.icon} size={ICON_FOCUS} color={accent} />
+        <HydrationStableIonicon name={action.icon} size={ICON_FOCUS} colour={accent} />
       </Animated.View>
     </Animated.View>
   )

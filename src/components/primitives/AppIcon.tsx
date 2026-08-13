@@ -1,5 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import type {ComponentProps} from 'react'
+import {StyleSheet, View} from 'react-native'
+
+import {useHydrated} from '@/lib/useHydrated'
 
 export type AppIconName =
   | 'home'
@@ -62,9 +65,9 @@ export type AppIconName =
   | 'arrowUp'
   | 'arrowDown'
 
-type IoniconName = ComponentProps<typeof Ionicons>['name']
+export type AppIoniconName = ComponentProps<typeof Ionicons>['name']
 
-const iconMap: Record<AppIconName, IoniconName> = {
+const iconMap: Record<AppIconName, AppIoniconName> = {
   home: 'home-outline',
   discover: 'compass-outline',
   create: 'add',
@@ -132,6 +135,32 @@ type AppIconProps = {
   colour: string
 }
 
-export function AppIcon({name, size = 22, colour}: AppIconProps) {
-  return <Ionicons name={iconMap[name]} size={size} color={colour} />
+type HydrationStableIoniconProps = {
+  name: AppIoniconName
+  size?: number
+  colour: string
 }
+
+export function HydrationStableIonicon({
+  name,
+  size = 22,
+  colour,
+}: HydrationStableIoniconProps) {
+  const hydrated = useHydrated()
+
+  if (!hydrated) {
+    return <View pointerEvents="none" style={[styles.placeholder, {height: size, width: size}]} />
+  }
+
+  return <Ionicons name={name} size={size} color={colour} />
+}
+
+export function AppIcon({name, size = 22, colour}: AppIconProps) {
+  return <HydrationStableIonicon name={iconMap[name]} size={size} colour={colour} />
+}
+
+const styles = StyleSheet.create({
+  placeholder: {
+    flexShrink: 0,
+  },
+})
