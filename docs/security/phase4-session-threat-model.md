@@ -25,8 +25,8 @@
 ## Phase 4 Mitigations
 
 - SecureStore on native for refresh tokens
-- memory-only access token
-- memory-only web simulation
+- memory-only access-token mirror for request headers
+- web session persistence isolated to `WebPersistentSessionStorage` and one namespaced `localStorage` key
 - query cache clearing on account changes
 - refresh mutex
 - opaque token contracts

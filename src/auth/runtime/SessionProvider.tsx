@@ -62,6 +62,7 @@ export function SessionProvider({children}: PropsWithChildren) {
         refreshToken: result.tokens.refreshToken,
         sessionId: result.session.sessionId,
         accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+        refreshTokenExpiresAt: result.tokens.refreshTokenExpiresAt,
       })
       setSession(result.session)
     },
@@ -257,8 +258,9 @@ export function SessionProvider({children}: PropsWithChildren) {
 
       const bundle = await services.sessionStorage.getSessionBundle().catch(() => null)
       if (__DEV__) {
+        const hasRefresh = Boolean(bundle?.refreshToken)
         console.info(
-          `Session bootstrap: bundle=${bundle ? 'present' : 'missing'} refresh=${bundle?.refreshToken ? 'yes' : 'no'}`,
+          `Session bootstrap: bundle=${bundle ? 'present' : 'missing'} refresh=${hasRefresh ? 'yes' : 'no'}`,
         )
       }
 
@@ -271,6 +273,7 @@ export function SessionProvider({children}: PropsWithChildren) {
             refreshToken: refreshed.tokens.refreshToken,
             sessionId: refreshed.session.sessionId,
             accessTokenExpiresAt: refreshed.tokens.accessTokenExpiresAt,
+            refreshTokenExpiresAt: refreshed.tokens.refreshTokenExpiresAt,
           })
           if (__DEV__) console.info('Session bootstrap: refresh restored')
           return refreshed.session
@@ -339,6 +342,7 @@ export function SessionProvider({children}: PropsWithChildren) {
           refreshToken: result.tokens.refreshToken,
           sessionId: result.session.sessionId,
           accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+          refreshTokenExpiresAt: result.tokens.refreshTokenExpiresAt,
         })
         return result.session
       }

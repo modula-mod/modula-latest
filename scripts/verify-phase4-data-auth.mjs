@@ -161,7 +161,7 @@ for (const file of [
   'src/auth/contracts/AuthCapability.ts',
   'src/auth/storage/SessionStorage.ts',
   'src/auth/storage/NativeSecureSessionStorage.ts',
-  'src/auth/storage/WebMemorySessionStorage.ts',
+  'src/auth/storage/WebPersistentSessionStorage.ts',
   'src/auth/runtime/SessionProvider.tsx',
   'src/auth/runtime/SessionRefreshCoordinator.ts',
   'src/auth/runtime/AccessTokenStore.ts',
@@ -230,7 +230,8 @@ requireText('src/api/contracts/identifiers.ts', /parseAccountId[\s\S]*parseProfi
 requireText('src/config/runtimeEnvironment.ts', /production[\s\S]*remote/, 'Production remote-mode rule is missing')
 requireText('src/auth/storage/SessionStorage.ts', 'modula.session.refresh-token.v1', 'Secure session storage key is incorrect')
 requireText('src/auth/storage/NativeSecureSessionStorage.ts', 'expo-secure-store', 'Native session storage must use Expo SecureStore')
-requireText('src/auth/storage/WebMemorySessionStorage.ts', /memory/i, 'Web session storage must be memory-only')
+requireText('src/auth/storage/WebPersistentSessionStorage.ts', 'modula.web.session.bundle.v1', 'Web session storage key is incorrect')
+requireText('src/auth/storage/WebPersistentSessionStorage.ts', /localStorage/, 'Web session storage must persist through localStorage')
 requireText('src/auth/contracts/Session.ts', /SessionState[\s\S]*BootingSession[\s\S]*SignedOutSession[\s\S]*GuestSession[\s\S]*AuthenticatedSession[\s\S]*RefreshingSession[\s\S]*ExpiredSession[\s\S]*ErrorSession/, 'Session state must be a discriminated union')
 requireText('src/auth/contracts/AuthCapability.ts', /post:create[\s\S]*profile:manage[\s\S]*messages:access[\s\S]*account:manage/, 'Auth capability contract is incomplete')
 requireText('src/auth/runtime/SessionRefreshCoordinator.ts', /private inFlight:[\s\S]*Promise/, 'Refresh coordinator must use an in-flight refresh mutex')
@@ -305,7 +306,10 @@ for (const file of sourceFiles) {
     fail(`Authorization header logic must not appear in UI source: ${file}`)
   }
 
-  if (/localStorage\.setItem\([^)]*token/i.test(body)) {
+  if (
+    file !== 'src/auth/storage/WebPersistentSessionStorage.ts' &&
+    /localStorage\.setItem\([^)]*token/i.test(body)
+  ) {
     fail(`Token-like localStorage write is forbidden: ${file}`)
   }
 

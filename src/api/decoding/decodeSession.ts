@@ -60,6 +60,13 @@ export function decodeAuthResult(value: unknown): AuthResult {
         tokens.accessTokenExpiresAt ?? tokens.accessExpiresAt,
         'access token expiry',
       ),
+      refreshTokenExpiresAt:
+        tokens.refreshTokenExpiresAt || tokens.refreshExpiresAt
+          ? asIsoDate(
+              tokens.refreshTokenExpiresAt ?? tokens.refreshExpiresAt,
+              'refresh token expiry',
+            )
+          : undefined,
     },
   }
 }

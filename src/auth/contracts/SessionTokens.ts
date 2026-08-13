@@ -10,6 +10,7 @@ export type SessionTokenPair = {
   accessToken: AccessToken
   refreshToken: RefreshToken
   accessTokenExpiresAt: string
+  refreshTokenExpiresAt?: string
 }
 
 export function parseAccessToken(value: string): AccessToken {

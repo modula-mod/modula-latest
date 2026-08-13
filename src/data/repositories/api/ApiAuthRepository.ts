@@ -376,6 +376,7 @@ export class ApiAuthRepository implements AuthRepository {
         accessToken: parseAccessToken(tokens.accessToken),
         refreshToken: parseRefreshToken(tokens.refreshToken),
         accessTokenExpiresAt: tokens.accessExpiresAt,
+        refreshTokenExpiresAt: tokens.refreshExpiresAt,
       },
     }
   }

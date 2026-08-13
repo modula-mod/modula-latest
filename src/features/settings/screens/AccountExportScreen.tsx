@@ -37,6 +37,7 @@ export function AccountExportScreen() {
         refreshToken: result.tokens.refreshToken,
         sessionId: result.session.sessionId,
         accessTokenExpiresAt: result.tokens.accessTokenExpiresAt,
+        refreshTokenExpiresAt: result.tokens.refreshTokenExpiresAt,
       })
       setPassword('')
       setReauthed(true)

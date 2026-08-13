@@ -10,7 +10,7 @@ Greenfield-owned Modula Account authentication.
 ## Storage
 
 Native SecureStore bundle (`modula.session.bundle.v1`) holds access token, refresh token, session ID, and expiry.
-Tokens are never written to AsyncStorage. Web uses memory-only storage.
+Tokens are never written to AsyncStorage. Web persists the same opaque bundle in `localStorage` under `modula.web.session.bundle.v1` so valid sessions survive reload and browser restart. Only `WebPersistentSessionStorage` owns that key; logout, expiry, refresh rejection, and revoked sessions clear it.
 
 ## API
 
