@@ -14,7 +14,7 @@ Current register counts:
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P0 | 12 | 9 | 0 | 2 | 0 | 1 | 0 |
-| P1 | 35 | 27 | 0 | 4 | 3 | 1 | 0 |
+| P1 | 35 | 10 | 0 | 0 | 24 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -267,7 +267,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Add controlled two-account story browser proof after media headers and session restore are fixed.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase7i.f5-stories`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser creates a story, sees thumbnail/full media, reloads viewer, advances next/previous, records seen state, and deletes/reports according to policy.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-008 - Text Posts
 
@@ -280,7 +280,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Add two-account browser/API proof for create, read, edit own, delete own, denial for other account, and reload persistence.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Two public accounts complete text post CRUD with correct authorization and persistence.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-009 - Image Posts
 
@@ -293,7 +293,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Fix media headers and prove upload -> storage -> API reference -> browser render -> refresh -> other authorized account render.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase7c.media-storage`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Controlled public image post renders for author and authorized second account after reload.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-010 - Reactions
 
@@ -306,7 +306,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove one active reaction per `(actor,target)` across Like -> Love -> Laugh -> Fire -> none with exact counts.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public two-account reaction flow has exact counts and no fake-success UI.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-011 - Comments And Replies
 
@@ -319,7 +319,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Add two-account API/browser tests for comment/reply lifecycle and authorization.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser proves create, edit own, delete own, reply, paginate, react, report, deny other edit, and reload.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-012 - Follows
 
@@ -332,7 +332,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove follow, unfollow, counts, notification, feed effect, and self-follow denial.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Two public accounts complete follow/unfollow with exact counts and no self-notification.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-013 - Notifications Activity
 
@@ -345,7 +345,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove follow, reaction, comment, reply, repost, security, and module notifications with no self-notification and correct targets.
 - Verification command: `pnpm --filter @modula/greenfield-worker test -- phase7e.notifications`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser Activity shows expected notifications and navigates to correct targets.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-014 - Bookmarks Saved
 
@@ -358,7 +358,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove bookmark, reload, logout/login, Saved visibility, and unbookmark.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser saved post persists across reload and re-login, then disappears after unbookmark.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-015 - Repost
 
@@ -371,7 +371,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove repost, unrepost if supported, share action behavior, counts, notification, and authorization.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6s.social`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public two-account flow shows repost/share results and notification without fake success.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-016 - Block Mute Report
 
@@ -384,7 +384,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove server-side block enforcement, separate mute behavior, and persistent reports for profile/post/comment/story.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase6.security`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public two-account flow verifies block, unblock, mute, report, direct-ID denial/filtering, and no fake toast-only success.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-017 - Discover
 
@@ -397,7 +397,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove real people/posts/modules search, loading, empty, pagination, failure, and block policy; remove fake surfaces from beta if needed.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase7e.search-platform`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser Discover shows only real content or honest Coming Soon states and respects block policy.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-018 - Search Recent Saved
 
@@ -449,7 +449,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove text and photo create, failure handling, reload persistence, and other-account render.
 - Verification command: `pnpm --filter @modula/greenfield-api test -- phase7c.media-storage`; `CI=true pnpm verify:phase7l-b`
 - Live verification: Public browser creates text/photo posts and renders the photo after refresh.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-022 - Composer Poll GIF Tools
 
@@ -475,7 +475,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Add deterministic beta classification and installability projection to registry summaries/details, hide non-beta duplicate/internal/test fixture records from normal Product Hub registry output, and dedupe contradictory UI status pills.
 - Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`; `pnpm lint`
 - Live verification: Public authenticated Product Hub shows one coherent card per beta product and no duplicate stale records.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P1-024 - Canonical Vault Notes Product
 
@@ -488,7 +488,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Registry emits `CANONICAL_PRODUCT` and `installability.status=available` for published `digital.modula.vault-notes`; frontend decodes that projection and displays non-duplicated human status copy.
 - Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`; `pnpm lint`
 - Live verification: Public Product Hub shows Vault Notes as Available/Installed/Update/Unavailable exactly once, with coherent details.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P1-025 - Stale Vault Notes Duplicate
 
@@ -501,7 +501,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Classify `modula.module.vaultNotes` as `DUPLICATE` with canonical replacement `digital.modula.vault-notes` and hide it from normal beta registry listing/detail/version catalogue.
 - Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`
 - Live verification: Public Product Hub, registry search, module detail, search, and install paths expose only canonical Vault Notes.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P1-026 - Vault Notes Install Enable
 
@@ -514,7 +514,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove install -> enable -> open -> health/views using disposable DB first and controlled production account later.
 - Verification command: `MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_MIGRATOR_URL=<disposable-admin> CI=true pnpm verify:phase7e-vault-notes`
 - Live verification: Controlled production account installs/enables Vault Notes and opens module host without contradictory status.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-027 - Vault Notes Note List
 
@@ -527,7 +527,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove enabled Vault Notes lists existing records, empty state, search/filter/sort, and reload.
 - Verification command: `MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_MIGRATOR_URL=<disposable-admin> CI=true pnpm verify:phase7e-vault-notes`
 - Live verification: Public browser opens Vault Notes and lists/searches records for controlled account.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-028 - Vault Notes Create Note
 
@@ -540,7 +540,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Update lifecycle verifier and browser flow to use schema-correct note payloads including `body`.
 - Verification command: `MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_MIGRATOR_URL=<disposable-admin> CI=true pnpm verify:phase7e-vault-notes`
 - Live verification: Controlled production account creates, reads, updates, deletes, archives, restores, searches, disables/enables, uninstall keepData, reinstalls, and recovers records.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-029 - Search Generated Modules
 
@@ -548,12 +548,12 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Feature/domain: Search generated modules / Product Hub
 - Symptom: Quarantined generated search modules are visible in registry output.
 - Root cause: Test/internal/quarantined generated module records were not excluded from beta Product Hub/search/install catalogue.
-- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/tests/phase7l.product-hub-policy.test.ts`
+- Source files: `services/greenfield-api/src/modules/beta-catalogue-policy.ts`; `services/greenfield-api/src/modules/registry-service.ts`; `services/greenfield-api/tests/phase7l.product-hub-policy.test.ts`; `services/greenfield-api/tests/phase7e.search-platform.test.ts`; `services/greenfield-worker/src/search/module-projector.ts`; `services/greenfield-worker/src/search/module-release-projector.ts`
 - Backend dependency: Registry/search projections and quarantine classifications.
-- Fix strategy: Classify `digital.modula.search-*` generated records as `TEST_ONLY` and hide them from normal beta registry listing/detail/version catalogue; existing search projector tests already hide quarantined modules from normal search.
-- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm typecheck`
+- Fix strategy: Classify `digital.modula.search-*` generated records as `TEST_ONLY`, hide them from normal beta registry listing/detail/version catalogue, and tombstone generated fixture module/release search documents instead of indexing active beta search results.
+- Verification command: `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7l.product-hub-policy.test.ts`; `pnpm --filter @modula/greenfield-api exec vitest run tests/phase7e.search-platform.test.ts`; `pnpm --filter @modula/greenfield-worker test`; `pnpm typecheck`
 - Live verification: Public Product Hub, registry search, global search, install preview, and release catalogue omit generated search fixtures from beta UI.
-- Status: FIXED_SOURCE
+- Status: PASS_LOCAL
 
 ### P7LB-P1-030 - Module Host Declarative States
 
@@ -566,7 +566,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Prove declarative route/widget/settings/search/event surfaces where beta-supported, with unavailable/quarantined states honest.
 - Verification command: `MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_MIGRATOR_URL=<disposable-admin> CI=true pnpm verify:phase7e-module-runtime-2`
 - Live verification: Public authenticated module host opens canonical Vault Notes views and handles unavailable/quarantined states without crash or fake success.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-031 - Module Runtime Health
 
@@ -579,7 +579,7 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Fix strategy: Provision isolated Postgres, apply migrations pending `[]`, run Runtime 2 with zero DB skips, then repeat live after fixed SHA deploy.
 - Verification command: `MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_MIGRATOR_URL=<disposable-admin> CI=true pnpm verify:phase7e-module-runtime-2`
 - Live verification: After deploy, Runtime 2 reports `SOURCE_FAILURE=0`, `TEST_ENV_FAILURE=0`, and `LIVE_DEPLOYMENT_FAILURE=0`.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-032 - Modula Mail Settings
 

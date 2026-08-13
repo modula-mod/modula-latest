@@ -4,6 +4,15 @@ import {entityIdFromEvent, SearchProjector, type SearchProjectionContext} from '
 
 export async function projectModule(db: ModulaWorkerDb, projector: SearchProjector, context: SearchProjectionContext): Promise<void> {
   const moduleId = moduleIdFromEvent(context)
+  if (isGeneratedSearchFixtureModuleId(moduleId)) {
+    await projector.tombstone({...context, entityId: moduleId}, {
+      sourceVersion: projector.sourceVersionFor(context, Date.now()),
+      visibility: 'public',
+      status: 'unavailable',
+    })
+    return
+  }
+
   const catalogue = await db
     .selectFrom('greenfield_extension_catalogue')
     .selectAll()
@@ -106,4 +115,8 @@ function stringField(value: unknown): string | undefined {
 
 function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+}
+
+function isGeneratedSearchFixtureModuleId(moduleId: string): boolean {
+  return /^digital\.modula\.search-[0-9a-f]+$/i.test(moduleId)
 }

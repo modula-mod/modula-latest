@@ -149,7 +149,7 @@ describeIfDb('Phase 7E unified search platform', () => {
   })
 
   it('projects module and release metadata and hides quarantined modules from normal search', async () => {
-    const moduleId = `digital.modula.search-${suffix}`
+    const moduleId = `digital.modula.catalogue-search-${suffix}`
     await modules.importPendingReview(testManifest(moduleId, suffix))
     await modules.publishRelease(moduleId, '1.0.0')
     await drainSearchDeliveries(12)
@@ -163,6 +163,13 @@ describeIfDb('Phase 7E unified search platform', () => {
     await drainSearchDeliveries(10)
     const quarantined = await search.search({query: `Search Module ${suffix}`, entityTypes: ['module']}, actorContext(null, null, `req-search-module-quarantine-${suffix}`))
     expect(quarantined.results.some(result => result.entityId === moduleId)).toBe(false)
+
+    const generatedFixtureModuleId = `digital.modula.search-${suffix}`
+    await modules.importPendingReview(testManifest(generatedFixtureModuleId, `${suffix} Fixture`))
+    await modules.publishRelease(generatedFixtureModuleId, '1.0.0')
+    await drainSearchDeliveries(12)
+    const fixtureResult = await search.search({query: `Search Module ${suffix} Fixture`, entityTypes: ['module', 'module-release']}, actorContext(null, null, `req-search-generated-fixture-${suffix}`))
+    expect(fixtureResult.results.some(result => result.entityId === generatedFixtureModuleId || result.metadata.moduleId === generatedFixtureModuleId)).toBe(false)
   })
 
   it('exposes diagnostics and queues audited reindex work', async () => {
@@ -180,7 +187,8 @@ describeIfDb('Phase 7E unified search platform', () => {
   })
 
   async function drainSearchDeliveries(max = 8): Promise<void> {
-    for (let i = 0; i < max; i += 1) {
+    const attempts = Math.max(max, 250)
+    for (let i = 0; i < attempts; i += 1) {
       const worked = await processOneEventDelivery(workerDb, workerConfig())
       if (!worked) return
     }

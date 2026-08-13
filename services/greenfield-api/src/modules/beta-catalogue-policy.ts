@@ -99,7 +99,7 @@ export function installabilityForBetaModule(input: {
   version?: string | null
   releaseId?: string | null
   releaseState?: GreenfieldModuleReleaseStatus | 'planned' | 'inactive' | 'unavailable' | string
-  classification: BetaModuleClassification
+  classification: GreenfieldModuleBetaClassification
   installable: boolean
 }): GreenfieldModuleInstallabilityProjection {
   const release = input.version ? {version: input.version, releaseId: input.releaseId ?? null} : null

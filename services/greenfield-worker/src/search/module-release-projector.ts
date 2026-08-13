@@ -27,6 +27,15 @@ export async function projectModuleRelease(db: ModulaWorkerDb, projector: Search
     return
   }
 
+  if (isGeneratedSearchFixtureModuleId(row.module_id)) {
+    await projector.tombstone({...context, entityId: row.release_id}, {
+      sourceVersion: projector.sourceVersionFor(context, row.updated_at.getTime()),
+      visibility: 'public',
+      status: 'unavailable',
+    })
+    return
+  }
+
   const manifest = recordFromJson(row.manifest)
   const releaseNotes = stringField(manifest.releaseNotes) ?? stringField(recordFromJson(manifest.extensions).releaseNotes)
   const compatibility = recordFromJson(row.compatibility)
@@ -77,4 +86,8 @@ function recordFromJson(value: unknown): Record<string, any> {
 
 function stringField(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined
+}
+
+function isGeneratedSearchFixtureModuleId(moduleId: string): boolean {
+  return /^digital\.modula\.search-[0-9a-f]+$/i.test(moduleId)
 }
