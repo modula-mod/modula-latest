@@ -4,6 +4,7 @@ import {existsSync, readFileSync} from 'node:fs'
 import path from 'node:path'
 
 const root = process.cwd()
+const avatarStudioRoot = process.env.MODULA_AVATAR_STUDIO_PATH || '/root/modula-mod/modula-avatar-studio'
 let failed = 0
 
 function pass(message) {
@@ -41,6 +42,17 @@ function run(label, command, args) {
   return true
 }
 
+function runIn(label, cwd, command, args) {
+  console.log(`\n==> ${label}`)
+  const result = spawnSync(command, args, {cwd, stdio: 'inherit'})
+  if (result.status !== 0) {
+    fail(`${label} exit ${result.status ?? 'null'}`)
+    return false
+  }
+  pass(label)
+  return true
+}
+
 function assert(condition, message) {
   if (condition) pass(message)
   else fail(message)
@@ -55,6 +67,7 @@ assertFile('docs/architecture/mdhs-overview.md', 'Identity is persistent. Appear
 assertFile('docs/specifications/mdhs-0.1.md', 'Render permission does not imply raw data permission.')
 assertFile('docs/security/mdhs-biometric-data.md', 'cross-user biometric matching')
 assertFile('docs/validation/phase7k-mdhs-contracts.md', 'contracts-first foundation')
+assertFile('docs/validation/phase7k-avatar-studio.md', 'modula-mod/modula-avatar-studio')
 
 if (run('@modula/avatar-contracts build', 'pnpm', ['--filter', '@modula/avatar-contracts', 'build'])) {
   const contracts = await import(path.join(root, 'packages/avatar-contracts/dist/index.js'))
@@ -133,6 +146,16 @@ if (run('@modula/avatar-contracts build', 'pnpm', ['--filter', '@modula/avatar-c
 
   const completeness = contracts.computeAvatarCompleteness([unknown])
   assert(completeness.some(item => item.domain === 'overall'), 'completeness returns overall domain')
+}
+
+if (!existsSync(avatarStudioRoot)) {
+  fail(`missing Avatar Studio repo at ${avatarStudioRoot}`)
+} else {
+  const manifestText = readFileSync(path.join(avatarStudioRoot, 'module.manifest.json'), 'utf8')
+  assert(manifestText.includes('"moduleId": "modula.avatar-studio"'), 'Avatar Studio module ID recorded')
+  assert(manifestText.includes('"moduleStandardVersion": "2.0.0"'), 'Avatar Studio Standard version recorded')
+  assert(manifestText.includes('"avatar.read.rawBiometrics"'), 'Avatar Studio raw biometric deny policy recorded')
+  runIn('Avatar Studio verify', avatarStudioRoot, 'pnpm', ['verify'])
 }
 
 console.log('\n---')

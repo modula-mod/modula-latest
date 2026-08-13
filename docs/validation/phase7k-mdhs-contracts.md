@@ -20,6 +20,7 @@ Implemented:
 - render permission vs raw-data permission separation
 - provider-neutral `AvatarObserver` and `AvatarCompiler` interfaces
 - deterministic completeness projection
+- external Avatar Studio shell recorded in `docs/validation/phase7k-avatar-studio.md`
 
 Verifier:
 
@@ -33,5 +34,4 @@ Not implemented in this checkpoint:
 - production avatar API
 - Avatar Vault storage backend
 - background processing jobs
-- Avatar Studio external repository
 - image analysis or render provider integration
