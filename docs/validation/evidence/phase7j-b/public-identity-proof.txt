@@ -1,21 +1,21 @@
 === git candidate ===
-eccd228abde2a444f12df5ae30191119181f4504
+2ef3755082b46e49fe62424e93d4a4de9c6f1e17
 
 === web version.json ===
 {
   "app": "modula",
   "version": "0.1.0",
   "phase": "phase7e-block14",
-  "commit": "eccd228abde2a444f12df5ae30191119181f4504",
-  "branch": "phase7j-product-convergence",
-  "builtAt": "2026-08-13T14:22:13.830Z",
+  "commit": "2ef3755082b46e49fe62424e93d4a4de9c6f1e17",
+  "branch": "main",
+  "builtAt": "2026-08-13T14:43:14.159Z",
   "environment": "production",
   "dataSource": "remote",
   "apiOrigin": "https://api.modula.digital"
 }
 
 === api version.json ===
-{"app":"modula","service":"greenfield-api","version":"0.1.0","phase":"phase7i-f5b","commit":"eccd228abde2a444f12df5ae30191119181f4504","builtAt":"2026-08-13T14:22:25Z","environment":"production","apiOrigin":"https://api.modula.digital","worker":{"service":"greenfield-worker","expectedCommit":"eccd228abde2a444f12df5ae30191119181f4504"},"mailProvisioner":{"service":"modula-mail-provisioner","expectedCommit":"eccd228abde2a444f12df5ae30191119181f4504","mode":"disabled"}}
+{"app":"modula","service":"greenfield-api","version":"0.1.0","phase":"phase7i-f5b","commit":"2ef3755082b46e49fe62424e93d4a4de9c6f1e17","builtAt":"2026-08-13T14:42:26Z","environment":"production","apiOrigin":"https://api.modula.digital","worker":{"service":"greenfield-worker","expectedCommit":"2ef3755082b46e49fe62424e93d4a4de9c6f1e17"},"mailProvisioner":{"service":"modula-mail-provisioner","expectedCommit":"2ef3755082b46e49fe62424e93d4a4de9c6f1e17","mode":"disabled"}}
 
 === health live ===
 {"ok":true,"data":{"status":"live"},"meta":{"requestId":"8c1bc734-d02f-4ae4-bb37-e8086a3e25cc","serverTime":"2026-08-13T14:33:11.501Z"}}

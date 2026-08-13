@@ -2,10 +2,10 @@
 
 Date: 2026-08-13 UTC
 Host checkout: `/root/modula-latest`
-Branch: `phase7j-product-convergence`
-Source SHA: `eccd228abde2a444f12df5ae30191119181f4504`
+Branch: `main`
+Source SHA: `2ef3755082b46e49fe62424e93d4a4de9c6f1e17`
 Production baseline before Phase 7J deployment: `7632e03cd904569eb71b68f93a60eab83100b2a1`
-Runtime-equivalent predecessor: `6517d521a57f065ca569b0a74c3aa2744df5c0ed`
+Runtime-equivalent predecessors: `6517d521a57f065ca569b0a74c3aa2744df5c0ed`, `eccd228abde2a444f12df5ae30191119181f4504`
 Earlier accepted candidate: `b5252d5f7654547ff8aa75498bd205336692cd99`
 
 ## Source and GitHub State
@@ -15,37 +15,37 @@ Earlier accepted candidate: `b5252d5f7654547ff8aa75498bd205336692cd99`
 | `git status --short` | clean before verification |
 | `git fetch origin --prune --tags` | PASS |
 | `origin/phase7j-product-convergence` | `eccd228abde2a444f12df5ae30191119181f4504` |
-| `origin/main` | `41ef513c0974f2887c630676fec80860b0d4db72` |
+| `origin/main` | `2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
 | `origin/phase7i-trusted-production-alpha` | `7632e03cd904569eb71b68f93a60eab83100b2a1` |
-| Local branch | `phase7j-product-convergence`, up to date with origin |
+| Local branch | `main`, up to date with origin |
 | Pre-production tag | `phase7j-pre-production-convergence-6517d52` exists on origin |
 
-The written mission expected `b5252d5...`, but GitHub now contains newer convergence head `eccd228...`. Per the mission rule, the newer remote convergence head is the active candidate. `6517d52...eccd228` is proof/report-only for runtime paths: `services/greenfield-api/migrations`, `services/greenfield-api/src`, `services/greenfield-worker/src`, `src`, `packages`, `public`, and `ops` are unchanged.
+The written mission expected `b5252d5...`, but GitHub later contained newer accepted convergence heads. Per the mission rule, the newer remote state became authoritative. `6517d52...2ef3755` is proof/report-only for runtime paths: `services/greenfield-api/migrations`, `services/greenfield-api/src`, `services/greenfield-worker/src`, `src`, `packages`, `public`, and `ops` are unchanged.
 
 ## Runtime Identity
 
 | Item | Value |
 | --- | --- |
-| `SOURCE_SHA` | `eccd228abde2a444f12df5ae30191119181f4504` |
-| `API_IMAGE` | `modula-greenfield-api:eccd228abde2a444f12df5ae30191119181f4504` |
+| `SOURCE_SHA` | `2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
+| `API_IMAGE` | `modula-greenfield-api:2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
 | `API_IMAGE_ID` | `sha256:2d8a6951b7e8c0d86201f2903498c0b46ff81eec6a9ec9c4ced076fd5e8169ae` |
 | `API_IMAGE_DIGEST` | local image, no repo digest recorded |
-| `WORKER_IMAGE` | `modula-greenfield-worker:eccd228abde2a444f12df5ae30191119181f4504` |
+| `WORKER_IMAGE` | `modula-greenfield-worker:2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
 | `WORKER_IMAGE_ID` | `sha256:81acf70cf21fc73e824f1f172f20e856ab66a14845b55f1db79e88e987762f8c` |
 | `WORKER_IMAGE_DIGEST` | local image, no repo digest recorded |
-| `SOURCE_BUILT_AT` | `2026-08-13T14:22:25Z` for API/worker; web marker `2026-08-13T14:22:13.830Z` |
+| `SOURCE_BUILT_AT` | `2026-08-13T14:42:26Z` for API/worker; web marker `2026-08-13T14:43:14.159Z` |
 | API container | `modula-production-greenfield-api-1`, user `modula`, status `running`, health `healthy` |
 | Worker container | `modula-production-greenfield-worker-1`, user `modula`, status `running` |
-| Web release | `/var/www/modula/releases/eccd228abde2a444f12df5ae30191119181f4504` |
+| Web release | `/var/www/modula/releases/2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
 | Previous web release | `/var/www/modula/releases/41ef513c0974f2887c630676fec80860b0d4db72` |
 
 Public identity agreement:
 
 | Surface | Result |
 | --- | --- |
-| `https://modula.digital/version.json` | commit `eccd228abde2a444f12df5ae30191119181f4504` |
-| `https://api.modula.digital/version.json` | commit `eccd228abde2a444f12df5ae30191119181f4504` |
-| API worker `expectedCommit` | `eccd228abde2a444f12df5ae30191119181f4504` |
+| `https://modula.digital/version.json` | commit `2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
+| `https://api.modula.digital/version.json` | commit `2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
+| API worker `expectedCommit` | `2ef3755082b46e49fe62424e93d4a4de9c6f1e17` |
 | `https://api.modula.digital/v1/health/live` | 200, `status=live` |
 | `https://api.modula.digital/v1/health/ready` | 200, `status=ready` |
 | `https://api.modula.digital/v1/meta` | 200, Greenfield production capabilities |
@@ -60,7 +60,7 @@ Evidence:
 
 Current source migration tip: `037_phase7i_f5b_rollback_compatibility`.
 
-No migration `038` or later exists in `services/greenfield-api/migrations/` at `6517d52`.
+No migration `038` or later exists in `services/greenfield-api/migrations/` at `2ef3755`.
 
 Production status was checked inside the running API container:
 
@@ -93,8 +93,8 @@ No production migration was applied during this continuation.
 | `CI=true pnpm --filter @modula/greenfield-api test` | PASS: 15 files passed, 9 skipped; 38 tests passed, 92 skipped |
 | `CI=true pnpm --filter @modula/greenfield-worker build` | PASS |
 | `CI=true pnpm --filter @modula/greenfield-worker test` | PASS: 7 files passed, 1 skipped; 9 tests passed, 8 skipped |
-| `CI=true pnpm build:web` | PASS, `dist/` marker `6517d52` |
-| `CI=true pnpm verify:web-build` | PASS: 202 files, commit `6517d52`, API origin `https://api.modula.digital` |
+| `CI=true pnpm build:web` | PASS, `dist/` marker `2ef3755` |
+| `CI=true pnpm verify:web-build` | PASS: 202 files, commit `2ef3755`, API origin `https://api.modula.digital` |
 | `CI=true pnpm exec expo install --check` | PASS |
 | `CI=true pnpm exec expo-doctor` | PASS_WITH_KNOWN_ADVISORY: 19/20, committed native folders / non-CNG advisory |
 | `git diff --check` | PASS |
@@ -132,7 +132,7 @@ No production migration was applied during this continuation.
 | `CI=true pnpm verify:phase7j-mac` | PASS |
 | `CI=true pnpm verify:phase7j-b` | PASS after current identity proof refresh |
 
-`CI=true pnpm verify:phase7e-module-runtime-2` is `PASS_WITH_KNOWN_MAINLINE_GUARD` before Part 14: Runtime 2 source/build/no-product/isolated DB integration passed, but the embedded web-production cutover verifier intentionally requires the checkout branch to be `main` and local `main` to equal `origin/main`.
+`CI=true pnpm verify:phase7e-module-runtime-2` previously had `PASS_WITH_KNOWN_MAINLINE_GUARD` before Part 14 because the embedded web-production cutover verifier required the checkout branch to be `main` and local `main` to equal `origin/main`.
 
 ## Auth Results
 
@@ -169,7 +169,7 @@ Known raw exploratory lines in `golden-path-api.txt` include failed alternate re
 
 ## Stories Results
 
-Source verifier `verify:stories` passed for real Story data, reports, expiry, and block behavior. Public `/v1/stories/rail` is a real 200 route on `6517d52`; the current anonymous rail is empty.
+Source verifier `verify:stories` passed for real Story data, reports, expiry, and block behavior. Public `/v1/stories/rail` is a real 200 route on `2ef3755`; the current anonymous rail is empty.
 
 Stored accepted public evidence under `docs/validation/evidence/phase7j-b/` includes a prior non-empty rail from the accepted deployment. New media upload/viewer navigation was not rerun in this continuation.
 
@@ -197,11 +197,11 @@ Source verifier `verify:marketplace` passed. It covers registry routes, install/
 1. `expo-doctor` returns the known 19/20 committed-native-folders non-CNG advisory. This is not a new P0/P1 regression.
 2. `verify:phase7e-module-runtime-2` remains blocked by its embedded mainline guard until Part 14 switches/pushes `main` to the deployed convergence SHA.
 3. Founder password acceptance remains a credential gap; founder OTP was proven previously.
-4. Some live browser/media acceptance artifacts are reused from the accepted Phase 7J cutover evidence rather than freshly rerun after the `6517d52` identity refresh.
+4. Some live browser/media acceptance artifacts are reused from the accepted Phase 7J cutover evidence rather than freshly rerun after the `2ef3755` identity refresh.
 5. Deep Runtime 2 UI walk remains Phase 7K/7K+ polish, not Track B MDHS.
 
 ## Verdict
 
 `PASS_WITH_DOCUMENTED_NON_BLOCKING_LIMITATIONS`
 
-Track B / MDHS remains intentionally not started. The next Track A step is Part 14: promote `eccd228abde2a444f12df5ae30191119181f4504` to `main`, then rerun the mainline-dependent verifier and fresh-main proof before creating the beta baseline tag.
+Track B / MDHS starts from `main` after the beta baseline tag is created on `2ef3755082b46e49fe62424e93d4a4de9c6f1e17`.
