@@ -74,8 +74,9 @@ export function VerifyEmailScreen() {
             returnKeyType="done"
             onSubmitEditing={() => void submit()}
             error={error ?? undefined}
+            testID="verify-email-code"
           />
-          <AppButton disabled={pending} onPress={() => void submit()}>
+          <AppButton testID="verify-email-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Verifying' : 'Verify and enter Modula'}
           </AppButton>
           <AppButton

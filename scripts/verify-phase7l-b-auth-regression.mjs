@@ -93,6 +93,7 @@ function buildEnvironment(databaseUrl) {
     MODULA_DATABASE_URL: databaseUrl,
     MODULA_DATABASE_MIGRATOR_URL: migratorDatabaseUrl,
     MODULA_ALLOWED_ORIGINS: process.env.MODULA_ALLOWED_ORIGINS ?? allowedOrigins,
+    MODULA_TRUST_PROXY: process.env.MODULA_TRUST_PROXY ?? 'true',
     MODULA_PREVIEW_WRITES_ENABLED: process.env.MODULA_PREVIEW_WRITES_ENABLED ?? 'true',
     MODULA_REGISTRATION_MODE: process.env.MODULA_REGISTRATION_MODE ?? 'open',
     MODULA_INVITE_ONLY: process.env.MODULA_INVITE_ONLY ?? 'false',

@@ -54,6 +54,7 @@ export function ResetPasswordScreen() {
             onChangeText={setToken}
             autoCapitalize="none"
             textContentType="oneTimeCode"
+            testID="reset-password-code"
           />
           <AuthField
             label="New password"
@@ -61,6 +62,7 @@ export function ResetPasswordScreen() {
             onChangeText={setPassword}
             secureTextEntry
             textContentType="newPassword"
+            testID="reset-password-new-password"
           />
           <AuthField
             label="Confirm password"
@@ -69,8 +71,9 @@ export function ResetPasswordScreen() {
             secureTextEntry
             textContentType="newPassword"
             error={error ?? undefined}
+            testID="reset-password-confirm-password"
           />
-          <AppButton disabled={pending} onPress={() => void submit()}>
+          <AppButton testID="reset-password-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Updating' : 'Update password'}
           </AppButton>
           {done ? (

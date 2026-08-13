@@ -6,6 +6,7 @@ const apiBaseURL = process.env.MODULA_PUBLIC_API_URL ?? 'http://127.0.0.1:4022'
 const apiOrigin = new URL(apiBaseURL).origin
 const sessionBundleKey = 'modula.web.session.bundle.v1'
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL ?? process.env.MODULA_DATABASE_URL
+let directApiRequestCounter = 0
 
 if (!databaseUrl) {
   throw new Error('MODULA_TEST_DATABASE_URL or MODULA_DATABASE_URL is required.')
@@ -28,6 +29,17 @@ type RegisterResult = {
   accountId: string
   primaryHandle: string
   verificationChallengeId: string
+}
+
+type RecoveryResult = {
+  requested: boolean
+  recoveryToken?: string
+}
+
+type SessionTokenResult = {
+  accessToken: string
+  refreshToken: string
+  sessionId: string
 }
 
 type StoredSessionBundle = {
@@ -120,10 +132,12 @@ async function latestMailCode(accountId: string, templateId: 'verification-code'
 }
 
 async function apiJson<T>(path: string, init: RequestInit): Promise<{response: Response; body: ApiEnvelope<T>}> {
+  directApiRequestCounter += 1
   const response = await fetch(apiURL(path), {
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      'X-Forwarded-For': `203.0.113.${directApiRequestCounter}`,
       ...(init.headers ?? {}),
     },
   })
@@ -166,6 +180,17 @@ async function createVerifiedAccount(prefix: string): Promise<TestAccount> {
     email,
     handle: register.body.data.primaryHandle,
     password,
+  }
+}
+
+function createAccountInput(prefix: string): TestAccount {
+  const unique = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+  const handle = `p7lb${prefix}${unique}`.replace(/[^a-z0-9]/g, '').slice(0, 20)
+  return {
+    accountId: '',
+    email: `phase7lb-${prefix}-${unique}@example.com`,
+    handle,
+    password: `Phase7LB-${unique}-password`,
   }
 }
 
@@ -340,6 +365,48 @@ async function requestEmailCode(page: Page, account: TestAccount) {
   await expect(page.getByTestId('sign-in-email-code')).toBeVisible()
 }
 
+async function registerThroughBrowser(page: Page, prefix: string) {
+  const account = createAccountInput(prefix)
+  await page.goto('/register', {waitUntil: 'networkidle'})
+  await expect(page.getByTestId('create-account-email')).toBeVisible({timeout: 15_000})
+
+  await page.getByTestId('create-account-display-name').fill(`Phase 7L ${prefix} User`)
+  await page.getByTestId('create-account-email').fill(account.email)
+  await page.getByTestId('create-account-email-continue').click()
+
+  await page.getByTestId('create-account-password').fill(account.password)
+  await page.getByTestId('create-account-password-confirmation').fill(account.password)
+  await page.getByTestId('create-account-password-continue').click()
+
+  await page.getByTestId('create-account-handle').fill(account.handle)
+  const availabilityResponse = page.waitForResponse(
+    matchesApiResponse(`/v1/accounts/handles/${encodeURIComponent(account.handle)}/availability`, 'GET'),
+  )
+  await page.getByTestId('create-account-handle-continue').click()
+  expect((await availabilityResponse).status()).toBe(200)
+
+  await page.getByTestId('create-account-terms').click()
+  await page.getByTestId('create-account-privacy').click()
+  const registerResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/register', 'POST'))
+  await page.getByTestId('create-account-submit').click()
+  const registered = await registerResponse
+  expect(registered.status()).toBe(201)
+  const envelope = (await registered.json()) as ApiEnvelope<RegisterResult>
+  expect(envelope.ok).toBe(true)
+  if (!envelope.ok) throw new Error(envelope.error.message)
+
+  await expect(page).toHaveURL(/\/verify-email/)
+  await expect(page.getByTestId('verify-email-code')).toBeVisible()
+  return {
+    account: {
+      ...account,
+      accountId: envelope.data.accountId,
+      handle: envelope.data.primaryHandle,
+    },
+    verificationChallengeId: envelope.data.verificationChallengeId,
+  }
+}
+
 function wrongCodeFor(code: string) {
   return code === '000000' ? '000001' : '000000'
 }
@@ -422,4 +489,92 @@ test('wrong OTP leaves no session and shows OTP-domain error', async ({page}) =>
   await expect(page.getByText('That sign-in code is invalid or expired.')).toBeVisible()
   await expectNoStoredSession(page)
   expectNoCriticalEvents(events, [{status: 401, method: 'POST', path: '/v1/sessions/email-code'}])
+})
+
+test('email verification browser flow rejects wrong code, activates account, and then signs in', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const {account} = await registerThroughBrowser(page, 'verify')
+  const code = await latestMailCode(account.accountId, 'verification-code')
+
+  const wrongResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/verify-email', 'POST'))
+  await page.getByTestId('verify-email-code').fill(wrongCodeFor(code))
+  await page.getByTestId('verify-email-submit').click()
+  const wrongVerification = await wrongResponse
+  expect(wrongVerification.status()).toBe(401)
+  const wrongEnvelope = (await wrongVerification.json()) as ApiEnvelope<unknown>
+  expect(wrongEnvelope.ok).toBe(false)
+  if (!wrongEnvelope.ok) expect(wrongEnvelope.error.code).toBe('CHALLENGE_INVALID')
+  await expect(page.getByText('That verification code is invalid or expired.')).toBeVisible()
+  await expectNoStoredSession(page)
+
+  const verifyResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/verify-email', 'POST'))
+  await page.getByTestId('verify-email-code').fill(code)
+  await page.getByTestId('verify-email-submit').click()
+  const verified = await verifyResponse
+  expect(verified.status()).toBe(200)
+  await expect(page).toHaveURL(/\/sign-in/)
+  await expectNoStoredSession(page)
+
+  await passwordLogin(page, account)
+  await reloadAndExpectRestored(page, account)
+  expectNoCriticalEvents(events, [{status: 401, method: 'POST', path: '/v1/accounts/verify-email'}])
+})
+
+test('password reset browser flow revokes old session and accepts only the new password', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const account = await createVerifiedAccount('reset')
+  const nextPassword = `${account.password}-next`
+  const login = await apiJson<SessionTokenResult>('/v1/sessions', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: account.email,
+      password: account.password,
+    }),
+  })
+  expect(login.response.status).toBe(200)
+  if (!login.body.ok) throw new Error(login.body.error.message)
+  const oldAccessToken = login.body.data.accessToken
+
+  await page.goto('/forgot-password', {waitUntil: 'networkidle'})
+  await page.getByTestId('forgot-password-email').fill(account.email)
+  const forgotResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/forgot-password', 'POST'))
+  await page.getByTestId('forgot-password-submit').click()
+  const forgot = await forgotResponse
+  expect(forgot.status()).toBe(200)
+  const recovery = (await forgot.json()) as ApiEnvelope<RecoveryResult>
+  expect(recovery.ok).toBe(true)
+  if (!recovery.ok || !recovery.data.recoveryToken) {
+    throw new Error('Disposable auth verifier requires non-production recovery token exposure.')
+  }
+  await expect(page.getByText(/reset instructions were accepted/i)).toBeVisible()
+
+  await page.getByTestId('forgot-password-have-code').click()
+  await expect(page).toHaveURL(/\/reset-password/)
+  await page.getByTestId('reset-password-code').fill(recovery.data.recoveryToken)
+  await page.getByTestId('reset-password-new-password').fill(nextPassword)
+  await page.getByTestId('reset-password-confirm-password').fill(nextPassword)
+  const resetResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/reset-password', 'POST'))
+  await page.getByTestId('reset-password-submit').click()
+  const reset = await resetResponse
+  expect(reset.status()).toBe(200)
+  await expect(page.getByText('Password updated. Sign in with your new password.')).toBeVisible()
+
+  const revoked = await page.request.get(apiURL('/v1/accounts/me'), {
+    headers: {authorization: `Bearer ${oldAccessToken}`},
+  })
+  expect(revoked.status()).toBe(401)
+
+  await fillPasswordForm(page, account, account.password)
+  const oldLoginResponse = page.waitForResponse(matchesApiResponse('/v1/sessions', 'POST'))
+  await page.getByTestId('sign-in-submit').click()
+  const oldLogin = await oldLoginResponse
+  expect(oldLogin.status()).toBe(401)
+  const oldLoginEnvelope = (await oldLogin.json()) as ApiEnvelope<unknown>
+  expect(oldLoginEnvelope.ok).toBe(false)
+  if (!oldLoginEnvelope.ok) expect(oldLoginEnvelope.error.code).toBe('INVALID_CREDENTIALS')
+  await expect(page.getByText('Invalid credentials')).toBeVisible()
+  await expectNoStoredSession(page)
+
+  await passwordLogin(page, {...account, password: nextPassword})
+  expectNoCriticalEvents(events, [{status: 401, method: 'POST', path: '/v1/sessions'}])
 })

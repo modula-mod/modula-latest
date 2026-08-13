@@ -40,8 +40,9 @@ export function ForgotPasswordScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
+            testID="forgot-password-email"
           />
-          <AppButton disabled={pending} onPress={() => void submit()}>
+          <AppButton testID="forgot-password-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Sending' : 'Send reset link'}
           </AppButton>
           {submitted ? (
@@ -50,7 +51,10 @@ export function ForgotPasswordScreen() {
               then continue to reset password.
             </AppText>
           ) : null}
-          <AppButton variant="secondary" onPress={() => router.push('/reset-password' as Href)}>
+          <AppButton
+            testID="forgot-password-have-code"
+            variant="secondary"
+            onPress={() => router.push('/reset-password' as Href)}>
             I have a reset code
           </AppButton>
           <AppButton variant="ghost" onPress={() => router.push('/sign-in' as Href)}>

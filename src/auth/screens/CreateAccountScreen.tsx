@@ -250,6 +250,7 @@ export function CreateAccountScreen() {
                 onChangeText={setDisplayName}
                 textContentType="name"
                 returnKeyType="next"
+                testID="create-account-display-name"
               />
               <AuthField
                 label="Email"
@@ -260,8 +261,11 @@ export function CreateAccountScreen() {
                 textContentType="emailAddress"
                 returnKeyType="next"
                 error={error ?? undefined}
+                testID="create-account-email"
               />
-              <AppButton onPress={nextFromEmail}>Continue</AppButton>
+              <AppButton testID="create-account-email-continue" onPress={nextFromEmail}>
+                Continue
+              </AppButton>
             </>
           ) : null}
 
@@ -274,6 +278,7 @@ export function CreateAccountScreen() {
                 secureTextEntry
                 textContentType="newPassword"
                 returnKeyType="next"
+                testID="create-account-password"
               />
               <AuthField
                 label="Confirm password"
@@ -283,8 +288,11 @@ export function CreateAccountScreen() {
                 textContentType="newPassword"
                 returnKeyType="done"
                 error={error ?? undefined}
+                testID="create-account-password-confirmation"
               />
-              <AppButton onPress={nextFromPassword}>Continue</AppButton>
+              <AppButton testID="create-account-password-continue" onPress={nextFromPassword}>
+                Continue
+              </AppButton>
             </>
           ) : null}
 
@@ -298,11 +306,15 @@ export function CreateAccountScreen() {
                 textContentType="username"
                 returnKeyType="done"
                 error={error ?? undefined}
+                testID="create-account-handle"
               />
               <AppText variant="caption" colour="textSecondary">
                 Your username is public and can change later. Your account ID never changes.
               </AppText>
-              <AppButton disabled={pending} onPress={() => void nextFromHandle()}>
+              <AppButton
+                testID="create-account-handle-continue"
+                disabled={pending}
+                onPress={() => void nextFromHandle()}>
                 {pending ? 'Checking' : 'Continue'}
               </AppButton>
             </>
@@ -327,7 +339,10 @@ export function CreateAccountScreen() {
                   {error}
                 </AppText>
               ) : null}
-              <AppButton disabled={pending} onPress={() => void submit()}>
+              <AppButton
+                testID="create-account-submit"
+                disabled={pending}
+                onPress={() => void submit()}>
                 {pending ? 'Creating' : 'Create Modula Account'}
               </AppButton>
             </>

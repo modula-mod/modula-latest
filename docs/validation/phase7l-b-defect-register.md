@@ -13,7 +13,7 @@ Current register counts:
 
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 12 | 4 | 0 | 0 | 7 | 1 | 0 |
+| P0 | 12 | 2 | 0 | 0 | 9 | 1 | 0 |
 | P1 | 35 | 10 | 0 | 0 | 24 | 1 | 0 |
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
@@ -143,12 +143,12 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Feature/domain: Password reset / Auth
 - Symptom: API password reset works with a valid recovery token, but browser reset flow is not proven.
 - Root cause: Phase 7L-A reset proof used DB-token audit path, not a full browser journey.
-- Source files: `src/auth/screens/ForgotPasswordScreen.tsx`; `src/auth/screens/ResetPasswordScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/accounts/recovery.ts`; `services/greenfield-api/src/mail/service.ts`
+- Source files: `src/auth/screens/ForgotPasswordScreen.tsx`; `src/auth/screens/ResetPasswordScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `tests/phase7l-b-auth-regression.test.ts`; `services/greenfield-api/src/accounts/recovery.ts`; `services/greenfield-api/src/mail/service.ts`
 - Backend dependency: Recovery token generation, reset endpoint, and mail delivery queue.
 - Fix strategy: Add controlled browser reset acceptance, preserving exact error domains and session state.
-- Verification command: `CI=true MODULA_E2E_RESET_EMAIL=<controlled> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public reset link flow changes password, rejects old password, accepts new password, and creates a usable session.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-011 - Email Verification Browser Proof
 
@@ -156,12 +156,12 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Feature/domain: Email verification / Auth
 - Symptom: API email verification works, but browser verify-email journey and session handoff are not proven.
 - Root cause: Phase 7L-A validated API challenge semantics only.
-- Source files: `src/auth/screens/CreateAccountScreen.tsx`; `src/auth/screens/VerifyEmailScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/accounts/service.ts`; `services/greenfield-api/src/auth/challenges/service.ts`; `services/greenfield-api/src/mail/service.ts`
+- Source files: `src/auth/screens/CreateAccountScreen.tsx`; `src/auth/screens/VerifyEmailScreen.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `tests/phase7l-b-auth-regression.test.ts`; `services/greenfield-api/src/accounts/service.ts`; `services/greenfield-api/src/auth/challenges/service.ts`; `services/greenfield-api/src/mail/service.ts`
 - Backend dependency: Register, resend verification, verify email, and challenge replay protection.
 - Fix strategy: Add controlled browser registration/verification proof with replay and wrong-code checks.
-- Verification command: `CI=true MODULA_E2E_REGISTER_EMAIL=<controlled> pnpm verify:phase7l-b`
+- Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
 - Live verification: Public browser verifies email, creates/uses the session only after valid verification, and rejects wrong/replayed codes.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P0-012 - Native iOS Build
 
