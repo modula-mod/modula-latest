@@ -2,11 +2,11 @@
 # Cloud Agent install for modula-latest.
 #
 # modula-latest consumes several packages from the sibling repository
-# modula-mod/modula-module-standard through `file:` dependencies resolved at
-# ../modula-mod/modula-module-standard. Those packages publish their types from
-# dist/, so the sibling must be checked out and built before this repo installs
-# or typechecks. This script prepares that layout idempotently and then installs
-# modula-latest.
+# modula-mod/modula-module-standard through `file:../modula-mod/modula-module-standard/...`
+# dependencies. Those packages resolve their types from dist/, so the sibling
+# must exist at ../modula-mod/modula-module-standard (relative to this repo) and
+# be built before this repo installs or typechecks. This script prepares that
+# layout idempotently and then installs modula-latest.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,26 +21,45 @@ MODULE_STANDARD_REPO="https://github.com/modula-mod/modula-module-standard.git"
 # active version per directory automatically.
 corepack prepare pnpm@11.21.0 --activate
 
-# 1. Ensure the file: dependency source is present at
-#    ../modula-mod/modula-module-standard. Reuse an existing sibling checkout
-#    (multi-repo workspace) when available; otherwise clone it.
-mkdir -p "$MOD_ORG_DIR"
+# Ensure the parent directory for the file: dependency source exists. When the
+# repo is checked out directly under a non-writable root (e.g. /workspace, whose
+# parent is /), fall back to sudo to create and own the directory.
+if [ ! -d "$MOD_ORG_DIR" ]; then
+  if ! mkdir -p "$MOD_ORG_DIR" 2>/dev/null; then
+    sudo mkdir -p "$MOD_ORG_DIR"
+    sudo chown "$(id -u):$(id -g)" "$MOD_ORG_DIR"
+  fi
+fi
+
+# Provide modula-module-standard at the expected path. Reuse an existing
+# checkout when one is available (multi-repo workspaces expose the repos as
+# siblings or under /agent/repos); otherwise clone it. Cloning requires the
+# generated GitHub token to include modula-module-standard, which is declared
+# via repositoryDependencies in .cursor/environment.json.
 if [ ! -e "$MODULE_STANDARD_DIR" ]; then
-  if [ -d "$PARENT_DIR/modula-module-standard/.git" ]; then
-    ln -s "$PARENT_DIR/modula-module-standard" "$MODULE_STANDARD_DIR"
-  else
+  reused=""
+  for candidate in \
+    "$PARENT_DIR/modula-module-standard" \
+    "/agent/repos/modula-module-standard"; do
+    if [ -d "$candidate/.git" ]; then
+      ln -s "$candidate" "$MODULE_STANDARD_DIR"
+      reused="$candidate"
+      break
+    fi
+  done
+  if [ -z "$reused" ]; then
     git clone --depth 1 "$MODULE_STANDARD_REPO" "$MODULE_STANDARD_DIR"
   fi
 fi
 
-# 2. Build modula-module-standard so its packages expose dist/ output that
-#    modula-latest's file: dependencies and typecheck resolve against.
+# Build modula-module-standard so its packages expose dist/ output that
+# modula-latest's file: dependencies and typecheck resolve against.
 (
   cd "$MODULE_STANDARD_DIR"
   corepack pnpm install --frozen-lockfile
   corepack pnpm build
 )
 
-# 3. Install modula-latest itself.
+# Install modula-latest itself.
 cd "$REPO_ROOT"
 corepack pnpm@11.21.0 install --frozen-lockfile
