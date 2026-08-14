@@ -1,0 +1,13 @@
+{
+  "name": "Modula (modula-latest)",
+  "repositoryDependencies": ["github.com/modula-mod/modula-module-standard"],
+  "install": "bash scripts/cloud-agent-install.sh",
+  "terminals": [
+    {
+      "name": "expo-web",
+      "command": "corepack pnpm@11.21.0 web",
+      "description": "Expo web dev server (Metro) for Modula on http://localhost:8081"
+    }
+  ],
+  "ports": [{ "name": "expo-web", "port": 8081 }]
+}
