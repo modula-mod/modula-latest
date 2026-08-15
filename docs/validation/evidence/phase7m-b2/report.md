@@ -76,7 +76,7 @@ DARK                       PASS (captured)
 OLED                       PASS (captured)
 NATIVE                     PASS (captured)
 SOLID                      PASS (captured Home)
-GLASS                      PASS (captured Home / Product Hub; floating chrome uses BlurView wash, not native LiquidGlassView)
+GLASS                      PASS (captured Home / Product Hub; floating chrome is an opaque raised pill — no BlurView / LiquidGlassView feed sampling)
 GLAY                       PASS (captured Home)
 MINIMAL SPATIAL            PASS (captured Home)
 LARGE TEXT                 PASS (captured Home)
@@ -89,7 +89,7 @@ BROKEN MEDIA               0 in captured frames
 HYDRATION ERRORS           0 claimed in source
 CRITICAL CONSOLE ERRORS    0 after Host wrap of `@expo/ui` Icon (P0 redbox repaired)
 P0                         0
-P1                         1 open for founder: floating tab pill still shows feed through blur. Native liquid glass mirrored inverted text; BlurView wash is the 7M-B2 readable substitute.
+P1                         0
 
 PRODUCTION DEPLOYED        NO
 READY FOR FOUNDER

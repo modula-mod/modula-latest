@@ -1,7 +1,6 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState, type ReactNode} from 'react'
 import {Pressable, StyleSheet, View} from 'react-native'
-import {BlurView} from 'expo-blur'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -28,14 +27,13 @@ import {
   type ModulaTabDefinition,
 } from '@/platform/ui/navigation/modula-tabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 
 export type {ModulaLiquidGlassTabBarProps}
 
 /**
  * Expandable floating bottom tab bar.
- * Native `@callstack/liquid-glass` still samples inverted feed text through
- * the pill, so 7M-B2 uses BlurView + a surface wash for readable chrome.
+ * The pill is an opaque raised surface. BlurView and LiquidGlassView both
+ * sample the scrolling feed and leak post text through the chrome.
  * Loaded only via dynamic require from PlatformTabs after a native-module probe.
  * Product screens must not import this file or `@callstack/liquid-glass`.
  */
@@ -89,46 +87,43 @@ const EXPAND_ACTIONS: ExpandAction[] = [
   {id: 'drafts', label: 'Drafts', icon: 'saved', href: '/drafts'},
 ]
 
-function GlassSurface({
+function ChromeSurface({
   children,
   style,
-  solidFallback,
+  backgroundColor,
+  borderColor,
+  shadowColor,
 }: {
   children: ReactNode
   style?: object
-  interactive?: boolean
-  solidFallback: string
+  backgroundColor: string
+  borderColor: string
+  shadowColor: string
 }) {
-  const {scheme} = useThemeTokens()
-  const {reduceTransparency} = useSystemAccessibility()
-
-  if (reduceTransparency) {
-    return (
-      <View style={[style, {backgroundColor: solidFallback, overflow: 'hidden'}]}>
+  const flattened = StyleSheet.flatten(style)
+  const borderRadius = flattened && 'borderRadius' in flattened ? flattened.borderRadius : undefined
+  return (
+    <View
+      style={[
+        styles.chromeShadow,
+        {
+          borderRadius,
+          shadowColor,
+        },
+      ]}>
+      <View
+        style={[
+          style,
+          styles.chromeFill,
+          {
+            backgroundColor,
+            borderColor,
+            borderRadius,
+          },
+        ]}>
         {children}
       </View>
-    )
-  }
-
-  // Native LiquidGlassView samples the scrolling feed and mirrors inverted text
-  // through the floating pill. BlurView + a surface wash is the readable chrome.
-  return (
-    <BlurView
-      intensity={64}
-      tint={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
-      style={[style, {overflow: 'hidden', backgroundColor: 'transparent'}]}>
-      <View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: solidFallback,
-            opacity: scheme === 'dark' ? 0.62 : 0.78,
-          },
-        ]}
-      />
-      {children}
-    </BlurView>
+    </View>
   )
 }
 
@@ -236,7 +231,7 @@ export function ModulaLiquidGlassTabBar({
     }
   }
 
-  const glassFallback = colours.surface
+  const glassFallback = colours.surfaceRaised
   const bottomPad = Math.max(insets.bottom, spacing[2])
 
   return (
@@ -250,16 +245,14 @@ export function ModulaLiquidGlassTabBar({
         },
       ]}>
       <Animated.View style={[mainTabStyle, styles.mainCluster]}>
-        <GlassSurface
-          solidFallback={glassFallback}
+        <ChromeSurface
+          backgroundColor={glassFallback}
+          borderColor={colours.border}
+          shadowColor={colours.shadow}
           style={[
             styles.liquidGlassView,
             {
               borderRadius: radius.xlarge,
-              // Native liquid glass needs no stroke; BlurView fallback stays
-              // borderless too so the pill reads as glass, not a solid card.
-              borderColor: 'transparent',
-              borderWidth: 0,
             },
           ]}>
           {/* Only mount expand menu when open — avoids ghost icons through glass. */}
@@ -344,7 +337,7 @@ export function ModulaLiquidGlassTabBar({
               )
             })}
           </View>
-        </GlassSurface>
+        </ChromeSurface>
       </Animated.View>
 
       <Pressable
@@ -358,13 +351,14 @@ export function ModulaLiquidGlassTabBar({
           void selectionHaptic()
         }}
         style={styles.plusButtonContainer}>
-        <GlassSurface
-          solidFallback={colours.accent}
+        <ChromeSurface
+          backgroundColor={colours.accent}
+          borderColor={colours.accent}
+          shadowColor={colours.shadow}
           style={[
             styles.plusButtonGlass,
             {
               borderRadius: radius.round,
-              backgroundColor: colours.accent,
             },
           ]}>
           <Animated.View style={plusIconStyle}>
@@ -374,13 +368,24 @@ export function ModulaLiquidGlassTabBar({
               size={26}
             />
           </Animated.View>
-        </GlassSurface>
+        </ChromeSurface>
       </Pressable>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  chromeFill: {
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+  },
+  chromeShadow: {
+    elevation: 10,
+    overflow: 'visible',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
+  },
   container: {
     alignItems: 'flex-end',
     flexDirection: 'row',
@@ -391,10 +396,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   liquidGlassView: {
-    backgroundColor: 'transparent',
     justifyContent: 'center',
     minHeight: FLOATING_TAB_BAR_SEGMENT_HEIGHT,
-    overflow: 'hidden',
   },
   mainCluster: {
     flex: 1,

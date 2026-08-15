@@ -69,6 +69,15 @@ const card = read('src/features/modules/components/ModuleCatalogueCard.tsx')
 record('CARD HIDES MODULE ID', !card.includes('digital.modula.vault-notes') && !card.includes('checksum'))
 record('CARD HAS INSTALL ACTION', card.includes("actionLabel") && card.includes('Install'))
 
+const tabBar = read('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx')
+record(
+  'TAB BAR OPAQUE CHROME',
+  !tabBar.includes("from 'expo-blur'") &&
+    !tabBar.includes("require('@callstack/liquid-glass')") &&
+    tabBar.includes('ChromeSurface') &&
+    tabBar.includes('surfaceRaised'),
+)
+
 const lab = read('src/platform/ui/dev/modula-primitives-lab.tsx')
 for (const primitive of [
   'Typography',
