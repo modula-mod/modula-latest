@@ -23,7 +23,7 @@ modula.module.vaultNotes → alias / migration only
 module-vault-notes → alias / migration only
 
 LEGACY REPOSITORIES:
-modula-mod/modula-module-vault-notes → archive / redirect only (inaccessible to this mission: GitHub 404)
+modula-mod/modula-module-vault-notes → archive / redirect only
 
 DATA NAMESPACE:
 module.digital.modula.vault-notes
@@ -32,7 +32,7 @@ module.digital.modula.vault-notes
 
 Product Hub identity `digital.modula.vault-notes` is preserved because it is the installed product identity.
 
-The accessible, buildable, testable source is `modula-mod/modula-vault-notes`.
+The go-forward, buildable, testable source is `modula-mod/modula-vault-notes`.
 
 Those two facts are not two products. A Git repository name is not a module ID.
 
@@ -56,10 +56,12 @@ An account may have 0 or 1 logical Vault Notes installation. Extra family rows a
 
 | Candidate | Result |
 | --- | --- |
-| `modula-mod/modula-vault-notes` | Exists, public, HEAD `4f2c3c9`, tags `vault-notes-v1.0.0` and `vault-notes-v1.1.0`, builds and self-verifies. Declared source ID in-tree is still `modula.vault-notes` until the source overlay is pushed. |
-| `modula-mod/modula-module-vault-notes` | Outcome **D/E**: GitHub returns 404 / “Could not resolve to a Repository”. No unique source could be recovered from this agent. Do not delete historical Git evidence if it later reappears; archive and redirect. |
+| `modula-mod/modula-vault-notes` | Exists, public, maintainer push via Mac HTTPS (`modula-mod` gh identity). HEAD after identity overlay `d92e445`. Tags `vault-notes-v1.0.0` and `vault-notes-v1.1.0`. `pnpm build`, `pnpm test`, `pnpm verify` all pass. Manifest ID is now `digital.modula.vault-notes`. Version remains 1.1.0. |
+| `modula-mod/modula-module-vault-notes` | Outcome **C**: private, recoverable from Mac. Cloud agents saw GitHub 404 (D/E). Contains unique historical Greenfield source for production `0.1.0` (`915bbf2`) and `0.2.0` (`54ab8ed`), plus an older MMS 0.3 host-rendered JSON prototype. Last push before archival: 2026-07-26. Archived with README redirect. History retained. Not deleted. |
 
 No third Vault Notes repository is created.
+
+The recovered legacy repository does not contain a reason to make it canonical: it does not build/test/self-verify as a Standard 1.1 module. Production 0.2.0 is a historical release of the same module ID, not a second product.
 
 ## Trust chain
 
@@ -68,15 +70,15 @@ Product Hub
     ↓
 canonical module release  digital.modula.vault-notes
     ↓
-manifest                  module.manifest.json (canonical ID overlay)
+manifest                  module.manifest.json (canonical ID in source as of d92e445)
     ↓
 repository                modula-mod/modula-vault-notes
     ↓
-commit SHA                tagged release commit
+commit SHA                tagged release commit f443972 (current 1.1.0)
     ↓
 release/tag               vault-notes-v1.1.0 (current)
     ↓
-artifact checksum         release asset SHA-256
+artifact checksum         46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a
 ```
 
-Every arrow must resolve. Product Hub must not claim `modula-mod/modula-module-vault-notes` as live source.
+Every arrow must resolve. Product Hub must not claim `modula-mod/modula-module-vault-notes` as live source. Historical 0.2.0 rows may keep that repository as provenance of the bytes that were imported; they are not the current lineage.

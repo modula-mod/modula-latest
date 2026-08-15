@@ -139,6 +139,8 @@ console.log('\n# Module platform database gates')
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL ?? process.env.MODULA_DATABASE_URL
 const externalCandidates = [
   process.env.MODULA_VAULT_NOTES_ROOT,
+  '/Users/msjoy/Developer/modula-vault-notes',
+  rel('../modula-vault-notes'),
   rel('../modula-mod/modula-vault-notes'),
   '/tmp/modula-mod/modula-vault-notes',
 ].filter(Boolean)

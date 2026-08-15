@@ -19,7 +19,12 @@ import {GreenfieldModulePermissionService} from './permission-service.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
 import {allRuntimePermissionKeys, GreenfieldModuleRuntime2Service} from './runtime2-service.js'
 import {GreenfieldModuleIdentityMigrationService} from './identity-migration-service.js'
-import {isVaultNotesModuleId, moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {
+  isVaultNotesModuleId,
+  moduleIdFamily,
+  resolveCanonicalModuleId,
+  selectCanonicalVaultNotesInstallation,
+} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -376,9 +381,8 @@ function arrayOfStrings(value: unknown): string[] {
 }
 
 function collapseVaultNotesInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
-  const vault = installations.filter(row => isVaultNotesModuleId(row.moduleId))
   const others = installations.filter(row => !isVaultNotesModuleId(row.moduleId))
-  if (vault.length <= 1) return installations.map(row => ({...row, moduleId: resolveCanonicalModuleId(row.moduleId)}))
-  const preferred = vault.find(row => row.status === 'enabled') ?? vault[0]!
+  const preferred = selectCanonicalVaultNotesInstallation(installations)
+  if (!preferred) return others
   return [...others, {...preferred, moduleId: resolveCanonicalModuleId(preferred.moduleId)}]
 }

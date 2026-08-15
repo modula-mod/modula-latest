@@ -28,7 +28,7 @@ export function classifyVaultNotesRow(row) {
     return row.current === false ? 'HISTORICAL_RELEASE' : 'CANONICAL'
   }
   if (row.moduleId === CANONICAL_ID && String(row.sourceRepository ?? '').includes('modula-module-vault-notes')) {
-    return 'STALE'
+    return row.current === true ? 'STALE' : 'HISTORICAL_RELEASE'
   }
   if (row.moduleId === CANONICAL_ID) return 'CANONICAL'
   if (String(row.name ?? '').toLowerCase() === 'vault notes') return 'DUPLICATE_INVALID'
@@ -42,4 +42,44 @@ if (isMain) {
   console.log(`CANONICAL REPOSITORY  ${CANONICAL_REPO}`)
   console.log(`LEGACY IDS            ${LEGACY_IDS.join(', ')}`)
   console.log('Inspect greenfield_module_releases / installations on VPS before any UPDATE.')
+  console.log('Production dump (2026-08-15 Mac via ssh modula-vps, no mutation):')
+  const production = [
+    {
+      kind: 'release',
+      moduleId: 'digital.modula.vault-notes',
+      version: '0.1.0',
+      releaseId: 'module-release:digital.modula.vault-notes:0.1.0',
+      sourceRepository: 'modula-mod/modula-module-vault-notes',
+      sourceCommit: '915bbf234818fd0eec2e83c6fa0b7fd52837184c',
+      releaseState: 'published',
+      historical: true,
+    },
+    {
+      kind: 'release',
+      moduleId: 'digital.modula.vault-notes',
+      version: '0.2.0',
+      releaseId: 'module-release:digital.modula.vault-notes:0.2.0',
+      sourceRepository: 'modula-mod/modula-module-vault-notes',
+      sourceCommit: '54ab8edac1ba469f0081c636e11f6059d712becc',
+      releaseState: 'published',
+      current: true,
+    },
+    {
+      kind: 'catalogue',
+      moduleId: 'digital.modula.vault-notes',
+      version: '0.2.0',
+      name: 'Vault Notes',
+      status: 'active',
+    },
+    {
+      kind: 'catalogue',
+      moduleId: 'modula.module.vaultNotes',
+      version: '1.0.0',
+      name: 'Vault Notes',
+      status: 'unavailable',
+    },
+  ]
+  for (const row of production) {
+    console.log(`${classifyVaultNotesRow(row).padEnd(22)} ${row.kind} ${row.moduleId} @ ${row.version}`)
+  }
 }

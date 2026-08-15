@@ -33,6 +33,7 @@ function read(file) {
 const identity = read('packages/greenfield-contracts/src/canonical-module-identity.ts')
 record('CANONICAL ID DECLARED', identity.includes("CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'"))
 record('CANONICAL REPO DECLARED', identity.includes("CANONICAL_VAULT_NOTES_REPOSITORY = 'modula-mod/modula-vault-notes'"))
+record('ARTIFACT SHA DECLARED', identity.includes('46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a'))
 record('LEGACY ALIAS DECLARED', identity.includes("'modula.vault-notes'"))
 record('NO THIRD PRODUCT', !identity.includes('vault-notes-something') && !identity.includes('1.2.0'))
 

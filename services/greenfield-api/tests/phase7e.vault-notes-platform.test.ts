@@ -42,7 +42,7 @@ const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 describe('Phase 7E Vault Notes external module declarations', () => {
   it('keeps Vault Notes outside hardcoded app feature paths', () => {
     expect(readJson('modula.module.json').standardVersion).toBe('1.2.0')
-    expect(readJson('modula.module.json').id).toBe('modula.vault-notes')
+    expect(readJson('modula.module.json').id).toBe(CANONICAL_VAULT_NOTES_MODULE_ID)
     expect(() => readFileSync(join(workspaceRoot, 'src/features/vault-notes/index.ts'), 'utf8')).toThrow()
     expect(() => readFileSync(join(workspaceRoot, 'app/vault-notes.tsx'), 'utf8')).toThrow()
     const moduleRepository = readFileSync(join(workspaceRoot, 'src/data/repositories/api/ApiModuleRepository.ts'), 'utf8')
@@ -880,6 +880,8 @@ function titleize(value: string) {
 function resolveVaultNotesRoot(workspaceRoot: string): string {
   const candidates = [
     process.env.MODULA_VAULT_NOTES_ROOT,
+    '/Users/msjoy/Developer/modula-vault-notes',
+    resolve(workspaceRoot, '../modula-vault-notes'),
     resolve(workspaceRoot, '../modula-mod/modula-vault-notes'),
     '/tmp/modula-mod/modula-vault-notes',
   ].filter((value): value is string => Boolean(value))

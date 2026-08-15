@@ -1,10 +1,12 @@
 # Phase 7M-B2 freeze
 
-Recorded 2026-08-15 from the cloud agent before identity mutation.
+Recorded 2026-08-15 from the Mac after pulling PR #19, then again after
+canonical source push. Production was not mutated.
 
 ```
 MAC_HEAD=
-(not this execution host)
+449a8b5c3cc018932eb0cb065a02dd96320748cd
+(working branch cursor/phase7m-b2-vault-notes-canonical-b6a2 at pull)
 
 ORIGIN_PR18_HEAD=
 aebcef49ae426d4fed00db96b0c0b146544bbdb6
@@ -13,14 +15,20 @@ MAIN_HEAD=
 645908778bc79cbe6cda05d72a80072a24a32248
 
 PRODUCTION_SHA=
-last accepted production SHA remains in place. This mission does not deploy.
+e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a
+(VPS /root/modula-latest detached HEAD; docker images tagged with this SHA)
 
 VPS_SOURCE_HEAD=
-UNAVAILABLE (`ssh modula-vps` hostname does not resolve here;
-root@87.106.40.136 → Permission denied (publickey))
+e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a
 
-VAULT_NOTES_REPO_HEAD=
+VAULT_NOTES_REPO_HEAD_AT_FREEZE=
 4f2c3c9ef18a862ca4f896c3f59bf2e821b38c11
+
+VAULT_NOTES_REPO_HEAD_AFTER_IDENTITY_PUSH=
+d92e4455cd56f95b0109e3dc8f1df0c8a52c60da
+TAG=
+vault-notes-v1.1.0 → f443972d53f94b6f192a37bcce8742bdf18a99b5
 ```
 
 PR #18 had moved beyond a5a451e. This branch starts from the actual PR HEAD `aebcef4`.
+Do not label an older commit as the candidate after source changes.

@@ -1,10 +1,19 @@
 import {describe, expect, it} from 'vitest'
 import {
+  CANONICAL_VAULT_NOTES_ARTIFACT_SHA256,
+  CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
+  CANONICAL_VAULT_NOTES_CURRENT_TAG,
+  CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  CANONICAL_VAULT_NOTES_DATA_NAMESPACE,
   CANONICAL_VAULT_NOTES_MODULE_ID,
   CANONICAL_VAULT_NOTES_REPOSITORY,
+  isCanonicalVaultNotesRepository,
   isLegacyVaultNotesModuleId,
+  isLegacyVaultNotesRepository,
   resolveCanonicalModuleId,
   rewriteLegacyVaultNotesId,
+  rewriteLegacyVaultNotesValue,
+  selectCanonicalVaultNotesInstallation,
   vaultNotesIdentityFamily,
 } from '@modula/greenfield-contracts'
 import {classifyBetaModule} from '../src/modules/beta-catalogue-policy.js'
@@ -44,7 +53,88 @@ describe('Vault Notes canonical identity', () => {
     expect(classifyVaultNotesRow({
       moduleId: 'digital.modula.vault-notes',
       sourceRepository: 'modula-mod/modula-module-vault-notes',
+      current: true,
     })).toBe('STALE')
+    expect(classifyVaultNotesRow({
+      moduleId: 'digital.modula.vault-notes',
+      sourceRepository: 'modula-mod/modula-module-vault-notes',
+      version: '0.1.0',
+      historical: true,
+    })).toBe('HISTORICAL_RELEASE')
     expect(classifyVaultNotesRow({moduleId: 'something.else', name: 'Vault Notes'})).toBe('DUPLICATE_INVALID')
+  })
+
+  it('legacy product is hidden so Product Hub count is 1', () => {
+    const rows = [
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'published', name: 'Vault Notes'},
+      {moduleId: 'modula.vault-notes', status: 'published', name: 'Vault Notes'},
+      {moduleId: 'modula.module.vaultNotes', status: 'unavailable', name: 'Vault Notes'},
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'superseded', name: 'Vault Notes'},
+    ]
+    const visible = rows.filter(row => classifyBetaModule(row).visibleInBeta)
+    expect(visible).toHaveLength(1)
+    expect(visible[0]!.moduleId).toBe(CANONICAL_VAULT_NOTES_MODULE_ID)
+  })
+
+  it('search result count is 1 for the Vault Notes family', () => {
+    const hits = [
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, name: 'Vault Notes'},
+      {moduleId: 'modula.vault-notes', name: 'Vault Notes'},
+      {moduleId: 'modula.module.vaultNotes', name: 'Vault Notes'},
+    ].filter(row => classifyBetaModule({moduleId: row.moduleId, status: 'published'}).visibleInBeta)
+    expect(hits).toHaveLength(1)
+  })
+
+  it('refuses a second family install by collapsing to one logical row', () => {
+    const selected = selectCanonicalVaultNotesInstallation([
+      {moduleId: 'modula.vault-notes', status: 'enabled', installationId: 'legacy'},
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'installedDisabled', installationId: 'canonical'},
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'removed', installationId: 'gone'},
+    ])
+    expect(selected).toMatchObject({installationId: 'legacy', status: 'enabled'})
+    expect(selectCanonicalVaultNotesInstallation([
+      {moduleId: 'modula.vault-notes', status: 'removed'},
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'removed'},
+    ])).toBeUndefined()
+  })
+
+  it('migrates note ownership onto the canonical namespace without duplicating', () => {
+    const before = [
+      {accountId: 'A', moduleId: 'modula.vault-notes', recordId: 'note-a', title: 'Note A'},
+      {accountId: 'A', moduleId: 'modula.vault-notes', recordId: 'note-b', title: 'Note B'},
+    ]
+    const after = rewriteLegacyVaultNotesValue(before)
+    expect(after.map(row => row.moduleId)).toEqual([CANONICAL_VAULT_NOTES_MODULE_ID, CANONICAL_VAULT_NOTES_MODULE_ID])
+    expect(after.map(row => row.title)).toEqual(['Note A', 'Note B'])
+    expect(new Set(after.map(row => `${row.accountId}:${row.recordId}`)).size).toBe(2)
+    expect(CANONICAL_VAULT_NOTES_DATA_NAMESPACE).toBe('module.digital.modula.vault-notes')
+  })
+
+  it('records canonical source provenance for the current release', () => {
+    expect(isCanonicalVaultNotesRepository(CANONICAL_VAULT_NOTES_REPOSITORY)).toBe(true)
+    expect(isLegacyVaultNotesRepository('modula-mod/modula-module-vault-notes')).toBe(true)
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.1.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.1.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toBe('f443972d53f94b6f192a37bcce8742bdf18a99b5')
+  })
+
+  it('records the current release artifact checksum', () => {
+    expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toMatch(/^[0-9a-f]{64}$/)
+    expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toBe(
+      '46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a',
+    )
+  })
+
+  it('treats an old family installation as an alias of the canonical product', () => {
+    const upgraded = selectCanonicalVaultNotesInstallation([
+      {moduleId: 'modula.vault-notes', status: 'enabled', version: '1.1.0'},
+    ])
+    expect(resolveCanonicalModuleId(upgraded!.moduleId)).toBe(CANONICAL_VAULT_NOTES_MODULE_ID)
+    expect(upgraded!.version).toBe('1.1.0')
+  })
+
+  it('does not invent version 1.2.0', () => {
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).not.toBe('1.2.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).not.toContain('1.2.0')
   })
 })

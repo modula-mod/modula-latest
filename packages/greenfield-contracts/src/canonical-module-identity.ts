@@ -12,6 +12,10 @@ export const CANONICAL_VAULT_NOTES_PUBLISHER = 'Modula'
 export const CANONICAL_VAULT_NOTES_PUBLISHER_ID = 'modula'
 export const CANONICAL_VAULT_NOTES_CURRENT_VERSION = '1.1.0'
 export const CANONICAL_VAULT_NOTES_CURRENT_TAG = 'vault-notes-v1.1.0'
+export const CANONICAL_VAULT_NOTES_CURRENT_COMMIT = 'f443972d53f94b6f192a37bcce8742bdf18a99b5'
+export const CANONICAL_VAULT_NOTES_SOURCE_HEAD = 'd92e4455cd56f95b0109e3dc8f1df0c8a52c60da'
+export const CANONICAL_VAULT_NOTES_ARTIFACT_SHA256 =
+  '46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a'
 export const CANONICAL_VAULT_NOTES_DATA_NAMESPACE = 'module.digital.modula.vault-notes'
 export const CANONICAL_VAULT_NOTES_RELEASE_LINEAGE = 'digital.modula.vault-notes'
 
@@ -88,4 +92,12 @@ export function isLegacyVaultNotesRepository(repository: string): boolean {
     .replace(/^git@github\.com:/, '')
     .replace(/\.git$/, '')
   return (LEGACY_VAULT_NOTES_REPOSITORIES as readonly string[]).includes(normalised)
+}
+
+export function selectCanonicalVaultNotesInstallation<T extends {moduleId: string; status: string}>(
+  rows: readonly T[],
+): T | undefined {
+  const vault = rows.filter(row => isVaultNotesModuleId(row.moduleId) && row.status !== 'removed')
+  if (!vault.length) return undefined
+  return vault.find(row => row.status === 'enabled') ?? vault[0]
 }
