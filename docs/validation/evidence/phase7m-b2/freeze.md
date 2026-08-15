@@ -5,8 +5,8 @@ canonical source push. Production was not mutated.
 
 ```
 MAC_HEAD=
-449a8b5c3cc018932eb0cb065a02dd96320748cd
-(working branch cursor/phase7m-b2-vault-notes-canonical-b6a2 at pull)
+7bf56ab (working branch after identity + flagship UI; evidence commit follows)
+(working branch cursor/phase7m-b2-vault-notes-canonical-b6a2)
 
 ORIGIN_PR18_HEAD=
 aebcef49ae426d4fed00db96b0c0b146544bbdb6
