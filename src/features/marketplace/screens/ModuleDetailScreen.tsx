@@ -55,19 +55,19 @@ export function ModuleDetailScreen() {
     setInstallError(null)
     setInstallStage('resolving')
     try {
-      setInstallStage('validating')
       const nextPreview = preview ?? await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined)
       setPreview(nextPreview)
+      setInstallStage('validating')
       if (nextPreview.compatible === false) {
         throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')
       }
       setInstallStage('compatibility')
       setInstallStage('permissions')
-      setInstallStage('installing')
       await services.moduleRepository.install(module.moduleId, {version: module.latestVersion ?? undefined})
+      setInstallStage('installing')
       if (enable) {
-        setInstallStage('enabling')
         await services.moduleRepository.enable(module.moduleId)
+        setInstallStage('enabling')
       }
       setInstallStage('ready')
       setInstallSheetOpen(false)

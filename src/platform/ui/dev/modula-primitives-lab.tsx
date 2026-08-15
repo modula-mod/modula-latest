@@ -175,11 +175,22 @@ export function ModulaPrimitivesLabScreen() {
       </LabBlock>
 
       <LabBlock title="Reaction Picker">
-        <AppText variant="caption" colour="textSecondary">👍 ❤️ 😂 😮 😢 🙏 compact reactions on the post action row.</AppText>
+        <View style={styles.row}>
+          {['👍', '❤️', '😂', '🔥', '🎉', '💡', '🤝', '🤔'].map(emoji => (
+            <AppText key={emoji} variant="title">{emoji}</AppText>
+          ))}
+        </View>
+        <AppText variant="caption" colour="textSecondary">
+          Long-press the like control on a post. One active reaction per actor.
+        </AppText>
       </LabBlock>
 
       <LabBlock title="Comment Thread">
-        <AppText variant="caption" colour="textSecondary">💬 Comment affordance opens the post thread, not a dashboard card.</AppText>
+        <View style={{gap: spacing[2], paddingLeft: spacing[2]}}>
+          <AppText variant="label">Ada</AppText>
+          <AppText variant="body">Comment affordance opens the post thread, not a dashboard card.</AppText>
+          <AppText variant="caption" colour="textSecondary">Reply · 2m</AppText>
+        </View>
       </LabBlock>
 
       <LabBlock title="Module Card">

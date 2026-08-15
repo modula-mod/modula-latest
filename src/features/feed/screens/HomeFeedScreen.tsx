@@ -216,7 +216,7 @@ export function HomeFeedScreen() {
                   style={styles.screen}
                   data={posts}
                   keyExtractor={item => item.id}
-                  renderItem={({item}) => <SocialPost post={item} />}
+                  renderItem={({item}) => <SocialPost post={item} compact />}
                   contentInsetAdjustmentBehavior="never"
                   bounces
                   alwaysBounceVertical

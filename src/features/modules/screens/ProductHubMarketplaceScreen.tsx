@@ -6,6 +6,7 @@ import {useRouter, type Href} from 'expo-router'
 import {AppText} from '@/components/primitives/AppText'
 import {ModuleCatalogueCard} from '@/features/modules/components'
 import {useInstalledModulesQuery, useModuleCatalogueQuery} from '@/features/modules/hooks'
+import {isLegacyVaultNotesModuleId, isVaultNotesModuleId, selectCanonicalVaultNotesInstallation} from '@modula/greenfield-contracts'
 import type {
   ModuleCatalogueItem,
   ProductHubCategory,
@@ -69,7 +70,7 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
   })
   const installed = useInstalledModulesQuery()
   const items = useMemo(() => {
-    const catalogueItems = catalogue.data ?? []
+    const catalogueItems = (catalogue.data ?? []).filter(item => !isLegacyVaultNotesModuleId(item.moduleId))
     if (hubMode === 'installed') {
       return catalogueItems.filter(item =>
         ['installed', 'enabled', 'disabled', 'updateAvailable', 'configurationRequired'].includes(
@@ -83,7 +84,11 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
     return catalogueItems
   }, [catalogue.data, hubMode])
   const featured = items.filter(item => item.featured).slice(0, compact ? 3 : 6)
-  const installedCount = installed.data?.length ?? 0
+  const installedCount = useMemo(() => {
+    const rows = installed.data ?? []
+    const others = rows.filter(row => !isVaultNotesModuleId(row.moduleId))
+    return others.length + (selectCanonicalVaultNotesInstallation(rows) ? 1 : 0)
+  }, [installed.data])
 
   const sections = useMemo(
     () =>

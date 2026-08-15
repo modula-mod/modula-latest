@@ -41,7 +41,7 @@ export function ModuleInstallProgress({
   failed?: string | null
   onOpen?: () => void
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const current = stageIndex(stage === 'failed' ? 'resolving' : stage)
   return (
     <View style={{gap: spacing[3]}} testID="module-install-progress">

@@ -148,9 +148,8 @@ function GlassSurface({
     return (
       <LiquidGlassView
         interactive={interactive}
-        // Clear keeps the pill chrome without a heavy rectangular blur slab
-        // that reads as "bottom progressive blur" tied to the tab bar.
-        effect="clear"
+        // Regular material stays glass without mirroring feed text through the pill.
+        effect="regular"
         style={style}>
         {children}
       </LiquidGlassView>
@@ -158,10 +157,9 @@ function GlassSurface({
   }
 
   // Soft glass fallback when Callstack liquid glass isn't linked / supported.
-  // Keep intensity low so shell edge dissolve owns the bottom fade.
   return (
     <BlurView
-      intensity={42}
+      intensity={56}
       tint={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
       style={[style, {overflow: 'hidden', backgroundColor: 'transparent'}]}>
       <View
@@ -169,8 +167,8 @@ function GlassSurface({
         style={[
           StyleSheet.absoluteFill,
           {
-            backgroundColor: '#FFFFFF',
-            opacity: scheme === 'dark' ? 0.06 : 0.1,
+            backgroundColor: solidFallback,
+            opacity: scheme === 'dark' ? 0.42 : 0.55,
           },
         ]}
       />

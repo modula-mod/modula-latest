@@ -43,7 +43,9 @@ function file(rel) {
 for (const rel of requiredFiles) file(rel)
 
 const product = file('src/features/product/screens/ProductHubScreen.tsx')
-if (!product.includes('ProductHubMarketplaceContent')) errors.push('Product Hub does not embed registry marketplace content')
+if (!product.includes('ProductHubMarketplaceScreen') && !product.includes('ProductHubMarketplaceContent')) {
+  errors.push('Product Hub does not embed registry marketplace content')
+}
 
 const marketplace = file('src/features/marketplace/screens/MarketplaceScreen.tsx')
 if (!marketplace.includes('ProductHubMarketplaceScreen')) errors.push('Marketplace route is not a Product Hub wrapper')

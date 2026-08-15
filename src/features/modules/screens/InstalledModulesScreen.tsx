@@ -1,5 +1,10 @@
 import {View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
+import {
+  CANONICAL_VAULT_NOTES_MODULE_ID,
+  isVaultNotesModuleId,
+  selectCanonicalVaultNotesInstallation,
+} from '@modula/greenfield-contracts'
 
 import {AppText} from '@/components/primitives/AppText'
 import {
@@ -14,7 +19,7 @@ export function InstalledModulesScreen() {
   const router = useRouter()
   const installed = useInstalledModulesQuery()
   const {spacing} = useThemeTokens()
-  const modules = installed.data ?? []
+  const modules = collapseVaultNotesRows(installed.data ?? [])
 
   return (
     <SettingsScreen
@@ -31,11 +36,20 @@ export function InstalledModulesScreen() {
               key={module.installationId || module.moduleId}
               last={index === modules.length - 1}
               row={{
-                title: module.name ?? module.moduleId,
+                title:
+                  module.name ??
+                  (isVaultNotesModuleId(module.moduleId) ? 'Vault Notes' : module.moduleId),
                 description: `${module.publisherName ?? 'Publisher'} · v${module.version}`,
                 icon: 'modules',
                 value: label(module.status),
-                onPress: () => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href),
+                onPress: () =>
+                  router.push(
+                    `/settings/modules/${encodeURIComponent(
+                      isVaultNotesModuleId(module.moduleId)
+                        ? CANONICAL_VAULT_NOTES_MODULE_ID
+                        : module.moduleId,
+                    )}` as Href,
+                  ),
               }}
             />
           ))
@@ -62,6 +76,12 @@ export function InstalledModulesScreen() {
       </SettingsSection>
     </SettingsScreen>
   )
+}
+
+function collapseVaultNotesRows<T extends {moduleId: string; status: string}>(rows: T[]): T[] {
+  const others = rows.filter(row => !isVaultNotesModuleId(row.moduleId))
+  const selected = selectCanonicalVaultNotesInstallation(rows)
+  return selected ? [...others, selected] : others
 }
 
 function label(value: string) {

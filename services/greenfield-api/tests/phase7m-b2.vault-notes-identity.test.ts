@@ -137,4 +137,39 @@ describe('Vault Notes canonical identity', () => {
     expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).not.toBe('1.2.0')
     expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).not.toContain('1.2.0')
   })
+
+  it('keep-data uninstall then reinstall restores the same notes', () => {
+    const retained = [
+      {accountId: 'A', moduleId: 'modula.vault-notes', recordId: 'note-a', title: 'Note A', deleted: false},
+      {accountId: 'A', moduleId: 'modula.vault-notes', recordId: 'note-b', title: 'Note B', deleted: false},
+    ]
+    const afterReinstall = rewriteLegacyVaultNotesValue(retained)
+    expect(afterReinstall.map(row => row.title)).toEqual(['Note A', 'Note B'])
+    expect(afterReinstall.every(row => row.moduleId === CANONICAL_VAULT_NOTES_MODULE_ID)).toBe(true)
+    expect(afterReinstall.every(row => row.deleted === false)).toBe(true)
+    expect(afterReinstall).toHaveLength(2)
+  })
+
+  it('does not leak notes across accounts during identity migration', () => {
+    const rows = [
+      {accountId: 'A', moduleId: 'modula.vault-notes', title: 'Note A'},
+      {accountId: 'B', moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, title: 'Note B'},
+    ]
+    const after = rewriteLegacyVaultNotesValue(rows)
+    expect(after.find(row => row.title === 'Note A')?.accountId).toBe('A')
+    expect(after.find(row => row.title === 'Note B')?.accountId).toBe('B')
+    expect(after.filter(row => row.accountId === 'A')).toHaveLength(1)
+    expect(after.filter(row => row.accountId === 'B')).toHaveLength(1)
+  })
+
+  it('Settings → Modules collapses the family to one installation identity', () => {
+    const listed = [
+      {moduleId: 'modula.vault-notes', status: 'enabled', version: '1.1.0'},
+      {moduleId: CANONICAL_VAULT_NOTES_MODULE_ID, status: 'installedDisabled', version: '0.2.0'},
+    ]
+    const selected = selectCanonicalVaultNotesInstallation(listed)
+    expect(selected).toMatchObject({status: 'enabled'})
+    expect(resolveCanonicalModuleId(selected!.moduleId)).toBe(CANONICAL_VAULT_NOTES_MODULE_ID)
+    expect(listed.filter(row => row.status !== 'removed')).toHaveLength(2)
+  })
 })

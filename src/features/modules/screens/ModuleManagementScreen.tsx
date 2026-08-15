@@ -16,6 +16,10 @@ import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {
+  isVaultNotesModuleId,
+  resolveCanonicalModuleId,
+} from '@modula/greenfield-contracts'
 
 export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const id = safeModuleId(moduleId)
@@ -33,7 +37,11 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const [uninstallPreview, setUninstallPreview] = useState<string | null>(null)
   const module = detail.data
   const backend = backendDiagnostics.data ?? module?.backend ?? null
-  const installed = installedModules.data?.find(item => item.moduleId === id)
+  const installed = installedModules.data?.find(
+    item =>
+      resolveCanonicalModuleId(item.moduleId) === id ||
+      (isVaultNotesModuleId(id) && isVaultNotesModuleId(item.moduleId)),
+  )
   const grantedPermissions = installed?.grantedPermissions ?? []
   const grantedAiPermissions = grantedPermissions.filter(permission => permission.startsWith('ai.'))
 
