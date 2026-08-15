@@ -184,9 +184,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Feature/domain: Auth UI public routes / Auth UI
 - Symptom: Login/register/forgot/verify routes rendered but emitted React hydration/runtime `#418` during the Phase 7L-A crawl.
 - Root cause: Header overflow controls rendered nested web pressables (`button` inside `button`) through `ChromeOverflowMenu` -> `ModulaMenu` -> `ModulaIconButton`; tab routes also rendered desktop rail markup on the first client render while static HTML used the unknown-width mobile bar.
-- Source files: `src/platform/ui/menus/chrome-overflow-menu.tsx`; `src/platform/ui/navigation/platform-tabs.web.tsx`; `src/components/primitives/AppIcon.tsx`; `src/platform/ui/motion/section-enter.tsx`; `src/platform/ui/refresh/pull-action-tray.tsx`; `tests/phase7l-b-public-routes.test.ts`
+- Source files: `src/platform/ui/menus/chrome-overflow-menu.tsx`; `src/platform/ui/navigation/platform-tabs.web.tsx`; `src/components/primitives/AppIcon.tsx`; `src/platform/ui/motion/section-enter.tsx`; `src/platform/ui/refresh/pull-action-tray.tsx`; `scripts/serve-web-dist.mjs`; `scripts/resolve-web-dist-file.mjs`; `ops/nginx/modula.digital-web.conf.snippet`; `tests/phase7l-b-public-routes.test.ts`
 - Backend dependency: None for render; auth endpoints for golden path proof.
-- Fix strategy: Use a visual-only overflow icon inside the menu pressable, keep web tab rail/bar first render server-compatible until hydration, and add a localhost-only API fixture boundary so route rendering can be verified without local-origin CORS noise.
+- Fix strategy: Use a visual-only overflow icon inside the menu pressable, keep web tab rail/bar first render server-compatible until hydration, serve Expo `[param]` HTML templates instead of Home `index.html` for dynamic routes, and add a localhost-only API fixture boundary so route rendering can be verified without local-origin CORS noise.
 - Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b:hydration`
 - Live verification: Fresh browser loads `/sign-in`, `/register`, `/forgot-password`, and `/verify-email` with hydration warnings/errors/pageerrors equal to zero.
 - Status: PASS_LOCAL

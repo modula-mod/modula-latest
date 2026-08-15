@@ -3,6 +3,8 @@ import {createServer} from 'node:http'
 import {existsSync, statSync, createReadStream} from 'node:fs'
 import path from 'node:path'
 
+import {resolveWebDistFile} from './resolve-web-dist-file.mjs'
+
 const root = path.resolve(new URL('..', import.meta.url).pathname)
 const distDir = path.join(root, 'dist')
 const port = Number(process.env.PORT ?? process.env.MODULA_WEB_PORT ?? 4174)
@@ -24,34 +26,6 @@ const contentTypes = new Map([
   ['.woff2', 'font/woff2'],
 ])
 
-function safeJoin(filePath) {
-  const normalised = path.normalize(filePath).replace(/^(\.\.[/\\])+/, '')
-  const resolved = path.join(distDir, normalised)
-  return resolved.startsWith(distDir) ? resolved : path.join(distDir, 'index.html')
-}
-
-function resolveFile(requestUrl) {
-  const url = new URL(requestUrl, `http://${host}:${port}`)
-  const pathname = decodeURIComponent(url.pathname)
-  const candidates = []
-
-  if (pathname === '/') {
-    candidates.push('index.html')
-  } else {
-    const clean = pathname.replace(/^\/+/, '').replace(/\/+$/, '')
-    candidates.push(clean)
-    candidates.push(`${clean}.html`)
-    candidates.push(path.join(clean, 'index.html'))
-  }
-
-  for (const candidate of candidates) {
-    const absolute = safeJoin(candidate)
-    if (existsSync(absolute) && statSync(absolute).isFile()) return absolute
-  }
-
-  return safeJoin('index.html')
-}
-
 const server = createServer((request, response) => {
   if (!request.url) {
     response.writeHead(400)
@@ -59,7 +33,13 @@ const server = createServer((request, response) => {
     return
   }
 
-  const file = resolveFile(request.url)
+  const file = resolveWebDistFile(distDir, request.url, `http://${host}:${port}`)
+  if (!file || !existsSync(file) || !statSync(file).isFile()) {
+    response.writeHead(404)
+    response.end('Not Found')
+    return
+  }
+
   const extension = path.extname(file)
   const cacheControl = file.includes(`${path.sep}_expo${path.sep}`)
     ? 'public, max-age=31536000, immutable'

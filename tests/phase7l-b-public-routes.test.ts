@@ -20,6 +20,7 @@ const publicRoutes = [
   '/settings',
   '/settings/appearance',
   '/settings/security',
+  '/profile/phase7lb-hydration-probe',
 ] as const
 
 const envelope = (data: unknown) => ({
@@ -66,10 +67,33 @@ const routeFixtures: Record<string, unknown> = {
     nextCursor: null,
     hasMore: false,
   },
+  '/v1/profiles/phase7lb-hydration-probe': {
+    id: 'profile_phase7lb_hydration_probe',
+    handle: 'phase7lb-hydration-probe',
+    displayName: 'Hydration Probe',
+    kind: 'person',
+    bio: 'Public profile hydration probe',
+    followerCount: 0,
+    followingCount: 0,
+    moduleCount: 0,
+    postCount: 0,
+    joinedAt: '2026-08-13T00:00:00.000Z',
+    focusStatus: {
+      id: 'available',
+      label: 'Available',
+      message: 'Open to collaborate',
+      updatedAt: '2026-08-13T00:00:00.000Z',
+    },
+    identityClaims: [],
+    links: [],
+    featuredModuleIds: [],
+    isFollowing: false,
+    followsViewer: false,
+  },
 }
 
 async function installLocalApiFixtures(page: Page) {
-  await page.route(/^https:\/\/api\.modula\.digital\/v1\/(meta|discover|feed\/home)(\?.*)?$/, async route => {
+  await page.route(/^https:\/\/api\.modula\.digital\//, async route => {
     const request = route.request()
     const url = new URL(request.url())
     const fixture = routeFixtures[url.pathname]
@@ -123,6 +147,11 @@ test.describe('Phase 7L-B public route rendering', () => {
       await page.waitForTimeout(500)
 
       expect(response?.status(), `${route} HTTP status`).toBeLessThan(400)
+      if (route.startsWith('/profile/')) {
+        const html = (await response?.text()) ?? ''
+        expect(html, `${route} must serve the public-profile template`).toContain('public-profile-pending')
+        expect(html, `${route} must not fall back to Home HTML`).not.toContain('Create a post')
+      }
 
       const criticalEvents = events.filter(event => {
         if (/Minified React error #418|hydration/i.test(event.text)) return true

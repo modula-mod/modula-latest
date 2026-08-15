@@ -2,6 +2,13 @@ import {execFileSync} from 'node:child_process'
 import {existsSync, readFileSync, readdirSync, statSync} from 'node:fs'
 import path from 'node:path'
 
+import {
+  collectDynamicHtmlTemplates,
+  nginxRewriteForTemplate,
+  resolveWebDistFile,
+  selfTestResolveWebDistFile,
+} from './resolve-web-dist-file.mjs'
+
 const repoRoot = path.resolve(new URL('..', import.meta.url).pathname)
 const distDir = path.join(repoRoot, 'dist')
 const expectedApiOrigin = process.env.EXPECTED_PUBLIC_API_ORIGIN ?? 'https://api.modula.digital'
@@ -100,6 +107,41 @@ const checksumManifest = readFileSync(path.join(distDir, 'checksums.sha256'), 'u
 for (const requiredChecksum of ['index.html', 'version.json', 'release.json']) {
   if (!checksumManifest.includes(`./${requiredChecksum}`)) {
     fail(`checksums.sha256 does not include ${requiredChecksum}`)
+  }
+}
+
+selfTestResolveWebDistFile()
+
+const routeProbes = [
+  ['/', 'index.html'],
+  ['/sign-in', 'sign-in.html'],
+  ['/profile', 'profile/index.html'],
+  ['/profile/edit', 'profile/edit.html'],
+  ['/profile/phase7lb-hydration-probe', 'profile/[handle].html'],
+  ['/profile/phase7lb-hydration-probe/followers', 'profile/[handle]/followers.html'],
+  ['/module/digital.modula.vault-notes', 'module/[moduleId].html'],
+  ['/module/digital.modula.vault-notes/notes/demo', 'module/[moduleId]/[...path].html'],
+  ['/product/gaia', 'product/gaia.html'],
+]
+for (const [requestPath, expected] of routeProbes) {
+  const resolved = resolveWebDistFile(distDir, requestPath)
+  if (!resolved) fail(`web dist resolver missed ${requestPath}`)
+  const relative = path.relative(distDir, resolved).split(path.sep).join('/')
+  if (relative !== expected) fail(`web dist resolver mapped ${requestPath} to ${relative}, expected ${expected}`)
+}
+
+const nginxSnippet = readFileSync(
+  path.join(repoRoot, 'ops/nginx/modula.digital-web.conf.snippet'),
+  'utf8',
+)
+if (!nginxSnippet.includes('try_files $uri $uri.html $uri/index.html @expo_dynamic')) {
+  fail('nginx snippet does not keep exact HTML lookup before Expo dynamic fallback')
+}
+for (const template of collectDynamicHtmlTemplates(distDir)) {
+  const rewrite = nginxRewriteForTemplate(template)
+  const line = `rewrite "${rewrite.regex}" "${rewrite.target}" last;`
+  if (!nginxSnippet.includes(line)) {
+    fail(`nginx snippet missing dynamic rewrite for ${template}`)
   }
 }
 

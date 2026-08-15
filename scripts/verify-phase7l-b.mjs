@@ -94,6 +94,12 @@ assertContains(
   'COMING_SOON',
   'BETA MANIFEST',
 )
+assertContains(
+  'scripts/serve-web-dist.mjs',
+  'resolveWebDistFile',
+  'WEB DIST DYNAMIC ROUTES',
+)
+run('WEB DIST ROUTES', 'node', ['scripts/resolve-web-dist-file.mjs'])
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL ?? process.env.MODULA_DATABASE_URL
 if (!databaseUrl) {

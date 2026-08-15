@@ -1,10 +1,5 @@
 # Intended production web routing for Expo Router preview builds.
 # Apply via deployment script to Hestia custom include, not by blindly rewriting generated templates.
-location / {
-    root /var/www/modula/current;
-    try_files $uri $uri.html $uri/index.html /index.html;
-}
-
 location /_expo/ {
     root /var/www/modula/current;
     add_header Cache-Control "public, max-age=31536000, immutable";
@@ -15,4 +10,35 @@ location /assets/ {
     root /var/www/modula/current;
     add_header Cache-Control "public, max-age=31536000, immutable";
     try_files $uri =404;
+}
+
+location / {
+    root /var/www/modula/current;
+    try_files $uri $uri.html $uri/index.html @expo_dynamic;
+}
+
+# Expo Router dynamic HTML templates. Exact static files win via try_files above.
+# Bracket filenames are rewritten only after those exact lookups miss.
+location @expo_dynamic {
+    rewrite "^/profile/[^/]+/followers$" "/profile/[handle]/followers.html" last;
+    rewrite "^/profile/[^/]+/following$" "/profile/[handle]/following.html" last;
+    rewrite "^/profile/[^/]+$" "/profile/[handle].html" last;
+    rewrite "^/post/[^/]+/analytics$" "/post/[postId]/analytics.html" last;
+    rewrite "^/post/[^/]+$" "/post/[postId].html" last;
+    rewrite "^/stories/[^/]+$" "/stories/[groupId].html" last;
+    rewrite "^/messages/[^/]+$" "/messages/[threadId].html" last;
+    rewrite "^/lists/[^/]+$" "/lists/[listId].html" last;
+    rewrite "^/communities/[^/]+$" "/communities/[topicId].html" last;
+    rewrite "^/collections/[^/]+$" "/collections/[collectionId].html" last;
+    rewrite "^/help/[^/]+$" "/help/[articleId].html" last;
+    rewrite "^/marketplace/seller/[^/]+$" "/marketplace/seller/[sellerId].html" last;
+    rewrite "^/marketplace/[^/]+$" "/marketplace/[moduleId].html" last;
+    rewrite "^/module/[^/]+/.+$" "/module/[moduleId]/[...path].html" last;
+    rewrite "^/module/[^/]+$" "/module/[moduleId].html" last;
+    rewrite "^/product/intelligence/[^/]+$" "/product/intelligence/[slug].html" last;
+    rewrite "^/product/[^/]+$" "/product/[slug].html" last;
+    rewrite "^/settings/developer/expo-ui/[^/]+$" "/settings/developer/expo-ui/[section].html" last;
+    rewrite "^/settings/extensions/[^/]+$" "/settings/extensions/[extensionId].html" last;
+    rewrite "^/settings/modules/[^/]+$" "/settings/modules/[moduleId].html" last;
+    rewrite ^ /index.html last;
 }

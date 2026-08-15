@@ -84,6 +84,7 @@
     "start:web:development": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --web",
     "build:web": "EXPO_PUBLIC_APP_ENV=production EXPO_PUBLIC_DATA_SOURCE=remote EXPO_PUBLIC_API_URL=https://api.modula.digital sh -c 'expo export --platform web && node scripts/write-web-version.mjs'",
     "verify:web-build": "node scripts/verify-web-build.mjs",
+    "verify:web-dist-routes": "node scripts/resolve-web-dist-file.mjs",
     "verify:mdhs-0.1": "node scripts/verify-mdhs-0.1.mjs",
     "verify:phase7k": "node scripts/verify-mdhs-0.1.mjs --phase7k",
     "verify:phase7l-a": "node scripts/verify-phase7l-a.mjs",

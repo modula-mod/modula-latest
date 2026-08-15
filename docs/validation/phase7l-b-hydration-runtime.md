@@ -26,6 +26,12 @@ Live runs against `https://modula.digital` do not use these localhost fixtures.
    - Static HTML cannot know browser width, so desktop browsers hydrated different markup from the server output.
    - The first client render now matches the server. Desktop rail activation occurs after hydration.
 
+3. `scripts/serve-web-dist.mjs` and production `try_files ... /index.html`
+   - Dynamic Expo routes such as `/profile/:handle` have HTML at `profile/[handle].html`.
+   - Exact-path lookup missed those templates and fell back to Home `index.html`.
+   - React then hydrated Home markup as `PublicProfileRoute`, which is runtime `#418`.
+   - The dist server now resolves `[param]` and `[...catchAll]` templates before the Home fallback. Nginx uses the same exact-then-dynamic order.
+
 ## Verification
 
 Command:
@@ -70,6 +76,7 @@ Routes covered:
 - `/settings`
 - `/settings/appearance`
 - `/settings/security`
+- `/profile/phase7lb-hydration-probe`
 
 Assertions:
 
