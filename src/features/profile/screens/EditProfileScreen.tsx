@@ -110,8 +110,8 @@ export function EditProfileScreen() {
 
     const website = createWebsiteLink(draft.website)
     await updateProfileMutation.mutateAsync({
-      avatarUri: draft.avatarUri,
-      coverUri: draft.coverUri,
+      avatarUri: canonicalProfileMediaUri(draft.avatarUri, ownerProfile.avatarUri),
+      coverUri: canonicalProfileMediaUri(draft.coverUri, ownerProfile.coverUri),
       displayName: draft.displayName.trim(),
       handle: normaliseHandle(draft.handle),
       bio: draft.bio.trim(),
@@ -125,7 +125,7 @@ export function EditProfileScreen() {
       website,
       focusStatus: draft.focusStatus,
     })
-    router.back()
+    router.replace('/profile')
   }
 
   const applyCapturedUri = (target: MediaCaptureTarget, uri: string) => {
@@ -203,7 +203,7 @@ export function EditProfileScreen() {
             style={[styles.notice, {gap: spacing[2], padding: spacing[3]}]}>
             <AppIcon name="info" colour={colours.accent} />
             <AppText variant="caption" colour="textSecondary" style={styles.noticeText}>
-              Development preview: profile identity edits are local session state only. Personal profile fields are not written to AsyncStorage.
+              Profile details save to Greenfield and follow the audience for each field.
             </AppText>
           </Surface>
 
@@ -222,20 +222,23 @@ export function EditProfileScreen() {
 
           <ProfileField
             label="Display name"
+            testID="edit-profile-display-name"
             value={draft.displayName}
             onChangeText={value => updateDraft(prev => ({...prev, displayName: value}))}
             maxLength={50}
           />
           <ProfileField
             label="Handle"
+            testID="edit-profile-handle"
             value={draft.handle}
             onChangeText={value => updateDraft(prev => ({...prev, handle: normaliseHandle(value)}))}
             autoCapitalize="none"
             maxLength={30}
-            help="Availability will be checked when account services are connected."
+            help="Handle availability is checked when you save."
           />
           <ProfileField
             label="Biography"
+            testID="edit-profile-bio"
             value={draft.bio}
             onChangeText={value => updateDraft(prev => ({...prev, bio: value}))}
             multiline
@@ -244,16 +247,19 @@ export function EditProfileScreen() {
           />
           <ProfileField
             label="Pronouns"
+            testID="edit-profile-pronouns"
             value={draft.pronouns}
             onChangeText={value => updateDraft(prev => ({...prev, pronouns: value}))}
           />
           <ProfileField
             label="Location"
+            testID="edit-profile-location"
             value={draft.location}
             onChangeText={value => updateDraft(prev => ({...prev, location: value}))}
           />
           <ProfileField
             label="Website"
+            testID="edit-profile-website"
             value={draft.website}
             onChangeText={value => updateDraft(prev => ({...prev, website: value}))}
             autoCapitalize="none"
@@ -315,6 +321,21 @@ function createWebsiteLink(value: string): ProfileLink | null {
     url: url.toString(),
     domain: url.hostname,
     visibility: 'public',
+  }
+}
+
+function canonicalProfileMediaUri(next: string | null, previous?: string): string | null | undefined {
+  if (next === null) return previous ? null : undefined
+  if (!next || next === previous) return undefined
+  return isPublicHttpsMediaUri(next) ? next : undefined
+}
+
+function isPublicHttpsMediaUri(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:'
+  } catch {
+    return false
   }
 }
 
@@ -420,6 +441,7 @@ function ControlButton({
 
 function ProfileField({
   label,
+  testID,
   value,
   onChangeText,
   help,
@@ -429,6 +451,7 @@ function ProfileField({
   keyboardType,
 }: {
   label: string
+  testID?: string
   value: string
   onChangeText: (value: string) => void
   help?: string
@@ -442,6 +465,7 @@ function ProfileField({
     <View style={{gap: spacing[2]}}>
       <AppText variant="headline">{label}</AppText>
       <TextInput
+        testID={testID}
         value={value}
         onChangeText={onChangeText}
         multiline={multiline}

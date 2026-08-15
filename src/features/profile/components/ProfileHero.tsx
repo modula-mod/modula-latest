@@ -121,8 +121,13 @@ export function ProfileHero({
             onClose={() => setCoverEditorOpen(false)}
             onSave={draft => {
               setCoverDraft(draft)
+              const coverUri =
+                draft.kind === 'none'
+                  ? null
+                  : canonicalProfileMediaUri(draft.uri, profile.coverUri)
+              if (coverUri === undefined) return
               void updateProfile.mutateAsync({
-                coverUri: draft.kind === 'none' ? null : draft.uri,
+                coverUri,
               })
             }}
           />
@@ -135,8 +140,10 @@ export function ProfileHero({
             onClose={() => setAvatarEditorOpen(false)}
             onSave={draft => {
               setAvatarDraft(draft)
+              const avatarUri = canonicalProfileMediaUri(draft.uri, profile.avatarUri)
+              if (avatarUri === undefined) return
               void updateProfile.mutateAsync({
-                avatarUri: draft.uri,
+                avatarUri,
               })
             }}
           />
@@ -144,6 +151,21 @@ export function ProfileHero({
       ) : null}
     </View>
   )
+}
+
+function canonicalProfileMediaUri(next: string | null, previous?: string): string | null | undefined {
+  if (next === null) return previous ? null : undefined
+  if (!next || next === previous) return undefined
+  return isPublicHttpsMediaUri(next) ? next : undefined
+}
+
+function isPublicHttpsMediaUri(value: string): boolean {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:'
+  } catch {
+    return false
+  }
 }
 
 function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {

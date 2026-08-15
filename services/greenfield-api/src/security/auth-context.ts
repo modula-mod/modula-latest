@@ -4,13 +4,19 @@ import {
   STANDARD_SESSION_CAPABILITIES,
 } from '@modula/api-contracts'
 import type {FastifyReply, FastifyRequest} from 'fastify'
+import type {AuthenticationStrength} from '../database/types.js'
 import type {SessionService} from './session.js'
 import {failureEnvelope, statusForError} from '../transport/envelope.js'
 
 export type AuthContext = {
   session: ModulaSession
+  sessionId: string
+  accountId: string
   actorId: string
   capabilities: Set<BackendCapability>
+  recentAuthenticationAt?: Date | null
+  authenticationStrength?: AuthenticationStrength
+  authenticationMethodId?: string | null
 }
 
 declare module 'fastify' {
@@ -26,6 +32,8 @@ export async function attachAuth(request: FastifyRequest, sessions: SessionServi
   const resolved = await sessions.resolveSession(token)
   if (!resolved) return
   request.auth = {
+    sessionId: resolved.sessionId,
+    accountId: resolved.accountId,
     actorId: resolved.actorId,
     capabilities: new Set(resolved.capabilities),
     session: {
@@ -48,7 +56,13 @@ export async function attachAuth(request: FastifyRequest, sessions: SessionServi
 export async function attachGreenfieldAccountAuth(
   request: FastifyRequest,
   input: {
-    resolveAccess: (token: string) => Promise<{accountId: string; sessionId: string} | null>
+    resolveAccess: (token: string) => Promise<{
+      accountId: string
+      sessionId: string
+      recentAuthenticationAt?: Date | null
+      authenticationStrength?: AuthenticationStrength
+      authenticationMethodId?: string | null
+    } | null>
     resolveActorForAccount: (
       accountId: string,
     ) => Promise<{actorId: string; handle: string | null} | null>
@@ -69,8 +83,13 @@ export async function attachGreenfieldAccountAuth(
     ? Array.from(new Set([...STANDARD_SESSION_CAPABILITIES, ...ADMIN_SESSION_CAPABILITIES]))
     : [...STANDARD_SESSION_CAPABILITIES]
   request.auth = {
+    sessionId: resolved.sessionId,
+    accountId: resolved.accountId,
     actorId: actor.actorId,
     capabilities: new Set(capabilities),
+    recentAuthenticationAt: resolved.recentAuthenticationAt,
+    authenticationStrength: resolved.authenticationStrength,
+    authenticationMethodId: resolved.authenticationMethodId,
     session: {
       id: resolved.sessionId,
       actorId: actor.actorId,

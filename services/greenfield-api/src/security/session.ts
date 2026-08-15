@@ -5,6 +5,7 @@ import type {ModulaDb} from '../database/client.js'
 
 export type ResolvedSession = {
   sessionId: string
+  accountId: string
   actorId: string
   capabilities: BackendCapability[]
   expiresAt: Date
@@ -111,6 +112,13 @@ export class SessionService {
         .execute()
       return null
     }
+    const actor = await this.db
+      .selectFrom('actors')
+      .select('account_id')
+      .where('id', '=', row.actor_id)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    if (!actor?.account_id) return null
 
     const capabilityRows = await this.db
       .selectFrom('session_capabilities')
@@ -123,6 +131,7 @@ export class SessionService {
 
     return {
       sessionId: row.id,
+      accountId: actor.account_id,
       actorId: row.actor_id,
       capabilities: capabilityRows.map(r => r.capability as BackendCapability),
       expiresAt: row.expires_at,

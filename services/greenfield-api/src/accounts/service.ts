@@ -600,6 +600,21 @@ export class AccountService {
         .set({primary_handle: handle, updated_at: now})
         .where('account_id', '=', accountId)
         .execute()
+      const actors = await trx
+        .selectFrom('actors')
+        .select('id')
+        .where('account_id', '=', accountId)
+        .where('deleted_at', 'is', null)
+        .execute()
+      const actorIds = actors.map(actor => actor.id)
+      if (actorIds.length > 0) {
+        await trx
+          .updateTable('profiles')
+          .set({handle, updated_at: now})
+          .where('actor_id', 'in', actorIds)
+          .where('deleted_at', 'is', null)
+          .execute()
+      }
       await trx
         .insertInto('greenfield_handle_history')
         .values({history_id: uuidv7(), account_id: accountId, handle, action: 'changed', created_at: now})

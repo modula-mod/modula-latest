@@ -37,6 +37,7 @@ import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {useHydrated} from '@/lib/useHydrated'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileShellProps = {
@@ -139,6 +140,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const router = useRouter()
   const {tab} = useLocalSearchParams<{tab?: string}>()
   const {width} = useWindowDimensions()
+  const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const registry = useProfileRegistry()
@@ -193,6 +195,10 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     presentation,
     visibleTabs,
   )
+
+  if (!hydrated) {
+    return <View style={[styles.screen, {backgroundColor: colours.canvas}]} />
+  }
 
   if (loading) {
     return (

@@ -220,6 +220,25 @@ export function SessionProvider({children}: PropsWithChildren) {
     [acceptAuthResult, services.authRepository],
   )
 
+  const updateCurrentProfile = useCallback<SessionActions['updateCurrentProfile']>(profile => {
+    setSession(current => {
+      if (current.status !== 'signedIn' && current.status !== 'refreshing') return current
+      return {
+        ...current,
+        account: {
+          ...current.account,
+          displayName: profile.displayName,
+          primaryHandle: profile.handle,
+        },
+        greenfieldAccount: {
+          ...current.greenfieldAccount,
+          primaryHandle: profile.handle,
+        },
+        profile,
+      }
+    })
+  }, [])
+
   const signOut = useCallback(async () => {
     const refreshToken = await services.sessionStorage.getRefreshToken().catch(() => null)
     await services.authRepository.signOut(refreshToken).catch(() => undefined)
@@ -387,6 +406,7 @@ export function SessionProvider({children}: PropsWithChildren) {
       resendVerification,
       continueAsGuest,
       continueAsDemo,
+      updateCurrentProfile,
       signOut,
     }),
     [
@@ -398,6 +418,7 @@ export function SessionProvider({children}: PropsWithChildren) {
       requestEmailSignInCode,
       signInWithEmailCode,
       signOut,
+      updateCurrentProfile,
       verifyEmail,
     ],
   )

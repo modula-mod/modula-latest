@@ -387,7 +387,7 @@ function createAccountInput(prefix: string): TestAccount {
 function collectCriticalEvents(page: Page): BrowserEvent[] {
   const events: BrowserEvent[] = []
   page.on('pageerror', error => {
-    events.push({type: 'pageerror', text: error.message})
+    events.push({type: 'pageerror', text: `${page.url()} ${error.stack ?? error.message}`})
   })
   page.on('console', message => {
     if (message.type() === 'error') {
@@ -900,6 +900,134 @@ test('universal search uses real API results, pagination, recent, saved, reload,
   await page.getByTestId('universal-search-input').fill(emptyQuery)
   expect((await emptyResponse).status()).toBe(200)
   await expect(page.getByTestId('universal-search-empty')).toBeVisible()
+
+  expectNoCriticalEvents(events)
+})
+
+test('profile owner, edit persistence, reload, and public viewer route use Greenfield state', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const owner = await createVerifiedAccount('profile')
+  const viewer = await createVerifiedAccount('viewer')
+  const nextHandle = `${owner.handle}x`
+  const nextDisplayName = `Phase 7L Profile ${owner.handle}`
+  const nextBio = `Persistent profile proof ${owner.handle}`
+  const nextLocation = `London ${owner.handle.slice(-4)}`
+  const nextWebsite = `https://example.com/${owner.handle}`
+
+  await passwordLogin(page, owner)
+  await gotoProtectedRoute(page, '/profile')
+  await expect(page.getByText(`@${owner.handle}`).first()).toBeVisible()
+  await expect(page.getByText('Posts').first()).toBeVisible()
+  await expect(page.getByText('Media').first()).toBeVisible()
+  await expect(page.getByText('About').first()).toBeVisible()
+  await expect(page.getByText('Modules').first()).toBeVisible()
+  await expect(page.getByText('Links').first()).toBeVisible()
+  await expect(page.getByLabel(/Focus status:/).first()).toBeVisible()
+
+  await page.goto('/profile/edit', {waitUntil: 'networkidle'})
+  await expect(page.getByTestId('edit-profile-display-name')).toBeVisible()
+  await page.getByTestId('edit-profile-display-name').fill(nextDisplayName)
+  await page.getByTestId('edit-profile-handle').fill(nextHandle)
+  await page.getByTestId('edit-profile-bio').fill(nextBio)
+  await page.getByTestId('edit-profile-location').fill(nextLocation)
+  await page.getByTestId('edit-profile-website').fill(nextWebsite)
+  await page.getByLabel('Set focus status to Busy').click()
+
+  const saveResponse = page.waitForResponse(matchesApiResponse('/v1/profiles/me', 'PATCH'))
+  await page.getByLabel('Save').click()
+  const saved = await saveResponse
+  expect(saved.status()).toBe(200)
+  const savedEnvelope = (await saved.json()) as ApiEnvelope<{handle: string; displayName: string; bio: string}>
+  expect(savedEnvelope.ok).toBe(true)
+  if (savedEnvelope.ok) {
+    expect(savedEnvelope.data.handle).toBe(nextHandle)
+    expect(savedEnvelope.data.displayName).toBe(nextDisplayName)
+    expect(savedEnvelope.data.bio).toBe(nextBio)
+  }
+
+  await expect(page.getByText(nextDisplayName).first()).toBeVisible()
+  await expect(page.getByText(`@${nextHandle}`).first()).toBeVisible()
+  await expect(page.getByText(nextBio).first()).toBeVisible()
+  await expect(page.getByText(nextLocation).first()).toBeVisible()
+  await expect(page.getByText('example.com').first()).toBeVisible()
+  await expect(page.getByLabel(`${nextDisplayName}, Busy. Focus status: Busy`).first()).toBeVisible()
+
+  const refreshResponse = page.waitForResponse(matchesApiResponse('/v1/sessions/refresh', 'POST'))
+  const meResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me', 'GET'))
+  await page.reload({waitUntil: 'networkidle'})
+  expect((await refreshResponse).status()).toBe(200)
+  expect((await meResponse).status()).toBe(200)
+  await expect(page).toHaveURL(/\/profile$/)
+  await expect(page.getByText(nextDisplayName).first()).toBeVisible()
+  await expect(page.getByText(`@${nextHandle}`).first()).toBeVisible()
+  await expect(page.getByText(nextBio).first()).toBeVisible()
+
+  await page.goto('/', {waitUntil: 'networkidle'})
+  await logoutFromDrawer(page)
+  await passwordLogin(page, viewer)
+  await gotoProtectedRoute(page, `/profile/${nextHandle}`)
+  await expect(page.getByText(nextDisplayName).first()).toBeVisible()
+  await expect(page.getByText(`@${nextHandle}`).first()).toBeVisible()
+  await expect(page.getByText(nextBio).first()).toBeVisible()
+  await expect(page.getByText(nextLocation).first()).toBeVisible()
+  await expect(page.getByText('example.com').first()).toBeVisible()
+  await expect(page.getByText('Edit Profile')).toBeHidden()
+  await expect(page.getByText(`Follow ${nextDisplayName}`).or(page.getByText('Follow')).first()).toBeVisible()
+
+  expectNoCriticalEvents(events)
+})
+
+test('composer poll and GIF controls are Coming Soon and do not fake a draft attachment', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const account = await createVerifiedAccount('composer')
+  await passwordLogin(page, account)
+  await gotoProtectedRoute(page, '/compose')
+  await expect(page.getByLabel('GIF — Coming Soon')).toBeVisible()
+  await expect(page.getByLabel('Poll — Coming Soon')).toBeVisible()
+
+  page.once('dialog', async dialog => {
+    expect(dialog.message()).toMatch(/Coming Soon|not part of beta Composer/i)
+    await dialog.accept()
+  })
+  await page.getByLabel('GIF — Coming Soon').click()
+  await expect(page.getByText('Which Modula surface should be refined next?')).toHaveCount(0)
+  await expect(page.getByText('Board')).toHaveCount(0)
+
+  page.once('dialog', async dialog => {
+    expect(dialog.message()).toMatch(/Coming Soon|Polls are not part of beta Composer/i)
+    await dialog.accept()
+  })
+  await page.getByLabel('Poll — Coming Soon').click()
+  await expect(page.getByText('Which Modula surface should be refined next?')).toHaveCount(0)
+
+  expectNoCriticalEvents(events)
+})
+
+test('settings expose honest mail, sessions, and Coming Soon security controls', async ({page}) => {
+  const events = collectCriticalEvents(page)
+  const account = await createVerifiedAccount('security')
+  await passwordLogin(page, account)
+
+  await gotoProtectedRoute(page, '/settings/security')
+  await expect(page.getByLabel('Passkeys — Coming Soon')).toBeVisible()
+  await expect(page.getByLabel('Authenticator app (TOTP) — Coming Soon')).toBeVisible()
+  await expect(page.getByLabel('Recovery codes — Coming Soon')).toBeVisible()
+  await page.getByLabel('Passkeys — Coming Soon').click()
+  await expect(page).toHaveURL(/\/settings\/security/)
+
+  const sessionsResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me/sessions', 'GET'))
+  await gotoProtectedRoute(page, '/settings/account/sessions')
+  expect((await sessionsResponse).status()).toBe(200)
+  await expect(page.getByTestId('account-session-row').first()).toBeVisible()
+  await expect(page.getByText('No additional sessions listed.')).toHaveCount(0)
+
+  const mailResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me/modula-mail', 'GET'))
+  await gotoProtectedRoute(page, '/settings/account/mail')
+  expect((await mailResponse).status()).toBe(200)
+  await expect(page.getByTestId('modula-mail-state')).toBeVisible()
+  await expect(page.getByText('No Modula mailbox').or(page.getByText('Mailbox not active')).or(page.getByText('Mailbox not live')).first()).toBeVisible()
+  await expect(page.getByText(/live inbox|active inbox/i).first()).toBeVisible()
+  await expect(page.getByText('Your mailbox is active')).toHaveCount(0)
 
   expectNoCriticalEvents(events)
 })

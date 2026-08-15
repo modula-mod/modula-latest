@@ -1550,9 +1550,17 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const auth = requireCapability(request, reply, 'profile:update')
     if (!auth) return
     try {
-      const body = request.body as {displayName?: string; bio?: string; visibility?: 'public' | 'followers' | 'teams' | 'private'; expectedVersion?: number; actorId?: string}
+      const body = request.body as {displayName?: string; bio?: string; visibility?: 'public' | 'followers' | 'teams' | 'private'; expectedVersion?: number; actorId?: string; handle?: string}
       if (body.actorId && body.actorId !== auth.actorId) {
         return sendError(reply, 'FORBIDDEN', 'Cross-actor profile edit denied', request.id)
+      }
+      const requestedHandle = typeof body.handle === 'string' ? body.handle.trim().toLowerCase() : ''
+      if (requestedHandle) {
+        const currentProfile = await profiles.getByActorId(auth.actorId, auth.actorId)
+        if (!currentProfile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+        if (requestedHandle !== currentProfile.handle.toLowerCase()) {
+          await accounts.changeHandle(auth.accountId, requestedHandle)
+        }
       }
       const updated = await profileWrites.updateMe(auth.actorId, body, {
         requestId: request.id,

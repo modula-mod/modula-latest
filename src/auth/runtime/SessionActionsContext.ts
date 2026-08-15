@@ -7,6 +7,7 @@ import type {
   SignInCredentials,
   VerifyEmailInput,
 } from '@/auth/contracts'
+import type {ModulaProfile} from '@/features/profile/contracts'
 
 export type SessionActions = {
   signIn(credentials: SignInCredentials, returnTo?: string): Promise<void>
@@ -17,6 +18,7 @@ export type SessionActions = {
   resendVerification(email: string): Promise<void>
   continueAsGuest(): void
   continueAsDemo(email: 'andrei@modula.local' | 'gaia@modula.local'): Promise<void>
+  updateCurrentProfile(profile: ModulaProfile): void
   signOut(): Promise<void>
 }
 
