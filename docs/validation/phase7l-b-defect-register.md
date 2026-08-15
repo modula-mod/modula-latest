@@ -13,8 +13,11 @@ Current register counts:
 
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 12 | 2 | 0 | 0 | 9 | 1 | 0 |
-| P1 | 35 | 7 | 0 | 0 | 27 | 1 | 0 |
+| P0 | 12 | 1 | 0 | 0 | 10 | 1 | 0 |
+| P1 | 35 | 0 | 0 | 0 | 34 | 1 | 0 |
+
+Local disposable proof SHA: `4cd3d2ac821d4f0b34dc3517d241f2a16c8a2b5e` (`CI=true pnpm verify:phase7l-b` on VPS disposable Postgres `modula-phase7l-b-pg`).
+P0 remaining OPEN is production identity only. Native iOS `xcodebuild` passed locally; simulator golden-path screenshots are still required before `PASS_LIVE`.
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -173,8 +176,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: Public Greenfield API for simulator golden path.
 - Fix strategy: Sync Mac source to fixed main, install dependencies/pods, run xcodebuild, launch simulator, and capture golden path evidence.
 - Verification command: `xcodebuild -workspace Modula.xcworkspace -scheme Modula -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
-- Live verification: Mac evidence shows `BUILD SUCCEEDED` and simulator screenshots for login, Home, Stories, post/reaction/comment, drawer, profile, settings, Product Hub, Vault Notes, logout, and re-login.
-- Status: OPEN
+- Live verification: Mac `xcodebuild` for iPhone 17 Pro simulator returned `BUILD SUCCEEDED` on 2026-08-15. Simulator golden-path screenshots for login, Home, Stories, post/reaction/comment, drawer, profile, settings, Product Hub, Vault Notes, logout, and re-login are still required before `PASS_LIVE`.
+- Status: PASS_LOCAL
 
 ## P1 Register
 
@@ -421,9 +424,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/features/profile/screens/UnifiedProfileScreen.tsx`; `src/features/profile/components/ProfileHero.tsx`; `src/features/profile/tabs/PostsProfileTab.tsx`; `src/features/profile/tabs/MediaProfileTab.tsx`; `src/features/profile/data-query/useProfileQuery.ts`; `src/data/repositories/api/ApiProfileRepository.ts`; `services/greenfield-api/src/domains/profiles/repository.ts`
 - Backend dependency: Profile, follow counts, post/media/module/link profile data.
 - Fix strategy: Keep the owner query tied to the signed-in session handle, then prove avatar, name, handle, bio, counts, Posts, Media, About, Modules, Links, Focus Halo, public second-account view, and reload behavior.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public browser validates owner and second-account profile views with media/avatar fallbacks.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-020 - Edit Profile
 
@@ -434,9 +437,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/features/profile/screens/EditProfileScreen.tsx`; `src/features/profile/data-query/useUpdateProfileMutation.ts`; `src/features/profile/storage/validateProfilePresentation.ts`; `services/greenfield-api/src/domains/profiles/writes.ts`
 - Backend dependency: Profile update service and validation.
 - Fix strategy: Prove edit persistence for avatar/name/handle/bio/links/surface preferences where beta-visible.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public browser edits controlled profile, reloads, and second account sees expected permitted changes.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-021 - Composer Text Photo
 
@@ -460,9 +463,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/features/feed/screens/HomeFeedScreen.tsx`; `src/data/repositories/api/ApiToolsRepository.ts`; `src/features/feed/postActions/catalog.ts`; `docs/product/modula-beta-feature-manifest.md`
 - Backend dependency: Tool registry only where real; no fake poll/GIF execution.
 - Fix strategy: Gate non-beta-ready tools to `COMING_SOON` or hide internal/test-only actions; keep text/photo real.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public composer exposes only working text/photo actions or honest disabled Coming Soon controls with no fake success.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-023 - Product Hub Route
 
@@ -590,9 +593,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/features/settings/screens/SettingsExtraScreens.tsx`; `src/features/settings/screens/AccountScreen.tsx`; `services/greenfield-api/src/mail/identity-service.ts`; `services/greenfield-api/src/mail/service.ts`
 - Backend dependency: Mail identity/provisioning/forwarding jobs and transactional mail.
 - Fix strategy: Preserve real transactional mail, show true identity/provisioner state, and avoid implying active mailbox when provisioner is disabled.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public Settings displays true Modula Mail identity state and transactional verification/OTP/reset/security alert mail still sends.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-033 - Security Center Sessions
 
@@ -603,9 +606,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `src/features/settings/screens/SettingsExtraScreens.tsx`; `src/features/settings/screens/AccountSessionsScreen.tsx`; `src/app/settings/account/sessions.tsx`; `src/data/repositories/api/ApiAuthRepository.ts`; `services/greenfield-api/src/auth/security-events/service.ts`; `services/greenfield-api/src/sessions/service.ts`
 - Backend dependency: Account sessions, revoke endpoints, security events.
 - Fix strategy: Prove visible rows are real or hidden/gated; verify sessions list, revoke, recent activity, and route navigation.
-- Verification command: `CI=true MODULA_E2E_EMAIL=<controlled> MODULA_E2E_PASSWORD=<redacted> pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public authenticated Security Center loads real sessions/recent activity and hides/gates unready controls.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-034 - Passkeys
 
@@ -616,9 +619,9 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `services/greenfield-api/src/auth/passkeys/service.ts`; `services/greenfield-api/src/auth/passkeys/rp.ts`; `src/features/settings/screens/SettingsExtraScreens.tsx`; `src/auth/screens/SignInScreen.tsx`; `docs/validation/phase7l-a-static-assets.md`
 - Backend dependency: Passkey service, relying-party configuration, AASA/webcredentials, security mail.
 - Fix strategy: Gate passkeys honestly as Coming Soon unless full registration/login/revoke proof exists.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public UI either hides/gates passkeys as Coming Soon or proves passkey setup/login/revoke on supported hardware with evidence.
-- Status: OPEN
+- Status: PASS_LOCAL
 
 ### P7LB-P1-035 - TOTP
 
@@ -629,6 +632,6 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Source files: `services/greenfield-api/src/auth/mfa/totp.ts`; `services/greenfield-api/src/auth/mfa/recovery-codes.ts`; `services/greenfield-api/src/auth/step-up/policy.ts`; `src/features/settings/screens/SettingsExtraScreens.tsx`
 - Backend dependency: TOTP credentials, step-up challenges, recovery codes, security events/mail.
 - Fix strategy: Gate TOTP/recovery codes honestly unless browser setup, verify, disable, and recovery-code evidence is captured.
-- Verification command: `CI=true pnpm verify:phase7l-b`
+- Verification command: `CI=true pnpm verify:phase7l-b:auth`
 - Live verification: Public UI either hides/gates TOTP as Coming Soon or proves setup/verify/disable/recovery-code lifecycle with evidence.
-- Status: OPEN
+- Status: PASS_LOCAL
