@@ -146,13 +146,21 @@ function GlassSurface({
 
   if (useNativeGlass) {
     return (
-      <LiquidGlassView
-        interactive={interactive}
-        // Regular material stays glass without mirroring feed text through the pill.
-        effect="regular"
-        style={style}>
+      <View style={[style, {overflow: 'hidden'}]}>
+        <LiquidGlassView
+          interactive={interactive}
+          effect="regular"
+          style={StyleSheet.absoluteFill}
+        />
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {backgroundColor: solidFallback, opacity: scheme === 'dark' ? 0.58 : 0.72},
+          ]}
+        />
         {children}
-      </LiquidGlassView>
+      </View>
     )
   }
 
