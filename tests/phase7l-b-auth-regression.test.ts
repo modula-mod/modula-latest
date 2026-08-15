@@ -87,6 +87,11 @@ function matchesApiResponse(path: string, method: string) {
   }
 }
 
+function matchesSuccessfulApiResponse(path: string, method: string) {
+  return (response: {url(): string; request(): {method(): string}; status(): number}) =>
+    matchesApiResponse(path, method)(response) && response.status() === 200
+}
+
 function matchesSearchQueryResponse(query: string) {
   return (response: {url(): string; request(): {method(): string}}) => {
     const url = new URL(response.url())
@@ -1015,13 +1020,17 @@ test('settings expose honest mail, sessions, and Coming Soon security controls',
   await page.getByLabel('Passkeys — Coming Soon').click()
   await expect(page).toHaveURL(/\/settings\/security/)
 
-  const sessionsResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me/sessions', 'GET'))
+  const sessionsResponse = page.waitForResponse(
+    matchesSuccessfulApiResponse('/v1/accounts/me/sessions', 'GET'),
+  )
   await gotoProtectedRoute(page, '/settings/account/sessions')
   expect((await sessionsResponse).status()).toBe(200)
   await expect(page.getByTestId('account-session-row').first()).toBeVisible()
   await expect(page.getByText('No additional sessions listed.')).toHaveCount(0)
 
-  const mailResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me/modula-mail', 'GET'))
+  const mailResponse = page.waitForResponse(
+    matchesSuccessfulApiResponse('/v1/accounts/me/modula-mail', 'GET'),
+  )
   await gotoProtectedRoute(page, '/settings/account/mail')
   expect((await mailResponse).status()).toBe(200)
   await expect(page.getByTestId('modula-mail-state')).toBeVisible()

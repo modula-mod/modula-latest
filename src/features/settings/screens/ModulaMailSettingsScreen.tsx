@@ -8,6 +8,7 @@ import {
   SettingsScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
+import {useSession} from '@/auth/runtime'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -23,6 +24,7 @@ type MailCopy = {
 }
 
 export function ModulaMailSettingsScreen() {
+  const session = useSession()
   const {apiClient} = useAppServices()
   const {spacing} = useThemeTokens()
   const [copy, setCopy] = useState<MailCopy>({
@@ -31,6 +33,7 @@ export function ModulaMailSettingsScreen() {
   })
 
   const load = useCallback(async () => {
+    if (session.status !== 'signedIn') return
     let provisionerMode = 'unknown'
     try {
       const version = await apiClient.get({path: '/v1/version'}, decodeApiVersion)
@@ -51,12 +54,13 @@ export function ModulaMailSettingsScreen() {
           'Could not read Modula Mail identity. Transactional mail still uses your sign-in email. This screen will not claim that a mailbox is active.',
       })
     }
-  }, [apiClient])
+  }, [apiClient, session.status])
 
   useEffect(() => {
+    if (session.status !== 'signedIn') return undefined
     const id = setTimeout(() => void load(), 0)
     return () => clearTimeout(id)
-  }, [load])
+  }, [load, session.status])
 
   return (
     <SettingsScreen

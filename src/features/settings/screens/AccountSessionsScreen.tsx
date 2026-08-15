@@ -10,29 +10,33 @@ import {
   SettingsScreen,
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
+import {useSession} from '@/auth/runtime'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function AccountSessionsScreen() {
+  const session = useSession()
   const services = useAppServices()
   const {colours, spacing, radius} = useThemeTokens()
   const [sessions, setSessions] = useState<GreenfieldSession[]>([])
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
+    if (session.status !== 'signedIn') return
     try {
       setSessions(await services.authRepository.listSessions())
       setError(null)
     } catch {
       setError('Could not load sessions.')
     }
-  }, [services.authRepository])
+  }, [services.authRepository, session.status])
 
   useEffect(() => {
+    if (session.status !== 'signedIn') return undefined
     const id = setTimeout(() => void load(), 0)
     return () => clearTimeout(id)
-  }, [load])
+  }, [load, session.status])
 
   const revokeOne = async (sessionId: string) => {
     const ok = await confirmModulaAction({
