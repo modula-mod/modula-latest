@@ -7,6 +7,8 @@ export type {
   PresentModulaActionsOptions,
 } from '@/platform/ui/menus/types'
 export {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+export {ModulaPopover} from '@/platform/ui/menus/modula-popover'
+export type {ModulaPopoverProps} from '@/platform/ui/menus/modula-popover'
 export {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 export {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'

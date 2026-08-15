@@ -22,6 +22,13 @@ export type {ModulaCheckboxProps} from '@/platform/ui/controls/modula-checkbox'
 export {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 export type {ModulaTextInputProps} from '@/platform/ui/controls/modula-text-input'
 export {ModulaSecureInput} from '@/platform/ui/controls/modula-secure-input'
+export {ModulaSecureField} from '@/platform/ui/controls/modula-secure-field'
+export {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
+export type {ModulaFieldShellProps} from '@/platform/ui/controls/modula-field-shell'
+export {ModulaOTPField} from '@/platform/ui/controls/modula-otp-field'
+export type {ModulaOTPFieldProps} from '@/platform/ui/controls/modula-otp-field'
+export {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+export type {ModulaSearchFieldProps} from '@/platform/ui/controls/modula-search-field'
 export {
   ModulaList,
   ModulaListItem,
