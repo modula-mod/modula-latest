@@ -1,106 +1,123 @@
 # Phase 7M-B — Vault Notes source provenance & registry reconciliation
 
-Track B, §15 (Vault Notes audit) and §14 (externality). This records the audit
-of the real external Vault Notes module repository and how its release is
-reconciled into the Modula registry for Phase 7M-B install/host acceptance.
+Track B, §15 (Vault Notes audit), §14 (externality). This records the audit of
+the real external Vault Notes repository and how it reconciles (and where it
+diverges) from the canonical Modula registry record.
 
-## Source repository
+## What was audited
+
+### A. The external repository the user exposed
 
 | Field | Value |
 | --- | --- |
 | Provider | GitHub |
 | Repository | `modula-mod/modula-vault-notes` (public) |
-| Default branch | `main` |
-| Audited base commit | `4f2c3c9` (`merge: consolidate Vault Notes 1.1 into main`) |
-| Existing release tags | `vault-notes-v1.0.0`, `vault-notes-v1.1.0` |
-| Release assets | `modula-vault-notes-1.0.0.tgz`, `modula-vault-notes-1.1.0.tgz` |
+| Default branch | `main`, HEAD `4f2c3c9` (`merge: consolidate Vault Notes 1.1 into main`) |
+| Declared module id | **`modula.vault-notes`** |
+| Declared version | **`1.1.0`** (Standard 1.2, `standardVersion 1.2.0`) |
+| Release tags / assets | `vault-notes-v1.0.0`, `vault-notes-v1.1.0` (`modula-vault-notes-{ver}.tgz`) |
 | `vault-notes-v1.1.0` asset sha256 | `46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a` |
-| Licence | first-party (`LicenseRef-Modula-First-Party`) — `LICENSE`, `SECURITY.md` |
+| Licence | first-party (`LicenseRef-Modula-First-Party`) |
+| Manifest sha256 | `d674b65a66bc5a671dc43ef2f8883d2faabc02b34c7c52d5c80162df9f661cfb` |
 
-The repository is a genuine external module: it carries its own
-`package.json`, `pnpm-workspace.yaml`, `tsconfig.json`, `module.manifest.json`
-(Greenfield release contract), `modula.module.json` (Standard 1.2 manifest),
-declarative `src/views/*.json`, JSON Schemas under `schemas/`, and its own
-`verify`/`release:package` tooling. It builds and tests independently
-(`pnpm build && pnpm test` → 7 tests pass). Nothing about Vault Notes is
-hardcoded into the host app; installation is driven from the manifest.
-
-## Identity discrepancy found
-
-The canonical Modula registry, Product Hub, host deep links and installed
-account records are keyed on **`digital.modula.vault-notes`** (the production
-registry record is `digital.modula.vault-notes`, collections `note` + `folder`,
-routes under `/module/digital.modula.vault-notes`).
-
-The external repository at the audited base commit declared its identity as
-the unqualified **`modula.vault-notes`** across the Standard manifest, release
-manifest, views, records, actions, functions, settings, routes and search
-declarations. Left unchanged, an install from this source would register a
-module whose id does not match the canonical Modula namespace, and host deep
-links / account records would diverge from production.
-
-## Resolution — release 1.2.0 (identity alignment)
-
-A new release was prepared **in the external repository** (not by forking into
-the host app and not by hardcoding) that renames the namespaced identity to
-`digital.modula.vault-notes`:
-
-- `modula.vault-notes.*` → `digital.modula.vault-notes.*` for records, views,
-  actions, functions, settings, routes and search declarations.
-- Record **collections keep their unqualified names** (`note`, `folder`,
-  `tag`, `note-link`, `note-version`, `saved-source`) so account data written
-  under a `digital.modula.vault-notes` installation is preserved and continuous
-  with the production collection contract.
-- `package.json`, `module.manifest.json` and `modula.module.json` bumped to
-  `1.2.0`; `source.releaseTag`/`releaseAssetName` updated to the 1.2.0 asset
-  names; `VAULT_NOTES_MODULE_VERSION` constant bumped.
-- `module.manifest.json.integrity.manifestSha256` recomputed with the canonical
-  `@modula/greenfield-module-manifest` checksum →
-  `5006e15ff472ef591166da6b0288c52e8ba2757bc579a1dcb6fbd8d14cbe33b7`.
-- `LICENSE-POLICY.md` added (required first-party licence evidence for registry
-  import) and listed in `package.json` `files` and manifest `license.evidenceIds`.
-
-The repo's own release gate passes on 1.2.0: `pnpm verify`
-(`tsc` build + `vitest` 7/7 + `scripts/verify-release.mjs`) →
-`Vault Notes release verifier passed`.
-
-Commit prepared in the external repo:
-`09067cc feat: release 1.2.0 — align canonical identity to digital.modula.vault-notes`.
-
-> **Push blocked:** the cloud agent's GitHub identity (`cursor[bot]`) has read
-> access to `modula-mod/modula-vault-notes` but not write/push
-> (`403 Permission ... denied`). The 1.2.0 commit and tag therefore live in the
-> local clone at `/modula-mod/modula-vault-notes` and have been imported into
-> the local registry for acceptance. Pushing `main` + tagging
-> `vault-notes-v1.2.0` and publishing the release asset requires a maintainer
-> with write access (or an appropriately scoped token).
-
-## Registry reconciliation (local acceptance)
-
-Imported through the canonical importer (no `git clone`-as-install; the module
-is read from its manifest and released into the registry database):
+This is a genuinely external, self-contained module: its own `package.json`,
+`pnpm-workspace.yaml`, `tsconfig.json`, `module.manifest.json` (Greenfield
+release contract), `modula.module.json` (Standard 1.2 manifest), declarative
+`src/views/*.json`, JSON Schemas under `schemas/`, and its own release tooling.
+It builds, tests and self-verifies independently:
 
 ```
-pnpm registry:import-module --path /modula-mod/modula-vault-notes --commit 09067cc…
-  → module: digital.modula.vault-notes  version: 1.2.0
-    manifest: valid  integrity: valid  licence: firstParty  trust: firstParty
-    collections: 6  views: 12  release: pendingReview
-
-pnpm registry:publish-release --module digital.modula.vault-notes --version 1.2.0
-  → release status: published  catalogue status: available
-    installation mode: declarative
+pnpm install && pnpm build && pnpm test   → 7/7 pass
+node scripts/verify-release.mjs           → Vault Notes release verifier passed
 ```
 
-Catalogue row (`greenfield_extension_catalogue`):
-`digital.modula.vault-notes | 1.2.0 | active | executable=false | firstParty`.
+Record collections: `note`, `folder`, `tag`, `note-link`, `note-version`,
+`saved-source`. Views (12): home, collection, detail, editor, search,
+favourites, archived, trash, folders, settings, empty, error.
 
-Executable functions remain disabled until server-side handlers exist; the
-module installs and renders declaratively via the generic Module Host, which is
-the Phase 7M-B acceptance surface.
+### B. The canonical registry record (live production)
 
-## Verification evidence
+`GET https://api.modula.digital/v1/registry/modules/digital.modula.vault-notes`:
 
-- `pnpm verify:phase7e-vault-notes` platform test (generic host install /
-  enable / edit / export / disable / re-enable) → 2/2 pass against the external
-  checkout.
-- External repo `pnpm verify` → build + 7/7 tests + release verifier pass.
+| Field | Value |
+| --- | --- |
+| Module id | **`digital.modula.vault-notes`** |
+| Version | **`0.2.0`** |
+| Status | `published` |
+| Source repository | **`modula-mod/modula-module-vault-notes`** (note: `module-`) |
+| Source commit | `54ab8edac1ba469f0081c636e11f6059d712becc` |
+| Manifest path | `module.manifest.json` |
+
+`GET .../modula.vault-notes` returns empty — the unqualified id is **not** a
+production registry product.
+
+## Divergence found (the audit finding)
+
+The external repository that is currently accessible is **not** the same object
+as the canonical production Product Hub product:
+
+| Dimension | External repo (accessible) | Canonical registry (production) |
+| --- | --- | --- |
+| Module id | `modula.vault-notes` | `digital.modula.vault-notes` |
+| Version | `1.1.0` | `0.2.0` |
+| Source repo | `modula-mod/modula-vault-notes` | `modula-mod/modula-module-vault-notes` |
+
+The canonical product's declared source repo, `modula-mod/modula-module-vault-notes`,
+is **not currently accessible** to this agent (`gh repo view` →
+"Could not resolve to a Repository"). So the exact source that produced
+`digital.modula.vault-notes@0.2.0` cannot be re-derived or byte-verified here.
+
+## How the codebase already reconciles identity (existing behaviour — preserved)
+
+- The **client never hardcodes** the canonical id. Phase 7E guards this:
+  `ApiModuleRepository.ts` must not contain `'digital.modula.vault-notes'`,
+  `local-vault-note`, or `includes('vault-notes')`. The id the client installs
+  and routes to comes from the registry catalogue response, not app code.
+- Product Hub canonicalisation lives in
+  `services/greenfield-api/src/modules/beta-catalogue-policy.ts`: it maps the
+  **legacy** id `modula.module.vaultNotes` → `digital.modula.vault-notes` and
+  classifies `digital.modula.vault-notes` (published) as the single
+  `CANONICAL_PRODUCT`. Phase 7L (`phase7l.product-hub-policy.test.ts`) locks
+  this in and passes.
+- The generic Module Host has **no** Vault Notes branching; views/routes/records
+  resolve from the manifest (`GET /v1/modules/:id/views`,
+  `/records/:collection`). Confirmed during the 7M-B host audit.
+
+## Decision — do not mutate the external repo
+
+An earlier 7M-B attempt renamed the external repo to
+`digital.modula.vault-notes@1.2.0` to force id alignment. That was reverted
+because it is the wrong reconciliation:
+
+1. **Not landable** — the cloud agent's identity (`cursor[bot]`) has read but
+   not write access to `modula-mod/modula-vault-notes` (`403` on push), so a
+   rename there cannot ship.
+2. **Breaks a passing regression** — Phase 7E
+   (`phase7e.vault-notes-platform.test.ts`) pins the external repo to
+   `modula.vault-notes@1.1.0`; renaming turns it red.
+3. **Invents a version** — `1.2.0` sits ahead of both the repo (`1.1.0`) and
+   production (`0.2.0`) with no upstream basis.
+
+The external repo is left at its genuine identity. Identity alignment is a
+registry/policy concern (already implemented and tested), not a source edit.
+
+## Verification evidence (all green)
+
+- `pnpm exec vitest run` on
+  `phase7e.vault-notes-platform.test.ts`, `phase7b.module-runtime.test.ts`,
+  `phase7e.module-runtime-2.test.ts`, `phase7l.product-hub-policy.test.ts`
+  → **19 passed** against the genuine external `modula.vault-notes` checkout at
+  `../modula-mod/modula-vault-notes`. This covers real install → enable → edit →
+  export → disable → re-enable through the generic host APIs, records CRUD,
+  settings, reinstall-with-keepData, and Product Hub canonicalisation policy.
+
+## Open item for a maintainer
+
+To byte-verify the canonical `digital.modula.vault-notes@0.2.0` against its
+declared source, `modula-mod/modula-module-vault-notes` (commit `54ab8ed`) must
+be made accessible, **or** the team should confirm whether
+`modula-mod/modula-vault-notes` is the intended go-forward source and, if so,
+publish a canonical `digital.modula.vault-notes` release from it through the
+registry importer (which requires write access to that external repo to tag the
+release). No local registry rows were left mutated: the local dev registry was
+recreated clean, and automated acceptance runs against ephemeral test data.
