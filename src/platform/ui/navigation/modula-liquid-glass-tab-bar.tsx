@@ -1,6 +1,6 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState, type ReactNode} from 'react'
-import {Pressable, StyleSheet, View} from 'react-native'
+import {Pressable, StyleSheet, View, type ViewStyle} from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -100,8 +100,8 @@ function ChromeSurface({
   borderColor: string
   shadowColor: string
 }) {
-  const flattened = StyleSheet.flatten(style)
-  const borderRadius = flattened && 'borderRadius' in flattened ? flattened.borderRadius : undefined
+  const flattened = StyleSheet.flatten(style) as ViewStyle | undefined
+  const borderRadius: ViewStyle['borderRadius'] = flattened?.borderRadius
   return (
     <View
       style={[
