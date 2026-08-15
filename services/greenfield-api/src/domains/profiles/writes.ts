@@ -373,7 +373,10 @@ function isPrivateMediaHost(hostname: string): boolean {
   }
   const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
   if (!ipv4) return false
-  const [a, b, c, d] = ipv4.slice(1).map(part => Number(part))
+  const a = Number(ipv4[1])
+  const b = Number(ipv4[2])
+  const c = Number(ipv4[3])
+  const d = Number(ipv4[4])
   if ([a, b, c, d].some(part => !Number.isInteger(part) || part < 0 || part > 255)) return true
   return (
     a === 0 ||
