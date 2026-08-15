@@ -1,0 +1,383 @@
+{
+  "phase": "7M-B2",
+  "capturedAt": "2026-08-15T21:50:00Z",
+  "productRepository": "modula-mod/modula-latest",
+  "productCommit": "332ed4f2d1551e58541828d51c9f15d46158ee5c",
+  "pullRequest": 19,
+  "source": {
+    "repository": "modula-mod/modula-latest",
+    "branch": "cursor/phase7m-b2-vault-notes-canonical-b6a2",
+    "commit": "332ed4f2d1551e58541828d51c9f15d46158ee5c",
+    "pullRequest": 19
+  },
+  "environment": {
+    "platform": "ios",
+    "device": "iPhone 17 Pro Simulator",
+    "os": "iOS 27.0",
+    "expoSdk": "57.0.12",
+    "reactNative": "0.86.2",
+    "simulatorUdid": "0727E2F0-8528-44DA-9F4C-7B5F7394096B"
+  },
+  "backend": {
+    "kind": "real",
+    "environment": "controlled",
+    "production": false
+  },
+  "status": "READY_FOR_REVIEW",
+  "sanitization": {
+    "exifStripped": true,
+    "credentials": 0,
+    "otpCodes": 0,
+    "tokens": 0,
+    "notes": [
+      "Feed handles are controlled Phase 7L/7LB simulator accounts, not personal DMs.",
+      "Auth email stage uses evidence-review@example.test (not a real mailbox).",
+      "Keyboard / password-manager chrome was cropped off the published email-stage frame.",
+      "Vault Notes is shown via generic Module Host (not installed on this simulator account)."
+    ]
+  },
+  "invariants": {
+    "vaultNotesVisibleProductCount": 1,
+    "textBleedThrough": 0,
+    "mirroredContent": 0,
+    "iconContrast": "PASS",
+    "touchTargets": "PASS",
+    "safeArea": "PASS",
+    "legacyVaultNotesCard": 0,
+    "blurViewInAcceptedChrome": 0,
+    "liquidGlassViewInAcceptedChrome": 0
+  },
+  "vaultNotes": {
+    "moduleId": "digital.modula.vault-notes",
+    "source": "modula-mod/modula-vault-notes",
+    "release": "1.1.0",
+    "host": "generic-module-host",
+    "installedOnThisSimulatorAccount": false
+  },
+  "files": [
+    {
+      "path": "phase-7m/b2/comparisons/7m-b2-contact-sheet-light-oled-01.png",
+      "bytes": 1362389,
+      "sha256": "2ad75fdad38d018246f69865610c642b08cf0e42d739927b043eff98bd59f7a7",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/floating-nav-current-raised.png",
+      "bytes": 94479,
+      "sha256": "91cdb36f8f09d997784b0bfeb84482b62b6c55d1d0d95e3eca8cabb5bce47050",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/floating-nav-rejected-glass.png",
+      "bytes": 117201,
+      "sha256": "17a78ea2d5c70207c9c8bf496d75282b7baa16e5acdeedb114ccdd0b4aff7095",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/home-before.png",
+      "bytes": 281095,
+      "sha256": "a5a8995a4c422db9429d69946cca10f38b761184a45eb4f051a0739228e6a373",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/home-current.png",
+      "bytes": 259155,
+      "sha256": "65cfd362c15136084b5e22fefc7d878f7d7d770858705fa0bcbeedd903192dda",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/product-hub-before.png",
+      "bytes": 267560,
+      "sha256": "6f1d83a2f83147cf3bdb09080a160bbbc6709307985ff889f8337df333ca9bcc",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/product-hub-current.png",
+      "bytes": 256635,
+      "sha256": "292a38c41c38680d08d63e8c8989e23aa464d7b3df0342500c15140cba5d7ca6",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/comparisons/rejected/7m-b2-ios-home-light-native-REJECTED-blur-01.png",
+      "bytes": 281095,
+      "sha256": "a5a8995a4c422db9429d69946cca10f38b761184a45eb4f051a0739228e6a373",
+      "rejected": true
+    },
+    {
+      "path": "phase-7m/b2/comparisons/rejected/7m-b2-ios-home-oled-native-REJECTED-blur-01.png",
+      "bytes": 310920,
+      "sha256": "d29dfc7175867a7c7614f0ed232e1350dcf7a8400ce5b4534171aac40f6de2b1",
+      "rejected": true
+    },
+    {
+      "path": "phase-7m/b2/comparisons/rejected/7m-b2-ios-product-hub-light-native-REJECTED-blur-01.png",
+      "bytes": 267560,
+      "sha256": "6f1d83a2f83147cf3bdb09080a160bbbc6709307985ff889f8337df333ca9bcc",
+      "rejected": true
+    },
+    {
+      "path": "phase-7m/b2/comparisons/rejected/7m-b2-motion-navigation-REJECTED-blur-01.mp4",
+      "bytes": 8157218,
+      "sha256": "2e7a30af4bc42dfa043df9e2fa76f5269e9d8b6198e81ce3938a55a88e8833f0",
+      "rejected": true
+    },
+    {
+      "path": "phase-7m/b2/ios/accessibility/7m-b2-ios-home-light-native-largetext-01.png",
+      "bytes": 290017,
+      "sha256": "e5bed2855498bc0fd2f0f73d8c080cd97d0079e7ec3097f47c5fbdc81671ada8",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/accessibility/7m-b2-ios-home-light-native-reducemotion-01.png",
+      "bytes": 259943,
+      "sha256": "0a469b149a8e53f2b5a55a56d97dd86c3714ee15aeb3d652952eeac6b830e64e",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-dark-native-01.png",
+      "bytes": 104628,
+      "sha256": "859879a2f690f9da6b7b314958e477cfb07d22c0c693da8b62e967ac7fe4bb31",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-dim-native-01.png",
+      "bytes": 107069,
+      "sha256": "ad4434cebb1734b458e1987d30ab8913433b05db8f2d897f6ca6289cade3b3b0",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-light-native-01.png",
+      "bytes": 107223,
+      "sha256": "aa7cdd84bba834be583a7ea094e735ae13132fec2baeb8391909ed3a6f80db7e",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-light-native-email-01.png",
+      "bytes": 86328,
+      "sha256": "c9b6ca6f95a17692cb64f39c89b4bf535e844fed4038b6b2386c073cc13847b7",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-light-native-error-01.png",
+      "bytes": 112484,
+      "sha256": "77f14787cbc3519f4a31af1e2bafca65f8f65b00070e6f5fd6815a03c6f98719",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/auth/7m-b2-ios-login-oled-native-01.png",
+      "bytes": 108353,
+      "sha256": "8cb589dc48d06791f08de44766e75ed7335409694226e4dd534dd5f4d1847c84",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-dark-native-01.png",
+      "bytes": 285112,
+      "sha256": "28174415de99f7cf6f43b52c26b4eb13b4b66cdd20f5975a338db6dc38ef1f75",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-dark-native-nav-01.png",
+      "bytes": 91858,
+      "sha256": "6666bf489c47f632fb16a5d39fc00192070dd9f2a8ff9d62145e3bebd9745f9e",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-dim-native-01.png",
+      "bytes": 311020,
+      "sha256": "d205aaf3e9dfa76052c568bf8de7f1b359dc7ce9f37564da65afa2ed73237157",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-glass-01.png",
+      "bytes": 259670,
+      "sha256": "abdd5f21898e697de1c5885a70aa4c6134360a50d92d2c9caf5d137881c8af83",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-glay-01.png",
+      "bytes": 260111,
+      "sha256": "786f373e66614a98dd46d8ff8c1475a587f5474a5b390aeef6563afe990fd71b",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-minimalspatial-01.png",
+      "bytes": 258907,
+      "sha256": "e693833127e610ac502d4154588d93da24d2b9af397fc3eb31e9062bd985a24b",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-native-01.png",
+      "bytes": 259155,
+      "sha256": "65cfd362c15136084b5e22fefc7d878f7d7d770858705fa0bcbeedd903192dda",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-native-drawer-01.png",
+      "bytes": 221900,
+      "sha256": "1a75450f773e2dfcab602d330816211d3ca8ad94f3cd20ba250dc336b4d81b8f",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-native-nav-01.png",
+      "bytes": 94479,
+      "sha256": "91cdb36f8f09d997784b0bfeb84482b62b6c55d1d0d95e3eca8cabb5bce47050",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-light-solid-01.png",
+      "bytes": 259670,
+      "sha256": "abdd5f21898e697de1c5885a70aa4c6134360a50d92d2c9caf5d137881c8af83",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-oled-native-01.png",
+      "bytes": 270705,
+      "sha256": "2bb6389d567c406c662a6dcfed24dc704dd94ad6df1bdccef39b582cbf67c184",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/home/7m-b2-ios-home-oled-native-nav-01.png",
+      "bytes": 85974,
+      "sha256": "cbc10ce2416c3867689ff2354b3e266d3162a794389acf1bfc5beedff79d30de",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-dark-native-01.png",
+      "bytes": 278325,
+      "sha256": "cf8c46ba86ff85eff9cfe606dffb9ce4550159ee515fa5b076b5c8f187b8f131",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-dim-native-01.png",
+      "bytes": 297541,
+      "sha256": "992392ba922e865a72133e6e9fc96f764a34f148859cf0d888d333f2d24b427e",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-glass-01.png",
+      "bytes": 257644,
+      "sha256": "5a3cac44a446fab5f490fad34909d8debd7dae872dfe71cc884dfc09414950c8",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-glay-01.png",
+      "bytes": 256650,
+      "sha256": "f6954f423fec835715e5dcfdf5eb18a27c10968cb053d9abed12992fc4c59d08",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-minimalspatial-01.png",
+      "bytes": 256650,
+      "sha256": "f6954f423fec835715e5dcfdf5eb18a27c10968cb053d9abed12992fc4c59d08",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-native-01.png",
+      "bytes": 256635,
+      "sha256": "292a38c41c38680d08d63e8c8989e23aa464d7b3df0342500c15140cba5d7ca6",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-native-installed-01.png",
+      "bytes": 202554,
+      "sha256": "6d508a068f5ea40e97aa991afc4b8d04782c873b321979d5aaa5aa7023d26746",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-native-modules-01.png",
+      "bytes": 236332,
+      "sha256": "97c616d5eff425b2fa2209078774c8a62a1d1a1fedfb0fb3abea5bf3e0589c19",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-native-nav-01.png",
+      "bytes": 109839,
+      "sha256": "cf836c3526b7f0004d443a11ac4d710829154dacdc14664349b0e73b3e748ba8",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-light-solid-01.png",
+      "bytes": 257644,
+      "sha256": "5a3cac44a446fab5f490fad34909d8debd7dae872dfe71cc884dfc09414950c8",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/product-hub/7m-b2-ios-product-hub-oled-native-01.png",
+      "bytes": 279999,
+      "sha256": "e7cdbaf4b0d03cb73b512f8ab6a5fbe39d8801b9baeb698ba50d4efe2c48a6da",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/surfaces/7m-b2-ios-settings-modules-light-native-01.png",
+      "bytes": 165945,
+      "sha256": "fc7050e32ce7455bf4a149919babe466a0355a3c2dfea4ceb905ed5e53559478",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/surfaces/7m-b2-ios-ui-lab-light-native-01.png",
+      "bytes": 206590,
+      "sha256": "7c5bf0d4321eafecde27266fe826152b27ab016ea039cbfff0521893cdf4867c",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-dark-native-01.png",
+      "bytes": 123292,
+      "sha256": "1b59243b201b66c69b56de9f181f907bd9cdca9aa9c3dbe55e88a52724c59ba9",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-dim-native-01.png",
+      "bytes": 132522,
+      "sha256": "0d1a59637fa0845296431e61ec890d547eacf14a4eee783c4886582700aa59c5",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-glass-01.png",
+      "bytes": 102641,
+      "sha256": "bd8b15b8c29849ea0ec6c6dedfdcde34fbda19cddb369f278735228be949cc23",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-glay-01.png",
+      "bytes": 101548,
+      "sha256": "2b24ee0e1f6d5e8582df9cc94b1634d25f1e011d4f6a1f63407f91785a4f4223",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-minimalspatial-01.png",
+      "bytes": 101548,
+      "sha256": "2b24ee0e1f6d5e8582df9cc94b1634d25f1e011d4f6a1f63407f91785a4f4223",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-native-01.png",
+      "bytes": 101534,
+      "sha256": "eed04b57e6bcacbf9a6e16630ee8e2287777906865fdde31f709170eb8befdd6",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-native-nav-01.png",
+      "bytes": 43463,
+      "sha256": "e4f3c9c5d11836f8145561586cade67e8f5faf86b5c9db696f232beff28a9160",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-light-solid-01.png",
+      "bytes": 102641,
+      "sha256": "bd8b15b8c29849ea0ec6c6dedfdcde34fbda19cddb369f278735228be949cc23",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/ios/vault-notes/7m-b2-ios-vault-notes-oled-native-01.png",
+      "bytes": 115704,
+      "sha256": "e9f44cf8d0924b2d1fb718d6f486dbdc743fdba10799a2a079d204d2aaa1a60c",
+      "rejected": false
+    },
+    {
+      "path": "phase-7m/b2/motion/7m-b2-motion-navigation-01.mp4",
+      "bytes": 6834294,
+      "sha256": "7c91c622c288386596e846eca71f79aba7f60c088fbae3a4e00bfcc58d7ccd8a",
+      "rejected": false
+    }
+  ]
+}

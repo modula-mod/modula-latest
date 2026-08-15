@@ -73,6 +73,9 @@ services/greenfield-api/backups/*.dump
 # Phase 7F-A local Mac evidence (logs; not committed)
 .local-evidence/
 
+# Evidence export staging (never auto-push)
+.staging/
+
 # MCP / agent local secrets (never commit tokens)
 .mcp.local.json
 .cursor/mcp.local.json

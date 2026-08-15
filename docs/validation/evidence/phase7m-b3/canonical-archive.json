@@ -1,0 +1,18 @@
+{
+  "phase": "7M-B3",
+  "visualPhase": "7M-B2",
+  "evidenceRepository": "https://github.com/modula-mod/modula-evidence-screenshots",
+  "evidenceVisibility": "private",
+  "evidenceCommit": "e3669c08c2af44fc8c8ae7f537dd18b858eeed3b",
+  "evidenceTag": "phase7m-b2-visual-review",
+  "productRepository": "modula-mod/modula-latest",
+  "productBranch": "cursor/phase7m-b2-vault-notes-canonical-b6a2",
+  "productCommit": "332ed4f2d1551e58541828d51c9f15d46158ee5c",
+  "pullRequest": 19,
+  "flagshipManifestPath": "phase-7m/b2/manifests/phase7m-b2.json",
+  "reviewIndex": "phase-7m/b2/REVIEW.md",
+  "contactSheet": "phase-7m/b2/comparisons/7m-b2-contact-sheet-light-oled-01.png",
+  "notACdn": true,
+  "productionDeployed": false,
+  "phase7mCStarted": false
+}
