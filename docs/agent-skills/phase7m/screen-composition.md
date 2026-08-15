@@ -21,6 +21,10 @@ Do not start by drawing boxes.
 
 Login → Home → Product Hub. If Home is rejected, fix Home; do not migrate 25 screens.
 
+## 7M-B4
+
+7M-B2 visual composition is rejected. Do not compose by polishing those screens. Study `docs/research/phase7m-b4-real-app-reference-matrix.md`, pick surfaces from CANVAS / CONTENT / SECTION / ROW / MEDIA / FLOATING CHROME / INTERACTIVE SURFACE, and stop at twelve compositions until founder selection.
+
 ## 7M-C freeze
 
 Functionality stays frozen underneath. Working profile edit must still save.

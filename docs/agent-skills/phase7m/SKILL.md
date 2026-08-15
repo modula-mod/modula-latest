@@ -8,11 +8,38 @@ description: >-
 
 # Modula UI Implementation Skill
 
+The previous Phase 7M-B visual direction has been explicitly rejected by the founder. Do not polish, preserve, or treat its visual composition as the baseline. Preserve its engineering work only. Research real shipping applications first, derive three materially different Modula visual directions, and stop for founder selection before broad implementation.
+
 ## Mission
 
 Implement or migrate Modula UI without inventing new visual architecture.
 
 **The Phase 7M UI System Research and Agent Skill Pack is the reference baseline for this mission. Do not blindly implement every proposed dependency or API. First inspect Modula's currently installed Expo SDK, React Native, Expo Router, `@expo/ui`, Reanimated, Gesture Handler, existing Surface runtime, existing platform adapters and shared components. Validate every external API against the exact installed version. Preserve existing accepted functionality. Consolidate existing components rather than creating parallel implementations. No broad product-screen redesign is authorised during 7M-A.**
+
+Phase 7M-B2 screenshots are engineering evidence. They are not an approved design language. 7M-B4 must not incrementally polish them. 7M-C is blocked until founder visual approval of a selected direction.
+
+## Anti-AI-UI rules (automatic failure)
+
+- NO CARD SOUP
+- NO PILL SOUP
+- NO RANDOM GRADIENTS
+- NO EVERYTHING-IS-ROUNDED
+- NO GIANT EMPTY HERO SPACE WITHOUT PURPOSE
+- NO GENERIC "WELCOME BACK" DASHBOARD DESIGN
+- NO ICON-IN-PASTEL-SQUARE FOR EVERY ENTITY
+- NO TEAL ON EVERY INTERACTION
+- NO DUPLICATED TITLE + HEADER TITLE
+- NO ADMIN/REGISTRY METADATA IN PRIMARY UI
+- NO DEBUG LANGUAGE
+- NO MOCK MARKETPLACE VISUALS
+- NO GLASS SIMPLY BECAUSE GLASS EXISTS
+- NO ANIMATION SIMPLY BECAUSE REANIMATED EXISTS
+- NO INVENTED DESIGN WITHOUT A REFERENCE OR DOCUMENTED RATIONALE
+- NO WHOLE-APP ROLLOUT BEFORE FOUNDER VISUAL APPROVAL
+
+`#369CAA` is the Modula accent. It is not every button, badge, tab, icon background, filter, link, module artwork, or status. Neutral hierarchy does most of the work.
+
+A section does not automatically need a background. A post does not automatically need a card. A label does not automatically need a pill. A status does not automatically need a badge. A filter does not automatically need another rounded container.
 
 ## Phase gate
 
@@ -20,6 +47,7 @@ Implement or migrate Modula UI without inventing new visual architecture.
 | --- | --- | --- |
 | 7M-A | Docs, inventory, this skill | New visual components, dep installs, screen redesign |
 | 7M-B | UI Lab + Login + Home + Product Hub prototypes | Migrating the rest of the app |
+| 7M-B4 | Real-app research, three directions, twelve compositions, founder gate | Implementing a direction before selection; polishing 7M-B2 visuals; production deploy; starting 7M-C |
 | 7M-C | Full rollout after **human visual approval** | Behaviour changes under the redesign |
 
 If 7L-B is not closed (`P0 OPEN 0`, live identity agreed), stop. Do not start UI reconstruction on a broken beta.
@@ -88,3 +116,10 @@ Never import a third-party UI library from a product screen.
 - `docs/agent-skills/phase7m/screen-composition.md`
 - `docs/agent-skills/phase7m/accessibility.md`
 - `docs/agent-skills/phase7m/visual-verification.md`
+- `docs/research/phase7m-b4-real-app-reference-matrix.md`
+- `docs/research/phase7m-b4-apple-current-guidance.md`
+- `docs/research/phase7m-b4-motion-references.md`
+- `docs/design/phase7m-b4-visual-directions.md`
+- `docs/design/phase7m-b4-module-artwork.md`
+- `docs/design/phase7m-b4-typography-roles.md`
+- `docs/design/phase7m-b4-navigation-prototypes.md`

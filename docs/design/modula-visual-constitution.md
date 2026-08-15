@@ -1,6 +1,8 @@
 # Modula Visual Constitution
 
-Phase: 7M-A (binding). Implementation of new visuals is **7M-B/C** after this constitution and UI Lab approval.
+Phase: 7M-A (binding). 7M-B2 engineering is preserved. **7M-B2 visual composition is rejected.** 7M-B4 produces three directions for founder selection. Implementation of a selected direction is **7M-B prototype / 7M-C** only after founder visual approval.
+
+The previous Phase 7M-B visual direction has been explicitly rejected by the founder. Do not polish, preserve, or treat its visual composition as the baseline. Preserve its engineering work only.
 
 Reference baseline: Phase 7M UI System Research and Agent Skill Pack. Inspect installed Expo SDK 57 / RN 0.86.2 / `@expo/ui` 57.0.10 before any API claim.
 
@@ -56,11 +58,30 @@ Not “an Expo UI app” and not “an Apple-looking app”. A Modula visual sys
 - Fake-success UI or hiding a broken control to make a screenshot pass.
 - Redesigning a working screen so it no longer saves / restores session / loads sessions.
 - Copying Bluesky ALF or `@bsky.app/*` components.
+- Card soup, pill soup, teal-on-every-interaction, duplicated titles, debug/registry copy in customer UI, generic cube as marketplace identity.
+- Treating 7M-B2 screenshots as the visual baseline.
+
+## Composition types
+
+A screen must declare a type. Rounded rectangles are not information architecture.
+
+| Type | Meaning | Typical screens |
+| --- | --- | --- |
+| CANVAS | Full-bleed content / artwork | Vault Notes pre-install, media |
+| CONTENT | Continuous document | Home feed |
+| SECTION | Named group without a mandatory background | Product Hub shelves |
+| ROW | Identity + text + optional action | Hub list, settings, posts |
+| MEDIA | Image/video is the object | Stories, post media, hub hero |
+| FLOATING CHROME | UI layer above content | Nav B/C, sheets |
+| INTERACTIVE SURFACE | Control that needs a hit area | Fields, Get, native tabs |
 
 ## Sequencing
 
 ```text
-7M-A  constitution + inventory + skill     ← this document
-7M-B  UI Lab + Login + Home + Product Hub  ← visual approval gate
-7M-C  full product UI rollout              ← functionality frozen underneath
+7M-A   constitution + inventory + skill
+7M-B   UI Lab + engineering prototypes (visual direction REJECTED)
+7M-B4  real-app research + 3 directions + 12 compositions  ← founder selection
+7M-C   full product UI rollout after founder visual approval
 ```
+
+Pointers: `docs/research/phase7m-b4-real-app-reference-matrix.md`, `docs/design/phase7m-b4-visual-directions.md`.
