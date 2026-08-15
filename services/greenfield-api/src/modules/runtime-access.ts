@@ -1,4 +1,5 @@
 import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import {moduleIdFamily, resolveCanonicalModuleId, rewriteLegacyVaultNotesId} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
 import {moduleError} from './module-errors.js'
@@ -20,6 +21,7 @@ export class GreenfieldModuleRuntimeAccessService {
   constructor(private readonly db: ModulaDb) {}
 
   async resolve(accountId: string, moduleId: string, options: {requireEnabled?: boolean} = {}): Promise<GreenfieldModuleRuntimeContext> {
+    const canonicalId = resolveCanonicalModuleId(moduleId)
     const row = await this.db
       .selectFrom('greenfield_extension_installations')
       .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
@@ -35,7 +37,7 @@ export class GreenfieldModuleRuntimeAccessService {
         'greenfield_module_versions.manifest',
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
-      .where('greenfield_module_releases.module_id', '=', moduleId)
+      .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
       .where('greenfield_extension_installations.status', '!=', 'removed')
       .executeTakeFirst()
 
@@ -54,10 +56,10 @@ export class GreenfieldModuleRuntimeAccessService {
       .orderBy('reviewed_at', 'desc')
       .executeTakeFirst()
     const manifest = row.manifest as GreenfieldModuleManifestV1
-    const fallbackPermissions = (manifest.permissions ?? []).map(permission => permission.permission)
+    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteLegacyVaultNotesId(permission.permission))
     return {
       accountId,
-      moduleId: row.module_id,
+      moduleId: canonicalId,
       installationId: row.installation_id,
       installationStatus: status,
       releaseId: row.release_id,
@@ -65,7 +67,7 @@ export class GreenfieldModuleRuntimeAccessService {
       extensionVersionId: row.extension_version_id,
       releaseState: row.release_state,
       manifest,
-      grantedPermissions: arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions,
+      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteLegacyVaultNotesId),
     }
   }
 

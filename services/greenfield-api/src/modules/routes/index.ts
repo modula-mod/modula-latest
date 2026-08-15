@@ -26,8 +26,13 @@ import {ModuleBackendEventService} from '../backend/event-service.js'
 import {ModuleBackendHealthService as GreenfieldModuleBackendHealthService} from '../backend/health-service.js'
 import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
 import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
+import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 type RouteConfig = Record<string, unknown>
+
+function canonicalModuleParam(request: FastifyRequest): string {
+  return resolveCanonicalModuleId(String((request.params as {moduleId?: string}).moduleId ?? ''))
+}
 
 export async function registerModuleRoutes(
   app: FastifyInstance,
@@ -77,7 +82,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/modules/:moduleId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.getModule((request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module lookup failed')
     }
@@ -86,7 +91,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/modules/:moduleId/versions', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.listVersions((request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await registry.listVersions(canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module versions lookup failed')
     }
@@ -96,7 +101,7 @@ export async function registerModuleRoutes(
     if (!requireRegistry(reply, request.id)) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await registry.getVersion(params.moduleId, params.version), request.id))
+      return reply.send(successEnvelope(await registry.getVersion(canonicalModuleParam(request), params.version), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
     }
@@ -118,7 +123,7 @@ export async function registerModuleRoutes(
   app.get('/v1/modules/installed/:moduleId', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
-    const installed = await installations.getInstalled(auth.accountId, (request.params as any).moduleId)
+    const installed = await installations.getInstalled(auth.accountId, canonicalModuleParam(request))
     if (!installed) return sendError(reply, 'NOT_FOUND', 'Module installation not found', request.id)
     return reply.send(successEnvelope(installed, request.id))
   })
@@ -127,7 +132,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await runtime2.runtimeSummary(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await runtime2.runtimeSummary(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module runtime lookup failed')
     }
@@ -141,9 +146,9 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await runtime2.invokeService({
         accountId: auth.accountId,
         actorId: actorIdForAccount(auth.accountId),
-        providerModuleId: (request.params as any).moduleId,
+        providerModuleId: canonicalModuleParam(request),
         serviceId: (request.params as any).serviceId,
-        callerModuleId: typeof body.callerModuleId === 'string' ? body.callerModuleId : (request.params as any).moduleId,
+        callerModuleId: typeof body.callerModuleId === 'string' ? body.callerModuleId : canonicalModuleParam(request),
         payload: body.input ?? {},
         idempotencyKey: idempotencyKey(request, body),
         depth: Number.isInteger(body.depth) ? body.depth : 1,
@@ -159,7 +164,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
-      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, (request.params as any).moduleId, body.version), request.id))
+      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install preview failed')
     }
@@ -172,7 +177,7 @@ export async function registerModuleRoutes(
       const body = (request.body as any) ?? {}
       return reply.code(202).send(
         successEnvelope(
-          await installations.install(auth.accountId, (request.params as any).moduleId, {
+          await installations.install(auth.accountId, canonicalModuleParam(request), {
             version: body.version,
             approvedPermissions: body.approvedPermissions,
             idempotencyKey: idempotencyKey(request, body),
@@ -189,7 +194,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.code(202).send(successEnvelope(await installations.enable(auth.accountId, (request.params as any).moduleId, idempotencyKey(request, request.body)), request.id))
+      return reply.code(202).send(successEnvelope(await installations.enable(auth.accountId, canonicalModuleParam(request), idempotencyKey(request, request.body)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Enable failed')
     }
@@ -199,7 +204,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.code(202).send(successEnvelope(await installations.disable(auth.accountId, (request.params as any).moduleId, idempotencyKey(request, request.body)), request.id))
+      return reply.code(202).send(successEnvelope(await installations.disable(auth.accountId, canonicalModuleParam(request), idempotencyKey(request, request.body)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Disable failed')
     }
@@ -212,7 +217,7 @@ export async function registerModuleRoutes(
       const body = (request.body as any) ?? {}
       return reply.code(202).send(
         successEnvelope(
-          await updates.update(auth.accountId, (request.params as any).moduleId, {
+          await updates.update(auth.accountId, canonicalModuleParam(request), {
             version: body.version,
             approvedPermissionIncrease: Boolean(body.approvedPermissionIncrease),
             idempotencyKey: idempotencyKey(request, body),
@@ -230,7 +235,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
-      return reply.send(successEnvelope(await installations.reviewPermissions(auth.accountId, (request.params as any).moduleId, {
+      return reply.send(successEnvelope(await installations.reviewPermissions(auth.accountId, canonicalModuleParam(request), {
         approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : [],
         idempotencyKey: idempotencyKey(request, body),
       }), request.id))
@@ -243,7 +248,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await uninstall.preview(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await uninstall.preview(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Uninstall preview failed')
     }
@@ -256,7 +261,7 @@ export async function registerModuleRoutes(
       const body = (request.body as any) ?? {}
       return reply.code(202).send(
         successEnvelope(
-          await uninstall.uninstall(auth.accountId, (request.params as any).moduleId, {
+          await uninstall.uninstall(auth.accountId, canonicalModuleParam(request), {
             choice: body.choice,
             confirmDelete: Boolean(body.confirmDelete),
             recentAuth: Boolean(body.recentAuth),
@@ -274,7 +279,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await settings.schema(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await settings.schema(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Settings schema failed')
     }
@@ -284,7 +289,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await settings.get(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await settings.get(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Settings lookup failed')
     }
@@ -294,7 +299,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await settings.patch(auth.accountId, (request.params as any).moduleId, ((request.body as any)?.values ?? request.body ?? {}) as any), request.id))
+      return reply.send(successEnvelope(await settings.patch(auth.accountId, canonicalModuleParam(request), ((request.body as any)?.values ?? request.body ?? {}) as any), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Settings update failed')
     }
@@ -310,7 +315,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await views.listViews(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await views.listViews(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module views lookup failed')
     }
@@ -440,7 +445,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await health.get(auth.accountId, (request.params as any).moduleId), request.id))
+      return reply.send(successEnvelope(await health.get(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module health lookup failed')
     }
@@ -450,7 +455,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      const context = await runtimeAccess.resolve(auth.accountId, canonicalModuleParam(request), {requireEnabled: false})
       return reply.send(successEnvelope(await backendHealth.diagnostics(context), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend diagnostics failed')
@@ -461,7 +466,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      const context = await runtimeAccess.resolve(auth.accountId, canonicalModuleParam(request), {requireEnabled: false})
       return reply.send(successEnvelope(await backendDiscovery.discover(context, {origin: stringOrUndefined((request.body as any)?.origin)}), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend discovery failed')
@@ -472,7 +477,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      const context = await runtimeAccess.resolve(auth.accountId, canonicalModuleParam(request), {requireEnabled: false})
       return reply.send(successEnvelope(await backendHealth.check(context), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend health failed')
@@ -483,7 +488,7 @@ export async function registerModuleRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      const context = await runtimeAccess.resolve(auth.accountId, (request.params as any).moduleId, {requireEnabled: false})
+      const context = await runtimeAccess.resolve(auth.accountId, canonicalModuleParam(request), {requireEnabled: false})
       return reply.send(successEnvelope(await backendLifecycle.disable(context), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend disable failed')
@@ -493,7 +498,7 @@ export async function registerModuleRoutes(
   app.post('/v1/modules/:moduleId/backend/events', routeConfig.writeConfig, async (request, reply) => {
     try {
       const token = bearerToken(request)
-      return reply.send(successEnvelope(await backendEvents.ingest((request.params as any).moduleId, request.body ?? {}, token, signatureHeader(request, 'x-modula-event-signature')), request.id))
+      return reply.send(successEnvelope(await backendEvents.ingest(canonicalModuleParam(request), request.body ?? {}, token, signatureHeader(request, 'x-modula-event-signature')), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend event ingestion failed')
     }
@@ -502,7 +507,7 @@ export async function registerModuleRoutes(
   app.post('/v1/modules/:moduleId/backend/webhooks/modula', routeConfig.writeConfig, async (request, reply) => {
     try {
       const token = bearerToken(request)
-      return reply.send(successEnvelope(await backendWebhooks.receive((request.params as any).moduleId, request.body ?? {}, token, signatureHeader(request, 'x-modula-webhook-signature')), request.id))
+      return reply.send(successEnvelope(await backendWebhooks.receive(canonicalModuleParam(request), request.body ?? {}, token, signatureHeader(request, 'x-modula-webhook-signature')), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module backend webhook receipt failed')
     }

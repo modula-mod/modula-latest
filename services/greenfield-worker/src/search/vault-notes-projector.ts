@@ -1,8 +1,12 @@
-import type {GreenfieldSearchDocument} from '@modula/greenfield-contracts'
+import {
+  CANONICAL_VAULT_NOTES_MODULE_ID,
+  vaultNotesIdentityFamily,
+  type GreenfieldSearchDocument,
+} from '@modula/greenfield-contracts'
 import type {ModulaWorkerDb} from '../database.js'
 import {SearchProjector, type SearchProjectionContext} from './projector.js'
 
-const VAULT_NOTES_MODULE_ID = 'modula.vault-notes'
+const VAULT_NOTES_MODULE_IDS = vaultNotesIdentityFamily()
 
 export async function projectVaultNotesRecord(db: ModulaWorkerDb, projector: SearchProjector, context: SearchProjectionContext): Promise<void> {
   const recordId = recordIdFromEvent(context)
@@ -10,7 +14,7 @@ export async function projectVaultNotesRecord(db: ModulaWorkerDb, projector: Sea
   const row = await db
     .selectFrom('greenfield_module_records')
     .selectAll()
-    .where('module_id', '=', VAULT_NOTES_MODULE_ID)
+    .where('module_id', 'in', [...VAULT_NOTES_MODULE_IDS])
     .where('collection', '=', collection)
     .where('record_id', '=', recordId)
     .executeTakeFirst()
@@ -46,7 +50,7 @@ function noteDocument(row: {record_id: string; account_id: string; revision: num
     title: stringField(data.title) ?? 'Untitled',
     body: deleted ? undefined : stringField(data.plainTextProjection),
     summary: undefined,
-    keywords: [VAULT_NOTES_MODULE_ID, 'vault-notes', folder].filter((item): item is string => Boolean(item)),
+    keywords: [CANONICAL_VAULT_NOTES_MODULE_ID, 'vault-notes', folder].filter((item): item is string => Boolean(item)),
     tags: arrayOfStrings(data.tagIds),
     visibility: 'account',
     status: deleted ? 'deleted' : 'active',
@@ -55,7 +59,7 @@ function noteDocument(row: {record_id: string; account_id: string; revision: num
     updatedAt: row.updated_at.toISOString(),
     indexedAt: new Date().toISOString(),
     metadata: {
-      moduleId: VAULT_NOTES_MODULE_ID,
+      moduleId: CANONICAL_VAULT_NOTES_MODULE_ID,
       folderId: stringField(data.folderId),
       folderName: folder,
       sourceTitle: stringField(record(data.source).title),
@@ -78,7 +82,7 @@ function folderDocument(row: {record_id: string; account_id: string; revision: n
     sourceVersion,
     accountId: row.account_id,
     title: stringField(data.name) ?? 'Folder',
-    keywords: [VAULT_NOTES_MODULE_ID, 'vault-notes', 'folder'],
+    keywords: [CANONICAL_VAULT_NOTES_MODULE_ID, 'vault-notes', 'folder'],
     tags: [],
     visibility: 'account',
     status: row.deleted_at ? 'deleted' : 'active',
@@ -87,7 +91,7 @@ function folderDocument(row: {record_id: string; account_id: string; revision: n
     updatedAt: row.updated_at.toISOString(),
     indexedAt: new Date().toISOString(),
     metadata: {
-      moduleId: VAULT_NOTES_MODULE_ID,
+      moduleId: CANONICAL_VAULT_NOTES_MODULE_ID,
       parentFolderId: stringField(data.parentFolderId),
       position: typeof data.position === 'number' ? data.position : undefined,
     },
@@ -100,7 +104,7 @@ async function folderName(db: ModulaWorkerDb, accountId: string, folderId?: stri
     .selectFrom('greenfield_module_records')
     .select('data')
     .where('account_id', '=', accountId)
-    .where('module_id', '=', VAULT_NOTES_MODULE_ID)
+    .where('module_id', 'in', [...VAULT_NOTES_MODULE_IDS])
     .where('collection', '=', 'folder')
     .where('record_id', '=', folderId)
     .executeTakeFirst()

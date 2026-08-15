@@ -79,5 +79,5 @@ export function PostActions({post}: {post: SocialPost}) {
 
 const styles = StyleSheet.create({
   action: {alignItems: 'center', flexDirection: 'row', gap: 4},
-  actions: {flexDirection: 'row', justifyContent: 'space-between', marginTop: 8},
+  actions: {flexDirection: 'row', justifyContent: 'space-between', marginTop: 2},
 })

@@ -92,6 +92,9 @@ assertExists('docs/research/phase7m-b-ui-dispositions.md', 'DISPOSITION INVENTOR
 console.log('\n# Track B — Real module platform (Vault Notes)')
 
 assertExists('docs/research/phase7m-b-vault-notes-provenance.md', 'VAULT PROVENANCE DOC')
+assertExists('docs/architecture/vault-notes-canonical-identity.md', 'CANONICAL IDENTITY DOC')
+assertExists('docs/validation/vault-notes-reference-classification.md', 'REFERENCE CLASSIFICATION')
+run('VAULT NOTES CANONICAL', 'node', ['scripts/verify-vault-notes-canonical.mjs'])
 // Generic host: no Vault Notes branching in host runtime.
 assertAbsent('src/features/modules/runtime/module-host.tsx', 'vault-notes', 'HOST NOT VAULT-HARDCODED')
 assertAbsent(
@@ -134,7 +137,12 @@ if (!distReady) {
 console.log('\n# Module platform database gates')
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL ?? process.env.MODULA_DATABASE_URL
-const externalRepo = rel('../modula-mod/modula-vault-notes')
+const externalCandidates = [
+  process.env.MODULA_VAULT_NOTES_ROOT,
+  rel('../modula-mod/modula-vault-notes'),
+  '/tmp/modula-mod/modula-vault-notes',
+].filter(Boolean)
+const externalRepo = externalCandidates.find(candidate => existsSync(path.join(candidate, 'module.manifest.json'))) ?? externalCandidates[1]
 const externalReady = existsSync(path.join(externalRepo, 'module.manifest.json'))
 record(
   'EXTERNAL VAULT REPO',
@@ -164,6 +172,7 @@ if (!databaseUrl) {
       'vitest',
       'run',
       'tests/phase7e.vault-notes-platform.test.ts',
+      'tests/phase7m-b2.vault-notes-identity.test.ts',
       'tests/phase7b.module-runtime.test.ts',
       'tests/phase7e.module-runtime-2.test.ts',
       'tests/phase7l.product-hub-policy.test.ts',

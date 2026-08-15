@@ -77,6 +77,14 @@ export function DeveloperSettingsScreen() {
       <SettingsSection title="Host labs">
         <SettingsLinkRow
           row={{
+            title: 'Modula UI Lab',
+            description: 'Typography, controls, module card, and install progress state matrix.',
+            icon: 'developer',
+            route: '/settings/developer/modula-ui-lab',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
             title: 'Expo UI Lab',
             description: 'Pick Expo UI playground components by product context.',
             icon: 'developer',

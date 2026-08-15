@@ -83,25 +83,23 @@ is **not currently accessible** to this agent (`gh repo view` →
   resolve from the manifest (`GET /v1/modules/:id/views`,
   `/records/:collection`). Confirmed during the 7M-B host audit.
 
-## Decision — do not mutate the external repo
+## Decision — 7M-B2 unification (supersedes “do not mutate”)
 
-An earlier 7M-B attempt renamed the external repo to
-`digital.modula.vault-notes@1.2.0` to force id alignment. That was reverted
-because it is the wrong reconciliation:
+Phase 7M-B2 eliminates the split. There is one Vault Notes:
 
-1. **Not landable** — the cloud agent's identity (`cursor[bot]`) has read but
-   not write access to `modula-mod/modula-vault-notes` (`403` on push), so a
-   rename there cannot ship.
-2. **Breaks a passing regression** — Phase 7E
-   (`phase7e.vault-notes-platform.test.ts`) pins the external repo to
-   `modula.vault-notes@1.1.0`; renaming turns it red.
-3. **Invents a version** — `1.2.0` sits ahead of both the repo (`1.1.0`) and
-   production (`0.2.0`) with no upstream basis.
+- Product: Vault Notes
+- Module ID: `digital.modula.vault-notes`
+- Source: `modula-mod/modula-vault-notes`
+- Legacy ID `modula.vault-notes` is an alias only
+- Legacy repo `modula-module-vault-notes` is archive/redirect only
 
-The external repo is left at its genuine identity. Identity alignment is a
-registry/policy concern (already implemented and tested), not a source edit.
+See `docs/architecture/vault-notes-canonical-identity.md`.
 
-## Verification evidence (all green)
+The earlier 7M-B attempt to invent `1.2.0` remains rejected. 7M-B2 overlays
+canonical identity at import and keeps version **1.1.0**.
+
+## Verification evidence
+
 
 - `pnpm exec vitest run` on
   `phase7e.vault-notes-platform.test.ts`, `phase7b.module-runtime.test.ts`,

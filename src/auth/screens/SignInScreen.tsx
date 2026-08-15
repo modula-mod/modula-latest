@@ -9,6 +9,7 @@ import {
   AuthShell,
   AppButton,
 } from '@/auth/screens/AuthScreenPrimitives'
+import {ModulaOTPField} from '@/platform/ui/controls/modula-otp-field'
 import {sanitizeReturnTo} from '@/auth/navigation/safeReturnTo'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
@@ -176,15 +177,10 @@ export function SignInScreen() {
           </AppButton>
           {emailCodeChallengeId ? (
             <>
-              <AuthField
-                label="Email code"
+              <ModulaOTPField
                 value={emailCode}
-                onChangeText={setEmailCode}
-                autoCapitalize="none"
-                keyboardType="numeric"
-                textContentType="oneTimeCode"
-                returnKeyType="done"
-                onSubmitEditing={() => void submitEmailCode()}
+                onChangeValue={setEmailCode}
+                accessibilityLabel="Email sign-in code"
                 testID="sign-in-email-code"
               />
               <AppButton

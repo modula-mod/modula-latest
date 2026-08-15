@@ -34,6 +34,11 @@ describe('Phase 7L-B Product Hub beta catalogue policy', () => {
       visibleInBeta: false,
       canonicalModuleId: 'digital.modula.vault-notes',
     })
+    expect(classifyBetaModule({moduleId: 'modula.vault-notes', status: 'published'})).toMatchObject({
+      classification: 'DUPLICATE',
+      visibleInBeta: false,
+      canonicalModuleId: 'digital.modula.vault-notes',
+    })
     expect(classifyBetaModule({moduleId: 'modula.module.tasks', status: 'unavailable'})).toMatchObject({
       classification: 'DUPLICATE',
       visibleInBeta: false,

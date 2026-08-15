@@ -1,6 +1,7 @@
 import {createHash} from 'node:crypto'
 import {canonicalJsonStringify} from '@modula/greenfield-protocol'
 import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
+import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -9,6 +10,7 @@ import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from './module-errors.js'
 import {collectionPermission, GreenfieldModuleRuntimeAccessService, type GreenfieldModuleRuntimeContext} from './runtime-access.js'
 import {GreenfieldModuleViewService} from './view-service.js'
+import {GreenfieldModuleIdentityMigrationService} from './identity-migration-service.js'
 
 type ModuleRecordOperation = 'create' | 'update' | 'delete' | 'restore' | 'purge'
 type ModuleRecordVersionChangeSource = 'update' | 'restore' | 'import' | 'delete' | 'ai-assisted'
@@ -55,7 +57,7 @@ export class GreenfieldModuleRecordService {
       .selectFrom('greenfield_module_records')
       .selectAll()
       .where('account_id', '=', accountId)
-      .where('module_id', '=', moduleId)
+      .where('module_id', 'in', [...moduleIdFamily(moduleId)])
       .where('collection', '=', collection)
       .where('deleted_at', 'is', null)
 
@@ -99,7 +101,7 @@ export class GreenfieldModuleRecordService {
       .selectFrom('greenfield_module_records')
       .selectAll()
       .where('account_id', '=', accountId)
-      .where('module_id', '=', moduleId)
+      .where('module_id', 'in', [...moduleIdFamily(moduleId)])
       .where('collection', '=', collection)
       .where('record_id', '=', recordId)
     if (!includeDeleted) query = query.where('deleted_at', 'is', null) as typeof query
@@ -107,7 +109,8 @@ export class GreenfieldModuleRecordService {
   }
 
   async create(accountId: string, moduleId: string, collection: string, input: {data?: unknown; visibility?: string; recordId?: string}) {
-    const context = await this.resolveRecordContext(accountId, moduleId, collection, 'write')
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    const context = await this.resolveRecordContext(accountId, canonicalId, collection, 'write')
     const data = requireRecordData(input.data)
     const visibility = normalizeVisibility(input.visibility ?? context.collectionDefinition.defaultVisibility)
     validateRecordData(context.collectionDefinition, data, visibility)
@@ -118,14 +121,14 @@ export class GreenfieldModuleRecordService {
     const sourceUri = getStringField(data, 'sourceUri')
     const payloadHash = sha256(canonicalJsonStringify(data))
     const eventId = uuidv7()
-    const eventHash = hashRecordEvent({eventId, recordId, moduleId, collection, operation: 'create', revision: 1, payloadHash})
+    const eventHash = hashRecordEvent({eventId, recordId, moduleId: canonicalId, collection, operation: 'create', revision: 1, payloadHash})
     await this.db.transaction().execute(async trx => {
       await trx
         .insertInto('greenfield_module_records')
         .values({
           record_id: recordId,
           account_id: accountId,
-          module_id: moduleId,
+          module_id: canonicalId,
           installation_id: context.runtime.installationId,
           collection,
           schema_ref: context.collectionDefinition.schemaRef,
@@ -141,11 +144,11 @@ export class GreenfieldModuleRecordService {
           deleted_at: null,
         })
         .execute()
-      await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
-      await new AuditRepository(trx).append('module.record.created', {moduleId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
-      await this.publishRecordDomainEvent(trx, {accountId, moduleId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null})
+      await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId: canonicalId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
+      await new AuditRepository(trx).append('module.record.created', {moduleId: canonicalId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
+      await this.publishRecordDomainEvent(trx, {accountId, moduleId: canonicalId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null})
     })
-    return this.get(accountId, moduleId, collection, recordId)
+    return this.get(accountId, canonicalId, collection, recordId)
   }
 
   async patch(accountId: string, moduleId: string, collection: string, recordId: string, input: {data?: unknown; expectedRevision?: number; visibility?: string; changeSource?: ModuleRecordVersionChangeSource; versionMetadata?: Record<string, unknown>}) {
@@ -206,8 +209,10 @@ export class GreenfieldModuleRecordService {
 
   private async resolveRecordContext(accountId: string, moduleId: string, collection: string, operation: 'read' | 'write' | 'delete') {
     if (!/^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/.test(collection)) throw moduleError('VALIDATION_FAILED', 'Invalid module collection')
-    const runtime = await this.access.resolve(accountId, moduleId, {requireEnabled: true})
-    this.access.enforceCapability(runtime, collectionPermission(moduleId, collection, operation))
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    await new GreenfieldModuleIdentityMigrationService(this.db).normalizeAccount(accountId)
+    const runtime = await this.access.resolve(accountId, canonicalId, {requireEnabled: true})
+    this.access.enforceCapability(runtime, collectionPermission(canonicalId, collection, operation))
     const collectionDefinition = (await this.views.collectionsForRelease(runtime)).find(item => item.collection === collection)
     if (!collectionDefinition) throw moduleError('FORBIDDEN', 'Module collection is not declared')
     return {runtime, collectionDefinition}

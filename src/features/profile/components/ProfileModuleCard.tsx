@@ -23,8 +23,8 @@ const statusLabels: Record<ProfileModulePreview['status'], string> = {
 
 function marketplaceRouteForModule(module: ProfileModulePreview): Href {
   const normalized = module.name.trim().toLowerCase()
-  if (normalized.includes('task')) return '/marketplace/module-tasks' as Href
-  if (normalized.includes('vault')) return '/marketplace/module-vault-notes' as Href
+  if (normalized.includes('task')) return '/marketplace/digital.modula.tasks' as Href
+  if (normalized.includes('vault')) return '/marketplace/digital.modula.vault-notes' as Href
   return '/marketplace' as Href
 }
 

@@ -6,6 +6,8 @@ import type {
 
 const LEGACY_MODULE_REPLACEMENTS: Record<string, string> = {
   'modula.module.vaultNotes': 'digital.modula.vault-notes',
+  'modula.vault-notes': 'digital.modula.vault-notes',
+  'module-vault-notes': 'digital.modula.vault-notes',
   'modula.module.tasks': 'digital.modula.tasks',
   'modula.module.dimon': 'digital.dimon.core',
 }

@@ -361,7 +361,7 @@ function ActivityRow({
   const openDestination = () => {
     onOpen()
     if (item.type === 'moduleUpdate') {
-      router.push('/marketplace/module-vault-notes' as Href)
+      router.push('/marketplace/digital.modula.vault-notes' as Href)
       return
     }
     if (item.type === 'teamInvitation') {

@@ -1,5 +1,9 @@
+import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+
 export function safeModuleId(value: unknown): string {
-  return typeof value === 'string' && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(value) ? value : ''
+  if (typeof value !== 'string') return ''
+  const canonical = resolveCanonicalModuleId(value)
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(canonical) ? canonical : ''
 }
 
 export function safeModulePath(value: unknown): string[] {

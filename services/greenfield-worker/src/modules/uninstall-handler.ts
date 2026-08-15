@@ -2,6 +2,7 @@ import type {ModulaWorkerDb} from '../database.js'
 import {unregisterModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
 import {removeStandard2Runtime, setStandard2RuntimeStatus} from './standard2-runtime-registration.js'
+import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -10,16 +11,17 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
   if (!installed) throw permanentModuleJob('VALIDATION_FAILED', 'Installation not found')
   const release = await db.selectFrom('greenfield_module_releases').select('release_id').where('extension_version_id', '=', installed.extension_version_id).executeTakeFirst()
   const choice = p.dataRetentionChoice === 'deleteData' || p.dataRetentionChoice === 'exportThenDelete' ? p.dataRetentionChoice : 'keepData'
+  const moduleId = resolveCanonicalModuleId(p.moduleId ?? installed.extension_version_id.split('@')[0])
+  const family = [...moduleIdFamily(moduleId)]
   const count = await db
     .selectFrom('greenfield_module_records')
     .select(({fn}) => fn.countAll<number>().as('count'))
     .where('account_id', '=', installed.account_id)
-    .where('module_id', '=', p.moduleId ?? installed.extension_version_id.split('@')[0])
+    .where('module_id', 'in', family)
     .where('deleted_at', 'is', null)
     .executeTakeFirst()
   await db.transaction().execute(async trx => {
     if (release) await unregisterModuleContributions(trx as any, release.release_id)
-    const moduleId = p.moduleId ?? installed.extension_version_id.split('@')[0]
     await setStandard2RuntimeStatus(trx as any, {
       installationId: p.installationId,
       accountId: installed.account_id,
@@ -34,7 +36,7 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
         .updateTable('greenfield_module_records')
         .set({deleted_at: new Date(), updated_at: new Date()})
         .where('account_id', '=', installed.account_id)
-        .where('module_id', '=', moduleId)
+        .where('module_id', 'in', family)
         .where('deleted_at', 'is', null)
         .execute()
     } else {
@@ -42,7 +44,7 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
         .updateTable('greenfield_module_records')
         .set({retained_after_uninstall: true, updated_at: new Date()})
         .where('account_id', '=', installed.account_id)
-        .where('module_id', '=', moduleId)
+        .where('module_id', 'in', family)
         .where('deleted_at', 'is', null)
         .execute()
     }

@@ -34,7 +34,7 @@ export function PostHeader({post, onMore}: PostHeaderProps) {
         accessibilityLabel={`Open ${post.author.displayName} profile`}
         onPress={() => router.push(profileRoute)}
         style={styles.avatar}>
-        <Avatar name={post.author.displayName} uri={post.author.avatarUri} colour={post.author.coverColour} size={42} />
+        <Avatar name={post.author.displayName} uri={post.author.avatarUri} colour={post.author.coverColour} size={36} />
       </AppPressable>
       <AppPressable
         accessibilityLabel={`Open ${post.author.displayName} profile`}

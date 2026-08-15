@@ -2,7 +2,8 @@ import {useState} from 'react'
 import {View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {AuthField, AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
+import {AuthPanel, AuthShell, AppButton} from '@/auth/screens/AuthScreenPrimitives'
+import {ModulaOTPField} from '@/platform/ui/controls/modula-otp-field'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -65,17 +66,20 @@ export function VerifyEmailScreen() {
           </AppText>
         </View>
         <AuthPanel>
-          <AuthField
-            label="Verification code"
+          <ModulaOTPField
             value={code}
-            onChangeText={setCode}
-            autoCapitalize="none"
-            textContentType="oneTimeCode"
-            returnKeyType="done"
-            onSubmitEditing={() => void submit()}
-            error={error ?? undefined}
+            onChangeValue={text => {
+              setCode(text)
+              if (error) setError(null)
+            }}
+            accessibilityLabel="Verification code"
             testID="verify-email-code"
           />
+          {error ? (
+            <AppText variant="caption" colour="destructive">
+              {error}
+            </AppText>
+          ) : null}
           <AppButton testID="verify-email-submit" disabled={pending} onPress={() => void submit()}>
             {pending ? 'Verifying' : 'Verify and enter Modula'}
           </AppButton>

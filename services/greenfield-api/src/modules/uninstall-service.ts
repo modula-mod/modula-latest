@@ -3,6 +3,7 @@ import type {ModulaDb} from '../database/client.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModuleDependencyResolver} from './dependency-resolver.js'
 import {GreenfieldModuleInstallationService} from './installation-service.js'
+import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 export type GreenfieldModuleUninstallChoice = 'keepData' | 'exportThenDelete' | 'deleteData' | 'cancel'
 
@@ -13,25 +14,26 @@ export class GreenfieldModuleUninstallService {
   ) {}
 
   async preview(accountId: string, moduleId: string) {
-    const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, moduleId)
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    const installed = await new GreenfieldModuleInstallationService(this.db, this.config).getInstalled(accountId, canonicalId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
-    const dependants = await new GreenfieldModuleDependencyResolver(this.db).activeDependants(accountId, moduleId)
+    const dependants = await new GreenfieldModuleDependencyResolver(this.db).activeDependants(accountId, canonicalId)
     const contributions = await this.db
       .selectFrom('greenfield_module_contributions')
       .innerJoin('greenfield_module_releases', 'greenfield_module_releases.release_id', 'greenfield_module_contributions.release_id')
       .select(['contribution_type', 'contribution_key'])
-      .where('greenfield_module_releases.module_id', '=', moduleId)
+      .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
       .where('greenfield_module_releases.version', '=', installed.version)
       .execute()
     const recordCounts = await this.db
       .selectFrom('greenfield_module_records')
       .select(({fn}) => fn.countAll<number>().as('count'))
       .where('account_id', '=', accountId)
-      .where('module_id', '=', moduleId)
+      .where('module_id', 'in', [...moduleIdFamily(canonicalId)])
       .where('deleted_at', 'is', null)
       .executeTakeFirst()
     return {
-      moduleId,
+      moduleId: canonicalId,
       version: installed.version,
       dependantModules: dependants,
       activeJobs: [],
@@ -44,16 +46,17 @@ export class GreenfieldModuleUninstallService {
   }
 
   async uninstall(accountId: string, moduleId: string, input: {choice?: GreenfieldModuleUninstallChoice; confirmDelete?: boolean; recentAuth?: boolean; idempotencyKey: string}) {
+    const canonicalId = resolveCanonicalModuleId(moduleId)
     const choice = input.choice ?? 'keepData'
     if (choice === 'cancel') return {cancelled: true}
-    const preview = await this.preview(accountId, moduleId)
+    const preview = await this.preview(accountId, canonicalId)
     if (preview.dependantModules.length > 0) throw moduleError('CONFLICT', 'Active dependant modules must be resolved before uninstall')
     if (choice === 'deleteData' && (!input.confirmDelete || !input.recentAuth)) {
       throw moduleError('VALIDATION_FAILED', 'Deleting module records requires recent authentication and explicit confirmation')
     }
     return new GreenfieldModuleInstallationService(this.db, this.config).enqueueTransition(
       accountId,
-      moduleId,
+      canonicalId,
       'uninstalling',
       'module.uninstall.requested',
       'module.uninstall',

@@ -5,6 +5,7 @@ import {useRouter, type Href} from 'expo-router'
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
 import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery, useModuleRuntimeQuery} from '@/features/modules/hooks'
+import {safeModuleId} from '@/features/modules/validation/module-route'
 import {
   SettingsLinkRow,
   SettingsScreen,
@@ -17,7 +18,7 @@ import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
-  const id = typeof moduleId === 'string' ? moduleId : ''
+  const id = safeModuleId(moduleId)
   const router = useRouter()
   const services = useAppServices()
   const detail = useModuleDetailQuery(id)
@@ -99,7 +100,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
     if (!module) return
     const confirmed = await confirmModulaAction({
       title: 'Revoke AI access',
-      message: 'Vault Notes remains enabled. AI actions stop until the AI permissions are granted again.',
+      message: `${module.name} remains enabled. AI actions stop until the AI permissions are granted again.`,
       confirmLabel: 'Revoke AI access',
       cancelLabel: 'Cancel',
     })
@@ -137,15 +138,21 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
                 <ModuleStatusPill state={module.priceState} />
               </View>
               <AppText variant="caption" colour="textSecondary">
+                {module.publisherName} · Version {module.latestVersion ?? 'unknown'} · {module.installationState === 'enabled' ? 'Enabled' : module.installationState}
+              </AppText>
+              <AppText variant="caption" colour="textSecondary">
                 Health is isolated to this module host. Failed contributions render as unavailable cards instead of breaking Modula.
               </AppText>
               <View style={[styles.actions, {gap: spacing[2]}]}>
+                <ModulaButton label="Open" accessibilityLabel="Open module" role="secondary" onPress={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)} />
                 {module.installationState === 'enabled' ? (
                   <ModulaButton label="Disable" accessibilityLabel="Disable module" role="secondary" loading={busy === 'disable'} onPress={() => void transition('disable')} />
                 ) : (
                   <ModulaButton label="Enable" accessibilityLabel="Enable module" loading={busy === 'enable'} onPress={() => void transition('enable')} />
                 )}
-                <ModulaButton label="Open module" accessibilityLabel="Open module" role="secondary" onPress={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)} />
+                <ModulaButton label="Check for Update" accessibilityLabel="Check for update" role="secondary" loading={busy === 'update'} onPress={() => void transition('update')} />
+                <ModulaButton label="Configure" accessibilityLabel="Configure module" role="plain" onPress={() => undefined} />
+                <ModulaButton label="Uninstall" accessibilityLabel="Uninstall module" role="destructive" loading={busy === 'uninstall'} onPress={() => void transition('uninstall')} />
               </View>
             </View>
           </SettingsSection>

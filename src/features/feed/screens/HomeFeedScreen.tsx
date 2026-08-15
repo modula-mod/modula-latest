@@ -541,8 +541,8 @@ function ComposerPrompt() {
           {
             borderTopColor: colours.border,
             borderBottomColor: colours.border,
-            padding: spacing[4],
-            gap: spacing[3],
+            padding: spacing[3],
+            gap: spacing[2],
           },
         ]}>
         <Avatar
@@ -552,7 +552,7 @@ function ComposerPrompt() {
           }
           uri={profile?.avatarUri}
           colour={profile?.coverColour}
-          size={40}
+          size={36}
         />
         <AppPressable
           accessibilityLabel="Create a post"

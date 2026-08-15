@@ -1,9 +1,14 @@
 import {randomUUID} from 'node:crypto'
-import {readdirSync, readFileSync} from 'node:fs'
+import {existsSync, readdirSync, readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {dirname, join, resolve} from 'node:path'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {sql} from 'kysely'
+import {
+  CANONICAL_VAULT_NOTES_MODULE_ID,
+  CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  rewriteLegacyVaultNotesValue,
+} from '@modula/greenfield-contracts'
 import {manifestChecksum, type GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
 import {
   validateGreenfieldModuleAction,
@@ -17,24 +22,27 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldSearchService} from '../src/domains/search/index.js'
+import {canonicalizeVaultNotesManifest} from '../src/modules/canonical-manifest.js'
 import {GreenfieldModuleInstallationService} from '../src/modules/installation-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {processOneEventDelivery} from '../../greenfield-worker/src/events/runner.js'
+import {handleModuleUninstall} from '../../greenfield-worker/src/modules/uninstall-handler.js'
+import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 import type {WorkerConfig} from '../../greenfield-worker/src/config.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
-const vaultNotesRoot = resolve(workspaceRoot, '../modula-mod/modula-vault-notes')
-const moduleId = 'modula.vault-notes'
-const moduleVersion = '1.1.0'
+const vaultNotesRoot = resolveVaultNotesRoot(workspaceRoot)
+const moduleId = CANONICAL_VAULT_NOTES_MODULE_ID
+const moduleVersion = CANONICAL_VAULT_NOTES_CURRENT_VERSION
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 describe('Phase 7E Vault Notes external module declarations', () => {
   it('keeps Vault Notes outside hardcoded app feature paths', () => {
-    expect(readJson('modula.module.json').id).toBe(moduleId)
     expect(readJson('modula.module.json').standardVersion).toBe('1.2.0')
+    expect(readJson('modula.module.json').id).toBe('modula.vault-notes')
     expect(() => readFileSync(join(workspaceRoot, 'src/features/vault-notes/index.ts'), 'utf8')).toThrow()
     expect(() => readFileSync(join(workspaceRoot, 'app/vault-notes.tsx'), 'utf8')).toThrow()
     const moduleRepository = readFileSync(join(workspaceRoot, 'src/data/repositories/api/ApiModuleRepository.ts'), 'utf8')
@@ -53,6 +61,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
   let otherToken = ''
   let otherAccountId = ''
   let installationId = ''
+  let installations: GreenfieldModuleInstallationService
   let search: GreenfieldSearchService
   const suffix = randomUUID().slice(0, 8)
 
@@ -67,6 +76,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     search = new GreenfieldSearchService(db, loadConfig())
     await app.ready()
     await importVaultNotesRelease()
+    installations = new GreenfieldModuleInstallationService(db, loadConfig())
     const primary = await registerAccount(`vault-${suffix}@example.com`, `vault${suffix}`.slice(0, 20))
     token = primary.token
     accountId = primary.accountId
@@ -120,7 +130,6 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(install.statusCode).toBe(202)
     installationId = install.json().data.installationId
     expect(install.json().data.status).toBe('installing')
-    const installations = new GreenfieldModuleInstallationService(db, loadConfig())
     await installations.setWorkerStatus(installationId, 'installedDisabled')
     const installing = await app.inject({method: 'GET', url: `/v1/modules/installed/${moduleId}`, headers: {authorization: `Bearer ${token}`}})
     expect(installing.statusCode).toBe(200)
@@ -135,7 +144,11 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
 
     const views = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/views`, headers: {authorization: `Bearer ${token}`}})
     expect(views.statusCode).toBe(200)
-    expect(views.json().data.views.map((view: any) => view.viewId)).toEqual(expect.arrayContaining(['modula.vault-notes.views.home', 'modula.vault-notes.views.editor', 'modula.vault-notes.views.settings']))
+    expect(views.json().data.views.map((view: any) => view.viewId)).toEqual(expect.arrayContaining([
+      'digital.modula.vault-notes.views.home',
+      'digital.modula.vault-notes.views.editor',
+      'digital.modula.vault-notes.views.settings',
+    ]))
 
     const settings = await app.inject({
       method: 'PATCH',
@@ -186,20 +199,20 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
 
     const duplicate = await app.inject({
       method: 'POST',
-      url: `/v1/modules/${moduleId}/actions/modula.vault-notes.actions.note.duplicate`,
+      url: `/v1/modules/${moduleId}/actions/digital.modula.vault-notes.actions.note.duplicate`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `duplicate-${suffix}`},
       payload: {input: noteData({title: `Vault Copy ${suffix}`, text: `Vault copy phrase ${suffix}`, folderId: folder.record_id, tagIds: [tag.record_id]})},
     })
     expect(duplicate.statusCode).toBe(200)
     expect(duplicate.json().data.result.revision).toBe(1)
 
-    const moved = await runAction('modula.vault-notes.actions.note.move', {recordId: note.record_id, expectedRevision: 2, folderId: folder.record_id})
+    const moved = await runAction('digital.modula.vault-notes.actions.note.move', {recordId: note.record_id, expectedRevision: 2, folderId: folder.record_id})
     expect(moved.result.data.folderId).toBe(folder.record_id)
-    const pinned = await runAction('modula.vault-notes.actions.note.pin', {recordId: note.record_id, expectedRevision: 3, pinned: true})
+    const pinned = await runAction('digital.modula.vault-notes.actions.note.pin', {recordId: note.record_id, expectedRevision: 3, pinned: true})
     expect(pinned.result.data.pinned).toBe(true)
-    const favourited = await runAction('modula.vault-notes.actions.note.favourite', {recordId: note.record_id, expectedRevision: 4, favourite: true})
+    const favourited = await runAction('digital.modula.vault-notes.actions.note.favourite', {recordId: note.record_id, expectedRevision: 4, favourite: true})
     expect(favourited.result.data.favourite).toBe(true)
-    const archived = await runAction('modula.vault-notes.actions.note.archive', {recordId: note.record_id, expectedRevision: 5, archived: true})
+    const archived = await runAction('digital.modula.vault-notes.actions.note.archive', {recordId: note.record_id, expectedRevision: 5, archived: true})
     expect(archived.result.data.archived).toBe(true)
 
     const deleted = await app.inject({
@@ -265,7 +278,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     await installations.setWorkerStatus(installationId, 'disabled')
     const blocked = await app.inject({
       method: 'POST',
-      url: `/v1/modules/${moduleId}/actions/modula.vault-notes.actions.note.create`,
+      url: `/v1/modules/${moduleId}/actions/digital.modula.vault-notes.actions.note.create`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `blocked-${suffix}`},
       payload: {input: noteData({title: 'blocked', text: 'blocked'})},
     })
@@ -279,6 +292,260 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     await installations.setWorkerStatus(installationId, 'enabled')
   })
 
+  it('resolves the legacy module ID onto the one canonical product', async () => {
+    const legacy = await app.inject({
+      method: 'GET',
+      url: '/v1/registry/modules/modula.vault-notes',
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(legacy.statusCode).toBe(200)
+    expect(legacy.json().data.moduleId).toBe(moduleId)
+    expect(legacy.json().data.latestVersion).toBe(moduleVersion)
+    const catalogue = await app.inject({
+      method: 'GET',
+      url: '/v1/registry/modules?q=Vault%20Notes',
+      headers: {authorization: `Bearer ${token}`},
+    })
+    const vaultCards = catalogue.json().data.items.filter((item: {name?: string; moduleId?: string}) =>
+      item.name === 'Vault Notes' || item.moduleId === moduleId || item.moduleId === 'modula.vault-notes',
+    )
+    expect(vaultCards).toHaveLength(1)
+    expect(vaultCards[0].moduleId).toBe(moduleId)
+  })
+
+  it('refuses a second Vault Notes installation for the same account', async () => {
+    const second = await app.inject({
+      method: 'POST',
+      url: '/v1/modules/modula.vault-notes/install',
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `dup-${suffix}`},
+      payload: {version: moduleVersion},
+    })
+    expect(second.statusCode).toBe(202)
+    expect(second.json().data.installationId).toBe(installationId)
+    const listed = await app.inject({
+      method: 'GET',
+      url: '/v1/modules/installed',
+      headers: {authorization: `Bearer ${token}`},
+    })
+    const vaultInstalls = listed.json().data.filter((item: {moduleId: string}) =>
+      item.moduleId === moduleId || item.moduleId === 'modula.vault-notes',
+    )
+    expect(vaultInstalls).toHaveLength(1)
+  })
+
+  it('migrates legacy-owned notes onto the canonical namespace without duplication', async () => {
+    await db
+      .updateTable('greenfield_module_records')
+      .set({module_id: 'modula.vault-notes'})
+      .where('account_id', '=', accountId)
+      .where('module_id', '=', moduleId)
+      .execute()
+    const before = await db
+      .selectFrom('greenfield_module_records')
+      .select(['record_id', 'collection'])
+      .where('account_id', '=', accountId)
+      .where('module_id', 'in', [moduleId, 'modula.vault-notes'])
+      .execute()
+    expect(before.length).toBeGreaterThan(0)
+    const listed = await app.inject({
+      method: 'GET',
+      url: '/v1/modules/installed',
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(listed.statusCode).toBe(200)
+    const after = await db
+      .selectFrom('greenfield_module_records')
+      .select(['record_id', 'module_id', 'collection'])
+      .where('account_id', '=', accountId)
+      .where('module_id', 'in', [moduleId, 'modula.vault-notes'])
+      .execute()
+    expect(after.every(row => row.module_id === moduleId)).toBe(true)
+    expect(after.map(row => `${row.collection}:${row.record_id}`).sort()).toEqual(
+      before.map(row => `${row.collection}:${row.record_id}`).sort(),
+    )
+  })
+
+  it('keeps notes across uninstall keep-data and reinstall', async () => {
+    const noteA = await createRecord('note', noteData({title: `Keep A ${suffix}`, text: `keep-a ${suffix}`}))
+    const noteB = await createRecord('note', noteData({title: `Keep B ${suffix}`, text: `keep-b ${suffix}`}))
+    const uninstall = await app.inject({
+      method: 'DELETE',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `keep-${suffix}`},
+      payload: {choice: 'keepData'},
+    })
+    expect(uninstall.statusCode).toBe(202)
+    await installations.setWorkerStatus(installationId, 'removed')
+    const reinstall = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `reinstall-${suffix}`},
+      payload: {version: moduleVersion},
+    })
+    expect(reinstall.statusCode).toBe(202)
+    installationId = reinstall.json().data.installationId
+    await finishInstall(token, installationId)
+    const restoredA = await app.inject({
+      method: 'GET',
+      url: `/v1/modules/${moduleId}/records/note/${noteA.record_id}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    const restoredB = await app.inject({
+      method: 'GET',
+      url: `/v1/modules/${moduleId}/records/note/${noteB.record_id}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(restoredA.statusCode).toBe(200)
+    expect(restoredB.statusCode).toBe(200)
+  })
+
+  it('isolates installation and notes across two accounts', async () => {
+    const otherInstalled = await app.inject({
+      method: 'GET',
+      url: `/v1/modules/installed/${moduleId}`,
+      headers: {authorization: `Bearer ${otherToken}`},
+    })
+    expect([404, 200]).toContain(otherInstalled.statusCode)
+    if (otherInstalled.statusCode === 200) {
+      expect(otherInstalled.json().data.status === 'removed' || !otherInstalled.json().data.installationId).toBeTruthy()
+    }
+    const installB = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${otherToken}`, 'idempotency-key': `b-install-${suffix}`},
+      payload: {version: moduleVersion},
+    })
+    expect(installB.statusCode).toBe(202)
+    const otherInstallationId = installB.json().data.installationId
+    await finishInstall(otherToken, otherInstallationId)
+    const noteB = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/records/note`,
+      headers: {authorization: `Bearer ${otherToken}`},
+      payload: {data: noteData({title: `Account B ${suffix}`, text: `secret-b ${suffix}`})},
+    })
+    expect(noteB.statusCode).toBe(201)
+    const aReadsB = await app.inject({
+      method: 'GET',
+      url: `/v1/modules/${moduleId}/records/note/${noteB.json().data.record_id}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(aReadsB.statusCode).toBe(404)
+  })
+
+  it('records canonical source provenance and a release checksum', async () => {
+    const detail = await app.inject({
+      method: 'GET',
+      url: `/v1/registry/modules/${moduleId}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(detail.statusCode).toBe(200)
+    expect(detail.json().data.moduleId).toBe(moduleId)
+    expect(detail.json().data.source.repository).toBe('modula-mod/modula-vault-notes')
+    expect(detail.json().data.source.commit).toMatch(/^[0-9a-f]{40}$/)
+    expect(detail.json().data.releaseSha256 || detail.json().data.manifestSha256).toMatch(/^[0-9a-f]{64}$/)
+  })
+
+  it('deletes notes only on a disposable account with delete-data uninstall', async () => {
+    const disposable = await registerAccount(`vault-del-${suffix}@example.com`, `vaultd${suffix}`.slice(0, 20))
+    const install = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `del-install-${suffix}`},
+      payload: {version: moduleVersion},
+    })
+    expect(install.statusCode).toBe(202)
+    const disposableInstallationId = install.json().data.installationId
+    await finishInstall(disposable.token, disposableInstallationId)
+    const created = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/records/note`,
+      headers: {authorization: `Bearer ${disposable.token}`},
+      payload: {data: noteData({title: `Disposable ${suffix}`, text: `delete-me ${suffix}`})},
+    })
+    expect(created.statusCode).toBe(201)
+    const recordId = created.json().data.record_id
+    const uninstall = await app.inject({
+      method: 'DELETE',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `del-${suffix}`},
+      payload: {choice: 'deleteData', confirmDelete: true, recentAuth: true},
+    })
+    expect(uninstall.statusCode).toBe(202)
+    await handleModuleUninstall(workerDb, {
+      installationId: disposableInstallationId,
+      moduleId,
+      dataRetentionChoice: 'deleteData',
+    })
+    const gone = await db
+      .selectFrom('greenfield_module_records')
+      .select(['deleted_at'])
+      .where('account_id', '=', disposable.accountId)
+      .where('record_id', '=', recordId)
+      .executeTakeFirst()
+    expect(gone?.deleted_at).toBeTruthy()
+    const founderStill = await db
+      .selectFrom('greenfield_module_records')
+      .select(({fn}) => fn.countAll<number>().as('count'))
+      .where('account_id', '=', accountId)
+      .where('module_id', '=', moduleId)
+      .where('deleted_at', 'is', null)
+      .executeTakeFirst()
+    expect(Number(founderStill?.count ?? 0)).toBeGreaterThan(0)
+  })
+
+  it('updates a historical 0.2.0 install onto 1.1.0 without losing notes', async () => {
+    const historical = await importHistoricalRelease()
+    const disposable = await registerAccount(`vault-upd-${suffix}@example.com`, `vaultu${suffix}`.slice(0, 20))
+    const install = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/install`,
+      headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `upd-install-${suffix}`},
+      payload: {version: historical.version},
+    })
+    expect(install.statusCode).toBe(202)
+    const disposableInstallationId = install.json().data.installationId
+    await finishInstall(disposable.token, disposableInstallationId)
+    const created = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/records/note`,
+      headers: {authorization: `Bearer ${disposable.token}`},
+      payload: {data: noteData({title: `Upgrade ${suffix}`, text: `keep-on-update ${suffix}`})},
+    })
+    expect(created.statusCode).toBe(201)
+    const recordId = created.json().data.record_id
+    const update = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/update`,
+      headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `upd-${suffix}`},
+      payload: {version: moduleVersion},
+    })
+    expect(update.statusCode).toBe(202)
+    const current = await new GreenfieldModuleReleaseService(db).getRelease(moduleId, moduleVersion)
+    await handleModuleUpdate(workerDb, {
+      installationId: disposableInstallationId,
+      targetReleaseId: current!.releaseId,
+      previousStatus: 'enabled',
+      moduleId,
+      accountId: disposable.accountId,
+    })
+    const restored = await app.inject({
+      method: 'GET',
+      url: `/v1/modules/${moduleId}/records/note/${recordId}`,
+      headers: {authorization: `Bearer ${disposable.token}`},
+    })
+    expect(restored.statusCode).toBe(200)
+    const versionRow = await db
+      .selectFrom('greenfield_extension_installations')
+      .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
+      .select(['greenfield_module_releases.version', 'greenfield_module_releases.source_commit'])
+      .where('greenfield_extension_installations.installation_id', '=', disposableInstallationId)
+      .executeTakeFirst()
+    expect(versionRow?.version).toBe(moduleVersion)
+    expect(versionRow?.source_commit).toMatch(/^[0-9a-f]{40}$/)
+  })
+
+
   async function importVaultNotesRelease() {
     const manifest = manifestForTest()
     const releases = new GreenfieldModuleReleaseService(db)
@@ -291,6 +558,32 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     const published = await releases.publishRelease(moduleId, moduleVersion)
     await registerRuntimeSurface(published.releaseId, manifest)
     return release
+  }
+
+  async function importHistoricalRelease() {
+    const manifest = structuredClone(manifestForTest())
+    manifest.version = '0.2.0'
+    const releases = new GreenfieldModuleReleaseService(db)
+    const existing = await releases.getRelease(moduleId, '0.2.0')
+    if (existing) {
+      await registerRuntimeSurface(existing.releaseId, manifest)
+      return existing
+    }
+    const release = await releases.importPendingReview(manifest)
+    const published = await releases.publishRelease(moduleId, '0.2.0')
+    await registerRuntimeSurface(published.releaseId, manifest)
+    return published
+  }
+
+  async function finishInstall(authToken: string, nextInstallationId: string) {
+    await installations.setWorkerStatus(nextInstallationId, 'installedDisabled')
+    const enable = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${moduleId}/enable`,
+      headers: {authorization: `Bearer ${authToken}`, 'idempotency-key': `enable-${nextInstallationId}`},
+    })
+    expect(enable.statusCode).toBe(202)
+    await installations.setWorkerStatus(nextInstallationId, 'enabled')
   }
 
   async function registerRuntimeSurface(releaseId: string, manifest: GreenfieldModuleManifestV1) {
@@ -486,8 +779,9 @@ function manifestForTest(): GreenfieldModuleManifestV1 {
   const manifest = structuredClone(readJson('module.manifest.json')) as GreenfieldModuleManifestV1
   manifest.source = {...manifest.source, commit: '1'.repeat(40)}
   manifest.integrity = {...manifest.integrity, manifestSha256: '', releaseSha256: '2'.repeat(64)}
-  manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
-  return manifest
+  const canonical = canonicalizeVaultNotesManifest(manifest) as GreenfieldModuleManifestV1
+  canonical.integrity.manifestSha256 = manifestChecksum({...canonical, integrity: {...canonical.integrity, manifestSha256: ''}})
+  return canonical
 }
 
 function collectionDefinitions(manifest: GreenfieldModuleManifestV1): GreenfieldModuleCollectionDefinition[] {
@@ -518,7 +812,7 @@ function viewDeclarations() {
     .filter(file => file.endsWith('.json'))
     .sort()
     .map(file => {
-      const validation = validateGreenfieldModuleView(readJson(`src/views/${file}`))
+      const validation = validateGreenfieldModuleView(rewriteLegacyVaultNotesValue(readJson(`src/views/${file}`)))
       expect(validation.valid).toBe(true)
       for (const action of validation.value?.toolbar ?? []) expect(validateGreenfieldModuleAction(action, moduleId).valid).toBe(true)
       return validation.value!
@@ -581,4 +875,16 @@ function arrayOfStrings(value: unknown): string[] {
 
 function titleize(value: string) {
   return value.replace(/([A-Z])/g, ' $1').replace(/[-_]/g, ' ').replace(/^./, letter => letter.toUpperCase())
+}
+
+function resolveVaultNotesRoot(workspaceRoot: string): string {
+  const candidates = [
+    process.env.MODULA_VAULT_NOTES_ROOT,
+    resolve(workspaceRoot, '../modula-mod/modula-vault-notes'),
+    '/tmp/modula-mod/modula-vault-notes',
+  ].filter((value): value is string => Boolean(value))
+  for (const dir of candidates) {
+    if (existsSync(join(dir, 'module.manifest.json'))) return dir
+  }
+  return candidates[1] ?? candidates[0]!
 }

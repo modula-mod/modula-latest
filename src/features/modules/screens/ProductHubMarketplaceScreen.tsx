@@ -3,7 +3,6 @@ import {useMemo, useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {ModuleCatalogueCard} from '@/features/modules/components'
 import {useInstalledModulesQuery, useModuleCatalogueQuery} from '@/features/modules/hooks'
@@ -14,7 +13,7 @@ import type {
 } from '@/data/repositories/contracts'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {ModulaCurvedSectionTabs} from '@/platform/ui/tabs'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -85,17 +84,6 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
   }, [catalogue.data, hubMode])
   const featured = items.filter(item => item.featured).slice(0, compact ? 3 : 6)
   const installedCount = installed.data?.length ?? 0
-  const standard20Count = items.filter(item => item.standard?.standardVersion === '2.0.0').length
-  const serviceCount = items.reduce((total, item) => total + (item.standard?.registries.services ?? 0), 0)
-  const apiCount = items.reduce((total, item) => total + (item.standard?.registries.apis ?? 0), 0)
-  const runtimeSupportedCount = items.reduce(
-    (total, item) => total + Object.values(item.standard?.runtimeSupport?.sections ?? {}).filter(state => state === 'SUPPORTED').length,
-    0,
-  )
-  const runtimeDeclarativeCount = items.reduce(
-    (total, item) => total + Object.values(item.standard?.runtimeSupport?.sections ?? {}).filter(state => state === 'DECLARATIVE_ONLY').length,
-    0,
-  )
 
   const sections = useMemo(
     () =>
@@ -115,7 +103,7 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
       <View style={{gap: spacing[2]}}>
         <AppText variant="headline">Product Hub</AppText>
         <AppText variant="body" colour="textSecondary">
-          Registry-backed modules, tools, functions, plugins, widgets and connectors. DIMON commercial distribution is represented as inactive metadata only.
+          Apps and modules for Modula. Artwork, identity, and usefulness first.
         </AppText>
       </View>
 
@@ -136,26 +124,12 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
         }}
       />
 
-      <View
-        style={[
-          styles.search,
-          {
-            backgroundColor: colours.surface,
-            borderColor: colours.border,
-            borderRadius: radius.round,
-            paddingHorizontal: spacing[3],
-          },
-        ]}>
-        <AppIcon name="search" colour={colours.textTertiary} size={18} />
-        <ModulaTextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search registry"
-          accessibilityLabel="Search Product Hub"
-          returnKeyType="search"
-          style={[styles.searchInput, {flex: 1}]}
-        />
-      </View>
+      <ModulaSearchField
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search Product Hub"
+        accessibilityLabel="Search Product Hub"
+      />
 
       {hubMode === 'discover' ? (
         <ModulaCurvedSectionTabs
@@ -170,13 +144,8 @@ export function ProductHubMarketplaceContent({compact = false}: {compact?: boole
 
       <View style={[styles.summaryRow, {gap: spacing[2]}]}>
         <SummaryChip label="Installed" value={String(installedCount)} />
-        <SummaryChip label="Compatible" value={String(items.filter(item => item.installable).length)} />
+        <SummaryChip label="Available" value={String(items.filter(item => item.installable).length)} />
         <SummaryChip label="Updates" value={String(items.filter(item => item.installationState === 'updateAvailable').length)} />
-        <SummaryChip label="Standard 2.0" value={String(standard20Count)} />
-        <SummaryChip label="Runtime supported" value={String(runtimeSupportedCount)} />
-        <SummaryChip label="Declarative only" value={String(runtimeDeclarativeCount)} />
-        <SummaryChip label="Services" value={String(serviceCount)} />
-        <SummaryChip label="APIs" value={String(apiCount)} />
       </View>
 
       {catalogue.isPending ? (

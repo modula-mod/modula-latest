@@ -40,14 +40,14 @@ function formatRelative(iso: string): string {
 
 function marketplaceIdForModuleName(name: string): string {
   const normalized = name.trim().toLowerCase()
-  if (normalized.includes('vault')) return 'module-vault-notes'
+  if (normalized.includes('vault')) return 'digital.modula.vault-notes'
   if (normalized.includes('task')) return 'module-tasks'
   if (normalized.includes('crm')) return 'module-crm'
   if (normalized.includes('health')) return 'module-health-agent'
   if (normalized.includes('automation')) return 'module-automations'
   if (normalized.includes('translate')) return 'module-translate-lite'
   if (normalized.includes('insight')) return 'module-insights'
-  return 'module-vault-notes'
+  return 'digital.modula.vault-notes'
 }
 
 export function FeedPostItem({post}: FeedPostItemProps) {

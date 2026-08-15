@@ -1,4 +1,4 @@
-import type {GreenfieldDomainEvent} from '@modula/greenfield-contracts'
+import {vaultNotesIdentityFamily, type GreenfieldDomainEvent} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {GreenfieldSearchEntityType, ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
@@ -165,13 +165,13 @@ async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; ent
       SELECT 'note'::text AS entity_type, record_id AS entity_id
       FROM greenfield_module_records
       WHERE account_id = ${request.account_id}
-        AND module_id = 'modula.vault-notes'
+        AND module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))})
         AND collection = 'note'
       UNION ALL
       SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id
       FROM greenfield_module_records
       WHERE account_id = ${request.account_id}
-        AND module_id = 'modula.vault-notes'
+        AND module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))})
         AND collection = 'folder'
       LIMIT 100
     `.execute(db)
@@ -182,8 +182,8 @@ async function reindexCandidates(db: ModulaWorkerDb, request: {mode: string; ent
     UNION ALL SELECT 'profile'::text AS entity_type, id AS entity_id FROM profiles
     UNION ALL SELECT 'module'::text AS entity_type, slug AS entity_id FROM greenfield_extension_catalogue WHERE kind = 'module'
     UNION ALL SELECT 'module-release'::text AS entity_type, release_id AS entity_id FROM greenfield_module_releases
-    UNION ALL SELECT 'note'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id = 'modula.vault-notes' AND collection = 'note'
-    UNION ALL SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id = 'modula.vault-notes' AND collection = 'folder'
+    UNION ALL SELECT 'note'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))}) AND collection = 'note'
+    UNION ALL SELECT 'vault-folder'::text AS entity_type, record_id AS entity_id FROM greenfield_module_records WHERE module_id IN (${sql.join(vaultNotesIdentityFamily().map(id => sql`${id}`))}) AND collection = 'folder'
     LIMIT 100
   `.execute(db)
   return rows.rows.map(row => ({entityType: row.entity_type, entityId: row.entity_id}))
@@ -200,10 +200,10 @@ async function idsForEntityType(db: ModulaWorkerDb, entityType: GreenfieldSearch
     return (await db.selectFrom('greenfield_extension_catalogue').select('slug').where('kind', '=', 'module').limit(100).execute()).map(row => ({entityType, entityId: row.slug}))
   }
   if (entityType === 'note') {
-    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', '=', 'modula.vault-notes').where('collection', '=', 'note').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
+    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', 'in', [...vaultNotesIdentityFamily()]).where('collection', '=', 'note').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
   }
   if (entityType === 'vault-folder') {
-    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', '=', 'modula.vault-notes').where('collection', '=', 'folder').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
+    return (await db.selectFrom('greenfield_module_records').select('record_id').where('module_id', 'in', [...vaultNotesIdentityFamily()]).where('collection', '=', 'folder').limit(100).execute()).map(row => ({entityType, entityId: row.record_id}))
   }
   return (await db.selectFrom('greenfield_module_releases').select('release_id').limit(100).execute()).map(row => ({entityType, entityId: row.release_id}))
 }

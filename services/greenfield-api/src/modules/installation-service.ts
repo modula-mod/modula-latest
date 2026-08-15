@@ -18,6 +18,8 @@ import {moduleError} from './module-errors.js'
 import {GreenfieldModulePermissionService} from './permission-service.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
 import {allRuntimePermissionKeys, GreenfieldModuleRuntime2Service} from './runtime2-service.js'
+import {GreenfieldModuleIdentityMigrationService} from './identity-migration-service.js'
+import {isVaultNotesModuleId, moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -49,6 +51,7 @@ export class GreenfieldModuleInstallationService {
   }
 
   async listInstalled(accountId: string): Promise<GreenfieldModuleInstallationRow[]> {
+    await new GreenfieldModuleIdentityMigrationService(this.db).normalizeAccount(accountId)
     const rows = await this.db
       .selectFrom('greenfield_extension_installations')
       .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
@@ -78,17 +81,19 @@ export class GreenfieldModuleInstallationService {
       installationId: row.installation_id,
       accountId: row.account_id,
       status: row.status as GreenfieldModuleInstallationStatus,
-      moduleId: row.module_id,
+      moduleId: resolveCanonicalModuleId(row.module_id),
       version: row.version,
       extensionVersionId: row.extension_version_id,
       grantedPermissions: arrayOfStrings(review?.granted_permissions),
       }
     }))
-    return installations
+    return collapseVaultNotesInstallations(installations)
   }
 
   async getInstalled(accountId: string, moduleId: string): Promise<GreenfieldModuleInstallationRow | undefined> {
-    return (await this.listInstalled(accountId)).find(row => row.moduleId === moduleId)
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    const family = new Set(moduleIdFamily(canonicalId))
+    return (await this.listInstalled(accountId)).find(row => family.has(row.moduleId) || resolveCanonicalModuleId(row.moduleId) === canonicalId)
   }
 
   async installPreview(accountId: string, moduleId: string, version?: string): Promise<GreenfieldModuleInstallPreview> {
@@ -146,6 +151,13 @@ export class GreenfieldModuleInstallationService {
     if (!this.config.moduleInstallationEnabled) throw moduleError('CAPABILITY_DISABLED', 'Greenfield module installation is disabled')
     if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     await this.permissions.enforceModuleInstallCapability(accountId)
+    const canonicalId = resolveCanonicalModuleId(moduleId)
+    const existingFamily = (await this.listInstalled(accountId)).find(row =>
+      isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId),
+    )
+    if (existingFamily && existingFamily.status !== 'removed') {
+      return {planId: existingFamily.installationId, installationId: existingFamily.installationId, status: existingFamily.status, idempotent: true}
+    }
     const existingPlan = await this.db
       .selectFrom('greenfield_module_install_plans')
       .selectAll()
@@ -156,9 +168,9 @@ export class GreenfieldModuleInstallationService {
       return {planId: existingPlan.plan_id, installationId: existingPlan.installation_id, status: existingPlan.status, idempotent: true}
     }
 
-    const release = input.version ? await this.registry.getVersion(moduleId, input.version) : await this.registry.latestPublished(moduleId)
-    const preview = await this.installPreview(accountId, moduleId, release.version)
-    const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
+    const release = input.version ? await this.registry.getVersion(canonicalId, input.version) : await this.registry.latestPublished(canonicalId)
+    const preview = await this.installPreview(accountId, canonicalId, release.version)
+    const dependencyPlan = await this.dependencies.resolve({moduleId: canonicalId, manifest: release.manifest, accountId})
     if (!preview.compatible) throw moduleError('VALIDATION_FAILED', `Module is incompatible: ${preview.incompatibilityReasons.join(', ')}`)
     const declaredPermissions = Array.from(new Set([
       ...preview.permissions.map(permission => permission.permission),
@@ -361,4 +373,12 @@ export class GreenfieldModuleInstallationService {
 
 function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+}
+
+function collapseVaultNotesInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
+  const vault = installations.filter(row => isVaultNotesModuleId(row.moduleId))
+  const others = installations.filter(row => !isVaultNotesModuleId(row.moduleId))
+  if (vault.length <= 1) return installations.map(row => ({...row, moduleId: resolveCanonicalModuleId(row.moduleId)}))
+  const preferred = vault.find(row => row.status === 'enabled') ?? vault[0]!
+  return [...others, {...preferred, moduleId: resolveCanonicalModuleId(preferred.moduleId)}]
 }

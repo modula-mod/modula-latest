@@ -7,7 +7,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
-import {InstallPreviewSheet, ModuleStatusPill} from '@/features/modules/components'
+import {InstallPreviewSheet, ModuleInstallProgress} from '@/features/modules/components'
+import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
@@ -28,6 +29,9 @@ export function ModuleDetailScreen() {
   const [preview, setPreview] = useState<ModuleInstallPreview | null>(null)
   const [installSheetOpen, setInstallSheetOpen] = useState(false)
   const [busy, setBusy] = useState<string | null>(null)
+  const [installStage, setInstallStage] = useState<ModuleInstallStageId | null>(null)
+  const [installError, setInstallError] = useState<string | null>(null)
+  const [technicalOpen, setTechnicalOpen] = useState(false)
 
   const openPreview = async () => {
     if (!module) return
@@ -48,16 +52,31 @@ export function ModuleDetailScreen() {
   const install = async (enable: boolean) => {
     if (!module) return
     setBusy(enable ? 'install-enable' : 'install')
+    setInstallError(null)
+    setInstallStage('resolving')
     try {
+      setInstallStage('validating')
+      const nextPreview = preview ?? await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined)
+      setPreview(nextPreview)
+      if (nextPreview.compatible === false) {
+        throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')
+      }
+      setInstallStage('compatibility')
+      setInstallStage('permissions')
+      setInstallStage('installing')
       await services.moduleRepository.install(module.moduleId, {version: module.latestVersion ?? undefined})
-      if (enable) await services.moduleRepository.enable(module.moduleId)
+      if (enable) {
+        setInstallStage('enabling')
+        await services.moduleRepository.enable(module.moduleId)
+      }
+      setInstallStage('ready')
       setInstallSheetOpen(false)
       await detail.refetch()
     } catch (error) {
-      Alert.alert(
-        'Install failed',
-        error instanceof Error ? error.message : 'Registry install did not complete. Check Product Hub and try again.',
-      )
+      setInstallStage('failed')
+      const message = error instanceof Error ? error.message : 'Registry install did not complete. Check Product Hub and try again.'
+      setInstallError(message)
+      Alert.alert('Install failed', message)
     } finally {
       setBusy(null)
     }
@@ -153,32 +172,73 @@ export function ModuleDetailScreen() {
               </View>
               <View style={styles.flex}>
                 <AppText variant="display">{module.name}</AppText>
-                <AppText variant="body" colour="textSecondary">{module.publisherName}</AppText>
+                <AppText variant="body" colour="textSecondary">{module.publisherName} ✓</AppText>
               </View>
             </View>
             <AppText variant="body" colour="textSecondary">{module.longDescription || module.description}</AppText>
-            <View style={[styles.wrap, {gap: spacing[2]}]}>
-              <ModuleStatusPill state={module.installationState} />
-              <ModuleStatusPill state={module.priceState} />
-              <ModuleStatusPill state={module.trustLevel} />
-            </View>
-            <ActionRow
-              state={module.installationState}
-              busy={busy}
-              installable={module.installable}
-              onPreview={openPreview}
-              onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
-              onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
-              onEnable={() => void transition('enable')}
-              onDisable={() => void transition('disable')}
-              onUpdate={() => void transition('update')}
-              onUninstall={() => void transition('uninstall')}
-            />
+            {installStage && installStage !== 'ready' ? (
+              <ModuleInstallProgress
+                productName={module.name}
+                stage={installStage}
+                failed={installError}
+                onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
+              />
+            ) : (
+              <ActionRow
+                state={module.installationState}
+                busy={busy}
+                installable={module.installable}
+                onPreview={openPreview}
+                onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
+                onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
+                onEnable={() => void transition('enable')}
+                onDisable={() => void transition('disable')}
+                onUpdate={() => void transition('update')}
+                onUninstall={() => void transition('uninstall')}
+              />
+            )}
           </Surface>
 
           <Section title="What this module does">
             <AppText variant="body" colour="textSecondary">{module.description}</AppText>
           </Section>
+          <Section title="Privacy & data">
+            <AppText variant="body" colour="textSecondary">
+              {module.privacy ?? 'Your data remains yours. Records stay account-scoped and permission-gated.'}
+            </AppText>
+          </Section>
+          <Section title="Permissions">
+            {module.permissions.length ? (
+              module.permissions.map(permission => (
+                <AppText key={permission.permission} variant="body" colour="textSecondary">
+                  • {permission.reason}
+                </AppText>
+              ))
+            ) : (
+              <AppText variant="caption" colour="textSecondary">No permissions declared for the selected release state.</AppText>
+            )}
+          </Section>
+          <Section title="What's new">
+            {(module.releaseNotes ?? []).length ? (
+              module.releaseNotes?.map(note => (
+                <AppText key={note} variant="caption" colour="textSecondary">{note}</AppText>
+              ))
+            ) : (
+              <AppText variant="caption" colour="textSecondary">Version {module.latestVersion ?? 'unreleased'}.</AppText>
+            )}
+          </Section>
+          <Section title="Version">
+            <InfoRow label="Version" value={module.latestVersion ?? 'Unreleased'} />
+            <InfoRow label="Availability" value={module.priceState} />
+          </Section>
+          <ModulaButton
+            label={technicalOpen ? 'Hide Trust & Technical Details' : 'Trust & Technical Details >'}
+            role="plain"
+            accessibilityLabel="Toggle trust and technical details"
+            onPress={() => setTechnicalOpen(open => !open)}
+          />
+          {technicalOpen ? (
+            <>
           <Section title="Publisher">
             <InfoRow label="Publisher" value={module.publisherName} />
             <InfoRow label="Publisher ID" value={module.publisherId} />
@@ -237,23 +297,10 @@ export function ModuleDetailScreen() {
           <Section title="Screens and contributions">
             <AppText variant="caption" colour="textSecondary">{summariseObject(module.contributions)}</AppText>
           </Section>
-          <Section title="Permissions">
+          <Section title="Declared permission keys">
             <PermissionGroup title="Platform permissions" permissions={platformPermissions(module)} />
             <PermissionGroup title="Module backend permissions" permissions={backendPermissions(module)} />
             <PermissionGroup title="External service permissions" permissions={externalPermissions(module)} />
-          </Section>
-          <Section title="All declared permissions">
-            {module.permissions.length ? (
-              module.permissions.map(permission => (
-                <View key={permission.permission} style={{gap: spacing[1]}}>
-                  <AppText variant="label">{permission.permission}</AppText>
-                  <AppText variant="caption" colour="textSecondary">{permission.reason}</AppText>
-                  <ModuleStatusPill state={permission.risk} />
-                </View>
-              ))
-            ) : (
-              <AppText variant="caption" colour="textSecondary">No permissions declared for the selected release state.</AppText>
-            )}
           </Section>
           <Section title="Data access">
             <AppText variant="caption" colour="textSecondary">
@@ -265,21 +312,8 @@ export function ModuleDetailScreen() {
             <InfoRow label="Compatibility" value={module.compatibility} />
             <InfoRow label="Distribution" value={module.priceState} />
           </Section>
-          <Section title="Release notes">
-            {(module.releaseNotes ?? []).length ? (
-              module.releaseNotes?.map(note => (
-                <AppText key={note} variant="caption" colour="textSecondary">{note}</AppText>
-              ))
-            ) : (
-              <AppText variant="caption" colour="textSecondary">No release notes are published for this registry item.</AppText>
-            )}
-          </Section>
-          <Section title="Privacy">
-            <AppText variant="caption" colour="textSecondary">{module.privacy ?? 'Privacy metadata is declared by the module release and enforced by registered permissions.'}</AppText>
-          </Section>
-          <Section title="Related extensions">
-            <AppText variant="caption" colour="textSecondary">Plugins, tools, functions, widgets and connectors appear in Product Hub when declared by the registry.</AppText>
-          </Section>
+            </>
+          ) : null}
         </ScrollView>
       </ResponsiveContent>
 

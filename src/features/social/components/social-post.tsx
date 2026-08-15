@@ -27,7 +27,7 @@ export function SocialPost({post, compact = false, showDivider = true}: SocialPo
         <View
           style={[
             styles.content,
-            {padding: compact ? spacing[3] : spacing[4]},
+            {paddingVertical: compact ? spacing[2] : spacing[3], paddingHorizontal: compact ? spacing[3] : spacing[4]},
           ]}>
           <MediaPostCard post={post} />
         </View>
@@ -38,7 +38,7 @@ export function SocialPost({post, compact = false, showDivider = true}: SocialPo
 
   return (
     <View>
-      <View style={[styles.content, {gap: spacing[2], padding: compact ? spacing[3] : spacing[4]}]}>
+      <View style={[styles.content, {gap: spacing[1], paddingVertical: compact ? spacing[2] : spacing[3], paddingHorizontal: compact ? spacing[3] : spacing[4]}]}>
         <PostHeader
           post={post}
           onMore={() => void openPostMoreMenu(post, {moderationRepository})}

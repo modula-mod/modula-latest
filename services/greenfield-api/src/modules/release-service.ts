@@ -17,6 +17,8 @@ import {GreenfieldEventBus} from '../events/index.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
+import {canonicalizeVaultNotesManifest} from './canonical-manifest.js'
+import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -53,6 +55,7 @@ export class GreenfieldModuleReleaseService {
   constructor(private readonly db: ModulaDb) {}
 
   async importPendingReview(manifest: GreenfieldModuleManifest): Promise<GreenfieldModuleReleaseRecord> {
+    manifest = canonicalizeVaultNotesManifest(manifest)
     const publisher = new GreenfieldModulePublisherService(this.db)
     await publisher.ensurePublisherForManifest(manifest)
 
@@ -308,7 +311,7 @@ export class GreenfieldModuleReleaseService {
         'greenfield_module_releases.trust_level',
         'greenfield_module_versions.manifest',
       ])
-      .where('greenfield_module_releases.module_id', '=', moduleId)
+      .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(moduleId)])
       .where('greenfield_module_releases.version', '=', version)
       .executeTakeFirst()
     return row ? mapRelease(row as any) : undefined
@@ -606,7 +609,7 @@ function mapRelease(row: any): GreenfieldModuleReleaseRecord {
     releaseId: row.release_id,
     extensionId: row.extension_id,
     extensionVersionId: row.extension_version_id,
-    moduleId: row.module_id,
+    moduleId: resolveCanonicalModuleId(row.module_id),
     version: row.version,
     publisherId: row.publisher_id,
     releaseState: row.release_state,
