@@ -1,6 +1,6 @@
 import {useRouter, type Href} from 'expo-router'
-import {useState, type ComponentType, type ReactNode} from 'react'
-import {Pressable, StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
+import {useState, type ReactNode} from 'react'
+import {Pressable, StyleSheet, View} from 'react-native'
 import {BlurView} from 'expo-blur'
 import Animated, {
   useAnimatedStyle,
@@ -33,44 +33,12 @@ import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibili
 export type {ModulaLiquidGlassTabBarProps}
 
 /**
- * Expandable liquid-glass bottom tab bar adapted from
- * https://github.com/iamitkhatkar/rn-expandable-tab-liquid-glass
- * (owner permission granted for Modula integration).
- *
- * Loaded only via dynamic require from PlatformTabs after a safe native-module
- * probe. Do not statically import this file from app routes or Expo Go paths.
- *
+ * Expandable floating bottom tab bar.
+ * Native `@callstack/liquid-glass` still samples inverted feed text through
+ * the pill, so 7M-B2 uses BlurView + a surface wash for readable chrome.
+ * Loaded only via dynamic require from PlatformTabs after a native-module probe.
  * Product screens must not import this file or `@callstack/liquid-glass`.
  */
-
-type LiquidGlassModule = {
-  LiquidGlassContainerView: ComponentType<{
-    style?: StyleProp<ViewStyle>
-    spacing?: number
-    children?: ReactNode
-  }>
-  LiquidGlassView: ComponentType<{
-    style?: StyleProp<ViewStyle>
-    interactive?: boolean
-    effect?: string
-    children?: ReactNode
-  }>
-  isLiquidGlassSupported: boolean
-}
-
-function loadLiquidGlassModule(): LiquidGlassModule | null {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('@callstack/liquid-glass') as LiquidGlassModule
-  } catch {
-    return null
-  }
-}
-
-const liquidGlass = loadLiquidGlassModule()
-const isLiquidGlassSupported = Boolean(liquidGlass?.isLiquidGlassSupported)
-const LiquidGlassContainerView = liquidGlass?.LiquidGlassContainerView ?? View
-const LiquidGlassView = liquidGlass?.LiquidGlassView ?? View
 
 const TAB_ICONS: Record<string, AppIconName> = {
   index: 'home',
@@ -124,7 +92,6 @@ const EXPAND_ACTIONS: ExpandAction[] = [
 function GlassSurface({
   children,
   style,
-  interactive = false,
   solidFallback,
 }: {
   children: ReactNode
@@ -134,7 +101,6 @@ function GlassSurface({
 }) {
   const {scheme} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
 
   if (reduceTransparency) {
     return (
@@ -144,30 +110,11 @@ function GlassSurface({
     )
   }
 
-  if (useNativeGlass) {
-    return (
-      <View style={[style, {overflow: 'hidden'}]}>
-        <LiquidGlassView
-          interactive={interactive}
-          effect="regular"
-          style={StyleSheet.absoluteFill}
-        />
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {backgroundColor: solidFallback, opacity: scheme === 'dark' ? 0.58 : 0.72},
-          ]}
-        />
-        {children}
-      </View>
-    )
-  }
-
-  // Soft glass fallback when Callstack liquid glass isn't linked / supported.
+  // Native LiquidGlassView samples the scrolling feed and mirrors inverted text
+  // through the floating pill. BlurView + a surface wash is the readable chrome.
   return (
     <BlurView
-      intensity={56}
+      intensity={64}
       tint={scheme === 'dark' ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
       style={[style, {overflow: 'hidden', backgroundColor: 'transparent'}]}>
       <View
@@ -176,7 +123,7 @@ function GlassSurface({
           StyleSheet.absoluteFill,
           {
             backgroundColor: solidFallback,
-            opacity: scheme === 'dark' ? 0.42 : 0.55,
+            opacity: scheme === 'dark' ? 0.62 : 0.78,
           },
         ]}
       />
@@ -195,7 +142,6 @@ export function ModulaLiquidGlassTabBar({
   const profile = session.status === 'signedIn' ? session.profile : null
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
-  const {reduceTransparency} = useSystemAccessibility()
   const {preferences} = useProductPreferences()
   const [expanded, setExpanded] = useState(false)
   const mainTabScale = useSharedValue(1)
@@ -291,16 +237,10 @@ export function ModulaLiquidGlassTabBar({
   }
 
   const glassFallback = colours.surface
-  const useNativeGlass = isLiquidGlassSupported && !reduceTransparency
-
-  const Container = useNativeGlass ? LiquidGlassContainerView : View
-
-  // Pin to physical bottom: 0 — safe-area is padding inside the glass so the
-  // chrome reaches the screen edge (no black strip under the home indicator).
   const bottomPad = Math.max(insets.bottom, spacing[2])
 
   return (
-    <Container
+    <View
       style={[
         styles.container,
         {
@@ -308,8 +248,7 @@ export function ModulaLiquidGlassTabBar({
           paddingBottom: bottomPad,
           gap: spacing[3],
         },
-      ]}
-      {...(useNativeGlass ? {spacing: 16} : {})}>
+      ]}>
       <Animated.View style={[mainTabStyle, styles.mainCluster]}>
         <GlassSurface
           solidFallback={glassFallback}
@@ -420,27 +359,24 @@ export function ModulaLiquidGlassTabBar({
         }}
         style={styles.plusButtonContainer}>
         <GlassSurface
-          interactive
           solidFallback={colours.accent}
           style={[
             styles.plusButtonGlass,
             {
               borderRadius: radius.round,
-              backgroundColor: useNativeGlass ? undefined : colours.accent,
+              backgroundColor: colours.accent,
             },
           ]}>
           <Animated.View style={plusIconStyle}>
             <AppIcon
               name="create"
-              colour={
-                useNativeGlass ? colours.text : colours.accentForeground
-              }
+              colour={colours.accentForeground}
               size={26}
             />
           </Animated.View>
         </GlassSurface>
       </Pressable>
-    </Container>
+    </View>
   )
 }
 
