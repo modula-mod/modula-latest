@@ -92,6 +92,7 @@ export function AccountSessionsScreen() {
                 if (id === 'revoke') void revokeOne(item.sessionId)
               }}>
               <View
+                testID="account-session-row"
                 style={[
                   styles.sessionRow,
                   {

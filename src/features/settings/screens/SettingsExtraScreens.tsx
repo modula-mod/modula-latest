@@ -363,15 +363,39 @@ export function SecuritySettingsScreen() {
         <SettingsLinkRow
           row={{
             title: 'Password',
-            description: 'Credential management and recovery.',
+            description: 'Change the password for this Modula Account.',
             icon: 'privacy',
             route: '/settings/account/password',
           }}
         />
         <SettingsLinkRow
           row={{
-            title: 'Recovery methods',
-            description: 'Email recovery is handled through account verification.',
+            title: 'Passkeys',
+            description: 'Hardware passkey registration is not part of this beta.',
+            icon: 'security',
+            comingSoon: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Authenticator app (TOTP)',
+            description: 'Time-based one-time passwords are not part of this beta.',
+            icon: 'security',
+            comingSoon: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Recovery codes',
+            description: 'Recovery-code setup is not part of this beta.',
+            icon: 'privacy',
+            comingSoon: true,
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Recovery email',
+            description: 'Sign-in email remains the recovery identity for this beta.',
             icon: 'account',
             route: '/settings/account/email',
           }}

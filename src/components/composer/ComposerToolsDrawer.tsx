@@ -67,12 +67,26 @@ function isAiRewrite(tool: ComposerToolItem): boolean {
 }
 
 function unavailableTitle(tool: ComposerToolItem): string {
+  if (isComingSoonTool(tool)) return `${tool.name} is Coming Soon`
   if (isAiRewrite(tool)) return 'AI rewrite is unavailable'
   if (isNftAttach(tool)) return 'NFT attach is unavailable'
   return tool.requiresModule ? `Requires ${tool.requiresModule}` : 'Tool unavailable'
 }
 
+function isComingSoonTool(tool: ComposerToolItem): boolean {
+  const key = `${tool.toolId} ${tool.name} ${tool.description ?? ''}`.toLowerCase()
+  return (
+    key.includes('coming soon') ||
+    tool.toolId.includes('gif') ||
+    tool.toolId.includes('poll') ||
+    (tool.toolId.includes('link') && !tool.toolId.includes('market'))
+  )
+}
+
 function availabilitySentence(tool: ComposerToolItem): string {
+  if (isComingSoonTool(tool)) {
+    return 'Coming Soon. This control does not attach anything to the draft.'
+  }
   if (tool.availability === 'requiresInstall') {
     return `Requires install. Open ${tool.requiresModule ?? 'the module'} to review permissions.`
   }
@@ -92,7 +106,7 @@ function availabilitySentence(tool: ComposerToolItem): string {
     if (tool.requiresModule) {
       return `Unavailable. Enable the ${tool.requiresModule} module before using this tool.`
     }
-    return 'Unavailable in this Preview build.'
+    return 'Unavailable in this build.'
   }
   if (tool.availability === 'preview') {
     return 'Preview state. A reviewed module manifest must enable this capability before it can run.'
@@ -153,7 +167,7 @@ export function ComposerToolsDrawer({
       onBrowseMarketplace()
       return
     }
-    if (tool.availability === 'unavailable') {
+    if (tool.availability === 'unavailable' || isComingSoonTool(tool)) {
       Alert.alert(unavailableTitle(tool), unavailableMessage(tool))
       return
     }

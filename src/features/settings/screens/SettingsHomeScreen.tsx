@@ -55,6 +55,12 @@ const accountRows: SettingsNavRow[] = [
     icon: 'integrations',
     route: '/settings/connections',
   },
+  {
+    title: 'Modula Mail',
+    description: 'Mailbox identity and provisioner state.',
+    icon: 'info',
+    route: '/settings/account/mail',
+  },
 ]
 
 const preferenceRows: SettingsNavRow[] = [

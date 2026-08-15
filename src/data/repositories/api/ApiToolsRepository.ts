@@ -43,8 +43,7 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     name: 'GIF',
     section: 'Media',
     availability: 'unavailable',
-    requiresModule: 'Sticker Kit',
-    description: 'GIF search requires the Sticker Kit module and no remote picker is called.',
+    description: 'Coming Soon. GIF search is not part of beta Composer and no remote picker is called.',
   },
   {
     toolId: 'modula.tool.file',
@@ -62,8 +61,8 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     moduleId: 'module-functions',
     name: 'Poll',
     section: 'Create',
-    availability: 'preview',
-    description: 'Seeded poll composer. Publishing support is protocol-dependent.',
+    availability: 'unavailable',
+    description: 'Coming Soon. Polls are not part of beta Composer and no poll is published.',
   },
   {
     toolId: 'modula.tool.link',
@@ -71,8 +70,8 @@ const BUILTIN_TOOLS: ComposerToolItem[] = [
     moduleId: 'module-link-library',
     name: 'Link',
     section: 'Create',
-    availability: 'active',
-    description: 'Insert a safe URL into the draft.',
+    availability: 'unavailable',
+    description: 'Coming Soon. Link cards are not part of beta Composer; paste a URL in the post text instead.',
   },
   {
     toolId: 'modula.tool.location',

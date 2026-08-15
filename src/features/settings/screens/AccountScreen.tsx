@@ -68,12 +68,20 @@ export function AccountScreen() {
               }}
             />
             <SettingsLinkRow
-              last
               row={{
                 title: 'Password',
                 description: 'Change your Modula Account password.',
                 icon: 'security',
                 route: '/settings/account/password',
+              }}
+            />
+            <SettingsLinkRow
+              last
+              row={{
+                title: 'Modula Mail',
+                description: 'Mailbox identity and provisioner state.',
+                icon: 'info',
+                route: '/settings/account/mail',
               }}
             />
           </SettingsSection>

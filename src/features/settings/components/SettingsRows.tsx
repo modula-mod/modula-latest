@@ -23,6 +23,7 @@ export type SettingsNavRow = {
   route?: string
   onPress?: () => void
   preview?: boolean
+  comingSoon?: boolean
 }
 
 /**
@@ -116,12 +117,20 @@ export function SettingsLinkRow({
 }) {
   const router = useRouter()
   const {colours, spacing} = useThemeTokens()
-  const title = row.preview ? `${row.title} — Preview` : row.title
+  const title = row.comingSoon
+    ? row.title
+    : row.preview
+      ? `${row.title} — Preview`
+      : row.title
+  const value = row.comingSoon ? row.value ?? 'Coming Soon' : row.value
+  const accessibilityLabel = row.comingSoon ? `${row.title} — Coming Soon` : title
 
   return (
     <AppPressable
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={row.comingSoon ? {disabled: true} : undefined}
       onPress={() => {
+        if (row.comingSoon) return
         if (row.onPress) {
           row.onPress()
           return
@@ -156,12 +165,12 @@ export function SettingsLinkRow({
           </AppText>
         ) : null}
       </View>
-      {row.value ? (
+      {value ? (
         <AppText variant="caption" colour="textTertiary" numberOfLines={1}>
-          {row.value}
+          {value}
         </AppText>
       ) : null}
-      <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
+      {row.comingSoon ? null : <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />}
     </AppPressable>
   )
 }

@@ -245,10 +245,11 @@ export class GreenfieldSessionService {
   }
 
   async listSessions(accountId: string) {
-    return this.db
+    const rows = await this.db
       .selectFrom('greenfield_sessions')
       .select([
         'session_id',
+        'account_id',
         'status',
         'created_at',
         'expires_at',
@@ -264,6 +265,18 @@ export class GreenfieldSessionService {
       .where('account_id', '=', accountId)
       .orderBy('created_at', 'desc')
       .execute()
+    return rows.map(row => ({
+      sessionId: row.session_id,
+      accountId: row.account_id,
+      status: row.status,
+      createdAt: row.created_at.toISOString(),
+      lastSeenAt: (row.last_seen_at ?? row.created_at).toISOString(),
+      expiresAt: row.expires_at.toISOString(),
+      revokedAt: row.revoked_at?.toISOString() ?? null,
+      userAgent: row.user_agent ?? undefined,
+      platform: serializeSessionPlatform(row.platform),
+      clientName: row.client_name ?? undefined,
+    }))
   }
 
   async markRecentlyAuthenticated(
@@ -356,4 +369,9 @@ export class GreenfieldSessionService {
       })
       .execute()
   }
+}
+
+function serializeSessionPlatform(value: string | null): 'ios' | 'android' | 'web' | 'unknown' {
+  if (value === 'ios' || value === 'android' || value === 'web' || value === 'unknown') return value
+  return 'unknown'
 }

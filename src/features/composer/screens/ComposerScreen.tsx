@@ -50,12 +50,6 @@ type PollPreview = {
 
 type ContentWarning = 'none' | 'sensitive' | 'spoiler'
 
-const demoLink: DraftLinkPreview = {
-  domain: 'modula.local',
-  title: 'Local Composer link preview',
-  description: 'A Phase 1-only link surface that does not call a backend.',
-}
-
 const AUDIENCE_OPTIONS = [
   {
     id: 'public' as const,
@@ -503,45 +497,60 @@ export function ComposerScreen() {
     }
   }
 
-  const previewTool = (name: string) => {
-    Alert.alert(
-      `${name} — Preview`,
-      'This tool remains a local Preview in Phase 4.5. No backend side effects.',
-    )
+  const comingSoonTool = (name: string, detail: string) => {
+    Alert.alert('Coming Soon', detail)
   }
 
   const toolbarItems: {label: string; icon: AppIconName; onPress: () => void}[] = [
     {label: 'Photo', icon: 'photo', onPress: () => void pickPhoto()},
     {label: 'Camera', icon: 'camera', onPress: () => void capturePhoto()},
-    {label: 'GIF Preview', icon: 'gif', onPress: () => previewTool('GIF')},
     {
-      label: 'Poll',
+      label: 'GIF — Coming Soon',
+      icon: 'gif',
+      onPress: () =>
+        comingSoonTool(
+          'GIF',
+          'GIF search is not part of beta Composer. No picker is opened and nothing is attached.',
+        ),
+    },
+    {
+      label: 'Poll — Coming Soon',
       icon: 'poll',
-      onPress: () => {
-        setPoll({
-          question: 'Which Modula surface should be refined next?',
-          options: ['Board', 'Composer', 'Profile'],
-        })
-      },
+      onPress: () =>
+        comingSoonTool(
+          'Poll',
+          'Polls are not part of beta Composer. No poll is added to this draft.',
+        ),
     },
     {
-      label: 'Link',
+      label: 'Link — Coming Soon',
       icon: 'link',
-      onPress: () => setLink(demoLink),
+      onPress: () =>
+        comingSoonTool(
+          'Link',
+          'Link cards are not part of beta Composer. Paste a URL in the post text instead.',
+        ),
     },
-    {label: 'Module Preview', icon: 'modules', onPress: () => previewTool('Module post')},
     {
-      label: 'Location / Circle Preview',
+      label: 'Module post — Coming Soon',
+      icon: 'modules',
+      onPress: () =>
+        comingSoonTool('Module post', 'Module posts are not part of this beta.'),
+    },
+    {
+      label: 'Location / Circle — Coming Soon',
       icon: 'community',
-      onPress: () => previewTool('Location / Circle'),
+      onPress: () =>
+        comingSoonTool('Location / Circle', 'Location and Circle attach are not part of this beta.'),
     },
     {
-      label: 'Content warning Preview',
+      label: 'Content warning — Coming Soon',
       icon: 'warning',
-      onPress: () => {
-        Keyboard.dismiss()
-        setCwOpen(true)
-      },
+      onPress: () =>
+        comingSoonTool(
+          'Content warning',
+          'Content warnings are not part of beta Composer. Nothing is attached to this draft.',
+        ),
     },
   ]
 
@@ -910,8 +919,10 @@ export function ComposerScreen() {
           ))}
           <View style={[styles.toolbarDivider, {backgroundColor: colours.border}]} />
           <AppPressable
-            accessibilityLabel="Add to thread Preview"
-            onPress={() => router.setParams({thread: '1', mode: 'thread'})}
+            accessibilityLabel="Add to thread — Coming Soon"
+            onPress={() =>
+              comingSoonTool('Thread', 'Thread composer is not part of this beta.')
+            }
             style={styles.toolIcon}>
             <AppIcon name="create" colour={colours.accent} />
           </AppPressable>
@@ -940,15 +951,16 @@ export function ComposerScreen() {
           onPhoto={() => void pickPhoto()}
           onCamera={() => void capturePhoto()}
           onInsertLink={() => {
-            setPermissionMessage(null)
-            setLink(demoLink)
+            comingSoonTool(
+              'Link',
+              'Link cards are not part of beta Composer. Paste a URL in the post text instead.',
+            )
           }}
           onInsertPoll={() => {
-            setPermissionMessage(null)
-            setPoll({
-              question: 'Which Modula surface should be refined next?',
-              options: ['Board', 'Composer', 'Profile'],
-            })
+            comingSoonTool(
+              'Poll',
+              'Polls are not part of beta Composer. No poll is added to this draft.',
+            )
           }}
           onBrowseMarketplace={() => router.push('/product' as Href)}
         />

@@ -106,6 +106,18 @@ export function createAuthRoutes(
       },
     },
     {
+      method: 'GET',
+      path: '/v1/accounts/me/modula-mail',
+      handler: ({accessToken}) => {
+        const account = database.getAccountByAccessToken(
+          accessToken ?? '',
+          configuration.get().sessionExpiryEnabled,
+        )
+        if (!account) throw unauthenticated()
+        return null
+      },
+    },
+    {
       method: 'PATCH',
       path: '/v1/accounts/me',
       handler: ({accessToken}) => {
