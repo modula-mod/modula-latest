@@ -117,4 +117,3 @@ if (failures.length) {
 
 console.log(`Staged ${files.length} file(s) at ${stageDir}`)
 console.log('Next: copy accepted, renamed, sanitized files into modula-evidence-screenshots. Do not push from this script.')
-)
