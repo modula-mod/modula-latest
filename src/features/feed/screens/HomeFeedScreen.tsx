@@ -91,18 +91,11 @@ export function HomeFeedScreen() {
   const homeBlocks = preferences.homeBlockIds
   const focusMeta = FOCUS_PRESET_META[focusPreset]
   const focusBannerCopy = useMemo(() => {
-    const sentences = [`${focusMeta.title} Focus is active.`]
-    if (focus.quietFeed) {
-      sentences.push('Quiet Feed is reducing algorithmic recommendations.')
-    }
-    if (focus.priorityWork) {
-      sentences.push('Work First is prioritising modules and project updates.')
-    }
-    if (!focus.quietFeed && !focus.priorityWork) {
-      sentences.push(focusMeta.summary)
-    }
-    return sentences.join(' ')
-  }, [focus.priorityWork, focus.quietFeed, focusMeta.summary, focusMeta.title])
+    const bits = [focusMeta.title]
+    if (focus.quietFeed) bits.push('Quiet Feed')
+    if (focus.priorityWork) bits.push('Work First')
+    return bits.join(' · ')
+  }, [focus.priorityWork, focus.quietFeed, focusMeta.title])
 
   const modeOrder = useMemo((): FeedModeLabel[] => {
     if (focus.priorityWork && focus.quietFeed) {
@@ -408,9 +401,9 @@ function HomeLayoutHeader({
           <AppIcon name="contrast" colour={colours.accent} size={16} />
           <View style={[styles.focusCopy, {gap: spacing[1]}]}>
             <AppText variant="label" colour="accent">
-              Focus mode is on
+              Focus
             </AppText>
-            <AppText variant="caption" colour="textSecondary">
+            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
               {focusBannerCopy}
             </AppText>
           </View>
