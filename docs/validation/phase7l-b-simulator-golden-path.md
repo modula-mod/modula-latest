@@ -6,7 +6,7 @@ App: `digital.modula.app` Expo dev client against `https://api.modula.digital`
 Source branch: `cursor/phase7l-b-beta-remediation-b75e`  
 Parent source SHA at capture: `e80b332c7028fac83db9ef42695bf351e9b59962`
 
-No new source P0/P1 was opened from this run. Active Sessions rendered against the still-pinned production API (`2ef3755`) with an honest load error; that is re-proved after the exact-SHA cutover, not treated as a new source defect.
+No new source P0/P1 was opened from this run. Active Sessions rendered against the still-pinned production API (`2ef3755`) with an honest load error; that was re-proved live after cutover to `e5d4b94` (`docs/validation/phase7l-b-live-golden-path.md`).
 
 ## Path captured
 

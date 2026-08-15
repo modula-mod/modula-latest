@@ -1,0 +1,35 @@
+{
+  "status": "ok",
+  "acceptedSha": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+  "capturedAt": "2026-08-15T16:25:00.487Z",
+  "web": {
+    "url": "https://modula.digital/version.json",
+    "commit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "builtAt": "2026-08-15T16:21:46.763Z",
+    "environment": "production",
+    "dataSource": "remote",
+    "apiOrigin": "https://api.modula.digital",
+    "releaseDir": "/var/www/modula/releases/e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "previousReleaseDir": "/var/www/modula/releases/2ef3755082b46e49fe62424e93d4a4de9c6f1e17"
+  },
+  "api": {
+    "url": "https://api.modula.digital/version.json",
+    "commit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "builtAt": "2026-08-15T16:20:00Z",
+    "environment": "production",
+    "workerExpectedCommit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "image": "modula-greenfield-api:e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "revisionLabel": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a"
+  },
+  "worker": {
+    "image": "modula-greenfield-worker:e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+    "revisionLabel": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a"
+  },
+  "health": {
+    "live": 200,
+    "ready": 200
+  },
+  "nginx": {
+    "try_files": "$uri $uri.html $uri/index.html @expo_dynamic"
+  }
+}

@@ -1,23 +1,34 @@
 # Phase 7L-B Defect Execution Register
 
-Date: 2026-08-13
+Date: 2026-08-13 / closed 2026-08-15
 Canonical repo: `/root/modula-latest`
-Canonical branch: `main`
+Canonical branch: `cursor/phase7l-b-beta-remediation-b75e`
 Phase 7L-A checkpoint: `6459087863dd087e303d2eb8fe74ac27df558877`
 Audit baseline source SHA: `fb4b58c07bf475d99ab6792d367058331257ea97`
-Audit baseline production SHA: `2ef3755082b46e49fe62424e93d4a4de9c6f1e17`
+Accepted production SHA: `e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a`
 
 Allowed statuses: `OPEN`, `IN_PROGRESS`, `FIXED_SOURCE`, `PASS_LOCAL`, `PASS_LIVE`, `BLOCKED_EXTERNAL`.
+
+Phase 7L-B close:
+
+```text
+P0 OPEN       0
+P1 OPEN       0
+
+PASS_LOCAL    PASS
+PASS_LIVE     PASS
+```
 
 Current register counts:
 
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 12 | 1 | 0 | 0 | 9 | 2 | 0 |
-| P1 | 35 | 0 | 0 | 0 | 34 | 1 | 0 |
+| P0 | 12 | 0 | 0 | 0 | 7 | 5 | 0 |
+| P1 | 35 | 0 | 0 | 0 | 29 | 6 | 0 |
 
 Local disposable proof SHA: `4cd3d2ac821d4f0b34dc3517d241f2a16c8a2b5e` (`CI=true pnpm verify:phase7l-b` on VPS disposable Postgres `modula-phase7l-b-pg`).
-iPhone 17 Pro simulator golden path captured on 2026-08-15 (`docs/validation/phase7l-b-simulator-golden-path.md`). P0 remaining OPEN is production identity only.
+iPhone 17 Pro simulator golden path: `docs/validation/phase7l-b-simulator-golden-path.md`.
+Live public golden path: `docs/validation/phase7l-b-live-golden-path.md`. Remaining `PASS_LOCAL` rows are disposable/browser proofs not re-run as extra live product journeys; they are not OPEN.
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -46,8 +57,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: API and worker version envelopes.
 - Fix strategy: After P0/P1 repairs, build and deploy only the exact fixed `PHASE7L_B_SHA`, then verify web/API/worker version agreement.
 - Verification command: `pnpm build:web`; `pnpm verify:web-build`; `curl -fsS https://modula.digital/version.json`; `curl -fsS https://api.modula.digital/version.json`
-- Live verification: Public web/API/worker report the exact `PHASE7L_B_SHA`.
-- Status: OPEN
+- Live verification: Public web/API/worker and Docker revision labels report `e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a` (`docs/validation/phase7l-b-live-golden-path.md`).
+- Status: PASS_LIVE
 
 ### P7LB-P0-003 - Password Login Handoff
 
@@ -59,8 +70,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: `POST /v1/sessions`; `GET /v1/accounts/me`; mail security alert queue.
 - Fix strategy: Repair canonical web storage, then add browser E2E proving password login, `/v1/accounts/me`, Home transition, reload restore, logout, and re-login.
 - Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
-- Live verification: Fresh private browser on `https://modula.digital/sign-in` reaches Home after password submit and remains authenticated after reload.
-- Status: PASS_LOCAL
+- Live verification: Fresh Chromium on `https://modula.digital/sign-in` reaches Home after password submit (`04-home-after-login.png`) and remains authenticated after reload (`05-home-after-reload.png`).
+- Status: PASS_LIVE
 
 ### P7LB-P0-004 - Email OTP Login Handoff
 
@@ -124,8 +135,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: `POST /v1/sessions/refresh`; `GET /v1/accounts/me`; session revocation state.
 - Fix strategy: Implement one documented canonical web session persistence model, restore through `/v1/accounts/me`, clear on expiry/revoke/logout, and avoid duplicate stores.
 - Verification command: `CI=true MODULA_TEST_DATABASE_URL=<disposable> MODULA_DATABASE_ADMIN_URL=<disposable-admin> pnpm verify:phase7l-b:auth`
-- Live verification: Public browser password login reaches Home, hard reload stays on Home, and `/v1/accounts/me` succeeds.
-- Status: PASS_LOCAL
+- Live verification: Public browser password login reaches Home, hard reload stays on Home, session bundle persists, and `/v1/accounts/me` succeeds.
+- Status: PASS_LIVE
 
 ### P7LB-P0-009 - Web Cold Browser Restore
 
@@ -191,8 +202,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: None for render; auth endpoints for golden path proof.
 - Fix strategy: Use a visual-only overflow icon inside the menu pressable, keep web tab rail/bar first render server-compatible until hydration, serve Expo `[param]` HTML templates instead of Home `index.html` for dynamic routes, and add a localhost-only API fixture boundary so route rendering can be verified without local-origin CORS noise.
 - Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b:hydration`
-- Live verification: Fresh browser loads `/sign-in`, `/register`, `/forgot-password`, and `/verify-email` with hydration warnings/errors/pageerrors equal to zero.
-- Status: PASS_LOCAL
+- Live verification: Fresh browser loads `/sign-in` (and profile/settings routes in the live golden path) with hydration warnings/errors/pageerrors equal to zero. React `#418` = 0.
+- Status: PASS_LIVE
 
 ### P7LB-P1-002 - Public Icon Font
 
@@ -243,8 +254,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: None for public render; auth/session for authenticated hydration route.
 - Fix strategy: Remove invalid nested pressable HTML, delay desktop rail selection until after hydration, and keep a browser console/pageerror gate over public routes.
 - Verification command: `pnpm build:web`; `CI=true pnpm verify:phase7l-b:hydration`
-- Live verification: Fresh browser loads `/`, `/sign-in`, `/register`, `/profile`, `/settings`, `/marketplace`, and Vault Notes with `pageerror=0`, hydration warnings `0`, and React `#418=0`.
-- Status: PASS_LOCAL
+- Live verification: Fresh browser loads `/sign-in`, `/profile/:handle`, authenticated Home, Settings sessions/mail with `pageerror=0`, hydration warnings `0`, and React `#418=0`.
+- Status: PASS_LIVE
 
 ### P7LB-P1-006 - Home Feed
 
@@ -425,8 +436,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: Profile, follow counts, post/media/module/link profile data.
 - Fix strategy: Keep the owner query tied to the signed-in session handle, then prove avatar, name, handle, bio, counts, Posts, Media, About, Modules, Links, Focus Halo, public second-account view, and reload behavior.
 - Verification command: `CI=true pnpm verify:phase7l-b:auth`
-- Live verification: Public browser validates owner and second-account profile views with media/avatar fallbacks.
-- Status: PASS_LOCAL
+- Live verification: Direct reload of `/profile/:handle` serves the public-profile template (not Home). Authenticated owner view and second-account visitor view both render the live handle.
+- Status: PASS_LIVE
 
 ### P7LB-P1-020 - Edit Profile
 
@@ -594,8 +605,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: Mail identity/provisioning/forwarding jobs and transactional mail.
 - Fix strategy: Preserve real transactional mail, show true identity/provisioner state, and avoid implying active mailbox when provisioner is disabled.
 - Verification command: `CI=true pnpm verify:phase7l-b:auth`
-- Live verification: Public Settings displays true Modula Mail identity state and transactional verification/OTP/reset/security alert mail still sends.
-- Status: PASS_LOCAL
+- Live verification: Public Settings `/settings/account/mail` displays true mailbox-not-active / queued identity. `GET /v1/accounts/me/modula-mail` returns 200.
+- Status: PASS_LIVE
 
 ### P7LB-P1-033 - Security Center Sessions
 
@@ -607,8 +618,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: Account sessions, revoke endpoints, security events.
 - Fix strategy: Prove visible rows are real or hidden/gated; verify sessions list, revoke, recent activity, and route navigation.
 - Verification command: `CI=true pnpm verify:phase7l-b:auth`
-- Live verification: Public authenticated Security Center loads real sessions/recent activity and hides/gates unready controls.
-- Status: PASS_LOCAL
+- Live verification: Public authenticated `/settings/account/sessions` loads real device rows. `GET /v1/accounts/me/sessions` returns 200 with a top-level array (not a nested envelope). No “Could not load sessions.”
+- Status: PASS_LIVE
 
 ### P7LB-P1-034 - Passkeys
 

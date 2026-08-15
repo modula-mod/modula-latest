@@ -1,0 +1,224 @@
+{
+  "sha": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a",
+  "startedAt": "2026-08-15T16:24:44.391Z",
+  "checks": [
+    {
+      "name": "web_version_sha",
+      "ok": true,
+      "detail": {
+        "commit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a"
+      }
+    },
+    {
+      "name": "api_version_sha",
+      "ok": true,
+      "detail": {
+        "commit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a"
+      }
+    },
+    {
+      "name": "worker_expected_sha",
+      "ok": true,
+      "detail": {
+        "expectedCommit": "e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a"
+      }
+    },
+    {
+      "name": "web_api_origin",
+      "ok": true,
+      "detail": {
+        "apiOrigin": "https://api.modula.digital"
+      }
+    },
+    {
+      "name": "api_password_login",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "api_me",
+      "ok": true,
+      "detail": {
+        "handle": "p7lbsima6a8084744e2c"
+      }
+    },
+    {
+      "name": "api_sessions_http",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "nestedOk": false,
+        "listType": "array",
+        "count": 5
+      }
+    },
+    {
+      "name": "api_sessions_decodable",
+      "ok": true,
+      "detail": {
+        "firstKeys": [
+          "sessionId",
+          "accountId",
+          "status",
+          "createdAt",
+          "lastSeenAt",
+          "expiresAt",
+          "revokedAt",
+          "userAgent",
+          "platform"
+        ]
+      }
+    },
+    {
+      "name": "api_modula_mail",
+      "ok": true,
+      "detail": {
+        "status": 200,
+        "keys": [
+          "mailIdentityId",
+          "address",
+          "localPart",
+          "domain",
+          "status",
+          "provider",
+          "providerReference",
+          "forwarding",
+          "quotaBytes",
+          "storageUsedBytes",
+          "requiresOperatorAdoption",
+          "activatedAt",
+          "updatedAt"
+        ]
+      }
+    },
+    {
+      "name": "api_public_profile_a",
+      "ok": true,
+      "detail": {
+        "handle": "p7lbsima6a8084744e2c"
+      }
+    },
+    {
+      "name": "api_public_profile_b",
+      "ok": true,
+      "detail": {
+        "handle": "p7lbsimb6a8084742290"
+      }
+    },
+    {
+      "name": "01-sign-in_http",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "01-sign-in_hydration",
+      "ok": true,
+      "detail": {
+        "hydration": []
+      }
+    },
+    {
+      "name": "sign_in_not_home_html",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "02-profile-a-reload_http",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "02-profile-a-reload_hydration",
+      "ok": true,
+      "detail": {
+        "hydration": []
+      }
+    },
+    {
+      "name": "profile_a_template",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "03-profile-b-reload_http",
+      "ok": true,
+      "detail": {
+        "status": 200
+      }
+    },
+    {
+      "name": "03-profile-b-reload_hydration",
+      "ok": true,
+      "detail": {
+        "hydration": []
+      }
+    },
+    {
+      "name": "profile_b_template",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "browser_login_home",
+      "ok": true,
+      "detail": {
+        "url": "https://modula.digital/"
+      }
+    },
+    {
+      "name": "browser_session_persisted",
+      "ok": true,
+      "detail": {
+        "hasBundle": true
+      }
+    },
+    {
+      "name": "browser_reload_restore",
+      "ok": true,
+      "detail": {}
+    },
+    {
+      "name": "browser_profile_a_handle",
+      "ok": true,
+      "detail": {
+        "snippet": "P7 Available Phase 7LB sima User @p7lbsima6a8084744e2c Modula profile You are viewing this profile with your current audience access. Private owner controls remain hidden. Follow M"
+      }
+    },
+    {
+      "name": "browser_sessions_loaded",
+      "ok": true,
+      "detail": {
+        "snippet": " Active Sessions  Greenfield sessions. Revoking others signs those devices out without changing your account. DEVICES unknown Last seen 8/15/2026, 5:24:54 PM · active Long-press for actions unknown Last seen 8/15/2026, 5:24:44 PM · active"
+      }
+    },
+    {
+      "name": "browser_mail_loaded",
+      "ok": true,
+      "detail": {
+        "snippet": " Modula Mail This is mailbox identity, not sign-in email. Transactional verification, OTP, reset, and security-alert mail still send to the account email. MAILBOX Mailbox not active Recorded state is queued for p7lbsima6a8084744e2c@modula."
+      }
+    },
+    {
+      "name": "browser_profile_b_handle",
+      "ok": true,
+      "detail": {
+        "snippet": "P7 Available Phase 7LB simb User @p7lbsimb6a8084742290 Modula profile You are viewing this profile as a visitor. Private fields, owner controls, and unavailable module tabs are hid"
+      }
+    },
+    {
+      "name": "no_react_418",
+      "ok": true,
+      "detail": {
+        "hydrationAll": []
+      }
+    }
+  ],
+  "finishedAt": "2026-08-15T16:25:00.487Z",
+  "events": []
+}
