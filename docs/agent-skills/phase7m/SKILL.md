@@ -8,7 +8,7 @@ description: >-
 
 # Modula UI Implementation Skill
 
-The previous Phase 7M-B visual direction has been explicitly rejected by the founder. Do not polish, preserve, or treat its visual composition as the baseline. Preserve its engineering work only. Research real shipping applications first, derive three materially different Modula visual directions, and stop for founder selection before broad implementation.
+The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 A/B/C are research, not an approved skin. **7M-B5** refines Direction M (Dense Social OS + Native Editorial + selective Spatial chrome) and may implement the flagged AUTH-2 / HOME-1 / HUB-1 / NOTES-1 / NAV-C combination. 7M-C and production deploy remain blocked. Founder visual approval is still required.
 
 ## Mission
 
@@ -16,7 +16,7 @@ Implement or migrate Modula UI without inventing new visual architecture.
 
 **The Phase 7M UI System Research and Agent Skill Pack is the reference baseline for this mission. Do not blindly implement every proposed dependency or API. First inspect Modula's currently installed Expo SDK, React Native, Expo Router, `@expo/ui`, Reanimated, Gesture Handler, existing Surface runtime, existing platform adapters and shared components. Validate every external API against the exact installed version. Preserve existing accepted functionality. Consolidate existing components rather than creating parallel implementations. No broad product-screen redesign is authorised during 7M-A.**
 
-Phase 7M-B2 screenshots are engineering evidence. They are not an approved design language. 7M-B4 must not incrementally polish them. 7M-C is blocked until founder visual approval of a selected direction.
+Phase 7M-B2 screenshots are engineering evidence. They are not an approved design language. 7M-B4 compositions are selection studies. 7M-B5 implements Direction M’s flagged candidate only. 7M-C is blocked until founder visual approval.
 
 ## Anti-AI-UI rules (automatic failure)
 
@@ -48,6 +48,7 @@ A section does not automatically need a background. A post does not automaticall
 | 7M-A | Docs, inventory, this skill | New visual components, dep installs, screen redesign |
 | 7M-B | UI Lab + Login + Home + Product Hub prototypes | Migrating the rest of the app |
 | 7M-B4 | Real-app research, three directions, twelve compositions, founder gate | Implementing a direction before selection; polishing 7M-B2 visuals; production deploy; starting 7M-C |
+| 7M-B5 | Direction M, twelve compositions in one language, real-app + RN implementation study, flagged four-screen rebuild, Vault Notes available/install/open, UI Lab quality compare | Implementing all 12; Expo SDK upgrade; new UI framework; production deploy; starting 7M-C |
 | 7M-C | Full rollout after **human visual approval** | Behaviour changes under the redesign |
 
 If 7L-B is not closed (`P0 OPEN 0`, live identity agreed), stop. Do not start UI reconstruction on a broken beta.
@@ -117,9 +118,9 @@ Never import a third-party UI library from a product screen.
 - `docs/agent-skills/phase7m/accessibility.md`
 - `docs/agent-skills/phase7m/visual-verification.md`
 - `docs/research/phase7m-b4-real-app-reference-matrix.md`
-- `docs/research/phase7m-b4-apple-current-guidance.md`
-- `docs/research/phase7m-b4-motion-references.md`
-- `docs/design/phase7m-b4-visual-directions.md`
-- `docs/design/phase7m-b4-module-artwork.md`
-- `docs/design/phase7m-b4-typography-roles.md`
-- `docs/design/phase7m-b4-navigation-prototypes.md`
+- `docs/research/phase7m-b5-social-reference-study.md`
+- `docs/research/phase7m-b5-expo-ui-integration-map.md`
+- `docs/research/phase7m-b5-liquid-glass-policy.md`
+- `docs/design/phase7m-b5-direction-m.md`
+- `docs/design/phase7m-b5-compositions.md`
+- `docs/design/phase7m-b5-module-artwork.md`

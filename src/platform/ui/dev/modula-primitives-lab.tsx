@@ -60,6 +60,31 @@ export function ModulaPrimitivesLabScreen() {
         Typography, surface, icons, and controls in one matrix. Product screens import these wrappers — never SwiftUI directly.
       </AppText>
 
+      <LabBlock title="Quality compare">
+        <AppText variant="caption" colour="textSecondary">
+          OLD / REFERENCE / MODULA NEW. References are linked, not copied, unless licensed.
+        </AppText>
+        {[
+          ['Navigation', 'Rejected 7M-B2 glass-over-feed pill', 'Apple HIG: tabs are destinations', 'NAV-C hybrid: opaque chrome + compose accessory'],
+          ['Fields', 'All auth fields as equal blocks', 'iOS AutoFill / progressive identity', 'Email → Continue → password or code'],
+          ['Buttons', 'Teal on every action', 'Airbnb scarce accent', 'Primary only on Install / Sign in'],
+          ['Menus', 'Custom overflow sheets only', 'SwiftUI Menu / Compose DropdownMenu', 'ModulaMenu + ContextMenu adapters'],
+          ['Sheets', 'Card stack install UI', 'Native sheet', 'Install preview sheet + live stages'],
+          ['Social', 'Post cards + dashboard banners', 'Threads/X continuous document', 'Hairline rows, Focus Halo stories'],
+          ['Marketplace', 'Installed 0 / Available 1 pills', 'App Store editorial shelves', 'Featured / Made by Modula / Your modules'],
+          ['Modules', 'Turquoise cube + Permission required', 'App Store identity imagery', 'ModuleArtwork + Available → Install → Open'],
+          ['Motion', 'Decorative blur', 'Interruptible toolbar / grid magnification', 'Reaction proximity; no rope physics'],
+          ['Media', 'Broken or generic icons', 'expo-image / artwork packs', 'Stories, posts, module art via existing media stack'],
+        ].map(([section, old, reference, next]) => (
+          <View key={section} style={{gap: 4}}>
+            <AppText variant="label">{section}</AppText>
+            <AppText variant="caption" colour="textTertiary">OLD · {old}</AppText>
+            <AppText variant="caption" colour="textSecondary">REFERENCE · {reference}</AppText>
+            <AppText variant="caption">MODULA NEW · {next}</AppText>
+          </View>
+        ))}
+      </LabBlock>
+
       <LabBlock title="Typography">
         <AppText variant="display">Display</AppText>
         <AppText variant="headline">Headline</AppText>
@@ -176,12 +201,12 @@ export function ModulaPrimitivesLabScreen() {
 
       <LabBlock title="Reaction Picker">
         <View style={styles.row}>
-          {['👍', '❤️', '😂', '🔥', '🎉', '💡', '🤝', '🤔'].map(emoji => (
+          {['👍', '❤️', '😂', '🔥'].map(emoji => (
             <AppText key={emoji} variant="title">{emoji}</AppText>
           ))}
         </View>
         <AppText variant="caption" colour="textSecondary">
-          Long-press the like control on a post. One active reaction per actor.
+          Tap Like. Long-press for proximity row. Web/screen reader uses a standard menu.
         </AppText>
       </LabBlock>
 

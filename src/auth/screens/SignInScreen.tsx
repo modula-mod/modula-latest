@@ -20,6 +20,8 @@ function validEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
+type AuthStep = 'identity' | 'password' | 'emailCode'
+
 export function SignInScreen() {
   const router = useRouter()
   const params = useLocalSearchParams<{returnTo?: string; email?: string}>()
@@ -32,6 +34,7 @@ export function SignInScreen() {
   const [emailCodeChallengeId, setEmailCodeChallengeId] = useState('')
   const [emailCodeMessage, setEmailCodeMessage] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [step, setStep] = useState<AuthStep>('identity')
   const [emailError, setEmailError] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(
     session.status === 'signedOut' && session.error ? session.error : null,
@@ -43,11 +46,24 @@ export function SignInScreen() {
     (runtimeEnvironment.appEnvironment === 'development' ||
       runtimeEnvironment.appEnvironment === 'preview')
 
+  const continueFromIdentity = () => {
+    const nextEmail = email.trim().toLowerCase()
+    if (!validEmail(nextEmail)) {
+      setEmailError('Enter a valid email address.')
+      setFormError(null)
+      return
+    }
+    setEmailError(null)
+    setFormError(null)
+    setStep('password')
+  }
+
   const submit = async () => {
     const nextEmail = email.trim().toLowerCase()
     if (!validEmail(nextEmail)) {
       setEmailError('Enter a valid email address.')
       setFormError(null)
+      setStep('identity')
       return
     }
     if (password.length < 8) {
@@ -77,6 +93,7 @@ export function SignInScreen() {
     if (!validEmail(nextEmail)) {
       setEmailError('Enter a valid email address.')
       setFormError(null)
+      setStep('identity')
       return
     }
     setPending(true)
@@ -87,6 +104,7 @@ export function SignInScreen() {
       setEmailCodeChallengeId(requested.challengeId)
       setEmailCode('')
       setEmailCodeMessage(`If available, a code was sent to ${requested.delivery.recipient}.`)
+      setStep('emailCode')
     } catch {
       setFormError('Modula could not request a sign-in code. Try again.')
     } finally {
@@ -99,6 +117,7 @@ export function SignInScreen() {
     if (!validEmail(nextEmail)) {
       setEmailError('Enter a valid email address.')
       setFormError(null)
+      setStep('identity')
       return
     }
     if (!emailCodeChallengeId || !emailCode.trim()) {
@@ -124,13 +143,10 @@ export function SignInScreen() {
 
   return (
     <AuthShell>
-      <View style={{gap: spacing[4]}}>
-        <View style={{gap: spacing[1]}}>
-          <AppText variant="display">Sign in</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Sign in with your Modula Account. External Networks are optional under Settings →
-            Connections.
-          </AppText>
+      <View style={{gap: spacing[5]}}>
+        <View style={{gap: spacing[2]}}>
+          <AppText variant="display">Modula</AppText>
+          <AppText variant="headline">Sign in</AppText>
         </View>
         <AuthPanel>
           <AuthField
@@ -144,39 +160,50 @@ export function SignInScreen() {
             autoCorrect={false}
             keyboardType="email-address"
             textContentType="emailAddress"
-            returnKeyType="next"
+            returnKeyType={step === 'identity' ? 'next' : 'done'}
+            onSubmitEditing={step === 'identity' ? continueFromIdentity : undefined}
             error={emailError ?? undefined}
             testID="sign-in-email"
           />
-          <AuthField
-            label="Password"
-            value={password}
-            onChangeText={text => {
-              setPassword(text)
-              if (formError) setFormError(null)
-            }}
-            secureTextEntry={!showPassword}
-            textContentType="password"
-            returnKeyType="done"
-            onSubmitEditing={() => void submit()}
-            error={formError ?? undefined}
-            testID="sign-in-password"
-          />
-          <AuthLink testID="sign-in-toggle-password" onPress={() => setShowPassword(value => !value)}>
-            {showPassword ? 'Hide password' : 'Show password'}
-          </AuthLink>
-          <AppButton testID="sign-in-submit" disabled={pending} onPress={() => void submit()}>
-            {pending ? 'Signing in' : 'Sign in'}
-          </AppButton>
-          <AppButton
-            testID="sign-in-email-code-request"
-            variant="secondary"
-            disabled={pending}
-            onPress={() => void requestEmailCode()}>
-            Email me a sign-in code
-          </AppButton>
-          {emailCodeChallengeId ? (
+          {step === 'identity' ? (
+            <AppButton testID="sign-in-continue" disabled={pending} onPress={continueFromIdentity}>
+              Continue
+            </AppButton>
+          ) : null}
+          {step === 'password' ? (
             <>
+              <AuthField
+                label="Password"
+                value={password}
+                onChangeText={text => {
+                  setPassword(text)
+                  if (formError) setFormError(null)
+                }}
+                secureTextEntry={!showPassword}
+                textContentType="password"
+                returnKeyType="done"
+                onSubmitEditing={() => void submit()}
+                error={formError ?? undefined}
+                testID="sign-in-password"
+              />
+              <AuthLink testID="sign-in-toggle-password" onPress={() => setShowPassword(value => !value)}>
+                {showPassword ? 'Hide' : 'Show'}
+              </AuthLink>
+              <AppButton testID="sign-in-submit" disabled={pending} onPress={() => void submit()}>
+                {pending ? 'Signing in' : 'Sign in'}
+              </AppButton>
+              <AuthLink testID="sign-in-email-code-request" onPress={() => void requestEmailCode()}>
+                Use a sign-in code instead
+              </AuthLink>
+            </>
+          ) : null}
+          {step === 'emailCode' ? (
+            <>
+              {emailCodeMessage ? (
+                <AppText variant="caption" colour="textSecondary">
+                  {emailCodeMessage}
+                </AppText>
+              ) : null}
               <ModulaOTPField
                 value={emailCode}
                 onChangeValue={setEmailCode}
@@ -189,23 +216,21 @@ export function SignInScreen() {
                 onPress={() => void submitEmailCode()}>
                 {pending ? 'Checking code' : 'Continue with email code'}
               </AppButton>
+              <AuthLink onPress={() => setStep('password')}>Use password instead</AuthLink>
             </>
           ) : null}
-          {emailCodeMessage ? (
-            <AppText variant="caption" colour="textSecondary">
-              {emailCodeMessage}
+          {formError && step !== 'password' ? (
+            <AppText variant="caption" colour="destructive">
+              {formError}
             </AppText>
           ) : null}
-          <View style={{gap: spacing[2], marginTop: spacing[1]}}>
-            <AuthLink onPress={() => router.push('/forgot-password' as Href)}>
-              Forgot password
-            </AuthLink>
-            <AuthLink onPress={() => router.push('/register' as Href)}>
-              Create Modula Account
-            </AuthLink>
+          <View style={{gap: spacing[2], marginTop: spacing[2]}}>
+            {step !== 'identity' ? (
+              <AuthLink onPress={() => router.push('/forgot-password' as Href)}>Forgot password</AuthLink>
+            ) : null}
+            <AuthLink onPress={() => router.push('/register' as Href)}>Create account</AuthLink>
             {showDemo ? (
-              <AppButton
-                variant="secondary"
+              <AuthLink
                 onPress={() =>
                   void continueAsDemo('andrei@modula.local').catch(error => {
                     setFormError(
@@ -215,8 +240,8 @@ export function SignInScreen() {
                     )
                   })
                 }>
-                Use development demo account
-              </AppButton>
+                Development demo
+              </AuthLink>
             ) : null}
           </View>
         </AuthPanel>

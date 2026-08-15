@@ -25,6 +25,10 @@ Login → Home → Product Hub. If Home is rejected, fix Home; do not migrate 25
 
 7M-B2 visual composition is rejected. Do not compose by polishing those screens. Study `docs/research/phase7m-b4-real-app-reference-matrix.md`, pick surfaces from CANVAS / CONTENT / SECTION / ROW / MEDIA / FLOATING CHROME / INTERACTIVE SURFACE, and stop at twelve compositions until founder selection.
 
+## 7M-B5
+
+Compose inside Direction M (`docs/design/phase7m-b5-direction-m.md`). Twelve compositions are layout alternatives, not three themes. Implement only the flagged candidate unless the founder selects otherwise. Spatial material stays in chrome/interactions. Product Hub is editorial. Vault Notes must never say Not available / Permission required when it is installable.
+
 ## 7M-C freeze
 
 Functionality stays frozen underneath. Working profile edit must still save.

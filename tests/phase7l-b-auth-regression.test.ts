@@ -576,6 +576,7 @@ async function expectAuthenticatedHome(page: Page, account: TestAccount) {
 async function fillPasswordForm(page: Page, account: TestAccount, password = account.password) {
   await page.goto('/sign-in', {waitUntil: 'networkidle'})
   await page.getByTestId('sign-in-email').fill(account.email)
+  await page.getByTestId('sign-in-continue').click()
   await page.getByTestId('sign-in-password').fill(password)
 }
 
@@ -637,6 +638,7 @@ async function activateByKeyboard(page: Page, testId: string) {
 async function requestEmailCode(page: Page, account: TestAccount) {
   await page.goto('/sign-in', {waitUntil: 'networkidle'})
   await page.getByTestId('sign-in-email').fill(account.email)
+  await page.getByTestId('sign-in-continue').click()
   const requestResponse = page.waitForResponse(matchesApiResponse('/v1/sessions/email-code/request', 'POST'))
   await page.getByTestId('sign-in-email-code-request').click()
   expect((await requestResponse).status()).toBe(200)

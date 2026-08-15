@@ -7,13 +7,13 @@ description: >-
 
 # Phase 7M (Cursor)
 
-The previous Phase 7M-B visual direction has been explicitly rejected by the founder. Do not polish, preserve, or treat its visual composition as the baseline. Preserve its engineering work only. Research real shipping applications first, derive three materially different Modula visual directions, and stop for founder selection before broad implementation.
+The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 produced three directions for selection; none is approved wholesale.
+
+**7M-B5 is authorised:** reference-driven refinement (Direction M), twelve compositions inside that language, then implement **one flagged candidate** (AUTH-2, HOME-1, HUB-1, NOTES-1, NAV-C) after checkpoint A. Founder visual approval remains required. **7M-C is blocked. Production deploy is not authorised.**
 
 Follow `docs/agent-skills/phase7m/SKILL.md` in full.
 
-**Reference baseline, not an implement-everything list.** Inspect installed Expo 57 / RN 0.86.2 / `@expo/ui` 57.0.10 / existing `src/platform/ui` + `src/theme` first. Consolidate. No `packages/ui` fork. No 7M-A production-screen redesign.
-
-7M-B2 screenshots are engineering evidence only. 7M-B4 compositions live in the evidence archive under `phase-7m/b4/`. Do not start 7M-C or a four-screen prototype until founder selection.
+Inspect installed Expo 57.0.12 / RN 0.86.2 / `@expo/ui` 57.0.10. No SDK upgrade. No new UI framework. No `packages/ui` fork.
 
 ## Anti-AI-UI rules
 
@@ -37,8 +37,9 @@ NO CARD SOUP · NO PILL SOUP · NO RANDOM GRADIENTS · NO EVERYTHING-IS-ROUNDED 
 ## Pointers
 
 - `docs/research/phase7m-current-inventory.md`
-- `docs/research/phase7m-b4-real-app-reference-matrix.md`
+- `docs/research/phase7m-b5-social-reference-study.md`
+- `docs/research/phase7m-b5-expo-ui-integration-map.md`
+- `docs/research/phase7m-b5-liquid-glass-policy.md`
+- `docs/design/phase7m-b5-direction-m.md`
 - `docs/design/modula-visual-constitution.md`
-- `docs/design/modula-component-contracts.md`
-- `docs/design/phase7m-b4-visual-directions.md`
 - `docs/agent-skills/phase7m/`

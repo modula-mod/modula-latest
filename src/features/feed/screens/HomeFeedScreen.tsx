@@ -20,7 +20,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Pill} from '@/components/primitives/Pill'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import {HomeSearchModal} from '@/features/feed/components/HomeSearchModal'
@@ -43,6 +42,7 @@ import {SocialPost} from '@/features/social/components/social-post'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
@@ -259,9 +259,9 @@ export function HomeFeedScreen() {
                         title="This feed is quiet."
                         description="Switch modes or publish a local post to start the conversation."
                         action={
-                          <Pill
+                          <ModulaButton
                             label="Create post"
-                            selected
+                            accessibilityLabel="Create a post"
                             onPress={() => router.push('/compose' as Href)}
                           />
                         }
@@ -488,8 +488,6 @@ function HomeLayoutHeader({
   // so the rail is never buried under chrome.
   const preferredOrder = [
     'presence',
-    'focus-banner',
-    'merge-banner',
     'mode-tabs',
     'composer',
   ]

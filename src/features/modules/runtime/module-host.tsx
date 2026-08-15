@@ -3,9 +3,11 @@ import {useRouter, type Href} from 'expo-router'
 
 import {ModuleViewRenderer} from '@/features/modules/runtime/module-view-renderer'
 import {ModuleErrorBoundary, ModuleErrorState} from '@/features/modules/runtime/module-error-boundary'
+import {ModuleInstallIdentity} from '@/features/modules/runtime/module-install-identity'
 import {ModuleLoadingState} from '@/features/modules/runtime/module-loading-state'
 import {ModulePermissionGate} from '@/features/modules/runtime/module-permission-gate'
 import {resolveModuleRouteView} from '@/features/modules/runtime/module-route-resolver'
+import {isInstalledModuleState} from '@/features/modules/identity/installPresentation'
 import {useModuleDetailQuery, useModuleViewsQuery} from '@/features/modules/hooks'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -41,12 +43,11 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
   if (detail.data.installationState === 'disabled') {
     return <ModuleErrorState title="Module disabled" body="Enable this module from Settings before opening its hosted route." onOpenSettings={openSettings} />
   }
-  if (!['enabled', 'installed'].includes(detail.data.installationState)) {
+  if (!isInstalledModuleState(detail.data.installationState)) {
     return (
-      <ModuleErrorState
-        title="Permission required"
-        body="Install and enable this module before opening its hosted route."
-        onOpenSettings={() => router.push(`/marketplace/${encodeURIComponent(moduleId)}` as Href)}
+      <ModuleInstallIdentity
+        module={detail.data}
+        onInstall={() => router.push(`/marketplace/${encodeURIComponent(moduleId)}` as Href)}
       />
     )
   }

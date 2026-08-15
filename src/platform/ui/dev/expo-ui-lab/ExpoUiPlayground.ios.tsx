@@ -11,6 +11,7 @@ import {
   SettingsSection,
   TaskManagementSection,
 } from '@/platform/ui/dev/expo-ui-lab/sections'
+import {GlassLabSection} from '@/platform/ui/dev/expo-ui-lab/sections/GlassLabSection'
 
 /**
  * Full liquid-glass-style playground from betomoedano/expo-ui-playground,
@@ -24,6 +25,7 @@ export function ExpoUiPlayground() {
           <Form>
             <ProfileSection />
             <ButtonsSection />
+            <GlassLabSection />
             <DashboardSection />
             <TaskManagementSection />
             <ContextMenuSection />

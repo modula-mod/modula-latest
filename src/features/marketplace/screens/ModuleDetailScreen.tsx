@@ -3,11 +3,12 @@ import {useState} from 'react'
 import {ScrollView, StyleSheet, View, Alert} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {Surface} from '@/components/primitives/Surface'
 import {InstallPreviewSheet, ModuleInstallProgress} from '@/features/modules/components'
+import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
+import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
@@ -167,12 +168,10 @@ export function ModuleDetailScreen() {
               },
             ]}>
             <View style={styles.heroHeader}>
-              <View style={[styles.icon, {backgroundColor: colours.accentSubtle, borderRadius: radius.large}]}>
-                <AppIcon name={module.kind === 'system' ? 'security' : 'modules'} colour={colours.accent} size={32} />
-              </View>
+              <ModuleArtwork moduleId={module.moduleId} name={module.name} size={88} variant="hero" />
               <View style={styles.flex}>
                 <AppText variant="display">{module.name}</AppText>
-                <AppText variant="body" colour="textSecondary">{module.publisherName} ✓</AppText>
+                <AppText variant="body" colour="textSecondary">{module.publisherName}</AppText>
               </View>
             </View>
             <AppText variant="body" colour="textSecondary">{module.longDescription || module.description}</AppText>
@@ -187,7 +186,10 @@ export function ModuleDetailScreen() {
               <ActionRow
                 state={module.installationState}
                 busy={busy}
+                moduleId={module.moduleId}
                 installable={module.installable}
+                latestVersion={module.latestVersion}
+                priceState={module.priceState}
                 onPreview={openPreview}
                 onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
                 onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
@@ -229,7 +231,7 @@ export function ModuleDetailScreen() {
           </Section>
           <Section title="Version">
             <InfoRow label="Version" value={module.latestVersion ?? 'Unreleased'} />
-            <InfoRow label="Availability" value={module.priceState} />
+            <InfoRow label="Availability" value={resolveModuleInstallPresentation(module).customerStatus} />
           </Section>
           <ModulaButton
             label={technicalOpen ? 'Hide Trust & Technical Details' : 'Trust & Technical Details >'}
@@ -333,7 +335,10 @@ export function ModuleDetailScreen() {
 function ActionRow({
   state,
   busy,
+  moduleId,
   installable,
+  latestVersion,
+  priceState,
   onPreview,
   onOpen,
   onSettings,
@@ -344,7 +349,10 @@ function ActionRow({
 }: {
   state: ModuleInstallationState
   busy: string | null
+  moduleId: string
   installable: boolean
+  latestVersion?: string | null
+  priceState?: ModuleDetail['priceState']
   onPreview: () => void
   onOpen: () => void
   onSettings: () => void
@@ -354,11 +362,24 @@ function ActionRow({
   onUninstall: () => void
 }) {
   const {spacing} = useThemeTokens()
+  const presentation = resolveModuleInstallPresentation({
+    moduleId,
+    installable,
+    installationState: state,
+    priceState,
+    latestVersion,
+  })
   const installed = ['installed', 'enabled', 'disabled', 'updateAvailable', 'configurationRequired'].includes(state)
   return (
     <View style={[styles.actions, {gap: spacing[2]}]}>
       {!installed ? (
-        <ModulaButton label={installable ? 'Install' : 'Not available'} accessibilityLabel="Install module" disabled={!installable} loading={busy === 'review'} onPress={onPreview} />
+        <ModulaButton
+          label={presentation.primaryAction === 'Can’t install on this device' ? 'Can’t install on this device' : presentation.primaryAction}
+          accessibilityLabel={`${presentation.primaryAction} module`}
+          disabled={!presentation.installable}
+          loading={busy === 'review'}
+          onPress={onPreview}
+        />
       ) : null}
       {state === 'disabled' || state === 'installed' ? <ModulaButton label="Enable" accessibilityLabel="Enable module" loading={busy === 'enable'} onPress={onEnable} /> : null}
       {state === 'enabled' || state === 'configurationRequired' ? <ModulaButton label="Open" accessibilityLabel="Open module" onPress={onOpen} /> : null}

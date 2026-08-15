@@ -1,6 +1,6 @@
 # Modula Visual Constitution
 
-Phase: 7M-A (binding). 7M-B2 engineering is preserved. **7M-B2 visual composition is rejected.** 7M-B4 produces three directions for founder selection. Implementation of a selected direction is **7M-B prototype / 7M-C** only after founder visual approval.
+Phase: 7M-A constitution still binding. 7M-B2 engineering is preserved. **7M-B2 visual composition is rejected.** 7M-B4 produced A/B/C for selection (none wholesale). **7M-B5 Direction M** is the working language; flagged flagships may be implemented for review. 7M-C remains blocked until founder visual approval.
 
 The previous Phase 7M-B visual direction has been explicitly rejected by the founder. Do not polish, preserve, or treat its visual composition as the baseline. Preserve its engineering work only.
 

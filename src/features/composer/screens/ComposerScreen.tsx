@@ -914,7 +914,7 @@ export function ComposerScreen() {
               accessibilityLabel={item.label}
               onPress={item.onPress}
               style={styles.toolIcon}>
-              <AppIcon name={item.icon} colour={colours.accent} />
+              <AppIcon name={item.icon} colour={colours.textSecondary} />
             </AppPressable>
           ))}
           <View style={[styles.toolbarDivider, {backgroundColor: colours.border}]} />

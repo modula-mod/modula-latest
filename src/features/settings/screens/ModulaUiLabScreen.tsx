@@ -16,7 +16,7 @@ export function ModulaUiLabRouteScreen() {
     )
   }
   return (
-    <SettingsScreen title="Modula UI Lab" caption="Flagship primitive state matrix for Phase 7M-B2.">
+    <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — quality compare plus flagship primitive matrix for Direction M.">
       <ModulaPrimitivesLabScreen />
     </SettingsScreen>
   )

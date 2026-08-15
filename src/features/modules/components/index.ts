@@ -1,5 +1,6 @@
 export * from '@/features/modules/components/InstallPreviewSheet'
 export * from '@/features/modules/components/ModuleAIActionMenu'
+export * from '@/features/modules/components/ModuleArtwork'
 export * from '@/features/modules/components/ModuleCatalogueCard'
 export * from '@/features/modules/components/ModuleInstallProgress'
 export * from '@/features/modules/components/ModuleStatusPill'

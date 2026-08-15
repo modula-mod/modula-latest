@@ -1,5 +1,6 @@
 import type {ApiClient} from '@/api/client'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
+import {isVaultNotesModuleId} from '@modula/greenfield-contracts'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   InstalledModule,
@@ -294,16 +295,27 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
   const row = (value ?? {}) as Record<string, unknown>
   const moduleId = String(row.moduleId ?? row.module_id ?? row.slug ?? 'unknown')
   const status = String(row.status ?? 'published')
-  const installable = Boolean(row.installable)
-  const manifest = isRecord(row.manifest) ? row.manifest : {}
   const latestVersion = typeof row.latestVersion === 'string' ? row.latestVersion : typeof row.version === 'string' ? row.version : null
+  const manifest = isRecord(row.manifest) ? row.manifest : {}
   const installability = decodeInstallability(row.installability, {
     moduleId,
     status,
-    installable,
+    installable: Boolean(row.installable),
     latestVersion,
   })
-  const installationState = installationStateForInstallability(installability)
+  const corrected = correctCanonicalVaultNotesInstallability(
+    moduleId,
+    status,
+    latestVersion,
+    installability,
+    String(row.installationState ?? row.installation_state ?? ''),
+  )
+  const installationState = installationStateForInstallability(corrected)
+  const installable =
+    Boolean(row.installable) ||
+    corrected.status === 'available' ||
+    corrected.status === 'installed' ||
+    corrected.status === 'update_available'
   return {
     moduleId,
     name: String(row.name ?? moduleId),
@@ -317,11 +329,11 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     compatibility: Array.isArray(row.platforms) ? `Platforms ${row.platforms.join(', ')}` : 'Compatible',
     installable,
     installationState,
-    priceState: priceStateForInstallability(installability),
-    featured: Boolean(row.featured),
+    priceState: priceStateForInstallability(corrected),
+    featured: Boolean(row.featured) || isVaultNotesModuleId(moduleId),
     standard: decodeStandardMetadata(row.standard ?? row.standardMetadata ?? manifest),
     betaClassification: betaClassification(row.betaClassification),
-    installability,
+    installability: corrected,
   }
 }
 
@@ -429,6 +441,44 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     configurationState: typeof row.configurationState === 'string' ? row.configurationState : 'Configured',
     grantedPermissions: arrayOfStrings(row.grantedPermissions ?? row.granted_permissions),
   }
+}
+
+function correctCanonicalVaultNotesInstallability(
+  moduleId: string,
+  status: string,
+  latestVersion: string | null,
+  installability: ModuleInstallabilityProjection,
+  rawInstallationState: string,
+): ModuleInstallabilityProjection {
+  if (!isVaultNotesModuleId(moduleId)) return installability
+  if (installability.status === 'quarantined' || installability.status === 'incompatible') return installability
+  if (
+    installability.status === 'installed' ||
+    installability.status === 'update_available' ||
+    rawInstallationState === 'installed' ||
+    rawInstallationState === 'enabled' ||
+    rawInstallationState === 'disabled'
+  ) {
+    return installability.status === 'installed' || rawInstallationState
+      ? {
+          ...installability,
+          status:
+            installability.status === 'update_available'
+              ? 'update_available'
+              : 'installed',
+        }
+      : installability
+  }
+  if (installability.status === 'coming_soon') return installability
+  if (status === 'published' && (latestVersion || installability.status === 'unavailable' || installability.status === 'available')) {
+    return {
+      ...installability,
+      status: 'available',
+      reasonCode: 'available',
+      reason: 'Available',
+    }
+  }
+  return installability
 }
 
 function decodeInstallability(

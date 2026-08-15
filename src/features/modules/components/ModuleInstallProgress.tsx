@@ -14,14 +14,14 @@ export type ModuleInstallStageId =
   | 'ready'
   | 'failed'
 
-export const MODULE_INSTALL_STAGES: {id: ModuleInstallStageId; label: string}[] = [
-  {id: 'resolving', label: 'Release verified'},
-  {id: 'validating', label: 'Manifest validated'},
-  {id: 'compatibility', label: 'Compatible'},
-  {id: 'permissions', label: 'Permissions granted'},
-  {id: 'installing', label: 'Module installed'},
-  {id: 'enabling', label: 'Module enabled'},
-  {id: 'ready', label: 'Ready'},
+export const MODULE_INSTALL_STAGES: {id: ModuleInstallStageId; label: string; activeLabel: string}[] = [
+  {id: 'resolving', label: 'Release verified', activeLabel: 'Verifying release'},
+  {id: 'validating', label: 'Manifest validated', activeLabel: 'Checking compatibility'},
+  {id: 'compatibility', label: 'Compatible', activeLabel: 'Checking compatibility'},
+  {id: 'permissions', label: 'Permissions granted', activeLabel: 'Reviewing permissions'},
+  {id: 'installing', label: 'Module installed', activeLabel: 'Installing'},
+  {id: 'enabling', label: 'Module enabled', activeLabel: 'Enabling'},
+  {id: 'ready', label: 'Ready', activeLabel: 'Ready'},
 ]
 
 const ORDER: ModuleInstallStageId[] = MODULE_INSTALL_STAGES.map(stage => stage.id)
@@ -55,7 +55,7 @@ export function ModuleInstallProgress({
             key={item.id}
             variant="body"
             colour={done ? 'text' : active ? 'accent' : 'textTertiary'}>
-            {done ? `✓ ${item.label}` : active ? `… ${item.label.replace(/ed$/, 'ing')}` : item.label}
+            {done ? `✓ ${item.label}` : active ? `… ${item.activeLabel}` : item.label}
           </AppText>
         )
       })}

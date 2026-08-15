@@ -1,9 +1,8 @@
-import {Modal, StyleSheet} from 'react-native'
+import {Modal, Platform, StyleSheet} from 'react-native'
 import {useEffect, useState} from 'react'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
   withTiming,
 } from 'react-native-reanimated'
@@ -15,51 +14,45 @@ import type {ReactionType, SocialPost} from '@/domain/social'
 import {useReactionMutation} from '@/features/social/data/useReactionMutation'
 import {useReduceMotion} from '@/lib/accessibility'
 import {lightImpactHaptic, selectionHaptic} from '@/lib/haptics'
+import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Shipped Greenfield taxonomy — not Love/Laugh/Fire. One active reaction per actor+post. */
-const reactions: {type: ReactionType; emoji: string; label: string}[] = [
+const CANONICAL: {type: ReactionType; emoji: string; label: string}[] = [
   {type: 'like', emoji: '👍', label: 'Like'},
   {type: 'love', emoji: '❤️', label: 'Love'},
   {type: 'laugh', emoji: '😂', label: 'Laugh'},
   {type: 'fire', emoji: '🔥', label: 'Fire'},
-  {type: 'celebrate', emoji: '🎉', label: 'Celebrate'},
-  {type: 'insightful', emoji: '💡', label: 'Insightful'},
-  {type: 'support', emoji: '🤝', label: 'Support'},
-  {type: 'curious', emoji: '🤔', label: 'Curious'},
 ]
 
-function BloomOption({
+const CELL = 48
+
+function ProximityOption({
   emoji,
   label,
   selected,
-  index,
+  emphasized,
   reduceMotion,
   onPress,
 }: {
   emoji: string
   label: string
   selected: boolean
-  index: number
+  emphasized: boolean
   reduceMotion: boolean
   onPress: () => void
 }) {
   const {colours, radius} = useThemeTokens()
-  const scale = useSharedValue(reduceMotion ? 1 : 0.4)
-  const opacity = useSharedValue(reduceMotion ? 1 : 0)
+  const scale = useSharedValue(1)
 
   useEffect(() => {
     if (reduceMotion) {
       scale.value = 1
-      opacity.value = 1
       return
     }
-    scale.value = withDelay(index * 28, withSpring(1, {damping: 14, stiffness: 220}))
-    opacity.value = withDelay(index * 28, withTiming(1, {duration: 120}))
-  }, [index, opacity, reduceMotion, scale])
+    scale.value = withSpring(emphasized ? 1.28 : selected ? 1.08 : 0.92, {damping: 16, stiffness: 220})
+  }, [emphasized, reduceMotion, scale, selected])
 
   const style = useAnimatedStyle(() => ({
-    opacity: opacity.value,
     transform: [{scale: scale.value}],
   }))
 
@@ -73,7 +66,7 @@ function BloomOption({
         style={[
           styles.option,
           {
-            backgroundColor: selected ? colours.accentSubtle : colours.surface,
+            backgroundColor: selected || emphasized ? colours.surfaceRaised : 'transparent',
             borderRadius: radius.round,
           },
         ]}>
@@ -85,33 +78,45 @@ function BloomOption({
 
 export function ReactionControl({post}: {post: SocialPost}) {
   const [open, setOpen] = useState(false)
+  const [hoverIndex, setHoverIndex] = useState(0)
   const mutation = useReactionMutation()
   const reduceMotion = useReduceMotion()
   const {colours, radius, spacing} = useThemeTokens()
   const currentReaction = post.viewerReaction ?? (post.liked ? 'like' : null)
-  const selected = reactions.find(item => item.type === currentReaction)
+  const selected = CANONICAL.find(item => item.type === currentReaction)
   const label = selected?.label ?? 'Like'
-  const bloomScale = useSharedValue(reduceMotion ? 1 : 0.85)
-
-  useEffect(() => {
-    if (!open) return
-    if (reduceMotion) {
-      bloomScale.value = 1
-      return
-    }
-    bloomScale.value = 0.85
-    bloomScale.value = withSpring(1, {damping: 16, stiffness: 200})
-  }, [bloomScale, open, reduceMotion])
-
-  const bloomStyle = useAnimatedStyle(() => ({
-    transform: [{scale: bloomScale.value}],
-  }))
+  const useMenu = Platform.OS === 'web' || reduceMotion
 
   const choose = (reaction: ReactionType | null) => {
     void lightImpactHaptic()
     mutation.mutate({postId: post.id, reaction})
     setOpen(false)
   }
+
+  const openPicker = () => {
+    void selectionHaptic()
+    if (useMenu) {
+      void presentModulaActions({
+        title: 'React',
+        actions: CANONICAL.map(item => ({id: item.type, label: `${item.emoji} ${item.label}`})),
+        cancelLabel: 'Cancel',
+      }).then(id => {
+        if (!id) return
+        const next = id as ReactionType
+        choose(currentReaction === next ? null : next)
+      })
+      return
+    }
+    setHoverIndex(Math.max(0, CANONICAL.findIndex(item => item.type === (currentReaction ?? 'like'))))
+    setOpen(true)
+  }
+
+  const bloomScale = useSharedValue(reduceMotion ? 1 : 0.9)
+  useEffect(() => {
+    if (!open) return
+    bloomScale.value = reduceMotion ? 1 : withTiming(1, {duration: 140})
+  }, [bloomScale, open, reduceMotion])
+  const bloomStyle = useAnimatedStyle(() => ({transform: [{scale: bloomScale.value}]}))
 
   return (
     <>
@@ -120,10 +125,7 @@ export function ReactionControl({post}: {post: SocialPost}) {
         accessibilityHint="Double tap to like. Long press to choose a reaction."
         accessibilityState={{selected: Boolean(selected), busy: mutation.isPending}}
         onPress={() => choose(currentReaction === 'like' ? null : 'like')}
-        onLongPress={() => {
-          void selectionHaptic()
-          setOpen(true)
-        }}
+        onLongPress={openPicker}
         delayLongPress={350}
         style={styles.trigger}>
         <AppIcon name="like" colour={selected ? colours.accent : colours.textSecondary} size={20} />
@@ -142,6 +144,22 @@ export function ReactionControl({post}: {post: SocialPost}) {
           style={[styles.backdrop, {backgroundColor: colours.surfaceOverlay}]}>
           <Animated.View
             accessibilityRole="menu"
+            onStartShouldSetResponder={() => true}
+            onMoveShouldSetResponder={() => true}
+            onResponderMove={event => {
+              const next = Math.min(
+                CANONICAL.length - 1,
+                Math.max(0, Math.floor(event.nativeEvent.locationX / CELL)),
+              )
+              setHoverIndex(current => {
+                if (current !== next) void selectionHaptic()
+                return next
+              })
+            }}
+            onResponderRelease={() => {
+              const target = CANONICAL[hoverIndex]
+              if (target) choose(currentReaction === target.type ? null : target.type)
+            }}
             style={[
               styles.bloom,
               bloomStyle,
@@ -154,17 +172,15 @@ export function ReactionControl({post}: {post: SocialPost}) {
                 paddingVertical: spacing[2],
               },
             ]}>
-            {reactions.map((reaction, index) => (
-              <BloomOption
+            {CANONICAL.map((reaction, index) => (
+              <ProximityOption
                 key={reaction.type}
                 emoji={reaction.emoji}
                 label={reaction.label}
                 selected={currentReaction === reaction.type}
-                index={index}
+                emphasized={hoverIndex === index}
                 reduceMotion={reduceMotion}
-                onPress={() =>
-                  choose(currentReaction === reaction.type ? null : reaction.type)
-                }
+                onPress={() => choose(currentReaction === reaction.type ? null : reaction.type)}
               />
             ))}
           </Animated.View>
@@ -190,9 +206,9 @@ const styles = StyleSheet.create({
   },
   option: {
     alignItems: 'center',
-    height: 48,
+    height: CELL,
     justifyContent: 'center',
-    width: 48,
+    width: CELL,
   },
   trigger: {alignItems: 'center', flexDirection: 'row', gap: 4},
 })
