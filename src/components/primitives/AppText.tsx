@@ -1,19 +1,14 @@
 import {Text, type TextProps, type TextStyle} from 'react-native'
 
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import type {SemanticColours, TypographyRole} from '@/theme/contracts'
+import {TYPOGRAPHY_SEMANTIC_ALIASES} from '@/theme/contracts/typography'
+import type {
+  SemanticColours,
+  TypographyRole,
+  TypographySemanticAlias,
+} from '@/theme/contracts'
 
-export type AppTextVariant =
-  | 'display'
-  | 'title1'
-  | 'title2'
-  | 'title'
-  | 'headline'
-  | 'body'
-  | 'bodyStrong'
-  | 'label'
-  | 'caption'
-  | 'micro'
+export type AppTextVariant = TypographyRole | TypographySemanticAlias
 
 type ColourKey = keyof SemanticColours | 'text' | 'textSecondary' | 'textTertiary'
 
@@ -22,17 +17,11 @@ type AppTextProps = TextProps & {
   colour?: ColourKey
 }
 
-const variantMap: Record<AppTextVariant, TypographyRole> = {
-  display: 'display',
-  title1: 'title1',
-  title2: 'title2',
-  title: 'title2',
-  headline: 'headline',
-  body: 'body',
-  bodyStrong: 'bodyStrong',
-  label: 'label',
-  caption: 'caption',
-  micro: 'micro',
+function resolveVariant(variant: AppTextVariant): TypographyRole {
+  if (variant in TYPOGRAPHY_SEMANTIC_ALIASES) {
+    return TYPOGRAPHY_SEMANTIC_ALIASES[variant as TypographySemanticAlias]
+  }
+  return variant as TypographyRole
 }
 
 /**
@@ -46,7 +35,7 @@ export function AppText({
   ...rest
 }: AppTextProps) {
   const {colours, typography} = useThemeTokens()
-  const typeStyle = typography[variantMap[variant]]
+  const typeStyle = typography[resolveVariant(variant)]
   const colourStyle: TextStyle = {
     color: colours[colour],
   }

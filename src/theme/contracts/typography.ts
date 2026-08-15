@@ -29,3 +29,25 @@ export const TYPOGRAPHY_ROLES = [
   'caption',
   'micro',
 ] as const satisfies readonly TypographyRole[]
+
+/**
+ * 7M semantic vocabulary resolved onto the canonical roles. Aliases keep one
+ * source of truth: they never define their own sizes.
+ * `metadata` intentionally maps to `caption` (13pt) — not `micro` — so
+ * timestamps and secondary metadata stay readable.
+ */
+export type TypographySemanticAlias =
+  | 'titleLarge'
+  | 'title'
+  | 'metadata'
+  | 'button'
+
+export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
+  TypographySemanticAlias,
+  TypographyRole
+> = {
+  titleLarge: 'title1',
+  title: 'title2',
+  metadata: 'caption',
+  button: 'label',
+}

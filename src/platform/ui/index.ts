@@ -5,6 +5,7 @@
  * Keyboard / camera / imperative menus land here alongside shell chrome.
  */
 export * from '@/platform/ui/buttons/button-role'
+export * from '@/platform/ui/icons'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
