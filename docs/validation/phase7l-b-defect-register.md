@@ -13,11 +13,11 @@ Current register counts:
 
 | Severity | Total | OPEN | IN_PROGRESS | FIXED_SOURCE | PASS_LOCAL | PASS_LIVE | BLOCKED_EXTERNAL |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P0 | 12 | 1 | 0 | 0 | 10 | 1 | 0 |
+| P0 | 12 | 1 | 0 | 0 | 9 | 2 | 0 |
 | P1 | 35 | 0 | 0 | 0 | 34 | 1 | 0 |
 
 Local disposable proof SHA: `4cd3d2ac821d4f0b34dc3517d241f2a16c8a2b5e` (`CI=true pnpm verify:phase7l-b` on VPS disposable Postgres `modula-phase7l-b-pg`).
-P0 remaining OPEN is production identity only. Native iOS `xcodebuild` passed locally; simulator golden-path screenshots are still required before `PASS_LIVE`.
+iPhone 17 Pro simulator golden path captured on 2026-08-15 (`docs/validation/phase7l-b-simulator-golden-path.md`). P0 remaining OPEN is production identity only.
 
 Closure rule: source edits alone never close a defect. A defect can move to `PASS_LOCAL` only after its verification command passes in the intended local or disposable acceptance environment. A defect can move to `PASS_LIVE` only after the public/live verification is captured against the deployed fixed SHA.
 
@@ -176,8 +176,8 @@ Closure rule: source edits alone never close a defect. A defect can move to `PAS
 - Backend dependency: Public Greenfield API for simulator golden path.
 - Fix strategy: Sync Mac source to fixed main, install dependencies/pods, run xcodebuild, launch simulator, and capture golden path evidence.
 - Verification command: `xcodebuild -workspace Modula.xcworkspace -scheme Modula -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build`
-- Live verification: Mac `xcodebuild` for iPhone 17 Pro simulator returned `BUILD SUCCEEDED` on 2026-08-15. Simulator golden-path screenshots for login, Home, Stories, post/reaction/comment, drawer, profile, settings, Product Hub, Vault Notes, logout, and re-login are still required before `PASS_LIVE`.
-- Status: PASS_LOCAL
+- Live verification: Mac `xcodebuild` for iPhone 17 Pro simulator returned `BUILD SUCCEEDED` on 2026-08-15. Simulator golden-path screenshots for cold launch, login, session restore, Home, Stories, Profile, edit Profile, `/profile/:handle`, Settings, Active Sessions, Modula Mail, logout/login, and second-account public profile are in `docs/validation/evidence/phase7l-b-simulator/` (`docs/validation/phase7l-b-simulator-golden-path.md`).
+- Status: PASS_LIVE
 
 ## P1 Register
 
