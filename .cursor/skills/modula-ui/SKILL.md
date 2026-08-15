@@ -15,6 +15,8 @@ description: >-
 - Using `@expo/ui` or studying Bluesky / NCL UI
 - Appearance settings
 
+Phase 7M visual work also requires `.cursor/skills/phase7m/SKILL.md` and `docs/agent-skills/phase7m/SKILL.md`. Do not start a parallel design system.
+
 ## Theme architecture (v5 dimensions)
 
 Independent dimensions resolve into one immutable `ThemeTokens`:
@@ -24,7 +26,7 @@ Independent dimensions resolve into one immutable `ThemeTokens`:
 | Colour mode | system, light, dim, dark, oled |
 | Theme family | standard (+ forest, ocean, plum, espresso, spaceGray reserved) |
 | Accent | modulaTeal `#369CAA` (+ reserved accents) |
-| Surface type | native, solid, glass, glay, minimalSpatial, skeuo, neo |
+| Surface type | native, solid, glass, glay, minimalSpatial, skeuomorphic, neomorphic |
 
 **Working now:** system → light/dark, Modula Teal, solid/native stubs.  
 **Deferred:** full family palettes, Glass/Liquid Glass/Skeuo/Neo engines.
@@ -53,6 +55,9 @@ See `docs/product/theme-architecture-v5.md` and `src/theme/`.
 - `src/theme/runtime/`
 - `src/components/primitives/`
 - `src/components/system/`
+- `src/platform/ui/` — canonical adapters (do not create `packages/ui`)
+- `docs/design/modula-visual-constitution.md`
+- `docs/research/phase7m-current-inventory.md`
 - `docs/architecture/bluesky-inspiration-policy.md`
 - `docs/architecture/expo-native-component-list.md`
 
