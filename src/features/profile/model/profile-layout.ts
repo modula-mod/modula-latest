@@ -27,7 +27,9 @@ export const PROFILE_LAYOUT = {
   /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
   avatarFit: 0.95,
   /** Lower the portrait into the white pocket. Does not move the inverted SVG. */
-  avatarDrop: 36,
+  avatarDrop: 72,
+  /** Extra drop for name / handle / bio. Does not move the inverted SVG. */
+  identityDrop: 55,
   /** Cover showing around the portrait inside the inverted cradle. */
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
@@ -75,6 +77,7 @@ export type ProfileGeometry = {
   gutterWidth: number
   identityPaddingTop: number
   identityPlateauGap: number
+  identityDrop: number
   identityColumnPad: number
   metricViewportHeight: number
   metricColumnTop: number
@@ -212,6 +215,7 @@ export function profileGeometry(
     gutterWidth,
     identityPaddingTop: PROFILE_LAYOUT.identityAfterAvatar,
     identityPlateauGap: PROFILE_LAYOUT.identityPlateauGap,
+    identityDrop: PROFILE_LAYOUT.identityDrop,
     identityColumnPad,
     metricViewportHeight: profileMetricWindowHeight(),
     metricColumnTop: slotSize / 2 + PROFILE_LAYOUT.metricColumnGap,

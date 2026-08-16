@@ -58,7 +58,7 @@ export function ProfileHeroSkeleton() {
               {
                 gap: spacing[2],
                 paddingLeft: geometry.identityColumnPad,
-                paddingTop: geometry.identityPlateauGap,
+                paddingTop: geometry.identityPlateauGap + geometry.identityDrop,
               },
             ]}>
             <SkeletonBlock height={24} width="52%" />

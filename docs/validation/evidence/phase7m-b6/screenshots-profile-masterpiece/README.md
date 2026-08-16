@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `avatar-lower.png` | Owner hero (this pass) | Avatar dropped 36pt into the white pocket; inverted SVG unchanged |
+| `avatar-and-text-lower.png` | Owner hero (this pass) | Avatar dropped another 36pt (72pt total); name/handle/bio dropped 55pt; inverted SVG unchanged |
+| `avatar-lower.png` | Owner hero (previous) | Avatar dropped 36pt into the white pocket; inverted SVG unchanged |
 | `profile-final-photo-cover.png` | Same hero | Progressive blur, status-bar contrast, glass chrome on photography |
 | `profile-final-picker-posts.png` | Picker | Posts selected; Followers / Following as downward context; no grey pill |
 | `profile-final-picker-followers.png` | Picker | Three-metric wheel (Followers / Following / Modules) |

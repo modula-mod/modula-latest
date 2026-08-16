@@ -163,7 +163,8 @@ assert.match(read('src/features/profile/model/profile-layout.ts'), /coverHeadroo
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /avatarLeft/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /plateauDepth/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarFit: 0\.95/)
-assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarDrop: 36/)
+assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarDrop: 72/)
+assert.match(read('src/features/profile/model/profile-layout.ts'), /identityDrop: 55/)
 assert.doesNotMatch(
   read('src/features/profile/model/profile-layout.ts'),
   /identityColumnPad: PROFILE_LAYOUT\.cradleGap \+ plateauRadius \+ 12/,

@@ -210,7 +210,7 @@ export function ProfileHero({
                 {
                   gap: spacing[2],
                   paddingLeft: geometry.identityColumnPad,
-                  paddingTop: geometry.identityPlateauGap,
+                  paddingTop: geometry.identityPlateauGap + geometry.identityDrop,
                 },
               ]}>
               {identity}
