@@ -28,11 +28,10 @@ export const PROFILE_LAYOUT = {
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
   plateauRadius: 20,
-  /** Extra overlay rise so the inverted SVG reads taller on the cover. */
-  transitionExtra: 48,
-  /** Cover above the portrait crown: chrome + clearance. */
-  coverHeadroomCompact: 56,
-  coverHeadroomRegular: 68,
+  /** Cover above the portrait crown: chrome + photo. Keep this tall — the
+   *  inverted overlay stays a short cradle at the bottom, not extra height. */
+  coverHeadroomCompact: 140,
+  coverHeadroomRegular: 160,
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
   /** Plateau edge to the identity cap height. */
@@ -150,9 +149,7 @@ export function profilePlateauDepth(
   contentWidth = 393,
 ): number {
   return Math.round(
-    profileCradleRadius(compact, showFocusHalo, contentWidth) +
-      PROFILE_LAYOUT.plateauRadius +
-      PROFILE_LAYOUT.transitionExtra,
+    profileCradleRadius(compact, showFocusHalo, contentWidth) + PROFILE_LAYOUT.plateauRadius,
   )
 }
 
@@ -170,9 +167,7 @@ export function profileGeometry(
   const avatarLead = profileAvatarLead(contentWidth)
   const cradleRadius = profileCradleRadius(compact, showFocusHalo, contentWidth)
   const plateauRadius = PROFILE_LAYOUT.plateauRadius
-  const plateauDepth = Math.round(
-    cradleRadius + plateauRadius + PROFILE_LAYOUT.transitionExtra,
-  )
+  const plateauDepth = Math.round(cradleRadius + plateauRadius)
   const gutterWidth = avatarLead + slotSize
 
   const identityColumnWidth = contentWidth - horizontalInset - gutterWidth
@@ -203,7 +198,7 @@ export function profileGeometry(
     metricColumnTop: plateauDepth + PROFILE_LAYOUT.metricColumnGap,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
     avatarCenterX: avatarLead + slotSize / 2,
-    avatarCenterY: plateauRadius + PROFILE_LAYOUT.transitionExtra,
+    avatarCenterY: plateauRadius,
     cradleRadius,
     plateauRadius,
     invertedCornerRadius: inverted.md,

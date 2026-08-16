@@ -85,7 +85,7 @@ export function ProfileCover({
   const hasPhoto = Boolean(uri) && kind !== 'none'
   const transitionHeight = Math.min(
     cradleRadius != null
-      ? Math.round(cradleRadius + plateauRadius + PROFILE_LAYOUT.transitionExtra)
+      ? Math.round(cradleRadius + plateauRadius)
       : profilePlateauDepth(Boolean(compact), false, width),
     height,
   )

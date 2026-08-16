@@ -159,7 +159,7 @@ assert.match(read('src/features/profile/components/ProfileCover.tsx'), /cradleRa
 assert.match(read('src/features/profile/components/ProfileCover.tsx'), /avatarCenterY/)
 assert.match(read('src/features/profile/components/ProfileCover.tsx'), /raisedSide="trailing"/)
 assert.match(read('src/features/profile/components/ProfileCover.tsx'), /marginTop: -insets\.top/)
-assert.match(read('src/features/profile/model/profile-layout.ts'), /transitionExtra/)
+assert.match(read('src/features/profile/model/profile-layout.ts'), /coverHeadroomCompact: 140/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /avatarLead/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /plateauDepth/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /metricColumnTop/)

@@ -164,7 +164,7 @@ assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'paddingTo
 assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerShown: false', 'PROFILE COVER UNDER HEADER')
 assertContains('src/app/(tabs)/profile/_layout.tsx', 'safeAreaInsets: {top: 0}', 'PROFILE STACK ZERO TOP INSET')
 assertContains('src/features/profile/components/ProfileCover.tsx', 'marginTop: -insets.top', 'COVER PULLS UNDER STATUS BAR')
-assertContains('src/features/profile/model/profile-layout.ts', 'transitionExtra', 'INVERTED SVG EXTRA HEIGHT')
+assertContains('src/features/profile/model/profile-layout.ts', 'coverHeadroomCompact: 140', 'COVER PHOTO IS TALL')
 assertContains('src/features/profile/components/ProfileShell.tsx', 'ProfileCoverChrome', 'PROFILE COVER OVERLAY CHROME')
 assertContains('src/platform/ui/navigation/profile-stack-header.tsx', "accessibilityLabel: 'Edit Profile'", 'PROFILE EDIT IN CONTROL GROUP')
 assertAbsent('src/features/profile/components/ProfileActions.tsx', 'Edit Profile', 'NO HERO EDIT PILL')
