@@ -42,8 +42,8 @@ type ProfileHeroProps = {
  * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
  * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
  *
- * The portrait sits in the inverted cradle pocket. Identity starts on the
- * canvas below the cover, to the right of the portrait — not on the photo.
+ * The canvas steps with a G1 inverted cradle around the portrait. Identity
+ * starts at the white plateau's leading edge, beside the pocket.
  */
 export function ProfileHero({
   profile,
@@ -186,6 +186,7 @@ export function ProfileHero({
           style={[
             styles.body,
             {
+              marginTop: -geometry.plateauDepth,
               paddingHorizontal: spacing[4],
               paddingTop: geometry.identityPlateauGap,
               paddingBottom: spacing[2],

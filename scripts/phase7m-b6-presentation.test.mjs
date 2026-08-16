@@ -161,8 +161,13 @@ assert.match(read('src/features/profile/components/ProfileCover.tsx'), /raisedSi
 assert.match(read('src/features/profile/components/ProfileCover.tsx'), /marginTop: -insets\.top/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /coverHeadroomCompact: 140/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /avatarLeft/)
+assert.match(read('src/features/profile/components/ProfileHero.tsx'), /plateauDepth/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarFit: 0\.95/)
-assert.match(read('src/features/profile/model/profile-layout.ts'), /coverHeadroomCompact: 140/)
+assert.doesNotMatch(read('src/features/profile/model/profile-layout.ts'), /avatarDrop/)
+assert.doesNotMatch(
+  read('src/features/profile/model/profile-layout.ts'),
+  /identityColumnPad: PROFILE_LAYOUT\.cradleGap \+ plateauRadius \+ 12/,
+)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /metricColumnTop/)
 assert.match(read('src/features/profile/components/ProfileMetricPicker.tsx'), /styles.rail/)
 const morph = read('src/features/profile/components/ProfileHeaderTitle.tsx')

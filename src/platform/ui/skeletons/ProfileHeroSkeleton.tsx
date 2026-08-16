@@ -33,7 +33,7 @@ export function ProfileHeroSkeleton() {
         style={[
           styles.body,
           {
-            marginTop: 0,
+            marginTop: -geometry.plateauDepth,
             paddingHorizontal: spacing[4],
             paddingTop: geometry.identityPlateauGap,
           },

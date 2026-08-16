@@ -26,8 +26,6 @@ export const PROFILE_LAYOUT = {
   avatarBorder: 3,
   /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
   avatarFit: 0.95,
-  /** Drop the portrait into the white cradle without growing the overlay. */
-  avatarDrop: 22,
   /** Cover showing around the portrait inside the inverted cradle. */
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
@@ -38,8 +36,8 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
-  /** Plateau edge to the identity cap height — on the canvas, not the photo. */
-  identityPlateauGap: 20,
+  /** Name sits just onto the white plateau so glyphs don’t spill into the photo. */
+  identityPlateauGap: 8,
   identityAfterAvatar: 12,
   coverTopBlur: 28,
   coverBottomBlur: 36,
@@ -181,10 +179,13 @@ export function profileGeometry(
   const cradleRadius = profileCradleRadius(compact, showFocusHalo, contentWidth)
   const plateauRadius = PROFILE_LAYOUT.plateauRadius
   const plateauDepth = Math.round(cradleRadius + plateauRadius)
-  const avatarDrop = PROFILE_LAYOUT.avatarDrop
-  const shelfDepth = PROFILE_LAYOUT.cradleGap - avatarDrop
   const avatarCenterX = avatarLead + pocketSlot / 2
   const gutterWidth = avatarLead + pocketSlot
+  // Seat the smaller portrait on the cradle centre so it sits in the pocket
+  // without moving the inverted radius.
+  const shelfDepth = cradleRadius - slotSize / 2
+  // Flat white plateau starts after the concave bite + convex landing.
+  const identityColumnPad = PROFILE_LAYOUT.cradleGap + plateauRadius
 
   const identityColumnWidth = contentWidth - horizontalInset - gutterWidth
   const stackedFallback =
@@ -210,12 +211,12 @@ export function profileGeometry(
     gutterWidth,
     identityPaddingTop: PROFILE_LAYOUT.identityAfterAvatar,
     identityPlateauGap: PROFILE_LAYOUT.identityPlateauGap,
-    identityColumnPad: PROFILE_LAYOUT.cradleGap + plateauRadius + 12,
+    identityColumnPad,
     metricViewportHeight: profileMetricWindowHeight(),
-    metricColumnTop: Math.max(0, -shelfDepth) + PROFILE_LAYOUT.metricColumnGap,
+    metricColumnTop: slotSize / 2 + PROFILE_LAYOUT.metricColumnGap,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
     avatarCenterX,
-    avatarCenterY: plateauRadius + avatarDrop,
+    avatarCenterY: plateauRadius,
     cradleRadius,
     plateauRadius,
     invertedCornerRadius: inverted.md,
