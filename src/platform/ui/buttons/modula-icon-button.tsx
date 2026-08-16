@@ -33,9 +33,10 @@ export function ModulaIconButton({
   style,
   testID,
   colour,
-  size = 22,
+  size = chrome === 'glass' ? 24 : 22,
 }: ModulaIconButtonProps) {
   const {colours} = useThemeTokens()
+  const hitStyle = chrome === 'glass' ? styles.glassTarget : styles.target
 
   if (chrome === 'plain' || chrome === 'bordered') {
     return (
@@ -46,7 +47,7 @@ export function ModulaIconButton({
         accessibilityState={{disabled: !!disabled}}
         disabled={disabled}
         onPress={onPress}
-        style={[styles.target, style]}>
+        style={[hitStyle, style]}>
         <AppIcon
           name={icon}
           size={size}
@@ -64,9 +65,9 @@ export function ModulaIconButton({
       accessibilityState={{disabled: !!disabled}}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.target, style]}>
+      style={[hitStyle, style]}>
       <LiquidGlassChrome interactive fallback="clear" style={styles.glass}>
-        <AppIcon name={icon} size={22} colour={colour ?? colours.text} />
+        <AppIcon name={icon} size={24} colour={colour ?? colours.text} />
       </LiquidGlassChrome>
     </AppPressable>
   )
@@ -75,10 +76,16 @@ export function ModulaIconButton({
 const styles = StyleSheet.create({
   glass: {
     alignItems: 'center',
-    borderRadius: 22,
-    height: 44,
+    borderRadius: 26,
+    height: 52,
     justifyContent: 'center',
-    width: 44,
+    width: 52,
+  },
+  glassTarget: {
+    alignItems: 'center',
+    height: 52,
+    justifyContent: 'center',
+    minWidth: 52,
   },
   target: {
     alignItems: 'center',

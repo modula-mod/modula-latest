@@ -20,9 +20,8 @@ import {
 } from '@/features/profile/contracts/profile'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -123,28 +122,31 @@ export function CustomizeProfileScreen() {
         title="Customize"
         onBack={leave}
         right={
-          <View style={styles.headerTrail}>
-            <ModulaIconButton
-              icon="check"
-              chrome="glass"
-              accessibilityLabel="Save profile presentation"
-              onPress={save}
-            />
-            <ChromeOverflowMenu
-              accessibilityLabel="Customize profile actions"
-              title="Customize"
-              actions={[
-                {id: 'save', label: 'Save', icon: 'check'},
-                {id: 'preview', label: 'Preview profile', icon: 'profile'},
-                {id: 'reset', label: 'Reset', icon: 'reset', style: 'destructive'},
-              ]}
-              onAction={id => {
-                if (id === 'save') save()
-                if (id === 'preview') preview()
-                if (id === 'reset') reset()
-              }}
-            />
-          </View>
+          <ChromeGlassControlGroup
+            items={[
+              {
+                kind: 'button',
+                icon: 'check',
+                accessibilityLabel: 'Save profile presentation',
+                onPress: save,
+              },
+              {
+                kind: 'menu',
+                accessibilityLabel: 'Customize profile actions',
+                title: 'Customize',
+                actions: [
+                  {id: 'save', label: 'Save', icon: 'check'},
+                  {id: 'preview', label: 'Preview profile', icon: 'profile'},
+                  {id: 'reset', label: 'Reset', icon: 'reset', style: 'destructive'},
+                ],
+                onAction: id => {
+                  if (id === 'save') save()
+                  if (id === 'preview') preview()
+                  if (id === 'reset') reset()
+                },
+              },
+            ]}
+          />
         }
       />
       <ResponsiveContent maxWidth={820}>
@@ -362,11 +364,6 @@ function Section({title, children}: {title: string; children: React.ReactNode}) 
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
-  },
-  headerTrail: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
   },
   screen: {
     flex: 1,

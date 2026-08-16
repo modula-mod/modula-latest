@@ -68,15 +68,16 @@ function RootNavigator() {
         <Stack.Screen name="share" options={{presentation: 'modal'}} />
         <Stack.Screen name="report" options={{presentation: 'modal'}} />
         <Stack.Screen name="reactions" options={{presentation: 'modal'}} />
+        <Stack.Screen name="board" />
         <Stack.Screen name="settings" />
       </Stack>
       {/* Live nav chrome: left NavigationDrawer (avatar → openDrawer).
           AdaptiveAccountPanel remains in codebase for sheet Preview / verify,
           but is not mounted — nothing called openAccountPanel after the drawer restore. */}
       <NavigationDrawer />
-      {/* Shell edge wash from physical bottom: 0 (not tab-bar geometry). */}
+      {/* iOS NativeTabs owns the home-indicator edge. Web still fades the rail. */}
       <ShellBottomProgressiveBlur />
-      {/* Floating tab bar at root so secondary stacks keep bottom chrome. */}
+      {/* NativeTabs live in (tabs). This mount is a no-op on iOS. */}
       <PersistentShellTabBar />
       <ModulaSplashOverlay />
     </>

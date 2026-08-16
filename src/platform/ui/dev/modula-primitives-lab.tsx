@@ -19,11 +19,10 @@ import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -123,24 +122,29 @@ export function ModulaPrimitivesLabScreen() {
 
       <LabBlock title="Toolbar chrome">
         <AppText variant="caption" colour="textSecondary">
-          Global back is ModulaBackButton. Overlay glass is a 44pt App Store circle.
-          Capsule glyphs stay plain. Activity uses a three-icon control group.
+          Global back is ModulaBackButton. Overlay glass is extraLarge (Expo UI).
+          Trailing share + overflow is a ControlGroup.
         </AppText>
         <View style={styles.row}>
           <ModulaBackButton onPress={() => undefined} />
-          <ChromeCircleButton
-            icon="share"
-            accessibilityLabel="Share"
-            onPress={() => undefined}
-          />
-          <ModulaControlGroup
-            label="Actions"
-            actions={[
-              {id: 'add', label: 'Add', icon: 'create'},
-              {id: 'save', label: 'Save', icon: 'bookmark'},
-              {id: 'share', label: 'Share', icon: 'share'},
+          <ChromeGlassControlGroup
+            items={[
+              {
+                kind: 'button',
+                icon: 'share',
+                accessibilityLabel: 'Share',
+                onPress: () => undefined,
+              },
+              {
+                kind: 'menu',
+                accessibilityLabel: 'More actions',
+                actions: [
+                  {id: 'add', label: 'Add', icon: 'create'},
+                  {id: 'save', label: 'Save', icon: 'bookmark'},
+                ],
+                onAction: () => undefined,
+              },
             ]}
-            onAction={() => undefined}
           />
         </View>
       </LabBlock>

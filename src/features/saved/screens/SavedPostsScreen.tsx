@@ -7,7 +7,6 @@ import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {useSavedPostsQuery} from '@/features/saved/data'
 import {SocialPost} from '@/features/social/components/social-post'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -29,22 +28,20 @@ export function SavedPostsScreen() {
           message: 'Posts I saved on Modula.',
         })
       }
-      right={
-        <ChromeOverflowMenu
-          accessibilityLabel="Saved actions"
-          title="Saved"
-          actions={[
-            {id: 'discover', label: 'Discover', icon: 'discover'},
-            {id: 'home', label: 'Home', icon: 'home'},
-            {id: 'collections', label: 'Collections — Preview', icon: 'bookmark'},
-          ]}
-          onAction={id => {
-            if (id === 'discover') router.push('/discover' as Href)
-            if (id === 'home') router.push('/' as Href)
-            if (id === 'collections') router.push('/collections' as Href)
-          }}
-        />
-      }
+      overflow={{
+        accessibilityLabel: 'Saved actions',
+        title: 'Saved',
+        actions: [
+          {id: 'discover', label: 'Discover', icon: 'discover'},
+          {id: 'home', label: 'Home', icon: 'home'},
+          {id: 'collections', label: 'Collections — Preview', icon: 'bookmark'},
+        ],
+        onAction: id => {
+          if (id === 'discover') router.push('/discover' as Href)
+          if (id === 'home') router.push('/' as Href)
+          if (id === 'collections') router.push('/collections' as Href)
+        },
+      }}
     />
   )
 

@@ -4,7 +4,7 @@ import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
-import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {OVERLAY_GLASS_HIT, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
@@ -32,9 +32,10 @@ export function ChromeIconMenu({
   chrome = 'glass',
 }: ChromeIconMenuProps) {
   const symbol = systemImage ?? sfSymbolForIcon(icon)
+  const hit = chrome === 'glass' ? OVERLAY_GLASS_HIT : TOOLBAR_HIT
 
   return (
-    <Host matchContents style={{minHeight: TOOLBAR_HIT, minWidth: TOOLBAR_HIT}}>
+    <Host matchContents style={{minHeight: hit, minWidth: hit}}>
       <Menu
         label={accessibilityLabel}
         systemImage={symbol as never}

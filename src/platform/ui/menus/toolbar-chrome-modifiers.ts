@@ -1,15 +1,13 @@
-import {
-  buttonBorderShape,
-  buttonStyle,
-  controlSize,
-  labelStyle,
-} from '@expo/ui/swift-ui/modifiers'
+import {buttonBorderShape, buttonStyle, controlSize, labelStyle} from '@expo/ui/swift-ui/modifiers'
 
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 
 /**
  * Shared SwiftUI modifiers for toolbar icons.
- * Overlay glass is large (App Store 44pt circle). Capsule glyphs are regular.
+ *
+ * Overlay glass uses extraLarge (Expo UI glass circle example) so back / share
+ * read as App Store controls. Glyphs inside a ControlGroup or header capsule
+ * stay plain — the group/capsule is the glass, not a second disc.
  */
 export function toolbarIconModifiers(
   chrome: ToolbarChrome,
@@ -23,6 +21,11 @@ export function toolbarIconModifiers(
     buttonStyle(styleName),
     labelStyle('iconOnly'),
     buttonBorderShape('circle'),
-    controlSize('large'),
+    controlSize('extraLarge'),
   ]
+}
+
+/** Plain glyphs inside a SwiftUI ControlGroup (the group is the glass). */
+export function toolbarGroupItemModifiers() {
+  return [buttonStyle('plain'), labelStyle('iconOnly'), controlSize('extraLarge')]
 }

@@ -57,6 +57,7 @@ export function PlatformTabs() {
           options={{
             title: tab.label,
             tabBarAccessibilityLabel: tab.label,
+            href: tab.id === 'create' ? null : undefined,
           }}
         />
       ))}
@@ -93,7 +94,9 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
   const visibleTabNames = new Set(
     resolveVisibleModulaTabs(preferences.tabBarIds, {
       alwaysIncludeRouteName: selectedRouteName,
-    }).map(tab => tab.routeName),
+    })
+      .filter(tab => tab.id !== 'create')
+      .map(tab => tab.routeName),
   )
 
   const visibleRoutes = state.routes.filter(route => visibleTabNames.has(route.name))

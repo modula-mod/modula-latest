@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import {Platform, StyleSheet} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
 import {useSegments} from 'expo-router'
 import Animated from 'react-native-reanimated'
@@ -24,6 +24,9 @@ export function ShellBottomProgressiveBlur() {
   const obscureStyle = useShellChromeObscureStyle('down')
   const {scheme} = useThemeTokens()
 
+  if (Platform.OS === 'ios') {
+    return null
+  }
   if (shouldHideShellTabBar(segments)) {
     return null
   }

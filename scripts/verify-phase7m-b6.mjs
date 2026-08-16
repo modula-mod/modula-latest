@@ -138,6 +138,16 @@ assertContains('src/platform/ui/buttons/sf-symbol-for-icon.ts', "check: 'checkma
 assertAbsent('src/features/activity/screens/ActivityScreen.tsx', 'titleRow', 'NO ACTIVITY ICON ROW')
 assertContains('src/features/activity/screens/ActivityScreen.tsx', 'unstable_headerRightItems', 'ACTIVITY HEADER ITEMS')
 assertAbsent('src/features/profile/screens/CustomizeProfileScreen.tsx', 'saveHit', 'NO CUSTOMIZE TEXT SAVE')
+assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'NativeTabs', 'NATIVE TABS')
+assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'minimizeBehavior', 'TAB MINIMIZE')
+assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'NavigationThemeProvider', 'TAB THEME PROVIDER')
+assertAbsent('src/platform/ui/navigation/platform-tabs.native.tsx', 'disableTransparentOnScrollEdge=', 'TAB BAR TRANSPARENT')
+assertAbsent('src/platform/ui/navigation/platform-tabs.native.tsx', 'name="board"', 'NO HIDDEN BOARD TAB')
+assertContains('src/app/board/index.tsx', 'BoardScreen', 'BOARD ROOT STACK')
+assertContains('src/platform/ui/navigation/persistent-shell-tab-bar.tsx', 'return null', 'NO FLOATING PILL')
+assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', "controlSize('extraLarge')", 'OVERLAY EXTRA LARGE')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', "shape: 'capsule'", 'CONTROL GROUP GLASS')
+assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'ChromeGlassControlGroup', 'MODULE DETAIL CONTROL GROUP')
 
 if (failures.length) {
   console.log(`\nFAILED ${failures.length}`)

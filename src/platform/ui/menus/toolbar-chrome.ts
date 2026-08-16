@@ -4,10 +4,12 @@
  * - `glass` — circular overlay on artwork / SecondaryScreenHeader.
  * Never put glass discs inside a header capsule.
  *
- * Overlay glass uses the large control so back / share read as 44pt
- * App Store circles. Capsule glyphs stay regular.
+ * Overlay glass uses extraLarge (Expo UI glass circle). Capsule glyphs stay regular.
  */
 export type ToolbarChrome = 'glass' | 'plain'
 
-/** Toolbar hit target — back, share, overflow, compact CTAs. */
+/** Minimum hit for capsule glyphs and compact CTAs. */
 export const TOOLBAR_HIT = 44
+
+/** Overlay extraLarge glass circle / ControlGroup host. */
+export const OVERLAY_GLASS_HIT = 52
