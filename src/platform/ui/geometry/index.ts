@@ -3,6 +3,7 @@ export {
   buildAvatarCradlePath,
   buildAvatarCradleRisePath,
   buildCoverCanvasLipPath,
+  buildCoverShelfStepPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
   type InvertedBiteRadii,

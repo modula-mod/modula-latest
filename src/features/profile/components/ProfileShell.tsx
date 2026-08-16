@@ -33,7 +33,7 @@ import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
 import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
-import {profileGeometry} from '@/features/profile/model/profile-layout'
+import {profileGeometry, PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
@@ -164,6 +164,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const headerHeight = useSharedValue(0)
   const stickyFlag = useSharedValue(0)
   const insetTop = insets.top
+  const stickyPad = insetTop + PROFILE_LAYOUT.stickyChromeClearance
   const [tabPad, setTabPad] = useState(0)
   const applyTabPad = useCallback((next: number) => {
     setTabPad(current => (current === next ? current : next))
@@ -174,7 +175,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       scrollY.value = y
       const hero = headerHeight.value
       const next =
-        insetTop > 0 && (hero <= 0 || y >= hero - insetTop) ? insetTop : 0
+        stickyPad > 0 && (hero <= 0 || y >= hero - stickyPad) ? stickyPad : 0
       const flag = next > 0 ? 1 : 0
       if (flag !== stickyFlag.value) {
         stickyFlag.value = flag
@@ -316,7 +317,9 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
 
   const main = (
     <Animated.ScrollView
+      automaticallyAdjustContentInsets={false}
       contentInsetAdjustmentBehavior="never"
+      contentInset={{bottom: 0, left: 0, right: 0, top: 0}}
       scrollEventThrottle={16}
       onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
@@ -331,12 +334,12 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
           headerHeight.value = event.nativeEvent.layout.height
         }}>
         {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
-        {presentation.layoutId === 'creator' && !isExpanded ? (
+        {presentation.layoutId === 'creator' && isExpanded ? (
           <FeaturedBand title="Featured links">{featuredLinks.map(link => (
             <ProfileLinkCard key={link.id} link={link} />
           ))}</FeaturedBand>
         ) : null}
-        {presentation.layoutId === 'professional' && !isExpanded ? (
+        {presentation.layoutId === 'professional' && isExpanded ? (
           <FeaturedBand title="Featured modules">{featuredModules.map(module => (
             <ProfileModuleCard key={module.id} module={module} />
           ))}</FeaturedBand>
@@ -360,7 +363,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         testID="profile-sticky-tabs"
         style={[
           styles.stickyTabs,
-          {backgroundColor: colours.canvas, paddingTop: tabPad},
+          {backgroundColor: colours.canvas, paddingTop: tabPad || spacing[3]},
         ]}>
         <ProfileTabBar
           tabs={visibleTabs}
@@ -381,14 +384,14 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ProfileCoverChrome
-        showBack={mode !== 'owner'}
+        showBack
         owner={viewer.canEdit}
         title={
           <ProfileHeaderTitle
             profile={profile}
             scrollY={scrollY}
             heroHeight={headerHeight}
-            insetTop={insets.top}
+            insetTop={stickyPad}
             fallbackHeight={heroGeometry.coverBody + 120}
           />
         }

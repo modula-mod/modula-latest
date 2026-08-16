@@ -79,7 +79,8 @@ export function PlatformTabs() {
               name={tab.routeName}
               accessibilityLabel={tab.label}
               hidden={hidden}
-              disableAutomaticContentInsets={tab.id === 'profile'}>
+              disableAutomaticContentInsets={tab.id === 'profile'}
+              contentStyle={tab.id === 'profile' ? {paddingTop: 0} : undefined}>
               <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
               <NativeTabs.Trigger.Icon
                 sf={{

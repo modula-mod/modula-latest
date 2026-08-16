@@ -5,6 +5,7 @@ import Svg, {Path} from 'react-native-svg'
 import {
   buildAvatarCradleRisePath,
   buildCoverCanvasLipPath,
+  buildCoverShelfStepPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
   type InvertedSurfacePathOptions,
@@ -29,10 +30,15 @@ type InvertedSurfaceTransitionProps = {
   trayWidth?: number
   trayHeight?: number
   cornerRadius?: number
+  /** Depth of the leading shelf below the raised plateau. */
+  stepRise?: number
+  /** Horizontal position of the riser between shelf and plateau. */
+  stepX?: number
+  /** Fillet radius shared by both riser corners. */
+  stepRadius?: number
   avatarCenterX?: number
   avatarCenterY?: number
   cradleRadius?: number
-  /** Convex radius where the cradle rise meets the raised plateau. */
   plateauRadius?: number
   style?: StyleProp<ViewStyle>
 }
@@ -52,6 +58,9 @@ export function InvertedSurfaceTransition({
   trayWidth,
   trayHeight,
   cornerRadius,
+  stepRise,
+  stepX,
+  stepRadius,
   avatarCenterX,
   avatarCenterY,
   cradleRadius,
@@ -66,15 +75,19 @@ export function InvertedSurfaceTransition({
       trayWidth,
       trayHeight,
       biteRadii: [Math.min(12, bite), bite, Math.min(12, bite)],
+      stepRise,
+      stepX,
+      stepRadius,
       avatarCenterX,
       avatarCenterY,
       cradleRadius,
       plateauRadius,
     }
-    if (avatarCenterX != null && cradleRadius != null) {
-      if (avatarSlot === 'leading' && raisedSide === 'trailing') {
-        return buildAvatarCradleRisePath(width, height, options)
-      }
+    if (avatarCenterX != null && cradleRadius != null && avatarSlot === 'leading' && raisedSide === 'trailing') {
+      return buildAvatarCradleRisePath(width, height, options)
+    }
+    if (stepX != null && avatarSlot === 'leading' && raisedSide === 'trailing') {
+      return buildCoverShelfStepPath(width, height, options)
     }
     if (edge === 'top' && side === 'leading') {
       return buildCoverCanvasLipPath(width, height, options)
@@ -92,6 +105,9 @@ export function InvertedSurfaceTransition({
     raisedSide,
     side,
     size,
+    stepRadius,
+    stepRise,
+    stepX,
     trayHeight,
     trayWidth,
     width,

@@ -1,27 +1,39 @@
 import {StyleSheet, View} from 'react-native'
 
 import {SkeletonBlock, SkeletonRow} from '@/platform/ui/skeletons/SkeletonBlock'
-import {profileGeometry, PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
+import {profileCoverBody, profileGeometry} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Mirrors the loaded hero: avatar in the cradle, identity on the plateau. */
+/** Mirrors the loaded hero: portrait on the shelf, identity on the plateau. */
 export function ProfileHeroSkeleton() {
   const {spacing} = useThemeTokens()
   const geometry = profileGeometry(true, false, spacing[4])
   const avatar = geometry.avatarSize
+  const cover = profileCoverBody(true)
 
   return (
     <View>
-      <SkeletonBlock
-        height={PROFILE_LAYOUT.coverBodyCompact}
-        width="100%"
-        borderRadius={0}
-      />
+      <View style={styles.cover}>
+        <SkeletonBlock height={cover} width="100%" borderRadius={0} />
+        <View
+          pointerEvents="none"
+          style={[
+            styles.avatar,
+            {
+              height: avatar,
+              width: avatar,
+              left: geometry.avatarLead,
+              bottom: geometry.shelfDepth,
+            },
+          ]}>
+          <SkeletonBlock height={avatar} width={avatar} borderRadius={avatar / 2} />
+        </View>
+      </View>
       <View
         style={[
           styles.body,
           {
-            marginTop: -geometry.raisedBodyHeight,
+            marginTop: -geometry.plateauDepth,
             paddingHorizontal: spacing[4],
           },
         ]}>
@@ -29,13 +41,25 @@ export function ProfileHeroSkeleton() {
           <View
             style={[
               styles.metrics,
-              {gap: spacing[2], paddingTop: geometry.metricColumnTop, width: geometry.identityColumnOffset},
+              {
+                gap: spacing[2],
+                paddingTop: geometry.metricColumnTop,
+                width: geometry.metricColumnWidth,
+              },
             ]}>
             <SkeletonBlock height={22} width={56} />
             <SkeletonBlock height={22} width={72} />
             <SkeletonBlock height={22} width={64} />
           </View>
-          <View style={[styles.identity, {gap: spacing[2], paddingTop: geometry.plateauRadius}]}>
+          <View
+            style={[
+              styles.identity,
+              {
+                gap: spacing[2],
+                paddingLeft: geometry.identityColumnPad,
+                paddingTop: geometry.identityPlateauGap,
+              },
+            ]}>
             <SkeletonBlock height={24} width="52%" />
             <SkeletonBlock height={14} width="70%" />
             <SkeletonBlock height={14} width="94%" />
@@ -47,19 +71,6 @@ export function ProfileHeroSkeleton() {
           </View>
         </View>
       </View>
-      <View
-        pointerEvents="none"
-        style={[
-          styles.avatar,
-          {
-            height: avatar,
-            width: avatar,
-            left: geometry.heroHorizontalInset,
-            top: PROFILE_LAYOUT.coverBodyCompact - geometry.avatarLift,
-          },
-        ]}>
-        <SkeletonBlock height={avatar} width={avatar} borderRadius={avatar / 2} />
-      </View>
     </View>
   )
 }
@@ -70,6 +81,9 @@ const styles = StyleSheet.create({
   },
   body: {
     width: '100%',
+  },
+  cover: {
+    position: 'relative',
   },
   identity: {
     flex: 1,

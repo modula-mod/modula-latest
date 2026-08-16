@@ -34,6 +34,12 @@ export type InvertedSurfacePathOptions = {
   cradleRadius?: number
   /** Convex radius where the cradle rise meets the raised plateau. */
   plateauRadius?: number
+  /** Depth of the shelf below the raised plateau. */
+  stepRise?: number
+  /** Horizontal position of the riser between shelf and plateau. */
+  stepX?: number
+  /** Fillet radius used on both corners of the riser. */
+  stepRadius?: number
 }
 
 export const PROFILE_COVER_INVERTED_DEFAULTS = {
@@ -95,20 +101,82 @@ export function buildCoverCanvasLipPath(
 }
 
 /**
- * Cover → canvas transition with an inverted corner cradling the avatar.
+ * Cover → canvas transition: a leading shelf that steps up to a raised plateau.
  *
- * The silhouette is tangent-continuous, built from straight runs joined by
- * quarter arcs — the construction an inverted-corner generator emits, not a
- * hand-tuned bezier:
+ * This is the silhouette an inverted-corner generator emits — straight runs
+ * joined by quarter arcs, so every join is tangent-continuous:
  *
- *   1. flat leading edge, tangent to the bottom of the cradle circle
- *   2. concave quarter arc (sweep 0) concentric with the avatar
- *   3. vertical rise, tangent to the trailing side of the cradle circle
- *   4. convex quarter arc (sweep 1) onto the raised plateau
- *   5. flat plateau carrying identity
+ *   1. convex quarter arc taking the canvas from the cover edge up to the shelf
+ *   2. flat shelf, which the portrait straddles
+ *   3. concave quarter arc (sweep 0) — the inverted corner
+ *   4. vertical riser
+ *   5. convex quarter arc (sweep 1) onto the plateau
+ *   6. flat plateau carrying identity
  *
- * Because steps 2 and 3 are exactly `cradleRadius` from the avatar centre,
- * the cover gap around the portrait is constant instead of pinched.
+ * The portrait is not cut out of the cover. It sits on the shelf and overlaps
+ * it, so the gap around it is the Focus Halo rather than a hole in the artwork
+ * that pinches whenever the avatar or the halo changes size.
+ */
+export function buildCoverShelfStepPath(
+  width: number,
+  height: number,
+  options?: InvertedSurfacePathOptions,
+): string {
+  const w = clampNonNegative(width)
+  const h = clampNonNegative(height)
+  if (w <= 0 || h <= 0) return ''
+
+  // Shelf depth below the plateau. The band is `rise + lead` tall: the plateau
+  // at y=0, the shelf at y=rise, the cover edge at y=h.
+  const rise = Math.min(clampNonNegative(options?.stepRise ?? inverted.lg), h)
+  const shelfY = rise
+  const lead = Math.min(
+    clampNonNegative(options?.cornerRadius ?? inverted.md),
+    Math.max(0, h - shelfY),
+    w / 2,
+  )
+  const stepX = Math.min(
+    Math.max(lead, clampNonNegative(options?.stepX ?? w / 2)),
+    w,
+  )
+  // Both riser corners share a radius so the step reads as one move. It cannot
+  // exceed half the rise (the riser would invert) or the runs either side.
+  const fillet = Math.min(
+    clampNonNegative(options?.stepRadius ?? inverted.md),
+    rise / 2,
+    Math.max(0, stepX - lead),
+    Math.max(0, w - stepX),
+  )
+
+  const leadIn = lead > 0 ? M(0, shelfY + lead) + A(lead, lead, shelfY) : M(0, shelfY)
+  const tail = H(w) + V(h) + H(0) + 'Z'
+
+  if (rise <= 0 || fillet <= 0) {
+    return leadIn + H(stepX) + V(0) + tail
+  }
+
+  return (
+    leadIn +
+    H(stepX - fillet) +
+    A(fillet, stepX, shelfY - fillet, 0) +
+    V(fillet) +
+    A(fillet, stepX + fillet, 0) +
+    tail
+  )
+}
+
+/**
+ * Cover → canvas transition that cradles the avatar with inverted corners.
+ *
+ * Straight runs joined by quarter arcs (G1) — the construction an inverted
+ * corner generator emits around a circle, not a 90° step:
+ *
+ *   1. flat leading shelf, tangent to the bottom of the cradle
+ *   2. concave quarter (sweep 0) concentric with the avatar
+ *   3. convex quarter (sweep 1) onto the raised plateau
+ *   4. flat plateau carrying the display name
+ *
+ * The plateau sits at the avatar centre so the name reads beside the portrait.
  */
 export function buildAvatarCradleRisePath(
   width: number,
@@ -122,7 +190,7 @@ export function buildAvatarCradleRisePath(
   const r = Math.min(
     clampNonNegative(options?.cradleRadius ?? inverted.profile),
     h,
-    w * 0.42,
+    w * 0.5,
   )
   const cx = Math.min(
     Math.max(
@@ -135,13 +203,12 @@ export function buildAvatarCradleRisePath(
     ),
     Math.max(0, w - r),
   )
-  // Bottom of the cradle circle rests on the leading edge of the canvas.
   const cy = clampNonNegative(options?.avatarCenterY ?? h - r)
   const baseY = Math.min(h, cy + r)
   const riseX = Math.min(w, cx + r)
   const plateauY = 0
   const plateau = Math.min(
-    clampNonNegative(options?.plateauRadius ?? inverted.sm),
+    clampNonNegative(options?.plateauRadius ?? inverted.md),
     Math.max(0, w - riseX),
     Math.max(0, cy - plateauY),
   )
@@ -222,8 +289,11 @@ export function buildTopLeadingInvertedPath(
   height: number,
   options?: InvertedSurfacePathOptions,
 ): string {
-  if (options?.avatarCenterX != null || options?.cradleRadius != null) {
+  if (options?.avatarCenterX != null && options?.cradleRadius != null) {
     return buildAvatarCradleRisePath(width, height, options)
+  }
+  if (options?.stepX != null || options?.stepRise != null) {
+    return buildCoverShelfStepPath(width, height, options)
   }
   return buildCoverCanvasLipPath(width, height, options)
 }

@@ -46,7 +46,7 @@ export function ProfileHeaderTitle({
     const hero = heroHeight?.value || fallbackHeight
     // Settles just before the tabs stick, so the two never cross-fade at once.
     const to = Math.max(1, hero - insetTop - CAPSULE_HEIGHT - 24)
-    const from = Math.max(0, to - 56)
+    const from = Math.max(0, to - 88)
     const progress = interpolate(scrollY?.value ?? 0, [from, to], [0, 1], 'clamp')
     return {
       opacity: progress,

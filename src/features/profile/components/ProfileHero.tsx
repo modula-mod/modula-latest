@@ -41,8 +41,10 @@ type ProfileHeroProps = {
 /**
  * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
  * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
- * Avatar occupies the leading inverted valley; identity sits on the raised
- * trailing plateau; metrics and metadata share a compact lower row.
+ *
+ * The canvas steps: a leading shelf the portrait straddles, then an inverted
+ * corner up to the trailing plateau. Identity sits on that plateau; metrics
+ * sit in the gutter under the portrait.
  */
 export function ProfileHero({
   profile,
@@ -58,7 +60,8 @@ export function ProfileHero({
   const {width, fontScale} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
-  const isCompact = compact ?? width < 760
+  // Phones stay on the compact scale even when the layout id is not `minimal`.
+  const isCompact = compact || width < 760
   const geometry = profileGeometry(isCompact, presentation.showFocusHalo, spacing[4], {
     contentWidth: width,
     fontScale,
@@ -71,7 +74,9 @@ export function ProfileHero({
   const [coverDraft, setCoverDraft] = useState<ProfileCoverDraft | null>(null)
   const [avatarDraft, setAvatarDraft] = useState<ProfileAvatarDraft | null>(null)
 
-  const identity = <ProfileIdentity profile={profile} viewer={viewer} compact />
+  const identity = (
+    <ProfileIdentity profile={profile} viewer={viewer} compact emphasis="hero" />
+  )
   const info = (
     <View style={[styles.infoColumn, {gap: spacing[2]}]}>
       <ProfileBio profile={profile} compact />
@@ -95,65 +100,71 @@ export function ProfileHero({
     />
   ) : null
 
+  const avatar = (
+    <ProfileAvatar
+      profile={profile}
+      size={geometry.avatarSize}
+      showFocusHalo={presentation.showFocusHalo}
+      canEdit={canEdit}
+      onEditPress={() => setAvatarEditorOpen(true)}
+      previewUri={avatarDraft ? avatarDraft.uri : undefined}
+      onPhotoUri={uri => {
+        setAvatarDraft({uri, sourceUri: uri})
+        const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+        if (avatarUri === undefined) return
+        void updateProfile.mutateAsync({avatarUri})
+      }}
+      onPhotoRemove={() => {
+        setAvatarDraft({uri: null, sourceUri: null})
+        if (!profile.avatarUri) return
+        void updateProfile.mutateAsync({avatarUri: null})
+      }}
+    />
+  )
+
   return (
     <View style={[styles.wrap, {backgroundColor: colours.canvas}]}>
-      <ProfileCover
-        profile={profile}
-        compact={isCompact}
-        canEdit={canEdit}
-        slotSize={geometry.slotSize}
-        contentInset={geometry.heroHorizontalInset}
-        raisedBodyHeight={geometry.raisedBodyHeight}
-        avatarCenterX={geometry.avatarCenterX}
-        avatarCenterY={geometry.avatarCenterY}
-        cradleRadius={geometry.cradleRadius}
-        plateauRadius={geometry.plateauRadius}
-        onEditPress={() => setCoverEditorOpen(true)}
-        previewUri={coverDraft ? coverDraft.uri : undefined}
-        previewKind={coverDraft?.kind}
-        scrollY={scrollY}
-        onPhotoUri={uri => {
-          setCoverDraft({uri, kind: 'photo'})
-          const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
-          if (coverUri === undefined) return
-          void updateProfile.mutateAsync({coverUri})
-        }}
-        onPhotoRemove={() => {
-          setCoverDraft({uri: null, kind: 'none'})
-          if (!profile.coverUri) return
-          void updateProfile.mutateAsync({coverUri: null})
-        }}
-      />
-      <View
-        pointerEvents="box-none"
-        style={[
-          styles.avatarSlot,
-          {
-            left: geometry.heroHorizontalInset,
-            top: geometry.coverBody - geometry.avatarLift,
-            height: geometry.slotSize,
-            width: geometry.slotSize,
-          },
-        ]}>
-        <ProfileAvatar
+      <View style={styles.coverBlock}>
+        <ProfileCover
           profile={profile}
-          size={geometry.avatarSize}
-          showFocusHalo={presentation.showFocusHalo}
+          compact={isCompact}
           canEdit={canEdit}
-          onEditPress={() => setAvatarEditorOpen(true)}
-          previewUri={avatarDraft ? avatarDraft.uri : undefined}
+          stepX={geometry.stepX}
+          stepRise={geometry.stepRise}
+          stepRadius={geometry.stepRadius}
+          avatarCenterX={geometry.avatarCenterX}
+          avatarCenterY={geometry.avatarCenterY}
+          cradleRadius={geometry.cradleRadius}
+          plateauRadius={geometry.plateauRadius}
+          onEditPress={() => setCoverEditorOpen(true)}
+          previewUri={coverDraft ? coverDraft.uri : undefined}
+          previewKind={coverDraft?.kind}
+          scrollY={scrollY}
           onPhotoUri={uri => {
-            setAvatarDraft({uri, sourceUri: uri})
-            const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
-            if (avatarUri === undefined) return
-            void updateProfile.mutateAsync({avatarUri})
+            setCoverDraft({uri, kind: 'photo'})
+            const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
+            if (coverUri === undefined) return
+            void updateProfile.mutateAsync({coverUri})
           }}
           onPhotoRemove={() => {
-            setAvatarDraft({uri: null, sourceUri: null})
-            if (!profile.avatarUri) return
-            void updateProfile.mutateAsync({avatarUri: null})
+            setCoverDraft({uri: null, kind: 'none'})
+            if (!profile.coverUri) return
+            void updateProfile.mutateAsync({coverUri: null})
           }}
         />
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.avatarSlot,
+            {
+              left: geometry.avatarLead,
+              bottom: geometry.shelfDepth,
+              height: geometry.slotSize,
+              width: geometry.slotSize,
+            },
+          ]}>
+          {avatar}
+        </View>
       </View>
       {stacked ? (
         <View
@@ -176,27 +187,33 @@ export function ProfileHero({
           style={[
             styles.body,
             {
-              marginTop: -geometry.raisedBodyHeight,
+              marginTop: -geometry.plateauDepth,
               paddingHorizontal: spacing[4],
               paddingBottom: spacing[2],
             },
           ]}>
-          {/* Identity rides the plateau and flows past the cover edge; the
-              metric column sits under the avatar in the leading gutter. */}
           <View pointerEvents="box-none" style={styles.plateauRow}>
             <View
               pointerEvents="box-none"
               style={[
                 styles.metricColumn,
                 {
-                  width: geometry.identityColumnOffset,
+                  width: geometry.metricColumnWidth,
                   paddingTop: geometry.metricColumnTop,
                 },
               ]}>
               {stats}
             </View>
-            <View style={[styles.identityColumn, {gap: spacing[2]}]}>
-              <View style={{paddingTop: geometry.plateauRadius}}>{identity}</View>
+            <View
+              style={[
+                styles.identityColumn,
+                {
+                  gap: spacing[2],
+                  paddingLeft: geometry.identityColumnPad,
+                  paddingTop: geometry.identityPlateauGap,
+                },
+              ]}>
+              {identity}
               {info}
             </View>
           </View>
@@ -272,12 +289,17 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 
 const styles = StyleSheet.create({
   avatarSlot: {
+    bottom: 0,
     position: 'absolute',
     zIndex: 3,
   },
   body: {
     minWidth: 0,
     zIndex: 2,
+  },
+  coverBlock: {
+    position: 'relative',
+    zIndex: 1,
   },
   identityColumn: {
     flex: 1,

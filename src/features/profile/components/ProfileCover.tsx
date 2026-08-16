@@ -18,6 +18,7 @@ import {
   PROFILE_LAYOUT,
   profileCoverBody,
   profileCoverHeight,
+  profilePlateauDepth,
 } from '@/features/profile/model/profile-layout'
 import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
 import {InvertedSurfaceTransition} from '@/platform/ui/geometry'
@@ -35,16 +36,17 @@ type ProfileCoverProps = {
   scrollY?: SharedValue<number>
   onPhotoUri?: (uri: string) => void
   onPhotoRemove?: () => void
-  slotSize?: number
-  contentInset?: number
-  raisedBodyHeight?: number
+  /** Riser between the leading shelf and the raised plateau. */
+  stepX?: number
+  stepRise?: number
+  stepRadius?: number
   avatarCenterX?: number
   avatarCenterY?: number
   cradleRadius?: number
   plateauRadius?: number
 }
 
-export const PROFILE_COVER_BODY = PROFILE_LAYOUT.coverBodyRegular
+export const PROFILE_COVER_BODY = profileCoverBody(false)
 const TOP_BLUR = PROFILE_LAYOUT.coverTopBlur
 const BOTTOM_BLUR = PROFILE_LAYOUT.coverBottomBlur
 
@@ -60,30 +62,33 @@ export function ProfileCover({
   scrollY,
   onPhotoUri,
   onPhotoRemove,
-  slotSize = PROFILE_LAYOUT.avatarCompact,
-  contentInset = 16,
-  raisedBodyHeight,
-  avatarCenterX: avatarCenterXProp,
-  avatarCenterY: avatarCenterYProp,
-  cradleRadius: cradleRadiusProp,
+  stepX,
+  stepRise,
+  stepRadius,
+  avatarCenterX,
+  avatarCenterY,
+  cradleRadius,
   plateauRadius = PROFILE_LAYOUT.plateauRadius,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
   const {colours} = useThemeTokens()
   const reduceMotion = useReduceMotion()
-  const height = profileCoverHeight(compact, insets.top)
+  // NativeTabs still content-insets the first ScrollView even with `never`.
+  // Pull the banner into that inset so the photograph sits under the status
+  // bar. Parallax lives on the inner artwork, not this node, so the image
+  // moves with the layout instead of drifting.
+  const height = profileCoverHeight(compact, insets.top, width)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
   const emptyFill = profile.coverColour ?? colours.borderStrong
   const hasPhoto = Boolean(uri) && kind !== 'none'
-  const cradleRadius = cradleRadiusProp ?? slotSize / 2 + PROFILE_LAYOUT.cradleGap
   const transitionHeight = Math.min(
-    raisedBodyHeight ?? cradleRadius + slotSize / 2 + PROFILE_LAYOUT.plateauLift,
-    profileCoverBody(compact),
+    cradleRadius != null
+      ? Math.round(cradleRadius + plateauRadius + PROFILE_LAYOUT.transitionExtra)
+      : profilePlateauDepth(Boolean(compact), false, width),
+    height,
   )
-  const avatarCenterX = avatarCenterXProp ?? contentInset + slotSize / 2
-  const avatarCenterY = avatarCenterYProp ?? transitionHeight - cradleRadius
 
   const animatedStyle = useAnimatedStyle(() => {
     if (reduceMotion) {
@@ -103,7 +108,7 @@ export function ProfileCover({
   })
 
   const body = (
-    <Animated.View
+    <View
       accessibilityRole="image"
       accessibilityLabel={`${profile.displayName} profile cover`}
       testID="profile-cover"
@@ -111,24 +116,31 @@ export function ProfileCover({
         styles.cover,
         {
           height,
-          // NativeTabs still applies a top content inset to the first ScrollView
-          // even with `never`; pull the banner into that inset so it sits under
-          // the status bar (X / Bluesky / LinkedIn).
           marginTop: -insets.top,
-          backgroundColor: kind === 'none' ? colours.canvas : emptyFill,
+          backgroundColor: colours.canvas,
         },
-        animatedStyle,
       ]}>
-      {hasPhoto ? (
-        <Image
-          source={{uri}}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-        />
-      ) : kind === 'none' ? null : (
-        <CoverAtmosphere wash={emptyFill} />
-      )}
+      {/* Only the artwork parallaxes. The canvas step is painted on top of it so
+          the silhouette stays welded to the cover's bottom edge while the
+          photograph drifts underneath. */}
+      <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+        <View
+          style={[
+            styles.artwork,
+            {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
+          ]}>
+          {hasPhoto ? (
+            <Image
+              source={{uri}}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
+          ) : kind === 'none' ? null : (
+            <CoverAtmosphere wash={emptyFill} />
+          )}
+        </View>
+      </Animated.View>
       {hasPhoto ? (
         <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
           <ProgressiveBlurBand
@@ -140,7 +152,7 @@ export function ProfileCover({
         </View>
       ) : null}
       {hasPhoto ? (
-        <View pointerEvents="none" style={styles.bottomBlur}>
+        <View pointerEvents="none" style={[styles.bottomBlur, {bottom: transitionHeight}]}>
           <ProgressiveBlurBand
             height={BOTTOM_BLUR}
             topHeavy={false}
@@ -153,19 +165,23 @@ export function ProfileCover({
         <InvertedSurfaceTransition
           edge="top"
           side="leading"
-          size="profile"
+          size="md"
           avatarSlot="leading"
           raisedSide="trailing"
           width={width}
           height={transitionHeight + 1}
           fill={colours.canvas}
+          cornerRadius={stepRadius ?? plateauRadius}
           avatarCenterX={avatarCenterX}
           avatarCenterY={avatarCenterY}
           cradleRadius={cradleRadius}
           plateauRadius={plateauRadius}
+          stepX={stepX}
+          stepRise={stepRise}
+          stepRadius={stepRadius ?? plateauRadius}
         />
       </View>
-    </Animated.View>
+    </View>
   )
 
   if (!canEdit) {
@@ -213,8 +229,10 @@ export function ProfileCover({
 }
 
 const styles = StyleSheet.create({
+  artwork: {
+    flex: 1,
+  },
   bottomBlur: {
-    bottom: 0,
     height: BOTTOM_BLUR,
     left: 0,
     position: 'absolute',

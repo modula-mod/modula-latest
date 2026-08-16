@@ -209,11 +209,32 @@ export function ProfileMetricPicker({
                 styles.focal,
                 {
                   backgroundColor: colours.text,
-                  top: selectedTop + 4,
-                  height: ITEM_HEIGHT - 8,
+                  top: selectedTop + 8,
+                  height: ITEM_HEIGHT - 16,
                 },
               ]}
             />
+          ) : null}
+          {showFocal ? (
+            <View
+              style={styles.rail}
+              accessible={false}
+              importantForAccessibility="no-hide-descendants">
+              {metrics.map((metric, index) => (
+                <View
+                  key={metric.id}
+                  style={[
+                    styles.dot,
+                    {
+                      backgroundColor:
+                        index === selectedIndex ? colours.text : colours.textTertiary,
+                      opacity: index === selectedIndex ? 0.85 : 0.28,
+                      transform: [{scale: index === selectedIndex ? 1 : 0.72}],
+                    },
+                  ]}
+                />
+              ))}
+            </View>
           ) : null}
           {metrics.map((metric, index) => (
             <MetricWheelItem
@@ -336,7 +357,7 @@ function MetricWheelItem({
   )
 }
 
-const FOCAL_GUTTER = 11
+const FOCAL_GUTTER = 14
 
 const styles = StyleSheet.create({
   copy: {
@@ -345,12 +366,26 @@ const styles = StyleSheet.create({
     minWidth: 0,
     paddingLeft: FOCAL_GUTTER,
   },
+  dot: {
+    borderRadius: 2,
+    height: 4,
+    width: 4,
+  },
   focal: {
     borderRadius: 1.5,
     left: 0,
-    opacity: 0.45,
+    opacity: 0.55,
     position: 'absolute',
-    width: 3,
+    width: 2,
+  },
+  rail: {
+    bottom: 8,
+    gap: 5,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    top: 8,
+    width: 8,
   },
   gesture: {
     alignItems: 'flex-start',

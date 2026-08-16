@@ -34,6 +34,10 @@ export default function ProfileStackLayout() {
         options={{
           title: '',
           headerShown: false,
+          headerTransparent: true,
+          // expo-router's NativeStackNavigationOptions omits this; native-stack honors it.
+          // @ts-expect-error native-stack zero top inset so the cover can bleed
+          safeAreaInsets: {top: 0},
         }}
       />
     </Stack>
