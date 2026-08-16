@@ -22,8 +22,8 @@ import {
 import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const NEIGHBOR_OPACITY = 0.42
-
+const NEIGHBOR_OPACITY = 0.32
+const NEIGHBOR_SCALE = 0.9
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 
 type ProfileMetricPickerProps = {
@@ -39,7 +39,7 @@ export function ProfileMetricPicker({
   onSelectMetric,
   onActivateMetric,
 }: ProfileMetricPickerProps) {
-  const {colours, motion, radius, spacing} = useThemeTokens()
+  const {motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const count = metrics.length
   const selectedIndex = Math.max(
@@ -138,23 +138,20 @@ export function ProfileMetricPicker({
   const selected = metrics[selectedIndex]
   const windowHeight = count === 1 ? ITEM_HEIGHT : profileMetricWindowHeight()
   const accessibilityValue = selected
-    ? `${selected.formattedFullValue} ${selected.label}. ${selectedIndex + 1} of ${count}.`
+    ? `${metricSpokenValue(selected)} ${selected.label}. ${selectedIndex + 1} of ${count}.`
     : undefined
 
   if (count === 1 && selected) {
     return (
       <AppPressable
         accessibilityRole="button"
-        accessibilityLabel={`${selected.formattedFullValue} ${selected.label}`}
+        accessibilityLabel={`${metricSpokenValue(selected)} ${selected.label}`}
         accessibilityHint={
           selected.destination.type === 'none' ? undefined : 'Opens this metric'
         }
         onPress={() => onActivateMetric(selected)}
         style={[styles.single, {minHeight: 44}]}>
-        <AppText variant="title2">{selected.formattedValue}</AppText>
-        <AppText variant="caption" colour="textSecondary">
-          {selected.label}
-        </AppText>
+        <MetricCopy metric={selected} selected />
       </AppPressable>
     )
   }
@@ -163,9 +160,9 @@ export function ProfileMetricPicker({
     <GestureDetector gesture={pan}>
       <View
         accessibilityRole="adjustable"
-        accessibilityLabel="Profile metric picker"
+        accessibilityLabel="Profile statistics"
         accessibilityValue={{text: accessibilityValue}}
-        accessibilityHint="Swipe up or down to change metric. Double tap to open."
+        accessibilityHint="Swipe up or down to change. Double tap to open."
         accessibilityActions={[
           {name: 'increment', label: 'Next metric'},
           {name: 'decrement', label: 'Previous metric'},
@@ -178,60 +175,71 @@ export function ProfileMetricPicker({
           if (name === 'activate') activate()
         }}
         testID="profile-metric-picker"
-        style={[styles.window, {height: windowHeight}]}>
-        <View
-          pointerEvents="none"
-          style={[
-            styles.selectedSurface,
-            {
-              backgroundColor: colours.surfaceMuted,
-              borderRadius: radius.medium,
-              height: ITEM_HEIGHT,
-              marginHorizontal: spacing[2],
-              top: ITEM_HEIGHT,
-            },
-          ]}
-        />
-        {metrics.map((metric, index) => (
-          <MetricWheelItem
-            key={metric.id}
-            metric={metric}
-            index={index}
-            scrollOffset={scrollOffset}
-            reduceMotion={reduceMotion}
-          />
-        ))}
-        <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
-          <AppPressable
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            onPress={() => moveBy(-1)}
-            style={[styles.hit, {top: 0, height: ITEM_HEIGHT}]}
-          />
-          <AppPressable
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            onPress={activate}
-            style={[styles.hit, {top: ITEM_HEIGHT, height: ITEM_HEIGHT}]}
-          />
-          <AppPressable
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            onPress={() => moveBy(1)}
-            style={[styles.hit, {top: ITEM_HEIGHT * 2, height: ITEM_HEIGHT}]}
-          />
-        </View>
-        {selected?.secondaryText ? (
-          <View
-            pointerEvents="none"
-            style={[styles.secondary, {paddingTop: spacing[1]}]}>
-            <AppText variant="micro" colour="textTertiary">
-              {selected.secondaryText}
-            </AppText>
+        style={[styles.gesture, {minHeight: Math.max(windowHeight, 96)}]}>
+        <View style={[styles.window, {height: windowHeight}]}>
+          {metrics.map((metric, index) => (
+            <MetricWheelItem
+              key={metric.id}
+              metric={metric}
+              index={index}
+              scrollOffset={scrollOffset}
+              reduceMotion={reduceMotion}
+            />
+          ))}
+          <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+            <AppPressable
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              onPress={() => moveBy(-1)}
+              style={[styles.hit, {top: 0, height: ITEM_HEIGHT}]}
+            />
+            <AppPressable
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              onPress={activate}
+              style={[styles.hit, {top: ITEM_HEIGHT, height: ITEM_HEIGHT}]}
+            />
+            <AppPressable
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              onPress={() => moveBy(1)}
+              style={[styles.hit, {top: ITEM_HEIGHT * 2, height: ITEM_HEIGHT}]}
+            />
           </View>
-        ) : null}
+        </View>
       </View>
     </GestureDetector>
+  )
+}
+
+function metricDisplayValue(metric: ProfileMetricDescriptor): string {
+  if (metric.loading) return '—'
+  if (metric.unavailable) return '—'
+  return metric.formattedValue
+}
+
+function metricSpokenValue(metric: ProfileMetricDescriptor): string {
+  if (metric.loading) return 'Loading'
+  if (metric.unavailable) return 'Unavailable'
+  return metric.formattedFullValue
+}
+
+function MetricCopy({
+  metric,
+  selected,
+}: {
+  metric: ProfileMetricDescriptor
+  selected: boolean
+}) {
+  return (
+    <View style={styles.copy}>
+      <AppText variant={selected ? 'headline' : 'caption'} colour={selected ? 'text' : 'textSecondary'}>
+        {metricDisplayValue(metric)}
+      </AppText>
+      <AppText variant="micro" colour="textSecondary">
+        {metric.label}
+      </AppText>
+    </View>
   )
 }
 
@@ -260,7 +268,7 @@ function MetricWheelItem({
       transform: [
         {translateY},
         {
-          scale: reduceMotion ? 1 : interpolate(progress, [0, 1], [1, 0.88]),
+          scale: reduceMotion ? 1 : interpolate(progress, [0, 1], [1, NEIGHBOR_SCALE]),
         },
       ],
     }
@@ -270,15 +278,21 @@ function MetricWheelItem({
     <Animated.View
       pointerEvents="none"
       style={[styles.item, {height: ITEM_HEIGHT}, style]}>
-      <AppText variant="headline">{metric.formattedValue}</AppText>
-      <AppText variant="caption" colour="textSecondary">
-        {metric.label}
-      </AppText>
+      <MetricCopy metric={metric} selected />
     </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
+  copy: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gesture: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
   hit: {
     left: 0,
     position: 'absolute',
@@ -291,18 +305,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  secondary: {
-    alignItems: 'center',
-    bottom: -18,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-  },
-  selectedSurface: {
-    left: 0,
-    position: 'absolute',
-    right: 0,
-  },
   single: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -310,7 +312,7 @@ const styles = StyleSheet.create({
   window: {
     alignSelf: 'center',
     maxWidth: 220,
-    minWidth: 140,
+    minWidth: 120,
     overflow: 'hidden',
     width: '100%',
   },

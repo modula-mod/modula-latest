@@ -1,6 +1,5 @@
 import {StyleSheet, View} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SettingsSection} from '@/features/settings/components/SettingsRows'
@@ -68,8 +67,7 @@ export function ProfileMetricCustomizer({draft, onChange}: ProfileMetricCustomiz
       <View style={{gap: spacing[2]}}>
         <AppText variant="headline">Profile Metrics</AppText>
         <AppText variant="caption" colour="textSecondary">
-          Choose which counts appear on your profile, their order, and the default.
-          At least one metric must stay visible.
+          Metrics show at the top of your profile. Pick up to 5.
         </AppText>
         {shown.length ? (
           <AppText variant="caption" colour="textTertiary">
@@ -168,7 +166,7 @@ function MetricRow({
         },
       ]}>
       <AppPressable
-        accessibilityLabel={`${definition.label} metric. Long press to reorder`}
+        accessibilityLabel={`${definition.label} metric. Drag handle, long press to reorder`}
         onLongPress={() => {
           void presentModulaActions({
             title: definition.label,
@@ -187,7 +185,10 @@ function MetricRow({
           })
         }}
         style={[styles.main, {gap: spacing[3]}]}>
-        <AppIcon name="board" colour={colours.text} size={20} />
+        <View style={styles.handle} accessibilityElementsHidden>
+          <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
+          <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
+        </View>
         <View style={styles.body}>
           <AppText variant="body">{definition.label}</AppText>
           <AppText variant="caption" colour="textTertiary">
@@ -222,6 +223,17 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
     minWidth: 0,
+  },
+  handle: {
+    gap: 3,
+    justifyContent: 'center',
+    paddingVertical: 8,
+    width: 18,
+  },
+  handleBar: {
+    borderRadius: 1,
+    height: 2,
+    width: 14,
   },
   main: {
     alignItems: 'center',

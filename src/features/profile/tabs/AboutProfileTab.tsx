@@ -59,6 +59,9 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
             year: 'numeric',
           })}
         />
+        {viewer.relationship === 'owner' ? (
+          <InfoItem label="Profile visibility" value="Public" />
+        ) : null}
         {showAtConnection ? (
           <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />
         ) : null}
