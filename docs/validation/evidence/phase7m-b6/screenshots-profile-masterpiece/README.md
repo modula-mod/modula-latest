@@ -26,7 +26,7 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `cradle-restored.png` | Owner hero (this pass) | Original G1 inverted radius restored; smaller avatar centred in the pocket; name starts at the white plateau edge |
+| `avatar-lower.png` | Owner hero (this pass) | Avatar dropped 36pt into the white pocket; inverted SVG unchanged |
 | `profile-final-photo-cover.png` | Same hero | Progressive blur, status-bar contrast, glass chrome on photography |
 | `profile-final-picker-posts.png` | Picker | Posts selected; Followers / Following as downward context; no grey pill |
 | `profile-final-picker-followers.png` | Picker | Three-metric wheel (Followers / Following / Modules) |

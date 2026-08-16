@@ -26,6 +26,8 @@ export const PROFILE_LAYOUT = {
   avatarBorder: 3,
   /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
   avatarFit: 0.95,
+  /** Lower the portrait into the white pocket. Does not move the inverted SVG. */
+  avatarDrop: 36,
   /** Cover showing around the portrait inside the inverted cradle. */
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
@@ -181,9 +183,8 @@ export function profileGeometry(
   const plateauDepth = Math.round(cradleRadius + plateauRadius)
   const avatarCenterX = avatarLead + pocketSlot / 2
   const gutterWidth = avatarLead + pocketSlot
-  // Seat the smaller portrait on the cradle centre so it sits in the pocket
-  // without moving the inverted radius.
-  const shelfDepth = cradleRadius - slotSize / 2
+  // Lower the painted portrait into the white pocket. The inverted SVG stays put.
+  const shelfDepth = cradleRadius - slotSize / 2 - PROFILE_LAYOUT.avatarDrop
   // Flat white plateau starts after the concave bite + convex landing.
   const identityColumnPad = PROFILE_LAYOUT.cradleGap + plateauRadius
 
