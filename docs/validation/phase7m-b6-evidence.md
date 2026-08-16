@@ -8,6 +8,16 @@ docs/validation/evidence/phase7m-b6/screenshots/
 
 Device captures are in **this repository** (iPhone 17 Pro Simulator, 2026-08-16). See `docs/validation/evidence/phase7m-b6/README.md`.
 
+Chrome-consistency **after** recapture (same device, Metro on the remake branch):
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-chrome-consistency/
+```
+
+See that folder’s README for what each after shot proves, and what is still visible.
+
+## Founder visual review set (captured)
+
 ## Founder visual review set (captured)
 
 01 Home — circular glass toolbar  

@@ -34,7 +34,7 @@ export function ModulaSwitch({
       <Switch
         value={value}
         onValueChange={onValueChange}
-        label={label ?? accessibilityLabel}
+        label={label}
         disabled={disabled}
         testID={testID}
       />

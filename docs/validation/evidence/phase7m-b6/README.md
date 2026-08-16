@@ -29,3 +29,7 @@ PRODUCTION DEPLOYED = NO
 | `14-messages.png` | Messages | Glass back + overflow filter |
 
 `01-home.png` is the settled Home frame after the Metro bundle.
+
+## After recapture (chrome consistency)
+
+`screenshots-chrome-consistency/` is the remake on the same simulator. It is not founder approval.

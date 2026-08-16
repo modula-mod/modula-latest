@@ -240,7 +240,6 @@ export function CustomizeProfileScreen() {
                     <SystemSwitch
                       value={enabled}
                       disabled={tabId === 'posts'}
-                      label={`${enabled ? 'Disable' : 'Enable'} ${manifest.title} tab`}
                       onValueChange={value =>
                         setDraft(prev => toggleTab(prev, tabId, value))
                       }
