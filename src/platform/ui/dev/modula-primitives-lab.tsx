@@ -19,8 +19,12 @@ import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
+import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
+import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const SAMPLE_MODULE: ModuleCatalogueItem = {
@@ -52,6 +56,7 @@ export function ModulaPrimitivesLabScreen() {
   const [enabled, setEnabled] = useState(true)
   const [popover, setPopover] = useState(false)
   const [sheet, setSheet] = useState(false)
+  const [page, setPage] = useState('overview')
 
   return (
     <View style={[styles.content, {gap: spacing[5]}]}>
@@ -113,6 +118,76 @@ export function ModulaPrimitivesLabScreen() {
         <ModulaButton label="Primary" onPress={() => undefined} />
         <ModulaButton label="Secondary" role="secondary" onPress={() => undefined} />
         <ModulaButton label="Destructive" role="destructive" onPress={() => undefined} />
+      </LabBlock>
+
+      <LabBlock title="Toolbar chrome">
+        <AppText variant="caption" colour="textSecondary">
+          App Store overlay: circular glass back / share. Glass is chrome-only.
+        </AppText>
+        <View style={styles.row}>
+          <ChromeCircleButton
+            icon="back"
+            accessibilityLabel="Back"
+            onPress={() => undefined}
+          />
+          <ChromeCircleButton
+            icon="share"
+            accessibilityLabel="Share"
+            onPress={() => undefined}
+          />
+          <ModulaControlGroup
+            label="Actions"
+            actions={[
+              {id: 'add', label: 'Add', icon: 'create'},
+              {id: 'save', label: 'Save', icon: 'bookmark'},
+              {id: 'share', label: 'Share', icon: 'share'},
+            ]}
+            onAction={() => undefined}
+          />
+        </View>
+      </LabBlock>
+
+      <LabBlock title="Product stats">
+        <ProductStatsRow
+          items={[
+            {label: 'Status', value: 'Live', detail: 'In this build'},
+            {label: 'Layer', value: 'Shell', detail: 'Capability'},
+            {label: 'Includes', value: '4', detail: 'Named surfaces'},
+          ]}
+        />
+      </LabBlock>
+
+      <LabBlock title="Page TabView">
+        <AppText variant="caption" colour="textSecondary">
+          In-screen pager only. Shell tabs stay on expo-router.
+        </AppText>
+        <ModulaPageTabView
+          selectedId={page}
+          onSelect={setPage}
+          height={180}
+          tabs={[
+            {
+              id: 'overview',
+              title: 'Overview',
+              icon: 'info',
+              content: (
+                <AppText variant="body" colour="textSecondary">
+                  Overview page. Native uses SwiftUI TabView page style.
+                </AppText>
+              ),
+            },
+            {
+              id: 'includes',
+              title: 'Includes',
+              icon: 'modules',
+              content: (
+                <AppText variant="body" colour="textSecondary">
+                  Includes page. Not a routed bottom tab.
+                </AppText>
+              ),
+            },
+          ]}
+        />
       </LabBlock>
 
       <LabBlock title="Fields">

@@ -14,12 +14,12 @@ function ActivityFilterMenu() {
       accessibilityLabel="Filter activity"
       title="Filter"
       actions={[
-        {id: 'all', label: 'All'},
-        {id: 'replies', label: 'Replies'},
-        {id: 'mentions', label: 'Mentions'},
-        {id: 'follows', label: 'Follows'},
-        {id: 'modules', label: 'Modules'},
-        {id: 'teams', label: 'Teams'},
+        {id: 'all', label: 'All', icon: 'activity'},
+        {id: 'replies', label: 'Replies', icon: 'comment'},
+        {id: 'mentions', label: 'Mentions', icon: 'messages'},
+        {id: 'follows', label: 'Follows', icon: 'people'},
+        {id: 'modules', label: 'Modules', icon: 'modules'},
+        {id: 'teams', label: 'Teams', icon: 'teams'},
       ]}
       onAction={() => {
         /* ActivityScreen owns live filter state; menu is discovery chrome. */

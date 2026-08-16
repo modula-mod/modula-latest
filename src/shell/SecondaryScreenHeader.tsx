@@ -17,15 +17,20 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 type SecondaryScreenHeaderProps = {
   title: string
   right?: ReactNode
+  /** Intercept the circular glass back control (dirty forms, custom leave). */
+  onBack?: () => void
+  /** App Store-style circular share. Combines with `right` when both are set. */
+  onShare?: () => void
 }
 
 /**
- * Secondary-route chrome: progressive blur overlay + plain Expo UI back icon.
+ * Secondary-route chrome: progressive blur overlay + circular glass back
+ * (App Store overlay). Share and overflow sit on the trailing edge.
  *
  * In-flow spacer clears the nav row only. The fade is a sibling absolute overlay
  * so it can paint over the top of the body (Android does not clip it to the spacer).
  */
-export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps) {
+export function SecondaryScreenHeader({title, right, onBack, onShare}: SecondaryScreenHeaderProps) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const {spacing} = useThemeTokens()
@@ -57,6 +62,10 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
               icon="back"
               accessibilityLabel="Go back"
               onPress={() => {
+                if (onBack) {
+                  onBack()
+                  return
+                }
                 if (router.canGoBack()) {
                   router.back()
                 } else {
@@ -69,7 +78,14 @@ export function SecondaryScreenHeader({title, right}: SecondaryScreenHeaderProps
             {title}
           </AppText>
           <View style={[styles.side, styles.sideEnd]}>
-            {right ?? <View style={styles.slotSpacer} />}
+            {onShare ? (
+              <ChromeCircleButton
+                icon="share"
+                accessibilityLabel="Share"
+                onPress={onShare}
+              />
+            ) : null}
+            {right ?? (onShare ? null : <View style={styles.slotSpacer} />)}
           </View>
         </View>
       </View>
@@ -98,7 +114,10 @@ const styles = StyleSheet.create({
     minWidth: 44,
   },
   sideEnd: {
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'flex-end',
   },
   slotSpacer: {
     height: 36,

@@ -15,6 +15,7 @@ import {ComposerToolsDrawer} from '@/components/composer/ComposerToolsDrawer'
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {Avatar} from '@/components/primitives/Avatar'
 import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
@@ -567,12 +568,11 @@ export function ComposerScreen() {
             paddingHorizontal: spacing[4],
           },
         ]}>
-        <AppPressable
+        <ChromeCircleButton
+          icon="close"
           accessibilityLabel="Cancel composer"
           onPress={() => void closeComposer()}
-          style={styles.headerButton}>
-          <AppText variant="label">Cancel</AppText>
-        </AppPressable>
+        />
         <View style={styles.headerCenter}>
           <AppText variant="headline">{headerTitle}</AppText>
           <AppPressable
@@ -1083,7 +1083,7 @@ const styles = StyleSheet.create({
   headerButton: {
     justifyContent: 'center',
     minHeight: 44,
-    minWidth: 64,
+    minWidth: 44,
   },
   headerCenter: {
     alignItems: 'center',

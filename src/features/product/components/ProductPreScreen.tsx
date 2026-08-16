@@ -1,13 +1,14 @@
+import {useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
-import {LinearGradient} from 'expo-linear-gradient'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {AppButton} from '@/components/primitives/AppButton'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
 import type {ProductCapability, ProductMaturity} from '@/features/product/data/productCatalogue'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
+import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -19,18 +20,30 @@ const MATURITY_LABEL: Record<ProductMaturity, string> = {
   inactive: 'Inactive',
 }
 
+const MATURITY_DETAIL: Record<ProductMaturity, string> = {
+  live: 'In this build',
+  preview: 'Honest preview',
+  planned: 'Named, not shipped',
+  inactive: 'Not a runtime',
+}
+
 export function ProductPreScreen({capability}: {capability: ProductCapability}) {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const {colours, radius, spacing, scheme} = useThemeTokens()
-  const wash =
-    scheme === 'dark'
-      ? ['#0B1416', colours.accentSubtle]
-      : [colours.accentSubtle, colours.canvas]
+  const {colours, spacing} = useThemeTokens()
+  const [page, setPage] = useState('overview')
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title={capability.name} />
+      <SecondaryScreenHeader
+        title={capability.name}
+        onShare={() =>
+          void shareModulaText({
+            title: capability.name,
+            message: `${capability.name} — ${capability.summary}`,
+          })
+        }
+      />
       <ResponsiveContent maxWidth={720}>
         <ScrollView
           contentContainerStyle={{
@@ -38,75 +51,76 @@ export function ProductPreScreen({capability}: {capability: ProductCapability}) 
             padding: spacing[4],
             paddingBottom: insets.bottom + spacing[8],
           }}>
-          <LinearGradient
-            colors={wash as [string, string]}
-            style={[styles.hero, {borderRadius: radius.large, padding: spacing[5], gap: spacing[3]}]}>
-            <View style={[styles.heroTop, {gap: spacing[3]}]}>
-              <View
-                style={[
-                  styles.icon,
-                  {
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    borderRadius: radius.large,
-                  },
-                ]}>
-                <AppIcon name={capability.icon} colour={colours.accent} size={28} />
-              </View>
-              <View style={{flex: 1, gap: spacing[1]}}>
-                <AppText variant="caption" colour="accent">
-                  {capability.eyebrow} · {MATURITY_LABEL[capability.maturity].toUpperCase()}
-                </AppText>
-                <AppText variant="display">{capability.name}</AppText>
-              </View>
-            </View>
-            <AppText variant="title2">{capability.summary}</AppText>
-            <AppText variant="body" colour="textSecondary">
-              {capability.body}
-            </AppText>
-          </LinearGradient>
-
           <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">Includes</AppText>
-            {capability.bullets.map(bullet => (
-              <Surface
-                key={bullet}
-                variant="contained"
-                style={[
-                  styles.bullet,
-                  {
-                    borderColor: colours.border,
-                    borderRadius: radius.medium,
-                    padding: spacing[3],
-                    gap: spacing[2],
-                    backgroundColor: colours.surface,
-                  },
-                ]}>
-                <AppIcon name="check" colour={colours.accent} size={16} />
-                <AppText variant="body">{bullet}</AppText>
-              </Surface>
-            ))}
+            <AppText variant="micro" colour="textTertiary">
+              {capability.eyebrow.toUpperCase()}
+            </AppText>
+            <AppText variant="display">{capability.name}</AppText>
+            <AppText variant="title2">{capability.summary}</AppText>
           </View>
 
-          {capability.pipeline ? (
-            <Surface
-              variant="contained"
-              style={[
-                styles.pipeline,
-                {
-                  gap: spacing[2],
-                  padding: spacing[4],
-                  borderRadius: radius.medium,
-                  backgroundColor: colours.surfaceRaised,
-                  borderColor: colours.border,
-                },
-              ]}>
-              <AppText variant="label">Pipeline</AppText>
-              <AppText variant="body" colour="textSecondary">
-                {capability.pipeline}
-              </AppText>
-            </Surface>
-          ) : null}
+          <ProductStatsRow
+            items={[
+              {
+                label: 'Status',
+                value: MATURITY_LABEL[capability.maturity],
+                detail: MATURITY_DETAIL[capability.maturity],
+              },
+              {
+                label: 'Layer',
+                value: capability.eyebrow,
+                detail: 'Capability',
+              },
+              {
+                label: 'Includes',
+                value: String(capability.bullets.length),
+                detail: 'Named surfaces',
+              },
+            ]}
+          />
+
+          <ModulaPageTabView
+            accessibilityLabel={`${capability.name} pages`}
+            selectedId={page}
+            onSelect={setPage}
+            height={300}
+            tabs={[
+              {
+                id: 'overview',
+                title: 'Overview',
+                icon: 'info',
+                content: (
+                  <View style={{gap: spacing[3]}}>
+                    <AppText variant="body" colour="textSecondary">
+                      {capability.body}
+                    </AppText>
+                    {capability.pipeline ? (
+                      <View style={{gap: spacing[1]}}>
+                        <AppText variant="label">Pipeline</AppText>
+                        <AppText variant="body" colour="textSecondary">
+                          {capability.pipeline}
+                        </AppText>
+                      </View>
+                    ) : null}
+                  </View>
+                ),
+              },
+              {
+                id: 'includes',
+                title: 'Includes',
+                icon: 'modules',
+                content: (
+                  <View style={{gap: spacing[3]}}>
+                    {capability.bullets.map(bullet => (
+                      <AppText key={bullet} variant="body">
+                        {bullet}
+                      </AppText>
+                    ))}
+                  </View>
+                ),
+              },
+            ]}
+          />
 
           {capability.maturity === 'inactive' || capability.maturity === 'planned' ? (
             <AppText variant="caption" colour="textTertiary">
@@ -117,20 +131,23 @@ export function ProductPreScreen({capability}: {capability: ProductCapability}) 
 
           <View style={{gap: spacing[3]}}>
             {capability.ctaLabel && capability.ctaRoute ? (
-              <AppButton onPress={() => router.push(capability.ctaRoute as Href)}>
-                {capability.ctaLabel}
-              </AppButton>
+              <ModulaButton
+                label={capability.ctaLabel}
+                onPress={() => router.push(capability.ctaRoute as Href)}
+              />
             ) : null}
             {capability.secondaryLabel && capability.secondaryRoute ? (
-              <AppButton
-                variant="secondary"
-                onPress={() => router.push(capability.secondaryRoute as Href)}>
-                {capability.secondaryLabel}
-              </AppButton>
+              <ModulaButton
+                label={capability.secondaryLabel}
+                role="secondary"
+                onPress={() => router.push(capability.secondaryRoute as Href)}
+              />
             ) : null}
-            <AppButton variant="ghost" onPress={() => router.push('/product' as Href)}>
-              All Modula capabilities
-            </AppButton>
+            <ModulaButton
+              label="All Modula capabilities"
+              role="secondary"
+              onPress={() => router.push('/product' as Href)}
+            />
           </View>
         </ScrollView>
       </ResponsiveContent>
@@ -140,19 +157,4 @@ export function ProductPreScreen({capability}: {capability: ProductCapability}) 
 
 const styles = StyleSheet.create({
   screen: {flex: 1},
-  hero: {width: '100%'},
-  heroTop: {alignItems: 'center', flexDirection: 'row'},
-  icon: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 64,
-    justifyContent: 'center',
-    width: 64,
-  },
-  bullet: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-  },
-  pipeline: {borderWidth: StyleSheet.hairlineWidth},
 })

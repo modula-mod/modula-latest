@@ -1,11 +1,13 @@
 import {useState} from 'react'
 import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
   SettingsLinkRow,
+  SettingsOverflowMenu,
   SettingsSection,
   type SettingsNavRow,
 } from '@/features/settings/components/SettingsRows'
@@ -185,10 +187,30 @@ export function SettingsHomeScreen() {
   const filteredAccount = accountRows.filter(match)
   const filteredPrefs = preferenceRows.filter(match)
   const filteredDeveloper = developerRows.filter(match)
+  const router = useRouter()
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Settings" />
+      <SecondaryScreenHeader
+        title="Settings"
+        right={
+          <SettingsOverflowMenu
+            title="Settings"
+            actions={[
+              {id: 'account', label: 'Account', icon: 'account'},
+              {id: 'appearance', label: 'Appearance', icon: 'appearance'},
+              {id: 'notifications', label: 'Notifications', icon: 'notifications'},
+              {id: 'privacy', label: 'Privacy', icon: 'privacy'},
+            ]}
+            onAction={id => {
+              if (id === 'account') router.push('/settings/account' as Href)
+              if (id === 'appearance') router.push('/settings/appearance' as Href)
+              if (id === 'notifications') router.push('/settings/notifications' as Href)
+              if (id === 'privacy') router.push('/settings/privacy' as Href)
+            }}
+          />
+        }
+      />
       <ResponsiveContent>
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}

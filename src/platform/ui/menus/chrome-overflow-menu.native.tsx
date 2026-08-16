@@ -1,5 +1,6 @@
 import {Host, Menu} from '@expo/ui/swift-ui'
 import {
+  buttonBorderShape,
   buttonStyle,
   controlSize,
   labelStyle,
@@ -16,7 +17,7 @@ type ChromeOverflowMenuProps = {
 }
 
 /**
- * Native SwiftUI Menu with a plain ellipsis trigger — no glass / filled disc.
+ * Native SwiftUI Menu with an App Store-style circular glass ellipsis.
  */
 export function ChromeOverflowMenu({
   actions,
@@ -29,9 +30,10 @@ export function ChromeOverflowMenu({
         label={accessibilityLabel}
         systemImage="ellipsis"
         modifiers={[
-          buttonStyle('plain'),
+          buttonStyle('glass'),
           labelStyle('iconOnly'),
-          controlSize('regular'),
+          buttonBorderShape('circle'),
+          controlSize('large'),
         ]}>
         {renderTapMenuItems(actions, onAction)}
       </Menu>

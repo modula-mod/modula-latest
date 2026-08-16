@@ -16,7 +16,10 @@ import {
 } from '@/features/profile/contracts/profile'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
+import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const layoutOptions: {
@@ -106,30 +109,53 @@ export function CustomizeProfileScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <SecondaryScreenHeader
+        title="Customize"
+        onBack={leave}
+        right={
+          <View style={styles.headerTrail}>
+            <ChromeOverflowMenu
+              accessibilityLabel="Customize profile actions"
+              title="Customize"
+              actions={[
+                {id: 'save', label: 'Save', icon: 'check'},
+                {id: 'preview', label: 'Preview profile', icon: 'profile'},
+                {id: 'reset', label: 'Reset', icon: 'reset', style: 'destructive'},
+              ]}
+              onAction={id => {
+                if (id === 'save') save()
+                if (id === 'preview') preview()
+                if (id === 'reset') reset()
+              }}
+            />
+            <AppPressable accessibilityLabel="Save profile presentation" onPress={save}>
+              <AppText variant="label" style={{color: colours.accent}}>
+                Save
+              </AppText>
+            </AppPressable>
+          </View>
+        }
+      />
       <ResponsiveContent maxWidth={820}>
         <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[styles.content, {gap: spacing[5], padding: spacing[4]}]}>
-          <View style={styles.header}>
-            <HeaderButton label="Cancel" onPress={leave} />
-            <AppText variant="headline" style={styles.headerTitle}>
-              Customize Profile
-            </AppText>
-            <HeaderButton label="Save" onPress={save} primary />
-          </View>
-
           <Section title="Profile layout">
-            <View style={[styles.layoutGrid, {gap: spacing[3]}]}>
-              {layoutOptions.map(option => (
-                <LayoutOption
-                  key={option.id}
-                  option={option}
-                  selected={draft.layoutId === option.id}
-                  onPress={() => setDraft(prev => ({...prev, layoutId: option.id}))}
-                />
-              ))}
-            </View>
+            <ModulaSegmentedPicker
+              appearance="segmented"
+              accessibilityLabel="Profile layout"
+              options={layoutOptions.map(option => ({
+                value: option.id,
+                label: option.title,
+              }))}
+              value={draft.layoutId}
+              onValueChange={next =>
+                setDraft(prev => ({...prev, layoutId: next as ProfileLayoutId}))
+              }
+            />
+            <AppText variant="caption" colour="textSecondary">
+              {layoutOptions.find(option => option.id === draft.layoutId)?.description}
+            </AppText>
           </Section>
 
           <Section title="Profile tabs">
@@ -199,23 +225,22 @@ export function CustomizeProfileScreen() {
           </Section>
 
           <Section title="Default tab">
-            <View style={[styles.choiceRow, {gap: spacing[2]}]}>
-              {draft.tabOrder
+            <ModulaSegmentedPicker
+              appearance="plain"
+              scrollable
+              accessibilityLabel="Default profile tab"
+              options={draft.tabOrder
                 .filter(tabId => draft.enabledTabIds.includes(tabId))
                 .map(tabId => {
                   const manifest = coreProfileTabs.find(tab => tab.id === tabId)
-                  if (!manifest) return null
-                  const selected = draft.defaultTabId === tabId
-                  return (
-                    <ChoiceButton
-                      key={tabId}
-                      label={manifest.title}
-                      selected={selected}
-                      onPress={() => setDraft(prev => ({...prev, defaultTabId: tabId}))}
-                    />
-                  )
+                  return {
+                    value: tabId,
+                    label: manifest?.title ?? tabId,
+                  }
                 })}
-            </View>
+              value={draft.defaultTabId}
+              onValueChange={next => setDraft(prev => ({...prev, defaultTabId: next}))}
+            />
           </Section>
 
           <Section title="Profile indicators">
@@ -317,82 +342,6 @@ function Section({title, children}: {title: string; children: React.ReactNode}) 
   )
 }
 
-function HeaderButton({
-  label,
-  onPress,
-  primary,
-}: {
-  label: string
-  onPress: () => void
-  primary?: boolean
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={[
-        styles.headerButton,
-        {
-          backgroundColor: primary ? colours.accent : colours.surfaceRaised,
-          borderColor: primary ? 'transparent' : colours.border,
-          borderRadius: radius.round,
-          paddingHorizontal: spacing[3],
-        },
-      ]}>
-      <AppText
-        variant="label"
-        style={{color: primary ? colours.accentForeground : colours.text}}>
-        {label}
-      </AppText>
-    </AppPressable>
-  )
-}
-
-function LayoutOption({
-  option,
-  selected,
-  onPress,
-}: {
-  option: (typeof layoutOptions)[number]
-  selected: boolean
-  onPress: () => void
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={`Select ${option.title} profile layout`}
-      accessibilityState={{selected}}
-      onPress={onPress}
-      style={[
-        styles.layoutOption,
-        {
-          backgroundColor: selected ? colours.accentSubtle : colours.surfaceRaised,
-          borderColor: selected ? colours.accentBorder : colours.border,
-          borderRadius: radius.large,
-          gap: spacing[3],
-          padding: spacing[3],
-        },
-      ]}>
-      <View style={[styles.layoutPreview, {gap: spacing[1]}]}>
-        <View style={[styles.previewLine, {backgroundColor: colours.accent}]} />
-        <View style={[styles.previewShort, {backgroundColor: colours.textMuted}]} />
-        <View style={[styles.previewTabs, {gap: spacing[1]}]}>
-          <View style={[styles.previewTab, {backgroundColor: colours.accentSubtle}]} />
-          <View style={[styles.previewTab, {backgroundColor: colours.surfaceMuted}]} />
-          <View style={[styles.previewTab, {backgroundColor: colours.surfaceMuted}]} />
-        </View>
-      </View>
-      <View style={{gap: spacing[1]}}>
-        <AppText variant="label">{option.title}</AppText>
-        <AppText variant="caption" colour="textSecondary">
-          {option.description}
-        </AppText>
-      </View>
-    </AppPressable>
-  )
-}
-
 function MoveButton({
   label,
   icon,
@@ -416,39 +365,6 @@ function MoveButton({
         {backgroundColor: colours.surfaceRaised, borderColor: colours.border, borderRadius: radius.round},
       ]}>
       <AppIcon name={icon} colour={colours.textSecondary} size={18} />
-    </AppPressable>
-  )
-}
-
-function ChoiceButton({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string
-  selected: boolean
-  onPress: () => void
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={`Set ${label} as default profile tab`}
-      accessibilityState={{selected}}
-      onPress={onPress}
-      style={[
-        styles.choice,
-        {
-          backgroundColor: selected ? colours.accentSubtle : colours.surfaceRaised,
-          borderColor: selected ? colours.accentBorder : colours.border,
-          borderRadius: radius.round,
-          paddingHorizontal: spacing[3],
-        },
-      ]}>
-      <AppText
-        variant="label"
-        style={{color: selected ? colours.accent : colours.text}}>
-        {label}
-      </AppText>
     </AppPressable>
   )
 }
@@ -521,15 +437,6 @@ function FooterButton({
 }
 
 const styles = StyleSheet.create({
-  choice: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-  },
-  choiceRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
   content: {
     paddingBottom: 48,
   },
@@ -543,18 +450,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  header: {
+  headerTrail: {
     alignItems: 'center',
     flexDirection: 'row',
-  },
-  headerButton: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
+    gap: 10,
   },
   indicatorLabel: {
     flex: 1,
@@ -571,43 +470,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     minHeight: 68,
   },
-  layoutGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  layoutOption: {
-    borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: '47%',
-    flexGrow: 1,
-    minWidth: 240,
-  },
-  layoutPreview: {
-    minHeight: 56,
-  },
   moveButton: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-  },
-  previewLine: {
-    borderRadius: 999,
-    height: 16,
-    width: '72%',
-  },
-  previewShort: {
-    borderRadius: 999,
-    height: 10,
-    width: '46%',
-  },
-  previewTab: {
-    borderRadius: 999,
-    flex: 1,
-    height: 10,
-  },
-  previewTabs: {
-    flexDirection: 'row',
-    marginTop: 6,
-    width: '86%',
   },
   screen: {
     flex: 1,

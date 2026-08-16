@@ -199,10 +199,10 @@ export function BoardScreen() {
         accessibilityLabel="Board layout menu"
         title="Board"
         actions={[
-          {id: 'customize', label: 'Customize pinned spaces'},
-          {id: 'marketplace', label: 'Open Product Hub'},
-          {id: 'saved', label: 'Open Saved'},
-          {id: 'compose', label: 'Quick compose'},
+          {id: 'customize', label: 'Customize pinned spaces', icon: 'appearance'},
+          {id: 'marketplace', label: 'Open Product Hub', icon: 'modules'},
+          {id: 'saved', label: 'Open Saved', icon: 'bookmark'},
+          {id: 'compose', label: 'Quick compose', icon: 'create'},
         ]}
         onAction={id => {
           if (id === 'customize') setCustomizeOpen(true)
@@ -551,9 +551,9 @@ export function BoardScreen() {
                       <ModulaControlGroup
                         label="Module"
                         actions={[
-                          {id: 'open', label: 'Open', systemImage: 'arrow.up.right'},
-                          {id: 'preview', label: 'Preview', systemImage: 'eye'},
-                          {id: 'pin', label: 'Pin', systemImage: 'pin'},
+                          {id: 'open', label: 'Open', icon: 'modules'},
+                          {id: 'preview', label: 'Preview', icon: 'eye'},
+                          {id: 'pin', label: 'Pin', icon: 'bookmark'},
                         ]}
                         onAction={id => {
                           if (id === 'open' || id === 'preview') {

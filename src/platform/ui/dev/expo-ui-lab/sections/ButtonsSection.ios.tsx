@@ -1,8 +1,10 @@
-import {Button, Section, VStack} from '@expo/ui/swift-ui'
+import {Button, ControlGroup, HStack, Menu, Section, VStack} from '@expo/ui/swift-ui'
 import {
+  buttonBorderShape,
   buttonStyle,
   controlSize,
   foregroundStyle,
+  labelStyle,
   tint,
 } from '@expo/ui/swift-ui/modifiers'
 
@@ -10,7 +12,45 @@ import {
 export function ButtonsSection() {
   return (
     <Section title="Buttons">
-      <VStack spacing={10}>
+      <VStack spacing={16}>
+        <HStack spacing={12}>
+          <Button
+            label="Back"
+            systemImage="chevron.left"
+            modifiers={[
+              buttonStyle('glass'),
+              labelStyle('iconOnly'),
+              buttonBorderShape('circle'),
+              controlSize('large'),
+            ]}
+          />
+          <Button
+            label="Share"
+            systemImage="square.and.arrow.up"
+            modifiers={[
+              buttonStyle('glass'),
+              labelStyle('iconOnly'),
+              buttonBorderShape('circle'),
+              controlSize('large'),
+            ]}
+          />
+          <Menu
+            label="More"
+            systemImage="ellipsis"
+            modifiers={[
+              buttonStyle('glass'),
+              labelStyle('iconOnly'),
+              buttonBorderShape('circle'),
+              controlSize('large'),
+            ]}>
+            <ControlGroup>
+              <Button label="Add" systemImage="plus" />
+              <Button label="Favorite" systemImage="heart" />
+              <Button label="Share" systemImage="square.and.arrow.up" />
+            </ControlGroup>
+            <Button label="Report" role="destructive" systemImage="flag" />
+          </Menu>
+        </HStack>
         <Button label="Default" />
         <Button
           label="Bordered"

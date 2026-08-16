@@ -6,6 +6,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -36,17 +37,22 @@ export function FeaturePreviewScreen({
 
   return (
     <View style={styles.screen}>
-      <SecondaryScreenHeader title={title} />
+      <SecondaryScreenHeader
+        title={title}
+        onShare={() =>
+          void shareModulaText({
+            title,
+            message: description,
+          })
+        }
+      />
       <ResponsiveContent>
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="display">{title}</AppText>
-            <AppText variant="body" colour="textSecondary">
-              {description}
-            </AppText>
-          </View>
+          <AppText variant="body" colour="textSecondary">
+            {description}
+          </AppText>
           <View style={{gap: spacing[3]}}>
             {cards.map(card => (
               <PreviewCard key={card.title} card={card} />

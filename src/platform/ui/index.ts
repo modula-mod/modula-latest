@@ -107,5 +107,8 @@ export {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating
 export {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 export {PageIntro} from '@/platform/ui/chrome/page-intro'
 export {SectionHeader} from '@/platform/ui/chrome/section-header'
+export {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
+export type {ProductStatItem} from '@/platform/ui/chrome/product-stats-row'
+export {shareModulaText} from '@/platform/ui/share/share-modula-text'
 export {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
 export {HubAtmosphere} from '@/platform/ui/atmosphere/hub-atmosphere'

@@ -19,9 +19,9 @@ function ProfileShareMenu() {
       accessibilityLabel="Share profile"
       title="Share"
       actions={[
-        {id: 'share', label: 'Share profile'},
-        {id: 'qr', label: 'QR / share sheet — Preview'},
-        {id: 'copy', label: 'Copy profile link'},
+        {id: 'share', label: 'Share profile', icon: 'share'},
+        {id: 'qr', label: 'QR / share sheet — Preview', icon: 'photo'},
+        {id: 'copy', label: 'Copy profile link', icon: 'link'},
       ]}
       onAction={id => {
         if (id === 'share' || id === 'qr') {
@@ -39,9 +39,9 @@ function ProfileOverflowMenu() {
       accessibilityLabel="Open profile actions"
       title="Profile"
       actions={[
-        {id: 'edit', label: 'Edit Profile'},
-        {id: 'customize', label: 'Customize'},
-        {id: 'settings', label: 'Settings'},
+        {id: 'edit', label: 'Edit Profile', icon: 'profile'},
+        {id: 'customize', label: 'Customize', icon: 'appearance'},
+        {id: 'settings', label: 'Settings', icon: 'settings'},
       ]}
       onAction={id => {
         if (id === 'edit') router.push('/profile/edit' as Href)

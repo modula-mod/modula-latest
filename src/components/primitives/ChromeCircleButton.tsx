@@ -9,19 +9,26 @@ type ChromeCircleButtonProps = {
   onPress?: () => void
   /** Visual-only — still renders native chrome; host owns press when false. */
   pressable?: boolean
+  /**
+   * App Store overlay chrome: circular glass (default).
+   * `plain` is glyph-only for dense nav bars.
+   */
+  chrome?: 'glass' | 'bordered' | 'plain'
   size?: number
   iconSize?: number
   style?: StyleProp<ViewStyle>
 }
 
 /**
- * Header icon control — Expo UI plain icon button (no glass / filled disc).
+ * Circular toolbar control — Expo UI glass + circle by default
+ * (App Store back / share). Falls back to bordered when glass is unavailable.
  */
 export function ChromeCircleButton({
   icon,
   accessibilityLabel,
   onPress,
   pressable = true,
+  chrome = 'glass',
   style,
 }: ChromeCircleButtonProps) {
   return (
@@ -29,7 +36,7 @@ export function ChromeCircleButton({
       icon={icon}
       accessibilityLabel={accessibilityLabel}
       onPress={pressable ? onPress : undefined}
-      chrome="plain"
+      chrome={chrome}
       style={style}
     />
   )

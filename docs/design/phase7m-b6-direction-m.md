@@ -101,3 +101,16 @@ Glass stays chrome-only. Expo UI ContextMenu / Menu (SDK 57.0.10) is the native 
 - Edit Profile: live cover + overlapping avatar preview, grouped identity fields, focus as a check list — not icon-in-pastel-square controls
 
 Siren.uix / Apple-density references inform hierarchy (overlapping identity, grouped lists, destructive red). This is not an Apple clone and not a glass wallpaper.
+
+## Toolbar chrome (B6 follow-up)
+
+App Store product-page overlay is the reference for **small circular glass controls** — back and share — not a floating glass tab bar over the feed.
+
+- `ChromeCircleButton` / `ModulaIconButton` default overlay chrome is circular `glass` (falls back to `bordered` when Liquid Glass is unavailable)
+- `ChromeOverflowMenu` / `ChromeIconMenu` use the same circular glass trigger
+- `SecondaryScreenHeader` carries glass back on secondary routes; `onShare` and `right` can combine (share + overflow)
+- `ModulaControlGroup` is a Menu + ControlGroup cluster with semantic `icon` names — features never pass SF Symbol strings
+- `ModulaPageTabView` is **in-screen paging only** (SwiftUI `tabViewStyle({ type: 'page' })`). Shell tabs stay `expo-router` / `PlatformTabs`
+- Product Hub stays editorial. Do not restore Discover / Installed / Updates segmented marketplace chrome
+
+Glass remains chrome-only (`docs/research/phase7m-b5-liquid-glass-policy.md`): menus, toolbar circles, transient overlays. Forbidden on feed cells, hub rows, form backgrounds, and a tab bar over moving feed text.

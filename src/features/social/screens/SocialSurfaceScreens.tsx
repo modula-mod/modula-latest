@@ -246,9 +246,9 @@ export function MessagesInboxScreen() {
             accessibilityLabel="Filter messages"
             title="Filter"
             actions={[
-              {id: 'all', label: 'All'},
-              {id: 'unread', label: 'Unread'},
-              {id: 'pinned', label: 'Pinned'},
+              {id: 'all', label: 'All', icon: 'messages'},
+              {id: 'unread', label: 'Unread', icon: 'activity'},
+              {id: 'pinned', label: 'Pinned', icon: 'bookmark'},
             ]}
             onAction={id => setFilter(id as 'all' | 'unread' | 'pinned')}
           />
@@ -501,11 +501,12 @@ export function MessageThreadScreen() {
             {
               id: 'forward',
               label: 'Forward',
+              icon: 'share',
               disabled: true,
               disabledReason: forwardRestrictionReason,
             },
-            {id: 'mute', label: 'Mute preview'},
-            {id: 'delete', label: 'Delete preview', style: 'destructive'},
+            {id: 'mute', label: 'Mute preview', icon: 'notifications'},
+            {id: 'delete', label: 'Delete preview', icon: 'trash', style: 'destructive'},
           ]}
           onAction={id => {
             if (id === 'forward') {

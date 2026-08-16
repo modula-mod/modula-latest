@@ -5,13 +5,10 @@ import {AppText} from '@/components/primitives/AppText'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export type ModulaControlGroupAction = ModulaActionItem & {
-  systemImage?: string
-}
+export type ModulaControlGroupAction = ModulaActionItem
 
 type ModulaControlGroupProps = {
   label: string
-  systemImage?: string
   actions: ModulaControlGroupAction[]
   onAction: (actionId: string) => void
   overflowActions?: ModulaActionItem[]

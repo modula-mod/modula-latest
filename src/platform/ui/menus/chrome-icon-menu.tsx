@@ -4,7 +4,7 @@ import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ChromeIconMenuProps = {
-  systemImage: string
+  systemImage?: string
   /** Fallback Ionicon when SwiftUI Menu is unavailable. */
   icon?: AppIconName
   title?: string

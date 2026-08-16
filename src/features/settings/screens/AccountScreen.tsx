@@ -28,9 +28,9 @@ export function AccountScreen() {
           <SettingsOverflowMenu
             title="Account"
             actions={[
-              {id: 'sessions', label: 'Active Sessions'},
-              {id: 'export', label: 'Export data'},
-              {id: 'sign-out', label: 'Sign out', style: 'destructive'},
+              {id: 'sessions', label: 'Active Sessions', icon: 'security'},
+              {id: 'export', label: 'Export data', icon: 'share'},
+              {id: 'sign-out', label: 'Sign out', icon: 'close', style: 'destructive'},
             ]}
             onAction={id => {
               if (id === 'sessions') router.push('/settings/account/sessions' as Href)

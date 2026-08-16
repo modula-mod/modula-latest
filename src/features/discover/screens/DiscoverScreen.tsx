@@ -23,6 +23,7 @@ import {
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {StackedAvatars} from '@/platform/ui/avatars'
@@ -163,19 +164,26 @@ export function DiscoverScreen() {
                 accessibilityLabel="Discover filter menu"
                 title="Discover filters"
                 actions={[
-                  {id: 'For You', label: 'For You'},
-                  {id: 'People', label: 'People'},
-                  {id: 'Communities', label: 'Communities'},
-                  {id: 'Marketplace', label: 'Marketplace'},
-                  {id: 'Media', label: 'Media'},
-                  {id: 'interests', label: 'Edit interests — Preview'},
-                  {id: 'feeds', label: 'Custom feeds — Preview'},
-                  {id: 'inspire', label: 'Inspire next'},
-                  {id: 'live', label: 'Live presence'},
-                  {id: 'customize', label: 'Customize Discover layout'},
-                  {id: 'media-grid', label: 'Media grid'},
-                  {id: 'open-marketplace', label: 'Open Marketplace'},
-                  {id: 'open-communities', label: 'Open Communities'},
+                  {id: 'For You', label: 'For You', icon: 'sparkles'},
+                  {id: 'People', label: 'People', icon: 'people'},
+                  {id: 'Communities', label: 'Communities', icon: 'community'},
+                  {id: 'Marketplace', label: 'Marketplace', icon: 'marketplace'},
+                  {id: 'Media', label: 'Media', icon: 'photo'},
+                  {
+                    id: 'more',
+                    label: 'More',
+                    icon: 'more',
+                    children: [
+                      {id: 'interests', label: 'Edit interests — Preview'},
+                      {id: 'feeds', label: 'Custom feeds — Preview'},
+                      {id: 'inspire', label: 'Inspire next'},
+                      {id: 'live', label: 'Live presence'},
+                    ],
+                  },
+                  {id: 'customize', label: 'Customize Discover layout', icon: 'appearance'},
+                  {id: 'media-grid', label: 'Media grid', icon: 'photo'},
+                  {id: 'open-marketplace', label: 'Open Marketplace', icon: 'marketplace'},
+                  {id: 'open-communities', label: 'Open Communities', icon: 'community'},
                 ]}
                 onAction={id => {
                   if (id === 'open-marketplace') {
@@ -258,19 +266,14 @@ export function DiscoverScreen() {
               </LiquidGlassChrome>
             </SectionEnter>
             <SectionEnter delay={60} from="right">
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{gap: spacing[2]}}>
-                {categories.map(item => (
-                  <Pill
-                    key={item}
-                    label={item}
-                    selected={category === item}
-                    onPress={() => setCategory(item)}
-                  />
-                ))}
-              </ScrollView>
+              <ModulaSegmentedPicker
+                appearance="plain"
+                scrollable
+                accessibilityLabel="Discover category"
+                options={categories.map(item => ({value: item, label: item}))}
+                value={category}
+                onValueChange={next => setCategory(next as Category)}
+              />
             </SectionEnter>
           </View>
 

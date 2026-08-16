@@ -39,10 +39,10 @@ export function ProfileModuleCard({module}: ProfileModuleCardProps) {
     <ModulaContextMenu
       accessibilityLabel={`${module.name} module actions`}
       actions={[
-        {id: 'open', label: 'Open'},
-        {id: 'preview', label: 'Preview'},
-        {id: 'pin', label: 'Pin to Board'},
-        {id: 'share', label: 'Share preview'},
+        {id: 'open', label: 'Open', icon: 'modules'},
+        {id: 'preview', label: 'Preview', icon: 'eye'},
+        {id: 'pin', label: 'Pin to Board', icon: 'bookmark'},
+        {id: 'share', label: 'Share preview', icon: 'share'},
       ]}
       onAction={id => {
         if (id === 'open' || id === 'preview') open()
@@ -80,9 +80,9 @@ export function ProfileModuleCard({module}: ProfileModuleCardProps) {
             <ModulaControlGroup
               label="Module"
               actions={[
-                {id: 'open', label: 'Open', systemImage: 'arrow.up.right'},
-                {id: 'preview', label: 'Preview', systemImage: 'eye'},
-                {id: 'pin', label: 'Pin', systemImage: 'pin'},
+                {id: 'open', label: 'Open', icon: 'modules'},
+                {id: 'preview', label: 'Preview', icon: 'eye'},
+                {id: 'pin', label: 'Pin', icon: 'bookmark'},
               ]}
               onAction={id => {
                 if (id === 'open' || id === 'preview') open()

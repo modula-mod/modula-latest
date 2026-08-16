@@ -175,11 +175,11 @@ export function ActivityScreen() {
                 accessibilityLabel="More activity actions"
                 title="Activity"
                 actions={[
-                  {id: 'notifications', label: 'Notification settings'},
-                  {id: 'markRead', label: 'Mark all as read'},
-                  {id: 'filter', label: 'Open filters'},
-                  {id: 'customize', label: 'Customize Activity'},
-                  {id: 'quiet', label: 'Quiet inbox'},
+                  {id: 'notifications', label: 'Notification settings', icon: 'notifications'},
+                  {id: 'markRead', label: 'Mark all as read', icon: 'check'},
+                  {id: 'filter', label: 'Open filters', icon: 'settings'},
+                  {id: 'customize', label: 'Customize Activity', icon: 'appearance'},
+                  {id: 'quiet', label: 'Quiet inbox', icon: 'privacy'},
                 ]}
                 onAction={id => {
                   if (id === 'notifications') {

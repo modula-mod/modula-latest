@@ -17,10 +17,13 @@ import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
+import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {type ModulaIconName} from '@/platform/ui/icons'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useAppServices} from '@/runtime/useAppServices'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -177,6 +180,21 @@ export function ModuleDetailScreen() {
   const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
   const showSticky = !heroActionVisible
   const releaseNotes = module.releaseNotes?.filter(Boolean) ?? []
+  const shareModule = () =>
+    void shareModulaText({
+      title: copy.name,
+      message: `${copy.name} — ${copy.short}`,
+    })
+  const installLabel =
+    module.installationState === 'available'
+      ? 'Available'
+      : module.installationState === 'enabled'
+        ? 'Open'
+        : module.installationState === 'installed'
+          ? 'Installed'
+          : module.installationState === 'updateAvailable'
+            ? 'Update'
+            : 'Preview'
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
@@ -213,6 +231,29 @@ export function ModuleDetailScreen() {
               onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
             />
           </View>
+          <ChromeCircleButton
+            icon="share"
+            accessibilityLabel={`Share ${copy.name}`}
+            onPress={shareModule}
+          />
+          <ChromeOverflowMenu
+            accessibilityLabel={`${copy.name} actions`}
+            title={copy.name}
+            actions={[
+              {id: 'share', label: 'Share', icon: 'share'},
+              {id: 'hub', label: 'Product Hub', icon: 'modules'},
+              {id: 'settings', label: 'Module settings', icon: 'settings'},
+            ]}
+            onAction={id => {
+              if (id === 'share') shareModule()
+              if (id === 'hub') router.push('/product' as Href)
+              if (id === 'settings') {
+                router.push(
+                  `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
+                )
+              }
+            }}
+          />
         </View>
       </View>
 
@@ -269,9 +310,27 @@ export function ModuleDetailScreen() {
                 />
               )}
             </View>
+            <ProductStatsRow
+              items={[
+                {
+                  label: 'Version',
+                  value: module.latestVersion ?? '—',
+                  detail: 'Package',
+                },
+                {
+                  label: 'Status',
+                  value: installLabel,
+                  detail: module.installable ? 'Installable' : 'Preview',
+                },
+                {
+                  label: 'Publisher',
+                  value: copy.publisher,
+                  detail: module.trustLevel === 'firstParty' ? 'First party' : 'Listed',
+                },
+              ]}
+            />
             <View style={styles.metaRow}>
               <MetaChip label="Private data" />
-              <MetaChip label={`Version ${module.latestVersion ?? 'unreleased'}`} />
               {module.standard?.standardVersion ? <MetaChip label="Module Standard" /> : null}
             </View>
           </View>

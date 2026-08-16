@@ -22,6 +22,8 @@ import {
 import type {SocialComment} from '@/domain/social'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function PostDetailScreen() {
@@ -66,7 +68,41 @@ export function PostDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title="Post" />
+      <SecondaryScreenHeader
+        title="Post"
+        onShare={
+          post
+            ? () =>
+                void shareModulaText({
+                  title: `${post.author.displayName} on Modula`,
+                  message: post.text || 'A post on Modula.',
+                })
+            : undefined
+        }
+        right={
+          <ChromeOverflowMenu
+            accessibilityLabel="Post actions"
+            title="Post"
+            actions={[
+              {id: 'share', label: 'Share', icon: 'share'},
+              {id: 'profile', label: 'Author profile', icon: 'profile'},
+              {id: 'home', label: 'Home', icon: 'home'},
+            ]}
+            onAction={id => {
+              if (id === 'share' && post) {
+                void shareModulaText({
+                  title: `${post.author.displayName} on Modula`,
+                  message: post.text || 'A post on Modula.',
+                })
+              }
+              if (id === 'profile' && post) {
+                router.push(`/profile/${encodeURIComponent(post.author.handle)}` as Href)
+              }
+              if (id === 'home') router.push('/' as Href)
+            }}
+          />
+        }
+      />
       <ResponsiveContent>
         {post ? (
           <>

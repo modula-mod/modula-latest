@@ -50,7 +50,7 @@ export function ModulaIconButton({
           buttonStyle(styleName),
           labelStyle('iconOnly'),
           buttonBorderShape('circle'),
-          controlSize('regular'),
+          controlSize('large'),
         ]
 
   return (
