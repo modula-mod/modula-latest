@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `cover-no-bottom-blur.png` | Owner hero (this pass) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
+| `hero-scroll-welded.png` | Owner hero (this pass) | Cover photo, avatar, and identity share one layout — no parallax desync on a fast fling |
+| `cover-no-bottom-blur.png` | Owner hero (previous) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
 | `picker-center-arrows.png` | Owner hero (previous) | Metric rail gone; numbers centered; 30% arrows above and below the picker |
 | `metrics-down-70.png` | Owner hero (previous) | Metric picker dropped another 50pt (70pt total); avatar 60pt, identity 55pt, inverted SVG unchanged |
 | `metrics-down-20.png` | Owner hero (previous) | Metric picker dropped 20pt; avatar 60pt, identity 55pt, inverted SVG unchanged |

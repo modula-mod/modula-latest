@@ -1,6 +1,5 @@
 import {useState} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
-import type {SharedValue} from 'react-native-reanimated'
 
 import type {
   ModulaProfile,
@@ -35,7 +34,6 @@ type ProfileHeroProps = {
   showActions?: boolean
   compact?: boolean
   onSelectTab: (tabId: string) => void
-  scrollY?: SharedValue<number>
 }
 
 /**
@@ -54,7 +52,6 @@ export function ProfileHero({
   showActions = true,
   compact,
   onSelectTab,
-  scrollY,
 }: ProfileHeroProps) {
   const {width, fontScale} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
@@ -122,8 +119,8 @@ export function ProfileHero({
   )
 
   return (
-    <View style={[styles.wrap, {backgroundColor: colours.canvas}]}>
-      <View style={styles.coverBlock}>
+    <View collapsable={false} style={[styles.wrap, {backgroundColor: colours.canvas}]}>
+      <View collapsable={false} style={styles.coverBlock}>
         <ProfileCover
           profile={profile}
           compact={isCompact}
@@ -138,7 +135,6 @@ export function ProfileHero({
           onEditPress={() => setCoverEditorOpen(true)}
           previewUri={coverDraft ? coverDraft.uri : undefined}
           previewKind={coverDraft?.kind}
-          scrollY={scrollY}
           onPhotoUri={uri => {
             setCoverDraft({uri, kind: 'photo'})
             const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
@@ -152,6 +148,7 @@ export function ProfileHero({
           }}
         />
         <View
+          collapsable={false}
           pointerEvents="box-none"
           style={[
             styles.avatarSlot,

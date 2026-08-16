@@ -1,14 +1,8 @@
 import {Image} from 'expo-image'
 import {Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
-import {useReduceMotion} from '@/lib/accessibility'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {
   applyProfilePhotoMenuAction,
@@ -32,8 +26,6 @@ type ProfileCoverProps = {
   onEditPress?: () => void
   previewUri?: string | null
   previewKind?: 'photo' | 'gradient' | 'solid' | 'none'
-  /** Scroll offset for X-style parallax / collapse. */
-  scrollY?: SharedValue<number>
   onPhotoUri?: (uri: string) => void
   onPhotoRemove?: () => void
   /** Riser between the leading shelf and the raised plateau. */
@@ -58,7 +50,6 @@ export function ProfileCover({
   onEditPress,
   previewUri,
   previewKind,
-  scrollY,
   onPhotoUri,
   onPhotoRemove,
   stepX,
@@ -72,11 +63,10 @@ export function ProfileCover({
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
   const {colours} = useThemeTokens()
-  const reduceMotion = useReduceMotion()
   // NativeTabs still content-insets the first ScrollView even with `never`.
   // Pull the banner into that inset so the photograph sits under the status
-  // bar. Parallax lives on the inner artwork, not this node, so the image
-  // moves with the layout instead of drifting.
+  // bar. No transform on this tree — a parallax layer desyncs the avatar
+  // and identity on a fast fling.
   const height = profileCoverHeight(compact, insets.top, width)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
@@ -88,23 +78,6 @@ export function ProfileCover({
       : profilePlateauDepth(Boolean(compact), false, width),
     height,
   )
-
-  const animatedStyle = useAnimatedStyle(() => {
-    if (reduceMotion) {
-      return {transform: [{translateY: 0}, {scale: 1}]}
-    }
-    const y = scrollY?.value ?? 0
-    return {
-      transform: [
-        {
-          translateY: interpolate(y, [0, height], [0, -height * 0.45], 'clamp'),
-        },
-        {
-          scale: interpolate(y, [-120, 0], [1.35, 1], 'clamp'),
-        },
-      ],
-    }
-  })
 
   const body = (
     <View
@@ -119,27 +92,22 @@ export function ProfileCover({
           backgroundColor: colours.canvas,
         },
       ]}>
-      {/* Only the artwork parallaxes. The canvas step is painted on top of it so
-          the silhouette stays welded to the cover's bottom edge while the
-          photograph drifts underneath. */}
-      <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-        <View
-          style={[
-            styles.artwork,
-            {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
-          ]}>
-          {hasPhoto ? (
-            <Image
-              source={{uri}}
-              style={StyleSheet.absoluteFill}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-            />
-          ) : kind === 'none' ? null : (
-            <CoverAtmosphere wash={emptyFill} />
-          )}
-        </View>
-      </Animated.View>
+      <View
+        style={[
+          styles.artwork,
+          {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
+        ]}>
+        {hasPhoto ? (
+          <Image
+            source={{uri}}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+          />
+        ) : kind === 'none' ? null : (
+          <CoverAtmosphere wash={emptyFill} />
+        )}
+      </View>
       {hasPhoto ? (
         <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
           <ProgressiveBlurBand
@@ -219,7 +187,7 @@ export function ProfileCover({
 
 const styles = StyleSheet.create({
   artwork: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
   },
   cover: {
     overflow: 'hidden',
