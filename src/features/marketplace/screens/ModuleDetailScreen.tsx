@@ -555,7 +555,13 @@ function backendModeLabel(mode: string): string {
 const styles = StyleSheet.create({
   actions: {alignItems: 'flex-start'},
   chrome: {width: '100%'},
-  chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 52},
+  chromeRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexShrink: 0,
+    gap: 12,
+    minHeight: 52,
+  },
   content: {padding: 16},
   flex: {flex: 1, minWidth: 0},
   hero: {alignItems: 'stretch'},

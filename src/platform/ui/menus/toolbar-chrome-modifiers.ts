@@ -1,6 +1,14 @@
-import {buttonBorderShape, buttonStyle, controlSize, imageScale, labelStyle} from '@expo/ui/swift-ui/modifiers'
+import {
+  buttonBorderShape,
+  buttonStyle,
+  controlSize,
+  frame,
+  imageScale,
+  labelStyle,
+} from '@expo/ui/swift-ui/modifiers'
 
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
+import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 
 /**
  * Shared SwiftUI modifiers for toolbar icons.
@@ -25,12 +33,21 @@ export function toolbarIconModifiers(
   ]
 }
 
-/** Plain glyphs inside an overlay glass capsule (same scale as Profile header). */
+/**
+ * Plain glyphs inside an overlay glass capsule.
+ * Same control size as Profile `chrome="plain"` header items, pinned to the
+ * 44pt toolbar hit so Expo Host cannot collapse to the SF Symbol.
+ */
 export function toolbarGroupItemModifiers() {
   return [
     buttonStyle('plain'),
     labelStyle('iconOnly'),
-    controlSize('large'),
+    controlSize('regular'),
     imageScale('large'),
+    frame({
+      alignment: 'center',
+      height: TOOLBAR_HIT,
+      width: TOOLBAR_HIT,
+    }),
   ]
 }

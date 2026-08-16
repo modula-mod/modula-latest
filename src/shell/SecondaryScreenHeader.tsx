@@ -136,6 +136,8 @@ const styles = StyleSheet.create({
   sideEnd: {
     alignItems: 'center',
     flexDirection: 'row',
+    flexGrow: 0,
+    flexShrink: 0,
     gap: 8,
     justifyContent: 'flex-end',
   },

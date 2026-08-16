@@ -71,9 +71,13 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
 const styles = StyleSheet.create({
   capsule: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
+    flexGrow: 0,
+    flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
     minHeight: OVERLAY_GROUP_HIT,
     minWidth: OVERLAY_GROUP_MIN_WIDTH,
+    overflow: 'hidden',
+    width: OVERLAY_GROUP_MIN_WIDTH,
   },
   row: {
     alignItems: 'center',

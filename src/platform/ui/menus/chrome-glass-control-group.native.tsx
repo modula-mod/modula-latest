@@ -40,9 +40,9 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
 /**
  * Overlay trailing share + overflow, sized like Profile's header capsule.
  *
- * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots. Expo Host is given an
- * explicit 44×44 frame and does not matchContents. Callstack glass views are
- * not used here — they shrink to SwiftUI intrinsic size.
+ * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots (110pt wide). Expo Host
+ * is given an explicit 44×44 frame and does not matchContents. Callstack /
+ * SwiftUI ControlGroup are not used — they shrink to compact intrinsic size.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const {scheme} = useThemeTokens()
@@ -50,71 +50,89 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
   const isDark = scheme === 'dark'
 
   return (
-    <View style={styles.capsule}>
-      <BlurView
-        pointerEvents="none"
-        intensity={64}
-        tint={isDark ? 'systemUltraThinMaterialDark' : 'systemUltraThinMaterialLight'}
-        style={StyleSheet.absoluteFill}
-      />
-      <View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.55)',
-            borderColor: isDark ? 'rgba(255,255,255,0.24)' : 'rgba(0,0,0,0.08)',
-            borderRadius: OVERLAY_GROUP_HIT / 2,
-            borderWidth: StyleSheet.hairlineWidth,
-          },
-        ]}
-      />
-      <View style={styles.row}>
-        {items.map(item => (
-          <View key={item.accessibilityLabel} style={styles.hit}>
-            <Host style={styles.hit}>
-              {item.kind === 'button' ? (
-                <Button
-                  label={item.accessibilityLabel}
-                  systemImage={sfSymbolForIcon(item.icon) as never}
-                  modifiers={itemModifiers}
-                  onPress={item.onPress}
-                />
-              ) : (
-                <Menu
-                  label={item.accessibilityLabel}
-                  systemImage="ellipsis"
-                  modifiers={itemModifiers}>
-                  {renderTapMenuItems(item.actions, item.onAction)}
-                </Menu>
-              )}
-            </Host>
-          </View>
-        ))}
+    <View style={styles.shell}>
+      <View style={styles.clip}>
+        <BlurView
+          pointerEvents="none"
+          intensity={80}
+          tint={isDark ? 'systemMaterialDark' : 'systemMaterialLight'}
+          style={StyleSheet.absoluteFill}
+        />
+        <View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              backgroundColor: isDark ? 'rgba(28,32,36,0.78)' : 'rgba(255,255,255,0.92)',
+              borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.12)',
+              borderRadius: OVERLAY_GROUP_HIT / 2,
+              borderWidth: StyleSheet.hairlineWidth,
+            },
+          ]}
+        />
+        <View style={styles.row}>
+          {items.map(item => (
+            <View key={item.accessibilityLabel} style={styles.hit}>
+              <Host style={styles.hit}>
+                {item.kind === 'button' ? (
+                  <Button
+                    label={item.accessibilityLabel}
+                    systemImage={sfSymbolForIcon(item.icon) as never}
+                    modifiers={itemModifiers}
+                    onPress={item.onPress}
+                  />
+                ) : (
+                  <Menu
+                    label={item.accessibilityLabel}
+                    systemImage="ellipsis"
+                    modifiers={itemModifiers}>
+                    {renderTapMenuItems(item.actions, item.onAction)}
+                  </Menu>
+                )}
+              </Host>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  capsule: {
+  clip: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
+    flexGrow: 0,
+    flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
-    minHeight: OVERLAY_GROUP_HIT,
-    minWidth: OVERLAY_GROUP_MIN_WIDTH,
     overflow: 'hidden',
     width: OVERLAY_GROUP_MIN_WIDTH,
   },
   hit: {
+    alignItems: 'center',
     height: OVERLAY_GROUP_HIT,
+    justifyContent: 'center',
     width: OVERLAY_GROUP_HIT,
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
+    flexGrow: 0,
+    flexShrink: 0,
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
+    width: OVERLAY_GROUP_MIN_WIDTH,
+  },
+  shell: {
+    borderRadius: OVERLAY_GROUP_HIT / 2,
+    elevation: 3,
+    flexGrow: 0,
+    flexShrink: 0,
+    height: OVERLAY_GROUP_HIT,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.16,
+    shadowRadius: 6,
     width: OVERLAY_GROUP_MIN_WIDTH,
   },
 })
