@@ -20,11 +20,13 @@ import {
   profileMetricWindowHeight,
 } from '@/features/profile/model/profile-layout'
 import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const NEIGHBOR_OPACITY = 0.34
 const FAR_OPACITY = 0.16
 const NEIGHBOR_SCALE = 0.88
+const ARROW_OPACITY = 0.3
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
 
@@ -161,8 +163,7 @@ export function ProfileMetricPicker({
   const accessibilityValue = selected
     ? `${selected.label}, ${metricSpokenValue(selected)}, selected, ${selectedIndex + 1} of ${count}.`
     : undefined
-  const showFocal = count > 1
-  const selectedTop = selectedRow * ITEM_HEIGHT
+  const showHints = count > 1
 
   if (count === 1 && selected) {
     return (
@@ -199,43 +200,8 @@ export function ProfileMetricPicker({
         }}
         testID="profile-metric-picker"
         style={[styles.gesture, {minHeight: Math.max(44, windowHeight)}]}>
+        {showHints ? <PickerHintArrow name="arrowUp" colour={colours.text} /> : null}
         <View style={[styles.window, {height: windowHeight}]}>
-          {showFocal ? (
-            <View
-              pointerEvents="none"
-              accessible={false}
-              importantForAccessibility="no-hide-descendants"
-              style={[
-                styles.focal,
-                {
-                  backgroundColor: colours.text,
-                  top: selectedTop + 8,
-                  height: ITEM_HEIGHT - 16,
-                },
-              ]}
-            />
-          ) : null}
-          {showFocal ? (
-            <View
-              style={styles.rail}
-              accessible={false}
-              importantForAccessibility="no-hide-descendants">
-              {metrics.map((metric, index) => (
-                <View
-                  key={metric.id}
-                  style={[
-                    styles.dot,
-                    {
-                      backgroundColor:
-                        index === selectedIndex ? colours.text : colours.textTertiary,
-                      opacity: index === selectedIndex ? 0.85 : 0.28,
-                      transform: [{scale: index === selectedIndex ? 1 : 0.72}],
-                    },
-                  ]}
-                />
-              ))}
-            </View>
-          ) : null}
           {metrics.map((metric, index) => (
             <MetricWheelItem
               key={metric.id}
@@ -268,8 +234,27 @@ export function ProfileMetricPicker({
             />
           </View>
         </View>
+        {showHints ? <PickerHintArrow name="arrowDown" colour={colours.text} /> : null}
       </View>
     </GestureDetector>
+  )
+}
+
+function PickerHintArrow({
+  name,
+  colour,
+}: {
+  name: 'arrowUp' | 'arrowDown'
+  colour: string
+}) {
+  return (
+    <View
+      pointerEvents="none"
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      style={styles.hint}>
+      <ModulaIcon name={name} colour={colour} size={12} />
+    </View>
   )
 }
 
@@ -297,13 +282,15 @@ function MetricCopy({
       <AppText
         variant={selected ? 'title2' : 'headline'}
         numberOfLines={1}
-        colour={selected ? 'text' : 'textSecondary'}>
+        colour={selected ? 'text' : 'textSecondary'}
+        style={styles.copyText}>
         {metricDisplayValue(metric)}
       </AppText>
       <AppText
         variant="micro"
         numberOfLines={1}
-        colour={selected ? 'textSecondary' : 'textTertiary'}>
+        colour={selected ? 'textSecondary' : 'textTertiary'}
+        style={styles.copyText}>
         {metric.label}
       </AppText>
     </View>
@@ -357,40 +344,27 @@ function MetricWheelItem({
   )
 }
 
-const FOCAL_GUTTER = 14
-
 const styles = StyleSheet.create({
   copy: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     minWidth: 0,
-    paddingLeft: FOCAL_GUTTER,
+    width: '100%',
   },
-  dot: {
-    borderRadius: 2,
-    height: 4,
-    width: 4,
-  },
-  focal: {
-    borderRadius: 1.5,
-    left: 0,
-    opacity: 0.55,
-    position: 'absolute',
-    width: 2,
-  },
-  rail: {
-    bottom: 8,
-    gap: 5,
-    justifyContent: 'center',
-    left: 0,
-    position: 'absolute',
-    top: 8,
-    width: 8,
+  copyText: {
+    textAlign: 'center',
+    width: '100%',
   },
   gesture: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+  },
+  hint: {
+    alignItems: 'center',
+    height: 16,
+    justifyContent: 'center',
+    opacity: ARROW_OPACITY,
   },
   hit: {
     left: 0,
@@ -398,16 +372,15 @@ const styles = StyleSheet.create({
     right: 0,
   },
   item: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
     left: 0,
     position: 'absolute',
     right: 0,
   },
   single: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'center',
-    paddingLeft: FOCAL_GUTTER,
   },
   window: {
     overflow: 'hidden',

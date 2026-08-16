@@ -171,7 +171,9 @@ assert.doesNotMatch(
   /identityColumnPad: PROFILE_LAYOUT\.cradleGap \+ plateauRadius \+ 12/,
 )
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /metricColumnTop/)
-assert.match(read('src/features/profile/components/ProfileMetricPicker.tsx'), /styles.rail/)
+assert.doesNotMatch(read('src/features/profile/components/ProfileMetricPicker.tsx'), /styles.rail/)
+assert.match(read('src/features/profile/components/ProfileMetricPicker.tsx'), /ARROW_OPACITY = 0.3/)
+assert.match(read('src/features/profile/components/ProfileMetricPicker.tsx'), /textAlign: 'center'/)
 const morph = read('src/features/profile/components/ProfileHeaderTitle.tsx')
 assert.match(morph, /LiquidGlassChrome/)
 assert.match(morph, /@\{profile\.handle\}/)
