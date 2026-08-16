@@ -111,7 +111,7 @@ App Store product-page overlay is the reference for **small circular glass contr
 - `ToolbarChrome` / `toolbarIconModifiers`: overlay `glass` is `controlSize('extraLarge')` (Expo UI glass circle). Capsule `plain` glyphs stay `regular`. Overlay host is `OVERLAY_GLASS_HIT` (52)
 - Shell tabs are Expo Router `NativeTabs` (`expo-router/unstable-native-tabs`) — real iOS 26 Liquid Glass `UITabBarController`. No Callstack floating pill. `minimizeBehavior="onScrollDown"`. Wrap in Expo Router `ThemeProvider` so iOS 26 glass does not flash white. Do not set `backgroundColor`, `blurEffect`, or `disableTransparentOnScrollEdge` (iOS 18-only; they kill Liquid Glass)
 - Create is a hidden NativeTabs trigger (`/compose` is the Home header action). Board is a **root stack** screen (`src/app/board`) so the drawer can open it without focusing a hidden tab
-- Module Detail / Customize / Saved trailing actions use `ChromeGlassControlGroup` — a glass HStack capsule with Profile’s 44pt hits and 22pt icon gap. SwiftUI ControlGroup is compact and is not used for this chrome
+- Module Detail / Customize / Saved trailing actions use `ChromeGlassControlGroup` — a 44pt glass capsule with Profile’s 22pt icon gap. Inner glyphs are plain 44pt hosts (same as Profile header items). Compact SwiftUI ControlGroup is not used
 - Global back is `ModulaBackButton` — overlay screens use glass; Profile and Activity tabs use plain in the header capsule
 - Activity header is one control group (mark-read + settings + overflow). No second in-page check / settings / more row
 - Native Home / Profile / Activity / Board / Reels headers pass `chrome="plain"`
