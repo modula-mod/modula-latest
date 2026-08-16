@@ -2,12 +2,13 @@ import {
   Button,
   ContextMenu,
   HStack,
+  Picker,
   Section,
   Text,
   Toggle,
   VStack,
 } from '@expo/ui/swift-ui'
-import {font, foregroundStyle} from '@expo/ui/swift-ui/modifiers'
+import {font, foregroundStyle, tag} from '@expo/ui/swift-ui/modifiers'
 
 import {useExpoUiLab} from '@/platform/ui/dev/expo-ui-lab/LabContext'
 
@@ -15,7 +16,7 @@ import {useExpoUiLab} from '@/platform/ui/dev/expo-ui-lab/LabContext'
  * Nested menus use ContextMenu-as-submenu (Submenu is deprecated in SDK 57).
  */
 export function ContextMenuSection() {
-  const {contextMenuStates, updateContextMenuState, tasks, toggleTask} =
+  const {contextMenuStates, updateContextMenuState, tasks, toggleTask, taskFilter, setTaskFilter} =
     useExpoUiLab()
 
   return (
@@ -25,8 +26,8 @@ export function ContextMenuSection() {
           Interactive Context Menu
         </Text>
         <Text modifiers={[font({size: 12}), foregroundStyle('gray')]}>
-          Long-press the menu button for nested options, toggles, and
-          destructive actions.
+          Long-press the menu button for nested options, a tab picker, toggles,
+          and destructive actions.
         </Text>
 
         <HStack spacing={16} alignment="center">
@@ -37,6 +38,20 @@ export function ContextMenuSection() {
                 label="Task Overview"
                 onPress={() => undefined}
               />
+
+              <Picker
+                label="Jump to tab"
+                systemImage="square.grid.2x2"
+                selection={taskFilter}
+                onSelectionChange={value => {
+                  if (value === 'all' || value === 'pending' || value === 'completed') {
+                    setTaskFilter(value)
+                  }
+                }}>
+                <Text modifiers={[tag('all')]}>All</Text>
+                <Text modifiers={[tag('pending')]}>Pending</Text>
+                <Text modifiers={[tag('completed')]}>Completed</Text>
+              </Picker>
 
               <ContextMenu>
                 <ContextMenu.Trigger>
@@ -153,6 +168,9 @@ export function ContextMenuSection() {
           <VStack spacing={4} alignment="leading">
             <Text modifiers={[font({size: 12}), foregroundStyle('gray')]}>
               Features:
+            </Text>
+            <Text modifiers={[font({size: 10}), foregroundStyle('gray')]}>
+              · Tabs in menu (Picker)
             </Text>
             <Text modifiers={[font({size: 10}), foregroundStyle('gray')]}>
               · Nested submenus

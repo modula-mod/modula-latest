@@ -166,9 +166,36 @@ export function ModulaPrimitivesLabScreen() {
       <LabBlock title="Context menu">
         <ModulaContextMenu
           accessibilityLabel="Sample context menu"
-          actions={[{id: 'open', label: 'Open'}, {id: 'share', label: 'Share'}]}
+          title="Actions"
+          actions={[
+            {id: 'share', label: 'Share', icon: 'share'},
+            {
+              id: 'mute',
+              label: 'Mute',
+              icon: 'notifications',
+              children: [
+                {id: 'mute-8h', label: '8 hours'},
+                {id: 'mute-1w', label: '1 week'},
+              ],
+            },
+            {
+              id: 'open-tab',
+              label: 'Open tab',
+              icon: 'board',
+              picker: {
+                options: [
+                  {id: 'posts', label: 'Posts'},
+                  {id: 'media', label: 'Media'},
+                ],
+                selectedId: 'posts',
+              },
+            },
+            {id: 'delete', label: 'Delete', icon: 'trash', style: 'destructive'},
+          ]}
           onAction={() => undefined}>
-          <AppText variant="body">Long-press this row for the context menu adapter.</AppText>
+          <AppText variant="body">
+            Long-press for nested Mute, a tab picker, and Delete.
+          </AppText>
         </ModulaContextMenu>
       </LabBlock>
 

@@ -1,7 +1,8 @@
-import {Button, Host, Menu, RNHostView} from '@expo/ui/swift-ui'
+import {Host, Menu, RNHostView} from '@expo/ui/swift-ui'
 import type {ReactNode} from 'react'
 import {View} from 'react-native'
 
+import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
 type ModulaMenuProps = {
@@ -28,8 +29,6 @@ export function ModulaMenu({
     return <View accessibilityLabel={accessibilityLabel}>{trigger}</View>
   }
 
-  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
-
   return (
     <Host matchContents>
       <Menu
@@ -40,22 +39,8 @@ export function ModulaMenu({
             </View>
           </RNHostView>
         }>
-        {visibleActions.map(action => (
-          <Button
-            key={action.id}
-            label={action.accessibilityLabel ?? getActionLabel(action)}
-            role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
-            onPress={() => {
-              if (!action.disabled) onAction(action.id)
-            }}
-          />
-        ))}
+        {renderTapMenuItems(actions, onAction)}
       </Menu>
     </Host>
   )
-}
-
-function getActionLabel(action: ModulaActionItem): string {
-  if (!action.disabled || !action.disabledReason) return action.label
-  return `${action.label} unavailable — ${action.disabledReason}`
 }

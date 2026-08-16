@@ -2,7 +2,7 @@ import type {ReactNode} from 'react'
 import {Pressable} from 'react-native'
 
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
-import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import type {ModulaActionItem, ModulaMenuFit} from '@/platform/ui/menus/types'
 
 type ModulaContextMenuProps = {
   children: ReactNode
@@ -11,6 +11,7 @@ type ModulaContextMenuProps = {
   onAction: (actionId: string) => void
   accessibilityLabel?: string
   disabled?: boolean
+  fit?: ModulaMenuFit
 }
 
 /**

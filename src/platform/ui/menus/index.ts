@@ -1,9 +1,13 @@
 export {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 export type {ConfirmModulaActionOptions} from '@/platform/ui/menus/confirmModulaAction'
 export {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+export {flattenModulaActions} from '@/platform/ui/menus/flatten-actions'
 export type {
   ModulaActionItem,
+  ModulaActionPicker,
+  ModulaActionPickerOption,
   ModulaActionStyle,
+  ModulaMenuFit,
   PresentModulaActionsOptions,
 } from '@/platform/ui/menus/types'
 export {ModulaMenu} from '@/platform/ui/menus/modula-menu'

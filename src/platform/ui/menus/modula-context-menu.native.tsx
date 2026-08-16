@@ -1,8 +1,9 @@
-import {Button, ContextMenu, Host} from '@expo/ui/swift-ui'
+import {ContextMenu, Host} from '@expo/ui/swift-ui'
 import type {ReactNode} from 'react'
 import {StyleSheet, View} from 'react-native'
 
-import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {renderContextMenuItems} from '@/platform/ui/menus/native-menu-items'
+import type {ModulaActionItem, ModulaMenuFit} from '@/platform/ui/menus/types'
 
 type ModulaContextMenuProps = {
   children: ReactNode
@@ -11,6 +12,12 @@ type ModulaContextMenuProps = {
   onAction: (actionId: string) => void
   accessibilityLabel?: string
   disabled?: boolean
+  /**
+   * `fill` (default) stretches the Host across a list row — required so
+   * Activity / feed cells are not crush-sized. `content` uses matchContents
+   * for compact triggers such as avatars.
+   */
+  fit?: ModulaMenuFit
 }
 
 /**
@@ -27,41 +34,28 @@ export function ModulaContextMenu({
   onAction,
   accessibilityLabel,
   disabled,
+  fit = 'fill',
 }: ModulaContextMenuProps) {
   if (disabled) {
-    return <View style={styles.fill}>{children}</View>
+    return <View style={fit === 'fill' ? styles.fill : undefined}>{children}</View>
   }
 
-  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
+  const contentFit = fit === 'content'
 
   return (
-    <Host style={styles.fill}>
+    <Host matchContents={contentFit} style={contentFit ? undefined : styles.fill}>
       <ContextMenu>
-        <ContextMenu.Items>
-          {visibleActions.map(action => (
-            <Button
-              key={action.id}
-              label={action.accessibilityLabel ?? getActionLabel(action)}
-              role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
-              onPress={() => {
-                if (!action.disabled) onAction(action.id)
-              }}
-            />
-          ))}
-        </ContextMenu.Items>
+        <ContextMenu.Items>{renderContextMenuItems(actions, onAction)}</ContextMenu.Items>
         <ContextMenu.Trigger>
-          <View style={styles.fill} accessibilityLabel={accessibilityLabel}>
+          <View
+            style={contentFit ? undefined : styles.fill}
+            accessibilityLabel={accessibilityLabel}>
             {children}
           </View>
         </ContextMenu.Trigger>
       </ContextMenu>
     </Host>
   )
-}
-
-function getActionLabel(action: ModulaActionItem): string {
-  if (!action.disabled || !action.disabledReason) return action.label
-  return `${action.label} unavailable — ${action.disabledReason}`
 }
 
 const styles = StyleSheet.create({

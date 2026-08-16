@@ -73,25 +73,52 @@ export function ProfileHero({
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
         scrollY={scrollY}
+        onPhotoUri={uri => {
+          setCoverDraft({uri, kind: 'photo'})
+          const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
+          if (coverUri === undefined) return
+          void updateProfile.mutateAsync({coverUri})
+        }}
+        onPhotoRemove={() => {
+          setCoverDraft({uri: null, kind: 'none'})
+          if (!profile.coverUri) return
+          void updateProfile.mutateAsync({coverUri: null})
+        }}
       />
       <View
         style={[
-          styles.body,
+          styles.identitySheet,
           {
+            backgroundColor: colours.canvas,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            marginTop: -24,
             paddingHorizontal: spacing[4],
             paddingBottom: spacing[4],
-            marginTop: -(avatarSize / 2),
             gap: spacing[3],
           },
         ]}>
-        <ProfileAvatar
-          profile={profile}
-          size={avatarSize}
-          showFocusHalo={presentation.showFocusHalo}
-          canEdit={canEdit}
-          onEditPress={() => setAvatarEditorOpen(true)}
-          previewUri={avatarDraft ? avatarDraft.uri : undefined}
-        />
+        <View style={{marginTop: -(avatarSize / 2), zIndex: 2}}>
+          <ProfileAvatar
+            profile={profile}
+            size={avatarSize}
+            showFocusHalo={presentation.showFocusHalo}
+            canEdit={canEdit}
+            onEditPress={() => setAvatarEditorOpen(true)}
+            previewUri={avatarDraft ? avatarDraft.uri : undefined}
+            onPhotoUri={uri => {
+              setAvatarDraft({uri, sourceUri: uri})
+              const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+              if (avatarUri === undefined) return
+              void updateProfile.mutateAsync({avatarUri})
+            }}
+            onPhotoRemove={() => {
+              setAvatarDraft({uri: null, sourceUri: null})
+              if (!profile.avatarUri) return
+              void updateProfile.mutateAsync({avatarUri: null})
+            }}
+          />
+        </View>
         <ProfileIdentity profile={profile} viewer={viewer} compact={isCompact} />
         <HeroViewingCopy viewer={viewer} />
       </View>
@@ -183,7 +210,7 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 }
 
 const styles = StyleSheet.create({
-  body: {
+  identitySheet: {
     alignItems: 'flex-start',
   },
   section: {

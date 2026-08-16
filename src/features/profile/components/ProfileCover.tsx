@@ -10,7 +10,12 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
+import {
+  applyProfilePhotoMenuAction,
+  profilePhotoMenuActions,
+} from '@/features/profile/components/profile-photo-menu'
 import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileCoverProps = {
@@ -22,6 +27,8 @@ type ProfileCoverProps = {
   previewKind?: 'photo' | 'gradient' | 'solid' | 'none'
   /** Scroll offset for X-style parallax / collapse. */
   scrollY?: SharedValue<number>
+  onPhotoUri?: (uri: string) => void
+  onPhotoRemove?: () => void
 }
 
 export function ProfileCover({
@@ -32,6 +39,8 @@ export function ProfileCover({
   previewUri,
   previewKind,
   scrollY,
+  onPhotoUri,
+  onPhotoRemove,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {colours, spacing} = useThemeTokens()
@@ -64,7 +73,6 @@ export function ProfileCover({
           height,
           backgroundColor:
             kind === 'none' ? colours.surface2 : profile.coverColour ?? colours.accentSubtle,
-          borderBottomColor: colours.border,
         },
         animatedStyle,
       ]}>
@@ -102,23 +110,52 @@ export function ProfileCover({
     </Animated.View>
   )
 
-  if (!canEdit || !onEditPress) {
+  if (!canEdit) {
     return body
   }
 
-  return (
+  const trigger = onEditPress ? (
     <Pressable
       accessibilityLabel="Edit profile cover"
       accessibilityRole="button"
       onPress={onEditPress}>
       {body}
     </Pressable>
+  ) : (
+    body
+  )
+
+  if (!onPhotoUri || !onPhotoRemove) {
+    return trigger
+  }
+
+  const applyUri = onPhotoUri
+  const applyRemove = onPhotoRemove
+
+  return (
+    <ModulaContextMenu
+      fit="fill"
+      accessibilityLabel="Cover photo actions"
+      title="Cover photo"
+      actions={profilePhotoMenuActions({
+        hasPhoto: Boolean(uri) && kind !== 'none',
+        removeLabel: 'Remove cover image',
+      })}
+      onAction={id => {
+        void applyProfilePhotoMenuAction({
+          actionId: id,
+          target: 'cover',
+          onUri: applyUri,
+          onRemove: applyRemove,
+        })
+      }}>
+      {trigger}
+    </ModulaContextMenu>
   )
 }
 
 const styles = StyleSheet.create({
   cover: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
     width: '100%',
   },

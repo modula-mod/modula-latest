@@ -90,3 +90,14 @@ Canonical chrome:
 - `CoverAtmosphere` / `HubAtmosphere` for paper/ink scene art when there is no photograph
 
 Applied to Profile, Board, Settings, Product Hub, Discover, Activity, module detail, and empty states. Accent stays a verb. No 7M-C whole-app rollout.
+
+## Profile menus (B6 follow-up)
+
+Glass stays chrome-only. Expo UI ContextMenu / Menu (SDK 57.0.10) is the native menu surface:
+
+- `ModulaActionItem` now carries a semantic `icon`, nested `children` (Mute ›), and `picker` (tabs inside the menu)
+- Native adapters render SF Symbols, nested ContextMenu/Menu, and Picker; web/Android flatten to an action sheet
+- Profile: long-press cover/avatar to change photo; More includes nested Mute; long-press the tab bar to jump tabs
+- Edit Profile: live cover + overlapping avatar preview, grouped identity fields, focus as a check list — not icon-in-pastel-square controls
+
+Siren.uix / Apple-density references inform hierarchy (overlapping identity, grouped lists, destructive red). This is not an Apple clone and not a glass wallpaper.

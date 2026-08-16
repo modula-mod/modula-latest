@@ -27,14 +27,15 @@ export async function presentMediaSourceMenu(
   options: PresentMediaSourceMenuOptions,
 ): Promise<MediaSourceMenuResult> {
   const actions: ModulaActionItem[] = [
-    {id: 'library', label: 'Choose Photo'},
-    {id: 'camera', label: 'Take Photo'},
+    {id: 'library', label: 'Choose Photo', icon: 'photo'},
+    {id: 'camera', label: 'Take Photo', icon: 'camera'},
   ]
 
   if (options.includeRemove) {
     actions.push({
       id: 'remove',
       label: options.removeLabel ?? 'Remove Photo',
+      icon: 'trash',
       style: 'destructive',
     })
   }

@@ -3,6 +3,11 @@ import {Pressable, StyleSheet, type StyleProp, type ViewStyle} from 'react-nativ
 import {Avatar} from '@/components/primitives/Avatar'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {FocusHalo} from '@/features/profile/components/FocusHalo'
+import {
+  applyProfilePhotoMenuAction,
+  profilePhotoMenuActions,
+} from '@/features/profile/components/profile-photo-menu'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileAvatarProps = {
@@ -13,6 +18,8 @@ type ProfileAvatarProps = {
   canEdit?: boolean
   onEditPress?: () => void
   previewUri?: string | null
+  onPhotoUri?: (uri: string) => void
+  onPhotoRemove?: () => void
 }
 
 export function ProfileAvatar({
@@ -23,6 +30,8 @@ export function ProfileAvatar({
   canEdit,
   onEditPress,
   previewUri,
+  onPhotoUri,
+  onPhotoRemove,
 }: ProfileAvatarProps) {
   const {colours} = useThemeTokens()
   const uri = previewUri === undefined ? profile.avatarUri : previewUri ?? undefined
@@ -50,17 +59,47 @@ export function ProfileAvatar({
     </FocusHalo>
   )
 
-  if (!canEdit || !onEditPress) {
+  if (!canEdit) {
     return avatar
   }
 
-  return (
+  const trigger = onEditPress ? (
     <Pressable
       accessibilityLabel="Change profile photo"
       accessibilityRole="button"
       onPress={onEditPress}>
       {avatar}
     </Pressable>
+  ) : (
+    avatar
+  )
+
+  if (!onPhotoUri || !onPhotoRemove) {
+    return trigger
+  }
+
+  const applyUri = onPhotoUri
+  const applyRemove = onPhotoRemove
+
+  return (
+    <ModulaContextMenu
+      fit="content"
+      accessibilityLabel="Profile photo actions"
+      title="Profile photo"
+      actions={profilePhotoMenuActions({
+        hasPhoto: Boolean(uri),
+        removeLabel: 'Remove profile picture',
+      })}
+      onAction={id => {
+        void applyProfilePhotoMenuAction({
+          actionId: id,
+          target: 'avatar',
+          onUri: applyUri,
+          onRemove: applyRemove,
+        })
+      }}>
+      {trigger}
+    </ModulaContextMenu>
   )
 }
 

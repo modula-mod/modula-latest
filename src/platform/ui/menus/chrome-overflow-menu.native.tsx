@@ -1,10 +1,11 @@
-import {Button, Host, Menu} from '@expo/ui/swift-ui'
+import {Host, Menu} from '@expo/ui/swift-ui'
 import {
   buttonStyle,
   controlSize,
   labelStyle,
 } from '@expo/ui/swift-ui/modifiers'
 
+import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
 type ChromeOverflowMenuProps = {
@@ -22,8 +23,6 @@ export function ChromeOverflowMenu({
   onAction,
   accessibilityLabel = 'More actions',
 }: ChromeOverflowMenuProps) {
-  const visibleActions = actions.filter(action => !action.disabled || action.disabledReason)
-
   return (
     <Host matchContents>
       <Menu
@@ -34,20 +33,7 @@ export function ChromeOverflowMenu({
           labelStyle('iconOnly'),
           controlSize('regular'),
         ]}>
-        {visibleActions.map(action => (
-          <Button
-            key={action.id}
-            label={
-              action.disabled && action.disabledReason
-                ? `${action.label} unavailable — ${action.disabledReason}`
-                : action.label
-            }
-            role={!action.disabled && action.style === 'destructive' ? 'destructive' : undefined}
-            onPress={() => {
-              if (!action.disabled) onAction(action.id)
-            }}
-          />
-        ))}
+        {renderTapMenuItems(actions, onAction)}
       </Menu>
     </Host>
   )

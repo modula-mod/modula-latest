@@ -11,6 +11,7 @@ import type {
 } from '@/features/profile/contracts/profile'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -20,6 +21,32 @@ import {shareProfile} from '@/features/profile/services/shareProfile'
 type ProfileActionsProps = {
   profile: ModulaProfile
   viewer: ProfileViewerContext
+}
+
+const OWNER_MORE_ACTIONS: ModulaActionItem[] = [
+  {id: 'os', label: 'Profile-OS', icon: 'settings'},
+  {id: 'customize', label: 'Customize', icon: 'appearance'},
+  {id: 'share', label: 'Share profile', icon: 'share'},
+  {id: 'preview', label: 'View as visitor', icon: 'eye'},
+]
+
+function visitorMoreActions(): ModulaActionItem[] {
+  return [
+    {id: 'share', label: 'Share profile', icon: 'share'},
+    {id: 'copy', label: 'Copy profile link', icon: 'link'},
+    {
+      id: 'mute',
+      label: 'Mute',
+      icon: 'notifications',
+      children: [
+        {id: 'mute-8h', label: '8 hours'},
+        {id: 'mute-1w', label: '1 week'},
+        {id: 'mute-forever', label: 'Forever'},
+      ],
+    },
+    {id: 'block', label: 'Block preview', icon: 'privacy', style: 'destructive'},
+    {id: 'report', label: 'Report preview', icon: 'warning', style: 'destructive'},
+  ]
 }
 
 export function ProfileActions({profile, viewer}: ProfileActionsProps) {
@@ -43,12 +70,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
         <ModulaMenu
           accessibilityLabel="More profile actions"
           title="Profile"
-          actions={[
-            {id: 'os', label: 'Profile-OS'},
-            {id: 'customize', label: 'Customize'},
-            {id: 'share', label: 'Share profile'},
-            {id: 'preview', label: 'View as visitor'},
-          ]}
+          actions={OWNER_MORE_ACTIONS}
           onAction={id => {
             if (id === 'os') router.push('/profile/os' as Href)
             if (id === 'customize') router.push('/profile/customize' as Href)
@@ -82,10 +104,11 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
         }}
         style={[
           styles.button,
+          styles.primary,
           {
             backgroundColor: profile.isFollowing ? colours.surfaceRaised : colours.accent,
             borderColor: profile.isFollowing ? colours.border : 'transparent',
-            borderRadius: radius.md,
+            borderRadius: radius.round,
             paddingHorizontal: spacing[4],
           },
         ]}>
@@ -100,13 +123,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
       <ModulaMenu
         accessibilityLabel="More profile actions"
         title={profile.displayName}
-        actions={[
-          {id: 'share', label: 'Share profile'},
-          {id: 'copy', label: 'Copy profile link'},
-          {id: 'mute', label: 'Mute preview', style: 'destructive'},
-          {id: 'block', label: 'Block preview', style: 'destructive'},
-          {id: 'report', label: 'Report preview', style: 'destructive'},
-        ]}
+        actions={visitorMoreActions()}
         onAction={id => {
           if (id === 'share' || id === 'copy') void shareProfile(profile)
         }}

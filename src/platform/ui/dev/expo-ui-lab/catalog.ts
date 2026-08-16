@@ -53,10 +53,10 @@ export const EXPO_UI_LAB_SECTIONS: ExpoUiLabSectionMeta[] = [
   {
     id: 'context-menu',
     title: 'Context menus',
-    summary: 'Long-press menus with nested menus, toggles, and destructive actions.',
-    expoComponents: ['ContextMenu', 'Menu', 'Button', 'Toggle'],
+    summary: 'Long-press menus with nested submenus, tab pickers, SF Symbols, and destructive actions.',
+    expoComponents: ['ContextMenu', 'Menu', 'Button', 'Toggle', 'Picker'],
     modulaWrappers: ['ModulaContextMenu', 'ModulaMenu', 'presentModulaActions'],
-    suggestedContexts: ['Feed post overflow', 'Messages rows', 'Activity items'],
+    suggestedContexts: ['Profile photo / cover', 'Profile tabs', 'Feed post overflow', 'Activity items'],
     status: 'wrapped',
   },
   {

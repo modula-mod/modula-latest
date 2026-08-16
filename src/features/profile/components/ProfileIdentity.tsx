@@ -43,6 +43,7 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
         </View>
         <AppText variant="body" colour="textSecondary" selectable>
           @{profile.handle}
+          {profile.pronouns ? ` · ${profile.pronouns}` : ''}
         </AppText>
       </View>
 

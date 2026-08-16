@@ -1,5 +1,7 @@
 import {ActionSheetIOS, Alert, Platform} from 'react-native'
 
+import {flattenModulaActions} from '@/platform/ui/menus/flatten-actions'
+import {getActionLabel} from '@/platform/ui/menus/action-label'
 import type {
   ModulaActionItem,
   PresentModulaActionsOptions,
@@ -9,13 +11,14 @@ import type {
  * Imperative overflow / More menu.
  * Uses ActionSheetIOS on iOS and Alert buttons elsewhere until Phase 4.5
  * swaps the body for `@expo/ui` ContextMenu / Menu hosts.
+ * Nested submenus and pickers flatten into a single list.
  * Product screens should call this (or Modula wrappers) — never import SwiftUI.
  */
 export function presentModulaActions(
   options: PresentModulaActionsOptions,
 ): Promise<string | null> {
   const cancelLabel = options.cancelLabel ?? 'Cancel'
-  const visibleActions = options.actions.filter(
+  const visibleActions = flattenModulaActions(options.actions).filter(
     action => !action.disabled || action.disabledReason,
   )
 
@@ -24,11 +27,6 @@ export function presentModulaActions(
   }
 
   return presentAlertActions(options, visibleActions, cancelLabel)
-}
-
-function getActionLabel(action: ModulaActionItem): string {
-  if (!action.disabled || !action.disabledReason) return action.label
-  return `${action.label} unavailable — ${action.disabledReason}`
 }
 
 function presentIosActionSheet(
