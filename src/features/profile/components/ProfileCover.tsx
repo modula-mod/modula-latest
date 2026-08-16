@@ -35,8 +35,12 @@ export const PROFILE_COVER_BODY = 180
 const TOP_BLUR = 28
 const BOTTOM_BLUR = 72
 
+export function profileCoverBody(compact: boolean | undefined) {
+  return compact ? 156 : PROFILE_COVER_BODY
+}
+
 export function profileCoverHeight(compact: boolean | undefined, insetTop: number) {
-  return (compact ? 156 : PROFILE_COVER_BODY) + insetTop
+  return profileCoverBody(compact) + insetTop
 }
 
 export function ProfileCover({
@@ -55,7 +59,7 @@ export function ProfileCover({
   const height = profileCoverHeight(compact, insets.top)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
-  const emptyFill = profile.coverColour ?? colours.border
+  const emptyFill = profile.coverColour ?? colours.borderStrong
 
   const animatedStyle = useAnimatedStyle(() => {
     const y = scrollY?.value ?? 0
@@ -80,6 +84,10 @@ export function ProfileCover({
         styles.cover,
         {
           height,
+          // NativeTabs still applies a top content inset to the first ScrollView
+          // even with `never`; pull the banner into that inset so it sits under
+          // the status bar (X / Bluesky / LinkedIn).
+          marginTop: -insets.top,
           backgroundColor: kind === 'none' ? colours.canvas : emptyFill,
         },
         animatedStyle,
@@ -94,14 +102,16 @@ export function ProfileCover({
       ) : kind === 'none' ? null : (
         <CoverAtmosphere wash={emptyFill} />
       )}
-      <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
-        <ProgressiveBlurBand
-          height={insets.top + TOP_BLUR}
-          topHeavy
-          strength="soft"
-          intensity={64}
-        />
-      </View>
+      {uri && kind !== 'none' ? (
+        <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
+          <ProgressiveBlurBand
+            height={insets.top + TOP_BLUR}
+            topHeavy
+            strength="soft"
+            intensity={64}
+          />
+        </View>
+      ) : null}
       <View pointerEvents="none" style={styles.bottomBlur}>
         <ProgressiveBlurBand
           height={BOTTOM_BLUR}

@@ -35,6 +35,7 @@ import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {ProfileCoverChrome} from '@/platform/ui/navigation/profile-stack-header'
 import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useHydrated} from '@/lib/useHydrated'
@@ -358,6 +359,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         main={main}
         right={isExpanded ? contextRail : undefined}
       />
+      <ProfileCoverChrome showBack={mode !== 'owner'} />
     </View>
   )
 }

@@ -1,7 +1,9 @@
 import {useRouter, type Href} from 'expo-router'
-import {View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {
@@ -10,6 +12,8 @@ import {
   plainHeaderSpacing,
   supportsPlainHeaderItems,
 } from '@/platform/ui/navigation/plain-header-items'
+import {LAYERS} from '@/theme/tokens/layers'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 function ProfileHeaderBack() {
   return <ModulaBackButton chrome="plain" />
@@ -97,3 +101,73 @@ export function profileHeaderRightItems() {
     plainHeaderCustomItem(<ProfileOverflowMenu />),
   ]
 }
+
+/**
+ * Share + overflow on the cover (X / Facebook / Bluesky). Used when the native
+ * header is hidden so the banner can start under the status bar.
+ */
+export function ProfileCoverChrome({showBack}: {showBack: boolean}) {
+  const insets = useSafeAreaInsets()
+  const router = useRouter()
+  const {spacing} = useThemeTokens()
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={[
+        styles.overlay,
+        {
+          paddingHorizontal: spacing[3],
+          paddingTop: insets.top + 8,
+          zIndex: LAYERS.sticky,
+        },
+      ]}>
+      <View pointerEvents="box-none" style={styles.overlayRow}>
+        {showBack ? <ModulaBackButton /> : <View />}
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'button',
+              icon: 'share',
+              accessibilityLabel: 'Share profile',
+              onPress: () => router.push('/share-profile' as Href),
+            },
+            {
+              kind: 'menu',
+              accessibilityLabel: 'Open profile actions',
+              title: 'Profile',
+              actions: [
+                {id: 'edit', label: 'Edit Profile', icon: 'profile'},
+                {id: 'customize', label: 'Customize', icon: 'appearance'},
+                {id: 'os', label: 'Profile-OS', icon: 'settings'},
+                {id: 'preview', label: 'View as visitor', icon: 'eye'},
+                {id: 'settings', label: 'Settings', icon: 'settings'},
+              ],
+              onAction: id => {
+                if (id === 'edit') router.push('/profile/edit' as Href)
+                if (id === 'customize') router.push('/profile/customize' as Href)
+                if (id === 'os') router.push('/profile/os' as Href)
+                if (id === 'preview') router.push('/profile/preview' as Href)
+                if (id === 'settings') router.push('/settings' as Href)
+              },
+            },
+          ]}
+        />
+      </View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  overlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  overlayRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+})

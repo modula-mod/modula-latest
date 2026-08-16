@@ -5,6 +5,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 /**
  * Quiet full-bleed banner when the profile has no cover photograph.
  * X / LinkedIn use a solid colour field — not a drawing, not a teal wash.
+ * Ink-on-canvas at low opacity stays token-driven and readable as a banner.
  */
 export function CoverAtmosphere({
   wash,
@@ -14,12 +15,21 @@ export function CoverAtmosphere({
   wash?: string
 }) {
   const {colours} = useThemeTokens()
-  const fill = wash ?? colours.surface2
   return (
-    <View
-      pointerEvents="none"
-      style={[styles.fill, {backgroundColor: fill}]}
-    />
+    <View pointerEvents="none" style={styles.fill}>
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          {backgroundColor: wash ?? colours.canvas},
+        ]}
+      />
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          {backgroundColor: colours.text, opacity: 0.16},
+        ]}
+      />
+    </View>
   )
 }
 

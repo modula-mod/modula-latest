@@ -33,7 +33,7 @@ Customize matched the coded 110×44 on all three passes (Δ Profile ≤ 4pt). Is
 | --- | --- | --- |
 | `01-home.png` | Home | System NativeTabs: Home / Discover / Activity / Profile. No Create tab. No dark Callstack pill |
 | `03-activity.png` | Activity | Same NativeTabs; selected Activity. Header control group is mark-read + settings + overflow |
-| `04-profile.png` | Profile | Same NativeTabs; selected Profile. Share + overflow are plain glyphs in the native header capsule |
+| `04-profile.png` | Profile | Cover paints under the status bar (sampled y=0 is banner gray, not canvas white). Avatar hangs over the banner; name sits below it. Share + overflow overlay on the cover (no root-tab back). Edit is Expo UI outlined. NativeTabs selected Profile |
 | `05-board.png` | Board | Root stack (drawer destination). No hidden-tab crash. No tab bar |
 | `07-module-detail.png` | Vault Notes | extraLarge glass back; share + overflow in one **110×44** capsule. No tab bar |
 | `08-settings.png` | Settings | extraLarge glass back + overflow circle. No tab bar (root stack) |
@@ -42,5 +42,5 @@ Customize matched the coded 110×44 on all three passes (Δ Profile ≤ 4pt). Is
 ## Still visible on device (not claimed fixed)
 
 - iOS 26 NativeTabs is itself a floating glass capsule — that is the system bar, not the retired Callstack pill
-- Cover atmosphere placeholders still show when there is no cover photo
+- Cover atmosphere placeholders still show when there is no cover photo (quiet ink field, not a drawing)
 - Founder visual approval is still required

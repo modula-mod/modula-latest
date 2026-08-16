@@ -1,5 +1,4 @@
 import {Stack} from 'expo-router'
-import {View} from 'react-native'
 
 import {nativeScreenHeaderOptions} from '@/platform/ui/navigation/native-screen-header'
 import {
@@ -34,12 +33,7 @@ export default function ProfileStackLayout() {
         name="index"
         options={{
           title: '',
-          headerTitle: () => null,
-          headerBackVisible: false,
-          headerLeft: () => null,
-          unstable_headerLeftItems: () => [],
-          headerBackground: () => <View />,
-          scrollEdgeEffects: {top: 'hidden', bottom: 'hidden'},
+          headerShown: false,
         }}
       />
     </Stack>

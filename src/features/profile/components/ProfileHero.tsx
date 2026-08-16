@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import type {SharedValue} from 'react-native-reanimated'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import type {
   ModulaProfile,
@@ -14,7 +13,7 @@ import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
 import {
   ProfileCover,
-  profileCoverHeight,
+  profileCoverBody,
 } from '@/features/profile/components/ProfileCover'
 import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
 import {ProfileStats} from '@/features/profile/components/ProfileStats'
@@ -59,14 +58,13 @@ export function ProfileHero({
   scrollY,
 }: ProfileHeroProps) {
   const {width} = useWindowDimensions()
-  const insets = useSafeAreaInsets()
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
   const avatarSize = isCompact ? 92 : 116
   const haloExtra = presentation.showFocusHalo ? 12 : 0
   const slotSize = avatarSize + haloExtra
-  const coverHeight = profileCoverHeight(isCompact, insets.top)
+  const coverBody = profileCoverBody(isCompact)
   const canEdit = viewer.canEdit
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
@@ -102,7 +100,7 @@ export function ProfileHero({
           styles.avatarSlot,
           {
             left: spacing[4],
-            top: coverHeight - slotSize / 2,
+            top: coverBody - slotSize / 2,
             height: slotSize,
             width: slotSize,
           },
