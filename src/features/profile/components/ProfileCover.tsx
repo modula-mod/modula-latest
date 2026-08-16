@@ -39,7 +39,9 @@ type ProfileCoverProps = {
   contentInset?: number
   raisedBodyHeight?: number
   avatarCenterX?: number
+  avatarCenterY?: number
   cradleRadius?: number
+  plateauRadius?: number
 }
 
 export const PROFILE_COVER_BODY = PROFILE_LAYOUT.coverBodyRegular
@@ -62,7 +64,9 @@ export function ProfileCover({
   contentInset = 16,
   raisedBodyHeight,
   avatarCenterX: avatarCenterXProp,
+  avatarCenterY: avatarCenterYProp,
   cradleRadius: cradleRadiusProp,
+  plateauRadius = PROFILE_LAYOUT.plateauRadius,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
@@ -73,13 +77,13 @@ export function ProfileCover({
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
   const emptyFill = profile.coverColour ?? colours.borderStrong
   const hasPhoto = Boolean(uri) && kind !== 'none'
+  const cradleRadius = cradleRadiusProp ?? slotSize / 2 + PROFILE_LAYOUT.cradleGap
   const transitionHeight = Math.min(
-    raisedBodyHeight ??
-      slotSize / 2 + PROFILE_LAYOUT.cradleGap + PROFILE_LAYOUT.cradleLipExtra,
+    raisedBodyHeight ?? cradleRadius + slotSize / 2 + PROFILE_LAYOUT.plateauLift,
     profileCoverBody(compact),
   )
   const avatarCenterX = avatarCenterXProp ?? contentInset + slotSize / 2
-  const cradleRadius = cradleRadiusProp ?? slotSize / 2 + PROFILE_LAYOUT.cradleGap
+  const avatarCenterY = avatarCenterYProp ?? transitionHeight - cradleRadius
 
   const animatedStyle = useAnimatedStyle(() => {
     if (reduceMotion) {
@@ -156,7 +160,9 @@ export function ProfileCover({
           height={transitionHeight + 1}
           fill={colours.canvas}
           avatarCenterX={avatarCenterX}
+          avatarCenterY={avatarCenterY}
           cradleRadius={cradleRadius}
+          plateauRadius={plateauRadius}
         />
       </View>
     </Animated.View>

@@ -161,7 +161,7 @@ export function ProfileMetricPicker({
   const accessibilityValue = selected
     ? `${selected.label}, ${metricSpokenValue(selected)}, selected, ${selectedIndex + 1} of ${count}.`
     : undefined
-  const showArrows = count > 1
+  const showFocal = count > 1
   const selectedTop = selectedRow * ITEM_HEIGHT
 
   if (count === 1 && selected) {
@@ -199,45 +199,22 @@ export function ProfileMetricPicker({
         }}
         testID="profile-metric-picker"
         style={[styles.gesture, {minHeight: Math.max(44, windowHeight)}]}>
-        {showArrows ? (
-          <AppText
-            accessible={false}
-            variant="micro"
-            colour="textTertiary"
-            style={styles.arrow}>
-            ˆ
-          </AppText>
-        ) : null}
         <View style={[styles.window, {height: windowHeight}]}>
-          <View
-            pointerEvents="none"
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            style={[
-              styles.focal,
-              {
-                borderColor: colours.separator,
-                top: selectedTop,
-                height: ITEM_HEIGHT,
-              },
-            ]}
-          />
-          <View style={styles.rail} accessible={false} importantForAccessibility="no-hide-descendants">
-            {metrics.map((metric, index) => (
-              <View
-                key={metric.id}
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor:
-                      index === selectedIndex ? colours.text : colours.textTertiary,
-                    opacity: index === selectedIndex ? 0.7 : 0.28,
-                    transform: [{scale: index === selectedIndex ? 1 : 0.7}],
-                  },
-                ]}
-              />
-            ))}
-          </View>
+          {showFocal ? (
+            <View
+              pointerEvents="none"
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              style={[
+                styles.focal,
+                {
+                  backgroundColor: colours.text,
+                  top: selectedTop + 4,
+                  height: ITEM_HEIGHT - 8,
+                },
+              ]}
+            />
+          ) : null}
           {metrics.map((metric, index) => (
             <MetricWheelItem
               key={metric.id}
@@ -270,15 +247,6 @@ export function ProfileMetricPicker({
             />
           </View>
         </View>
-        {showArrows ? (
-          <AppText
-            accessible={false}
-            variant="micro"
-            colour="textTertiary"
-            style={styles.arrow}>
-            ˇ
-          </AppText>
-        ) : null}
       </View>
     </GestureDetector>
   )
@@ -306,11 +274,15 @@ function MetricCopy({
   return (
     <View style={styles.copy}>
       <AppText
-        variant={selected ? 'headline' : 'caption'}
+        variant={selected ? 'title2' : 'headline'}
+        numberOfLines={1}
         colour={selected ? 'text' : 'textSecondary'}>
         {metricDisplayValue(metric)}
       </AppText>
-      <AppText variant="micro" colour={selected ? 'textSecondary' : 'textTertiary'}>
+      <AppText
+        variant="micro"
+        numberOfLines={1}
+        colour={selected ? 'textSecondary' : 'textTertiary'}>
         {metric.label}
       </AppText>
     </View>
@@ -364,31 +336,24 @@ function MetricWheelItem({
   )
 }
 
+const FOCAL_GUTTER = 11
+
 const styles = StyleSheet.create({
-  arrow: {
-    opacity: 0.35,
-    textAlign: 'center',
-  },
   copy: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    paddingLeft: 10,
-  },
-  dot: {
-    borderRadius: 2,
-    height: 4,
-    width: 4,
+    minWidth: 0,
+    paddingLeft: FOCAL_GUTTER,
   },
   focal: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    left: 12,
-    opacity: 0.28,
+    borderRadius: 1.5,
+    left: 0,
+    opacity: 0.45,
     position: 'absolute',
-    right: 4,
+    width: 3,
   },
   gesture: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
     width: '100%',
   },
@@ -398,24 +363,16 @@ const styles = StyleSheet.create({
     right: 0,
   },
   item: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
     left: 0,
     position: 'absolute',
     right: 0,
   },
-  rail: {
-    bottom: 6,
-    gap: 5,
-    justifyContent: 'center',
-    left: 0,
-    position: 'absolute',
-    top: 6,
-    width: 8,
-  },
   single: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
+    paddingLeft: FOCAL_GUTTER,
   },
   window: {
     overflow: 'hidden',

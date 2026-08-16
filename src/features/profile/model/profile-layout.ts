@@ -6,10 +6,15 @@ import {inverted} from '@/theme/foundations/inverted'
  *
  * Vertical rhythm:
  *   cover → glass chrome
- *   avatar in an inverted leading valley
- *   name / handle on the raised trailing plateau
- *   compact metric column | bio + metadata grid
+ *   avatar cradled by the inverted corner, cover still visible below it
+ *   name / handle / bio on the raised trailing plateau
+ *   compact metric column | metadata grid
  *   tabs → content
+ *
+ * The cradle drives everything below the cover: the concave quarter arc and
+ * the rise are both exactly `cradleRadius` from the avatar centre, so the
+ * canvas edge, the identity column offset, and the cover height all fall out
+ * of one number instead of being tuned independently.
  */
 export const PROFILE_LAYOUT = {
   coverBodyCompact: 158,
@@ -19,21 +24,25 @@ export const PROFILE_LAYOUT = {
   haloExtra: 5,
   haloWidth: 2,
   avatarBorder: 0,
-  /** Cover showing around the avatar inside the inverted valley. */
-  cradleGap: 6,
-  cradleLipExtra: 4,
+  /** Cover showing around the avatar inside the inverted cradle. */
+  cradleGap: 14,
+  /** Plateau clearance above the avatar crown. */
+  plateauLift: 4,
+  /** Convex radius where the cradle rise meets the identity plateau. */
+  plateauRadius: 16,
+  /** Gap from the cradle rise to the first identity glyph. */
+  identityColumnGap: 4,
   /** Breathing room from the avatar/halo bottom to stacked-fallback identity. */
   identityAfterAvatar: 8,
-  identityColumnGap: 12,
+  /** Canvas above the metric column, measured from the cover edge. */
+  metricColumnTop: 10,
   coverTopBlur: 28,
   coverBottomBlur: 36,
-  metricItemHeight: 28,
+  metricItemHeight: 40,
   metricWindowItems: 3,
   metricMaxVisible: 5,
   metricColumnMin: 96,
-  metricColumnMax: 120,
-  raisedBodyCompact: 88,
-  raisedBodyRegular: 96,
+  metricColumnMax: 132,
   stackedFontScale: 1.35,
   stackedWidth: 340,
   invertedSize: inverted.profile,
@@ -43,17 +52,23 @@ export type ProfileGeometry = {
   coverBody: number
   avatarSize: number
   slotSize: number
-  avatarOverlap: number
+  /** Distance from the cover edge up to the top of the avatar slot. */
+  avatarLift: number
   haloExpansion: number
   heroHorizontalInset: number
   identityPaddingTop: number
+  /** Leading offset of the identity column — sits on the cradle rise. */
   identityColumnOffset: number
+  /** Height of the cover band the canvas plateau rises through. */
   raisedBodyHeight: number
-  raisedIdentityInset: number
   metricViewportHeight: number
+  metricColumnTop: number
   metricColumnWidth: number
   avatarCenterX: number
+  /** Avatar centre inside the transition band. */
+  avatarCenterY: number
   cradleRadius: number
+  plateauRadius: number
   invertedCornerRadius: number
   transitionHeight: number
   stackedFallback: boolean
@@ -92,8 +107,20 @@ export function profileMetricColumnWidth(contentWidth: number): number {
   )
 }
 
-export function profileRaisedBodyHeight(compact: boolean): number {
-  return compact ? PROFILE_LAYOUT.raisedBodyCompact : PROFILE_LAYOUT.raisedBodyRegular
+export function profileCradleRadius(compact: boolean, showFocusHalo: boolean): number {
+  return profileAvatarSlotSize(compact, showFocusHalo) / 2 + PROFILE_LAYOUT.cradleGap
+}
+
+/**
+ * Band the canvas rises through: cradle radius (avatar centre to the canvas
+ * edge) plus the avatar's upper half plus clearance above the crown.
+ */
+export function profileRaisedBodyHeight(compact: boolean, showFocusHalo: boolean): number {
+  return Math.round(
+    profileCradleRadius(compact, showFocusHalo) +
+      profileAvatarSlotSize(compact, showFocusHalo) / 2 +
+      PROFILE_LAYOUT.plateauLift,
+  )
 }
 
 /**
@@ -109,31 +136,37 @@ export function profileGeometry(
   const avatarSize = profileAvatarSize(compact)
   const haloExpansion = profileHaloExtra(showFocusHalo)
   const slotSize = avatarSize + haloExpansion
-  const avatarOverlap = slotSize / 2
-  const cradleRadius = avatarOverlap + PROFILE_LAYOUT.cradleGap
-  const raisedBodyHeight = profileRaisedBodyHeight(compact)
+  const cradleRadius = profileCradleRadius(compact, showFocusHalo)
+  const raisedBodyHeight = profileRaisedBodyHeight(compact, showFocusHalo)
   const contentWidth = options?.contentWidth ?? 390
   const fontScale = options?.fontScale ?? 1
+  const identityColumnOffset = Math.round(
+    slotSize / 2 + cradleRadius + PROFILE_LAYOUT.identityColumnGap,
+  )
+  // The identity column must still hold a name and a handle beside the rise.
   const stackedFallback =
     fontScale >= PROFILE_LAYOUT.stackedFontScale ||
-    contentWidth < PROFILE_LAYOUT.stackedWidth
+    contentWidth < PROFILE_LAYOUT.stackedWidth ||
+    contentWidth - horizontalInset * 2 - identityColumnOffset < 150
   return {
     coverBody: profileCoverBody(compact),
     avatarSize,
     slotSize,
-    avatarOverlap,
+    avatarLift: cradleRadius + slotSize / 2,
     haloExpansion,
     heroHorizontalInset: horizontalInset,
-    identityPaddingTop: avatarOverlap + PROFILE_LAYOUT.identityAfterAvatar,
-    identityColumnOffset: slotSize + PROFILE_LAYOUT.identityColumnGap,
+    identityPaddingTop: slotSize / 2 + PROFILE_LAYOUT.identityAfterAvatar,
+    identityColumnOffset,
     raisedBodyHeight,
-    raisedIdentityInset: Math.round(raisedBodyHeight * 0.78),
     metricViewportHeight: profileMetricWindowHeight(),
+    metricColumnTop: raisedBodyHeight + PROFILE_LAYOUT.metricColumnTop,
     metricColumnWidth: profileMetricColumnWidth(
       Math.max(0, contentWidth - horizontalInset * 2),
     ),
     avatarCenterX: horizontalInset + slotSize / 2,
+    avatarCenterY: raisedBodyHeight - cradleRadius,
     cradleRadius,
+    plateauRadius: PROFILE_LAYOUT.plateauRadius,
     invertedCornerRadius: inverted.profile,
     transitionHeight: raisedBodyHeight,
     stackedFallback,

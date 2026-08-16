@@ -3,7 +3,7 @@ import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import Svg, {Path} from 'react-native-svg'
 
 import {
-  buildAsymmetricRaisedTrailingPath,
+  buildAvatarCradleRisePath,
   buildCoverCanvasLipPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
@@ -30,7 +30,10 @@ type InvertedSurfaceTransitionProps = {
   trayHeight?: number
   cornerRadius?: number
   avatarCenterX?: number
+  avatarCenterY?: number
   cradleRadius?: number
+  /** Convex radius where the cradle rise meets the raised plateau. */
+  plateauRadius?: number
   style?: StyleProp<ViewStyle>
 }
 
@@ -50,7 +53,9 @@ export function InvertedSurfaceTransition({
   trayHeight,
   cornerRadius,
   avatarCenterX,
+  avatarCenterY,
   cradleRadius,
+  plateauRadius,
   style,
 }: InvertedSurfaceTransitionProps) {
   const d = useMemo(() => {
@@ -62,11 +67,13 @@ export function InvertedSurfaceTransition({
       trayHeight,
       biteRadii: [Math.min(12, bite), bite, Math.min(12, bite)],
       avatarCenterX,
+      avatarCenterY,
       cradleRadius,
+      plateauRadius,
     }
     if (avatarCenterX != null && cradleRadius != null) {
       if (avatarSlot === 'leading' && raisedSide === 'trailing') {
-        return buildAsymmetricRaisedTrailingPath(width, height, options)
+        return buildAvatarCradleRisePath(width, height, options)
       }
     }
     if (edge === 'top' && side === 'leading') {
@@ -75,11 +82,13 @@ export function InvertedSurfaceTransition({
     return buildTopLeadingInvertedPath(width, height, options)
   }, [
     avatarCenterX,
+    avatarCenterY,
     avatarSlot,
     cornerRadius,
     cradleRadius,
     edge,
     height,
+    plateauRadius,
     raisedSide,
     side,
     size,

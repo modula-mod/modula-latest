@@ -23,6 +23,7 @@ import {
 } from '@/features/profile/contracts/profile'
 import type {ProfileTabManifest, ProfileTabVisibility} from '@/features/profile/contracts/profileTabs'
 import {useModuleCatalogueQuery, useModuleContributionQuery} from '@/features/modules/hooks'
+import {ProfileHeaderTitle} from '@/features/profile/components/ProfileHeaderTitle'
 import {ProfileHero} from '@/features/profile/components/ProfileHero'
 import {ProfileLayout} from '@/features/profile/components/ProfileLayout'
 import {ProfileLinkCard} from '@/features/profile/components/ProfileLinkCard'
@@ -32,6 +33,7 @@ import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
 import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
+import {profileGeometry} from '@/features/profile/model/profile-layout'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
@@ -141,7 +143,7 @@ function normalizeLegacyProfileModuleId(moduleId: string): string {
 export function ProfileShell({mode, handle}: ProfileShellProps) {
   const router = useRouter()
   const {tab} = useLocalSearchParams<{tab?: string}>()
-  const {width} = useWindowDimensions()
+  const {width, fontScale} = useWindowDimensions()
   const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
   const insets = useSafeAreaInsets()
@@ -370,9 +372,27 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     </Animated.ScrollView>
   )
 
+  // The name morphs into the chrome as the hero identity clears the header.
+  const heroGeometry = profileGeometry(width < 760, presentation.showFocusHalo, spacing[4], {
+    contentWidth: width,
+    fontScale,
+  })
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <ProfileCoverChrome showBack={mode !== 'owner'} owner={viewer.canEdit} />
+      <ProfileCoverChrome
+        showBack={mode !== 'owner'}
+        owner={viewer.canEdit}
+        title={
+          <ProfileHeaderTitle
+            profile={profile}
+            scrollY={scrollY}
+            heroHeight={headerHeight}
+            insetTop={insets.top}
+            fallbackHeight={heroGeometry.coverBody + 120}
+          />
+        }
+      />
       <ProfileLayout
         left={isExpanded ? hero : undefined}
         main={main}

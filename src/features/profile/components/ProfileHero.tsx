@@ -71,19 +71,17 @@ export function ProfileHero({
   const [coverDraft, setCoverDraft] = useState<ProfileCoverDraft | null>(null)
   const [avatarDraft, setAvatarDraft] = useState<ProfileAvatarDraft | null>(null)
 
-  const identity = (
-    <ProfileIdentity profile={profile} viewer={viewer} compact />
-  )
+  const identity = <ProfileIdentity profile={profile} viewer={viewer} compact />
   const info = (
     <View style={[styles.infoColumn, {gap: spacing[2]}]}>
+      <ProfileBio profile={profile} compact />
+      <ProfileMetadataGrid profile={profile} viewer={viewer} />
       {showActions && !viewer.canEdit ? (
         <View style={styles.visitorActions}>
           <ProfileActions profile={profile} viewer={viewer} />
         </View>
       ) : null}
       <HeroViewingCopy viewer={viewer} />
-      <ProfileBio profile={profile} compact />
-      <ProfileMetadataGrid profile={profile} viewer={viewer} />
     </View>
   )
   const stats = showStats ? (
@@ -107,7 +105,9 @@ export function ProfileHero({
         contentInset={geometry.heroHorizontalInset}
         raisedBodyHeight={geometry.raisedBodyHeight}
         avatarCenterX={geometry.avatarCenterX}
+        avatarCenterY={geometry.avatarCenterY}
         cradleRadius={geometry.cradleRadius}
+        plateauRadius={geometry.plateauRadius}
         onEditPress={() => setCoverEditorOpen(true)}
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
@@ -130,7 +130,7 @@ export function ProfileHero({
           styles.avatarSlot,
           {
             left: geometry.heroHorizontalInset,
-            top: geometry.coverBody - geometry.avatarOverlap,
+            top: geometry.coverBody - geometry.avatarLift,
             height: geometry.slotSize,
             width: geometry.slotSize,
           },
@@ -155,50 +155,53 @@ export function ProfileHero({
           }}
         />
       </View>
-      <View
-        style={[
-          styles.body,
-          {
-            paddingHorizontal: spacing[4],
-            paddingTop: 0,
-            paddingBottom: spacing[2],
-            gap: spacing[2],
-          },
-        ]}>
+      {stacked ? (
         <View
-          style={{
-            marginTop: stacked ? 0 : -geometry.raisedIdentityInset,
-            minHeight: stacked
-              ? geometry.identityPaddingTop
-              : geometry.raisedIdentityInset,
-            paddingLeft: stacked ? 0 : geometry.identityColumnOffset,
-            paddingTop: stacked ? geometry.identityPaddingTop : spacing[2],
-            justifyContent: 'flex-end',
-          }}>
+          style={[
+            styles.body,
+            {
+              paddingHorizontal: spacing[4],
+              paddingTop: spacing[3],
+              paddingBottom: spacing[2],
+              gap: spacing[3],
+            },
+          ]}>
           {identity}
+          {info}
+          {stats}
         </View>
-        {stacked ? (
-          <View style={{gap: spacing[3]}}>
-            {info}
-            {stats}
-          </View>
-        ) : (
-          <View style={[styles.lowerGrid, {gap: spacing[3]}]}>
-            <View style={styles.infoSlot}>{info}</View>
+      ) : (
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.body,
+            {
+              marginTop: -geometry.raisedBodyHeight,
+              paddingHorizontal: spacing[4],
+              paddingBottom: spacing[2],
+            },
+          ]}>
+          {/* Identity rides the plateau and flows past the cover edge; the
+              metric column sits under the avatar in the leading gutter. */}
+          <View pointerEvents="box-none" style={styles.plateauRow}>
             <View
+              pointerEvents="box-none"
               style={[
                 styles.metricColumn,
                 {
-                  width: geometry.metricColumnWidth,
-                  minWidth: geometry.metricColumnWidth,
-                  paddingTop: geometry.avatarOverlap,
+                  width: geometry.identityColumnOffset,
+                  paddingTop: geometry.metricColumnTop,
                 },
               ]}>
               {stats}
             </View>
+            <View style={[styles.identityColumn, {gap: spacing[2]}]}>
+              <View style={{paddingTop: geometry.plateauRadius}}>{identity}</View>
+              {info}
+            </View>
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
       {canEdit ? (
         <>
@@ -276,21 +279,21 @@ const styles = StyleSheet.create({
     minWidth: 0,
     zIndex: 2,
   },
-  infoColumn: {
-    minWidth: 0,
-  },
-  infoSlot: {
+  identityColumn: {
     flex: 1,
     minWidth: 0,
   },
-  lowerGrid: {
-    alignItems: 'flex-start',
-    flexDirection: 'row-reverse',
+  infoColumn: {
     minWidth: 0,
   },
   metricColumn: {
     flexGrow: 0,
     flexShrink: 0,
+  },
+  plateauRow: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    minWidth: 0,
   },
   visitorActions: {
     alignItems: 'flex-start',

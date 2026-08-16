@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react'
 import {useRouter, type Href} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -105,17 +106,24 @@ export function profileHeaderRightItems() {
 /**
  * Share + overflow on the cover (X / Facebook / Bluesky). Used when the native
  * header is hidden so the banner can start under the status bar.
+ *
+ * `title` is the identity that morphs in beside the back control on scroll; it
+ * shares the leading slot so the name reads as chrome, not as a second hero.
  */
 export function ProfileCoverChrome({
   showBack,
   owner = true,
+  title,
 }: {
   showBack: boolean
   owner?: boolean
+  title?: ReactNode
 }) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const {spacing} = useThemeTokens()
+  const canGoBack = useNavigationCanGoBack()
+  const backVisible = showBack || canGoBack
 
   return (
     <View
@@ -129,7 +137,12 @@ export function ProfileCoverChrome({
         },
       ]}>
       <View pointerEvents="box-none" style={styles.overlayRow}>
-        {showBack ? <ModulaBackButton /> : <View />}
+        <View
+          pointerEvents="box-none"
+          style={[styles.leading, {gap: spacing[2]}]}>
+          {backVisible ? <ModulaBackButton /> : null}
+          {title}
+        </View>
         <ChromeGlassControlGroup
           items={[
             ...(owner
@@ -187,7 +200,22 @@ export function ProfileCoverChrome({
   )
 }
 
+function useNavigationCanGoBack(): boolean {
+  const router = useRouter()
+  try {
+    return router.canGoBack()
+  } catch {
+    return false
+  }
+}
+
 const styles = StyleSheet.create({
+  leading: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexShrink: 1,
+    minWidth: 0,
+  },
   overlay: {
     left: 0,
     position: 'absolute',
@@ -197,6 +225,7 @@ const styles = StyleSheet.create({
   overlayRow: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 8,
     justifyContent: 'space-between',
   },
 })

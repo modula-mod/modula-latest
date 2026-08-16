@@ -1,7 +1,7 @@
 export {
   PROFILE_COVER_INVERTED_DEFAULTS,
-  buildAsymmetricRaisedTrailingPath,
   buildAvatarCradlePath,
+  buildAvatarCradleRisePath,
   buildCoverCanvasLipPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,

@@ -28,8 +28,12 @@ export type InvertedSurfacePathOptions = {
   biteRadii?: InvertedBiteRadii
   /** Horizontal centre of the avatar slot, in overlay coordinates. */
   avatarCenterX?: number
+  /** Vertical centre of the avatar slot, in overlay coordinates. */
+  avatarCenterY?: number
   /** Outer radius of the cover cradle around the avatar / Focus Halo. */
   cradleRadius?: number
+  /** Convex radius where the cradle rise meets the raised plateau. */
+  plateauRadius?: number
 }
 
 export const PROFILE_COVER_INVERTED_DEFAULTS = {
@@ -91,14 +95,22 @@ export function buildCoverCanvasLipPath(
 }
 
 /**
- * Asymmetric cover → canvas transition.
+ * Cover → canvas transition with an inverted corner cradling the avatar.
  *
- * Left shoulder stays lower (cover continues beside the avatar). A concave
- * valley cradles the portrait, then the trailing surface rises into the
- * cover so identity can sit on the raised right plateau. This is not a
- * rounded rect and not a full-width semicircle crater.
+ * The silhouette is tangent-continuous, built from straight runs joined by
+ * quarter arcs — the construction an inverted-corner generator emits, not a
+ * hand-tuned bezier:
+ *
+ *   1. flat leading edge, tangent to the bottom of the cradle circle
+ *   2. concave quarter arc (sweep 0) concentric with the avatar
+ *   3. vertical rise, tangent to the trailing side of the cradle circle
+ *   4. convex quarter arc (sweep 1) onto the raised plateau
+ *   5. flat plateau carrying identity
+ *
+ * Because steps 2 and 3 are exactly `cradleRadius` from the avatar centre,
+ * the cover gap around the portrait is constant instead of pinched.
  */
-export function buildAsymmetricRaisedTrailingPath(
+export function buildAvatarCradleRisePath(
   width: number,
   height: number,
   options?: InvertedSurfacePathOptions,
@@ -109,36 +121,44 @@ export function buildAsymmetricRaisedTrailingPath(
 
   const r = Math.min(
     clampNonNegative(options?.cradleRadius ?? inverted.profile),
-    h * 0.92,
+    h,
     w * 0.42,
   )
   const cx = Math.min(
     Math.max(
-      r * 0.6,
+      0,
       clampNonNegative(
         options?.avatarCenterX ??
           options?.trayWidth ??
           PROFILE_COVER_INVERTED_DEFAULTS.trayWidth,
       ),
     ),
-    w * 0.48,
+    Math.max(0, w - r),
   )
-  const leftY = Math.min(h * 0.72, Math.max(h * 0.58, r * 0.85))
-  const valleyY = h
-  const rightX = Math.min(w - 12, Math.max(cx + r * 0.85, cx + 28))
-  const k = Math.max(18, r * 0.9)
+  // Bottom of the cradle circle rests on the leading edge of the canvas.
+  const cy = clampNonNegative(options?.avatarCenterY ?? h - r)
+  const baseY = Math.min(h, cy + r)
+  const riseX = Math.min(w, cx + r)
+  const plateauY = 0
+  const plateau = Math.min(
+    clampNonNegative(options?.plateauRadius ?? inverted.sm),
+    Math.max(0, w - riseX),
+    Math.max(0, cy - plateauY),
+  )
 
-  if (r <= 0) {
-    return M(0, h) + H(w) + V(0) + H(0) + 'Z'
+  if (r <= 0 || riseX >= w) {
+    return M(0, baseY) + H(w) + V(h) + H(0) + 'Z'
   }
 
   return (
-    M(0, h) +
-    V(leftY) +
-    `C${(cx * 0.35).toFixed(2)},${leftY.toFixed(2)} ${(cx - k).toFixed(2)},${valleyY.toFixed(2)} ${cx.toFixed(2)},${valleyY.toFixed(2)}` +
-    `C${(cx + k).toFixed(2)},${valleyY.toFixed(2)} ${(rightX - 10).toFixed(2)},0 ${rightX.toFixed(2)},0` +
+    M(0, baseY) +
+    H(cx) +
+    A(r, riseX, cy, 0) +
+    V(plateauY + plateau) +
+    A(plateau, riseX + plateau, plateauY) +
     H(w) +
     V(h) +
+    H(0) +
     'Z'
   )
 }
@@ -147,8 +167,8 @@ export function buildAsymmetricRaisedTrailingPath(
  * Canvas cradle around the avatar.
  *
  * Fills the overlay except an upper semicircle centred on the cover/body
- * line. Kept as a geometry primitive; Profile cover uses the asymmetric
- * raised-trailing path so the right identity plateau can rise into the cover.
+ * line. Kept as a geometry primitive; Profile cover uses the cradle-rise
+ * path so the trailing identity plateau can rise into the cover.
  */
 export function buildAvatarCradlePath(
   width: number,
@@ -203,7 +223,7 @@ export function buildTopLeadingInvertedPath(
   options?: InvertedSurfacePathOptions,
 ): string {
   if (options?.avatarCenterX != null || options?.cradleRadius != null) {
-    return buildAsymmetricRaisedTrailingPath(width, height, options)
+    return buildAvatarCradleRisePath(width, height, options)
   }
   return buildCoverCanvasLipPath(width, height, options)
 }
