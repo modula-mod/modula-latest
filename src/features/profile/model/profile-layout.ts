@@ -12,8 +12,8 @@ import {inverted} from '@/theme/foundations/inverted'
  *   tabs → content
  */
 export const PROFILE_LAYOUT = {
-  coverBodyCompact: 152,
-  coverBodyRegular: 168,
+  coverBodyCompact: 158,
+  coverBodyRegular: 176,
   avatarCompact: 76,
   avatarRegular: 88,
   haloExtra: 5,
@@ -32,8 +32,8 @@ export const PROFILE_LAYOUT = {
   metricMaxVisible: 5,
   metricColumnMin: 96,
   metricColumnMax: 120,
-  raisedBodyCompact: 72,
-  raisedBodyRegular: 80,
+  raisedBodyCompact: 88,
+  raisedBodyRegular: 96,
   stackedFontScale: 1.35,
   stackedWidth: 340,
   invertedSize: inverted.profile,

@@ -123,7 +123,7 @@ export function buildAsymmetricRaisedTrailingPath(
     ),
     w * 0.48,
   )
-  const leftY = Math.min(h * 0.56, Math.max(h * 0.42, r * 0.7))
+  const leftY = Math.min(h * 0.72, Math.max(h * 0.58, r * 0.85))
   const valleyY = h
   const rightX = Math.min(w - 12, Math.max(cx + r * 0.85, cx + 28))
   const k = Math.max(18, r * 0.9)

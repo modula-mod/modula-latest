@@ -259,16 +259,10 @@ function isPublicHttpsMediaUri(value: string): boolean {
 }
 
 function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
-  if (viewer.canEdit) return null
-  const copy =
-    viewer.mode === 'preview'
-      ? 'Visitor preview — owner controls stay hidden.'
-      : viewer.relationship === 'visitor'
-        ? 'You’re viewing the public profile.'
-        : 'You’re viewing this profile with your current access.'
+  if (viewer.mode !== 'preview') return null
   return (
     <AppText variant="caption" colour="textTertiary">
-      {copy}
+      Visitor preview — owner controls stay hidden.
     </AppText>
   )
 }

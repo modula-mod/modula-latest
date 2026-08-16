@@ -382,10 +382,10 @@ const styles = StyleSheet.create({
   focal: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderTopWidth: StyleSheet.hairlineWidth,
-    left: 10,
-    opacity: 0.45,
+    left: 12,
+    opacity: 0.28,
     position: 'absolute',
-    right: 0,
+    right: 4,
   },
   gesture: {
     alignItems: 'center',
