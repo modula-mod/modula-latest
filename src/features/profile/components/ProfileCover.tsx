@@ -1,6 +1,6 @@
 import {Image} from 'expo-image'
-import {LinearGradient} from 'expo-linear-gradient'
-import {Pressable, StyleSheet} from 'react-native'
+import {StyleSheet, View} from 'react-native'
+import {Pressable} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {
   applyProfilePhotoMenuAction,
@@ -30,6 +31,11 @@ type ProfileCoverProps = {
   onPhotoRemove?: () => void
 }
 
+/** Cover photo height below the status bar (X / Bluesky / LinkedIn banner). */
+export const PROFILE_COVER_BODY = 168
+const TOP_BLUR = 28
+const BOTTOM_BLUR = 72
+
 export function ProfileCover({
   profile,
   compact,
@@ -43,8 +49,8 @@ export function ProfileCover({
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {colours} = useThemeTokens()
-  const baseHeight = compact ? 168 : 200
-  const height = baseHeight + insets.top
+  const bodyHeight = compact ? 148 : PROFILE_COVER_BODY
+  const height = bodyHeight + insets.top
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
 
@@ -66,12 +72,13 @@ export function ProfileCover({
     <Animated.View
       accessibilityRole="image"
       accessibilityLabel={`${profile.displayName} profile cover`}
+      testID="profile-cover"
       style={[
         styles.cover,
         {
           height,
           backgroundColor:
-            kind === 'none' ? colours.surface2 : profile.coverColour ?? colours.accentSubtle,
+            kind === 'none' ? colours.surface2 : profile.coverColour ?? colours.surface2,
         },
         animatedStyle,
       ]}>
@@ -83,14 +90,24 @@ export function ProfileCover({
           cachePolicy="memory-disk"
         />
       ) : kind === 'none' ? null : (
-        <CoverAtmosphere wash={profile.coverColour ?? colours.surfaceRaised} ink={colours.text} paper={colours.surface} />
+        <CoverAtmosphere wash={profile.coverColour ?? colours.surface2} />
       )}
-      <LinearGradient
-        colors={['rgba(0,0,0,0.25)', 'transparent', 'rgba(0,0,0,0.2)']}
-        locations={[0, 0.45, 1]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
+      <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
+        <ProgressiveBlurBand
+          height={insets.top + TOP_BLUR}
+          topHeavy
+          strength="soft"
+          intensity={52}
+        />
+      </View>
+      <View pointerEvents="none" style={styles.bottomBlur}>
+        <ProgressiveBlurBand
+          height={BOTTOM_BLUR}
+          topHeavy={false}
+          strength="soft"
+          intensity={44}
+        />
+      </View>
     </Animated.View>
   )
 
@@ -139,8 +156,21 @@ export function ProfileCover({
 }
 
 const styles = StyleSheet.create({
+  bottomBlur: {
+    bottom: 0,
+    height: BOTTOM_BLUR,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+  },
   cover: {
     overflow: 'hidden',
     width: '100%',
+  },
+  topBlur: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 })

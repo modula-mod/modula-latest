@@ -325,12 +325,14 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         </View>
       ) : null}
       {presentation.layoutId === 'creator' ? (
-        <ProfileStats
-          profile={profile}
-          ownerHandle={ownerProfile.handle}
-          presentation={presentation}
-          onSelectTab={setSelectedTabRequest}
-        />
+        <View style={{paddingHorizontal: spacing[4]}}>
+          <ProfileStats
+            profile={profile}
+            ownerHandle={ownerProfile.handle}
+            presentation={presentation}
+            onSelectTab={setSelectedTabRequest}
+          />
+        </View>
       ) : null}
       <ProfileTabBar
         tabs={visibleTabs}

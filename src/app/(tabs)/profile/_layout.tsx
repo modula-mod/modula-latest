@@ -29,7 +29,14 @@ export default function ProfileStackLayout() {
           ? {unstable_headerRightItems: () => rightItems}
           : null),
       }}>
-      <Stack.Screen name="index" />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: '',
+          headerTitle: () => null,
+          headerBackground: () => null,
+        }}
+      />
     </Stack>
   )
 }

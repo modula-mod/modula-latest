@@ -157,6 +157,9 @@ assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', 'height: TOO
 assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', "controlSize('regular')", 'GROUP GLYPHS MATCH PROFILE')
 assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'matchContents=', 'GROUP HOST NOT SHRUNK')
 assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', '<ControlGroup', 'NO COMPACT CONTROLGROUP')
+assertContains('src/features/profile/components/ProfileCover.tsx', 'ProgressiveBlurBand', 'PROFILE COVER PROGRESSIVE BLUR')
+assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerBackground: () => null', 'PROFILE COVER UNDER HEADER')
+assertContains('src/features/profile/components/ProfileActions.tsx', 'ModulaButton', 'PROFILE EDIT USES EXPO UI BUTTON')
 assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'ChromeGlassControlGroup', 'MODULE DETAIL CONTROL GROUP')
 
 if (failures.length) {

@@ -37,9 +37,9 @@ type ProfileHeroProps = {
 }
 
 /**
- * X / Instagram order: cover → avatar overlapping cover only → identity
- * on the canvas → one compact action on the avatar row → stats.
- * No identity sheet, no second More next to Edit Profile.
+ * X / Instagram / Bluesky / LinkedIn: cover is full-bleed from the top
+ * (under the transparent header) → avatar overlapping the banner → identity
+ * and inline stats on the canvas. Edit lives on the avatar row.
  */
 export function ProfileHero({
   profile,
@@ -56,7 +56,7 @@ export function ProfileHero({
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
-  const avatarSize = isCompact ? 88 : 112
+  const avatarSize = isCompact ? 92 : 116
   const canEdit = viewer.canEdit
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
@@ -91,7 +91,7 @@ export function ProfileHero({
           styles.body,
           {
             paddingHorizontal: spacing[4],
-            paddingBottom: spacing[4],
+            paddingBottom: spacing[3],
             gap: spacing[3],
           },
         ]}>
@@ -125,15 +125,15 @@ export function ProfileHero({
         </View>
         <ProfileIdentity profile={profile} viewer={viewer} compact />
         <HeroViewingCopy viewer={viewer} />
+        {showStats ? (
+          <ProfileStats
+            profile={profile}
+            ownerHandle={ownerHandle}
+            presentation={presentation}
+            onSelectTab={onSelectTab}
+          />
+        ) : null}
       </View>
-      {showStats ? (
-        <ProfileStats
-          profile={profile}
-          ownerHandle={ownerHandle}
-          presentation={presentation}
-          onSelectTab={onSelectTab}
-        />
-      ) : null}
 
       {canEdit ? (
         <>
@@ -211,7 +211,7 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 const styles = StyleSheet.create({
   avatarActions: {
     flexShrink: 0,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   avatarRow: {
     alignItems: 'flex-end',

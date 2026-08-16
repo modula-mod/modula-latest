@@ -26,6 +26,10 @@ function formatFull(value: number): string {
   return new Intl.NumberFormat().format(value)
 }
 
+/**
+ * Inline stats — X / Bluesky / Facebook density.
+ * Number + label on one baseline; not a four-column boxed strip.
+ */
 export function ProfileStats({
   profile,
   ownerHandle,
@@ -33,7 +37,7 @@ export function ProfileStats({
   onSelectTab,
 }: ProfileStatsProps) {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const baseRoute = `/profile/${profile.handle}`
   const stats = [
     {
@@ -67,21 +71,15 @@ export function ProfileStats({
   ].filter(item => item.visible)
 
   return (
-    <View
-      style={[
-        styles.row,
-        {borderTopColor: colours.separator, borderBottomColor: colours.separator},
-      ]}>
+    <View style={[styles.row, {gap: spacing[4]}]}>
       {stats.map(item => (
         <AppPressable
           key={item.id}
           accessibilityLabel={`${formatFull(item.value)} ${item.label.toLowerCase()}`}
           onPress={item.onPress}
-          style={[styles.stat, {gap: spacing[1]}]}>
-          <AppText variant="headline" style={styles.center}>
-            {formatCompact(item.value)}
-          </AppText>
-          <AppText variant="caption" colour="textSecondary" style={styles.center}>
+          style={styles.stat}>
+          <AppText variant="headline">{formatCompact(item.value)}</AppText>
+          <AppText variant="caption" colour="textSecondary">
             {item.label}
           </AppText>
         </AppPressable>
@@ -91,18 +89,15 @@ export function ProfileStats({
 }
 
 const styles = StyleSheet.create({
-  center: {
-    textAlign: 'center',
-  },
   row: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
     flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   stat: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    minHeight: 52,
+    alignItems: 'baseline',
+    flexDirection: 'row',
+    gap: 5,
+    minHeight: 44,
   },
 })
