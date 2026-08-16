@@ -33,3 +33,7 @@ PRODUCTION DEPLOYED = NO
 ## After recapture (chrome consistency)
 
 `screenshots-chrome-consistency/` is the remake on the same simulator. It is not founder approval.
+
+## After recapture (toolbar / global back)
+
+`screenshots-toolbar-back/` is the 44pt `ModulaBackButton` + Activity header control group on the same simulator. It is not founder approval.

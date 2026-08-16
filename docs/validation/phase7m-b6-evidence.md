@@ -14,7 +14,13 @@ Chrome-consistency **after** recapture (same device, Metro on the remake branch)
 docs/validation/evidence/phase7m-b6/screenshots-chrome-consistency/
 ```
 
-See that folder’s README for what each after shot proves, and what is still visible.
+Toolbar / global back **after** recapture (same device, Metro on `cursor/phase7m-b6-toolbar-back-6d0c`):
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-toolbar-back/
+```
+
+See that folder’s README for Activity’s header control group, Profile back, and 44pt overlay circles.
 
 ## Founder visual review set (captured)
 
