@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `hero-scroll-welded.png` | Owner hero (this pass) | Cover photo, avatar, and identity share one layout — portrait is in the plateau row, not absolutely positioned on the cover |
+| `picker-under-avatar.png` | Owner hero (this pass) | Metric wheel sits just under the in-flow portrait (`metricDrop: 0`); avatar/identity unchanged |
+| `hero-scroll-welded.png` | Owner hero (previous) | Cover photo, avatar, and identity share one layout — portrait is in the plateau row, not absolutely positioned on the cover |
 | `tabs-morph-flush.png` | Owner scrolled (this pass) | Sticky tabs sit flush under the morphing name — spacer under chrome, no padding jump |
 | `cover-no-bottom-blur.png` | Owner hero (previous) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
 | `picker-center-arrows.png` | Owner hero (previous) | Metric rail gone; numbers centered; 30% arrows above and below the picker |

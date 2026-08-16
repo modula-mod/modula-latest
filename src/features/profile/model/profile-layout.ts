@@ -40,8 +40,12 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
-  /** Extra drop for the metric picker. Does not move the inverted SVG. */
-  metricDrop: 70,
+  /**
+   * Extra space under the in-flow portrait before the wheel.
+   * Does not move the inverted SVG. 0 restores the pre-flow gap —
+   * the old 70pt was padding the hanging absolute avatar already occupied.
+   */
+  metricDrop: 0,
   /** Name sits just onto the white plateau so glyphs don’t spill into the photo. */
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
