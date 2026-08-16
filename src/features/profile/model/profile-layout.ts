@@ -40,6 +40,8 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
+  /** Extra drop for the metric picker. Does not move the inverted SVG. */
+  metricDrop: 20,
   /** Name sits just onto the white plateau so glyphs don’t spill into the photo. */
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
@@ -218,7 +220,8 @@ export function profileGeometry(
     identityDrop: PROFILE_LAYOUT.identityDrop,
     identityColumnPad,
     metricViewportHeight: profileMetricWindowHeight(),
-    metricColumnTop: slotSize / 2 + PROFILE_LAYOUT.metricColumnGap,
+    metricColumnTop:
+      slotSize / 2 + PROFILE_LAYOUT.metricColumnGap + PROFILE_LAYOUT.metricDrop,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
     avatarCenterX,
     avatarCenterY: plateauRadius,

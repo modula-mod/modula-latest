@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `avatar-up-12.png` | Owner hero (this pass) | Avatar raised 12pt from the 72pt drop (now 60pt); identity still 55pt down; inverted SVG unchanged |
+| `metrics-down-20.png` | Owner hero (this pass) | Metric picker dropped 20pt; avatar 60pt, identity 55pt, inverted SVG unchanged |
+| `avatar-up-12.png` | Owner hero (previous) | Avatar raised 12pt from the 72pt drop (now 60pt); identity still 55pt down; inverted SVG unchanged |
 | `avatar-and-text-lower.png` | Owner hero (previous) | Avatar dropped another 36pt (72pt total); name/handle/bio dropped 55pt; inverted SVG unchanged |
 | `avatar-lower.png` | Owner hero (previous) | Avatar dropped 36pt into the white pocket; inverted SVG unchanged |
 | `profile-final-photo-cover.png` | Same hero | Progressive blur, status-bar contrast, glass chrome on photography |
