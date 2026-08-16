@@ -14,8 +14,7 @@ type FocusHaloProps = {
 }
 
 /**
- * Focus Halo 2.0 — compact availability ring around the avatar.
- * Colour follows Focus status. No pulse, no second badge.
+ * Focus Halo — identity-state ring. Thin, flush to the avatar, no pulse.
  */
 export function FocusHalo({
   status,
@@ -48,6 +47,7 @@ export function FocusHalo({
           {
             borderColor: ringColour,
             borderRadius: (size + extra) / 2,
+            borderWidth: PROFILE_LAYOUT.haloWidth,
             height: size + extra,
             width: size + extra,
           },
@@ -80,7 +80,6 @@ function colourForStatus(
 const styles = StyleSheet.create({
   ring: {
     alignItems: 'center',
-    borderWidth: 2,
     justifyContent: 'center',
   },
 })

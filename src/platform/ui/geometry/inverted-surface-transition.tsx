@@ -2,6 +2,7 @@ import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import Svg, {Path} from 'react-native-svg'
 
 import {
+  buildAvatarCradlePath,
   buildCoverCanvasLipPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
@@ -23,6 +24,8 @@ type InvertedSurfaceTransitionProps = {
   trayWidth?: number
   trayHeight?: number
   cornerRadius?: number
+  avatarCenterX?: number
+  cradleRadius?: number
   style?: StyleProp<ViewStyle>
 }
 
@@ -39,6 +42,8 @@ export function InvertedSurfaceTransition({
   trayWidth,
   trayHeight,
   cornerRadius,
+  avatarCenterX,
+  cradleRadius,
   style,
 }: InvertedSurfaceTransitionProps) {
   if (width <= 0 || height <= 0) return null
@@ -48,11 +53,15 @@ export function InvertedSurfaceTransition({
     trayWidth,
     trayHeight,
     biteRadii: [Math.min(12, bite), bite, Math.min(12, bite)],
+    avatarCenterX,
+    cradleRadius,
   }
   const d =
-    edge === 'top' && side === 'leading'
-      ? buildCoverCanvasLipPath(width, height, options)
-      : buildTopLeadingInvertedPath(width, height, options)
+    avatarCenterX != null && cradleRadius != null
+      ? buildAvatarCradlePath(width, height, options)
+      : edge === 'top' && side === 'leading'
+        ? buildCoverCanvasLipPath(width, height, options)
+        : buildTopLeadingInvertedPath(width, height, options)
 
   return (
     <View

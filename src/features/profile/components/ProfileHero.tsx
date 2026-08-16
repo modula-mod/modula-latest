@@ -22,11 +22,7 @@ import {
   ProfileCoverEditor,
   type ProfileCoverDraft,
 } from '@/features/profile/editor/profile-cover-editor'
-import {
-  profileAvatarSize,
-  profileAvatarSlotSize,
-  profileCoverBody,
-} from '@/features/profile/model/profile-layout'
+import {profileGeometry} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileHeroProps = {
@@ -61,9 +57,7 @@ export function ProfileHero({
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
-  const avatarSize = profileAvatarSize(isCompact)
-  const slotSize = profileAvatarSlotSize(isCompact, presentation.showFocusHalo)
-  const coverBody = profileCoverBody(isCompact)
+  const geometry = profileGeometry(isCompact, presentation.showFocusHalo, spacing[4])
   const canEdit = viewer.canEdit
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
@@ -77,8 +71,8 @@ export function ProfileHero({
         profile={profile}
         compact={isCompact}
         canEdit={canEdit}
-        slotSize={slotSize}
-        contentInset={spacing[4]}
+        slotSize={geometry.slotSize}
+        contentInset={geometry.heroHorizontalInset}
         onEditPress={() => setCoverEditorOpen(true)}
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
@@ -100,15 +94,15 @@ export function ProfileHero({
         style={[
           styles.avatarSlot,
           {
-            left: spacing[4],
-            top: coverBody - slotSize / 2,
-            height: slotSize,
-            width: slotSize,
+            left: geometry.heroHorizontalInset,
+            top: geometry.coverBody - geometry.avatarOverlap,
+            height: geometry.slotSize,
+            width: geometry.slotSize,
           },
         ]}>
         <ProfileAvatar
           profile={profile}
-          size={avatarSize}
+          size={geometry.avatarSize}
           showFocusHalo={presentation.showFocusHalo}
           canEdit={canEdit}
           onEditPress={() => setAvatarEditorOpen(true)}
@@ -131,16 +125,24 @@ export function ProfileHero({
           styles.body,
           {
             paddingHorizontal: spacing[4],
-            paddingTop: spacing[1],
-            paddingBottom: spacing[3],
-            gap: spacing[3],
+            paddingTop: 0,
+            paddingBottom: spacing[2],
+            gap: spacing[2],
           },
         ]}>
-        {showActions && !viewer.canEdit ? (
-          <View style={[styles.avatarActions, {paddingLeft: slotSize + spacing[3]}]}>
-            <ProfileActions profile={profile} viewer={viewer} />
-          </View>
-        ) : null}
+        <View
+          style={{
+            minHeight: geometry.identityPaddingTop,
+            paddingLeft: viewer.canEdit ? 0 : geometry.slotSize + spacing[3],
+            justifyContent: 'center',
+            alignItems: viewer.canEdit ? 'stretch' : 'flex-end',
+          }}>
+          {showActions && !viewer.canEdit ? (
+            <View style={styles.avatarActions}>
+              <ProfileActions profile={profile} viewer={viewer} />
+            </View>
+          ) : null}
+        </View>
         <ProfileIdentity profile={profile} viewer={viewer} compact />
         <HeroViewingCopy viewer={viewer} />
         {showStats ? (

@@ -26,6 +26,10 @@ export type InvertedSurfacePathOptions = {
   trayHeight?: number
   /** [leading fillet, inverted fillet, trailing fillet] */
   biteRadii?: InvertedBiteRadii
+  /** Horizontal centre of the avatar slot, in overlay coordinates. */
+  avatarCenterX?: number
+  /** Outer radius of the cover cradle around the avatar / Focus Halo. */
+  cradleRadius?: number
 }
 
 export const PROFILE_COVER_INVERTED_DEFAULTS = {
@@ -87,6 +91,57 @@ export function buildCoverCanvasLipPath(
 }
 
 /**
+ * Canvas cradle around the avatar.
+ *
+ * Fills the overlay except an upper semicircle centred on the cover/body
+ * line. The hole is slightly larger than the avatar + Focus Halo so cover
+ * imagery remains around the portrait. White shoulders stay thin on the
+ * leading edge (the avatar sits near the inset) and become the body lip
+ * on the trailing edge — one composition, not a rectangle with a sticker.
+ */
+export function buildAvatarCradlePath(
+  width: number,
+  height: number,
+  options?: InvertedSurfacePathOptions,
+): string {
+  const w = clampNonNegative(width)
+  const h = clampNonNegative(height)
+  if (w <= 0 || h <= 0) return ''
+
+  const radius = Math.min(
+    clampNonNegative(options?.cradleRadius ?? inverted.profile),
+    h,
+    w / 2,
+  )
+  const cx = Math.min(
+    Math.max(
+      radius,
+      clampNonNegative(
+        options?.avatarCenterX ??
+          options?.trayWidth ??
+          PROFILE_COVER_INVERTED_DEFAULTS.trayWidth,
+      ),
+    ),
+    w - radius,
+  )
+
+  if (radius <= 0) {
+    return M(0, h) + H(w) + V(0) + H(0) + 'Z'
+  }
+
+  return (
+    M(0, h) +
+    H(cx - radius) +
+    A(radius, cx + radius, h, 0) +
+    H(w) +
+    V(0) +
+    H(0) +
+    V(h) +
+    'Z'
+  )
+}
+
+/**
  * Fill path for a band whose top-leading corner is inverted.
  * Used as a canvas-coloured overlay at the bottom of a profile cover so the
  * body appears to wrap around the avatar.
@@ -96,6 +151,9 @@ export function buildTopLeadingInvertedPath(
   height: number,
   options?: InvertedSurfacePathOptions,
 ): string {
+  if (options?.avatarCenterX != null || options?.cradleRadius != null) {
+    return buildAvatarCradlePath(width, height, options)
+  }
   return buildCoverCanvasLipPath(width, height, options)
 }
 

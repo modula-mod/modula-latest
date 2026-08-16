@@ -7,7 +7,6 @@ import {
   type ModulaProfile,
   type ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
-import {ProfileVisibilityBadge} from '@/features/profile/components/ProfileVisibilityBadge'
 import {openSafeExternalUrl} from '@/lib/safeExternalUrl'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -36,47 +35,47 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
     <View style={[styles.wrap, {gap: compact ? spacing[2] : spacing[3]}]}>
       <View style={{gap: spacing[1]}}>
         <View style={[styles.handleRow, {gap: spacing[2]}]}>
-          <AppText variant="title2" numberOfLines={2} style={styles.name}>
+          <AppText variant="title2" numberOfLines={3} style={styles.name}>
             {profile.displayName}
           </AppText>
           {verified ? <ModulaIcon name="verified" colour={colours.text} size={18} /> : null}
         </View>
-        <AppText variant="body" colour="textSecondary" selectable>
+        <AppText variant="caption" colour="textSecondary" selectable>
           @{profile.handle}
           {profile.pronouns ? ` · ${profile.pronouns}` : ''}
         </AppText>
       </View>
 
-      {profile.bio ? <AppText variant="body">{profile.bio}</AppText> : null}
+      {profile.bio ? (
+        <AppText variant="body" style={styles.bio}>
+          {profile.bio}
+        </AppText>
+      ) : null}
 
-      <View style={[styles.metadata, {gap: spacing[2]}]}>
-        <View style={[styles.metaItem, {gap: spacing[1]}]}>
-          <ModulaIcon name="clock" colour={colours.textSecondary} size={16} />
-          <AppText variant="caption" colour="textSecondary">
-            Joined {joined}
-          </AppText>
-        </View>
-        {locationVisible ? (
+      <View style={[styles.metadata, {gap: spacing[1]}]}>
+        <View style={[styles.metaRow, {gap: spacing[3]}]}>
           <View style={[styles.metaItem, {gap: spacing[1]}]}>
-            <ModulaIcon name="community" colour={colours.textSecondary} size={16} />
+            <ModulaIcon name="clock" colour={colours.textSecondary} size={14} />
             <AppText variant="caption" colour="textSecondary">
-              {profile.location?.label}
+              Joined {joined}
             </AppText>
-            {profile.location ? (
-              <ProfileVisibilityBadge
-                visibility={profile.location.visibility}
-                contextLabel="Location"
-              />
-            ) : null}
           </View>
-        ) : null}
+          {locationVisible ? (
+            <View style={[styles.metaItem, {gap: spacing[1]}]}>
+              <ModulaIcon name="community" colour={colours.textSecondary} size={14} />
+              <AppText variant="caption" colour="textSecondary">
+                {profile.location?.label}
+              </AppText>
+            </View>
+          ) : null}
+        </View>
         {websiteVisible && profile.website ? (
           <AppPressable
             accessibilityLabel={`Open ${profile.website.label}`}
             onPress={() => void openSafeExternalUrl(profile.website?.url ?? '')}
             style={[styles.metaItem, {gap: spacing[1]}]}>
-            <ModulaIcon name="link" colour={colours.text} size={16} />
-            <AppText variant="caption" colour="textSecondary">
+            <ModulaIcon name="link" colour={colours.textSecondary} size={14} />
+            <AppText variant="caption" colour="text">
               {profile.website.domain}
             </AppText>
           </AppPressable>
@@ -97,6 +96,9 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
 }
 
 const styles = StyleSheet.create({
+  bio: {
+    lineHeight: 22,
+  },
   handleRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -105,11 +107,15 @@ const styles = StyleSheet.create({
   metaItem: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 28,
+    minHeight: 22,
   },
-  metadata: {
+  metaRow: {
+    alignItems: 'center',
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  metadata: {
+    minWidth: 0,
   },
   name: {
     flexShrink: 1,

@@ -60,7 +60,7 @@ export function ProfileCover({
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
-  const {colours, inverted} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const height = profileCoverHeight(compact, insets.top)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
@@ -68,10 +68,11 @@ export function ProfileCover({
   const emptyFill = profile.coverColour ?? colours.borderStrong
   const hasPhoto = Boolean(uri) && kind !== 'none'
   const transitionHeight = Math.min(
-    Math.round(slotSize / 2 + inverted.md),
+    slotSize / 2 + PROFILE_LAYOUT.cradleGap + PROFILE_LAYOUT.cradleLipExtra,
     PROFILE_LAYOUT.coverBodyCompact,
   )
-  const trayWidth = slotSize + contentInset
+  const avatarCenterX = contentInset + slotSize / 2
+  const cradleRadius = slotSize / 2 + PROFILE_LAYOUT.cradleGap
 
   const animatedStyle = useAnimatedStyle(() => {
     if (reduceMotion) {
@@ -145,7 +146,8 @@ export function ProfileCover({
           width={width}
           height={transitionHeight + 1}
           fill={colours.canvas}
-          trayWidth={trayWidth}
+          avatarCenterX={avatarCenterX}
+          cradleRadius={cradleRadius}
         />
       </View>
     </Animated.View>
