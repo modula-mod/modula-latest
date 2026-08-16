@@ -149,10 +149,11 @@ assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', "controlSize
 assertContains('src/platform/ui/menus/toolbar-chrome.ts', 'OVERLAY_GROUP_HIT = TOOLBAR_HIT', 'GROUP HIT IS 44')
 assertContains('src/platform/ui/menus/toolbar-chrome.ts', 'OVERLAY_GROUP_GAP = 22', 'GROUP GAP IS 22')
 assertContains('src/platform/ui/navigation/plain-header-items.ts', 'HEADER_ICON_PAIR_GAP = 22', 'PROFILE GAP IS 22')
-assertContains('src/platform/ui/menus/chrome-glass-control-group.tsx', 'HEADER_ICON_PAIR_GAP', 'GROUP USES PROFILE GAP')
-assertContains('src/platform/ui/menus/chrome-glass-control-group.tsx', 'OVERLAY_GROUP_HIT', 'GROUP USES 44PT HIT')
-assertContains('src/platform/ui/menus/chrome-glass-control-group.tsx', 'LiquidGlassChrome', 'GROUP GLASS CAPSULE')
-assertAbsent('src/platform/ui/menus/chrome-glass-control-group.tsx', '<ControlGroup', 'NO COMPACT CONTROLGROUP')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'HEADER_ICON_PAIR_GAP', 'GROUP USES PROFILE GAP')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'OVERLAY_GROUP_HIT', 'GROUP USES 44PT HIT')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'LiquidGlassChrome', 'GROUP GLASS CAPSULE')
+assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'matchContents=', 'GROUP HOST NOT SHRUNK')
+assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', '<ControlGroup', 'NO COMPACT CONTROLGROUP')
 assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'ChromeGlassControlGroup', 'MODULE DETAIL CONTROL GROUP')
 
 if (failures.length) {

@@ -34,15 +34,7 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
   throw new Error('Overlay group must match Profile header sizes (44pt hit, 22pt gap)')
 }
 
-/**
- * Overlay trailing share + overflow, sized like Profile's header capsule.
- *
- * RN layout owns the 44×110pt frame. SwiftUI ControlGroup / matchContents
- * Host shrinks to ~23pt and is not used here.
- *
- * Inner glyphs are plain 44pt hosts — same as Profile `chrome="plain"`.
- * The capsule is the glass (LiquidGlassChrome).
- */
+/** Web / Android: Profile-sized capsule — 44pt hits, 22pt gap. */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   return (
     <LiquidGlassChrome
@@ -90,6 +82,6 @@ const styles = StyleSheet.create({
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
     minWidth: OVERLAY_GROUP_MIN_WIDTH,
-    paddingHorizontal: 10,
+    paddingHorizontal: 6,
   },
 })
