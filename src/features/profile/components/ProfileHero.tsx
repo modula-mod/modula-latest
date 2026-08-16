@@ -42,9 +42,8 @@ type ProfileHeroProps = {
  * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
  * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
  *
- * The canvas steps: a leading shelf the portrait straddles, then an inverted
- * corner up to the trailing plateau. Identity sits on that plateau; metrics
- * sit in the gutter under the portrait.
+ * The portrait sits in the inverted cradle pocket. Identity starts on the
+ * canvas below the cover, to the right of the portrait — not on the photo.
  */
 export function ProfileHero({
   profile,
@@ -157,7 +156,7 @@ export function ProfileHero({
           style={[
             styles.avatarSlot,
             {
-              left: geometry.avatarLead,
+              left: geometry.avatarLeft,
               bottom: geometry.shelfDepth,
               height: geometry.slotSize,
               width: geometry.slotSize,
@@ -187,8 +186,8 @@ export function ProfileHero({
           style={[
             styles.body,
             {
-              marginTop: -geometry.plateauDepth,
               paddingHorizontal: spacing[4],
+              paddingTop: geometry.identityPlateauGap,
               paddingBottom: spacing[2],
             },
           ]}>
@@ -298,6 +297,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   coverBlock: {
+    overflow: 'visible',
     position: 'relative',
     zIndex: 1,
   },

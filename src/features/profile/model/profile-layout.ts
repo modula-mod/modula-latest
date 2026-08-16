@@ -24,6 +24,10 @@ export const PROFILE_LAYOUT = {
   haloExtra: 5,
   haloWidth: 2,
   avatarBorder: 3,
+  /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
+  avatarFit: 0.95,
+  /** Drop the portrait into the white cradle without growing the overlay. */
+  avatarDrop: 22,
   /** Cover showing around the portrait inside the inverted cradle. */
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
@@ -34,8 +38,8 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
-  /** Plateau edge to the identity cap height. */
-  identityPlateauGap: 8,
+  /** Plateau edge to the identity cap height — on the canvas, not the photo. */
+  identityPlateauGap: 20,
   identityAfterAvatar: 12,
   coverTopBlur: 28,
   coverBottomBlur: 36,
@@ -60,6 +64,7 @@ export type ProfileGeometry = {
   haloExpansion: number
   heroHorizontalInset: number
   avatarLead: number
+  avatarLeft: number
   avatarLift: number
   plateauDepth: number
   shelfDepth: number
@@ -86,10 +91,14 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value))
 }
 
-export function profileAvatarSize(compact: boolean, contentWidth = 393): number {
+export function profileAvatarSizeFull(compact: boolean, contentWidth = 393): number {
   const scaled = Math.round(contentWidth * PROFILE_LAYOUT.avatarRatio)
   const size = clamp(scaled, PROFILE_LAYOUT.avatarMin, PROFILE_LAYOUT.avatarMax)
   return compact ? size : size + 8
+}
+
+export function profileAvatarSize(compact: boolean, contentWidth = 393): number {
+  return Math.round(profileAvatarSizeFull(compact, contentWidth) * PROFILE_LAYOUT.avatarFit)
 }
 
 export function profileHaloExtra(showFocusHalo: boolean): number {
@@ -117,7 +126,9 @@ export function profileCradleRadius(
   showFocusHalo: boolean,
   contentWidth = 393,
 ): number {
-  return profileAvatarSlotSize(compact, showFocusHalo, contentWidth) / 2 + PROFILE_LAYOUT.cradleGap
+  const pocket =
+    profileAvatarSizeFull(compact, contentWidth) + profileHaloExtra(showFocusHalo)
+  return pocket / 2 + PROFILE_LAYOUT.cradleGap
 }
 
 export function profileCoverBody(compact: boolean | undefined, contentWidth = 393): number {
@@ -161,14 +172,19 @@ export function profileGeometry(
 ): ProfileGeometry {
   const contentWidth = options?.contentWidth ?? 393
   const fontScale = options?.fontScale ?? 1
-  const avatarSize = profileAvatarSize(compact, contentWidth)
+  const paintedSize = profileAvatarSize(compact, contentWidth)
+  const fullSize = profileAvatarSizeFull(compact, contentWidth)
   const haloExpansion = profileHaloExtra(showFocusHalo)
-  const slotSize = avatarSize + haloExpansion
+  const slotSize = paintedSize + haloExpansion
+  const pocketSlot = fullSize + haloExpansion
   const avatarLead = profileAvatarLead(contentWidth)
   const cradleRadius = profileCradleRadius(compact, showFocusHalo, contentWidth)
   const plateauRadius = PROFILE_LAYOUT.plateauRadius
   const plateauDepth = Math.round(cradleRadius + plateauRadius)
-  const gutterWidth = avatarLead + slotSize
+  const avatarDrop = PROFILE_LAYOUT.avatarDrop
+  const shelfDepth = PROFILE_LAYOUT.cradleGap - avatarDrop
+  const avatarCenterX = avatarLead + pocketSlot / 2
+  const gutterWidth = avatarLead + pocketSlot
 
   const identityColumnWidth = contentWidth - horizontalInset - gutterWidth
   const stackedFallback =
@@ -178,14 +194,15 @@ export function profileGeometry(
 
   return {
     coverBody: profileCoverBody(compact, contentWidth),
-    avatarSize,
+    avatarSize: paintedSize,
     slotSize,
     haloExpansion,
     heroHorizontalInset: horizontalInset,
     avatarLead,
+    avatarLeft: avatarCenterX - slotSize / 2,
     avatarLift: cradleRadius + slotSize / 2,
     plateauDepth,
-    shelfDepth: PROFILE_LAYOUT.cradleGap,
+    shelfDepth,
     transitionHeight: plateauDepth,
     stepX: gutterWidth,
     stepRise: Math.round(cradleRadius),
@@ -195,10 +212,10 @@ export function profileGeometry(
     identityPlateauGap: PROFILE_LAYOUT.identityPlateauGap,
     identityColumnPad: PROFILE_LAYOUT.cradleGap + plateauRadius + 12,
     metricViewportHeight: profileMetricWindowHeight(),
-    metricColumnTop: plateauDepth + PROFILE_LAYOUT.metricColumnGap,
+    metricColumnTop: Math.max(0, -shelfDepth) + PROFILE_LAYOUT.metricColumnGap,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
-    avatarCenterX: avatarLead + slotSize / 2,
-    avatarCenterY: plateauRadius,
+    avatarCenterX,
+    avatarCenterY: plateauRadius + avatarDrop,
     cradleRadius,
     plateauRadius,
     invertedCornerRadius: inverted.md,

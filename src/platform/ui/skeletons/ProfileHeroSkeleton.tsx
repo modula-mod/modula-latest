@@ -22,7 +22,7 @@ export function ProfileHeroSkeleton() {
             {
               height: avatar,
               width: avatar,
-              left: geometry.avatarLead,
+              left: geometry.avatarLeft,
               bottom: geometry.shelfDepth,
             },
           ]}>
@@ -33,8 +33,9 @@ export function ProfileHeroSkeleton() {
         style={[
           styles.body,
           {
-            marginTop: -geometry.plateauDepth,
+            marginTop: 0,
             paddingHorizontal: spacing[4],
+            paddingTop: geometry.identityPlateauGap,
           },
         ]}>
         <View style={styles.row}>
