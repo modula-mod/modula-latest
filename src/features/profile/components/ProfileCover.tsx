@@ -71,7 +71,7 @@ export function ProfileCover({
     Math.round(slotSize / 2 + inverted.md),
     PROFILE_LAYOUT.coverBodyCompact,
   )
-  const trayWidth = slotSize + contentInset + inverted.sm
+  const trayWidth = slotSize + contentInset
 
   const animatedStyle = useAnimatedStyle(() => {
     if (reduceMotion) {
@@ -143,11 +143,9 @@ export function ProfileCover({
           side="leading"
           size="profile"
           width={width}
-          height={transitionHeight}
+          height={transitionHeight + 1}
           fill={colours.canvas}
           trayWidth={trayWidth}
-          trayHeight={Math.min(transitionHeight, slotSize * 0.62)}
-          cornerRadius={0}
         />
       </View>
     </Animated.View>

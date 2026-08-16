@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/immutability */
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo} from 'react'
 import {StyleSheet, View} from 'react-native'
 import {Gesture, GestureDetector} from 'react-native-gesture-handler'
 import Animated, {
@@ -20,8 +20,9 @@ import {
   profileMetricWindowHeight,
 } from '@/features/profile/model/profile-layout'
 import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
-import {InvertedSelectedSurface} from '@/platform/ui/geometry'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+const NEIGHBOR_OPACITY = 0.42
 
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 
@@ -45,7 +46,6 @@ export function ProfileMetricPicker({
     0,
     metrics.findIndex(metric => metric.id === selectedMetricId),
   )
-  const [surfaceWidth, setSurfaceWidth] = useState(0)
   const scrollOffset = useSharedValue(selectedIndex * ITEM_HEIGHT)
   const startOffset = useSharedValue(selectedIndex * ITEM_HEIGHT)
   const lastTick = useSharedValue(selectedIndex)
@@ -178,26 +178,20 @@ export function ProfileMetricPicker({
           if (name === 'activate') activate()
         }}
         testID="profile-metric-picker"
-        style={[styles.window, {height: windowHeight}]}
-        onLayout={event => setSurfaceWidth(event.nativeEvent.layout.width)}>
-        {surfaceWidth > 0 ? (
-          <View
-            pointerEvents="none"
-            style={[
-              styles.selectedSurface,
-              {
-                height: ITEM_HEIGHT,
-                top: ITEM_HEIGHT,
-                borderRadius: radius.medium,
-              },
-            ]}>
-            <InvertedSelectedSurface
-              width={Math.min(surfaceWidth, 168)}
-              height={ITEM_HEIGHT}
-              fill={colours.surfaceMuted}
-            />
-          </View>
-        ) : null}
+        style={[styles.window, {height: windowHeight}]}>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.selectedSurface,
+            {
+              backgroundColor: colours.surfaceMuted,
+              borderRadius: radius.medium,
+              height: ITEM_HEIGHT,
+              marginHorizontal: spacing[2],
+              top: ITEM_HEIGHT,
+            },
+          ]}
+        />
         {metrics.map((metric, index) => (
           <MetricWheelItem
             key={metric.id}
@@ -258,7 +252,11 @@ function MetricWheelItem({
     const distance = Math.abs(offset)
     const progress = Math.min(1, distance / ITEM_HEIGHT)
     return {
-      opacity: reduceMotion ? (progress < 0.5 ? 1 : 0.38) : interpolate(progress, [0, 1], [1, 0.25]),
+      opacity: reduceMotion
+        ? progress < 0.5
+          ? 1
+          : NEIGHBOR_OPACITY
+        : interpolate(progress, [0, 1], [1, NEIGHBOR_OPACITY]),
       transform: [
         {translateY},
         {
@@ -301,10 +299,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   selectedSurface: {
-    alignItems: 'center',
-    justifyContent: 'center',
     left: 0,
-    overflow: 'hidden',
     position: 'absolute',
     right: 0,
   },

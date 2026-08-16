@@ -45,6 +45,47 @@ function clampBite(
   ) as InvertedBiteRadii
 }
 
+function clampNonNegative(value: number): number {
+  return Number.isFinite(value) ? Math.max(0, value) : 0
+}
+
+/**
+ * Canvas lip at the bottom of a profile cover.
+ *
+ * Fills only to the right of `trayWidth` so the cover photo stays around the
+ * avatar. The top-leading corner is inverted (sweep 0) — a concave join, not
+ * a wrap under the avatar and not a convex rounded rect.
+ */
+export function buildCoverCanvasLipPath(
+  width: number,
+  height: number,
+  options?: InvertedSurfacePathOptions,
+): string {
+  const w = clampNonNegative(width)
+  const h = clampNonNegative(height)
+  if (w <= 0 || h <= 0) return ''
+
+  const trayW = Math.min(
+    clampNonNegative(options?.trayWidth ?? PROFILE_COVER_INVERTED_DEFAULTS.trayWidth),
+    w,
+  )
+  const available = w - trayW
+  if (available <= 0) return ''
+
+  const r = Math.min(
+    clampNonNegative(options?.biteRadii?.[1] ?? inverted.profile),
+    h,
+    available,
+  )
+  const x0 = trayW
+
+  if (r <= 0) {
+    return M(x0, h) + H(w) + V(0) + H(x0) + V(h) + 'Z'
+  }
+
+  return M(x0, h) + H(w) + V(0) + H(x0 + r) + A(r, x0, r, 0) + V(h) + 'Z'
+}
+
 /**
  * Fill path for a band whose top-leading corner is inverted.
  * Used as a canvas-coloured overlay at the bottom of a profile cover so the
@@ -55,42 +96,13 @@ export function buildTopLeadingInvertedPath(
   height: number,
   options?: InvertedSurfacePathOptions,
 ): string {
-  const defaults = PROFILE_COVER_INVERTED_DEFAULTS
-  const trayW = Math.min(options?.trayWidth ?? defaults.trayWidth, Math.max(48, width * 0.62))
-  const trayH = Math.min(
-    options?.trayHeight ?? defaults.trayHeight,
-    Math.max(24, height - 2),
-  )
-  const r = Math.min(
-    options?.cornerRadius ?? defaults.cornerRadius,
-    width / 6,
-    height / 2,
-  )
-  const [c0, c1, c2] = clampBite(
-    options?.biteRadii ?? defaults.biteRadii,
-    trayW,
-    trayH,
-  )
-
-  let path = M(0, height)
-  path += H(width)
-  path += V(r)
-  path += A(r, width - r, 0)
-  path += H(trayW + c0)
-  path += A(c0, trayW, c0)
-  path += V(trayH - c1)
-  path += A(c1, trayW - c1, trayH, 0)
-  path += H(c2)
-  path += A(c2, 0, trayH + c2)
-  path += V(height)
-  path += 'Z'
-  return path
+  return buildCoverCanvasLipPath(width, height, options)
 }
 
 /**
  * Fill path for a compact selected surface with one inverted bottom-trailing
- * corner — used by the Profile Metric Picker when the geometry clarifies
- * selection without becoming a second card.
+ * corner — kept as a geometry primitive. Profile Metric Picker does not use
+ * this; a concave selected pill read as a broken control.
  */
 export function buildSelectedInvertedSurfacePath(
   width: number,

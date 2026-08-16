@@ -2,6 +2,7 @@ import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import Svg, {Path} from 'react-native-svg'
 
 import {
+  buildCoverCanvasLipPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
   type InvertedSurfacePathOptions,
@@ -50,7 +51,7 @@ export function InvertedSurfaceTransition({
   }
   const d =
     edge === 'top' && side === 'leading'
-      ? buildTopLeadingInvertedPath(width, height, options)
+      ? buildCoverCanvasLipPath(width, height, options)
       : buildTopLeadingInvertedPath(width, height, options)
 
   return (

@@ -2,9 +2,12 @@ import {useMemo, useState, type ReactNode} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import Animated, {
+  interpolate,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -142,6 +145,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {width} = useWindowDimensions()
   const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
+  const insets = useSafeAreaInsets()
   const tabPadding = useFloatingTabBarContentPadding({
     automaticInsetsDisabled: true,
   })
@@ -156,10 +160,25 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const catalogueQuery = useModuleCatalogueQuery()
   const isExpanded = width >= 1100
   const scrollY = useSharedValue(0)
+  const headerHeight = useSharedValue(0)
+  const insetTop = insets.top
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
       scrollY.value = event.contentOffset.y
     },
+  })
+  const stickyPadStyle = useAnimatedStyle(() => {
+    const hero = headerHeight.value
+    if (insetTop <= 0) return {paddingTop: 0}
+    if (hero <= 0) return {paddingTop: insetTop}
+    return {
+      paddingTop: interpolate(
+        scrollY.value,
+        [hero - insetTop, hero],
+        [0, insetTop],
+        'clamp',
+      ),
+    }
   })
 
   const ownerProfile = ownerQuery.data ?? null
@@ -293,57 +312,60 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     </View>
   )
 
-  const stickyTabIndex =
-    (mode === 'preview' ? 1 : 0) +
-    (!isExpanded && presentation.layoutId !== 'minimal' ? 1 : 0) +
-    (presentation.layoutId === 'creator' && !isExpanded ? 1 : 0) +
-    (presentation.layoutId === 'professional' && !isExpanded ? 1 : 0) +
-    (presentation.layoutId === 'minimal' ? 1 : 0)
-
   const main = (
     <Animated.ScrollView
       contentInsetAdjustmentBehavior="never"
       scrollEventThrottle={16}
       onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
-      stickyHeaderIndices={[stickyTabIndex]}
+      stickyHeaderIndices={[1]}
       contentContainerStyle={[
         styles.scrollContent,
         {paddingBottom: tabPadding},
       ]}>
-      {mode === 'preview' ? <PreviewBar /> : null}
-      {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
-      {presentation.layoutId === 'creator' && !isExpanded ? (
-        <FeaturedBand title="Featured links">{featuredLinks.map(link => (
-          <ProfileLinkCard key={link.id} link={link} />
-        ))}</FeaturedBand>
-      ) : null}
-      {presentation.layoutId === 'professional' && !isExpanded ? (
-        <FeaturedBand title="Featured modules">{featuredModules.map(module => (
-          <ProfileModuleCard key={module.id} module={module} />
-        ))}</FeaturedBand>
-      ) : null}
-      {presentation.layoutId === 'minimal' ? (
-        <View style={[styles.minimalActions, {paddingHorizontal: spacing[4], paddingBottom: spacing[3]}]}>
-          <ProfileHero
-            profile={profile}
-            viewer={viewer}
-            presentation={presentation}
-            ownerHandle={ownerProfile.handle}
-            showStats={false}
-            showActions
-            compact
-            onSelectTab={setSelectedTabRequest}
-          />
-        </View>
-      ) : null}
-      <View style={[styles.stickyTabs, {backgroundColor: colours.canvas}]}>
+      <View
+        collapsable={false}
+        onLayout={event => {
+          // Shared values are mutated from layout; React immutability lint does not apply.
+          // eslint-disable-next-line react-hooks/immutability
+          headerHeight.value = event.nativeEvent.layout.height
+        }}>
+        {mode === 'preview' ? <PreviewBar /> : null}
+        {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
+        {presentation.layoutId === 'creator' && !isExpanded ? (
+          <FeaturedBand title="Featured links">{featuredLinks.map(link => (
+            <ProfileLinkCard key={link.id} link={link} />
+          ))}</FeaturedBand>
+        ) : null}
+        {presentation.layoutId === 'professional' && !isExpanded ? (
+          <FeaturedBand title="Featured modules">{featuredModules.map(module => (
+            <ProfileModuleCard key={module.id} module={module} />
+          ))}</FeaturedBand>
+        ) : null}
+        {presentation.layoutId === 'minimal' ? (
+          <View style={[styles.minimalActions, {paddingHorizontal: spacing[4], paddingBottom: spacing[3]}]}>
+            <ProfileHero
+              profile={profile}
+              viewer={viewer}
+              presentation={presentation}
+              ownerHandle={ownerProfile.handle}
+              showStats={false}
+              showActions
+              compact
+              onSelectTab={setSelectedTabRequest}
+            />
+          </View>
+        ) : null}
+      </View>
+      <Animated.View
+        testID="profile-sticky-tabs"
+        style={[styles.stickyTabs, {backgroundColor: colours.canvas}, stickyPadStyle]}>
         <ProfileTabBar
           tabs={visibleTabs}
           selectedTabId={selectedTabId}
           onSelectTab={setSelectedTabRequest}
         />
-      </View>
+      </Animated.View>
       <ProfileTabContent profile={profile} viewer={viewer} tab={selectedTab} />
     </Animated.ScrollView>
   )
