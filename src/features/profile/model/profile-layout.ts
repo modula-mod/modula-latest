@@ -27,7 +27,7 @@ export const PROFILE_LAYOUT = {
   /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
   avatarFit: 0.95,
   /** Lower the portrait into the white pocket. Does not move the inverted SVG. */
-  avatarDrop: 72,
+  avatarDrop: 60,
   /** Extra drop for name / handle / bio. Does not move the inverted SVG. */
   identityDrop: 55,
   /** Cover showing around the portrait inside the inverted cradle. */

@@ -166,7 +166,7 @@ assertContains('src/app/(tabs)/profile/_layout.tsx', 'safeAreaInsets: {top: 0}',
 assertContains('src/features/profile/components/ProfileCover.tsx', 'marginTop: -insets.top', 'COVER PULLS UNDER STATUS BAR')
 assertContains('src/features/profile/model/profile-layout.ts', 'coverHeadroomCompact: 140', 'COVER PHOTO IS TALL')
 assertContains('src/features/profile/model/profile-layout.ts', 'avatarFit: 0.95', 'AVATAR FITS THE POCKET')
-assertContains('src/features/profile/model/profile-layout.ts', 'avatarDrop: 72', 'AVATAR MOVES LOWER')
+assertContains('src/features/profile/model/profile-layout.ts', 'avatarDrop: 60', 'AVATAR MOVES LOWER')
 assertContains('src/features/profile/model/profile-layout.ts', 'identityDrop: 55', 'IDENTITY MOVES LOWER')
 assertContains('src/features/profile/components/ProfileHero.tsx', 'plateauDepth', 'BODY PULLS UP TO THE PLATEAU')
 assertContains('src/features/profile/model/profile-layout.ts', 'identityColumnPad', 'NAME STARTS AT THE PLATEAU')
