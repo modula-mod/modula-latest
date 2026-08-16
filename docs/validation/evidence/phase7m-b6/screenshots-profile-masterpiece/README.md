@@ -1,6 +1,6 @@
 # Phase 7M-B6 Profile masterpiece evidence
 
-Captured 2026-08-16 on **iPhone 17 Pro Simulator** (`0727E2F0-8528-44DA-9F4C-7B5F7394096B`, iOS 27.0). Metro on `cursor/phase7m-b6-profile-masterpiece-ce59`. Local demo-owner session (`@andrei.modula`).
+Captured 2026-08-17 on **iPhone 17 Pro Simulator** (`0727E2F0-8528-44DA-9F4C-7B5F7394096B`, iOS 27.0). Metro on `cursor/phase7m-b6-profile-masterpiece-ce59`. Local demo-owner session (`@andrei.modula`).
 
 Baseline before this pass: `docs/validation/evidence/phase7m-b6/screenshots-profile-evolution/`.
 
