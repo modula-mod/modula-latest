@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `picker-center-arrows.png` | Owner hero (this pass) | Metric rail gone; numbers centered; 30% arrows above and below the picker |
+| `cover-no-bottom-blur.png` | Owner hero (this pass) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
+| `picker-center-arrows.png` | Owner hero (previous) | Metric rail gone; numbers centered; 30% arrows above and below the picker |
 | `metrics-down-70.png` | Owner hero (previous) | Metric picker dropped another 50pt (70pt total); avatar 60pt, identity 55pt, inverted SVG unchanged |
 | `metrics-down-20.png` | Owner hero (previous) | Metric picker dropped 20pt; avatar 60pt, identity 55pt, inverted SVG unchanged |
 | `avatar-up-12.png` | Owner hero (previous) | Avatar raised 12pt from the 72pt drop (now 60pt); identity still 55pt down; inverted SVG unchanged |

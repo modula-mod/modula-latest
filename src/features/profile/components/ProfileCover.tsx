@@ -48,7 +48,6 @@ type ProfileCoverProps = {
 
 export const PROFILE_COVER_BODY = profileCoverBody(false)
 const TOP_BLUR = PROFILE_LAYOUT.coverTopBlur
-const BOTTOM_BLUR = PROFILE_LAYOUT.coverBottomBlur
 
 export {profileCoverBody, profileCoverHeight}
 
@@ -151,16 +150,6 @@ export function ProfileCover({
           />
         </View>
       ) : null}
-      {hasPhoto ? (
-        <View pointerEvents="none" style={[styles.bottomBlur, {bottom: transitionHeight}]}>
-          <ProgressiveBlurBand
-            height={BOTTOM_BLUR}
-            topHeavy={false}
-            strength="soft"
-            intensity={52}
-          />
-        </View>
-      ) : null}
       <View pointerEvents="none" style={styles.transition}>
         <InvertedSurfaceTransition
           edge="top"
@@ -231,12 +220,6 @@ export function ProfileCover({
 const styles = StyleSheet.create({
   artwork: {
     flex: 1,
-  },
-  bottomBlur: {
-    height: BOTTOM_BLUR,
-    left: 0,
-    position: 'absolute',
-    right: 0,
   },
   cover: {
     overflow: 'hidden',

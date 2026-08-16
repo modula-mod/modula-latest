@@ -46,7 +46,6 @@ export const PROFILE_LAYOUT = {
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
   coverTopBlur: 28,
-  coverBottomBlur: 36,
   metricItemHeight: 42,
   metricWindowItems: 3,
   metricMaxVisible: 5,
