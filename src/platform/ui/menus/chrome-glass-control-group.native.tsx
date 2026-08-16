@@ -1,9 +1,9 @@
 import {StyleSheet, View} from 'react-native'
+import {BlurView} from 'expo-blur'
 import {Button, Host, Menu} from '@expo/ui/swift-ui'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import {toolbarGroupItemModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/platform/ui/menus/toolbar-chrome'
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ChromeGlassGroupButton = {
   kind: 'button'
@@ -39,41 +40,59 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
 /**
  * Overlay trailing share + overflow, sized like Profile's header capsule.
  *
- * Each glyph lives in a 44×44 Host that does not shrink to the SF Symbol.
- * Gap is Profile's 22pt `HEADER_ICON_PAIR_GAP`.
- * The capsule is LiquidGlassChrome — not compact SwiftUI ControlGroup.
+ * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots. Expo Host is given an
+ * explicit 44×44 frame and does not matchContents. Callstack glass views are
+ * not used here — they shrink to SwiftUI intrinsic size.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
+  const {scheme} = useThemeTokens()
   const itemModifiers = toolbarGroupItemModifiers()
+  const isDark = scheme === 'dark'
 
   return (
-    <LiquidGlassChrome
-      interactive
-      fallback="clear"
-      contentLayout="flow"
-      style={styles.capsule}>
+    <View style={styles.capsule}>
+      <BlurView
+        pointerEvents="none"
+        intensity={64}
+        tint={isDark ? 'systemUltraThinMaterialDark' : 'systemUltraThinMaterialLight'}
+        style={StyleSheet.absoluteFill}
+      />
+      <View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.55)',
+            borderColor: isDark ? 'rgba(255,255,255,0.24)' : 'rgba(0,0,0,0.08)',
+            borderRadius: OVERLAY_GROUP_HIT / 2,
+            borderWidth: StyleSheet.hairlineWidth,
+          },
+        ]}
+      />
       <View style={styles.row}>
         {items.map(item => (
-          <Host key={item.accessibilityLabel} style={styles.hit}>
-            {item.kind === 'button' ? (
-              <Button
-                label={item.accessibilityLabel}
-                systemImage={sfSymbolForIcon(item.icon) as never}
-                modifiers={itemModifiers}
-                onPress={item.onPress}
-              />
-            ) : (
-              <Menu
-                label={item.accessibilityLabel}
-                systemImage="ellipsis"
-                modifiers={itemModifiers}>
-                {renderTapMenuItems(item.actions, item.onAction)}
-              </Menu>
-            )}
-          </Host>
+          <View key={item.accessibilityLabel} style={styles.hit}>
+            <Host style={styles.hit}>
+              {item.kind === 'button' ? (
+                <Button
+                  label={item.accessibilityLabel}
+                  systemImage={sfSymbolForIcon(item.icon) as never}
+                  modifiers={itemModifiers}
+                  onPress={item.onPress}
+                />
+              ) : (
+                <Menu
+                  label={item.accessibilityLabel}
+                  systemImage="ellipsis"
+                  modifiers={itemModifiers}>
+                  {renderTapMenuItems(item.actions, item.onAction)}
+                </Menu>
+              )}
+            </Host>
+          </View>
         ))}
       </View>
-    </LiquidGlassChrome>
+    </View>
   )
 }
 
@@ -83,6 +102,8 @@ const styles = StyleSheet.create({
     height: OVERLAY_GROUP_HIT,
     minHeight: OVERLAY_GROUP_HIT,
     minWidth: OVERLAY_GROUP_MIN_WIDTH,
+    overflow: 'hidden',
+    width: OVERLAY_GROUP_MIN_WIDTH,
   },
   hit: {
     height: OVERLAY_GROUP_HIT,
@@ -94,7 +115,6 @@ const styles = StyleSheet.create({
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
-    minWidth: OVERLAY_GROUP_MIN_WIDTH,
-    paddingHorizontal: 6,
+    width: OVERLAY_GROUP_MIN_WIDTH,
   },
 })
