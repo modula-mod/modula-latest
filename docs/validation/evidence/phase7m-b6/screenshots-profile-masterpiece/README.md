@@ -26,7 +26,7 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `profile-final-owner.png` | Owner hero | Full-bleed photo cover, glass Edit/Share/More, Focus Halo, cradle, name clear of avatar, compact picker, tabs, first post |
+| `cover-bleed-taller-svg.png` | Owner hero (this pass) | Cover bleeds under the status bar; inverted SVG is taller (`transitionExtra`) |
 | `profile-final-photo-cover.png` | Same hero | Progressive blur, status-bar contrast, glass chrome on photography |
 | `profile-final-picker-posts.png` | Picker | Posts selected; Followers / Following as downward context; no grey pill |
 | `profile-final-picker-followers.png` | Picker | Three-metric wheel (Followers / Following / Modules) |
