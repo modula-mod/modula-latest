@@ -7,7 +7,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
-import {useSession} from '@/auth/runtime'
 import type {ModuleContribution} from '@/data/repositories/contracts'
 import {useActivityQuery} from '@/features/activity/data'
 import {useDiscoverQuery} from '@/features/discover/data'
@@ -17,6 +16,10 @@ import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {PageIntro} from '@/platform/ui/chrome/page-intro'
+import {SectionHeader} from '@/platform/ui/chrome/section-header'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {
@@ -95,12 +98,10 @@ export function BoardScreen() {
   const navigation = useNavigation()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
-  const session = useSession()
   const discoverQuery = useDiscoverQuery()
   const activityQuery = useActivityQuery()
   const boardContributions = useModuleContributionQuery({surface: 'board', enabledOnly: true})
   const installedModules = useInstalledModulesQuery()
-  const ownerName = session.status === 'signedIn' ? session.profile.displayName : 'there'
   const modules = discoverQuery.data?.featuredModules ?? []
   const activity = activityQuery.data?.pages.flatMap(page => page.items) ?? []
   const [customizeOpen, setCustomizeOpen] = useState(false)
@@ -237,72 +238,45 @@ export function BoardScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
-          <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">Good focus, {ownerName}</AppText>
-            <AppText variant="body" colour="textSecondary">
-              Board is your private operating dashboard — modules, widgets, and next actions in one
-              place.
-            </AppText>
-          </View>
+          <SectionEnter>
+            <PageIntro
+              eyebrow="Workspace"
+              icon="board"
+              body="Modules, widgets, and next actions — your private operating surface."
+            />
+          </SectionEnter>
 
-          <Surface
-            variant="contained"
-            style={[styles.focus, {gap: spacing[3], padding: spacing[4]}]}>
-            <View
-              style={[
-                styles.focusIcon,
-                {backgroundColor: colours.accentSubtle, borderRadius: radius.medium},
-              ]}>
-              <AppIcon name="board" colour={colours.accent} />
-            </View>
-            <View style={styles.focusBody}>
+          <SectionEnter delay={40}>
+          <View style={{gap: spacing[2]}}>
+            <SectionHeader title="Focus" icon="sparkles" />
+            <View style={{gap: spacing[2]}}>
               <AppText variant="headline">
                 {focusHalo
                   ? `Focus · ${focusPresetTitle}`
                   : focusPreset === 'off'
-                    ? 'Focus Off'
+                    ? 'Focus off'
                     : 'Current focus'}
               </AppText>
               <AppText variant="body" colour="textSecondary">
                 {BOARD_FOCUS_POLICY_SENTENCES[focusPreset]}
               </AppText>
-              <View style={{gap: spacing[2]}}>
-                <AppPressable
-                  accessibilityLabel="Open Profile-OS pre-screen"
-                  onPress={() => router.push('/profile/os' as Href)}>
-                  <AppText variant="caption" colour="accent">
-                    Explore Profile-OS →
-                  </AppText>
-                </AppPressable>
-                <AppPressable
-                  accessibilityLabel="Open Focus Mode"
-                  onPress={() => router.push('/product/focus' as Href)}>
-                  <AppText variant="caption" colour="accent">
-                    Focus Mode →
-                  </AppText>
-                </AppPressable>
-                <AppPressable
-                  accessibilityLabel="Open Product Hub"
-                  onPress={() => router.push('/product' as Href)}>
-                  <AppText variant="caption" colour="accent">
-                    All capabilities →
-                  </AppText>
-                </AppPressable>
-              </View>
-            </View>
-          </Surface>
-
-          <View style={{gap: spacing[3]}}>
-            <View style={styles.sectionHeader}>
-              <AppText variant="headline">Widgets</AppText>
               <AppPressable
-                accessibilityLabel="Manage widgets"
-                onPress={() => router.push('/product/widgets' as Href)}>
-                <AppText variant="caption" colour="accent">
-                  Manage
-                </AppText>
+                accessibilityLabel="Open Focus Mode"
+                onPress={() => router.push('/product/focus' as Href)}>
+                <AppText variant="label">Open Focus Mode</AppText>
               </AppPressable>
             </View>
+          </View>
+          </SectionEnter>
+
+          <SectionEnter delay={80}>
+          <View style={{gap: spacing[3]}}>
+            <SectionHeader
+              title="Widgets"
+              icon="modules"
+              trailing="Manage"
+              onPress={() => router.push('/product/widgets' as Href)}
+            />
             {boardWidgets.length === 0 ? (
               <AppText variant="caption" colour="textSecondary">
                 No widgets on Board — add some in Widgets studio.
@@ -345,11 +319,8 @@ export function BoardScreen() {
                           flexBasis: widget.size.startsWith('2') ? '100%' : '47%',
                         },
                       ]}>
-                      <AppIcon name={widget.icon} colour={colours.accent} />
+                      <AppIcon name={widget.icon} colour={colours.text} size={22} />
                       <AppText variant="headline">{widget.name}</AppText>
-                      <AppText variant="caption" colour="textTertiary">
-                        {widget.size} · {widget.status} · #{index + 1}
-                      </AppText>
                       <AppText variant="caption" colour="textSecondary">
                         {widget.description}
                       </AppText>
@@ -360,50 +331,40 @@ export function BoardScreen() {
               </View>
             )}
           </View>
+          </SectionEnter>
 
-          <View style={[styles.quickRow, {gap: spacing[2]}]}>
+          <SectionEnter delay={120}>
+          <View style={{gap: spacing[2]}}>
+            <SectionHeader title="Studios" icon="tools" />
             {[
-              {label: 'Design Lab', route: '/settings/appearance-lab'},
-              {label: 'Atlas', route: '/product/atlas'},
-              {label: 'Start', route: '/product/start'},
-              {label: 'Intelligence', route: '/product/intelligence'},
-              {label: 'Widgets', route: '/product/widgets'},
-              {label: 'Automations', route: '/product/automations'},
-              {label: 'Merge Feeds', route: '/product/merge-feeds'},
-              {label: 'Forge', route: '/product/forge'},
-              {label: 'Gaia', route: '/product/gaia'},
+              {label: 'Design Lab', route: '/settings/appearance-lab', icon: 'appearance' as ModulaIconName},
+              {label: 'Intelligence', route: '/product/intelligence', icon: 'sparkles' as ModulaIconName},
+              {label: 'Forge', route: '/product/forge', icon: 'developer' as ModulaIconName},
+              {label: 'Gaia', route: '/product/gaia', icon: 'automation' as ModulaIconName},
+              {label: 'Widgets', route: '/product/widgets', icon: 'modules' as ModulaIconName},
             ].map(item => (
               <AppPressable
                 key={item.route}
                 accessibilityLabel={item.label}
                 onPress={() => router.push(item.route as Href)}
-                style={[
-                  styles.quickChip,
-                  {
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    borderRadius: radius.round,
-                    paddingHorizontal: spacing[3],
-                    paddingVertical: spacing[2],
-                  },
-                ]}>
-                <AppText variant="caption">{item.label}</AppText>
+                style={[styles.studioRow, {borderBottomColor: colours.separator}]}>
+                <ModulaIcon name={item.icon} colour={colours.text} size={18} />
+                <AppText variant="label" style={styles.studioLabel}>
+                  {item.label}
+                </AppText>
+                <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
               </AppPressable>
             ))}
           </View>
+          </SectionEnter>
 
           <View style={{gap: spacing[3]}}>
-            <View style={styles.sectionHeader}>
-              <AppText variant="headline">Pinned spaces</AppText>
-              <AppPressable
-                accessibilityLabel="Customize pinned spaces"
-                onPress={() => setCustomizeOpen(true)}
-                style={styles.customizeHit}>
-                <AppText variant="caption" colour="accent">
-                  Customize
-                </AppText>
-              </AppPressable>
-            </View>
+            <SectionHeader
+              title="Pinned spaces"
+              icon="board"
+              trailing="Customize"
+              onPress={() => setCustomizeOpen(true)}
+            />
             {loading ? (
               <BoardGridSkeleton />
             ) : pinnedSpaces.length === 0 ? (
@@ -419,7 +380,7 @@ export function BoardScreen() {
                     borderColor: colours.border,
                   },
                 ]}>
-                <AppIcon name="board" colour={colours.accent} size={28} />
+                <AppIcon name="board" colour={colours.textTertiary} size={28} />
                 <AppText variant="headline">Pin your daily surfaces</AppText>
                 <AppText variant="body" colour="textSecondary">
                   Board stays empty until you choose spaces — Product Hub, Saved, Lists, and more.
@@ -461,7 +422,7 @@ export function BoardScreen() {
                           padding: spacing[4],
                         },
                       ]}>
-                      <AppIcon name={space.icon} colour={colours.accent} />
+                      <AppIcon name={space.icon} colour={colours.text} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{space.label}</AppText>
                         <AppText variant="caption" colour="textSecondary">
@@ -477,16 +438,12 @@ export function BoardScreen() {
 
           <FeatureErrorBoundary label="Board module contributions">
             <View style={{gap: spacing[3]}}>
-              <View style={styles.sectionHeader}>
-                <AppText variant="headline">Module contributions</AppText>
-                <AppPressable
-                  accessibilityLabel="Manage modules"
-                  onPress={() => router.push('/settings/modules' as Href)}>
-                  <AppText variant="caption" colour="accent">
-                    Manage
-                  </AppText>
-                </AppPressable>
-              </View>
+              <SectionHeader
+                title="Module contributions"
+                icon="modules"
+                trailing="Manage"
+                onPress={() => router.push('/settings/modules' as Href)}
+              />
               {boardContributions.isPending ? (
                 <AppText variant="caption" colour="textSecondary">
                   Loading Board module contributions.
@@ -519,7 +476,7 @@ export function BoardScreen() {
                       borderColor: colours.border,
                     },
                   ]}>
-                  <AppIcon name="modules" colour={colours.accent} size={24} />
+                  <AppIcon name="modules" colour={colours.textTertiary} size={24} />
                   <AppText variant="headline">No active Board modules</AppText>
                   <AppText variant="caption" colour="textSecondary">
                     Enabled modules can register launcher, summary, card, or list contributions here.
@@ -531,16 +488,12 @@ export function BoardScreen() {
 
           <FeatureErrorBoundary label="Board module grid">
             <View style={{gap: spacing[3]}}>
-              <View style={styles.sectionHeader}>
-                <AppText variant="headline">Modules</AppText>
-                <AppPressable
-                  accessibilityLabel="Browse Product Hub modules"
-                  onPress={() => router.push('/product' as Href)}>
-                  <AppText variant="caption" colour="accent">
-                    Browse
-                  </AppText>
-                </AppPressable>
-              </View>
+              <SectionHeader
+                title="Modules"
+                icon="modules"
+                trailing="Browse"
+                onPress={() => router.push('/product' as Href)}
+              />
               {modules.length === 0 ? (
                 <Surface
                   variant="contained"
@@ -554,7 +507,7 @@ export function BoardScreen() {
                       borderColor: colours.border,
                     },
                   ]}>
-                  <AppIcon name="modules" colour={colours.accent} size={28} />
+                  <AppIcon name="modules" colour={colours.textTertiary} size={28} />
                   <AppText variant="headline">Install your first capability</AppText>
                   <AppText variant="body" colour="textSecondary">
                     Modules like Vault Notes, Tasks, and CRM ship as packages through Product Hub.
@@ -583,14 +536,14 @@ export function BoardScreen() {
                           padding: spacing[4],
                         },
                       ]}>
-                      <AppIcon name={module.icon} colour={colours.accent} />
+                      <AppIcon name={module.icon} colour={colours.text} />
                       <View style={{gap: spacing[1]}}>
                         <AppText variant="headline">{module.name}</AppText>
                         <AppText variant="caption" colour="textSecondary">
                           {module.description}
                         </AppText>
                       </View>
-                      <AppText variant="caption" colour="accent">
+                      <AppText variant="caption" colour="textSecondary">
                         {module.status}
                       </AppText>
                     </AppPressable>
@@ -616,7 +569,12 @@ export function BoardScreen() {
           </FeatureErrorBoundary>
 
           <View style={{gap: spacing[3]}}>
-            <AppText variant="headline">Recent activity</AppText>
+            <SectionHeader
+              title="Recent activity"
+              icon="activity"
+              trailing="All"
+              onPress={() => router.push('/activity' as Href)}
+            />
             {activity.slice(0, 3).map(item => (
               <AppPressable
                 key={item.id}
@@ -673,11 +631,11 @@ export function BoardScreen() {
                 style={[
                   styles.customizeRow,
                   {
-                    backgroundColor: pinned ? colours.accentSubtle : colours.surfaceRaised,
+                    backgroundColor: pinned ? colours.surface : colours.surfaceRaised,
                     borderRadius: radius.medium,
                   },
                 ]}>
-                <AppIcon name={space.icon} colour={colours.accent} />
+                <AppIcon name={space.icon} colour={colours.text} />
                 <View style={styles.focusBody}>
                   <AppText variant="label" numberOfLines={1}>
                     {space.label}
@@ -686,7 +644,7 @@ export function BoardScreen() {
                     {space.description}
                   </AppText>
                 </View>
-                <AppText variant="caption" colour={pinned ? 'accent' : 'textSecondary'}>
+                <AppText variant="caption" colour="textSecondary">
                   {pinned ? 'Pinned' : 'Off'}
                 </AppText>
               </AppPressable>
@@ -730,18 +688,13 @@ function BoardContributionCard({
         },
       ]}>
       <View style={[styles.moduleContributionHeader, {gap: spacing[3]}]}>
-        <View style={[styles.focusIcon, {backgroundColor: colours.accentSubtle, borderRadius: radius.medium}]}>
-          <AppIcon name="modules" colour={colours.accent} />
-        </View>
+        <AppIcon name="modules" colour={colours.text} />
         <View style={styles.focusBody}>
           <AppText variant="headline">{title}</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            {contribution.moduleId} · {contribution.type}
-          </AppText>
         </View>
       </View>
       <AppText variant="caption" colour="textSecondary">{description}</AppText>
-      <View style={[styles.quickRow, {gap: spacing[2]}]}>
+      <View style={[styles.actionsRow, {gap: spacing[3]}]}>
         <AppPressable accessibilityLabel={`Open ${title}`} onPress={onOpen}>
           <AppText variant="label" colour="accent">Open</AppText>
         </AppPressable>
@@ -781,12 +734,17 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     width: '100%',
   },
-  quickRow: {
+  actionsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  quickChip: {
-    borderWidth: StyleSheet.hairlineWidth,
+  studioLabel: {flex: 1},
+  studioRow: {
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: 12,
+    minHeight: 48,
   },
   widgetCard: {
     borderWidth: StyleSheet.hairlineWidth,

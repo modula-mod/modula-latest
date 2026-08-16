@@ -1,12 +1,12 @@
 import {StyleSheet, View} from 'react-native'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileTabEmptyStateProps = {
-  icon: AppIconName
+  icon: ModulaIconName
   title: string
   description: string
   actionLabel?: string
@@ -24,17 +24,7 @@ export function ProfileTabEmptyState({
 
   return (
     <View style={[styles.wrap, {gap: spacing[3], padding: spacing[5]}]}>
-      <View
-        style={[
-          styles.icon,
-          {
-            backgroundColor: colours.accentSubtle,
-            borderColor: colours.accentBorder,
-            borderRadius: radius.round,
-          },
-        ]}>
-        <AppIcon name={icon} colour={colours.accent} />
-      </View>
+      <ModulaIcon name={icon} colour={colours.textTertiary} size={28} />
       <View style={{gap: spacing[1]}}>
         <AppText variant="headline" style={styles.center}>
           {title}
@@ -68,16 +58,10 @@ const styles = StyleSheet.create({
   action: {
     alignItems: 'center',
     justifyContent: 'center',
+    minHeight: 44,
   },
   center: {
     textAlign: 'center',
-  },
-  icon: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    height: 54,
-    justifyContent: 'center',
-    width: 54,
   },
   wrap: {
     alignItems: 'center',

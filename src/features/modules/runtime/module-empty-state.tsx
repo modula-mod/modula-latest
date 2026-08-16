@@ -2,6 +2,7 @@ import {View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleEmptyState({
@@ -17,9 +18,10 @@ export function ModuleEmptyState({
   primaryAction?: {label: string; onPress: () => void}
   secondaryAction?: {label: string; onPress: () => void}
 }) {
-  const {spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[3], paddingVertical: spacing[6]}} testID="module-empty-state">
+      <ModulaIcon name="modules" colour={colours.textTertiary} size={28} />
       <AppText variant="headline">{title}</AppText>
       {body || message ? (
         <AppText variant="body" colour="textSecondary">

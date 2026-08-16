@@ -24,6 +24,8 @@ import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-pic
 import {isBlockOn} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {PageIntro} from '@/platform/ui/chrome/page-intro'
+import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
@@ -156,6 +158,11 @@ export function ActivityScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
+          <PageIntro
+            eyebrow="Inbox"
+            icon="activity"
+            body="Likes, replies, mentions, and module updates."
+          />
           <View style={styles.titleRow}>
             <AppPressable
               accessibilityLabel="Mark all as read"
@@ -244,7 +251,7 @@ export function ActivityScreen() {
             if (!items.length) return null
             const groupBody = (
               <View style={{gap: spacing[3]}}>
-                <AppText variant="headline">{group}</AppText>
+                <SectionHeader title={group} icon="activity" />
                 <View style={{gap: spacing[2]}}>
                   {items.map((item, itemIndex) => {
                     const row = (

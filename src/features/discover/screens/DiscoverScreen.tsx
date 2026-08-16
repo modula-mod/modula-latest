@@ -23,11 +23,14 @@ import {
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
+import {PageIntro} from '@/platform/ui/chrome/page-intro'
+import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {type ModulaIconName} from '@/platform/ui/icons'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -149,9 +152,13 @@ export function DiscoverScreen() {
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
-              <AppText variant="body" colour="textSecondary" style={{flex: 1}}>
-                People, topics, modules, and media
-              </AppText>
+              <View style={{flex: 1}}>
+                <PageIntro
+                  eyebrow="Explore"
+                  icon="discover"
+                  body="People, topics, modules, and media."
+                />
+              </View>
               <ChromeOverflowMenu
                 accessibilityLabel="Discover filter menu"
                 title="Discover filters"
@@ -211,16 +218,8 @@ export function DiscoverScreen() {
               <AppPressable
                 accessibilityLabel="Edit interests Preview"
                 onPress={() => router.push('/discover/interests' as Href)}
-                style={[
-                  styles.cta,
-                  {
-                    backgroundColor: colours.accentSubtle,
-                    borderRadius: radius.round,
-                  },
-                ]}>
-                <AppText variant="label" style={{color: colours.accent}}>
-                  Choose interests — Preview
-                </AppText>
+                style={styles.cta}>
+                <AppText variant="label">Choose interests — Preview</AppText>
               </AppPressable>
             </SectionEnter>
             <SectionEnter delay={40}>
@@ -248,20 +247,13 @@ export function DiscoverScreen() {
                     style={[styles.searchInput, {color: colours.text}]}
                     returnKeyType="search"
                   />
-                  <AppPressable
-                    accessibilityLabel="Open inspire destinations"
-                    onPress={() => router.push('/discover/inspire' as Href)}
-                    style={[
-                      styles.searchChip,
-                      {
-                        backgroundColor: colours.accentSubtle,
-                        borderRadius: radius.round,
-                      },
-                    ]}>
-                    <AppText variant="caption" colour="accent">
-                      Inspire
-                    </AppText>
-                  </AppPressable>
+                    <AppPressable
+                      accessibilityLabel="Open inspire destinations"
+                      onPress={() => router.push('/discover/inspire' as Href)}>
+                      <AppText variant="caption" colour="textSecondary">
+                        Inspire
+                      </AppText>
+                    </AppPressable>
                 </View>
               </LiquidGlassChrome>
             </SectionEnter>
@@ -478,11 +470,19 @@ function filterDiscover(result: DiscoverResult | undefined, query: string): Disc
   }
 }
 
-function Section({title, children}: {title: string; children: React.ReactNode}) {
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string
+  icon?: ModulaIconName
+  children: React.ReactNode
+}) {
   const {spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[3]}}>
-      <AppText variant="headline">{title}</AppText>
+      <SectionHeader title={title} icon={icon} />
       {children}
     </View>
   )
@@ -492,7 +492,7 @@ function ReelsPreviewRail({result}: {result: DiscoverResult}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   return (
-    <Section title="Reels preview">
+    <Section title="Reels preview" icon="play">
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{gap: spacing[3]}}>
         {result.reels.map(reel => (
           <AppPressable
@@ -523,7 +523,7 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
   const {colours, radius, spacing} = useThemeTokens()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   return (
-    <Section title="Suggested people">
+    <Section title="Suggested people" icon="people">
       {people.length > 1 ? (
         <StackedAvatars
           faces={people.slice(0, 5).map(profile => ({
@@ -606,10 +606,10 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
 
 function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
   const router = useRouter()
-  const {spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   return (
-    <Section title="Trending topics">
-      <View style={[styles.topicWrap, {gap: spacing[2]}]}>
+    <Section title="Trending topics" icon="community">
+      <View style={{gap: spacing[1]}}>
         {topics.map(topic => (
           <ModulaContextMenu
             key={topic.id}
@@ -624,10 +624,16 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
                 router.push(`/communities/${topic.id}` as Href)
               }
             }}>
-            <Pill
-              label={`${topic.label}`}
+            <AppPressable
+              accessibilityLabel={topic.label}
               onPress={() => router.push(`/communities/${topic.id}` as Href)}
-            />
+              style={[styles.topicRow, {borderBottomColor: colours.separator}]}>
+              <AppIcon name="community" colour={colours.text} size={18} />
+              <AppText variant="label" style={styles.personBody}>
+                {topic.label}
+              </AppText>
+              <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
+            </AppPressable>
           </ModulaContextMenu>
         ))}
       </View>
@@ -645,9 +651,9 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
 
 function CommunitiesRail({topics}: {topics: DiscoverResult['trendingTopics']}) {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   return (
-    <Section title="Communities">
+    <Section title="Communities" icon="community">
       <View style={{gap: spacing[2]}}>
         {topics.map(topic => (
           <AppPressable
@@ -657,14 +663,12 @@ function CommunitiesRail({topics}: {topics: DiscoverResult['trendingTopics']}) {
             style={[
               styles.communityRow,
               {
-                backgroundColor: colours.surfaceRaised,
-                borderColor: colours.border,
-                borderRadius: radius.large,
-                padding: spacing[3],
+                borderBottomColor: colours.separator,
+                paddingVertical: spacing[3],
                 gap: spacing[3],
               },
             ]}>
-            <AppIcon name="community" colour={colours.accent} />
+            <AppIcon name="community" colour={colours.text} />
             <View style={styles.personBody}>
               <AppText variant="label">{topic.label}</AppText>
               <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
@@ -681,26 +685,24 @@ function CommunitiesRail({topics}: {topics: DiscoverResult['trendingTopics']}) {
 
 function FeaturedModules({modules}: {modules: DiscoverResult['featuredModules']}) {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   return (
-    <Section title="Featured modules">
+    <Section title="Featured modules" icon="modules">
       <View style={{gap: spacing[3]}}>
         {modules.slice(0, 5).map(module => (
           <AppPressable
             key={module.id}
             accessibilityLabel={`Open ${module.name} in Marketplace`}
             onPress={() => router.push(`/marketplace/${module.id}` as Href)}
-            style={[styles.moduleRow, {gap: spacing[3], padding: spacing[3]}]}>
-            <View style={[styles.moduleIcon, {backgroundColor: colours.accentSubtle, borderRadius: radius.medium}]}>
-              <AppIcon name={module.icon} colour={colours.accent} />
-            </View>
+            style={[styles.moduleRow, {gap: spacing[3], paddingVertical: spacing[2]}]}>
+            <AppIcon name={module.icon} colour={colours.text} />
             <View style={styles.personBody}>
               <AppText variant="label">{module.name}</AppText>
               <AppText variant="caption" colour="textSecondary">
                 {module.description}
               </AppText>
             </View>
-            <AppText variant="caption" colour="accent">
+            <AppText variant="caption" colour="textSecondary">
               {module.status}
             </AppText>
           </AppPressable>
@@ -708,7 +710,7 @@ function FeaturedModules({modules}: {modules: DiscoverResult['featuredModules']}
         <AppPressable
           accessibilityLabel="Open Marketplace"
           onPress={() => router.push('/marketplace' as Href)}>
-          <AppText variant="label" colour="accent">
+          <AppText variant="label">
             Browse all Marketplace tools
           </AppText>
         </AppPressable>
@@ -721,7 +723,7 @@ function MediaGrid({result}: {result: DiscoverResult}) {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   return (
-    <Section title="Media grid">
+    <Section title="Media grid" icon="photo">
       <View style={[styles.mediaGrid, {gap: spacing[2]}]}>
         {result.media.map(item => (
           <AppPressable
@@ -743,7 +745,7 @@ function MediaGrid({result}: {result: DiscoverResult}) {
 const styles = StyleSheet.create({
   communityRow: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     minHeight: 56,
   },
@@ -773,12 +775,6 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     flexBasis: '31.5%',
     justifyContent: 'center',
-  },
-  moduleIcon: {
-    alignItems: 'center',
-    height: 42,
-    justifyContent: 'center',
-    width: 42,
   },
   moduleRow: {
     alignItems: 'center',
@@ -824,11 +820,6 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 46,
   },
-  searchChip: {
-    justifyContent: 'center',
-    minHeight: 28,
-    paddingHorizontal: 10,
-  },
   searchGlass: {
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
@@ -843,8 +834,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  topicWrap: {
+  topicRow: {
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    gap: 12,
+    minHeight: 48,
   },
 })

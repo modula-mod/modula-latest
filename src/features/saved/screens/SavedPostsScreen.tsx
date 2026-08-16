@@ -4,7 +4,6 @@ import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability} from '@/auth/runtime'
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {AppText} from '@/components/primitives/AppText'
 import {useSavedPostsQuery} from '@/features/saved/data'
 import {SocialPost} from '@/features/social/components/social-post'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -50,14 +49,11 @@ export function SavedPostsScreen() {
               }}
             />
           ) : (
-            <View style={{gap: spacing[3]}}>
-              <AppText variant="display">Saved</AppText>
-              <EmptyState
-                icon="bookmark"
-                title="No saved posts yet"
-                description="Save posts from Home or profiles to build a local knowledge trail."
-              />
-            </View>
+            <EmptyState
+              icon="bookmark"
+              title="No saved posts yet"
+              description="Save posts from Home or profiles to build a local knowledge trail."
+            />
           )}
         </View>
       </ResponsiveContent>

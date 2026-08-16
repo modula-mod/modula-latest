@@ -11,6 +11,7 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {canAccessDeveloperLabs} from '@/lib/platform'
+import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -192,6 +193,11 @@ export function SettingsHomeScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
+          <PageIntro
+            eyebrow="Preferences"
+            icon="settings"
+            body="Account, appearance, and how Modula behaves."
+          />
           <View
             style={[
               styles.search,
@@ -219,7 +225,7 @@ export function SettingsHomeScreen() {
             {filteredAccount.map((row, index) => (
               <SettingsLinkRow
                 key={row.title}
-                row={{...row, description: undefined}}
+                row={row}
                 last={index === filteredAccount.length - 1}
               />
             ))}
@@ -231,7 +237,6 @@ export function SettingsHomeScreen() {
                 key={row.title}
                 row={{
                   ...row,
-                  description: undefined,
                   value:
                     row.title === 'Appearance'
                       ? appearanceValue
@@ -262,7 +267,7 @@ export function SettingsHomeScreen() {
               {filteredDeveloper.map((row, index) => (
                 <SettingsLinkRow
                   key={row.title}
-                  row={{...row, description: undefined}}
+                  row={row}
                   last={false}
                 />
               ))}

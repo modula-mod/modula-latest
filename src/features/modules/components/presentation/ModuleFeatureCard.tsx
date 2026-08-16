@@ -25,14 +25,13 @@ export function ModuleFeatureCard({
       style={[styles.card, {width, gap: spacing[2]}]}>
       <View
         style={{
-          alignItems: 'center',
           backgroundColor: colours.surfaceRaised,
           borderRadius: radius.large,
-          height: width,
-          justifyContent: 'center',
+          height: 128,
+          overflow: 'hidden',
           width,
         }}>
-        <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={88} variant="hero" />
+        <ModuleArtwork moduleId={item.moduleId} name={copy.name} variant="scene" sceneHeight={128} />
       </View>
       <AppText variant="label" numberOfLines={1}>
         {copy.name}

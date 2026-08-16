@@ -1,4 +1,4 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import Svg, {Circle, Line, Path, Rect} from 'react-native-svg'
 
 import {AppText} from '@/components/primitives/AppText'
@@ -14,18 +14,23 @@ export function ModuleArtwork({
   name,
   size = 64,
   variant = 'icon',
+  sceneHeight,
 }: {
   moduleId: string
   name?: string
   size?: number
   variant?: 'icon' | 'hero' | 'scene'
+  sceneHeight?: number
 }) {
   const pack = moduleArtworkPack(moduleId, name)
   if (variant === 'scene') {
     return (
       <View
         accessibilityLabel={`${pack.name} artwork`}
-        style={[styles.scene, {backgroundColor: pack.palette.wash}]}>
+        style={[
+          styles.scene,
+          {backgroundColor: pack.palette.wash, height: sceneHeight ?? 210},
+        ]}>
         <ArtworkScene pack={pack} kind={pack.kind} />
       </View>
     )
@@ -50,12 +55,10 @@ export function ModuleArtwork({
 }
 
 function ArtworkScene({pack, kind}: {pack: ModuleArtworkPack; kind: ModuleArtworkKind}) {
-  const {width} = useWindowDimensions()
-  const sceneWidth = Math.max(320, width)
   const {ink, paper, wash, stitch} = pack.palette
   if (kind === 'vault-notes') {
     return (
-      <Svg width={sceneWidth} height={210} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+      <Svg width="100%" height="100%" viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
         <Rect x="0" y="0" width="320" height="180" fill={wash} />
         <Path d="M0 128 C80 108 160 148 320 118 L320 180 L0 180 Z" fill={paper} opacity="0.35" />
         <Rect x="168" y="36" width="118" height="132" rx="8" fill={wash} stroke={ink} strokeWidth="1" opacity="0.55" />
@@ -82,7 +85,7 @@ function ArtworkScene({pack, kind}: {pack: ModuleArtworkPack; kind: ModuleArtwor
   }
   if (kind === 'tasks') {
     return (
-      <Svg width={sceneWidth} height={210} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+      <Svg width="100%" height="100%" viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
         <Rect width="320" height="180" fill={wash} />
         <Rect x="58" y="28" width="204" height="124" rx="10" fill={paper} />
         <Path d="M84 62 L96 74 L118 50" stroke={ink} strokeWidth="2.4" fill="none" strokeLinecap="round" />

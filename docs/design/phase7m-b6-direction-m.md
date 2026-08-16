@@ -65,3 +65,15 @@ PRODUCTION DEPLOYED = NO
 ```
 
 Vault Notes candidate identity remains `digital.modula.vault-notes` / `1.1.0` / `modula-mod/modula-vault-notes`. Production `0.2.0` is unchanged.
+
+## Density pass (B6 follow-up)
+
+Developer Tools remains the density reference (eyebrow / display / body / section lists / icons) — not a licence to copy its gradient card onto product screens.
+
+Canonical chrome:
+
+- `PageIntro` for page-level eyebrow + body when the native title already owns the name
+- `SectionHeader` for section lists (Product Hub re-exports it as `HubSectionHeader`)
+- `CoverAtmosphere` / `HubAtmosphere` for paper/ink scene art when there is no photograph
+
+Applied to Profile, Board, Settings, Product Hub, Discover, Activity, module detail, and empty states. Accent stays a verb. No 7M-C whole-app rollout.

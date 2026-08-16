@@ -148,15 +148,7 @@ export function SettingsLinkRow({
           gap: spacing[3],
         },
       ]}>
-      {row.icon ? (
-        <View
-          style={[
-            styles.iconWrap,
-            {backgroundColor: colours.accentSubtle, borderColor: 'transparent'},
-          ]}>
-          <AppIcon name={row.icon} colour={colours.accent} size={18} />
-        </View>
-      ) : null}
+      {row.icon ? <AppIcon name={row.icon} colour={colours.text} size={20} /> : null}
       <View style={styles.rowText}>
         <AppText variant="body">{title}</AppText>
         {row.description ? (
@@ -354,15 +346,6 @@ const styles = StyleSheet.create({
   contextWrap: {
     alignSelf: 'stretch',
     width: '100%',
-  },
-  iconWrap: {
-    alignItems: 'center',
-    borderRadius: 10,
-    borderWidth: 0,
-    flexShrink: 0,
-    height: 30,
-    justifyContent: 'center',
-    width: 30,
   },
   list: {
     borderWidth: StyleSheet.hairlineWidth,

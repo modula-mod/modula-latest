@@ -9,6 +9,7 @@ import {
   canViewerSeeProfileField,
   type ProfileKind,
 } from '@/features/profile/contracts/profile'
+import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {IdentityIndicator} from '@/features/profile/components/IdentityIndicator'
 import type {ProfileTabRendererProps} from '@/features/profile/contracts/profileTabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -38,7 +39,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
   return (
     <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
       <View style={{gap: spacing[2]}}>
-        <AppText variant="headline">About</AppText>
+        <SectionHeader title="About" icon="profile" />
         <AppText variant="body">{profile.bio}</AppText>
       </View>
       <Surface variant="plain" style={[styles.infoGrid, {gap: spacing[3]}]}>
@@ -58,17 +59,13 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
             year: 'numeric',
           })}
         />
-        <InfoItem
-          label="Portability"
-          value="Greenfield repository export available in Settings → Account → Your Data"
-        />
         {showAtConnection ? (
           <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />
         ) : null}
       </Surface>
       {visibleClaims.length ? (
         <View style={{gap: spacing[2]}}>
-          <AppText variant="headline">Identity indicators</AppText>
+          <SectionHeader title="Identity indicators" icon="verified" />
           <View style={[styles.claims, {gap: spacing[2]}]}>
             {visibleClaims.map(claim => (
               <IdentityIndicator key={claim.id} claim={claim} />
@@ -77,7 +74,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
         </View>
       ) : null}
       <View style={{gap: spacing[2]}}>
-        <AppText variant="headline">Interests</AppText>
+        <SectionHeader title="Interests" icon="sparkles" />
         <AppText variant="body" colour="textSecondary">
           Profile OS, governed intelligence, modular tools, design systems and public workflows.
         </AppText>

@@ -32,6 +32,8 @@ import {
   consumeProductHubOffset,
   rememberProductHubOffset,
 } from '@/features/modules/state/productHubScroll'
+import {HubAtmosphere} from '@/platform/ui/atmosphere/hub-atmosphere'
+import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {LAYERS} from '@/theme/tokens/layers'
@@ -154,9 +156,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
         </View>
         {!search.compact && !searchActive ? (
           <View style={{gap: spacing[3], paddingBottom: spacing[3]}}>
-            <AppText variant="body" colour="textSecondary">
-              Extend your Modula.
-            </AppText>
+            <PageIntro eyebrow="Catalogue" icon="modules" body="Extend your Modula." />
             <ProductHubSearchChrome
               model={search}
               compact={false}
@@ -248,6 +248,9 @@ function EditorialLanding({
   }
   return (
     <View style={[styles.landing, wide ? styles.landingWide : null, {gap: spacing[6]}]}>
+      <SectionEnter delay={0}>
+        <HubAtmosphere />
+      </SectionEnter>
       {featured ? (
         <SectionEnter delay={0}>
           <View style={{gap: spacing[2]}}>
@@ -315,18 +318,20 @@ function EditorialLanding({
       ) : null}
 
       {updates.length ? (
-        <AppText variant="caption" colour="textSecondary">
-          {updates.length} update{updates.length === 1 ? '' : 's'} available
-        </AppText>
+        <HubSectionHeader
+          title="Updates"
+          icon="update"
+          subtitle={`${updates.length} update${updates.length === 1 ? '' : 's'} available`}
+        />
       ) : null}
 
       {!items.length ? (
-        <View style={{gap: spacing[2]}}>
-          <AppText variant="headline">Nothing here yet</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Modules you can install will appear here.
-          </AppText>
-        </View>
+        <PageIntro
+          eyebrow="Catalogue"
+          icon="modules"
+          title="Nothing here yet"
+          body="Modules you can install will appear here."
+        />
       ) : null}
     </View>
   )

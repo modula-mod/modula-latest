@@ -8,7 +8,6 @@ import type {
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
 import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
@@ -169,31 +168,17 @@ function isPublicHttpsMediaUri(value: string): boolean {
 }
 
 function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  const copy = viewer.canEdit
-    ? 'You are viewing owner controls. Visitors see only the published tabs, public fields, and module cards you choose to show.'
-    : viewer.mode === 'preview'
-      ? 'You are viewing the visitor preview. Owner-only controls, private modules, and unpublished fields are hidden.'
+  if (viewer.canEdit) return null
+  const copy =
+    viewer.mode === 'preview'
+      ? 'Visitor preview — owner controls stay hidden.'
       : viewer.relationship === 'visitor'
-        ? 'You are viewing this profile as a visitor. Private fields, owner controls, and unavailable module tabs are hidden.'
-        : 'You are viewing this profile with your current audience access. Private owner controls remain hidden.'
-
+        ? 'You’re viewing the public profile.'
+        : 'You’re viewing this profile with your current access.'
   return (
-    <Surface
-      variant="contained"
-      style={[
-        styles.viewingCopy,
-        {
-          backgroundColor: colours.surface,
-          borderColor: colours.border,
-          borderRadius: radius.medium,
-          padding: spacing[3],
-        },
-      ]}>
-      <AppText variant="body" colour="textSecondary">
-        {copy}
-      </AppText>
-    </Surface>
+    <AppText variant="caption" colour="textTertiary">
+      {copy}
+    </AppText>
   )
 }
 
@@ -203,10 +188,6 @@ const styles = StyleSheet.create({
   },
   section: {
     minWidth: 0,
-  },
-  viewingCopy: {
-    borderWidth: StyleSheet.hairlineWidth,
-    width: '100%',
   },
   wrap: {
     overflow: 'hidden',

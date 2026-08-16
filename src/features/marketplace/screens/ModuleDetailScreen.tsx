@@ -4,7 +4,6 @@ import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {EmptyState} from '@/components/primitives/EmptyState'
@@ -18,6 +17,8 @@ import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
+import {SectionHeader} from '@/platform/ui/chrome/section-header'
+import {type ModulaIconName} from '@/platform/ui/icons'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -229,6 +230,11 @@ export function ModuleDetailScreen() {
               <ModuleArtwork moduleId={module.moduleId} name={copy.name} variant="scene" />
             </View>
             <View style={{gap: spacing[1]}}>
+              {copy.eyebrow ? (
+                <AppText variant="micro" colour="textTertiary">
+                  {copy.eyebrow.toUpperCase()}
+                </AppText>
+              ) : null}
               <AppText variant="display">{copy.name}</AppText>
               <AppText variant="body" colour="textSecondary">{copy.short}</AppText>
               <AppText variant="caption" colour="textTertiary">
@@ -273,7 +279,7 @@ export function ModuleDetailScreen() {
           <View style={[styles.rule, {backgroundColor: colours.separator}]} />
 
           <View style={{gap: spacing[2]}}>
-            <AppText variant="headline">What {copy.name} does</AppText>
+            <SectionHeader title={`What ${copy.name} does`} icon="note" />
             <AppText variant="body" colour="textSecondary">{copy.whatItDoes}</AppText>
           </View>
 
@@ -281,29 +287,32 @@ export function ModuleDetailScreen() {
 
           <Disclosure
             title="What's New"
+            icon="update"
             summary={`Version ${module.latestVersion ?? 'unreleased'}`}
             body={releaseNotes.length ? releaseNotes.join('\n') : 'Folders, search and lifecycle improvements.'}
           />
 
           <Disclosure
             title="Privacy & Access"
+            icon="privacy"
             summary={copy.privacy}
             open={privacyOpen}
             onToggle={() => setPrivacyOpen(open => !open)}
             body="Records stay account-scoped. Other accounts cannot read them."
           />
 
-          <AppPressable
-            accessibilityLabel="Made by Modula"
-            onPress={() => router.push('/product' as Href)}>
-            <AppText variant="headline">{`Made by ${copy.publisher} >`}</AppText>
-          </AppPressable>
+          <SectionHeader
+            title={`Made by ${copy.publisher}`}
+            icon="modules"
+            onPress={() => router.push('/product' as Href)}
+          />
 
-          <AppPressable
-            accessibilityLabel="Trust and technical details"
-            onPress={() => setTechnicalOpen(open => !open)}>
-            <AppText variant="headline">{`Trust & Technical Details ${technicalOpen ? '⌃' : '>'}`}</AppText>
-          </AppPressable>
+          <SectionHeader
+            title="Trust & Technical Details"
+            icon="security"
+            trailing={technicalOpen ? 'Hide' : 'Show'}
+            onPress={() => setTechnicalOpen(open => !open)}
+          />
           {technicalOpen ? <TechnicalDetails module={module} /> : null}
         </ScrollView>
       </ResponsiveContent>
@@ -334,12 +343,14 @@ function MetaChip({label}: {label: string}) {
 
 function Disclosure({
   title,
+  icon,
   summary,
   body,
   open,
   onToggle,
 }: {
   title: string
+  icon?: ModulaIconName
   summary: string
   body?: string
   open?: boolean
@@ -350,12 +361,13 @@ function Disclosure({
   const shown = open ?? localOpen
   return (
     <View style={{gap: spacing[2]}}>
-      <AppPressable
-        accessibilityLabel={`${title}. ${shown ? 'Hide' : 'Show'} details`}
-        onPress={onToggle ?? (() => setLocalOpen(value => !value))}>
-        <AppText variant="headline">{`${title} ${shown ? '⌃' : '>'}`}</AppText>
-      </AppPressable>
-      <AppText variant="caption" colour="textSecondary">{summary}</AppText>
+      <SectionHeader
+        title={title}
+        icon={icon}
+        subtitle={summary}
+        trailing={shown ? 'Hide' : 'Show'}
+        onPress={onToggle ?? (() => setLocalOpen(value => !value))}
+      />
       {shown && body ? <AppText variant="body" colour="textSecondary">{body}</AppText> : null}
       <View style={[styles.rule, {backgroundColor: colours.separator}]} />
     </View>

@@ -10,6 +10,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
+import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileCoverProps = {
@@ -75,15 +76,7 @@ export function ProfileCover({
           cachePolicy="memory-disk"
         />
       ) : kind === 'none' ? null : (
-        <LinearGradient
-          colors={[
-            profile.coverColour ?? colours.accentSubtle,
-            colours.surfaceRaised,
-          ]}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          style={StyleSheet.absoluteFill}
-        />
+        <CoverAtmosphere wash={profile.coverColour ?? colours.surfaceRaised} ink={colours.text} paper={colours.surface} />
       )}
       <LinearGradient
         colors={['rgba(0,0,0,0.25)', 'transparent', 'rgba(0,0,0,0.2)']}

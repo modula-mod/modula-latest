@@ -36,6 +36,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
           <ModulaButton
             label="Edit Profile"
             role="primary"
+            fullWidth
             onPress={() => router.push('/profile/edit' as Href)}
           />
         </View>
