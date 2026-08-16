@@ -4,7 +4,7 @@ import {SkeletonBlock, SkeletonRow} from '@/platform/ui/skeletons/SkeletonBlock'
 import {profileCoverBody, profileGeometry} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Mirrors the loaded hero: portrait on the shelf, identity on the plateau. */
+/** Mirrors the loaded hero: portrait in the plateau row, identity beside it. */
 export function ProfileHeroSkeleton() {
   const {spacing} = useThemeTokens()
   const geometry = profileGeometry(true, false, spacing[4])
@@ -15,19 +15,6 @@ export function ProfileHeroSkeleton() {
     <View>
       <View style={styles.cover}>
         <SkeletonBlock height={cover} width="100%" borderRadius={0} />
-        <View
-          pointerEvents="none"
-          style={[
-            styles.avatar,
-            {
-              height: avatar,
-              width: avatar,
-              left: geometry.avatarLeft,
-              bottom: geometry.shelfDepth,
-            },
-          ]}>
-          <SkeletonBlock height={avatar} width={avatar} borderRadius={avatar / 2} />
-        </View>
       </View>
       <View
         style={[
@@ -43,11 +30,22 @@ export function ProfileHeroSkeleton() {
             style={[
               styles.metrics,
               {
-                gap: spacing[2],
-                paddingTop: geometry.metricColumnTop,
+                gap: geometry.metricColumnTop,
                 width: geometry.metricColumnWidth,
               },
             ]}>
+            <View
+              style={[
+                styles.avatar,
+                {
+                  height: avatar,
+                  width: avatar,
+                  marginTop: geometry.avatarFlowTop,
+                  marginLeft: geometry.avatarFlowLeft,
+                },
+              ]}>
+              <SkeletonBlock height={avatar} width={avatar} borderRadius={avatar / 2} />
+            </View>
             <SkeletonBlock height={22} width={56} />
             <SkeletonBlock height={22} width={72} />
             <SkeletonBlock height={22} width={64} />
@@ -78,13 +76,14 @@ export function ProfileHeroSkeleton() {
 
 const styles = StyleSheet.create({
   avatar: {
-    position: 'absolute',
+    overflow: 'visible',
   },
   body: {
+    overflow: 'visible',
     width: '100%',
   },
   cover: {
-    position: 'relative',
+    overflow: 'visible',
   },
   identity: {
     flex: 1,

@@ -1,6 +1,11 @@
 import type {ReactNode} from 'react'
 import {useRouter, type Href} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
@@ -109,34 +114,55 @@ export function profileHeaderRightItems() {
  *
  * `title` is the identity that morphs in beside the back control on scroll; it
  * shares the leading slot so the name reads as chrome, not as a second hero.
+ * A canvas backdrop fades in with that morph so sticky tabs meet a header,
+ * not a gap.
  */
 export function ProfileCoverChrome({
   showBack,
   owner = true,
   title,
+  scrollY,
+  heroHeight,
+  chromeHeight,
 }: {
   showBack: boolean
   owner?: boolean
   title?: ReactNode
+  scrollY?: SharedValue<number>
+  heroHeight?: SharedValue<number>
+  chromeHeight: number
 }) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
-  const {spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const canGoBack = useNavigationCanGoBack()
   const backVisible = showBack || canGoBack
+  const fallbackHeight = chromeHeight + 120
+
+  const backdropStyle = useAnimatedStyle(() => {
+    const hero = heroHeight?.value || fallbackHeight
+    const to = Math.max(1, hero - chromeHeight)
+    const from = Math.max(0, to - 88)
+    const progress = interpolate(scrollY?.value ?? 0, [from, to], [0, 1], 'clamp')
+    return {opacity: progress}
+  })
 
   return (
     <View
       pointerEvents="box-none"
-      style={[
-        styles.overlay,
-        {
-          paddingHorizontal: spacing[3],
-          paddingTop: insets.top + 8,
-          zIndex: LAYERS.sticky,
-        },
-      ]}>
-      <View pointerEvents="box-none" style={styles.overlayRow}>
+      style={[styles.overlay, {zIndex: LAYERS.sticky}]}>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.backdrop,
+          {backgroundColor: colours.canvas, height: chromeHeight},
+          backdropStyle,
+        ]}
+      />
+      <View
+        pointerEvents="box-none"
+        style={{paddingHorizontal: spacing[3], paddingTop: insets.top + 8}}>
+        <View pointerEvents="box-none" style={styles.overlayRow}>
         <View
           pointerEvents="box-none"
           style={[styles.leading, {gap: spacing[2]}]}>
@@ -196,6 +222,7 @@ export function ProfileCoverChrome({
           ]}
         />
       </View>
+      </View>
     </View>
   )
 }
@@ -210,6 +237,12 @@ function useNavigationCanGoBack(): boolean {
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   leading: {
     alignItems: 'center',
     flexDirection: 'row',

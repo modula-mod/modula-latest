@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `hero-scroll-welded.png` | Owner hero (this pass) | Cover photo, avatar, and identity share one layout — no parallax desync on a fast fling |
+| `hero-scroll-welded.png` | Owner hero (this pass) | Cover photo, avatar, and identity share one layout — portrait is in the plateau row, not absolutely positioned on the cover |
+| `tabs-morph-flush.png` | Owner scrolled (this pass) | Sticky tabs sit flush under the morphing name — spacer under chrome, no padding jump |
 | `cover-no-bottom-blur.png` | Owner hero (previous) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
 | `picker-center-arrows.png` | Owner hero (previous) | Metric rail gone; numbers centered; 30% arrows above and below the picker |
 | `metrics-down-70.png` | Owner hero (previous) | Metric picker dropped another 50pt (70pt total); avatar 60pt, identity 55pt, inverted SVG unchanged |
@@ -49,6 +50,6 @@ FOUNDER VISUAL APPROVAL = PENDING
 ## Known limitations
 
 - Founder visual approval is still required
-- Maestro swipes on Profile often hit the metric picker or NativeTabs, so a fully collapsed sticky-tab frame was not captured cleanly. The sticky path is unchanged: `stickyHeaderIndices={[1]}` with layout `paddingTop` when the hero has left the viewport
+- Maestro swipes on Profile often hit the metric picker or NativeTabs, so a fully collapsed sticky-tab frame was not captured cleanly. Sticky path: `stickyHeaderIndices={[1]}` with a transparent spacer (`marginTop: -stickyPad`) so tabs sit flush under chrome without a layout jump
 - Module-contributed metrics remain registry-ready only
 - Demo owner cover is an Unsplash development photograph so photo-cover review does not depend on an empty grey field

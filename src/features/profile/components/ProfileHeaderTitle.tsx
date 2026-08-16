@@ -44,8 +44,8 @@ export function ProfileHeaderTitle({
 
   const animatedStyle = useAnimatedStyle(() => {
     const hero = heroHeight?.value || fallbackHeight
-    // Settles just before the tabs stick, so the two never cross-fade at once.
-    const to = Math.max(1, hero - insetTop - CAPSULE_HEIGHT - 24)
+    // Arrive with the sticky tabs, as one collapsed header.
+    const to = Math.max(1, hero - insetTop)
     const from = Math.max(0, to - 88)
     const progress = interpolate(scrollY?.value ?? 0, [from, to], [0, 1], 'clamp')
     return {

@@ -96,26 +96,41 @@ export function ProfileHero({
     />
   ) : null
 
+  // In the plateau row with the name — never `position: 'absolute'` on the
+  // cover. Absolute children desync from in-flow text on a fast fling.
   const avatar = (
-    <ProfileAvatar
-      profile={profile}
-      size={geometry.avatarSize}
-      showFocusHalo={presentation.showFocusHalo}
-      canEdit={canEdit}
-      onEditPress={() => setAvatarEditorOpen(true)}
-      previewUri={avatarDraft ? avatarDraft.uri : undefined}
-      onPhotoUri={uri => {
-        setAvatarDraft({uri, sourceUri: uri})
-        const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
-        if (avatarUri === undefined) return
-        void updateProfile.mutateAsync({avatarUri})
-      }}
-      onPhotoRemove={() => {
-        setAvatarDraft({uri: null, sourceUri: null})
-        if (!profile.avatarUri) return
-        void updateProfile.mutateAsync({avatarUri: null})
-      }}
-    />
+    <View
+      collapsable={false}
+      pointerEvents="box-none"
+      style={[
+        styles.avatarFlow,
+        {
+          marginTop: geometry.avatarFlowTop,
+          marginLeft: geometry.avatarFlowLeft,
+          height: geometry.slotSize,
+          width: geometry.slotSize,
+        },
+      ]}>
+      <ProfileAvatar
+        profile={profile}
+        size={geometry.avatarSize}
+        showFocusHalo={presentation.showFocusHalo}
+        canEdit={canEdit}
+        onEditPress={() => setAvatarEditorOpen(true)}
+        previewUri={avatarDraft ? avatarDraft.uri : undefined}
+        onPhotoUri={uri => {
+          setAvatarDraft({uri, sourceUri: uri})
+          const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+          if (avatarUri === undefined) return
+          void updateProfile.mutateAsync({avatarUri})
+        }}
+        onPhotoRemove={() => {
+          setAvatarDraft({uri: null, sourceUri: null})
+          if (!profile.avatarUri) return
+          void updateProfile.mutateAsync({avatarUri: null})
+        }}
+      />
+    </View>
   )
 
   return (
@@ -147,32 +162,21 @@ export function ProfileHero({
             void updateProfile.mutateAsync({coverUri: null})
           }}
         />
-        <View
-          collapsable={false}
-          pointerEvents="box-none"
-          style={[
-            styles.avatarSlot,
-            {
-              left: geometry.avatarLeft,
-              bottom: geometry.shelfDepth,
-              height: geometry.slotSize,
-              width: geometry.slotSize,
-            },
-          ]}>
-          {avatar}
-        </View>
       </View>
       {stacked ? (
         <View
+          pointerEvents="box-none"
           style={[
             styles.body,
             {
+              marginTop: -geometry.plateauDepth,
               paddingHorizontal: spacing[4],
-              paddingTop: spacing[3],
+              paddingTop: geometry.identityPlateauGap,
               paddingBottom: spacing[2],
               gap: spacing[3],
             },
           ]}>
+          {avatar}
           {identity}
           {info}
           {stats}
@@ -196,9 +200,10 @@ export function ProfileHero({
                 styles.metricColumn,
                 {
                   width: geometry.metricColumnWidth,
-                  paddingTop: geometry.metricColumnTop,
+                  gap: geometry.metricColumnTop,
                 },
               ]}>
+              {avatar}
               {stats}
             </View>
             <View
@@ -285,13 +290,13 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 }
 
 const styles = StyleSheet.create({
-  avatarSlot: {
-    bottom: 0,
-    position: 'absolute',
+  avatarFlow: {
+    overflow: 'visible',
     zIndex: 3,
   },
   body: {
     minWidth: 0,
+    overflow: 'visible',
     zIndex: 2,
   },
   coverBlock: {
@@ -309,6 +314,7 @@ const styles = StyleSheet.create({
   metricColumn: {
     flexGrow: 0,
     flexShrink: 0,
+    overflow: 'visible',
   },
   plateauRow: {
     alignItems: 'flex-start',

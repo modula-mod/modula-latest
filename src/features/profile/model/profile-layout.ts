@@ -51,10 +51,10 @@ export const PROFILE_LAYOUT = {
   metricMaxVisible: 5,
   metricRailGutter: 14,
   /**
-   * Cover overlay below the safe area: 8pt offset + 44pt glass hit + 24pt so
-   * sticky tabs sit under the morphing name, not through it.
+   * Overlay chrome below the safe area: 8pt offset + 44pt glass hit.
+   * Sticky tabs sit flush under that row — the name morphs into it.
    */
-  stickyChromeClearance: 76,
+  stickyChromeClearance: 52,
   stackedFontScale: 1.35,
   stackedWidth: 340,
   invertedSize: inverted.profile,
@@ -83,6 +83,9 @@ export type ProfileGeometry = {
   metricViewportHeight: number
   metricColumnTop: number
   metricColumnWidth: number
+  /** Pull the portrait into the plateau row so it scrolls with the name. */
+  avatarFlowTop: number
+  avatarFlowLeft: number
   avatarCenterX: number
   avatarCenterY: number
   cradleRadius: number
@@ -191,6 +194,12 @@ export function profileGeometry(
   const shelfDepth = cradleRadius - slotSize / 2 - PROFILE_LAYOUT.avatarDrop
   // Flat white plateau starts after the concave bite + convex landing.
   const identityColumnPad = PROFILE_LAYOUT.cradleGap + plateauRadius
+  const avatarLeft = avatarCenterX - slotSize / 2
+  // Same visual as `bottom: shelfDepth` on the cover, but in the plateau row
+  // so a fast fling cannot composite the portrait apart from the name.
+  const avatarFlowTop =
+    plateauDepth - shelfDepth - slotSize - PROFILE_LAYOUT.identityPlateauGap
+  const avatarFlowLeft = avatarLeft - horizontalInset
 
   const identityColumnWidth = contentWidth - horizontalInset - gutterWidth
   const stackedFallback =
@@ -205,7 +214,7 @@ export function profileGeometry(
     haloExpansion,
     heroHorizontalInset: horizontalInset,
     avatarLead,
-    avatarLeft: avatarCenterX - slotSize / 2,
+    avatarLeft,
     avatarLift: cradleRadius + slotSize / 2,
     plateauDepth,
     shelfDepth,
@@ -219,9 +228,10 @@ export function profileGeometry(
     identityDrop: PROFILE_LAYOUT.identityDrop,
     identityColumnPad,
     metricViewportHeight: profileMetricWindowHeight(),
-    metricColumnTop:
-      slotSize / 2 + PROFILE_LAYOUT.metricColumnGap + PROFILE_LAYOUT.metricDrop,
+    metricColumnTop: PROFILE_LAYOUT.metricColumnGap + PROFILE_LAYOUT.metricDrop,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
+    avatarFlowTop,
+    avatarFlowLeft,
     avatarCenterX,
     avatarCenterY: plateauRadius,
     cradleRadius,
