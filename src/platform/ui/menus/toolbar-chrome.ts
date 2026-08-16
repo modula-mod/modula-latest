@@ -8,8 +8,17 @@
  */
 export type ToolbarChrome = 'glass' | 'plain'
 
-/** Minimum hit for capsule glyphs and compact CTAs. */
+/** Minimum hit for capsule glyphs, Profile header icons, and compact CTAs. */
 export const TOOLBAR_HIT = 44
 
-/** Overlay extraLarge glass circle / ControlGroup host. */
+/** Overlay extraLarge glass circle (standalone back / overflow). */
 export const OVERLAY_GLASS_HIT = 52
+
+/**
+ * Overlay grouped trailing actions (Customize / Module Detail).
+ * Same 44pt hits as Profile `unstable_header*Items`. Gap is
+ * `HEADER_ICON_PAIR_GAP` (22) from `plain-header-items`.
+ */
+export const OVERLAY_GROUP_HIT = TOOLBAR_HIT
+export const OVERLAY_GROUP_GAP = 22
+export const OVERLAY_GROUP_MIN_WIDTH = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP

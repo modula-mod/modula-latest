@@ -123,7 +123,7 @@ export function ModulaPrimitivesLabScreen() {
       <LabBlock title="Toolbar chrome">
         <AppText variant="caption" colour="textSecondary">
           Global back is ModulaBackButton. Overlay glass is extraLarge (Expo UI).
-          Trailing share + overflow is a ControlGroup.
+          Trailing share + overflow is a Profile-sized glass capsule (44pt, 22pt gap).
         </AppText>
         <View style={styles.row}>
           <ModulaBackButton onPress={() => undefined} />

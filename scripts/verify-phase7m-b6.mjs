@@ -146,6 +146,12 @@ assertAbsent('src/platform/ui/navigation/platform-tabs.native.tsx', 'name="board
 assertContains('src/app/board/index.tsx', 'BoardScreen', 'BOARD ROOT STACK')
 assertContains('src/platform/ui/navigation/persistent-shell-tab-bar.tsx', 'return null', 'NO FLOATING PILL')
 assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', "controlSize('extraLarge')", 'OVERLAY EXTRA LARGE')
+assertContains('src/platform/ui/menus/toolbar-chrome.ts', 'OVERLAY_GROUP_HIT = TOOLBAR_HIT', 'GROUP HIT IS 44')
+assertContains('src/platform/ui/menus/toolbar-chrome.ts', 'OVERLAY_GROUP_GAP = 22', 'GROUP GAP IS 22')
+assertContains('src/platform/ui/navigation/plain-header-items.ts', 'HEADER_ICON_PAIR_GAP = 22', 'PROFILE GAP IS 22')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'HStack', 'GROUP HSTACK')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'HEADER_ICON_PAIR_GAP', 'GROUP USES PROFILE GAP')
+assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'OVERLAY_GROUP_HIT', 'GROUP USES 44PT HIT')
 assertContains('src/platform/ui/menus/chrome-glass-control-group.native.tsx', "shape: 'capsule'", 'CONTROL GROUP GLASS')
 assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'ChromeGlassControlGroup', 'MODULE DETAIL CONTROL GROUP')
 

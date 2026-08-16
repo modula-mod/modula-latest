@@ -111,7 +111,7 @@ App Store product-page overlay is the reference for **small circular glass contr
 - `ToolbarChrome` / `toolbarIconModifiers`: overlay `glass` is `controlSize('extraLarge')` (Expo UI glass circle). Capsule `plain` glyphs stay `regular`. Overlay host is `OVERLAY_GLASS_HIT` (52)
 - Shell tabs are Expo Router `NativeTabs` (`expo-router/unstable-native-tabs`) — real iOS 26 Liquid Glass `UITabBarController`. No Callstack floating pill. `minimizeBehavior="onScrollDown"`. Wrap in Expo Router `ThemeProvider` so iOS 26 glass does not flash white. Do not set `backgroundColor`, `blurEffect`, or `disableTransparentOnScrollEdge` (iOS 18-only; they kill Liquid Glass)
 - Create is a hidden NativeTabs trigger (`/compose` is the Home header action). Board is a **root stack** screen (`src/app/board`) so the drawer can open it without focusing a hidden tab
-- Module Detail / Customize / Saved trailing actions use `ChromeGlassControlGroup` (SwiftUI ControlGroup + `glassEffect` capsule). Inner glyphs are plain extraLarge; the group is the glass. A lone overflow stays one extraLarge circle, not a one-item group
+- Module Detail / Customize / Saved trailing actions use `ChromeGlassControlGroup` — a glass HStack capsule with Profile’s 44pt hits and 22pt icon gap. SwiftUI ControlGroup is compact and is not used for this chrome
 - Global back is `ModulaBackButton` — overlay screens use glass; Profile and Activity tabs use plain in the header capsule
 - Activity header is one control group (mark-read + settings + overflow). No second in-page check / settings / more row
 - Native Home / Profile / Activity / Board / Reels headers pass `chrome="plain"`
@@ -119,7 +119,7 @@ App Store product-page overlay is the reference for **small circular glass contr
 - Compact CTAs (Edit Profile, Open/Install) share the 44pt height
 - Compose accessory matches the same 44pt toolbar scale
 - `ModulaControlGroup` is lab-only; product module rows use tap + long-press context menu
-- Customize trailing chrome is one extraLarge ControlGroup (save check + overflow) — not a text Save next to a mismatched ellipsis
+- Customize trailing chrome is one Profile-sized glass capsule (save check + overflow) — 44pt hits, 22pt gap
 - Customize tabs are a grouped Settings list + switch; reorder is long-press, not extra circles
 - Module Detail shows one compact GET/OPEN pill; Disable / Configure / Uninstall live in overflow
 - Profile hero: cover → avatar overlapping cover only → identity on canvas → one compact Edit/Follow pill. No identity sheet, no More next to Edit Profile

@@ -3,7 +3,11 @@ import {StyleSheet, View} from 'react-native'
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
-import {OVERLAY_GLASS_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {
+  OVERLAY_GROUP_HIT,
+  OVERLAY_GROUP_MIN_WIDTH,
+} from '@/platform/ui/menus/toolbar-chrome'
+import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -24,7 +28,7 @@ export type ChromeGlassGroupMenu = {
 
 export type ChromeGlassGroupItem = ChromeGlassGroupButton | ChromeGlassGroupMenu
 
-/** Web / Android: one capsule row so share + overflow stay a single control. */
+/** Web / Android: Profile-sized capsule — 44pt hits, 22pt gap. */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const {colours} = useThemeTokens()
 
@@ -35,6 +39,7 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
         {
           backgroundColor: colours.surfaceRaised,
           borderColor: colours.border,
+          gap: HEADER_ICON_PAIR_GAP,
         },
       ]}>
       {items.map(item =>
@@ -64,11 +69,13 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
 const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
-    borderRadius: 26,
+    borderRadius: OVERLAY_GROUP_HIT / 2,
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    minHeight: OVERLAY_GLASS_HIT,
+    height: OVERLAY_GROUP_HIT,
+    minHeight: OVERLAY_GROUP_HIT,
+    minWidth: OVERLAY_GROUP_MIN_WIDTH,
     overflow: 'hidden',
-    paddingHorizontal: 4,
+    paddingHorizontal: 12,
   },
 })

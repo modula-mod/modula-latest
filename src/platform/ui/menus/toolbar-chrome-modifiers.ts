@@ -1,4 +1,4 @@
-import {buttonBorderShape, buttonStyle, controlSize, labelStyle} from '@expo/ui/swift-ui/modifiers'
+import {buttonBorderShape, buttonStyle, controlSize, imageScale, labelStyle} from '@expo/ui/swift-ui/modifiers'
 
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 
@@ -25,7 +25,12 @@ export function toolbarIconModifiers(
   ]
 }
 
-/** Plain glyphs inside a SwiftUI ControlGroup (the group is the glass). */
+/** Plain glyphs inside an overlay glass capsule (same scale as Profile header). */
 export function toolbarGroupItemModifiers() {
-  return [buttonStyle('plain'), labelStyle('iconOnly'), controlSize('extraLarge')]
+  return [
+    buttonStyle('plain'),
+    labelStyle('iconOnly'),
+    controlSize('large'),
+    imageScale('large'),
+  ]
 }

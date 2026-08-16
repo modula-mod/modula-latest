@@ -1,12 +1,22 @@
-import {Button, ControlGroup, Host, Menu} from '@expo/ui/swift-ui'
-import {controlSize, glassEffect} from '@expo/ui/swift-ui/modifiers'
+import {Button, Host, HStack, Menu} from '@expo/ui/swift-ui'
+import {controlSize, frame, glassEffect, padding} from '@expo/ui/swift-ui/modifiers'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import {toolbarGroupItemModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
-import {OVERLAY_GLASS_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {
+  OVERLAY_GROUP_GAP,
+  OVERLAY_GROUP_HIT,
+  OVERLAY_GROUP_MIN_WIDTH,
+  TOOLBAR_HIT,
+} from '@/platform/ui/menus/toolbar-chrome'
+import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+
+if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_GAP) {
+  throw new Error('Overlay group must match Profile header sizes (44pt hit, 22pt gap)')
+}
 
 export type ChromeGlassGroupButton = {
   kind: 'button'
@@ -26,24 +36,39 @@ export type ChromeGlassGroupMenu = {
 export type ChromeGlassGroupItem = ChromeGlassGroupButton | ChromeGlassGroupMenu
 
 /**
- * SwiftUI ControlGroup for overlay trailing actions (share + overflow).
- * The group is the liquid glass capsule; inner controls stay plain extraLarge.
+ * Overlay trailing share + overflow. Sized like Profile's iOS 26 header
+ * capsule: 44pt hits (`OVERLAY_GROUP_HIT` / `TOOLBAR_HIT`) and 22pt gap
+ * (`HEADER_ICON_PAIR_GAP`). SwiftUI ControlGroup is compact (~23pt) and is
+ * not used here.
  *
- * Reference: Expo UI ControlGroup + glassEffect capsule
- * (https://docs.expo.dev/versions/v57.0.0/sdk/ui/swift-ui/controlgroup/).
+ * Reference: Profile `unstable_headerRightItems` + Expo UI HStack glass capsule.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const itemModifiers = toolbarGroupItemModifiers()
 
   return (
-    <Host matchContents style={{minHeight: OVERLAY_GLASS_HIT}}>
-      <ControlGroup
+    <Host
+      matchContents
+      style={{
+        height: OVERLAY_GROUP_HIT,
+        minHeight: OVERLAY_GROUP_HIT,
+        minWidth: OVERLAY_GROUP_MIN_WIDTH,
+      }}>
+      <HStack
+        spacing={HEADER_ICON_PAIR_GAP}
+        alignment="center"
         modifiers={[
           glassEffect({
             glass: {variant: 'regular', interactive: true},
             shape: 'capsule',
           }),
-          controlSize('extraLarge'),
+          controlSize('large'),
+          padding({horizontal: 12, vertical: 6}),
+          frame({
+            minWidth: OVERLAY_GROUP_MIN_WIDTH,
+            minHeight: OVERLAY_GROUP_HIT,
+            height: OVERLAY_GROUP_HIT,
+          }),
         ]}>
         {items.map(item =>
           item.kind === 'button' ? (
@@ -64,7 +89,7 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
             </Menu>
           ),
         )}
-      </ControlGroup>
+      </HStack>
     </Host>
   )
 }
