@@ -16,7 +16,6 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {FeatureErrorBoundary} from '@/components/system/FeatureErrorBoundary'
 import {useSession} from '@/auth/runtime'
 import type {ModulaProfile} from '@/features/profile/contracts'
@@ -36,6 +35,7 @@ import {
   type ReelOverflowActionId,
 } from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
@@ -136,8 +136,9 @@ export function ReelsScreen() {
             />
           ),
           headerLeft: () => (
-            <ChromeCircleButton
+            <ModulaIconButton
               icon="create"
+              chrome="plain"
               accessibilityLabel="Create"
               onPress={() => router.push('/compose' as Href)}
             />
@@ -145,6 +146,7 @@ export function ReelsScreen() {
           headerRight: () => (
             <View style={styles.headerSideEnd}>
               <ChromeIconMenu
+                chrome="plain"
                 systemImage="ellipsis"
                 icon="more"
                 accessibilityLabel="Reels options"
@@ -153,6 +155,7 @@ export function ReelsScreen() {
                 onAction={runChrome}
               />
               <ChromeIconMenu
+                chrome="plain"
                 systemImage="line.3.horizontal.decrease"
                 icon="settings"
                 accessibilityLabel="Reels filters"
@@ -166,8 +169,9 @@ export function ReelsScreen() {
             ? {
                 unstable_headerLeftItems: () => [
                   plainHeaderCustomItem(
-                    <ChromeCircleButton
+                    <ModulaIconButton
                       icon="create"
+                      chrome="plain"
                       accessibilityLabel="Create"
                       onPress={() => router.push('/compose' as Href)}
                     />,
@@ -176,6 +180,7 @@ export function ReelsScreen() {
                 unstable_headerRightItems: () => [
                   plainHeaderCustomItem(
                     <ChromeIconMenu
+                      chrome="plain"
                       systemImage="ellipsis"
                       icon="more"
                       accessibilityLabel="Reels options"
@@ -187,6 +192,7 @@ export function ReelsScreen() {
                   plainHeaderSpacing(),
                   plainHeaderCustomItem(
                     <ChromeIconMenu
+                      chrome="plain"
                       systemImage="line.3.horizontal.decrease"
                       icon="settings"
                       accessibilityLabel="Reels filters"

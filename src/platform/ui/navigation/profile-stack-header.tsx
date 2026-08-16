@@ -1,6 +1,7 @@
 import {useRouter, type Href} from 'expo-router'
 import {View} from 'react-native'
 
+import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {
@@ -9,6 +10,10 @@ import {
   plainHeaderSpacing,
   supportsPlainHeaderItems,
 } from '@/platform/ui/navigation/plain-header-items'
+
+function ProfileHeaderBack() {
+  return <ModulaBackButton chrome="plain" />
+}
 
 function ProfileShareMenu() {
   const router = useRouter()
@@ -59,6 +64,10 @@ function ProfileOverflowMenu() {
 }
 
 /** Android / web fallback — one slot (may share a capsule on older paths). */
+export function ProfileHeaderLeft() {
+  return <ProfileHeaderBack />
+}
+
 export function ProfileHeaderRight() {
   return (
     <View
@@ -71,6 +80,12 @@ export function ProfileHeaderRight() {
       <ProfileOverflowMenu />
     </View>
   )
+}
+
+/** iOS 26+: back glyph in the leading capsule. */
+export function profileHeaderLeftItems() {
+  if (!supportsPlainHeaderItems()) return undefined
+  return [plainHeaderCustomItem(<ProfileHeaderBack />)]
 }
 
 /** iOS 26+: shared liquid glass with share + more spaced apart inside it. */

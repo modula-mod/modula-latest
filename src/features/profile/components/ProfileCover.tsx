@@ -1,6 +1,6 @@
 import {Image} from 'expo-image'
 import {LinearGradient} from 'expo-linear-gradient'
-import {Pressable, StyleSheet, View} from 'react-native'
+import {Pressable, StyleSheet} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,7 +8,6 @@ import Animated, {
 } from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {AppText} from '@/components/primitives/AppText'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {
   applyProfilePhotoMenuAction,
@@ -43,7 +42,7 @@ export function ProfileCover({
   onPhotoRemove,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
-  const {colours, spacing} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const baseHeight = compact ? 168 : 200
   const height = baseHeight + insets.top
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
@@ -92,21 +91,6 @@ export function ProfileCover({
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
-      {canEdit ? (
-        <View
-          style={[
-            styles.editChip,
-            {
-              backgroundColor: colours.mediaOverlayControlBackground,
-              bottom: spacing[3],
-              right: spacing[3],
-            },
-          ]}>
-          <AppText variant="caption" style={{color: colours.mediaOverlayText}}>
-            Edit Cover
-          </AppText>
-        </View>
-      ) : null}
     </Animated.View>
   )
 
@@ -158,12 +142,5 @@ const styles = StyleSheet.create({
   cover: {
     overflow: 'hidden',
     width: '100%',
-  },
-  editChip: {
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    position: 'absolute',
-    zIndex: 2,
   },
 })

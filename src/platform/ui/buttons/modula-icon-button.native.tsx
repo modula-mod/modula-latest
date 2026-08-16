@@ -3,6 +3,7 @@ import type {StyleProp, ViewStyle} from 'react-native'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
+import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
@@ -39,7 +40,7 @@ export function ModulaIconButton({
   })
 
   return (
-    <Host matchContents style={style}>
+    <Host matchContents style={[{minHeight: TOOLBAR_HIT, minWidth: TOOLBAR_HIT}, style]}>
       <Button
         label={accessibilityLabel}
         systemImage={systemImage as never}

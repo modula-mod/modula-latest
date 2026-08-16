@@ -108,11 +108,15 @@ App Store product-page overlay is the reference for **small circular glass contr
 
 **One chrome layer.** iOS 26 `unstable_header*Items` already wraps icons in a shared liquid-glass capsule. Glyphs inside that capsule are `plain`. Circular `glass` is only for overlays on artwork (`SecondaryScreenHeader`, module detail). Never both — that is the “buttons inside buttons” defect.
 
-- `ToolbarChrome` / `toolbarIconModifiers`: `plain` or circular `glass`, both `controlSize('regular')` (44pt hit)
-- Native Home / Profile / Activity / Board headers pass `chrome="plain"`
+- `ToolbarChrome` / `toolbarIconModifiers`: overlay `glass` is `controlSize('large')` (44pt App Store circle). Capsule `plain` glyphs stay `regular`. Hit target is `TOOLBAR_HIT` (44)
+- Global back is `ModulaBackButton` — overlay screens use glass; Profile and Activity tabs use plain in the header capsule
+- Activity header is one control group (mark-read + settings + overflow). No second in-page check / settings / more row
+- Native Home / Profile / Activity / Board / Reels headers pass `chrome="plain"`
 - `ChromeCircleButton` / overlay menus keep circular `glass`
+- Compact CTAs (Edit Profile, Open/Install) share the 44pt height
 - Compose accessory matches the same 44pt toolbar scale
 - `ModulaControlGroup` is lab-only; product module rows use tap + long-press context menu
+- Customize trailing chrome is a 44pt save check + overflow — not a text Save next to a mismatched ellipsis
 - Customize tabs are a grouped Settings list + switch; reorder is long-press, not extra circles
 - Module Detail shows one compact GET/OPEN pill; Disable / Configure / Uninstall live in overflow
 - Profile hero: cover → avatar overlapping cover only → identity on canvas → one compact Edit/Follow pill. No identity sheet, no More next to Edit Profile

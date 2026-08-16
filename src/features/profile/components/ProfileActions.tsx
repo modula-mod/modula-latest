@@ -98,7 +98,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
         }}
         trigger={
           <View pointerEvents="none" style={styles.moreHit}>
-            <AppIcon name="more" colour={colours.text} size={20} />
+            <AppIcon name="more" colour={colours.text} size={22} />
           </View>
         }
       />
@@ -150,15 +150,15 @@ function ProfileActionPill({
 const styles = StyleSheet.create({
   moreHit: {
     alignItems: 'center',
-    height: 36,
+    height: 44,
     justifyContent: 'center',
-    minWidth: 36,
+    minWidth: 44,
   },
   pill: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-    minHeight: 36,
+    minHeight: 44,
   },
   row: {
     alignItems: 'center',

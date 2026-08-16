@@ -8,6 +8,7 @@ export * from '@/platform/ui/buttons/button-role'
 export * from '@/platform/ui/icons'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+export {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 export {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 export type {

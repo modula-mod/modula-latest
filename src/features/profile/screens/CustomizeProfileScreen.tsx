@@ -20,6 +20,7 @@ import {
 } from '@/features/profile/contracts/profile'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
@@ -123,6 +124,12 @@ export function CustomizeProfileScreen() {
         onBack={leave}
         right={
           <View style={styles.headerTrail}>
+            <ModulaIconButton
+              icon="check"
+              chrome="glass"
+              accessibilityLabel="Save profile presentation"
+              onPress={save}
+            />
             <ChromeOverflowMenu
               accessibilityLabel="Customize profile actions"
               title="Customize"
@@ -137,14 +144,6 @@ export function CustomizeProfileScreen() {
                 if (id === 'reset') reset()
               }}
             />
-            <AppPressable
-              accessibilityLabel="Save profile presentation"
-              onPress={save}
-              style={styles.saveHit}>
-              <AppText variant="label" style={{color: colours.accent}}>
-                Save
-              </AppText>
-            </AppPressable>
           </View>
         }
       />
@@ -367,14 +366,7 @@ const styles = StyleSheet.create({
   headerTrail: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 4,
-  },
-  saveHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    minWidth: 44,
-    paddingHorizontal: 8,
+    gap: 8,
   },
   screen: {
     flex: 1,

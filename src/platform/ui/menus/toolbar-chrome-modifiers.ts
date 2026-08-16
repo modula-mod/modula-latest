@@ -9,7 +9,7 @@ import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 
 /**
  * Shared SwiftUI modifiers for toolbar icons.
- * Regular control size so header glyphs, overlay circles, and menus match.
+ * Overlay glass is large (App Store 44pt circle). Capsule glyphs are regular.
  */
 export function toolbarIconModifiers(
   chrome: ToolbarChrome,
@@ -23,6 +23,6 @@ export function toolbarIconModifiers(
     buttonStyle(styleName),
     labelStyle('iconOnly'),
     buttonBorderShape('circle'),
-    controlSize('regular'),
+    controlSize('large'),
   ]
 }

@@ -66,7 +66,7 @@ export function ModulaIconButton({
       onPress={onPress}
       style={[styles.target, style]}>
       <LiquidGlassChrome interactive fallback="clear" style={styles.glass}>
-        <AppIcon name={icon} size={18} colour={colour ?? colours.text} />
+        <AppIcon name={icon} size={22} colour={colour ?? colours.text} />
       </LiquidGlassChrome>
     </AppPressable>
   )
@@ -75,10 +75,10 @@ export function ModulaIconButton({
 const styles = StyleSheet.create({
   glass: {
     alignItems: 'center',
-    borderRadius: 18,
-    height: 36,
+    borderRadius: 22,
+    height: 44,
     justifyContent: 'center',
-    width: 36,
+    width: 44,
   },
   target: {
     alignItems: 'center',

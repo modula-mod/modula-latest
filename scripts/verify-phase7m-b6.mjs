@@ -129,6 +129,15 @@ assertAbsent('src/features/profile/components/ProfileHero.tsx', 'identitySheet',
 assertAbsent('src/features/profile/screens/CustomizeProfileScreen.tsx', 'MoveButton', 'NO REORDER CIRCLES')
 assertAbsent('src/features/profile/components/ProfileModuleCard.tsx', 'ModulaControlGroup', 'NO MODULE CONTROL GROUP')
 assertAbsent('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'fullWidth', 'NO BRICK MODULE CTAS')
+assertExists('src/platform/ui/buttons/modula-back-button.tsx', 'GLOBAL BACK BUTTON')
+assertContains('src/shell/SecondaryScreenHeader.tsx', 'ModulaBackButton', 'SECONDARY BACK')
+assertContains('src/platform/ui/navigation/profile-stack-header.tsx', 'profileHeaderLeftItems', 'PROFILE BACK')
+assertContains('src/app/(tabs)/activity/_layout.tsx', 'ActivityHeaderLeft', 'ACTIVITY BACK')
+assertContains('src/platform/ui/navigation/activity-stack-header.tsx', 'ActivitySettingsButton', 'ACTIVITY HEADER GROUP')
+assertContains('src/platform/ui/buttons/sf-symbol-for-icon.ts', "check: 'checkmark'", 'CHECK SF SYMBOL')
+assertAbsent('src/features/activity/screens/ActivityScreen.tsx', 'titleRow', 'NO ACTIVITY ICON ROW')
+assertContains('src/features/activity/screens/ActivityScreen.tsx', 'unstable_headerRightItems', 'ACTIVITY HEADER ITEMS')
+assertAbsent('src/features/profile/screens/CustomizeProfileScreen.tsx', 'saveHit', 'NO CUSTOMIZE TEXT SAVE')
 
 if (failures.length) {
   console.log(`\nFAILED ${failures.length}`)

@@ -20,6 +20,7 @@ import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {type ModulaIconName} from '@/platform/ui/icons'
+import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
@@ -228,9 +229,7 @@ export function ModuleDetailScreen() {
           },
         ]}>
         <View style={styles.chromeRow}>
-          <ChromeCircleButton
-            icon="back"
-            accessibilityLabel="Go back"
+          <ModulaBackButton
             onPress={() => {
               if (router.canGoBack()) router.back()
               else router.replace('/product' as Href)
@@ -250,29 +249,31 @@ export function ModuleDetailScreen() {
               onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
             />
           </View>
-          <ChromeCircleButton
-            icon="share"
-            accessibilityLabel={`Share ${copy.name}`}
-            onPress={shareModule}
-          />
-          <ChromeOverflowMenu
-            accessibilityLabel={`${copy.name} actions`}
-            title={copy.name}
-            actions={overflowActions}
-            onAction={id => {
-              if (id === 'share') shareModule()
-              if (id === 'hub') router.push('/product' as Href)
-              if (id === 'enable') void transition('enable')
-              if (id === 'disable') void transition('disable')
-              if (id === 'update') void transition('update')
-              if (id === 'uninstall') void transition('uninstall')
-              if (id === 'settings') {
-                router.push(
-                  `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
-                )
-              }
-            }}
-          />
+          <View style={styles.chromeTrail}>
+            <ChromeCircleButton
+              icon="share"
+              accessibilityLabel={`Share ${copy.name}`}
+              onPress={shareModule}
+            />
+            <ChromeOverflowMenu
+              accessibilityLabel={`${copy.name} actions`}
+              title={copy.name}
+              actions={overflowActions}
+              onAction={id => {
+                if (id === 'share') shareModule()
+                if (id === 'hub') router.push('/product' as Href)
+                if (id === 'enable') void transition('enable')
+                if (id === 'disable') void transition('disable')
+                if (id === 'update') void transition('update')
+                if (id === 'uninstall') void transition('uninstall')
+                if (id === 'settings') {
+                  router.push(
+                    `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
+                  )
+                }
+              }}
+            />
+          </View>
         </View>
       </View>
 
@@ -552,6 +553,7 @@ const styles = StyleSheet.create({
   actions: {alignItems: 'flex-start'},
   chrome: {width: '100%'},
   chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 44},
+  chromeTrail: {alignItems: 'center', flexDirection: 'row', gap: 8},
   content: {padding: 16},
   flex: {flex: 1, minWidth: 0},
   hero: {alignItems: 'stretch'},

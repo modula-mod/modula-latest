@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   compact: {
-    minHeight: 36,
-    paddingVertical: 6,
+    minHeight: 44,
+    paddingVertical: 10,
   },
   regular: {
     minHeight: 44,

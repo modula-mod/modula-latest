@@ -22,6 +22,7 @@ import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
@@ -122,14 +123,11 @@ export function ModulaPrimitivesLabScreen() {
 
       <LabBlock title="Toolbar chrome">
         <AppText variant="caption" colour="textSecondary">
-          App Store overlay: circular glass back / share. Glass is chrome-only.
+          Global back is ModulaBackButton. Overlay glass is a 44pt App Store circle.
+          Capsule glyphs stay plain. Activity uses a three-icon control group.
         </AppText>
         <View style={styles.row}>
-          <ChromeCircleButton
-            icon="back"
-            accessibilityLabel="Back"
-            onPress={() => undefined}
-          />
+          <ModulaBackButton onPress={() => undefined} />
           <ChromeCircleButton
             icon="share"
             accessibilityLabel="Share"

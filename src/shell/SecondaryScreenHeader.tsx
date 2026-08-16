@@ -1,11 +1,11 @@
 import type {ReactNode} from 'react'
-import {useRouter} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {AppText} from '@/components/primitives/AppText'
+import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {
   CHROME_BLUR_INTENSITY,
   CHROME_FADE_EXTENSION,
@@ -31,7 +31,6 @@ type SecondaryScreenHeaderProps = {
  * so it can paint over the top of the body (Android does not clip it to the spacer).
  */
 export function SecondaryScreenHeader({title, right, onBack, onShare}: SecondaryScreenHeaderProps) {
-  const router = useRouter()
   const insets = useSafeAreaInsets()
   const {spacing} = useThemeTokens()
   const rowHeight = insets.top + CHROME_HEADER_ROW
@@ -58,21 +57,7 @@ export function SecondaryScreenHeader({title, right, onBack, onShare}: Secondary
             },
           ]}>
           <View style={styles.side}>
-            <ChromeCircleButton
-              icon="back"
-              accessibilityLabel="Go back"
-              onPress={() => {
-                if (onBack) {
-                  onBack()
-                  return
-                }
-                if (router.canGoBack()) {
-                  router.back()
-                } else {
-                  router.replace('/index' as never)
-                }
-              }}
-            />
+            <ModulaBackButton onPress={onBack} />
           </View>
           <AppText variant="headline" numberOfLines={1} style={styles.title}>
             {title}
@@ -120,8 +105,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   slotSpacer: {
-    height: 36,
-    width: 36,
+    height: 44,
+    width: 44,
   },
   title: {
     flex: 1,

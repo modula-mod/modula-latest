@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react'
 import {
   LayoutAnimation,
   Platform,
@@ -7,7 +7,7 @@ import {
   UIManager,
   View,
 } from 'react-native'
-import {useRouter, type Href} from 'expo-router'
+import {useNavigation, useRouter, type Href} from 'expo-router'
 
 import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -15,7 +15,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Pill} from '@/components/primitives/Pill'
 import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
@@ -29,7 +28,10 @@ import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {
+  ActivityHeaderRight,
+  activityHeaderRightItems,
+} from '@/platform/ui/navigation/activity-stack-header'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -73,7 +75,7 @@ function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
 }
 
 export function ActivityScreen() {
-  const router = useRouter()
+  const navigation = useNavigation()
   const {activityRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
@@ -95,6 +97,30 @@ export function ActivityScreen() {
   )
   const showBlock = (id: string) => isBlockOn(preferences.activityBlockIds, id)
   const staggerEnter = showBlock('stagger-enter') && !reduceMotion
+
+  const markAllRead = useCallback(() => {
+    setReadIds(new Set(activity.map(item => item.id)))
+    void selectionHaptic()
+    void activityRepository.markAllRead().catch(() => undefined)
+  }, [activity, activityRepository])
+
+  const openFilters = useCallback(() => setFilterSheetOpen(true), [])
+
+  useLayoutEffect(() => {
+    const rightItems = activityHeaderRightItems({
+      onMarkRead: markAllRead,
+      onOpenFilters: openFilters,
+    })
+    navigation.setOptions({
+      headerRight: () => (
+        <ActivityHeaderRight
+          onMarkRead={markAllRead}
+          onOpenFilters={openFilters}
+        />
+      ),
+      ...(rightItems ? {unstable_headerRightItems: () => rightItems} : null),
+    })
+  }, [markAllRead, navigation, openFilters])
 
   useEffect(() => {
     if (!reduceMotion) {
@@ -137,12 +163,6 @@ export function ActivityScreen() {
     setFilterSheetOpen(false)
   }
 
-  const markAllRead = () => {
-    setReadIds(new Set(activity.map(item => item.id)))
-    void selectionHaptic()
-    void activityRepository.markAllRead().catch(() => undefined)
-  }
-
   return (
     <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
       <ResponsiveContent>
@@ -157,44 +177,6 @@ export function ActivityScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
-          <View style={styles.titleRow}>
-            <AppPressable
-              accessibilityLabel="Mark all as read"
-              onPress={markAllRead}
-              style={styles.iconHit}>
-              <AppIcon name="check" colour={colours.textSecondary} />
-            </AppPressable>
-            <View style={styles.titleActions}>
-              <AppPressable
-                accessibilityLabel="Filter activity"
-                onPress={() => setFilterSheetOpen(true)}
-                style={styles.iconHit}>
-                <AppIcon name="settings" colour={colours.textSecondary} />
-              </AppPressable>
-              <ChromeOverflowMenu
-                chrome="plain"
-                accessibilityLabel="More activity actions"
-                title="Activity"
-                actions={[
-                  {id: 'notifications', label: 'Notification settings', icon: 'notifications'},
-                  {id: 'markRead', label: 'Mark all as read', icon: 'check'},
-                  {id: 'filter', label: 'Open filters', icon: 'settings'},
-                  {id: 'customize', label: 'Customize Activity', icon: 'appearance'},
-                  {id: 'quiet', label: 'Quiet inbox', icon: 'privacy'},
-                ]}
-                onAction={id => {
-                  if (id === 'notifications') {
-                    router.push('/settings/notifications' as Href)
-                  }
-                  if (id === 'markRead') markAllRead()
-                  if (id === 'filter') setFilterSheetOpen(true)
-                  if (id === 'customize') router.push('/product/layout-activity' as Href)
-                  if (id === 'quiet') router.push('/product/quiet-inbox' as Href)
-                }}
-              />
-            </View>
-          </View>
-
           {showBlock('filter-pills') ? (
             <SectionEnter delay={20} from="right">
               <View style={{gap: spacing[2]}}>
@@ -215,13 +197,6 @@ export function ActivityScreen() {
                       applyFilter(next)
                     }
                   }}
-                />
-                <Pill
-                  label="More filters"
-                  selected={
-                    filter !== 'all' && filter !== 'mentions' && filter !== 'extensions'
-                  }
-                  onPress={() => setFilterSheetOpen(true)}
                 />
               </View>
             </SectionEnter>
@@ -520,12 +495,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 42,
   },
-  iconHit: {
-    alignItems: 'center',
-    height: 44,
-    justifyContent: 'center',
-    width: 44,
-  },
   preview: {
     borderWidth: StyleSheet.hairlineWidth,
   },
@@ -539,16 +508,6 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
-  },
-  titleActions: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 4,
-  },
-  titleRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   unreadDot: {
     borderRadius: 5,

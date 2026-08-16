@@ -2,6 +2,7 @@ import {Host, Menu} from '@expo/ui/swift-ui'
 
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
+import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
@@ -25,7 +26,7 @@ export function ChromeOverflowMenu({
   chrome = 'glass',
 }: ChromeOverflowMenuProps) {
   return (
-    <Host matchContents>
+    <Host matchContents style={{minHeight: TOOLBAR_HIT, minWidth: TOOLBAR_HIT}}>
       <Menu
         label={accessibilityLabel}
         systemImage="ellipsis"
