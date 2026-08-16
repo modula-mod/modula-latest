@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   single: {
-    // Full-bleed on phone — cover goes edge-to-edge (X-style). Wide layouts use expanded.
+    flex: 1,
     width: '100%',
   },
 })

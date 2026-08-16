@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import type {SharedValue} from 'react-native-reanimated'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import type {
   ModulaProfile,
@@ -11,7 +12,10 @@ import {AppText} from '@/components/primitives/AppText'
 import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
-import {ProfileCover} from '@/features/profile/components/ProfileCover'
+import {
+  ProfileCover,
+  profileCoverHeight,
+} from '@/features/profile/components/ProfileCover'
 import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
 import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {
@@ -37,9 +41,11 @@ type ProfileHeroProps = {
 }
 
 /**
- * X / Instagram / Bluesky / LinkedIn: cover is full-bleed from the top
- * (under the transparent header) → avatar overlapping the banner → identity
- * and inline stats on the canvas. Edit lives on the avatar row.
+ * X / Instagram / Bluesky / LinkedIn: cover is full-bleed from the status bar
+ * → avatar hanging over the banner (absolute, so it cannot eat the name) →
+ * identity and inline stats on the canvas. Edit is an Expo UI outlined button
+ * on the avatar row. Cover photos stay `expo-image` — `@expo/ui` Image is
+ * SF Symbols only (Expo SDK 57 docs).
  */
 export function ProfileHero({
   profile,
@@ -53,10 +59,14 @@ export function ProfileHero({
   scrollY,
 }: ProfileHeroProps) {
   const {width} = useWindowDimensions()
+  const insets = useSafeAreaInsets()
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
   const avatarSize = isCompact ? 92 : 116
+  const haloExtra = presentation.showFocusHalo ? 12 : 0
+  const slotSize = avatarSize + haloExtra
+  const coverHeight = profileCoverHeight(isCompact, insets.top)
   const canEdit = viewer.canEdit
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
@@ -87,42 +97,51 @@ export function ProfileHero({
         }}
       />
       <View
+        pointerEvents="box-none"
+        style={[
+          styles.avatarSlot,
+          {
+            left: spacing[4],
+            top: coverHeight - slotSize / 2,
+            height: slotSize,
+            width: slotSize,
+          },
+        ]}>
+        <ProfileAvatar
+          profile={profile}
+          size={avatarSize}
+          showFocusHalo={presentation.showFocusHalo}
+          canEdit={canEdit}
+          onEditPress={() => setAvatarEditorOpen(true)}
+          previewUri={avatarDraft ? avatarDraft.uri : undefined}
+          onPhotoUri={uri => {
+            setAvatarDraft({uri, sourceUri: uri})
+            const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+            if (avatarUri === undefined) return
+            void updateProfile.mutateAsync({avatarUri})
+          }}
+          onPhotoRemove={() => {
+            setAvatarDraft({uri: null, sourceUri: null})
+            if (!profile.avatarUri) return
+            void updateProfile.mutateAsync({avatarUri: null})
+          }}
+        />
+      </View>
+      <View
         style={[
           styles.body,
           {
             paddingHorizontal: spacing[4],
-            paddingBottom: spacing[3],
+            paddingTop: spacing[2],
+            paddingBottom: spacing[4],
             gap: spacing[3],
           },
         ]}>
-        <View style={styles.avatarRow}>
-          <View style={{marginTop: -(avatarSize / 2), zIndex: 2}}>
-            <ProfileAvatar
-              profile={profile}
-              size={avatarSize}
-              showFocusHalo={presentation.showFocusHalo}
-              canEdit={canEdit}
-              onEditPress={() => setAvatarEditorOpen(true)}
-              previewUri={avatarDraft ? avatarDraft.uri : undefined}
-              onPhotoUri={uri => {
-                setAvatarDraft({uri, sourceUri: uri})
-                const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
-                if (avatarUri === undefined) return
-                void updateProfile.mutateAsync({avatarUri})
-              }}
-              onPhotoRemove={() => {
-                setAvatarDraft({uri: null, sourceUri: null})
-                if (!profile.avatarUri) return
-                void updateProfile.mutateAsync({avatarUri: null})
-              }}
-            />
+        {showActions ? (
+          <View style={[styles.avatarActions, {paddingLeft: slotSize + spacing[3]}]}>
+            <ProfileActions profile={profile} viewer={viewer} />
           </View>
-          {showActions ? (
-            <View style={styles.avatarActions}>
-              <ProfileActions profile={profile} viewer={viewer} />
-            </View>
-          ) : null}
-        </View>
+        ) : null}
         <ProfileIdentity profile={profile} viewer={viewer} compact />
         <HeroViewingCopy viewer={viewer} />
         {showStats ? (
@@ -210,18 +229,20 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 
 const styles = StyleSheet.create({
   avatarActions: {
-    flexShrink: 0,
-    paddingBottom: 8,
-  },
-  avatarRow: {
     alignItems: 'flex-end',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexShrink: 0,
+    minHeight: 44,
+  },
+  avatarSlot: {
+    position: 'absolute',
+    zIndex: 3,
   },
   body: {
     minWidth: 0,
+    zIndex: 2,
   },
   wrap: {
-    overflow: 'hidden',
+    overflow: 'visible',
+    position: 'relative',
   },
 })

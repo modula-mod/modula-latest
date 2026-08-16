@@ -71,7 +71,7 @@ export function ProfileStats({
   ].filter(item => item.visible)
 
   return (
-    <View style={[styles.row, {gap: spacing[4]}]}>
+    <View style={[styles.row, {gap: spacing[5]}]}>
       {stats.map(item => (
         <AppPressable
           key={item.id}
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   stat: {
     alignItems: 'baseline',
     flexDirection: 'row',
-    gap: 5,
-    minHeight: 44,
+    gap: 6,
+    minHeight: 32,
   },
 })

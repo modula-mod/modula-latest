@@ -1,6 +1,5 @@
 import {Image} from 'expo-image'
-import {StyleSheet, View} from 'react-native'
-import {Pressable} from 'react-native'
+import {Pressable, StyleSheet, View} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -31,10 +30,14 @@ type ProfileCoverProps = {
   onPhotoRemove?: () => void
 }
 
-/** Cover photo height below the status bar (X / Bluesky / LinkedIn banner). */
-export const PROFILE_COVER_BODY = 168
+/** Banner height below the status bar (X / Bluesky / LinkedIn). */
+export const PROFILE_COVER_BODY = 180
 const TOP_BLUR = 28
 const BOTTOM_BLUR = 72
+
+export function profileCoverHeight(compact: boolean | undefined, insetTop: number) {
+  return (compact ? 156 : PROFILE_COVER_BODY) + insetTop
+}
 
 export function ProfileCover({
   profile,
@@ -49,10 +52,10 @@ export function ProfileCover({
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {colours} = useThemeTokens()
-  const bodyHeight = compact ? 148 : PROFILE_COVER_BODY
-  const height = bodyHeight + insets.top
+  const height = profileCoverHeight(compact, insets.top)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
+  const emptyFill = profile.coverColour ?? colours.border
 
   const animatedStyle = useAnimatedStyle(() => {
     const y = scrollY?.value ?? 0
@@ -77,8 +80,7 @@ export function ProfileCover({
         styles.cover,
         {
           height,
-          backgroundColor:
-            kind === 'none' ? colours.surface2 : profile.coverColour ?? colours.surface2,
+          backgroundColor: kind === 'none' ? colours.canvas : emptyFill,
         },
         animatedStyle,
       ]}>
@@ -90,14 +92,14 @@ export function ProfileCover({
           cachePolicy="memory-disk"
         />
       ) : kind === 'none' ? null : (
-        <CoverAtmosphere wash={profile.coverColour ?? colours.surface2} />
+        <CoverAtmosphere wash={emptyFill} />
       )}
       <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
         <ProgressiveBlurBand
           height={insets.top + TOP_BLUR}
           topHeavy
           strength="soft"
-          intensity={52}
+          intensity={64}
         />
       </View>
       <View pointerEvents="none" style={styles.bottomBlur}>
@@ -105,7 +107,7 @@ export function ProfileCover({
           height={BOTTOM_BLUR}
           topHeavy={false}
           strength="soft"
-          intensity={44}
+          intensity={52}
         />
       </View>
     </Animated.View>

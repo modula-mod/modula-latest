@@ -36,6 +36,10 @@ const iosAdaptiveIcon =
  * Create is hidden (compose lives in the Home header as `/compose`). Hidden
  * NativeTabs routes cannot be focused, so Board is a root stack screen, not a
  * hidden trigger.
+ *
+ * Profile sets `disableAutomaticContentInsets` so the cover can paint under the
+ * status bar (Expo Router native tabs: first ScrollView is otherwise inset).
+ * https://docs.expo.dev/router/advanced/native-tabs/#safe-area-handling
  */
 export function PlatformTabs() {
   const {scheme, colours} = useThemeTokens()
@@ -74,7 +78,8 @@ export function PlatformTabs() {
               key={tab.id}
               name={tab.routeName}
               accessibilityLabel={tab.label}
-              hidden={hidden}>
+              hidden={hidden}
+              disableAutomaticContentInsets={tab.id === 'profile'}>
               <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
               <NativeTabs.Trigger.Icon
                 sf={{

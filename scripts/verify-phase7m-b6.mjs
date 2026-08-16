@@ -158,8 +158,12 @@ assertContains('src/platform/ui/menus/toolbar-chrome-modifiers.ts', "controlSize
 assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', 'matchContents=', 'GROUP HOST NOT SHRUNK')
 assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', '<ControlGroup', 'NO COMPACT CONTROLGROUP')
 assertContains('src/features/profile/components/ProfileCover.tsx', 'ProgressiveBlurBand', 'PROFILE COVER PROGRESSIVE BLUR')
-assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerBackground: () => null', 'PROFILE COVER UNDER HEADER')
+assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'disableAutomaticContentInsets={tab.id === \'profile\'}', 'PROFILE COVER UNDER STATUS BAR')
+assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerBackground: () => <View />', 'PROFILE COVER UNDER HEADER')
+assertContains('src/app/(tabs)/profile/_layout.tsx', "scrollEdgeEffects: {top: 'hidden'", 'PROFILE NO IOS26 EDGE WASH')
+assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerBackVisible: false', 'PROFILE TAB HAS NO BACK')
 assertContains('src/features/profile/components/ProfileActions.tsx', 'ModulaButton', 'PROFILE EDIT USES EXPO UI BUTTON')
+assertContains('src/features/profile/components/ProfileHero.tsx', 'expo-image', 'PROFILE PHOTO NOT EXPO UI IMAGE')
 assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'ChromeGlassControlGroup', 'MODULE DETAIL CONTROL GROUP')
 
 if (failures.length) {

@@ -83,6 +83,7 @@ export function ModulaMotionTabs({
                 variant="label"
                 style={{
                   color: selected ? colours.text : colours.textSecondary,
+                  fontWeight: selected ? '600' : '500',
                 }}>
                 {tab.title}
               </AppText>
@@ -90,7 +91,7 @@ export function ModulaMotionTabs({
                 style={[
                   styles.underline,
                   {
-                    backgroundColor: selected ? colours.accent : 'transparent',
+                    backgroundColor: selected ? colours.text : 'transparent',
                     width: selected ? '100%' : '40%',
                   },
                 ]}

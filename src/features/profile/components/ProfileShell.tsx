@@ -1,5 +1,5 @@
 import {useMemo, useState, type ReactNode} from 'react'
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import Animated, {
   useAnimatedScrollHandler,
@@ -39,6 +39,7 @@ import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useHydrated} from '@/lib/useHydrated'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 type ProfileShellProps = {
   mode: ProfileScreenMode
@@ -142,6 +143,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {width} = useWindowDimensions()
   const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
+  const insets = useSafeAreaInsets()
   const tabPadding = useFloatingTabBarContentPadding()
   const registry = useProfileRegistry()
   const {presentation} = useProfile()
@@ -297,7 +299,13 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       scrollEventThrottle={16}
       onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[styles.scrollContent, {paddingBottom: tabPadding}]}>
+      contentContainerStyle={[
+        styles.scrollContent,
+        {
+          paddingBottom:
+            Platform.OS === 'ios' ? 72 + insets.bottom : tabPadding,
+        },
+      ]}>
       {mode === 'preview' ? <PreviewBar /> : null}
       {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
       {presentation.layoutId === 'creator' && !isExpanded ? (
