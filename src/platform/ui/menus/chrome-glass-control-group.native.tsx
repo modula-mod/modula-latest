@@ -1,5 +1,4 @@
 import {StyleSheet, View} from 'react-native'
-import {BlurView} from 'expo-blur'
 import {Button, Host, Menu} from '@expo/ui/swift-ui'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
@@ -42,7 +41,8 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
  *
  * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots (110pt wide). Expo Host
  * is given an explicit 44×44 frame and does not matchContents. Callstack /
- * SwiftUI ControlGroup are not used — they shrink to compact intrinsic size.
+ * SwiftUI ControlGroup / BlurView are not used — they shrink or wash out to
+ * white on overlay headers.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const {scheme} = useThemeTokens()
@@ -51,25 +51,14 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
 
   return (
     <View style={styles.shell}>
-      <View style={styles.clip}>
-        <BlurView
-          pointerEvents="none"
-          intensity={80}
-          tint={isDark ? 'systemMaterialDark' : 'systemMaterialLight'}
-          style={StyleSheet.absoluteFill}
-        />
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: isDark ? 'rgba(28,32,36,0.78)' : 'rgba(255,255,255,0.92)',
-              borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.12)',
-              borderRadius: OVERLAY_GROUP_HIT / 2,
-              borderWidth: StyleSheet.hairlineWidth,
-            },
-          ]}
-        />
+      <View
+        style={[
+          styles.clip,
+          {
+            backgroundColor: isDark ? 'rgba(36,40,44,0.94)' : '#F7F7F8',
+            borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.14)',
+          },
+        ]}>
         <View style={styles.row}>
           {items.map(item => (
             <View key={item.accessibilityLabel} style={styles.hit}>
@@ -101,6 +90,7 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
 const styles = StyleSheet.create({
   clip: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
+    borderWidth: 1,
     flexGrow: 0,
     flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
