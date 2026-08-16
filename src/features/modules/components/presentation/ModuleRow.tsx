@@ -25,28 +25,30 @@ export function ModuleRow({
   const copy = productCopyFor(item.moduleId, item.name, item.description)
   return (
     <View>
-      <AppPressable
-        accessibilityLabel={`Open ${copy.name}`}
-        onPress={onPress}
-        style={[styles.row, {gap: spacing[3], paddingVertical: spacing[3]}]}>
-        <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={56} variant="icon" />
-        <View style={styles.flex}>
-          <AppText variant="label" numberOfLines={1}>
-            {copy.name}
-          </AppText>
-          <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-            {copy.short}
-          </AppText>
-          <AppText variant="micro" colour="textTertiary" numberOfLines={1}>
-            {copy.publisher}
-          </AppText>
-        </View>
+      <View style={[styles.row, {gap: spacing[3], paddingVertical: spacing[3]}]}>
+        <AppPressable
+          accessibilityLabel={`Open ${copy.name}`}
+          onPress={onPress}
+          style={styles.identity}>
+          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={56} variant="icon" />
+          <View style={styles.flex}>
+            <AppText variant="label" numberOfLines={1}>
+              {copy.name}
+            </AppText>
+            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+              {copy.short}
+            </AppText>
+            <AppText variant="micro" colour="textTertiary" numberOfLines={1}>
+              {copy.publisher}
+            </AppText>
+          </View>
+        </AppPressable>
         <ModuleAction
           presentation={presentation}
           productName={copy.name}
           onPress={onAction ?? onPress}
         />
-      </AppPressable>
+      </View>
       {showSeparator ? <View style={[styles.rule, {backgroundColor: colours.separator}]} /> : null}
     </View>
   )
@@ -54,6 +56,14 @@ export function ModuleRow({
 
 const styles = StyleSheet.create({
   flex: {flex: 1, gap: 2, minWidth: 0},
+  identity: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 12,
+    minHeight: 56,
+    minWidth: 0,
+  },
   row: {
     alignItems: 'center',
     flexDirection: 'row',

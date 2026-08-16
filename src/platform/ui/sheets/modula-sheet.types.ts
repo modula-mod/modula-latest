@@ -4,6 +4,8 @@ export type ModulaSheetDetent = 'medium' | 'large' | 'full'
 
 export type ModulaSheetSnapPoint = 'half' | 'full' | {fraction: number} | {height: number}
 
+export type NativeSheetSnapPoint = 'half' | 'full'
+
 export type ModulaSheetProps = {
   isPresented: boolean
   onDismiss: () => void
@@ -33,9 +35,23 @@ export type ModulaSheetProps = {
   accessibilityLabel?: string
 }
 
-export function snapPointsForDetent(detent: ModulaSheetDetent | undefined): ModulaSheetSnapPoint[] {
-  if (detent === 'full') return ['full']
-  if (detent === 'large') return [{fraction: 0.92}, 'full']
-  if (detent === 'medium') return ['half', 'full']
+export function snapPointsForDetent(detent: ModulaSheetDetent | undefined): NativeSheetSnapPoint[] {
+  if (detent === 'full' || detent === 'large') return ['full']
   return ['half', 'full']
+}
+
+/**
+ * Expo UI 57 BottomSheet accepts `'half' | 'full'`. Fraction/height objects
+ * prevent presentation while chrome-obscure still hides the tab bar.
+ */
+export function nativeSnapPoints(points: ModulaSheetSnapPoint[] | undefined): NativeSheetSnapPoint[] {
+  if (!points?.length) return ['half', 'full']
+  const mapped = points.map(point => {
+    if (point === 'half' || point === 'full') return point
+    if (typeof point === 'object' && point && 'fraction' in point) {
+      return point.fraction >= 0.75 ? 'full' : 'half'
+    }
+    return 'full'
+  })
+  return [...new Set(mapped)]
 }

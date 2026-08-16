@@ -43,12 +43,15 @@ export function reduceProductHubSearch(
   switch (event.type) {
     case 'SCROLL': {
       if (isProductHubSearchActive(model.state) || model.state === 'SEARCH_COLLAPSING') {
+        if (model.compact === event.compact) return model
         return {...model, compact: event.compact}
       }
+      const nextState = event.compact ? 'COMPACT_HEADER' : 'IDLE_LARGE_HEADER'
+      if (model.compact === event.compact && model.state === nextState) return model
       return {
         ...model,
         compact: event.compact,
-        state: event.compact ? 'COMPACT_HEADER' : 'IDLE_LARGE_HEADER',
+        state: nextState,
       }
     }
     case 'TAP_SEARCH': {
@@ -64,10 +67,12 @@ export function reduceProductHubSearch(
         return model
       }
       const query = event.query
+      const nextState = query.trim() ? 'SEARCH_RESULTS' : 'SEARCH_ACTIVE'
+      if (model.query === query && model.state === nextState) return model
       return {
         ...model,
         query,
-        state: query.trim() ? 'SEARCH_RESULTS' : 'SEARCH_ACTIVE',
+        state: nextState,
       }
     }
     case 'CANCEL': {

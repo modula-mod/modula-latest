@@ -21,52 +21,50 @@ export function ModuleEditorialHero({
   const {colours, radius, spacing} = useThemeTokens()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
-  const pack = item.moduleId
   return (
-    <AppPressable
-      accessibilityLabel={`Open featured ${copy.name}`}
-      onPress={onPress}
+    <View
       style={[
         styles.card,
         {
           backgroundColor: colours.surfaceRaised,
           borderRadius: radius.xlarge,
-          gap: spacing[4],
-          padding: spacing[4],
         },
       ]}
       testID="module-editorial-hero">
-      <View style={styles.art}>
-        <ModuleArtwork moduleId={pack} name={copy.name} size={168} variant="hero" />
-      </View>
-      <View style={{gap: spacing[1]}}>
-        {copy.eyebrow ? (
-          <AppText variant="micro" colour="textTertiary">
-            {copy.eyebrow.toUpperCase()}
-          </AppText>
-        ) : null}
-        <AppText variant="display">{copy.name}</AppText>
-        <AppText variant="body" colour="textSecondary">
-          {copy.tagline}
-        </AppText>
-      </View>
-      <View style={[styles.actionRow, {gap: spacing[3]}]}>
-        <ModuleArtwork moduleId={pack} name={copy.name} size={44} />
-        <View style={styles.flex}>
-          <AppText variant="label">{copy.name}</AppText>
-          <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-            {copy.short}
+      <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
+        <ModuleArtwork moduleId={item.moduleId} name={copy.name} variant="scene" />
+        <View style={[styles.copy, {gap: spacing[1], padding: spacing[4]}]}>
+          {copy.eyebrow ? (
+            <AppText variant="micro" colour="textTertiary">
+              {copy.eyebrow.toUpperCase()}
+            </AppText>
+          ) : null}
+          <AppText variant="display">{copy.name}</AppText>
+          <AppText variant="body" colour="textSecondary">
+            {copy.tagline}
           </AppText>
         </View>
+      </AppPressable>
+      <View style={[styles.actionRow, {gap: spacing[3], paddingHorizontal: spacing[4], paddingBottom: spacing[4]}]}>
+        <AppPressable accessibilityLabel={`Open ${copy.name}`} onPress={onPress} style={styles.identity}>
+          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={44} />
+          <View style={styles.flex}>
+            <AppText variant="label">{copy.name}</AppText>
+            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+              {copy.short}
+            </AppText>
+          </View>
+        </AppPressable>
         <ModuleAction presentation={presentation} productName={copy.name} onPress={onAction ?? onPress} />
       </View>
-    </AppPressable>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   actionRow: {alignItems: 'center', flexDirection: 'row'},
-  art: {alignItems: 'center', justifyContent: 'center'},
   card: {overflow: 'hidden', width: '100%'},
+  copy: {alignItems: 'flex-start'},
   flex: {flex: 1, minWidth: 0},
+  identity: {alignItems: 'center', flex: 1, flexDirection: 'row', gap: 12, minWidth: 0},
 })

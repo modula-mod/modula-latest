@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import {useQueryClient} from '@tanstack/react-query'
@@ -27,7 +27,7 @@ import {LAYERS} from '@/theme/tokens/layers'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleDetailScreen() {
-  const {moduleId} = useLocalSearchParams<{moduleId: string}>()
+  const {moduleId, install} = useLocalSearchParams<{moduleId: string; install?: string}>()
   const id = String(moduleId ?? '')
   const router = useRouter()
   const services = useAppServices()
@@ -38,7 +38,9 @@ export function ModuleDetailScreen() {
   const detail = useModuleDetailQuery(id)
   const module = detail.data
   const [preview, setPreview] = useState<ModuleInstallPreview | null>(null)
-  const [installSheetOpen, setInstallSheetOpen] = useState(false)
+  const [installSheetOpen, setInstallSheetOpen] = useState(
+    () => install === '1' || install === 'true',
+  )
   const [busy, setBusy] = useState<string | null>(null)
   const [installStage, setInstallStage] = useState<ModuleInstallStageId | null>(null)
   const [installError, setInstallError] = useState<string | null>(null)
@@ -54,23 +56,31 @@ export function ModuleDetailScreen() {
     ])
   }
 
-  const openPreview = async () => {
-    if (!module) return
-    setBusy('review')
-    try {
-      setPreview(await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined))
-      setInstallSheetOpen(true)
-    } catch (error) {
-      Alert.alert(
-        'Install preview unavailable',
-        error instanceof Error ? error.message : 'Could not load install preview for this module.',
-      )
-    } finally {
-      setBusy(null)
-    }
+  const openPreview = () => {
+    setInstallSheetOpen(true)
   }
 
-  const install = async (enable: boolean) => {
+  useEffect(() => {
+    if (!installSheetOpen || !module || preview) return
+    let cancelled = false
+    void services.moduleRepository
+      .installPreview(module.moduleId, module.latestVersion ?? undefined)
+      .then(next => {
+        if (!cancelled) setPreview(next)
+      })
+      .catch(error => {
+        if (cancelled) return
+        Alert.alert(
+          'Install preview unavailable',
+          error instanceof Error ? error.message : 'Could not load install preview for this module.',
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [installSheetOpen, module, preview, services.moduleRepository])
+
+  const installModule = async (enable: boolean) => {
     if (!module) return
     setBusy(enable ? 'install-enable' : 'install')
     setInstallError(null)
@@ -188,22 +198,20 @@ export function ModuleDetailScreen() {
               else router.replace('/product' as Href)
             }}
           />
-          {showSticky ? (
-            <View style={styles.stickyIdentity} testID="module-sticky-install">
-              <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={28} />
-              <AppText variant="label" numberOfLines={1} style={styles.flex}>
-                {copy.name}
-              </AppText>
-              <ModuleAction
-                presentation={presentation}
-                productName={copy.name}
-                loading={busy === 'review'}
-                onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
-              />
-            </View>
-          ) : (
-            <View style={styles.flex} />
-          )}
+          <View
+            pointerEvents={showSticky ? 'auto' : 'none'}
+            style={[styles.stickyIdentity, {opacity: showSticky ? 1 : 0}]}
+            testID="module-sticky-install">
+            <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={28} />
+            <AppText variant="label" numberOfLines={1} style={styles.flex}>
+              {copy.name}
+            </AppText>
+            <ModuleAction
+              presentation={presentation}
+              productName={copy.name}
+              onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
+            />
+          </View>
         </View>
       </View>
 
@@ -212,11 +220,14 @@ export function ModuleDetailScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[6], paddingBottom: tabPadding + spacing[6]}]}
           keyboardShouldPersistTaps="handled"
           onScroll={event => {
-            setHeroActionVisible(event.nativeEvent.contentOffset.y < 164)
+            const visible = event.nativeEvent.contentOffset.y < 220
+            setHeroActionVisible(current => (current === visible ? current : visible))
           }}
           scrollEventThrottle={16}>
           <View style={[styles.hero, {gap: spacing[4]}]}>
-            <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={88} variant="hero" />
+            <View style={styles.heroArt}>
+              <ModuleArtwork moduleId={module.moduleId} name={copy.name} variant="scene" />
+            </View>
             <View style={{gap: spacing[1]}}>
               <AppText variant="display">{copy.name}</AppText>
               <AppText variant="body" colour="textSecondary">{copy.short}</AppText>
@@ -225,9 +236,7 @@ export function ModuleDetailScreen() {
                 {module.trustLevel === 'firstParty' ? '  ·  Modula' : ''}
               </AppText>
             </View>
-            <View
-              onLayout={() => undefined}
-              testID="module-hero-install">
+            <View testID="module-hero-install">
               {installStage && installStage !== 'ready' ? (
                 <ModuleInstallProgress
                   productName={copy.name}
@@ -243,6 +252,7 @@ export function ModuleDetailScreen() {
                   installable={module.installable}
                   latestVersion={module.latestVersion}
                   priceState={module.priceState}
+                  productName={copy.name}
                   onPreview={openPreview}
                   onOpen={openModule}
                   onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
@@ -306,8 +316,8 @@ export function ModuleDetailScreen() {
         stage={installStage}
         failed={installError}
         onDismiss={() => setInstallSheetOpen(false)}
-        onInstall={() => void install(false)}
-        onInstallAndEnable={() => void install(true)}
+        onInstall={() => void installModule(false)}
+        onInstallAndEnable={() => void installModule(true)}
         onOpen={openModule}
       />
     </View>
@@ -359,6 +369,7 @@ function ActionRow({
   installable,
   latestVersion,
   priceState,
+  productName,
   onPreview,
   onOpen,
   onSettings,
@@ -373,6 +384,7 @@ function ActionRow({
   installable: boolean
   latestVersion?: string | null
   priceState?: ModuleDetail['priceState']
+  productName: string
   onPreview: () => void
   onOpen: () => void
   onSettings: () => void
@@ -395,17 +407,29 @@ function ActionRow({
       {!installed ? (
         <ModuleAction
           presentation={presentation}
-          productName="module"
-          loading={busy === 'review'}
+          productName={productName}
+          fullWidth
           onPress={onPreview}
         />
       ) : null}
-      {state === 'disabled' || state === 'installed' ? <ModulaButton label="Enable" accessibilityLabel="Enable module" loading={busy === 'enable'} onPress={onEnable} /> : null}
-      {state === 'enabled' || state === 'configurationRequired' ? <ModulaButton label="Open" accessibilityLabel="Open module" onPress={onOpen} /> : null}
-      {state === 'enabled' ? <ModulaButton label="Disable" role="secondary" accessibilityLabel="Disable module" loading={busy === 'disable'} onPress={onDisable} /> : null}
-      {state === 'updateAvailable' ? <ModulaButton label="Update" accessibilityLabel="Update module" loading={busy === 'update'} onPress={onUpdate} /> : null}
-      {installed ? <ModulaButton label="Configure" role="secondary" accessibilityLabel="Open module settings" onPress={onSettings} /> : null}
-      {installed ? <ModulaButton label="Uninstall" role="destructive" accessibilityLabel="Uninstall module" loading={busy === 'uninstall'} onPress={onUninstall} /> : null}
+      {state === 'disabled' || state === 'installed' ? (
+        <ModulaButton label="Enable" accessibilityLabel="Enable module" loading={busy === 'enable'} fullWidth onPress={onEnable} />
+      ) : null}
+      {state === 'enabled' || state === 'configurationRequired' ? (
+        <ModulaButton label="Open" accessibilityLabel="Open module" fullWidth onPress={onOpen} />
+      ) : null}
+      {state === 'enabled' ? (
+        <ModulaButton label="Disable" role="secondary" accessibilityLabel="Disable module" loading={busy === 'disable'} fullWidth onPress={onDisable} />
+      ) : null}
+      {state === 'updateAvailable' ? (
+        <ModulaButton label="Update" accessibilityLabel="Update module" loading={busy === 'update'} fullWidth onPress={onUpdate} />
+      ) : null}
+      {installed ? (
+        <ModulaButton label="Configure" role="secondary" accessibilityLabel="Open module settings" fullWidth onPress={onSettings} />
+      ) : null}
+      {installed ? (
+        <ModulaButton label="Uninstall" role="destructive" accessibilityLabel="Uninstall module" loading={busy === 'uninstall'} fullWidth onPress={onUninstall} />
+      ) : null}
     </View>
   )
 }
@@ -446,12 +470,13 @@ function backendModeLabel(mode: string): string {
 }
 
 const styles = StyleSheet.create({
-  actions: {alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap'},
+  actions: {alignItems: 'stretch', width: '100%'},
   chrome: {width: '100%'},
   chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 44},
   content: {padding: 16},
   flex: {flex: 1, minWidth: 0},
-  hero: {alignItems: 'flex-start'},
+  hero: {alignItems: 'stretch'},
+  heroArt: {borderRadius: 24, marginHorizontal: -16, overflow: 'hidden'},
   infoRow: {gap: 2},
   metaRow: {flexDirection: 'row', flexWrap: 'wrap'},
   rule: {height: StyleSheet.hairlineWidth, width: '100%'},

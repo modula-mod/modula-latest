@@ -2,24 +2,29 @@ import {useEffect} from 'react'
 import {BottomSheet} from '@expo/ui'
 import {containerRelativeFrame, frame} from '@expo/ui/swift-ui/modifiers'
 import {BlurView} from 'expo-blur'
-import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
 
+import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaSheetLayout} from '@/platform/ui/sheets/modula-sheet-layout'
 import {
+  nativeSnapPoints,
   snapPointsForDetent,
   type ModulaSheetProps,
 } from '@/platform/ui/sheets/modula-sheet.types'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
+import {LAYERS} from '@/theme/tokens/layers'
+import {scrimColour} from '@/theme/tokens/scrim'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 
 /**
- * Native sheet via `@expo/ui` universal BottomSheet.
- * Actionable workflows use header / scroll body / fixed footer.
- * Forces full-width content — Expo's SwiftUI Host defaults to topLeading
- * intrinsic sizing, which otherwise shrink-wraps rows to ~44pt.
+ * One sheet primitive.
+ *
+ * Structured header/footer sheets (install, composer tools) present as an RN
+ * Modal so footer CTAs receive touches. Simple sheets keep Expo BottomSheet
+ * with `'half' | 'full'` snap points only.
  */
 export function ModulaSheet({
   isPresented,
@@ -36,14 +41,15 @@ export function ModulaSheet({
   obscureShellChrome = true,
   accessibilityLabel,
 }: ModulaSheetProps) {
-  const {colours, spacing, scheme} = useThemeTokens()
+  const {colours, spacing, radius, scheme, resolvedColourMode} = useThemeTokens()
   const {width: windowWidth, height: windowHeight} = useWindowDimensions()
   const {reduceTransparency} = useSystemAccessibility()
+  const reduceMotion = useReduceMotion()
   const useGlass = material === 'glass' && !reduceTransparency && Platform.OS === 'ios'
   const contentWidth = Math.max(280, windowWidth - 32)
-  const resolvedSnapPoints = snapPoints ?? snapPointsForDetent(detent)
   const structured = Boolean(header || footer)
-  const maxBody = Math.round(windowHeight * (detent === 'medium' ? 0.52 : 0.86))
+  const resolvedSnapPoints = nativeSnapPoints(snapPoints ?? snapPointsForDetent(detent))
+  const maxBody = Math.round(windowHeight * (detent === 'medium' ? 0.56 : 0.92))
 
   useEffect(() => {
     if (!obscureShellChrome) return
@@ -58,6 +64,47 @@ export function ModulaSheet({
   ) : (
     children
   )
+
+  if (structured) {
+    return (
+      <Modal
+        visible={isPresented}
+        transparent
+        animationType={reduceMotion ? 'fade' : 'slide'}
+        onRequestClose={onDismiss}
+        testID={testID}
+        accessibilityViewIsModal>
+        <View style={[styles.modalRoot, {zIndex: LAYERS.sheet}]}>
+          <Pressable
+            accessibilityLabel="Dismiss"
+            onPress={onDismiss}
+            style={[
+              styles.backdrop,
+              {backgroundColor: scrimColour(resolvedColourMode, reduceTransparency)},
+            ]}
+          />
+          <View
+            accessibilityLabel={accessibilityLabel}
+            style={[
+              styles.modalSheet,
+              {
+                backgroundColor: colours.surface,
+                padding: spacing[4],
+                borderTopLeftRadius: radius.xlarge,
+                borderTopRightRadius: radius.xlarge,
+                height: maxBody,
+                maxHeight: maxBody,
+              },
+            ]}>
+            {showDragIndicator ? (
+              <View style={[styles.handle, {backgroundColor: colours.separator}]} />
+            ) : null}
+            <View style={styles.modalContent}>{inner}</View>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
 
   return (
     <BottomSheet
@@ -112,15 +159,41 @@ export function ModulaSheet({
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   body: {
     alignSelf: 'stretch',
-    flex: 1,
     overflow: 'hidden',
   },
   content: {
     alignSelf: 'stretch',
-    flex: 1,
     minHeight: 0,
     zIndex: 1,
+  },
+  handle: {
+    alignSelf: 'center',
+    borderRadius: 2,
+    height: 4,
+    marginBottom: 10,
+    width: 36,
+  },
+  modalContent: {
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
+  },
+  modalRoot: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    alignSelf: 'stretch',
+    maxHeight: '92%',
+    width: '100%',
   },
 })

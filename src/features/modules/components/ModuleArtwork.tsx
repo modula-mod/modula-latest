@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import Svg, {Circle, Line, Path, Rect} from 'react-native-svg'
 
 import {AppText} from '@/components/primitives/AppText'
@@ -18,11 +18,20 @@ export function ModuleArtwork({
   moduleId: string
   name?: string
   size?: number
-  variant?: 'icon' | 'hero'
+  variant?: 'icon' | 'hero' | 'scene'
 }) {
   const pack = moduleArtworkPack(moduleId, name)
+  if (variant === 'scene') {
+    return (
+      <View
+        accessibilityLabel={`${pack.name} artwork`}
+        style={[styles.scene, {backgroundColor: pack.palette.wash}]}>
+        <ArtworkScene pack={pack} kind={pack.kind} />
+      </View>
+    )
+  }
   const width = variant === 'hero' ? size * 1.6 : size
-  const height = variant === 'hero' ? size : size
+  const height = size
   return (
     <View
       accessibilityLabel={`${pack.name} artwork`}
@@ -36,6 +45,55 @@ export function ModuleArtwork({
         },
       ]}>
       <ArtworkMark pack={pack} kind={pack.kind} size={Math.min(width, height)} />
+    </View>
+  )
+}
+
+function ArtworkScene({pack, kind}: {pack: ModuleArtworkPack; kind: ModuleArtworkKind}) {
+  const {width} = useWindowDimensions()
+  const sceneWidth = Math.max(320, width)
+  const {ink, paper, wash, stitch} = pack.palette
+  if (kind === 'vault-notes') {
+    return (
+      <Svg width={sceneWidth} height={210} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <Rect x="0" y="0" width="320" height="180" fill={wash} />
+        <Path d="M0 128 C80 108 160 148 320 118 L320 180 L0 180 Z" fill={paper} opacity="0.35" />
+        <Rect x="168" y="36" width="118" height="132" rx="8" fill={wash} stroke={ink} strokeWidth="1" opacity="0.55" />
+        <Path
+          d="M48 28 H168 C176 28 182 34 182 42 V156 C182 164 176 170 168 170 H62 C54 170 48 164 48 156 V48 L68 28 Z"
+          fill={paper}
+        />
+        <Path d="M48 48 H68 V28" fill="none" stroke={ink} strokeWidth="1.4" strokeLinejoin="round" />
+        <Path d="M78 64 H158" stroke={ink} strokeWidth="2" strokeLinecap="round" />
+        <Path d="M78 80 H148" stroke={ink} strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
+        <Path d="M78 96 H154" stroke={ink} strokeWidth="1.6" strokeLinecap="round" opacity="0.4" />
+        <Path d="M78 112 H132" stroke={ink} strokeWidth="1.6" strokeLinecap="round" opacity="0.28" />
+        <Path
+          d="M138 128 C138 118 150 116 154 126 C158 138 138 138 138 150"
+          stroke={stitch ?? ink}
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <Path d="M196 58 H262" stroke={ink} strokeWidth="1.4" opacity="0.25" strokeLinecap="round" />
+        <Path d="M196 74 H248" stroke={ink} strokeWidth="1.4" opacity="0.18" strokeLinecap="round" />
+      </Svg>
+    )
+  }
+  if (kind === 'tasks') {
+    return (
+      <Svg width={sceneWidth} height={210} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <Rect width="320" height="180" fill={wash} />
+        <Rect x="58" y="28" width="204" height="124" rx="10" fill={paper} />
+        <Path d="M84 62 L96 74 L118 50" stroke={ink} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <Line x1="84" y1="96" x2="228" y2="96" stroke={ink} strokeWidth="1.6" opacity="0.4" />
+        <Line x1="84" y1="118" x2="196" y2="118" stroke={ink} strokeWidth="1.6" opacity="0.25" />
+      </Svg>
+    )
+  }
+  return (
+    <View style={[styles.sceneFallback, {borderColor: ink}]}>
+      <ArtworkMark pack={pack} kind={kind} size={96} />
     </View>
   )
 }
@@ -151,5 +209,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+  },
+  scene: {
+    height: 210,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  sceneFallback: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
 })

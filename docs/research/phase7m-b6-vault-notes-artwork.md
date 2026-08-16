@@ -15,7 +15,7 @@ Folded private page.
 - Symbol: folded sheet with three ink lines and a scarce stitch
 - Icon: works at 44 / 56 / 64
 - Accent: ivory / iron ink / warm umber (`#F4EDE1`, `#2A241C`, `#8A6A4B`)
-- Hero: same mark, larger wash
+- Hero: full-width folded-page **scene**, plus the same mark at icon sizes
 - Fallback: generic cube only when a pack is missing
 
 Avoided: padlock, vault door, teal cube, generic document-only icon.

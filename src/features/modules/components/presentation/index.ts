@@ -1,4 +1,5 @@
 export {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
+export {HubSectionHeader} from '@/features/modules/components/presentation/HubSectionHeader'
 export {ModuleCategoryTile, PRODUCT_HUB_BROWSE_CATEGORIES} from '@/features/modules/components/presentation/ModuleCategoryTile'
 export {ModuleCollection, PRODUCT_HUB_COLLECTIONS} from '@/features/modules/components/presentation/ModuleCollection'
 export {ModuleEditorialHero} from '@/features/modules/components/presentation/ModuleEditorialHero'

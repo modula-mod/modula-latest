@@ -1,7 +1,7 @@
 import {View} from 'react-native'
 
-import {AppText} from '@/components/primitives/AppText'
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {HubSectionHeader} from '@/features/modules/components/presentation/HubSectionHeader'
 import {ModuleRow} from '@/features/modules/components/presentation/ModuleRow'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -29,14 +29,7 @@ export function ModuleCollection({
   if (!items.length) return null
   return (
     <View style={{gap: spacing[2]}} testID="module-collection">
-      <View style={{gap: spacing[1]}}>
-        <AppText variant="headline">{title}</AppText>
-        {subtitle ? (
-          <AppText variant="caption" colour="textSecondary">
-            {subtitle}
-          </AppText>
-        ) : null}
-      </View>
+      <HubSectionHeader title={title} subtitle={subtitle} icon="folder" />
       {items.map((item, index) => (
         <ModuleRow
           key={`${title}-${item.moduleId}`}

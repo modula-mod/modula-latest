@@ -67,7 +67,11 @@ assertContains('src/features/modules/state/productHubSearchMachine.ts', 'SEARCH_
 assertContains('src/features/modules/state/productHubSearchMachine.ts', 'SEARCH_ACTIVE', 'SEARCH ACTIVE')
 assertContains('src/features/modules/state/productHubSearchMachine.ts', 'SEARCH_RESULTS', 'SEARCH RESULTS')
 assertContains('src/features/modules/components/ProductHubSearchChrome.tsx', 'product-hub-search-input', 'WEB SEARCH')
-assertContains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'product-hub-search-browse', 'SEARCH BROWSE')
+assertContains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'install=1', 'HUB INSTALL OPENS SHEET')
+assertAbsent('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'contentOffset={{', 'NO SCROLL OFFSET BINDING')
+assertContains('src/features/modules/components/presentation/ModuleAction.tsx', 'AppPressable', 'RN INSTALL CTA')
+assertContains('src/platform/ui/sheets/modula-sheet.native.tsx', '<Modal', 'STRUCTURED SHEET MODAL')
+assertContains('src/features/modules/components/ModuleArtwork.tsx', "variant === 'scene'", 'HERO SCENE ART')
 
 console.log('\n# Module detail + sticky install')
 assertContains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'module-sticky-install', 'STICKY INSTALL')

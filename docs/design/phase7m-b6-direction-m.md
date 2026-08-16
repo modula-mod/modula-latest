@@ -40,6 +40,12 @@ The primary CTA never lives at the end of an unbounded ScrollView.
 
 When a sheet is open, shell navigation recedes (`setShellChromeHoldObscure`).
 
+Structured header/footer sheets present through the same `ModulaSheet` primitive as an RN Modal so footer and compact Install buttons receive taps. Expo BottomSheet remains for simple sheets, with `'half' | 'full'` snap points only.
+
+Hub Install opens `/marketplace/[id]?install=1`. The detail screen presents the sheet immediately from declared permissions and hydrates `installPreview` in the background.
+
+## Production
+
 ## Search
 
 Option 2, explicit state machine:

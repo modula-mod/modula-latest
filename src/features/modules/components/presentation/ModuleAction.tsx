@@ -1,12 +1,14 @@
 import {StyleSheet} from 'react-native'
 
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
 import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
-import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /**
- * Compact product CTA. Teal only for the meaningful primary verb.
- * `Soon` is metadata, not a fake button.
+ * Compact product CTA. Always an RN pressable — Expo UI Host+Button does not
+ * receive taps inside ScrollView / nested pressables on iOS.
+ * Teal only for the meaningful primary verb.
  */
 export function ModuleAction({
   presentation,
@@ -25,51 +27,71 @@ export function ModuleAction({
   loading?: boolean
   testID?: string
 }) {
-  const {spacing} = useThemeTokens()
+  const {colours, radius, spacing} = useThemeTokens()
   const label = presentation.primaryAction
-  if (label === 'Soon') {
-    return (
-      <ModulaButton
-        label="Soon"
-        role="plain"
-        disabled
-        accessibilityLabel={`${productName} coming soon`}
-        testID={testID}
-        style={compact ? styles.compact : undefined}
-      />
-    )
-  }
-  if (label === 'Can’t install on this device') {
-    return (
-      <ModulaButton
-        label="View"
-        role="secondary"
-        accessibilityLabel={`View ${productName}`}
-        onPress={onPress}
-        testID={testID}
-        style={compact ? styles.compact : undefined}
-      />
-    )
-  }
-  const primary = label === 'Install' || label === 'Update' || label === 'Open' || label === 'Enable'
+  const soon = label === 'Soon'
+  const blocked = label === 'Can’t install on this device'
+  const shown = blocked ? 'View' : label
+  const primary = shown === 'Install' || shown === 'Update'
+  const disabled = soon || loading || (!presentation.installable && shown === 'Install')
+  const backgroundColor = soon
+    ? 'transparent'
+    : primary
+      ? colours.accent
+      : colours.surface
+  const borderColor = soon || primary ? 'transparent' : colours.border
+  const labelColour = soon
+    ? colours.textTertiary
+    : primary
+      ? colours.accentForeground
+      : colours.text
+
   return (
-    <ModulaButton
-      label={label}
-      role={primary && label !== 'Open' && label !== 'Enable' ? 'primary' : 'secondary'}
-      accessibilityLabel={`${label} ${productName}`}
-      onPress={onPress}
-      loading={loading}
-      disabled={!presentation.installable && label === 'Install'}
-      fullWidth={fullWidth}
-      testID={testID}
-      style={compact && !fullWidth ? [styles.compact, {paddingHorizontal: spacing[3]}] : undefined}
-    />
+    <AppPressable
+      accessibilityLabel={soon ? `${productName} coming soon` : `${shown} ${productName}`}
+      accessibilityState={{disabled}}
+      disabled={disabled}
+      hitSlop={8}
+      onPress={disabled ? undefined : onPress}
+      testID={testID ?? `module-action-${shown.toLowerCase()}`}
+      style={[
+        styles.capsule,
+        compact && !fullWidth ? styles.compact : styles.regular,
+        {
+          backgroundColor,
+          borderColor,
+          borderRadius: radius.round,
+          paddingHorizontal: compact && !fullWidth ? spacing[3] : spacing[4],
+          alignSelf: fullWidth ? 'stretch' : 'flex-start',
+          width: fullWidth ? '100%' : undefined,
+          opacity: disabled ? 0.45 : 1,
+        },
+      ]}>
+      <AppText
+        variant="label"
+        style={{
+          color: labelColour,
+          textAlign: 'center',
+          fontWeight: primary ? '600' : '500',
+        }}>
+        {loading ? `${shown}…` : shown}
+      </AppText>
+    </AppPressable>
   )
 }
 
 const styles = StyleSheet.create({
+  capsule: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'center',
+  },
   compact: {
     minHeight: 36,
     paddingVertical: 6,
+  },
+  regular: {
+    minHeight: 44,
+    paddingVertical: 10,
   },
 })

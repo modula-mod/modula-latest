@@ -33,7 +33,7 @@ export function SectionEnter({
   const fadeEntering = useMotionEntering('fade', scaledDelay)
   const directionalEntering = useMotionEntering(from, scaledDelay)
 
-  if (Platform.OS === 'web' || typeof document === 'undefined') {
+  if (Platform.OS === 'web') {
     return <>{children}</>
   }
 
