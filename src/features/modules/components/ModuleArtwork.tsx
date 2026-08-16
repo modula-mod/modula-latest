@@ -55,15 +55,16 @@ function ArtworkMark({
   if (kind === 'vault-notes') {
     return (
       <Svg width={size} height={size} viewBox="0 0 64 64">
-        <Rect x="14" y="12" width="36" height="42" rx="3" fill={paper} />
-        <Path d="M14 12 L28 12 L28 22 L14 18 Z" fill={pack.palette.wash} />
-        <Line x1="22" y1="30" x2="42" y2="30" stroke={ink} strokeWidth="1.4" strokeLinecap="round" />
-        <Line x1="22" y1="36" x2="38" y2="36" stroke={ink} strokeWidth="1.2" strokeLinecap="round" opacity="0.55" />
-        <Line x1="22" y1="42" x2="40" y2="42" stroke={ink} strokeWidth="1.2" strokeLinecap="round" opacity="0.35" />
+        <Rect x="18" y="16" width="30" height="36" rx="3" fill={pack.palette.wash} />
+        <Path d="M12 14 H40 C42 14 44 16 44 18 V50 C44 52 42 54 40 54 H16 C14 54 12 52 12 50 V20 L18 14 Z" fill={paper} />
+        <Path d="M12 20 H18 V14" fill="none" stroke={ink} strokeWidth="1.2" strokeLinejoin="round" />
+        <Path d="M22 28 H38" stroke={ink} strokeWidth="1.3" strokeLinecap="round" />
+        <Path d="M22 34 H34" stroke={ink} strokeWidth="1.15" strokeLinecap="round" opacity="0.55" />
+        <Path d="M22 40 H36" stroke={ink} strokeWidth="1.15" strokeLinecap="round" opacity="0.35" />
         <Path
-          d="M44 40 C44 34 38 32 38 38 C38 42 44 42 44 46"
+          d="M36 44 C36 40 40 39 41 43 C42 47 36 47 36 51"
           stroke={stitch ?? ink}
-          strokeWidth="1.6"
+          strokeWidth="1.5"
           fill="none"
           strokeLinecap="round"
         />

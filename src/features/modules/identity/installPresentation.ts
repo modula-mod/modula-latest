@@ -4,7 +4,7 @@ import {isVaultNotesModuleId} from '@modula/greenfield-contracts'
 export type ModuleInstallPresentation = {
   installable: boolean
   customerStatus: string
-  primaryAction: 'Install' | 'Open' | 'Enable' | 'Coming soon' | 'Can’t install on this device'
+  primaryAction: 'Install' | 'Open' | 'Enable' | 'Update' | 'Soon' | 'Can’t install on this device'
   /** Classification for B5 Vault Notes “Not available” / “Permission required”. */
   source:
     | 'OK'
@@ -63,8 +63,13 @@ export function resolveModuleInstallPresentation(input: {
   if (installed) {
     return {
       installable: true,
-      customerStatus: installationState === 'enabled' ? 'Installed' : 'Installed',
-      primaryAction: installationState === 'disabled' || installationState === 'installed' ? 'Enable' : 'Open',
+      customerStatus: installationState === 'updateAvailable' ? 'Update available' : 'Installed',
+      primaryAction:
+        installationState === 'updateAvailable'
+          ? 'Update'
+          : installationState === 'disabled' || installationState === 'installed'
+            ? 'Enable'
+            : 'Open',
       source: 'OK',
     }
   }
@@ -72,8 +77,8 @@ export function resolveModuleInstallPresentation(input: {
   if (comingSoon) {
     return {
       installable: false,
-      customerStatus: 'Coming soon',
-      primaryAction: 'Coming soon',
+      customerStatus: 'Soon',
+      primaryAction: 'Soon',
       source: 'OK',
     }
   }

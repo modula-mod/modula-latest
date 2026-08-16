@@ -8,7 +8,7 @@ description: >-
 
 # Modula UI Implementation Skill
 
-The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 A/B/C are research, not an approved skin. **7M-B5** refines Direction M (Dense Social OS + Native Editorial + selective Spatial chrome) and may implement the flagged AUTH-2 / HOME-1 / HUB-1 / NOTES-1 / NAV-C combination. 7M-C and production deploy remain blocked. Founder visual approval is still required.
+The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 A/B/C are research, not an approved skin. **7M-B6** matures Direction M (editorial Product Hub, reachable install, sheets/drawers, Vault Notes 1.1 candidate). 7M-C and production deploy remain blocked. Founder visual approval is still required.
 
 ## Mission
 
@@ -49,6 +49,7 @@ A section does not automatically need a background. A post does not automaticall
 | 7M-B | UI Lab + Login + Home + Product Hub prototypes | Migrating the rest of the app |
 | 7M-B4 | Real-app research, three directions, twelve compositions, founder gate | Implementing a direction before selection; polishing 7M-B2 visuals; production deploy; starting 7M-C |
 | 7M-B5 | Direction M, twelve compositions in one language, real-app + RN implementation study, flagged four-screen rebuild, Vault Notes available/install/open, UI Lab quality compare | Implementing all 12; Expo SDK upgrade; new UI framework; production deploy; starting 7M-C |
+| 7M-B6 | Direction M Product Hub reconstruction, reachable install footer, search morph, generic host polish | Production deploy; starting 7M-C; Apple clone; second sheet primitive |
 | 7M-C | Full rollout after **human visual approval** | Behaviour changes under the redesign |
 
 If 7L-B is not closed (`P0 OPEN 0`, live identity agreed), stop. Do not start UI reconstruction on a broken beta.

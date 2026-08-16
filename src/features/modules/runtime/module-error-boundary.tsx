@@ -21,6 +21,18 @@ export class ModuleErrorBoundary extends Component<{children: ReactNode; fallbac
   }
 }
 
+function userFacingError(title: string, body?: string): {title: string; body: string; technical?: string} {
+  const technical = `${title} ${body ?? ''}`
+  if (/MODULE_|CAPABILITY_|NOT_RESOLVED|E_/.test(technical)) {
+    return {
+      title: 'Couldn’t open this module',
+      body: 'Try again. If it keeps failing, open module settings.',
+      technical,
+    }
+  }
+  return {title, body: body ?? 'This module is unavailable. The rest of Modula is still available.'}
+}
+
 export function ModuleErrorState({
   title,
   body = 'This module is unavailable. The rest of Modula is still available.',
@@ -33,11 +45,12 @@ export function ModuleErrorState({
   onOpenSettings?: () => void
 }) {
   const {spacing} = useThemeTokens()
+  const presented = userFacingError(title, body)
   return (
     <View style={{gap: spacing[3], padding: spacing[4]}}>
-      <AppText variant="headline">{title}</AppText>
+      <AppText variant="headline">{presented.title}</AppText>
       <AppText variant="body" colour="textSecondary">
-        {body}
+        {presented.body}
       </AppText>
       <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
         {onRetry ? <ModulaButton label="Retry" accessibilityLabel="Retry" onPress={onRetry} /> : null}

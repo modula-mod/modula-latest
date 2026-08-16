@@ -1,0 +1,67 @@
+import {StyleSheet, View} from 'react-native'
+
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
+import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
+import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
+import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
+import {productCopyFor} from '@/features/modules/identity/productCopy'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+export function ModuleRow({
+  item,
+  onPress,
+  onAction,
+  showSeparator = true,
+}: {
+  item: ModuleCatalogueItem
+  onPress: () => void
+  onAction?: () => void
+  showSeparator?: boolean
+}) {
+  const {colours, spacing} = useThemeTokens()
+  const presentation = resolveModuleInstallPresentation(item)
+  const copy = productCopyFor(item.moduleId, item.name, item.description)
+  return (
+    <View>
+      <AppPressable
+        accessibilityLabel={`Open ${copy.name}`}
+        onPress={onPress}
+        style={[styles.row, {gap: spacing[3], paddingVertical: spacing[3]}]}>
+        <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={56} variant="icon" />
+        <View style={styles.flex}>
+          <AppText variant="label" numberOfLines={1}>
+            {copy.name}
+          </AppText>
+          <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+            {copy.short}
+          </AppText>
+          <AppText variant="micro" colour="textTertiary" numberOfLines={1}>
+            {copy.publisher}
+          </AppText>
+        </View>
+        <ModuleAction
+          presentation={presentation}
+          productName={copy.name}
+          onPress={onAction ?? onPress}
+        />
+      </AppPressable>
+      {showSeparator ? <View style={[styles.rule, {backgroundColor: colours.separator}]} /> : null}
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  flex: {flex: 1, gap: 2, minWidth: 0},
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 72,
+    width: '100%',
+  },
+  rule: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 68,
+  },
+})

@@ -11,6 +11,7 @@ import {
   CHROME_FADE_EXTENSION,
   CHROME_HEADER_ROW,
 } from '@/platform/ui/navigation/chrome-insets'
+import {LAYERS} from '@/theme/tokens/layers'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type SecondaryScreenHeaderProps = {
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    zIndex: 4,
+    zIndex: LAYERS.sticky,
   },
   row: {
     alignItems: 'flex-end',

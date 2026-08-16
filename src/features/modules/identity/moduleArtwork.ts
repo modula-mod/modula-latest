@@ -27,7 +27,7 @@ const PACKS: Record<string, ModuleArtworkPack> = {
     moduleId: 'digital.modula.vault-notes',
     kind: 'vault-notes',
     name: 'Vault Notes',
-    tagline: 'Private notes and saved knowledge, wherever you use Modula.',
+    tagline: 'Your private knowledge space.',
     publisher: 'Modula',
     palette: {
       paper: '#F4EDE1',

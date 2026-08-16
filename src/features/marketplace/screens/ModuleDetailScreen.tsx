@@ -1,22 +1,29 @@
-import type {ReactNode} from 'react'
 import {useState} from 'react'
-import {ScrollView, StyleSheet, View, Alert} from 'react-native'
+import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import {useQueryClient} from '@tanstack/react-query'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Surface} from '@/components/primitives/Surface'
 import {InstallPreviewSheet, ModuleInstallProgress} from '@/features/modules/components'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
-import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
+import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
+import {ModulePreview} from '@/features/modules/components/presentation/ModulePreview'
 import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
+import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
+import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
+import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useAppServices} from '@/runtime/useAppServices'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
-import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {LAYERS} from '@/theme/tokens/layers'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleDetailScreen() {
@@ -24,7 +31,10 @@ export function ModuleDetailScreen() {
   const id = String(moduleId ?? '')
   const router = useRouter()
   const services = useAppServices()
-  const {colours, radius, spacing} = useThemeTokens()
+  const queryClient = useQueryClient()
+  const insets = useSafeAreaInsets()
+  const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const detail = useModuleDetailQuery(id)
   const module = detail.data
   const [preview, setPreview] = useState<ModuleInstallPreview | null>(null)
@@ -33,6 +43,16 @@ export function ModuleDetailScreen() {
   const [installStage, setInstallStage] = useState<ModuleInstallStageId | null>(null)
   const [installError, setInstallError] = useState<string | null>(null)
   const [technicalOpen, setTechnicalOpen] = useState(false)
+  const [privacyOpen, setPrivacyOpen] = useState(false)
+  const [heroActionVisible, setHeroActionVisible] = useState(true)
+
+  const refreshCatalogue = async () => {
+    await Promise.all([
+      detail.refetch(),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.catalogueRoot}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.installed}),
+    ])
+  }
 
   const openPreview = async () => {
     if (!module) return
@@ -71,8 +91,7 @@ export function ModuleDetailScreen() {
         setInstallStage('enabling')
       }
       setInstallStage('ready')
-      setInstallSheetOpen(false)
-      await detail.refetch()
+      await refreshCatalogue()
     } catch (error) {
       setInstallStage('failed')
       const message = error instanceof Error ? error.message : 'Registry install did not complete. Check Product Hub and try again.'
@@ -110,7 +129,7 @@ export function ModuleDetailScreen() {
       if (kind === 'disable') await services.moduleRepository.disable(module.moduleId)
       if (kind === 'update') await services.moduleRepository.update(module.moduleId)
       if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData')
-      await detail.refetch()
+      await refreshCatalogue()
     } catch (error) {
       Alert.alert(
         'Module action failed',
@@ -124,12 +143,7 @@ export function ModuleDetailScreen() {
   if (detail.isPending) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-        <SecondaryScreenHeader title="Module" />
-        <EmptyState
-          icon="modules"
-          title="Loading module"
-          description="Resolving registry metadata, install state and publisher trust."
-        />
+        <EmptyState icon="modules" title="Loading module" description="Resolving this product." />
       </View>
     )
   }
@@ -137,185 +151,150 @@ export function ModuleDetailScreen() {
   if (!module) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-        <SecondaryScreenHeader title="Module" />
         <EmptyState
           icon="marketplace"
           title="Module unavailable"
-          description="This registry item is not available for the current account."
+          description="This product is not available for the current account."
           action={<ModulaButton label="Return to Product Hub" role="secondary" onPress={() => router.push('/product' as Href)} />}
         />
       </View>
     )
   }
 
+  const copy = productCopyFor(module.moduleId, module.name, module.longDescription || module.description)
+  const presentation = resolveModuleInstallPresentation(module)
+  const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
+  const showSticky = !heroActionVisible
+  const releaseNotes = module.releaseNotes?.filter(Boolean) ?? []
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <SecondaryScreenHeader title={module.name} />
+      <View
+        style={[
+          styles.chrome,
+          {
+            paddingTop: insets.top + 8,
+            paddingHorizontal: spacing[3],
+            backgroundColor: colours.canvas,
+            zIndex: LAYERS.sticky,
+          },
+        ]}>
+        <View style={styles.chromeRow}>
+          <ChromeCircleButton
+            icon="back"
+            accessibilityLabel="Go back"
+            onPress={() => {
+              if (router.canGoBack()) router.back()
+              else router.replace('/product' as Href)
+            }}
+          />
+          {showSticky ? (
+            <View style={styles.stickyIdentity} testID="module-sticky-install">
+              <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={28} />
+              <AppText variant="label" numberOfLines={1} style={styles.flex}>
+                {copy.name}
+              </AppText>
+              <ModuleAction
+                presentation={presentation}
+                productName={copy.name}
+                loading={busy === 'review'}
+                onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
+              />
+            </View>
+          ) : (
+            <View style={styles.flex} />
+          )}
+        </View>
+      </View>
+
       <ResponsiveContent maxWidth={780}>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
-          keyboardShouldPersistTaps="handled">
-          <Surface
-            variant="contained"
-            style={[
-              styles.hero,
-              {
-                backgroundColor: colours.surfaceRaised,
-                borderColor: colours.border,
-                borderRadius: radius.large,
-                gap: spacing[4],
-                padding: spacing[5],
-              },
-            ]}>
-            <View style={styles.heroHeader}>
-              <ModuleArtwork moduleId={module.moduleId} name={module.name} size={88} variant="hero" />
-              <View style={styles.flex}>
-                <AppText variant="display">{module.name}</AppText>
-                <AppText variant="body" colour="textSecondary">{module.publisherName}</AppText>
-              </View>
+          contentContainerStyle={[styles.content, {gap: spacing[6], paddingBottom: tabPadding + spacing[6]}]}
+          keyboardShouldPersistTaps="handled"
+          onScroll={event => {
+            setHeroActionVisible(event.nativeEvent.contentOffset.y < 164)
+          }}
+          scrollEventThrottle={16}>
+          <View style={[styles.hero, {gap: spacing[4]}]}>
+            <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={88} variant="hero" />
+            <View style={{gap: spacing[1]}}>
+              <AppText variant="display">{copy.name}</AppText>
+              <AppText variant="body" colour="textSecondary">{copy.short}</AppText>
+              <AppText variant="caption" colour="textTertiary">
+                {copy.publisher}
+                {module.trustLevel === 'firstParty' ? '  ·  Modula' : ''}
+              </AppText>
             </View>
-            <AppText variant="body" colour="textSecondary">{module.longDescription || module.description}</AppText>
-            {installStage && installStage !== 'ready' ? (
-              <ModuleInstallProgress
-                productName={module.name}
-                stage={installStage}
-                failed={installError}
-                onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
-              />
-            ) : (
-              <ActionRow
-                state={module.installationState}
-                busy={busy}
-                moduleId={module.moduleId}
-                installable={module.installable}
-                latestVersion={module.latestVersion}
-                priceState={module.priceState}
-                onPreview={openPreview}
-                onOpen={() => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)}
-                onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
-                onEnable={() => void transition('enable')}
-                onDisable={() => void transition('disable')}
-                onUpdate={() => void transition('update')}
-                onUninstall={() => void transition('uninstall')}
-              />
-            )}
-          </Surface>
+            <View
+              onLayout={() => undefined}
+              testID="module-hero-install">
+              {installStage && installStage !== 'ready' ? (
+                <ModuleInstallProgress
+                  productName={copy.name}
+                  stage={installStage}
+                  failed={installError}
+                  onOpen={openModule}
+                />
+              ) : (
+                <ActionRow
+                  state={module.installationState}
+                  busy={busy}
+                  moduleId={module.moduleId}
+                  installable={module.installable}
+                  latestVersion={module.latestVersion}
+                  priceState={module.priceState}
+                  onPreview={openPreview}
+                  onOpen={openModule}
+                  onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
+                  onEnable={() => void transition('enable')}
+                  onDisable={() => void transition('disable')}
+                  onUpdate={() => void transition('update')}
+                  onUninstall={() => void transition('uninstall')}
+                />
+              )}
+            </View>
+            <View style={styles.metaRow}>
+              <MetaChip label="Private data" />
+              <MetaChip label={`Version ${module.latestVersion ?? 'unreleased'}`} />
+              {module.standard?.standardVersion ? <MetaChip label="Module Standard" /> : null}
+            </View>
+          </View>
 
-          <Section title="What this module does">
-            <AppText variant="body" colour="textSecondary">{module.description}</AppText>
-          </Section>
-          <Section title="Privacy & data">
-            <AppText variant="body" colour="textSecondary">
-              {module.privacy ?? 'Your data remains yours. Records stay account-scoped and permission-gated.'}
-            </AppText>
-          </Section>
-          <Section title="Permissions">
-            {module.permissions.length ? (
-              module.permissions.map(permission => (
-                <AppText key={permission.permission} variant="body" colour="textSecondary">
-                  • {permission.reason}
-                </AppText>
-              ))
-            ) : (
-              <AppText variant="caption" colour="textSecondary">No permissions declared for the selected release state.</AppText>
-            )}
-          </Section>
-          <Section title="What's new">
-            {(module.releaseNotes ?? []).length ? (
-              module.releaseNotes?.map(note => (
-                <AppText key={note} variant="caption" colour="textSecondary">{note}</AppText>
-              ))
-            ) : (
-              <AppText variant="caption" colour="textSecondary">Version {module.latestVersion ?? 'unreleased'}.</AppText>
-            )}
-          </Section>
-          <Section title="Version">
-            <InfoRow label="Version" value={module.latestVersion ?? 'Unreleased'} />
-            <InfoRow label="Availability" value={resolveModuleInstallPresentation(module).customerStatus} />
-          </Section>
-          <ModulaButton
-            label={technicalOpen ? 'Hide Trust & Technical Details' : 'Trust & Technical Details >'}
-            role="plain"
-            accessibilityLabel="Toggle trust and technical details"
-            onPress={() => setTechnicalOpen(open => !open)}
+          <View style={[styles.rule, {backgroundColor: colours.separator}]} />
+
+          <View style={{gap: spacing[2]}}>
+            <AppText variant="headline">What {copy.name} does</AppText>
+            <AppText variant="body" colour="textSecondary">{copy.whatItDoes}</AppText>
+          </View>
+
+          <ModulePreview moduleId={module.moduleId} name={copy.name} />
+
+          <Disclosure
+            title="What's New"
+            summary={`Version ${module.latestVersion ?? 'unreleased'}`}
+            body={releaseNotes.length ? releaseNotes.join('\n') : 'Folders, search and lifecycle improvements.'}
           />
-          {technicalOpen ? (
-            <>
-          <Section title="Publisher">
-            <InfoRow label="Publisher" value={module.publisherName} />
-            <InfoRow label="Publisher ID" value={module.publisherId} />
-            <InfoRow label="Trust" value={module.trustLevel} />
-          </Section>
-          <Section title="Backend">
-            <InfoRow label="Mode" value={backendModeLabel(module.backend.mode)} />
-            <InfoRow label="Provider" value={module.backend.provider} />
-            <InfoRow label="Deployment" value={ownershipLabel(module.backend.deploymentOwnership)} />
-            <InfoRow label="Endpoint" value={module.backend.endpoint ?? 'Resolved during installation'} />
-            <InfoRow label="Protocol" value={module.backend.protocolVersion ?? 'Not required'} />
-            <InfoRow label="Status" value={statusLabel(module.backend.status)} />
-            <InfoRow label="Self-hosting" value={module.backend.selfHostingSupported ? 'Supported' : 'Not supported'} />
-            <InfoRow label="External data processing" value={module.backend.externalDataProcessing ? 'Yes' : 'No'} />
-          </Section>
-          <Section title="Data location">
-            <InfoRow label="Primary store" value={dataLocationLabel(module.backend.dataLocation)} />
-            <InfoRow label="Regions" value={module.backend.regions.length ? module.backend.regions.join(', ') : 'Not declared'} />
-          </Section>
-          {module.standard ? (
-            <Section title="Module standard">
-              <InfoRow label="Manifest" value={module.standard.manifestVersion ? `Greenfield v${module.standard.manifestVersion}` : 'Not declared'} />
-              <InfoRow label="Standard" value={module.standard.standardVersion ?? 'Legacy'} />
-              <InfoRow label="Section versions" value={String(Object.keys(module.standard.sectionVersions).length)} />
-              <InfoRow label="Dependencies" value={standardDependencySummary(module)} />
-              <InfoRow label="Registries" value={standardRegistrySummary(module)} />
-              <InfoRow label="Capabilities" value={standardCapabilitySummary(module)} />
-              <InfoRow label="Engines" value={module.standard.engines.length ? module.standard.engines.join(', ') : 'Declarative host runtime'} />
-            </Section>
-          ) : null}
-          {module.standard?.runtimeSupport ? (
-            <Section title="Runtime support">
-              <InfoRow label="Supported sections" value={runtimeSupportCount(module, 'SUPPORTED')} />
-              <InfoRow label="Partial sections" value={runtimeSupportCount(module, 'PARTIALLY_SUPPORTED')} />
-              <InfoRow label="Declarative-only sections" value={runtimeSupportCount(module, 'DECLARATIVE_ONLY')} />
-              <InfoRow label="Unsupported sections" value={runtimeSupportCount(module, 'UNSUPPORTED')} />
-              <InfoRow label="Service invocation depth" value={String(module.standard.runtimeSupport.maximumServiceInvocationDepth)} />
-              <InfoRow label="Declared but not fully operational" value={runtimeDiagnosticSummary(module)} />
-            </Section>
-          ) : null}
-          {module.standard && hasRegistryMetadata(module) ? (
-            <Section title="Services and APIs">
-              <InfoRow label="Services" value={registryPreview(module.serviceRegistry, 'kind')} />
-              <InfoRow label="APIs" value={apiRegistryPreview(module.apiRegistry)} />
-              <InfoRow label="Hooks" value={registryPreview(module.hookRegistry, 'hook')} />
-              <InfoRow label="Events" value={registryPreview(module.eventBus, 'type')} />
-            </Section>
-          ) : null}
-          <Section title="Trust and provenance">
-            <InfoRow label="Module ID" value={module.moduleId} />
-            <InfoRow label="Source repository" value={module.sourceRepository || 'Not declared'} />
-            <InfoRow label="Source commit" value={module.sourceCommit || 'Not declared'} />
-            <InfoRow label="Manifest checksum" value={module.manifestChecksum || 'Pending'} />
-            <InfoRow label="Release checksum" value={module.releaseChecksum || 'Pending'} />
-          </Section>
-          <Section title="Screens and contributions">
-            <AppText variant="caption" colour="textSecondary">{summariseObject(module.contributions)}</AppText>
-          </Section>
-          <Section title="Declared permission keys">
-            <PermissionGroup title="Platform permissions" permissions={platformPermissions(module)} />
-            <PermissionGroup title="Module backend permissions" permissions={backendPermissions(module)} />
-            <PermissionGroup title="External service permissions" permissions={externalPermissions(module)} />
-          </Section>
-          <Section title="Data access">
-            <AppText variant="caption" colour="textSecondary">
-              Records are account-scoped, schema-validated and permission-gated by collection. Raw SQL, arbitrary filters and cross-module queries are rejected by the Greenfield runtime.
-            </AppText>
-          </Section>
-          <Section title="Compatibility">
-            <InfoRow label="Version" value={module.latestVersion ?? 'Unreleased'} />
-            <InfoRow label="Compatibility" value={module.compatibility} />
-            <InfoRow label="Distribution" value={module.priceState} />
-          </Section>
-            </>
-          ) : null}
+
+          <Disclosure
+            title="Privacy & Access"
+            summary={copy.privacy}
+            open={privacyOpen}
+            onToggle={() => setPrivacyOpen(open => !open)}
+            body="Records stay account-scoped. Other accounts cannot read them."
+          />
+
+          <AppPressable
+            accessibilityLabel="Made by Modula"
+            onPress={() => router.push('/product' as Href)}>
+            <AppText variant="headline">{`Made by ${copy.publisher} >`}</AppText>
+          </AppPressable>
+
+          <AppPressable
+            accessibilityLabel="Trust and technical details"
+            onPress={() => setTechnicalOpen(open => !open)}>
+            <AppText variant="headline">{`Trust & Technical Details ${technicalOpen ? '⌃' : '>'}`}</AppText>
+          </AppPressable>
+          {technicalOpen ? <TechnicalDetails module={module} /> : null}
         </ScrollView>
       </ResponsiveContent>
 
@@ -324,10 +303,51 @@ export function ModuleDetailScreen() {
         preview={preview}
         isPresented={installSheetOpen}
         pending={Boolean(busy)}
+        stage={installStage}
+        failed={installError}
         onDismiss={() => setInstallSheetOpen(false)}
         onInstall={() => void install(false)}
         onInstallAndEnable={() => void install(true)}
+        onOpen={openModule}
       />
+    </View>
+  )
+}
+
+function MetaChip({label}: {label: string}) {
+  return (
+    <AppText variant="micro" colour="textTertiary" style={{marginRight: 12}}>
+      {label}
+    </AppText>
+  )
+}
+
+function Disclosure({
+  title,
+  summary,
+  body,
+  open,
+  onToggle,
+}: {
+  title: string
+  summary: string
+  body?: string
+  open?: boolean
+  onToggle?: () => void
+}) {
+  const {colours, spacing} = useThemeTokens()
+  const [localOpen, setLocalOpen] = useState(false)
+  const shown = open ?? localOpen
+  return (
+    <View style={{gap: spacing[2]}}>
+      <AppPressable
+        accessibilityLabel={`${title}. ${shown ? 'Hide' : 'Show'} details`}
+        onPress={onToggle ?? (() => setLocalOpen(value => !value))}>
+        <AppText variant="headline">{`${title} ${shown ? '⌃' : '>'}`}</AppText>
+      </AppPressable>
+      <AppText variant="caption" colour="textSecondary">{summary}</AppText>
+      {shown && body ? <AppText variant="body" colour="textSecondary">{body}</AppText> : null}
+      <View style={[styles.rule, {backgroundColor: colours.separator}]} />
     </View>
   )
 }
@@ -373,10 +393,9 @@ function ActionRow({
   return (
     <View style={[styles.actions, {gap: spacing[2]}]}>
       {!installed ? (
-        <ModulaButton
-          label={presentation.primaryAction === 'Can’t install on this device' ? 'Can’t install on this device' : presentation.primaryAction}
-          accessibilityLabel={`${presentation.primaryAction} module`}
-          disabled={!presentation.installable}
+        <ModuleAction
+          presentation={presentation}
+          productName="module"
           loading={busy === 'review'}
           onPress={onPreview}
         />
@@ -391,24 +410,22 @@ function ActionRow({
   )
 }
 
-function Section({title, children}: {title: string; children: ReactNode}) {
-  const {colours, radius, spacing} = useThemeTokens()
+function TechnicalDetails({module}: {module: ModuleDetail}) {
+  const {spacing} = useThemeTokens()
   return (
-    <Surface
-      variant="contained"
-      style={[
-        styles.section,
-        {
-          backgroundColor: colours.surface,
-          borderColor: colours.border,
-          borderRadius: radius.large,
-          gap: spacing[3],
-          padding: spacing[4],
-        },
-      ]}>
-      <AppText variant="headline">{title}</AppText>
-      {children}
-    </Surface>
+    <View style={{gap: spacing[4]}}>
+      <InfoRow label="Publisher" value={module.publisherName} />
+      <InfoRow label="Source" value={module.sourceRepository || 'Not declared'} />
+      <InfoRow label="Version" value={module.latestVersion ?? 'Unreleased'} />
+      <InfoRow label="Manifest" value={module.standard?.manifestVersion ? `v${module.standard.manifestVersion}` : 'Not declared'} />
+      <InfoRow label="Module Standard" value={module.standard?.standardVersion ?? 'Legacy'} />
+      <InfoRow label="Repository" value={module.sourceRepository || 'Not declared'} />
+      <InfoRow label="Commit" value={module.sourceCommit || 'Not declared'} />
+      <InfoRow label="Checksum" value={module.manifestChecksum || 'Pending'} />
+      <InfoRow label="Permissions" value={module.permissions.map(item => item.permission).join(', ') || 'None declared'} />
+      <InfoRow label="Mode" value={backendModeLabel(module.backend.mode)} />
+      <InfoRow label="Compatibility" value={module.compatibility} />
+    </View>
   )
 }
 
@@ -421,156 +438,23 @@ function InfoRow({label, value}: {label: string; value: string}) {
   )
 }
 
-function PermissionGroup({title, permissions}: {title: string; permissions: string[]}) {
-  return (
-    <View style={{gap: 4}}>
-      <AppText variant="label">{title}</AppText>
-      <AppText variant="caption" colour="textSecondary">{permissions.length ? permissions.join(', ') : 'None declared'}</AppText>
-    </View>
-  )
-}
-
-function platformPermissions(module: ModuleDetail): string[] {
-  const backend = new Set(module.backend.backendPermissions)
-  return module.permissions
-    .map(permission => permission.permission)
-    .filter(permission => !backend.has(permission) && !isExternalPermission(permission))
-}
-
-function backendPermissions(module: ModuleDetail): string[] {
-  return module.backend.backendPermissions
-}
-
-function externalPermissions(module: ModuleDetail): string[] {
-  return module.permissions.map(permission => permission.permission).filter(isExternalPermission)
-}
-
-function isExternalPermission(permission: string): boolean {
-  return permission.startsWith('network:') || permission.startsWith('connector:') || permission.startsWith('dimon:')
-}
-
 function backendModeLabel(mode: string): string {
-  if (mode === 'greenfield-managed') return 'Greenfield-managed'
+  if (mode === 'greenfield-managed') return 'Managed by Modula'
   if (mode === 'module-managed') return 'Module-managed'
   if (mode === 'frontend-only') return 'Frontend-only'
   return 'Hybrid'
 }
 
-function ownershipLabel(value: string): string {
-  return value.replace(/-/g, ' ').replace(/^./, char => char.toUpperCase())
-}
-
-function dataLocationLabel(value: string): string {
-  if (value === 'greenfield') return 'Greenfield'
-  if (value === 'module-backend') return 'Module provider'
-  if (value === 'device') return 'Device'
-  return 'Mixed'
-}
-
-function statusLabel(value: string): string {
-  return value.replace(/-/g, ' ').replace(/^./, char => char.toUpperCase())
-}
-
-function summariseObject(value: Record<string, unknown>): string {
-  const entries = Object.entries(value ?? {})
-  if (!entries.length) return 'No contributions are declared for this release.'
-  return entries.map(([key, item]) => `${key}: ${Array.isArray(item) ? item.length : 1}`).join(' · ')
-}
-
-function standardDependencySummary(module: ModuleDetail): string {
-  const dependencies = module.standard?.dependencies
-  if (!dependencies) return 'Not declared'
-  return [
-    `requires ${dependencies.requires}`,
-    `optional ${dependencies.optional}`,
-    `recommended ${dependencies.recommended}`,
-    `conflicts ${dependencies.conflicts}`,
-    `provides ${dependencies.provides}`,
-  ].join(' · ')
-}
-
-function standardRegistrySummary(module: ModuleDetail): string {
-  const registries = module.standard?.registries
-  if (!registries) return 'Not declared'
-  return [
-    `services ${registries.services}`,
-    `APIs ${registries.apis}`,
-    `hooks ${registries.hooks}`,
-    `jobs ${registries.jobs}`,
-    `widgets ${registries.widgets}`,
-    `automation ${registries.automation}`,
-  ].join(' · ')
-}
-
-function standardCapabilitySummary(module: ModuleDetail): string {
-  const flags = module.standard?.capabilityFlags ?? {}
-  const enabled = Object.entries(flags)
-    .filter(([, value]) => value)
-    .map(([key]) => key.replace(/^supports/, ''))
-  const declared = [...(module.standard?.capabilities ?? []), ...enabled]
-  return declared.length ? declared.slice(0, 10).join(', ') : 'Not declared'
-}
-
-function runtimeSupportCount(module: ModuleDetail, state: string): string {
-  const sections = Object.values(module.standard?.runtimeSupport?.sections ?? {})
-  return String(sections.filter(sectionState => sectionState === state).length)
-}
-
-function runtimeDiagnosticSummary(module: ModuleDetail): string {
-  const diagnostics = module.standard?.runtimeDiagnostics ?? []
-  if (!diagnostics.length) return 'None declared'
-  return diagnostics
-    .slice(0, 8)
-    .map(diagnostic => `${diagnostic.section}: ${runtimeStateLabel(diagnostic.state)}`)
-    .join(' · ')
-}
-
-function runtimeStateLabel(value: string): string {
-  return value.toLowerCase().replace(/_/g, ' ')
-}
-
-function hasRegistryMetadata(module: ModuleDetail): boolean {
-  const registries = module.standard?.registries
-  if (!registries) return false
-  return registries.services + registries.apis + registries.hooks + registryItemCount(module.eventBus) > 0
-}
-
-function registryPreview(value: Record<string, unknown> | undefined, field: string): string {
-  const items = registryItems(value)
-  if (!items.length) return 'Not declared'
-  return items
-    .slice(0, 6)
-    .map(item => String(item[field] ?? item.title ?? item.id ?? 'registry item'))
-    .join(', ')
-}
-
-function apiRegistryPreview(value: Record<string, unknown> | undefined): string {
-  const items = registryItems(value)
-  if (!items.length) return 'Not declared'
-  return items
-    .slice(0, 6)
-    .map(item => `${String(item.method ?? 'API')} ${String(item.path ?? item.id ?? '')}`)
-    .join(', ')
-}
-
-function registryItemCount(value: Record<string, unknown> | undefined): number {
-  return registryItems(value).length
-}
-
-function registryItems(value: Record<string, unknown> | undefined): Record<string, unknown>[] {
-  const items = value?.items
-  return Array.isArray(items) ? items.filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null && !Array.isArray(item)) : []
-}
-
 const styles = StyleSheet.create({
-  actions: {flexDirection: 'row', flexWrap: 'wrap'},
-  content: {padding: 16, paddingBottom: 40},
+  actions: {alignItems: 'flex-start', flexDirection: 'row', flexWrap: 'wrap'},
+  chrome: {width: '100%'},
+  chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 44},
+  content: {padding: 16},
   flex: {flex: 1, minWidth: 0},
-  hero: {borderWidth: StyleSheet.hairlineWidth},
-  heroHeader: {alignItems: 'center', flexDirection: 'row', gap: 16},
-  icon: {alignItems: 'center', height: 72, justifyContent: 'center', width: 72},
+  hero: {alignItems: 'flex-start'},
   infoRow: {gap: 2},
+  metaRow: {flexDirection: 'row', flexWrap: 'wrap'},
+  rule: {height: StyleSheet.hairlineWidth, width: '100%'},
   screen: {flex: 1},
-  section: {borderWidth: StyleSheet.hairlineWidth},
-  wrap: {flexDirection: 'row', flexWrap: 'wrap'},
+  stickyIdentity: {alignItems: 'center', flex: 1, flexDirection: 'row', gap: 10, minWidth: 0},
 })

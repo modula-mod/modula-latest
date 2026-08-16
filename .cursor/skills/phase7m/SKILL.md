@@ -9,7 +9,7 @@ description: >-
 
 The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 produced three directions for selection; none is approved wholesale.
 
-**7M-B5 is authorised:** reference-driven refinement (Direction M), twelve compositions inside that language, then implement **one flagged candidate** (AUTH-2, HOME-1, HUB-1, NOTES-1, NAV-C) after checkpoint A. Founder visual approval remains required. **7M-C is blocked. Production deploy is not authorised.**
+**7M-B6 is authorised:** mature Direction M — editorial Product Hub, reachable install sheets, morphing search, generic Module Host. Founder visual approval remains required. **7M-C is blocked. Production deploy is not authorised.**
 
 Follow `docs/agent-skills/phase7m/SKILL.md` in full.
 

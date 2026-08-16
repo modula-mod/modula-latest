@@ -1,31 +1,46 @@
 import {View} from 'react-native'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function ModuleEmptyState({title, body}: {title: string; body?: string}) {
-  const {colours, radius, spacing} = useThemeTokens()
+export function ModuleEmptyState({
+  title,
+  body,
+  message,
+  primaryAction,
+  secondaryAction,
+}: {
+  title: string
+  body?: string
+  message?: string
+  primaryAction?: {label: string; onPress: () => void}
+  secondaryAction?: {label: string; onPress: () => void}
+}) {
+  const {spacing} = useThemeTokens()
   return (
-    <Surface
-      variant="contained"
-      style={{
-        alignItems: 'center',
-        borderColor: colours.border,
-        borderRadius: radius.large,
-        gap: spacing[2],
-        padding: spacing[5],
-      }}>
-      <View style={{backgroundColor: colours.accentSubtle, borderRadius: radius.round, padding: spacing[3]}}>
-        <AppIcon name="modules" colour={colours.accent} />
-      </View>
+    <View style={{gap: spacing[3], paddingVertical: spacing[6]}} testID="module-empty-state">
       <AppText variant="headline">{title}</AppText>
-      {body ? (
-        <AppText variant="caption" colour="textSecondary" style={{textAlign: 'center'}}>
-          {body}
+      {body || message ? (
+        <AppText variant="body" colour="textSecondary">
+          {body ?? message}
         </AppText>
       ) : null}
-    </Surface>
+      {primaryAction ? (
+        <ModulaButton
+          label={primaryAction.label}
+          accessibilityLabel={primaryAction.label}
+          onPress={primaryAction.onPress}
+        />
+      ) : null}
+      {secondaryAction ? (
+        <ModulaButton
+          label={secondaryAction.label}
+          role="secondary"
+          accessibilityLabel={secondaryAction.label}
+          onPress={secondaryAction.onPress}
+        />
+      ) : null}
+    </View>
   )
 }

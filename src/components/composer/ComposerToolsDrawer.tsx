@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react'
-import {Alert, ScrollView, StyleSheet, View} from 'react-native'
+import {Alert, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -7,11 +7,7 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ComposerToolItem, ComposerToolSection, FunctionInvocationState} from '@/data/repositories/contracts'
-import {
-  keyboardScrollProps,
-  sheetKeyboardBottomInset,
-  useKeyboardHeight,
-} from '@/platform/ui/keyboard'
+import {sheetKeyboardBottomInset, useKeyboardHeight} from '@/platform/ui/keyboard'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -223,21 +219,29 @@ export function ComposerToolsDrawer({
     <ModulaSheet
       isPresented={visible}
       onDismiss={onClose}
-      snapPoints={['half', 'full']}
-      testID="composer-tools-sheet">
-      <ScrollView
-        {...keyboardScrollProps}
-        contentContainerStyle={{paddingBottom: bottomPad, gap: spacing[4]}}>
-        <View style={{gap: spacing[1]}}>
-          <AppText variant="headline">Composer Tools</AppText>
+      detent="large"
+      header={
+        <View style={{gap: spacing[1], paddingBottom: spacing[3]}}>
+          <AppText variant="headline">Create</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Media, create, modules, and agents — honest Preview / Requires module states.
-          </AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Tools register via manifests; this drawer shows whether each capability is available,
-            preview-only, or blocked before anything runs.
+            Registered tools only. Preview and required-module states stay honest.
           </AppText>
         </View>
+      }
+      footer={
+        <View style={{paddingBottom: bottomPad}}>
+          <AppPressable
+            accessibilityLabel="Browse tools"
+            onPress={() => {
+              onClose()
+              onBrowseMarketplace()
+            }}>
+            <AppText variant="label">Browse tools</AppText>
+          </AppPressable>
+        </View>
+      }
+      testID="composer-tools-sheet">
+      <View style={{gap: spacing[4]}}>
         {invocationState !== 'idle' ? (
           <View
             style={[
@@ -326,7 +330,7 @@ export function ComposerToolsDrawer({
             </View>
           </View>
         ))}
-      </ScrollView>
+      </View>
     </ModulaSheet>
   )
 }

@@ -12,6 +12,7 @@ import {AppText} from '@/components/primitives/AppText'
 import type {ModuleAIProductActionDefinition, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
 import {ModuleAIActionMenu, SchemaSettingsRenderer} from '@/features/modules/components'
 import {useModuleRecordMutations, useModuleRecordsQuery} from '@/features/modules/hooks'
+import {ModuleActionBar} from '@/features/modules/runtime/module-action-bar'
 import {ModuleEmptyState} from '@/features/modules/runtime/module-empty-state'
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
 import {primaryActionFor} from '@/features/modules/runtime/module-action-runner'
@@ -87,13 +88,27 @@ export function ModuleViewRenderer({moduleId, view, aiActions = []}: {moduleId: 
   }
 
   if (view.kind === 'emptyState') {
-    return <ModuleEmptyState title={view.emptyState?.title ?? view.title} body={view.emptyState?.body} />
+    return (
+      <ModuleEmptyState
+        title={view.emptyState?.title ?? view.title}
+        body={view.emptyState?.body}
+        primaryAction={
+          createAction
+            ? {label: createAction.label, onPress: () => { void runAction(createAction, draft) }}
+            : undefined
+        }
+      />
+    )
   }
 
   return (
     <View style={{gap: spacing[4]}}>
       <View style={{gap: spacing[2]}}>
         <AppText variant="display">{view.title}</AppText>
+        <ModuleActionBar
+          actions={allActions}
+          onAction={action => { void runAction(action) }}
+        />
         {view.kind === 'collection' ? (
           <View
             style={[
@@ -182,7 +197,15 @@ export function ModuleViewRenderer({moduleId, view, aiActions = []}: {moduleId: 
           ))}
         </ScrollView>
       ) : (
-        <ModuleEmptyState title={view.emptyState?.title ?? 'No module records'} body={view.emptyState?.body ?? 'Create the first record from this module.'} />
+        <ModuleEmptyState
+          title={view.emptyState?.title ?? view.title}
+          body={view.emptyState?.body ?? 'Create the first record when you are ready.'}
+          primaryAction={
+            createAction
+              ? {label: createAction.label, onPress: () => { void runAction(createAction, draft) }}
+              : undefined
+          }
+        />
       )}
     </View>
   )
@@ -246,22 +269,27 @@ function RecordRow({
   onEdit: () => void
   onDelete: () => void
 }) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const titleField = fields.find(field => field.name === 'title') ?? fields[0]
   const title = titleField ? String(record.data[titleField.name] ?? 'Untitled') : 'Record'
   const body = fields.find(field => field.name === 'body')
+  const tags = record.data.tags
+  const tagCount = Array.isArray(tags) ? tags.length : 0
+  const updated = record.updated_at ?? record.updatedAt ?? ''
   return (
-    <View style={[styles.panel, {backgroundColor: colours.surface, borderColor: colours.border, borderRadius: radius.large, gap: spacing[2], padding: spacing[4]}]}>
+    <View style={{gap: spacing[2], paddingVertical: spacing[3]}}>
       <AppText variant="headline">{title}</AppText>
       {body && record.data[body.name] ? (
-        <AppText variant="caption" colour="textSecondary" numberOfLines={3}>{String(record.data[body.name])}</AppText>
+        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>{String(record.data[body.name])}</AppText>
       ) : null}
-      <AppText variant="micro" colour="textTertiary">Revision {record.revision}</AppText>
+      <AppText variant="micro" colour="textTertiary">
+        {[updated ? relativeDay(updated) : null, tagCount ? `${tagCount} tags` : null].filter(Boolean).join('  ·  ')}
+      </AppText>
       <View style={{alignItems: 'center', flexDirection: 'row', gap: spacing[2]}}>
-        <AppPressable accessibilityLabel="Edit note" onPress={onEdit}>
+        <AppPressable accessibilityLabel="Edit record" onPress={onEdit}>
           <AppText variant="label" colour="accent">Edit</AppText>
         </AppPressable>
-        <AppPressable accessibilityLabel="Delete note" onPress={onDelete}>
+        <AppPressable accessibilityLabel="Delete record" onPress={onDelete}>
           <AppText variant="label" colour="destructive">Delete</AppText>
         </AppPressable>
         <ModuleAIActionMenu
@@ -273,6 +301,20 @@ function RecordRow({
       </View>
     </View>
   )
+}
+
+function relativeDay(value: string): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  const start = new Date()
+  start.setHours(0, 0, 0, 0)
+  const then = new Date(date)
+  then.setHours(0, 0, 0, 0)
+  const delta = Math.round((start.getTime() - then.getTime()) / 86_400_000)
+  if (delta === 0) return 'Today'
+  if (delta === 1) return 'Yesterday'
+  if (delta < 7) return `${delta} days ago`
+  return date.toLocaleDateString()
 }
 
 const styles = StyleSheet.create({
