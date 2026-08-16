@@ -93,20 +93,24 @@ export function ProfileCover({
         },
       ]}>
       <View
-        style={[
-          styles.artwork,
-          {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
-        ]}>
-        {hasPhoto ? (
-          <Image
-            source={{uri}}
-            style={StyleSheet.absoluteFill}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-          />
-        ) : kind === 'none' ? null : (
-          <CoverAtmosphere wash={emptyFill} />
-        )}
+        collapsable={false}
+        style={StyleSheet.absoluteFill}>
+        <View
+          style={[
+            styles.artwork,
+            {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
+          ]}>
+          {hasPhoto ? (
+            <Image
+              source={{uri}}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
+          ) : kind === 'none' ? null : (
+            <CoverAtmosphere wash={emptyFill} />
+          )}
+        </View>
       </View>
       {hasPhoto ? (
         <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
@@ -187,7 +191,7 @@ export function ProfileCover({
 
 const styles = StyleSheet.create({
   artwork: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
   },
   cover: {
     overflow: 'hidden',

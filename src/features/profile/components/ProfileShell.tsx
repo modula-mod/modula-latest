@@ -1,9 +1,9 @@
-import {useMemo, useState, type ReactNode} from 'react'
+import {useCallback, useMemo, useState, type ReactNode} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import Animated, {
+  runOnJS,
   useAnimatedScrollHandler,
-  useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -165,17 +165,22 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const stickyFlag = useSharedValue(0)
   const insetTop = insets.top
   const stickyPad = insetTop + PROFILE_LAYOUT.stickyChromeClearance
-  const tabRestPad = spacing[3]
-  const stickyTabsStyle = useAnimatedStyle(() => ({
-    paddingTop: stickyFlag.value ? stickyPad : tabRestPad,
-  }))
+  const [tabPad, setTabPad] = useState(0)
+  const applyTabPad = useCallback((next: number) => {
+    setTabPad(current => (current === next ? current : next))
+  }, [])
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
       const y = event.contentOffset.y
       scrollY.value = y
       const hero = headerHeight.value
-      stickyFlag.value =
-        stickyPad > 0 && (hero <= 0 || y >= hero - stickyPad) ? 1 : 0
+      const next =
+        stickyPad > 0 && (hero <= 0 || y >= hero - stickyPad) ? stickyPad : 0
+      const flag = next > 0 ? 1 : 0
+      if (flag !== stickyFlag.value) {
+        stickyFlag.value = flag
+        runOnJS(applyTabPad)(next)
+      }
     },
   })
 
@@ -353,19 +358,18 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
           </View>
         ) : null}
       </View>
-      <Animated.View
+      <View
         testID="profile-sticky-tabs"
         style={[
           styles.stickyTabs,
-          {backgroundColor: colours.canvas},
-          stickyTabsStyle,
+          {backgroundColor: colours.canvas, paddingTop: tabPad || spacing[3]},
         ]}>
         <ProfileTabBar
           tabs={visibleTabs}
           selectedTabId={selectedTabId}
           onSelectTab={setSelectedTabRequest}
         />
-      </Animated.View>
+      </View>
       <ProfileTabContent profile={profile} viewer={viewer} tab={selectedTab} />
     </Animated.ScrollView>
   )

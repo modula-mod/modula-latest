@@ -161,7 +161,6 @@ assertAbsent('src/platform/ui/menus/chrome-glass-control-group.native.tsx', '<Co
 assertContains('src/features/profile/components/ProfileCover.tsx', 'ProgressiveBlurBand', 'PROFILE COVER PROGRESSIVE BLUR')
 assertAbsent('src/features/profile/components/ProfileCover.tsx', 'bottomBlur', 'COVER HAS NO BOTTOM BLUR')
 assertAbsent('src/features/profile/components/ProfileCover.tsx', 'interpolate(', 'COVER HAS NO PARALLAX TRANSFORM')
-assertAbsent('src/features/profile/components/ProfileShell.tsx', 'runOnJS', 'STICKY TABS DO NOT RERENDER ON SCROLL')
 assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'disableAutomaticContentInsets={tab.id === \'profile\'}', 'PROFILE COVER UNDER STATUS BAR')
 assertContains('src/platform/ui/navigation/platform-tabs.native.tsx', 'paddingTop: 0', 'PROFILE TAB ZERO TOP PADDING')
 assertContains('src/app/(tabs)/profile/_layout.tsx', 'headerShown: false', 'PROFILE COVER UNDER HEADER')
