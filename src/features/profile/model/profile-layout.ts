@@ -41,7 +41,7 @@ export const PROFILE_LAYOUT = {
   /** Portrait bottom to the top of the metric wheel. */
   metricColumnGap: 12,
   /** Extra drop for the metric picker. Does not move the inverted SVG. */
-  metricDrop: 20,
+  metricDrop: 70,
   /** Name sits just onto the white plateau so glyphs don’t spill into the photo. */
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
