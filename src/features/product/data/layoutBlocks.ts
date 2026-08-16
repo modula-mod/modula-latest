@@ -47,7 +47,7 @@ export const HOME_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     id: 'composer',
     slot: 'home',
     label: 'Composer prompt',
-    description: 'Glass “What are you building?” row.',
+    description: '“Start a post” identity row on Home.',
     icon: 'text',
   },
 ]

@@ -24,7 +24,6 @@ import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-pic
 import {isBlockOn} from '@/features/product/data/layoutBlocks'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
-import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
@@ -105,7 +104,7 @@ export function ActivityScreen() {
 
   if (activityQuery.isLoading) {
     return (
-      <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
         <ActivityListSkeleton />
       </View>
     )
@@ -122,7 +121,7 @@ export function ActivityScreen() {
 
   if (!activity.length) {
     return (
-      <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
         <EmptyState
           icon="activity"
           title="No activity yet"
@@ -145,7 +144,7 @@ export function ActivityScreen() {
   }
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
       <ResponsiveContent>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -158,11 +157,6 @@ export function ActivityScreen() {
             },
           ]}
           keyboardShouldPersistTaps="handled">
-          <PageIntro
-            eyebrow="Inbox"
-            icon="activity"
-            body="Likes, replies, mentions, and module updates."
-          />
           <View style={styles.titleRow}>
             <AppPressable
               accessibilityLabel="Mark all as read"
@@ -335,7 +329,7 @@ export function ActivityScreen() {
 function ActivityRow({
   item,
   unread,
-  highlightUnread,
+  highlightUnread: _highlightUnread,
   peers,
   onOpen,
   onMarkRead,
@@ -416,13 +410,11 @@ function ActivityRow({
           style={[
             styles.row,
             {
-              backgroundColor:
-                unread && highlightUnread ? colours.surfaceRaised : 'transparent',
-              borderRadius: radius.xlarge,
+              backgroundColor: colours.surface,
+              borderRadius: radius.large,
               gap: spacing[3],
-              opacity: unread ? 1 : 0.72,
-              paddingHorizontal: spacing[2],
-              paddingVertical: spacing[2],
+              paddingHorizontal: spacing[3],
+              paddingVertical: spacing[3],
             },
           ]}>
           {item.actor && profileRoute ? (
@@ -431,13 +423,13 @@ function ActivityRow({
                 name={item.actor.displayName}
                 uri={item.actor.avatarUri}
                 colour={item.actor.coverColour}
-                size={42}
+                size={48}
               />
               {unread ? (
                 <View
                   style={[
                     styles.unreadDot,
-                    {backgroundColor: colours.accent, borderColor: colours.canvas},
+                    {backgroundColor: colours.accent, borderColor: colours.surface},
                   ]}
                 />
               ) : null}
@@ -447,11 +439,11 @@ function ActivityRow({
               style={[
                 styles.iconAvatar,
                 {
-                  backgroundColor: colours.accentSubtle,
+                  backgroundColor: colours.surfaceMuted,
                   borderRadius: radius.round,
                 },
               ]}>
-              <AppIcon name={item.icon ?? 'activity'} colour={colours.accent} />
+              <AppIcon name={item.icon ?? 'activity'} colour={colours.text} />
             </View>
           )}
           <View style={styles.body}>

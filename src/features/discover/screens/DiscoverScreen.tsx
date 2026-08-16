@@ -137,7 +137,7 @@ export function DiscoverScreen() {
   const layoutEmpty = hasResults && visibleSectionIds.length === 0
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
       <ResponsiveContent>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -549,7 +549,7 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
                   name={profile.displayName}
                   uri={profile.avatarUri}
                   colour={profile.coverColour}
-                  size={42}
+                  size={48}
                 />
                 <View style={styles.personBody}>
                   <AppText variant="label">{profile.displayName}</AppText>
@@ -578,7 +578,9 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
                   style={[
                     styles.followButton,
                     {
-                      backgroundColor: profile.isFollowing ? colours.surfaceMuted : colours.accent,
+                      backgroundColor: profile.isFollowing ? colours.surface : colours.accent,
+                      borderColor: profile.isFollowing ? colours.border : 'transparent',
+                      borderWidth: StyleSheet.hairlineWidth,
                       borderRadius: radius.round,
                     },
                   ]}>
@@ -762,9 +764,9 @@ const styles = StyleSheet.create({
   followButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 38,
-    minWidth: 86,
-    paddingHorizontal: 12,
+    minHeight: 36,
+    minWidth: 88,
+    paddingHorizontal: 16,
   },
   mediaGrid: {
     flexDirection: 'row',

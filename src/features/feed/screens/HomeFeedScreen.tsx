@@ -190,7 +190,7 @@ export function HomeFeedScreen() {
   }, [motion.slow, pullDistance, refreshing])
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
       <HomeSearchModal
         visible={searchOpen}
         onClose={() => setSearchOpen(false)}
@@ -530,8 +530,10 @@ function ComposerPrompt() {
         style={[
           styles.prompt,
           {
-            borderTopColor: colours.border,
-            borderBottomColor: colours.border,
+            backgroundColor: colours.surface,
+            borderRadius: radius.large,
+            marginHorizontal: spacing[3],
+            marginBottom: spacing[2],
             padding: spacing[3],
             gap: spacing[2],
           },
@@ -543,7 +545,7 @@ function ComposerPrompt() {
           }
           uri={profile?.avatarUri}
           colour={profile?.coverColour}
-          size={36}
+          size={48}
         />
         <AppPressable
           accessibilityLabel="Create a post"
@@ -554,15 +556,13 @@ function ComposerPrompt() {
               flex: 1,
               borderRadius: radius.round,
               paddingHorizontal: spacing[4],
-              backgroundColor: colours.surfaceRaised,
-              borderColor: colours.border,
-              borderWidth: StyleSheet.hairlineWidth,
+              backgroundColor: colours.surfaceMuted,
               minHeight: 44,
               justifyContent: 'center',
             },
           ]}>
           <AppText variant="body" colour="textSecondary">
-            What are you building?
+            Start a post
           </AppText>
         </AppPressable>
         <ModulaIconButton
@@ -593,8 +593,6 @@ const styles = StyleSheet.create({
   },
   prompt: {
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderTopWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
   promptGlass: {

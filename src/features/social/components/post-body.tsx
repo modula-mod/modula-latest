@@ -81,7 +81,7 @@ export function PostBody({post}: {post: SocialPost}) {
       <View style={{gap: spacing[3], marginTop: spacing[2]}}>
         {text}
         <Surface variant="contained" style={[styles.module, {gap: spacing[3], padding: spacing[3]}]}>
-          <AppIcon name="modules" colour={colours.accent} size={24} />
+          <AppIcon name="modules" colour={colours.text} size={24} />
           <View style={styles.flex}>
             <AppText variant="headline">{post.module.name}</AppText>
             <AppText variant="caption" colour="textSecondary">

@@ -34,9 +34,11 @@ export function PostActions({post}: {post: SocialPost}) {
       onPress={onPress}
       style={styles.action}>
       <AppIcon name={icon} colour={selected ? colours.accent : colours.textSecondary} size={20} />
-      <AppText variant="caption" style={{color: selected ? colours.accent : colours.textSecondary}}>
-        {selected ? label : count || ''}
-      </AppText>
+      {typeof count === 'number' && count > 0 ? (
+        <AppText variant="caption" style={{color: selected ? colours.accent : colours.textSecondary}}>
+          {count}
+        </AppText>
+      ) : null}
     </AppPressable>
   )
 

@@ -26,6 +26,19 @@ Module Detail is a continuous product page:
 
 Cards are reserved for media and grouped interactive content.
 
+## Siren.uix social reference (founder)
+
+Founder directed B6 to match [@siren.uix](https://www.instagram.com/siren.uix) — specifically the LinkedIn app redesign carousel [DSjlMDlks24](https://www.instagram.com/p/DSjlMDlks24/?img_index=1) (Home / Notifications / Network).
+
+Adapted into Modula — not a LinkedIn clone:
+
+- Muted page canvas with white grouped cells (Home posts, Activity rows, Start a post)
+- 48px circular identity, name + meta stack, trailing overflow
+- Outline action counts; accent only on the verb (Follow, Like when selected, unread dot)
+- Discover people rows with a single rounded Follow control
+
+Product Hub stays editorial. This does not start 7M-C.
+
 ## Overlay invariant
 
 Every actionable Modula sheet:

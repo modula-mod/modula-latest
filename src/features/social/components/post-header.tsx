@@ -10,7 +10,7 @@ import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProf
 import {useSession} from '@/auth/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type PostHeaderProps = {post: SocialPost; onMore?: () => void}
+type PostHeaderProps = {post: SocialPost; onMore?: () => void; avatarSize?: number}
 
 function relativeTime(iso: string): string {
   const minutes = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60_000))
@@ -19,7 +19,7 @@ function relativeTime(iso: string): string {
   return hours < 24 ? `${hours}h` : `${Math.round(hours / 24)}d`
 }
 
-export function PostHeader({post, onMore}: PostHeaderProps) {
+export function PostHeader({post, onMore, avatarSize = 40}: PostHeaderProps) {
   const router = useRouter()
   const session = useSession()
   const {colours} = useThemeTokens()
@@ -34,7 +34,7 @@ export function PostHeader({post, onMore}: PostHeaderProps) {
         accessibilityLabel={`Open ${post.author.displayName} profile`}
         onPress={() => router.push(profileRoute)}
         style={styles.avatar}>
-        <Avatar name={post.author.displayName} uri={post.author.avatarUri} colour={post.author.coverColour} size={36} />
+        <Avatar name={post.author.displayName} uri={post.author.avatarUri} colour={post.author.coverColour} size={avatarSize} />
       </AppPressable>
       <AppPressable
         accessibilityLabel={`Open ${post.author.displayName} profile`}
@@ -58,5 +58,5 @@ const styles = StyleSheet.create({
   avatar: {alignItems: 'center', justifyContent: 'center'},
   identity: {flex: 1, justifyContent: 'center', minWidth: 0},
   more: {alignItems: 'center', justifyContent: 'center'},
-  row: {alignItems: 'center', flexDirection: 'row', gap: 10},
+  row: {alignItems: 'center', flexDirection: 'row', gap: 12},
 })

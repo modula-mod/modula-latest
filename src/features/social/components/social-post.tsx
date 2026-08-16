@@ -16,39 +16,60 @@ type SocialPostProps = {
   showDivider?: boolean
 }
 
-/** Provider-neutral presentation for feed rows, post detail, and embedded posts. */
+/**
+ * Provider-neutral feed row.
+ * `compact` is the Home cell: white grouped surface on a muted canvas
+ * (siren.uix LinkedIn redesign — identity row, not nested card soup).
+ */
 export function SocialPost({post, compact = false, showDivider = true}: SocialPostProps) {
-  const {spacing} = useThemeTokens()
+  const {colours, radius, spacing} = useThemeTokens()
   const {moderationRepository} = useAppServices()
+  const padV = compact ? spacing[3] : spacing[3]
+  const padH = compact ? spacing[3] : spacing[4]
 
-  if (post.kind === 'media') {
+  const inner =
+    post.kind === 'media' ? (
+      <View style={{paddingVertical: padV, paddingHorizontal: padH}}>
+        <MediaPostCard post={post} />
+      </View>
+    ) : (
+      <View style={[styles.content, {gap: spacing[2], paddingVertical: padV, paddingHorizontal: padH}]}>
+        <PostHeader
+          post={post}
+          avatarSize={compact ? 48 : 40}
+          onMore={() => void openPostMoreMenu(post, {moderationRepository})}
+        />
+        <PostBody post={post} />
+        <PostActions post={post} />
+      </View>
+    )
+
+  if (compact) {
     return (
-      <View>
-        <View
-          style={[
-            styles.content,
-            {paddingVertical: compact ? spacing[2] : spacing[3], paddingHorizontal: compact ? spacing[3] : spacing[4]},
-          ]}>
-          <MediaPostCard post={post} />
-        </View>
-        {showDivider ? <Divider /> : null}
+      <View
+        style={[
+          styles.cell,
+          {
+            backgroundColor: colours.surface,
+            borderRadius: radius.large,
+            marginHorizontal: spacing[3],
+            marginBottom: spacing[2],
+          },
+        ]}>
+        {inner}
       </View>
     )
   }
 
   return (
     <View>
-      <View style={[styles.content, {gap: spacing[1], paddingVertical: compact ? spacing[2] : spacing[3], paddingHorizontal: compact ? spacing[3] : spacing[4]}]}>
-        <PostHeader
-          post={post}
-          onMore={() => void openPostMoreMenu(post, {moderationRepository})}
-        />
-        <PostBody post={post} />
-        <PostActions post={post} />
-      </View>
+      {inner}
       {showDivider ? <Divider /> : null}
     </View>
   )
 }
 
-const styles = StyleSheet.create({content: {minWidth: 0}})
+const styles = StyleSheet.create({
+  cell: {overflow: 'hidden'},
+  content: {minWidth: 0},
+})
