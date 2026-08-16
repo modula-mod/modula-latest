@@ -8,6 +8,7 @@ import {toolbarGroupItemModifiers} from '@/platform/ui/menus/toolbar-chrome-modi
 import {
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
+  OVERLAY_GROUP_MIN_WIDTH,
   overlayGroupWidth,
   TOOLBAR_HIT,
 } from '@/platform/ui/menus/toolbar-chrome'
@@ -34,6 +35,9 @@ export type ChromeGlassGroupItem = ChromeGlassGroupButton | ChromeGlassGroupMenu
 
 if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_GAP) {
   throw new Error('Overlay group must match Profile header sizes (44pt hit, 22pt gap)')
+}
+if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
+  throw new Error('overlayGroupWidth(2) must equal OVERLAY_GROUP_MIN_WIDTH')
 }
 
 /**
