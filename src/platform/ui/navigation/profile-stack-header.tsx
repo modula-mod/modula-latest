@@ -106,7 +106,13 @@ export function profileHeaderRightItems() {
  * Share + overflow on the cover (X / Facebook / Bluesky). Used when the native
  * header is hidden so the banner can start under the status bar.
  */
-export function ProfileCoverChrome({showBack}: {showBack: boolean}) {
+export function ProfileCoverChrome({
+  showBack,
+  owner = true,
+}: {
+  showBack: boolean
+  owner?: boolean
+}) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
   const {spacing} = useThemeTokens()
@@ -132,25 +138,40 @@ export function ProfileCoverChrome({showBack}: {showBack: boolean}) {
               accessibilityLabel: 'Share profile',
               onPress: () => router.push('/share-profile' as Href),
             },
-            {
-              kind: 'menu',
-              accessibilityLabel: 'Open profile actions',
-              title: 'Profile',
-              actions: [
-                {id: 'edit', label: 'Edit Profile', icon: 'profile'},
-                {id: 'customize', label: 'Customize', icon: 'appearance'},
-                {id: 'os', label: 'Profile-OS', icon: 'settings'},
-                {id: 'preview', label: 'View as visitor', icon: 'eye'},
-                {id: 'settings', label: 'Settings', icon: 'settings'},
-              ],
-              onAction: id => {
-                if (id === 'edit') router.push('/profile/edit' as Href)
-                if (id === 'customize') router.push('/profile/customize' as Href)
-                if (id === 'os') router.push('/profile/os' as Href)
-                if (id === 'preview') router.push('/profile/preview' as Href)
-                if (id === 'settings') router.push('/settings' as Href)
-              },
-            },
+            owner
+              ? {
+                  kind: 'menu' as const,
+                  accessibilityLabel: 'Open profile actions',
+                  title: 'Profile',
+                  actions: [
+                    {id: 'edit', label: 'Edit Profile', icon: 'profile'},
+                    {id: 'customize', label: 'Customize', icon: 'appearance'},
+                    {id: 'os', label: 'Profile-OS', icon: 'settings'},
+                    {id: 'preview', label: 'View as visitor', icon: 'eye'},
+                    {id: 'settings', label: 'Settings', icon: 'settings'},
+                  ],
+                  onAction: (id: string) => {
+                    if (id === 'edit') router.push('/profile/edit' as Href)
+                    if (id === 'customize') router.push('/profile/customize' as Href)
+                    if (id === 'os') router.push('/profile/os' as Href)
+                    if (id === 'preview') router.push('/profile/preview' as Href)
+                    if (id === 'settings') router.push('/settings' as Href)
+                  },
+                }
+              : {
+                  kind: 'menu' as const,
+                  accessibilityLabel: 'More profile actions',
+                  title: 'Profile',
+                  actions: [
+                    {id: 'share', label: 'Share profile', icon: 'share'},
+                    {id: 'copy', label: 'Copy profile link', icon: 'link'},
+                  ],
+                  onAction: (id: string) => {
+                    if (id === 'share' || id === 'copy') {
+                      router.push('/share-profile' as Href)
+                    }
+                  },
+                },
           ]}
         />
       </View>

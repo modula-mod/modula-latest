@@ -1,6 +1,7 @@
 import {createContext} from 'react'
 
 import type {ResolvedAppearance} from '@/theme/contracts'
+import {inverted} from '@/theme/foundations/inverted'
 import {radius} from '@/theme/foundations/radius'
 import {spacing} from '@/theme/foundations/spacing'
 
@@ -20,6 +21,7 @@ export type ThemeTokenSet = ResolvedAppearance & {
   scheme: 'light' | 'dark'
   spacing: typeof spacing
   radius: typeof radius
+  inverted: typeof inverted
   material: ResolvedAppearance['materials']['card']
   colours: ResolvedAppearance['colours'] & LegacySemanticAliases
 }

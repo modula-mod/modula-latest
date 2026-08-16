@@ -51,7 +51,7 @@ export function ProfileAvatar({
           styles.avatar,
           {
             borderColor: colours.canvas,
-            borderWidth: 4,
+            borderWidth: 3,
           },
           style,
         ]}

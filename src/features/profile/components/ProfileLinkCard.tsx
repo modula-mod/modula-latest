@@ -19,6 +19,7 @@ export function ProfileLinkCard({link}: ProfileLinkCardProps) {
   return (
     <AppPressable
       accessibilityLabel={`Open ${link.label}`}
+      accessibilityHint={`Opens ${link.domain} in a browser`}
       onPress={() => void openSafeExternalUrl(link.url)}>
       <Surface
         variant="contained"

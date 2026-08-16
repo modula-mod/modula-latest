@@ -28,7 +28,7 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
     canViewerSeeProfileField(profile.website.visibility, viewer.relationship)
   const verified = profile.identityClaims.some(claim => claim.status === 'verified')
   const joined = new Date(profile.joinedAt).toLocaleDateString(undefined, {
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   })
 

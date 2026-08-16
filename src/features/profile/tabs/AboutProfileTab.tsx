@@ -40,7 +40,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
     <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
       <View style={{gap: spacing[2]}}>
         <SectionHeader title="About" icon="profile" />
-        <AppText variant="body">{profile.bio}</AppText>
+        {profile.bio ? <AppText variant="body">{profile.bio}</AppText> : null}
       </View>
       <Surface variant="plain" style={[styles.infoGrid, {gap: spacing[3]}]}>
         <InfoItem label="Profile type" value={kindLabels[profile.kind]} />

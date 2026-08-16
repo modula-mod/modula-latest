@@ -48,6 +48,8 @@ export function ModulaMotionTabs({
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const previous = useRef(selectedTabId)
+  const scroller = useRef<ScrollView>(null)
+  const offsets = useRef<Record<string, number>>({})
 
   useEffect(() => {
     if (previous.current === selectedTabId) return
@@ -55,11 +57,16 @@ export function ModulaMotionTabs({
     if (!reduceMotion) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     }
+    const x = offsets.current[selectedTabId]
+    if (typeof x === 'number') {
+      scroller.current?.scrollTo({x: Math.max(0, x - 24), animated: !reduceMotion})
+    }
   }, [reduceMotion, selectedTabId])
 
   return (
     <View style={[styles.wrap, {borderBottomColor: colours.separator}]}>
       <ScrollView
+        ref={scroller}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={[
@@ -74,6 +81,9 @@ export function ModulaMotionTabs({
               accessibilityRole="tab"
               accessibilityLabel={tab.accessibilityLabel ?? tab.title}
               accessibilityState={{selected}}
+              onLayout={event => {
+                offsets.current[tab.id] = event.nativeEvent.layout.x
+              }}
               onPress={() => {
                 void selectionHaptic()
                 onSelectTab(tab.id)

@@ -1,103 +1,68 @@
-import {StyleSheet, View} from 'react-native'
+import {useCallback, useMemo, useState} from 'react'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
 import type {
   ModulaProfile,
   ProfilePresentationPreferences,
 } from '@/features/profile/contracts/profile'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ProfileMetricPicker} from '@/features/profile/components/ProfileMetricPicker'
+import {useProfileMetrics} from '@/features/profile/hooks/useProfileMetrics'
+import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
 
 type ProfileStatsProps = {
   profile: ModulaProfile
   ownerHandle: string
   presentation: ProfilePresentationPreferences
   onSelectTab: (tabId: string) => void
-}
-
-function formatCompact(value: number): string {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(value >= 10000000 ? 0 : 1)}M`
-  if (value >= 1000) return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}K`
-  return String(value)
-}
-
-function formatFull(value: number): string {
-  return new Intl.NumberFormat().format(value)
+  isOwner: boolean
 }
 
 /**
- * Inline stats — X / Bluesky / Facebook density.
- * Number + label on one baseline; not a four-column boxed strip.
+ * Profile Metric Picker host. Selecting a metric is not navigation —
+ * activation (tap selected / accessibility activate) opens the destination.
  */
 export function ProfileStats({
   profile,
   ownerHandle,
   presentation,
   onSelectTab,
+  isOwner,
 }: ProfileStatsProps) {
   const router = useRouter()
-  const {spacing} = useThemeTokens()
-  const baseRoute = `/profile/${profile.handle}`
-  const stats = [
-    {
-      id: 'posts',
-      label: 'Posts',
-      value: profile.postCount,
-      visible: true,
-      onPress: () => onSelectTab('posts'),
+  const {metrics, defaultMetricId} = useProfileMetrics({
+    profile,
+    ownerHandle,
+    presentation,
+    isOwner,
+  })
+  const [selectedMetricId, setSelectedMetricId] = useState<string>(defaultMetricId)
+
+  const resolvedSelectedId = useMemo(() => {
+    if (metrics.some(metric => metric.id === selectedMetricId)) return selectedMetricId
+    return metrics[0]?.id ?? defaultMetricId
+  }, [defaultMetricId, metrics, selectedMetricId])
+
+  const activate = useCallback(
+    (metric: ProfileMetricDescriptor) => {
+      if (metric.destination.type === 'profile-tab') {
+        onSelectTab(metric.destination.tabId)
+        return
+      }
+      if (metric.destination.type === 'route') {
+        router.push(metric.destination.href as Href)
+      }
     },
-    {
-      id: 'followers',
-      label: 'Followers',
-      value: profile.followerCount,
-      visible: presentation.showFollowerCount,
-      onPress: () => router.push(`${baseRoute}/followers` as Href),
-    },
-    {
-      id: 'following',
-      label: 'Following',
-      value: profile.followingCount,
-      visible: presentation.showFollowerCount,
-      onPress: () => router.push(`${baseRoute}/following` as Href),
-    },
-    {
-      id: 'modules',
-      label: 'Modules',
-      value: profile.moduleCount,
-      visible: presentation.showModuleCount,
-      onPress: () => onSelectTab('modules'),
-    },
-  ].filter(item => item.visible)
+    [onSelectTab, router],
+  )
+
+  if (!metrics.length) return null
 
   return (
-    <View style={[styles.row, {gap: spacing[5]}]}>
-      {stats.map(item => (
-        <AppPressable
-          key={item.id}
-          accessibilityLabel={`${formatFull(item.value)} ${item.label.toLowerCase()}`}
-          onPress={item.onPress}
-          style={styles.stat}>
-          <AppText variant="headline">{formatCompact(item.value)}</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            {item.label}
-          </AppText>
-        </AppPressable>
-      ))}
-    </View>
+    <ProfileMetricPicker
+      metrics={metrics}
+      selectedMetricId={resolvedSelectedId}
+      onSelectMetric={setSelectedMetricId}
+      onActivateMetric={activate}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  row: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  stat: {
-    alignItems: 'baseline',
-    flexDirection: 'row',
-    gap: 6,
-    minHeight: 32,
-  },
-})

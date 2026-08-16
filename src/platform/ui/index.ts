@@ -113,3 +113,7 @@ export type {ProductStatItem} from '@/platform/ui/chrome/product-stats-row'
 export {shareModulaText} from '@/platform/ui/share/share-modula-text'
 export {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
 export {HubAtmosphere} from '@/platform/ui/atmosphere/hub-atmosphere'
+export {
+  InvertedSelectedSurface,
+  InvertedSurfaceTransition,
+} from '@/platform/ui/geometry'

@@ -13,6 +13,7 @@ import {SystemSwitch} from '@/components/system/SystemSwitch'
 import {profileTabIdsFromPresentation} from '@/features/product/data/profileTabsSync'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {coreProfileTabs} from '@/features/profile/data/coreProfileTabs'
+import {ProfileMetricCustomizer} from '@/features/profile/components/ProfileMetricCustomizer'
 import {
   DEFAULT_PROFILE_PRESENTATION,
   type ProfileLayoutId,
@@ -268,6 +269,8 @@ export function CustomizeProfileScreen() {
             />
           </Section>
 
+          <ProfileMetricCustomizer draft={draft} onChange={setDraft} />
+
           <SettingsSection title="Profile indicators">
             <SettingsToggleRow
               label="Show Focus Halo"
@@ -275,22 +278,6 @@ export function CustomizeProfileScreen() {
               value={draft.showFocusHalo}
               onValueChange={value =>
                 setDraft(prev => ({...prev, showFocusHalo: value}))
-              }
-            />
-            <SettingsToggleRow
-              label="Show follower count"
-              description="Show follower and following counts already present on the profile."
-              value={draft.showFollowerCount}
-              onValueChange={value =>
-                setDraft(prev => ({...prev, showFollowerCount: value}))
-              }
-            />
-            <SettingsToggleRow
-              label="Show module count"
-              description="Show how many modules this profile has made visible."
-              value={draft.showModuleCount}
-              onValueChange={value =>
-                setDraft(prev => ({...prev, showModuleCount: value}))
               }
               last
             />

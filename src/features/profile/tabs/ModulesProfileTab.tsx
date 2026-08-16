@@ -1,4 +1,5 @@
 import {StyleSheet, View} from 'react-native'
+import {useRouter, type Href} from 'expo-router'
 
 import {
   canViewerSeeProfileField,
@@ -12,6 +13,7 @@ import type {ProfileModulePreview} from '@/features/profile/contracts/profileMod
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModulesProfileTab({profile, viewer}: ProfileTabRendererProps) {
+  const router = useRouter()
   const {spacing} = useThemeTokens()
   const catalogue = useModuleCatalogueQuery()
   const modules = profile.featuredModuleIds
@@ -25,10 +27,20 @@ export function ModulesProfileTab({profile, viewer}: ProfileTabRendererProps) {
         icon="modules"
         title={
           viewer.relationship === 'owner'
-            ? 'Featured modules will appear here.'
-            : 'No public modules are featured.'
+            ? 'No public modules yet.'
+            : 'No public modules.'
         }
-        description="Module cards are previews of profile-attached capabilities."
+        description={
+          viewer.relationship === 'owner'
+            ? 'Choose which installed modules appear on your profile.'
+            : 'Public modules from this profile will appear here.'
+        }
+        actionLabel={viewer.relationship === 'owner' ? 'Customize' : undefined}
+        onAction={
+          viewer.relationship === 'owner'
+            ? () => router.push('/profile/customize' as Href)
+            : undefined
+        }
       />
     )
   }

@@ -1,5 +1,5 @@
 import {useMemo, useState, type ReactNode} from 'react'
-import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
 import Animated, {
   useAnimatedScrollHandler,
@@ -25,7 +25,6 @@ import {ProfileHero} from '@/features/profile/components/ProfileHero'
 import {ProfileLayout} from '@/features/profile/components/ProfileLayout'
 import {ProfileLinkCard} from '@/features/profile/components/ProfileLinkCard'
 import {ProfileModuleCard} from '@/features/profile/components/ProfileModuleCard'
-import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {ProfileTabBar} from '@/features/profile/components/ProfileTabBar'
 import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
@@ -40,7 +39,6 @@ import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useHydrated} from '@/lib/useHydrated'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 type ProfileShellProps = {
   mode: ProfileScreenMode
@@ -144,8 +142,9 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const {width} = useWindowDimensions()
   const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
-  const insets = useSafeAreaInsets()
-  const tabPadding = useFloatingTabBarContentPadding()
+  const tabPadding = useFloatingTabBarContentPadding({
+    automaticInsetsDisabled: true,
+  })
   const registry = useProfileRegistry()
   const {presentation} = useProfile()
   const ownerQuery = useOwnerProfileQuery()
@@ -261,7 +260,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       viewer={viewer}
       presentation={presentation}
       ownerHandle={ownerProfile.handle}
-      showStats={presentation.layoutId !== 'creator' && presentation.layoutId !== 'minimal'}
+      showStats={presentation.layoutId !== 'minimal'}
       showActions={presentation.layoutId !== 'minimal'}
       compact={presentation.layoutId === 'minimal' || isExpanded}
       onSelectTab={setSelectedTabRequest}
@@ -294,18 +293,23 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     </View>
   )
 
+  const stickyTabIndex =
+    (mode === 'preview' ? 1 : 0) +
+    (!isExpanded && presentation.layoutId !== 'minimal' ? 1 : 0) +
+    (presentation.layoutId === 'creator' && !isExpanded ? 1 : 0) +
+    (presentation.layoutId === 'professional' && !isExpanded ? 1 : 0) +
+    (presentation.layoutId === 'minimal' ? 1 : 0)
+
   const main = (
     <Animated.ScrollView
       contentInsetAdjustmentBehavior="never"
       scrollEventThrottle={16}
       onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
+      stickyHeaderIndices={[stickyTabIndex]}
       contentContainerStyle={[
         styles.scrollContent,
-        {
-          paddingBottom:
-            Platform.OS === 'ios' ? 72 + insets.bottom : tabPadding,
-        },
+        {paddingBottom: tabPadding},
       ]}>
       {mode === 'preview' ? <PreviewBar /> : null}
       {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
@@ -333,21 +337,13 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
           />
         </View>
       ) : null}
-      {presentation.layoutId === 'creator' ? (
-        <View style={{paddingHorizontal: spacing[4]}}>
-          <ProfileStats
-            profile={profile}
-            ownerHandle={ownerProfile.handle}
-            presentation={presentation}
-            onSelectTab={setSelectedTabRequest}
-          />
-        </View>
-      ) : null}
-      <ProfileTabBar
-        tabs={visibleTabs}
-        selectedTabId={selectedTabId}
-        onSelectTab={setSelectedTabRequest}
-      />
+      <View style={[styles.stickyTabs, {backgroundColor: colours.canvas}]}>
+        <ProfileTabBar
+          tabs={visibleTabs}
+          selectedTabId={selectedTabId}
+          onSelectTab={setSelectedTabRequest}
+        />
+      </View>
       <ProfileTabContent profile={profile} viewer={viewer} tab={selectedTab} />
     </Animated.ScrollView>
   )
@@ -359,7 +355,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         main={main}
         right={isExpanded ? contextRail : undefined}
       />
-      <ProfileCoverChrome showBack={mode !== 'owner'} />
+      <ProfileCoverChrome showBack={mode !== 'owner'} owner={viewer.canEdit} />
     </View>
   )
 }
@@ -480,6 +476,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    minWidth: 0,
+  },
+  stickyTabs: {
     minWidth: 0,
   },
 })

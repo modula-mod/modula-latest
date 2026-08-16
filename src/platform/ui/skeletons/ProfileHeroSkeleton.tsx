@@ -1,24 +1,37 @@
 import {StyleSheet, View} from 'react-native'
 
 import {SkeletonBlock, SkeletonRow} from '@/platform/ui/skeletons/SkeletonBlock'
+import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ProfileHeroSkeleton() {
   const {spacing} = useThemeTokens()
+  const avatar = PROFILE_LAYOUT.avatarCompact
 
   return (
     <View>
-      <SkeletonBlock height={240} width="100%" borderRadius={0} />
+      <SkeletonBlock height={PROFILE_LAYOUT.coverBodyCompact + 48} width="100%" borderRadius={0} />
       <View style={[styles.body, {gap: spacing[3], paddingHorizontal: spacing[4]}]}>
-        <SkeletonBlock height={92} width={92} borderRadius={46} style={styles.avatar} />
+        <SkeletonBlock
+          height={avatar}
+          width={avatar}
+          borderRadius={avatar / 2}
+          style={styles.avatar}
+        />
         <View style={styles.actions} />
         <SkeletonBlock height={22} width="48%" />
         <SkeletonBlock height={14} width="36%" />
         <SkeletonBlock height={14} width="90%" />
-        <SkeletonRow gap={spacing[5]}>
-          <SkeletonBlock height={16} width={72} />
-          <SkeletonBlock height={16} width={88} />
-          <SkeletonBlock height={16} width={88} />
+        <View style={styles.metrics}>
+          <SkeletonBlock height={18} width={56} />
+          <SkeletonBlock height={28} width={88} />
+          <SkeletonBlock height={18} width={56} />
+        </View>
+        <SkeletonRow gap={spacing[4]}>
+          <SkeletonBlock height={14} width={52} />
+          <SkeletonBlock height={14} width={52} />
+          <SkeletonBlock height={14} width={52} />
+          <SkeletonBlock height={14} width={64} />
         </SkeletonRow>
       </View>
     </View>
@@ -30,9 +43,14 @@ const styles = StyleSheet.create({
     height: 44,
   },
   avatar: {
-    marginTop: -46,
+    marginTop: -40,
   },
   body: {
     width: '100%',
+  },
+  metrics: {
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
   },
 })

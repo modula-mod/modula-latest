@@ -3,6 +3,11 @@ import {
   type ProfileLayoutId,
   type ProfilePresentationPreferences,
 } from '@/features/profile/contracts/profile'
+import {
+  DEFAULT_PROFILE_METRIC_ORDER,
+  isProfileMetricId,
+  type ProfileMetricId,
+} from '@/features/profile/model/profile-metrics'
 
 const VALID_LAYOUT_IDS = new Set<ProfileLayoutId>([
   'social',
@@ -15,6 +20,22 @@ const CORE_TAB_IDS = ['posts', 'media', 'about', 'modules', 'links', 'shop', 'ag
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every(item => typeof item === 'string')
+}
+
+function migrateHiddenMetricIds(
+  candidate: Partial<ProfilePresentationPreferences>,
+): ProfileMetricId[] {
+  if (isStringArray(candidate.hiddenMetricIds)) {
+    return [...new Set(candidate.hiddenMetricIds.filter(isProfileMetricId))]
+  }
+  const hidden: ProfileMetricId[] = []
+  if (candidate.showFollowerCount === false) {
+    hidden.push('followers', 'following')
+  }
+  if (candidate.showModuleCount === false) {
+    hidden.push('modules')
+  }
+  return hidden
 }
 
 export function validateProfilePresentation(
@@ -42,6 +63,34 @@ export function validateProfilePresentation(
       ? candidate.defaultTabId
       : 'posts'
 
+  const orderedMetricIds = uniqueMetrics([
+    ...(isStringArray(candidate.orderedMetricIds)
+      ? candidate.orderedMetricIds.filter(isProfileMetricId)
+      : []),
+    ...DEFAULT_PROFILE_METRIC_ORDER,
+  ])
+  let hiddenMetricIds = migrateHiddenMetricIds(candidate)
+  const visible = orderedMetricIds.filter(id => !hiddenMetricIds.includes(id))
+  if (!visible.length) {
+    hiddenMetricIds = hiddenMetricIds.filter(id => id !== 'posts')
+  }
+  const visibleAfter = orderedMetricIds.filter(id => !hiddenMetricIds.includes(id))
+  const defaultMetricId =
+    typeof candidate.defaultMetricId === 'string' &&
+    isProfileMetricId(candidate.defaultMetricId) &&
+    visibleAfter.includes(candidate.defaultMetricId)
+      ? candidate.defaultMetricId
+      : visibleAfter[0] ?? 'posts'
+
+  const showFollowerCount =
+    typeof candidate.showFollowerCount === 'boolean'
+      ? candidate.showFollowerCount
+      : !hiddenMetricIds.includes('followers')
+  const showModuleCount =
+    typeof candidate.showModuleCount === 'boolean'
+      ? candidate.showModuleCount
+      : !hiddenMetricIds.includes('modules')
+
   return {
     schemaVersion: 1,
     layoutId,
@@ -52,13 +101,14 @@ export function validateProfilePresentation(
       typeof candidate.showFocusHalo === 'boolean'
         ? candidate.showFocusHalo
         : DEFAULT_PROFILE_PRESENTATION.showFocusHalo,
-    showModuleCount:
-      typeof candidate.showModuleCount === 'boolean'
-        ? candidate.showModuleCount
-        : DEFAULT_PROFILE_PRESENTATION.showModuleCount,
-    showFollowerCount:
-      typeof candidate.showFollowerCount === 'boolean'
-        ? candidate.showFollowerCount
-        : DEFAULT_PROFILE_PRESENTATION.showFollowerCount,
+    showModuleCount,
+    showFollowerCount,
+    orderedMetricIds,
+    hiddenMetricIds,
+    defaultMetricId,
   }
+}
+
+function uniqueMetrics(ids: ProfileMetricId[]): ProfileMetricId[] {
+  return [...new Set(ids)]
 }

@@ -11,10 +11,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
-import {
-  ProfileCover,
-  profileCoverBody,
-} from '@/features/profile/components/ProfileCover'
+import {ProfileCover} from '@/features/profile/components/ProfileCover'
 import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
 import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {
@@ -25,6 +22,11 @@ import {
   ProfileCoverEditor,
   type ProfileCoverDraft,
 } from '@/features/profile/editor/profile-cover-editor'
+import {
+  profileAvatarSize,
+  profileAvatarSlotSize,
+  profileCoverBody,
+} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileHeroProps = {
@@ -40,11 +42,9 @@ type ProfileHeroProps = {
 }
 
 /**
- * X / Instagram / Bluesky / LinkedIn: cover is full-bleed from the status bar
- * → avatar hanging over the banner (absolute, so it cannot eat the name) →
- * identity and inline stats on the canvas. Edit is an Expo UI outlined button
- * on the avatar row. Cover photos stay `expo-image` — `@expo/ui` Image is
- * SF Symbols only (Expo SDK 57 docs).
+ * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
+ * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
+ * Avatar hangs over the inverted cover→canvas transition; identity sits below.
  */
 export function ProfileHero({
   profile,
@@ -61,9 +61,8 @@ export function ProfileHero({
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
-  const avatarSize = isCompact ? 92 : 116
-  const haloExtra = presentation.showFocusHalo ? 12 : 0
-  const slotSize = avatarSize + haloExtra
+  const avatarSize = profileAvatarSize(isCompact)
+  const slotSize = profileAvatarSlotSize(isCompact, presentation.showFocusHalo)
   const coverBody = profileCoverBody(isCompact)
   const canEdit = viewer.canEdit
 
@@ -78,6 +77,8 @@ export function ProfileHero({
         profile={profile}
         compact={isCompact}
         canEdit={canEdit}
+        slotSize={slotSize}
+        contentInset={spacing[4]}
         onEditPress={() => setCoverEditorOpen(true)}
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
@@ -130,8 +131,8 @@ export function ProfileHero({
           styles.body,
           {
             paddingHorizontal: spacing[4],
-            paddingTop: spacing[2],
-            paddingBottom: spacing[4],
+            paddingTop: spacing[1],
+            paddingBottom: spacing[3],
             gap: spacing[3],
           },
         ]}>
@@ -144,10 +145,12 @@ export function ProfileHero({
         <HeroViewingCopy viewer={viewer} />
         {showStats ? (
           <ProfileStats
+            key={profile.id}
             profile={profile}
             ownerHandle={ownerHandle}
             presentation={presentation}
             onSelectTab={onSelectTab}
+            isOwner={viewer.canEdit}
           />
         ) : null}
       </View>

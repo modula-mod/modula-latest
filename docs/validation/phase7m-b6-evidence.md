@@ -26,9 +26,13 @@ NativeTabs / Liquid Glass **after** recapture (same device, Metro on `cursor/pha
 docs/validation/evidence/phase7m-b6/screenshots-native-tabs/
 ```
 
-See that folder’s README for the system tab bar, Module Detail ControlGroup, and overlay extraLarge chrome.
+Profile evolution (Metric Picker, inverted geometry, sticky tabs) on `cursor/phase7m-b6-profile-evolution-8344`:
 
-## Founder visual review set (captured)
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-evolution/
+```
+
+See that folder’s README. Founder visual approval is still required.
 
 ## Founder visual review set (captured)
 

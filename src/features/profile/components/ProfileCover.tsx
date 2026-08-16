@@ -1,5 +1,5 @@
 import {Image} from 'expo-image'
-import {Pressable, StyleSheet, View} from 'react-native'
+import {Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,12 +8,19 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
+import {useReduceMotion} from '@/lib/accessibility'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {
   applyProfilePhotoMenuAction,
   profilePhotoMenuActions,
 } from '@/features/profile/components/profile-photo-menu'
+import {
+  PROFILE_LAYOUT,
+  profileCoverBody,
+  profileCoverHeight,
+} from '@/features/profile/model/profile-layout'
 import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
+import {InvertedSurfaceTransition} from '@/platform/ui/geometry'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -28,20 +35,15 @@ type ProfileCoverProps = {
   scrollY?: SharedValue<number>
   onPhotoUri?: (uri: string) => void
   onPhotoRemove?: () => void
+  slotSize?: number
+  contentInset?: number
 }
 
-/** Banner height below the status bar (X / Bluesky / LinkedIn). */
-export const PROFILE_COVER_BODY = 180
-const TOP_BLUR = 28
-const BOTTOM_BLUR = 72
+export const PROFILE_COVER_BODY = PROFILE_LAYOUT.coverBodyRegular
+const TOP_BLUR = PROFILE_LAYOUT.coverTopBlur
+const BOTTOM_BLUR = PROFILE_LAYOUT.coverBottomBlur
 
-export function profileCoverBody(compact: boolean | undefined) {
-  return compact ? 156 : PROFILE_COVER_BODY
-}
-
-export function profileCoverHeight(compact: boolean | undefined, insetTop: number) {
-  return profileCoverBody(compact) + insetTop
-}
+export {profileCoverBody, profileCoverHeight}
 
 export function ProfileCover({
   profile,
@@ -53,15 +55,28 @@ export function ProfileCover({
   scrollY,
   onPhotoUri,
   onPhotoRemove,
+  slotSize = PROFILE_LAYOUT.avatarCompact,
+  contentInset = 16,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
-  const {colours} = useThemeTokens()
+  const {width} = useWindowDimensions()
+  const {colours, inverted} = useThemeTokens()
+  const reduceMotion = useReduceMotion()
   const height = profileCoverHeight(compact, insets.top)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
   const emptyFill = profile.coverColour ?? colours.borderStrong
+  const hasPhoto = Boolean(uri) && kind !== 'none'
+  const transitionHeight = Math.min(
+    Math.round(slotSize / 2 + inverted.md),
+    PROFILE_LAYOUT.coverBodyCompact,
+  )
+  const trayWidth = slotSize + contentInset + inverted.sm
 
   const animatedStyle = useAnimatedStyle(() => {
+    if (reduceMotion) {
+      return {transform: [{translateY: 0}, {scale: 1}]}
+    }
     const y = scrollY?.value ?? 0
     return {
       transform: [
@@ -92,7 +107,7 @@ export function ProfileCover({
         },
         animatedStyle,
       ]}>
-      {uri && kind !== 'none' ? (
+      {hasPhoto ? (
         <Image
           source={{uri}}
           style={StyleSheet.absoluteFill}
@@ -102,7 +117,7 @@ export function ProfileCover({
       ) : kind === 'none' ? null : (
         <CoverAtmosphere wash={emptyFill} />
       )}
-      {uri && kind !== 'none' ? (
+      {hasPhoto ? (
         <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
           <ProgressiveBlurBand
             height={insets.top + TOP_BLUR}
@@ -112,12 +127,27 @@ export function ProfileCover({
           />
         </View>
       ) : null}
-      <View pointerEvents="none" style={styles.bottomBlur}>
-        <ProgressiveBlurBand
-          height={BOTTOM_BLUR}
-          topHeavy={false}
-          strength="soft"
-          intensity={52}
+      {hasPhoto ? (
+        <View pointerEvents="none" style={styles.bottomBlur}>
+          <ProgressiveBlurBand
+            height={BOTTOM_BLUR}
+            topHeavy={false}
+            strength="soft"
+            intensity={52}
+          />
+        </View>
+      ) : null}
+      <View pointerEvents="none" style={styles.transition}>
+        <InvertedSurfaceTransition
+          edge="top"
+          side="leading"
+          size="profile"
+          width={width}
+          height={transitionHeight}
+          fill={colours.canvas}
+          trayWidth={trayWidth}
+          trayHeight={Math.min(transitionHeight, slotSize * 0.62)}
+          cornerRadius={0}
         />
       </View>
     </Animated.View>
@@ -151,7 +181,7 @@ export function ProfileCover({
       accessibilityLabel="Cover photo actions"
       title="Cover photo"
       actions={profilePhotoMenuActions({
-        hasPhoto: Boolean(uri) && kind !== 'none',
+        hasPhoto,
         removeLabel: 'Remove cover image',
       })}
       onAction={id => {
@@ -184,5 +214,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
+  },
+  transition: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
 })
