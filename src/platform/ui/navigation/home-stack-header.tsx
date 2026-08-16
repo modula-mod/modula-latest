@@ -47,7 +47,7 @@ export function HomeHeaderLeft() {
       {visible ? (
         <ModulaIconButton
           icon="menu"
-          chrome="glass"
+          chrome="plain"
           accessibilityLabel="Open navigation drawer"
           testID="home-open-drawer"
           onPress={() => {
@@ -88,7 +88,7 @@ export function HomeHeaderCreate() {
       {visible ? (
         <ModulaIconButton
           icon="create"
-          chrome="glass"
+          chrome="plain"
           accessibilityLabel="Create a post"
           onPress={() => {
             void selectionHaptic()
@@ -111,7 +111,7 @@ export function HomeHeaderMessages() {
       {visible ? (
         <ModulaIconButton
           icon="messages"
-          chrome="glass"
+          chrome="plain"
           accessibilityLabel="Open messages"
           onPress={() => router.push('/messages' as Href)}
         />

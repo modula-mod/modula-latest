@@ -106,10 +106,16 @@ Siren.uix / Apple-density references inform hierarchy (overlapping identity, gro
 
 App Store product-page overlay is the reference for **small circular glass controls** — back and share — not a floating glass tab bar over the feed.
 
-- `ChromeCircleButton` / `ModulaIconButton` default overlay chrome is circular `glass` (falls back to `bordered` when Liquid Glass is unavailable)
-- `ChromeOverflowMenu` / `ChromeIconMenu` use the same circular glass trigger
-- `SecondaryScreenHeader` carries glass back on secondary routes; `onShare` and `right` can combine (share + overflow)
-- `ModulaControlGroup` is a Menu + ControlGroup cluster with semantic `icon` names — features never pass SF Symbol strings
+**One chrome layer.** iOS 26 `unstable_header*Items` already wraps icons in a shared liquid-glass capsule. Glyphs inside that capsule are `plain`. Circular `glass` is only for overlays on artwork (`SecondaryScreenHeader`, module detail). Never both — that is the “buttons inside buttons” defect.
+
+- `ToolbarChrome` / `toolbarIconModifiers`: `plain` or circular `glass`, both `controlSize('regular')` (44pt hit)
+- Native Home / Profile / Activity / Board headers pass `chrome="plain"`
+- `ChromeCircleButton` / overlay menus keep circular `glass`
+- Compose accessory matches the same 44pt toolbar scale
+- `ModulaControlGroup` is lab-only; product module rows use tap + long-press context menu
+- Customize tabs are a grouped Settings list + switch; reorder is long-press, not extra circles
+- Module Detail shows one compact GET/OPEN pill; Disable / Configure / Uninstall live in overflow
+- Profile hero: cover → avatar overlapping cover only → identity on canvas → one compact Edit/Follow pill. No identity sheet, no More next to Edit Profile
 - `ModulaPageTabView` is **in-screen paging only** (SwiftUI `tabViewStyle({ type: 'page' })`). Shell tabs stay `expo-router` / `PlatformTabs`
 - Product Hub stays editorial. Do not restore Discover / Installed / Updates segmented marketplace chrome
 

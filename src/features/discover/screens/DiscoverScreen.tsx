@@ -161,6 +161,7 @@ export function DiscoverScreen() {
                 />
               </View>
               <ChromeOverflowMenu
+                chrome="plain"
                 accessibilityLabel="Discover filter menu"
                 title="Discover filters"
                 actions={[

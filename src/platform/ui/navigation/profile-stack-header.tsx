@@ -16,6 +16,7 @@ function ProfileShareMenu() {
     <ChromeIconMenu
       systemImage="square.and.arrow.up"
       icon="share"
+      chrome="plain"
       accessibilityLabel="Share profile"
       title="Share"
       actions={[
@@ -36,16 +37,21 @@ function ProfileOverflowMenu() {
   const router = useRouter()
   return (
     <ChromeOverflowMenu
+      chrome="plain"
       accessibilityLabel="Open profile actions"
       title="Profile"
       actions={[
         {id: 'edit', label: 'Edit Profile', icon: 'profile'},
         {id: 'customize', label: 'Customize', icon: 'appearance'},
+        {id: 'os', label: 'Profile-OS', icon: 'settings'},
+        {id: 'preview', label: 'View as visitor', icon: 'eye'},
         {id: 'settings', label: 'Settings', icon: 'settings'},
       ]}
       onAction={id => {
         if (id === 'edit') router.push('/profile/edit' as Href)
         if (id === 'customize') router.push('/profile/customize' as Href)
+        if (id === 'os') router.push('/profile/os' as Href)
+        if (id === 'preview') router.push('/profile/preview' as Href)
         if (id === 'settings') router.push('/settings' as Href)
       }}
     />

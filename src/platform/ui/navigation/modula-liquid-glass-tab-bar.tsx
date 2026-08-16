@@ -365,7 +365,7 @@ export function ModulaLiquidGlassTabBar({
             <AppIcon
               name="create"
               colour={colours.accentForeground}
-              size={26}
+              size={22}
             />
           </Animated.View>
         </ChromeSurface>
@@ -417,9 +417,9 @@ const styles = StyleSheet.create({
   },
   plusButtonGlass: {
     alignItems: 'center',
-    height: 60,
+    height: 44,
     justifyContent: 'center',
-    width: 60,
+    width: 44,
   },
   profileAvatar: {
     borderWidth: 0,

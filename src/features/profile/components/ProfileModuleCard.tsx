@@ -8,7 +8,6 @@ import {Surface} from '@/components/primitives/Surface'
 import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {ProfileVisibilityBadge} from '@/features/profile/components/ProfileVisibilityBadge'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileModuleCardProps = {
@@ -76,18 +75,6 @@ export function ProfileModuleCard({module}: ProfileModuleCardProps) {
             <ProfileVisibilityBadge
               visibility={module.visibility}
               contextLabel={`${module.name} module`}
-            />
-            <ModulaControlGroup
-              label="Module"
-              actions={[
-                {id: 'open', label: 'Open', icon: 'modules'},
-                {id: 'preview', label: 'Preview', icon: 'eye'},
-                {id: 'pin', label: 'Pin', icon: 'bookmark'},
-              ]}
-              onAction={id => {
-                if (id === 'open' || id === 'preview') open()
-                if (id === 'pin') router.push('/board' as Href)
-              }}
             />
           </View>
         </Surface>

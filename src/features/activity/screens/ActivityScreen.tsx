@@ -172,6 +172,7 @@ export function ActivityScreen() {
                 <AppIcon name="settings" colour={colours.textSecondary} />
               </AppPressable>
               <ChromeOverflowMenu
+                chrome="plain"
                 accessibilityLabel="More activity actions"
                 title="Activity"
                 actions={[

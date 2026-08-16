@@ -1,14 +1,9 @@
 import {Button, Host} from '@expo/ui/swift-ui'
-import {
-  buttonBorderShape,
-  buttonStyle,
-  controlSize,
-  labelStyle,
-} from '@expo/ui/swift-ui/modifiers'
 import type {StyleProp, ViewStyle} from 'react-native'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
+import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
@@ -39,19 +34,9 @@ export function ModulaIconButton({
   const glassOk =
     chrome === 'glass' &&
     (isNativeGlassRuntimeAvailable() || isCallstackLiquidGlassNativeAvailable())
-  const styleName =
-    chrome === 'plain' ? 'plain' : glassOk ? 'glass' : 'bordered'
-
-  // Plain = glyph only (no filled disc). Glass/bordered keep circular chrome.
-  const modifiers =
-    chrome === 'plain'
-      ? [buttonStyle('plain'), labelStyle('iconOnly'), controlSize('regular')]
-      : [
-          buttonStyle(styleName),
-          labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
-          controlSize('large'),
-        ]
+  const modifiers = toolbarIconModifiers(chrome === 'plain' ? 'plain' : 'glass', {
+    glassAvailable: chrome === 'glass' && glassOk,
+  })
 
   return (
     <Host matchContents style={style}>

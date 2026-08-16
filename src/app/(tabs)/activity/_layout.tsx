@@ -11,6 +11,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 function ActivityFilterMenu() {
   return (
     <ChromeOverflowMenu
+      chrome="plain"
       accessibilityLabel="Filter activity"
       title="Filter"
       actions={[

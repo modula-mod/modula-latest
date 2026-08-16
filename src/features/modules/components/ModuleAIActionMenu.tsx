@@ -91,6 +91,7 @@ export function ModuleAIActionMenu({
   return (
     <>
       <ChromeOverflowMenu
+        chrome="plain"
         title="AI tools"
         accessibilityLabel="AI tools"
         actions={runnableActions.map(action => ({

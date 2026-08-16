@@ -14,7 +14,6 @@ import {useInstalledModulesQuery, useModuleContributionQuery} from '@/features/m
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
@@ -196,6 +195,7 @@ export function BoardScreen() {
   useLayoutEffect(() => {
     const renderMenu = () => (
       <ChromeOverflowMenu
+        chrome="plain"
         accessibilityLabel="Board layout menu"
         title="Board"
         actions={[
@@ -524,44 +524,42 @@ export function BoardScreen() {
               <View style={[styles.moduleGrid, {gap: spacing[3]}]}>
                 {modules.map(module => (
                   <View key={module.id} style={styles.moduleCardWrap}>
-                    <AppPressable
-                      accessibilityLabel={`Open ${module.name}`}
-                      onPress={() => router.push(moduleMarketplaceHref(module.id))}
-                      style={[
-                        styles.moduleCard,
-                        {
-                          backgroundColor: colours.surface,
-                          borderColor: colours.border,
-                          borderRadius: radius.large,
-                          padding: spacing[4],
-                        },
-                      ]}>
-                      <AppIcon name={module.icon} colour={colours.text} />
-                      <View style={{gap: spacing[1]}}>
-                        <AppText variant="headline">{module.name}</AppText>
+                    <ModulaContextMenu
+                      accessibilityLabel={`${module.name} module actions`}
+                      actions={[
+                        {id: 'open', label: 'Open', icon: 'modules'},
+                        {id: 'preview', label: 'Preview', icon: 'eye'},
+                        {id: 'pin', label: 'Pin to Board', icon: 'bookmark'},
+                      ]}
+                      onAction={id => {
+                        if (id === 'open' || id === 'preview' || id === 'pin') {
+                          router.push(moduleMarketplaceHref(module.id))
+                        }
+                      }}>
+                      <AppPressable
+                        accessibilityLabel={`Open ${module.name}`}
+                        onPress={() => router.push(moduleMarketplaceHref(module.id))}
+                        style={[
+                          styles.moduleCard,
+                          {
+                            backgroundColor: colours.surface,
+                            borderColor: colours.border,
+                            borderRadius: radius.large,
+                            padding: spacing[4],
+                          },
+                        ]}>
+                        <AppIcon name={module.icon} colour={colours.text} />
+                        <View style={{gap: spacing[1]}}>
+                          <AppText variant="headline">{module.name}</AppText>
+                          <AppText variant="caption" colour="textSecondary">
+                            {module.description}
+                          </AppText>
+                        </View>
                         <AppText variant="caption" colour="textSecondary">
-                          {module.description}
+                          {module.status}
                         </AppText>
-                      </View>
-                      <AppText variant="caption" colour="textSecondary">
-                        {module.status}
-                      </AppText>
-                    </AppPressable>
-                    <View style={styles.controlGroup}>
-                      <ModulaControlGroup
-                        label="Module"
-                        actions={[
-                          {id: 'open', label: 'Open', icon: 'modules'},
-                          {id: 'preview', label: 'Preview', icon: 'eye'},
-                          {id: 'pin', label: 'Pin', icon: 'bookmark'},
-                        ]}
-                        onAction={id => {
-                          if (id === 'open' || id === 'preview') {
-                            router.push(moduleMarketplaceHref(module.id))
-                          }
-                        }}
-                      />
-                    </View>
+                      </AppPressable>
+                    </ModulaContextMenu>
                   </View>
                 ))}
               </View>
@@ -750,9 +748,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     flexGrow: 1,
     minWidth: 140,
-  },
-  controlGroup: {
-    marginTop: 8,
   },
   customizeHit: {
     justifyContent: 'center',

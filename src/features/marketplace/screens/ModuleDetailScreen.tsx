@@ -12,7 +12,7 @@ import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
 import {ModulePreview} from '@/features/modules/components/presentation/ModulePreview'
 import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
-import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
+import {resolveModuleInstallPresentation, isInstalledModuleState} from '@/features/modules/identity/installPresentation'
 import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useModuleDetailQuery} from '@/features/modules/hooks'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
@@ -22,6 +22,7 @@ import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {type ModulaIconName} from '@/platform/ui/icons'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -177,6 +178,7 @@ export function ModuleDetailScreen() {
 
   const copy = productCopyFor(module.moduleId, module.name, module.longDescription || module.description)
   const presentation = resolveModuleInstallPresentation(module)
+  const installed = isInstalledModuleState(module.installationState)
   const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
   const showSticky = !heroActionVisible
   const releaseNotes = module.releaseNotes?.filter(Boolean) ?? []
@@ -185,6 +187,23 @@ export function ModuleDetailScreen() {
       title: copy.name,
       message: `${copy.name} — ${copy.short}`,
     })
+  const overflowActions: ModulaActionItem[] = [
+    {id: 'share', label: 'Share', icon: 'share'},
+    {id: 'hub', label: 'Product Hub', icon: 'modules'},
+    ...(module.installationState === 'disabled' || module.installationState === 'installed'
+      ? [{id: 'enable', label: 'Enable', icon: 'check' as const}]
+      : []),
+    ...(module.installationState === 'enabled'
+      ? [{id: 'disable', label: 'Disable', icon: 'privacy' as const}]
+      : []),
+    ...(module.installationState === 'updateAvailable'
+      ? [{id: 'update', label: 'Update', icon: 'update' as const}]
+      : []),
+    {id: 'settings', label: installed ? 'Configure' : 'Module settings', icon: 'settings'},
+    ...(installed
+      ? [{id: 'uninstall', label: 'Uninstall', icon: 'trash' as const, style: 'destructive' as const}]
+      : []),
+  ]
   const installLabel =
     module.installationState === 'available'
       ? 'Available'
@@ -239,14 +258,14 @@ export function ModuleDetailScreen() {
           <ChromeOverflowMenu
             accessibilityLabel={`${copy.name} actions`}
             title={copy.name}
-            actions={[
-              {id: 'share', label: 'Share', icon: 'share'},
-              {id: 'hub', label: 'Product Hub', icon: 'modules'},
-              {id: 'settings', label: 'Module settings', icon: 'settings'},
-            ]}
+            actions={overflowActions}
             onAction={id => {
               if (id === 'share') shareModule()
               if (id === 'hub') router.push('/product' as Href)
+              if (id === 'enable') void transition('enable')
+              if (id === 'disable') void transition('disable')
+              if (id === 'update') void transition('update')
+              if (id === 'uninstall') void transition('uninstall')
               if (id === 'settings') {
                 router.push(
                   `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
@@ -302,11 +321,8 @@ export function ModuleDetailScreen() {
                   productName={copy.name}
                   onPreview={openPreview}
                   onOpen={openModule}
-                  onSettings={() => router.push(`/settings/modules/${encodeURIComponent(module.moduleId)}` as Href)}
                   onEnable={() => void transition('enable')}
-                  onDisable={() => void transition('disable')}
                   onUpdate={() => void transition('update')}
-                  onUninstall={() => void transition('uninstall')}
                 />
               )}
             </View>
@@ -443,11 +459,8 @@ function ActionRow({
   productName,
   onPreview,
   onOpen,
-  onSettings,
   onEnable,
-  onDisable,
   onUpdate,
-  onUninstall,
 }: {
   state: ModuleInstallationState
   busy: string | null
@@ -458,13 +471,9 @@ function ActionRow({
   productName: string
   onPreview: () => void
   onOpen: () => void
-  onSettings: () => void
   onEnable: () => void
-  onDisable: () => void
   onUpdate: () => void
-  onUninstall: () => void
 }) {
-  const {spacing} = useThemeTokens()
   const presentation = resolveModuleInstallPresentation({
     moduleId,
     installable,
@@ -472,35 +481,34 @@ function ActionRow({
     priceState,
     latestVersion,
   })
-  const installed = ['installed', 'enabled', 'disabled', 'updateAvailable', 'configurationRequired'].includes(state)
+  const loading =
+    (presentation.primaryAction === 'Enable' && busy === 'enable') ||
+    (presentation.primaryAction === 'Update' && busy === 'update') ||
+    (presentation.primaryAction === 'Install' &&
+      (busy === 'install' || busy === 'install-enable'))
+  const onPrimary = () => {
+    if (presentation.primaryAction === 'Open') {
+      onOpen()
+      return
+    }
+    if (presentation.primaryAction === 'Enable') {
+      onEnable()
+      return
+    }
+    if (presentation.primaryAction === 'Update') {
+      onUpdate()
+      return
+    }
+    onPreview()
+  }
   return (
-    <View style={[styles.actions, {gap: spacing[2]}]}>
-      {!installed ? (
-        <ModuleAction
-          presentation={presentation}
-          productName={productName}
-          fullWidth
-          onPress={onPreview}
-        />
-      ) : null}
-      {state === 'disabled' || state === 'installed' ? (
-        <ModulaButton label="Enable" accessibilityLabel="Enable module" loading={busy === 'enable'} fullWidth onPress={onEnable} />
-      ) : null}
-      {state === 'enabled' || state === 'configurationRequired' ? (
-        <ModulaButton label="Open" accessibilityLabel="Open module" fullWidth onPress={onOpen} />
-      ) : null}
-      {state === 'enabled' ? (
-        <ModulaButton label="Disable" role="secondary" accessibilityLabel="Disable module" loading={busy === 'disable'} fullWidth onPress={onDisable} />
-      ) : null}
-      {state === 'updateAvailable' ? (
-        <ModulaButton label="Update" accessibilityLabel="Update module" loading={busy === 'update'} fullWidth onPress={onUpdate} />
-      ) : null}
-      {installed ? (
-        <ModulaButton label="Configure" role="secondary" accessibilityLabel="Open module settings" fullWidth onPress={onSettings} />
-      ) : null}
-      {installed ? (
-        <ModulaButton label="Uninstall" role="destructive" accessibilityLabel="Uninstall module" loading={busy === 'uninstall'} fullWidth onPress={onUninstall} />
-      ) : null}
+    <View style={styles.actions}>
+      <ModuleAction
+        presentation={presentation}
+        productName={productName}
+        loading={loading}
+        onPress={onPrimary}
+      />
     </View>
   )
 }
@@ -541,7 +549,7 @@ function backendModeLabel(mode: string): string {
 }
 
 const styles = StyleSheet.create({
-  actions: {alignItems: 'stretch', width: '100%'},
+  actions: {alignItems: 'flex-start'},
   chrome: {width: '100%'},
   chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 44},
   content: {padding: 16},

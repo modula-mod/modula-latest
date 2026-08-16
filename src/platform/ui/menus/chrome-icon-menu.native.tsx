@@ -1,14 +1,10 @@
 import {Host, Menu} from '@expo/ui/swift-ui'
-import {
-  buttonBorderShape,
-  buttonStyle,
-  controlSize,
-  labelStyle,
-} from '@expo/ui/swift-ui/modifiers'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
+import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
+import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
 type ChromeIconMenuProps = {
@@ -18,10 +14,13 @@ type ChromeIconMenuProps = {
   actions: ModulaActionItem[]
   onAction: (id: string) => void
   accessibilityLabel: string
+  /** glass = overlay circle. plain = glyph inside a native header capsule. */
+  chrome?: ToolbarChrome
 }
 
 /**
- * Native SwiftUI Menu with a circular glass SF Symbol trigger.
+ * Native SwiftUI Menu. Overlay screens keep circular glass; native stack
+ * headers pass `plain` so iOS 26 does not nest a disc inside the capsule.
  */
 export function ChromeIconMenu({
   systemImage,
@@ -29,6 +28,7 @@ export function ChromeIconMenu({
   actions,
   onAction,
   accessibilityLabel,
+  chrome = 'glass',
 }: ChromeIconMenuProps) {
   const symbol = systemImage ?? sfSymbolForIcon(icon)
 
@@ -37,12 +37,7 @@ export function ChromeIconMenu({
       <Menu
         label={accessibilityLabel}
         systemImage={symbol as never}
-        modifiers={[
-          buttonStyle('glass'),
-          labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
-          controlSize('large'),
-        ]}>
+        modifiers={toolbarIconModifiers(chrome)}>
         {renderTapMenuItems(actions, onAction)}
       </Menu>
     </Host>

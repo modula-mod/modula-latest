@@ -1,15 +1,10 @@
 import {Button, ControlGroup, Host, Menu} from '@expo/ui/swift-ui'
-import {
-  buttonBorderShape,
-  buttonStyle,
-  controlSize,
-  labelStyle,
-} from '@expo/ui/swift-ui/modifiers'
 import type {ReactNode} from 'react'
 
 import {modulaIconDefinition} from '@/platform/ui/icons/modula-icon-registry'
 import {actionSystemImage} from '@/platform/ui/menus/action-system-image'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
+import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
 export type ModulaControlGroupAction = ModulaActionItem
@@ -25,8 +20,9 @@ type ModulaControlGroupProps = {
 }
 
 /**
- * Expo UI SwiftUI ControlGroup inside a circular glass Menu.
- * Compact horizontal icon row (Add / Favorite / Share) plus overflow items.
+ * Expo UI SwiftUI ControlGroup inside a Menu. Lab / rare clusters only.
+ * Product screens should prefer a single overflow Menu or a long-press
+ * context menu — do not nest this trigger inside a header capsule.
  */
 export function ModulaControlGroup({
   label,
@@ -41,12 +37,7 @@ export function ModulaControlGroup({
       <Menu
         label={label}
         systemImage={triggerSymbol}
-        modifiers={[
-          buttonStyle('glass'),
-          labelStyle('iconOnly'),
-          buttonBorderShape('circle'),
-          controlSize('large'),
-        ]}>
+        modifiers={toolbarIconModifiers('plain')}>
         <ControlGroup>
           {actions.map(action => (
             <Button

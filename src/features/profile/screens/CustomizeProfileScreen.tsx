@@ -1,11 +1,15 @@
 import {useMemo, useState} from 'react'
-import {Alert, ScrollView, StyleSheet, Switch, View} from 'react-native'
+import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
+import {
+  SettingsSection,
+  SettingsToggleRow,
+} from '@/features/settings/components/SettingsRows'
+import {SystemSwitch} from '@/components/system/SystemSwitch'
 import {profileTabIdsFromPresentation} from '@/features/product/data/profileTabsSync'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {coreProfileTabs} from '@/features/profile/data/coreProfileTabs'
@@ -18,6 +22,8 @@ import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -62,6 +68,7 @@ export function CustomizeProfileScreen() {
   const {setProfilePresentation} = useProfileActions()
   const {update: updateProductPrefs} = useProductPreferences()
   const {colours, spacing} = useThemeTokens()
+  const tabPadding = useFloatingTabBarContentPadding()
   const [draft, setDraft] = useState<ProfilePresentationPreferences>(presentation)
   const initial = useMemo(() => JSON.stringify(presentation), [presentation])
   const dirty = JSON.stringify(draft) !== initial
@@ -107,6 +114,8 @@ export function CustomizeProfileScreen() {
     ])
   }
 
+  const enabledTabs = draft.tabOrder.filter(tabId => draft.enabledTabIds.includes(tabId))
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader
@@ -128,7 +137,10 @@ export function CustomizeProfileScreen() {
                 if (id === 'reset') reset()
               }}
             />
-            <AppPressable accessibilityLabel="Save profile presentation" onPress={save}>
+            <AppPressable
+              accessibilityLabel="Save profile presentation"
+              onPress={save}
+              style={styles.saveHit}>
               <AppText variant="label" style={{color: colours.accent}}>
                 Save
               </AppText>
@@ -139,7 +151,10 @@ export function CustomizeProfileScreen() {
       <ResponsiveContent maxWidth={820}>
         <ScrollView
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={[styles.content, {gap: spacing[5], padding: spacing[4]}]}>
+          contentContainerStyle={[
+            styles.content,
+            {gap: spacing[5], padding: spacing[4], paddingBottom: tabPadding},
+          ]}>
           <Section title="Profile layout">
             <ModulaSegmentedPicker
               appearance="segmented"
@@ -158,16 +173,16 @@ export function CustomizeProfileScreen() {
             </AppText>
           </Section>
 
-          <Section title="Profile tabs">
+          <View style={{gap: spacing[2]}}>
             <AppText variant="caption" colour="textSecondary">
-              Choose the tabs visitors can see and the owner-only surfaces you want ready. Shop and
-              Agents are Preview slots until packages install through Registry.
+              Choose visitor-facing tabs. Long-press a row to reorder.
             </AppText>
-            <View style={{gap: spacing[2]}}>
+            <SettingsSection title="Profile tabs">
               {draft.tabOrder.map((tabId, index) => {
                 const manifest = coreProfileTabs.find(tab => tab.id === tabId)
                 if (!manifest) return null
                 const enabled = draft.enabledTabIds.includes(tabId)
+                const last = index === draft.tabOrder.length - 1
                 const sourceLabel =
                   manifest.source === 'module'
                     ? 'Module · Preview'
@@ -176,106 +191,110 @@ export function CustomizeProfileScreen() {
                       : manifest.visibility === 'followers'
                         ? 'Followers'
                         : 'Owner only'
+                const description = tabPreviewDescriptions[tabId]
+                  ? `${sourceLabel}. ${tabPreviewDescriptions[tabId]}`
+                  : sourceLabel
                 return (
-                  <Surface
+                  <View
                     key={tabId}
-                    variant="contained"
-                    style={[styles.tabRow, {gap: spacing[3], padding: spacing[3]}]}>
-                    <AppIcon name={manifest.icon} colour={colours.accent} />
-                    <View style={styles.tabBody}>
-                      <AppText variant="label">{manifest.title}</AppText>
-                      <AppText variant="caption" colour="textSecondary">
-                        {sourceLabel}
-                      </AppText>
-                      {tabPreviewDescriptions[tabId] ? (
-                        <AppText variant="caption" colour="textSecondary">
-                          {tabPreviewDescriptions[tabId]}
+                    style={[
+                      styles.tabRow,
+                      {
+                        borderBottomColor: last ? 'transparent' : colours.separator,
+                        paddingHorizontal: spacing[4],
+                      },
+                    ]}>
+                    <AppPressable
+                      accessibilityLabel={`${manifest.title} tab. Long press to reorder`}
+                      onLongPress={() => {
+                        void presentModulaActions({
+                          title: manifest.title,
+                          actions: [
+                            {
+                              id: 'up',
+                              label: 'Move up',
+                              icon: 'arrowUp',
+                              disabled: index === 0,
+                            },
+                            {
+                              id: 'down',
+                              label: 'Move down',
+                              icon: 'arrowDown',
+                              disabled: index === draft.tabOrder.length - 1,
+                            },
+                          ],
+                        }).then(id => {
+                          if (id === 'up') setDraft(prev => moveTab(prev, tabId, 'up'))
+                          if (id === 'down') setDraft(prev => moveTab(prev, tabId, 'down'))
+                        })
+                      }}
+                      style={[styles.tabMain, {gap: spacing[3]}]}>
+                      <AppIcon name={manifest.icon} colour={colours.text} size={20} />
+                      <View style={styles.tabBody}>
+                        <AppText variant="body">{manifest.title}</AppText>
+                        <AppText variant="caption" colour="textTertiary" numberOfLines={2}>
+                          {description}
                         </AppText>
-                      ) : null}
-                    </View>
-                    <Switch
+                      </View>
+                    </AppPressable>
+                    <SystemSwitch
                       value={enabled}
                       disabled={tabId === 'posts'}
-                      accessibilityLabel={`${enabled ? 'Disable' : 'Enable'} ${manifest.title} tab`}
-                      accessibilityState={{disabled: tabId === 'posts'}}
+                      label={`${enabled ? 'Disable' : 'Enable'} ${manifest.title} tab`}
                       onValueChange={value =>
                         setDraft(prev => toggleTab(prev, tabId, value))
                       }
                     />
-                    <MoveButton
-                      label={`Move ${manifest.title} tab up`}
-                      disabled={index === 0}
-                      icon="arrowUp"
-                      onPress={() =>
-                        setDraft(prev => moveTab(prev, tabId, 'up'))
-                      }
-                    />
-                    <MoveButton
-                      label={`Move ${manifest.title} tab down`}
-                      disabled={index === draft.tabOrder.length - 1}
-                      icon="arrowDown"
-                      onPress={() =>
-                        setDraft(prev => moveTab(prev, tabId, 'down'))
-                      }
-                    />
-                  </Surface>
+                  </View>
                 )
               })}
-            </View>
-          </Section>
+            </SettingsSection>
+          </View>
 
           <Section title="Default tab">
             <ModulaSegmentedPicker
               appearance="plain"
               scrollable
               accessibilityLabel="Default profile tab"
-              options={draft.tabOrder
-                .filter(tabId => draft.enabledTabIds.includes(tabId))
-                .map(tabId => {
-                  const manifest = coreProfileTabs.find(tab => tab.id === tabId)
-                  return {
-                    value: tabId,
-                    label: manifest?.title ?? tabId,
-                  }
-                })}
+              options={enabledTabs.map(tabId => {
+                const manifest = coreProfileTabs.find(tab => tab.id === tabId)
+                return {
+                  value: tabId,
+                  label: manifest?.title ?? tabId,
+                }
+              })}
               value={draft.defaultTabId}
               onValueChange={next => setDraft(prev => ({...prev, defaultTabId: next}))}
             />
           </Section>
 
-          <Section title="Profile indicators">
-            <Surface variant="contained" style={[styles.indicatorPanel, {padding: spacing[3]}]}>
-              <IndicatorSwitch
-                label="Show Focus Halo"
-                description="Focus Halo places a small availability ring around your avatar so people understand whether you are available, focused, busy, or offline before they interrupt you. It follows your Focus state and does not reveal private modules or hidden fields."
-                value={draft.showFocusHalo}
-                onValueChange={value =>
-                  setDraft(prev => ({...prev, showFocusHalo: value}))
-                }
-              />
-              <IndicatorSwitch
-                label="Show follower count"
-                description="Show the follower and following counts already present on the profile. Modula should not invent, estimate, or inflate these numbers."
-                value={draft.showFollowerCount}
-                onValueChange={value =>
-                  setDraft(prev => ({...prev, showFollowerCount: value}))
-                }
-              />
-              <IndicatorSwitch
-                label="Show module count"
-                description="Show how many modules this profile has made visible in its presentation."
-                value={draft.showModuleCount}
-                onValueChange={value =>
-                  setDraft(prev => ({...prev, showModuleCount: value}))
-                }
-              />
-            </Surface>
-          </Section>
-
-          <View style={[styles.footerActions, {gap: spacing[2]}]}>
-            <FooterButton label="Preview" icon="profile" onPress={preview} />
-            <FooterButton label="Reset" icon="reset" onPress={reset} destructive />
-          </View>
+          <SettingsSection title="Profile indicators">
+            <SettingsToggleRow
+              label="Show Focus Halo"
+              description="A small availability ring around your avatar. It follows Focus and does not reveal private modules."
+              value={draft.showFocusHalo}
+              onValueChange={value =>
+                setDraft(prev => ({...prev, showFocusHalo: value}))
+              }
+            />
+            <SettingsToggleRow
+              label="Show follower count"
+              description="Show follower and following counts already present on the profile."
+              value={draft.showFollowerCount}
+              onValueChange={value =>
+                setDraft(prev => ({...prev, showFollowerCount: value}))
+              }
+            />
+            <SettingsToggleRow
+              label="Show module count"
+              description="Show how many modules this profile has made visible."
+              value={draft.showModuleCount}
+              onValueChange={value =>
+                setDraft(prev => ({...prev, showModuleCount: value}))
+              }
+              last
+            />
+          </SettingsSection>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -342,148 +361,41 @@ function Section({title, children}: {title: string; children: React.ReactNode}) 
   )
 }
 
-function MoveButton({
-  label,
-  icon,
-  disabled,
-  onPress,
-}: {
-  label: string
-  icon: Parameters<typeof AppIcon>[0]['name']
-  disabled: boolean
-  onPress: () => void
-}) {
-  const {colours, radius} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={label}
-      accessibilityState={{disabled}}
-      disabled={disabled}
-      onPress={onPress}
-      style={[
-        styles.moveButton,
-        {backgroundColor: colours.surfaceRaised, borderColor: colours.border, borderRadius: radius.round},
-      ]}>
-      <AppIcon name={icon} colour={colours.textSecondary} size={18} />
-    </AppPressable>
-  )
-}
-
-function IndicatorSwitch({
-  label,
-  description,
-  value,
-  onValueChange,
-}: {
-  label: string
-  description: string
-  value: boolean
-  onValueChange: (value: boolean) => void
-}) {
-  const {spacing} = useThemeTokens()
-  return (
-    <View style={[styles.indicatorRow, {gap: spacing[3]}]}>
-      <View style={[styles.indicatorCopy, {gap: spacing[1]}]}>
-        <AppText variant="body" style={styles.indicatorLabel}>
-          {label}
-        </AppText>
-        <AppText variant="caption" colour="textSecondary">
-          {description}
-        </AppText>
-      </View>
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-        accessibilityLabel={label}
-      />
-    </View>
-  )
-}
-
-function FooterButton({
-  label,
-  icon,
-  destructive,
-  onPress,
-}: {
-  label: string
-  icon: Parameters<typeof AppIcon>[0]['name']
-  destructive?: boolean
-  onPress: () => void
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={[
-        styles.footerButton,
-        {
-          backgroundColor: colours.surfaceRaised,
-          borderColor: colours.border,
-          borderRadius: radius.round,
-          gap: spacing[2],
-          paddingHorizontal: spacing[4],
-        },
-      ]}>
-      <AppIcon
-        name={icon}
-        colour={destructive ? colours.destructive : colours.accent}
-        size={18}
-      />
-      <AppText variant="label">{label}</AppText>
-    </AppPressable>
-  )
-}
-
 const styles = StyleSheet.create({
   content: {
-    paddingBottom: 48,
-  },
-  footerActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  footerButton: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexGrow: 1,
   },
   headerTrail: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
+    gap: 4,
   },
-  indicatorLabel: {
-    flex: 1,
-  },
-  indicatorCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  indicatorPanel: {
-    gap: 10,
-  },
-  indicatorRow: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    minHeight: 68,
-  },
-  moveButton: {
+  saveHit: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    height: 44,
     justifyContent: 'center',
+    minWidth: 44,
+    paddingHorizontal: 8,
   },
   screen: {
     flex: 1,
   },
   tabBody: {
     flex: 1,
+    gap: 2,
+    minWidth: 0,
+  },
+  tabMain: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
     minWidth: 0,
   },
   tabRow: {
     alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
+    minHeight: 52,
+    width: '100%',
   },
 })

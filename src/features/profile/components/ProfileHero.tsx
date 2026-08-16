@@ -37,8 +37,9 @@ type ProfileHeroProps = {
 }
 
 /**
- * Mobile order: cover → avatar overlap → identity → actions → stats.
- * Identity claims stay in About; cover/avatar editors open for owners only.
+ * X / Instagram order: cover → avatar overlapping cover only → identity
+ * on the canvas → one compact action on the avatar row → stats.
+ * No identity sheet, no second More next to Edit Profile.
  */
 export function ProfileHero({
   profile,
@@ -55,7 +56,7 @@ export function ProfileHero({
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
-  const avatarSize = isCompact ? 96 : 120
+  const avatarSize = isCompact ? 88 : 112
   const canEdit = viewer.canEdit
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
@@ -87,46 +88,44 @@ export function ProfileHero({
       />
       <View
         style={[
-          styles.identitySheet,
+          styles.body,
           {
-            backgroundColor: colours.canvas,
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            marginTop: -24,
             paddingHorizontal: spacing[4],
             paddingBottom: spacing[4],
             gap: spacing[3],
           },
         ]}>
-        <View style={{marginTop: -(avatarSize / 2), zIndex: 2}}>
-          <ProfileAvatar
-            profile={profile}
-            size={avatarSize}
-            showFocusHalo={presentation.showFocusHalo}
-            canEdit={canEdit}
-            onEditPress={() => setAvatarEditorOpen(true)}
-            previewUri={avatarDraft ? avatarDraft.uri : undefined}
-            onPhotoUri={uri => {
-              setAvatarDraft({uri, sourceUri: uri})
-              const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
-              if (avatarUri === undefined) return
-              void updateProfile.mutateAsync({avatarUri})
-            }}
-            onPhotoRemove={() => {
-              setAvatarDraft({uri: null, sourceUri: null})
-              if (!profile.avatarUri) return
-              void updateProfile.mutateAsync({avatarUri: null})
-            }}
-          />
+        <View style={styles.avatarRow}>
+          <View style={{marginTop: -(avatarSize / 2), zIndex: 2}}>
+            <ProfileAvatar
+              profile={profile}
+              size={avatarSize}
+              showFocusHalo={presentation.showFocusHalo}
+              canEdit={canEdit}
+              onEditPress={() => setAvatarEditorOpen(true)}
+              previewUri={avatarDraft ? avatarDraft.uri : undefined}
+              onPhotoUri={uri => {
+                setAvatarDraft({uri, sourceUri: uri})
+                const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+                if (avatarUri === undefined) return
+                void updateProfile.mutateAsync({avatarUri})
+              }}
+              onPhotoRemove={() => {
+                setAvatarDraft({uri: null, sourceUri: null})
+                if (!profile.avatarUri) return
+                void updateProfile.mutateAsync({avatarUri: null})
+              }}
+            />
+          </View>
+          {showActions ? (
+            <View style={styles.avatarActions}>
+              <ProfileActions profile={profile} viewer={viewer} />
+            </View>
+          ) : null}
         </View>
-        <ProfileIdentity profile={profile} viewer={viewer} compact={isCompact} />
+        <ProfileIdentity profile={profile} viewer={viewer} compact />
         <HeroViewingCopy viewer={viewer} />
       </View>
-      {showActions ? (
-        <View style={[styles.section, {paddingHorizontal: spacing[4], paddingBottom: spacing[3]}]}>
-          <ProfileActions profile={profile} viewer={viewer} />
-        </View>
-      ) : null}
       {showStats ? (
         <ProfileStats
           profile={profile}
@@ -210,10 +209,16 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 }
 
 const styles = StyleSheet.create({
-  identitySheet: {
-    alignItems: 'flex-start',
+  avatarActions: {
+    flexShrink: 0,
+    paddingBottom: 4,
   },
-  section: {
+  avatarRow: {
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  body: {
     minWidth: 0,
   },
   wrap: {

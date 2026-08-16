@@ -121,6 +121,15 @@ assertExists('docs/validation/phase7m-b6-evidence.md', 'EVIDENCE INDEX')
 assertContains('docs/validation/phase7m-b6-cutover-rehearsal.md', 'PRODUCTION DEPLOYED = NO', 'NO PRODUCTION DEPLOY')
 assertContains('docs/validation/phase7m-b6-cutover-rehearsal.md', '7M-C STARTED = NO', '7M-C NOT STARTED')
 
+console.log('\n# Chrome consistency')
+assertContains('docs/design/phase7m-b6-direction-m.md', 'One chrome layer', 'CHROME LAYER RULE')
+assertContains('src/platform/ui/navigation/home-stack-header.tsx', 'chrome="plain"', 'HEADER PLAIN GLYPHS')
+assertContains('src/platform/ui/navigation/profile-stack-header.tsx', 'chrome="plain"', 'PROFILE HEADER PLAIN')
+assertAbsent('src/features/profile/components/ProfileHero.tsx', 'identitySheet', 'NO IDENTITY SHEET')
+assertAbsent('src/features/profile/screens/CustomizeProfileScreen.tsx', 'MoveButton', 'NO REORDER CIRCLES')
+assertAbsent('src/features/profile/components/ProfileModuleCard.tsx', 'ModulaControlGroup', 'NO MODULE CONTROL GROUP')
+assertAbsent('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'fullWidth', 'NO BRICK MODULE CTAS')
+
 if (failures.length) {
   console.log(`\nFAILED ${failures.length}`)
   for (const item of failures) console.log(` - ${item}`)

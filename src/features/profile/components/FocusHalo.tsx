@@ -1,7 +1,6 @@
 import type {ReactNode} from 'react'
 import {StyleSheet, View} from 'react-native'
 
-import {AppText} from '@/components/primitives/AppText'
 import type {FocusStatus} from '@/features/profile/contracts/presence'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -13,6 +12,10 @@ type FocusHaloProps = {
   visible?: boolean
 }
 
+/**
+ * Availability ring only — no overlapping status chip.
+ * Customize copy: a small ring around the avatar, not a second badge on Edit Profile.
+ */
 export function FocusHalo({
   status,
   profileName,
@@ -20,7 +23,7 @@ export function FocusHalo({
   children,
   visible = true,
 }: FocusHaloProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours} = useThemeTokens()
   const ringColour =
     status.id === 'available'
       ? colours.success
@@ -42,7 +45,7 @@ export function FocusHalo({
     <View
       accessibilityRole="image"
       accessibilityLabel={`${profileName}, ${status.label}. Focus status: ${status.label}`}
-      style={{width: size + 12}}>
+      style={{width: size + 12, height: size + 12}}>
       <View
         style={[
           styles.ring,
@@ -55,32 +58,11 @@ export function FocusHalo({
         ]}>
         {children}
       </View>
-      <View
-        style={[
-          styles.label,
-          {
-            backgroundColor: colours.surfaceRaised,
-            borderColor: ringColour,
-            borderRadius: radius.round,
-            paddingHorizontal: spacing[2],
-          },
-        ]}>
-        <AppText variant="micro" numberOfLines={1}>
-          {status.label}
-        </AppText>
-      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  label: {
-    alignSelf: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    marginTop: -12,
-    minHeight: 24,
-  },
   ring: {
     alignItems: 'center',
     borderWidth: 3,

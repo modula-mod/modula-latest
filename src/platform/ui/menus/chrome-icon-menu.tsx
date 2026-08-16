@@ -1,5 +1,6 @@
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -11,6 +12,8 @@ type ChromeIconMenuProps = {
   actions: ModulaActionItem[]
   onAction: (id: string) => void
   accessibilityLabel: string
+  /** Accepted for API parity with native; fallback trigger is always a plain glyph. */
+  chrome?: ToolbarChrome
 }
 
 /**

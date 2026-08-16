@@ -3,6 +3,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability, useProtectedPrompt} from '@/auth/runtime'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppText} from '@/components/primitives/AppText'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import type {
@@ -12,7 +13,6 @@ import type {
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
-import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {selectionHaptic} from '@/lib/haptics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {parseProfileId} from '@/api/contracts'
@@ -22,13 +22,6 @@ type ProfileActionsProps = {
   profile: ModulaProfile
   viewer: ProfileViewerContext
 }
-
-const OWNER_MORE_ACTIONS: ModulaActionItem[] = [
-  {id: 'os', label: 'Profile-OS', icon: 'settings'},
-  {id: 'customize', label: 'Customize', icon: 'appearance'},
-  {id: 'share', label: 'Share profile', icon: 'share'},
-  {id: 'preview', label: 'View as visitor', icon: 'eye'},
-]
 
 function visitorMoreActions(): ModulaActionItem[] {
   return [
@@ -49,35 +42,26 @@ function visitorMoreActions(): ModulaActionItem[] {
   ]
 }
 
+/**
+ * Compact in-hero actions. Owner overflow lives in the native header.
+ * Visitor overflow is a plain glyph — never a second labeled brick.
+ * Reference: X / Instagram profile — one compact Follow/Edit pill on the avatar row.
+ */
 export function ProfileActions({profile, viewer}: ProfileActionsProps) {
   const router = useRouter()
   const canFollow = useCapability('social:follow')
   const prompt = useProtectedPrompt()
   const followMutation = useFollowProfileMutation()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours} = useThemeTokens()
 
   if (viewer.canEdit) {
     return (
-      <View style={[styles.row, {gap: spacing[2]}]}>
-        <View style={styles.primary}>
-          <ModulaButton
-            label="Edit Profile"
-            role="primary"
-            fullWidth
-            onPress={() => router.push('/profile/edit' as Href)}
-          />
-        </View>
-        <ModulaMenu
-          accessibilityLabel="More profile actions"
-          title="Profile"
-          actions={OWNER_MORE_ACTIONS}
-          onAction={id => {
-            if (id === 'os') router.push('/profile/os' as Href)
-            if (id === 'customize') router.push('/profile/customize' as Href)
-            if (id === 'share') void shareProfile(profile)
-            if (id === 'preview') router.push('/profile/preview' as Href)
-          }}
-          trigger={<ModulaButton label="More" role="secondary" />}
+      <View style={styles.row}>
+        <ProfileActionPill
+          label="Edit Profile"
+          accessibilityLabel="Edit Profile"
+          primary
+          onPress={() => router.push('/profile/edit' as Href)}
         />
         <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
       </View>
@@ -85,12 +69,14 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
   }
 
   return (
-    <View style={[styles.row, {gap: spacing[2]}]}>
-      <AppPressable
+    <View style={styles.row}>
+      <ProfileActionPill
+        label={profile.isFollowing ? 'Following' : 'Follow'}
         accessibilityLabel={
           profile.isFollowing ? `Unfollow ${profile.displayName}` : `Follow ${profile.displayName}`
         }
-        accessibilityState={{selected: profile.isFollowing}}
+        primary={!profile.isFollowing}
+        selected={profile.isFollowing}
         onPress={() => {
           void selectionHaptic()
           if (!canFollow) {
@@ -102,24 +88,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
             following: !profile.isFollowing,
           })
         }}
-        style={[
-          styles.button,
-          styles.primary,
-          {
-            backgroundColor: profile.isFollowing ? colours.surfaceRaised : colours.accent,
-            borderColor: profile.isFollowing ? colours.border : 'transparent',
-            borderRadius: radius.round,
-            paddingHorizontal: spacing[4],
-          },
-        ]}>
-        <AppText
-          variant="label"
-          style={{
-            color: profile.isFollowing ? colours.text : colours.accentForeground,
-          }}>
-          {profile.isFollowing ? 'Following' : 'Follow'}
-        </AppText>
-      </AppPressable>
+      />
       <ModulaMenu
         accessibilityLabel="More profile actions"
         title={profile.displayName}
@@ -127,25 +96,73 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
         onAction={id => {
           if (id === 'share' || id === 'copy') void shareProfile(profile)
         }}
-        trigger={<ModulaButton label="More" role="secondary" />}
+        trigger={
+          <View pointerEvents="none" style={styles.moreHit}>
+            <AppIcon name="more" colour={colours.text} size={20} />
+          </View>
+        }
       />
       <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
     </View>
   )
 }
 
+function ProfileActionPill({
+  label,
+  accessibilityLabel,
+  primary,
+  selected,
+  onPress,
+}: {
+  label: string
+  accessibilityLabel: string
+  primary?: boolean
+  selected?: boolean
+  onPress: () => void
+}) {
+  const {colours, radius, spacing} = useThemeTokens()
+  return (
+    <AppPressable
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={selected ? {selected: true} : undefined}
+      onPress={onPress}
+      style={[
+        styles.pill,
+        {
+          backgroundColor: primary ? colours.accent : colours.surface,
+          borderColor: primary ? 'transparent' : colours.border,
+          borderRadius: radius.round,
+          paddingHorizontal: spacing[4],
+        },
+      ]}>
+      <AppText
+        variant="label"
+        style={{
+          color: primary ? colours.accentForeground : colours.text,
+          fontWeight: '600',
+        }}>
+        {label}
+      </AppText>
+    </AppPressable>
+  )
+}
+
 const styles = StyleSheet.create({
-  button: {
+  moreHit: {
+    alignItems: 'center',
+    height: 36,
+    justifyContent: 'center',
+    minWidth: 36,
+  },
+  pill: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-    minHeight: 44,
-  },
-  primary: {
-    flex: 1,
+    minHeight: 36,
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 8,
   },
 })

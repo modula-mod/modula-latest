@@ -1,6 +1,7 @@
 import {StyleSheet, View} from 'react-native'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
+import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -10,6 +11,8 @@ type ChromeOverflowMenuProps = {
   actions: ModulaActionItem[]
   onAction: (id: string) => void
   accessibilityLabel?: string
+  /** Accepted for API parity with native; fallback trigger is always a plain glyph. */
+  chrome?: ToolbarChrome
 }
 
 /**

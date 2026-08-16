@@ -36,7 +36,7 @@ export function ProfileIdentity({profile, viewer, compact}: ProfileIdentityProps
     <View style={[styles.wrap, {gap: compact ? spacing[2] : spacing[3]}]}>
       <View style={{gap: spacing[1]}}>
         <View style={[styles.handleRow, {gap: spacing[2]}]}>
-          <AppText variant={compact ? 'title2' : 'display'} numberOfLines={2} style={styles.name}>
+          <AppText variant="title2" numberOfLines={2} style={styles.name}>
             {profile.displayName}
           </AppText>
           {verified ? <ModulaIcon name="verified" colour={colours.text} size={18} /> : null}
