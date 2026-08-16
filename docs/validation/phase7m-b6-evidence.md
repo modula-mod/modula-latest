@@ -20,7 +20,13 @@ Toolbar / global back **after** recapture (same device, Metro on `cursor/phase7m
 docs/validation/evidence/phase7m-b6/screenshots-toolbar-back/
 ```
 
-See that folder’s README for Activity’s header control group, Profile back, and 44pt overlay circles.
+NativeTabs / Liquid Glass **after** recapture (same device, Metro on `cursor/phase7m-b6-native-tabs-6d0c`):
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-native-tabs/
+```
+
+See that folder’s README for the system tab bar, Module Detail ControlGroup, and overlay extraLarge chrome.
 
 ## Founder visual review set (captured)
 
