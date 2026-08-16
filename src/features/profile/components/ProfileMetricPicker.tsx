@@ -23,8 +23,22 @@ import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-met
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const NEIGHBOR_OPACITY = 0.32
+const FAR_OPACITY = 0.14
 const NEIGHBOR_SCALE = 0.9
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
+const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
+
+function windowStartFromOffset(offset: number, count: number): number {
+  'worklet'
+  if (count <= WINDOW_ITEMS) return 0
+  const index = offset / ITEM_HEIGHT
+  return Math.max(0, Math.min(count - WINDOW_ITEMS, index - 1))
+}
+
+function windowStartForIndex(index: number, count: number): number {
+  if (count <= WINDOW_ITEMS) return 0
+  return Math.max(0, Math.min(count - WINDOW_ITEMS, index - 1))
+}
 
 type ProfileMetricPickerProps = {
   metrics: ProfileMetricDescriptor[]
@@ -136,7 +150,14 @@ export function ProfileMetricPicker({
   if (!count) return null
 
   const selected = metrics[selectedIndex]
-  const windowHeight = count === 1 ? ITEM_HEIGHT : profileMetricWindowHeight()
+  const windowHeight =
+    count === 1
+      ? ITEM_HEIGHT
+      : count === 2
+        ? ITEM_HEIGHT * 2
+        : profileMetricWindowHeight()
+  const windowStart = windowStartForIndex(selectedIndex, count)
+  const selectedRow = selectedIndex - windowStart
   const accessibilityValue = selected
     ? `${metricSpokenValue(selected)} ${selected.label}. ${selectedIndex + 1} of ${count}.`
     : undefined
@@ -175,13 +196,14 @@ export function ProfileMetricPicker({
           if (name === 'activate') activate()
         }}
         testID="profile-metric-picker"
-        style={[styles.gesture, {minHeight: Math.max(windowHeight, 96)}]}>
+        style={[styles.gesture, {minHeight: windowHeight}]}>
         <View style={[styles.window, {height: windowHeight}]}>
           {metrics.map((metric, index) => (
             <MetricWheelItem
               key={metric.id}
               metric={metric}
               index={index}
+              count={count}
               scrollOffset={scrollOffset}
               reduceMotion={reduceMotion}
             />
@@ -191,19 +213,19 @@ export function ProfileMetricPicker({
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={() => moveBy(-1)}
-              style={[styles.hit, {top: 0, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: (selectedRow - 1) * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
             />
             <AppPressable
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={activate}
-              style={[styles.hit, {top: ITEM_HEIGHT, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: selectedRow * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
             />
             <AppPressable
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={() => moveBy(1)}
-              style={[styles.hit, {top: ITEM_HEIGHT * 2, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: (selectedRow + 1) * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
             />
           </View>
         </View>
@@ -246,29 +268,34 @@ function MetricCopy({
 function MetricWheelItem({
   metric,
   index,
+  count,
   scrollOffset,
   reduceMotion,
 }: {
   metric: ProfileMetricDescriptor
   index: number
+  count: number
   scrollOffset: SharedValue<number>
   reduceMotion: boolean
 }) {
   const style = useAnimatedStyle(() => {
-    const offset = index * ITEM_HEIGHT - scrollOffset.value
-    const translateY = ITEM_HEIGHT + offset
-    const distance = Math.abs(offset)
-    const progress = Math.min(1, distance / ITEM_HEIGHT)
+    const selected = scrollOffset.value / ITEM_HEIGHT
+    const windowStart = windowStartFromOffset(scrollOffset.value, count)
+    const translateY = (index - windowStart) * ITEM_HEIGHT
+    const distance = Math.abs(index - selected)
+    const progress = Math.min(2, distance)
     return {
       opacity: reduceMotion
         ? progress < 0.5
           ? 1
-          : NEIGHBOR_OPACITY
-        : interpolate(progress, [0, 1], [1, NEIGHBOR_OPACITY]),
+          : progress < 1.5
+            ? NEIGHBOR_OPACITY
+            : FAR_OPACITY
+        : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_OPACITY, FAR_OPACITY]),
       transform: [
         {translateY},
         {
-          scale: reduceMotion ? 1 : interpolate(progress, [0, 1], [1, NEIGHBOR_SCALE]),
+          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
         },
       ],
     }

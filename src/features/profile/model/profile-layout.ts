@@ -15,7 +15,7 @@ export const PROFILE_LAYOUT = {
   avatarRegular: 96,
   haloExtra: 6,
   haloWidth: 2,
-  avatarBorder: 2,
+  avatarBorder: 0,
   /** Cover showing around the avatar inside the canvas cradle. */
   cradleGap: 4,
   cradleLipExtra: 2,
@@ -23,7 +23,7 @@ export const PROFILE_LAYOUT = {
   identityAfterAvatar: 8,
   coverTopBlur: 28,
   coverBottomBlur: 48,
-  metricItemHeight: 34,
+  metricItemHeight: 32,
   metricWindowItems: 3,
   metricMaxVisible: 5,
   invertedSize: inverted.profile,

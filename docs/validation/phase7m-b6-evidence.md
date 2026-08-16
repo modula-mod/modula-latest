@@ -32,6 +32,12 @@ Profile evolution (Metric Picker, inverted geometry, sticky tabs) on `cursor/pha
 docs/validation/evidence/phase7m-b6/screenshots-profile-evolution/
 ```
 
+Profile masterpiece pass (avatar slot, cradle, typography picker) on `cursor/phase7m-b6-profile-masterpiece-ce59`:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-masterpiece/
+```
+
 See that folder’s README. Founder visual approval is still required.
 
 ## Founder visual review set (captured)

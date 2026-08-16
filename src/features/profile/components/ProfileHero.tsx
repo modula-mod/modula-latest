@@ -132,7 +132,7 @@ export function ProfileHero({
         ]}>
         <View
           style={{
-            minHeight: geometry.identityPaddingTop,
+            minHeight: geometry.identityPaddingTop + spacing[2],
             paddingLeft: viewer.canEdit ? 0 : geometry.slotSize + spacing[3],
             justifyContent: 'center',
             alignItems: viewer.canEdit ? 'stretch' : 'flex-end',
