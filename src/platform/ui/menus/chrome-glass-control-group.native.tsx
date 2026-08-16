@@ -3,6 +3,7 @@ import {Button, Host, Menu} from '@expo/ui/swift-ui'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import {toolbarGroupItemModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import {
@@ -14,7 +15,6 @@ import {
 } from '@/platform/ui/menus/toolbar-chrome'
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ChromeGlassGroupButton = {
   kind: 'button'
@@ -45,61 +45,53 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
  *
  * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots. Width follows item
  * count (2 → 110pt, 3 → 176pt). Expo Host is given an explicit 44×44 frame
- * and does not matchContents. Callstack / SwiftUI ControlGroup / BlurView
- * are not used — they shrink or wash out to white on overlay headers.
+ * and does not matchContents. The capsule itself is LiquidGlassChrome
+ * (Callstack / expo-glass-effect / BlurView) so photography shows through.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
-  const {scheme} = useThemeTokens()
   const itemModifiers = toolbarGroupItemModifiers()
-  const isDark = scheme === 'dark'
   const width = overlayGroupWidth(items.length)
 
   return (
-    <View style={[styles.shell, {width}]}>
-      <View
-        style={[
-          styles.clip,
-          {
-            backgroundColor: isDark ? 'rgba(36,40,44,0.94)' : '#F7F7F8',
-            borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.14)',
-            width,
-          },
-        ]}>
-        <View style={[styles.row, {width}]}>
-          {items.map(item => (
-            <View key={item.accessibilityLabel} style={styles.hit}>
-              <Host style={styles.hit}>
-                {item.kind === 'button' ? (
-                  <Button
-                    label={item.accessibilityLabel}
-                    systemImage={sfSymbolForIcon(item.icon) as never}
-                    modifiers={itemModifiers}
-                    onPress={item.onPress}
-                  />
-                ) : (
-                  <Menu
-                    label={item.accessibilityLabel}
-                    systemImage="ellipsis"
-                    modifiers={itemModifiers}>
-                    {renderTapMenuItems(item.actions, item.onAction)}
-                  </Menu>
-                )}
-              </Host>
-            </View>
-          ))}
-        </View>
+    <LiquidGlassChrome
+      interactive
+      fallback="clear"
+      contentLayout="flow"
+      style={[styles.capsule, {minWidth: width, width}]}>
+      <View style={[styles.row, {minWidth: width, width}]}>
+        {items.map(item => (
+          <View key={item.accessibilityLabel} style={styles.hit}>
+            <Host style={styles.hit}>
+              {item.kind === 'button' ? (
+                <Button
+                  label={item.accessibilityLabel}
+                  systemImage={sfSymbolForIcon(item.icon) as never}
+                  modifiers={itemModifiers}
+                  onPress={item.onPress}
+                />
+              ) : (
+                <Menu
+                  label={item.accessibilityLabel}
+                  systemImage="ellipsis"
+                  modifiers={itemModifiers}>
+                  {renderTapMenuItems(item.actions, item.onAction)}
+                </Menu>
+              )}
+            </Host>
+          </View>
+        ))}
       </View>
-    </View>
+    </LiquidGlassChrome>
   )
 }
 
 const styles = StyleSheet.create({
-  clip: {
+  capsule: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
-    borderWidth: 1,
     flexGrow: 0,
     flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
+    minHeight: OVERLAY_GROUP_HIT,
     overflow: 'hidden',
   },
   hit: {
@@ -116,16 +108,5 @@ const styles = StyleSheet.create({
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
-  },
-  shell: {
-    borderRadius: OVERLAY_GROUP_HIT / 2,
-    elevation: 3,
-    flexGrow: 0,
-    flexShrink: 0,
-    height: OVERLAY_GROUP_HIT,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 1},
-    shadowOpacity: 0.16,
-    shadowRadius: 6,
   },
 })

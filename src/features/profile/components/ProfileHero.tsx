@@ -12,7 +12,8 @@ import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
 import {ProfileCover} from '@/features/profile/components/ProfileCover'
-import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
+import {ProfileBio, ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
+import {ProfileMetadataGrid} from '@/features/profile/components/ProfileMetadataGrid'
 import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {
   ProfileAvatarEditor,
@@ -40,7 +41,8 @@ type ProfileHeroProps = {
 /**
  * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
  * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
- * Avatar hangs over the inverted cover→canvas transition; identity sits below.
+ * Avatar occupies the leading inverted valley; identity sits on the raised
+ * trailing plateau; metrics and metadata share a compact lower row.
  */
 export function ProfileHero({
   profile,
@@ -53,17 +55,47 @@ export function ProfileHero({
   onSelectTab,
   scrollY,
 }: ProfileHeroProps) {
-  const {width} = useWindowDimensions()
+  const {width, fontScale} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
   const isCompact = compact ?? width < 760
-  const geometry = profileGeometry(isCompact, presentation.showFocusHalo, spacing[4])
+  const geometry = profileGeometry(isCompact, presentation.showFocusHalo, spacing[4], {
+    contentWidth: width,
+    fontScale,
+  })
   const canEdit = viewer.canEdit
+  const stacked = geometry.stackedFallback
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
   const [avatarEditorOpen, setAvatarEditorOpen] = useState(false)
   const [coverDraft, setCoverDraft] = useState<ProfileCoverDraft | null>(null)
   const [avatarDraft, setAvatarDraft] = useState<ProfileAvatarDraft | null>(null)
+
+  const identity = (
+    <ProfileIdentity profile={profile} viewer={viewer} compact />
+  )
+  const info = (
+    <View style={[styles.infoColumn, {gap: spacing[2]}]}>
+      {showActions && !viewer.canEdit ? (
+        <View style={styles.visitorActions}>
+          <ProfileActions profile={profile} viewer={viewer} />
+        </View>
+      ) : null}
+      <HeroViewingCopy viewer={viewer} />
+      <ProfileBio profile={profile} compact />
+      <ProfileMetadataGrid profile={profile} viewer={viewer} />
+    </View>
+  )
+  const stats = showStats ? (
+    <ProfileStats
+      key={profile.id}
+      profile={profile}
+      ownerHandle={ownerHandle}
+      presentation={presentation}
+      onSelectTab={onSelectTab}
+      isOwner={viewer.canEdit}
+    />
+  ) : null
 
   return (
     <View style={[styles.wrap, {backgroundColor: colours.canvas}]}>
@@ -73,6 +105,9 @@ export function ProfileHero({
         canEdit={canEdit}
         slotSize={geometry.slotSize}
         contentInset={geometry.heroHorizontalInset}
+        raisedBodyHeight={geometry.raisedBodyHeight}
+        avatarCenterX={geometry.avatarCenterX}
+        cradleRadius={geometry.cradleRadius}
         onEditPress={() => setCoverEditorOpen(true)}
         previewUri={coverDraft ? coverDraft.uri : undefined}
         previewKind={coverDraft?.kind}
@@ -132,29 +167,37 @@ export function ProfileHero({
         ]}>
         <View
           style={{
-            minHeight: geometry.identityPaddingTop + spacing[2],
-            paddingLeft: viewer.canEdit ? 0 : geometry.slotSize + spacing[3],
-            justifyContent: 'center',
-            alignItems: viewer.canEdit ? 'stretch' : 'flex-end',
+            marginTop: stacked ? 0 : -geometry.raisedIdentityInset,
+            minHeight: stacked
+              ? geometry.identityPaddingTop
+              : geometry.raisedIdentityInset,
+            paddingLeft: stacked ? 0 : geometry.identityColumnOffset,
+            paddingTop: stacked ? geometry.identityPaddingTop : spacing[2],
+            justifyContent: 'flex-end',
           }}>
-          {showActions && !viewer.canEdit ? (
-            <View style={styles.avatarActions}>
-              <ProfileActions profile={profile} viewer={viewer} />
-            </View>
-          ) : null}
+          {identity}
         </View>
-        <ProfileIdentity profile={profile} viewer={viewer} compact />
-        <HeroViewingCopy viewer={viewer} />
-        {showStats ? (
-          <ProfileStats
-            key={profile.id}
-            profile={profile}
-            ownerHandle={ownerHandle}
-            presentation={presentation}
-            onSelectTab={onSelectTab}
-            isOwner={viewer.canEdit}
-          />
-        ) : null}
+        {stacked ? (
+          <View style={{gap: spacing[3]}}>
+            {info}
+            {stats}
+          </View>
+        ) : (
+          <View style={[styles.lowerGrid, {gap: spacing[3]}]}>
+            <View style={styles.infoSlot}>{info}</View>
+            <View
+              style={[
+                styles.metricColumn,
+                {
+                  width: geometry.metricColumnWidth,
+                  minWidth: geometry.metricColumnWidth,
+                  paddingTop: geometry.avatarOverlap,
+                },
+              ]}>
+              {stats}
+            </View>
+          </View>
+        )}
       </View>
 
       {canEdit ? (
@@ -231,11 +274,6 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 }
 
 const styles = StyleSheet.create({
-  avatarActions: {
-    alignItems: 'flex-end',
-    flexShrink: 0,
-    minHeight: 44,
-  },
   avatarSlot: {
     position: 'absolute',
     zIndex: 3,
@@ -243,6 +281,27 @@ const styles = StyleSheet.create({
   body: {
     minWidth: 0,
     zIndex: 2,
+  },
+  infoColumn: {
+    minWidth: 0,
+  },
+  infoSlot: {
+    flex: 1,
+    minWidth: 0,
+  },
+  lowerGrid: {
+    alignItems: 'flex-start',
+    flexDirection: 'row-reverse',
+    minWidth: 0,
+  },
+  metricColumn: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
+  visitorActions: {
+    alignItems: 'flex-start',
+    flexShrink: 0,
+    minHeight: 44,
   },
   wrap: {
     overflow: 'visible',

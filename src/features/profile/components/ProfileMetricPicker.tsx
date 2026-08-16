@@ -22,9 +22,9 @@ import {
 import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const NEIGHBOR_OPACITY = 0.32
-const FAR_OPACITY = 0.14
-const NEIGHBOR_SCALE = 0.9
+const NEIGHBOR_OPACITY = 0.34
+const FAR_OPACITY = 0.16
+const NEIGHBOR_SCALE = 0.88
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
 
@@ -53,7 +53,7 @@ export function ProfileMetricPicker({
   onSelectMetric,
   onActivateMetric,
 }: ProfileMetricPickerProps) {
-  const {motion} = useThemeTokens()
+  const {colours, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const count = metrics.length
   const selectedIndex = Math.max(
@@ -159,14 +159,16 @@ export function ProfileMetricPicker({
   const windowStart = windowStartForIndex(selectedIndex, count)
   const selectedRow = selectedIndex - windowStart
   const accessibilityValue = selected
-    ? `${metricSpokenValue(selected)} ${selected.label}. ${selectedIndex + 1} of ${count}.`
+    ? `${selected.label}, ${metricSpokenValue(selected)}, selected, ${selectedIndex + 1} of ${count}.`
     : undefined
+  const showArrows = count > 1
+  const selectedTop = selectedRow * ITEM_HEIGHT
 
   if (count === 1 && selected) {
     return (
       <AppPressable
         accessibilityRole="button"
-        accessibilityLabel={`${metricSpokenValue(selected)} ${selected.label}`}
+        accessibilityLabel={`${selected.label}, ${metricSpokenValue(selected)}`}
         accessibilityHint={
           selected.destination.type === 'none' ? undefined : 'Opens this metric'
         }
@@ -196,14 +198,53 @@ export function ProfileMetricPicker({
           if (name === 'activate') activate()
         }}
         testID="profile-metric-picker"
-        style={[styles.gesture, {minHeight: windowHeight}]}>
+        style={[styles.gesture, {minHeight: Math.max(44, windowHeight)}]}>
+        {showArrows ? (
+          <AppText
+            accessible={false}
+            variant="micro"
+            colour="textTertiary"
+            style={styles.arrow}>
+            ˆ
+          </AppText>
+        ) : null}
         <View style={[styles.window, {height: windowHeight}]}>
+          <View
+            pointerEvents="none"
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            style={[
+              styles.focal,
+              {
+                borderColor: colours.separator,
+                top: selectedTop,
+                height: ITEM_HEIGHT,
+              },
+            ]}
+          />
+          <View style={styles.rail} accessible={false} importantForAccessibility="no-hide-descendants">
+            {metrics.map((metric, index) => (
+              <View
+                key={metric.id}
+                style={[
+                  styles.dot,
+                  {
+                    backgroundColor:
+                      index === selectedIndex ? colours.text : colours.textTertiary,
+                    opacity: index === selectedIndex ? 0.7 : 0.28,
+                    transform: [{scale: index === selectedIndex ? 1 : 0.7}],
+                  },
+                ]}
+              />
+            ))}
+          </View>
           {metrics.map((metric, index) => (
             <MetricWheelItem
               key={metric.id}
               metric={metric}
               index={index}
               count={count}
+              selected={index === selectedIndex}
               scrollOffset={scrollOffset}
               reduceMotion={reduceMotion}
             />
@@ -229,6 +270,15 @@ export function ProfileMetricPicker({
             />
           </View>
         </View>
+        {showArrows ? (
+          <AppText
+            accessible={false}
+            variant="micro"
+            colour="textTertiary"
+            style={styles.arrow}>
+            ˇ
+          </AppText>
+        ) : null}
       </View>
     </GestureDetector>
   )
@@ -255,10 +305,12 @@ function MetricCopy({
 }) {
   return (
     <View style={styles.copy}>
-      <AppText variant={selected ? 'headline' : 'caption'} colour={selected ? 'text' : 'textSecondary'}>
+      <AppText
+        variant={selected ? 'headline' : 'caption'}
+        colour={selected ? 'text' : 'textSecondary'}>
         {metricDisplayValue(metric)}
       </AppText>
-      <AppText variant="micro" colour="textSecondary">
+      <AppText variant="micro" colour={selected ? 'textSecondary' : 'textTertiary'}>
         {metric.label}
       </AppText>
     </View>
@@ -269,20 +321,22 @@ function MetricWheelItem({
   metric,
   index,
   count,
+  selected,
   scrollOffset,
   reduceMotion,
 }: {
   metric: ProfileMetricDescriptor
   index: number
   count: number
+  selected: boolean
   scrollOffset: SharedValue<number>
   reduceMotion: boolean
 }) {
   const style = useAnimatedStyle(() => {
-    const selected = scrollOffset.value / ITEM_HEIGHT
+    const current = scrollOffset.value / ITEM_HEIGHT
     const windowStart = windowStartFromOffset(scrollOffset.value, count)
     const translateY = (index - windowStart) * ITEM_HEIGHT
-    const distance = Math.abs(index - selected)
+    const distance = Math.abs(index - current)
     const progress = Math.min(2, distance)
     return {
       opacity: reduceMotion
@@ -295,7 +349,7 @@ function MetricWheelItem({
       transform: [
         {translateY},
         {
-          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
+          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.84]),
         },
       ],
     }
@@ -305,15 +359,33 @@ function MetricWheelItem({
     <Animated.View
       pointerEvents="none"
       style={[styles.item, {height: ITEM_HEIGHT}, style]}>
-      <MetricCopy metric={metric} selected />
+      <MetricCopy metric={metric} selected={selected} />
     </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
+  arrow: {
+    opacity: 0.35,
+    textAlign: 'center',
+  },
   copy: {
     alignItems: 'center',
     justifyContent: 'center',
+    paddingLeft: 10,
+  },
+  dot: {
+    borderRadius: 2,
+    height: 4,
+    width: 4,
+  },
+  focal: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    left: 10,
+    opacity: 0.45,
+    position: 'absolute',
+    right: 0,
   },
   gesture: {
     alignItems: 'center',
@@ -332,14 +404,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
+  rail: {
+    bottom: 6,
+    gap: 5,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    top: 6,
+    width: 8,
+  },
   single: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   window: {
-    alignSelf: 'center',
-    maxWidth: 220,
-    minWidth: 120,
     overflow: 'hidden',
     width: '100%',
   },

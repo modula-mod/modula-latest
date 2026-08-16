@@ -38,7 +38,13 @@ Profile masterpiece pass (avatar slot, cradle, typography picker) on `cursor/pha
 docs/validation/evidence/phase7m-b6/screenshots-profile-masterpiece/
 ```
 
-See that folder’s README. Founder visual approval is still required.
+Profile signature composition (asymmetric inverted body, name on the right, left Metric Picker, metadata grid, true Liquid Glass group) on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-signature/
+```
+
+See that folder’s README for **Profile Signature Composition Comparison**. Founder visual approval is still required.
 
 ## Founder visual review set (captured)
 

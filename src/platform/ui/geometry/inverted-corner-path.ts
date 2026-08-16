@@ -91,13 +91,64 @@ export function buildCoverCanvasLipPath(
 }
 
 /**
+ * Asymmetric cover → canvas transition.
+ *
+ * Left shoulder stays lower (cover continues beside the avatar). A concave
+ * valley cradles the portrait, then the trailing surface rises into the
+ * cover so identity can sit on the raised right plateau. This is not a
+ * rounded rect and not a full-width semicircle crater.
+ */
+export function buildAsymmetricRaisedTrailingPath(
+  width: number,
+  height: number,
+  options?: InvertedSurfacePathOptions,
+): string {
+  const w = clampNonNegative(width)
+  const h = clampNonNegative(height)
+  if (w <= 0 || h <= 0) return ''
+
+  const r = Math.min(
+    clampNonNegative(options?.cradleRadius ?? inverted.profile),
+    h * 0.92,
+    w * 0.42,
+  )
+  const cx = Math.min(
+    Math.max(
+      r * 0.6,
+      clampNonNegative(
+        options?.avatarCenterX ??
+          options?.trayWidth ??
+          PROFILE_COVER_INVERTED_DEFAULTS.trayWidth,
+      ),
+    ),
+    w * 0.48,
+  )
+  const leftY = Math.min(h * 0.56, Math.max(h * 0.42, r * 0.7))
+  const valleyY = h
+  const rightX = Math.min(w - 12, Math.max(cx + r * 0.85, cx + 28))
+  const k = Math.max(18, r * 0.9)
+
+  if (r <= 0) {
+    return M(0, h) + H(w) + V(0) + H(0) + 'Z'
+  }
+
+  return (
+    M(0, h) +
+    V(leftY) +
+    `C${(cx * 0.35).toFixed(2)},${leftY.toFixed(2)} ${(cx - k).toFixed(2)},${valleyY.toFixed(2)} ${cx.toFixed(2)},${valleyY.toFixed(2)}` +
+    `C${(cx + k).toFixed(2)},${valleyY.toFixed(2)} ${(rightX - 10).toFixed(2)},0 ${rightX.toFixed(2)},0` +
+    H(w) +
+    V(h) +
+    'Z'
+  )
+}
+
+/**
  * Canvas cradle around the avatar.
  *
  * Fills the overlay except an upper semicircle centred on the cover/body
- * line. The hole is slightly larger than the avatar + Focus Halo so cover
- * imagery remains around the portrait. White shoulders stay thin on the
- * leading edge (the avatar sits near the inset) and become the body lip
- * on the trailing edge — one composition, not a rectangle with a sticker.
+ * line. Kept as a geometry primitive; Profile cover uses the asymmetric
+ * raised-trailing path so the right identity plateau can rise into the cover.
  */
 export function buildAvatarCradlePath(
   width: number,
@@ -152,7 +203,7 @@ export function buildTopLeadingInvertedPath(
   options?: InvertedSurfacePathOptions,
 ): string {
   if (options?.avatarCenterX != null || options?.cradleRadius != null) {
-    return buildAvatarCradlePath(width, height, options)
+    return buildAsymmetricRaisedTrailingPath(width, height, options)
   }
   return buildCoverCanvasLipPath(width, height, options)
 }

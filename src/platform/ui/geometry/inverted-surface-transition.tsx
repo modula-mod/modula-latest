@@ -1,8 +1,9 @@
+import {useMemo} from 'react'
 import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import Svg, {Path} from 'react-native-svg'
 
 import {
-  buildAvatarCradlePath,
+  buildAsymmetricRaisedTrailingPath,
   buildCoverCanvasLipPath,
   buildSelectedInvertedSurfacePath,
   buildTopLeadingInvertedPath,
@@ -18,6 +19,10 @@ type InvertedSurfaceTransitionProps = {
   edge?: InvertedSurfaceEdge
   side?: InvertedSurfaceSide
   size?: InvertedSurfaceSize
+  /** Portrait sits on this side of the transition. */
+  avatarSlot?: InvertedSurfaceSide
+  /** Raised canvas plateau — Profile identity occupies `trailing`. */
+  raisedSide?: InvertedSurfaceSide
   width: number
   height: number
   fill: string
@@ -36,6 +41,8 @@ export function InvertedSurfaceTransition({
   edge = 'top',
   side = 'leading',
   size = 'profile',
+  avatarSlot = 'leading',
+  raisedSide = 'trailing',
   width,
   height,
   fill,
@@ -46,22 +53,42 @@ export function InvertedSurfaceTransition({
   cradleRadius,
   style,
 }: InvertedSurfaceTransitionProps) {
-  if (width <= 0 || height <= 0) return null
-  const bite = inverted[size]
-  const options: InvertedSurfacePathOptions = {
-    cornerRadius,
-    trayWidth,
-    trayHeight,
-    biteRadii: [Math.min(12, bite), bite, Math.min(12, bite)],
+  const d = useMemo(() => {
+    if (width <= 0 || height <= 0) return ''
+    const bite = inverted[size]
+    const options: InvertedSurfacePathOptions = {
+      cornerRadius,
+      trayWidth,
+      trayHeight,
+      biteRadii: [Math.min(12, bite), bite, Math.min(12, bite)],
+      avatarCenterX,
+      cradleRadius,
+    }
+    if (avatarCenterX != null && cradleRadius != null) {
+      if (avatarSlot === 'leading' && raisedSide === 'trailing') {
+        return buildAsymmetricRaisedTrailingPath(width, height, options)
+      }
+    }
+    if (edge === 'top' && side === 'leading') {
+      return buildCoverCanvasLipPath(width, height, options)
+    }
+    return buildTopLeadingInvertedPath(width, height, options)
+  }, [
     avatarCenterX,
+    avatarSlot,
+    cornerRadius,
     cradleRadius,
-  }
-  const d =
-    avatarCenterX != null && cradleRadius != null
-      ? buildAvatarCradlePath(width, height, options)
-      : edge === 'top' && side === 'leading'
-        ? buildCoverCanvasLipPath(width, height, options)
-        : buildTopLeadingInvertedPath(width, height, options)
+    edge,
+    height,
+    raisedSide,
+    side,
+    size,
+    trayHeight,
+    trayWidth,
+    width,
+  ])
+
+  if (width <= 0 || height <= 0 || !d) return null
 
   return (
     <View
@@ -89,8 +116,11 @@ export function InvertedSelectedSurface({
   fill,
   style,
 }: InvertedSelectedSurfaceProps) {
-  if (width <= 0 || height <= 0) return null
-  const d = buildSelectedInvertedSurfacePath(width, height)
+  const d = useMemo(
+    () => (width <= 0 || height <= 0 ? '' : buildSelectedInvertedSurfacePath(width, height)),
+    [height, width],
+  )
+  if (width <= 0 || height <= 0 || !d) return null
   return (
     <View
       pointerEvents="none"

@@ -67,12 +67,26 @@ export function ProfileMetricCustomizer({draft, onChange}: ProfileMetricCustomiz
       <View style={{gap: spacing[2]}}>
         <AppText variant="headline">Profile Metrics</AppText>
         <AppText variant="caption" colour="textSecondary">
-          Metrics show at the top of your profile. Pick up to 5.
+          Reorder and select the metrics shown on your profile. Pick up to 5.
         </AppText>
         {shown.length ? (
-          <AppText variant="caption" colour="textTertiary">
-            Preview · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
-          </AppText>
+          <View style={[styles.preview, {borderColor: colours.separator, gap: spacing[3]}]}>
+            <View style={styles.previewColumn} accessibilityLabel="Preview metrics">
+              {shown.slice(0, 3).map((id, index) => {
+                const selected = index === Math.min(1, shown.length - 1)
+                return (
+                  <View key={id} style={[styles.previewMetric, {opacity: selected ? 1 : 0.38}]}>
+                    <AppText variant={selected ? 'headline' : 'caption'}>
+                      {profileMetricRegistry[id].label}
+                    </AppText>
+                  </View>
+                )
+              })}
+            </View>
+            <AppText variant="caption" colour="textTertiary" style={styles.previewCopy}>
+              Preview · left-side selector · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
+            </AppText>
+          </View>
         ) : null}
       </View>
 
@@ -234,6 +248,24 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     height: 2,
     width: 14,
+  },
+  preview: {
+    alignItems: 'center',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    paddingTop: 12,
+  },
+  previewColumn: {
+    alignItems: 'flex-start',
+    minWidth: 88,
+  },
+  previewCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  previewMetric: {
+    minHeight: 22,
+    justifyContent: 'center',
   },
   main: {
     alignItems: 'center',

@@ -328,7 +328,6 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
         onLayout={event => {
           headerHeight.value = event.nativeEvent.layout.height
         }}>
-        {mode === 'preview' ? <PreviewBar /> : null}
         {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
         {presentation.layoutId === 'creator' && !isExpanded ? (
           <FeaturedBand title="Featured links">{featuredLinks.map(link => (
@@ -373,12 +372,22 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <ProfileCoverChrome showBack={mode !== 'owner'} owner={viewer.canEdit} />
       <ProfileLayout
         left={isExpanded ? hero : undefined}
         main={main}
         right={isExpanded ? contextRail : undefined}
       />
-      <ProfileCoverChrome showBack={mode !== 'owner'} owner={viewer.canEdit} />
+      {mode === 'preview' ? (
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.previewOverlay,
+            {top: insets.top + 56, paddingHorizontal: spacing[3], zIndex: 3},
+          ]}>
+          <PreviewBar />
+        </View>
+      ) : null}
     </View>
   )
 }
@@ -485,7 +494,11 @@ const styles = StyleSheet.create({
   previewBar: {
     alignItems: 'center',
     flexDirection: 'row',
-    margin: 12,
+  },
+  previewOverlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
   previewExit: {
     alignItems: 'center',
