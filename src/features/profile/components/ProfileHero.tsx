@@ -136,7 +136,7 @@ export function ProfileHero({
             gap: spacing[3],
           },
         ]}>
-        {showActions ? (
+        {showActions && !viewer.canEdit ? (
           <View style={[styles.avatarActions, {paddingLeft: slotSize + spacing[3]}]}>
             <ProfileActions profile={profile} viewer={viewer} />
           </View>

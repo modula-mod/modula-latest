@@ -7,7 +7,7 @@ import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
-  OVERLAY_GROUP_MIN_WIDTH,
+  overlayGroupWidth,
   TOOLBAR_HIT,
 } from '@/platform/ui/menus/toolbar-chrome'
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
@@ -36,13 +36,14 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
 
 /** Web / Android: Profile-sized capsule — 44pt hits, 22pt gap. */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
+  const width = overlayGroupWidth(items.length)
   return (
     <LiquidGlassChrome
       interactive
       fallback="clear"
       contentLayout="flow"
-      style={styles.capsule}>
-      <View style={styles.row}>
+      style={[styles.capsule, {minWidth: width, width}]}>
+      <View style={[styles.row, {minWidth: width}]}>
         {items.map(item =>
           item.kind === 'button' ? (
             <ModulaIconButton
@@ -75,9 +76,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
     minHeight: OVERLAY_GROUP_HIT,
-    minWidth: OVERLAY_GROUP_MIN_WIDTH,
     overflow: 'hidden',
-    width: OVERLAY_GROUP_MIN_WIDTH,
   },
   row: {
     alignItems: 'center',
@@ -85,7 +84,6 @@ const styles = StyleSheet.create({
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
-    minWidth: OVERLAY_GROUP_MIN_WIDTH,
     paddingHorizontal: 6,
   },
 })

@@ -22,3 +22,9 @@ export const OVERLAY_GLASS_HIT = 52
 export const OVERLAY_GROUP_HIT = TOOLBAR_HIT
 export const OVERLAY_GROUP_GAP = 22
 export const OVERLAY_GROUP_MIN_WIDTH = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP
+
+/** Capsule width for n icon slots: 44pt hits with 22pt gaps. */
+export function overlayGroupWidth(itemCount: number): number {
+  const count = Math.max(1, itemCount)
+  return count * OVERLAY_GROUP_HIT + Math.max(0, count - 1) * OVERLAY_GROUP_GAP
+}

@@ -149,6 +149,8 @@ assert.match(lip, /A\(r, x0, r, 0\)/)
 assert.doesNotMatch(read('src/features/profile/components/ProfileCover.tsx'), /cornerRadius=\{0\}/)
 assert.match(read('src/features/profile/components/ProfileShell.tsx'), /stickyHeaderIndices=\{\[1\]\}/)
 assert.match(read('src/features/profile/components/ProfileShell.tsx'), /insetTop/)
+assert.match(read('src/platform/ui/navigation/profile-stack-header.tsx'), /accessibilityLabel: 'Edit Profile'/)
+assert.doesNotMatch(read('src/features/profile/components/ProfileActions.tsx'), /Edit Profile/)
 console.log('PROFILE METRICS                PASS')
 
 console.log('\nphase7m-b6 presentation tests passed')

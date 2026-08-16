@@ -132,6 +132,16 @@ export function ProfileCoverChrome({
         {showBack ? <ModulaBackButton /> : <View />}
         <ChromeGlassControlGroup
           items={[
+            ...(owner
+              ? [
+                  {
+                    kind: 'button' as const,
+                    icon: 'edit' as const,
+                    accessibilityLabel: 'Edit Profile',
+                    onPress: () => router.push('/profile/edit' as Href),
+                  },
+                ]
+              : []),
             {
               kind: 'button',
               icon: 'share',
@@ -144,14 +154,12 @@ export function ProfileCoverChrome({
                   accessibilityLabel: 'Open profile actions',
                   title: 'Profile',
                   actions: [
-                    {id: 'edit', label: 'Edit Profile', icon: 'profile'},
                     {id: 'customize', label: 'Customize', icon: 'appearance'},
                     {id: 'os', label: 'Profile-OS', icon: 'settings'},
                     {id: 'preview', label: 'View as visitor', icon: 'eye'},
                     {id: 'settings', label: 'Settings', icon: 'settings'},
                   ],
                   onAction: (id: string) => {
-                    if (id === 'edit') router.push('/profile/edit' as Href)
                     if (id === 'customize') router.push('/profile/customize' as Href)
                     if (id === 'os') router.push('/profile/os' as Href)
                     if (id === 'preview') router.push('/profile/preview' as Href)

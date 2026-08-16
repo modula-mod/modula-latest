@@ -64,6 +64,7 @@ export type AppIconName =
   | 'trash'
   | 'arrowUp'
   | 'arrowDown'
+  | 'edit'
 
 export type AppIoniconName = ComponentProps<typeof Ionicons>['name']
 
@@ -127,6 +128,7 @@ const iconMap: Record<AppIconName, AppIoniconName> = {
   trash: 'trash-outline',
   arrowUp: 'arrow-up-outline',
   arrowDown: 'arrow-down-outline',
+  edit: 'pencil-outline',
 }
 
 type AppIconProps = {

@@ -1,5 +1,4 @@
 import {StyleSheet, View} from 'react-native'
-import {useRouter, type Href} from 'expo-router'
 
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {useCapability, useProtectedPrompt} from '@/auth/runtime'
@@ -42,27 +41,16 @@ function visitorMoreActions(): ModulaActionItem[] {
 
 /**
  * Compact in-hero actions via Expo UI `ModulaButton` (universal outlined/filled).
- * Owner overflow lives in the native header. Reference: X / Instagram / Bluesky
- * — one compact Edit or Follow control on the avatar row, not a teal brick.
+ * Owner Edit lives in the cover control group. Visitors keep Follow on the
+ * avatar row — X / Instagram / Bluesky density, not a teal brick.
  */
 export function ProfileActions({profile, viewer}: ProfileActionsProps) {
-  const router = useRouter()
   const canFollow = useCapability('social:follow')
   const prompt = useProtectedPrompt()
   const followMutation = useFollowProfileMutation()
 
   if (viewer.canEdit) {
-    return (
-      <View style={styles.row}>
-        <ModulaButton
-          label="Edit Profile"
-          role="secondary"
-          accessibilityLabel="Edit Profile"
-          onPress={() => router.push('/profile/edit' as Href)}
-        />
-        <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
-      </View>
-    )
+    return null
   }
 
   return (

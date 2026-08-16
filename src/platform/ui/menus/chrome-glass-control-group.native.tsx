@@ -8,7 +8,7 @@ import {toolbarGroupItemModifiers} from '@/platform/ui/menus/toolbar-chrome-modi
 import {
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
-  OVERLAY_GROUP_MIN_WIDTH,
+  overlayGroupWidth,
   TOOLBAR_HIT,
 } from '@/platform/ui/menus/toolbar-chrome'
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
@@ -37,29 +37,31 @@ if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_
 }
 
 /**
- * Overlay trailing share + overflow, sized like Profile's header capsule.
+ * Overlay trailing actions, sized like Profile's header capsule.
  *
- * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots (110pt wide). Expo Host
- * is given an explicit 44×44 frame and does not matchContents. Callstack /
- * SwiftUI ControlGroup / BlurView are not used — they shrink or wash out to
- * white on overlay headers.
+ * Layout is RN-owned: 44pt tall, 22pt gap, 44pt slots. Width follows item
+ * count (2 → 110pt, 3 → 176pt). Expo Host is given an explicit 44×44 frame
+ * and does not matchContents. Callstack / SwiftUI ControlGroup / BlurView
+ * are not used — they shrink or wash out to white on overlay headers.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const {scheme} = useThemeTokens()
   const itemModifiers = toolbarGroupItemModifiers()
   const isDark = scheme === 'dark'
+  const width = overlayGroupWidth(items.length)
 
   return (
-    <View style={styles.shell}>
+    <View style={[styles.shell, {width}]}>
       <View
         style={[
           styles.clip,
           {
             backgroundColor: isDark ? 'rgba(36,40,44,0.94)' : '#F7F7F8',
             borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.14)',
+            width,
           },
         ]}>
-        <View style={styles.row}>
+        <View style={[styles.row, {width}]}>
           {items.map(item => (
             <View key={item.accessibilityLabel} style={styles.hit}>
               <Host style={styles.hit}>
@@ -95,7 +97,6 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
     overflow: 'hidden',
-    width: OVERLAY_GROUP_MIN_WIDTH,
   },
   hit: {
     alignItems: 'center',
@@ -111,7 +112,6 @@ const styles = StyleSheet.create({
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
-    width: OVERLAY_GROUP_MIN_WIDTH,
   },
   shell: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
@@ -123,6 +123,5 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.16,
     shadowRadius: 6,
-    width: OVERLAY_GROUP_MIN_WIDTH,
   },
 })
