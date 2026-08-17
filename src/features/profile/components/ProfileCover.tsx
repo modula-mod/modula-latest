@@ -12,10 +12,8 @@ import {
   PROFILE_LAYOUT,
   profileCoverBody,
   profileCoverHeight,
-  profilePlateauDepth,
 } from '@/features/profile/model/profile-layout'
 import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
-import {InvertedSurfaceTransition} from '@/platform/ui/geometry'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -28,14 +26,6 @@ type ProfileCoverProps = {
   previewKind?: 'photo' | 'gradient' | 'solid' | 'none'
   onPhotoUri?: (uri: string) => void
   onPhotoRemove?: () => void
-  /** Riser between the leading shelf and the raised plateau. */
-  stepX?: number
-  stepRise?: number
-  stepRadius?: number
-  avatarCenterX?: number
-  avatarCenterY?: number
-  cradleRadius?: number
-  plateauRadius?: number
 }
 
 export const PROFILE_COVER_BODY = profileCoverBody(false)
@@ -52,13 +42,6 @@ export function ProfileCover({
   previewKind,
   onPhotoUri,
   onPhotoRemove,
-  stepX,
-  stepRise,
-  stepRadius,
-  avatarCenterX,
-  avatarCenterY,
-  cradleRadius,
-  plateauRadius = PROFILE_LAYOUT.plateauRadius,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
@@ -66,18 +49,13 @@ export function ProfileCover({
   // NativeTabs still content-insets the first ScrollView even with `never`.
   // Pull the banner into that inset so the photograph sits under the status
   // bar. No transform on this tree — a parallax layer desyncs the avatar
-  // and identity on a fast fling.
+  // and identity on a fast fling. The inverted pocket is painted in the
+  // hero body so it shares coordinates with the portrait.
   const height = profileCoverHeight(compact, insets.top, width)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
   const emptyFill = profile.coverColour ?? colours.borderStrong
   const hasPhoto = Boolean(uri) && kind !== 'none'
-  const transitionHeight = Math.min(
-    cradleRadius != null
-      ? Math.round(cradleRadius + plateauRadius)
-      : profilePlateauDepth(Boolean(compact), false, width),
-    height,
-  )
 
   const body = (
     <View
@@ -92,9 +70,7 @@ export function ProfileCover({
           backgroundColor: colours.canvas,
         },
       ]}>
-      <View
-        collapsable={false}
-        style={StyleSheet.absoluteFill}>
+      <View collapsable={false} style={StyleSheet.absoluteFill}>
         <View
           style={[
             styles.artwork,
@@ -122,26 +98,6 @@ export function ProfileCover({
           />
         </View>
       ) : null}
-      <View pointerEvents="none" style={styles.transition}>
-        <InvertedSurfaceTransition
-          edge="top"
-          side="leading"
-          size="md"
-          avatarSlot="leading"
-          raisedSide="trailing"
-          width={width}
-          height={transitionHeight + 1}
-          fill={colours.canvas}
-          cornerRadius={stepRadius ?? plateauRadius}
-          avatarCenterX={avatarCenterX}
-          avatarCenterY={avatarCenterY}
-          cradleRadius={cradleRadius}
-          plateauRadius={plateauRadius}
-          stepX={stepX}
-          stepRise={stepRise}
-          stepRadius={stepRadius ?? plateauRadius}
-        />
-      </View>
     </View>
   )
 
@@ -202,11 +158,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-  },
-  transition: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
   },
 })

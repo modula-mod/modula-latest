@@ -177,6 +177,8 @@ export function buildCoverShelfStepPath(
  *   4. flat plateau carrying the display name
  *
  * The plateau sits at the avatar centre so the name reads beside the portrait.
+ * `avatarCenterX` / `avatarCenterY` / `cradleRadius` must come from
+ * `profilePocketGeometry()` — do not invent a second centre for the SVG.
  */
 export function buildAvatarCradleRisePath(
   width: number,

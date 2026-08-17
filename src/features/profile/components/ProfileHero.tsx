@@ -9,11 +9,12 @@ import type {
 import {AppText} from '@/components/primitives/AppText'
 import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
+import {ProfileAboutPage} from '@/features/profile/components/ProfileAboutPage'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
 import {ProfileCover} from '@/features/profile/components/ProfileCover'
-import {ProfileBio, ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
-import {ProfileMetadataGrid} from '@/features/profile/components/ProfileMetadataGrid'
-import {ProfileStats} from '@/features/profile/components/ProfileStats'
+import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
+import {ProfileInfoPager} from '@/features/profile/components/ProfileInfoPager'
+import {ProfileMetricsPage} from '@/features/profile/components/ProfileMetricsPage'
 import {
   ProfileAvatarEditor,
   type ProfileAvatarDraft,
@@ -23,6 +24,7 @@ import {
   type ProfileCoverDraft,
 } from '@/features/profile/editor/profile-cover-editor'
 import {profileGeometry} from '@/features/profile/model/profile-layout'
+import {InvertedSurfaceTransition} from '@/platform/ui/geometry'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileHeroProps = {
@@ -40,8 +42,8 @@ type ProfileHeroProps = {
  * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
  * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
  *
- * The canvas steps with a G1 inverted cradle around the portrait. Identity
- * starts at the white plateau's leading edge, beside the pocket.
+ * The inverted SVG cradle is painted in this body overlap band so the
+ * portrait and the pocket share `profilePocketGeometry()`.
  */
 export function ProfileHero({
   profile,
@@ -64,6 +66,7 @@ export function ProfileHero({
   })
   const canEdit = viewer.canEdit
   const stacked = geometry.stackedFallback
+  const pocket = geometry.pocket
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
   const [avatarEditorOpen, setAvatarEditorOpen] = useState(false)
@@ -73,31 +76,33 @@ export function ProfileHero({
   const identity = (
     <ProfileIdentity profile={profile} viewer={viewer} compact emphasis="hero" />
   )
-  const info = (
-    <View style={[styles.infoColumn, {gap: spacing[2]}]}>
-      <ProfileBio profile={profile} compact />
-      <ProfileMetadataGrid profile={profile} viewer={viewer} />
+  const pager = (
+    <ProfileInfoPager
+      metrics={
+        showStats ? (
+          <ProfileMetricsPage
+            profile={profile}
+            ownerHandle={ownerHandle}
+            presentation={presentation}
+            onSelectTab={onSelectTab}
+            isOwner={viewer.canEdit}
+          />
+        ) : null
+      }
+      about={<ProfileAboutPage profile={profile} viewer={viewer} />}
+    />
+  )
+  const extras = (
+    <>
       {showActions && !viewer.canEdit ? (
         <View style={styles.visitorActions}>
           <ProfileActions profile={profile} viewer={viewer} />
         </View>
       ) : null}
       <HeroViewingCopy viewer={viewer} />
-    </View>
+    </>
   )
-  const stats = showStats ? (
-    <ProfileStats
-      key={profile.id}
-      profile={profile}
-      ownerHandle={ownerHandle}
-      presentation={presentation}
-      onSelectTab={onSelectTab}
-      isOwner={viewer.canEdit}
-    />
-  ) : null
 
-  // In the plateau row with the name — never `position: 'absolute'` on the
-  // cover. Absolute children desync from in-flow text on a fast fling.
   const avatar = (
     <View
       collapsable={false}
@@ -133,20 +138,34 @@ export function ProfileHero({
     </View>
   )
 
+  const cradle = (
+    <View pointerEvents="none" style={styles.cradle}>
+      <InvertedSurfaceTransition
+        edge="top"
+        side="leading"
+        size="md"
+        width={width}
+        height={geometry.plateauDepth}
+        fill={colours.canvas}
+        cornerRadius={geometry.plateauRadius}
+        avatarCenterX={pocket.pocketCenterX}
+        avatarCenterY={pocket.pocketCenterY}
+        cradleRadius={pocket.pocketRadius}
+        plateauRadius={geometry.plateauRadius}
+        stepX={geometry.stepX}
+        stepRise={geometry.stepRise}
+        stepRadius={geometry.stepRadius}
+      />
+    </View>
+  )
+
   return (
-    <View collapsable={false} style={[styles.wrap, {backgroundColor: colours.canvas}]}>
+    <View collapsable={false} style={styles.wrap}>
       <View collapsable={false} style={styles.coverBlock}>
         <ProfileCover
           profile={profile}
           compact={isCompact}
           canEdit={canEdit}
-          stepX={geometry.stepX}
-          stepRise={geometry.stepRise}
-          stepRadius={geometry.stepRadius}
-          avatarCenterX={geometry.avatarCenterX}
-          avatarCenterY={geometry.avatarCenterY}
-          cradleRadius={geometry.cradleRadius}
-          plateauRadius={geometry.plateauRadius}
           onEditPress={() => setCoverEditorOpen(true)}
           previewUri={coverDraft ? coverDraft.uri : undefined}
           previewKind={coverDraft?.kind}
@@ -163,64 +182,71 @@ export function ProfileHero({
           }}
         />
       </View>
-      {stacked ? (
-        <View
-          pointerEvents="box-none"
-          style={[
-            styles.body,
-            {
-              marginTop: -geometry.plateauDepth,
-              paddingHorizontal: spacing[4],
-              paddingTop: geometry.identityPlateauGap,
-              paddingBottom: spacing[2],
-              gap: spacing[3],
-            },
-          ]}>
-          {avatar}
-          {identity}
-          {info}
-          {stats}
-        </View>
-      ) : (
-        <View
-          pointerEvents="box-none"
-          style={[
-            styles.body,
-            {
-              marginTop: -geometry.plateauDepth,
-              paddingHorizontal: spacing[4],
-              paddingTop: geometry.identityPlateauGap,
-              paddingBottom: spacing[2],
-            },
-          ]}>
-          <View pointerEvents="box-none" style={styles.plateauRow}>
-            <View
-              pointerEvents="box-none"
-              style={[
-                styles.metricColumn,
-                {
-                  width: geometry.metricColumnWidth,
-                  gap: geometry.metricColumnTop,
-                },
-              ]}>
-              {avatar}
-              {stats}
-            </View>
-            <View
-              style={[
-                styles.identityColumn,
-                {
-                  gap: spacing[2],
-                  paddingLeft: geometry.identityColumnPad,
-                  paddingTop: geometry.identityPlateauGap + geometry.identityDrop,
-                },
-              ]}>
-              {identity}
-              {info}
-            </View>
+      <View
+        pointerEvents="box-none"
+        style={[
+          styles.body,
+          {
+            marginTop: -geometry.plateauDepth,
+            paddingBottom: spacing[2],
+          },
+        ]}>
+        {cradle}
+        {stacked ? (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.stacked,
+              {
+                paddingHorizontal: spacing[4],
+                paddingTop: geometry.identityPlateauGap,
+                gap: spacing[3],
+              },
+            ]}>
+            {avatar}
+            {identity}
+            {extras}
+            {pager}
           </View>
-        </View>
-      )}
+        ) : (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.content,
+              {
+                paddingHorizontal: spacing[4],
+                paddingTop: geometry.identityPlateauGap,
+                gap: geometry.metricColumnTop,
+              },
+            ]}>
+            <View pointerEvents="box-none" style={styles.plateauRow}>
+              <View
+                pointerEvents="box-none"
+                style={[
+                  styles.avatarColumn,
+                  {
+                    width: geometry.metricColumnWidth,
+                  },
+                ]}>
+                {avatar}
+              </View>
+              <View
+                style={[
+                  styles.identityColumn,
+                  {
+                    gap: spacing[1],
+                    paddingLeft: geometry.identityColumnPad,
+                    paddingTop: geometry.identityDrop,
+                  },
+                ]}>
+                {identity}
+                {extras}
+              </View>
+            </View>
+            {pager}
+          </View>
+        )}
+      </View>
 
       {canEdit ? (
         <>
@@ -290,11 +316,22 @@ function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
 }
 
 const styles = StyleSheet.create({
+  avatarColumn: {
+    flexGrow: 0,
+    flexShrink: 0,
+    overflow: 'visible',
+  },
   avatarFlow: {
     overflow: 'visible',
     zIndex: 3,
   },
   body: {
+    minWidth: 0,
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 2,
+  },
+  content: {
     minWidth: 0,
     overflow: 'visible',
     zIndex: 2,
@@ -304,22 +341,28 @@ const styles = StyleSheet.create({
     position: 'relative',
     zIndex: 1,
   },
+  cradle: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1,
+  },
   identityColumn: {
     flex: 1,
     minWidth: 0,
-  },
-  infoColumn: {
-    minWidth: 0,
-  },
-  metricColumn: {
-    flexGrow: 0,
-    flexShrink: 0,
-    overflow: 'visible',
+    zIndex: 2,
   },
   plateauRow: {
     alignItems: 'flex-start',
     flexDirection: 'row',
     minWidth: 0,
+    zIndex: 2,
+  },
+  stacked: {
+    minWidth: 0,
+    overflow: 'visible',
+    zIndex: 2,
   },
   visitorActions: {
     alignItems: 'flex-start',

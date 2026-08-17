@@ -84,7 +84,7 @@ export function ProfileMetricCustomizer({draft, onChange}: ProfileMetricCustomiz
               })}
             </View>
             <AppText variant="caption" colour="textTertiary" style={styles.previewCopy}>
-              Preview · left-side selector · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
+              Preview · Metrics page · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
             </AppText>
           </View>
         ) : null}

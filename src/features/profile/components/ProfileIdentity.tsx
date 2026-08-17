@@ -79,13 +79,18 @@ export function ProfileIdentity({
 export function ProfileBio({
   profile,
   compact,
+  maxLines,
 }: {
   profile: ModulaProfile
   compact?: boolean
+  maxLines?: number
 }) {
   if (!profile.bio) return null
   return (
-    <AppText variant="body" style={[styles.bio, compact ? styles.bioCompact : null]}>
+    <AppText
+      variant="body"
+      numberOfLines={maxLines}
+      style={[styles.bio, compact ? styles.bioCompact : null]}>
       {profile.bio}
     </AppText>
   )
@@ -96,7 +101,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   bioCompact: {
-    lineHeight: 19,
+    lineHeight: 18,
   },
   handleRow: {
     alignItems: 'center',

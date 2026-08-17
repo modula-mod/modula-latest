@@ -23,10 +23,10 @@ import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-met
 import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const NEIGHBOR_OPACITY = 0.34
-const FAR_OPACITY = 0.16
-const NEIGHBOR_SCALE = 0.88
-const ARROW_OPACITY = 0.3
+const NEIGHBOR_OPACITY = 0.4
+const FAR_OPACITY = 0.18
+const NEIGHBOR_SCALE = 0.9
+const ARROW_OPACITY = 0.28
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
 
@@ -103,8 +103,8 @@ export function ProfileMetricPicker({
   const pan = useMemo(() => {
     return Gesture.Pan()
       .enabled(count > 1)
-      .activeOffsetY([-8, 8])
-      .failOffsetX([-24, 24])
+      .activeOffsetY([-14, 14])
+      .failOffsetX([-20, 20])
       .onBegin(() => {
         startOffset.value = scrollOffset.value
       })
@@ -329,7 +329,7 @@ function MetricWheelItem({
       transform: [
         {translateY},
         {
-          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.84]),
+          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
         },
       ],
     }
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     alignItems: 'center',
-    height: 16,
+    height: 12,
     justifyContent: 'center',
     opacity: ARROW_OPACITY,
   },

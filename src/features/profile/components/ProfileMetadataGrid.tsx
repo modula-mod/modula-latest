@@ -22,15 +22,21 @@ type MetadataCell = {
 type ProfileMetadataGridProps = {
   profile: ModulaProfile
   viewer: ProfileViewerContext
+  /** Owner visibility on the hero About page. The About tab still holds the full copy. */
+  includeVisibility?: boolean
 }
 
 /**
  * Compact identity metadata. Two columns at normal width, no settings cards.
  * Missing fields collapse — never leave empty boxes.
  */
-export function ProfileMetadataGrid({profile, viewer}: ProfileMetadataGridProps) {
+export function ProfileMetadataGrid({
+  profile,
+  viewer,
+  includeVisibility = false,
+}: ProfileMetadataGridProps) {
   const {colours, spacing} = useThemeTokens()
-  const cells = metadataCells(profile, viewer)
+  const cells = metadataCells(profile, viewer, includeVisibility)
 
   if (!cells.length) return null
 
@@ -90,7 +96,7 @@ function MetadataCellView({
       importantForAccessibility={cell.onPress ? 'no-hide-descendants' : 'auto'}
       style={[styles.cell, {gap}]}>
       <ModulaIcon name={cell.icon} colour={colours.textSecondary} size={13} />
-      <AppText variant="caption" colour="textSecondary" numberOfLines={1} style={styles.label}>
+      <AppText variant="caption" colour="textSecondary" numberOfLines={2} style={styles.label}>
         {cell.label}
       </AppText>
     </View>
@@ -118,6 +124,7 @@ function MetadataCellView({
 function metadataCells(
   profile: ModulaProfile,
   viewer: ProfileViewerContext,
+  includeVisibility: boolean,
 ): MetadataCell[] {
   const locationVisible =
     profile.location &&
@@ -160,6 +167,15 @@ function metadataCells(
       label: domain,
       accessibilityLabel: `Website ${domain}`,
       onPress: () => void openSafeExternalUrl(profile.website?.url ?? ''),
+    })
+  }
+
+  if (includeVisibility && viewer.relationship === 'owner') {
+    cells.push({
+      key: 'visibility',
+      icon: 'eye',
+      label: 'Public',
+      accessibilityLabel: 'Profile visibility Public',
     })
   }
 

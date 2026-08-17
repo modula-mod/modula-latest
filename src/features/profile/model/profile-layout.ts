@@ -6,8 +6,11 @@ import {inverted} from '@/theme/foundations/inverted'
  *   cover photograph, full bleed under the chrome
  *   inverted-corner cradle around the portrait (circular bite + convex landing)
  *   display name / handle on the raised plateau, beside the portrait
- *   metric wheel under the portrait | bio + metadata to the right
+ *   Metrics / About pager under the identity
  *   tabs → content
+ *
+ * Pocket and portrait share `profilePocketGeometry()`. The inverted SVG
+ * overlay lives in the body overlap band so it cannot drift from the avatar.
  *
  * The cradle radius is the portrait slot plus a small cover gap, so the
  * inverted corner wraps the circle instead of cutting a 90° step beside it.
@@ -24,17 +27,21 @@ export const PROFILE_LAYOUT = {
   haloExtra: 5,
   haloWidth: 2,
   avatarBorder: 3,
-  /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
+  /** Painted portrait is 5% smaller than the max slot so it seats in the pocket. */
   avatarFit: 0.95,
   /**
-   * Extra drop below the SVG cradle centre. 0 keeps the portrait in the
-   * inverted pocket. A positive value (used in earlier passes) leaves the
-   * bite empty because the SVG does not follow this knob.
+   * Optical correction only. Positive lowers the painted portrait relative to
+   * the shared pocket centre. Not a layout mechanism — SVG and avatar both
+   * read `profilePocketGeometry()`. There is no `modula-profile-andrei.yaml`;
+   * this token lives here.
    */
   avatarDrop: 0,
-  /** Extra drop for name / handle / bio. Does not move the inverted SVG. */
-  identityDrop: 55,
-  /** Cover showing around the portrait inside the inverted cradle. */
+  /**
+   * Optical drop for name / handle onto the raised plateau. Small on purpose:
+   * the identity sits beside the pocket, not under the old 60pt avatar miss.
+   */
+  identityDrop: 8,
+  /** Cover showing around the outer silhouette (portrait + separator + halo). */
   cradleGap: 8,
   /** Convex landing from the cradle onto the identity plateau. */
   plateauRadius: 20,
@@ -42,8 +49,12 @@ export const PROFILE_LAYOUT = {
    *  inverted overlay stays a short cradle at the bottom, not extra height. */
   coverHeadroomCompact: 140,
   coverHeadroomRegular: 160,
-  /** Portrait bottom to the top of the metric wheel. */
-  metricColumnGap: 12,
+  /** Portrait bottom to the profile info pager. */
+  metricColumnGap: 8,
+  /** Compact Metrics / About pager. Replaces the old side-by-side info block. */
+  pagerMinHeight: 188,
+  pagerMaxHeight: 228,
+  pagerIndicatorSize: 6,
   /**
    * Extra space under the in-flow portrait before the wheel.
    * Does not move the inverted SVG. 0 restores the pre-flow gap —
@@ -54,7 +65,7 @@ export const PROFILE_LAYOUT = {
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
   coverTopBlur: 28,
-  metricItemHeight: 42,
+  metricItemHeight: 36,
   metricWindowItems: 3,
   metricMaxVisible: 5,
   metricRailGutter: 14,
@@ -67,6 +78,21 @@ export const PROFILE_LAYOUT = {
   stackedWidth: 340,
   invertedSize: inverted.profile,
 } as const
+
+/**
+ * Canonical avatar / SVG cradle geometry. Overlay and portrait both read this.
+ * Coordinates are in the body overlap band: y = 0 at the top of the inverted
+ * overlay (the raised plateau), x = 0 at the screen leading edge.
+ */
+export type ProfilePocketGeometry = {
+  pocketCenterX: number
+  pocketCenterY: number
+  pocketRadius: number
+  avatarCenterX: number
+  avatarCenterY: number
+  avatarRadius: number
+  haloExpansion: number
+}
 
 export type ProfileGeometry = {
   coverBody: number
@@ -91,6 +117,7 @@ export type ProfileGeometry = {
   metricViewportHeight: number
   metricColumnTop: number
   metricColumnWidth: number
+  pagerHeight: number
   /** Pull the portrait into the plateau row so it scrolls with the name. */
   avatarFlowTop: number
   avatarFlowLeft: number
@@ -100,6 +127,7 @@ export type ProfileGeometry = {
   plateauRadius: number
   invertedCornerRadius: number
   stackedFallback: boolean
+  pocket: ProfilePocketGeometry
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -141,9 +169,32 @@ export function profileCradleRadius(
   showFocusHalo: boolean,
   contentWidth = 393,
 ): number {
-  const pocket =
-    profileAvatarSizeFull(compact, contentWidth) + profileHaloExtra(showFocusHalo)
-  return pocket / 2 + PROFILE_LAYOUT.cradleGap
+  return profileAvatarSlotSize(compact, showFocusHalo, contentWidth) / 2 + PROFILE_LAYOUT.cradleGap
+}
+
+/**
+ * Shared pocket + avatar centres. The SVG cradle and the painted portrait
+ * must both use this — never offset one independently.
+ */
+export function profilePocketGeometry(
+  compact: boolean,
+  showFocusHalo: boolean,
+  contentWidth = 393,
+): ProfilePocketGeometry {
+  const haloExpansion = profileHaloExtra(showFocusHalo)
+  const avatarRadius = profileAvatarSlotSize(compact, showFocusHalo, contentWidth) / 2
+  const pocketRadius = avatarRadius + PROFILE_LAYOUT.cradleGap
+  const pocketCenterX = profileAvatarLead(contentWidth) + avatarRadius
+  const pocketCenterY = PROFILE_LAYOUT.plateauRadius
+  return {
+    pocketCenterX,
+    pocketCenterY,
+    pocketRadius,
+    avatarCenterX: pocketCenterX,
+    avatarCenterY: pocketCenterY + PROFILE_LAYOUT.avatarDrop,
+    avatarRadius,
+    haloExpansion,
+  }
 }
 
 export function profileCoverBody(compact: boolean | undefined, contentWidth = 393): number {
@@ -188,25 +239,20 @@ export function profileGeometry(
   const contentWidth = options?.contentWidth ?? 393
   const fontScale = options?.fontScale ?? 1
   const paintedSize = profileAvatarSize(compact, contentWidth)
-  const fullSize = profileAvatarSizeFull(compact, contentWidth)
-  const haloExpansion = profileHaloExtra(showFocusHalo)
-  const slotSize = paintedSize + haloExpansion
-  const pocketSlot = fullSize + haloExpansion
+  const pocket = profilePocketGeometry(compact, showFocusHalo, contentWidth)
+  const slotSize = paintedSize + pocket.haloExpansion
   const avatarLead = profileAvatarLead(contentWidth)
-  const cradleRadius = profileCradleRadius(compact, showFocusHalo, contentWidth)
+  const cradleRadius = pocket.pocketRadius
   const plateauRadius = PROFILE_LAYOUT.plateauRadius
   const plateauDepth = Math.round(cradleRadius + plateauRadius)
-  const avatarCenterX = avatarLead + pocketSlot / 2
-  const gutterWidth = avatarLead + pocketSlot
-  // Lower the painted portrait into the white pocket. The inverted SVG stays put.
-  const shelfDepth = cradleRadius - slotSize / 2 - PROFILE_LAYOUT.avatarDrop
-  // Flat white plateau starts after the concave bite + convex landing.
+  const gutterWidth = avatarLead + slotSize
+  const shelfDepth = cradleRadius - pocket.avatarRadius - PROFILE_LAYOUT.avatarDrop
   const identityColumnPad = PROFILE_LAYOUT.cradleGap + plateauRadius
-  const avatarLeft = avatarCenterX - slotSize / 2
-  // Same visual as `bottom: shelfDepth` on the cover, but in the plateau row
-  // so a fast fling cannot composite the portrait apart from the name.
+  const avatarLeft = pocket.avatarCenterX - pocket.avatarRadius
+  // Body overlap band is the overlay: y=0 at plateau. Portrait centre is the
+  // pocket centre, minus the body padding that sits above the flow child.
   const avatarFlowTop =
-    plateauDepth - shelfDepth - slotSize - PROFILE_LAYOUT.identityPlateauGap
+    pocket.avatarCenterY - PROFILE_LAYOUT.identityPlateauGap - pocket.avatarRadius
   const avatarFlowLeft = avatarLeft - horizontalInset
 
   const identityColumnWidth = contentWidth - horizontalInset - gutterWidth
@@ -219,11 +265,11 @@ export function profileGeometry(
     coverBody: profileCoverBody(compact, contentWidth),
     avatarSize: paintedSize,
     slotSize,
-    haloExpansion,
+    haloExpansion: pocket.haloExpansion,
     heroHorizontalInset: horizontalInset,
     avatarLead,
     avatarLeft,
-    avatarLift: cradleRadius + slotSize / 2,
+    avatarLift: cradleRadius + pocket.avatarRadius,
     plateauDepth,
     shelfDepth,
     transitionHeight: plateauDepth,
@@ -238,13 +284,15 @@ export function profileGeometry(
     metricViewportHeight: profileMetricWindowHeight(),
     metricColumnTop: PROFILE_LAYOUT.metricColumnGap + PROFILE_LAYOUT.metricDrop,
     metricColumnWidth: Math.max(0, gutterWidth - horizontalInset),
+    pagerHeight: PROFILE_LAYOUT.pagerMinHeight,
     avatarFlowTop,
     avatarFlowLeft,
-    avatarCenterX,
-    avatarCenterY: plateauRadius,
+    avatarCenterX: pocket.avatarCenterX,
+    avatarCenterY: pocket.avatarCenterY,
     cradleRadius,
     plateauRadius,
     invertedCornerRadius: inverted.md,
     stackedFallback,
+    pocket,
   }
 }
