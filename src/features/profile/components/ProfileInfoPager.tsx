@@ -255,14 +255,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    minHeight: 20,
+    minHeight: 44,
     paddingTop: 4,
   },
   indicatorHit: {
     alignItems: 'center',
-    height: 20,
+    height: 44,
     justifyContent: 'center',
-    width: 20,
+    width: 44,
   },
   dot: {
     overflow: 'hidden',
