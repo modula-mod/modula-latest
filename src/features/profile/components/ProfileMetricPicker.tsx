@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/immutability */
 import {useCallback, useEffect, useMemo} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {Gesture, GestureDetector} from 'react-native-gesture-handler'
 import Animated, {
   interpolate,
@@ -16,8 +16,9 @@ import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {
-  PROFILE_LAYOUT,
+  profileMetricItemHeight,
   profileMetricWindowHeight,
+  profileMetricWindowItems,
 } from '@/features/profile/model/profile-layout'
 import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-metrics'
 import {ModulaIcon} from '@/platform/ui/icons'
@@ -27,19 +28,25 @@ const NEIGHBOR_OPACITY = 0.58
 const FAR_OPACITY = 0.42
 const NEIGHBOR_SCALE = 0.92
 const ARROW_OPACITY = 0.28
-const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
-const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
-
-function windowStartFromOffset(offset: number, count: number): number {
+function windowStartFromOffset(
+  offset: number,
+  count: number,
+  itemHeight: number,
+  windowItems: number,
+): number {
   'worklet'
-  if (count <= WINDOW_ITEMS) return 0
-  const index = offset / ITEM_HEIGHT
-  return Math.max(0, Math.min(count - WINDOW_ITEMS, index - 1))
+  if (count <= windowItems) return 0
+  const index = offset / itemHeight
+  return Math.max(0, Math.min(count - windowItems, index - 1))
 }
 
-function windowStartForIndex(index: number, count: number): number {
-  if (count <= WINDOW_ITEMS) return 0
-  return Math.max(0, Math.min(count - WINDOW_ITEMS, index - 1))
+function windowStartForIndex(
+  index: number,
+  count: number,
+  windowItems: number,
+): number {
+  if (count <= windowItems) return 0
+  return Math.max(0, Math.min(count - windowItems, index - 1))
 }
 
 type ProfileMetricPickerProps = {
@@ -63,24 +70,27 @@ export function ProfileMetricPicker({
 }: ProfileMetricPickerProps) {
   const {colours, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
+  const {fontScale} = useWindowDimensions()
+  const itemHeight = profileMetricItemHeight(fontScale)
+  const windowItems = profileMetricWindowItems(fontScale)
   const count = metrics.length
   const selectedIndex = Math.max(
     0,
     metrics.findIndex(metric => metric.id === selectedMetricId),
   )
-  const scrollOffset = useSharedValue(selectedIndex * ITEM_HEIGHT)
-  const startOffset = useSharedValue(selectedIndex * ITEM_HEIGHT)
+  const scrollOffset = useSharedValue(selectedIndex * itemHeight)
+  const startOffset = useSharedValue(selectedIndex * itemHeight)
   const lastTick = useSharedValue(selectedIndex)
 
   useEffect(() => {
-    const next = selectedIndex * ITEM_HEIGHT
+    const next = selectedIndex * itemHeight
     lastTick.value = selectedIndex
     if (reduceMotion) {
       scrollOffset.value = next
       return
     }
     scrollOffset.value = withSpring(next, motion.springs.selection)
-  }, [lastTick, motion.springs.selection, reduceMotion, scrollOffset, selectedIndex])
+  }, [itemHeight, lastTick, motion.springs.selection, reduceMotion, scrollOffset, selectedIndex])
 
   const commitIndex = useCallback(
     (index: number) => {
@@ -115,7 +125,7 @@ export function ProfileMetricPicker({
         startOffset.value = scrollOffset.value
       })
       .onUpdate(event => {
-        const max = Math.max(0, (count - 1) * ITEM_HEIGHT)
+        const max = Math.max(0, (count - 1) * itemHeight)
         const raw = startOffset.value - event.translationY
         if (raw < 0) {
           scrollOffset.value = raw * 0.32
@@ -124,20 +134,20 @@ export function ProfileMetricPicker({
         } else {
           scrollOffset.value = raw
         }
-        const tick = Math.max(0, Math.min(count - 1, Math.round(scrollOffset.value / ITEM_HEIGHT)))
+        const tick = Math.max(0, Math.min(count - 1, Math.round(scrollOffset.value / itemHeight)))
         if (tick !== lastTick.value) {
           lastTick.value = tick
           runOnJS(selectionHaptic)()
         }
       })
       .onEnd(event => {
-        const max = Math.max(0, (count - 1) * ITEM_HEIGHT)
-        const from = Math.round(startOffset.value / ITEM_HEIGHT)
+        const max = Math.max(0, (count - 1) * itemHeight)
+        const from = Math.round(startOffset.value / itemHeight)
         const projected = scrollOffset.value - event.velocityY * 0.08
-        const unbounded = Math.round(projected / ITEM_HEIGHT)
+        const unbounded = Math.round(projected / itemHeight)
         const limited = Math.max(from - 2, Math.min(from + 2, unbounded))
         const next = Math.max(0, Math.min(count - 1, limited))
-        const destination = Math.max(0, Math.min(max, next * ITEM_HEIGHT))
+        const destination = Math.max(0, Math.min(max, next * itemHeight))
         if (reduceMotion) {
           scrollOffset.value = destination
         } else {
@@ -148,6 +158,7 @@ export function ProfileMetricPicker({
   }, [
     commitIndex,
     count,
+    itemHeight,
     lastTick,
     motion.springs.selection,
     reduceMotion,
@@ -160,11 +171,11 @@ export function ProfileMetricPicker({
   const selected = metrics[selectedIndex]
   const windowHeight =
     count === 1
-      ? ITEM_HEIGHT
+      ? itemHeight
       : count === 2
-        ? ITEM_HEIGHT * 2
-        : profileMetricWindowHeight()
-  const windowStart = windowStartForIndex(selectedIndex, count)
+        ? itemHeight * 2
+        : profileMetricWindowHeight(fontScale)
+  const windowStart = windowStartForIndex(selectedIndex, count, windowItems)
   const selectedRow = selectedIndex - windowStart
   const accessibilityValue = selected
     ? `${selected.label}, ${metricSpokenValue(selected)}, selected, ${selectedIndex + 1} of ${count}.`
@@ -228,6 +239,8 @@ export function ProfileMetricPicker({
               reduceMotion={reduceMotion}
               align={align}
               showSelectionDot={showSelectionDot}
+              itemHeight={itemHeight}
+              windowItems={windowItems}
             />
           ))}
           <View
@@ -237,8 +250,8 @@ export function ProfileMetricPicker({
             style={[
               styles.focal,
               {
-                top: selectedRow * ITEM_HEIGHT,
-                height: ITEM_HEIGHT,
+                top: selectedRow * itemHeight,
+                height: itemHeight,
               },
             ]}>
             <View style={[styles.focalRule, {backgroundColor: colours.separator, top: 0}]} />
@@ -249,19 +262,19 @@ export function ProfileMetricPicker({
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={() => moveBy(-1)}
-              style={[styles.hit, {top: (selectedRow - 1) * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: (selectedRow - 1) * itemHeight, height: itemHeight}]}
             />
             <AppPressable
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={activate}
-              style={[styles.hit, {top: selectedRow * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: selectedRow * itemHeight, height: itemHeight}]}
             />
             <AppPressable
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
               onPress={() => moveBy(1)}
-              style={[styles.hit, {top: (selectedRow + 1) * ITEM_HEIGHT, height: ITEM_HEIGHT}]}
+              style={[styles.hit, {top: (selectedRow + 1) * itemHeight, height: itemHeight}]}
             />
           </View>
         </View>
@@ -357,6 +370,8 @@ function MetricWheelItem({
   reduceMotion,
   align,
   showSelectionDot,
+  itemHeight,
+  windowItems,
 }: {
   metric: ProfileMetricDescriptor
   index: number
@@ -366,12 +381,20 @@ function MetricWheelItem({
   reduceMotion: boolean
   align: 'center' | 'start'
   showSelectionDot: boolean
+  itemHeight: number
+  windowItems: number
 }) {
   const listLayout = align === 'start'
+  const skipScale = listLayout || itemHeight > 36
   const style = useAnimatedStyle(() => {
-    const current = scrollOffset.value / ITEM_HEIGHT
-    const windowStart = windowStartFromOffset(scrollOffset.value, count)
-    const translateY = (index - windowStart) * ITEM_HEIGHT
+    const current = scrollOffset.value / itemHeight
+    const windowStart = windowStartFromOffset(
+      scrollOffset.value,
+      count,
+      itemHeight,
+      windowItems,
+    )
+    const translateY = (index - windowStart) * itemHeight
     const distance = Math.abs(index - current)
     const progress = Math.min(2, distance)
     return {
@@ -394,7 +417,7 @@ function MetricWheelItem({
         {translateY},
         {
           scale:
-            reduceMotion || listLayout
+            reduceMotion || skipScale
               ? 1
               : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
         },
@@ -405,7 +428,7 @@ function MetricWheelItem({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.item, {height: ITEM_HEIGHT}, style]}>
+      style={[styles.item, {height: itemHeight}, style]}>
       <MetricCopy
         metric={metric}
         selected={selected}

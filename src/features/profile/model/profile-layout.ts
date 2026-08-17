@@ -219,8 +219,16 @@ export function profileCoverHeight(
   return profileCoverBody(compact, contentWidth) + insetTop
 }
 
-export function profileMetricWindowHeight(): number {
-  return PROFILE_LAYOUT.metricItemHeight * PROFILE_LAYOUT.metricWindowItems
+export function profileMetricItemHeight(fontScale = 1): number {
+  return Math.round(PROFILE_LAYOUT.metricItemHeight * Math.max(1, Math.min(fontScale, 1.9)))
+}
+
+export function profileMetricWindowItems(fontScale = 1): number {
+  return fontScale >= PROFILE_LAYOUT.stackedFontScale ? 3 : PROFILE_LAYOUT.metricWindowItems
+}
+
+export function profileMetricWindowHeight(fontScale = 1): number {
+  return profileMetricItemHeight(fontScale) * profileMetricWindowItems(fontScale)
 }
 
 /** Stack Metrics above About on the same Overview page — never an inner pager. */
