@@ -6,7 +6,7 @@ import {inverted} from '@/theme/foundations/inverted'
  *   cover photograph, full bleed under the chrome
  *   inverted-corner cradle around the portrait (circular bite + convex landing)
  *   display name / handle on the raised plateau, beside the portrait
- *   Metrics / About pager under the identity
+ *   nested snapshot pager under the identity (Overview / Modules / Links)
  *   tabs → content
  *
  * Pocket and portrait share `profilePocketGeometry()`. The inverted SVG
@@ -49,11 +49,12 @@ export const PROFILE_LAYOUT = {
    *  inverted overlay stays a short cradle at the bottom, not extra height. */
   coverHeadroomCompact: 140,
   coverHeadroomRegular: 160,
-  /** Portrait bottom to the profile info pager. */
-  metricColumnGap: 8,
-  /** Compact Metrics / About pager page body (chrome sits above this). */
-  pagerMinHeight: 168,
-  pagerMaxHeight: 196,
+  /** Portrait bottom to the profile snapshot pager. */
+  metricColumnGap: 6,
+  /** Compact nested snapshot body (Metrics / About / previews). */
+  pagerMinHeight: 148,
+  snapshotBodyMinHeight: 148,
+  snapshotBodyMaxHeight: 188,
   pagerIndicatorSize: 6,
   /**
    * Extra space under the in-flow portrait before the wheel.

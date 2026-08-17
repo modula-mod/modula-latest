@@ -24,8 +24,8 @@ import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const NEIGHBOR_OPACITY = 0.4
-const FAR_OPACITY = 0.18
-const NEIGHBOR_SCALE = 0.9
+const FAR_OPACITY = 0.28
+const NEIGHBOR_SCALE = 0.92
 const ARROW_OPACITY = 0.28
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
 const WINDOW_ITEMS = PROFILE_LAYOUT.metricWindowItems
@@ -230,6 +230,20 @@ export function ProfileMetricPicker({
               showSelectionDot={showSelectionDot}
             />
           ))}
+          <View
+            pointerEvents="none"
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            style={[
+              styles.focal,
+              {
+                top: selectedRow * ITEM_HEIGHT,
+                height: ITEM_HEIGHT,
+              },
+            ]}>
+            <View style={[styles.focalRule, {backgroundColor: colours.separator, top: 0}]} />
+            <View style={[styles.focalRule, {backgroundColor: colours.separator, bottom: 0}]} />
+          </View>
           <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
             <AppPressable
               accessibilityElementsHidden
@@ -428,6 +442,18 @@ const styles = StyleSheet.create({
   copyTextStart: {
     textAlign: 'left',
     width: '100%',
+  },
+  focal: {
+    left: 24,
+    position: 'absolute',
+    right: 24,
+  },
+  focalRule: {
+    height: StyleSheet.hairlineWidth,
+    left: 0,
+    opacity: 0.7,
+    position: 'absolute',
+    right: 0,
   },
   gesture: {
     alignItems: 'center',

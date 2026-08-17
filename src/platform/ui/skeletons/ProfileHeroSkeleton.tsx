@@ -62,27 +62,29 @@ export function ProfileHeroSkeleton() {
         </View>
         <View style={[styles.pager, {minHeight: geometry.pagerHeight, gap: spacing[2]}]}>
           <View style={styles.pagerChrome}>
-            <SkeletonBlock height={14} width={84} />
-            <SkeletonBlock height={14} width={72} />
+            <SkeletonBlock height={14} width={96} />
+            <SkeletonBlock height={10} width={28} />
           </View>
-          <View style={styles.pagerBody}>
-            <View style={styles.pagerCol}>
-              <SkeletonBlock height={28} width="78%" />
-              <SkeletonBlock height={12} width="54%" />
-              <SkeletonBlock height={22} width="70%" />
-              <SkeletonBlock height={12} width="48%" />
-            </View>
-            <View style={styles.pagerCol}>
-              <SkeletonBlock height={22} width={22} borderRadius={6} />
-              <SkeletonBlock height={22} width="72%" />
-              <SkeletonBlock height={12} width="90%" />
-              <SkeletonBlock height={12} width="64%" />
-            </View>
+          <View style={styles.switcher}>
+            <SkeletonBlock height={12} width={64} />
+            <SkeletonBlock height={12} width={52} />
           </View>
-          <SkeletonRow gap={spacing[2]}>
+          <View style={styles.metrics}>
+            <SkeletonBlock height={22} width="28%" />
+            <SkeletonBlock height={10} width="22%" />
+            <SkeletonBlock height={28} width="24%" />
+            <SkeletonBlock height={10} width="20%" />
+            <SkeletonBlock height={22} width="26%" />
+          </View>
+          <SkeletonRow gap={spacing[2]} style={styles.dots}>
             <SkeletonBlock height={6} width={6} borderRadius={3} />
             <SkeletonBlock height={6} width={6} borderRadius={3} />
           </SkeletonRow>
+          <View style={styles.outerNav}>
+            <SkeletonBlock height={10} width={72} />
+            <SkeletonBlock height={10} width={64} />
+            <SkeletonBlock height={10} width={48} />
+          </View>
         </View>
       </View>
     </View>
@@ -112,20 +114,25 @@ const styles = StyleSheet.create({
     minWidth: 0,
     width: '100%',
   },
-  pagerBody: {
-    flexDirection: 'row',
-    gap: 12,
-    minWidth: 0,
-    width: '100%',
-  },
   pagerChrome: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  switcher: {
     flexDirection: 'row',
     gap: 16,
   },
-  pagerCol: {
-    flex: 1,
-    gap: 8,
-    minWidth: 0,
+  metrics: {
+    alignItems: 'center',
+    gap: 6,
+    width: '100%',
+  },
+  dots: {
+    justifyContent: 'center',
+  },
+  outerNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   row: {
     alignItems: 'flex-start',

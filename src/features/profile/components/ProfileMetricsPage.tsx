@@ -15,9 +15,8 @@ type ProfileMetricsPageProps = {
 }
 
 /**
- * Hero pager page 01. Two-column metric snapshot: picker on the left,
- * featured selected metric on the right. Full lists still open through
- * metric activation. There is no top-level Metrics tab.
+ * Overview Metrics inner page. Canonical metric descriptors only.
+ * There is no top-level Metrics tab — activation opens Posts / connections / Modules.
  */
 export function ProfileMetricsPage({
   profile,

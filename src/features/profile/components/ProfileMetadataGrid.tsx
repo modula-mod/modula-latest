@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -8,6 +8,7 @@ import {
   type ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
 import {openSafeExternalUrl} from '@/lib/safeExternalUrl'
+import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -36,7 +37,10 @@ export function ProfileMetadataGrid({
   includeVisibility = false,
 }: ProfileMetadataGridProps) {
   const {colours, spacing} = useThemeTokens()
+  const {fontScale} = useWindowDimensions()
   const cells = metadataCells(profile, viewer, includeVisibility)
+  const stacked = fontScale >= PROFILE_LAYOUT.stackedFontScale
+  const rows = stacked ? cells.map(cell => [cell]) : chunkPairs(cells)
 
   if (!cells.length) return null
 
@@ -48,7 +52,7 @@ export function ProfileMetadataGrid({
       accessibilityRole="summary"
       style={styles.wrap}
       testID="profile-metadata-grid">
-      {chunkPairs(cells).map((row, rowIndex) => (
+      {rows.map((row, rowIndex) => (
         <View key={row.map(cell => cell.key).join('-')} style={styles.rowBlock}>
           {rowIndex > 0 ? (
             <View

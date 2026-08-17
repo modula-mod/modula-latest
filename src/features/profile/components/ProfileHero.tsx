@@ -9,12 +9,10 @@ import type {
 import {AppText} from '@/components/primitives/AppText'
 import {useUpdateProfileMutation} from '@/features/profile/data-query'
 import {ProfileActions} from '@/features/profile/components/ProfileActions'
-import {ProfileAboutPage} from '@/features/profile/components/ProfileAboutPage'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
 import {ProfileCover} from '@/features/profile/components/ProfileCover'
 import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
-import {ProfileInfoPager} from '@/features/profile/components/ProfileInfoPager'
-import {ProfileMetricsPage} from '@/features/profile/components/ProfileMetricsPage'
+import {ProfileSnapshotPager} from '@/features/profile/components/ProfileSnapshotPager'
 import {
   ProfileAvatarEditor,
   type ProfileAvatarDraft,
@@ -77,19 +75,13 @@ export function ProfileHero({
     <ProfileIdentity profile={profile} viewer={viewer} compact emphasis="hero" />
   )
   const pager = (
-    <ProfileInfoPager
-      metrics={
-        showStats ? (
-          <ProfileMetricsPage
-            profile={profile}
-            ownerHandle={ownerHandle}
-            presentation={presentation}
-            onSelectTab={onSelectTab}
-            isOwner={viewer.canEdit}
-          />
-        ) : null
-      }
-      about={<ProfileAboutPage profile={profile} viewer={viewer} />}
+    <ProfileSnapshotPager
+      profile={profile}
+      viewer={viewer}
+      presentation={presentation}
+      ownerHandle={ownerHandle}
+      showStats={showStats}
+      onSelectTab={onSelectTab}
     />
   )
   const extras = (

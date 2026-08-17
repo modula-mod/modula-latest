@@ -12,9 +12,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
-import type {ModuleCatalogueItem, ModuleContribution} from '@/data/repositories/contracts'
+import type {ModuleContribution} from '@/data/repositories/contracts'
 import {
-  canViewerSeeProfileField,
   createViewerContext,
   type ModulaProfile,
   type ProfileScreenMode,
@@ -30,8 +29,11 @@ import {ProfileModuleCard} from '@/features/profile/components/ProfileModuleCard
 import {ProfileTabBar} from '@/features/profile/components/ProfileTabBar'
 import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
-import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
+import {
+  resolvePublicProfileLinks,
+  resolvePublicProfileModules,
+} from '@/features/profile/data/resolveProfilePublicContent'
 import {profileGeometry, PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
@@ -97,46 +99,6 @@ function moduleProfileTabManifests(contributions: ModuleContribution[]): Profile
         moduleId: contribution.moduleId,
       }
     })
-}
-
-function catalogueItemToProfileModule(module: ModuleCatalogueItem): ProfileModulePreview {
-  return {
-    id: module.moduleId,
-    name: module.name,
-    description: module.description,
-    icon: module.kind === 'system' ? 'settings' : 'modules',
-    status: module.installationState === 'enabled' || module.installationState === 'installed'
-      ? 'featured'
-      : module.installable
-        ? 'available'
-        : 'preview',
-    visibility: 'public',
-    actionLabel: module.installationState === 'enabled'
-      ? 'Open'
-      : module.installable
-        ? 'Available'
-        : 'Preview',
-  }
-}
-
-function profileFeaturedModules(
-  profile: ModulaProfile,
-  catalogue: ModuleCatalogueItem[],
-  viewer: ProfileViewerRelationship,
-): ProfileModulePreview[] {
-  const byId = new Map(catalogue.map(module => [module.moduleId, module]))
-  return profile.featuredModuleIds
-    .map(moduleId => byId.get(moduleId) ?? byId.get(normalizeLegacyProfileModuleId(moduleId)))
-    .filter((module): module is ModuleCatalogueItem => Boolean(module))
-    .map(catalogueItemToProfileModule)
-    .filter(module => canViewerSeeProfileField(module.visibility, viewer))
-}
-
-function normalizeLegacyProfileModuleId(moduleId: string): string {
-  if (moduleId === 'module-vault-notes') return 'digital.modula.vault-notes'
-  if (moduleId === 'module-tasks') return 'digital.modula.tasks'
-  if (moduleId === 'module-dimon-core') return 'digital.dimon.core'
-  return moduleId
 }
 
 export function ProfileShell({mode, handle}: ProfileShellProps) {
@@ -250,13 +212,8 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   }
 
   const selectedTab = visibleTabs.find(next => next.id === selectedTabId) ?? visibleTabs[0] ?? null
-  const modules = profileFeaturedModules(profile, catalogueQuery.data ?? [], viewer.relationship)
-  const links = [
-    profile.website,
-    ...profile.links,
-  ].filter((link): link is NonNullable<typeof link> =>
-    Boolean(link && canViewerSeeProfileField(link.visibility, viewer.relationship)),
-  )
+  const modules = resolvePublicProfileModules(profile, viewer.relationship, catalogueQuery.data ?? [])
+  const links = resolvePublicProfileLinks(profile, viewer.relationship)
 
   const featuredLinks = links.slice(0, 2)
   const featuredModules = modules.slice(0, 2)
