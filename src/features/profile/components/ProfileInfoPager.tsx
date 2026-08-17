@@ -127,11 +127,14 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
   }))
 
   const goTo = (next: number) => {
-    if (pageWidth <= 0) {
-      commitPage(next)
+    const clamped = Math.max(0, Math.min(PAGE_COUNT - 1, next))
+    const width = pageWidth
+    if (width > 0) {
+      animateTo(clamped)
       return
     }
-    animateTo(next)
+    pageSV.value = clamped
+    commitPage(clamped)
   }
 
   const current = PAGES[pageIndex] ?? 'metrics'
@@ -161,7 +164,7 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
         const next = Math.round(event.nativeEvent.layout.width)
         if (next > 0 && next !== pageWidth) {
           setPageWidth(next)
-          translateX.value = -pageIndex * next
+          translateX.value = -pageSV.value * next
         }
       }}>
       <GestureDetector gesture={pan}>
