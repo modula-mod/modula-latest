@@ -26,8 +26,12 @@ export const PROFILE_LAYOUT = {
   avatarBorder: 3,
   /** Painted portrait is 5% smaller than the cradle so it sits inside the pocket. */
   avatarFit: 0.95,
-  /** Lower the portrait into the white pocket. Does not move the inverted SVG. */
-  avatarDrop: 60,
+  /**
+   * Extra drop below the SVG cradle centre. 0 keeps the portrait in the
+   * inverted pocket. A positive value (used in earlier passes) leaves the
+   * bite empty because the SVG does not follow this knob.
+   */
+  avatarDrop: 0,
   /** Extra drop for name / handle / bio. Does not move the inverted SVG. */
   identityDrop: 55,
   /** Cover showing around the portrait inside the inverted cradle. */

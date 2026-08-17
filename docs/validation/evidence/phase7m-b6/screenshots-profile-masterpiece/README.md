@@ -26,7 +26,8 @@ FOUNDER VISUAL APPROVAL = PENDING
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `profile-now.png` | Owner hero (live, 2026-08-17 10:17) | Current composition: in-flow avatar, metric wheel under the portrait (`metricDrop: 0`) |
+| `avatar-in-svg-pocket.png` | Owner hero (this pass) | Painted portrait nested in the inverted cradle (`avatarDrop: 0`). SVG unchanged |
+| `profile-now.png` | Owner hero (previous live) | Avatar sat 60pt below the bite — the drop did not move the SVG |
 | `picker-under-avatar.png` | Owner hero (this pass) | Metric wheel sits just under the in-flow portrait (`metricDrop: 0`); avatar/identity unchanged |
 | `hero-scroll-welded.png` | Owner hero (previous) | Cover photo, avatar, and identity share one layout — portrait is in the plateau row, not absolutely positioned on the cover |
 | `tabs-morph-flush.png` | Owner scrolled (this pass) | Sticky tabs sit flush under the morphing name — spacer under chrome, no padding jump |

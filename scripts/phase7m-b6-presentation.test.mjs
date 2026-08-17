@@ -167,7 +167,7 @@ assert.match(read('src/features/profile/components/ProfileHero.tsx'), /avatarFlo
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /avatarFlowLeft/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /plateauDepth/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarFit: 0\.95/)
-assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarDrop: 60/)
+assert.match(read('src/features/profile/model/profile-layout.ts'), /avatarDrop: 0/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /identityDrop: 55/)
 assert.match(read('src/features/profile/model/profile-layout.ts'), /metricDrop: 0/)
 assert.doesNotMatch(
