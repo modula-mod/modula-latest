@@ -207,7 +207,12 @@ assert.match(read('src/features/profile/model/profile-layout.ts'), /export funct
 assert.match(read('src/features/profile/components/ProfileSnapshotPager.tsx'), /resolveProfileSnapshotPages/)
 assert.match(read('src/features/profile/components/ProfileHero.tsx'), /ProfileSnapshotPager/)
 assert.doesNotMatch(read('src/features/profile/components/ProfileSnapshotPager.tsx'), /@expo\/ui\/swift-ui/)
-assert.match(read('src/features/profile/model/profile-snapshot.ts'), /type ProfileOverviewPage = 'metrics' \| 'about'/)
+assert.match(read('src/features/profile/model/profile-snapshot.ts'), /type ProfileSnapshotPageId = 'overview' \| 'modules' \| 'links'/)
+assert.doesNotMatch(read('src/features/profile/model/profile-snapshot.ts'), /type ProfileOverviewPage = 'metrics' \| 'about'/)
+assert.match(read('src/features/profile/components/ProfileOverviewPage.tsx'), /profile-overview-split/)
+assert.match(read('src/features/profile/components/ProfileOverviewPage.tsx'), /profile-overview-metrics/)
+assert.match(read('src/features/profile/components/ProfileOverviewPage.tsx'), /profile-overview-about/)
+assert.doesNotMatch(read('src/features/profile/components/ProfileOverviewPage.tsx'), /useProfilePagerAnimation/)
 assert.doesNotMatch(read('src/features/profile/components/ProfileStats.tsx'), /profile-metrics-split/)
 console.log('PROFILE METRICS                PASS')
 
