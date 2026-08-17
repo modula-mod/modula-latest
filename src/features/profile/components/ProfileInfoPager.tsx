@@ -145,19 +145,6 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
 
   return (
     <View
-      accessibilityRole="adjustable"
-      accessibilityLabel="Profile details"
-      accessibilityValue={{text: accessibilityValue}}
-      accessibilityHint="Swipe left or right to change page."
-      accessibilityActions={[
-        {name: 'increment', label: 'About page'},
-        {name: 'decrement', label: 'Metrics page'},
-      ]}
-      onAccessibilityAction={event => {
-        const name = event.nativeEvent.actionName
-        if (name === 'increment') goTo(1)
-        if (name === 'decrement') goTo(0)
-      }}
       testID="profile-info-pager"
       style={styles.host}
       onLayout={event => {
@@ -167,6 +154,22 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
           translateX.value = -pageSV.value * next
         }
       }}>
+      <View
+        accessibilityRole="adjustable"
+        accessibilityLabel="Profile details"
+        accessibilityValue={{text: accessibilityValue}}
+        accessibilityHint="Swipe left or right to change page."
+        accessibilityActions={[
+          {name: 'increment', label: 'About page'},
+          {name: 'decrement', label: 'Metrics page'},
+        ]}
+        onAccessibilityAction={event => {
+          const name = event.nativeEvent.actionName
+          if (name === 'increment') goTo(1)
+          if (name === 'decrement') goTo(0)
+        }}
+        style={styles.a11yAnchor}
+      />
       <GestureDetector gesture={pan}>
         <View style={[styles.viewport, {minHeight: PROFILE_LAYOUT.pagerMinHeight, maxHeight: PROFILE_LAYOUT.pagerMaxHeight}]}>
           <Animated.View
@@ -229,6 +232,11 @@ const styles = StyleSheet.create({
   host: {
     minWidth: 0,
     width: '100%',
+  },
+  a11yAnchor: {
+    height: 1,
+    overflow: 'hidden',
+    width: 1,
   },
   viewport: {
     overflow: 'hidden',
