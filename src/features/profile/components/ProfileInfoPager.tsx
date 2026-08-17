@@ -198,6 +198,7 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
               accessibilityRole="button"
               accessibilityLabel={index === 0 ? 'Metrics page' : 'About page'}
               accessibilityState={{selected: active}}
+              testID={`profile-info-indicator-${id}`}
               hitSlop={12}
               onPress={() => goTo(index)}
               style={styles.indicatorHit}>

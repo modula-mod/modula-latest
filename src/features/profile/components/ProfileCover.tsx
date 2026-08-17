@@ -52,6 +52,7 @@ export function ProfileCover({
   // and identity on a fast fling. The inverted pocket is painted in the
   // hero body so it shares coordinates with the portrait.
   const height = profileCoverHeight(compact, insets.top, width)
+  const bodyHeight = profileCoverBody(compact, width)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
   const emptyFill = profile.coverColour ?? colours.borderStrong
@@ -65,12 +66,19 @@ export function ProfileCover({
       style={[
         styles.cover,
         {
-          height,
-          marginTop: -insets.top,
+          height: bodyHeight,
           backgroundColor: colours.canvas,
         },
       ]}>
-      <View collapsable={false} style={StyleSheet.absoluteFill}>
+      <View
+        collapsable={false}
+        style={[
+          styles.bleed,
+          {
+            height,
+            top: -insets.top,
+          },
+        ]}>
         <View
           style={[
             styles.artwork,
@@ -87,17 +95,17 @@ export function ProfileCover({
             <CoverAtmosphere wash={emptyFill} />
           )}
         </View>
+        {hasPhoto ? (
+          <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
+            <ProgressiveBlurBand
+              height={insets.top + TOP_BLUR}
+              topHeavy
+              strength="soft"
+              intensity={64}
+            />
+          </View>
+        ) : null}
       </View>
-      {hasPhoto ? (
-        <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
-          <ProgressiveBlurBand
-            height={insets.top + TOP_BLUR}
-            topHeavy
-            strength="soft"
-            intensity={64}
-          />
-        </View>
-      ) : null}
     </View>
   )
 
@@ -149,8 +157,14 @@ const styles = StyleSheet.create({
   artwork: {
     flex: 1,
   },
-  cover: {
+  bleed: {
+    left: 0,
     overflow: 'hidden',
+    position: 'absolute',
+    right: 0,
+  },
+  cover: {
+    overflow: 'visible',
     width: '100%',
   },
   topBlur: {

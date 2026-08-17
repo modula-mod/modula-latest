@@ -13,9 +13,9 @@ import {inverted} from '@/theme/foundations/inverted'
  * overlay lives in the body overlap band so it cannot drift from the avatar.
  *
  * The cradle radius is the portrait slot plus a small cover gap, so the
- * inverted corner wraps the circle instead of cutting a 90° step beside it.
- * The plateau sits at the avatar centre — the name is beside the portrait,
- * not in the cover chrome and not under the feet.
+ * inverted corner wraps the bottom of the circle instead of a trailing
+ * quarter that left the left shelf degenerate. The plateau sits at the
+ * overlay top — the name is beside the portrait, not in the cover chrome.
  */
 export const PROFILE_LAYOUT = {
   avatarRatio: 0.22,
@@ -42,7 +42,7 @@ export const PROFILE_LAYOUT = {
    */
   identityDrop: 8,
   /** Cover showing around the outer silhouette (portrait + separator + halo). */
-  cradleGap: 8,
+  cradleGap: 4,
   /** Convex landing from the cradle onto the identity plateau. */
   plateauRadius: 20,
   /** Cover above the portrait crown: chrome + photo. Keep this tall — the
@@ -52,7 +52,7 @@ export const PROFILE_LAYOUT = {
   /** Portrait bottom to the profile info pager. */
   metricColumnGap: 8,
   /** Compact Metrics / About pager. Replaces the old side-by-side info block. */
-  pagerMinHeight: 188,
+  pagerMinHeight: 172,
   pagerMaxHeight: 228,
   pagerIndicatorSize: 6,
   /**
@@ -185,13 +185,14 @@ export function profilePocketGeometry(
   const avatarRadius = profileAvatarSlotSize(compact, showFocusHalo, contentWidth) / 2
   const pocketRadius = avatarRadius + PROFILE_LAYOUT.cradleGap
   const pocketCenterX = profileAvatarLead(contentWidth) + avatarRadius
-  const pocketCenterY = PROFILE_LAYOUT.plateauRadius
+  // Optical drop, if any, moves the shared centre — SVG and portrait together.
+  const pocketCenterY = PROFILE_LAYOUT.plateauRadius + PROFILE_LAYOUT.avatarDrop
   return {
     pocketCenterX,
     pocketCenterY,
     pocketRadius,
     avatarCenterX: pocketCenterX,
-    avatarCenterY: pocketCenterY + PROFILE_LAYOUT.avatarDrop,
+    avatarCenterY: pocketCenterY,
     avatarRadius,
     haloExpansion,
   }
@@ -226,7 +227,9 @@ export function profilePlateauDepth(
   contentWidth = 393,
 ): number {
   return Math.round(
-    profileCradleRadius(compact, showFocusHalo, contentWidth) + PROFILE_LAYOUT.plateauRadius,
+    profileCradleRadius(compact, showFocusHalo, contentWidth) +
+      PROFILE_LAYOUT.plateauRadius +
+      Math.max(0, PROFILE_LAYOUT.avatarDrop),
   )
 }
 
@@ -244,9 +247,11 @@ export function profileGeometry(
   const avatarLead = profileAvatarLead(contentWidth)
   const cradleRadius = pocket.pocketRadius
   const plateauRadius = PROFILE_LAYOUT.plateauRadius
-  const plateauDepth = Math.round(cradleRadius + plateauRadius)
+  const plateauDepth = Math.round(
+    cradleRadius + plateauRadius + Math.max(0, PROFILE_LAYOUT.avatarDrop),
+  )
   const gutterWidth = avatarLead + slotSize
-  const shelfDepth = cradleRadius - pocket.avatarRadius - PROFILE_LAYOUT.avatarDrop
+  const shelfDepth = cradleRadius - pocket.avatarRadius
   const identityColumnPad = PROFILE_LAYOUT.cradleGap + plateauRadius
   const avatarLeft = pocket.avatarCenterX - pocket.avatarRadius
   // Body overlap band is the overlay: y=0 at plateau. Portrait centre is the

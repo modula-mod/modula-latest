@@ -15,12 +15,14 @@ function buildAvatarCradleRisePath(w, h, o) {
   const r = Math.min(o.cradleRadius, h, w * 0.42)
   const cx = Math.min(Math.max(0, o.avatarCenterX), Math.max(0, w - r))
   const cy = o.avatarCenterY ?? h - r
-  const baseY = Math.min(h, cy + r)
+  const leftX = Math.max(0, cx - r)
+  const nadirY = Math.min(h, cy + r)
   const riseX = Math.min(w, cx + r)
   const plateau = Math.min(o.plateauRadius, Math.max(0, w - riseX), Math.max(0, cy))
   return (
-    M(0, baseY) +
-    H(cx) +
+    M(0, cy) +
+    H(leftX) +
+    A(r, cx, nadirY, 0) +
     A(r, riseX, cy, 0) +
     V(plateau) +
     A(plateau, riseX + plateau, 0) +

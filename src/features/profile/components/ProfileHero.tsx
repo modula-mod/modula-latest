@@ -148,8 +148,8 @@ export function ProfileHero({
         height={geometry.plateauDepth}
         fill={colours.canvas}
         cornerRadius={geometry.plateauRadius}
-        avatarCenterX={pocket.pocketCenterX}
-        avatarCenterY={pocket.pocketCenterY}
+        avatarCenterX={pocket.avatarCenterX}
+        avatarCenterY={pocket.avatarCenterY}
         cradleRadius={pocket.pocketRadius}
         plateauRadius={geometry.plateauRadius}
         stepX={geometry.stepX}
@@ -191,6 +191,13 @@ export function ProfileHero({
             paddingBottom: spacing[2],
           },
         ]}>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.canvasFill,
+            {backgroundColor: colours.canvas, top: geometry.plateauDepth},
+          ]}
+        />
         {cradle}
         {stacked ? (
           <View
@@ -330,6 +337,13 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     position: 'relative',
     zIndex: 2,
+  },
+  canvasFill: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    zIndex: 0,
   },
   content: {
     minWidth: 0,

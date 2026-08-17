@@ -168,15 +168,16 @@ export function buildCoverShelfStepPath(
 /**
  * Cover → canvas transition that cradles the avatar with inverted corners.
  *
- * Straight runs joined by quarter arcs (G1) — the construction an inverted
- * corner generator emits around a circle, not a 90° step:
+ * Straight runs joined by quarter arcs (G1) — a U around the shared pocket
+ * centre, not a 90° step and not a single trailing quarter:
  *
- *   1. flat leading shelf, tangent to the bottom of the cradle
- *   2. concave quarter (sweep 0) concentric with the avatar
- *   3. convex quarter (sweep 1) onto the raised plateau
- *   4. flat plateau carrying the display name
+ *   1. flat leading shelf at pocket-centre height
+ *   2. concave quarter (sweep 0) to the nadir, concentric with the avatar
+ *   3. concave quarter (sweep 0) to the trailing tangent
+ *   4. convex quarter (sweep 1) onto the raised identity plateau
+ *   5. flat plateau carrying the display name
  *
- * The plateau sits at the avatar centre so the name reads beside the portrait.
+ * The plateau sits at the overlay top so the name reads beside the portrait.
  * `avatarCenterX` / `avatarCenterY` / `cradleRadius` must come from
  * `profilePocketGeometry()` — do not invent a second centre for the SVG.
  */
@@ -206,7 +207,8 @@ export function buildAvatarCradleRisePath(
     Math.max(0, w - r),
   )
   const cy = clampNonNegative(options?.avatarCenterY ?? h - r)
-  const baseY = Math.min(h, cy + r)
+  const leftX = Math.max(0, cx - r)
+  const nadirY = Math.min(h, cy + r)
   const riseX = Math.min(w, cx + r)
   const plateauY = 0
   const plateau = Math.min(
@@ -216,12 +218,13 @@ export function buildAvatarCradleRisePath(
   )
 
   if (r <= 0 || riseX >= w) {
-    return M(0, baseY) + H(w) + V(h) + H(0) + 'Z'
+    return M(0, nadirY) + H(w) + V(h) + H(0) + 'Z'
   }
 
   return (
-    M(0, baseY) +
-    H(cx) +
+    M(0, cy) +
+    H(leftX) +
+    A(r, cx, nadirY, 0) +
     A(r, riseX, cy, 0) +
     V(plateauY + plateau) +
     A(plateau, riseX + plateau, plateauY) +
