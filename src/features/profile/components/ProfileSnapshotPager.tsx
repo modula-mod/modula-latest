@@ -67,7 +67,6 @@ export function ProfileSnapshotPager({
   const headerPan = useMemo(() => createPan(), [createPan])
   const modulesPan = useMemo(() => createPan(), [createPan])
   const linksPan = useMemo(() => createPan(), [createPan])
-  const navPan = useMemo(() => createPan(), [createPan])
   const catalogue = useModuleCatalogueQuery()
   const modules = resolvePublicProfileModules(
     profile,
@@ -175,15 +174,11 @@ export function ProfileSnapshotPager({
         importantForAccessibility="no-hide-descendants"
         style={[styles.rule, {backgroundColor: colours.separator}]}
       />
-      <GestureDetector gesture={navPan}>
-        <View>
-          <ProfileSnapshotNav
-            pages={pages}
-            selectedId={current.id}
-            onSelect={goTo}
-          />
-        </View>
-      </GestureDetector>
+      <ProfileSnapshotNav
+        pages={pages}
+        selectedId={current.id}
+        onSelect={goTo}
+      />
     </View>
   )
 }
@@ -197,6 +192,7 @@ const styles = StyleSheet.create({
   host: {
     minWidth: 0,
     width: '100%',
+    zIndex: 2,
   },
   page: {
     minWidth: 0,

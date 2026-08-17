@@ -303,6 +303,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       <View
         testID="profile-sticky-tabs"
         collapsable={false}
+        pointerEvents="box-none"
         style={[styles.stickyTabs, {marginTop: -stickyPad}]}>
         <View pointerEvents="none" style={{height: stickyPad}} />
         <View style={{backgroundColor: colours.canvas}}>
@@ -485,5 +486,6 @@ const styles = StyleSheet.create({
   stickyTabs: {
     backgroundColor: 'transparent',
     minWidth: 0,
+    zIndex: 1,
   },
 })
