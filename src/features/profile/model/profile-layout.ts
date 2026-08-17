@@ -69,7 +69,7 @@ export const PROFILE_LAYOUT = {
   identityAfterAvatar: 12,
   coverTopBlur: 28,
   metricItemHeight: 32,
-  metricWindowItems: 4,
+  metricWindowItems: 3,
   metricMaxVisible: 5,
   metricRailGutter: 14,
   /**
@@ -78,6 +78,7 @@ export const PROFILE_LAYOUT = {
    */
   stickyChromeClearance: 52,
   stackedFontScale: 1.35,
+  metricCompactFontScale: 1.8,
   stackedWidth: 340,
   invertedSize: inverted.profile,
 } as const
@@ -224,7 +225,11 @@ export function profileMetricItemHeight(fontScale = 1): number {
 }
 
 export function profileMetricWindowItems(fontScale = 1): number {
-  return fontScale >= PROFILE_LAYOUT.stackedFontScale ? 3 : PROFILE_LAYOUT.metricWindowItems
+  return fontScale >= PROFILE_LAYOUT.metricCompactFontScale ? 2 : PROFILE_LAYOUT.metricWindowItems
+}
+
+export function profileMetricFocalSlot(windowItems: number): number {
+  return Math.max(0, Math.floor((windowItems - 1) / 2))
 }
 
 export function profileMetricWindowHeight(fontScale = 1): number {
