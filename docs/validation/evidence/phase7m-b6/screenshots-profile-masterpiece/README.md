@@ -1,8 +1,9 @@
-# Phase 7M-B6 Profile masterpiece evidence
+# Phase 7M-B6 Profile pager + avatar pocket
 
-Captured 2026-08-17 on **iPhone 17 Pro Simulator** (`0727E2F0-8528-44DA-9F4C-7B5F7394096B`, iOS 27.0). Metro on `cursor/phase7m-b6-profile-masterpiece-ce59`. Local demo-owner session (`@andrei.modula`).
+Captured 2026-08-17 on **iPhone 17 Pro Simulator** (`0727E2F0-8528-44DA-9F4C-7B5F7394096B`, iOS 27.0). Local demo-owner session (`@andrei.modula`).
 
-Baseline before this pass: `docs/validation/evidence/phase7m-b6/screenshots-profile-evolution/`.
+Work branch: `cursor/phase7m-b6-profile-pager-bc99`  
+Base: `cursor/phase7m-b6-profile-masterpiece-ce59`
 
 ```
 PRODUCTION DEPLOYED = NO
@@ -10,49 +11,29 @@ PRODUCTION DEPLOYED = NO
 FOUNDER VISUAL APPROVAL = PENDING
 ```
 
-## Before → after
+There is no `modula-profile-andrei.yaml`. Layout tokens live in `src/features/profile/model/profile-layout.ts`.
 
-| Issue in evolution shots | After this pass |
-| --- | --- |
-| Avatar covered name / handle / pronouns | Identity starts below the avatar+halo slot (`profileGeometry`) |
-| White lip felt like a rectangle with one inverted corner | Cover uses `buildAvatarCradlePath` so canvas hugs the avatar |
-| Giant muted grey metric pill | Typography + opacity + scale only; no selected surface |
-| Often only one neighbour obvious | Packed 3-row window shows previous/selected/next when they exist |
-| Public badge on the hero | Removed from identity; owner visibility lives on About |
-| Metadata → website gap | One metadata family (joined + location, then website) |
-| Tabs/content started too low | Cover, picker, and identity gaps compressed; first post is in the first viewport |
+Hero About in the pager is a compact identity summary. The top-level Profile **About** tab remains the full expanded profile. They are not synced.
 
-## Founder set
+## Founder set (this pass)
 
 | File | Surface | What to look at |
 | --- | --- | --- |
-| `avatar-in-svg-pocket.png` | Owner hero (this pass) | Painted portrait nested in the inverted cradle (`avatarDrop: 0`). SVG unchanged |
-| `profile-now.png` | Owner hero (previous live) | Avatar sat 60pt below the bite — the drop did not move the SVG |
-| `picker-under-avatar.png` | Owner hero (this pass) | Metric wheel sits just under the in-flow portrait (`metricDrop: 0`); avatar/identity unchanged |
-| `hero-scroll-welded.png` | Owner hero (previous) | Cover photo, avatar, and identity share one layout — portrait is in the plateau row, not absolutely positioned on the cover |
-| `tabs-morph-flush.png` | Owner scrolled (this pass) | Sticky tabs sit flush under the morphing name — spacer under chrome, no padding jump |
-| `cover-no-bottom-blur.png` | Owner hero (previous) | No frosted band where the photograph meets the white plateau; status-bar blur stays |
-| `picker-center-arrows.png` | Owner hero (previous) | Metric rail gone; numbers centered; 30% arrows above and below the picker |
-| `metrics-down-70.png` | Owner hero (previous) | Metric picker dropped another 50pt (70pt total); avatar 60pt, identity 55pt, inverted SVG unchanged |
-| `metrics-down-20.png` | Owner hero (previous) | Metric picker dropped 20pt; avatar 60pt, identity 55pt, inverted SVG unchanged |
-| `avatar-up-12.png` | Owner hero (previous) | Avatar raised 12pt from the 72pt drop (now 60pt); identity still 55pt down; inverted SVG unchanged |
-| `avatar-and-text-lower.png` | Owner hero (previous) | Avatar dropped another 36pt (72pt total); name/handle/bio dropped 55pt; inverted SVG unchanged |
-| `avatar-lower.png` | Owner hero (previous) | Avatar dropped 36pt into the white pocket; inverted SVG unchanged |
-| `profile-final-photo-cover.png` | Same hero | Progressive blur, status-bar contrast, glass chrome on photography |
-| `profile-final-picker-posts.png` | Picker | Posts selected; Followers / Following as downward context; no grey pill |
-| `profile-final-picker-followers.png` | Picker | Three-metric wheel (Followers / Following / Modules) |
-| `profile-final-picker-modules.png` | Picker + activate | Modules selected; activate opened the Modules tab (selection ≠ navigation) |
-| `profile-final-customize-metrics.png` | Customize | Profile Metrics, drag handles, visibility toggles, default metric, Focus Halo |
-| `profile-final-scrolled.png` | Scroll | NativeTabs remain; content can sit behind glass. Sticky-tab collapse is implemented in `ProfileShell` (`stickyHeaderIndices`) |
-| `profile-final-dark.png` | Dark | Canvas, halo, glass cluster, picker hierarchy |
-| `profile-final-oled.png` | OLED | Deeper canvas; same geometry |
-| `profile-final-empty.png` | Public / no photo | Gaia quiet cover atmosphere, back control, Following + more, no owner Edit |
+| `profile-avatar-pocket-fixed.png` | Owner hero close-up | Avatar seated in the concentric U cradle (`buildAvatarCradleRisePath`). Focus Halo inside `pocketRadius`. `avatarDrop: 0` is optical-only and moves SVG + portrait together |
+| `profile-info-pager-metrics.png` | Owner hero, page 01 | Metrics first, vertical picker, ● ○, tabs + first post in the first viewport. Liquid Glass back + Edit/Share/More. NativeTabs |
+| `profile-info-pager-about.png` | Attempted page 02 | Maestro can locate `profile-info-indicator-about` but does not fire the RN press, so this frame is still Metrics. Swipe on-device to review bio + two-column metadata |
+| `profile-info-pager-followers.png` | Attempted Followers | Same Maestro limitation on the nested metric pan. Default metric remains **Posts** (user default). Code selects Followers via the picker, not a hardcoded 248 |
+| `profile-info-pager-scrolled.png` | Scrolled | Sticky collapsed identity, tabs, NativeTabs, last content above the tab bar |
+| `profile-info-pager-dark.png` | Dark hero | Canvas, halo, glass cluster, faded metrics, pager dots |
+| `profile-info-pager-oled.png` | OLED hero | True-black body, same geometry |
+| `profile-pocket-long-name.png` | Long name attempt | Edit Profile save did not persist `Christopher Alexander Johnson` in Maestro. Identity column still wraps; pocket is unchanged |
 
-`pass2-hero.png` is the same composition as the owner/photo/posts set (first successful iteration after the geometry fix).
+`tabs-morph-flush.png` is leftover from an earlier masterpiece pass, not this pager capture.
 
-## Known limitations
+## Geometry
 
-- Founder visual approval is still required
-- Maestro swipes on Profile often hit the metric picker or NativeTabs, so a fully collapsed sticky-tab frame was not captured cleanly. Sticky path: `stickyHeaderIndices={[1]}` with a transparent spacer (`marginTop: -stickyPad`) so tabs sit flush under chrome without a layout jump
-- Module-contributed metrics remain registry-ready only
-- Demo owner cover is an Unsplash development photograph so photo-cover review does not depend on an empty grey field
+- Canonical source: `profilePocketGeometry()` in `profile-layout.ts`
+- SVG owner: `buildAvatarCradleRisePath` via `InvertedSurfaceTransition` in `ProfileHero` (same parent as the portrait)
+- Previous bugs: `avatarDrop` moved only the painted avatar; trailing-only quarter left a degenerate left shelf; cover status-bar bleed painted photo under the overlay
+- `identityDrop: 8` — name on the raised plateau
+- `avatarDrop: 0` — compatibility token, optical only
