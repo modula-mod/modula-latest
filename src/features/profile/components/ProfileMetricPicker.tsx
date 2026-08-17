@@ -104,7 +104,7 @@ export function ProfileMetricPicker({
     return Gesture.Pan()
       .enabled(count > 1)
       .activeOffsetY([-14, 14])
-      .failOffsetX([-20, 20])
+      .failOffsetX([-10, 10])
       .onBegin(() => {
         startOffset.value = scrollOffset.value
       })

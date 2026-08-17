@@ -18,7 +18,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type ProfileInfoPage = 'metrics' | 'about'
 
 const PAGES: ProfileInfoPage[] = ['metrics', 'about']
-const AXIS_LOCK = 16
+const AXIS_LOCK = 10
 const PAGE_COUNT = PAGES.length
 
 type ProfileInfoPagerProps = {
