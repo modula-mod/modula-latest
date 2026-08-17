@@ -221,6 +221,11 @@ assert.match(read('src/features/profile/components/ProfileOverviewPage.tsx'), /f
 assert.match(read('src/features/profile/model/profile-layout.ts'), /overviewMetricsMaxWidth: 148/)
 assert.doesNotMatch(read('src/features/profile/components/ProfileOverviewPage.tsx'), /useProfilePagerAnimation/)
 assert.doesNotMatch(read('src/features/profile/components/ProfileStats.tsx'), /profile-metrics-split/)
+assert.doesNotMatch(read('src/features/profile/components/ProfileSnapshotPager.tsx'), /ProfileSnapshotHeader/)
+assert.doesNotMatch(read('src/features/profile/components/ProfileSnapshotNav.tsx'), /AppText/)
+assert.match(read('src/features/profile/components/ProfileSnapshotNav.tsx'), /accessibilityLabel=\{`\$\{page\.number\} \$\{page\.label\}`\}/)
+assert.match(read('src/features/profile/components/ProfileOverviewPage.tsx'), /accessibilityLabel=\{label\}/)
+assert.match(read('src/features/profile/components/ProfileSnapshotPager.tsx'), /page \$\{pageIndex \+ 1\} of/)
 console.log('PROFILE METRICS                PASS')
 
 console.log('\nphase7m-b6 presentation tests passed')

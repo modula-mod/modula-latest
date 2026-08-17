@@ -6,7 +6,6 @@ import Animated from 'react-native-reanimated'
 import {ProfileLinksPreview} from '@/features/profile/components/ProfileLinksPreview'
 import {ProfileModulesPreview} from '@/features/profile/components/ProfileModulesPreview'
 import {ProfileOverviewPageView} from '@/features/profile/components/ProfileOverviewPage'
-import {ProfileSnapshotHeader} from '@/features/profile/components/ProfileSnapshotHeader'
 import {ProfileSnapshotNav} from '@/features/profile/components/ProfileSnapshotNav'
 import {useProfilePagerAnimation} from '@/features/profile/components/useProfilePagerAnimation'
 import type {
@@ -38,12 +37,11 @@ type ProfileSnapshotPagerProps = {
 /**
  * Profile snapshot pager.
  *
- * Outer: Overview → Modules → Links (labeled navigator).
+ * Outer: Overview → Modules → Links (minimal page indicator).
  * Overview always shows Metrics and About together — there is no inner pager.
  *
- * Horizontal swipe is bound to the header and each page so it does not
- * compete with the vertical metric wheel. Outer labels are the primary
- * mobile control.
+ * Horizontal swipe is bound to each page so it does not compete with the
+ * vertical metric wheel. The centered indicator remains tappable.
  */
 export function ProfileSnapshotPager({
   profile,
@@ -63,7 +61,6 @@ export function ProfileSnapshotPager({
     goTo,
     onViewportLayout,
   } = useProfilePagerAnimation(pages.length)
-  const headerPan = useMemo(() => createPan(), [createPan])
   const overviewPan = useMemo(() => createPan(), [createPan])
   const modulesPan = useMemo(() => createPan(), [createPan])
   const linksPan = useMemo(() => createPan(), [createPan])
@@ -98,15 +95,6 @@ export function ProfileSnapshotPager({
         }}
         style={styles.a11yAnchor}
       />
-      <GestureDetector gesture={headerPan}>
-        <View>
-          <ProfileSnapshotHeader
-            page={current}
-            index={pageIndex}
-            count={pages.length}
-          />
-        </View>
-      </GestureDetector>
       <View
         onLayout={event => onViewportLayout(event.nativeEvent.layout.width)}
         style={styles.viewport}>

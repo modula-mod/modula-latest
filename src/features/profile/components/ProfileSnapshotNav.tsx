@@ -1,6 +1,5 @@
-import {Pressable, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Pressable, StyleSheet, View} from 'react-native'
 
-import {AppText} from '@/components/primitives/AppText'
 import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import type {ProfileSnapshotPageDescriptor} from '@/features/profile/model/profile-snapshot'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -11,97 +10,81 @@ type ProfileSnapshotNavProps = {
   onSelect: (index: number) => void
 }
 
+const CAPSULE_WIDTH = 16
+const CAPSULE_HEIGHT = 3
+
 /**
- * Labeled outer pager navigator. Dots never appear alone — the user must
- * know which major profile surface they are moving to.
+ * Minimal outer pager indicator. Active page is a short capsule; inactive
+ * pages are dots. Labels stay on the accessibility tree only.
  */
 export function ProfileSnapshotNav({pages, selectedId, onSelect}: ProfileSnapshotNavProps) {
   const {colours, spacing} = useThemeTokens()
-  const {fontScale} = useWindowDimensions()
-  const compact = fontScale < PROFILE_LAYOUT.stackedFontScale
-
-  const items = pages.map((page, index) => {
-    const active = page.id === selectedId
-    return (
-      <Pressable
-        key={page.id}
-        accessibilityRole="button"
-        accessibilityLabel={`${page.number} ${page.label}`}
-        accessibilityState={{selected: active}}
-        testID={`profile-snapshot-nav-${page.id}`}
-        hitSlop={8}
-        onPress={() => onSelect(index)}
-        style={[styles.item, compact ? styles.itemGrow : null]}>
-        <AppText
-          variant="micro"
-          colour={active ? 'text' : 'textSecondary'}
-          numberOfLines={1}
-          style={styles.label}>
-          {page.number} {page.label}
-        </AppText>
-        <View
-          style={[
-            styles.dot,
-            {
-              backgroundColor: active ? colours.accent : colours.textTertiary,
-              opacity: active ? 1 : 0.52,
-              width: PROFILE_LAYOUT.pagerIndicatorSize,
-              height: PROFILE_LAYOUT.pagerIndicatorSize,
-              borderRadius: PROFILE_LAYOUT.pagerIndicatorSize / 2,
-            },
-          ]}
-        />
-      </Pressable>
-    )
-  })
-
-  if (!compact) {
-    return (
-      <ScrollView
-        horizontal
-        testID="profile-snapshot-nav"
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[styles.scroll, {gap: spacing[3]}]}>
-        {items}
-      </ScrollView>
-    )
-  }
+  const dot = PROFILE_LAYOUT.pagerIndicatorSize
 
   return (
-    <View style={styles.row} testID="profile-snapshot-nav">
-      {items}
+    <View style={[styles.row, {gap: spacing[2]}]} testID="profile-snapshot-nav">
+      {pages.map((page, index) => {
+        const active = page.id === selectedId
+        return (
+          <Pressable
+            key={page.id}
+            accessibilityRole="button"
+            accessibilityLabel={`${page.number} ${page.label}`}
+            accessibilityState={{selected: active}}
+            testID={`profile-snapshot-nav-${page.id}`}
+            hitSlop={10}
+            onPress={() => onSelect(index)}
+            style={styles.item}>
+            <View
+              style={
+                active
+                  ? [
+                      styles.capsule,
+                      {
+                        backgroundColor: colours.accent,
+                        width: CAPSULE_WIDTH,
+                        height: CAPSULE_HEIGHT,
+                        borderRadius: CAPSULE_HEIGHT / 2,
+                      },
+                    ]
+                  : [
+                      styles.dot,
+                      {
+                        backgroundColor: colours.textTertiary,
+                        opacity: 0.55,
+                        width: dot,
+                        height: dot,
+                        borderRadius: dot / 2,
+                      },
+                    ]
+              }
+            />
+          </Pressable>
+        )
+      })}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  capsule: {
+    overflow: 'hidden',
+  },
   dot: {
     overflow: 'hidden',
   },
   item: {
     alignItems: 'center',
-    gap: 5,
+    height: 28,
     justifyContent: 'center',
-    minHeight: 36,
-    paddingHorizontal: 4,
-    paddingVertical: 4,
-  },
-  itemGrow: {
-    flex: 1,
-  },
-  label: {
-    textAlign: 'center',
+    width: 28,
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     minWidth: 0,
+    paddingVertical: 2,
     width: '100%',
-  },
-  scroll: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 36,
   },
 })

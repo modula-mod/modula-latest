@@ -1,6 +1,5 @@
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
-import {AppText} from '@/components/primitives/AppText'
 import {ProfileAboutPage} from '@/features/profile/components/ProfileAboutPage'
 import {ProfileMetricsPage} from '@/features/profile/components/ProfileMetricsPage'
 import type {
@@ -27,7 +26,7 @@ type ProfileOverviewPageViewProps = {
  * Overview split: Metrics and About are simultaneously visible.
  * There is no inner pager, inner dots, or Metrics/About swipe.
  *
- * Compact column headers are labels, not tappable tabs.
+ * Column names stay on the accessibility tree only — no visible Metrics/About headings.
  * Large Dynamic Type / narrow widths stack both columns on this same page.
  */
 export function ProfileOverviewPageView({
@@ -104,24 +103,24 @@ export function ProfileOverviewPageView({
 
 function OverviewColumnHeader({label}: {label: string}) {
   return (
-    <AppText
-      variant="label"
-      colour="textSecondary"
+    <View
+      accessible
       accessibilityRole="header"
-      numberOfLines={1}
-      style={styles.columnHeader}>
-      {label}
-    </AppText>
+      accessibilityLabel={label}
+      style={styles.a11yHeader}
+    />
   )
 }
 
 const styles = StyleSheet.create({
+  a11yHeader: {
+    height: 1,
+    overflow: 'hidden',
+    width: 1,
+  },
   aboutColumn: {
     flex: 1,
     minWidth: 0,
-  },
-  columnHeader: {
-    marginBottom: 6,
   },
   divider: {
     alignSelf: 'stretch',
