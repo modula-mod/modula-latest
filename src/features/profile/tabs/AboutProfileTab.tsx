@@ -6,6 +6,8 @@ import {useSession} from '@/auth/runtime'
 import {usePrimaryAtprotoConnection} from '@/features/atproto/data/useAtprotoConnectionsQuery'
 import {useAtprotoCapability} from '@/features/atproto/data/useApiMetadataQuery'
 import {
+  DEFAULT_PROFILE_VISIBILITY,
+  PROFILE_VISIBILITY_LABELS,
   canViewerSeeProfileField,
   type ProfileKind,
 } from '@/features/profile/contracts/profile'
@@ -60,7 +62,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           })}
         />
         {viewer.relationship === 'owner' ? (
-          <InfoItem label="Profile visibility" value="Public" />
+          <InfoItem label="Profile visibility" value={PROFILE_VISIBILITY_LABELS[DEFAULT_PROFILE_VISIBILITY]} />
         ) : null}
         {showAtConnection ? (
           <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />

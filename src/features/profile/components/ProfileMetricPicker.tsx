@@ -23,8 +23,8 @@ import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-met
 import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const NEIGHBOR_OPACITY = 0.4
-const FAR_OPACITY = 0.28
+const NEIGHBOR_OPACITY = 0.58
+const FAR_OPACITY = 0.42
 const NEIGHBOR_SCALE = 0.92
 const ARROW_OPACITY = 0.28
 const ITEM_HEIGHT = PROFILE_LAYOUT.metricItemHeight
@@ -332,14 +332,14 @@ function MetricCopy({
         <AppText
           variant={selected ? 'title2' : 'headline'}
           numberOfLines={1}
-          colour={selected ? 'text' : 'textSecondary'}
+          colour="text"
           style={textStyle}>
           {metricDisplayValue(metric)}
         </AppText>
         <AppText
           variant="micro"
           numberOfLines={1}
-          colour={selected ? 'textSecondary' : 'textTertiary'}
+          colour="textSecondary"
           style={textStyle}>
           {metric.label}
         </AppText>

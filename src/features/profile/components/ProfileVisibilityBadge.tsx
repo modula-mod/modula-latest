@@ -1,15 +1,11 @@
 import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
-import type {ProfileVisibility} from '@/features/profile/contracts/profile'
+import {
+  PROFILE_VISIBILITY_LABELS,
+  type ProfileVisibility,
+} from '@/features/profile/contracts/profile'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-
-const visibilityLabels: Record<ProfileVisibility, string> = {
-  public: 'Public',
-  followers: 'Followers',
-  teams: 'Teams',
-  private: 'Private',
-}
 
 type ProfileVisibilityBadgeProps = {
   visibility: ProfileVisibility
@@ -21,7 +17,7 @@ export function ProfileVisibilityBadge({
   contextLabel,
 }: ProfileVisibilityBadgeProps) {
   const {colours, radius, spacing} = useThemeTokens()
-  const label = visibilityLabels[visibility]
+  const label = PROFILE_VISIBILITY_LABELS[visibility]
 
   return (
     <View

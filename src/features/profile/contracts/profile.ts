@@ -10,6 +10,16 @@ export type ProfileVisibility =
   | 'teams'
   | 'private'
 
+/** Product-default profile visibility until a profile-level field exists. */
+export const DEFAULT_PROFILE_VISIBILITY: ProfileVisibility = 'public'
+
+export const PROFILE_VISIBILITY_LABELS: Record<ProfileVisibility, string> = {
+  public: 'Public',
+  followers: 'Followers',
+  teams: 'Teams',
+  private: 'Private',
+}
+
 export type ProfileKind =
   | 'person'
   | 'creator'

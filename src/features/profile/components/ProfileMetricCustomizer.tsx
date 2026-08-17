@@ -75,7 +75,7 @@ export function ProfileMetricCustomizer({draft, onChange}: ProfileMetricCustomiz
               {shown.slice(0, 3).map((id, index) => {
                 const selected = index === Math.min(1, shown.length - 1)
                 return (
-                  <View key={id} style={[styles.previewMetric, {opacity: selected ? 1 : 0.38}]}>
+                  <View key={id} style={[styles.previewMetric, {opacity: selected ? 1 : 0.55}]}>
                     <AppText variant={selected ? 'headline' : 'caption'}>
                       {profileMetricRegistry[id].label}
                     </AppText>
@@ -84,7 +84,7 @@ export function ProfileMetricCustomizer({draft, onChange}: ProfileMetricCustomiz
               })}
             </View>
             <AppText variant="caption" colour="textTertiary" style={styles.previewCopy}>
-              Preview · Metrics page · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
+              Preview · Overview Metrics · {shown.map(id => profileMetricRegistry[id].label).join(' · ')}
             </AppText>
           </View>
         ) : null}

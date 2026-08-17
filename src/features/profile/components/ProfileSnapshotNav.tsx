@@ -34,7 +34,7 @@ export function ProfileSnapshotNav({pages, selectedId, onSelect}: ProfileSnapsho
         style={[styles.item, compact ? styles.itemGrow : null]}>
         <AppText
           variant="micro"
-          colour={active ? 'text' : 'textTertiary'}
+          colour={active ? 'text' : 'textSecondary'}
           numberOfLines={1}
           style={styles.label}>
           {page.number} {page.label}
@@ -44,7 +44,7 @@ export function ProfileSnapshotNav({pages, selectedId, onSelect}: ProfileSnapsho
             styles.dot,
             {
               backgroundColor: active ? colours.accent : colours.textTertiary,
-              opacity: active ? 1 : 0.38,
+              opacity: active ? 1 : 0.52,
               width: PROFILE_LAYOUT.pagerIndicatorSize,
               height: PROFILE_LAYOUT.pagerIndicatorSize,
               borderRadius: PROFILE_LAYOUT.pagerIndicatorSize / 2,

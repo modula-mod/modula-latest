@@ -3,6 +3,8 @@ import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {
+  DEFAULT_PROFILE_VISIBILITY,
+  PROFILE_VISIBILITY_LABELS,
   canViewerSeeProfileField,
   type ModulaProfile,
   type ProfileViewerContext,
@@ -169,17 +171,19 @@ function metadataCells(
       key: 'website',
       icon: 'link',
       label: domain,
-      accessibilityLabel: `Website ${domain}`,
+      accessibilityLabel: `Website ${domain}${profile.website.url ? `, ${profile.website.url}` : ''}`,
       onPress: () => void openSafeExternalUrl(profile.website?.url ?? ''),
     })
   }
 
   if (includeVisibility && viewer.relationship === 'owner') {
+    const visibility = DEFAULT_PROFILE_VISIBILITY
+    const visibilityLabel = PROFILE_VISIBILITY_LABELS[visibility]
     cells.push({
       key: 'visibility',
       icon: 'eye',
-      label: 'Public',
-      accessibilityLabel: 'Profile visibility Public',
+      label: visibilityLabel,
+      accessibilityLabel: `Profile visibility ${visibilityLabel}`,
     })
   }
 
