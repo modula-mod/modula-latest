@@ -52,6 +52,12 @@ True split Overview (Metrics + About always together) on `cursor/phase7m-b6-true
 docs/validation/evidence/phase7m-b6/screenshots-profile-split/
 ```
 
+Overview/pager label chrome removal on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-label-chrome/
+```
+
 ## Founder visual review set (captured)
 
 01 Home — circular glass toolbar  
