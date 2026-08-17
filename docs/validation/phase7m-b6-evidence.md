@@ -46,6 +46,12 @@ docs/validation/evidence/phase7m-b6/screenshots-profile-signature/
 
 See that folder’s README for **Profile Signature Composition Comparison**. Founder visual approval is still required.
 
+True split Overview (Metrics + About always together) on `cursor/phase7m-b6-true-split-overview-543f`:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-split/
+```
+
 ## Founder visual review set (captured)
 
 01 Home — circular glass toolbar  
