@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 
+import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
@@ -18,6 +19,10 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type ProfileInfoPage = 'metrics' | 'about'
 
 const PAGES: ProfileInfoPage[] = ['metrics', 'about']
+const PAGE_CHROME: {id: ProfileInfoPage; label: string}[] = [
+  {id: 'metrics', label: '01 Metrics'},
+  {id: 'about', label: '02 About'},
+]
 const AXIS_LOCK = 10
 const PAGE_COUNT = PAGES.length
 
@@ -31,9 +36,12 @@ type ProfileInfoPagerProps = {
  *
  * Pager About is a compact identity summary. The top-level Profile About tab
  * remains the full expanded profile information. Do not sync their state.
+ *
+ * In-panel chrome reads "01 Metrics" then "02 About". Those labels switch
+ * pages; they are not two pages on screen at once.
  */
 export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
-  const {colours, motion} = useThemeTokens()
+  const {colours, motion, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const [pageWidth, setPageWidth] = useState(0)
   const [pageIndex, setPageIndex] = useState(0)
@@ -144,16 +152,7 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
       : 'About. Page 2 of 2.'
 
   return (
-    <View
-      testID="profile-info-pager"
-      style={styles.host}
-      onLayout={event => {
-        const next = Math.round(event.nativeEvent.layout.width)
-        if (next > 0 && next !== pageWidth) {
-          setPageWidth(next)
-          translateX.value = -pageSV.value * next
-        }
-      }}>
+    <View testID="profile-info-pager" style={styles.host}>
       <View
         accessibilityRole="adjustable"
         accessibilityLabel="Profile details"
@@ -170,31 +169,87 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
         }}
         style={styles.a11yAnchor}
       />
-      <GestureDetector gesture={pan}>
-        <View style={[styles.viewport, {minHeight: PROFILE_LAYOUT.pagerMinHeight, maxHeight: PROFILE_LAYOUT.pagerMaxHeight}]}>
-          <Animated.View
-            style={[
-              styles.track,
-              {width: pageWidth > 0 ? pageWidth * PAGE_COUNT : '200%'},
-              trackStyle,
-            ]}>
-            <View
-              testID="profile-info-page-metrics"
-              accessibilityElementsHidden={pageIndex !== 0}
-              importantForAccessibility={pageIndex === 0 ? 'auto' : 'no-hide-descendants'}
-              style={[styles.page, pageWidth > 0 ? {width: pageWidth} : styles.pageHalf]}>
-              {metrics}
-            </View>
-            <View
-              testID="profile-info-page-about"
-              accessibilityElementsHidden={pageIndex !== 1}
-              importantForAccessibility={pageIndex === 1 ? 'auto' : 'no-hide-descendants'}
-              style={[styles.page, pageWidth > 0 ? {width: pageWidth} : styles.pageHalf]}>
-              {about}
-            </View>
-          </Animated.View>
+      <View
+        style={[
+          styles.panel,
+          {
+            backgroundColor: colours.surfaceRaised,
+            borderColor: colours.border,
+            borderRadius: radius.large,
+            paddingHorizontal: spacing[3],
+            paddingTop: spacing[1],
+            paddingBottom: spacing[2],
+          },
+        ]}>
+        <View style={styles.chrome} testID="profile-info-pager-chrome">
+          {PAGE_CHROME.map((page, index) => {
+            const active = index === pageIndex
+            return (
+              <Pressable
+                key={page.id}
+                accessibilityRole="button"
+                accessibilityLabel={page.label}
+                accessibilityState={{selected: active}}
+                testID={`profile-info-chrome-${page.id}`}
+                hitSlop={8}
+                onPress={() => goTo(index)}
+                style={styles.chromeHit}>
+                <AppText
+                  variant="label"
+                  colour={active ? 'text' : 'textTertiary'}
+                  numberOfLines={1}>
+                  {page.label}
+                </AppText>
+                <View
+                  style={[
+                    styles.chromeRule,
+                    {backgroundColor: active ? colours.accent : 'transparent'},
+                  ]}
+                />
+              </Pressable>
+            )
+          })}
         </View>
-      </GestureDetector>
+        <GestureDetector gesture={pan}>
+          <View
+            onLayout={event => {
+              const next = Math.round(event.nativeEvent.layout.width)
+              if (next > 0 && next !== pageWidth) {
+                setPageWidth(next)
+                translateX.value = -pageSV.value * next
+              }
+            }}
+            style={[
+              styles.viewport,
+              {
+                minHeight: PROFILE_LAYOUT.pagerMinHeight,
+                maxHeight: PROFILE_LAYOUT.pagerMaxHeight,
+              },
+            ]}>
+            <Animated.View
+              style={[
+                styles.track,
+                {width: pageWidth > 0 ? pageWidth * PAGE_COUNT : '200%'},
+                trackStyle,
+              ]}>
+              <View
+                testID="profile-info-page-metrics"
+                accessibilityElementsHidden={pageIndex !== 0}
+                importantForAccessibility={pageIndex === 0 ? 'auto' : 'no-hide-descendants'}
+                style={[styles.page, pageWidth > 0 ? {width: pageWidth} : styles.pageHalf]}>
+                {metrics}
+              </View>
+              <View
+                testID="profile-info-page-about"
+                accessibilityElementsHidden={pageIndex !== 1}
+                importantForAccessibility={pageIndex === 1 ? 'auto' : 'no-hide-descendants'}
+                style={[styles.page, pageWidth > 0 ? {width: pageWidth} : styles.pageHalf]}>
+                {about}
+              </View>
+            </Animated.View>
+          </View>
+        </GestureDetector>
+      </View>
       <View style={styles.indicators} testID="profile-info-pager-indicators">
         {PAGES.map((id, index) => {
           const active = index === pageIndex
@@ -237,6 +292,26 @@ const styles = StyleSheet.create({
     height: 1,
     overflow: 'hidden',
     width: 1,
+  },
+  panel: {
+    borderWidth: StyleSheet.hairlineWidth,
+    minWidth: 0,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  chrome: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  chromeHit: {
+    justifyContent: 'flex-end',
+    minHeight: 44,
+    paddingTop: 8,
+  },
+  chromeRule: {
+    borderRadius: 1,
+    height: 2,
+    marginTop: 6,
   },
   viewport: {
     overflow: 'hidden',

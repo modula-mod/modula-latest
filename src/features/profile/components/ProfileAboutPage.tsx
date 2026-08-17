@@ -6,7 +6,6 @@ import type {
   ModulaProfile,
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
-import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileAboutPageProps = {
@@ -24,10 +23,7 @@ export function ProfileAboutPage({profile, viewer}: ProfileAboutPageProps) {
   const {spacing} = useThemeTokens()
 
   return (
-    <View style={[styles.page, {gap: spacing[2]}]} testID="profile-about-page">
-      <AppText variant="micro" colour="textTertiary" style={styles.label}>
-        About
-      </AppText>
+    <View style={[styles.page, {gap: spacing[2], paddingTop: spacing[1]}]} testID="profile-about-page">
       <ProfileBio profile={profile} compact maxLines={3} />
       <ProfileMetadataGrid profile={profile} viewer={viewer} includeVisibility />
     </View>
@@ -35,11 +31,6 @@ export function ProfileAboutPage({profile, viewer}: ProfileAboutPageProps) {
 }
 
 const styles = StyleSheet.create({
-  label: {
-    letterSpacing: 0.4,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-  },
   page: {
     flex: 1,
     minWidth: 0,

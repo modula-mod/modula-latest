@@ -26,9 +26,9 @@ export const PROFILE_LAYOUT = {
   avatarLeadMax: 32,
   haloExtra: 5,
   haloWidth: 2,
-  avatarBorder: 3,
-  /** Painted portrait is 5% smaller than the max slot so it seats in the pocket. */
-  avatarFit: 0.95,
+  avatarBorder: 4,
+  /** Painted portrait sits just inside the slot so the pocket can cradle it. */
+  avatarFit: 0.98,
   /**
    * Optical correction only. Positive lowers the painted portrait relative to
    * the shared pocket centre. Not a layout mechanism — SVG and avatar both
@@ -42,7 +42,7 @@ export const PROFILE_LAYOUT = {
    */
   identityDrop: 8,
   /** Cover showing around the outer silhouette (portrait + separator + halo). */
-  cradleGap: 4,
+  cradleGap: 2,
   /** Convex landing from the cradle onto the identity plateau. */
   plateauRadius: 20,
   /** Cover above the portrait crown: chrome + photo. Keep this tall — the
@@ -51,9 +51,9 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the profile info pager. */
   metricColumnGap: 8,
-  /** Compact Metrics / About pager. Replaces the old side-by-side info block. */
-  pagerMinHeight: 172,
-  pagerMaxHeight: 228,
+  /** Compact Metrics / About pager page body (chrome sits above this). */
+  pagerMinHeight: 168,
+  pagerMaxHeight: 196,
   pagerIndicatorSize: 6,
   /**
    * Extra space under the in-flow portrait before the wheel.
@@ -65,8 +65,8 @@ export const PROFILE_LAYOUT = {
   identityPlateauGap: 8,
   identityAfterAvatar: 12,
   coverTopBlur: 28,
-  metricItemHeight: 36,
-  metricWindowItems: 3,
+  metricItemHeight: 32,
+  metricWindowItems: 4,
   metricMaxVisible: 5,
   metricRailGutter: 14,
   /**

@@ -59,7 +59,7 @@ export function ProfileIdentity({
         {verified ? (
           <ModulaIcon
             name="verified"
-            colour={colours.text}
+            colour={colours.info}
             size={emphasis === 'hero' ? 18 : 16}
           />
         ) : null}

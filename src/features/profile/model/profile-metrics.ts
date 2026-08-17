@@ -57,6 +57,7 @@ export const profileMetricRegistry: Record<ProfileMetricId, ProfileMetricDefinit
     defaultOrder: 0,
     selectValue: profile => profile.postCount,
     destinationFor: () => ({type: 'profile-tab', tabId: 'posts'}),
+    secondaryText: () => "Content you've shared so far on Modula.",
   },
   followers: {
     id: 'followers',
@@ -67,6 +68,7 @@ export const profileMetricRegistry: Record<ProfileMetricId, ProfileMetricDefinit
       type: 'route',
       href: `/profile/${ownerHandle || profile.handle}/followers`,
     }),
+    secondaryText: () => 'People who follow this profile.',
   },
   following: {
     id: 'following',
@@ -77,6 +79,7 @@ export const profileMetricRegistry: Record<ProfileMetricId, ProfileMetricDefinit
       type: 'route',
       href: `/profile/${ownerHandle || profile.handle}/following`,
     }),
+    secondaryText: () => 'Accounts this profile follows.',
   },
   modules: {
     id: 'modules',
@@ -84,6 +87,7 @@ export const profileMetricRegistry: Record<ProfileMetricId, ProfileMetricDefinit
     defaultOrder: 3,
     selectValue: profile => profile.moduleCount,
     destinationFor: () => ({type: 'profile-tab', tabId: 'modules'}),
+    secondaryText: () => 'Installed modules on this profile.',
   },
 }
 

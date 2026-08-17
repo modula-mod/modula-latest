@@ -47,6 +47,9 @@ type ProfileMetricPickerProps = {
   selectedMetricId: string
   onSelectMetric: (metricId: string) => void
   onActivateMetric: (metric: ProfileMetricDescriptor) => void
+  align?: 'center' | 'start'
+  showSelectionDot?: boolean
+  showHints?: boolean
 }
 
 export function ProfileMetricPicker({
@@ -54,6 +57,9 @@ export function ProfileMetricPicker({
   selectedMetricId,
   onSelectMetric,
   onActivateMetric,
+  align = 'center',
+  showSelectionDot = false,
+  showHints,
 }: ProfileMetricPickerProps) {
   const {colours, motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
@@ -163,7 +169,7 @@ export function ProfileMetricPicker({
   const accessibilityValue = selected
     ? `${selected.label}, ${metricSpokenValue(selected)}, selected, ${selectedIndex + 1} of ${count}.`
     : undefined
-  const showHints = count > 1
+  const hintsVisible = showHints ?? count > 1
 
   if (count === 1 && selected) {
     return (
@@ -175,7 +181,12 @@ export function ProfileMetricPicker({
         }
         onPress={() => onActivateMetric(selected)}
         style={[styles.single, {minHeight: 44}]}>
-        <MetricCopy metric={selected} selected />
+        <MetricCopy
+          metric={selected}
+          selected
+          align={align}
+          showSelectionDot={showSelectionDot}
+        />
       </AppPressable>
     )
   }
@@ -199,8 +210,12 @@ export function ProfileMetricPicker({
           if (name === 'activate') activate()
         }}
         testID="profile-metric-picker"
-        style={[styles.gesture, {minHeight: Math.max(44, windowHeight)}]}>
-        {showHints ? <PickerHintArrow name="arrowUp" colour={colours.text} /> : null}
+        style={[
+          styles.gesture,
+          align === 'start' ? styles.gestureStart : null,
+          {minHeight: Math.max(44, windowHeight)},
+        ]}>
+        {hintsVisible ? <PickerHintArrow name="arrowUp" colour={colours.text} /> : null}
         <View style={[styles.window, {height: windowHeight}]}>
           {metrics.map((metric, index) => (
             <MetricWheelItem
@@ -211,6 +226,8 @@ export function ProfileMetricPicker({
               selected={index === selectedIndex}
               scrollOffset={scrollOffset}
               reduceMotion={reduceMotion}
+              align={align}
+              showSelectionDot={showSelectionDot}
             />
           ))}
           <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
@@ -234,7 +251,7 @@ export function ProfileMetricPicker({
             />
           </View>
         </View>
-        {showHints ? <PickerHintArrow name="arrowDown" colour={colours.text} /> : null}
+        {hintsVisible ? <PickerHintArrow name="arrowDown" colour={colours.text} /> : null}
       </View>
     </GestureDetector>
   )
@@ -273,26 +290,46 @@ function metricSpokenValue(metric: ProfileMetricDescriptor): string {
 function MetricCopy({
   metric,
   selected,
+  align,
+  showSelectionDot,
 }: {
   metric: ProfileMetricDescriptor
   selected: boolean
+  align: 'center' | 'start'
+  showSelectionDot: boolean
 }) {
+  const {colours} = useThemeTokens()
+  const start = align === 'start'
+  const textStyle = start ? styles.copyTextStart : styles.copyText
+
   return (
-    <View style={styles.copy}>
-      <AppText
-        variant={selected ? 'title2' : 'headline'}
-        numberOfLines={1}
-        colour={selected ? 'text' : 'textSecondary'}
-        style={styles.copyText}>
-        {metricDisplayValue(metric)}
-      </AppText>
-      <AppText
-        variant="micro"
-        numberOfLines={1}
-        colour={selected ? 'textSecondary' : 'textTertiary'}
-        style={styles.copyText}>
-        {metric.label}
-      </AppText>
+    <View style={[styles.copyRow, start ? styles.copyRowStart : null]}>
+      {showSelectionDot ? (
+        <View
+          style={[
+            styles.selectionDot,
+            {
+              backgroundColor: selected ? colours.accent : 'transparent',
+            },
+          ]}
+        />
+      ) : null}
+      <View style={[styles.copy, start ? styles.copyStart : null]}>
+        <AppText
+          variant={selected ? 'title2' : 'headline'}
+          numberOfLines={1}
+          colour={selected ? 'text' : 'textSecondary'}
+          style={textStyle}>
+          {metricDisplayValue(metric)}
+        </AppText>
+        <AppText
+          variant="micro"
+          numberOfLines={1}
+          colour={selected ? 'textSecondary' : 'textTertiary'}
+          style={textStyle}>
+          {metric.label}
+        </AppText>
+      </View>
     </View>
   )
 }
@@ -304,6 +341,8 @@ function MetricWheelItem({
   selected,
   scrollOffset,
   reduceMotion,
+  align,
+  showSelectionDot,
 }: {
   metric: ProfileMetricDescriptor
   index: number
@@ -311,7 +350,10 @@ function MetricWheelItem({
   selected: boolean
   scrollOffset: SharedValue<number>
   reduceMotion: boolean
+  align: 'center' | 'start'
+  showSelectionDot: boolean
 }) {
+  const listLayout = align === 'start'
   const style = useAnimatedStyle(() => {
     const current = scrollOffset.value / ITEM_HEIGHT
     const windowStart = windowStartFromOffset(scrollOffset.value, count)
@@ -323,13 +365,24 @@ function MetricWheelItem({
         ? progress < 0.5
           ? 1
           : progress < 1.5
-            ? NEIGHBOR_OPACITY
-            : FAR_OPACITY
-        : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_OPACITY, FAR_OPACITY]),
+            ? listLayout
+              ? 0.72
+              : NEIGHBOR_OPACITY
+            : listLayout
+              ? 0.5
+              : FAR_OPACITY
+        : interpolate(
+            progress,
+            [0, 1, 2],
+            listLayout ? [1, 0.72, 0.5] : [1, NEIGHBOR_OPACITY, FAR_OPACITY],
+          ),
       transform: [
         {translateY},
         {
-          scale: reduceMotion ? 1 : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
+          scale:
+            reduceMotion || listLayout
+              ? 1
+              : interpolate(progress, [0, 1, 2], [1, NEIGHBOR_SCALE, 0.86]),
         },
       ],
     }
@@ -339,7 +392,12 @@ function MetricWheelItem({
     <Animated.View
       pointerEvents="none"
       style={[styles.item, {height: ITEM_HEIGHT}, style]}>
-      <MetricCopy metric={metric} selected={selected} />
+      <MetricCopy
+        metric={metric}
+        selected={selected}
+        align={align}
+        showSelectionDot={showSelectionDot}
+      />
     </Animated.View>
   )
 }
@@ -347,18 +405,44 @@ function MetricWheelItem({
 const styles = StyleSheet.create({
   copy: {
     alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
+    minWidth: 0,
+  },
+  copyStart: {
+    alignItems: 'flex-start',
+  },
+  copyRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
     minWidth: 0,
     width: '100%',
   },
+  copyRowStart: {
+    justifyContent: 'flex-start',
+  },
   copyText: {
     textAlign: 'center',
+    width: '100%',
+  },
+  copyTextStart: {
+    textAlign: 'left',
     width: '100%',
   },
   gesture: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+  },
+  gestureStart: {
+    alignItems: 'stretch',
+  },
+  selectionDot: {
+    borderRadius: 3,
+    flexShrink: 0,
+    height: 6,
+    marginRight: 8,
+    width: 6,
   },
   hint: {
     alignItems: 'center',
@@ -372,7 +456,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   item: {
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'center',
     left: 0,
     position: 'absolute',

@@ -60,12 +60,25 @@ export function ProfileHeroSkeleton() {
             <SkeletonBlock height={14} width="70%" />
           </View>
         </View>
-        <View style={[styles.pager, {height: geometry.pagerHeight, gap: spacing[2]}]}>
-          <SkeletonBlock height={10} width={56} />
-          <SkeletonBlock height={28} width={72} />
-          <SkeletonBlock height={14} width={64} />
-          <SkeletonBlock height={22} width={48} />
-          <SkeletonBlock height={14} width={72} />
+        <View style={[styles.pager, {minHeight: geometry.pagerHeight, gap: spacing[2]}]}>
+          <View style={styles.pagerChrome}>
+            <SkeletonBlock height={14} width={84} />
+            <SkeletonBlock height={14} width={72} />
+          </View>
+          <View style={styles.pagerBody}>
+            <View style={styles.pagerCol}>
+              <SkeletonBlock height={28} width="78%" />
+              <SkeletonBlock height={12} width="54%" />
+              <SkeletonBlock height={22} width="70%" />
+              <SkeletonBlock height={12} width="48%" />
+            </View>
+            <View style={styles.pagerCol}>
+              <SkeletonBlock height={22} width={22} borderRadius={6} />
+              <SkeletonBlock height={22} width="72%" />
+              <SkeletonBlock height={12} width="90%" />
+              <SkeletonBlock height={12} width="64%" />
+            </View>
+          </View>
           <SkeletonRow gap={spacing[2]}>
             <SkeletonBlock height={6} width={6} borderRadius={3} />
             <SkeletonBlock height={6} width={6} borderRadius={3} />
@@ -96,10 +109,23 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   pager: {
-    alignItems: 'center',
-    justifyContent: 'center',
     minWidth: 0,
     width: '100%',
+  },
+  pagerBody: {
+    flexDirection: 'row',
+    gap: 12,
+    minWidth: 0,
+    width: '100%',
+  },
+  pagerChrome: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  pagerCol: {
+    flex: 1,
+    gap: 8,
+    minWidth: 0,
   },
   row: {
     alignItems: 'flex-start',
