@@ -216,14 +216,21 @@ export function buildAvatarCradleRisePath(
     Math.max(0, w - riseX),
     Math.max(0, cy - plateauY),
   )
+  const leftFillet = Math.min(plateau, leftX, Math.max(0, cy - plateauY))
 
   if (r <= 0 || riseX >= w) {
     return M(0, nadirY) + H(w) + V(h) + H(0) + 'Z'
   }
 
+  const leadIn =
+    leftFillet > 0
+      ? M(0, plateauY) +
+        (leftX > leftFillet ? H(leftX - leftFillet) : '') +
+        A(leftFillet, leftX, plateauY + leftFillet)
+      : M(0, cy) + H(leftX)
+
   return (
-    M(0, cy) +
-    H(leftX) +
+    leadIn +
     A(r, cx, nadirY, 0) +
     A(r, riseX, cy, 0) +
     V(plateauY + plateau) +

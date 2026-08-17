@@ -201,6 +201,7 @@ assertAbsent('src/features/profile/components/ProfileCover.tsx', 'cornerRadius={
 assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'buildCoverCanvasLipPath', 'COVER CANVAS LIP PATH')
 assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'buildAvatarCradlePath', 'AVATAR CRADLE PATH')
 assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'buildAvatarCradleRisePath', 'AVATAR CRADLE RISE PATH')
+assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'leftFillet', 'CRADLE HAS A LEADING LIP')
 assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'A(r, cx, nadirY, 0)', 'CRADLE LEADING QUARTER')
 assertContains('src/platform/ui/geometry/inverted-corner-path.ts', 'A(r, riseX, cy, 0)', 'CRADLE TRAILING QUARTER')
 assertContains('src/features/profile/model/profile-layout.ts', 'profileGeometry', 'PROFILE GEOMETRY CONTRACT')
