@@ -25,11 +25,11 @@ import type {ProfileMetricDescriptor} from '@/features/profile/model/profile-met
 import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const NEIGHBOR_OPACITY = 0.58
-const FAR_OPACITY = 0.42
-const NEIGHBOR_SCALE = 0.96
+const NEIGHBOR_OPACITY = 0.72
+const FAR_OPACITY = 0.52
+const NEIGHBOR_SCALE = 0.98
 const ARROW_OPACITY = 0.4
-const FOCAL_BLEED = 2
+const FOCAL_BLEED = 1
 
 type ProfileMetricPickerProps = {
   metrics: ProfileMetricDescriptor[]
@@ -243,8 +243,18 @@ export function ProfileMetricPicker({
                 height: itemHeight + FOCAL_BLEED * 2,
               },
             ]}>
-            <View style={[styles.focalRule, {backgroundColor: colours.separator, top: 0}]} />
-            <View style={[styles.focalRule, {backgroundColor: colours.separator, bottom: 0}]} />
+            <View
+              style={[
+                styles.focalRule,
+                {backgroundColor: colours.textTertiary, top: 0},
+              ]}
+            />
+            <View
+              style={[
+                styles.focalRule,
+                {backgroundColor: colours.textTertiary, bottom: 0},
+              ]}
+            />
           </View>
           <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
             <AppPressable
@@ -342,7 +352,7 @@ function MetricCopy({
         <AppText
           variant="headline"
           numberOfLines={1}
-          colour="text"
+          colour={selected ? 'text' : 'textSecondary'}
           style={[textStyle, selected ? styles.valueSelected : styles.valueNeighbor]}>
           {metricDisplayValue(metric)}
         </AppText>
@@ -461,16 +471,16 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   focal: {
-    left: 18,
+    left: 28,
     position: 'absolute',
-    right: 18,
+    right: 28,
   },
   focalRule: {
-    height: StyleSheet.hairlineWidth,
-    left: 0,
-    opacity: 0.85,
+    height: 1,
+    left: 8,
+    opacity: 0.38,
     position: 'absolute',
-    right: 0,
+    right: 8,
   },
   gesture: {
     alignItems: 'center',
@@ -489,9 +499,8 @@ const styles = StyleSheet.create({
   },
   hint: {
     alignItems: 'center',
-    height: 14,
+    height: 10,
     justifyContent: 'center',
-    marginVertical: 1,
   },
   hit: {
     left: 0,
@@ -510,7 +519,6 @@ const styles = StyleSheet.create({
   },
   labelSelected: {
     lineHeight: 12,
-    marginTop: 1,
   },
   single: {
     alignItems: 'center',
@@ -519,11 +527,13 @@ const styles = StyleSheet.create({
   valueNeighbor: {
     fontSize: 13,
     fontWeight: '600',
+    letterSpacing: -0.1,
     lineHeight: 16,
   },
   valueSelected: {
+    fontSize: 18,
     fontWeight: '700',
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
     lineHeight: 20,
   },
   window: {
