@@ -19,7 +19,6 @@ import {
   resolvePublicProfileLinks,
   resolvePublicProfileModules,
 } from '@/features/profile/data/resolveProfilePublicContent'
-import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {
   LINK_PREVIEW_COUNT,
   MODULE_PREVIEW_COUNT,
@@ -37,14 +36,14 @@ type ProfileSnapshotPagerProps = {
 }
 
 /**
- * Nested Profile snapshot pager.
+ * Profile snapshot pager.
  *
  * Outer: Overview → Modules → Links (labeled navigator).
- * Inner, inside Overview only: Metrics ↔ About.
+ * Overview always shows Metrics and About together — there is no inner pager.
  *
- * Outer swipe is bound to the header and to Modules/Links content so it
- * does not compete with the inner Overview pager or the metric wheel.
- * Outer labels are the primary mobile control.
+ * Horizontal swipe is bound to the header and each page so it does not
+ * compete with the vertical metric wheel. Outer labels are the primary
+ * mobile control.
  */
 export function ProfileSnapshotPager({
   profile,
@@ -65,6 +64,7 @@ export function ProfileSnapshotPager({
     onViewportLayout,
   } = useProfilePagerAnimation(pages.length)
   const headerPan = useMemo(() => createPan(), [createPan])
+  const overviewPan = useMemo(() => createPan(), [createPan])
   const modulesPan = useMemo(() => createPan(), [createPan])
   const linksPan = useMemo(() => createPan(), [createPan])
   const catalogue = useModuleCatalogueQuery()
@@ -130,18 +130,22 @@ export function ProfileSnapshotPager({
                 importantForAccessibility={hidden ? 'no-hide-descendants' : 'auto'}
                 style={[styles.page, widthStyle]}>
                 {page.id === 'overview' ? (
-                  <ProfileOverviewPageView
-                    profile={profile}
-                    viewer={viewer}
-                    presentation={presentation}
-                    ownerHandle={ownerHandle}
-                    onSelectTab={onSelectTab}
-                    showStats={showStats}
-                  />
+                  <GestureDetector gesture={overviewPan}>
+                    <View>
+                      <ProfileOverviewPageView
+                        profile={profile}
+                        viewer={viewer}
+                        presentation={presentation}
+                        ownerHandle={ownerHandle}
+                        onSelectTab={onSelectTab}
+                        showStats={showStats}
+                      />
+                    </View>
+                  </GestureDetector>
                 ) : null}
                 {page.id === 'modules' ? (
                   <GestureDetector gesture={modulesPan}>
-                    <View style={{minHeight: PROFILE_LAYOUT.snapshotBodyMinHeight}}>
+                    <View>
                       <ProfileModulesPreview
                         modules={modules}
                         viewer={viewer}
@@ -154,7 +158,7 @@ export function ProfileSnapshotPager({
                 ) : null}
                 {page.id === 'links' ? (
                   <GestureDetector gesture={linksPan}>
-                    <View style={{minHeight: PROFILE_LAYOUT.snapshotBodyMinHeight}}>
+                    <View>
                       <ProfileLinksPreview
                         links={links}
                         viewer={viewer}
@@ -204,6 +208,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   track: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
   },
   viewport: {

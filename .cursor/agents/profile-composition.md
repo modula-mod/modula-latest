@@ -31,8 +31,8 @@ When invoked:
   `buildCoverShelfStepPath` — never a hard 90° cut and never a bezier scoop
   concentric with the avatar.
 - Identity (display name, `@handle`) sits on the raised trailing plateau, to
-  the right of the portrait. Metrics sit in the leading gutter under the
-  portrait, with the dotted rail.
+  the right of the portrait. Overview is a Metrics | About split — never an
+  exclusive inner pager. The outer pager remains Overview / Modules / Links.
 - `ProfileCoverChrome` keeps a glass back control. On scroll, `ProfileHeaderTitle`
   morphs the name and `@handle` in beside that control.
 - Sticky tabs must clear that chrome. Pad with

@@ -15,7 +15,7 @@ type ProfileMetricsPageProps = {
 }
 
 /**
- * Overview Metrics inner page. Canonical metric descriptors only.
+ * Overview Metrics column. Canonical metric descriptors only.
  * There is no top-level Metrics tab — activation opens Posts / connections / Modules.
  */
 export function ProfileMetricsPage({
@@ -41,7 +41,6 @@ export function ProfileMetricsPage({
 
 const styles = StyleSheet.create({
   page: {
-    flex: 1,
     minWidth: 0,
     width: '100%',
   },

@@ -1,6 +1,6 @@
 import {StyleSheet, View} from 'react-native'
 
-import {SkeletonBlock, SkeletonRow} from '@/platform/ui/skeletons/SkeletonBlock'
+import {SkeletonBlock} from '@/platform/ui/skeletons/SkeletonBlock'
 import {profileCoverBody, profileGeometry} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -60,26 +60,28 @@ export function ProfileHeroSkeleton() {
             <SkeletonBlock height={14} width="70%" />
           </View>
         </View>
-        <View style={[styles.pager, {minHeight: geometry.pagerHeight, gap: spacing[2]}]}>
+        <View style={[styles.pager, {gap: spacing[2]}]}>
           <View style={styles.pagerChrome}>
             <SkeletonBlock height={14} width={96} />
             <SkeletonBlock height={10} width={28} />
           </View>
-          <View style={styles.switcher}>
-            <SkeletonBlock height={12} width={64} />
-            <SkeletonBlock height={12} width={52} />
+          <View style={styles.split}>
+            <View style={styles.metrics}>
+              <SkeletonBlock height={10} width={52} />
+              <SkeletonBlock height={22} width="78%" />
+              <SkeletonBlock height={10} width="62%" />
+              <SkeletonBlock height={28} width="70%" />
+              <SkeletonBlock height={10} width="58%" />
+            </View>
+            <View style={styles.about}>
+              <SkeletonBlock height={10} width={44} />
+              <SkeletonBlock height={12} width="100%" />
+              <SkeletonBlock height={12} width="92%" />
+              <SkeletonBlock height={12} width="74%" />
+              <SkeletonBlock height={10} width="64%" />
+              <SkeletonBlock height={10} width="58%" />
+            </View>
           </View>
-          <View style={styles.metrics}>
-            <SkeletonBlock height={22} width="28%" />
-            <SkeletonBlock height={10} width="22%" />
-            <SkeletonBlock height={28} width="24%" />
-            <SkeletonBlock height={10} width="20%" />
-            <SkeletonBlock height={22} width="26%" />
-          </View>
-          <SkeletonRow gap={spacing[2]} style={styles.dots}>
-            <SkeletonBlock height={6} width={6} borderRadius={3} />
-            <SkeletonBlock height={6} width={6} borderRadius={3} />
-          </SkeletonRow>
           <View style={styles.outerNav}>
             <SkeletonBlock height={10} width={72} />
             <SkeletonBlock height={10} width={64} />
@@ -118,17 +120,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  switcher: {
+  split: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
+    minWidth: 0,
   },
   metrics: {
     alignItems: 'center',
+    flexBasis: '36%',
+    flexGrow: 0,
+    flexShrink: 0,
     gap: 6,
-    width: '100%',
+    minWidth: 0,
   },
-  dots: {
-    justifyContent: 'center',
+  about: {
+    flex: 1,
+    gap: 6,
+    minWidth: 0,
   },
   outerNav: {
     flexDirection: 'row',

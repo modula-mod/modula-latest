@@ -1,23 +1,27 @@
 /**
- * Profile Snapshot Pager — nested information architecture.
+ * Profile Snapshot Pager — information architecture.
  *
- * Outer level (major profile surfaces):
+ * Outer level (the only horizontal snapshot pager):
  *   Overview → Modules → Links
  *
- * Inner level, only inside Overview:
- *   Metrics ↔ About
+ * Overview is a true split, not an inner pager:
+ *   Metrics column + About column, always visible together.
  *
  * Upper snapshot = compact preview / identity summary.
  * Lower Profile tabs = full destination content.
- * Semantic overlap (About / Modules / Links) is intentional.
  *
- * Overview is permanent and always first. Metrics and About stay
- * inside Overview for this phase — they are not outer pages.
+ * Semantic overlap is intentional:
+ *   Overview About  = compact summary
+ *   Lower About tab = expanded profile information
+ *   Outer Modules   = snapshot
+ *   Lower Modules   = full module surface
+ *   Outer Links     = snapshot
+ *   Lower Links     = full links collection
+ *
+ * Overview is permanent and always first.
  */
 
 export type ProfileSnapshotPageId = 'overview' | 'modules' | 'links'
-
-export type ProfileOverviewPage = 'metrics' | 'about'
 
 export type ProfileSnapshotPageDescriptor = {
   id: ProfileSnapshotPageId
@@ -27,11 +31,6 @@ export type ProfileSnapshotPageDescriptor = {
   available: boolean
 }
 
-export const PROFILE_SNAPSHOT_OVERVIEW_PAGES: ProfileOverviewPage[] = [
-  'metrics',
-  'about',
-]
-
 export const CANONICAL_PROFILE_SNAPSHOT_PAGES: ProfileSnapshotPageDescriptor[] = [
   {id: 'overview', order: 0, label: 'Overview', number: '01', available: true},
   {id: 'modules', order: 1, label: 'Modules', number: '02', available: true},
@@ -39,7 +38,6 @@ export const CANONICAL_PROFILE_SNAPSHOT_PAGES: ProfileSnapshotPageDescriptor[] =
 ]
 
 export const DEFAULT_SNAPSHOT_PAGE: ProfileSnapshotPageId = 'overview'
-export const DEFAULT_OVERVIEW_PAGE: ProfileOverviewPage = 'metrics'
 
 export const MODULE_PREVIEW_COUNT = 4
 export const LINK_PREVIEW_COUNT = 3
@@ -63,8 +61,4 @@ export function snapshotPageIndex(
 ): number {
   const index = pages.findIndex(page => page.id === id)
   return index >= 0 ? index : 0
-}
-
-export function overviewPageIndex(page: ProfileOverviewPage): number {
-  return page === 'about' ? 1 : 0
 }

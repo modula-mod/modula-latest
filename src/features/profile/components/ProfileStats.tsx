@@ -19,7 +19,7 @@ type ProfileStatsProps = {
 }
 
 /**
- * Overview Metrics page. Vertical selector only — tap the selected metric
+ * Overview Metrics column. Vertical selector only — tap the selected metric
  * to open its destination. No right-hand duplicate list.
  */
 export function ProfileStats({
@@ -75,8 +75,6 @@ export function ProfileStats({
 const styles = StyleSheet.create({
   host: {
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
     minWidth: 0,
     width: '100%',
   },

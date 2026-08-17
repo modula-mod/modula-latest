@@ -12,23 +12,26 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 type ProfileAboutPageProps = {
   profile: ModulaProfile
   viewer: ProfileViewerContext
+  compact?: boolean
 }
 
 /**
- * Overview About inner page. Compact identity snapshot: bio + metadata.
+ * Overview About column. Compact identity snapshot: bio + metadata.
  * The lower About tab remains the expanded destination.
+ *
+ * Bio starts at the top of the column. Missing bio lets metadata move up.
  */
-export function ProfileAboutPage({profile, viewer}: ProfileAboutPageProps) {
+export function ProfileAboutPage({profile, viewer, compact = false}: ProfileAboutPageProps) {
   const {spacing} = useThemeTokens()
   const {fontScale} = useWindowDimensions()
-  const bioLines = fontScale >= PROFILE_LAYOUT.stackedFontScale ? 4 : 3
+  const bioLines = fontScale >= PROFILE_LAYOUT.stackedFontScale ? 5 : compact ? 4 : 5
 
   return (
     <View
-      style={[styles.page, {gap: spacing[2], paddingTop: spacing[1]}]}
+      style={[styles.page, {gap: spacing[2]}]}
       testID="profile-about-page">
       {profile.bio ? (
-        <ProfileBio profile={profile} compact maxLines={bioLines} />
+        <ProfileBio profile={profile} compact={compact} maxLines={bioLines} />
       ) : null}
       <ProfileMetadataGrid profile={profile} viewer={viewer} includeVisibility />
     </View>
@@ -37,7 +40,6 @@ export function ProfileAboutPage({profile, viewer}: ProfileAboutPageProps) {
 
 const styles = StyleSheet.create({
   page: {
-    flex: 1,
     justifyContent: 'flex-start',
     minWidth: 0,
     width: '100%',

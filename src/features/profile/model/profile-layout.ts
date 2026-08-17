@@ -6,7 +6,7 @@ import {inverted} from '@/theme/foundations/inverted'
  *   cover photograph, full bleed under the chrome
  *   inverted-corner cradle around the portrait (circular bite + convex landing)
  *   display name / handle on the raised plateau, beside the portrait
- *   nested snapshot pager under the identity (Overview / Modules / Links)
+ *   snapshot pager under the identity (Overview split / Modules / Links)
  *   tabs → content
  *
  * Pocket and portrait share `profilePocketGeometry()`. The inverted SVG
@@ -51,10 +51,12 @@ export const PROFILE_LAYOUT = {
   coverHeadroomRegular: 160,
   /** Portrait bottom to the profile snapshot pager. */
   metricColumnGap: 6,
-  /** Compact nested snapshot body (Metrics / About / previews). */
-  pagerMinHeight: 148,
-  snapshotBodyMinHeight: 148,
+  /** Compact snapshot body (Overview split / module & link previews). */
+  pagerMinHeight: 172,
+  snapshotBodyMinHeight: 132,
   snapshotBodyMaxHeight: 188,
+  /** Metrics column in the Overview split — about one-third, capped on tablet. */
+  overviewMetricsMaxWidth: 148,
   pagerIndicatorSize: 6,
   /**
    * Extra space under the in-flow portrait before the wheel.
@@ -219,6 +221,11 @@ export function profileCoverHeight(
 
 export function profileMetricWindowHeight(): number {
   return PROFILE_LAYOUT.metricItemHeight * PROFILE_LAYOUT.metricWindowItems
+}
+
+/** Stack Metrics above About on the same Overview page — never an inner pager. */
+export function profileOverviewStacked(contentWidth: number, fontScale: number): boolean {
+  return fontScale >= PROFILE_LAYOUT.stackedFontScale || contentWidth < PROFILE_LAYOUT.stackedWidth
 }
 
 /** Cover bottom up to the plateau: cradle to avatar centre, plus the landing. */

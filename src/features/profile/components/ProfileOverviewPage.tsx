@@ -1,21 +1,17 @@
-import {Pressable, StyleSheet, View} from 'react-native'
-import {GestureDetector} from 'react-native-gesture-handler'
-import Animated from 'react-native-reanimated'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
+import {AppText} from '@/components/primitives/AppText'
 import {ProfileAboutPage} from '@/features/profile/components/ProfileAboutPage'
 import {ProfileMetricsPage} from '@/features/profile/components/ProfileMetricsPage'
-import {ProfileOverviewSwitcher} from '@/features/profile/components/ProfileOverviewSwitcher'
-import {useProfilePagerAnimation} from '@/features/profile/components/useProfilePagerAnimation'
 import type {
   ModulaProfile,
   ProfilePresentationPreferences,
   ProfileViewerContext,
 } from '@/features/profile/contracts/profile'
-import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {
-  PROFILE_SNAPSHOT_OVERVIEW_PAGES,
-  type ProfileOverviewPage,
-} from '@/features/profile/model/profile-snapshot'
+  PROFILE_LAYOUT,
+  profileOverviewStacked,
+} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileOverviewPageViewProps = {
@@ -28,9 +24,11 @@ type ProfileOverviewPageViewProps = {
 }
 
 /**
- * Inner Overview pager: Metrics ↔ About.
- * Horizontal swipe stays inside this content region so it cannot fight
- * the outer Overview → Modules → Links navigator.
+ * Overview split: Metrics and About are simultaneously visible.
+ * There is no inner pager, inner dots, or Metrics/About swipe.
+ *
+ * Compact column headers are labels, not tappable tabs.
+ * Large Dynamic Type / narrow widths stack both columns on this same page.
  */
 export function ProfileOverviewPageView({
   profile,
@@ -40,139 +38,118 @@ export function ProfileOverviewPageView({
   onSelectTab,
   showStats,
 }: ProfileOverviewPageViewProps) {
-  const {colours} = useThemeTokens()
-  const pager = useProfilePagerAnimation(PROFILE_SNAPSHOT_OVERVIEW_PAGES.length)
-  const current: ProfileOverviewPage = PROFILE_SNAPSHOT_OVERVIEW_PAGES[pager.pageIndex] ?? 'metrics'
-  const accessibilityValue =
-    current === 'metrics' ? 'Metrics, 1 of 2.' : 'About, 2 of 2.'
+  const {colours, spacing} = useThemeTokens()
+  const {width, fontScale} = useWindowDimensions()
+  const stacked = profileOverviewStacked(width, fontScale)
 
-  const goToPage = (page: ProfileOverviewPage) => {
-    pager.goTo(page === 'about' ? 1 : 0)
+  const metrics = showStats ? (
+    <ProfileMetricsPage
+      profile={profile}
+      ownerHandle={ownerHandle}
+      presentation={presentation}
+      onSelectTab={onSelectTab}
+      isOwner={viewer.canEdit}
+    />
+  ) : null
+
+  const about = <ProfileAboutPage profile={profile} viewer={viewer} compact />
+
+  if (stacked) {
+    return (
+      <View style={[styles.host, {gap: spacing[3]}]} testID="profile-overview-page">
+        {showStats ? (
+          <View testID="profile-overview-metrics" style={styles.stackBlock}>
+            <OverviewColumnHeader label="Metrics" />
+            {metrics}
+          </View>
+        ) : null}
+        <View testID="profile-overview-about" style={styles.stackBlock}>
+          <OverviewColumnHeader label="About" />
+          {about}
+        </View>
+      </View>
+    )
   }
 
   return (
     <View style={styles.host} testID="profile-overview-page">
       <View
-        accessibilityRole="adjustable"
-        accessibilityLabel="Overview details"
-        accessibilityValue={{text: accessibilityValue}}
-        accessibilityHint="Swipe left or right to switch Metrics and About."
-        accessibilityActions={[
-          {name: 'increment', label: 'Next overview page'},
-          {name: 'decrement', label: 'Previous overview page'},
-        ]}
-        onAccessibilityAction={event => {
-          const name = event.nativeEvent.actionName
-          if (name === 'increment') pager.goTo(1)
-          if (name === 'decrement') pager.goTo(0)
-        }}
-        style={styles.a11yAnchor}
-      />
-      <ProfileOverviewSwitcher selected={current} onSelect={goToPage} />
-      <GestureDetector gesture={pager.pan}>
+        testID="profile-overview-split"
+        style={[styles.split, {gap: spacing[3]}]}>
         <View
-          onLayout={event => pager.onViewportLayout(event.nativeEvent.layout.width)}
-          style={[styles.viewport, {minHeight: PROFILE_LAYOUT.snapshotBodyMinHeight}]}>
-          <Animated.View
-            style={[
-              styles.track,
-              {width: pager.pageWidth > 0 ? pager.pageWidth * 2 : '200%'},
-              pager.trackStyle,
-            ]}>
-            <View
-              testID="profile-overview-metrics"
-              accessibilityElementsHidden={pager.pageIndex !== 0}
-              importantForAccessibility={pager.pageIndex === 0 ? 'auto' : 'no-hide-descendants'}
-              style={[styles.page, pager.pageWidth > 0 ? {width: pager.pageWidth} : styles.pageHalf]}>
-              {showStats ? (
-                <ProfileMetricsPage
-                  profile={profile}
-                  ownerHandle={ownerHandle}
-                  presentation={presentation}
-                  onSelectTab={onSelectTab}
-                  isOwner={viewer.canEdit}
-                />
-              ) : null}
-            </View>
-            <View
-              testID="profile-overview-about"
-              accessibilityElementsHidden={pager.pageIndex !== 1}
-              importantForAccessibility={pager.pageIndex === 1 ? 'auto' : 'no-hide-descendants'}
-              style={[styles.page, pager.pageWidth > 0 ? {width: pager.pageWidth} : styles.pageHalf]}>
-              <ProfileAboutPage profile={profile} viewer={viewer} />
-            </View>
-          </Animated.View>
+          testID="profile-overview-metrics"
+          style={[
+            styles.metricsColumn,
+            {maxWidth: PROFILE_LAYOUT.overviewMetricsMaxWidth},
+          ]}>
+          <OverviewColumnHeader label="Metrics" />
+          <View style={styles.metricsBody}>{metrics}</View>
         </View>
-      </GestureDetector>
-      <View style={styles.indicators} testID="profile-overview-indicators">
-        {PROFILE_SNAPSHOT_OVERVIEW_PAGES.map((id, index) => {
-          const active = index === pager.pageIndex
-          return (
-            <Pressable
-              key={id}
-              accessibilityRole="button"
-              accessibilityLabel={id === 'metrics' ? 'Metrics, 1 of 2' : 'About, 2 of 2'}
-              accessibilityState={{selected: active}}
-              testID={`profile-overview-indicator-${id}`}
-              hitSlop={10}
-              onPress={() => pager.goTo(index)}
-              style={styles.indicatorHit}>
-              <View
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: active ? colours.accent : colours.textTertiary,
-                    opacity: active ? 1 : 0.38,
-                    width: PROFILE_LAYOUT.pagerIndicatorSize,
-                    height: PROFILE_LAYOUT.pagerIndicatorSize,
-                    borderRadius: PROFILE_LAYOUT.pagerIndicatorSize / 2,
-                  },
-                ]}
-              />
-            </Pressable>
-          )
-        })}
+        <View
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          style={[
+            styles.divider,
+            {backgroundColor: colours.separator, width: StyleSheet.hairlineWidth},
+          ]}
+        />
+        <View testID="profile-overview-about" style={styles.aboutColumn}>
+          <OverviewColumnHeader label="About" />
+          {about}
+        </View>
       </View>
     </View>
   )
 }
 
+function OverviewColumnHeader({label}: {label: string}) {
+  return (
+    <AppText
+      variant="label"
+      colour="textSecondary"
+      accessibilityRole="header"
+      numberOfLines={1}
+      style={styles.columnHeader}>
+      {label}
+    </AppText>
+  )
+}
+
 const styles = StyleSheet.create({
-  a11yAnchor: {
-    height: 1,
-    overflow: 'hidden',
-    width: 1,
+  aboutColumn: {
+    flex: 1,
+    minWidth: 0,
   },
-  dot: {
-    overflow: 'hidden',
+  columnHeader: {
+    marginBottom: 6,
+  },
+  divider: {
+    alignSelf: 'stretch',
+    opacity: 0.45,
   },
   host: {
     minWidth: 0,
     width: '100%',
   },
-  indicatorHit: {
-    alignItems: 'center',
-    height: 22,
+  metricsBody: {
+    flex: 1,
     justifyContent: 'center',
-    width: 22,
-  },
-  indicators: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingTop: 2,
-  },
-  page: {
     minWidth: 0,
   },
-  pageHalf: {
-    width: '50%',
+  metricsColumn: {
+    flexBasis: '36%',
+    flexGrow: 0,
+    flexShrink: 0,
+    minWidth: 108,
   },
-  track: {
+  split: {
+    alignItems: 'stretch',
     flexDirection: 'row',
+    minWidth: 0,
+    width: '100%',
   },
-  viewport: {
-    overflow: 'hidden',
+  stackBlock: {
+    minWidth: 0,
     width: '100%',
   },
 })
