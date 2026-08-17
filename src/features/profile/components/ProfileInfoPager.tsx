@@ -160,8 +160,8 @@ export function ProfileInfoPager({metrics, about}: ProfileInfoPagerProps) {
         accessibilityValue={{text: accessibilityValue}}
         accessibilityHint="Swipe left or right to change page."
         accessibilityActions={[
-          {name: 'increment', label: 'About page'},
-          {name: 'decrement', label: 'Metrics page'},
+          {name: 'increment', label: 'Next page'},
+          {name: 'decrement', label: 'Previous page'},
         ]}
         onAccessibilityAction={event => {
           const name = event.nativeEvent.actionName
