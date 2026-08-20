@@ -37,3 +37,7 @@ PRODUCTION DEPLOYED = NO
 ## After recapture (toolbar / global back)
 
 `screenshots-toolbar-back/` is the 44pt `ModulaBackButton` + Activity header control group on the same simulator. It is not founder approval.
+
+## After recapture (NativeTabs / Liquid Glass)
+
+`screenshots-native-tabs/` is Expo Router `NativeTabs` (iOS 26 system Liquid Glass tab bar) plus overlay ControlGroup capsules on the same simulator. It is not founder approval.

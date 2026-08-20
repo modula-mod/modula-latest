@@ -1,18 +1,18 @@
 import {Image} from 'expo-image'
-import {LinearGradient} from 'expo-linear-gradient'
-import {Pressable, StyleSheet} from 'react-native'
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-  type SharedValue,
-} from 'react-native-reanimated'
+import {Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 import {
   applyProfilePhotoMenuAction,
   profilePhotoMenuActions,
 } from '@/features/profile/components/profile-photo-menu'
+import {
+  PROFILE_LAYOUT,
+  profileCoverBody,
+  profileCoverHeight,
+} from '@/features/profile/model/profile-layout'
 import {CoverAtmosphere} from '@/platform/ui/atmosphere/cover-atmosphere'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -24,11 +24,14 @@ type ProfileCoverProps = {
   onEditPress?: () => void
   previewUri?: string | null
   previewKind?: 'photo' | 'gradient' | 'solid' | 'none'
-  /** Scroll offset for X-style parallax / collapse. */
-  scrollY?: SharedValue<number>
   onPhotoUri?: (uri: string) => void
   onPhotoRemove?: () => void
 }
+
+export const PROFILE_COVER_BODY = profileCoverBody(false)
+const TOP_BLUR = PROFILE_LAYOUT.coverTopBlur
+
+export {profileCoverBody, profileCoverHeight}
 
 export function ProfileCover({
   profile,
@@ -37,61 +40,73 @@ export function ProfileCover({
   onEditPress,
   previewUri,
   previewKind,
-  scrollY,
   onPhotoUri,
   onPhotoRemove,
 }: ProfileCoverProps) {
   const insets = useSafeAreaInsets()
+  const {width} = useWindowDimensions()
   const {colours} = useThemeTokens()
-  const baseHeight = compact ? 168 : 200
-  const height = baseHeight + insets.top
+  // NativeTabs still content-insets the first ScrollView even with `never`.
+  // Pull the banner into that inset so the photograph sits under the status
+  // bar. No transform on this tree — a parallax layer desyncs the avatar
+  // and identity on a fast fling. The inverted pocket is painted in the
+  // hero body so it shares coordinates with the portrait.
+  const height = profileCoverHeight(compact, insets.top, width)
+  const bodyHeight = profileCoverBody(compact, width)
   const uri = previewUri === undefined ? profile.coverUri : previewUri ?? undefined
   const kind = previewKind ?? (uri ? 'photo' : 'gradient')
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const y = scrollY?.value ?? 0
-    return {
-      transform: [
-        {
-          translateY: interpolate(y, [0, height], [0, -height * 0.45], 'clamp'),
-        },
-        {
-          scale: interpolate(y, [-120, 0], [1.35, 1], 'clamp'),
-        },
-      ],
-    }
-  })
+  const emptyFill = profile.coverColour ?? colours.borderStrong
+  const hasPhoto = Boolean(uri) && kind !== 'none'
 
   const body = (
-    <Animated.View
+    <View
       accessibilityRole="image"
       accessibilityLabel={`${profile.displayName} profile cover`}
+      testID="profile-cover"
       style={[
         styles.cover,
         {
-          height,
-          backgroundColor:
-            kind === 'none' ? colours.surface2 : profile.coverColour ?? colours.accentSubtle,
+          height: bodyHeight,
+          backgroundColor: colours.canvas,
         },
-        animatedStyle,
       ]}>
-      {uri && kind !== 'none' ? (
-        <Image
-          source={{uri}}
-          style={StyleSheet.absoluteFill}
-          contentFit="cover"
-          cachePolicy="memory-disk"
-        />
-      ) : kind === 'none' ? null : (
-        <CoverAtmosphere wash={profile.coverColour ?? colours.surfaceRaised} ink={colours.text} paper={colours.surface} />
-      )}
-      <LinearGradient
-        colors={['rgba(0,0,0,0.25)', 'transparent', 'rgba(0,0,0,0.2)']}
-        locations={[0, 0.45, 1]}
-        style={StyleSheet.absoluteFill}
-        pointerEvents="none"
-      />
-    </Animated.View>
+      <View
+        collapsable={false}
+        style={[
+          styles.bleed,
+          {
+            height,
+            top: -insets.top,
+          },
+        ]}>
+        <View
+          style={[
+            styles.artwork,
+            {backgroundColor: kind === 'none' ? colours.canvas : emptyFill},
+          ]}>
+          {hasPhoto ? (
+            <Image
+              source={{uri}}
+              style={StyleSheet.absoluteFill}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+            />
+          ) : kind === 'none' ? null : (
+            <CoverAtmosphere wash={emptyFill} />
+          )}
+        </View>
+        {hasPhoto ? (
+          <View pointerEvents="none" style={[styles.topBlur, {height: insets.top + TOP_BLUR}]}>
+            <ProgressiveBlurBand
+              height={insets.top + TOP_BLUR}
+              topHeavy
+              strength="soft"
+              intensity={64}
+            />
+          </View>
+        ) : null}
+      </View>
+    </View>
   )
 
   if (!canEdit) {
@@ -122,7 +137,7 @@ export function ProfileCover({
       accessibilityLabel="Cover photo actions"
       title="Cover photo"
       actions={profilePhotoMenuActions({
-        hasPhoto: Boolean(uri) && kind !== 'none',
+        hasPhoto,
         removeLabel: 'Remove cover image',
       })}
       onAction={id => {
@@ -139,8 +154,23 @@ export function ProfileCover({
 }
 
 const styles = StyleSheet.create({
-  cover: {
+  artwork: {
+    flex: 1,
+  },
+  bleed: {
+    left: 0,
     overflow: 'hidden',
+    position: 'absolute',
+    right: 0,
+  },
+  cover: {
+    overflow: 'visible',
     width: '100%',
+  },
+  topBlur: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 })

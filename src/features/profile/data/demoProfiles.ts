@@ -31,7 +31,9 @@ export const demoProfileList: ModulaProfile[] = [
     handle: 'andrei.modula',
     displayName: 'Andrei',
     kind: 'person',
-    bio: 'Building Modula - a modular Social Operating System where your profile becomes your platform.',
+    bio: 'Building Modula — a modular Social Operating System where your profile becomes your platform.',
+    coverUri:
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80',
     pronouns: 'he/him',
     location: {
       label: 'United Kingdom',

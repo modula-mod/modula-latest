@@ -20,9 +20,49 @@ Toolbar / global back **after** recapture (same device, Metro on `cursor/phase7m
 docs/validation/evidence/phase7m-b6/screenshots-toolbar-back/
 ```
 
-See that folder’s README for Activity’s header control group, Profile back, and 44pt overlay circles.
+NativeTabs / Liquid Glass **after** recapture (same device, Metro on `cursor/phase7m-b6-native-tabs-6d0c`):
 
-## Founder visual review set (captured)
+```
+docs/validation/evidence/phase7m-b6/screenshots-native-tabs/
+```
+
+Profile evolution (Metric Picker, inverted geometry, sticky tabs) on `cursor/phase7m-b6-profile-evolution-8344`:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-evolution/
+```
+
+Profile masterpiece pass (avatar slot, cradle, typography picker) on `cursor/phase7m-b6-profile-masterpiece-ce59`:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-masterpiece/
+```
+
+Profile signature composition (asymmetric inverted body, name on the right, left Metric Picker, metadata grid, true Liquid Glass group) on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-signature/
+```
+
+See that folder’s README for **Profile Signature Composition Comparison**. Founder visual approval is still required.
+
+True split Overview (Metrics + About always together) on `cursor/phase7m-b6-true-split-overview-543f`:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-split/
+```
+
+Overview/pager label chrome removal on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-label-chrome/
+```
+
+Metrics picker micro pass 03 on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-metrics-03/
+```
 
 ## Founder visual review set (captured)
 

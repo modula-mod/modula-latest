@@ -8,6 +8,7 @@ import {
   profilePhotoMenuActions,
 } from '@/features/profile/components/profile-photo-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileAvatarProps = {
@@ -51,7 +52,7 @@ export function ProfileAvatar({
           styles.avatar,
           {
             borderColor: colours.canvas,
-            borderWidth: 4,
+            borderWidth: PROFILE_LAYOUT.avatarBorder,
           },
           style,
         ]}

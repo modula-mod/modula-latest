@@ -10,6 +10,16 @@ export type ProfileVisibility =
   | 'teams'
   | 'private'
 
+/** Product-default profile visibility until a profile-level field exists. */
+export const DEFAULT_PROFILE_VISIBILITY: ProfileVisibility = 'public'
+
+export const PROFILE_VISIBILITY_LABELS: Record<ProfileVisibility, string> = {
+  public: 'Public',
+  followers: 'Followers',
+  teams: 'Teams',
+  private: 'Private',
+}
+
 export type ProfileKind =
   | 'person'
   | 'creator'
@@ -104,6 +114,12 @@ export type ProfilePresentationPreferences = {
   showFocusHalo: boolean
   showModuleCount: boolean
   showFollowerCount: boolean
+  /** System metric ids in display order. Unknown ids are ignored. */
+  orderedMetricIds: string[]
+  /** Metrics omitted from the picker. Owner customize still lists them. */
+  hiddenMetricIds: string[]
+  /** Initially selected metric. Must be visible. */
+  defaultMetricId: string
 }
 
 export const DEFAULT_PROFILE_PRESENTATION: ProfilePresentationPreferences = {
@@ -129,6 +145,9 @@ export const DEFAULT_PROFILE_PRESENTATION: ProfilePresentationPreferences = {
   showFocusHalo: true,
   showModuleCount: true,
   showFollowerCount: true,
+  orderedMetricIds: ['posts', 'followers', 'following', 'modules'],
+  hiddenMetricIds: [],
+  defaultMetricId: 'posts',
 }
 
 export function canViewerSeeProfileField(

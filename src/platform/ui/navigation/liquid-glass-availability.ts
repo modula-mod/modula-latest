@@ -8,10 +8,8 @@ import {TurboModuleRegistry} from 'react-native'
  * The enforcing registry API throws and white-screens Expo Go / stale native
  * builds when the binary is missing (often at package import time).
  *
- * Full liquid-glass expandable tabs require a custom native rebuild:
- *   cd ios && pod install && cd ..
- *   pnpm exec expo run:ios
- * Expo Go always uses the NativeTabs fallback.
+ * Overlay glass buttons use this probe plus the Expo UI glass runtime.
+ * Shell tabs are Expo Router NativeTabs (not this Callstack module).
  */
 export function isCallstackLiquidGlassNativeAvailable(): boolean {
   if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {

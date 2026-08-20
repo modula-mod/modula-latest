@@ -13,6 +13,7 @@ import {SystemSwitch} from '@/components/system/SystemSwitch'
 import {profileTabIdsFromPresentation} from '@/features/product/data/profileTabsSync'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {coreProfileTabs} from '@/features/profile/data/coreProfileTabs'
+import {ProfileMetricCustomizer} from '@/features/profile/components/ProfileMetricCustomizer'
 import {
   DEFAULT_PROFILE_PRESENTATION,
   type ProfileLayoutId,
@@ -20,9 +21,8 @@ import {
 } from '@/features/profile/contracts/profile'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -123,28 +123,31 @@ export function CustomizeProfileScreen() {
         title="Customize"
         onBack={leave}
         right={
-          <View style={styles.headerTrail}>
-            <ModulaIconButton
-              icon="check"
-              chrome="glass"
-              accessibilityLabel="Save profile presentation"
-              onPress={save}
-            />
-            <ChromeOverflowMenu
-              accessibilityLabel="Customize profile actions"
-              title="Customize"
-              actions={[
-                {id: 'save', label: 'Save', icon: 'check'},
-                {id: 'preview', label: 'Preview profile', icon: 'profile'},
-                {id: 'reset', label: 'Reset', icon: 'reset', style: 'destructive'},
-              ]}
-              onAction={id => {
-                if (id === 'save') save()
-                if (id === 'preview') preview()
-                if (id === 'reset') reset()
-              }}
-            />
-          </View>
+          <ChromeGlassControlGroup
+            items={[
+              {
+                kind: 'button',
+                icon: 'check',
+                accessibilityLabel: 'Save profile presentation',
+                onPress: save,
+              },
+              {
+                kind: 'menu',
+                accessibilityLabel: 'Customize profile actions',
+                title: 'Customize',
+                actions: [
+                  {id: 'save', label: 'Save', icon: 'check'},
+                  {id: 'preview', label: 'Preview profile', icon: 'profile'},
+                  {id: 'reset', label: 'Reset', icon: 'reset', style: 'destructive'},
+                ],
+                onAction: id => {
+                  if (id === 'save') save()
+                  if (id === 'preview') preview()
+                  if (id === 'reset') reset()
+                },
+              },
+            ]}
+          />
         }
       />
       <ResponsiveContent maxWidth={820}>
@@ -266,6 +269,8 @@ export function CustomizeProfileScreen() {
             />
           </Section>
 
+          <ProfileMetricCustomizer draft={draft} onChange={setDraft} />
+
           <SettingsSection title="Profile indicators">
             <SettingsToggleRow
               label="Show Focus Halo"
@@ -273,22 +278,6 @@ export function CustomizeProfileScreen() {
               value={draft.showFocusHalo}
               onValueChange={value =>
                 setDraft(prev => ({...prev, showFocusHalo: value}))
-              }
-            />
-            <SettingsToggleRow
-              label="Show follower count"
-              description="Show follower and following counts already present on the profile."
-              value={draft.showFollowerCount}
-              onValueChange={value =>
-                setDraft(prev => ({...prev, showFollowerCount: value}))
-              }
-            />
-            <SettingsToggleRow
-              label="Show module count"
-              description="Show how many modules this profile has made visible."
-              value={draft.showModuleCount}
-              onValueChange={value =>
-                setDraft(prev => ({...prev, showModuleCount: value}))
               }
               last
             />
@@ -362,11 +351,6 @@ function Section({title, children}: {title: string; children: React.ReactNode}) 
 const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
-  },
-  headerTrail: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 8,
   },
   screen: {
     flex: 1,

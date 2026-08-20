@@ -15,6 +15,12 @@ export {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 export type {ModulaPopoverProps} from '@/platform/ui/menus/modula-popover'
 export {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 export {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
+export {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
+export type {
+  ChromeGlassGroupButton,
+  ChromeGlassGroupItem,
+  ChromeGlassGroupMenu,
+} from '@/platform/ui/menus/chrome-glass-control-group'
 export type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 export {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'

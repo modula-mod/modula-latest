@@ -1,7 +1,15 @@
+import type {ReactNode} from 'react'
 import {useRouter, type Href} from 'expo-router'
-import {View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  type SharedValue,
+} from 'react-native-reanimated'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {
@@ -10,6 +18,8 @@ import {
   plainHeaderSpacing,
   supportsPlainHeaderItems,
 } from '@/platform/ui/navigation/plain-header-items'
+import {LAYERS} from '@/theme/tokens/layers'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 function ProfileHeaderBack() {
   return <ModulaBackButton chrome="plain" />
@@ -97,3 +107,158 @@ export function profileHeaderRightItems() {
     plainHeaderCustomItem(<ProfileOverflowMenu />),
   ]
 }
+
+/**
+ * Share + overflow on the cover (X / Facebook / Bluesky). Used when the native
+ * header is hidden so the banner can start under the status bar.
+ *
+ * `title` is the identity that morphs in beside the back control on scroll; it
+ * shares the leading slot so the name reads as chrome, not as a second hero.
+ * A canvas backdrop fades in with that morph so sticky tabs meet a header,
+ * not a gap.
+ */
+export function ProfileCoverChrome({
+  showBack,
+  owner = true,
+  title,
+  scrollY,
+  heroHeight,
+  chromeHeight,
+}: {
+  showBack: boolean
+  owner?: boolean
+  title?: ReactNode
+  scrollY?: SharedValue<number>
+  heroHeight?: SharedValue<number>
+  chromeHeight: number
+}) {
+  const insets = useSafeAreaInsets()
+  const router = useRouter()
+  const {colours, spacing} = useThemeTokens()
+  const canGoBack = useNavigationCanGoBack()
+  const backVisible = showBack || canGoBack
+  const fallbackHeight = chromeHeight + 120
+
+  const backdropStyle = useAnimatedStyle(() => {
+    const hero = heroHeight?.value || fallbackHeight
+    const to = Math.max(1, hero - chromeHeight)
+    const from = Math.max(0, to - 88)
+    const progress = interpolate(scrollY?.value ?? 0, [from, to], [0, 1], 'clamp')
+    return {opacity: progress}
+  })
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={[styles.overlay, {zIndex: LAYERS.sticky}]}>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.backdrop,
+          {backgroundColor: colours.canvas, height: chromeHeight},
+          backdropStyle,
+        ]}
+      />
+      <View
+        pointerEvents="box-none"
+        style={{paddingHorizontal: spacing[3], paddingTop: insets.top + 8}}>
+        <View pointerEvents="box-none" style={styles.overlayRow}>
+        <View
+          pointerEvents="box-none"
+          style={[styles.leading, {gap: spacing[2]}]}>
+          {backVisible ? <ModulaBackButton /> : null}
+          {title}
+        </View>
+        <ChromeGlassControlGroup
+          items={[
+            ...(owner
+              ? [
+                  {
+                    kind: 'button' as const,
+                    icon: 'edit' as const,
+                    accessibilityLabel: 'Edit Profile',
+                    onPress: () => router.push('/profile/edit' as Href),
+                  },
+                ]
+              : []),
+            {
+              kind: 'button',
+              icon: 'share',
+              accessibilityLabel: 'Share profile',
+              onPress: () => router.push('/share-profile' as Href),
+            },
+            owner
+              ? {
+                  kind: 'menu' as const,
+                  accessibilityLabel: 'Open profile actions',
+                  title: 'Profile',
+                  actions: [
+                    {id: 'customize', label: 'Customize', icon: 'appearance'},
+                    {id: 'os', label: 'Profile-OS', icon: 'settings'},
+                    {id: 'preview', label: 'View as visitor', icon: 'eye'},
+                    {id: 'settings', label: 'Settings', icon: 'settings'},
+                  ],
+                  onAction: (id: string) => {
+                    if (id === 'customize') router.push('/profile/customize' as Href)
+                    if (id === 'os') router.push('/profile/os' as Href)
+                    if (id === 'preview') router.push('/profile/preview' as Href)
+                    if (id === 'settings') router.push('/settings' as Href)
+                  },
+                }
+              : {
+                  kind: 'menu' as const,
+                  accessibilityLabel: 'More profile actions',
+                  title: 'Profile',
+                  actions: [
+                    {id: 'share', label: 'Share profile', icon: 'share'},
+                    {id: 'copy', label: 'Copy profile link', icon: 'link'},
+                  ],
+                  onAction: (id: string) => {
+                    if (id === 'share' || id === 'copy') {
+                      router.push('/share-profile' as Href)
+                    }
+                  },
+                },
+          ]}
+        />
+      </View>
+      </View>
+    </View>
+  )
+}
+
+function useNavigationCanGoBack(): boolean {
+  const router = useRouter()
+  try {
+    return router.canGoBack()
+  } catch {
+    return false
+  }
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  leading: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  overlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  overlayRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
+  },
+})

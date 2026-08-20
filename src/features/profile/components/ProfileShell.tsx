@@ -5,15 +5,15 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from 'react-native-reanimated'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {QueryErrorState} from '@/components/data'
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Surface} from '@/components/primitives/Surface'
-import type {ModuleCatalogueItem, ModuleContribution} from '@/data/repositories/contracts'
+import type {ModuleContribution} from '@/data/repositories/contracts'
 import {
-  canViewerSeeProfileField,
   createViewerContext,
   type ModulaProfile,
   type ProfileScreenMode,
@@ -21,20 +21,25 @@ import {
 } from '@/features/profile/contracts/profile'
 import type {ProfileTabManifest, ProfileTabVisibility} from '@/features/profile/contracts/profileTabs'
 import {useModuleCatalogueQuery, useModuleContributionQuery} from '@/features/modules/hooks'
+import {ProfileHeaderTitle} from '@/features/profile/components/ProfileHeaderTitle'
 import {ProfileHero} from '@/features/profile/components/ProfileHero'
 import {ProfileLayout} from '@/features/profile/components/ProfileLayout'
 import {ProfileLinkCard} from '@/features/profile/components/ProfileLinkCard'
 import {ProfileModuleCard} from '@/features/profile/components/ProfileModuleCard'
-import {ProfileStats} from '@/features/profile/components/ProfileStats'
 import {ProfileTabBar} from '@/features/profile/components/ProfileTabBar'
 import {ProfileTabContent} from '@/features/profile/components/ProfileTabContent'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
-import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
 import {useOwnerProfileQuery, useProfileQuery} from '@/features/profile/data-query'
+import {
+  resolvePublicProfileLinks,
+  resolvePublicProfileModules,
+} from '@/features/profile/data/resolveProfilePublicContent'
+import {profileGeometry, PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {resolveProfileTabs, resolveSelectedProfileTab} from '@/features/profile/registry/resolveProfileTabs'
 import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileRegistry} from '@/features/profile/runtime/useProfileRegistry'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {ProfileCoverChrome} from '@/platform/ui/navigation/profile-stack-header'
 import {ProfileHeroSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useHydrated} from '@/lib/useHydrated'
@@ -96,53 +101,16 @@ function moduleProfileTabManifests(contributions: ModuleContribution[]): Profile
     })
 }
 
-function catalogueItemToProfileModule(module: ModuleCatalogueItem): ProfileModulePreview {
-  return {
-    id: module.moduleId,
-    name: module.name,
-    description: module.description,
-    icon: module.kind === 'system' ? 'settings' : 'modules',
-    status: module.installationState === 'enabled' || module.installationState === 'installed'
-      ? 'featured'
-      : module.installable
-        ? 'available'
-        : 'preview',
-    visibility: 'public',
-    actionLabel: module.installationState === 'enabled'
-      ? 'Open'
-      : module.installable
-        ? 'Available'
-        : 'Preview',
-  }
-}
-
-function profileFeaturedModules(
-  profile: ModulaProfile,
-  catalogue: ModuleCatalogueItem[],
-  viewer: ProfileViewerRelationship,
-): ProfileModulePreview[] {
-  const byId = new Map(catalogue.map(module => [module.moduleId, module]))
-  return profile.featuredModuleIds
-    .map(moduleId => byId.get(moduleId) ?? byId.get(normalizeLegacyProfileModuleId(moduleId)))
-    .filter((module): module is ModuleCatalogueItem => Boolean(module))
-    .map(catalogueItemToProfileModule)
-    .filter(module => canViewerSeeProfileField(module.visibility, viewer))
-}
-
-function normalizeLegacyProfileModuleId(moduleId: string): string {
-  if (moduleId === 'module-vault-notes') return 'digital.modula.vault-notes'
-  if (moduleId === 'module-tasks') return 'digital.modula.tasks'
-  if (moduleId === 'module-dimon-core') return 'digital.dimon.core'
-  return moduleId
-}
-
 export function ProfileShell({mode, handle}: ProfileShellProps) {
   const router = useRouter()
   const {tab} = useLocalSearchParams<{tab?: string}>()
-  const {width} = useWindowDimensions()
+  const {width, fontScale} = useWindowDimensions()
   const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
-  const tabPadding = useFloatingTabBarContentPadding()
+  const insets = useSafeAreaInsets()
+  const tabPadding = useFloatingTabBarContentPadding({
+    automaticInsetsDisabled: true,
+  })
   const registry = useProfileRegistry()
   const {presentation} = useProfile()
   const ownerQuery = useOwnerProfileQuery()
@@ -154,6 +122,9 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   const catalogueQuery = useModuleCatalogueQuery()
   const isExpanded = width >= 1100
   const scrollY = useSharedValue(0)
+  const headerHeight = useSharedValue(0)
+  const insetTop = insets.top
+  const stickyPad = insetTop + PROFILE_LAYOUT.stickyChromeClearance
   const onScroll = useAnimatedScrollHandler({
     onScroll: event => {
       scrollY.value = event.contentOffset.y
@@ -241,13 +212,8 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
   }
 
   const selectedTab = visibleTabs.find(next => next.id === selectedTabId) ?? visibleTabs[0] ?? null
-  const modules = profileFeaturedModules(profile, catalogueQuery.data ?? [], viewer.relationship)
-  const links = [
-    profile.website,
-    ...profile.links,
-  ].filter((link): link is NonNullable<typeof link> =>
-    Boolean(link && canViewerSeeProfileField(link.visibility, viewer.relationship)),
-  )
+  const modules = resolvePublicProfileModules(profile, viewer.relationship, catalogueQuery.data ?? [])
+  const links = resolvePublicProfileLinks(profile, viewer.relationship)
 
   const featuredLinks = links.slice(0, 2)
   const featuredModules = modules.slice(0, 2)
@@ -258,11 +224,10 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       viewer={viewer}
       presentation={presentation}
       ownerHandle={ownerProfile.handle}
-      showStats={presentation.layoutId !== 'creator' && presentation.layoutId !== 'minimal'}
+      showStats={presentation.layoutId !== 'minimal'}
       showActions={presentation.layoutId !== 'minimal'}
       compact={presentation.layoutId === 'minimal' || isExpanded}
       onSelectTab={setSelectedTabRequest}
-      scrollY={scrollY}
     />
   )
 
@@ -293,61 +258,105 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
 
   const main = (
     <Animated.ScrollView
+      automaticallyAdjustContentInsets={false}
       contentInsetAdjustmentBehavior="never"
+      contentInset={{bottom: 0, left: 0, right: 0, top: 0}}
       scrollEventThrottle={16}
       onScroll={onScroll}
       keyboardShouldPersistTaps="handled"
-      contentContainerStyle={[styles.scrollContent, {paddingBottom: tabPadding}]}>
-      {mode === 'preview' ? <PreviewBar /> : null}
-      {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
-      {presentation.layoutId === 'creator' && !isExpanded ? (
-        <FeaturedBand title="Featured links">{featuredLinks.map(link => (
-          <ProfileLinkCard key={link.id} link={link} />
-        ))}</FeaturedBand>
-      ) : null}
-      {presentation.layoutId === 'professional' && !isExpanded ? (
-        <FeaturedBand title="Featured modules">{featuredModules.map(module => (
-          <ProfileModuleCard key={module.id} module={module} />
-        ))}</FeaturedBand>
-      ) : null}
-      {presentation.layoutId === 'minimal' ? (
-        <View style={[styles.minimalActions, {paddingHorizontal: spacing[4], paddingBottom: spacing[3]}]}>
-          <ProfileHero
-            profile={profile}
-            viewer={viewer}
-            presentation={presentation}
-            ownerHandle={ownerProfile.handle}
-            showStats={false}
-            showActions
-            compact
+      stickyHeaderIndices={[1]}
+      contentContainerStyle={[
+        styles.scrollContent,
+        {paddingBottom: tabPadding},
+      ]}>
+      <View
+        collapsable={false}
+        onLayout={event => {
+          headerHeight.value = event.nativeEvent.layout.height
+        }}>
+        {!isExpanded && presentation.layoutId !== 'minimal' ? hero : null}
+        {presentation.layoutId === 'creator' && isExpanded ? (
+          <FeaturedBand title="Featured links">{featuredLinks.map(link => (
+            <ProfileLinkCard key={link.id} link={link} />
+          ))}</FeaturedBand>
+        ) : null}
+        {presentation.layoutId === 'professional' && isExpanded ? (
+          <FeaturedBand title="Featured modules">{featuredModules.map(module => (
+            <ProfileModuleCard key={module.id} module={module} />
+          ))}</FeaturedBand>
+        ) : null}
+        {presentation.layoutId === 'minimal' ? (
+          <View style={[styles.minimalActions, {paddingHorizontal: spacing[4], paddingBottom: spacing[3]}]}>
+            <ProfileHero
+              profile={profile}
+              viewer={viewer}
+              presentation={presentation}
+              ownerHandle={ownerProfile.handle}
+              showStats={false}
+              showActions
+              compact
+              onSelectTab={setSelectedTabRequest}
+            />
+          </View>
+        ) : null}
+      </View>
+      <View
+        testID="profile-sticky-tabs"
+        collapsable={false}
+        pointerEvents="box-none"
+        style={[styles.stickyTabs, {marginTop: -stickyPad}]}>
+        <View pointerEvents="none" style={{height: stickyPad}} />
+        <View style={{backgroundColor: colours.canvas}}>
+          <ProfileTabBar
+            tabs={visibleTabs}
+            selectedTabId={selectedTabId}
             onSelectTab={setSelectedTabRequest}
           />
         </View>
-      ) : null}
-      {presentation.layoutId === 'creator' ? (
-        <ProfileStats
-          profile={profile}
-          ownerHandle={ownerProfile.handle}
-          presentation={presentation}
-          onSelectTab={setSelectedTabRequest}
-        />
-      ) : null}
-      <ProfileTabBar
-        tabs={visibleTabs}
-        selectedTabId={selectedTabId}
-        onSelectTab={setSelectedTabRequest}
-      />
+      </View>
       <ProfileTabContent profile={profile} viewer={viewer} tab={selectedTab} />
     </Animated.ScrollView>
   )
 
+  // The name morphs into the chrome as the hero identity clears the header.
+  const heroGeometry = profileGeometry(width < 760, presentation.showFocusHalo, spacing[4], {
+    contentWidth: width,
+    fontScale,
+  })
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <ProfileCoverChrome
+        showBack
+        owner={viewer.canEdit}
+        chromeHeight={stickyPad}
+        scrollY={scrollY}
+        heroHeight={headerHeight}
+        title={
+          <ProfileHeaderTitle
+            profile={profile}
+            scrollY={scrollY}
+            heroHeight={headerHeight}
+            insetTop={stickyPad}
+            fallbackHeight={heroGeometry.coverBody + 120}
+          />
+        }
+      />
       <ProfileLayout
         left={isExpanded ? hero : undefined}
         main={main}
         right={isExpanded ? contextRail : undefined}
       />
+      {mode === 'preview' ? (
+        <View
+          pointerEvents="box-none"
+          style={[
+            styles.previewOverlay,
+            {top: insets.top + 56, paddingHorizontal: spacing[3], zIndex: 3},
+          ]}>
+          <PreviewBar />
+        </View>
+      ) : null}
     </View>
   )
 }
@@ -454,7 +463,11 @@ const styles = StyleSheet.create({
   previewBar: {
     alignItems: 'center',
     flexDirection: 'row',
-    margin: 12,
+  },
+  previewOverlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
   previewExit: {
     alignItems: 'center',
@@ -469,5 +482,10 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     minWidth: 0,
+  },
+  stickyTabs: {
+    backgroundColor: 'transparent',
+    minWidth: 0,
+    zIndex: 1,
   },
 })

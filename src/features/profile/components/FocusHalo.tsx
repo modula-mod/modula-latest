@@ -2,6 +2,7 @@ import type {ReactNode} from 'react'
 import {StyleSheet, View} from 'react-native'
 
 import type {FocusStatus} from '@/features/profile/contracts/presence'
+import {PROFILE_LAYOUT} from '@/features/profile/model/profile-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type FocusHaloProps = {
@@ -13,8 +14,7 @@ type FocusHaloProps = {
 }
 
 /**
- * Availability ring only — no overlapping status chip.
- * Customize copy: a small ring around the avatar, not a second badge on Edit Profile.
+ * Focus Halo — identity-state ring. Thin, flush to the avatar, no pulse.
  */
 export function FocusHalo({
   status,
@@ -24,36 +24,32 @@ export function FocusHalo({
   visible = true,
 }: FocusHaloProps) {
   const {colours} = useThemeTokens()
-  const ringColour =
-    status.id === 'available'
-      ? colours.success
-      : status.id === 'focused'
-        ? colours.focusRing
-        : status.id === 'busy'
-          ? colours.warning
-          : status.id === 'doNotDisturb'
-            ? colours.destructive
-            : status.id === 'live'
-              ? colours.info
-              : colours.textMuted
+  const extra = PROFILE_LAYOUT.haloExtra
+  const ringColour = colourForStatus(status.id, colours)
+  const label = `${profileName}, ${status.label}`
 
-  if (!visible) {
-    return <View accessibilityLabel={`${profileName} avatar`}>{children}</View>
+  if (!visible || status.id === 'private') {
+    return (
+      <View accessibilityLabel={`${profileName} avatar`} style={{width: size, height: size}}>
+        {children}
+      </View>
+    )
   }
 
   return (
     <View
       accessibilityRole="image"
-      accessibilityLabel={`${profileName}, ${status.label}. Focus status: ${status.label}`}
-      style={{width: size + 12, height: size + 12}}>
+      accessibilityLabel={`${label}. Focus status: ${status.label}`}
+      style={{width: size + extra, height: size + extra}}>
       <View
         style={[
           styles.ring,
           {
             borderColor: ringColour,
-            borderRadius: (size + 12) / 2,
-            height: size + 12,
-            width: size + 12,
+            borderRadius: (size + extra) / 2,
+            borderWidth: PROFILE_LAYOUT.haloWidth,
+            height: size + extra,
+            width: size + extra,
           },
         ]}>
         {children}
@@ -62,10 +58,28 @@ export function FocusHalo({
   )
 }
 
+function colourForStatus(
+  id: FocusStatus['id'],
+  colours: {
+    success: string
+    focusRing: string
+    warning: string
+    destructive: string
+    info: string
+    textMuted: string
+  },
+): string {
+  if (id === 'available') return colours.success
+  if (id === 'focused') return colours.focusRing
+  if (id === 'busy') return colours.warning
+  if (id === 'doNotDisturb') return colours.destructive
+  if (id === 'live') return colours.info
+  return colours.textMuted
+}
+
 const styles = StyleSheet.create({
   ring: {
     alignItems: 'center',
-    borderWidth: 3,
     justifyContent: 'center',
   },
 })

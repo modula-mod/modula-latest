@@ -1,138 +1,98 @@
-import {Tabs} from 'expo-router'
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from 'expo-router'
 import {NativeTabs} from 'expo-router/unstable-native-tabs'
-import type {ComponentType} from 'react'
+import {DynamicColorIOS, Platform} from 'react-native'
 
 import {isTabEnabled} from '@/features/product/data/resolveTabBar'
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
-import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
-import type {ModulaLiquidGlassTabBarProps} from '@/platform/ui/navigation/modula-liquid-glass-tab-bar.types'
 import {MODULA_TABS} from '@/platform/ui/navigation/modula-tabs'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type LiquidGlassTabBarComponent = ComponentType<ModulaLiquidGlassTabBarProps>
-
-let cachedLiquidGlassTabBar: LiquidGlassTabBarComponent | null | undefined
-
 /**
- * Lazily load the expandable liquid-glass tab bar only when the native module
- * is linked. A static import of `@callstack/liquid-glass` crashes Expo Go /
- * stale binaries at module evaluation time (`NativeLiquidGlassModule`).
- */
-function getLiquidGlassTabBar(): LiquidGlassTabBarComponent | null {
-  if (cachedLiquidGlassTabBar !== undefined) {
-    return cachedLiquidGlassTabBar
-  }
-
-  if (!isCallstackLiquidGlassNativeAvailable()) {
-    cachedLiquidGlassTabBar = null
-    return null
-  }
-
-  try {
-    // Dynamic require keeps @callstack/liquid-glass off the Expo Go bundle path.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@/platform/ui/navigation/modula-liquid-glass-tab-bar') as {
-      ModulaLiquidGlassTabBar: LiquidGlassTabBarComponent
-    }
-    cachedLiquidGlassTabBar = mod.ModulaLiquidGlassTabBar
-  } catch {
-    cachedLiquidGlassTabBar = null
-  }
-
-  return cachedLiquidGlassTabBar
-}
-
-/**
- * Native tabs:
- * - Dev client / `expo run:ios` with pods → ModulaLiquidGlassTabBar
- *   (authorized rn-expandable-tab-liquid-glass pattern)
- * - Expo Go / missing NativeLiquidGlassModule → Expo Router NativeTabs fallback
+ * Unselected tab glyphs follow the system interface style so Liquid Glass can
+ * invert over light and dark content. Selected state stays Modula teal.
  *
- * Create is not a tab destination — compose stays toolbar / expand action.
+ * Reference: https://docs.expo.dev/router/advanced/native-tabs/
+ */
+const iosAdaptiveIcon =
+  Platform.OS === 'ios'
+    ? DynamicColorIOS({
+        dark: 'rgb(235, 235, 245)',
+        light: 'rgb(60, 60, 67)',
+      })
+    : undefined
+
+/**
+ * Shell tabs are Expo Router NativeTabs — UITabBarController on iOS, which is
+ * the Liquid Glass tab bar when built with Xcode 26.
+ *
+ * Do not wrap this in a custom floating pill. Do not set `backgroundColor`,
+ * `blurEffect`, or `disableTransparentOnScrollEdge` — those only affect iOS 18
+ * and they kill iOS 26 transparency.
+ *
+ * Create is hidden (compose lives in the Home header as `/compose`). Hidden
+ * NativeTabs routes cannot be focused, so Board is a root stack screen, not a
+ * hidden trigger.
+ *
+ * Profile sets `disableAutomaticContentInsets` so the cover can paint under the
+ * status bar (Expo Router native tabs: first ScrollView is otherwise inset).
+ * https://docs.expo.dev/router/advanced/native-tabs/#safe-area-handling
  */
 export function PlatformTabs() {
-  // Probe native module so PersistentShellTabBar and this navigator agree.
-  if (getLiquidGlassTabBar()) {
-    return <LiquidGlassPlatformTabs />
+  const {scheme, colours} = useThemeTokens()
+  const {preferences} = useProductPreferences()
+  const defaultIcon = iosAdaptiveIcon ?? colours.textSecondary
+  const navigationTheme = {
+    ...(scheme === 'dark' ? DarkTheme : DefaultTheme),
+    colors: {
+      ...(scheme === 'dark' ? DarkTheme.colors : DefaultTheme.colors),
+      background: colours.canvas,
+      card: colours.canvas,
+      primary: colours.accent,
+      text: colours.text,
+      border: colours.border,
+    },
   }
 
-  return <NativeTabsFallback />
-}
-
-function LiquidGlassPlatformTabs() {
-  const {colours} = useThemeTokens()
-
-  // Floating bar is owned by PersistentShellTabBar at the root so settings /
-  // product / marketplace keep the same chrome. Avoid a second in-tabs bar.
   return (
-    <Tabs
-      tabBar={() => null}
-      screenOptions={{
-        headerShown: false,
-        sceneStyle: {backgroundColor: colours.canvas},
-      }}>
-      {MODULA_TABS.map(tab => {
-        const options =
-          tab.id === 'create'
-            ? {
-                title: 'Create',
-                tabBarAccessibilityLabel: tab.label,
-                // Create stays a file route (redirects to compose) but is not a
-                // tab destination — the liquid-glass plus control owns compose.
-                href: null,
-              }
-            : {
-                title: tab.label,
-                tabBarAccessibilityLabel: tab.label,
-              }
-
-        return (
-          <Tabs.Screen
-            key={tab.id}
-            name={tab.routeName}
-            options={options}
-          />
-        )
-      })}
-      {/* Board lives under (tabs)/ but is opened from drawer / shortcuts. */}
-      <Tabs.Screen name="board" options={{href: null, title: 'Board'}} />
-    </Tabs>
-  )
-}
-
-function NativeTabsFallback() {
-  const {colours} = useThemeTokens()
-  const {preferences} = useProductPreferences()
-
-  return (
-    <NativeTabs
-      tintColor={colours.accent}
-      disableTransparentOnScrollEdge
-      labelStyle={{
-        default: {color: colours.textSecondary},
-        selected: {color: colours.accent},
-      }}
-      iconColor={{
-        default: colours.textSecondary,
-        selected: colours.accent,
-      }}>
-      {MODULA_TABS.map(tab => (
-        <NativeTabs.Trigger
-          key={tab.id}
-          name={tab.routeName}
-          accessibilityLabel={tab.label}
-          hidden={!isTabEnabled(preferences.tabBarIds, tab.id)}
-          disableTransparentOnScrollEdge>
-          <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Icon
-            sf={{
-              default: tab.sfSymbol.default as never,
-              selected: tab.sfSymbol.selected as never,
-            }}
-            md={tab.materialSymbol as never}
-          />
-        </NativeTabs.Trigger>
-      ))}
-    </NativeTabs>
+    <NavigationThemeProvider value={navigationTheme}>
+      <NativeTabs
+        minimizeBehavior="onScrollDown"
+        tintColor={colours.accent}
+        labelStyle={{
+          default: {color: defaultIcon},
+          selected: {color: colours.accent},
+        }}
+        iconColor={{
+          default: defaultIcon,
+          selected: colours.accent,
+        }}>
+        {MODULA_TABS.map(tab => {
+          const hidden =
+            tab.id === 'create' || !isTabEnabled(preferences.tabBarIds, tab.id)
+          return (
+            <NativeTabs.Trigger
+              key={tab.id}
+              name={tab.routeName}
+              accessibilityLabel={tab.label}
+              hidden={hidden}
+              disableAutomaticContentInsets={tab.id === 'profile'}
+              contentStyle={tab.id === 'profile' ? {paddingTop: 0} : undefined}>
+              <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
+              <NativeTabs.Trigger.Icon
+                sf={{
+                  default: tab.sfSymbol.default as never,
+                  selected: tab.sfSymbol.selected as never,
+                }}
+                md={tab.materialSymbol as never}
+              />
+            </NativeTabs.Trigger>
+          )
+        })}
+      </NativeTabs>
+    </NavigationThemeProvider>
   )
 }

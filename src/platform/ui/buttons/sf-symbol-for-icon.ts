@@ -31,6 +31,7 @@ export const SF_SYMBOL_FOR_ICON: Partial<Record<AppIconName, string>> = {
   home: 'house',
   activity: 'heart',
   profile: 'person',
+  edit: 'square.and.pencil',
   chevronRight: 'chevron.right',
   warning: 'exclamationmark.triangle',
   marketplace: 'bag',

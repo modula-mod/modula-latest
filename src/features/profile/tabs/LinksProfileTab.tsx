@@ -1,21 +1,14 @@
 import {StyleSheet, View} from 'react-native'
 
-import {
-  canViewerSeeProfileField,
-} from '@/features/profile/contracts/profile'
 import type {ProfileTabRendererProps} from '@/features/profile/contracts/profileTabs'
 import {ProfileLinkCard} from '@/features/profile/components/ProfileLinkCard'
 import {ProfileTabEmptyState} from '@/features/profile/components/ProfileTabEmptyState'
+import {resolvePublicProfileLinks} from '@/features/profile/data/resolveProfilePublicContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function LinksProfileTab({profile, viewer}: ProfileTabRendererProps) {
   const {spacing} = useThemeTokens()
-  const links = [
-    profile.website,
-    ...profile.links,
-  ].filter((link): link is NonNullable<typeof link> =>
-    Boolean(link && canViewerSeeProfileField(link.visibility, viewer.relationship)),
-  )
+  const links = resolvePublicProfileLinks(profile, viewer.relationship)
 
   if (!links.length) {
     return (

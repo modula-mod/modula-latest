@@ -3,6 +3,14 @@ import type {IdentityClaim} from '@/features/profile/contracts/identity'
 export const demoIdentityClaims: Record<string, IdentityClaim[]> = {
   'profile-andrei': [
     {
+      id: 'claim-andrei-verified',
+      kind: 'organisation',
+      label: 'Modula',
+      status: 'verified',
+      visibility: 'public',
+      issuerLabel: 'Demo verification',
+    },
+    {
       id: 'claim-andrei-domain',
       kind: 'domain',
       label: 'modula.digital',

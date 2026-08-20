@@ -6,6 +6,8 @@ import {useSession} from '@/auth/runtime'
 import {usePrimaryAtprotoConnection} from '@/features/atproto/data/useAtprotoConnectionsQuery'
 import {useAtprotoCapability} from '@/features/atproto/data/useApiMetadataQuery'
 import {
+  DEFAULT_PROFILE_VISIBILITY,
+  PROFILE_VISIBILITY_LABELS,
   canViewerSeeProfileField,
   type ProfileKind,
 } from '@/features/profile/contracts/profile'
@@ -40,7 +42,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
     <View style={[styles.wrap, {gap: spacing[4], padding: spacing[4]}]}>
       <View style={{gap: spacing[2]}}>
         <SectionHeader title="About" icon="profile" />
-        <AppText variant="body">{profile.bio}</AppText>
+        {profile.bio ? <AppText variant="body">{profile.bio}</AppText> : null}
       </View>
       <Surface variant="plain" style={[styles.infoGrid, {gap: spacing[3]}]}>
         <InfoItem label="Profile type" value={kindLabels[profile.kind]} />
@@ -59,6 +61,9 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
             year: 'numeric',
           })}
         />
+        {viewer.relationship === 'owner' ? (
+          <InfoItem label="Profile visibility" value={PROFILE_VISIBILITY_LABELS[DEFAULT_PROFILE_VISIBILITY]} />
+        ) : null}
         {showAtConnection ? (
           <InfoItem label="Connected networks" value={`AT Protocol · @${connection.handle}`} />
         ) : null}

@@ -108,7 +108,10 @@ App Store product-page overlay is the reference for **small circular glass contr
 
 **One chrome layer.** iOS 26 `unstable_header*Items` already wraps icons in a shared liquid-glass capsule. Glyphs inside that capsule are `plain`. Circular `glass` is only for overlays on artwork (`SecondaryScreenHeader`, module detail). Never both — that is the “buttons inside buttons” defect.
 
-- `ToolbarChrome` / `toolbarIconModifiers`: overlay `glass` is `controlSize('large')` (44pt App Store circle). Capsule `plain` glyphs stay `regular`. Hit target is `TOOLBAR_HIT` (44)
+- `ToolbarChrome` / `toolbarIconModifiers`: overlay `glass` is `controlSize('extraLarge')` (Expo UI glass circle). Capsule `plain` glyphs stay `regular`. Overlay host is `OVERLAY_GLASS_HIT` (52)
+- Shell tabs are Expo Router `NativeTabs` (`expo-router/unstable-native-tabs`) — real iOS 26 Liquid Glass `UITabBarController`. No Callstack floating pill. `minimizeBehavior="onScrollDown"`. Wrap in Expo Router `ThemeProvider` so iOS 26 glass does not flash white. Do not set `backgroundColor`, `blurEffect`, or `disableTransparentOnScrollEdge` (iOS 18-only; they kill Liquid Glass)
+- Create is a hidden NativeTabs trigger (`/compose` is the Home header action). Board is a **root stack** screen (`src/app/board`) so the drawer can open it without focusing a hidden tab
+- Module Detail / Customize / Saved trailing actions use `ChromeGlassControlGroup` — a 44pt glass capsule with Profile’s 22pt icon gap. Inner glyphs are plain 44pt hosts (same as Profile header items). Compact SwiftUI ControlGroup is not used
 - Global back is `ModulaBackButton` — overlay screens use glass; Profile and Activity tabs use plain in the header capsule
 - Activity header is one control group (mark-read + settings + overflow). No second in-page check / settings / more row
 - Native Home / Profile / Activity / Board / Reels headers pass `chrome="plain"`
@@ -116,11 +119,11 @@ App Store product-page overlay is the reference for **small circular glass contr
 - Compact CTAs (Edit Profile, Open/Install) share the 44pt height
 - Compose accessory matches the same 44pt toolbar scale
 - `ModulaControlGroup` is lab-only; product module rows use tap + long-press context menu
-- Customize trailing chrome is a 44pt save check + overflow — not a text Save next to a mismatched ellipsis
+- Customize trailing chrome is one Profile-sized glass capsule (save check + overflow) — 44pt hits, 22pt gap
 - Customize tabs are a grouped Settings list + switch; reorder is long-press, not extra circles
 - Module Detail shows one compact GET/OPEN pill; Disable / Configure / Uninstall live in overflow
 - Profile hero: cover → avatar overlapping cover only → identity on canvas → one compact Edit/Follow pill. No identity sheet, no More next to Edit Profile
-- `ModulaPageTabView` is **in-screen paging only** (SwiftUI `tabViewStyle({ type: 'page' })`). Shell tabs stay `expo-router` / `PlatformTabs`
+- `ModulaPageTabView` is **in-screen paging only** (SwiftUI `tabViewStyle({ type: 'page' })`). Shell tabs are Expo Router `NativeTabs`
 - Product Hub stays editorial. Do not restore Discover / Installed / Updates segmented marketplace chrome
 
-Glass remains chrome-only (`docs/research/phase7m-b5-liquid-glass-policy.md`): menus, toolbar circles, transient overlays. Forbidden on feed cells, hub rows, form backgrounds, and a tab bar over moving feed text.
+Glass remains chrome-only (`docs/research/phase7m-b5-liquid-glass-policy.md`): menus, toolbar circles, NativeTabs, transient overlays. Forbidden on feed cells, hub rows, and form backgrounds. The custom floating pill over moving feed text is retired — NativeTabs is the system tab bar.

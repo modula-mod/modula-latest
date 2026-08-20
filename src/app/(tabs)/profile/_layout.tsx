@@ -29,7 +29,17 @@ export default function ProfileStackLayout() {
           ? {unstable_headerRightItems: () => rightItems}
           : null),
       }}>
-      <Stack.Screen name="index" />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: '',
+          headerShown: false,
+          headerTransparent: true,
+          // expo-router's NativeStackNavigationOptions omits this; native-stack honors it.
+          // @ts-expect-error native-stack zero top inset so the cover can bleed
+          safeAreaInsets: {top: 0},
+        }}
+      />
     </Stack>
   )
 }

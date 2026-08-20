@@ -1,6 +1,5 @@
 import {useState} from 'react'
 import {StyleSheet, View, useWindowDimensions} from 'react-native'
-import type {SharedValue} from 'react-native-reanimated'
 
 import type {
   ModulaProfile,
@@ -13,7 +12,7 @@ import {ProfileActions} from '@/features/profile/components/ProfileActions'
 import {ProfileAvatar} from '@/features/profile/components/ProfileAvatar'
 import {ProfileCover} from '@/features/profile/components/ProfileCover'
 import {ProfileIdentity} from '@/features/profile/components/ProfileIdentity'
-import {ProfileStats} from '@/features/profile/components/ProfileStats'
+import {ProfileSnapshotPager} from '@/features/profile/components/ProfileSnapshotPager'
 import {
   ProfileAvatarEditor,
   type ProfileAvatarDraft,
@@ -22,6 +21,8 @@ import {
   ProfileCoverEditor,
   type ProfileCoverDraft,
 } from '@/features/profile/editor/profile-cover-editor'
+import {profileGeometry} from '@/features/profile/model/profile-layout'
+import {InvertedSurfaceTransition} from '@/platform/ui/geometry'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileHeroProps = {
@@ -33,13 +34,14 @@ type ProfileHeroProps = {
   showActions?: boolean
   compact?: boolean
   onSelectTab: (tabId: string) => void
-  scrollY?: SharedValue<number>
 }
 
 /**
- * X / Instagram order: cover → avatar overlapping cover only → identity
- * on the canvas → one compact action on the avatar row → stats.
- * No identity sheet, no second More next to Edit Profile.
+ * Cover is full-bleed from the status bar. Cover photos stay `expo-image` —
+ * `@expo/ui` Image is SF Symbols only (Expo SDK 57 docs).
+ *
+ * The inverted SVG cradle is painted in this body overlap band so the
+ * portrait and the pocket share `profilePocketGeometry()`.
  */
 export function ProfileHero({
   profile,
@@ -50,90 +52,200 @@ export function ProfileHero({
   showActions = true,
   compact,
   onSelectTab,
-  scrollY,
 }: ProfileHeroProps) {
-  const {width} = useWindowDimensions()
+  const {width, fontScale} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
   const updateProfile = useUpdateProfileMutation()
-  const isCompact = compact ?? width < 760
-  const avatarSize = isCompact ? 88 : 112
+  // Phones stay on the compact scale even when the layout id is not `minimal`.
+  const isCompact = compact || width < 760
+  const geometry = profileGeometry(isCompact, presentation.showFocusHalo, spacing[4], {
+    contentWidth: width,
+    fontScale,
+  })
   const canEdit = viewer.canEdit
+  const stacked = geometry.stackedFallback
+  const pocket = geometry.pocket
 
   const [coverEditorOpen, setCoverEditorOpen] = useState(false)
   const [avatarEditorOpen, setAvatarEditorOpen] = useState(false)
   const [coverDraft, setCoverDraft] = useState<ProfileCoverDraft | null>(null)
   const [avatarDraft, setAvatarDraft] = useState<ProfileAvatarDraft | null>(null)
 
-  return (
-    <View style={[styles.wrap, {backgroundColor: colours.canvas}]}>
-      <ProfileCover
+  const identity = (
+    <ProfileIdentity profile={profile} viewer={viewer} compact emphasis="hero" />
+  )
+  const pager = (
+    <ProfileSnapshotPager
+      profile={profile}
+      viewer={viewer}
+      presentation={presentation}
+      ownerHandle={ownerHandle}
+      showStats={showStats}
+      onSelectTab={onSelectTab}
+    />
+  )
+  const extras = (
+    <>
+      {showActions && !viewer.canEdit ? (
+        <View style={styles.visitorActions}>
+          <ProfileActions profile={profile} viewer={viewer} />
+        </View>
+      ) : null}
+      <HeroViewingCopy viewer={viewer} />
+    </>
+  )
+
+  const avatar = (
+    <View
+      collapsable={false}
+      pointerEvents="box-none"
+      style={[
+        styles.avatarFlow,
+        {
+          marginTop: geometry.avatarFlowTop,
+          marginLeft: geometry.avatarFlowLeft,
+          height: geometry.slotSize,
+          width: geometry.slotSize,
+        },
+      ]}>
+      <ProfileAvatar
         profile={profile}
-        compact={isCompact}
+        size={geometry.avatarSize}
+        showFocusHalo={presentation.showFocusHalo}
         canEdit={canEdit}
-        onEditPress={() => setCoverEditorOpen(true)}
-        previewUri={coverDraft ? coverDraft.uri : undefined}
-        previewKind={coverDraft?.kind}
-        scrollY={scrollY}
+        onEditPress={() => setAvatarEditorOpen(true)}
+        previewUri={avatarDraft ? avatarDraft.uri : undefined}
         onPhotoUri={uri => {
-          setCoverDraft({uri, kind: 'photo'})
-          const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
-          if (coverUri === undefined) return
-          void updateProfile.mutateAsync({coverUri})
+          setAvatarDraft({uri, sourceUri: uri})
+          const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
+          if (avatarUri === undefined) return
+          void updateProfile.mutateAsync({avatarUri})
         }}
         onPhotoRemove={() => {
-          setCoverDraft({uri: null, kind: 'none'})
-          if (!profile.coverUri) return
-          void updateProfile.mutateAsync({coverUri: null})
+          setAvatarDraft({uri: null, sourceUri: null})
+          if (!profile.avatarUri) return
+          void updateProfile.mutateAsync({avatarUri: null})
         }}
       />
+    </View>
+  )
+
+  const cradle = (
+    <View pointerEvents="none" style={styles.cradle}>
+      <InvertedSurfaceTransition
+        edge="top"
+        side="leading"
+        size="md"
+        width={width}
+        height={geometry.plateauDepth}
+        fill={colours.canvas}
+        cornerRadius={geometry.plateauRadius}
+        avatarCenterX={pocket.avatarCenterX}
+        avatarCenterY={pocket.avatarCenterY}
+        cradleRadius={pocket.pocketRadius}
+        plateauRadius={geometry.plateauRadius}
+        stepX={geometry.stepX}
+        stepRise={geometry.stepRise}
+        stepRadius={geometry.stepRadius}
+      />
+    </View>
+  )
+
+  return (
+    <View collapsable={false} style={styles.wrap}>
+      <View collapsable={false} style={styles.coverBlock}>
+        <ProfileCover
+          profile={profile}
+          compact={isCompact}
+          canEdit={canEdit}
+          onEditPress={() => setCoverEditorOpen(true)}
+          previewUri={coverDraft ? coverDraft.uri : undefined}
+          previewKind={coverDraft?.kind}
+          onPhotoUri={uri => {
+            setCoverDraft({uri, kind: 'photo'})
+            const coverUri = canonicalProfileMediaUri(uri, profile.coverUri)
+            if (coverUri === undefined) return
+            void updateProfile.mutateAsync({coverUri})
+          }}
+          onPhotoRemove={() => {
+            setCoverDraft({uri: null, kind: 'none'})
+            if (!profile.coverUri) return
+            void updateProfile.mutateAsync({coverUri: null})
+          }}
+        />
+      </View>
       <View
+        pointerEvents="box-none"
         style={[
           styles.body,
           {
-            paddingHorizontal: spacing[4],
-            paddingBottom: spacing[4],
-            gap: spacing[3],
+            marginTop: -geometry.plateauDepth,
+            paddingBottom: spacing[2],
           },
         ]}>
-        <View style={styles.avatarRow}>
-          <View style={{marginTop: -(avatarSize / 2), zIndex: 2}}>
-            <ProfileAvatar
-              profile={profile}
-              size={avatarSize}
-              showFocusHalo={presentation.showFocusHalo}
-              canEdit={canEdit}
-              onEditPress={() => setAvatarEditorOpen(true)}
-              previewUri={avatarDraft ? avatarDraft.uri : undefined}
-              onPhotoUri={uri => {
-                setAvatarDraft({uri, sourceUri: uri})
-                const avatarUri = canonicalProfileMediaUri(uri, profile.avatarUri)
-                if (avatarUri === undefined) return
-                void updateProfile.mutateAsync({avatarUri})
-              }}
-              onPhotoRemove={() => {
-                setAvatarDraft({uri: null, sourceUri: null})
-                if (!profile.avatarUri) return
-                void updateProfile.mutateAsync({avatarUri: null})
-              }}
-            />
-          </View>
-          {showActions ? (
-            <View style={styles.avatarActions}>
-              <ProfileActions profile={profile} viewer={viewer} />
-            </View>
-          ) : null}
-        </View>
-        <ProfileIdentity profile={profile} viewer={viewer} compact />
-        <HeroViewingCopy viewer={viewer} />
-      </View>
-      {showStats ? (
-        <ProfileStats
-          profile={profile}
-          ownerHandle={ownerHandle}
-          presentation={presentation}
-          onSelectTab={onSelectTab}
+        <View
+          pointerEvents="none"
+          style={[
+            styles.canvasFill,
+            {backgroundColor: colours.canvas, top: geometry.plateauDepth},
+          ]}
         />
-      ) : null}
+        {cradle}
+        {stacked ? (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.stacked,
+              {
+                paddingHorizontal: spacing[4],
+                paddingTop: geometry.identityPlateauGap,
+                gap: spacing[3],
+              },
+            ]}>
+            {avatar}
+            {identity}
+            {extras}
+            {pager}
+          </View>
+        ) : (
+          <View
+            pointerEvents="box-none"
+            style={[
+              styles.content,
+              {
+                paddingHorizontal: spacing[4],
+                paddingTop: geometry.identityPlateauGap,
+                gap: geometry.metricColumnTop,
+              },
+            ]}>
+            <View pointerEvents="box-none" style={styles.plateauRow}>
+              <View
+                pointerEvents="box-none"
+                style={[
+                  styles.avatarColumn,
+                  {
+                    width: geometry.metricColumnWidth,
+                  },
+                ]}>
+                {avatar}
+              </View>
+              <View
+                style={[
+                  styles.identityColumn,
+                  {
+                    gap: spacing[1],
+                    paddingLeft: geometry.identityColumnPad,
+                    paddingTop: geometry.identityDrop,
+                  },
+                ]}>
+                {identity}
+                {extras}
+              </View>
+            </View>
+            {pager}
+          </View>
+        )}
+      </View>
 
       {canEdit ? (
         <>
@@ -194,34 +306,77 @@ function isPublicHttpsMediaUri(value: string): boolean {
 }
 
 function HeroViewingCopy({viewer}: {viewer: ProfileViewerContext}) {
-  if (viewer.canEdit) return null
-  const copy =
-    viewer.mode === 'preview'
-      ? 'Visitor preview — owner controls stay hidden.'
-      : viewer.relationship === 'visitor'
-        ? 'You’re viewing the public profile.'
-        : 'You’re viewing this profile with your current access.'
+  if (viewer.mode !== 'preview') return null
   return (
     <AppText variant="caption" colour="textTertiary">
-      {copy}
+      Visitor preview — owner controls stay hidden.
     </AppText>
   )
 }
 
 const styles = StyleSheet.create({
-  avatarActions: {
+  avatarColumn: {
+    flexGrow: 0,
     flexShrink: 0,
-    paddingBottom: 4,
+    overflow: 'visible',
   },
-  avatarRow: {
-    alignItems: 'flex-end',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  avatarFlow: {
+    overflow: 'visible',
+    zIndex: 3,
   },
   body: {
     minWidth: 0,
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 2,
+  },
+  canvasFill: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    zIndex: 0,
+  },
+  content: {
+    minWidth: 0,
+    overflow: 'visible',
+    zIndex: 2,
+  },
+  coverBlock: {
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 1,
+  },
+  cradle: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1,
+  },
+  identityColumn: {
+    flex: 1,
+    minWidth: 0,
+    zIndex: 2,
+  },
+  plateauRow: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    minWidth: 0,
+    zIndex: 2,
+  },
+  stacked: {
+    minWidth: 0,
+    overflow: 'visible',
+    zIndex: 2,
+  },
+  visitorActions: {
+    alignItems: 'flex-start',
+    flexShrink: 0,
+    minHeight: 44,
   },
   wrap: {
-    overflow: 'hidden',
+    overflow: 'visible',
+    position: 'relative',
   },
 })

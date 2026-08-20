@@ -5,7 +5,7 @@ import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {InstallPreviewSheet, ModuleInstallProgress} from '@/features/modules/components'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
@@ -22,7 +22,6 @@ import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {type ModulaIconName} from '@/platform/ui/icons'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {shareModulaText} from '@/platform/ui/share/share-modula-text'
@@ -249,31 +248,35 @@ export function ModuleDetailScreen() {
               onPress={presentation.primaryAction === 'Open' ? openModule : openPreview}
             />
           </View>
-          <View style={styles.chromeTrail}>
-            <ChromeCircleButton
-              icon="share"
-              accessibilityLabel={`Share ${copy.name}`}
-              onPress={shareModule}
-            />
-            <ChromeOverflowMenu
-              accessibilityLabel={`${copy.name} actions`}
-              title={copy.name}
-              actions={overflowActions}
-              onAction={id => {
-                if (id === 'share') shareModule()
-                if (id === 'hub') router.push('/product' as Href)
-                if (id === 'enable') void transition('enable')
-                if (id === 'disable') void transition('disable')
-                if (id === 'update') void transition('update')
-                if (id === 'uninstall') void transition('uninstall')
-                if (id === 'settings') {
-                  router.push(
-                    `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
-                  )
-                }
-              }}
-            />
-          </View>
+          <ChromeGlassControlGroup
+            items={[
+              {
+                kind: 'button',
+                icon: 'share',
+                accessibilityLabel: `Share ${copy.name}`,
+                onPress: shareModule,
+              },
+              {
+                kind: 'menu',
+                accessibilityLabel: `${copy.name} actions`,
+                title: copy.name,
+                actions: overflowActions,
+                onAction: id => {
+                  if (id === 'share') shareModule()
+                  if (id === 'hub') router.push('/product' as Href)
+                  if (id === 'enable') void transition('enable')
+                  if (id === 'disable') void transition('disable')
+                  if (id === 'update') void transition('update')
+                  if (id === 'uninstall') void transition('uninstall')
+                  if (id === 'settings') {
+                    router.push(
+                      `/settings/modules/${encodeURIComponent(module.moduleId)}` as Href,
+                    )
+                  }
+                },
+              },
+            ]}
+          />
         </View>
       </View>
 
@@ -552,8 +555,13 @@ function backendModeLabel(mode: string): string {
 const styles = StyleSheet.create({
   actions: {alignItems: 'flex-start'},
   chrome: {width: '100%'},
-  chromeRow: {alignItems: 'center', flexDirection: 'row', gap: 12, minHeight: 44},
-  chromeTrail: {alignItems: 'center', flexDirection: 'row', gap: 8},
+  chromeRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexShrink: 0,
+    gap: 12,
+    minHeight: 52,
+  },
   content: {padding: 16},
   flex: {flex: 1, minWidth: 0},
   hero: {alignItems: 'stretch'},
