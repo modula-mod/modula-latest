@@ -27,6 +27,7 @@ export function CarouselPostRenderer({content}: {content: CarouselPostContent}) 
       <ScrollView
         horizontal
         pagingEnabled
+        testID="post-carousel"
         showsHorizontalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}

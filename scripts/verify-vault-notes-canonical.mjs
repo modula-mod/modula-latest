@@ -67,7 +67,14 @@ record('NO APP FEATURE SCREEN', !existsSync(rel('src/app/vault-notes.tsx')))
 
 const card = read('src/features/modules/components/ModuleCatalogueCard.tsx')
 record('CARD HIDES MODULE ID', !card.includes('digital.modula.vault-notes') && !card.includes('checksum'))
-record('CARD HAS INSTALL ACTION', card.includes("actionLabel") && card.includes('Install'))
+const moduleAction = read('src/features/modules/components/presentation/ModuleAction.tsx')
+record(
+  'CARD HAS INSTALL ACTION',
+  card.includes('onAction') &&
+    card.includes('ModuleRow') &&
+    moduleAction.includes("shown === 'Install'") &&
+    moduleAction.includes('onPress'),
+)
 
 const tabBar = read('src/platform/ui/navigation/modula-liquid-glass-tab-bar.tsx')
 record(

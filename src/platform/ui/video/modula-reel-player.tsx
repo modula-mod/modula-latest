@@ -1,5 +1,7 @@
+import {useEffect} from 'react'
 import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
+import {useVideoPlayer, VideoView} from 'expo-video'
 
 import {AppText} from '@/components/primitives/AppText'
 import {DraggableVideoControls} from '@/platform/ui/video/draggable-video-controls'
@@ -12,11 +14,44 @@ export type ModulaReelPlayerProps = {
   style?: StyleProp<ViewStyle>
 }
 
-/** Web fallback — editorial still + static controls (no expo-video surface). */
+/** Web player. expo-video uses the browser media element while retaining one API. */
 export function ModulaReelPlayer({
+  sourceUri,
   posterColour,
+  active = true,
   style,
 }: ModulaReelPlayerProps) {
+  if (sourceUri) {
+    return <WebVideoPlayer sourceUri={sourceUri} active={active} style={style} />
+  }
+
+  return <WebVideoFallback posterColour={posterColour} style={style} />
+}
+
+function WebVideoPlayer({sourceUri, active, style}: ModulaReelPlayerProps) {
+  const player = useVideoPlayer(sourceUri, instance => {
+    instance.loop = true
+  })
+
+  useEffect(() => {
+    if (active) player.play()
+    else player.pause()
+  }, [active, player])
+
+  return (
+    <View style={[styles.root, style]}>
+      <VideoView
+        accessibilityLabel="Post video"
+        contentFit="cover"
+        nativeControls
+        player={player}
+        style={StyleSheet.absoluteFill}
+      />
+    </View>
+  )
+}
+
+function WebVideoFallback({posterColour, style}: Pick<ModulaReelPlayerProps, 'posterColour' | 'style'>) {
   const {colours} = useThemeTokens()
   const fill = posterColour ?? colours.accent
 
@@ -35,7 +70,7 @@ export function ModulaReelPlayer({
           onTogglePlay={() => undefined}
         />
         <AppText variant="caption" style={{color: colours.mediaOverlaySecondary}}>
-          Video playback Preview requires a native build
+          Video preview unavailable
         </AppText>
       </View>
     </View>

@@ -1,9 +1,10 @@
-import {StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import {LinearGradient} from 'expo-linear-gradient'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {useSessionActions} from '@/auth/runtime'
+import {WelcomeIdentityField} from '@/auth/components/WelcomeIdentityField'
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -16,11 +17,8 @@ export function WelcomeScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const {continueAsGuest} = useSessionActions()
-  const {colours, spacing, scheme} = useThemeTokens()
-  const wash =
-    scheme === 'dark'
-      ? ['#071012', '#0B1416', colours.accentSubtle]
-      : [colours.accentSubtle, '#F3F7F8', colours.canvas]
+  const {colours, spacing} = useThemeTokens()
+  const wash = [colours.accentSubtle, colours.surface1, colours.canvas]
 
   return (
     <View style={[styles.root, {backgroundColor: colours.canvas}]}>
@@ -31,14 +29,21 @@ export function WelcomeScreen() {
         style={StyleSheet.absoluteFill}
       />
 
+      <ScrollView
+        contentInsetAdjustmentBehavior="never"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: insets.top + spacing[5],
+            paddingBottom: insets.bottom + spacing[4],
+            paddingHorizontal: spacing[5],
+            gap: spacing[4],
+          },
+        ]}>
       <View
         style={[
           styles.composition,
-          {
-            paddingTop: insets.top + spacing[8],
-            paddingBottom: insets.bottom + spacing[6],
-            paddingHorizontal: spacing[5],
-          },
         ]}>
         <View style={[styles.hero, {gap: spacing[3]}]}>
           <AppText variant="caption" colour="accent">
@@ -49,10 +54,11 @@ export function WelcomeScreen() {
           </AppText>
           <AppText variant="title2">Your digital world, built around you.</AppText>
           <AppText variant="body" colour="textSecondary" style={styles.support}>
-            A Profile-OS where modules add the tools you choose — calm, private, and under your
-            control.
+            Social, modular, and shaped around your identity — with the tools you choose.
           </AppText>
         </View>
+
+        <WelcomeIdentityField />
 
         <View style={[styles.cta, {gap: spacing[3]}]}>
           <AppButton onPress={() => router.push('/onboarding' as Href)}>Get started</AppButton>
@@ -63,11 +69,11 @@ export function WelcomeScreen() {
             Explore as guest
           </AppButton>
           <AppText variant="caption" colour="textTertiary" style={styles.footnote}>
-            Accounts are owned by Greenfield. DIMON ownership and autonomous AI stay inactive until
-            foundations are ready.
+            Private by default. Your profile stays under your control.
           </AppText>
         </View>
       </View>
+      </ScrollView>
     </View>
   )
 }
@@ -77,9 +83,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
   },
   composition: {
-    flex: 1,
+    flexGrow: 1,
+    gap: 22,
     justifyContent: 'space-between',
     maxWidth: 480,
+    minHeight: 700,
     width: '100%',
     alignSelf: 'center',
   },
@@ -94,6 +102,9 @@ const styles = StyleSheet.create({
   },
   root: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   support: {
     maxWidth: 360,

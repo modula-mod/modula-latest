@@ -4,7 +4,7 @@ packages:
   - packages/*
 
 overrides:
-  expo-constants: ~57.0.10
+  expo-constants: ~57.0.13
 
 allowBuilds:
   '@shopify/react-native-skia': true

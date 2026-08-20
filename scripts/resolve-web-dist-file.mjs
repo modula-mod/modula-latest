@@ -115,6 +115,7 @@ export function resolveWebDistFile(distDir, requestUrl, origin = 'http://127.0.0
   const url = new URL(requestUrl, origin)
   const pathname = decodeURIComponent(url.pathname)
   const fallback = path.join(distDir, 'index.html')
+  const notFound = path.join(distDir, '+not-found.html')
 
   if (pathname === '/') {
     return isFile(fallback) ? fallback : null
@@ -122,7 +123,7 @@ export function resolveWebDistFile(distDir, requestUrl, origin = 'http://127.0.0
 
   const segments = pathname.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
   if (segments.some(isUnsafeSegment)) {
-    return isFile(fallback) ? fallback : null
+    return isFile(notFound) ? notFound : isFile(fallback) ? fallback : null
   }
 
   const exact = matchExact(distDir, segments)
@@ -131,7 +132,7 @@ export function resolveWebDistFile(distDir, requestUrl, origin = 'http://127.0.0
   const dynamic = matchDynamic(distDir, segments, distDir)
   if (dynamic) return dynamic
 
-  return isFile(fallback) ? fallback : null
+  return isFile(notFound) ? notFound : isFile(fallback) ? fallback : null
 }
 
 function walkFiles(dir) {
@@ -184,7 +185,7 @@ export function renderNginxDynamicRewrites(distDir) {
   for (const rewrite of rewrites) {
     lines.push(`    rewrite "${rewrite.regex}" "${rewrite.target}" last;`)
   }
-  lines.push('    rewrite ^ /index.html last;')
+  lines.push('    rewrite ^ /+not-found.html last;')
   lines.push('}')
   lines.push('')
   return lines.join('\n')
@@ -203,6 +204,7 @@ export function selfTestResolveWebDistFile() {
   const root = mkdtempSync(path.join(os.tmpdir(), 'modula-web-dist-'))
   try {
     const files = [
+      '+not-found.html',
       'index.html',
       'profile/index.html',
       'profile/edit.html',
@@ -237,8 +239,8 @@ export function selfTestResolveWebDistFile() {
     )
     assertEqual(resolved('/product/gaia'), 'product/gaia.html', 'static product wins')
     assertEqual(resolved('/product/unknown-slug'), 'product/[slug].html', 'dynamic product slug')
-    assertEqual(resolved('/missing-route'), 'index.html', 'unknown fallback')
-    assertEqual(resolved('/profile/../index.html'), 'index.html', 'path traversal rejected')
+    assertEqual(resolved('/missing-route'), '+not-found.html', 'unknown fallback')
+    assertEqual(resolved('/profile/../index.html'), 'index.html', 'path traversal normalized safely')
   } finally {
     rmSync(root, {recursive: true, force: true})
   }

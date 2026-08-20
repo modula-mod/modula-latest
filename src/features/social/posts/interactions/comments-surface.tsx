@@ -1,30 +1,46 @@
-import {ActivityIndicator, StyleSheet, TextInput, View} from 'react-native'
-import Animated, {
-  interpolate,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from 'react-native'
+import {Gesture, GestureDetector} from 'react-native-gesture-handler'
+import Animated, {Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from 'react-native-reanimated'
+import {scheduleOnRN} from 'react-native-worklets'
 
+import type {PostId} from '@/api/contracts'
+import {useSession} from '@/auth/runtime'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import type {SocialComment} from '@/domain/social'
 import {CommentPreview} from '@/features/social/components/comment-preview'
-import {PostBottomHandle} from '@/features/social/posts/components/post-bottom-handle'
+import {useCommentMutations} from '@/features/social/data/useCommentsQuery'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
-import {usePostInteraction} from '@/features/social/posts/interactions/post-interaction-context'
+import {postSpringConfig, usePostInteraction} from '@/features/social/posts/interactions/post-interaction-context'
+import {commentsModeForSnap, commentsSnapTarget} from '@/features/social/posts/state/post-interaction-machine'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
 import {postLayerZ} from '@/features/social/posts/tokens/post-layout'
-import {useSession} from '@/auth/runtime'
+import {POST_MOTION} from '@/features/social/posts/tokens/post-motion'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type CommentsSurfaceProps = {
-  postId: string
+  postId: PostId
   commentCount: number
   comments: SocialComment[] | undefined
   isLoading: boolean
   isError: boolean
   isOffline?: boolean
   disabled?: boolean
+  onRetry: () => void
+  onRequireAuth: () => void
 }
 
 export function CommentsSurface({
@@ -35,127 +51,238 @@ export function CommentsSurface({
   isError,
   isOffline,
   disabled,
+  onRetry,
+  onRequireAuth,
 }: CommentsSurfaceProps) {
   const session = useSession()
+  const mutations = useCommentMutations(postId)
+  const {height: viewportHeight} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
-  const {commentsProgress, shellHeight} = usePostInteraction()
+  const {commentsProgress, mode, reduceMotion, setMode} = usePostInteraction()
+  const [text, setText] = useState('')
+  const dragStart = useSharedValue<number>(POST_MOTION.commentsSnapPoints.partial)
+  const signedIn = session.status === 'signedIn'
+  const visible = mode === 'commentsDragging' || mode === 'commentsPeek' || mode === 'commentsPartial' || mode === 'commentsFull'
+
+  const animateTo = useCallback((snap: keyof typeof POST_MOTION.commentsSnapPoints, velocity = 0) => {
+    const value = POST_MOTION.commentsSnapPoints[snap]
+    commentsProgress.set(
+      reduceMotion
+        ? withTiming(value, {duration: 120})
+        : withSpring(value, {...postSpringConfig('comments'), velocity}),
+    )
+    setMode(commentsModeForSnap(snap))
+  }, [commentsProgress, reduceMotion, setMode])
+
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web' || typeof document === 'undefined') return undefined
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      animateTo('closed')
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [animateTo, visible])
+
+  const sheetPan = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetY([-8, 8])
+        .failOffsetX([-24, 24])
+        .onBegin(() => {
+          dragStart.set(commentsProgress.get())
+          scheduleOnRN(setMode, 'commentsDragging')
+        })
+        .onUpdate(event => {
+          const next = Math.min(1, Math.max(0, dragStart.get() - event.translationY / 360))
+          commentsProgress.set(next)
+        })
+        .onEnd(event => {
+          const snap = commentsSnapTarget(commentsProgress.get(), event.velocityY)
+          const value = POST_MOTION.commentsSnapPoints[snap]
+          commentsProgress.set(
+            reduceMotion
+              ? withTiming(value, {duration: 120})
+              : withSpring(value, {...postSpringConfig('comments'), velocity: event.velocityY}),
+          )
+          scheduleOnRN(setMode, commentsModeForSnap(snap))
+        }),
+    [commentsProgress, dragStart, reduceMotion, setMode],
+  )
 
   const sheetStyle = useAnimatedStyle(() => {
-    const height = shellHeight.get()
     const progress = commentsProgress.get()
+    const peekHeight = Math.min(220, viewportHeight * 0.3)
+    const partialHeight = viewportHeight * 0.56
+    const fullHeight = viewportHeight * 0.94
     return {
-      transform: [{translateY: interpolate(progress, [0, 1], [height, height * 0.08])}],
+      height: interpolate(
+        progress,
+        [POST_MOTION.commentsSnapPoints.peek, POST_MOTION.commentsSnapPoints.partial, POST_MOTION.commentsSnapPoints.full],
+        [peekHeight, partialHeight, fullHeight],
+        Extrapolation.CLAMP,
+      ),
     }
-  })
+  }, [viewportHeight])
 
   const chromeOpacity = useAnimatedStyle(() => ({
-    opacity: interpolate(commentsProgress.get(), [0, 0.2, 0.55], [0, 0.65, 1]),
+    opacity: interpolate(commentsProgress.get(), [0, 0.12, 0.4], [0, 0.7, 1]),
   }))
 
+  const submit = () => {
+    const value = text.trim()
+    if (!signedIn) {
+      onRequireAuth()
+      return
+    }
+    if (!value || mutations.create.isPending) return
+    mutations.create.mutate(value, {onSuccess: () => setText('')})
+  }
+
+  const authorLabel = (comment: SocialComment) =>
+    signedIn && comment.authorId === session.profile.id ? 'You' : 'Member'
+
   let body = (
-    <AppText variant="body" colour="textSecondary">
-      No comments yet. Start the conversation.
-    </AppText>
+    <View style={[styles.message, {gap: spacing[1]}]}>
+      <AppText variant="label">No comments yet</AppText>
+      <AppText variant="body" colour="textSecondary">Start the conversation.</AppText>
+    </View>
   )
   if (disabled) {
     body = <AppText variant="body" colour="textSecondary">Comments are disabled on this post.</AppText>
   } else if (isOffline) {
     body = <AppText variant="body" colour="textSecondary">You appear to be offline.</AppText>
   } else if (isError) {
-    body = <AppText variant="body" colour="textSecondary">Could not load comments.</AppText>
+    body = (
+      <View style={[styles.message, {gap: spacing[2]}]}>
+        <AppText variant="label">Comments couldn&apos;t load.</AppText>
+        <AppPressable accessibilityLabel="Try loading comments again" onPress={onRetry} style={styles.retry}>
+          <AppText variant="label" colour="accent">Try again</AppText>
+        </AppPressable>
+      </View>
+    )
   } else if (isLoading) {
-    body = <ActivityIndicator color={colours.accent} />
+    body = <ActivityIndicator accessibilityLabel="Loading comments" color={colours.accent} />
   } else if (comments?.length) {
     body = (
-      <View style={{gap: spacing[2]}}>
-        {comments.slice(0, 4).map(comment => (
-          <CommentPreview key={comment.id} comment={comment} />
+      <View style={{gap: spacing[1]}}>
+        {comments.map(comment => (
+          <CommentPreview key={comment.id} comment={comment} authorLabel={authorLabel(comment)} />
         ))}
       </View>
     )
   }
 
+  if (!visible) return null
+
   return (
-    <Animated.View
-      pointerEvents="box-none"
-      style={[styles.root, sheetStyle, {zIndex: postLayerZ('transient')}]}>
-      <Animated.View style={[styles.sheet, chromeOpacity]}>
-        <PostSurface
-          role="comments"
-          style={[
-            styles.panel,
-            {
-              borderTopLeftRadius: POST_GEOMETRY.commentsRadius,
-              borderTopRightRadius: POST_GEOMETRY.commentsRadius,
-              paddingHorizontal: spacing[3],
-              paddingTop: spacing[2],
-              paddingBottom: spacing[4],
-            },
-          ]}>
-          <PostBottomHandle progress={commentsProgress} />
-          <View style={[styles.header, {marginBottom: spacing[2]}]}>
-            <AppText variant="label" style={{color: colours.mediaOverlayText}}>
-              Comments
-            </AppText>
-            <AppText variant="caption" style={{color: colours.mediaOverlaySecondary}}>
-              {commentCount > 0 ? `View all ${commentCount}` : 'Be first'}
-            </AppText>
-          </View>
-          {body}
-          <View style={[styles.composer, {gap: spacing[2], marginTop: spacing[3]}]}>
-            <Avatar
-              name={session.status === 'signedIn' ? session.profile.displayName : 'You'}
-              uri={session.status === 'signedIn' ? session.profile.avatarUri : undefined}
-              size={32}
-            />
-            <AppPressable
-              accessibilityLabel="Add a comment"
-              style={[
-                styles.input,
-                {
-                  backgroundColor: colours.mediaOverlayControlBackground,
-                  borderColor: colours.borderStrong,
-                  paddingHorizontal: spacing[3],
-                },
-              ]}>
-              <TextInput
-                editable={false}
-                placeholder="Add a comment..."
-                placeholderTextColor={colours.mediaOverlaySecondary}
-                style={{color: colours.mediaOverlayText, flex: 1, minHeight: 36}}
+    <Modal animationType="none" onRequestClose={() => animateTo('closed')} transparent visible>
+      <View
+        accessibilityViewIsModal
+        onAccessibilityEscape={() => animateTo('closed')}
+        style={[styles.root, {zIndex: postLayerZ('transient')}]}
+        testID="post-comments-sheet">
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, chromeOpacity, {backgroundColor: colours.backdrop, opacity: 0.35}]} />
+        <AppPressable
+          accessibilityLabel="Dismiss comments"
+          onPress={() => animateTo('closed')}
+          style={StyleSheet.absoluteFill}
+        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboard}>
+        <Animated.View style={[styles.sheet, chromeOpacity, sheetStyle]}>
+          <PostSurface
+            role="comments"
+            style={[
+              styles.panel,
+              {
+                borderTopLeftRadius: POST_GEOMETRY.commentsRadius,
+                borderTopRightRadius: POST_GEOMETRY.commentsRadius,
+              },
+            ]}>
+            <GestureDetector gesture={sheetPan}>
+              <View accessibilityLabel="Drag comments" style={[styles.handleZone, {paddingTop: spacing[2]}]}>
+                <View style={[styles.handle, {backgroundColor: colours.textMuted}]} />
+              </View>
+            </GestureDetector>
+            <View style={[styles.header, {paddingHorizontal: spacing[4], paddingBottom: spacing[2]}]}>
+              <View>
+                <AppText variant="headline">Comments</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  {commentCount > 0 ? `${commentCount} in this conversation` : 'Be the first to respond'}
+                </AppText>
+              </View>
+              <AppPressable accessibilityLabel="Close comments" onPress={() => animateTo('closed')} style={styles.close}>
+                <AppIcon name="close" colour={colours.textMain} size={20} />
+              </AppPressable>
+            </View>
+            <ScrollView
+              contentContainerStyle={{paddingHorizontal: spacing[4], paddingBottom: spacing[3]}}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              style={styles.thread}>
+              {body}
+            </ScrollView>
+            <View style={[styles.composer, {borderTopColor: colours.separator, gap: spacing[2], padding: spacing[3]}]}>
+              <Avatar
+                name={signedIn ? session.profile.displayName : 'You'}
+                uri={signedIn ? session.profile.avatarUri : undefined}
+                size={34}
               />
-            </AppPressable>
-          </View>
-        </PostSurface>
-      </Animated.View>
-    </Animated.View>
+              <View style={[styles.inputWrap, {backgroundColor: colours.surface2, borderColor: colours.borderStrong}]}>
+                <TextInput
+                  accessibilityLabel="Write a comment"
+                  editable={signedIn && !mutations.create.isPending}
+                  multiline
+                  onChangeText={setText}
+                  onFocus={() => animateTo('full')}
+                  onPressIn={() => {
+                    if (!signedIn) onRequireAuth()
+                  }}
+                  placeholder={signedIn ? 'Write a comment…' : 'Sign in to comment'}
+                  placeholderTextColor={colours.textMuted}
+                  style={[styles.input, {color: colours.textMain}]}
+                  value={text}
+                />
+                <AppPressable
+                  accessibilityLabel="Send comment"
+                  disabled={signedIn && (!text.trim() || mutations.create.isPending)}
+                  onPress={submit}
+                  style={styles.send}>
+                  <AppIcon
+                    name="send"
+                    colour={text.trim() ? colours.accent : colours.textMuted}
+                    size={19}
+                  />
+                </AppPressable>
+              </View>
+            </View>
+          </PostSurface>
+        </Animated.View>
+      </KeyboardAvoidingView>
+      </View>
+    </Modal>
   )
 }
 
 const styles = StyleSheet.create({
-  composer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  input: {
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  panel: {
-    minHeight: 180,
-  },
-  root: {
-    ...StyleSheet.absoluteFill,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    width: '100%',
-  },
+  close: {alignItems: 'center', height: 44, justifyContent: 'center', width: 44},
+  composer: {alignItems: 'center', borderTopWidth: StyleSheet.hairlineWidth, flexDirection: 'row'},
+  handle: {borderRadius: 999, height: 5, opacity: 0.75, width: 42},
+  handleZone: {alignItems: 'center', height: 32, justifyContent: 'flex-start'},
+  header: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
+  input: {flex: 1, maxHeight: 96, minHeight: 42, paddingHorizontal: 12, paddingVertical: 10},
+  inputWrap: {alignItems: 'center', borderRadius: 24, borderWidth: StyleSheet.hairlineWidth, flex: 1, flexDirection: 'row'},
+  keyboard: {height: '100%', justifyContent: 'flex-end', width: '100%'},
+  message: {alignItems: 'center', paddingVertical: 28},
+  panel: {flex: 1, overflow: 'hidden'},
+  retry: {minHeight: 44, paddingHorizontal: 18, justifyContent: 'center'},
+  root: {flex: 1, justifyContent: 'flex-end'},
+  send: {alignItems: 'center', height: 44, justifyContent: 'center', width: 44},
+  sheet: {bottom: 0, position: 'absolute', width: '100%'},
+  thread: {flex: 1},
 })

@@ -33,13 +33,31 @@ export function PostSurface({role, children, style, contentLayout = 'flow'}: Pos
     )
   }
 
+
+  // Rails use discrete backed controls. A single tall blurred slab samples too much
+  // media and weakens contrast on high-frequency photography.
+  if (role === 'rail') {
+    return <View style={style}>{children}</View>
+  }
+
+  if (role === 'context' || role === 'reaction') {
+    return (
+      <View style={[styles.base, {backgroundColor: colours.backdrop}, style]}>
+        {children}
+      </View>
+    )
+  }
+
+  if (role === 'comments') {
+    return (
+      <View style={[styles.base, {backgroundColor: colours.surface1}, style]}>
+        {children}
+      </View>
+    )
+  }
+
   if (reduceTransparency || Platform.OS === 'web') {
-    const background =
-      role === 'context'
-        ? isDark
-          ? 'rgba(22,28,32,0.92)'
-          : 'rgba(245,247,248,0.94)'
-        : colours.mediaOverlayControlBackground
+    const background = isDark ? colours.surfaceOverlay : colours.surface1
     return (
       <View style={[styles.base, {backgroundColor: background}, style]}>
         {children}

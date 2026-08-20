@@ -1,5 +1,5 @@
 import {useMemo} from 'react'
-import {LayoutChangeEvent, StyleSheet, View} from 'react-native'
+import {LayoutChangeEvent, StyleSheet, View, useWindowDimensions} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -8,7 +8,6 @@ import Animated, {
 import {Gesture, GestureDetector} from 'react-native-gesture-handler'
 import {scheduleOnRN} from 'react-native-worklets'
 import * as Haptics from 'expo-haptics'
-import {useRouter, type Href} from 'expo-router'
 
 import type {ReactionType, SocialPost} from '@/domain/social'
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
@@ -31,6 +30,7 @@ import {PostContentRenderer} from '@/features/social/posts/renderers/post-conten
 import {
   commentsModeForSnap,
   commentsSnapTarget,
+  canOpenComments,
 } from '@/features/social/posts/state/post-interaction-machine'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
@@ -48,11 +48,12 @@ type PostShellProps = {
   post: SocialPost
   active?: boolean
   compact?: boolean
+  presentation?: 'feed' | 'detail'
 }
 
-function PostShellInner({post, active = true, compact}: PostShellProps) {
-  const router = useRouter()
+function PostShellInner({post, active = true, compact, presentation = 'feed'}: PostShellProps) {
   const session = useSession()
+  const {width} = useWindowDimensions()
   const {moderationRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const canEngage = useCapability('post:engage')
@@ -62,8 +63,9 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
   const commentsQuery = useCommentsQuery(post.id)
   const content = useMemo(() => resolvePostContent(post), [post])
   const aspectRatio = defaultPostAspectRatio(content)
+  const mediaFirst = content.kind === 'image' || content.kind === 'carousel' || content.kind === 'video' || content.kind === 'music' || content.kind === 'movie'
 
-  const {commentsProgress, railProgress, shellHeight, setMode} = usePostInteraction()
+  const {commentsProgress, mode, railProgress, shellHeight, setMode} = usePostInteraction()
 
   const isOwner = session.status === 'signedIn' && session.profile.id === post.author.id
   const contextActions: PostContextAction[] = buildPostOverflowActions(post, {isOwner}).map(
@@ -111,8 +113,10 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
   const bottomPan = useMemo(
     () =>
       Gesture.Pan()
+        .enabled(canOpenComments(mode))
         .activeOffsetY([-9999, -10])
         .failOffsetX([-24, 24])
+        .onBegin(() => scheduleOnRN(setMode, 'commentsDragging'))
         .onUpdate(event => {
           const next = Math.min(1, Math.max(0, -event.translationY / 280))
           commentsProgress.set(next)
@@ -132,8 +136,17 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
             })
           }
         }),
-    [commentsProgress, setMode],
+    [commentsProgress, mode, setMode],
   )
+
+  const openComments = () => {
+    if (!canOpenComments(mode)) return
+    const snap = presentation === 'detail' ? 'full' : 'partial'
+    commentsProgress.set(withSpring(POST_MOTION.commentsSnapPoints[snap], postSpringConfig('comments')))
+    setMode(commentsModeForSnap(snap))
+  }
+
+  const detail = presentation === 'detail'
 
   return (
     <View
@@ -143,9 +156,13 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
         {
           aspectRatio,
           backgroundColor: colours.surface1,
-          borderRadius: compact ? POST_GEOMETRY.compactRadius : POST_GEOMETRY.outerRadius,
+          borderRadius: detail && width < 768
+            ? 0
+            : compact
+              ? POST_GEOMETRY.compactRadius
+              : POST_GEOMETRY.outerRadius,
           marginBottom: spacing[2],
-          marginHorizontal: spacing[3],
+          marginHorizontal: detail ? 0 : spacing[3],
         },
       ]}>
       <Animated.View style={[StyleSheet.absoluteFill, mediaStyle]}>
@@ -157,15 +174,15 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
       </Animated.View>
 
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, dimStyle, {backgroundColor: colours.backdrop}]} />
-      <PostHeader post={post} />
-      <PostCaption text={post.text} opacity={commentsProgress} />
+      <PostHeader post={post} overlay={mediaFirst} />
+      {mediaFirst ? <PostCaption text={post.text} opacity={commentsProgress} /> : null}
       <PostActionRail
         post={post}
         contextActions={contextActions}
         onReact={onReact}
         onSave={() => protectedRun(() => save.mutate({postId: post.id, saved: !post.saved}))}
         onShare={() => void runPostOverflowAction('share', post, {moderationRepository})}
-        onCommentPress={() => router.push(`/post/${post.id}` as Href)}
+        onCommentPress={openComments}
       />
       <GestureDetector gesture={bottomPan}>
         <View style={styles.bottomZone}>
@@ -178,6 +195,8 @@ function PostShellInner({post, active = true, compact}: PostShellProps) {
         comments={commentsQuery.data}
         isLoading={commentsQuery.isLoading}
         isError={commentsQuery.isError}
+        onRetry={() => void commentsQuery.refetch()}
+        onRequireAuth={prompt.show}
       />
       <ProtectedActionPrompt
         visible={prompt.visible}

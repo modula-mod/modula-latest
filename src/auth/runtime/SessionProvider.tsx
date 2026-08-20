@@ -192,7 +192,10 @@ export function SessionProvider({children}: PropsWithChildren) {
   }, [router, services])
 
   const continueAsDemo = useCallback(
-    async (email: 'andrei@modula.local' | 'gaia@modula.local') => {
+    async (
+      email: 'andrei@modula.local' | 'gaia@modula.local',
+      returnTo = '/',
+    ) => {
       if (runtimeEnvironment.appEnvironment === 'production') {
         throw new Error('Demo accounts are unavailable in production.')
       }
@@ -201,7 +204,7 @@ export function SessionProvider({children}: PropsWithChildren) {
           email,
           password: localPassword,
         })
-        await acceptAuthResult(result, '/')
+        await acceptAuthResult(result, returnTo)
       } catch (error) {
         const code =
           error && typeof error === 'object' && 'code' in error

@@ -30,15 +30,6 @@ export function resolvePostContent(post: SocialPost): PostContent {
       }
     }
     const image = images[0] ?? items[0]
-    if (image?.title?.toLowerCase().includes('city lights') || image?.title?.toLowerCase().includes('midnight')) {
-      return {
-        kind: 'music',
-        artwork: image,
-        title: image.title ?? 'City Lights',
-        artist: post.author.displayName,
-        durationSec: 208,
-      }
-    }
     return {
       kind: 'image',
       source: image,

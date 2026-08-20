@@ -40,6 +40,14 @@ export const SF_SYMBOL_FOR_ICON: Partial<Record<AppIconName, string>> = {
   contrast: 'circle.lefthalf.filled',
   automation: 'cpu',
   privacy: 'lock.shield',
+  reactionLike: 'hand.thumbsup',
+  reactionLove: 'heart.fill',
+  reactionLaugh: 'face.smiling',
+  reactionFire: 'flame',
+  reactionSupport: 'person.2',
+  reactionCelebrate: 'sparkles',
+  reactionInsightful: 'lightbulb',
+  reactionCurious: 'questionmark.circle',
 }
 
 export function sfSymbolForIcon(icon: AppIconName): string {

@@ -6,6 +6,7 @@ import {createAppearanceRoutes} from '@/api/local/routes/appearanceRoutes'
 import {createAtprotoRoutes} from '@/api/local/routes/atprotoRoutes'
 import {createAuthRoutes} from '@/api/local/routes/authRoutes'
 import {createBoardRoutes} from '@/api/local/routes/boardRoutes'
+import {createCommentRoutes} from '@/api/local/routes/commentRoutes'
 import {createDiscoverRoutes} from '@/api/local/routes/discoverRoutes'
 import {createFeedRoutes} from '@/api/local/routes/feedRoutes'
 import {createMetaRoutes} from '@/api/local/routes/metaRoutes'
@@ -61,6 +62,7 @@ export class LocalApiRouter {
       ...createAuthRoutes(database, configuration),
       ...createFeedRoutes(database),
       ...createPostRoutes(database),
+      ...createCommentRoutes(database),
       ...createProfileRoutes(database),
       ...createBoardRoutes(database),
       ...createActivityRoutes(database),

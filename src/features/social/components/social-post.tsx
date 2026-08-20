@@ -8,15 +8,16 @@ type SocialPostProps = {
   post: SocialPostModel
   compact?: boolean
   showDivider?: boolean
+  presentation?: 'feed' | 'detail'
 }
 
 /**
  * Provider-neutral feed row using the universal post interaction shell.
  */
-export function SocialPost({post, compact = false, showDivider = false}: SocialPostProps) {
+export function SocialPost({post, compact = false, showDivider = false, presentation = 'feed'}: SocialPostProps) {
   return (
     <View>
-      <PostShell post={post} compact={compact} active />
+      <PostShell post={post} compact={compact} active presentation={presentation} />
       {!compact && showDivider ? <Divider /> : null}
     </View>
   )

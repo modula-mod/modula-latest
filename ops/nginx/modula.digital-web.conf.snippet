@@ -40,5 +40,5 @@ location @expo_dynamic {
     rewrite "^/settings/developer/expo-ui/[^/]+$" "/settings/developer/expo-ui/[section].html" last;
     rewrite "^/settings/extensions/[^/]+$" "/settings/extensions/[extensionId].html" last;
     rewrite "^/settings/modules/[^/]+$" "/settings/modules/[moduleId].html" last;
-    rewrite ^ /index.html last;
+    rewrite ^ /+not-found.html last;
 }

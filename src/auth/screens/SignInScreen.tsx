@@ -232,7 +232,7 @@ export function SignInScreen() {
             {showDemo ? (
               <AuthLink
                 onPress={() =>
-                  void continueAsDemo('andrei@modula.local').catch(error => {
+                  void continueAsDemo('andrei@modula.local', returnTo).catch(error => {
                     setFormError(
                       error instanceof Error
                         ? error.message

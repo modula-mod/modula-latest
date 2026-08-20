@@ -60,8 +60,8 @@ export function PostHeader({post, overlay = true, opacity = 1}: PostHeaderProps)
               {post.author.displayName}
             </AppText>
             {verified ? (
-              <View style={styles.verified}>
-                <AppIcon name="check" colour="#FFFFFF" size={10} />
+              <View style={[styles.verified, {backgroundColor: colours.accent}]}>
+                <AppIcon name="check" colour={colours.mediaOverlayText} size={10} />
               </View>
             ) : null}
             <AppText variant="caption" style={{color: subInk}}>
@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
   },
   verified: {
     alignItems: 'center',
-    backgroundColor: '#369CAA',
     borderRadius: 999,
     height: 14,
     justifyContent: 'center',

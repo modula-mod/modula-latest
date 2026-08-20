@@ -7,6 +7,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {VideoPostContent} from '@/features/social/posts/types/post'
 import {ModulaReelPlayer} from '@/platform/ui/video/modula-reel-player'
+import {MediaFullPlayer} from '@/features/social/posts/interactions/media-full-player'
 import {usePostInteraction} from '@/features/social/posts/interactions/post-interaction-context'
 import {postLayerZ} from '@/features/social/posts/tokens/post-layout'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -20,6 +21,7 @@ export function VideoPostRenderer({content, active = false}: VideoPostRendererPr
   const {colours} = useThemeTokens()
   const {mediaExpansionProgress, setMode} = usePostInteraction()
   const [playing, setPlaying] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const sourceUri = content.source.url?.startsWith('local://')
     ? ''
     : content.source.url
@@ -27,6 +29,13 @@ export function VideoPostRenderer({content, active = false}: VideoPostRendererPr
   const expand = () => {
     mediaExpansionProgress.set(1)
     setMode('mediaExpanded')
+    setExpanded(true)
+  }
+
+  const closePlayer = () => {
+    setExpanded(false)
+    mediaExpansionProgress.set(0)
+    setMode('idle')
   }
 
   return (
@@ -61,6 +70,12 @@ export function VideoPostRenderer({content, active = false}: VideoPostRendererPr
           0:24 / 1:24
         </AppText>
       </View>
+      <MediaFullPlayer
+        onClose={closePlayer}
+        posterColour={content.source.colour}
+        sourceUri={sourceUri}
+        visible={expanded}
+      />
     </View>
   )
 }

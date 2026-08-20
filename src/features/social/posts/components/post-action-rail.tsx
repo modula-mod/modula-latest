@@ -1,5 +1,5 @@
-import {useMemo, useState} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {Platform, StyleSheet, View} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -21,7 +21,11 @@ import {
 } from '@/features/social/posts/interactions/post-interaction-context'
 import {PostContextMenu} from '@/features/social/posts/interactions/post-context-menu'
 import {ReactionPicker} from '@/features/social/posts/interactions/reaction-picker'
-import {railReleaseTarget} from '@/features/social/posts/state/post-interaction-machine'
+import {
+  canOpenContext,
+  canStartReaction,
+  railReleaseTarget,
+} from '@/features/social/posts/state/post-interaction-machine'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
 import {POST_MOTION} from '@/features/social/posts/tokens/post-motion'
@@ -66,14 +70,16 @@ function RailButton({
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={POST_MOTION.reactionHoldMs}
-      style={styles.railButton}>
+      style={[
+        styles.railButton,
+        {
+          backgroundColor: colours.mediaOverlayControlBackground,
+          borderColor: colours.borderStrong,
+        },
+      ]}>
       <AppIcon name={icon} colour={ink} size={compact ? 22 : 24} />
-      {typeof count === 'number' ? (
+      {typeof count === 'number' && count > 0 ? (
         <PostCounter value={count} selected={selected} overlay />
-      ) : icon === 'bookmark' || icon === 'saved' ? (
-        <AppText variant="caption" style={styles.saveLabel}>
-          Save
-        </AppText>
       ) : null}
     </AppPressable>
   )
@@ -91,11 +97,12 @@ export function PostActionRail({
   const {
     railProgress,
     commentsProgress,
+    mode,
     reduceMotion,
     setMode,
   } = usePostInteraction()
-  const [reactionOpen, setReactionOpen] = useState(false)
   const [customOpen, setCustomOpen] = useState(false)
+  const returnFocus = useRef<{focus?: () => void} | null>(null)
   const liked = Boolean(post.liked || post.viewerReaction)
   const currentReaction = post.viewerReaction ?? (post.liked ? 'like' : null)
 
@@ -109,12 +116,10 @@ export function PostActionRail({
   const railPan = useMemo(
     () =>
       Gesture.Pan()
-        .manualActivation(true)
-        .onTouchesDown((_e, state) => {
-          state.activate()
-        })
+        .enabled(canOpenContext(mode))
         .activeOffsetY([8, 9999])
         .failOffsetX([-24, 24])
+        .onBegin(() => scheduleOnRN(setMode, 'railDragging'))
         .onUpdate(event => {
           const next = Math.min(1, Math.max(0, event.translationY / RAIL_DRAG_DISTANCE))
           railProgress.set(next)
@@ -133,7 +138,7 @@ export function PostActionRail({
             scheduleOnRN(setMode, 'idle')
           }
         }),
-    [railProgress, setMode],
+    [mode, railProgress, setMode],
   )
 
   const railStyle = useAnimatedStyle(() => {
@@ -149,10 +154,9 @@ export function PostActionRail({
       [0, 1],
       [POST_GEOMETRY.actionRailRadius, POST_GEOMETRY.contextMenuRadius],
     )
-    const translateX = interpolate(p, [0, 1], [0, -(POST_GEOMETRY.contextMenuWidth - POST_GEOMETRY.actionRailWidth)])
     return {
       opacity: 1 - comments * 0.85,
-      transform: [{translateX}, {scale: 1 - comments * 0.04}],
+      transform: [{scale: 1 - comments * 0.04}],
       width,
       borderRadius: radius,
     }
@@ -167,24 +171,60 @@ export function PostActionRail({
     pointerEvents: railProgress.get() > 0.7 ? ('auto' as const) : ('none' as const),
   }))
 
-  const closeContext = () => {
+  const restoreFocus = useCallback(() => {
+    if (Platform.OS === 'web') {
+      setTimeout(() => returnFocus.current?.focus?.(), 0)
+    }
+  }, [])
+
+  const closeContext = useCallback(() => {
     setMode('idle')
     railProgress.set(withSpring(0, postSpringConfig('rail')))
+    restoreFocus()
+  }, [railProgress, restoreFocus, setMode])
+
+  const openContext = () => {
+    if (!canOpenContext(mode)) return
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      returnFocus.current = document.activeElement as {focus?: () => void}
+    }
+    setMode('contextOpen')
+    railProgress.set(withSpring(1, postSpringConfig('rail')))
   }
 
+  useEffect(() => {
+    if (mode !== 'contextOpen' || Platform.OS !== 'web' || typeof document === 'undefined') return undefined
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      closeContext()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [closeContext, mode])
+
   const openReaction = () => {
+    if (!canStartReaction(mode)) return
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      returnFocus.current = document.activeElement as {focus?: () => void}
+    }
     if (reduceMotion) {
-      onReact(currentReaction === 'like' ? null : 'like')
+      setMode('reactionSelecting')
       return
     }
-    setReactionOpen(true)
+    setMode('reactionHolding')
     setMode('reactionSelecting')
   }
+
+  const reactionOpen = mode === 'reactionHolding' || mode === 'reactionSelecting'
+  const contextVisible = mode === 'railDragging' || mode === 'contextOpen'
+  const commentsOpen = mode === 'commentsDragging' || mode === 'commentsPeek' || mode === 'commentsPartial' || mode === 'commentsFull'
 
   return (
     <>
       <GestureDetector gesture={railPan}>
         <Animated.View
+          pointerEvents={commentsOpen ? 'none' : 'auto'}
           style={[
             styles.railAnchor,
             railStyle,
@@ -196,17 +236,36 @@ export function PostActionRail({
           <PostSurface role="rail" style={styles.railSurface}>
             <Animated.View style={[styles.compactColumn, compactStyle]}>
               <RailButton
-                label={liked ? 'Unlike' : 'Like'}
-                icon="like"
-                selected={liked}
-                count={post.likeCount}
-                onPress={() => onReact(currentReaction === 'like' ? null : 'like')}
-                onLongPress={openReaction}
+                compact
+                label="Open post menu"
+                icon="more"
+                onPress={openContext}
               />
+              <View style={styles.reactionControl}>
+                <RailButton
+                  label={liked ? 'Unlike' : 'Like'}
+                  icon="like"
+                  selected={liked}
+                  count={post.likeCount || undefined}
+                  onPress={() => onReact(currentReaction === 'like' ? null : 'like')}
+                  onLongPress={openReaction}
+                />
+                {Platform.OS === 'web' ? (
+                  <AppPressable
+                    accessibilityLabel="Choose reaction"
+                    onPress={openReaction}
+                    style={[
+                      styles.reactionMore,
+                      {backgroundColor: colours.mediaOverlayControlBackground, borderColor: colours.borderStrong},
+                    ]}>
+                    <AppText variant="label" style={{color: colours.mediaOverlayText}}>＋</AppText>
+                  </AppPressable>
+                ) : null}
+              </View>
               <RailButton
                 label="Comment"
                 icon="comment"
-                count={post.replyCount}
+                count={post.replyCount || undefined}
                 onPress={onCommentPress}
               />
               <RailButton
@@ -218,7 +277,11 @@ export function PostActionRail({
               <RailButton label="Share" icon="share" count={post.repostCount || undefined} onPress={onShare} />
             </Animated.View>
             <Animated.View style={[styles.menuColumn, menuStyle]}>
-              <PostContextMenu actions={contextActions} onClose={closeContext} />
+              {contextVisible ? (
+                <PostSurface role="context" style={styles.menuSurface}>
+                  <PostContextMenu actions={contextActions} onClose={closeContext} />
+                </PostSurface>
+              ) : null}
             </Animated.View>
           </PostSurface>
         </Animated.View>
@@ -229,16 +292,16 @@ export function PostActionRail({
         customOpen={customOpen}
         currentReaction={currentReaction}
         onClose={() => {
-          setReactionOpen(false)
           setCustomOpen(false)
           setMode('idle')
+          restoreFocus()
         }}
         onOpenCustom={() => setCustomOpen(true)}
         onSelect={reaction => {
           onReact(reaction)
-          setReactionOpen(false)
           setCustomOpen(false)
           setMode('idle')
+          restoreFocus()
         }}
       />
     </>
@@ -248,9 +311,7 @@ export function PostActionRail({
 const styles = StyleSheet.create({
   compactColumn: {
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 10,
+    gap: 6,
   },
   grabber: {
     alignItems: 'center',
@@ -269,9 +330,8 @@ const styles = StyleSheet.create({
   },
   menuColumn: {
     ...StyleSheet.absoluteFill,
-    paddingHorizontal: 10,
-    paddingVertical: 12,
   },
+  menuSurface: {flex: 1, paddingHorizontal: 10, paddingVertical: 12},
   railAnchor: {
     bottom: 72,
     position: 'absolute',
@@ -279,17 +339,26 @@ const styles = StyleSheet.create({
   },
   railButton: {
     alignItems: 'center',
+    borderRadius: POST_GEOMETRY.actionButtonSize / 2,
+    borderWidth: StyleSheet.hairlineWidth,
     height: POST_GEOMETRY.actionButtonSize,
     justifyContent: 'center',
     width: POST_GEOMETRY.actionButtonSize,
   },
   railSurface: {
-    minHeight: 220,
-    overflow: 'hidden',
+    minHeight: 254,
+    overflow: 'visible',
   },
-  saveLabel: {
-    color: 'rgba(255,255,255,0.86)',
-    fontSize: 10,
-    marginTop: 2,
+  reactionControl: {position: 'relative'},
+  reactionMore: {
+    alignItems: 'center',
+    borderRadius: 22,
+    borderWidth: StyleSheet.hairlineWidth,
+    height: 44,
+    justifyContent: 'center',
+    left: -42,
+    position: 'absolute',
+    top: 0,
+    width: 36,
   },
 })

@@ -59,19 +59,15 @@ export function commentsModeForSnap(
 }
 
 export function canOpenComments(mode: PostInteractionMode): boolean {
-  return mode !== 'contextOpen' && mode !== 'reactionSelecting' && mode !== 'mediaExpanded'
+  return mode !== 'contextOpen' && mode !== 'reactionHolding' && mode !== 'reactionSelecting' && mode !== 'mediaExpanded'
 }
 
 export function canOpenContext(mode: PostInteractionMode): boolean {
-  return (
-    mode === 'idle' ||
-    mode === 'railDragging' ||
-    mode === 'commentsPeek'
-  )
+  return mode === 'idle' || mode === 'railDragging'
 }
 
 export function canStartReaction(mode: PostInteractionMode): boolean {
-  return mode === 'idle' || mode === 'commentsPeek'
+  return mode === 'idle'
 }
 
 export function reactionIndexFromX(

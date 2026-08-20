@@ -17,7 +17,10 @@ export type SessionActions = {
   verifyEmail(input: VerifyEmailInput): Promise<void>
   resendVerification(email: string): Promise<void>
   continueAsGuest(): void
-  continueAsDemo(email: 'andrei@modula.local' | 'gaia@modula.local'): Promise<void>
+  continueAsDemo(
+    email: 'andrei@modula.local' | 'gaia@modula.local',
+    returnTo?: string,
+  ): Promise<void>
   updateCurrentProfile(profile: ModulaProfile): void
   signOut(): Promise<void>
 }

@@ -2,10 +2,16 @@ import {Link, Stack} from 'expo-router'
 import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
+import {useHydrated} from '@/lib/useHydrated'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function NotFoundScreen() {
+  const hydrated = useHydrated()
   const {colours, spacing} = useThemeTokens()
+
+  if (!hydrated) {
+    return <View testID="not-found-pending" style={[styles.screen, {backgroundColor: colours.canvas}]} />
+  }
 
   return (
     <>

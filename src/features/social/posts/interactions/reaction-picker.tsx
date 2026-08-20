@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from 'react'
-import {Modal, StyleSheet, View} from 'react-native'
+import {Modal, Platform, StyleSheet, View} from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -11,7 +11,7 @@ import {scheduleOnRN} from 'react-native-worklets'
 import * as Haptics from 'expo-haptics'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
 import {CustomReactionPicker} from '@/features/social/posts/interactions/custom-reaction-picker'
 import {postSpringConfig} from '@/features/social/posts/interactions/post-interaction-context'
@@ -40,11 +40,14 @@ function ReactionCell({
   option,
   selected,
   emphasized,
+  onPress,
 }: {
   option: ReactionOption
   selected: boolean
   emphasized: boolean
+  onPress: () => void
 }) {
+  const {colours} = useThemeTokens()
   const scale = useSharedValue(1)
   useEffect(() => {
     scale.value = withSpring(emphasized ? 1.42 : selected ? 1.08 : 1, postSpringConfig('rail'))
@@ -55,8 +58,15 @@ function ReactionCell({
   }))
 
   return (
-    <Animated.View style={[styles.cell, style]}>
-      <AppText variant="title">{option.emoji}</AppText>
+    <Animated.View style={style}>
+      <AppPressable
+        accessibilityLabel={option.label}
+        accessibilityRole="button"
+        accessibilityState={{selected}}
+        onPress={onPress}
+        style={styles.cell}>
+        <AppIcon name={option.icon} colour={colours.mediaOverlayIcon} size={25} />
+      </AppPressable>
     </Animated.View>
   )
 }
@@ -67,7 +77,7 @@ function ReactionPickerRail({
   onSelect,
 }: Pick<ReactionPickerProps, 'currentReaction' | 'onOpenCustom' | 'onSelect'>) {
   const {colours, spacing} = useThemeTokens()
-  const options = useMemo(() => [...DEFAULT_REACTIONS, {type: 'custom', emoji: '＋', label: 'More'}], [])
+  const options = useMemo<ReactionOption[]>(() => [...DEFAULT_REACTIONS, {type: 'custom', icon: 'create', label: 'More'}], [])
   const initialIndex = Math.max(0, options.findIndex(item => item.type === (currentReaction ?? 'like')))
   const [hoverIndex, setHoverIndex] = useState(initialIndex)
   const bloom = useSharedValue(0.92)
@@ -113,6 +123,14 @@ function ReactionPickerRail({
     transform: [{scale: bloom.value}],
   }))
 
+  const choose = (option: ReactionOption) => {
+    if (option.type === 'custom') {
+      onOpenCustom()
+      return
+    }
+    onSelect(currentReaction === option.type ? null : (option.type as ReactionType))
+  }
+
   return (
     <GestureDetector gesture={pan}>
       <Animated.View style={[styles.bloomWrap, bloomStyle]}>
@@ -130,10 +148,11 @@ function ReactionPickerRail({
           ]}>
           {options.map((option, index) => (
             <ReactionCell
-              key={`${option.type}-${option.emoji}`}
+              key={`${option.type}-${option.icon}`}
               option={option}
               selected={currentReaction === option.type}
               emphasized={hoverIndex === index}
+              onPress={() => choose(option)}
             />
           ))}
         </PostSurface>
@@ -165,11 +184,31 @@ export function ReactionPicker({
   onOpenCustom,
   onSelect,
 }: ReactionPickerProps) {
+  const {colours} = useThemeTokens()
+
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web' || typeof document === 'undefined') return undefined
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      onClose()
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onClose, visible])
+
   if (!visible) return null
 
   return (
     <Modal transparent visible animationType="fade" onRequestClose={onClose}>
-      <AppPressable accessibilityLabel="Close reactions" onPress={onClose} style={styles.backdrop}>
+      <View accessibilityViewIsModal style={[styles.backdrop, {backgroundColor: colours.backdrop}]}>
+        <AppPressable
+          accessibilityLabel="Close reactions"
+          onPress={onClose}
+          style={StyleSheet.absoluteFill}
+        />
         {customOpen ? (
           <CustomReactionPicker
             options={CUSTOM_REACTIONS}
@@ -184,7 +223,7 @@ export function ReactionPicker({
             onSelect={onSelect}
           />
         )}
-      </AppPressable>
+      </View>
     </Modal>
   )
 }
@@ -192,7 +231,6 @@ export function ReactionPicker({
 const styles = StyleSheet.create({
   backdrop: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.28)',
     flex: 1,
     justifyContent: 'flex-end',
     paddingBottom: 160,

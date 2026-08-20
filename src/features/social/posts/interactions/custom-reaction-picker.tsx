@@ -2,6 +2,7 @@ import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {AppIcon} from '@/components/primitives/AppIcon'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
 import type {ReactionOption} from '@/features/social/posts/state/post-interaction-types'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
@@ -33,14 +34,14 @@ export function CustomReactionPicker({options, onSelect, onClose}: CustomReactio
       <View style={styles.grid}>
         {options.map(option => (
           <AppPressable
-            key={`${option.type}-${option.emoji}`}
+            key={`${option.type}-${option.icon}`}
             accessibilityLabel={option.label}
             onPress={() => {
               onSelect(option.type)
               onClose()
             }}
             style={styles.cell}>
-            <AppText variant="title">{option.emoji}</AppText>
+            <AppIcon name={option.icon} colour={colours.mediaOverlayIcon} size={25} />
           </AppPressable>
         ))}
       </View>

@@ -1,3 +1,5 @@
+import type {AppIconName} from '@/components/primitives/AppIcon'
+
 export type PostInteractionMode =
   | 'idle'
   | 'railDragging'
@@ -27,27 +29,20 @@ export type PostContextAction = {
 
 export type ReactionOption = {
   type: string
-  emoji: string
+  icon: AppIconName
   label: string
 }
 
 export const DEFAULT_REACTIONS: ReactionOption[] = [
-  {type: 'like', emoji: '❤️', label: 'Like'},
-  {type: 'laugh', emoji: '😂', label: 'Laugh'},
-  {type: 'curious', emoji: '😮', label: 'Wow'},
-  {type: 'support', emoji: '😢', label: 'Sad'},
-  {type: 'fire', emoji: '😡', label: 'Angry'},
+  {type: 'like', icon: 'reactionLike', label: 'Like'},
+  {type: 'love', icon: 'reactionLove', label: 'Love'},
+  {type: 'laugh', icon: 'reactionLaugh', label: 'Laugh'},
+  {type: 'fire', icon: 'reactionFire', label: 'Fire'},
+  {type: 'support', icon: 'reactionSupport', label: 'Support'},
 ]
 
 export const CUSTOM_REACTIONS: ReactionOption[] = [
-  {type: 'celebrate', emoji: '👍', label: 'Thumbs up'},
-  {type: 'insightful', emoji: '🙌', label: 'Hands up'},
-  {type: 'fire', emoji: '🔥', label: 'Fire'},
-  {type: 'celebrate', emoji: '🎉', label: 'Party'},
-  {type: 'love', emoji: '💯', label: '100'},
-  {type: 'love', emoji: '💜', label: 'Purple heart'},
-  {type: 'insightful', emoji: '⭐', label: 'Star'},
-  {type: 'curious', emoji: '🤔', label: 'Thinking'},
-  {type: 'celebrate', emoji: '🚀', label: 'Rocket'},
-  {type: 'curious', emoji: '👀', label: 'Eyes'},
+  {type: 'celebrate', icon: 'reactionCelebrate', label: 'Celebrate'},
+  {type: 'insightful', icon: 'reactionInsightful', label: 'Insightful'},
+  {type: 'curious', icon: 'reactionCurious', label: 'Curious'},
 ]

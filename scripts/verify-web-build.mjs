@@ -122,6 +122,7 @@ const routeProbes = [
   ['/module/digital.modula.vault-notes', 'module/[moduleId].html'],
   ['/module/digital.modula.vault-notes/notes/demo', 'module/[moduleId]/[...path].html'],
   ['/product/gaia', 'product/gaia.html'],
+  ['/phase7m-b7-intentional-not-found', '+not-found.html'],
 ]
 for (const [requestPath, expected] of routeProbes) {
   const resolved = resolveWebDistFile(distDir, requestPath)
@@ -136,6 +137,9 @@ const nginxSnippet = readFileSync(
 )
 if (!nginxSnippet.includes('try_files $uri $uri.html $uri/index.html @expo_dynamic')) {
   fail('nginx snippet does not keep exact HTML lookup before Expo dynamic fallback')
+}
+if (!nginxSnippet.includes('rewrite ^ /+not-found.html last;')) {
+  fail('nginx snippet does not route unmatched paths to the exported not-found document')
 }
 for (const template of collectDynamicHtmlTemplates(distDir)) {
   const rewrite = nginxRewriteForTemplate(template)

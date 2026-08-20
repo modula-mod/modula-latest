@@ -6,8 +6,10 @@ Do not call every overlay a drawer.
 | --- | --- | --- |
 | Main shell navigation | DRAWER | Finger-tracked, velocity finish, focus restore |
 | Composer Tools | SHEET | Header / scroll / footer; registered tools only |
-| Comments | SHEET | Existing |
-| Reactions | POPOVER | Existing proximity row |
+| Comments | BOTTOM SHEET | Post-owned closed / peek / partial / full detents; sticky composer |
+| Reactions | POPOVER | Post-owned backed reaction set; keyboard alternative |
+| Post context actions | CONTEXT MENU | Rail-down gesture or explicit web menu button; Escape returns focus |
+| Video full player | FULL_SCREEN_MODAL | Explicit expand only; comments remains the bottom-pull action |
 | Module install / permissions | SHEET | Large detent when complex; fixed Install footer |
 | Module settings | ROUTE | `/settings/modules/[id]` |
 | Appearance | ROUTE | Existing Appearance |

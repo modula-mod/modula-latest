@@ -4,7 +4,7 @@ import type {AuthResult, RefreshToken} from '@/auth/contracts'
 import type {ModulaAccount} from '@/domain/account'
 import type {ActivityItem} from '@/domain/activity'
 import type {DiscoverResult, ReelItem} from '@/domain/discovery'
-import type {ConnectionListInput, CreatePostInput, FeedMode, FollowResult, PostEngagement, SocialPost} from '@/domain/social'
+import type {ConnectionListInput, CreatePostInput, FeedMode, FollowResult, PostEngagement, SocialComment, SocialPost} from '@/domain/social'
 import type {DiscoverSearchResult} from '@/data/repositories/contracts/DiscoverRepository'
 import type {CreateStoryInput, StoryGroup, StoryItem, StoryRailEntry, StoryRingState} from '@/domain/stories'
 import type {ModulaProfile, UpdateProfileInput} from '@/features/profile/contracts'
@@ -31,6 +31,7 @@ export type LocalProfileRecord = ModulaProfile & {
   accountId: AccountId | null
 }
 export type LocalPostRecord = SocialPost
+export type LocalCommentRecord = SocialComment
 export type LocalFollowRecord = {followerProfileId: ProfileId; followingProfileId: ProfileId}
 export type LocalLikeRecord = {profileId: ProfileId; postId: PostId}
 export type LocalSaveRecord = {profileId: ProfileId; postId: PostId}
@@ -104,6 +105,7 @@ export type LocalApiDatabaseState = {
   accounts: LocalAccountRecord[]
   profiles: LocalProfileRecord[]
   posts: LocalPostRecord[]
+  comments: LocalCommentRecord[]
   follows: LocalFollowRecord[]
   likes: LocalLikeRecord[]
   saves: LocalSaveRecord[]
@@ -283,6 +285,74 @@ export class LocalApiDatabase {
     this.state.posts = [post, ...this.state.posts]
     this.idempotentPosts.set(input.idempotencyKey, post.id)
     return this.decoratePost(post)
+  }
+
+  listComments(postId: PostId): SocialComment[] {
+    return clone(
+      this.state.comments
+        .filter(comment => comment.postId === postId && comment.parentCommentId === null)
+        .sort((left, right) => left.createdAt.localeCompare(right.createdAt)),
+    )
+  }
+
+  listCommentReplies(commentId: string): SocialComment[] {
+    return clone(
+      this.state.comments
+        .filter(comment => comment.rootCommentId === commentId)
+        .sort((left, right) => left.createdAt.localeCompare(right.createdAt)),
+    )
+  }
+
+  createComment(postId: PostId, authorId: string, text: string): SocialComment {
+    const post = this.state.posts.find(item => item.id === postId)
+    if (!post) throw new Error('Post not found.')
+    const value = text.trim()
+    if (!value) throw new Error('Comment text is required.')
+    const now = this.clock.iso()
+    const comment: SocialComment = {
+      id: `comment-local-${Date.now()}`,
+      postId,
+      authorId,
+      parentCommentId: null,
+      rootCommentId: null,
+      text: value,
+      depth: 0,
+      replyCount: 0,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    }
+    this.state.comments.push(comment)
+    post.replyCount += 1
+    return clone(comment)
+  }
+
+  createCommentReply(parentCommentId: string, authorId: string, text: string): SocialComment {
+    const parent = this.state.comments.find(comment => comment.id === parentCommentId)
+    if (!parent) throw new Error('Comment not found.')
+    const value = text.trim()
+    if (!value) throw new Error('Reply text is required.')
+    const now = this.clock.iso()
+    const comment: SocialComment = {
+      id: `reply-local-${Date.now()}`,
+      postId: parent.postId,
+      authorId,
+      parentCommentId: parent.id,
+      rootCommentId: parent.rootCommentId ?? parent.id,
+      text: value,
+      depth: Math.min(parent.depth + 1, 4),
+      replyCount: 0,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+      deletedAt: null,
+    }
+    this.state.comments.push(comment)
+    parent.replyCount += 1
+    const post = this.state.posts.find(item => item.id === parent.postId)
+    if (post) post.replyCount += 1
+    return clone(comment)
   }
 
   toggleLike(postId: PostId, liked: boolean): PostEngagement {

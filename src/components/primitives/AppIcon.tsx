@@ -65,6 +65,14 @@ export type AppIconName =
   | 'arrowUp'
   | 'arrowDown'
   | 'edit'
+  | 'reactionLike'
+  | 'reactionLove'
+  | 'reactionLaugh'
+  | 'reactionFire'
+  | 'reactionSupport'
+  | 'reactionCelebrate'
+  | 'reactionInsightful'
+  | 'reactionCurious'
 
 export type AppIoniconName = ComponentProps<typeof Ionicons>['name']
 
@@ -129,6 +137,14 @@ const iconMap: Record<AppIconName, AppIoniconName> = {
   arrowUp: 'arrow-up-outline',
   arrowDown: 'arrow-down-outline',
   edit: 'pencil-outline',
+  reactionLike: 'thumbs-up-outline',
+  reactionLove: 'heart',
+  reactionLaugh: 'happy-outline',
+  reactionFire: 'flame-outline',
+  reactionSupport: 'people-outline',
+  reactionCelebrate: 'sparkles-outline',
+  reactionInsightful: 'bulb-outline',
+  reactionCurious: 'help-circle-outline',
 }
 
 type AppIconProps = {
