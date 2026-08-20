@@ -107,6 +107,7 @@ contains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'FEATUR
 absent('src/features/modules/hooks/useModuleQueries.ts', "enabled: session.status === 'signedIn',\n    queryFn: () => moduleRepository.listCatalogue", 'PUBLIC MODULE CATALOGUE')
 contains('src/data/repositories/api/ApiModuleRepository.ts', 'if (!options.includeInstalled) return filterCatalogue(remote, input)', 'PUBLIC REGISTRY FALLBACK')
 contains('src/features/modules/runtime/module-host.tsx', 'if (detail.isPending) return', 'PUBLIC MODULE DETAIL')
+contains('src/app/marketplace/seller/[sellerId].tsx', 'HydratedRouteBoundary', 'SELLER HYDRATION')
 contains('src/features/marketplace/screens/ModuleDetailScreen.tsx', 'module-sticky-install', 'INSTALL CTA')
 contains('src/platform/ui/sheets/modula-sheet-layout.tsx', 'fixed above safe area', 'FIXED SHEET ACTION')
 record('VAULT NOTES', existsSync(file('scripts/verify-vault-notes-canonical.mjs')))

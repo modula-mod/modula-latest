@@ -27,6 +27,7 @@ const routes = [
   '/post/post-local-owner-media/analytics',
   '/marketplace',
   '/marketplace/digital.modula.vault-notes',
+  '/marketplace/seller/seller-modula',
   '/module/digital.modula.vault-notes',
   '/settings',
   '/settings/extensions',
