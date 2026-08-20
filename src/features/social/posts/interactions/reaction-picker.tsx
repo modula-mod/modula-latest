@@ -203,7 +203,7 @@ export function ReactionPicker({
 
   return (
     <Modal transparent visible animationType="fade" onRequestClose={onClose}>
-      <View accessibilityViewIsModal style={[styles.backdrop, {backgroundColor: colours.backdrop}]}>
+      <View accessibilityViewIsModal style={[styles.backdrop, {backgroundColor: colours.mediaOverlayScrim}]}>
         <AppPressable
           accessibilityLabel="Close reactions"
           onPress={onClose}

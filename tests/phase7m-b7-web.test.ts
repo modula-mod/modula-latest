@@ -107,6 +107,9 @@ test('Post V2 public interactions share one overlay grammar', async ({page}) => 
   const events = collectCriticalEvents(page)
   await page.goto(new URL('/post/post-local-owner-media', baseURL).toString(), {waitUntil: 'networkidle'})
 
+  const shellBox = await page.getByTestId('post-shell').boundingBox()
+  expect(shellBox?.height ?? 0).toBeGreaterThan(600)
+
   const reactionTrigger = page.getByRole('button', {name: 'Choose reaction'})
   await reactionTrigger.click()
   await expect(page.getByRole('button', {name: 'Love'})).toBeVisible()

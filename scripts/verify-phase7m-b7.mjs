@@ -75,6 +75,7 @@ for (const [label, name] of [
   record(label, existsSync(file(`src/features/social/posts/renderers/${name}`)))
 }
 contains('src/features/social/posts/components/post-shell.tsx', "presentation?: 'feed' | 'detail'", 'ONE POST SHELL')
+contains('src/features/social/posts/components/post-shell.tsx', 'minHeight: detail ? detailHeight : undefined', 'IMMERSIVE DETAIL HEIGHT')
 contains('src/features/feed/screens/PostDetailScreen.tsx', 'presentation="detail"', 'DETAIL USES POST SHELL')
 absent('src/features/feed/screens/PostDetailScreen.tsx', 'CommentComposer', 'NO DUPLICATE COMPOSER')
 contains('src/features/social/posts/components/post-action-rail.tsx', 'Open post menu', 'WEB CONTEXT MENU')
@@ -82,6 +83,7 @@ contains('src/features/social/posts/components/post-action-rail.tsx', 'canStartR
 contains('src/features/social/posts/components/post-action-rail.tsx', 'canOpenContext', 'CONTEXT STATE GATE')
 contains('src/features/social/posts/components/post-shell.tsx', 'canOpenComments', 'COMMENTS STATE GATE')
 contains('src/features/social/posts/interactions/reaction-picker.tsx', 'reactionIndexFromX', 'HORIZONTAL SELECTION')
+contains('src/features/social/posts/interactions/reaction-picker.tsx', 'colours.mediaOverlayScrim', 'REACTION CONTEXT SCRIM')
 contains('src/features/social/posts/renderers/carousel-post-renderer.tsx', 'CONTROLLED_MEDIA_FALLBACKS', 'CONTROLLED CAROUSEL MEDIA')
 contains('src/features/social/posts/interactions/reaction-picker.tsx', "event.key !== 'Escape'", 'REACTION KEYBOARD')
 contains('src/features/social/posts/interactions/media-full-player.tsx', 'presentationStyle="fullScreen"', 'VIDEO FULL PLAYER')

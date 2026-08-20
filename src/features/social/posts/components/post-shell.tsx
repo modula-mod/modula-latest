@@ -53,7 +53,7 @@ type PostShellProps = {
 
 function PostShellInner({post, active = true, compact, presentation = 'feed'}: PostShellProps) {
   const session = useSession()
-  const {width} = useWindowDimensions()
+  const {height, width} = useWindowDimensions()
   const {moderationRepository} = useAppServices()
   const {colours, spacing} = useThemeTokens()
   const canEngage = useCapability('post:engage')
@@ -147,14 +147,17 @@ function PostShellInner({post, active = true, compact, presentation = 'feed'}: P
   }
 
   const detail = presentation === 'detail'
+  const detailWidth = width >= 768 ? 680 : width
+  const detailHeight = Math.max(height - 64, detailWidth / aspectRatio)
 
   return (
     <View
+      testID="post-shell"
       onLayout={onLayout}
       style={[
         styles.shell,
         {
-          aspectRatio,
+          aspectRatio: detail ? undefined : aspectRatio,
           backgroundColor: colours.surface1,
           borderRadius: detail && width < 768
             ? 0
@@ -163,6 +166,7 @@ function PostShellInner({post, active = true, compact, presentation = 'feed'}: P
               : POST_GEOMETRY.outerRadius,
           marginBottom: spacing[2],
           marginHorizontal: detail ? 0 : spacing[3],
+          minHeight: detail ? detailHeight : undefined,
         },
       ]}>
       <Animated.View style={[StyleSheet.absoluteFill, mediaStyle]}>
