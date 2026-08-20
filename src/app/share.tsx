@@ -2,6 +2,7 @@ import {useLocalSearchParams, useRouter} from 'expo-router'
 import {View} from 'react-native'
 
 import {ShareToSheet} from '@/features/social/sheets/ShareToSheet'
+import {HydratedRouteBoundary} from '@/components/system/HydratedRouteBoundary'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /**
@@ -21,17 +22,19 @@ export default function ShareRoute() {
   const title = String(params.title ?? 'Share')
 
   return (
-    <View style={{flex: 1, backgroundColor: colours.canvas}}>
-      <ShareToSheet
-        isPresented
-        onDismiss={() => {
-          if (router.canGoBack()) router.back()
-          else router.replace('/index' as never)
-        }}
-        title={title}
-        permalink={permalink}
-        shareMessage={shareMessage}
-      />
-    </View>
+    <HydratedRouteBoundary>
+      <View style={{flex: 1, backgroundColor: colours.canvas}}>
+        <ShareToSheet
+          isPresented
+          onDismiss={() => {
+            if (router.canGoBack()) router.back()
+            else router.replace('/' as never)
+          }}
+          title={title}
+          permalink={permalink}
+          shareMessage={shareMessage}
+        />
+      </View>
+    </HydratedRouteBoundary>
   )
 }

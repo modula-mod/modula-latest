@@ -33,6 +33,13 @@ const server = createServer((request, response) => {
     return
   }
 
+  const requestUrl = new URL(request.url, `http://${host}:${port}`)
+  if (requestUrl.pathname === '/index' || requestUrl.pathname === '/index.html') {
+    response.writeHead(308, {Location: `/${requestUrl.search}`})
+    response.end()
+    return
+  }
+
   const file = resolveWebDistFile(distDir, request.url, `http://${host}:${port}`)
   if (!file || !existsSync(file) || !statSync(file).isFile()) {
     response.writeHead(404)

@@ -1,5 +1,10 @@
 import {ShareProfileSheetScreen} from '@/features/social/screens/SocialSurfaceScreens'
+import {HydratedRouteBoundary} from '@/components/system/HydratedRouteBoundary'
 
 export default function ShareProfileRoute() {
-  return <ShareProfileSheetScreen />
+  return (
+    <HydratedRouteBoundary>
+      <ShareProfileSheetScreen />
+    </HydratedRouteBoundary>
+  )
 }

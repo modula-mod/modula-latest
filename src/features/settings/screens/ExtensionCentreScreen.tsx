@@ -3,6 +3,7 @@ import {View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
+import {useSession} from '@/auth/runtime'
 import type {ExtensionCentreItem} from '@/data/repositories/contracts'
 import {
   SettingsLinkRow,
@@ -27,6 +28,7 @@ const SECTIONS = [
 
 export function ExtensionCentreScreen() {
   const services = useAppServices()
+  const session = useSession()
   const router = useRouter()
   const {spacing} = useThemeTokens()
   const [available, setAvailable] = useState<ExtensionCentreItem[]>([])
@@ -35,8 +37,10 @@ export function ExtensionCentreScreen() {
   useEffect(() => {
     let active = true
     void Promise.all([
-      services.extensionRepository.listAvailable(),
-      services.extensionRepository.listInstalled(),
+      services.extensionRepository.listAvailable().catch(() => []),
+      session.status === 'signedIn'
+        ? services.extensionRepository.listInstalled().catch(() => [])
+        : Promise.resolve([]),
     ]).then(([nextAvailable, nextInstalled]) => {
       if (!active) return
       setAvailable(nextAvailable)
@@ -45,7 +49,7 @@ export function ExtensionCentreScreen() {
     return () => {
       active = false
     }
-  }, [services.extensionRepository])
+  }, [services.extensionRepository, session.status])
 
   const bySection = useMemo(() => {
     const map: Record<(typeof SECTIONS)[number], ExtensionCentreItem[]> = {

@@ -48,7 +48,7 @@ export function ModulaBackButton({
           router.back()
           return
         }
-        router.replace('/index' as never)
+        router.replace('/' as never)
       }}
     />
   )

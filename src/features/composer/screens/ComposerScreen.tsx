@@ -329,7 +329,7 @@ export function ComposerScreen() {
     if (router.canGoBack()) {
       router.back()
     } else {
-      router.replace('/index' as Href)
+      router.replace('/' as Href)
     }
   }
 
@@ -437,7 +437,7 @@ export function ComposerScreen() {
       } else if (isQuoteMode && params.quotePostId) {
         router.replace(`/post/${params.quotePostId}` as Href)
       } else {
-        router.replace('/index' as Href)
+        router.replace('/' as Href)
       }
     } catch {
       setPublicationBanner('needsAttention')

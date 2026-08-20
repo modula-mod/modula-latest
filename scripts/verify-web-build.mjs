@@ -138,6 +138,9 @@ const nginxSnippet = readFileSync(
 if (!nginxSnippet.includes('try_files $uri $uri.html $uri/index.html @expo_dynamic')) {
   fail('nginx snippet does not keep exact HTML lookup before Expo dynamic fallback')
 }
+if (!nginxSnippet.includes('location = /index') || !nginxSnippet.includes('return 308 /;')) {
+  fail('nginx snippet does not redirect the legacy /index alias to canonical Home')
+}
 if (!nginxSnippet.includes('rewrite ^ /+not-found.html last;')) {
   fail('nginx snippet does not route unmatched paths to the exported not-found document')
 }

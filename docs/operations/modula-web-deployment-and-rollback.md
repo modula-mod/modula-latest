@@ -132,6 +132,7 @@ Required vhost behavior:
 - `https://www.modula.digital` redirects to `https://modula.digital`.
 - Apex serves `/var/www/modula/current`.
 - Route fallback uses `try_files $uri $uri.html $uri/index.html @expo_dynamic`.
+- Legacy `/index` and `/index.html` requests redirect permanently to canonical `/` before static lookup.
 - `@expo_dynamic` rewrites Expo `[param]` templates only after exact HTML lookup misses, so `/profile/:handle` does not hydrate Home.
 - Unmatched paths resolve to Expo's exported `+not-found.html`, never Home's `index.html`, preventing a 404 hydration mismatch.
 - Hashed Expo assets receive long immutable caching.

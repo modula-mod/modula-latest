@@ -12,6 +12,16 @@ location /assets/ {
     try_files $uri =404;
 }
 
+# /index is a legacy navigation alias, not an Expo Router route. Serving the
+# root HTML at that pathname makes the client hydrate against a different URL.
+location = /index {
+    return 308 /;
+}
+
+location = /index.html {
+    return 308 /;
+}
+
 location / {
     root /var/www/modula/current;
     try_files $uri $uri.html $uri/index.html @expo_dynamic;
