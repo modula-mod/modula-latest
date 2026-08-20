@@ -9,6 +9,31 @@ function minutesAgo(minutes: number): string {
 
 export const initialDemoPosts: DemoPost[] = [
   {
+    id: 'post-showcase-bali',
+    kind: 'media',
+    feed: 'following',
+    author: demoProfiles.design,
+    createdAt: minutesAgo(2),
+    liked: true,
+    saved: false,
+    reposted: false,
+    likeCount: 24600,
+    replyCount: 368,
+    repostCount: 1200,
+    text: 'Chasing sunsets... #bali ✨',
+    glowColour: '#FF7A45',
+    media: [
+      {
+        id: 'media-bali-sunset',
+        kind: 'image',
+        title: 'Bali sunset',
+        uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+        colour: '#FF7A45',
+        aspectRatio: 4 / 5,
+      },
+    ],
+  },
+  {
     id: 'post-local-1',
     kind: 'text',
     feed: 'following',

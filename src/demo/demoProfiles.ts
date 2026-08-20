@@ -23,8 +23,8 @@ export const demoProfiles = {
   },
   design: {
     id: 'profile-design',
-    displayName: 'Modula Design',
-    handle: 'design.modula',
+    displayName: 'Jenny Wilson',
+    handle: 'jenny.modula',
     bio: 'Interface patterns, theme inheritance, and premium OS-level surfaces.',
     avatarColour: '#9B6B43',
     moduleCount: 6,

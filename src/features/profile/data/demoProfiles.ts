@@ -113,11 +113,11 @@ export const demoProfileList: ModulaProfile[] = [
   {
     id: 'profile-design',
     handle: 'design.modula',
-    displayName: 'Modula Design',
+    displayName: 'Jenny Wilson',
     kind: 'organisation',
     bio: 'Design organisation for theme inheritance, material rules and premium profile surfaces.',
     location: {
-      label: 'Design systems',
+      label: 'Bali, Indonesia',
       visibility: 'public',
     },
     website: {
