@@ -246,13 +246,13 @@ export function ProfileMetricPicker({
             <View
               style={[
                 styles.focalRule,
-                {backgroundColor: colours.textTertiary, top: 0},
+                {backgroundColor: colours.textSecondary, top: 0},
               ]}
             />
             <View
               style={[
                 styles.focalRule,
-                {backgroundColor: colours.textTertiary, bottom: 0},
+                {backgroundColor: colours.textSecondary, bottom: 0},
               ]}
             />
           </View>
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   focalRule: {
     height: 1,
     left: 8,
-    opacity: 0.38,
+    opacity: 0.48,
     position: 'absolute',
     right: 8,
   },

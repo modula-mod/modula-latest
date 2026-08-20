@@ -58,6 +58,12 @@ Overview/pager label chrome removal on the same branch:
 docs/validation/evidence/phase7m-b6/screenshots-profile-label-chrome/
 ```
 
+Metrics picker micro pass 03 on the same branch:
+
+```
+docs/validation/evidence/phase7m-b6/screenshots-profile-metrics-03/
+```
+
 ## Founder visual review set (captured)
 
 01 Home — circular glass toolbar  
