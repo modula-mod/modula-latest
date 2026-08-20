@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'

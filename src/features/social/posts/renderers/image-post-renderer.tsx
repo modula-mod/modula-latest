@@ -41,7 +41,10 @@ export function ImagePostRenderer({content, onDoubleTapLike}: ImagePostRendererP
     if (now - lastTap.current < 280) {
       onDoubleTapLike()
       if (!reduceMotion) {
+        // Reanimated shared values, not React state.
+        // eslint-disable-next-line react-hooks/immutability
         heartScale.value = 0.4
+        // eslint-disable-next-line react-hooks/immutability
         heartOpacity.value = 1
         heartScale.value = withSpring(1.12, {damping: 10, stiffness: 200})
         heartOpacity.value = withTiming(0, {duration: 520})

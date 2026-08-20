@@ -61,25 +61,21 @@ function ReactionCell({
   )
 }
 
-export function ReactionPicker({
-  visible,
-  customOpen,
+function ReactionPickerRail({
   currentReaction,
-  onClose,
   onOpenCustom,
   onSelect,
-}: ReactionPickerProps) {
+}: Pick<ReactionPickerProps, 'currentReaction' | 'onOpenCustom' | 'onSelect'>) {
   const {colours, spacing} = useThemeTokens()
-  const [hoverIndex, setHoverIndex] = useState(0)
-  const bloom = useSharedValue(0.92)
   const options = useMemo(() => [...DEFAULT_REACTIONS, {type: 'custom', emoji: '＋', label: 'More'}], [])
+  const initialIndex = Math.max(0, options.findIndex(item => item.type === (currentReaction ?? 'like')))
+  const [hoverIndex, setHoverIndex] = useState(initialIndex)
+  const bloom = useSharedValue(0.92)
 
   useEffect(() => {
-    if (!visible) return
     bloom.value = withTiming(1, {duration: 180})
-    setHoverIndex(Math.max(0, options.findIndex(item => item.type === (currentReaction ?? 'like'))))
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined)
-  }, [bloom, currentReaction, options, visible])
+  }, [bloom])
 
   const pan = useMemo(
     () =>
@@ -117,6 +113,58 @@ export function ReactionPicker({
     transform: [{scale: bloom.value}],
   }))
 
+  return (
+    <GestureDetector gesture={pan}>
+      <Animated.View style={[styles.bloomWrap, bloomStyle]}>
+        <PostSurface
+          role="reaction"
+          style={[
+            styles.bloom,
+            {
+              borderColor: colours.borderStrong,
+              borderRadius: POST_GEOMETRY.reactionRadius,
+              gap: spacing[1],
+              paddingHorizontal: spacing[2],
+              paddingVertical: spacing[2],
+            },
+          ]}>
+          {options.map((option, index) => (
+            <ReactionCell
+              key={`${option.type}-${option.emoji}`}
+              option={option}
+              selected={currentReaction === option.type}
+              emphasized={hoverIndex === index}
+            />
+          ))}
+        </PostSurface>
+        <View style={styles.dots}>
+          {options.slice(0, 5).map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                {
+                  backgroundColor:
+                    hoverIndex === index ? colours.accent : colours.mediaOverlaySecondary,
+                  opacity: hoverIndex === index ? 1 : 0.45,
+                },
+              ]}
+            />
+          ))}
+        </View>
+      </Animated.View>
+    </GestureDetector>
+  )
+}
+
+export function ReactionPicker({
+  visible,
+  customOpen,
+  currentReaction,
+  onClose,
+  onOpenCustom,
+  onSelect,
+}: ReactionPickerProps) {
   if (!visible) return null
 
   return (
@@ -129,46 +177,12 @@ export function ReactionPicker({
             onClose={onClose}
           />
         ) : (
-          <GestureDetector gesture={pan}>
-            <Animated.View style={[styles.bloomWrap, bloomStyle]}>
-              <PostSurface
-                role="reaction"
-                style={[
-                  styles.bloom,
-                  {
-                    borderColor: colours.borderStrong,
-                    borderRadius: POST_GEOMETRY.reactionRadius,
-                    gap: spacing[1],
-                    paddingHorizontal: spacing[2],
-                    paddingVertical: spacing[2],
-                  },
-                ]}>
-                {options.map((option, index) => (
-                  <ReactionCell
-                    key={`${option.type}-${option.emoji}`}
-                    option={option}
-                    selected={currentReaction === option.type}
-                    emphasized={hoverIndex === index}
-                  />
-                ))}
-              </PostSurface>
-              <View style={styles.dots}>
-                {options.slice(0, 5).map((_, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.dot,
-                      {
-                        backgroundColor:
-                          hoverIndex === index ? colours.accent : colours.mediaOverlaySecondary,
-                        opacity: hoverIndex === index ? 1 : 0.45,
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-            </Animated.View>
-          </GestureDetector>
+          <ReactionPickerRail
+            key={String(currentReaction ?? 'like')}
+            currentReaction={currentReaction}
+            onOpenCustom={onOpenCustom}
+            onSelect={onSelect}
+          />
         )}
       </AppPressable>
     </Modal>

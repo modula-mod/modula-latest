@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet} from 'react-native'
 import Animated, {useAnimatedStyle, type SharedValue} from 'react-native-reanimated'
 
 import {AppText} from '@/components/primitives/AppText'
@@ -15,12 +15,11 @@ type PostCaptionProps = {
 
 export function PostCaption({text, opacity, overlay = true}: PostCaptionProps) {
   const {colours, spacing} = useThemeTokens()
-  const trimmed = text?.trim()
-  if (!trimmed) return null
-
   const animated = useAnimatedStyle(() => ({
     opacity: opacity ? opacity.get() : 1,
   }))
+  const trimmed = text?.trim()
+  if (!trimmed) return null
 
   return (
     <Animated.View
