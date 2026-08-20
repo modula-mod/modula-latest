@@ -52,7 +52,7 @@ export class AppErrorBoundary extends Component<
               style={styles.button}>
               <Text style={styles.label}>Try again</Text>
             </Pressable>
-            <Link href="/" asChild>
+            <Link href={'/' as never} asChild>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Return home"

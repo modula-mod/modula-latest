@@ -82,6 +82,7 @@ contains('src/features/social/posts/components/post-action-rail.tsx', 'canStartR
 contains('src/features/social/posts/components/post-action-rail.tsx', 'canOpenContext', 'CONTEXT STATE GATE')
 contains('src/features/social/posts/components/post-shell.tsx', 'canOpenComments', 'COMMENTS STATE GATE')
 contains('src/features/social/posts/interactions/reaction-picker.tsx', 'reactionIndexFromX', 'HORIZONTAL SELECTION')
+contains('src/features/social/posts/renderers/carousel-post-renderer.tsx', 'CONTROLLED_MEDIA_FALLBACKS', 'CONTROLLED CAROUSEL MEDIA')
 contains('src/features/social/posts/interactions/reaction-picker.tsx', "event.key !== 'Escape'", 'REACTION KEYBOARD')
 contains('src/features/social/posts/interactions/media-full-player.tsx', 'presentationStyle="fullScreen"', 'VIDEO FULL PLAYER')
 contains('src/platform/ui/video/modula-reel-player.tsx', 'useVideoPlayer', 'WEB VIDEO')

@@ -7,6 +7,13 @@ import {AppText} from '@/components/primitives/AppText'
 import type {CarouselPostContent} from '@/features/social/posts/types/post'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+const CONTROLLED_MEDIA_FALLBACKS: Readonly<Record<string, string>> = {
+  'media-profile-platform':
+    'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+  'media-profile-tabs':
+    'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1200&q=80',
+}
+
 export function CarouselPostRenderer({content}: {content: CarouselPostContent}) {
   const {colours, spacing} = useThemeTokens()
   const [index, setIndex] = useState(0)
@@ -32,23 +39,28 @@ export function CarouselPostRenderer({content}: {content: CarouselPostContent}) 
         onScroll={onScroll}
         scrollEventThrottle={16}
         style={StyleSheet.absoluteFill}>
-        {content.items.map(item => (
-          <View
-            key={item.id}
-            style={{
-              height: '100%',
-              width: width || '100%',
-            }}>
-            {item.url && !item.url.startsWith('local://') ? (
-              <Image source={{uri: item.url}} style={StyleSheet.absoluteFill} contentFit="cover" />
-            ) : (
-              <LinearGradient
-                colors={[item.colour ?? colours.accent, colours.surface3]}
-                style={StyleSheet.absoluteFill}
-              />
-            )}
-          </View>
-        ))}
+        {content.items.map(item => {
+          const controlledUri = CONTROLLED_MEDIA_FALLBACKS[item.id]
+          const imageUri =
+            item.url && !item.url.startsWith('local://') ? item.url : controlledUri
+          return (
+            <View
+              key={item.id}
+              style={{
+                height: '100%',
+                width: width || '100%',
+              }}>
+              {imageUri ? (
+                <Image source={{uri: imageUri}} style={StyleSheet.absoluteFill} contentFit="cover" />
+              ) : (
+                <LinearGradient
+                  colors={[item.colour ?? colours.accent, colours.surface3]}
+                  style={StyleSheet.absoluteFill}
+                />
+              )}
+            </View>
+          )
+        })}
       </ScrollView>
       <LinearGradient
         colors={['rgba(0,0,0,0.42)', 'transparent']}

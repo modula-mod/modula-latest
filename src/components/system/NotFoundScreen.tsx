@@ -22,7 +22,7 @@ export function NotFoundScreen() {
           {backgroundColor: colours.canvas, padding: spacing[6], gap: spacing[3]},
         ]}>
         <AppText variant="title">Screen not found</AppText>
-        <Link href="/">
+        <Link href={'/' as never}>
           <AppText colour="accent">Return home</AppText>
         </Link>
       </View>
