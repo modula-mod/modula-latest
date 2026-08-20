@@ -1,7 +1,11 @@
 export const moduleQueryKeys = {
   catalogueRoot: ['modules', 'catalogue'] as const,
-  catalogue: (input: {q?: string; category?: string}) => ['modules', 'catalogue', input] as const,
-  detail: (moduleId: string) => ['modules', 'detail', moduleId] as const,
+  catalogue: (input: {q?: string; category?: string}, viewer: 'public' | 'signedIn' = 'public') =>
+    ['modules', 'catalogue', viewer, input] as const,
+  detail: (moduleId: string, viewer?: 'public' | 'signedIn') =>
+    viewer
+      ? ['modules', 'detail', moduleId, viewer] as const
+      : ['modules', 'detail', moduleId] as const,
   installed: ['modules', 'installed'] as const,
   views: (moduleId: string) => ['modules', 'views', moduleId] as const,
   view: (moduleId: string, viewId: string) => ['modules', 'view', moduleId, viewId] as const,

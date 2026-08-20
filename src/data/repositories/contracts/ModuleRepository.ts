@@ -381,8 +381,11 @@ export type ApplyAIExecutionResponse = {
 }
 
 export interface ModuleRepository {
-  listCatalogue(input?: {q?: string; category?: ProductHubCategory; limit?: number}): Promise<ModuleCatalogueItem[]>
-  getModule(moduleId: string): Promise<ModuleDetail | null>
+  listCatalogue(
+    input?: {q?: string; category?: ProductHubCategory; limit?: number},
+    options?: {includeInstalled?: boolean},
+  ): Promise<ModuleCatalogueItem[]>
+  getModule(moduleId: string, options?: {includeInstalled?: boolean}): Promise<ModuleDetail | null>
   listInstalled(): Promise<InstalledModule[]>
   installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview>
   install(moduleId: string, input?: {version?: string; enable?: boolean}): Promise<unknown>

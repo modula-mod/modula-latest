@@ -21,7 +21,7 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
   const openSettings = () => router.push(`/settings/modules/${encodeURIComponent(moduleId)}` as Href)
   const returnToBoard = () => router.push('/board' as Href)
 
-  if (detail.isPending || views.isPending) return <ModuleLoadingState />
+  if (detail.isPending) return <ModuleLoadingState />
   if (!detail.data) {
     return (
       <ModuleErrorState
@@ -51,6 +51,8 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
       />
     )
   }
+
+  if (views.isPending) return <ModuleLoadingState />
 
   const view = resolveModuleRouteView(views.data ?? [], path)
   if (!view) {

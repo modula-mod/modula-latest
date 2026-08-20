@@ -89,6 +89,14 @@ test.describe('Phase 7M-B7 exact web route gate', () => {
       await page.waitForTimeout(600)
 
       expect(response?.status(), `${route} HTTP status`).toBeLessThan(400)
+      if (route === '/marketplace') {
+        await expect(page.getByText('Loading catalogue.', {exact: true})).toBeHidden()
+        await expect(page.getByText('FEATURED', {exact: true})).toBeVisible()
+      }
+      if (route === '/module/digital.modula.vault-notes') {
+        await expect(page.getByText('Loading module', {exact: true})).toBeHidden()
+        await expect(page.getByText('Vault Notes', {exact: true}).first()).toBeVisible()
+      }
       expect(events, JSON.stringify(events, null, 2)).toEqual([])
     })
   }

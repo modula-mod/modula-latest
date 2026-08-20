@@ -76,24 +76,28 @@ async function localOnlyFallback<T>(operation: Promise<T>, fallback: () => T | P
 export class ApiModuleRepository implements ModuleRepository {
   constructor(private readonly client: ApiClient) {}
 
-  async listCatalogue(input: {q?: string; category?: ProductHubCategory; limit?: number} = {}): Promise<ModuleCatalogueItem[]> {
+  async listCatalogue(
+    input: {q?: string; category?: ProductHubCategory; limit?: number} = {},
+    options: {includeInstalled?: boolean} = {},
+  ): Promise<ModuleCatalogueItem[]> {
     return localOnlyFallback(
       this.client.get(
-        {path: '/v1/registry/modules', authenticated: true, query: {q: input.q, limit: input.limit ?? 50}},
+        {path: '/v1/registry/modules', query: {q: input.q, limit: input.limit ?? 50}},
         decodeCataloguePage,
       ),
       () => filterCatalogue(LOCAL_CATALOGUE, input),
     ).then(async remote => {
       if (runtimeEnvironment.dataSource === 'local' && remote === LOCAL_CATALOGUE) return remote
+      if (!options.includeInstalled) return filterCatalogue(remote, input)
       const installed = await this.listInstalled()
       const byId = new Map(installed.map(item => [item.moduleId, item]))
       return filterCatalogue(remote.map(item => applyInstalledState(item, byId.get(item.moduleId))), input)
     })
   }
 
-  async getModule(moduleId: string): Promise<ModuleDetail | null> {
+  async getModule(moduleId: string, options: {includeInstalled?: boolean} = {}): Promise<ModuleDetail | null> {
     return localOnlyFallback(
-      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`, authenticated: true}, decodeModuleDetail),
+      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
       () => {
         const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
         return fallback ? {
@@ -107,6 +111,7 @@ export class ApiModuleRepository implements ModuleRepository {
       },
     ).then(async item => {
       if (!item) return null
+      if (!options.includeInstalled) return item
       const installed = await this.listInstalled()
       return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
     })

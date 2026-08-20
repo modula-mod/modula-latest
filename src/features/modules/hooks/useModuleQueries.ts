@@ -8,10 +8,10 @@ import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 export function useModuleCatalogueQuery(input: {q?: string; category?: ProductHubCategory} = {}) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
+  const viewer = session.status === 'signedIn' ? 'signedIn' : 'public'
   return useQuery({
-    queryKey: moduleQueryKeys.catalogue(input),
-    enabled: session.status === 'signedIn',
-    queryFn: () => moduleRepository.listCatalogue(input),
+    queryKey: moduleQueryKeys.catalogue(input, viewer),
+    queryFn: () => moduleRepository.listCatalogue(input, {includeInstalled: viewer === 'signedIn'}),
   })
 }
 
@@ -28,10 +28,11 @@ export function useInstalledModulesQuery() {
 export function useModuleDetailQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
+  const viewer = session.status === 'signedIn' ? 'signedIn' : 'public'
   return useQuery({
-    queryKey: moduleQueryKeys.detail(moduleId),
-    queryFn: () => moduleRepository.getModule(moduleId),
-    enabled: Boolean(moduleId) && session.status === 'signedIn',
+    queryKey: moduleQueryKeys.detail(moduleId, viewer),
+    queryFn: () => moduleRepository.getModule(moduleId, {includeInstalled: viewer === 'signedIn'}),
+    enabled: Boolean(moduleId),
   })
 }
 
