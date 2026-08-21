@@ -5,7 +5,7 @@ modula-mod/modula-latest
 SOURCE BRANCH
 cursor/phase7n-a-mainline-ui-convergence-60f3
 SOURCE SHA
-see git rev-parse on this branch at capture time; Hub/Module Detail stills include the local Vault Notes catalogue repair in `ApiModuleRepository.ts`
+c9383df42c9dabe5c2cee399ebf8bb6d61d13f70
 EXPO SDK
 57.0.15 (expo ~57.0.15, react-native 0.86.2, @expo/ui ~57.0.12)
 IOS TARGET

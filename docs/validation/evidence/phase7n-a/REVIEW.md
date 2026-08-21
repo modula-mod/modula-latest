@@ -1,7 +1,7 @@
 MODULA PHASE 7N-A
 CURRENT MAIN UI BASELINE
 SOURCE
-main @ pending-convergence-PR-34 (branch cursor/phase7n-a-mainline-ui-convergence-60f3)
+main @ c9383df42c9dabe5c2cee399ebf8bb6d61d13f70 (branch cursor/phase7n-a-mainline-ui-convergence-60f3; origin/main merge pending)
 PRODUCTION DEPLOYED
 NO
 START HERE
