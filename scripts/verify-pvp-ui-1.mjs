@@ -94,10 +94,12 @@ record(
 const pkg = read('package.json')
 record(
   'SDK 57 APIS CHECKED',
-  pkg.includes('"expo": "54') === false &&
-    /"expo":\s*"~?57/.test(pkg) &&
-    skills.includes('expo-router 57.0.15') &&
-    skills.includes('@expo/ui 57.0.12'),
+  /"expo":\s*"~?57/.test(pkg) &&
+    /"expo-router":\s*"~?57/.test(pkg) &&
+    /"@expo\/ui":\s*"~?57/.test(pkg) &&
+    skills.includes('INSTALLED SDK INSPECTED') &&
+    skills.includes('57.0.15') &&
+    skills.includes('57.0.12'),
 )
 
 console.log('\n# ARCHITECTURE')
