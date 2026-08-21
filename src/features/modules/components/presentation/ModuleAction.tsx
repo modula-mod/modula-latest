@@ -33,7 +33,7 @@ export function ModuleAction({
   const label = presentation.primaryAction
   const soon = label === 'Soon'
   const blocked = label === 'Can’t install on this device'
-  const shown = blocked ? 'View' : label
+  const shown = soon ? 'Coming Soon' : blocked ? 'Unavailable' : label
   const primary = shown === 'Install' || shown === 'Update'
   const disabled = soon || loading || (!presentation.installable && shown === 'Install')
   const productTone = tone === 'product' && !soon
@@ -60,7 +60,7 @@ export function ModuleAction({
       disabled={disabled}
       hitSlop={8}
       onPress={disabled ? undefined : onPress}
-      testID={testID ?? `module-action-${shown.toLowerCase()}`}
+      testID={testID ?? `module-action-${shown.toLowerCase().replace(/\s+/g, '-')}`}
       style={[
         styles.capsule,
         compact && !fullWidth ? styles.compact : styles.regular,
@@ -75,13 +75,13 @@ export function ModuleAction({
         },
       ]}>
       <AppText
-        variant="label"
+        variant="buttonLabel"
         style={{
           color: labelColour,
           textAlign: 'center',
           fontWeight: primary || productTone ? '700' : '500',
         }}>
-        {loading ? `${shown}…` : shown}
+        {loading ? (shown === 'Install' ? 'Installing…' : shown === 'Update' ? 'Updating…' : `${shown}…`) : shown}
       </AppText>
     </AppPressable>
   )
