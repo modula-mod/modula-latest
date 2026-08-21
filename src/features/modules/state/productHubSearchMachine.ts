@@ -5,6 +5,8 @@ export type ProductHubSearchState =
   | 'SEARCH_EXPANDING'
   | 'SEARCH_ACTIVE'
   | 'SEARCH_RESULTS'
+  | 'SEARCH_EMPTY'
+  | 'SEARCH_ERROR'
   | 'SEARCH_COLLAPSING'
 
 export type ProductHubSearchEvent =
@@ -12,6 +14,7 @@ export type ProductHubSearchEvent =
   | {type: 'TAP_SEARCH'}
   | {type: 'GEOMETRY_SETTLED'}
   | {type: 'TYPE'; query: string}
+  | {type: 'RESULTS_CHANGED'; count: number; error: boolean}
   | {type: 'CANCEL'}
   | {type: 'COLLAPSE_COMPLETE'}
 
@@ -32,7 +35,9 @@ export function isProductHubSearchActive(state: ProductHubSearchState): boolean 
     state === 'SEARCH_TRIGGER' ||
     state === 'SEARCH_EXPANDING' ||
     state === 'SEARCH_ACTIVE' ||
-    state === 'SEARCH_RESULTS'
+    state === 'SEARCH_RESULTS' ||
+    state === 'SEARCH_EMPTY' ||
+    state === 'SEARCH_ERROR'
   )
 }
 
@@ -74,6 +79,11 @@ export function reduceProductHubSearch(
         query,
         state: nextState,
       }
+    }
+    case 'RESULTS_CHANGED': {
+      if (!model.query.trim() || !isProductHubSearchActive(model.state)) return model
+      const state = event.error ? 'SEARCH_ERROR' : event.count ? 'SEARCH_RESULTS' : 'SEARCH_EMPTY'
+      return model.state === state ? model : {...model, state}
     }
     case 'CANCEL': {
       if (!isProductHubSearchActive(model.state)) return model

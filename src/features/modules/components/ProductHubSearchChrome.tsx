@@ -1,5 +1,5 @@
 import {useEffect, useRef} from 'react'
-import {Pressable, StyleSheet, TextInput} from 'react-native'
+import {Platform, Pressable, StyleSheet, TextInput, type View} from 'react-native'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -33,6 +33,7 @@ export function ProductHubSearchChrome({
   const {colours, radius, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const inputRef = useRef<TextInput>(null)
+  const triggerRef = useRef<View>(null)
   const active = isProductHubSearchActive(model.state) || model.state === 'SEARCH_COLLAPSING'
   const expanded = isProductHubSearchActive(model.state)
   const progress = useSharedValue(expanded ? 1 : compact ? 0 : 1)
@@ -60,9 +61,19 @@ export function ProductHubSearchChrome({
     transform: [{translateX: (1 - progress.value) * 12}],
   }))
 
+  const cancelSearch = () => {
+    onCancel()
+    if (Platform.OS === 'web') {
+      setTimeout(() => {
+        ;(triggerRef.current as unknown as HTMLElement | null)?.focus?.()
+      }, reduceMotion ? 0 : 230)
+    }
+  }
+
   if (compact && !active) {
     return (
       <Pressable
+        ref={triggerRef}
         accessibilityRole="button"
         accessibilityLabel="Search Product Hub"
         onPress={onTrigger}
@@ -93,6 +104,9 @@ export function ProductHubSearchChrome({
           ref={inputRef}
           value={model.query}
           onChangeText={onChangeText}
+          onKeyPress={event => {
+            if (event.nativeEvent.key === 'Escape') cancelSearch()
+          }}
           placeholder="Search modules, tools and more…"
           placeholderTextColor={colours.textTertiary}
           accessibilityLabel="Search Product Hub"
@@ -104,6 +118,7 @@ export function ProductHubSearchChrome({
         />
       ) : (
         <Pressable
+          ref={triggerRef}
           accessibilityRole="button"
           accessibilityLabel="Search Product Hub"
           onPress={onTrigger}
@@ -114,11 +129,18 @@ export function ProductHubSearchChrome({
         </Pressable>
       )}
       {expanded ? (
-        <Pressable accessibilityLabel="Cancel search" onPress={onCancel} hitSlop={8} testID="product-hub-search-cancel">
-          <AppText variant="label" colour="accent">
-            Cancel
-          </AppText>
-        </Pressable>
+        <>
+          {model.query ? (
+            <Pressable accessibilityLabel="Clear search" onPress={() => onChangeText('')} hitSlop={8} testID="product-hub-search-clear">
+              <ModulaIcon name="close" size={17} colour={colours.textTertiary} />
+            </Pressable>
+          ) : null}
+          <Pressable accessibilityLabel="Cancel search" onPress={cancelSearch} hitSlop={8} testID="product-hub-search-cancel">
+            <AppText variant="label" colour="accent">
+              Cancel
+            </AppText>
+          </Pressable>
+        </>
       ) : null}
     </Animated.View>
   )

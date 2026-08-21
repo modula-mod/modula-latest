@@ -7,7 +7,6 @@ import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
 import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {productCopyFor} from '@/features/modules/identity/productCopy'
-import {moduleIdentitySubtext} from '@/features/modules/identity/moduleIdentitySubtext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleRow({
@@ -35,9 +34,6 @@ export function ModuleRow({
           <View style={styles.flex}>
             <AppText variant="label" numberOfLines={1}>
               {copy.name}
-            </AppText>
-            <AppText variant="micro" colour="textTertiary" numberOfLines={1}>
-              {moduleIdentitySubtext(item.moduleId, item.latestVersion, {compact: true})}
             </AppText>
             <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
               {copy.short}

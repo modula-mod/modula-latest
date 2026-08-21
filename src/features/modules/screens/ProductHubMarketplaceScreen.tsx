@@ -32,7 +32,6 @@ import {
   consumeProductHubOffset,
   rememberProductHubOffset,
 } from '@/features/modules/state/productHubScroll'
-import {HubAtmosphere} from '@/platform/ui/atmosphere/hub-atmosphere'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -122,6 +121,11 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
     ? items.filter(item => matchesQuery(item, search.query))
     : []
 
+  useEffect(() => {
+    if (!search.query.trim()) return
+    dispatch({type: 'RESULTS_CHANGED', count: results.length, error: catalogue.isError})
+  }, [catalogue.isError, results.length, search.query])
+
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <View
@@ -156,7 +160,9 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
         </View>
         {!search.compact && !searchActive ? (
           <View style={{gap: spacing[3], paddingBottom: spacing[3]}}>
-            <PageIntro eyebrow="Catalogue" icon="modules" body="Extend your Modula." />
+            <AppText variant="body" colour="textSecondary">
+              Discover modules built for Modula.
+            </AppText>
             <ProductHubSearchChrome
               model={search}
               compact={false}
@@ -191,6 +197,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
               suggested={suggested}
               results={results}
               pending={catalogue.isPending}
+              error={catalogue.isError}
               onOpen={openModule}
               onAction={onAction}
               onBrowse={category => dispatch({type: 'TYPE', query: category})}
@@ -248,9 +255,6 @@ function EditorialLanding({
   }
   return (
     <View style={[styles.landing, wide ? styles.landingWide : null, {gap: spacing[6]}]}>
-      <SectionEnter delay={0}>
-        <HubAtmosphere />
-      </SectionEnter>
       {featured ? (
         <SectionEnter delay={0}>
           <View style={{gap: spacing[2]}}>
@@ -327,7 +331,7 @@ function EditorialLanding({
 
       {!items.length ? (
         <PageIntro
-          eyebrow="Catalogue"
+          eyebrow="Product Hub"
           icon="modules"
           title="Nothing here yet"
           body="Modules you can install will appear here."
@@ -342,6 +346,7 @@ function SearchMode({
   suggested,
   results,
   pending,
+  error,
   onOpen,
   onAction,
   onBrowse,
@@ -350,6 +355,7 @@ function SearchMode({
   suggested: ModuleCatalogueItem[]
   results: ModuleCatalogueItem[]
   pending: boolean
+  error: boolean
   onOpen: (moduleId: string) => void
   onAction: (item: ModuleCatalogueItem) => void
   onBrowse: (category: ProductHubCategory) => void
@@ -364,6 +370,11 @@ function SearchMode({
           “{query}”
         </AppText>
         {pending ? <AppText variant="caption" colour="textSecondary">Searching…</AppText> : null}
+        {error ? (
+          <AppText variant="body" colour="destructive">
+            Product Hub search couldn&apos;t load. Try again.
+          </AppText>
+        ) : null}
         {modules.length ? (
           <View>
             <HubSectionHeader title="Modules" icon="modules" eyebrow />
@@ -392,7 +403,7 @@ function SearchMode({
             ))}
           </View>
         ) : null}
-        {!pending && !results.length ? (
+        {!pending && !error && !results.length ? (
           <AppText variant="body" colour="textSecondary">
             No matching modules or tools.
           </AppText>

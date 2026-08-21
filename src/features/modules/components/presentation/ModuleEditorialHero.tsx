@@ -5,6 +5,7 @@ import {AppText} from '@/components/primitives/AppText'
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
+import {ProductCover} from '@/features/modules/components/product-detail/ProductCover'
 import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -32,7 +33,7 @@ export function ModuleEditorialHero({
       ]}
       testID="module-editorial-hero">
       <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
-        <ModuleArtwork moduleId={item.moduleId} name={copy.name} variant="scene" />
+        <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} />
         <View style={[styles.copy, {gap: spacing[1], padding: spacing[4]}]}>
           {copy.eyebrow ? (
             <AppText variant="micro" colour="textTertiary">
