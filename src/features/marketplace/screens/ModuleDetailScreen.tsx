@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
-import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -273,12 +273,14 @@ export function ModuleDetailScreen() {
           onScroll={event => setScrollOffset(event.nativeEvent.contentOffset.y)}
           scrollEventThrottle={16}>
           <View style={styles.coverRegion}>
-            <ProductCover
-              moduleId={module.moduleId}
-              name={copy.name}
-              inset={false}
-              transitionToCanvas
-            />
+            <Link.AppleZoomTarget>
+              <ProductCover
+                moduleId={module.moduleId}
+                name={copy.name}
+                inset={false}
+                transitionToCanvas
+              />
+            </Link.AppleZoomTarget>
             <ProductTopChrome
               productName={copy.name}
               top={insets.top + spacing[2]}
