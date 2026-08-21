@@ -1,5 +1,5 @@
 import {Link, type Href} from 'expo-router'
-import {StyleSheet, View} from 'react-native'
+import {Pressable, StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -27,13 +27,12 @@ export function ModuleEditorialHero({
   const copy = productCopyFor(item.moduleId, item.name, item.description)
   const cover = (
     <View
-      style={[
-        styles.media,
-        {
-          borderRadius: radius.xlarge,
-          overflow: 'hidden',
-        },
-      ]}>
+      style={{
+        borderCurve: 'continuous',
+        borderRadius: radius.xlarge,
+        overflow: 'hidden',
+        width: '100%',
+      }}>
       {/* ProductCover keeps the Vault Notes photo; other modules use ModuleArtwork variant="scene". */}
       <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} />
     </View>
@@ -57,10 +56,10 @@ export function ModuleEditorialHero({
       {href ? (
         <Link href={href as Href}>
           <Link.Trigger>
-            <AppPressable accessibilityLabel={`Open featured ${copy.name}`}>
+            <Pressable accessibilityRole="link" accessibilityLabel={`Open featured ${copy.name}`}>
               <Link.AppleZoom>{cover}</Link.AppleZoom>
               {story}
-            </AppPressable>
+            </Pressable>
           </Link.Trigger>
         </Link>
       ) : (
@@ -102,5 +101,4 @@ const styles = StyleSheet.create({
   feature: {width: '100%'},
   flex: {flex: 1, minWidth: 0},
   identity: {alignItems: 'center', flex: 1, flexDirection: 'row', gap: 12, minWidth: 0},
-  media: {borderCurve: 'continuous', width: '100%'},
 })
