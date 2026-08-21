@@ -27,6 +27,7 @@ import {ModuleBackendHealthService as GreenfieldModuleBackendHealthService} from
 import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
 import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -42,6 +43,7 @@ export async function registerModuleRoutes(
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
 ): Promise<void> {
   const registry = new GreenfieldModuleRegistryService(db)
+  const marketplace = new GreenfieldModuleMarketplaceService(db)
   const releases = new GreenfieldModuleReleaseService(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
   const installations = new GreenfieldModuleInstallationService(db, config)
@@ -104,6 +106,18 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await registry.getVersion(canonicalModuleParam(request), params.version), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
+    }
+  })
+
+  app.put('/v1/registry/modules/:moduleId/rating', routeConfig.writeConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const rating = Number((request.body as {rating?: unknown} | undefined)?.rating)
+      return reply.send(successEnvelope(await marketplace.submitRating(canonicalModuleParam(request), auth.accountId, rating), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module rating update failed')
     }
   })
 

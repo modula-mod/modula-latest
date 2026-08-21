@@ -3,6 +3,10 @@ import type {
   GreenfieldModuleFieldDefinition,
   GreenfieldModuleView,
 } from '@modula/greenfield-module-ui-contracts'
+import type {
+  GreenfieldModuleMarketplace,
+  GreenfieldModuleRating,
+} from '@modula/greenfield-module-registry-contracts'
 
 export type ProductHubExtensionKind =
   | 'module'
@@ -173,6 +177,7 @@ export type ModuleDetail = ModuleCatalogueItem & {
   eventBus?: Record<string, unknown>
   hookRegistry?: Record<string, unknown>
   capabilityDiscovery?: Record<string, unknown>
+  marketplace?: GreenfieldModuleMarketplace
 }
 
 export type InstalledModule = {
@@ -388,6 +393,7 @@ export interface ModuleRepository {
     options?: {includeInstalled?: boolean},
   ): Promise<ModuleCatalogueItem[]>
   getModule(moduleId: string, options?: {includeInstalled?: boolean}): Promise<ModuleDetail | null>
+  rateModule(moduleId: string, rating: number): Promise<GreenfieldModuleRating>
   listInstalled(): Promise<InstalledModule[]>
   installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview>
   install(moduleId: string, input?: {version?: string; enable?: boolean}): Promise<unknown>

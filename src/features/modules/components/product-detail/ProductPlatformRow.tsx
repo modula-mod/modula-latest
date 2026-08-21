@@ -11,7 +11,7 @@ export function ProductPlatformRow({platforms}: {platforms: string[]}) {
   const visible = platforms.filter(platform => platform in LABELS)
   return (
     <View style={{gap: spacing[2]}} testID="product-platform-row">
-      <AppText variant="headline" accessibilityRole="header">Compatibility</AppText>
+      <AppText variant="sectionTitle" accessibilityRole="header">Compatibility</AppText>
       <View
         accessibilityLabel={visible.length ? `Platforms: ${visible.map(platform => LABELS[platform]).join(', ')}` : 'Platform compatibility not declared'}
         style={[styles.row, {borderColor: colours.separator, gap: spacing[3]}]}>
@@ -19,6 +19,8 @@ export function ProductPlatformRow({platforms}: {platforms: string[]}) {
         <AppText variant="caption" colour="textSecondary">
           {visible.length ? visible.map(platform => LABELS[platform]).join(' · ') : 'Not declared for this release'}
         </AppText>
+        <View style={styles.spacer} />
+        <ModulaIcon name="chevronRight" size={15} colour={colours.textTertiary} />
       </View>
     </View>
   )
@@ -26,4 +28,5 @@ export function ProductPlatformRow({platforms}: {platforms: string[]}) {
 
 const styles = StyleSheet.create({
   row: {alignItems: 'center', borderBottomWidth: StyleSheet.hairlineWidth, borderTopWidth: StyleSheet.hairlineWidth, flexDirection: 'row', minHeight: 48, paddingVertical: 10},
+  spacer: {flex: 1},
 })

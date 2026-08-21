@@ -91,6 +91,51 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     await db?.destroy()
   })
 
+  it('projects publisher declarations and real account ratings without seeded Marketplace numbers', async () => {
+    const initial = await app.inject({
+      method: 'GET',
+      url: `/v1/registry/modules/${moduleId}`,
+      headers: {authorization: `Bearer ${token}`},
+    })
+    expect(initial.statusCode).toBe(200)
+    expect(initial.json().data.marketplace).toMatchObject({
+      category: {state: 'declared', value: 'Productivity'},
+      ageRating: {state: 'declared', value: '4+'},
+      offlineSupport: {state: 'declared', value: false},
+      syncSupport: {state: 'declared', value: true},
+      inAppPurchases: {state: 'declared', value: false},
+      previews: [],
+      rating: {average: null, count: 0},
+      installations: {count: 0},
+      release: {
+        publishedAt: '2026-08-01T16:34:15.000Z',
+        sizeBytes: 26458,
+      },
+    })
+
+    const primaryRating = await app.inject({
+      method: 'PUT',
+      url: `/v1/registry/modules/${moduleId}/rating`,
+      headers: {authorization: `Bearer ${token}`},
+      payload: {rating: 5},
+    })
+    expect(primaryRating.statusCode).toBe(200)
+    expect(primaryRating.json().data).toMatchObject({userRating: 5, average: 5, count: 1})
+
+    const otherRating = await app.inject({
+      method: 'PUT',
+      url: `/v1/registry/modules/${moduleId}/rating`,
+      headers: {authorization: `Bearer ${otherToken}`},
+      payload: {rating: 3},
+    })
+    expect(otherRating.statusCode).toBe(200)
+    expect(otherRating.json().data).toMatchObject({userRating: 3, average: 4, count: 2})
+
+    const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
+    expect(detail.statusCode).toBe(200)
+    expect(detail.json().data.marketplace.rating).toMatchObject({average: 4, count: 2})
+  })
+
   it('installs, enables, edits, exports, disables and re-enables through generic module host APIs', async () => {
     const discover = await app.inject({
       method: 'GET',

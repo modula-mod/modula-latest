@@ -18,15 +18,18 @@ import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaIcon} from '@/platform/ui/icons'
+import {ModulaReelPlayer} from '@/platform/ui/video/modula-reel-player'
 import {LAYERS} from '@/theme/tokens/layers'
 import {scrimColour} from '@/theme/tokens/scrim'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ProductPreviewFrame = {
   id: string
+  type: 'image' | 'video'
   headline: string
   accessibilityLabel: string
   source: ImageSource | number | string
+  posterSource?: ImageSource | number | string
 }
 
 export function ProductPreviewCarousel({
@@ -42,6 +45,8 @@ export function ProductPreviewCarousel({
   const scrollRef = useRef<ScrollView>(null)
   const [page, setPage] = useState(0)
   const [openId, setOpenId] = useState<string | null>(null)
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({})
+  const [failed, setFailed] = useState<Record<string, boolean>>({})
   const cardWidth = Math.min(286, Math.max(224, Math.round(width * (width >= 720 ? 0.3 : 0.72))))
   const gap = spacing[3]
   const open = frames.find(frame => frame.id === openId) ?? null
@@ -49,7 +54,7 @@ export function ProductPreviewCarousel({
   if (!frames.length) {
     return (
       <View style={{gap: spacing[3]}} testID="product-preview-carousel">
-        <AppText variant="headline" accessibilityRole="header">Preview</AppText>
+        <AppText variant="sectionTitle" accessibilityRole="header">Preview</AppText>
         <View
           accessibilityLabel={`${productName} screenshots are not available for this release`}
           style={[
@@ -86,7 +91,7 @@ export function ProductPreviewCarousel({
   return (
     <View style={{gap: spacing[3]}} testID="product-preview-carousel">
       <View style={styles.headingRow}>
-        <AppText variant="headline" accessibilityRole="header">Preview</AppText>
+        <AppText variant="sectionTitle" accessibilityRole="header">Preview</AppText>
         {Platform.OS === 'web' ? (
           <View style={styles.webControls}>
             <ModulaIconButton
@@ -113,31 +118,60 @@ export function ProductPreviewCarousel({
         snapToInterval={cardWidth + gap}
         snapToAlignment="start"
         contentContainerStyle={{gap, paddingRight: spacing[5]}}>
-        {frames.map(frame => (
-          <AppPressable
-            key={frame.id}
-            accessibilityLabel={`${frame.accessibilityLabel}. Open preview`}
-            onPress={() => setOpenId(frame.id)}
-            style={[
-              styles.card,
-              {
-                backgroundColor: colours.surface,
-                borderColor: colours.border,
-                borderRadius: radius.xlarge,
-                width: cardWidth,
-              },
-            ]}>
-            <AppText variant="headline" style={styles.headline}>{frame.headline}</AppText>
-            <AppImage
-              accessibilityLabel={frame.accessibilityLabel}
-              source={frame.source}
-              contentFit="cover"
-              contentPosition="top"
-              transition={reduceMotion ? 0 : 120}
-              style={styles.image}
-            />
-          </AppPressable>
-        ))}
+        {frames.map(frame => {
+          const mediaSource = frame.type === 'video' ? frame.posterSource : frame.source
+          return (
+            <AppPressable
+              key={frame.id}
+              accessibilityLabel={`${frame.accessibilityLabel}. Open ${frame.type} preview`}
+              onPress={() => setOpenId(frame.id)}
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colours.surface,
+                  borderColor: colours.border,
+                  borderRadius: radius.xlarge,
+                  width: cardWidth,
+                },
+              ]}>
+              <AppText variant="sectionTitle" style={styles.headline}>{frame.headline}</AppText>
+              {mediaSource ? (
+                <View style={styles.image}>
+                  <AppImage
+                    accessibilityLabel={frame.accessibilityLabel}
+                    source={mediaSource}
+                    contentFit="cover"
+                    contentPosition="top"
+                    onLoad={() => setLoaded(current => ({...current, [frame.id]: true}))}
+                    onError={() => setFailed(current => ({...current, [frame.id]: true}))}
+                    transition={reduceMotion ? 0 : 120}
+                    style={StyleSheet.absoluteFill}
+                  />
+                  {!loaded[frame.id] && !failed[frame.id] ? (
+                    <View accessibilityLabel="Loading preview" style={[styles.mediaState, {backgroundColor: colours.surfaceRaised}]}>
+                      <AppText variant="caption" colour="textTertiary">Loading…</AppText>
+                    </View>
+                  ) : null}
+                  {failed[frame.id] ? (
+                    <View accessibilityLabel="Preview failed to load" style={[styles.mediaState, {backgroundColor: colours.surfaceRaised}]}>
+                      <ModulaIcon name="module" size={20} colour={colours.textTertiary} />
+                      <AppText variant="caption" colour="textSecondary">Preview unavailable</AppText>
+                    </View>
+                  ) : null}
+                  {frame.type === 'video' ? (
+                    <View accessibilityElementsHidden style={styles.videoBadge}>
+                      <AppText variant="label" style={{color: '#fff'}}>▶</AppText>
+                    </View>
+                  ) : null}
+                </View>
+              ) : (
+                <View accessibilityLabel="Video poster not available" style={[styles.image, styles.mediaState, {backgroundColor: colours.surfaceRaised}]}>
+                  <AppText variant="caption" colour="textSecondary">Video preview</AppText>
+                </View>
+              )}
+            </AppPressable>
+          )
+        })}
       </ScrollView>
       <View accessibilityLabel={`Preview ${page + 1} of ${frames.length}`} style={styles.indicatorRow}>
         {frames.map((frame, index) => (
@@ -183,13 +217,19 @@ export function ProductPreviewCarousel({
                 <AppText variant="headline" style={styles.viewerTitle}>{open.headline}</AppText>
                 <ModulaIconButton icon="close" accessibilityLabel="Close preview" onPress={() => setOpenId(null)} />
               </View>
-              <AppImage
-                accessibilityLabel={open.accessibilityLabel}
-                source={open.source}
-                contentFit="contain"
-                contentPosition="top"
-                style={styles.viewerImage}
-              />
+              {open.type === 'video' && typeof open.source === 'string' ? (
+                <View accessibilityLabel={open.accessibilityLabel} style={styles.viewerImage}>
+                  <ModulaReelPlayer sourceUri={open.source} active style={StyleSheet.absoluteFill} />
+                </View>
+              ) : (
+                <AppImage
+                  accessibilityLabel={open.accessibilityLabel}
+                  source={open.source}
+                  contentFit="contain"
+                  contentPosition="top"
+                  style={styles.viewerImage}
+                />
+              )}
             </View>
           ) : null}
         </View>
@@ -217,9 +257,11 @@ const styles = StyleSheet.create({
   indicator: {borderRadius: 4, height: 5},
   indicatorRow: {alignItems: 'center', alignSelf: 'center', flexDirection: 'row', gap: 6, minHeight: 16},
   lightbox: {alignItems: 'center', flex: 1, justifyContent: 'center', padding: 20},
+  mediaState: {alignItems: 'center', gap: 8, justifyContent: 'center'},
   viewer: {gap: 12, maxWidth: 640, width: '100%'},
   viewerHeader: {alignItems: 'center', flexDirection: 'row', gap: 12},
   viewerImage: {minHeight: 420, width: '100%'},
   viewerTitle: {flex: 1, minWidth: 0},
+  videoBadge: {alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.58)', borderRadius: 24, height: 48, justifyContent: 'center', left: '50%', marginLeft: -24, marginTop: -24, position: 'absolute', top: '50%', width: 48},
   webControls: {alignItems: 'center', flexDirection: 'row', gap: 6},
 })

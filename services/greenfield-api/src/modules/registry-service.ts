@@ -12,12 +12,15 @@ import {normalizeModuleManifest} from './manifest-normalizer.js'
 import {GreenfieldModuleReleaseService} from './release-service.js'
 import {classifyBetaModule, installabilityForBetaModule} from './beta-catalogue-policy.js'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {GreenfieldModuleMarketplaceService} from './marketplace-service.js'
 
 export class GreenfieldModuleRegistryService {
   private readonly releases: GreenfieldModuleReleaseService
+  private readonly marketplace: GreenfieldModuleMarketplaceService
 
   constructor(private readonly db: ModulaDb) {
     this.releases = new GreenfieldModuleReleaseService(db)
+    this.marketplace = new GreenfieldModuleMarketplaceService(db)
   }
 
   async listModules(filters: GreenfieldRegistryFilter = {}): Promise<{items: GreenfieldRegistryModuleSummary[]; nextCursor: string | null}> {
@@ -32,6 +35,7 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.release_state',
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
+        'greenfield_module_releases.published_at',
         'greenfield_module_versions.manifest',
         'greenfield_publishers.publisher_id',
         'greenfield_publishers.display_name',
@@ -131,6 +135,11 @@ export class GreenfieldModuleRegistryService {
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
+      const marketplace = await this.marketplace.project({
+        moduleId: latest.moduleId,
+        manifest: latest.manifest,
+        registryPublishedAt: latest.publishedAt,
+      })
       return {
         moduleId: latest.moduleId,
         name: latest.manifest.name,
@@ -158,6 +167,10 @@ export class GreenfieldModuleRegistryService {
           manifestSha256: latest.manifestSha256,
           releaseSha256: latest.releaseSha256,
         }),
+        marketplace,
+        releaseNotes: marketplace.release.notes,
+        publishedAt: marketplace.release.publishedAt,
+        releaseSizeBytes: marketplace.release.sizeBytes,
         betaClassification: beta.classification,
         installability: installabilityForBetaModule({
           moduleId: latest.moduleId,
@@ -234,6 +247,7 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.manifest_path',
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
+        'greenfield_module_releases.published_at',
         'greenfield_module_versions.manifest',
       ])
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
@@ -257,6 +271,7 @@ export class GreenfieldModuleRegistryService {
       manifestPath: row.manifest_path,
       licenseStatus: row.license_status,
       trustLevel: row.trust_level,
+      publishedAt: row.published_at ?? null,
     }))
   }
 

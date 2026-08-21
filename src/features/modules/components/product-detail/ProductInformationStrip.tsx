@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
   divider: {bottom: 14, left: 0, position: 'absolute', top: 14, width: StyleSheet.hairlineWidth},
   fitItem: {flex: 1, minWidth: 0},
   frame: {overflow: 'hidden'},
-  item: {justifyContent: 'center', minHeight: 92, paddingHorizontal: 10, paddingVertical: 12},
+  item: {justifyContent: 'center', minHeight: 76, paddingHorizontal: 8, paddingVertical: 9},
   label: {fontWeight: '700'},
   labelRow: {alignItems: 'flex-start'},
-  scrollItem: {minWidth: 138},
+  scrollItem: {minWidth: 124},
 })

@@ -68,6 +68,13 @@ export type {
   ProductHubCategory,
   ProductHubExtensionKind,
 } from '@/data/repositories/contracts/ModuleRepository'
+export type {
+  GreenfieldModuleMarketplace,
+  GreenfieldModulePreview,
+  GreenfieldModuleRating,
+  GreenfieldModuleRatingAggregate,
+  GreenfieldRegistryDeclaration,
+} from '@modula/greenfield-module-registry-contracts'
 export type {PostRepository} from '@/data/repositories/contracts/PostRepository'
 export type {
   ProductPreferencesRepository,

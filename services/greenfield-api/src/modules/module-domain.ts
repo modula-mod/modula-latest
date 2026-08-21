@@ -75,6 +75,7 @@ export type GreenfieldModuleReleaseRecord = {
   manifestPath: string
   licenseStatus: string
   trustLevel: string
+  publishedAt: Date | null
 }
 
 export type GreenfieldModuleInstallationRow = {

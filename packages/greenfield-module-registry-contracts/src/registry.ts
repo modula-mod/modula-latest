@@ -92,3 +92,48 @@ export type GreenfieldRegistryFilter = {
   limit?: number
   cursor?: string
 }
+
+/** A missing registry declaration is intentionally different from `false`. */
+export type GreenfieldRegistryDeclaration<T> =
+  | {state: 'declared'; value: T}
+  | {state: 'unknown'}
+
+export type GreenfieldModulePreview = {
+  id: string
+  type: 'image' | 'video'
+  source: string
+  posterSource?: string
+  alt?: string
+  width?: number
+  height?: number
+  sortOrder: number
+}
+
+export type GreenfieldModuleRatingAggregate = {
+  average: number | null
+  count: number
+  updatedAt: string | null
+}
+
+export type GreenfieldModuleMarketplace = {
+  category: GreenfieldRegistryDeclaration<string>
+  ageRating: GreenfieldRegistryDeclaration<string>
+  privacy: GreenfieldRegistryDeclaration<string>
+  offlineSupport: GreenfieldRegistryDeclaration<boolean>
+  syncSupport: GreenfieldRegistryDeclaration<boolean>
+  inAppPurchases: GreenfieldRegistryDeclaration<boolean>
+  previews: GreenfieldModulePreview[]
+  rating: GreenfieldModuleRatingAggregate
+  installations: {count: number}
+  chart: {rank: number; category: string; totalModules: number} | null
+  release: {
+    publishedAt: string | null
+    sizeBytes: number | null
+    notes: string[]
+  }
+}
+
+export type GreenfieldModuleRating = GreenfieldModuleRatingAggregate & {
+  moduleId: string
+  userRating: number
+}

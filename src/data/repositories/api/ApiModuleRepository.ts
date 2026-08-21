@@ -3,6 +3,10 @@ import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {isVaultNotesModuleId} from '@modula/greenfield-contracts'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
+  GreenfieldModuleMarketplace,
+  GreenfieldModuleRating,
+} from '@modula/greenfield-module-registry-contracts'
+import type {
   InstalledModule,
   ApplyAIExecutionRequest,
   ApplyAIExecutionResponse,
@@ -115,6 +119,14 @@ export class ApiModuleRepository implements ModuleRepository {
       const installed = await this.listInstalled()
       return {...item, installationState: applyInstalledState(item, installed.find(row => row.moduleId === moduleId)).installationState}
     })
+  }
+
+  rateModule(moduleId: string, rating: number): Promise<GreenfieldModuleRating> {
+    return this.client.put({
+      path: `/v1/registry/modules/${encodeURIComponent(moduleId)}/rating`,
+      authenticated: true,
+      body: {rating},
+    }, decodeModuleRating)
   }
 
   listInstalled(): Promise<InstalledModule[]> {
@@ -382,6 +394,22 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
           : null,
     releaseSizeBytes: finiteNumber(row.releaseSizeBytes ?? row.packageSizeBytes ?? release.sizeBytes),
     privacy: typeof row.privacy === 'string' ? row.privacy : typeof manifest.privacy === 'string' ? manifest.privacy : undefined,
+    marketplace: decodeMarketplace(row.marketplace),
+  }
+}
+
+function decodeMarketplace(value: unknown): GreenfieldModuleMarketplace | undefined {
+  return isRecord(value) ? value as GreenfieldModuleMarketplace : undefined
+}
+
+function decodeModuleRating(value: unknown): GreenfieldModuleRating {
+  const row = isRecord(value) ? value : {}
+  return {
+    moduleId: String(row.moduleId ?? ''),
+    userRating: Number(row.userRating ?? 0),
+    average: finiteNumber(row.average),
+    count: finiteNumber(row.count) ?? 0,
+    updatedAt: typeof row.updatedAt === 'string' ? row.updatedAt : null,
   }
 }
 

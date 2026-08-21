@@ -22,7 +22,7 @@ export function ProductWhatsNew({
   return (
     <View style={{gap: spacing[2]}} testID="product-whats-new">
       <View style={styles.headingRow}>
-        <AppText variant="headline" accessibilityRole="header">What&apos;s New</AppText>
+        <AppText variant="sectionTitle" accessibilityRole="header">What&apos;s New</AppText>
         {onVersionHistory ? (
           <AppPressable
             accessibilityLabel={versionHistoryOpen ? 'Hide version history' : 'Open version history'}
@@ -37,12 +37,12 @@ export function ProductWhatsNew({
       </AppText>
       {releaseNotes.length ? (
         releaseNotes.map((note, index) => (
-          <AppText key={`${index}-${note}`} variant="body" colour="textSecondary">
+          <AppText key={`${index}-${note}`} variant="secondaryBody" colour="textSecondary">
             {note}
           </AppText>
         ))
       ) : (
-        <AppText variant="body" colour="textSecondary">
+        <AppText variant="secondaryBody" colour="textSecondary">
           Release notes are not available for this registry release.
         </AppText>
       )}

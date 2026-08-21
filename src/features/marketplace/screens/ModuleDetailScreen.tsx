@@ -5,9 +5,10 @@ import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
+import {useSession} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import type {ModuleDetail, ModuleInstallPreview} from '@/data/repositories/contracts'
+import type {GreenfieldRegistryDeclaration, ModuleDetail, ModuleInstallPreview} from '@/data/repositories/contracts'
 import {InstallPreviewSheet} from '@/features/modules/components/InstallPreviewSheet'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
@@ -22,6 +23,7 @@ import {
   ProductMetadataStrip,
   ProductPlatformRow,
   ProductPreviewCarousel,
+  ProductRatingPanel,
   ProductStickyHeader,
   ProductTabs,
   ProductTopChrome,
@@ -54,6 +56,7 @@ export function ModuleDetailScreen() {
   const id = String(moduleId ?? '')
   const router = useRouter()
   const services = useAppServices()
+  const session = useSession()
   const queryClient = useQueryClient()
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
@@ -71,6 +74,8 @@ export function ModuleDetailScreen() {
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
   const [heroActionBottom, setHeroActionBottom] = useState(360)
   const [scrollOffset, setScrollOffset] = useState(0)
+  const [ratingBusy, setRatingBusy] = useState(false)
+  const [userRating, setUserRating] = useState<number | null>(null)
 
   const installRequested = install === '1' || install === 'true'
   const installReviewOpen = installSheetOpen || installRequested
@@ -165,6 +170,21 @@ export function ModuleDetailScreen() {
       Alert.alert(`${module.name} couldn’t be updated`, 'Try again.')
     } finally {
       setBusy(null)
+    }
+  }
+
+  const rateModule = async (rating: number) => {
+    if (!module || ratingBusy) return
+    setRatingBusy(true)
+    try {
+      await services.moduleRepository.rateModule(module.moduleId, rating)
+      setUserRating(rating)
+      await detail.refetch()
+    } catch (error) {
+      console.warn('Product Hub rating failed', error)
+      Alert.alert('Rating wasn’t saved', 'Try again in a moment.')
+    } finally {
+      setRatingBusy(false)
     }
   }
 
@@ -272,7 +292,7 @@ export function ModuleDetailScreen() {
           <View
             style={[
               styles.productLead,
-              {gap: spacing[4], marginTop: -64, paddingHorizontal: spacing[4]},
+              {gap: spacing[3], marginTop: -60, paddingHorizontal: spacing[4]},
             ]}>
             <View style={[styles.identityRow, stackedIdentity && styles.identityStack, {gap: spacing[4]}]}>
               <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={heroArtworkSize} variant="hero" />
@@ -289,7 +309,7 @@ export function ModuleDetailScreen() {
                     const {y, height} = event.nativeEvent.layout
                     setHeroActionBottom(y + height + 230)
                   }}
-                  style={{marginTop: spacing[3]}}
+                  style={{marginTop: spacing[2]}}
                   testID="module-hero-install">
                   <ProductActionGroup
                     presentation={presentation}
@@ -308,7 +328,7 @@ export function ModuleDetailScreen() {
           <View
             style={[
               styles.editorialBody,
-              {gap: spacing[8], paddingHorizontal: spacing[4], paddingTop: spacing[5]},
+              {gap: spacing[6], paddingHorizontal: spacing[4], paddingTop: spacing[4]},
             ]}>
             <TabContent
               tab={selectedTab}
@@ -327,6 +347,10 @@ export function ModuleDetailScreen() {
               versionHistoryOpen={versionHistoryOpen}
               onVersionHistory={() => setVersionHistoryOpen(current => !current)}
               onProductHub={() => router.push('/product' as Href)}
+              canRate={session.status === 'signedIn'}
+              ratingBusy={ratingBusy}
+              userRating={userRating}
+              onRate={rating => void rateModule(rating)}
             />
           </View>
         </ScrollView>
@@ -374,6 +398,10 @@ function TabContent({
   versionHistoryOpen,
   onVersionHistory,
   onProductHub,
+  canRate,
+  ratingBusy,
+  userRating,
+  onRate,
 }: {
   tab: ProductTabId
   module: ModuleDetail
@@ -391,6 +419,10 @@ function TabContent({
   versionHistoryOpen: boolean
   onVersionHistory: () => void
   onProductHub: () => void
+  canRate: boolean
+  ratingBusy: boolean
+  userRating: number | null
+  onRate: (rating: number) => void
 }) {
   const {spacing} = useThemeTokens()
 
@@ -424,12 +456,13 @@ function TabContent({
 
   if (tab === 'reviews') {
     return (
-      <View style={{gap: spacing[2]}}>
-        <AppText variant="headline" accessibilityRole="header">Reviews</AppText>
-        <AppText variant="body" colour="textSecondary">
-          Ratings and reviews are not available in Product Hub yet.
-        </AppText>
-      </View>
+      <ProductRatingPanel
+        rating={module.marketplace?.rating ?? {average: null, count: 0, updatedAt: null}}
+        canRate={canRate}
+        selectedRating={userRating}
+        busy={ratingBusy}
+        onRate={onRate}
+      />
     )
   }
 
@@ -457,7 +490,7 @@ function TabContent({
       <ProductPlatformRow platforms={platforms} />
       <ProductDescription>{description}</ProductDescription>
       <View style={{gap: spacing[3]}}>
-        <AppText variant="headline" accessibilityRole="header">Module Information</AppText>
+        <AppText variant="sectionTitle" accessibilityRole="header">Module Information</AppText>
         <ProductInformationStrip items={information.map(item => ({...item, onPress: () => onInformation(item.id)}))} />
         {informationOpen ? <InformationDetail module={module} section={informationOpen} /> : null}
         <ProductInformationDisclosure label="Information" onPress={() => onInformation(informationOpen ?? 'privacy')} />
@@ -540,6 +573,9 @@ function licenseLabelFor(module: ModuleDetail): string {
 }
 
 function inAppPurchaseLabelFor(module: ModuleDetail): string {
+  const declared = declaredValue(module.marketplace?.inAppPurchases)
+  if (declared === true) return 'This release declares in-app purchases'
+  if (declared === false) return 'This release declares no in-app purchases'
   const value = marketplaceMetadataFor(module).inAppPurchases
   if (value === true) return 'This release declares in-app purchases'
   if (value === false) return 'This release declares no in-app purchases'
@@ -549,10 +585,10 @@ function inAppPurchaseLabelFor(module: ModuleDetail): string {
 function metadataFor(module: ModuleDetail): ProductMetadataItem[] {
   const marketplace = marketplaceMetadataFor(module)
   const reviews = asRecord(marketplace.reviews)
-  const average = numberOrNull(marketplace.rating ?? reviews?.average)
-  const reviewCount = numberOrNull(marketplace.ratingCount ?? reviews?.count)
-  const age = stringOrNull(marketplace.ageRating)
-  const chartRank = numberOrNull(marketplace.chartRank)
+  const average = module.marketplace?.rating.average ?? numberOrNull(marketplace.rating ?? reviews?.average)
+  const reviewCount = module.marketplace?.rating.count ?? numberOrNull(marketplace.ratingCount ?? reviews?.count)
+  const age = declaredValue(module.marketplace?.ageRating) ?? stringOrNull(marketplace.ageRating)
+  const chartRank = module.marketplace?.chart?.rank ?? numberOrNull(marketplace.chartRank)
   const packageSize = module.releaseSizeBytes ?? numberOrNull(marketplace.packageSizeBytes)
 
   return [
@@ -560,11 +596,11 @@ function metadataFor(module: ModuleDetail): ProductMetadataItem[] {
       id: 'rating',
       value: average === null ? '—' : average.toFixed(1),
       label: 'Rating',
-      detail: average !== null && reviewCount !== null ? `${Math.round(reviewCount).toLocaleString()} reviews` : undefined,
+      detail: average !== null && reviewCount !== null ? `${Math.round(reviewCount).toLocaleString()} ratings` : undefined,
     },
     {id: 'age', value: age ?? '—', label: 'Age'},
     {id: 'chart', value: chartRank === null ? '—' : `#${Math.round(chartRank)}`, label: 'Chart'},
-    {id: 'developer', value: module.publisherName.toUpperCase(), label: 'Developer'},
+    {id: 'developer', value: module.publisherName, label: 'Developer'},
     {id: 'size', value: formatBytes(packageSize), label: 'Size'},
     {id: 'version', value: module.latestVersion ?? '—', label: 'Version'},
   ]
@@ -572,9 +608,14 @@ function metadataFor(module: ModuleDetail): ProductMetadataItem[] {
 
 function capabilitiesFor(module: ModuleDetail, platforms: string[]): ProductCapabilityItem[] {
   const manifest = module.normalizedManifest ?? module.manifest ?? {}
-  const privateRecords = Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))
-  const offline = declarationPresentation(asRecord(manifest.offline), 'offline support')
-  const sync = declarationPresentation(asRecord(manifest.realtime), 'sync support')
+  const privacy = declaredValue(module.marketplace?.privacy)
+  const privateRecords = privacy !== null || (!module.marketplace && (Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))))
+  const offline = module.marketplace
+    ? booleanDeclarationPresentation(module.marketplace.offlineSupport, 'offline support')
+    : declarationPresentation(asRecord(manifest.offline), 'offline support')
+  const sync = module.marketplace
+    ? booleanDeclarationPresentation(module.marketplace.syncSupport, 'sync support')
+    : declarationPresentation(asRecord(manifest.realtime), 'sync support')
 
   return [
     {
@@ -582,7 +623,7 @@ function capabilitiesFor(module: ModuleDetail, platforms: string[]): ProductCapa
       icon: 'privacy',
       label: 'Private',
       value: privateRecords ? 'Private' : 'Not declared',
-      detail: privateRecords ? 'Account-scoped data' : 'No privacy declaration',
+      detail: privateRecords ? privacy ?? 'Account-scoped data' : 'No privacy declaration',
     },
     {id: 'offline', icon: 'storage', label: 'Offline', ...offline},
     {id: 'sync', icon: 'update', label: 'Sync', ...sync},
@@ -601,15 +642,19 @@ function informationFor(module: ModuleDetail): ProductInformationItem[] {
   const license = asRecord(manifest.license)
   const marketplace = marketplaceMetadataFor(module)
   const spdx = stringOrNull(license?.spdx)
-  const inAppPurchases = typeof marketplace.inAppPurchases === 'boolean'
-    ? marketplace.inAppPurchases ? 'Declared' : 'None'
-    : 'Not declared'
-  const privateRecords = Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))
+  const typedIap = declaredValue(module.marketplace?.inAppPurchases)
+  const inAppPurchases = typedIap !== null
+    ? typedIap ? 'Declared' : 'None'
+    : typeof marketplace.inAppPurchases === 'boolean'
+      ? marketplace.inAppPurchases ? 'Declared' : 'None'
+      : 'Not declared'
+  const privacy = declaredValue(module.marketplace?.privacy)
+  const privateRecords = privacy !== null || (!module.marketplace && (Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))))
   const openSource = spdx && !/^LicenseRef-/i.test(spdx) ? spdx : 'Not declared'
 
   return [
     {id: 'privacy', icon: 'privacy', label: 'Privacy', value: privateRecords ? 'Private' : 'Not declared'},
-    {id: 'source', icon: 'verified', label: 'Open Source', value: openSource},
+    {id: 'source', icon: 'verified', label: 'Source', value: openSource},
     {id: 'price', icon: 'marketplace', label: 'In-App Purchases', value: inAppPurchases},
     {id: 'developer', icon: 'profile', label: 'Developer', value: module.publisherName},
   ]
@@ -639,7 +684,13 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 function marketplaceMetadataFor(module: ModuleDetail): Record<string, unknown> {
   const normalized = module.normalizedManifest ?? {}
   const manifest = module.manifest ?? {}
-  return asRecord(normalized.marketplace) ?? asRecord(manifest.marketplace) ?? {}
+  const normalizedExtensions = asRecord(normalized.extensions)
+  const manifestExtensions = asRecord(manifest.extensions)
+  return asRecord(normalized.marketplace)
+    ?? asRecord(normalizedExtensions?.marketplace)
+    ?? asRecord(manifest.marketplace)
+    ?? asRecord(manifestExtensions?.marketplace)
+    ?? {}
 }
 
 function numberOrNull(value: unknown): number | null {
@@ -663,13 +714,39 @@ function declarationPresentation(
   label: string,
 ): Pick<ProductCapabilityItem, 'value' | 'detail'> {
   if (!declaration) return {value: 'Not declared', detail: `No verified ${label}`}
+  const explicitlyTrue = declaration.enabled === true || declaration.supported === true
   if (declaration.enabled === false || declaration.supported === false) {
     return {value: 'Not supported', detail: 'Disabled by manifest'}
   }
-  return {value: 'Declared', detail: 'Manifest declaration'}
+  if (explicitlyTrue) return {value: 'Supported', detail: 'Declared by manifest'}
+  return {value: 'Not declared', detail: `No verified ${label}`}
+}
+
+function declaredValue<T>(declaration: GreenfieldRegistryDeclaration<T> | undefined): T | null {
+  return declaration?.state === 'declared' ? declaration.value : null
+}
+
+function booleanDeclarationPresentation(
+  declaration: GreenfieldRegistryDeclaration<boolean>,
+  label: string,
+): Pick<ProductCapabilityItem, 'value' | 'detail'> {
+  if (declaration.state === 'unknown') return {value: 'Not declared', detail: `No verified ${label}`}
+  return declaration.value
+    ? {value: 'Supported', detail: 'Declared by publisher'}
+    : {value: 'Not supported', detail: 'Declared by publisher'}
 }
 
 function previewsFor(module: ModuleDetail): ProductPreviewFrame[] {
+  if (module.marketplace) {
+    return module.marketplace.previews.map((preview, index) => ({
+      id: preview.id,
+      type: preview.type,
+      headline: preview.alt ?? `Preview ${index + 1}`,
+      accessibilityLabel: preview.alt ?? `${module.name} ${preview.type} preview ${index + 1}`,
+      source: preview.source,
+      posterSource: preview.posterSource,
+    }))
+  }
   const marketplace = marketplaceMetadataFor(module)
   const rows = Array.isArray(marketplace.previews)
     ? marketplace.previews
@@ -685,7 +762,7 @@ function previewsFor(module: ModuleDetail): ProductPreviewFrame[] {
     if (!source) return []
     const headline = stringOrNull(row?.headline ?? row?.title) ?? `Preview ${index + 1}`
     const label = stringOrNull(row?.accessibilityLabel) ?? `${module.name} preview: ${headline}`
-    return [{id: stringOrNull(row?.id) ?? `preview-${index + 1}`, headline, accessibilityLabel: label, source}]
+    return [{id: stringOrNull(row?.id) ?? `preview-${index + 1}`, type: 'image' as const, headline, accessibilityLabel: label, source}]
   })
 }
 

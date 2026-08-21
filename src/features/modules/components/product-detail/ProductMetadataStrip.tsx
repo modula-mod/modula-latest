@@ -26,10 +26,10 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
           style={[styles.divider, {backgroundColor: colours.separator}]}
         />
       ) : null}
-      <AppText variant="headline" numberOfLines={1} adjustsFontSizeToFit style={styles.value}>
+      <AppText variant="metricValue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={styles.value}>
         {item.value}
       </AppText>
-      <AppText variant="micro" colour="textTertiary" numberOfLines={1} style={styles.label}>
+      <AppText variant="metricLabel" colour="textTertiary" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={styles.label}>
         {item.label.toUpperCase()}
       </AppText>
       {item.detail ? (
@@ -57,12 +57,12 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
 
 const styles = StyleSheet.create({
   content: {alignItems: 'stretch', flexDirection: 'row'},
-  detail: {fontSize: 9, lineHeight: 12, textAlign: 'center'},
-  divider: {bottom: 14, left: 0, position: 'absolute', top: 14, width: StyleSheet.hairlineWidth},
+  detail: {fontSize: 8.5, lineHeight: 11, textAlign: 'center'},
+  divider: {bottom: 10, left: 0, position: 'absolute', top: 10, width: StyleSheet.hairlineWidth},
   fitItem: {flex: 1, minWidth: 0},
   frame: {borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden'},
-  item: {alignItems: 'center', justifyContent: 'center', minHeight: 76, paddingHorizontal: 6, paddingVertical: 9},
-  label: {fontSize: 9, fontWeight: '700', letterSpacing: 0.35, lineHeight: 12},
-  scrollItem: {minWidth: 106},
-  value: {fontSize: 15, lineHeight: 19, textAlign: 'center'},
+  item: {alignItems: 'center', justifyContent: 'center', minHeight: 66, paddingHorizontal: 4, paddingVertical: 7},
+  label: {fontSize: 8.5, fontWeight: '700', letterSpacing: 0.2, lineHeight: 11},
+  scrollItem: {minWidth: 90},
+  value: {fontSize: 14, fontVariant: ['tabular-nums'], lineHeight: 18, textAlign: 'center'},
 })

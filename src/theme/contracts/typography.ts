@@ -41,6 +41,13 @@ export type TypographySemanticAlias =
   | 'title'
   | 'metadata'
   | 'button'
+  | 'moduleTitle'
+  | 'moduleSubtitle'
+  | 'publisher'
+  | 'metricValue'
+  | 'metricLabel'
+  | 'sectionTitle'
+  | 'secondaryBody'
 
 export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   TypographySemanticAlias,
@@ -50,4 +57,11 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   title: 'title2',
   metadata: 'caption',
   button: 'label',
+  moduleTitle: 'display',
+  moduleSubtitle: 'body',
+  publisher: 'caption',
+  metricValue: 'headline',
+  metricLabel: 'micro',
+  sectionTitle: 'headline',
+  secondaryBody: 'caption',
 }

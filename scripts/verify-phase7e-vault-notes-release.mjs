@@ -20,7 +20,7 @@ const provenancePath = join(vaultNotesRoot, 'release/vault-notes-v1.1.0.provenan
 if (!existsSync(provenancePath)) fail('Vault Notes release provenance is missing')
 else {
   const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'))
-  if (provenance.moduleId === 'modula.vault-notes' && provenance.moduleVersion === '1.1.0') pass('release provenance identifies Vault Notes 1.1')
+  if (provenance.moduleId === 'digital.modula.vault-notes' && provenance.moduleVersion === '1.1.0') pass('release provenance identifies canonical Vault Notes 1.1')
   else fail('release provenance identity mismatch')
   if (provenance.releaseTag === releaseTag) pass('release provenance records immutable tag')
   else fail('release provenance tag mismatch')

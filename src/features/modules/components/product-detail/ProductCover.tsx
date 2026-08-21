@@ -34,9 +34,9 @@ export function ProductCover({
   const height = transitionToCanvas
     ? Math.min(420, Math.max(300, Math.round(contentWidth * 0.76)))
     : Math.min(300, Math.max(176, Math.round(contentWidth * 0.36)))
-  const transitionHeight = Math.min(160, Math.max(122, Math.round(height * 0.46)))
+  const transitionHeight = Math.min(142, Math.max(108, Math.round(height * 0.38)))
   const canvasClear = colourWithAlpha(colours.canvas, 0)
-  const canvasWash = colourWithAlpha(colours.canvas, 0.76)
+  const canvasWash = colourWithAlpha(colours.canvas, 0.58)
   const source = moduleId === 'digital.modula.vault-notes' ? VAULT_NOTES_COVER : null
 
   return (
@@ -68,12 +68,12 @@ export function ProductCover({
           <ProgressiveBlurBand
             height={transitionHeight}
             topHeavy={false}
-            intensity={86}
+            intensity={72}
             style={styles.transition}
           />
           <LinearGradient
             colors={[canvasClear, canvasWash, colours.canvas]}
-            locations={[0, 0.62, 1]}
+            locations={[0, 0.7, 1]}
             pointerEvents="none"
             style={[styles.transition, {height: transitionHeight}]}
           />

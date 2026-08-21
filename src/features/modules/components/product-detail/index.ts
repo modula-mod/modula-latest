@@ -9,6 +9,7 @@ export {ProductInformationStrip, type ProductInformationItem} from './ProductInf
 export {ProductMetadataStrip, type ProductMetadataItem} from './ProductMetadataStrip'
 export {ProductPlatformRow} from './ProductPlatformRow'
 export {ProductPreviewCarousel, type ProductPreviewFrame} from './ProductPreviewCarousel'
+export {ProductRatingPanel} from './ProductRatingPanel'
 export {ProductStickyHeader} from './ProductStickyHeader'
 export {ProductTabs, PRODUCT_TABS, type ProductTabId} from './ProductTabs'
 export {ProductTopChrome} from './ProductTopChrome'

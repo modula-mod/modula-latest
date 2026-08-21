@@ -22,22 +22,22 @@ export function ProductIdentity({
   return (
     <View style={[styles.identity, {gap: spacing[1]}]} testID="product-identity">
       {privateByDesign ? <ProductBadge /> : null}
-      <AppText variant="display" accessibilityRole="header" style={styles.title}>
+      <AppText variant="moduleTitle" accessibilityRole="header" style={styles.title}>
         {name}
       </AppText>
-      <AppText variant="body" colour="textSecondary">
+      <AppText variant="moduleSubtitle" colour="textSecondary">
         {subtitle}
       </AppText>
       <View style={[styles.publisher, {gap: spacing[1]}]}>
         <ModulaIcon name="module" size={15} colour={colours.textTertiary} />
-        <AppText variant="caption" colour="textTertiary">
+        <AppText variant="publisher" colour="textTertiary">
           {publisher}
         </AppText>
         {verified ? (
           <>
-            <AppText variant="caption" colour="textTertiary">·</AppText>
+            <AppText variant="publisher" colour="textTertiary">·</AppText>
             <ModulaIcon name="verified" size={15} colour={colours.accent} />
-            <AppText variant="caption" colour="textTertiary">Verified</AppText>
+            <AppText variant="publisher" colour="textTertiary">Verified</AppText>
           </>
         ) : null}
       </View>
@@ -48,5 +48,5 @@ export function ProductIdentity({
 const styles = StyleSheet.create({
   identity: {minWidth: 0},
   publisher: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap'},
-  title: {fontSize: 34, letterSpacing: -0.9, lineHeight: 39},
+  title: {letterSpacing: -0.7},
 })

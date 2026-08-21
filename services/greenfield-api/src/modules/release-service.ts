@@ -309,6 +309,7 @@ export class GreenfieldModuleReleaseService {
         'greenfield_module_releases.manifest_path',
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
+        'greenfield_module_releases.published_at',
         'greenfield_module_versions.manifest',
       ])
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(moduleId)])
@@ -338,6 +339,7 @@ export class GreenfieldModuleReleaseService {
         'greenfield_module_releases.manifest_path',
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
+        'greenfield_module_releases.published_at',
         'greenfield_module_versions.manifest',
       ])
       .where('greenfield_module_releases.release_id', '=', releaseId)
@@ -623,5 +625,6 @@ function mapRelease(row: any): GreenfieldModuleReleaseRecord {
     manifestPath: row.manifest_path,
     licenseStatus: row.license_status,
     trustLevel: row.trust_level,
+    publishedAt: row.published_at ?? null,
   }
 }
