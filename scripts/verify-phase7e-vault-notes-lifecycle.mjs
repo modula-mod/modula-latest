@@ -26,7 +26,7 @@ for (const action of [
   'tag.assign',
   'tag.remove',
 ]) {
-  const expectedId = `modula.vault-notes.action.${action}`
+  const expectedId = `digital.modula.vault-notes.action.${action}`
   if (actionIds.has(expectedId)) pass(`${action} declared`)
   else fail(`${action} action missing`)
 }
@@ -53,8 +53,8 @@ includes('services/greenfield-api/src/modules/routes/index.ts', [
 includes('services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts', [
   'install-preview',
   'setWorkerStatus',
-  'modula.vault-notes.actions.note.duplicate',
-  'modula.vault-notes.actions.note.archive',
+  'digital.modula.vault-notes.actions.note.duplicate',
+  'digital.modula.vault-notes.actions.note.archive',
   'disable',
   'reenable',
 ], 'Vault Notes lifecycle integration test')

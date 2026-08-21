@@ -156,6 +156,23 @@ Isolated B10 change only:
 
 Tracked `ios/` and `android/` remain first-class. Expo Doctor’s tracked-native-folder/CNG warning is expected (`docs/architecture/native-project-policy.md`) and is not a reason to prebuild `--clean`.
 
+## Native codesign workaround (ExpoModulesJSI xattr)
+
+iPhone 17 Pro Debug builds from a worktree under `~/Documents/Codex` fail at:
+
+```
+expo-modules-jsi/.../PackageFrameworks/ExpoModulesJSI.framework:
+resource fork, Finder information, or similar detritus not allowed
+```
+
+Diagnosis: iCloud File Provider writes `com.apple.FinderInfo` and `com.apple.fileprovider.fpfs#P` onto the Expo-generated framework. This is not a project signing-architecture defect. `xattr -cr` on the framework is immediately overwritten while the tree remains under Documents.
+
+Workaround used: perform native builds from a second worktree outside iCloud,
+
+`/Users/msjoy/Developer/modula-7n-a-native`
+
+same branch SHA. Only the generated framework metadata is avoided; codesign is not globally disabled; `ios/` / `android/` are not deleted.
+
 ## Skills loaded this phase
 
 Canonical UI skill remains Phase 7M:
