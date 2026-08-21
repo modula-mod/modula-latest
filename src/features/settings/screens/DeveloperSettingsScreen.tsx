@@ -85,6 +85,14 @@ export function DeveloperSettingsScreen() {
         />
         <SettingsLinkRow
           row={{
+            title: 'Native navigation experiments',
+            description: 'SDK 57 NativeTabs, SearchBar, Zoom, Liquid Glass comparison. Internal only.',
+            icon: 'developer',
+            route: '/settings/developer/pvp-native-experiments',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
             title: 'Expo UI Lab',
             description: 'Pick Expo UI playground components by product context.',
             icon: 'developer',
