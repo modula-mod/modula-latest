@@ -1,13 +1,37 @@
 import {StyleSheet, View} from 'react-native'
-import {useState} from 'react'
+import {useReducer, useState} from 'react'
 
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {Surface} from '@/components/primitives/Surface'
+import {InstallPreviewSheet} from '@/features/modules/components/InstallPreviewSheet'
+import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleCatalogueCard} from '@/features/modules/components/ModuleCatalogueCard'
 import {ModuleInstallProgress} from '@/features/modules/components/ModuleInstallProgress'
 import {ModuleStatusPill} from '@/features/modules/components/ModuleStatusPill'
-import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {ProductHubSearchChrome} from '@/features/modules/components/ProductHubSearchChrome'
+import {
+  ModuleEditorialHero,
+  ModuleRow,
+} from '@/features/modules/components/presentation'
+import {
+  ProductActionGroup,
+  ProductCapabilityStrip,
+  ProductCover,
+  ProductIdentity,
+  ProductMetadataStrip,
+  ProductPreviewCarousel,
+  ProductStickyHeader,
+  ProductTabs,
+  ProductTopChrome,
+  type ProductTabId,
+} from '@/features/modules/components/product-detail'
+import type {ModuleCatalogueItem, ModuleDetail} from '@/data/repositories/contracts'
+import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
+import {
+  initialProductHubSearch,
+  reduceProductHubSearch,
+} from '@/features/modules/state/productHubSearchMachine'
 import {StoryRingAvatar} from '@/platform/ui/avatars/StoryRingAvatar'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
@@ -44,6 +68,18 @@ const SAMPLE_MODULE: ModuleCatalogueItem = {
   compatibility: 'Compatible',
 }
 
+const SAMPLE_MODULE_DETAIL = {
+  ...SAMPLE_MODULE,
+  longDescription: SAMPLE_MODULE.description,
+  backend: {},
+  permissions: [
+    {permission: 'records.notes.read', reason: 'Read Vault Notes records.', risk: 'low'},
+    {permission: 'records.notes.write', reason: 'Create and update Vault Notes records.', risk: 'low'},
+  ],
+  contributions: {},
+  privacy: 'Vault Notes records are scoped to the current Modula account.',
+} as ModuleDetail
+
 /**
  * State matrix for Modula primitives that flagship screens must prove in 7M-B2.
  */
@@ -57,6 +93,10 @@ export function ModulaPrimitivesLabScreen() {
   const [popover, setPopover] = useState(false)
   const [sheet, setSheet] = useState(false)
   const [page, setPage] = useState('overview')
+  const [productTab, setProductTab] = useState<ProductTabId>('overview')
+  const [installReview, setInstallReview] = useState(false)
+  const [hubSearch, dispatchHubSearch] = useReducer(reduceProductHubSearch, initialProductHubSearch)
+  const installPresentation = resolveModuleInstallPresentation(SAMPLE_MODULE)
 
   return (
     <View style={[styles.content, {gap: spacing[5]}]}>
@@ -331,7 +371,7 @@ export function ModulaPrimitivesLabScreen() {
       </LabBlock>
 
       <LabBlock title="Install Progress">
-        <ModuleInstallProgress productName="Vault Notes" stage="permissions" />
+        <ModuleInstallProgress productName="Vault Notes" stage="compatibility" />
       </LabBlock>
 
       <LabBlock title="Permissions">
@@ -347,6 +387,131 @@ export function ModulaPrimitivesLabScreen() {
           <ModuleStatusPill state="updateAvailable" />
         </View>
       </LabBlock>
+
+      <LabBlock title="ProductCover">
+        <ProductCover moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} />
+      </LabBlock>
+
+      <LabBlock title="ProductTopChrome">
+        <View style={styles.chromePreview}>
+          <ProductCover moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} />
+          <ProductTopChrome
+            productName={SAMPLE_MODULE.name}
+            top={12}
+            onBack={() => undefined}
+            onShare={() => undefined}
+            actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
+            onAction={() => undefined}
+          />
+        </View>
+      </LabBlock>
+
+      <LabBlock title="ModuleArtwork">
+        <View style={styles.row}>
+          <ModuleArtwork moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} size={96} variant="hero" />
+          <ModuleArtwork moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} variant="row" />
+          <ModuleArtwork moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} variant="compact" />
+        </View>
+      </LabBlock>
+
+      <LabBlock title="ProductIdentity">
+        <ProductIdentity
+          name="Vault Notes"
+          subtitle="Private notes and knowledge"
+          publisher="Modula"
+          privateByDesign
+          verified
+        />
+      </LabBlock>
+
+      <LabBlock title="ProductActions">
+        <ProductActionGroup
+          presentation={installPresentation}
+          productName="Vault Notes"
+          onPrimary={() => setInstallReview(true)}
+        />
+      </LabBlock>
+
+      <LabBlock title="ProductMetadataStrip">
+        <ProductMetadataStrip
+          items={[
+            {id: 'privacy', value: 'PRIVATE', label: 'Privacy', detail: 'Account scoped'},
+            {id: 'version', value: '1.1.0', label: 'Version'},
+            {id: 'developer', value: 'MODULA', label: 'Developer'},
+            {id: 'source', value: 'VERIFIED', label: 'Source'},
+          ]}
+        />
+      </LabBlock>
+
+      <LabBlock title="ProductTabs">
+        <ProductTabs selected={productTab} onSelect={setProductTab} />
+      </LabBlock>
+
+      <LabBlock title="ProductCapabilityStrip">
+        <ProductCapabilityStrip
+          items={[
+            {id: 'privacy', icon: 'privacy', label: 'Privacy', value: 'Private', detail: 'Account-scoped records'},
+            {id: 'records', icon: 'note', label: 'Records', value: 'Notes & folders', detail: 'Declared storage'},
+            {id: 'source', icon: 'verified', label: 'Source', value: 'Verified', detail: 'Published by Modula'},
+          ]}
+        />
+      </LabBlock>
+
+      <LabBlock title="ProductPreviewCarousel">
+        <ProductPreviewCarousel productName="Vault Notes" frames={[]} />
+        <AppText variant="caption" colour="textSecondary">
+          Intentionally empty until verified running-module screenshots are captured.
+        </AppText>
+      </LabBlock>
+
+      <LabBlock title="ProductStickyHeader">
+        <View style={styles.stickyPreview}>
+          <ProductStickyHeader
+            visible
+            top={0}
+            moduleId={SAMPLE_MODULE.moduleId}
+            name={SAMPLE_MODULE.name}
+            presentation={installPresentation}
+            onPrimary={() => setInstallReview(true)}
+          />
+        </View>
+      </LabBlock>
+
+      <LabBlock title="InstallReview">
+        <ModulaButton label="Review Vault Notes install" onPress={() => setInstallReview(true)} />
+      </LabBlock>
+
+      <LabBlock title="ModuleRow">
+        <ModuleRow item={SAMPLE_MODULE} onPress={() => undefined} onAction={() => setInstallReview(true)} />
+      </LabBlock>
+
+      <LabBlock title="EditorialHero">
+        <ModuleEditorialHero item={SAMPLE_MODULE} onPress={() => undefined} onAction={() => setInstallReview(true)} />
+      </LabBlock>
+
+      <LabBlock title="ProductHubSearch">
+        <ProductHubSearchChrome
+          model={hubSearch}
+          compact={false}
+          onTrigger={() => dispatchHubSearch({type: 'TAP_SEARCH'})}
+          onChangeText={query => dispatchHubSearch({type: 'TYPE', query})}
+          onCancel={() => dispatchHubSearch({type: 'CANCEL'})}
+          onSettled={() => {
+            if (hubSearch.state === 'SEARCH_EXPANDING') dispatchHubSearch({type: 'GEOMETRY_SETTLED'})
+            if (hubSearch.state === 'SEARCH_COLLAPSING') dispatchHubSearch({type: 'COLLAPSE_COMPLETE'})
+          }}
+        />
+      </LabBlock>
+
+      <InstallPreviewSheet
+        module={SAMPLE_MODULE_DETAIL}
+        preview={null}
+        isPresented={installReview}
+        pending={false}
+        onDismiss={() => setInstallReview(false)}
+        onInstall={() => undefined}
+        onInstallAndEnable={() => undefined}
+      />
     </View>
   )
 }
@@ -362,6 +527,8 @@ function LabBlock({title, children}: {title: string; children: React.ReactNode})
 }
 
 const styles = StyleSheet.create({
+  chromePreview: {overflow: 'hidden', position: 'relative'},
   content: {paddingBottom: 48},
   row: {flexDirection: 'row', gap: 16},
+  stickyPreview: {height: 72, position: 'relative'},
 })
