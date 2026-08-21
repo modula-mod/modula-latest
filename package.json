@@ -253,7 +253,8 @@
     "verify:mainline": "node scripts/verify-phase7i-f5-auth-foundation.mjs mainline",
     "verify:phase7m-b8": "node scripts/verify-phase7m-b8.mjs",
     "verify:phase7m-b9": "node scripts/verify-phase7m-b9.mjs",
-    "verify:phase7m-b10": "node scripts/verify-phase7m-b10.mjs"
+    "verify:phase7m-b10": "node scripts/verify-phase7m-b10.mjs",
+    "verify:phase7n-a": "node scripts/verify-phase7n-a.mjs"
   },
   "private": true
 }
