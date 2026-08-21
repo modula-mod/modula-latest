@@ -15,8 +15,8 @@
 | PRODUCT_BRANCH | `cursor/phase7m-b8-founder-mockup-reconstruction` |
 | BASE | `origin/cursor/phase7m-b7-full-route-post-v2` @ `9bde9e7…` |
 | PRODUCT_SHA | 61af6d3c96fbec3af53caddbcbfb08751cf18711 |
-| PR | _(filled after open)_ |
-| WEB deploy | Pending FINAL_PRODUCT_SHA + clean VPS build |
+| PR | https://github.com/modula-mod/modula-latest/pull/33 |
+| WEB deploy | DEPLOYED web-only `ff6be1b722c1974cf0f0093adfc5af95165f9d96` → `/var/www/modula/releases/ff6be1b…`; previous `f0da1c1…` preserved; DB migration NONE |
 | DATABASE MIGRATION | **NONE** |
 | 7M-C | **NOT AUTHORISED** |
 
