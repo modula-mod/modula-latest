@@ -18,6 +18,11 @@ import {useModuleDetailQuery} from '@/features/modules/hooks'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 import type {ModuleDetail, ModuleInstallPreview, ModuleInstallationState} from '@/data/repositories/contracts'
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
+import {moduleIdentitySubtext} from '@/features/modules/identity/moduleIdentitySubtext'
+import {
+  CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  isVaultNotesModuleId,
+} from '@modula/greenfield-contracts'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {type ModulaIconName} from '@/platform/ui/icons'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
@@ -300,6 +305,16 @@ export function ModuleDetailScreen() {
                 </AppText>
               ) : null}
               <AppText variant="display">{copy.name}</AppText>
+              <AppText variant="caption" colour="textTertiary" accessibilityLabel="Module identity">
+                {moduleIdentitySubtext(module.moduleId, module.latestVersion)}
+              </AppText>
+              {isVaultNotesModuleId(module.moduleId) &&
+              module.latestVersion &&
+              module.latestVersion !== CANONICAL_VAULT_NOTES_CURRENT_VERSION ? (
+                <AppText variant="caption" colour="textTertiary">
+                  Registry {module.latestVersion} · candidate {CANONICAL_VAULT_NOTES_CURRENT_VERSION} not published yet
+                </AppText>
+              ) : null}
               <AppText variant="body" colour="textSecondary">{copy.short}</AppText>
               <AppText variant="caption" colour="textTertiary">
                 {copy.publisher}
