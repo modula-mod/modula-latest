@@ -19,7 +19,7 @@ export function ModuleArtwork({
   moduleId: string
   name?: string
   size?: number
-  variant?: 'icon' | 'hero' | 'scene'
+  variant?: 'icon' | 'hero' | 'row' | 'compact' | 'scene' | 'fallback'
   sceneHeight?: number
 }) {
   const pack = moduleArtworkPack(moduleId, name)
@@ -35,21 +35,28 @@ export function ModuleArtwork({
       </View>
     )
   }
-  const width = variant === 'hero' ? size * 1.6 : size
-  const height = size
+  const resolvedSize = variant === 'compact' ? 32 : variant === 'row' ? Math.max(size, 56) : size
+  const width = resolvedSize
+  const height = resolvedSize
+  const radius = variant === 'compact' ? 9 : variant === 'row' ? 14 : variant === 'hero' ? 24 : 14
   return (
     <View
       accessibilityLabel={`${pack.name} artwork`}
+      accessibilityRole="image"
       style={[
         styles.frame,
         {
           width,
           height,
           backgroundColor: pack.palette.wash,
-          borderRadius: variant === 'hero' ? 18 : 14,
+          borderRadius: radius,
         },
       ]}>
-      <ArtworkMark pack={pack} kind={pack.kind} size={Math.min(width, height)} />
+      <ArtworkMark
+        pack={pack}
+        kind={variant === 'fallback' ? 'fallback' : pack.kind}
+        size={Math.min(width, height)}
+      />
     </View>
   )
 }
@@ -107,7 +114,7 @@ function ArtworkMark({
   size,
 }: {
   pack: ModuleArtworkPack
-  kind: ModuleArtworkKind
+  kind: ModuleArtworkKind | 'fallback'
   size: number
 }) {
   const inset = size * 0.18

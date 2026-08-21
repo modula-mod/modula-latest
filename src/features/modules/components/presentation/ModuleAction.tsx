@@ -17,6 +17,7 @@ export function ModuleAction({
   compact = true,
   fullWidth = false,
   loading = false,
+  tone = 'catalogue',
   testID,
 }: {
   presentation: ModuleInstallPresentation
@@ -25,6 +26,7 @@ export function ModuleAction({
   compact?: boolean
   fullWidth?: boolean
   loading?: boolean
+  tone?: 'catalogue' | 'product'
   testID?: string
 }) {
   const {colours, radius, spacing} = useThemeTokens()
@@ -34,14 +36,19 @@ export function ModuleAction({
   const shown = blocked ? 'View' : label
   const primary = shown === 'Install' || shown === 'Update'
   const disabled = soon || loading || (!presentation.installable && shown === 'Install')
+  const productTone = tone === 'product' && !soon
   const backgroundColor = soon
     ? 'transparent'
+    : productTone
+      ? colours.text
     : primary
       ? colours.accent
       : colours.surface
-  const borderColor = soon || primary ? 'transparent' : colours.border
+  const borderColor = soon || primary || productTone ? 'transparent' : colours.border
   const labelColour = soon
     ? colours.textTertiary
+    : productTone
+      ? colours.canvas
     : primary
       ? colours.accentForeground
       : colours.text
@@ -72,7 +79,7 @@ export function ModuleAction({
         style={{
           color: labelColour,
           textAlign: 'center',
-          fontWeight: primary ? '600' : '500',
+          fontWeight: primary || productTone ? '700' : '500',
         }}>
         {loading ? `${shown}…` : shown}
       </AppText>
