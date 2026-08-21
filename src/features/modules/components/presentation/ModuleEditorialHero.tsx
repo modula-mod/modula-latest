@@ -54,13 +54,11 @@ export function ModuleEditorialHero({
   return (
     <View style={styles.feature} testID="module-editorial-hero">
       {href ? (
-        <Link href={href as Href}>
-          <Link.Trigger>
-            <Pressable accessibilityRole="link" accessibilityLabel={`Open featured ${copy.name}`}>
-              <Link.AppleZoom>{cover}</Link.AppleZoom>
-              {story}
-            </Pressable>
-          </Link.Trigger>
+        <Link href={href as Href} asChild>
+          <Pressable accessibilityRole="link" accessibilityLabel={`Open featured ${copy.name}`}>
+            <Link.AppleZoom>{cover}</Link.AppleZoom>
+            {story}
+          </Pressable>
         </Link>
       ) : (
         <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
