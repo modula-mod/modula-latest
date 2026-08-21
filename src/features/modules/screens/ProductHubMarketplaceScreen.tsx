@@ -1,16 +1,19 @@
-import {useCallback, useEffect, useMemo, useReducer, useRef} from 'react'
+import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react'
 import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Avatar} from '@/components/primitives/Avatar'
 import {useSession} from '@/auth/runtime'
 import type {ModuleCatalogueItem, ProductHubCategory} from '@/data/repositories/contracts'
 import {isLegacyVaultNotesModuleId} from '@modula/greenfield-contracts'
-import {ProductHubSearchChrome} from '@/features/modules/components/ProductHubSearchChrome'
+import {ProductHubHeader} from '@/features/modules/components/ProductHubHeader'
 import {
+  ProductHubSegmentedControl,
+  type ProductHubSegment,
+} from '@/features/modules/components/ProductHubSegmentedControl'
+import {
+  ComingSoonRow,
   HubSectionHeader,
   ModuleCategoryTile,
   ModuleCollection,
@@ -32,6 +35,7 @@ import {
   consumeProductHubOffset,
   rememberProductHubOffset,
 } from '@/features/modules/state/productHubScroll'
+import {selectionHaptic} from '@/lib/haptics'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -54,6 +58,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const [search, dispatch] = useReducer(reduceProductHubSearch, initialProductHubSearch)
+  const [segment, setSegment] = useState<ProductHubSegment>('discover')
   const catalogue = useModuleCatalogueQuery({
     q: '',
     category: 'All',
@@ -61,6 +66,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   const scrollRef = useRef<ScrollView>(null)
   const restored = useRef(false)
   const wide = width >= 960
+  const desktop = width >= 1100
   const searchActive = isProductHubSearchActive(search.state)
 
   useEffect(() => {
@@ -78,10 +84,25 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   )
 
   const featured = items.find(item => item.featured) ?? items.find(item => item.installable) ?? items[0]
-  const madeByModula = items.filter(item => item.publisherName === 'Modula' || item.publisherId === 'modula')
-  const available = items.filter(item => item.installable && !isInstalledModuleState(item.installationState))
+  const featuredId = featured?.moduleId
+  const madeByModula = items.filter(
+    item =>
+      item.moduleId !== featuredId &&
+      (item.publisherName === 'Modula' || item.publisherId === 'modula'),
+  )
+  const available = items.filter(
+    item =>
+      item.installable &&
+      !isInstalledModuleState(item.installationState) &&
+      item.moduleId !== featuredId &&
+      resolveModuleInstallPresentation(item).primaryAction !== 'Soon',
+  )
+  const comingSoon = items.filter(
+    item => item.moduleId !== featuredId && resolveModuleInstallPresentation(item).primaryAction === 'Soon',
+  )
   const yours = items.filter(item => isInstalledModuleState(item.installationState))
   const updates = items.filter(item => item.installationState === 'updateAvailable')
+  const yoursOnDiscover = yours.filter(item => item.moduleId !== featuredId)
 
   const openModule = (moduleId: string) => {
     rememberProductHubOffset(consumeProductHubOffset())
@@ -94,6 +115,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   }
 
   const onAction = (item: ModuleCatalogueItem) => {
+    void selectionHaptic()
     const presentation = resolveModuleInstallPresentation(item)
     if (presentation.primaryAction === 'Open') {
       router.push(`/module/${encodeURIComponent(item.moduleId)}` as Href)
@@ -129,53 +151,25 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <View
-        style={[
-          styles.chrome,
-          {
-            paddingTop: insets.top + spacing[2],
-            paddingHorizontal: spacing[4],
-            zIndex: LAYERS.sticky,
-            backgroundColor: colours.canvas,
-          },
-        ]}>
-        <View style={styles.titleRow}>
-          <AppText variant={search.compact && !searchActive ? 'headline' : 'display'}>Product Hub</AppText>
-          <View style={styles.titleActions}>
-            {search.compact || searchActive ? (
-              <ProductHubSearchChrome
-                model={search}
-                compact={search.compact && !searchActive}
-                onTrigger={() => dispatch({type: 'TAP_SEARCH'})}
-                onChangeText={text => dispatch({type: 'TYPE', query: text})}
-                onCancel={() => dispatch({type: 'CANCEL'})}
-                onSettled={onSettled}
-              />
-            ) : null}
-            <AppPressable
-              accessibilityLabel="Open profile"
-              onPress={() => router.push('/profile' as Href)}>
-              <Avatar name={profileName} uri={profileUri} size={32} />
-            </AppPressable>
-          </View>
-        </View>
-        {!search.compact && !searchActive ? (
-          <View style={{gap: spacing[3], paddingBottom: spacing[3]}}>
-            <AppText variant="body" colour="textSecondary">
-              Discover modules built for Modula.
-            </AppText>
-            <ProductHubSearchChrome
-              model={search}
-              compact={false}
-              onTrigger={() => dispatch({type: 'TAP_SEARCH'})}
-              onChangeText={text => dispatch({type: 'TYPE', query: text})}
-              onCancel={() => dispatch({type: 'CANCEL'})}
-              onSettled={onSettled}
-            />
-          </View>
-        ) : null}
+        style={{
+          paddingTop: insets.top + spacing[2],
+          zIndex: LAYERS.sticky,
+          backgroundColor: colours.canvas,
+        }}>
+        <ProductHubHeader
+          compact={search.compact}
+          search={search}
+          profileName={profileName}
+          profileUri={profileUri}
+          onSearchTrigger={() => dispatch({type: 'TAP_SEARCH'})}
+          onSearchChange={text => dispatch({type: 'TYPE', query: text})}
+          onSearchCancel={() => dispatch({type: 'CANCEL'})}
+          onSearchSettled={onSettled}
+          onProfilePress={() => router.push('/profile' as Href)}
+        />
       </View>
 
-      <ResponsiveContent maxWidth={wide ? 1100 : 860}>
+      <ResponsiveContent maxWidth={desktop ? 1120 : wide ? 860 : 860}>
         <ScrollView
           ref={scrollRef}
           onScroll={event => {
@@ -203,18 +197,48 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
               onBrowse={category => dispatch({type: 'TYPE', query: category})}
             />
           ) : (
-            <EditorialLanding
-              featured={featured}
-              available={available}
-              madeByModula={madeByModula}
-              yours={yours}
-              updates={updates}
-              items={items}
-              pending={catalogue.isPending}
-              wide={wide}
-              onOpen={openModule}
-              onAction={onAction}
-            />
+            <>
+              <ProductHubSegmentedControl
+                value={segment}
+                onChange={next => {
+                  void selectionHaptic()
+                  setSegment(next)
+                }}
+                updatesDisabled={!updates.length}
+              />
+              {segment === 'installed' ? (
+                <InstalledMode
+                  yours={yours}
+                  pending={catalogue.isPending}
+                  onOpen={openModule}
+                  onAction={onAction}
+                />
+              ) : null}
+              {segment === 'updates' ? (
+                <UpdatesMode
+                  updates={updates}
+                  pending={catalogue.isPending}
+                  onOpen={openModule}
+                  onAction={onAction}
+                />
+              ) : null}
+              {segment === 'discover' ? (
+                <EditorialLanding
+                  featured={featured}
+                  available={available}
+                  comingSoon={comingSoon}
+                  madeByModula={madeByModula}
+                  yours={yoursOnDiscover}
+                  updates={updates}
+                  items={items}
+                  featuredId={featuredId}
+                  pending={catalogue.isPending}
+                  wide={wide}
+                  onOpen={openModule}
+                  onAction={onAction}
+                />
+              ) : null}
+            </>
           )}
         </ScrollView>
       </ResponsiveContent>
@@ -225,10 +249,12 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
 function EditorialLanding({
   featured,
   available,
+  comingSoon,
   madeByModula,
   yours,
   updates,
   items,
+  featuredId,
   pending,
   wide,
   onOpen,
@@ -236,10 +262,12 @@ function EditorialLanding({
 }: {
   featured?: ModuleCatalogueItem
   available: ModuleCatalogueItem[]
+  comingSoon: ModuleCatalogueItem[]
   madeByModula: ModuleCatalogueItem[]
   yours: ModuleCatalogueItem[]
   updates: ModuleCatalogueItem[]
   items: ModuleCatalogueItem[]
+  featuredId?: string
   pending: boolean
   wide: boolean
   onOpen: (moduleId: string) => void
@@ -257,10 +285,11 @@ function EditorialLanding({
     <View style={[styles.landing, wide ? styles.landingWide : null, {gap: spacing[6]}]}>
       {featured ? (
         <SectionEnter delay={0}>
-          <View style={{gap: spacing[2]}}>
+          <View style={{gap: spacing[2]}} testID="product-hub-featured">
             <HubSectionHeader title="FEATURED" icon="sparkles" eyebrow />
             <ModuleEditorialHero
               item={featured}
+              href={`/marketplace/${encodeURIComponent(featured.moduleId)}`}
               onPress={() => onOpen(featured.moduleId)}
               onAction={() => onAction(featured)}
             />
@@ -270,7 +299,7 @@ function EditorialLanding({
 
       {available.length ? (
         <SectionEnter delay={40}>
-          <View>
+          <View testID="product-hub-new-for-modula">
             <HubSectionHeader title="New for Modula" icon="download" />
             {available.map((item, index) => (
               <ModuleRow
@@ -285,12 +314,32 @@ function EditorialLanding({
         </SectionEnter>
       ) : null}
 
+      {comingSoon.length ? (
+        <SectionEnter delay={60}>
+          <View testID="product-hub-coming-soon">
+            <HubSectionHeader title="Coming Soon" icon="clock" />
+            {comingSoon.map((item, index) => (
+              <ComingSoonRow
+                key={`soon-${item.moduleId}`}
+                item={item}
+                onPress={() => onOpen(item.moduleId)}
+                showSeparator={index < comingSoon.length - 1}
+              />
+            ))}
+          </View>
+        </SectionEnter>
+      ) : null}
+
       <SectionEnter delay={80}>
-        <ModuleShelf title="Made by Modula" items={madeByModula} onOpen={onOpen} icon="modules" />
+        <View testID="product-hub-made-by-modula">
+          <ModuleShelf title="Made by Modula" items={madeByModula} onOpen={onOpen} icon="modules" />
+        </View>
       </SectionEnter>
 
       {PRODUCT_HUB_COLLECTIONS.map((collection, index) => {
-        const members = items.filter(item => collection.moduleIds.includes(item.moduleId))
+        const members = items.filter(
+          item => collection.moduleIds.includes(item.moduleId) && item.moduleId !== featuredId,
+        )
         return (
           <SectionEnter key={collection.id} delay={120 + index * 40}>
             <ModuleCollection
@@ -306,7 +355,7 @@ function EditorialLanding({
 
       {yours.length ? (
         <SectionEnter delay={200}>
-          <View>
+          <View testID="product-hub-your-modules">
             <HubSectionHeader title="Your modules" icon="check" />
             {yours.map((item, index) => (
               <ModuleRow
@@ -341,6 +390,92 @@ function EditorialLanding({
   )
 }
 
+function InstalledMode({
+  yours,
+  pending,
+  onOpen,
+  onAction,
+}: {
+  yours: ModuleCatalogueItem[]
+  pending: boolean
+  onOpen: (moduleId: string) => void
+  onAction: (item: ModuleCatalogueItem) => void
+}) {
+  if (pending) {
+    return (
+      <AppText variant="caption" colour="textSecondary">
+        Loading catalogue.
+      </AppText>
+    )
+  }
+  if (!yours.length) {
+    return (
+      <PageIntro
+        eyebrow="Installed"
+        icon="modules"
+        title="No modules installed"
+        body="Modules you install will appear here."
+      />
+    )
+  }
+  return (
+    <View testID="product-hub-installed">
+      {yours.map((item, index) => (
+        <ModuleRow
+          key={`installed-${item.moduleId}`}
+          item={item}
+          onPress={() => onOpen(item.moduleId)}
+          onAction={() => onAction(item)}
+          showSeparator={index < yours.length - 1}
+        />
+      ))}
+    </View>
+  )
+}
+
+function UpdatesMode({
+  updates,
+  pending,
+  onOpen,
+  onAction,
+}: {
+  updates: ModuleCatalogueItem[]
+  pending: boolean
+  onOpen: (moduleId: string) => void
+  onAction: (item: ModuleCatalogueItem) => void
+}) {
+  if (pending) {
+    return (
+      <AppText variant="caption" colour="textSecondary">
+        Loading catalogue.
+      </AppText>
+    )
+  }
+  if (!updates.length) {
+    return (
+      <PageIntro
+        eyebrow="Updates"
+        icon="update"
+        title="You’re up to date"
+        body="When a module has an update, it will appear here."
+      />
+    )
+  }
+  return (
+    <View testID="product-hub-updates">
+      {updates.map((item, index) => (
+        <ModuleRow
+          key={`update-${item.moduleId}`}
+          item={item}
+          onPress={() => onOpen(item.moduleId)}
+          onAction={() => onAction(item)}
+          showSeparator={index < updates.length - 1}
+        />
+      ))}
+    </View>
+  )
+}
+
 function SearchMode({
   query,
   suggested,
@@ -369,9 +504,13 @@ function SearchMode({
         <AppText variant="caption" colour="textTertiary">
           “{query}”
         </AppText>
-        {pending ? <AppText variant="caption" colour="textSecondary">Searching…</AppText> : null}
+        {pending ? (
+          <AppText variant="caption" colour="textSecondary" testID="product-hub-search-loading">
+            Searching…
+          </AppText>
+        ) : null}
         {error ? (
-          <AppText variant="body" colour="destructive">
+          <AppText variant="body" colour="destructive" testID="product-hub-search-error">
             Product Hub search couldn&apos;t load. Try again.
           </AppText>
         ) : null}
@@ -404,7 +543,7 @@ function SearchMode({
           </View>
         ) : null}
         {!pending && !error && !results.length ? (
-          <AppText variant="body" colour="textSecondary">
+          <AppText variant="body" colour="textSecondary" testID="product-hub-search-empty">
             No matching modules or tools.
           </AppText>
         ) : null}
@@ -445,12 +584,9 @@ function matchesQuery(item: ModuleCatalogueItem, query: string): boolean {
 }
 
 const styles = StyleSheet.create({
-  chrome: {width: '100%'},
   content: {paddingHorizontal: 16, paddingTop: 8},
   landing: {width: '100%'},
-  landingWide: {alignSelf: 'center', maxWidth: 1100, width: '100%'},
+  landingWide: {alignSelf: 'center', maxWidth: 1120, width: '100%'},
   screen: {flex: 1},
   tiles: {flexDirection: 'row', flexWrap: 'wrap', gap: 12},
-  titleActions: {alignItems: 'center', flexDirection: 'row', gap: 12},
-  titleRow: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', minHeight: 44},
 })
