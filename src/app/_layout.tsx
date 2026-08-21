@@ -11,6 +11,7 @@ import {SessionProvider} from '@/auth/runtime'
 import {QueryRuntimeProvider} from '@/data/query'
 import {ProductPreferencesProvider} from '@/features/product/runtime/ProductPreferencesProvider'
 import {ProfilePresentationProvider} from '@/features/profile/runtime/ProfilePresentationProvider'
+import {AppLockGate, AppLockProvider} from '@/features/security/app-lock'
 import '@/features/social/registerExpansionDestinations'
 import {AccountPanelProvider} from '@/platform/ui/navigation/AccountPanelContext'
 import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
@@ -96,16 +97,19 @@ export default function RootLayout() {
           <QueryRuntimeProvider>
             <SessionProvider>
               <AppearanceProvider>
-                <ProductPreferencesProvider>
-                  <ProfilePresentationProvider>
-                    <AccountPanelProvider>
-                      <ShellDrawerProvider>
-                        <RootNavigator />
-                        <NetworkStatusBanner />
-                      </ShellDrawerProvider>
-                    </AccountPanelProvider>
-                  </ProfilePresentationProvider>
-                </ProductPreferencesProvider>
+                <AppLockProvider>
+                  <ProductPreferencesProvider>
+                    <ProfilePresentationProvider>
+                      <AccountPanelProvider>
+                        <ShellDrawerProvider>
+                          <RootNavigator />
+                          <NetworkStatusBanner />
+                          <AppLockGate />
+                        </ShellDrawerProvider>
+                      </AccountPanelProvider>
+                    </ProfilePresentationProvider>
+                  </ProductPreferencesProvider>
+                </AppLockProvider>
               </AppearanceProvider>
             </SessionProvider>
           </QueryRuntimeProvider>

@@ -157,3 +157,12 @@ Pattern (not a package): [telegram-join-animation](https://github.com/mahdidavoo
 **Owner use cases:** Presence join island + Appearance Advanced motion Preview + Home pull-to-refresh shimmering edge (`src/platform/ui/refresh/`). Reanimated/LinearGradient fallback when Skia is not linked.
 
 Removal path: drop `ModulaJoinIsland` call sites, then remove `@shopify/react-native-skia` and native rebuild.
+
+
+## Phase 7M-B8 — Local App Lock (founder security mockups)
+
+| Package | Version | Purpose | Native | Storage/security role | Evidence | Added in |
+|---|---:|---|---|---|---|---|
+| expo-local-authentication | ~16.0.5 | Optional biometric unlock for **local-only** App Lock (Face ID / Touch ID / fingerprint). Credentials and PIN/pattern/password hashes stay on-device via SecureStore; nothing is sent to Modula servers. | Yes | Biometric prompt only; no Modula secret upload | `pnpm add -w expo-local-authentication@~16.0.5` (Expo install hung in agent environment; version matches SDK 57 matrix) | Phase 7M-B8 |
+
+Removal path: delete App Lock biometric method + uninstall package; PIN/password/pattern remain via SecureStore.

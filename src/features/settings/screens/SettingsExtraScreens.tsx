@@ -324,16 +324,18 @@ export function SecuritySettingsScreen() {
   return (
     <SettingsScreen
       title="Security"
-      caption="Sessions, credentials, recovery methods, and account protection. Controls only appear when backed by Greenfield state."
+      caption="Sessions, credentials, local App Lock, and account protection. Controls only appear when backed by Greenfield state or on-device storage."
       right={
         <SettingsOverflowMenu
           title="Security"
           actions={[
+            {id: 'app-lock', label: 'Local App Lock'},
             {id: 'sessions', label: 'Active sessions'},
             {id: 'password', label: 'Password management'},
             {id: 'account', label: 'Account settings'},
           ]}
           onAction={id => {
+            if (id === 'app-lock') router.push('/settings/app-lock' as Href)
             if (id === 'sessions') router.push('/settings/account/sessions' as Href)
             if (id === 'password') router.push('/settings/account/password' as Href)
             if (id === 'account') router.push('/settings/account' as Href)
@@ -398,6 +400,30 @@ export function SecuritySettingsScreen() {
             description: 'Sign-in email remains the recovery identity for this beta.',
             icon: 'account',
             route: '/settings/account/email',
+          }}
+          last
+        />
+      </SettingsSection>
+      <SettingsSection title="Local App Lock">
+        <SettingsLinkRow
+          row={{
+            title: 'App Lock',
+            description:
+              'PIN, password, pattern, or biometrics — stored only on this device.',
+            icon: 'privacy',
+            route: '/settings/app-lock',
+          }}
+          last
+        />
+      </SettingsSection>
+      <SettingsSection title="Trusted devices & recovery">
+        <SettingsLinkRow
+          row={{
+            title: 'Devices & sessions',
+            description:
+              'Review signed-in sessions. App Lock secrets stay on-device and are separate from account sessions.',
+            icon: 'security',
+            route: '/settings/account/sessions',
           }}
           last
         />
