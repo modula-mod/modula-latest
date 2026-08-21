@@ -83,7 +83,11 @@ const SAMPLE_MODULE_DETAIL = {
 /**
  * State matrix for Modula primitives that flagship screens must prove in 7M-B2.
  */
-export function ModulaPrimitivesLabScreen() {
+export function ModulaPrimitivesLabScreen({
+  initialInstallReviewOpen = false,
+}: {
+  initialInstallReviewOpen?: boolean
+} = {}) {
   const {colours, spacing, radius} = useThemeTokens()
   const [segment, setSegment] = useState('Following')
   const [secure, setSecure] = useState('secret-value')
@@ -94,7 +98,7 @@ export function ModulaPrimitivesLabScreen() {
   const [sheet, setSheet] = useState(false)
   const [page, setPage] = useState('overview')
   const [productTab, setProductTab] = useState<ProductTabId>('overview')
-  const [installReview, setInstallReview] = useState(false)
+  const [installReview, setInstallReview] = useState(initialInstallReviewOpen)
   const [hubSearch, dispatchHubSearch] = useReducer(reduceProductHubSearch, initialProductHubSearch)
   const installPresentation = resolveModuleInstallPresentation(SAMPLE_MODULE)
 

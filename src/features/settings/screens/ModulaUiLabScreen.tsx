@@ -1,3 +1,5 @@
+import {useLocalSearchParams} from 'expo-router'
+
 import {
   SettingsCaption,
   SettingsScreen,
@@ -7,6 +9,7 @@ import {canAccessDeveloperLabs} from '@/lib/platform'
 import {ModulaPrimitivesLabScreen} from '@/platform/ui/dev/modula-primitives-lab'
 
 export function ModulaUiLabRouteScreen() {
+  const {installReview} = useLocalSearchParams<{installReview?: string}>()
   if (!canAccessDeveloperLabs()) {
     return (
       <SettingsScreen title="Modula UI Lab">
@@ -17,7 +20,7 @@ export function ModulaUiLabRouteScreen() {
   }
   return (
     <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — quality compare plus flagship primitive matrix for Direction M.">
-      <ModulaPrimitivesLabScreen />
+      <ModulaPrimitivesLabScreen initialInstallReviewOpen={installReview === '1'} />
     </SettingsScreen>
   )
 }

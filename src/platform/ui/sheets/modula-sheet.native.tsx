@@ -42,14 +42,17 @@ export function ModulaSheet({
   accessibilityLabel,
 }: ModulaSheetProps) {
   const {colours, spacing, radius, scheme, resolvedColourMode} = useThemeTokens()
-  const {width: windowWidth, height: windowHeight} = useWindowDimensions()
+  const {width: windowWidth, height: windowHeight, fontScale} = useWindowDimensions()
   const {reduceTransparency} = useSystemAccessibility()
   const reduceMotion = useReduceMotion()
   const useGlass = material === 'glass' && !reduceTransparency && Platform.OS === 'ios'
   const contentWidth = Math.max(280, windowWidth - 32)
   const structured = Boolean(header || footer)
   const resolvedSnapPoints = nativeSnapPoints(snapPoints ?? snapPointsForDetent(detent))
-  const maxBody = Math.round(windowHeight * (detent === 'medium' ? 0.56 : 0.92))
+  const needsAccessibilityHeight = structured && fontScale > 1.2
+  const maxBody = Math.round(
+    windowHeight * (detent === 'medium' && !needsAccessibilityHeight ? 0.56 : 0.92),
+  )
 
   useEffect(() => {
     if (!obscureShellChrome) return

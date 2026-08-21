@@ -73,7 +73,7 @@ export function InstallPreviewSheet({
         onPress={onOpen}
         testID="module-install-open"
       />
-      <ModulaButton label="Done" role="plain" onPress={onDismiss} />
+      <ModulaButton label="Done" role="plain" fullWidth onPress={onDismiss} />
     </View>
   ) : (
     <View style={{gap: spacing[2]}}>
@@ -86,7 +86,13 @@ export function InstallPreviewSheet({
         onPress={onInstallAndEnable}
         testID="module-install-confirm"
       />
-      <ModulaButton label="Cancel" role="plain" disabled={pending || installing} onPress={onDismiss} />
+      <ModulaButton
+        label="Cancel"
+        role="plain"
+        disabled={pending || installing}
+        fullWidth
+        onPress={onDismiss}
+      />
     </View>
   )
 
