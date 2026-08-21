@@ -15,3 +15,11 @@ export async function lightImpactHaptic(): Promise<void> {
     // Haptics are optional in Phase 1.
   }
 }
+
+export async function successHaptic(): Promise<void> {
+  try {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+  } catch {
+    // Haptics are optional and silent on web.
+  }
+}

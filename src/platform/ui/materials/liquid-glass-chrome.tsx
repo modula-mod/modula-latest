@@ -42,6 +42,7 @@ type ExpoGlassViewComponent = ComponentType<{
   style?: StyleProp<ViewStyle>
   glassEffectStyle?: string
   colorScheme?: 'light' | 'dark'
+  isInteractive?: boolean
   children?: ReactNode
 }>
 
@@ -158,6 +159,7 @@ export function LiquidGlassChrome({
     return (
       <LoadedExpoGlassView
         glassEffectStyle={effect}
+        isInteractive={interactive}
         colorScheme={isDark ? 'dark' : 'light'}
         style={[styles.base, styles.shadow, style]}>
         {children}
