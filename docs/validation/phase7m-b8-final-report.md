@@ -14,7 +14,7 @@
 | --- | --- |
 | PRODUCT_BRANCH | `cursor/phase7m-b8-founder-mockup-reconstruction` |
 | BASE | `origin/cursor/phase7m-b7-full-route-post-v2` @ `9bde9e7…` |
-| PRODUCT_SHA | _(filled after commit)_ |
+| PRODUCT_SHA | 61af6d3c96fbec3af53caddbcbfb08751cf18711 |
 | PR | _(filled after open)_ |
 | WEB deploy | Pending FINAL_PRODUCT_SHA + clean VPS build |
 | DATABASE MIGRATION | **NONE** |
