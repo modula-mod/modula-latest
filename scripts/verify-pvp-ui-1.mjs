@@ -211,6 +211,15 @@ if (ci) {
   spawn('WEB BUILD', 'pnpm', ['build:web'])
   spawn('WEB VERIFY', 'pnpm', ['verify:web-build'])
   spawn('EXPO INSTALL CHECK', 'pnpm', ['exec', 'expo', 'install', '--check'])
+  const doctor = spawnSync('pnpm', ['exec', 'expo-doctor'], {cwd: root, encoding: 'utf8'})
+  const doctorOut = `${doctor.stdout || ''}\n${doctor.stderr || ''}`
+  const expectedWarning = /CNG|native folder|prebuild/i.test(doctorOut)
+  const doctorOk = doctor.status === 0 || (doctor.status === 1 && expectedWarning)
+  record(
+    'EXPO DOCTOR',
+    doctorOk,
+    doctor.status === 0 ? 'clean' : expectedWarning ? 'PASS_WITH_EXPECTED_WARNING' : doctorOut.trim().split('\n').slice(-4).join(' | '),
+  )
   spawn('GIT DIFF CHECK', 'git', ['diff', '--check'])
 }
 
