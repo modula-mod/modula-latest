@@ -12,9 +12,10 @@ import {
 } from '@/platform/ui/dev/modula-primitives-lab'
 
 export function ModulaUiLabRouteScreen() {
-  const {installReview, productHero} = useLocalSearchParams<{
+  const {installReview, productHero, productOverview} = useLocalSearchParams<{
     installReview?: string
     productHero?: string
+    productOverview?: string
   }>()
   if (!canAccessDeveloperLabs()) {
     return (
@@ -24,7 +25,9 @@ export function ModulaUiLabRouteScreen() {
       </SettingsScreen>
     )
   }
-  if (productHero === '1') return <ProductHeroLabScreen />
+  if (productHero === '1') {
+    return <ProductHeroLabScreen initialOverviewOffset={productOverview === '1'} />
+  }
   return (
     <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — quality compare plus flagship primitive matrix for Direction M.">
       <ModulaPrimitivesLabScreen initialInstallReviewOpen={installReview === '1'} />

@@ -161,6 +161,8 @@ export type ModuleDetail = ModuleCatalogueItem & {
   manifestChecksum?: string
   releaseChecksum?: string | null
   releaseNotes?: string[]
+  releasePublishedAt?: string | null
+  releaseSizeBytes?: number | null
   privacy?: string
   standard?: ModuleStandardMetadata
   manifest?: Record<string, unknown>

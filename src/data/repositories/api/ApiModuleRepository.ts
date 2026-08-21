@@ -348,6 +348,7 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
   const publisher = (row.publisher ?? {}) as Record<string, unknown>
   const placeholder = (row.placeholder ?? {}) as Record<string, unknown>
   const source = (row.source ?? {}) as Record<string, unknown>
+  const release = (row.release ?? {}) as Record<string, unknown>
   const manifest = (row.manifest ?? row.placeholder ?? {}) as Record<string, unknown>
   const backendSource = isRecord(manifest.backend) ? manifest.backend : isRecord(row.backend) ? row.backend : undefined
   return {
@@ -373,8 +374,20 @@ function decodeModuleDetail(value: unknown): ModuleDetail {
     manifestChecksum: typeof row.manifestSha256 === 'string' ? row.manifestSha256 : undefined,
     releaseChecksum: typeof row.releaseSha256 === 'string' ? row.releaseSha256 : null,
     releaseNotes: Array.isArray(row.releaseNotes) ? row.releaseNotes.map(String) : [],
+    releasePublishedAt:
+      typeof row.publishedAt === 'string'
+        ? row.publishedAt
+        : typeof release.publishedAt === 'string'
+          ? release.publishedAt
+          : null,
+    releaseSizeBytes: finiteNumber(row.releaseSizeBytes ?? row.packageSizeBytes ?? release.sizeBytes),
     privacy: typeof row.privacy === 'string' ? row.privacy : typeof manifest.privacy === 'string' ? manifest.privacy : undefined,
   }
+}
+
+function finiteNumber(value: unknown): number | null {
+  const number = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : Number.NaN
+  return Number.isFinite(number) && number >= 0 ? number : null
 }
 
 function decodeBackendMetadata(value: unknown, moduleId: string): ModuleBackendMetadata {

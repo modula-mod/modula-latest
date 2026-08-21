@@ -4,20 +4,20 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export type ProductTabId = 'overview' | 'features' | 'permissions' | 'versions' | 'related'
+export type ProductTabId = 'overview' | 'features' | 'permissions' | 'reviews' | 'related'
 
 export const PRODUCT_TABS: {id: ProductTabId; label: string}[] = [
   {id: 'overview', label: 'Overview'},
   {id: 'features', label: 'Features'},
   {id: 'permissions', label: 'Permissions'},
-  {id: 'versions', label: 'Versions'},
+  {id: 'reviews', label: 'Reviews'},
   {id: 'related', label: 'Related'},
 ]
 
 export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSelect: (tab: ProductTabId) => void}) {
   const {colours, radius} = useThemeTokens()
-  const {fontScale} = useWindowDimensions()
-  const scrollable = fontScale > 1.2
+  const {fontScale, width} = useWindowDimensions()
+  const scrollable = fontScale > 1.15 || width < 380
   const tabs = PRODUCT_TABS.map(tab => {
     const active = tab.id === selected
     return (

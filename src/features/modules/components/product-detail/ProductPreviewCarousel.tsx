@@ -17,6 +17,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {LAYERS} from '@/theme/tokens/layers'
 import {scrimColour} from '@/theme/tokens/scrim'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -45,7 +46,31 @@ export function ProductPreviewCarousel({
   const gap = spacing[3]
   const open = frames.find(frame => frame.id === openId) ?? null
 
-  if (!frames.length) return null
+  if (!frames.length) {
+    return (
+      <View style={{gap: spacing[3]}} testID="product-preview-carousel">
+        <AppText variant="headline" accessibilityRole="header">Preview</AppText>
+        <View
+          accessibilityLabel={`${productName} screenshots are not available for this release`}
+          style={[
+            styles.empty,
+            {
+              borderColor: colours.separator,
+              gap: spacing[3],
+              paddingVertical: spacing[4],
+            },
+          ]}>
+          <ModulaIcon name="module" size={20} colour={colours.textTertiary} />
+          <View style={{flex: 1, gap: spacing[1]}}>
+            <AppText variant="label">Screenshots not available</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              This registry release does not include verified product preview media yet.
+            </AppText>
+          </View>
+        </View>
+      </View>
+    )
+  }
 
   const move = (direction: -1 | 1) => {
     const next = Math.min(frames.length - 1, Math.max(0, page + direction))
@@ -179,6 +204,12 @@ const styles = StyleSheet.create({
     minHeight: 430,
     overflow: 'hidden',
     paddingTop: 18,
+  },
+  empty: {
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
   },
   headingRow: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
   headline: {minHeight: 62, paddingHorizontal: 18, textAlign: 'center'},

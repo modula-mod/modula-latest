@@ -48,5 +48,5 @@ export function ProductIdentity({
 const styles = StyleSheet.create({
   identity: {minWidth: 0},
   publisher: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap'},
-  title: {fontSize: 29, letterSpacing: -0.65, lineHeight: 33},
+  title: {fontSize: 34, letterSpacing: -0.9, lineHeight: 39},
 })

@@ -7,7 +7,7 @@ export function ProductDescription({children}: {children: string}) {
   const {spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[2]}} testID="product-description">
-      <AppText variant="headline" accessibilityRole="header">About this product</AppText>
+      <AppText variant="headline" accessibilityRole="header">Description</AppText>
       <AppText variant="body" colour="textSecondary">{children}</AppText>
     </View>
   )

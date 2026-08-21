@@ -68,6 +68,7 @@ export function ModuleDetailScreen() {
   const [installError, setInstallError] = useState<string | null>(null)
   const [selectedTab, setSelectedTab] = useState<ProductTabId>('overview')
   const [informationOpen, setInformationOpen] = useState<string | null>(null)
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
   const [heroActionBottom, setHeroActionBottom] = useState(360)
   const [scrollOffset, setScrollOffset] = useState(0)
 
@@ -189,11 +190,11 @@ export function ModuleDetailScreen() {
   const installed = isInstalledModuleState(module.installationState)
   const platforms = platformsFor(module)
   const releaseNotes = module.releaseNotes?.filter(Boolean) ?? []
-  const metadata = metadataFor(module, platforms)
+  const metadata = metadataFor(module)
   const capabilities = capabilitiesFor(module, platforms)
   const information = informationFor(module)
   const permissionGroups = presentPermissions(module.permissions, copy.name).groups
-  const previewFrames = previewsFor(module.moduleId)
+  const previewFrames = previewsFor(module)
   const stackedIdentity = width < 330
   const heroArtworkSize = Math.min(116, Math.max(94, Math.round(width * 0.25)))
   const stickyVisible = scrollOffset > heroActionBottom
@@ -317,11 +318,14 @@ export function ModuleDetailScreen() {
               capabilities={capabilities}
               platforms={platforms}
               releaseNotes={releaseNotes}
+              releaseDate={module.releasePublishedAt}
               previewFrames={previewFrames}
               information={information}
               informationOpen={informationOpen}
               onInformation={id => setInformationOpen(current => current === id ? null : id)}
               permissionGroups={permissionGroups}
+              versionHistoryOpen={versionHistoryOpen}
+              onVersionHistory={() => setVersionHistoryOpen(current => !current)}
               onProductHub={() => router.push('/product' as Href)}
             />
           </View>
@@ -361,11 +365,14 @@ function TabContent({
   capabilities,
   platforms,
   releaseNotes,
+  releaseDate,
   previewFrames,
   information,
   informationOpen,
   onInformation,
   permissionGroups,
+  versionHistoryOpen,
+  onVersionHistory,
   onProductHub,
 }: {
   tab: ProductTabId
@@ -375,11 +382,14 @@ function TabContent({
   capabilities: ProductCapabilityItem[]
   platforms: string[]
   releaseNotes: string[]
+  releaseDate?: string | null
   previewFrames: ProductPreviewFrame[]
   information: ProductInformationItem[]
   informationOpen: string | null
   onInformation: (id: string) => void
   permissionGroups: ReturnType<typeof presentPermissions>['groups']
+  versionHistoryOpen: boolean
+  onVersionHistory: () => void
   onProductHub: () => void
 }) {
   const {spacing} = useThemeTokens()
@@ -412,8 +422,15 @@ function TabContent({
     )
   }
 
-  if (tab === 'versions') {
-    return <ProductWhatsNew version={module.latestVersion} releaseNotes={releaseNotes} />
+  if (tab === 'reviews') {
+    return (
+      <View style={{gap: spacing[2]}}>
+        <AppText variant="headline" accessibilityRole="header">Reviews</AppText>
+        <AppText variant="body" colour="textSecondary">
+          Ratings and reviews are not available in Product Hub yet.
+        </AppText>
+      </View>
+    )
   }
 
   if (tab === 'related') {
@@ -429,11 +446,18 @@ function TabContent({
   return (
     <>
       <ProductCapabilityStrip items={capabilities} />
-      <ProductWhatsNew version={module.latestVersion} releaseNotes={releaseNotes} />
+      <ProductWhatsNew
+        version={module.latestVersion}
+        releaseDate={releaseDate}
+        releaseNotes={releaseNotes}
+        versionHistoryOpen={versionHistoryOpen}
+        onVersionHistory={module.latestVersion ? onVersionHistory : undefined}
+      />
       <ProductPreviewCarousel productName={productName} frames={previewFrames} />
       <ProductPlatformRow platforms={platforms} />
       <ProductDescription>{description}</ProductDescription>
       <View style={{gap: spacing[3]}}>
+        <AppText variant="headline" accessibilityRole="header">Module Information</AppText>
         <ProductInformationStrip items={information.map(item => ({...item, onPress: () => onInformation(item.id)}))} />
         {informationOpen ? <InformationDetail module={module} section={informationOpen} /> : null}
         <ProductInformationDisclosure label="Information" onPress={() => onInformation(informationOpen ?? 'privacy')} />
@@ -465,6 +489,7 @@ function InformationDetail({module, section}: {module: ModuleDetail; section: st
       {section === 'source' ? (
         <>
           <AppText variant="label">Trust and provenance</AppText>
+          <InfoRow label="Licence" value={licenseLabelFor(module)} />
           <InfoRow label="Canonical repository" value={vault ? VAULT_NOTES_CANONICAL_SOURCE : module.sourceRepository || 'Not declared'} />
           <InfoRow label="Registry release" value={module.latestVersion ?? 'Not published'} />
           {vault ? <InfoRow label="Canonical source release" value={CANONICAL_VAULT_NOTES_CURRENT_VERSION} /> : null}
@@ -474,9 +499,9 @@ function InformationDetail({module, section}: {module: ModuleDetail; section: st
       ) : null}
       {section === 'price' ? (
         <>
-          <AppText variant="label">Price</AppText>
+          <AppText variant="label">In-App Purchases</AppText>
           <AppText variant="body" colour="textSecondary">
-            This registry release is listed as {module.priceState.toLowerCase()}.
+            {inAppPurchaseLabelFor(module)}. The registry listing is {module.priceState.toLowerCase()}.
           </AppText>
         </>
       ) : null}
@@ -508,48 +533,86 @@ function InfoRow({label, value}: {label: string; value: string}) {
   )
 }
 
-function metadataFor(module: ModuleDetail, platforms: string[]): ProductMetadataItem[] {
-  const items: ProductMetadataItem[] = []
-  const privateRecords = Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))
-  if (privateRecords) items.push({id: 'privacy', value: 'PRIVATE', label: 'Privacy', detail: 'Account scoped'})
-  if (module.latestVersion) items.push({id: 'version', value: module.latestVersion, label: 'Version', detail: 'Registry release'})
-  items.push({id: 'developer', value: module.publisherName.toUpperCase(), label: 'Developer'})
-  if (module.trustLevel === 'firstParty') items.push({id: 'source', value: 'VERIFIED', label: 'Source', detail: 'First party'})
-  if (platforms.length) {
-    items.push({
-      id: 'platform',
-      value: platforms.length >= 3 ? 'UNIVERSAL' : String(platforms.length),
-      label: 'Platform',
-      detail: platforms.map(platformLabel).join(' · '),
-    })
-  }
-  return items
+function licenseLabelFor(module: ModuleDetail): string {
+  const manifest = module.normalizedManifest ?? module.manifest ?? {}
+  const licence = asRecord(manifest.license)
+  return stringOrNull(licence?.spdx) ?? 'Not declared'
+}
+
+function inAppPurchaseLabelFor(module: ModuleDetail): string {
+  const value = marketplaceMetadataFor(module).inAppPurchases
+  if (value === true) return 'This release declares in-app purchases'
+  if (value === false) return 'This release declares no in-app purchases'
+  return 'In-app purchase metadata is not declared for this release'
+}
+
+function metadataFor(module: ModuleDetail): ProductMetadataItem[] {
+  const marketplace = marketplaceMetadataFor(module)
+  const reviews = asRecord(marketplace.reviews)
+  const average = numberOrNull(marketplace.rating ?? reviews?.average)
+  const reviewCount = numberOrNull(marketplace.ratingCount ?? reviews?.count)
+  const age = stringOrNull(marketplace.ageRating)
+  const chartRank = numberOrNull(marketplace.chartRank)
+  const packageSize = module.releaseSizeBytes ?? numberOrNull(marketplace.packageSizeBytes)
+
+  return [
+    {
+      id: 'rating',
+      value: average === null ? '—' : average.toFixed(1),
+      label: 'Rating',
+      detail: average !== null && reviewCount !== null ? `${Math.round(reviewCount).toLocaleString()} reviews` : undefined,
+    },
+    {id: 'age', value: age ?? '—', label: 'Age'},
+    {id: 'chart', value: chartRank === null ? '—' : `#${Math.round(chartRank)}`, label: 'Chart'},
+    {id: 'developer', value: module.publisherName.toUpperCase(), label: 'Developer'},
+    {id: 'size', value: formatBytes(packageSize), label: 'Size'},
+    {id: 'version', value: module.latestVersion ?? '—', label: 'Version'},
+  ]
 }
 
 function capabilitiesFor(module: ModuleDetail, platforms: string[]): ProductCapabilityItem[] {
-  const items: ProductCapabilityItem[] = []
-  if (module.privacy || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))) {
-    items.push({id: 'privacy', icon: 'privacy', label: 'Privacy', value: 'Private', detail: 'Account-scoped records'})
-  }
-  if (module.permissions.some(permission => /record|note|folder/i.test(permission.permission))) {
-    items.push({id: 'records', icon: 'note', label: 'Records', value: 'Notes & folders', detail: 'Declared module storage'})
-  }
-  if (module.trustLevel === 'firstParty') {
-    items.push({id: 'source', icon: 'verified', label: 'Source', value: 'Verified', detail: 'Published by Modula'})
-  }
-  if (platforms.length) {
-    items.push({id: 'platforms', icon: 'module', label: 'Platforms', value: platforms.map(platformLabel).join(', '), detail: module.compatibility})
-  }
-  return items
+  const manifest = module.normalizedManifest ?? module.manifest ?? {}
+  const privateRecords = Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))
+  const offline = declarationPresentation(asRecord(manifest.offline), 'offline support')
+  const sync = declarationPresentation(asRecord(manifest.realtime), 'sync support')
+
+  return [
+    {
+      id: 'privacy',
+      icon: 'privacy',
+      label: 'Private',
+      value: privateRecords ? 'Private' : 'Not declared',
+      detail: privateRecords ? 'Account-scoped data' : 'No privacy declaration',
+    },
+    {id: 'offline', icon: 'storage', label: 'Offline', ...offline},
+    {id: 'sync', icon: 'update', label: 'Sync', ...sync},
+    {
+      id: 'platforms',
+      icon: 'module',
+      label: 'Platforms',
+      value: platforms.length ? platforms.map(platformLabel).join(', ') : 'Not declared',
+      detail: platforms.length ? module.compatibility : 'No platform declaration',
+    },
+  ]
 }
 
 function informationFor(module: ModuleDetail): ProductInformationItem[] {
-  const items: ProductInformationItem[] = []
-  if (module.privacy || module.permissions.length) items.push({id: 'privacy', icon: 'privacy', label: 'Privacy', value: 'Private'})
-  if (module.sourceRepository || module.trustLevel === 'firstParty') items.push({id: 'source', icon: 'verified', label: 'Source', value: module.trustLevel === 'firstParty' ? 'Verified' : 'Declared'})
-  if (module.priceState === 'Free' || module.priceState === 'Included') items.push({id: 'price', icon: 'marketplace', label: 'Price', value: module.priceState})
-  items.push({id: 'developer', icon: 'profile', label: 'Developer', value: module.publisherName})
-  return items
+  const manifest = module.normalizedManifest ?? module.manifest ?? {}
+  const license = asRecord(manifest.license)
+  const marketplace = marketplaceMetadataFor(module)
+  const spdx = stringOrNull(license?.spdx)
+  const inAppPurchases = typeof marketplace.inAppPurchases === 'boolean'
+    ? marketplace.inAppPurchases ? 'Declared' : 'None'
+    : 'Not declared'
+  const privateRecords = Boolean(module.privacy) || module.permissions.some(permission => /record|note|folder/i.test(permission.permission))
+  const openSource = spdx && !/^LicenseRef-/i.test(spdx) ? spdx : 'Not declared'
+
+  return [
+    {id: 'privacy', icon: 'privacy', label: 'Privacy', value: privateRecords ? 'Private' : 'Not declared'},
+    {id: 'source', icon: 'verified', label: 'Open Source', value: openSource},
+    {id: 'price', icon: 'marketplace', label: 'In-App Purchases', value: inAppPurchases},
+    {id: 'developer', icon: 'profile', label: 'Developer', value: module.publisherName},
+  ]
 }
 
 function platformsFor(module: ModuleDetail): string[] {
@@ -573,10 +636,57 @@ function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null
 }
 
-function previewsFor(_moduleId: string): ProductPreviewFrame[] {
-  // B9 only exposes captures produced by the running module. Verified media is
-  // added by the evidence capture step; illustrative UI mocks are forbidden.
-  return []
+function marketplaceMetadataFor(module: ModuleDetail): Record<string, unknown> {
+  const normalized = module.normalizedManifest ?? {}
+  const manifest = module.manifest ?? {}
+  return asRecord(normalized.marketplace) ?? asRecord(manifest.marketplace) ?? {}
+}
+
+function numberOrNull(value: unknown): number | null {
+  const number = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : Number.NaN
+  return Number.isFinite(number) && number >= 0 ? number : null
+}
+
+function stringOrNull(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function formatBytes(value: number | null): string {
+  if (value === null) return '—'
+  if (value < 1024) return `${Math.round(value)} B`
+  if (value < 1024 * 1024) return `${(value / 1024).toFixed(value < 10 * 1024 ? 1 : 0)} KB`
+  return `${(value / (1024 * 1024)).toFixed(value < 10 * 1024 * 1024 ? 1 : 0)} MB`
+}
+
+function declarationPresentation(
+  declaration: Record<string, unknown> | null,
+  label: string,
+): Pick<ProductCapabilityItem, 'value' | 'detail'> {
+  if (!declaration) return {value: 'Not declared', detail: `No verified ${label}`}
+  if (declaration.enabled === false || declaration.supported === false) {
+    return {value: 'Not supported', detail: 'Disabled by manifest'}
+  }
+  return {value: 'Declared', detail: 'Manifest declaration'}
+}
+
+function previewsFor(module: ModuleDetail): ProductPreviewFrame[] {
+  const marketplace = marketplaceMetadataFor(module)
+  const rows = Array.isArray(marketplace.previews)
+    ? marketplace.previews
+    : Array.isArray(marketplace.screenshots)
+      ? marketplace.screenshots
+      : []
+
+  return rows.flatMap((value, index) => {
+    const row = asRecord(value)
+    const source = typeof value === 'string'
+      ? value
+      : stringOrNull(row?.url ?? row?.source)
+    if (!source) return []
+    const headline = stringOrNull(row?.headline ?? row?.title) ?? `Preview ${index + 1}`
+    const label = stringOrNull(row?.accessibilityLabel) ?? `${module.name} preview: ${headline}`
+    return [{id: stringOrNull(row?.id) ?? `preview-${index + 1}`, headline, accessibilityLabel: label, source}]
+  })
 }
 
 function ProductDetailSkeleton({top}: {top: number}) {

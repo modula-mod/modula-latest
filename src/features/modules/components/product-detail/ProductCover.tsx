@@ -32,9 +32,9 @@ export function ProductCover({
   const {colours, radius} = useThemeTokens()
   const contentWidth = Math.min(width, 1120)
   const height = transitionToCanvas
-    ? Math.min(380, Math.max(270, Math.round(contentWidth * 0.7)))
+    ? Math.min(420, Math.max(300, Math.round(contentWidth * 0.76)))
     : Math.min(300, Math.max(176, Math.round(contentWidth * 0.36)))
-  const transitionHeight = Math.min(132, Math.max(104, Math.round(height * 0.42)))
+  const transitionHeight = Math.min(160, Math.max(122, Math.round(height * 0.46)))
   const canvasClear = colourWithAlpha(colours.canvas, 0)
   const canvasWash = colourWithAlpha(colours.canvas, 0.76)
   const source = moduleId === 'digital.modula.vault-notes' ? VAULT_NOTES_COVER : null

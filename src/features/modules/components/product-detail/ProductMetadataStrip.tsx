@@ -12,8 +12,8 @@ export type ProductMetadataItem = {
 
 export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
   const {colours, radius} = useThemeTokens()
-  const {fontScale} = useWindowDimensions()
-  const scrollable = fontScale > 1.2
+  const {fontScale, width} = useWindowDimensions()
+  const scrollable = fontScale > 1.15 || width < 390
   const content = items.map((item, index) => (
     <View
       key={item.id}
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   divider: {bottom: 14, left: 0, position: 'absolute', top: 14, width: StyleSheet.hairlineWidth},
   fitItem: {flex: 1, minWidth: 0},
   frame: {borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden'},
-  item: {alignItems: 'center', justifyContent: 'center', minHeight: 84, paddingHorizontal: 6, paddingVertical: 10},
+  item: {alignItems: 'center', justifyContent: 'center', minHeight: 76, paddingHorizontal: 6, paddingVertical: 9},
   label: {fontSize: 9, fontWeight: '700', letterSpacing: 0.35, lineHeight: 12},
   scrollItem: {minWidth: 106},
   value: {fontSize: 15, lineHeight: 19, textAlign: 'center'},

@@ -1,4 +1,4 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useReducer, useState} from 'react'
 import {StatusBar} from 'expo-status-bar'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -20,12 +20,17 @@ import {
   ProductActionGroup,
   ProductCapabilityStrip,
   ProductCover,
+  ProductDescription,
   ProductIdentity,
+  ProductInformationDisclosure,
+  ProductInformationStrip,
   ProductMetadataStrip,
+  ProductPlatformRow,
   ProductPreviewCarousel,
   ProductStickyHeader,
   ProductTabs,
   ProductTopChrome,
+  ProductWhatsNew,
   type ProductTabId,
 } from '@/features/modules/components/product-detail'
 import type {ModuleCatalogueItem, ModuleDetail} from '@/data/repositories/contracts'
@@ -73,77 +78,141 @@ const SAMPLE_MODULE: ModuleCatalogueItem = {
 const SAMPLE_MODULE_DETAIL = {
   ...SAMPLE_MODULE,
   longDescription: SAMPLE_MODULE.description,
-  backend: {},
+  backend: {
+    mode: 'greenfield-managed',
+    provider: 'Modula',
+    deploymentOwnership: 'modula-hosted',
+    dataLocation: 'greenfield',
+    regions: [],
+    status: 'available',
+    selfHostingSupported: false,
+    externalDataProcessing: false,
+    backendPermissions: [],
+  },
   permissions: [
     {permission: 'records.notes.read', reason: 'Read Vault Notes records.', risk: 'low'},
     {permission: 'records.notes.write', reason: 'Create and update Vault Notes records.', risk: 'low'},
   ],
   contributions: {},
   privacy: 'Vault Notes records are scoped to the current Modula account.',
+  releasePublishedAt: '2026-08-01T15:41:25+01:00',
+  releaseNotes: [
+    'Adds optional, provider-neutral AI product actions with explicit review before changes are applied.',
+    'Vault Notes remains operational without AI permissions or provider availability.',
+  ],
+  sourceRepository: 'modula-mod/modula-vault-notes',
+  manifest: {
+    compatibility: {platforms: ['ios', 'android', 'web']},
+    license: {spdx: 'LicenseRef-Modula-First-Party'},
+  },
 } as ModuleDetail
 
 /** Focused native specimen for reference-geometry checks on a simulator. */
-export function ProductHeroLabScreen() {
+export function ProductHeroLabScreen({
+  initialOverviewOffset = false,
+}: {
+  initialOverviewOffset?: boolean
+} = {}) {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
   const {colours, spacing} = useThemeTokens()
   const presentation = resolveModuleInstallPresentation(SAMPLE_MODULE)
   const artworkSize = Math.min(116, Math.max(94, Math.round(width * 0.25)))
+  const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
 
   return (
     <View style={[styles.heroSpecimen, {backgroundColor: colours.canvas}]}>
       <StatusBar style="light" />
-      <View style={styles.heroSpecimenCover}>
-        <ProductCover
-          moduleId={SAMPLE_MODULE.moduleId}
-          name={SAMPLE_MODULE.name}
-          inset={false}
-          transitionToCanvas
-        />
-        <ProductTopChrome
-          productName={SAMPLE_MODULE.name}
-          top={insets.top + spacing[2]}
-          onBack={() => undefined}
-          onShare={() => undefined}
-          actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
-          onAction={() => undefined}
-        />
-      </View>
-      <View style={[styles.heroSpecimenLead, {gap: spacing[4], paddingHorizontal: spacing[4]}]}>
-        <View style={[styles.heroSpecimenIdentity, {gap: spacing[4]}]}>
-          <ModuleArtwork
+      <ScrollView
+        contentContainerStyle={{paddingBottom: spacing[10]}}
+        contentOffset={initialOverviewOffset ? {x: 0, y: 780} : undefined}
+      >
+        <View style={styles.heroSpecimenCover}>
+          <ProductCover
             moduleId={SAMPLE_MODULE.moduleId}
             name={SAMPLE_MODULE.name}
-            size={artworkSize}
-            variant="hero"
+            inset={false}
+            transitionToCanvas
           />
-          <View style={{flex: 1, minWidth: 0, paddingTop: spacing[1]}}>
-            <ProductIdentity
-              name="Vault Notes"
-              subtitle="Private notes and knowledge"
-              publisher="Modula"
-              privateByDesign
-              verified
+          <ProductTopChrome
+            productName={SAMPLE_MODULE.name}
+            top={insets.top + spacing[2]}
+            onBack={() => undefined}
+            onShare={() => undefined}
+            actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
+            onAction={() => undefined}
+          />
+        </View>
+        <View style={[styles.heroSpecimenLead, {gap: spacing[4], paddingHorizontal: spacing[4]}]}>
+          <View style={[styles.heroSpecimenIdentity, {gap: spacing[4]}]}>
+            <ModuleArtwork
+              moduleId={SAMPLE_MODULE.moduleId}
+              name={SAMPLE_MODULE.name}
+              size={artworkSize}
+              variant="hero"
             />
-            <View style={{marginTop: spacing[3]}}>
-              <ProductActionGroup
-                presentation={presentation}
-                productName="Vault Notes"
-                onPrimary={() => undefined}
+            <View style={{flex: 1, minWidth: 0, paddingTop: spacing[1]}}>
+              <ProductIdentity
+                name="Vault Notes"
+                subtitle="Private notes and knowledge"
+                publisher="Modula"
+                privateByDesign
+                verified
               />
+              <View style={{marginTop: spacing[3]}}>
+                <ProductActionGroup
+                  presentation={presentation}
+                  productName="Vault Notes"
+                  onPrimary={() => undefined}
+                />
+              </View>
             </View>
           </View>
+          <ProductMetadataStrip
+            items={[
+              {id: 'rating', value: '—', label: 'Rating'},
+              {id: 'age', value: '—', label: 'Age'},
+              {id: 'chart', value: '—', label: 'Chart'},
+              {id: 'developer', value: 'MODULA', label: 'Developer'},
+              {id: 'size', value: '—', label: 'Size'},
+              {id: 'version', value: '1.1.0', label: 'Version'},
+            ]}
+          />
+          <ProductTabs selected="overview" onSelect={() => undefined} />
         </View>
-        <ProductMetadataStrip
-          items={[
-            {id: 'privacy', value: 'PRIVATE', label: 'Privacy', detail: 'Account scoped'},
-            {id: 'version', value: '1.1.0', label: 'Version'},
-            {id: 'developer', value: 'MODULA', label: 'Developer'},
-            {id: 'source', value: 'VERIFIED', label: 'Source'},
-          ]}
-        />
-        <ProductTabs selected="overview" onSelect={() => undefined} />
-      </View>
+        <View style={[styles.heroSpecimenOverview, {gap: spacing[8], paddingHorizontal: spacing[4], paddingTop: spacing[5]}]}>
+          <ProductCapabilityStrip
+            items={[
+              {id: 'privacy', icon: 'privacy', label: 'Private', value: 'Private', detail: 'Account-scoped data'},
+              {id: 'offline', icon: 'storage', label: 'Offline', value: 'Not declared', detail: 'No verified offline support'},
+              {id: 'sync', icon: 'update', label: 'Sync', value: 'Not declared', detail: 'No verified sync support'},
+              {id: 'platforms', icon: 'module', label: 'Platforms', value: 'iOS, Android, Web', detail: 'Registry declaration'},
+            ]}
+          />
+          <ProductWhatsNew
+            version="1.1.0"
+            releaseDate={SAMPLE_MODULE_DETAIL.releasePublishedAt}
+            releaseNotes={SAMPLE_MODULE_DETAIL.releaseNotes ?? []}
+            versionHistoryOpen={versionHistoryOpen}
+            onVersionHistory={() => setVersionHistoryOpen(current => !current)}
+          />
+          <ProductPreviewCarousel productName="Vault Notes" frames={[]} />
+          <ProductPlatformRow platforms={['ios', 'android', 'web']} />
+          <ProductDescription>Keep thoughts, links and information inside your private Vault.</ProductDescription>
+          <View style={{gap: spacing[3]}}>
+            <AppText variant="headline" accessibilityRole="header">Module Information</AppText>
+            <ProductInformationStrip
+              items={[
+                {id: 'privacy', icon: 'privacy', label: 'Privacy', value: 'Private'},
+                {id: 'source', icon: 'verified', label: 'Open Source', value: 'Not declared'},
+                {id: 'price', icon: 'marketplace', label: 'In-App Purchases', value: 'Not declared'},
+                {id: 'developer', icon: 'profile', label: 'Developer', value: 'Modula'},
+              ]}
+            />
+            <ProductInformationDisclosure label="Information" onPress={() => undefined} />
+          </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -605,6 +674,7 @@ const styles = StyleSheet.create({
   heroSpecimenCover: {position: 'relative'},
   heroSpecimenIdentity: {alignItems: 'flex-start', flexDirection: 'row'},
   heroSpecimenLead: {marginTop: -64},
+  heroSpecimenOverview: {paddingBottom: 20},
   row: {flexDirection: 'row', gap: 16},
   stickyPreview: {height: 72, position: 'relative'},
 })

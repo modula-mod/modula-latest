@@ -95,7 +95,14 @@ for (const marker of composition) {
   previous = index
 }
 record('DETAIL COMPOSITION ORDER', ordered)
-absent(detailName, /ratings?|downloads?|No\. ?7|age rating/i, 'NO FAKE MARKET DATA')
+absent(detailName, /4\.8|1\.2K|No\. ?7|18\.6\s*MB/i, 'NO FAKE MARKET VALUES')
+record(
+  'UNAVAILABLE METRICS ARE EXPLICIT',
+  detail.includes("value: average === null ? '—'") &&
+    detail.includes("value: age ?? '—'") &&
+    detail.includes("value: chartRank === null ? '—'") &&
+    detail.includes("value: module.latestVersion ?? '—'"),
+)
 contains(detailName, 'module.latestVersion', 'VISIBLE VERSION IS REGISTRY DATA')
 
 console.log('\n# Actions and install review')

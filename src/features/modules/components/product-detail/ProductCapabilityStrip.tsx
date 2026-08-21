@@ -14,8 +14,8 @@ export type ProductCapabilityItem = {
 
 export function ProductCapabilityStrip({items}: {items: ProductCapabilityItem[]}) {
   const {colours, radius, spacing} = useThemeTokens()
-  const {fontScale} = useWindowDimensions()
-  const scrollable = fontScale > 1.2
+  const {fontScale, width} = useWindowDimensions()
+  const scrollable = fontScale > 1.15 || width < 380
   const content = items.map((item, index) => (
     <View
       key={item.id}
@@ -39,14 +39,17 @@ export function ProductCapabilityStrip({items}: {items: ProductCapabilityItem[]}
     </View>
   ))
   return (
-    <View style={[styles.frame, {borderColor: colours.border, borderRadius: radius.xlarge}]} testID="product-capability-strip">
-      {scrollable ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
-          {content}
-        </ScrollView>
-      ) : (
-        <View style={styles.content}>{content}</View>
-      )}
+    <View style={{gap: spacing[3]}} testID="product-capability-strip">
+      <AppText variant="headline" accessibilityRole="header">Trust &amp; capabilities</AppText>
+      <View style={[styles.frame, {borderColor: colours.border, borderRadius: radius.xlarge}]}>
+        {scrollable ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+            {content}
+          </ScrollView>
+        ) : (
+          <View style={styles.content}>{content}</View>
+        )}
+      </View>
     </View>
   )
 }
