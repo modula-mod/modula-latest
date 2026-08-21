@@ -8,7 +8,7 @@ description: >-
 
 # Modula UI Implementation Skill
 
-The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 A/B/C are research, not an approved skin. **7M-B6** matures Direction M (editorial Product Hub, reachable install, sheets/drawers, Vault Notes 1.1 candidate). 7M-C and production deploy remain blocked. Founder visual approval is still required.
+The previous Phase 7M-B / 7M-B2 visual direction has been explicitly rejected. Preserve engineering only. 7M-B4 A/B/C are research, not an approved skin. **7M-B6** matures Direction M (editorial Product Hub, reachable install, sheets/drawers, Vault Notes 1.1 candidate). 7M-C remains blocked. Web-only deploys require an explicit phase gate (B8 completed its web cutover under founder-approval-still-required rules). Founder visual approval is still required.
 
 ## Mission
 
