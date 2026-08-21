@@ -1,5 +1,6 @@
 import {Link, type Href} from 'expo-router'
 import {Pressable, StyleSheet, View} from 'react-native'
+import {LinearGradient} from 'expo-linear-gradient'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -11,6 +12,11 @@ import {resolveModuleInstallPresentation} from '@/features/modules/identity/inst
 import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+/**
+ * Direction A — Editorial Story.
+ * Artwork owns the frame. Copy lives in the image. Product identity is attached
+ * to the same story, not a second card.
+ */
 export function ModuleEditorialHero({
   item,
   onPress,
@@ -33,21 +39,26 @@ export function ModuleEditorialHero({
         overflow: 'hidden',
         width: '100%',
       }}>
-      {/* ProductCover keeps the Vault Notes photo; other modules use ModuleArtwork variant="scene". */}
-      <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} />
-    </View>
-  )
-  const story = (
-    <View style={[styles.copy, {gap: spacing[1], paddingTop: spacing[4]}]}>
-      {copy.eyebrow ? (
-        <AppText variant="editorialEyebrow" colour="textTertiary" style={styles.eyebrow}>
-          {copy.eyebrow.toUpperCase()}
+      <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} size="editorial" />
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.72)']}
+        locations={[0.42, 0.68, 1]}
+        pointerEvents="none"
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[styles.story, {padding: spacing[4]}]} pointerEvents="none">
+        {copy.eyebrow ? (
+          <AppText variant="editorialEyebrow" style={styles.overlayEyebrow}>
+            {copy.eyebrow.toUpperCase()}
+          </AppText>
+        ) : null}
+        <AppText variant="editorialTitle" style={styles.overlayTitle}>
+          {copy.name}
         </AppText>
-      ) : null}
-      <AppText variant="editorialTitle">{copy.name}</AppText>
-      <AppText variant="editorialSubtitle" colour="textSecondary">
-        {copy.tagline}
-      </AppText>
+        <AppText variant="editorialSubtitle" style={styles.overlaySubtitle}>
+          {copy.tagline}
+        </AppText>
+      </View>
     </View>
   )
 
@@ -57,13 +68,11 @@ export function ModuleEditorialHero({
         <Link href={href as Href} asChild>
           <Pressable accessibilityRole="link" accessibilityLabel={`Open featured ${copy.name}`}>
             <Link.AppleZoom>{cover}</Link.AppleZoom>
-            {story}
           </Pressable>
         </Link>
       ) : (
         <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
           {cover}
-          {story}
         </AppPressable>
       )}
       <View
@@ -74,11 +83,11 @@ export function ModuleEditorialHero({
             paddingTop: spacing[4],
             borderTopColor: colours.separator,
             borderTopWidth: StyleSheet.hairlineWidth,
-            marginTop: spacing[4],
+            marginTop: spacing[3],
           },
         ]}>
         <AppPressable accessibilityLabel={`Open ${copy.name}`} onPress={onPress} style={styles.identity}>
-          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={44} />
+          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={52} variant="icon" />
           <View style={styles.flex}>
             <AppText variant="productName">{copy.name}</AppText>
             <AppText variant="productSubtitle" colour="textSecondary" numberOfLines={1}>
@@ -94,9 +103,11 @@ export function ModuleEditorialHero({
 
 const styles = StyleSheet.create({
   actionRow: {alignItems: 'center', flexDirection: 'row'},
-  copy: {alignItems: 'flex-start'},
-  eyebrow: {letterSpacing: 0.8},
   feature: {width: '100%'},
   flex: {flex: 1, minWidth: 0},
   identity: {alignItems: 'center', flex: 1, flexDirection: 'row', gap: 12, minWidth: 0},
+  overlayEyebrow: {color: 'rgba(255,255,255,0.82)', letterSpacing: 0.8},
+  overlaySubtitle: {color: 'rgba(255,255,255,0.86)'},
+  overlayTitle: {color: '#FFFFFF'},
+  story: {bottom: 0, left: 0, position: 'absolute', right: 0},
 })

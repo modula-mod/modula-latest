@@ -1,7 +1,7 @@
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
 import {ModuleRow} from '@/features/modules/components/presentation/ModuleRow'
 
-/** Intentionally muted marketplace row for planned modules. */
+/** Additional coming-soon catalogue row. The lead story uses ComingSoonEditorial. */
 export function ComingSoonRow({
   item,
   onPress,

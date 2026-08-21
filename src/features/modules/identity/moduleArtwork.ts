@@ -7,6 +7,14 @@ export type ModuleArtworkKind =
   | 'gubic'
   | 'fallback'
 
+/** Marketplace artwork roles. Do not stretch one source into every slot. */
+export type ModuleArtworkRole =
+  | 'heroArtwork'
+  | 'tileArtwork'
+  | 'moduleIcon'
+  | 'editorialArtwork'
+  | 'previewArtwork'
+
 export type ModuleArtworkPack = {
   moduleId: string
   kind: ModuleArtworkKind
@@ -19,7 +27,18 @@ export type ModuleArtworkPack = {
     ink: string
     wash: string
     stitch?: string
+    night?: string
   }
+}
+
+export function artworkRoleForVariant(
+  variant: 'icon' | 'hero' | 'row' | 'compact' | 'scene' | 'fallback' | 'editorial' | 'preview',
+): ModuleArtworkRole {
+  if (variant === 'editorial' || variant === 'hero') return 'editorialArtwork'
+  if (variant === 'scene') return 'heroArtwork'
+  if (variant === 'preview') return 'previewArtwork'
+  if (variant === 'compact' || variant === 'row' || variant === 'icon') return 'moduleIcon'
+  return 'tileArtwork'
 }
 
 const PACKS: Record<string, ModuleArtworkPack> = {
@@ -34,6 +53,7 @@ const PACKS: Record<string, ModuleArtworkPack> = {
       ink: '#2A241C',
       wash: '#E4D5C1',
       stitch: '#8A6A4B',
+      night: '#1A1612',
     },
   },
   'digital.modula.tasks': {
@@ -42,7 +62,7 @@ const PACKS: Record<string, ModuleArtworkPack> = {
     name: 'Tasks',
     tagline: 'Quiet lists for work that has to ship.',
     publisher: 'Modula',
-    palette: {paper: '#EFEFEA', ink: '#1F1F1C', wash: '#D8D8D0'},
+    palette: {paper: '#EFEFEA', ink: '#1F1F1C', wash: '#D8D8D0', night: '#141412'},
   },
   'digital.modula.crm': {
     moduleId: 'digital.modula.crm',

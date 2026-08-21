@@ -30,7 +30,7 @@ export function ModulaUiLabRouteScreen() {
     return <ProductHeroLabScreen initialOverviewOffset={productOverview === '1'} />
   }
   return (
-    <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — quality compare plus PVP-UI-1 Product Hub specimens.">
+    <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — PVP-UI-1R directions plus Product Hub specimens.">
       <PvpUi1LabBlocks />
       <ModulaPrimitivesLabScreen initialInstallReviewOpen={installReview === '1'} />
     </SettingsScreen>

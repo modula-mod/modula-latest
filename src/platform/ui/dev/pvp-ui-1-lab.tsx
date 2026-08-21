@@ -21,6 +21,7 @@ import {
 } from '@/features/modules/state/productHubSearchMachine'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {PvpUi1rLabBlocks} from '@/platform/ui/dev/pvp-ui-1r-lab'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const VAULT: ModuleCatalogueItem = {
@@ -72,6 +73,7 @@ export function PvpUi1LabBlocks() {
 
   return (
     <View style={{gap: spacing[5]}}>
+      <PvpUi1rLabBlocks />
       <AppText variant="title1">PVP-UI-1 Product Hub</AppText>
       <AppText variant="body" colour="textSecondary">
         Native editorial marketplace specimens. Not a second UI Lab.
@@ -83,6 +85,9 @@ export function PvpUi1LabBlocks() {
             compact={false}
             search={hubSearch}
             profileName="Founder"
+            segment={segment}
+            onSegmentChange={setSegment}
+            wide={false}
             onSearchTrigger={() => dispatchHubSearch({type: 'TAP_SEARCH'})}
             onSearchChange={query => dispatchHubSearch({type: 'TYPE', query})}
             onSearchCancel={() => dispatchHubSearch({type: 'CANCEL'})}

@@ -71,7 +71,7 @@ export function ModuleAction({
           paddingHorizontal: compact && !fullWidth ? spacing[3] : spacing[4],
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
           width: fullWidth ? '100%' : undefined,
-          opacity: disabled ? 0.45 : 1,
+          opacity: loading ? 0.7 : 1,
         },
       ]}>
       <AppText

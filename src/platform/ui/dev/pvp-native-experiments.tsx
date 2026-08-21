@@ -22,13 +22,18 @@ const EXPERIMENTS: Experiment[] = [
   },
   {
     api: 'Stack.SearchBar',
-    decision: 'ADAPT',
-    detail: 'Installed types warn that Stack.SearchBar forces the system header visible. ProductHubSearch wraps the search machine instead.',
+    decision: 'REJECT',
+    detail: 'SDK 57 types force headerShown. Rejected as Product Hub chrome. Compact glass morph is the adapted production search.',
   },
   {
     api: 'ModulaSegmentedPicker / Expo UI segmented',
-    decision: 'ADOPT',
-    detail: 'Discover / Installed / Updates uses the existing native adapter.',
+    decision: 'ADAPT',
+    detail: 'Kept for wide library chrome. Rejected as a stacked utility block under search. Narrow web uses a full-label popover so Discover never truncates.',
+  },
+  {
+    api: 'Stack.Toolbar.SearchBarSlot',
+    decision: 'REJECT',
+    detail: 'Conflicts with Modula floating tab bar. Evaluated in this lab; Product Hub keeps compact glass search in the header.',
   },
   {
     api: 'expo-glass-effect GlassView',
@@ -66,7 +71,7 @@ export function PvpNativeExperimentsScreen() {
       contentContainerStyle={[styles.content, {gap: spacing[5], padding: spacing[4]}]}>
       <AppText variant="display">Native navigation experiments</AppText>
       <AppText variant="body" colour="textSecondary">
-        Installed Expo Router 57.0.15 and @expo/ui 57.0.12. Decisions are recorded in docs/research/pvp-ui-1-native-experiments.md.
+        Installed Expo Router 57.0.15 and @expo/ui 57.0.12. Decisions are recorded in docs/research/pvp-ui-1r-native-experiments.md.
       </AppText>
 
       {EXPERIMENTS.map(item => (

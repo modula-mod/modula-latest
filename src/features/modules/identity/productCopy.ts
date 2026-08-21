@@ -9,11 +9,19 @@ const KNOWN_COPY: Record<
 > = {
   'digital.modula.vault-notes': {
     eyebrow: 'Private by design',
-    tagline: 'Your private knowledge space.',
+    tagline: 'Your knowledge, kept yours.',
     short: 'Private notes and knowledge',
     description: 'Private notes and knowledge, built into Modula.',
     whatItDoes: 'Keep thoughts, links and information inside your private Vault.',
     privacy: 'Your Vault Notes records are private to your account.',
+  },
+  'digital.modula.tasks': {
+    eyebrow: 'Coming to Modula',
+    tagline: 'Quiet lists for work that has to ship.',
+    short: 'Quiet lists that have to ship',
+    description: 'Tasks is coming to Modula. Lists stay on your account.',
+    whatItDoes: 'Capture work that has to ship without scattering it across other apps.',
+    privacy: 'When it ships, your lists remain account-scoped.',
   },
 }
 

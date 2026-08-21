@@ -31,7 +31,7 @@ export function ModuleRow({
   const quiet = muted || comingSoon
 
   return (
-    <View testID={quiet ? 'coming-soon-row' : 'module-row'} style={{opacity: quiet ? 0.72 : 1}}>
+    <View testID={quiet ? 'coming-soon-row' : 'module-row'}>
       <View
         style={[
           styles.row,

@@ -73,7 +73,12 @@ console.log('PRODUCT HUB\n')
 
 console.log('# SOURCE')
 const branch = git(['branch', '--show-current'])
-record('BRANCH', branch.stdout === 'cursor/pvp-ui-1-product-hub', branch.stdout)
+record(
+  'BRANCH',
+  branch.stdout === 'cursor/pvp-ui-1-product-hub' ||
+    branch.stdout === 'cursor/pvp-ui-1r-product-hub-visual-reset',
+  branch.stdout,
+)
 const ancestor = git(['merge-base', '--is-ancestor', 'origin/main', 'HEAD'])
 record('MAIN BASE', ancestor.status === 0, ancestor.status === 0 ? git(['rev-parse', '--short', 'origin/main']).stdout : ancestor.stderr)
 const dirty = git(['status', '--porcelain'])
@@ -120,9 +125,9 @@ record('HEADER', hub.includes('ProductHubHeader'))
 record('SEARCH', hub.includes('ProductHubSearchChrome') || read('src/features/modules/components/ProductHubHeader.tsx').includes('ProductHubSearchChrome'))
 record('FEATURED', hub.includes('product-hub-featured') && hub.includes('ModuleEditorialHero'))
 record('NEW FOR MODULA', hub.includes('New for Modula') && hub.includes('ModuleRow'))
-record('MADE BY MODULA', hub.includes('Made by Modula') && hub.includes('ModuleShelf'))
+record('MADE BY MODULA', hub.includes('Made by Modula') && (hub.includes('ModuleShelf') || hub.includes('ModuleIconShelf')))
 record('MODULE ROW', existsSync(file('src/features/modules/components/presentation/ModuleRow.tsx')))
-record('COMING SOON', hub.includes('ComingSoonRow') && read('src/features/modules/components/presentation/ModuleAction.tsx').includes('Coming Soon'))
+record('COMING SOON', (hub.includes('ComingSoonRow') || hub.includes('ComingSoonEditorial')) && read('src/features/modules/components/presentation/ModuleAction.tsx').includes('Coming Soon'))
 record('INSTALLED STATE', hub.includes("segment === 'installed'") && hub.includes('isInstalledModuleState'))
 record('VAULT NOTES VISIBLE', hub.includes('isLegacyVaultNotesModuleId') && hub.includes('featuredId'), 'canonical once on Discover')
 record(
@@ -143,7 +148,7 @@ record('CUSTOM/NATIVE TABS EVALUATED', experiments.includes('NativeTabs') && exp
 
 console.log('\n# WEB')
 record('RESPONSIVE MOBILE', hub.includes('useWindowDimensions') && hub.includes('ResponsiveContent'))
-record('RESPONSIVE DESKTOP', hub.includes('1120') && read('src/features/modules/components/presentation/ModuleShelf.tsx').includes('width >= 1100'))
+record('RESPONSIVE DESKTOP', hub.includes('1180') && (read('src/features/modules/components/presentation/ModuleShelf.tsx').includes('width >= 1100') || hub.includes('desktopSplit')))
 record('KEYBOARD SEARCH', read('src/features/modules/components/ProductHubSearchChrome.tsx').includes('Escape'))
 record('FOCUS STATES', read('src/features/modules/components/ProductHubSearchChrome.tsx').includes('outlineColor'))
 

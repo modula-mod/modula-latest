@@ -4,6 +4,7 @@ import {LinearGradient} from 'expo-linear-gradient'
 import {AppImage} from '@/components/primitives/AppImage'
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
+import {moduleArtworkPack} from '@/features/modules/identity/moduleArtwork'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const VAULT_NOTES_COVER = require('../../../../../assets/images/product-hub/vault-notes-cover.png')
@@ -17,23 +18,36 @@ function colourWithAlpha(colour: string, alpha: number): string {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`
 }
 
+function packNight(moduleId: string): string {
+  return moduleArtworkPack(moduleId).palette.night ?? '#111111'
+}
+
 export function ProductCover({
   moduleId,
   name,
   inset = true,
   transitionToCanvas = false,
+  size = 'detail',
 }: {
   moduleId: string
   name: string
   inset?: boolean
   transitionToCanvas?: boolean
+  size?: 'detail' | 'editorial' | 'bleed' | 'split'
 }) {
   const {width} = useWindowDimensions()
   const {colours, radius} = useThemeTokens()
   const contentWidth = Math.min(width, 1120)
-  const height = transitionToCanvas
-    ? Math.min(420, Math.max(300, Math.round(contentWidth * 0.76)))
-    : Math.min(300, Math.max(176, Math.round(contentWidth * 0.36)))
+  const height =
+    size === 'bleed'
+      ? Math.min(520, Math.max(360, Math.round(contentWidth * 0.92)))
+      : size === 'editorial'
+        ? Math.min(420, Math.max(280, Math.round(contentWidth * 0.72)))
+        : size === 'split'
+          ? Math.min(360, Math.max(240, Math.round(contentWidth * 0.62)))
+          : transitionToCanvas
+            ? Math.min(420, Math.max(300, Math.round(contentWidth * 0.76)))
+            : Math.min(300, Math.max(176, Math.round(contentWidth * 0.36)))
   const transitionHeight = Math.min(142, Math.max(108, Math.round(height * 0.38)))
   const canvasClear = colourWithAlpha(colours.canvas, 0)
   const canvasWash = colourWithAlpha(colours.canvas, 0.58)
@@ -45,7 +59,7 @@ export function ProductCover({
       style={[
         styles.cover,
         {
-          backgroundColor: colours.surfaceRaised,
+          backgroundColor: source ? packNight(moduleId) : colours.surfaceRaised,
           borderRadius: inset ? radius.xlarge : 0,
           height,
         },

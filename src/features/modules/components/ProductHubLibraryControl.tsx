@@ -1,0 +1,115 @@
+import {useState} from 'react'
+import {StyleSheet, View} from 'react-native'
+
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
+import {
+  ProductHubSegmentedControl,
+  type ProductHubSegment,
+} from '@/features/modules/components/ProductHubSegmentedControl'
+import {ModulaIcon} from '@/platform/ui/icons'
+import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+const LABELS: {value: ProductHubSegment; label: string}[] = [
+  {value: 'discover', label: 'Discover'},
+  {value: 'installed', label: 'Installed'},
+  {value: 'updates', label: 'Updates'},
+]
+
+/**
+ * Library navigation without a stacked utility block.
+ * Wide: native segmented control with full labels.
+ * Narrow: popover menu so "Discover" is never truncated to "Disco…".
+ */
+export function ProductHubLibraryControl({
+  value,
+  onChange,
+  updatesDisabled = false,
+  wide,
+}: {
+  value: ProductHubSegment
+  onChange: (value: ProductHubSegment) => void
+  updatesDisabled?: boolean
+  wide: boolean
+}) {
+  const {colours, radius, spacing} = useThemeTokens()
+  const [open, setOpen] = useState(false)
+  const current = LABELS.find(option => option.value === value)?.label ?? 'Discover'
+
+  if (wide) {
+    return (
+      <View testID="product-hub-library-wide">
+        <ProductHubSegmentedControl
+          value={value}
+          onChange={onChange}
+          updatesDisabled={updatesDisabled}
+        />
+      </View>
+    )
+  }
+
+  return (
+    <ModulaPopover
+      isOpen={open}
+      onDismiss={() => setOpen(false)}
+      width={220}
+      accessibilityLabel="Product Hub library"
+      testID="product-hub-library-menu"
+      trigger={
+        <LiquidGlassChrome
+          interactive
+          fallback="regular"
+          contentLayout="flow"
+          style={{borderRadius: radius.round}}>
+          <AppPressable
+            accessibilityLabel={`Library, ${current}`}
+            accessibilityRole="button"
+            onPress={() => setOpen(next => !next)}
+            testID="product-hub-library-trigger"
+            style={[styles.trigger, {paddingHorizontal: spacing[3], gap: spacing[1]}]}>
+            <AppText variant="buttonLabel" numberOfLines={1}>
+              {current}
+            </AppText>
+            <ModulaIcon name="modules" size={14} colour={colours.text} />
+          </AppPressable>
+        </LiquidGlassChrome>
+      }>
+      <View style={{gap: spacing[1]}}>
+        {LABELS.map(option => {
+          const disabled = option.value === 'updates' && updatesDisabled
+          const selected = option.value === value
+          return (
+            <AppPressable
+              key={option.value}
+              accessibilityLabel={option.label}
+              accessibilityState={{disabled, selected}}
+              disabled={disabled}
+              onPress={() => {
+                onChange(option.value)
+                setOpen(false)
+              }}
+              style={[styles.item, {padding: spacing[3]}]}>
+              <AppText
+                variant="body"
+                colour={selected ? 'accent' : disabled ? 'textTertiary' : 'text'}
+                numberOfLines={1}>
+                {option.label}
+              </AppText>
+            </AppPressable>
+          )
+        })}
+      </View>
+    </ModulaPopover>
+  )
+}
+
+const styles = StyleSheet.create({
+  item: {minHeight: 44, justifyContent: 'center'},
+  trigger: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 36,
+  },
+})

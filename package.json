@@ -255,7 +255,8 @@
     "verify:phase7m-b9": "node scripts/verify-phase7m-b9.mjs",
     "verify:phase7m-b10": "node scripts/verify-phase7m-b10.mjs",
     "verify:phase7n-a": "node scripts/verify-phase7n-a.mjs",
-    "verify:pvp-ui-1": "node scripts/verify-pvp-ui-1.mjs"
+    "verify:pvp-ui-1": "node scripts/verify-pvp-ui-1.mjs",
+    "verify:pvp-ui-1r": "node scripts/verify-pvp-ui-1r.mjs"
   },
   "private": true
 }
