@@ -1,5 +1,7 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useReducer, useState} from 'react'
+import {StatusBar} from 'expo-status-bar'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
@@ -79,6 +81,72 @@ const SAMPLE_MODULE_DETAIL = {
   contributions: {},
   privacy: 'Vault Notes records are scoped to the current Modula account.',
 } as ModuleDetail
+
+/** Focused native specimen for reference-geometry checks on a simulator. */
+export function ProductHeroLabScreen() {
+  const insets = useSafeAreaInsets()
+  const {width} = useWindowDimensions()
+  const {colours, spacing} = useThemeTokens()
+  const presentation = resolveModuleInstallPresentation(SAMPLE_MODULE)
+  const artworkSize = Math.min(116, Math.max(94, Math.round(width * 0.25)))
+
+  return (
+    <View style={[styles.heroSpecimen, {backgroundColor: colours.canvas}]}>
+      <StatusBar style="light" />
+      <View style={styles.heroSpecimenCover}>
+        <ProductCover
+          moduleId={SAMPLE_MODULE.moduleId}
+          name={SAMPLE_MODULE.name}
+          inset={false}
+          transitionToCanvas
+        />
+        <ProductTopChrome
+          productName={SAMPLE_MODULE.name}
+          top={insets.top + spacing[2]}
+          onBack={() => undefined}
+          onShare={() => undefined}
+          actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
+          onAction={() => undefined}
+        />
+      </View>
+      <View style={[styles.heroSpecimenLead, {gap: spacing[4], paddingHorizontal: spacing[4]}]}>
+        <View style={[styles.heroSpecimenIdentity, {gap: spacing[4]}]}>
+          <ModuleArtwork
+            moduleId={SAMPLE_MODULE.moduleId}
+            name={SAMPLE_MODULE.name}
+            size={artworkSize}
+            variant="hero"
+          />
+          <View style={{flex: 1, minWidth: 0, paddingTop: spacing[1]}}>
+            <ProductIdentity
+              name="Vault Notes"
+              subtitle="Private notes and knowledge"
+              publisher="Modula"
+              privateByDesign
+              verified
+            />
+            <View style={{marginTop: spacing[3]}}>
+              <ProductActionGroup
+                presentation={presentation}
+                productName="Vault Notes"
+                onPrimary={() => undefined}
+              />
+            </View>
+          </View>
+        </View>
+        <ProductMetadataStrip
+          items={[
+            {id: 'privacy', value: 'PRIVATE', label: 'Privacy', detail: 'Account scoped'},
+            {id: 'version', value: '1.1.0', label: 'Version'},
+            {id: 'developer', value: 'MODULA', label: 'Developer'},
+            {id: 'source', value: 'VERIFIED', label: 'Source'},
+          ]}
+        />
+        <ProductTabs selected="overview" onSelect={() => undefined} />
+      </View>
+    </View>
+  )
+}
 
 /**
  * State matrix for Modula primitives that flagship screens must prove in 7M-B2.
@@ -533,6 +601,10 @@ function LabBlock({title, children}: {title: string; children: React.ReactNode})
 const styles = StyleSheet.create({
   chromePreview: {overflow: 'hidden', position: 'relative'},
   content: {paddingBottom: 48},
+  heroSpecimen: {flex: 1},
+  heroSpecimenCover: {position: 'relative'},
+  heroSpecimenIdentity: {alignItems: 'flex-start', flexDirection: 'row'},
+  heroSpecimenLead: {marginTop: -64},
   row: {flexDirection: 'row', gap: 16},
   stickyPreview: {height: 72, position: 'relative'},
 })

@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -56,7 +57,7 @@ export function ModuleDetailScreen() {
   const queryClient = useQueryClient()
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, scheme, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const detail = useModuleDetailQuery(id)
   const module = detail.data
@@ -243,17 +244,23 @@ export function ModuleDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+      <StatusBar style={scrollOffset < 210 ? 'light' : scheme === 'dark' ? 'light' : 'dark'} />
       <ResponsiveContent maxWidth={920}>
         <ScrollView
-          contentContainerStyle={{paddingBottom: tabPadding + spacing[8], paddingHorizontal: spacing[3], paddingTop: insets.top + spacing[2]}}
+          contentContainerStyle={{paddingBottom: tabPadding + spacing[8]}}
           keyboardShouldPersistTaps="handled"
           onScroll={event => setScrollOffset(event.nativeEvent.contentOffset.y)}
           scrollEventThrottle={16}>
           <View style={styles.coverRegion}>
-            <ProductCover moduleId={module.moduleId} name={copy.name} />
+            <ProductCover
+              moduleId={module.moduleId}
+              name={copy.name}
+              inset={false}
+              transitionToCanvas
+            />
             <ProductTopChrome
               productName={copy.name}
-              top={spacing[3]}
+              top={insets.top + spacing[2]}
               onBack={goBack}
               onShare={shareModule}
               actions={overflowActions}
@@ -261,7 +268,11 @@ export function ModuleDetailScreen() {
             />
           </View>
 
-          <View style={[styles.productLead, {gap: spacing[4], marginTop: -24, paddingHorizontal: spacing[1]}]}>
+          <View
+            style={[
+              styles.productLead,
+              {gap: spacing[4], marginTop: -64, paddingHorizontal: spacing[4]},
+            ]}>
             <View style={[styles.identityRow, stackedIdentity && styles.identityStack, {gap: spacing[4]}]}>
               <ModuleArtwork moduleId={module.moduleId} name={copy.name} size={heroArtworkSize} variant="hero" />
               <View style={[styles.identityCopy, {paddingTop: stackedIdentity ? 0 : spacing[1]}]}>
@@ -293,7 +304,11 @@ export function ModuleDetailScreen() {
             <ProductTabs selected={selectedTab} onSelect={setSelectedTab} />
           </View>
 
-          <View style={[styles.editorialBody, {gap: spacing[8], paddingHorizontal: spacing[1], paddingTop: spacing[5]}]}>
+          <View
+            style={[
+              styles.editorialBody,
+              {gap: spacing[8], paddingHorizontal: spacing[4], paddingTop: spacing[5]},
+            ]}>
             <TabContent
               tab={selectedTab}
               module={module}
