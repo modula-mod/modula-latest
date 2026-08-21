@@ -108,9 +108,7 @@ export function InstallPreviewSheet({
             {copy.description}
           </AppText>
           <View style={{gap: spacing[2]}}>
-            <AppText variant="micro" colour="textTertiary">
-              ACCESS
-            </AppText>
+            <AppText variant="headline">What {copy.name} can use</AppText>
             {presentation.groups.map(group => {
               const open = openGroup === group.id
               return (
@@ -162,6 +160,11 @@ export function InstallPreviewSheet({
           {preview?.compatible === false ? (
             <AppText variant="caption" colour="destructive">
               {preview.incompatibilityReasons.join(', ') || 'This module is not compatible.'}
+            </AppText>
+          ) : null}
+          {failed ? (
+            <AppText variant="caption" colour="destructive" accessibilityLiveRegion="assertive">
+              {failed}
             </AppText>
           ) : null}
         </View>

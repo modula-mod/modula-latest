@@ -31,11 +31,10 @@ function classifyPermission(permission: ModulePermissionInput): PermissionAudien
 
 function groupIdFor(permission: ModulePermissionInput): UserFacingPermissionGroup['id'] {
   const text = `${permission.permission} ${permission.reason}`.toLowerCase()
-  if (/folder/.test(text)) return 'folders'
   if (/search/.test(text)) return 'search'
   if (/profile|tab/.test(text)) return 'profile'
   if (/composer|quick action|save to vault|integration|surface/.test(text)) return 'integrations'
-  if (/note|record|document|knowledge/.test(text)) return 'notes'
+  if (/folder|note|record|document|knowledge/.test(text)) return 'notes'
   return 'other'
 }
 
@@ -45,13 +44,8 @@ const GROUP_META: Record<
 > = {
   notes: {
     section: 'YOUR DATA',
-    title: 'Notes',
-    summary: 'Create, edit and delete notes you make in this module.',
-  },
-  folders: {
-    section: 'YOUR DATA',
-    title: 'Folders',
-    summary: 'Create and organise folders.',
+    title: 'Notes & folders',
+    summary: 'Create, organise and remove the notes and folders you make here.',
   },
   search: {
     section: 'YOUR DATA',
@@ -60,8 +54,8 @@ const GROUP_META: Record<
   },
   integrations: {
     section: 'MODULA INTEGRATION',
-    title: 'Quick actions',
-    summary: 'Add optional actions to supported Modula surfaces.',
+    title: 'Modula integration',
+    summary: 'Add declared actions to supported Modula surfaces.',
   },
   profile: {
     section: 'MODULA INTEGRATION',
@@ -82,10 +76,9 @@ export function presentPermissions(
   const items = permissions ?? []
   const technical = items.filter(item => classifyPermission(item) === 'technical')
   const userFacing = items.filter(item => classifyPermission(item) === 'user')
-  const source = userFacing.length ? userFacing : items
   const grouped = new Map<string, UserFacingPermissionGroup>()
 
-  for (const permission of source) {
+  for (const permission of userFacing) {
     const id = groupIdFor(permission)
     const existing = grouped.get(id)
     if (existing) {
@@ -100,6 +93,19 @@ export function presentPermissions(
       summary: meta.summary,
       permissions: [permission],
     })
+  }
+
+  if (!userFacing.length && technical.length) {
+    const technicalText = technical.map(item => `${item.permission} ${item.reason}`).join(' ').toLowerCase()
+    const inferredIds = [
+      /note|folder|record|document|schema/.test(technicalText) ? 'notes' : null,
+      /search/.test(technicalText) ? 'search' : null,
+      /profile|tab|composer|surface|integration/.test(technicalText) ? 'integrations' : null,
+    ].filter((id): id is string => Boolean(id))
+    for (const id of inferredIds) {
+      const meta = GROUP_META[id] ?? GROUP_META.other
+      grouped.set(id, {id, ...meta, permissions: []})
+    }
   }
 
   if (!grouped.size) {

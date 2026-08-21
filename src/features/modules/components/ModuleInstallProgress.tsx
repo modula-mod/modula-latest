@@ -6,9 +6,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ModuleInstallStageId =
   | 'resolving'
-  | 'validating'
   | 'compatibility'
-  | 'permissions'
   | 'installing'
   | 'enabling'
   | 'ready'
@@ -16,9 +14,7 @@ export type ModuleInstallStageId =
 
 export const MODULE_INSTALL_STAGES: {id: ModuleInstallStageId; label: string; activeLabel: string}[] = [
   {id: 'resolving', label: 'Release verified', activeLabel: 'Verifying release'},
-  {id: 'validating', label: 'Manifest validated', activeLabel: 'Checking compatibility'},
-  {id: 'compatibility', label: 'Compatible', activeLabel: 'Checking compatibility'},
-  {id: 'permissions', label: 'Permissions granted', activeLabel: 'Reviewing permissions'},
+  {id: 'compatibility', label: 'Compatibility checked', activeLabel: 'Checking compatibility'},
   {id: 'installing', label: 'Module installed', activeLabel: 'Installing'},
   {id: 'enabling', label: 'Module enabled', activeLabel: 'Enabling'},
   {id: 'ready', label: 'Ready', activeLabel: 'Ready'},
@@ -45,7 +41,7 @@ export function ModuleInstallProgress({
   const current = stageIndex(stage === 'failed' ? 'resolving' : stage)
   return (
     <View style={{gap: spacing[3]}} testID="module-install-progress">
-      <AppText variant="headline">Installing {productName}…</AppText>
+      <AppText variant="headline">{stage === 'ready' ? `${productName} is ready` : `Installing ${productName}…`}</AppText>
       {MODULE_INSTALL_STAGES.filter(item => item.id !== 'ready').map(item => {
         const index = stageIndex(item.id)
         const done = current > index || stage === 'ready'
