@@ -18,7 +18,7 @@ origin/cursor/phase7m-b7-full-route-post-v2  9bde9e7
     └── ancestor of
 origin/cursor/phase7m-b8-founder-mockup-reconstruction  ff6324f
     └── ancestor of
-origin/cursor/phase7m-b9-product-hub-exact-reconstruction  5b0ccbed
+origin/cursor/phase7m-b9-product-hub-exact-reconstruction  5b0ccbed43df9db5298a731c5d07ef0434b86d8c
     └── + 1 preservation commit
 origin/cursor/phase7m-b10-product-hub-founder-fidelity  d1a0b3a
 ```
@@ -192,6 +192,27 @@ Also loaded: `modula-architecture`, `modula-dependencies`, `modula-ui`, `animate
 - PR #33 `cursor/phase7m-b8-founder-mockup-reconstruction` — ancestor of B9
 
 They must not be merged on top of 7N-A. Close them after 7N-A lands on `main`.
+
+## Local catalogue repair (truthful Module Detail)
+
+`ApiModuleRepository` `LOCAL_CATALOGUE` previously listed only Tasks (coming soon) and DIMON Core. With `EXPO_PUBLIC_DATA_SOURCE=local` the registry request fails closed into that list, so `/marketplace/digital.modula.vault-notes` rendered “This product isn’t available right now.”
+
+7N-A added canonical Vault Notes 1.1.0 as the featured local catalogue item so Module Detail evidence is the **actual product UI**, not an empty state. This is a data fallback repair, not a visual redesign. Local `/install-preview` still has no fallback; the install sheet surfaces `Alert.alert` “Vault Notes couldn’t be prepared” — isolated, not judged as layout.
+
+## Visual baseline capture (2026-08-21)
+
+| Gate | Result |
+| --- | --- |
+| iPhone 17 Pro Debug build | PASS (`/tmp/modula-7na-native-derived`) |
+| iPhone 17 Pro Release build | PASS (same derived-data tree) |
+| iOS interactive (taps/swipes) | BLOCKED_MAC_LOCKED (`CGSSessionScreenIsLocked=Yes`) |
+| Core-7 light native stills | CAPTURED via `simctl openurl` |
+| OLED / Dim / Surface Types on Core-3 | NOT DISTINCTLY CAPTURED |
+| Motion clips | 0 |
+| Fresh clone `modula-main-ui-baseline` | NOT CREATED (`origin/main` still `fcca100` until PR #34 merges) |
+| Production modified | NO |
+
+Evidence: `modula-mod/modula-evidence-screenshots` `phase-7n/a/`.
 
 ## What 7N-A is not
 

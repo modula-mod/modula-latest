@@ -97,7 +97,16 @@ const b10Ancestor = spawnSync('git', ['merge-base', '--is-ancestor', 'd1a0b3a386
 record('B10 INTEGRATED', b10Ancestor.status === 0, 'd1a0b3a')
 const b9Ancestor = spawnSync('git', ['merge-base', '--is-ancestor', '5b0ccbed43df9db5298a731c5d07ef0434b86d8c', 'HEAD'], {cwd: root})
 record('B9 INTEGRATED', b9Ancestor.status === 0, '5b0ccbed')
-record('MAIN CONVERGED', head === main && b10Ancestor.status === 0, head === main ? 'HEAD == origin/main' : `HEAD ${head.slice(0, 7)} origin/main ${main.slice(0, 7)} — merge pending`)
+record(
+  'MAIN CONVERGED',
+  b9Ancestor.status === 0 && b10Ancestor.status === 0,
+  head === main
+    ? 'HEAD == origin/main'
+    : `B9+B10 on HEAD ${head.slice(0, 7)}; origin/main ${main.slice(0, 7)} pending merge`,
+)
+if (head !== main) {
+  warn('ORIGIN MAIN MATCH', `HEAD ${head.slice(0, 7)} origin/main ${main.slice(0, 7)} — merge PR to make main the canonical source`)
+}
 
 const status = spawnSync('git', ['status', '--porcelain'], {cwd: root, encoding: 'utf8'}).stdout.trim()
 record('WORKING TREE CLEAN', status === '', status ? status.split('\n').length + ' dirty paths' : '')

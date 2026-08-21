@@ -1,6 +1,15 @@
 import type {ApiClient} from '@/api/client'
 import {runtimeEnvironment} from '@/config/runtimeEnvironment'
-import {isVaultNotesModuleId} from '@modula/greenfield-contracts'
+import {
+  CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
+  CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+  CANONICAL_VAULT_NOTES_MODULE_ID,
+  CANONICAL_VAULT_NOTES_PRODUCT_NAME,
+  CANONICAL_VAULT_NOTES_PUBLISHER,
+  CANONICAL_VAULT_NOTES_PUBLISHER_ID,
+  CANONICAL_VAULT_NOTES_REPOSITORY,
+  isVaultNotesModuleId,
+} from '@modula/greenfield-contracts'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {
   GreenfieldModuleMarketplace,
@@ -34,6 +43,23 @@ import type {
 } from '@/data/repositories/contracts/ModuleRepository'
 
 const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
+  {
+    moduleId: CANONICAL_VAULT_NOTES_MODULE_ID,
+    name: CANONICAL_VAULT_NOTES_PRODUCT_NAME,
+    description: 'Private notes and knowledge, built into Modula.',
+    publisherId: CANONICAL_VAULT_NOTES_PUBLISHER_ID,
+    publisherName: CANONICAL_VAULT_NOTES_PUBLISHER,
+    kind: 'module',
+    category: 'Productivity',
+    trustLevel: 'firstParty',
+    latestVersion: CANONICAL_VAULT_NOTES_CURRENT_VERSION,
+    compatibility: 'iOS, Android, Web',
+    installable: true,
+    installationState: 'available',
+    priceState: 'Free',
+    featured: true,
+    betaClassification: 'CANONICAL_PRODUCT',
+  },
   {
     moduleId: 'digital.modula.tasks',
     name: 'Tasks',
@@ -104,14 +130,29 @@ export class ApiModuleRepository implements ModuleRepository {
       this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
       () => {
         const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
-        return fallback ? {
+        if (!fallback) return null
+        const vault = isVaultNotesModuleId(fallback.moduleId)
+        return {
           ...fallback,
           longDescription: fallback.description,
           backend: defaultBackendMetadata(moduleId),
-          permissions: [],
+          permissions: vault
+            ? [
+                {
+                  permission: 'records:module.digital.modula.vault-notes.notes:write',
+                  reason: 'Create private note records',
+                  risk: 'medium' as const,
+                },
+              ]
+            : [],
           contributions: {},
-          privacy: undefined,
-        } : null
+          privacy: vault ? 'Your Vault Notes records are private to your account.' : undefined,
+          sourceRepository: vault ? CANONICAL_VAULT_NOTES_REPOSITORY : undefined,
+          sourceCommit: vault ? CANONICAL_VAULT_NOTES_CURRENT_COMMIT : undefined,
+          releaseNotes: vault
+            ? ['Private notes stay on your account.', 'Twelve declared Vault views.']
+            : undefined,
+        }
       },
     ).then(async item => {
       if (!item) return null
