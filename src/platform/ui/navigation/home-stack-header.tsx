@@ -9,8 +9,8 @@ import Animated, {
 import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {
-  HEADER_ICON_PAIR_GAP,
   plainHeaderCustomItem,
   plainHeaderSpacing,
   supportsPlainHeaderItems,
@@ -121,15 +121,31 @@ export function HomeHeaderMessages() {
 }
 
 /**
- * Android / web fallback. On iOS prefer `homeHeaderRightItems` so the shared
- * liquid-glass capsule keeps both icons with a real gap between them.
+ * Android / web — same shared `ChromeGlassControlGroup` as Product Hub /
+ * Profile. iOS uses `homeHeaderRightItems` so UIKit owns the liquid glass.
  */
 export function HomeHeaderRight() {
+  const router = useRouter()
   return (
-    <View style={styles.fallbackPair}>
-      <HomeHeaderCreate />
-      <HomeHeaderMessages />
-    </View>
+    <ChromeGlassControlGroup
+      items={[
+        {
+          kind: 'button',
+          icon: 'create',
+          accessibilityLabel: 'Create a post',
+          onPress: () => {
+            void selectionHaptic()
+            router.push('/compose' as Href)
+          },
+        },
+        {
+          kind: 'button',
+          icon: 'messages',
+          accessibilityLabel: 'Open messages',
+          onPress: () => router.push('/messages' as Href),
+        },
+      ]}
+    />
   )
 }
 
@@ -149,11 +165,6 @@ export function homeHeaderRightItems() {
 }
 
 const styles = StyleSheet.create({
-  fallbackPair: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: HEADER_ICON_PAIR_GAP,
-  },
   titleWrap: {
     alignItems: 'center',
     justifyContent: 'center',

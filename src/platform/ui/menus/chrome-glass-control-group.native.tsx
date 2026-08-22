@@ -43,32 +43,22 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
   throw new Error('overlayGroupWidth(2) must equal OVERLAY_GROUP_MIN_WIDTH')
 }
 
-type GlassSlotProps = {
+type GlassViewProps = {
   style?: StyleProp<ViewStyle>
   interactive?: boolean
-  children?: ReactNode
-}
-
-type GlassContainerProps = {
-  spacing?: number
-  style?: StyleProp<ViewStyle>
+  isInteractive?: boolean
+  effect?: 'clear' | 'regular' | 'none'
+  glassEffectStyle?: string
   children?: ReactNode
 }
 
 type CallstackModule = {
-  LiquidGlassView: ComponentType<GlassSlotProps & {effect?: 'clear' | 'regular' | 'none'}>
-  LiquidGlassContainerView: ComponentType<GlassContainerProps>
+  LiquidGlassView: ComponentType<GlassViewProps>
   isLiquidGlassSupported: boolean
 }
 
 type ExpoGlassModule = {
-  GlassView: ComponentType<
-    GlassSlotProps & {
-      glassEffectStyle?: string
-      isInteractive?: boolean
-    }
-  >
-  GlassContainer: ComponentType<GlassContainerProps>
+  GlassView: ComponentType<GlassViewProps>
 }
 
 let cachedCallstack: CallstackModule | null | undefined
@@ -106,123 +96,89 @@ function loadExpoGlass(): ExpoGlassModule | null {
 }
 
 /**
- * Home-parity overlay control group.
+ * THE shared Home-style control group.
  *
- * Home uses UIKit shared header liquid glass (`unstable_header*Items`).
- * Overlay screens cannot use that API, so this mirrors it with
- * LiquidGlassContainerView / GlassContainer: each 44pt plain glyph sits in
- * its own glass disc, and the container merges them into one continuous
- * capsule (same material as Home — not a BlurView pill with a drop shadow).
+ * One liquid-glass capsule. Plain 44pt glyphs inside with 22pt gap.
+ * Never separate glass discs — that reads as buttons, not a control group.
+ *
+ * Home iOS uses UIKit `unstable_header*Items` for the same look; every other
+ * surface (Product Hub, Profile cover, product detail, Home Android/web)
+ * mounts this component.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const {reduceTransparency} = useSystemAccessibility()
   const width = overlayGroupWidth(items.length)
-  const rowStyle: StyleProp<ViewStyle> = [styles.row, {minWidth: width, width}]
+  const capsuleStyle: StyleProp<ViewStyle> = [
+    styles.capsule,
+    {minWidth: width, width},
+  ]
+  const content = <View style={[styles.row, {minWidth: width, width}]}>{items.map(renderSlot)}</View>
 
   if (reduceTransparency) {
-    return (
-      <View style={[styles.fallbackCapsule, {minWidth: width, width}]}>
-        <View style={rowStyle}>{items.map(renderPlainSlot)}</View>
-      </View>
-    )
+    return <View style={capsuleStyle}>{content}</View>
   }
 
   const callstack = loadCallstack()
   if (callstack?.isLiquidGlassSupported) {
-    const {LiquidGlassContainerView, LiquidGlassView} = callstack
+    const {LiquidGlassView} = callstack
     return (
-      <LiquidGlassContainerView spacing={HEADER_ICON_PAIR_GAP} style={rowStyle}>
-        {items.map(item => (
-          <LiquidGlassView
-            key={item.accessibilityLabel}
-            interactive
-            effect="regular"
-            style={styles.glassDisc}>
-            <View style={styles.hit}>{renderPlainControl(item)}</View>
-          </LiquidGlassView>
-        ))}
-      </LiquidGlassContainerView>
+      <LiquidGlassView interactive effect="regular" style={capsuleStyle}>
+        {content}
+      </LiquidGlassView>
     )
   }
 
   const expo = loadExpoGlass()
-  if (expo?.GlassContainer && expo.GlassView) {
-    const {GlassContainer, GlassView} = expo
+  if (expo?.GlassView) {
     return (
-      <GlassContainer spacing={HEADER_ICON_PAIR_GAP} style={rowStyle}>
-        {items.map(item => (
-          <GlassView
-            key={item.accessibilityLabel}
-            isInteractive
-            glassEffectStyle="regular"
-            style={styles.glassDisc}>
-            <View style={styles.hit}>{renderPlainControl(item)}</View>
-          </GlassView>
-        ))}
-      </GlassContainer>
+      <expo.GlassView isInteractive glassEffectStyle="regular" style={capsuleStyle}>
+        {content}
+      </expo.GlassView>
     )
   }
 
-  // Blur / web-adjacent fallback — still LiquidGlassChrome so verifiers and
-  // older devices keep a single capsule.
   return (
     <LiquidGlassChrome
       interactive
       fallback="regular"
       contentLayout="flow"
-      style={[styles.fallbackCapsule, {minWidth: width, width}]}>
-      <View style={rowStyle}>{items.map(renderPlainSlot)}</View>
+      style={capsuleStyle}>
+      {content}
     </LiquidGlassChrome>
   )
 }
 
-function renderPlainSlot(item: ChromeGlassGroupItem) {
+function renderSlot(item: ChromeGlassGroupItem) {
   return (
     <View key={item.accessibilityLabel} style={styles.hit}>
-      {renderPlainControl(item)}
+      {item.kind === 'button' ? (
+        <ModulaIconButton
+          icon={item.icon}
+          chrome="plain"
+          accessibilityLabel={item.accessibilityLabel}
+          onPress={item.onPress}
+        />
+      ) : (
+        <ChromeIconMenu
+          icon={item.icon ?? 'more'}
+          chrome="plain"
+          accessibilityLabel={item.accessibilityLabel}
+          title={item.title}
+          actions={item.actions}
+          onAction={item.onAction}
+        />
+      )}
     </View>
   )
 }
 
-function renderPlainControl(item: ChromeGlassGroupItem) {
-  if (item.kind === 'button') {
-    return (
-      <ModulaIconButton
-        icon={item.icon}
-        chrome="plain"
-        accessibilityLabel={item.accessibilityLabel}
-        onPress={item.onPress}
-      />
-    )
-  }
-  return (
-    <ChromeIconMenu
-      icon={item.icon ?? 'more'}
-      chrome="plain"
-      accessibilityLabel={item.accessibilityLabel}
-      title={item.title}
-      actions={item.actions}
-      onAction={item.onAction}
-    />
-  )
-}
-
 const styles = StyleSheet.create({
-  fallbackCapsule: {
+  capsule: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
     flexGrow: 0,
     flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
     minHeight: OVERLAY_GROUP_HIT,
-    overflow: 'hidden',
-  },
-  glassDisc: {
-    borderRadius: OVERLAY_GROUP_HIT / 2,
-    flexGrow: 0,
-    flexShrink: 0,
-    height: OVERLAY_GROUP_HIT,
-    overflow: 'visible',
-    width: OVERLAY_GROUP_HIT,
   },
   hit: {
     alignItems: 'center',

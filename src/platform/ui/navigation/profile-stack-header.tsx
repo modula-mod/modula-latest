@@ -78,17 +78,50 @@ export function ProfileHeaderLeft() {
   return <ProfileHeaderBack />
 }
 
+/** Android / web — shared `ChromeGlassControlGroup` (iOS uses header items). */
 export function ProfileHeaderRight() {
+  const router = useRouter()
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: HEADER_ICON_PAIR_GAP,
-      }}>
-      <ProfileShareMenu />
-      <ProfileOverflowMenu />
-    </View>
+    <ChromeGlassControlGroup
+      items={[
+        {
+          kind: 'menu',
+          icon: 'share',
+          accessibilityLabel: 'Share profile',
+          title: 'Share',
+          actions: [
+            {id: 'share', label: 'Share profile', icon: 'share'},
+            {id: 'qr', label: 'QR / share sheet — Preview', icon: 'photo'},
+            {id: 'copy', label: 'Copy profile link', icon: 'link'},
+          ],
+          onAction: id => {
+            if (id === 'share' || id === 'qr') {
+              router.push('/share-profile' as Href)
+            }
+          },
+        },
+        {
+          kind: 'menu',
+          icon: 'more',
+          accessibilityLabel: 'Open profile actions',
+          title: 'Profile',
+          actions: [
+            {id: 'edit', label: 'Edit Profile', icon: 'profile'},
+            {id: 'customize', label: 'Customize', icon: 'appearance'},
+            {id: 'os', label: 'Profile-OS', icon: 'settings'},
+            {id: 'preview', label: 'View as visitor', icon: 'eye'},
+            {id: 'settings', label: 'Settings', icon: 'settings'},
+          ],
+          onAction: id => {
+            if (id === 'edit') router.push('/profile/edit' as Href)
+            if (id === 'customize') router.push('/profile/customize' as Href)
+            if (id === 'os') router.push('/profile/os' as Href)
+            if (id === 'preview') router.push('/profile/preview' as Href)
+            if (id === 'settings') router.push('/settings' as Href)
+          },
+        },
+      ]}
+    />
   )
 }
 

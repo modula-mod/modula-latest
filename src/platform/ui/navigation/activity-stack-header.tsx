@@ -1,11 +1,10 @@
 import {useRouter, type Href} from 'expo-router'
-import {View} from 'react-native'
 
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 import {
-  HEADER_ICON_PAIR_GAP,
   plainHeaderCustomItem,
   plainHeaderSpacing,
   supportsPlainHeaderItems,
@@ -72,26 +71,48 @@ export function ActivityHeaderLeft() {
 
 /**
  * Trailing control group: mark-read, settings, overflow.
- * iOS 26 wraps these in one shared glass capsule.
+ * Android / web use shared `ChromeGlassControlGroup`. iOS 26 uses header items.
  */
 export function ActivityHeaderRight({
   onMarkRead,
   onOpenFilters,
 }: ActivityHeaderRightProps) {
+  const router = useRouter()
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: HEADER_ICON_PAIR_GAP,
-      }}>
-      <ActivityMarkReadButton onMarkRead={onMarkRead} />
-      <ActivitySettingsButton />
-      <ActivityOverflowMenu
-        onMarkRead={onMarkRead}
-        onOpenFilters={onOpenFilters}
-      />
-    </View>
+    <ChromeGlassControlGroup
+      items={[
+        {
+          kind: 'button',
+          icon: 'check',
+          accessibilityLabel: 'Mark all as read',
+          onPress: onMarkRead,
+        },
+        {
+          kind: 'button',
+          icon: 'settings',
+          accessibilityLabel: 'Notification settings',
+          onPress: () => router.push('/settings/notifications' as Href),
+        },
+        {
+          kind: 'menu',
+          icon: 'more',
+          accessibilityLabel: 'Activity actions',
+          title: 'Activity',
+          actions: [
+            {id: 'filter', label: 'Filters', icon: 'settings'},
+            {id: 'markRead', label: 'Mark all as read', icon: 'check'},
+            {id: 'customize', label: 'Customize Activity', icon: 'appearance'},
+            {id: 'quiet', label: 'Quiet inbox', icon: 'privacy'},
+          ],
+          onAction: id => {
+            if (id === 'filter') onOpenFilters()
+            if (id === 'markRead') onMarkRead()
+            if (id === 'customize') router.push('/product/layout-activity' as Href)
+            if (id === 'quiet') router.push('/product/quiet-inbox' as Href)
+          },
+        },
+      ]}
+    />
   )
 }
 

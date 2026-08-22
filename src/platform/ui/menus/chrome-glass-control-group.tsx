@@ -40,12 +40,10 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
 }
 
 /**
- * Home-parity control group for overlay chrome (Product Hub, Profile cover,
- * product detail, secondary headers).
+ * THE shared Home-style control group (web / Android).
  *
- * On iOS 26 the `.native` file uses LiquidGlassContainerView / GlassContainer
- * so discs merge into system liquid glass (Home material). This file is the
- * BlurView / web capsule fallback.
+ * One liquid-glass capsule. Plain 44pt glyphs, 22pt gap. Same API as the
+ * native file — never separate glass discs.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const width = overlayGroupWidth(items.length)
