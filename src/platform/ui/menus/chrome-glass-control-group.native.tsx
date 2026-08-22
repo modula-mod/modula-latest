@@ -40,12 +40,9 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
 }
 
 /**
- * Same grouped chrome as the Home route: 44pt plain glyphs, 22pt gap,
- * one liquid-glass capsule. Overlay screens cannot use the iOS 26 shared
- * header capsule, so this is the in-tree equivalent.
- *
- * Inner glyphs are `chrome="plain"` (same as Home `unstable_header*Items`).
- * Do not nest SwiftUI Host buttons with their own glass discs.
+ * Native Home-parity control group. Same RN layout as the cross-platform
+ * file: 44×44 plain slots, 22pt gap, one LiquidGlassChrome capsule.
+ * Avoids nested SwiftUI Host glass discs (those made Profile look wrong).
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const width = overlayGroupWidth(items.length)
@@ -56,27 +53,27 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
       contentLayout="flow"
       style={[styles.capsule, {minWidth: width, width}]}>
       <View style={[styles.row, {minWidth: width, width}]}>
-        {items.map(item =>
-          item.kind === 'button' ? (
-            <ModulaIconButton
-              key={item.accessibilityLabel}
-              icon={item.icon}
-              chrome="plain"
-              accessibilityLabel={item.accessibilityLabel}
-              onPress={item.onPress}
-            />
-          ) : (
-            <ChromeIconMenu
-              key={item.accessibilityLabel}
-              icon={item.icon ?? 'more'}
-              chrome="plain"
-              accessibilityLabel={item.accessibilityLabel}
-              title={item.title}
-              actions={item.actions}
-              onAction={item.onAction}
-            />
-          ),
-        )}
+        {items.map(item => (
+          <View key={item.accessibilityLabel} style={styles.hit}>
+            {item.kind === 'button' ? (
+              <ModulaIconButton
+                icon={item.icon}
+                chrome="plain"
+                accessibilityLabel={item.accessibilityLabel}
+                onPress={item.onPress}
+              />
+            ) : (
+              <ChromeIconMenu
+                icon={item.icon ?? 'more'}
+                chrome="plain"
+                accessibilityLabel={item.accessibilityLabel}
+                title={item.title}
+                actions={item.actions}
+                onAction={item.onAction}
+              />
+            )}
+          </View>
+        ))}
       </View>
     </LiquidGlassChrome>
   )
@@ -90,6 +87,14 @@ const styles = StyleSheet.create({
     height: OVERLAY_GROUP_HIT,
     minHeight: OVERLAY_GROUP_HIT,
     overflow: 'hidden',
+  },
+  hit: {
+    alignItems: 'center',
+    flexGrow: 0,
+    flexShrink: 0,
+    height: OVERLAY_GROUP_HIT,
+    justifyContent: 'center',
+    width: OVERLAY_GROUP_HIT,
   },
   row: {
     alignItems: 'center',

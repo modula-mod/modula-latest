@@ -239,7 +239,14 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
           <ProgressiveBlurBand height={blurHeight} topHeavy intensity={CHROME_BLUR_INTENSITY} />
         </View>
-        <View style={{paddingTop: insets.top + spacing[2]}}>
+        <View
+          style={[
+            styles.headerBand,
+            {
+              height: headerRow,
+              paddingTop: insets.top,
+            },
+          ]}>
           <ProductHubHeader
             compact={search.compact}
             scrollY={scrollY}
@@ -629,6 +636,11 @@ const styles = StyleSheet.create({
   content: {paddingHorizontal: 16},
   desktopColumn: {flex: 1, minWidth: 280},
   desktopSplit: {flexDirection: 'row', flexWrap: 'wrap', gap: 32, width: '100%'},
+  headerBand: {
+    justifyContent: 'flex-end',
+    paddingBottom: 6,
+    width: '100%',
+  },
   landing: {width: '100%'},
   landingWide: {alignSelf: 'center', maxWidth: 1180, width: '100%'},
   overlay: {

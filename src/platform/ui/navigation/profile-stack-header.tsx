@@ -163,67 +163,67 @@ export function ProfileCoverChrome({
         pointerEvents="box-none"
         style={{paddingHorizontal: spacing[3], paddingTop: insets.top + 8}}>
         <View pointerEvents="box-none" style={styles.overlayRow}>
-        <View
-          pointerEvents="box-none"
-          style={[styles.leading, {gap: spacing[2]}]}>
-          {backVisible ? <ModulaBackButton /> : null}
-          {title}
+          <View
+            pointerEvents="box-none"
+            style={[styles.leading, {gap: spacing[2]}]}>
+            {backVisible ? <ModulaBackButton /> : null}
+            {title}
+          </View>
+          <ChromeGlassControlGroup
+            items={[
+              ...(owner
+                ? [
+                    {
+                      kind: 'button' as const,
+                      icon: 'edit' as const,
+                      accessibilityLabel: 'Edit Profile',
+                      onPress: () => router.push('/profile/edit' as Href),
+                    },
+                  ]
+                : []),
+              {
+                kind: 'button',
+                icon: 'share',
+                accessibilityLabel: 'Share profile',
+                onPress: () => router.push('/share-profile' as Href),
+              },
+              owner
+                ? {
+                    kind: 'menu' as const,
+                    icon: 'more' as const,
+                    accessibilityLabel: 'Open profile actions',
+                    title: 'Profile',
+                    actions: [
+                      {id: 'customize', label: 'Customize', icon: 'appearance'},
+                      {id: 'os', label: 'Profile-OS', icon: 'settings'},
+                      {id: 'preview', label: 'View as visitor', icon: 'eye'},
+                      {id: 'settings', label: 'Settings', icon: 'settings'},
+                    ],
+                    onAction: (id: string) => {
+                      if (id === 'customize') router.push('/profile/customize' as Href)
+                      if (id === 'os') router.push('/profile/os' as Href)
+                      if (id === 'preview') router.push('/profile/preview' as Href)
+                      if (id === 'settings') router.push('/settings' as Href)
+                    },
+                  }
+                : {
+                    kind: 'menu' as const,
+                    icon: 'more' as const,
+                    accessibilityLabel: 'More profile actions',
+                    title: 'Profile',
+                    actions: [
+                      {id: 'share', label: 'Share profile', icon: 'share'},
+                      {id: 'copy', label: 'Copy profile link', icon: 'link'},
+                    ],
+                    onAction: (id: string) => {
+                      if (id === 'share' || id === 'copy') {
+                        router.push('/share-profile' as Href)
+                      }
+                    },
+                  },
+            ]}
+          />
         </View>
-        <ChromeGlassControlGroup
-          items={[
-            ...(owner
-              ? [
-                  {
-                    kind: 'button' as const,
-                    icon: 'edit' as const,
-                    accessibilityLabel: 'Edit Profile',
-                    onPress: () => router.push('/profile/edit' as Href),
-                  },
-                ]
-              : []),
-            {
-              kind: 'button',
-              icon: 'share',
-              accessibilityLabel: 'Share profile',
-              onPress: () => router.push('/share-profile' as Href),
-            },
-            owner
-              ? {
-                  kind: 'menu' as const,
-                  icon: 'more' as const,
-                  accessibilityLabel: 'Open profile actions',
-                  title: 'Profile',
-                  actions: [
-                    {id: 'customize', label: 'Customize', icon: 'appearance'},
-                    {id: 'os', label: 'Profile-OS', icon: 'settings'},
-                    {id: 'preview', label: 'View as visitor', icon: 'eye'},
-                    {id: 'settings', label: 'Settings', icon: 'settings'},
-                  ],
-                  onAction: (id: string) => {
-                    if (id === 'customize') router.push('/profile/customize' as Href)
-                    if (id === 'os') router.push('/profile/os' as Href)
-                    if (id === 'preview') router.push('/profile/preview' as Href)
-                    if (id === 'settings') router.push('/settings' as Href)
-                  },
-                }
-              : {
-                  kind: 'menu' as const,
-                  icon: 'more' as const,
-                  accessibilityLabel: 'More profile actions',
-                  title: 'Profile',
-                  actions: [
-                    {id: 'share', label: 'Share profile', icon: 'share'},
-                    {id: 'copy', label: 'Copy profile link', icon: 'link'},
-                  ],
-                  onAction: (id: string) => {
-                    if (id === 'share' || id === 'copy') {
-                      router.push('/share-profile' as Href)
-                    }
-                  },
-                },
-          ]}
-        />
-      </View>
       </View>
     </View>
   )
@@ -260,7 +260,8 @@ const styles = StyleSheet.create({
   overlayRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 8,
+    gap: HEADER_ICON_PAIR_GAP,
     justifyContent: 'space-between',
+    minHeight: 44,
   },
 })
