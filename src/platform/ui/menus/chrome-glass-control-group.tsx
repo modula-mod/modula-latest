@@ -43,16 +43,16 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
  * Home-parity control group for overlay chrome (Product Hub, Profile cover,
  * product detail, secondary headers).
  *
- * Layout matches Home `unstable_header*Items`: 44×44 plain glyph slots,
- * 22pt gap, one liquid-glass capsule. Each item is pinned to a fixed hit so
- * search/discover (or edit/share/more) stay equal size.
+ * On iOS 26 the `.native` file uses LiquidGlassContainerView / GlassContainer
+ * so discs merge into system liquid glass (Home material). This file is the
+ * BlurView / web capsule fallback.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const width = overlayGroupWidth(items.length)
   return (
     <LiquidGlassChrome
       interactive
-      fallback="clear"
+      fallback="regular"
       contentLayout="flow"
       style={[styles.capsule, {minWidth: width, width}]}>
       <View style={[styles.row, {minWidth: width, width}]}>
