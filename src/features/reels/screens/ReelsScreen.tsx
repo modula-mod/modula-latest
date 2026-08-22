@@ -35,16 +35,10 @@ import {
   type ReelOverflowActionId,
 } from '@/features/reels/reelActions'
 import {selectionHaptic} from '@/lib/haptics'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
-import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
-import {
-  plainHeaderCustomItem,
-  plainHeaderSpacing,
-  supportsPlainHeaderItems,
-} from '@/platform/ui/navigation/plain-header-items'
 import {ModulaReelPlayer} from '@/platform/ui/video'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {ReelItem as ReelItemType} from '@/domain/discovery'
@@ -136,74 +130,39 @@ export function ReelsScreen() {
             />
           ),
           headerLeft: () => (
-            <ModulaIconButton
-              icon="create"
-              chrome="plain"
-              accessibilityLabel="Create"
-              onPress={() => router.push('/compose' as Href)}
+            <ChromeGlassControlGroup
+              items={[
+                {
+                  kind: 'button',
+                  icon: 'create',
+                  accessibilityLabel: 'Create',
+                  onPress: () => router.push('/compose' as Href),
+                },
+              ]}
             />
           ),
           headerRight: () => (
-            <View style={styles.headerSideEnd}>
-              <ChromeIconMenu
-                chrome="plain"
-                systemImage="ellipsis"
-                icon="more"
-                accessibilityLabel="Reels options"
-                title="Reels"
-                actions={buildReelHeaderMoreActions()}
-                onAction={runChrome}
-              />
-              <ChromeIconMenu
-                chrome="plain"
-                systemImage="line.3.horizontal.decrease"
-                icon="settings"
-                accessibilityLabel="Reels filters"
-                title="Filters"
-                actions={buildReelHeaderFilterActions(mode)}
-                onAction={runChrome}
-              />
-            </View>
+            <ChromeGlassControlGroup
+              items={[
+                {
+                  kind: 'menu',
+                  icon: 'more',
+                  accessibilityLabel: 'Reels options',
+                  title: 'Reels',
+                  actions: buildReelHeaderMoreActions(),
+                  onAction: runChrome,
+                },
+                {
+                  kind: 'menu',
+                  icon: 'settings',
+                  accessibilityLabel: 'Reels filters',
+                  title: 'Filters',
+                  actions: buildReelHeaderFilterActions(mode),
+                  onAction: runChrome,
+                },
+              ]}
+            />
           ),
-          ...(supportsPlainHeaderItems()
-            ? {
-                unstable_headerLeftItems: () => [
-                  plainHeaderCustomItem(
-                    <ModulaIconButton
-                      icon="create"
-                      chrome="plain"
-                      accessibilityLabel="Create"
-                      onPress={() => router.push('/compose' as Href)}
-                    />,
-                  ),
-                ],
-                unstable_headerRightItems: () => [
-                  plainHeaderCustomItem(
-                    <ChromeIconMenu
-                      chrome="plain"
-                      systemImage="ellipsis"
-                      icon="more"
-                      accessibilityLabel="Reels options"
-                      title="Reels"
-                      actions={buildReelHeaderMoreActions()}
-                      onAction={runChrome}
-                    />,
-                  ),
-                  plainHeaderSpacing(),
-                  plainHeaderCustomItem(
-                    <ChromeIconMenu
-                      chrome="plain"
-                      systemImage="line.3.horizontal.decrease"
-                      icon="settings"
-                      accessibilityLabel="Reels filters"
-                      title="Filters"
-                      actions={buildReelHeaderFilterActions(mode)}
-                      onAction={runChrome}
-                    />,
-                  ),
-                ],
-              }
-            : null),
           headerStyle: {backgroundColor: 'transparent'},
         }}
       />
@@ -547,12 +506,6 @@ const styles = StyleSheet.create({
   emptyAction: {
     marginTop: 8,
     padding: 12,
-  },
-  headerSideEnd: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 22,
-    paddingRight: 4,
   },
   item: {
     overflow: 'hidden',

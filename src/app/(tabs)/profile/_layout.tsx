@@ -4,15 +4,11 @@ import {nativeScreenHeaderOptions} from '@/platform/ui/navigation/native-screen-
 import {
   ProfileHeaderLeft,
   ProfileHeaderRight,
-  profileHeaderLeftItems,
-  profileHeaderRightItems,
 } from '@/platform/ui/navigation/profile-stack-header'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export default function ProfileStackLayout() {
   const {colours} = useThemeTokens()
-  const rightItems = profileHeaderRightItems()
-  const leftItems = profileHeaderLeftItems()
 
   return (
     <Stack
@@ -24,10 +20,6 @@ export default function ProfileStackLayout() {
         contentStyle: {backgroundColor: colours.canvas},
         headerLeft: () => <ProfileHeaderLeft />,
         headerRight: () => <ProfileHeaderRight />,
-        ...(leftItems ? {unstable_headerLeftItems: () => leftItems} : null),
-        ...(rightItems
-          ? {unstable_headerRightItems: () => rightItems}
-          : null),
       }}>
       <Stack.Screen
         name="index"

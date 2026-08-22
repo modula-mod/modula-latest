@@ -1,6 +1,6 @@
 import {useRouter, type Href} from 'expo-router'
 import {useState} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet} from 'react-native'
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -8,13 +8,7 @@ import Animated, {
 
 import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
-import {
-  plainHeaderCustomItem,
-  plainHeaderSpacing,
-  supportsPlainHeaderItems,
-} from '@/platform/ui/navigation/plain-header-items'
 import {shellChromeObscureAmount} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useShellChromeObscureStyle} from '@/platform/ui/navigation/use-shell-chrome-obscure-style'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -36,6 +30,7 @@ function useShellChromeVisible(threshold = 0.2) {
   return {obscureStyle, visible}
 }
 
+/** Leading Home control — shared liquid-glass capsule (single glyph). */
 export function HomeHeaderLeft() {
   const {openDrawer} = useShellDrawer()
   const {obscureStyle, visible} = useShellChromeVisible()
@@ -45,15 +40,18 @@ export function HomeHeaderLeft() {
       pointerEvents={visible ? 'auto' : 'none'}
       style={obscureStyle}>
       {visible ? (
-        <ModulaIconButton
-          icon="menu"
-          chrome="plain"
-          accessibilityLabel="Open navigation drawer"
-          testID="home-open-drawer"
-          onPress={() => {
-            void selectionHaptic()
-            openDrawer()
-          }}
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'button',
+              icon: 'menu',
+              accessibilityLabel: 'Open navigation drawer',
+              onPress: () => {
+                void selectionHaptic()
+                openDrawer()
+              },
+            },
+          ]}
         />
       ) : null}
     </Animated.View>
@@ -77,91 +75,41 @@ export function HomeHeaderTitle() {
   )
 }
 
-export function HomeHeaderCreate() {
-  const router = useRouter()
-  const {obscureStyle, visible} = useShellChromeVisible()
-
-  return (
-    <Animated.View
-      pointerEvents={visible ? 'auto' : 'none'}
-      style={obscureStyle}>
-      {visible ? (
-        <ModulaIconButton
-          icon="create"
-          chrome="plain"
-          accessibilityLabel="Create a post"
-          onPress={() => {
-            void selectionHaptic()
-            router.push('/compose' as Href)
-          }}
-        />
-      ) : null}
-    </Animated.View>
-  )
-}
-
-export function HomeHeaderMessages() {
-  const router = useRouter()
-  const {obscureStyle, visible} = useShellChromeVisible()
-
-  return (
-    <Animated.View
-      pointerEvents={visible ? 'auto' : 'none'}
-      style={obscureStyle}>
-      {visible ? (
-        <ModulaIconButton
-          icon="messages"
-          chrome="plain"
-          accessibilityLabel="Open messages"
-          onPress={() => router.push('/messages' as Href)}
-        />
-      ) : null}
-    </Animated.View>
-  )
-}
-
 /**
- * Android / web — same shared `ChromeGlassControlGroup` as Product Hub /
- * Profile. iOS uses `homeHeaderRightItems` so UIKit owns the liquid glass.
+ * Trailing Home control group — same `ChromeGlassControlGroup` as Product Hub /
+ * Profile / Activity. Inner glyphs are chrome="plain" inside one liquid-glass capsule.
  */
 export function HomeHeaderRight() {
   const router = useRouter()
+  const {obscureStyle, visible} = useShellChromeVisible()
+
   return (
-    <ChromeGlassControlGroup
-      items={[
-        {
-          kind: 'button',
-          icon: 'create',
-          accessibilityLabel: 'Create a post',
-          onPress: () => {
-            void selectionHaptic()
-            router.push('/compose' as Href)
-          },
-        },
-        {
-          kind: 'button',
-          icon: 'messages',
-          accessibilityLabel: 'Open messages',
-          onPress: () => router.push('/messages' as Href),
-        },
-      ]}
-    />
+    <Animated.View
+      pointerEvents={visible ? 'auto' : 'none'}
+      style={obscureStyle}>
+      {visible ? (
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'button',
+              icon: 'create',
+              accessibilityLabel: 'Create a post',
+              onPress: () => {
+                void selectionHaptic()
+                router.push('/compose' as Href)
+              },
+            },
+            {
+              kind: 'button',
+              icon: 'messages',
+              accessibilityLabel: 'Open messages',
+              onPress: () => router.push('/messages' as Href),
+            },
+          ]}
+        />
+      ) : null}
+    </Animated.View>
   )
-}
-
-/** iOS 26+: shared liquid glass + spaced icons (not clustered left). */
-export function homeHeaderLeftItems() {
-  if (!supportsPlainHeaderItems()) return undefined
-  return [plainHeaderCustomItem(<HomeHeaderLeft />)]
-}
-
-export function homeHeaderRightItems() {
-  if (!supportsPlainHeaderItems()) return undefined
-  return [
-    plainHeaderCustomItem(<HomeHeaderCreate />),
-    plainHeaderSpacing(),
-    plainHeaderCustomItem(<HomeHeaderMessages />),
-  ]
 }
 
 const styles = StyleSheet.create({
