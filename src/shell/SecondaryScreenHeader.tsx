@@ -30,8 +30,8 @@ type SecondaryScreenHeaderProps = {
 }
 
 /**
- * Secondary-route chrome: extraLarge glass back + trailing ControlGroup
- * when share and overflow are both present (Expo UI ControlGroup).
+ * Secondary-route chrome: extraLarge glass back + trailing Home-sized
+ * control group when share and overflow are both present.
  */
 export function SecondaryScreenHeader({
   title,

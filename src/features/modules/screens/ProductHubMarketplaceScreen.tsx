@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react'
 import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {useSharedValue} from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
@@ -36,7 +37,13 @@ import {
 import {selectionHaptic} from '@/lib/haptics'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
+import {
+  CHROME_BLUR_INTENSITY,
+  CHROME_FADE_EXTENSION,
+  CHROME_HEADER_ROW,
+} from '@/platform/ui/navigation/chrome-insets'
 import {LAYERS} from '@/theme/tokens/layers'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -63,6 +70,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
     category: 'All',
   })
   const scrollRef = useRef<ScrollView>(null)
+  const scrollY = useSharedValue(0)
   const restored = useRef(false)
   const wide = width >= 960
   const desktop = width >= 1100
@@ -147,39 +155,17 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
     dispatch({type: 'RESULTS_CHANGED', count: results.length, error: catalogue.isError})
   }, [catalogue.isError, results.length, search.query])
 
+  const headerRow = insets.top + CHROME_HEADER_ROW
+  const blurHeight = headerRow + CHROME_FADE_EXTENSION
+
   return (
     <View style={[styles.screen, {backgroundColor: canvas}]}>
-      <View
-        style={{
-          paddingTop: insets.top + spacing[2],
-          zIndex: LAYERS.sticky,
-          backgroundColor: canvas,
-        }}>
-        <ProductHubHeader
-          compact={search.compact}
-          search={search}
-          profileName={profileName}
-          profileUri={profileUri}
-          segment={segment}
-          onSegmentChange={next => {
-            void selectionHaptic()
-            setSegment(next)
-          }}
-          updatesDisabled={!updates.length}
-          wide={wide}
-          onSearchTrigger={() => dispatch({type: 'TAP_SEARCH'})}
-          onSearchChange={text => dispatch({type: 'TYPE', query: text})}
-          onSearchCancel={() => dispatch({type: 'CANCEL'})}
-          onSearchSettled={onSettled}
-          onProfilePress={() => router.push('/profile' as Href)}
-        />
-      </View>
-
       <ResponsiveContent maxWidth={desktop ? 1180 : wide ? 860 : 860}>
         <ScrollView
           ref={scrollRef}
           onScroll={event => {
             const y = event.nativeEvent.contentOffset.y
+            scrollY.value = y
             rememberProductHubOffset(y)
             const compact = search.compact ? y > COMPACT_OFF : y > COMPACT_ON
             dispatch({type: 'SCROLL', compact})
@@ -189,7 +175,11 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
           keyboardDismissMode="interactive"
           contentContainerStyle={[
             styles.content,
-            {gap: spacing[6], paddingBottom: tabPadding + spacing[6]},
+            {
+              gap: spacing[6],
+              paddingTop: headerRow + spacing[2],
+              paddingBottom: tabPadding + spacing[6],
+            },
           ]}>
           {searchActive ? (
             <SearchMode
@@ -245,6 +235,32 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
           )}
         </ScrollView>
       </ResponsiveContent>
+      <View pointerEvents="box-none" style={[styles.overlay, {height: blurHeight, zIndex: LAYERS.sticky}]}>
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ProgressiveBlurBand height={blurHeight} topHeavy intensity={CHROME_BLUR_INTENSITY} />
+        </View>
+        <View style={{paddingTop: insets.top + spacing[2]}}>
+          <ProductHubHeader
+            compact={search.compact}
+            scrollY={scrollY}
+            search={search}
+            profileName={profileName}
+            profileUri={profileUri}
+            segment={segment}
+            onSegmentChange={next => {
+              void selectionHaptic()
+              setSegment(next)
+            }}
+            updatesDisabled={!updates.length}
+            wide={wide}
+            onSearchTrigger={() => dispatch({type: 'TAP_SEARCH'})}
+            onSearchChange={text => dispatch({type: 'TYPE', query: text})}
+            onSearchCancel={() => dispatch({type: 'CANCEL'})}
+            onSearchSettled={onSettled}
+            onProfilePress={() => router.push('/profile' as Href)}
+          />
+        </View>
+      </View>
     </View>
   )
 }
@@ -610,10 +626,16 @@ function matchesQuery(item: ModuleCatalogueItem, query: string): boolean {
 }
 
 const styles = StyleSheet.create({
-  content: {paddingHorizontal: 16, paddingTop: 8},
+  content: {paddingHorizontal: 16},
   desktopColumn: {flex: 1, minWidth: 280},
   desktopSplit: {flexDirection: 'row', flexWrap: 'wrap', gap: 32, width: '100%'},
   landing: {width: '100%'},
   landingWide: {alignSelf: 'center', maxWidth: 1180, width: '100%'},
+  overlay: {
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   screen: {flex: 1},
 })

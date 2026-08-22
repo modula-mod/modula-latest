@@ -282,6 +282,7 @@ export function ModuleDetailScreen() {
               />
             </Link.AppleZoomTarget>
             <ProductTopChrome
+              // Share + overflow use ChromeGlassControlGroup (Home-sized capsule).
               productName={copy.name}
               top={insets.top + spacing[2]}
               onBack={goBack}

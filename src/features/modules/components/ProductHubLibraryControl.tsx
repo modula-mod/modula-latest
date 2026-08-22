@@ -7,6 +7,7 @@ import {
   ProductHubSegmentedControl,
   type ProductHubSegment,
 } from '@/features/modules/components/ProductHubSegmentedControl'
+import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
@@ -18,10 +19,17 @@ const LABELS: {value: ProductHubSegment; label: string}[] = [
   {value: 'updates', label: 'Updates'},
 ]
 
+/** Full labels for the Home-style header menu — never truncated to “Disco…”. */
+export const PRODUCT_HUB_LIBRARY_ACTIONS: ModulaActionItem[] = LABELS.map(option => ({
+  id: option.value,
+  label: option.label,
+  icon: option.value === 'discover' ? 'discover' : option.value === 'installed' ? 'modules' : 'download',
+}))
+
 /**
  * Library navigation without a stacked utility block.
- * Wide: native segmented control with full labels.
- * Narrow: popover menu so "Discover" is never truncated to "Disco…".
+ * Production Product Hub uses ChromeGlassControlGroup + these actions.
+ * This popover remains for UI Lab / wide fallback specimens.
  */
 export function ProductHubLibraryControl({
   value,

@@ -3,10 +3,11 @@ import {StyleSheet, View} from 'react-native'
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
+  OVERLAY_GROUP_MIN_WIDTH,
   overlayGroupWidth,
   TOOLBAR_HIT,
 } from '@/platform/ui/menus/toolbar-chrome'
@@ -22,6 +23,7 @@ export type ChromeGlassGroupButton = {
 
 export type ChromeGlassGroupMenu = {
   kind: 'menu'
+  icon?: AppIconName
   accessibilityLabel: string
   title?: string
   actions: ModulaActionItem[]
@@ -31,10 +33,18 @@ export type ChromeGlassGroupMenu = {
 export type ChromeGlassGroupItem = ChromeGlassGroupButton | ChromeGlassGroupMenu
 
 if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_GAP) {
-  throw new Error('Overlay group must match Profile header sizes (44pt hit, 22pt gap)')
+  throw new Error('Overlay group must match Home header sizes (44pt hit, 22pt gap)')
+}
+if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
+  throw new Error('overlayGroupWidth(2) must equal OVERLAY_GROUP_MIN_WIDTH')
 }
 
-/** Web / Android: Profile-sized capsule — 44pt hits, 22pt gap. */
+/**
+ * Same grouped chrome as the Home route: 44pt plain glyphs, 22pt gap,
+ * one liquid-glass capsule. Used on overlays where the native iOS 26
+ * shared header capsule is not available (Product Hub, Profile cover,
+ * product detail, secondary screens).
+ */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
   const width = overlayGroupWidth(items.length)
   return (
@@ -43,7 +53,7 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
       fallback="clear"
       contentLayout="flow"
       style={[styles.capsule, {minWidth: width, width}]}>
-      <View style={[styles.row, {minWidth: width}]}>
+      <View style={[styles.row, {minWidth: width, width}]}>
         {items.map(item =>
           item.kind === 'button' ? (
             <ModulaIconButton
@@ -54,8 +64,9 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
               onPress={item.onPress}
             />
           ) : (
-            <ChromeOverflowMenu
+            <ChromeIconMenu
               key={item.accessibilityLabel}
+              icon={item.icon ?? 'more'}
               chrome="plain"
               accessibilityLabel={item.accessibilityLabel}
               title={item.title}
@@ -81,9 +92,10 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
+    flexGrow: 0,
+    flexShrink: 0,
     gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
-    paddingHorizontal: 6,
   },
 })

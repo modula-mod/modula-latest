@@ -190,6 +190,7 @@ export function ProfileCoverChrome({
             owner
               ? {
                   kind: 'menu' as const,
+                  icon: 'more' as const,
                   accessibilityLabel: 'Open profile actions',
                   title: 'Profile',
                   actions: [
@@ -207,6 +208,7 @@ export function ProfileCoverChrome({
                 }
               : {
                   kind: 'menu' as const,
+                  icon: 'more' as const,
                   accessibilityLabel: 'More profile actions',
                   title: 'Profile',
                   actions: [
