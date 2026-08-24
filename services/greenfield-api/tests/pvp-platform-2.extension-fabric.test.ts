@@ -13,6 +13,7 @@ import {GreenfieldModuleDependencyResolver} from '../src/modules/dependency-reso
 import {GreenfieldExtensionFabricService} from '../src/modules/extension-fabric-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
+import {executeWithBoundedRetry} from '../src/modules/backend/gateway-service.js'
 import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
@@ -210,6 +211,31 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     expect(assertion.raw_user_bearer_forwarded).toBe(false)
     expect(assertion.capabilities).toEqual([editorCapability])
     expect(assertion.expires_at.getTime() - assertion.issued_at.getTime()).toBeLessThanOrEqual(15 * 60_000)
+  })
+
+  it('bounds TEST_ONLY service timeout retries and never retries a non-idempotent action', async () => {
+    const retryDelays: number[] = []
+    let idempotentAttempts = 0
+    await expect(executeWithBoundedRetry(async () => {
+      idempotentAttempts += 1
+      throw Object.assign(new Error('TEST_ONLY extension service timed out'), {code: 'ETIMEDOUT'})
+    }, {
+      enabled: true,
+      retryDelaysMs: [5, 10],
+      sleep: async delayMs => { retryDelays.push(delayMs) },
+    })).rejects.toMatchObject({code: 'ETIMEDOUT'})
+    expect(idempotentAttempts).toBe(3)
+    expect(retryDelays).toEqual([5, 10])
+
+    let nonIdempotentAttempts = 0
+    await expect(executeWithBoundedRetry(async () => {
+      nonIdempotentAttempts += 1
+      throw Object.assign(new Error('TEST_ONLY extension service timed out'), {code: 'ETIMEDOUT'})
+    }, {
+      enabled: false,
+      sleep: async () => undefined,
+    })).rejects.toMatchObject({code: 'ETIMEDOUT'})
+    expect(nonIdempotentAttempts).toBe(1)
   })
 
   it('records one failed contribution without taking down its core host', async () => {

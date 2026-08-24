@@ -78,23 +78,28 @@ export class ModuleBackendGatewayService {
     const endpoint = await resolveBackendEndpoint(backend, installation.resolvedOrigin ?? undefined)
     const started = Date.now()
     try {
-      const response = await fetchBackendJson(endpoint.urlFor(action.path), {
-        method: 'POST',
-        body: {
-          actionId: action.actionId,
-          installationId: input.context.installationId,
-          moduleId: input.context.moduleId,
-          input: input.payload,
-          idempotencyKey: input.idempotencyKey,
-          requestId: input.requestId,
+      const response = await executeWithBoundedRetry(async () => {
+        const attempt = await fetchBackendJson(endpoint.urlFor(action.path), {
+          method: 'POST',
+          body: {
+            actionId: action.actionId,
+            installationId: input.context.installationId,
+            moduleId: input.context.moduleId,
+            input: input.payload,
+            idempotencyKey: input.idempotencyKey,
+            requestId: input.requestId,
+            token: scoped.token,
+          },
           token: scoped.token,
-        },
-        token: scoped.token,
-        idempotencyKey: input.idempotencyKey,
-        timeoutMs: action.timeoutMs,
-        maxResponseBytes: 1_000_000,
+          idempotencyKey: input.idempotencyKey,
+          timeoutMs: action.timeoutMs,
+          maxResponseBytes: 1_000_000,
+        })
+        if (attempt.status < 200 || attempt.status >= 300) throw moduleError('VALIDATION_FAILED', `Module backend action failed with HTTP ${attempt.status}`)
+        return attempt
+      }, {
+        enabled: action.idempotent,
       })
-      if (response.status < 200 || response.status >= 300) throw moduleError('VALIDATION_FAILED', `Module backend action failed with HTTP ${response.status}`)
       const result = validateBackendActionResponse(response.json)
       await this.repository.recordHealth({context: input.context, component: 'gateway', status: 'healthy', latencyMs: Date.now() - started, circuitState: 'closed'})
       return {
@@ -109,6 +114,40 @@ export class ModuleBackendGatewayService {
       throw error
     }
   }
+}
+
+const BACKEND_RETRY_DELAYS_MS = [100, 300] as const
+
+export async function executeWithBoundedRetry<T>(
+  operation: () => Promise<T>,
+  options: {
+    enabled: boolean
+    maximumAttempts?: number
+    retryDelaysMs?: readonly number[]
+    sleep?: (delayMs: number) => Promise<void>
+  },
+): Promise<T> {
+  const maximumAttempts = options.enabled ? Math.max(1, Math.min(options.maximumAttempts ?? 3, 3)) : 1
+  const retryDelaysMs = options.retryDelaysMs ?? BACKEND_RETRY_DELAYS_MS
+  const sleep = options.sleep ?? (delayMs => new Promise(resolve => setTimeout(resolve, delayMs)))
+  let attempt = 0
+  while (attempt < maximumAttempts) {
+    attempt += 1
+    try {
+      return await operation()
+    } catch (error) {
+      if (attempt >= maximumAttempts || !isRetryableBackendFailure(error)) throw error
+      await sleep(retryDelaysMs[Math.min(attempt - 1, retryDelaysMs.length - 1)] ?? 0)
+    }
+  }
+  throw new Error('Module backend retry bounds exhausted')
+}
+
+function isRetryableBackendFailure(error: unknown): boolean {
+  const code = error && typeof error === 'object' && 'code' in error ? String((error as {code?: unknown}).code ?? '') : ''
+  if (['ECONNREFUSED', 'ECONNRESET', 'EPIPE', 'ETIMEDOUT', 'EAI_AGAIN'].includes(code)) return true
+  const message = error instanceof Error ? error.message : String(error)
+  return /timed out|HTTP 5\d\d/i.test(message)
 }
 
 function enforceActionPermissions(context: GreenfieldModuleRuntimeContext, action: ModuleBackendActionDefinition) {

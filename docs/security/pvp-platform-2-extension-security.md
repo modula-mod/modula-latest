@@ -47,6 +47,7 @@ No connector receives unrestricted provider credentials from a module.
 `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts` covers
 cycle rejection, checksum quarantine, capability escalation denial,
 cross-account resource/event isolation, raw-bearer absence, contribution
-enable/disable boundaries, declared background actions, and redacted jobs.
+enable/disable boundaries, declared background actions, bounded idempotent
+timeout retry with non-idempotent fail-fast behavior, and redacted jobs.
 `scripts/verify-pvp-platform-2.mjs` additionally scans product/runtime sources
 for prohibited executable and product-hardcoding patterns.
