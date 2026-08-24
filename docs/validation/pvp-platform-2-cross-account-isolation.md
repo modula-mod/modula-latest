@@ -34,7 +34,8 @@ all carry the authenticated account.
 
 `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts` creates
 separate accounts and proves capability/resource and event/job isolation while
-also checking audit/job redaction. Result: `8 passed`.
+also checking audit/job redaction and bounded service timeout retries. Result:
+`9 passed`.
 
 `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`
 registers and verifies two real Greenfield accounts, installs the four immutable

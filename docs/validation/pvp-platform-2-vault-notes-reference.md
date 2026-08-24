@@ -64,7 +64,7 @@ release into the disposable registry, and proves:
 10. return `404` when Account B requests Account A's host.
 
 The real API/worker integration result is `4 passed`; the lower-level extension
-fabric suite is `8 passed`.
+fabric suite is `9 passed`.
 
 ## Honest boundary
 

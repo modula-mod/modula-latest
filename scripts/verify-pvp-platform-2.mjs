@@ -84,7 +84,7 @@ function staticChecks(mode) {
   }
   if (all || mode === 'service-fabric') {
     source('SCOPED SERVICE ASSERTION', 'services/greenfield-api/src/modules/backend/token-service.ts', ['consumerProductId', 'targetProductId', 'actionId', 'jti', 'raw_user_bearer_forwarded: false'])
-    source('GATEWAY TIMEOUT AND CIRCUIT', 'services/greenfield-api/src/modules/backend/gateway-service.ts', ['circuit is open', 'timeoutMs: action.timeoutMs', 'recordFailure'])
+    source('GATEWAY TIMEOUT RETRY AND CIRCUIT', 'services/greenfield-api/src/modules/backend/gateway-service.ts', ['circuit is open', 'timeoutMs: action.timeoutMs', 'executeWithBoundedRetry', 'maximumAttempts', 'recordFailure'])
   }
   if (all || mode === 'provenance') {
     source('IMMUTABLE RELEASE VERIFICATION', 'services/greenfield-api/src/modules/release-service.ts', ['source_commit', 'manifest_sha256', 'release_sha256', 'publishRelease'])

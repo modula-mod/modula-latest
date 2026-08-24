@@ -73,10 +73,11 @@ CI=true pnpm --filter @modula/greenfield-api exec vitest run \
   tests/pvp-platform-2.reference-products.test.ts --reporter=verbose
 ```
 
-Result: 2 test files passed, 12 tests passed, 0 skipped. This includes two
+Result: 2 test files passed, 13 tests passed, 0 skipped. This includes two
 new accounts in the disposable copy, immutable release import, graph/lifecycle,
 scoped assertion, capability denial, checksum quarantine, event/job isolation,
-and the full four-product reference journey.
+bounded idempotent service timeout retry, and the full four-product reference
+journey.
 
 ## Gate
 
