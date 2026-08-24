@@ -1,4 +1,5 @@
 import {createHash, createHmac, randomBytes} from 'node:crypto'
+import {sql} from 'kysely'
 import type {ModuleBackendDefinition, ModuleSessionClaims} from '@modula/greenfield-module-manifest'
 import type {AppConfig} from '../../config/index.js'
 import type {ModulaDb} from '../../database/client.js'
@@ -9,8 +10,16 @@ import {ModuleBackendRepository} from './repository.js'
 
 export type IssuedModuleBackendToken = {
   token: string
-  claims: ModuleSessionClaims
+  claims: ModuleSessionClaims & Partial<ExtensionServiceClaims>
   expiresAt: Date
+}
+
+export type ExtensionServiceClaims = {
+  consumer: string
+  target: string
+  actionId: string
+  scope: {type: 'installation' | 'resource' | 'action'; ref: string | null}
+  jti: string
 }
 
 export type ResolvedModuleBackendToken = {
@@ -41,11 +50,26 @@ export class ModuleBackendTokenService {
     permissions: string[]
     capabilities: string[]
     requestId?: string
+    extensionInvocation?: {
+      consumerProductId: string
+      targetProductId: string
+      targetInstallationId: string
+      actionId: string
+      serviceId: string
+      scope: ExtensionServiceClaims['scope']
+    }
   }): Promise<IssuedModuleBackendToken> {
     if (input.backend.authentication?.tokenExchangeRequired !== true) throw moduleError('FORBIDDEN', 'Module backend token exchange is required')
     const nowSeconds = Math.floor(Date.now() / 1000)
     const ttl = Math.min(input.backend.authentication?.tokenTtlSeconds ?? 900, 900)
-    const claims: ModuleSessionClaims = {
+    const extensionClaims: Partial<ExtensionServiceClaims> = input.extensionInvocation ? {
+      consumer: input.extensionInvocation.consumerProductId,
+      target: input.extensionInvocation.targetProductId,
+      actionId: input.extensionInvocation.actionId,
+      scope: input.extensionInvocation.scope,
+      jti: `extension-assertion:${uuidv7()}`,
+    } : {}
+    const claims: ModuleSessionClaims & Partial<ExtensionServiceClaims> = {
       issuer: this.config.publicApiUrl,
       audience: input.backend.authentication?.audience ?? `modula-module:${input.context.moduleId}`,
       subject: input.actorId,
@@ -59,9 +83,37 @@ export class ModuleBackendTokenService {
       issuedAt: nowSeconds,
       expiresAt: nowSeconds + ttl,
       requestId: input.requestId,
+      ...extensionClaims,
     }
     const token = this.sign(claims)
     await this.repository.recordSession({context: input.context, claims, token, requestId: input.requestId})
+    if (input.extensionInvocation && claims.jti) {
+      await this.db
+        .insertInto('greenfield_extension_service_assertions')
+        .values({
+          assertion_id: `extension-service-assertion:${uuidv7()}`,
+          jti: claims.jti,
+          account_id: input.context.accountId,
+          consumer_installation_id: input.context.installationId,
+          consumer_product_id: input.extensionInvocation.consumerProductId,
+          target_installation_id: input.extensionInvocation.targetInstallationId,
+          target_product_id: input.extensionInvocation.targetProductId,
+          service_id: input.extensionInvocation.serviceId,
+          action_id: input.extensionInvocation.actionId,
+          capabilities: sql`${JSON.stringify(Array.from(new Set(input.capabilities)).sort())}::jsonb`,
+          scope_type: input.extensionInvocation.scope.type,
+          scope_ref: input.extensionInvocation.scope.ref,
+          token_hash: sha256(token),
+          raw_user_bearer_forwarded: false,
+          request_id: input.requestId ?? claims.jti,
+          issued_at: new Date(claims.issuedAt * 1000),
+          expires_at: new Date(claims.expiresAt * 1000),
+          consumed_at: null,
+          revoked_at: null,
+          created_at: new Date(),
+        })
+        .execute()
+    }
     return {token, claims, expiresAt: new Date(claims.expiresAt * 1000)}
   }
 
@@ -87,7 +139,7 @@ export class ModuleBackendTokenService {
     }
   }
 
-  private sign(claims: ModuleSessionClaims): string {
+  private sign(claims: ModuleSessionClaims & Partial<ExtensionServiceClaims>): string {
     const header = {alg: 'HS256', typ: 'modula-module-session+jwt', kid: 'greenfield-module-token-v1'}
     const encodedHeader = base64url(JSON.stringify(header))
     const encodedClaims = base64url(JSON.stringify(claims))

@@ -9,7 +9,7 @@ import type {
   GreenfieldAIUsageUnits,
   ResolvedAIExecutionTarget,
 } from '@modula/greenfield-contracts'
-import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AuditRepository} from '../domains/audit/repository.js'
@@ -42,7 +42,7 @@ const PROTECTED_PROMPT_VARIABLES = new Set(['system', 'systemInstruction', 'syst
 
 export type GreenfieldAIProviderRuntimeRequest = GreenfieldAIRequestContract & {
   grantedPermissions?: string[]
-  manifest?: GreenfieldModuleManifestV1
+  manifest?: GreenfieldModuleManifest
   permittedProviders?: string[]
   preferredProviderId?: string
   routingStrategy?: GreenfieldAIProviderRoutingStrategy
@@ -909,7 +909,7 @@ function normalizeCapabilities(
 }
 
 function enforceModuleAiPermissions(input: {
-  manifest?: GreenfieldModuleManifestV1
+  manifest?: GreenfieldModuleManifest
   grantedPermissions: string[]
   requiredCapabilities: GreenfieldAIModelCapability[]
   structuredOutput: boolean
@@ -928,7 +928,7 @@ function enforceModuleAiPermissions(input: {
   if (input.toolCount > 0 && !granted.has('ai.tools.execute')) throw moduleError('FORBIDDEN', 'Module AI permission denied: ai.tools.execute')
 }
 
-function enforceDeclaredCapabilities(manifest: GreenfieldModuleManifestV1 | undefined, required: readonly GreenfieldAIModelCapability[]): void {
+function enforceDeclaredCapabilities(manifest: GreenfieldModuleManifest | undefined, required: readonly GreenfieldAIModelCapability[]): void {
   const declared = new Set(manifest?.ai?.requiredCapabilities ?? [])
   if (declared.size === 0) return
   for (const capability of required) {
@@ -1054,12 +1054,12 @@ function credentialScopes(providerId: string, accountId: string): Array<{scopeTy
   return [{scopeType: 'account', scopeId: accountId}, {scopeType: 'platform'}, {scopeType: 'development'}]
 }
 
-function permittedProvidersFromManifest(manifest?: GreenfieldModuleManifestV1): string[] | undefined {
+function permittedProvidersFromManifest(manifest?: GreenfieldModuleManifest): string[] | undefined {
   const value = (manifest?.ai as Record<string, unknown> | undefined)?.permittedProviders
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : undefined
 }
 
-function routingStrategyFromManifest(manifest?: GreenfieldModuleManifestV1): GreenfieldAIProviderRoutingStrategy {
+function routingStrategyFromManifest(manifest?: GreenfieldModuleManifest): GreenfieldAIProviderRoutingStrategy {
   const value = (manifest?.ai as Record<string, unknown> | undefined)?.routingStrategy
   return value === 'fixed' || value === 'local-first' ? value : 'capability-first'
 }

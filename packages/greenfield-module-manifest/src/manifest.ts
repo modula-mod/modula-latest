@@ -7,7 +7,7 @@ import type {GreenfieldModulePermission} from './permissions.js'
 import type {GreenfieldGitHubModuleSource} from './source.js'
 import type {GreenfieldModuleBackendDefinition} from './backend.js'
 import type {GreenfieldModuleAiDeclaration} from './ai.js'
-import type {ModuleStandard20ManifestExtensions, ModuleStandard20SectionVersions} from '@modula/module-standard'
+import type {ModulaExtensionProduct, ModuleStandard20ManifestExtensions, ModuleStandard20SectionVersions} from '@modula/module-standard'
 
 export const GREENFIELD_MODULE_MANIFEST_VERSION = 1 as const
 export const GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION = 2 as const
@@ -67,8 +67,9 @@ export type GreenfieldModuleManifestV1 = {
 export type GreenfieldModuleManifestV2 = Omit<GreenfieldModuleManifestV1, 'manifestVersion'> &
   ModuleStandard20ManifestExtensions & {
     manifestVersion: typeof GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION
-    standardVersion: '2.0.0'
+    standardVersion: '2.0.0' | '2.1.0'
     sectionVersions: ModuleStandard20SectionVersions
+    extensionProduct?: ModulaExtensionProduct
   }
 
 export type GreenfieldModuleManifest = GreenfieldModuleManifestV1 | GreenfieldModuleManifestV2

@@ -64,6 +64,7 @@ export type OutboxEventType =
   | 'module.plugin.enable'
   | 'module.plugin.disable'
   | 'module.plugin.uninstall'
+  | 'extension.job.execute'
 
 export type EnqueueOutboxEventInput = {
   eventType: OutboxEventType

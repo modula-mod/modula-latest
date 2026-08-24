@@ -3,6 +3,7 @@ import type {ModulaWorkerDb} from '../database.js'
 import {registerModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
+import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 
 export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as any
@@ -26,6 +27,12 @@ export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfi
       releaseId: release.release_id,
       status: 'registered',
       jobsPaused: false,
+    })
+    await projectExtensionLifecycle(trx as any, {
+      installationId: p.installationId,
+      accountId: p.accountId,
+      productId: p.moduleId,
+      state: 'ENABLED',
     })
     await trx.updateTable('greenfield_extension_installations').set({status: 'enabled', updated_at: new Date()}).where('installation_id', '=', p.installationId).execute()
   })

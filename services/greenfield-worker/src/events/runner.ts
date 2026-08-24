@@ -186,7 +186,14 @@ function canRouteEvent(
   event: GreenfieldDomainEvent,
   subscription: Database['greenfield_event_subscriptions'],
 ): boolean {
-  return subscription.permitted_visibility.includes(event.visibility) && subscription.permitted_classifications.includes(event.classification)
+  if (!subscription.permitted_visibility.includes(event.visibility) || !subscription.permitted_classifications.includes(event.classification)) return false
+  const filters = recordFromJson(subscription.filters)
+  if (typeof filters.accountId === 'string' && filters.accountId !== event.accountId) return false
+  if (typeof filters.aggregateType === 'string' && filters.aggregateType !== event.aggregateType) return false
+  if (typeof filters.aggregateId === 'string' && filters.aggregateId !== event.aggregateId) return false
+  const payload = recordFromJson(event.payload)
+  if (typeof filters.targetProductId === 'string' && filters.targetProductId !== payload.moduleId) return false
+  return true
 }
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, subscriberId: string): Promise<T> {

@@ -9,18 +9,18 @@ else pass('external Vault Notes repository exists')
 run('pnpm', ['verify'], 'external Vault Notes verifier passes', vaultNotesRoot)
 
 const standardHead = git(standardRoot, ['rev-parse', 'HEAD'])
-const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v1.2.0'])
+const standardTag = git(standardRoot, ['rev-list', '-n', '1', 'mms-v2.1.0'])
 if (standardHead && standardTag && isAncestor(standardRoot, standardTag, standardHead)) {
-  pass('mms-v1.2.0 release commit is contained in current Module Standard HEAD')
+  pass('mms-v2.1.0 release commit is contained in current Module Standard HEAD')
 } else {
-  fail(`mms-v1.2.0 must be contained in Module Standard HEAD; head=${standardHead ?? 'unknown'} tag=${standardTag ?? 'unknown'}`)
+  fail(`mms-v2.1.0 must be contained in Module Standard HEAD; head=${standardHead ?? 'unknown'} tag=${standardTag ?? 'unknown'}`)
 }
 
 const standardManifest = json('modula.module.json')
 for (const [field, expected] of Object.entries({
-  standardVersion: '1.2.0',
-  moduleVersion: '1.1.0',
-  manifestSchemaVersion: '1.2.0',
+  standardVersion: '2.1.0',
+  moduleVersion: '1.2.0',
+  manifestSchemaVersion: '2.1.0',
   dataSchemaVersion: '1.0.0',
 })) {
   if (standardManifest[field] === expected) pass(`${field} is ${expected}`)
@@ -33,12 +33,12 @@ includes('package.json', [
   '@modula/module-standard',
   '@modula/module-validator',
   '@modula/module-sdk',
-], 'external Standard 1.2 package dependencies', vaultNotesRoot)
+], 'external Standard 2.1 package dependencies', vaultNotesRoot)
 includes('scripts/verify-release.mjs', ['validateModulaModuleManifest', 'Standard source is not copied'], 'Vault Notes release verifier', vaultNotesRoot)
 includes('docs/operations/module-standard-package-consumption.md', [
-  'development-only',
-  'mms-v1.2.0',
-  'provider-neutral AI product actions',
+  'real immutable',
+  'mms-v2.1.0',
+  'extension product contracts',
   'fail closed',
 ], 'main app module-standard package consumption documentation')
 

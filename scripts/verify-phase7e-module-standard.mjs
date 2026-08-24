@@ -49,8 +49,8 @@ run('git', ['status', '--short'], 'external repository status inspected', standa
 run('pnpm', ['verify'], 'external module-standard repo verifier passes', standardRoot)
 
 const standardPackage = JSON.parse(standardFile('packages/module-standard/package.json') || '{}')
-if (standardPackage.version === '2.0.0') pass('@modula/module-standard version is 2.0.0')
-else fail('@modula/module-standard version must be 2.0.0')
+if (standardPackage.version === '2.1.0') pass('@modula/module-standard version is 2.1.0')
+else fail('@modula/module-standard version must be 2.1.0')
 
 for (const packagePath of [
   'packages/module-sdk/package.json',
@@ -63,8 +63,8 @@ for (const packagePath of [
   'packages/module-backend-fixtures/package.json',
 ]) {
   const pkg = JSON.parse(standardFile(packagePath) || '{}')
-  if (pkg.version === '2.0.0') pass(`${pkg.name} version is 2.0.0`)
-  else fail(`${packagePath} must be version 2.0.0`)
+  if (pkg.version === '2.1.0') pass(`${pkg.name} version is 2.1.0`)
+  else fail(`${packagePath} must be version 2.1.0`)
 }
 
 for (const doc of [
@@ -87,6 +87,7 @@ for (const doc of [
 standardFile('schemas/module-manifest-1.0.schema.json')
 standardFile('schemas/module-manifest-1.1.schema.json')
 standardFile('schemas/module-manifest-2.0.schema.json')
+standardFile('schemas/module-manifest-2.1.schema.json')
 standardFile('specifications/module-standard-1.0.md')
 const standard20Source = standardFile('packages/module-standard/src/standard-2.ts')
 for (const marker of [
@@ -117,7 +118,7 @@ for (const field of ['standardVersion', 'moduleVersion', 'manifestSchemaVersion'
 }
 
 const {MODULA_MODULE_STANDARD_VERSION, MODULA_MODULE_BACKEND_PROTOCOL_VERSION, MODULA_MODULE_STANDARD_2_VERSION, createDefaultModuleSectionVersions} = await import('@modula/module-standard')
-if (MODULA_MODULE_STANDARD_VERSION === '2.0.0' && MODULA_MODULE_STANDARD_2_VERSION === '2.0.0') pass('main app can import @modula/module-standard 2.0.0')
+if (MODULA_MODULE_STANDARD_VERSION === '2.1.0' && MODULA_MODULE_STANDARD_2_VERSION === '2.0.0') pass('main app can import current Standard 2.1 with the compatible Standard 2.0 base')
 else fail('main app imported unexpected module standard version')
 if (MODULA_MODULE_BACKEND_PROTOCOL_VERSION === '1.0.0') pass('main app can import module backend protocol version')
 else fail('main app imported unexpected module backend protocol version')
@@ -125,7 +126,7 @@ if (Object.keys(createDefaultModuleSectionVersions()).length >= 40) pass('Standa
 else fail('Standard 2.0 section versions are incomplete')
 
 const hostManifest = file('packages/greenfield-module-manifest/src/validation.ts')
-for (const marker of ['STANDARD_2_REQUIRES_MANIFEST_V2', 'INVALID_MODULE_API_PATH', 'UNKNOWN_PERMISSION_CATEGORY', 'MISSING_SECTION_VERSIONS']) {
+for (const marker of ['STANDARD_2_REQUIRES_MANIFEST_V2', 'INVALID_MODULE_API_PATH', 'UNKNOWN_PERMISSION_CATEGORY', 'MISSING_SECTION_VERSIONS', 'EXTENSION_PRODUCT_REQUIRES_STANDARD_2_1']) {
   if (hostManifest.includes(marker)) pass(`host manifest validator checks ${marker}`)
   else fail(`host manifest validator missing ${marker}`)
 }

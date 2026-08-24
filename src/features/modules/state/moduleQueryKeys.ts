@@ -17,5 +17,7 @@ export const moduleQueryKeys = {
   health: (moduleId: string) => ['modules', 'health', moduleId] as const,
   runtime: (moduleId: string) => ['modules', 'runtime', moduleId] as const,
   backend: (moduleId: string) => ['modules', 'backend', moduleId] as const,
+  relationships: (moduleId: string) => ['modules', 'relationships', moduleId] as const,
+  composition: (moduleId: string, route?: string, platform?: string) => ['modules', 'composition', moduleId, route ?? 'root', platform ?? 'web'] as const,
   contributions: (input: {surface?: string; moduleId?: string}) => ['modules', 'contributions', input] as const,
 }

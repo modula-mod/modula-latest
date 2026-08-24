@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {Alert, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
@@ -8,7 +8,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {useSession} from '@/auth/runtime'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import type {GreenfieldRegistryDeclaration, ModuleDetail, ModuleInstallPreview} from '@/data/repositories/contracts'
+import type {GreenfieldRegistryDeclaration, ModuleDetail, ModuleInstallPreview, ModuleProductRelationship} from '@/data/repositories/contracts'
 import {InstallPreviewSheet} from '@/features/modules/components/InstallPreviewSheet'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import type {ModuleInstallStageId} from '@/features/modules/components/ModuleInstallProgress'
@@ -37,7 +37,7 @@ import {
 import {isInstalledModuleState, resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {presentPermissions} from '@/features/modules/identity/permissionPresentation'
 import {productCopyFor} from '@/features/modules/identity/productCopy'
-import {useModuleDetailQuery} from '@/features/modules/hooks'
+import {useModuleDetailQuery, useModuleRelationshipsQuery} from '@/features/modules/hooks'
 import {moduleQueryKeys} from '@/features/modules/state/moduleQueryKeys'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
@@ -63,6 +63,7 @@ export function ModuleDetailScreen() {
   const {colours, scheme, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const detail = useModuleDetailQuery(id)
+  const relationships = useModuleRelationshipsQuery(id)
   const module = detail.data
   const [preview, setPreview] = useState<ModuleInstallPreview | null>(null)
   const [installSheetOpen, setInstallSheetOpen] = useState(false)
@@ -92,7 +93,7 @@ export function ModuleDetailScreen() {
     if (!installReviewOpen || !module || preview) return
     let cancelled = false
     void services.moduleRepository
-      .installPreview(module.moduleId, module.latestVersion ?? undefined)
+      .installPreview(module.moduleId, module.latestVersion ?? undefined, productPlatform())
       .then(next => {
         if (!cancelled) setPreview(next)
       })
@@ -112,14 +113,18 @@ export function ModuleDetailScreen() {
     setInstallError(null)
     setInstallStage('resolving')
     try {
-      const nextPreview = preview ?? await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined)
+      const nextPreview = preview ?? await services.moduleRepository.installPreview(module.moduleId, module.latestVersion ?? undefined, productPlatform())
       setPreview(nextPreview)
       setInstallStage('compatibility')
       if (nextPreview.compatible === false) {
         throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')
       }
       setInstallStage('installing')
-      await services.moduleRepository.install(module.moduleId, {version: module.latestVersion ?? undefined})
+      await services.moduleRepository.install(module.moduleId, {
+        version: module.latestVersion ?? undefined,
+        platform: productPlatform(),
+        approvedPermissions: nextPreview.permissions.map(permission => permission.permission),
+      })
       if (enable) {
         setInstallStage('enabling')
         await services.moduleRepository.enable(module.moduleId)
@@ -139,6 +144,7 @@ export function ModuleDetailScreen() {
 
   const transition = async (kind: 'enable' | 'disable' | 'update' | 'uninstall') => {
     if (!module) return
+    let removeDependants = false
     if (kind === 'disable') {
       const confirmed = await confirmModulaAction({
         title: `Disable ${module.name}?`,
@@ -149,21 +155,29 @@ export function ModuleDetailScreen() {
       if (!confirmed) return
     }
     if (kind === 'uninstall') {
+      const uninstallPreview = await services.moduleRepository.uninstallPreview(module.moduleId)
+      const dependants = [
+        ...uninstallPreview.dependantModules.map(item => String((item as {module_id?: unknown}).module_id ?? 'dependent module')),
+        ...uninstallPreview.dependantExtensions.map(item => item.productId),
+      ]
       const confirmed = await confirmModulaAction({
         title: `Uninstall ${module.name}?`,
-        message: 'This keeps your module data for a future reinstall.',
-        confirmLabel: 'Uninstall and keep data',
+        message: dependants.length
+          ? `${dependants.join(', ')} depend on ${module.name}. Remove these products and keep their data?`
+          : 'This keeps your module data for a future reinstall.',
+        confirmLabel: dependants.length ? 'Remove products, keep data' : 'Uninstall and keep data',
         cancelLabel: 'Cancel',
         destructive: true,
       })
       if (!confirmed) return
+      removeDependants = dependants.length > 0
     }
     setBusy(kind)
     try {
       if (kind === 'enable') await services.moduleRepository.enable(module.moduleId)
       if (kind === 'disable') await services.moduleRepository.disable(module.moduleId)
       if (kind === 'update') await services.moduleRepository.update(module.moduleId)
-      if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData')
+      if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData', {removeDependants})
       await refreshCatalogue()
     } catch (error) {
       console.warn('Product Hub module action failed', error)
@@ -350,6 +364,9 @@ export function ModuleDetailScreen() {
               versionHistoryOpen={versionHistoryOpen}
               onVersionHistory={() => setVersionHistoryOpen(current => !current)}
               onProductHub={() => router.push('/product' as Href)}
+              extensions={relationships.data?.extensions ?? []}
+              targets={relationships.data?.targets ?? []}
+              onExtension={productId => router.push(`/marketplace/${encodeURIComponent(productId)}` as Href)}
               canRate={session.status === 'signedIn'}
               ratingBusy={ratingBusy}
               userRating={userRating}
@@ -384,6 +401,11 @@ export function ModuleDetailScreen() {
   )
 }
 
+function productPlatform(): 'ios' | 'android' | 'web' | 'desktop' {
+  if (Platform.OS === 'ios' || Platform.OS === 'android' || Platform.OS === 'web') return Platform.OS
+  return 'desktop'
+}
+
 function TabContent({
   tab,
   module,
@@ -401,6 +423,9 @@ function TabContent({
   versionHistoryOpen,
   onVersionHistory,
   onProductHub,
+  extensions,
+  targets,
+  onExtension,
   canRate,
   ratingBusy,
   userRating,
@@ -422,6 +447,9 @@ function TabContent({
   versionHistoryOpen: boolean
   onVersionHistory: () => void
   onProductHub: () => void
+  extensions: ModuleProductRelationship[]
+  targets: ModuleProductRelationship[]
+  onExtension: (productId: string) => void
   canRate: boolean
   ratingBusy: boolean
   userRating: number | null
@@ -472,8 +500,15 @@ function TabContent({
   if (tab === 'related') {
     return (
       <View style={{gap: spacing[3]}}>
-        <AppText variant="headline" accessibilityRole="header">Made by {module.publisherName}</AppText>
-        <AppText variant="body" colour="textSecondary">Discover more products from this publisher in Product Hub.</AppText>
+        {targets.length ? (
+          <View style={{gap: spacing[2]}}>
+            <AppText variant="headline" accessibilityRole="header">Works with</AppText>
+            <ExtensionRelationshipList extensions={targets} onOpen={onExtension} />
+          </View>
+        ) : null}
+        <AppText variant="headline" accessibilityRole="header">Extends {productName}</AppText>
+        <ExtensionRelationshipList extensions={extensions} onOpen={onExtension} />
+        <AppText variant="body" colour="textSecondary">Discover more products from {module.publisherName} in Product Hub.</AppText>
         <ModulaButton label="Explore Product Hub" role="secondary" onPress={onProductHub} />
       </View>
     )
@@ -492,6 +527,18 @@ function TabContent({
       <ProductPreviewCarousel productName={productName} frames={previewFrames} />
       <ProductPlatformRow platforms={platforms} />
       <ProductDescription>{description}</ProductDescription>
+      {targets.length ? (
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="sectionTitle" accessibilityRole="header">Works with</AppText>
+          <ExtensionRelationshipList extensions={targets} onOpen={onExtension} />
+        </View>
+      ) : null}
+      {extensions.length ? (
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="sectionTitle" accessibilityRole="header">Add-ons and plugins</AppText>
+          <ExtensionRelationshipList extensions={extensions} onOpen={onExtension} />
+        </View>
+      ) : null}
       <View style={{gap: spacing[3]}}>
         <AppText variant="sectionTitle" accessibilityRole="header">Module Information</AppText>
         <ProductInformationStrip items={information.map(item => ({...item, onPress: () => onInformation(item.id)}))} />
@@ -499,6 +546,25 @@ function TabContent({
         <ProductInformationDisclosure label="Information" onPress={() => onInformation(informationOpen ?? 'privacy')} />
       </View>
     </>
+  )
+}
+
+function ExtensionRelationshipList({extensions, onOpen}: {extensions: ModuleProductRelationship[]; onOpen: (productId: string) => void}) {
+  const {colours, radius, spacing} = useThemeTokens()
+  if (!extensions.length) return <AppText variant="body" colour="textSecondary">No compatible extensions are published yet.</AppText>
+  return (
+    <View style={{gap: spacing[2]}}>
+      {extensions.map(extension => (
+        <View key={extension.productId} style={[styles.relationshipRow, {borderColor: colours.border, borderRadius: radius.large, gap: spacing[2], padding: spacing[3]}]}>
+          <View style={{flex: 1, gap: spacing[1]}}>
+            <AppText variant="label">{extension.name}</AppText>
+            <AppText variant="caption" colour="textSecondary">{extension.description}</AppText>
+            <AppText variant="micro" colour="textTertiary">{extension.productKind} · {extension.version} · requires {extension.versionRange}</AppText>
+          </View>
+          <ModulaButton label="View" role="secondary" accessibilityLabel={`View ${extension.name}`} onPress={() => onOpen(extension.productId)} />
+        </View>
+      ))}
+    </View>
   )
 }
 
@@ -854,6 +920,7 @@ const styles = StyleSheet.create({
   infoRow: {gap: 2},
   informationDetail: {borderWidth: StyleSheet.hairlineWidth, padding: 16},
   productLead: {position: 'relative'},
+  relationshipRow: {alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, flexDirection: 'row'},
   screen: {flex: 1},
   skeletonLead: {alignItems: 'center', flexDirection: 'row', gap: 16},
 })

@@ -1,11 +1,74 @@
 export type GreenfieldExtensionKind =
   | 'module'
+  | 'addon'
   | 'plugin'
   | 'function'
   | 'tool'
   | 'connector'
   | 'widget'
+  | 'service'
   | 'bridge'
+
+export type GreenfieldExtensionProductKind = Exclude<GreenfieldExtensionKind, 'bridge'>
+
+export type GreenfieldExtensionContributionKind =
+  | 'view.section'
+  | 'toolbar.action'
+  | 'editor.command'
+  | 'editor.attachment'
+  | 'menu.item'
+  | 'contextMenu.item'
+  | 'settings.section'
+  | 'home.section'
+  | 'widget'
+  | 'record.decorator'
+  | 'search.provider'
+  | 'composer.tool'
+  | 'background.action'
+
+export type GreenfieldExtensionLifecycleState =
+  | 'NOT_INSTALLED'
+  | 'RESOLVING'
+  | 'INSTALLING'
+  | 'INSTALLED'
+  | 'ENABLING'
+  | 'ENABLED'
+  | 'DISABLING'
+  | 'DISABLED'
+  | 'UNINSTALLING'
+  | 'UPDATE_AVAILABLE'
+  | 'UPDATING'
+  | 'INCOMPATIBLE'
+  | 'QUARANTINED'
+  | 'FAILED'
+
+export type GreenfieldExtensionTarget = {
+  productId: string
+  versionRange: string
+  requiredCapabilities: string[]
+  requiredExtensionPoints: string[]
+}
+
+export type GreenfieldExtensionPointContract = {
+  id: string
+  title: string
+  contributionKinds: GreenfieldExtensionContributionKind[]
+  requiredCapability: string | null
+  platforms: Array<'ios' | 'android' | 'web' | 'desktop' | 'server'>
+  maxContributions: number
+}
+
+export type GreenfieldExtensionContributionContract = {
+  id: string
+  title: string
+  kind: GreenfieldExtensionContributionKind
+  extensionPoint: string
+  contractId: string
+  requiredCapability: string | null
+  platforms: Array<'ios' | 'android' | 'web' | 'desktop' | 'server'>
+  requiresOnline: boolean
+  priority: number
+}
 
 export type GreenfieldExtensionTrust =
   | 'firstParty'

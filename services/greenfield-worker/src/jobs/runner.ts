@@ -18,6 +18,8 @@ import {registerModuleContributions, unregisterModuleContributions} from '../mod
 import {registerModuleSchemas, unregisterModuleSchemas} from '../modules/schema-registration-handler.js'
 import {handleModuleUninstall} from '../modules/uninstall-handler.js'
 import {handleModuleUpdate} from '../modules/update-handler.js'
+import {handleExtensionJob} from '../modules/extension-job-handler.js'
+import {handleExtensionEventDispatch} from '../modules/extension-event-handler.js'
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
@@ -146,6 +148,12 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
       case 'module.plugin.disable':
       case 'module.plugin.uninstall':
         await handleModulePluginLifecycle(db, config, job.payload)
+        break
+      case 'extension.job.execute':
+        await handleExtensionJob(db, job.payload)
+        break
+      case 'extension.event.dispatch':
+        await handleExtensionEventDispatch(db, job.payload)
         break
       case 'search.index':
       case 'search.index.post':

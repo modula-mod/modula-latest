@@ -10,6 +10,22 @@ export type GreenfieldExtensionStatus =
   | 'incompatible'
   | 'removed'
 
+export type GreenfieldExtensionProjectedState =
+  | 'NOT_INSTALLED'
+  | 'RESOLVING'
+  | 'INSTALLING'
+  | 'INSTALLED'
+  | 'ENABLING'
+  | 'ENABLED'
+  | 'DISABLING'
+  | 'DISABLED'
+  | 'UNINSTALLING'
+  | 'UPDATE_AVAILABLE'
+  | 'UPDATING'
+  | 'INCOMPATIBLE'
+  | 'QUARANTINED'
+  | 'FAILED'
+
 export type GreenfieldExtensionInstallation = {
   installationId: string
   accountId: string

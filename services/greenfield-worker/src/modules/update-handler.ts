@@ -2,6 +2,7 @@ import type {ModulaWorkerDb} from '../database.js'
 import {registerModuleContributions, unregisterModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
+import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 
 export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -23,6 +24,27 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
       status: p.previousStatus === 'enabled' ? 'registered' : 'disabled',
       jobsPaused: p.previousStatus !== 'enabled',
     })
+    await projectExtensionLifecycle(trx as any, {
+      installationId: p.installationId,
+      accountId: p.accountId,
+      productId: release.module_id,
+      state: p.previousStatus === 'enabled' ? 'ENABLED' : 'DISABLED',
+    })
+    for (const dependant of Array.isArray(p.incompatibleExtensions) ? p.incompatibleExtensions : []) {
+      if (!dependant?.installationId || !dependant?.productId) continue
+      await projectExtensionLifecycle(trx as any, {
+        installationId: dependant.installationId,
+        accountId: p.accountId,
+        productId: dependant.productId,
+        state: 'INCOMPATIBLE',
+        errorCode: 'TARGET_VERSION_INCOMPATIBLE',
+      })
+      await trx.updateTable('greenfield_extension_installations')
+        .set({status: 'incompatible', updated_at: new Date()})
+        .where('installation_id', '=', dependant.installationId)
+        .where('account_id', '=', p.accountId)
+        .execute()
+    }
     await trx
       .updateTable('greenfield_extension_installations')
       .set({extension_version_id: release.extension_version_id, status: p.previousStatus === 'enabled' ? 'enabled' : 'disabled', updated_at: new Date()})

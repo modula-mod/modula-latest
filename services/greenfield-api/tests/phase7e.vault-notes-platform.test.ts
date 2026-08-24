@@ -6,10 +6,12 @@ import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {sql} from 'kysely'
 import {
   CANONICAL_VAULT_NOTES_MODULE_ID,
+  CANONICAL_VAULT_NOTES_ARTIFACT_SHA256,
+  CANONICAL_VAULT_NOTES_CURRENT_COMMIT,
   CANONICAL_VAULT_NOTES_CURRENT_VERSION,
   rewriteLegacyVaultNotesValue,
 } from '@modula/greenfield-contracts'
-import {manifestChecksum, type GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {
   validateGreenfieldModuleAction,
   validateGreenfieldModuleCollection,
@@ -41,7 +43,7 @@ const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
 describe('Phase 7E Vault Notes external module declarations', () => {
   it('keeps Vault Notes outside hardcoded app feature paths', () => {
-    expect(readJson('modula.module.json').standardVersion).toBe('1.2.0')
+    expect(readJson('modula.module.json').standardVersion).toBe('2.1.0')
     expect(readJson('modula.module.json').id).toBe(CANONICAL_VAULT_NOTES_MODULE_ID)
     expect(() => readFileSync(join(workspaceRoot, 'src/features/vault-notes/index.ts'), 'utf8')).toThrow()
     expect(() => readFileSync(join(workspaceRoot, 'app/vault-notes.tsx'), 'utf8')).toThrow()
@@ -108,8 +110,8 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       rating: {average: null, count: 0},
       installations: {count: 0},
       release: {
-        publishedAt: '2026-08-01T16:34:15.000Z',
-        sizeBytes: 26458,
+        publishedAt: '2026-08-24T00:00:00.000Z',
+        sizeBytes: null,
       },
     })
 
@@ -298,7 +300,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       payload: {format: 'json'},
     })
     expect(exportResult.statusCode).toBe(200)
-    expect(exportResult.json().data.manifest).toMatchObject({moduleId, moduleVersion, standardVersion: '1.2.0', dataSchemaVersion: '1.0.0'})
+    expect(exportResult.json().data.manifest).toMatchObject({moduleId, moduleVersion, standardVersion: '2.1.0', dataSchemaVersion: '1.0.0'})
 
     const health = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/health`, headers: {authorization: `Bearer ${token}`}})
     expect(health.statusCode).toBe(200)
@@ -539,7 +541,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(Number(founderStill?.count ?? 0)).toBeGreaterThan(0)
   })
 
-  it('updates a historical 0.2.0 install onto 1.1.0 without losing notes', async () => {
+  it('updates a historical 0.2.0 install onto 1.2.0 without losing notes', async () => {
     const historical = await importHistoricalRelease()
     const disposable = await registerAccount(`vault-upd-${suffix}@example.com`, `vaultu${suffix}`.slice(0, 20))
     const install = await app.inject({
@@ -599,7 +601,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       await registerRuntimeSurface(existing.releaseId, manifest)
       return existing
     }
-    const release = await releases.importPendingReview(manifest)
+    const release = await releases.importPendingReview(manifest, immutableReleaseEvidence(manifest))
     const published = await releases.publishRelease(moduleId, moduleVersion)
     await registerRuntimeSurface(published.releaseId, manifest)
     return release
@@ -608,13 +610,15 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
   async function importHistoricalRelease() {
     const manifest = structuredClone(manifestForTest())
     manifest.version = '0.2.0'
+    if (manifest.extensionProduct) manifest.extensionProduct.version = '0.2.0'
+    manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
     const releases = new GreenfieldModuleReleaseService(db)
     const existing = await releases.getRelease(moduleId, '0.2.0')
     if (existing) {
       await registerRuntimeSurface(existing.releaseId, manifest)
       return existing
     }
-    const release = await releases.importPendingReview(manifest)
+    const release = await releases.importPendingReview(manifest, syntheticHistoricalEvidence(manifest))
     const published = await releases.publishRelease(moduleId, '0.2.0')
     await registerRuntimeSurface(published.releaseId, manifest)
     return published
@@ -631,7 +635,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     await installations.setWorkerStatus(nextInstallationId, 'enabled')
   }
 
-  async function registerRuntimeSurface(releaseId: string, manifest: GreenfieldModuleManifestV1) {
+  async function registerRuntimeSurface(releaseId: string, manifest: GreenfieldModuleManifest) {
     const collections = collectionDefinitions(manifest)
     for (const collection of collections) {
       await db
@@ -820,16 +824,37 @@ function workerConfig(): WorkerConfig {
   }
 }
 
-function manifestForTest(): GreenfieldModuleManifestV1 {
-  const manifest = structuredClone(readJson('module.manifest.json')) as GreenfieldModuleManifestV1
-  manifest.source = {...manifest.source, commit: '1'.repeat(40)}
-  manifest.integrity = {...manifest.integrity, manifestSha256: '', releaseSha256: '2'.repeat(64)}
-  const canonical = canonicalizeVaultNotesManifest(manifest) as GreenfieldModuleManifestV1
+function manifestForTest(): GreenfieldModuleManifest {
+  const manifest = structuredClone(readJson('module.manifest.json')) as GreenfieldModuleManifest
+  const canonical = canonicalizeVaultNotesManifest(manifest)
   canonical.integrity.manifestSha256 = manifestChecksum({...canonical, integrity: {...canonical.integrity, manifestSha256: ''}})
   return canonical
 }
 
-function collectionDefinitions(manifest: GreenfieldModuleManifestV1): GreenfieldModuleCollectionDefinition[] {
+function immutableReleaseEvidence(manifest: GreenfieldModuleManifest) {
+  const provenance = readJson('release/vault-notes-v1.2.0.provenance.json')
+  expect(provenance.releaseCommit).toBe(CANONICAL_VAULT_NOTES_CURRENT_COMMIT)
+  expect(provenance.packageChecksum).toBe(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256)
+  return {
+    repository: provenance.repository as string,
+    releaseTag: provenance.releaseTag as string,
+    releaseCommit: provenance.releaseCommit as string,
+    artifactSha256: provenance.packageChecksum as string,
+    manifestSha256: manifest.integrity.manifestSha256,
+  }
+}
+
+function syntheticHistoricalEvidence(manifest: GreenfieldModuleManifest) {
+  return {
+    repository: manifest.source.repository,
+    releaseTag: manifest.source.releaseTag!,
+    releaseCommit: '0'.repeat(39) + '2',
+    artifactSha256: '2'.repeat(64),
+    manifestSha256: manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}}),
+  }
+}
+
+function collectionDefinitions(manifest: GreenfieldModuleManifest): GreenfieldModuleCollectionDefinition[] {
   return (manifest.contributions.schemas ?? []).map(schema => {
     const schemaDefinition = readJson(schema.schemaRef)
     const greenfield = record(schemaDefinition['x-greenfield'])

@@ -26,8 +26,10 @@ import {ModuleBackendEventService} from '../backend/event-service.js'
 import {ModuleBackendHealthService as GreenfieldModuleBackendHealthService} from '../backend/health-service.js'
 import {ModuleBackendLifecycleService} from '../backend/lifecycle-service.js'
 import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
+import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
+import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -63,6 +65,8 @@ export async function registerModuleRoutes(
   const backendLifecycle = new ModuleBackendLifecycleService(db)
   const backendEvents = new ModuleBackendEventService(db, config)
   const backendWebhooks = new ModuleBackendWebhookService(db, config)
+  const backendGateway = new ModuleBackendGatewayService(db, config)
+  const extensionFabric = new GreenfieldExtensionFabricService(db)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -81,12 +85,39 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.get('/v1/registry/products', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await registry.listModules({...(request.query as any), productKind: (request.query as any)?.productKind ?? 'all'}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Registry product listing failed')
+    }
+  })
+
   app.get('/v1/registry/modules/:moduleId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
       return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module lookup failed')
+    }
+  })
+
+  app.get('/v1/registry/products/:productId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await registry.getModule(String((request.params as any).productId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Registry product lookup failed')
+    }
+  })
+
+  app.get('/v1/registry/products/:productId/relationships', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await extensionFabric.relationships(String((request.params as any).productId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Registry product relationship lookup failed')
     }
   })
 
@@ -142,6 +173,136 @@ export async function registerModuleRoutes(
     return reply.send(successEnvelope(installed, request.id))
   })
 
+  app.get('/v1/module-host/:targetProductId/composition', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const query = (request.query as any) ?? {}
+      return reply.send(successEnvelope(await extensionFabric.composeHost(auth.accountId, String((request.params as any).targetProductId), {
+        platform: typeof query.platform === 'string' ? query.platform : 'web',
+        route: typeof query.route === 'string' ? query.route : undefined,
+        online: query.online !== 'false',
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module Host extension composition failed')
+    }
+  })
+
+  app.get('/v1/extensions/:extensionProductId/capabilities', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await extensionFabric.declaredCapabilities(auth.accountId, String((request.params as any).extensionProductId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension capability lookup failed')
+    }
+  })
+
+  app.post('/v1/extensions/:extensionProductId/capabilities/review', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      const approved = Array.isArray(body.approvedCapabilities) ? body.approvedCapabilities.filter((value: unknown): value is string => typeof value === 'string') : []
+      return reply.send(successEnvelope(await extensionFabric.reviewCapabilities(auth.accountId, String((request.params as any).extensionProductId), approved), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension capability review failed')
+    }
+  })
+
+  app.post('/v1/extensions/:extensionProductId/contributions/:contributionId/invoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      const brokered = await extensionFabric.assertInvocation({
+        accountId: auth.accountId,
+        extensionProductId: String((request.params as any).extensionProductId),
+        targetProductId: String(body.targetProductId ?? ''),
+        contributionId: String((request.params as any).contributionId),
+        actionId: String(body.actionId ?? ''),
+        requiredCapabilities: Array.isArray(body.requiredCapabilities) ? body.requiredCapabilities.filter((value: unknown): value is string => typeof value === 'string') : [],
+        resource: body.resource,
+      })
+      const extensionProductId = String((request.params as any).extensionProductId)
+      const context = await runtimeAccess.resolve(auth.accountId, extensionProductId, {requireEnabled: true})
+      if (!backendGateway.canHandle(context, String(body.actionId ?? ''))) {
+        return reply.send(successEnvelope({authorized: true, executor: 'DECLARATIVE_ONLY', ...brokered}, request.id))
+      }
+      const result = await backendGateway.executeAction({
+        context,
+        actionId: String(body.actionId ?? ''),
+        actorId: actorIdForAccount(auth.accountId),
+        payload: {
+          target: {productId: String(body.targetProductId ?? '')},
+          resource: brokered.resource,
+          variables: body.variables && typeof body.variables === 'object' ? body.variables : {},
+        },
+        idempotencyKey: idempotencyKey(request, body),
+        requestId: request.id,
+        extensionInvocation: {
+          consumerProductId: extensionProductId,
+          targetProductId: String(body.targetProductId ?? ''),
+          targetInstallationId: brokered.targetInstallationId,
+          serviceId: String(body.serviceId ?? 'extension-backend'),
+          scope: brokered.scope,
+          capabilities: brokered.capabilities,
+        },
+      })
+      return reply.send(successEnvelope({authorized: true, executor: 'SERVICE_FABRIC', result}, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension contribution invocation denied')
+    }
+  })
+
+  app.post('/v1/extensions/:extensionProductId/contributions/:contributionId/fail', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      const errorCode = String(body.errorCode ?? 'CONTRIBUTION_RENDER_FAILED').slice(0, 80)
+      return reply.send(successEnvelope(await extensionFabric.failContribution(
+        auth.accountId,
+        String((request.params as any).extensionProductId),
+        String((request.params as any).contributionId),
+        errorCode,
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension contribution failure recording failed')
+    }
+  })
+
+  app.post('/v1/extensions/:extensionProductId/jobs', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      return reply.code(202).send(successEnvelope(await extensionFabric.enqueueJob({
+        accountId: auth.accountId,
+        extensionProductId: String((request.params as any).extensionProductId),
+        targetProductId: String(body.targetProductId ?? ''),
+        contributionId: String(body.contributionId ?? ''),
+        actionId: String(body.actionId ?? ''),
+        idempotencyKey: idempotencyKey(request, body),
+        requestId: request.id,
+        metadata: body.metadata,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension job enqueue failed')
+    }
+  })
+
+  app.get('/v1/extensions/:extensionProductId/inspector', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    if (config.environment === 'production') return sendError(reply, 'NOT_FOUND', 'Developer inspector is unavailable', request.id)
+    try {
+      return reply.send(successEnvelope(await extensionFabric.developerInspector(auth.accountId, String((request.params as any).extensionProductId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Extension developer inspector failed')
+    }
+  })
+
   app.get('/v1/modules/:moduleId/runtime', routeConfig.profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -178,7 +339,7 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       const body = (request.body as any) ?? {}
-      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version), request.id))
+      return reply.send(successEnvelope(await installations.installPreview(auth.accountId, canonicalModuleParam(request), body.version, modulePlatform(body.platform)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install preview failed')
     }
@@ -194,6 +355,7 @@ export async function registerModuleRoutes(
           await installations.install(auth.accountId, canonicalModuleParam(request), {
             version: body.version,
             approvedPermissions: body.approvedPermissions,
+            platform: modulePlatform(body.platform),
             idempotencyKey: idempotencyKey(request, body),
           }),
           request.id,
@@ -279,6 +441,7 @@ export async function registerModuleRoutes(
             choice: body.choice,
             confirmDelete: Boolean(body.confirmDelete),
             recentAuth: Boolean(body.recentAuth),
+            removeDependants: Boolean(body.removeDependants),
             idempotencyKey: idempotencyKey(request, body),
           }),
           request.id,
@@ -532,8 +695,9 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       await publishers.requireAdminAccount(auth.accountId)
-      const manifest = new GreenfieldModuleManifestService().parse((request.body as any)?.manifest ?? request.body)
-      return reply.code(201).send(successEnvelope(await releases.importPendingReview(manifest), request.id))
+      const body = (request.body as any) ?? {}
+      const manifest = new GreenfieldModuleManifestService().parse(body.manifest ?? request.body)
+      return reply.code(201).send(successEnvelope(await releases.importPendingReview(manifest, body.releaseEvidence), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry import failed')
     }
@@ -679,6 +843,10 @@ function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery
 function stringOrUndefined(value: unknown): string | undefined {
   if (typeof value === 'string' && value.length > 0) return value
   return undefined
+}
+
+function modulePlatform(value: unknown): 'ios' | 'android' | 'web' | 'desktop' | 'server' {
+  return value === 'ios' || value === 'android' || value === 'web' || value === 'desktop' || value === 'server' ? value : 'web'
 }
 
 function actorIdForAccount(accountId: string): string {

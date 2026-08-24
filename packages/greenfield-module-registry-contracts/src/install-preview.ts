@@ -1,6 +1,7 @@
 export type GreenfieldModuleInstallPreview = {
   moduleId: string
   version: string
+  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
   compatible: boolean
   incompatibilityReasons: string[]
   trust: {
@@ -32,6 +33,21 @@ export type GreenfieldModuleInstallPreview = {
     reason?: string
   }>
   dependencyWarnings?: string[]
+  extensionTargets?: Array<{
+    productId: string
+    versionRange: string
+    installedVersion: string | null
+    installed: boolean
+    compatible: boolean
+    requiredCapabilities: string[]
+    requiredExtensionPoints: string[]
+  }>
+  extensionContributions?: Array<{
+    id: string
+    kind: string
+    extensionPoint: string
+    requiredCapability: string | null
+  }>
   provides?: Array<{id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}>
   contributions: {
     routes: number

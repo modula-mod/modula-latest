@@ -7,6 +7,7 @@ import {
   manifestChecksum,
   type GreenfieldModuleContributions,
   type GreenfieldModuleManifest,
+  type ModulaExtensionProduct,
 } from '@modula/greenfield-module-manifest'
 import {sql} from 'kysely'
 import type {GreenfieldModuleReleaseState} from '../database/types.js'
@@ -36,6 +37,14 @@ type ContributionType =
   | 'job'
   | 'event'
 
+export type GreenfieldModuleReleaseEvidence = {
+  repository: string
+  releaseTag: string
+  releaseCommit: string
+  artifactSha256: string
+  manifestSha256?: string
+}
+
 const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, ContributionType> = {
   routes: 'route',
   profileTabs: 'profileTab',
@@ -54,7 +63,7 @@ const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, Co
 export class GreenfieldModuleReleaseService {
   constructor(private readonly db: ModulaDb) {}
 
-  async importPendingReview(manifest: GreenfieldModuleManifest): Promise<GreenfieldModuleReleaseRecord> {
+  async importPendingReview(manifest: GreenfieldModuleManifest, evidence?: GreenfieldModuleReleaseEvidence): Promise<GreenfieldModuleReleaseRecord> {
     manifest = canonicalizeVaultNotesManifest(manifest)
     const publisher = new GreenfieldModulePublisherService(this.db)
     await publisher.ensurePublisherForManifest(manifest)
@@ -69,8 +78,12 @@ export class GreenfieldModuleReleaseService {
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)
     const computedManifestSha = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
-    const releaseSha = manifest.integrity.releaseSha256 ?? computedManifestSha
+    const extensionProduct = extensionProductForManifest(manifest)
+    if (extensionProduct) validateReleaseEvidence(manifest, computedManifestSha, evidence)
+    const releaseSha = evidence?.artifactSha256 ?? manifest.integrity.releaseSha256 ?? computedManifestSha
+    const sourceCommit = evidence?.releaseCommit ?? manifest.source.commit
     const backend = manifest.backend ?? {mode: 'greenfield-managed' as const}
+    const productKind = productKindForManifest(manifest)
     const dependencyRows = dependencyRequestsFromManifest(manifest)
       .filter(dependency => dependency.moduleId && (dependency.relation === 'requires' || dependency.relation === 'optional' || dependency.relation === 'recommended'))
 
@@ -124,7 +137,7 @@ export class GreenfieldModuleReleaseService {
           publisher_id: manifest.publisher.publisherId,
           release_state: 'pendingReview',
           source_repository: manifest.source.repository,
-          source_commit: manifest.source.commit,
+          source_commit: sourceCommit,
           manifest_path: manifest.source.manifestPath,
           manifest_sha256: computedManifestSha,
           release_sha256: releaseSha,
@@ -133,6 +146,8 @@ export class GreenfieldModuleReleaseService {
           compatibility: manifest.compatibility,
           license_status: manifest.license.status,
           trust_level: manifest.trust.requestedLevel,
+          product_kind: productKind,
+          extension_product: jsonb(extensionProduct ?? {}),
           published_at: null,
           quarantined_at: null,
           revoked_at: null,
@@ -141,6 +156,37 @@ export class GreenfieldModuleReleaseService {
           updated_at: now,
         })
         .execute()
+      if (extensionProduct) {
+        if (extensionProduct.targets.length) {
+          await trx.insertInto('greenfield_extension_targets').values(extensionProduct.targets.map((target, index) => ({
+            target_id: `extension-target:${releaseId}:${index}`,
+            release_id: releaseId,
+            product_id: manifest.moduleId,
+            product_kind: productKind,
+            target_product_id: target.productId,
+            version_range: target.versionRange,
+            required_capabilities: jsonb(target.requiredCapabilities ?? []),
+            required_extension_points: jsonb(target.requiredExtensionPoints ?? []),
+            created_at: now,
+          }))).execute()
+        }
+        if (extensionProduct.extensionPoints.length) {
+          await trx.insertInto('greenfield_extension_points').values(extensionProduct.extensionPoints.map(point => ({
+            extension_point_id: `extension-point:${releaseId}:${point.id}`,
+            release_id: releaseId,
+            product_id: manifest.moduleId,
+            point_key: point.id,
+            title: point.title,
+            contribution_kinds: jsonb(point.contributionKinds),
+            required_capability: point.requiredCapability ?? null,
+            platforms: jsonb(point.platforms ?? []),
+            max_contributions: point.maxContributions ?? 20,
+            declaration: jsonb(point),
+            created_at: now,
+            updated_at: now,
+          }))).execute()
+        }
+      }
       await trx
         .insertInto('greenfield_module_sources')
         .values({
@@ -150,7 +196,7 @@ export class GreenfieldModuleReleaseService {
           repository: manifest.source.repository,
           repository_id: null,
           default_branch: null,
-          commit: manifest.source.commit,
+          commit: sourceCommit,
           manifest_path: manifest.source.manifestPath,
           release_tag: manifest.source.releaseTag ?? null,
           release_asset_name: manifest.source.releaseAssetName ?? null,
@@ -214,7 +260,7 @@ export class GreenfieldModuleReleaseService {
           release_sha256: releaseSha,
           schema_sha256: {},
           settings_schema_sha256: null,
-          source_commit: manifest.source.commit,
+          source_commit: sourceCommit,
           verified_at: null,
           mismatch_at: null,
         })
@@ -350,7 +396,8 @@ export class GreenfieldModuleReleaseService {
   async verifyRelease(moduleId: string, version: string): Promise<GreenfieldModuleReleaseRecord> {
     const release = await this.requireRelease(moduleId, version)
     const declaredManifestSha = release.manifest.integrity.manifestSha256
-    if (declaredManifestSha && declaredManifestSha !== release.manifestSha256) {
+    const computedManifestSha = manifestChecksum({...release.manifest, integrity: {...release.manifest.integrity, manifestSha256: ''}})
+    if (!declaredManifestSha || declaredManifestSha !== release.manifestSha256 || computedManifestSha !== release.manifestSha256) {
       await this.quarantineRelease(release.releaseId, 'checksum mismatch', 'block')
       throw moduleError('VALIDATION_FAILED', 'Manifest checksum mismatch quarantined release')
     }
@@ -365,12 +412,14 @@ export class GreenfieldModuleReleaseService {
   }
 
   async publishRelease(moduleId: string, version: string): Promise<GreenfieldModuleReleaseRecord> {
-    const release = await this.requireRelease(moduleId, version)
-    if (release.releaseState !== 'verified' && release.releaseState !== 'pendingReview') {
+    let release = await this.requireRelease(moduleId, version)
+    if (release.releaseState === 'pendingReview') release = await this.verifyRelease(moduleId, version)
+    if (release.releaseState !== 'verified') {
       throw moduleError('VALIDATION_FAILED', `Release ${moduleId}@${version} cannot be published from ${release.releaseState}`)
     }
     const now = new Date()
     const sourceVersion = Math.floor(now.getTime() / 1000)
+    const productKind = productKindForManifest(release.manifest)
     await this.db.transaction().execute(async trx => {
       await trx
         .updateTable('greenfield_module_releases')
@@ -385,7 +434,7 @@ export class GreenfieldModuleReleaseService {
         .values({
           extension_id: release.moduleId,
           slug: release.moduleId,
-          kind: 'module',
+          kind: productKind,
           name: release.manifest.name,
           description: release.manifest.description,
           version: release.version,
@@ -415,6 +464,7 @@ export class GreenfieldModuleReleaseService {
             executable: release.manifest.lifecycle?.executionMode !== 'declarative' && release.trustLevel === 'firstParty',
             distribution_model: 'free',
             entitlement_id: null,
+            kind: productKindForManifest(release.manifest),
             updated_at: now,
           }),
         )
@@ -604,6 +654,28 @@ export class GreenfieldModuleReleaseService {
     }
     if (rows.length) await trx.insertInto('greenfield_module_contributions').values(rows).execute()
   }
+}
+
+function extensionProductForManifest(manifest: GreenfieldModuleManifest): ModulaExtensionProduct | null {
+  const value = (manifest as any).extensionProduct
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as ModulaExtensionProduct : null
+}
+
+function productKindForManifest(manifest: GreenfieldModuleManifest) {
+  return extensionProductForManifest(manifest)?.kind ?? 'module'
+}
+
+function validateReleaseEvidence(
+  manifest: GreenfieldModuleManifest,
+  computedManifestSha: string,
+  evidence?: GreenfieldModuleReleaseEvidence,
+) {
+  if (!evidence) throw moduleError('VALIDATION_FAILED', 'Standard 2.1 extension products require immutable release evidence')
+  if (evidence.repository !== manifest.source.repository) throw moduleError('VALIDATION_FAILED', 'Release evidence repository does not match manifest source')
+  if (!manifest.source.releaseTag || evidence.releaseTag !== manifest.source.releaseTag) throw moduleError('VALIDATION_FAILED', 'Release evidence tag does not match manifest source')
+  if (!/^[0-9a-f]{40}$/.test(evidence.releaseCommit)) throw moduleError('VALIDATION_FAILED', 'Release evidence requires an exact 40-character commit')
+  if (!/^[0-9a-f]{64}$/.test(evidence.artifactSha256) || /^0+$/.test(evidence.artifactSha256)) throw moduleError('VALIDATION_FAILED', 'Release evidence requires a non-zero artifact SHA-256')
+  if (evidence.manifestSha256 && evidence.manifestSha256 !== computedManifestSha) throw moduleError('VALIDATION_FAILED', 'Release evidence manifest checksum does not match the imported manifest')
 }
 
 function mapRelease(row: any): GreenfieldModuleReleaseRecord {

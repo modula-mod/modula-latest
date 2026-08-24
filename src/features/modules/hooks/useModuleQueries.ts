@@ -36,6 +36,25 @@ export function useModuleDetailQuery(moduleId: string) {
   })
 }
 
+export function useModuleRelationshipsQuery(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  return useQuery({
+    queryKey: moduleQueryKeys.relationships(moduleId),
+    queryFn: () => moduleRepository.getProductRelationships(moduleId),
+    enabled: Boolean(moduleId),
+  })
+}
+
+export function useModuleHostCompositionQuery(moduleId: string, route?: string, platform = 'web') {
+  const {moduleRepository} = useAppServices()
+  const session = useSession()
+  return useQuery({
+    queryKey: moduleQueryKeys.composition(moduleId, route, platform),
+    queryFn: () => moduleRepository.getHostComposition(moduleId, {platform, route}),
+    enabled: Boolean(moduleId) && session.status === 'signedIn',
+  })
+}
+
 export function useModuleViewsQuery(moduleId: string) {
   const {moduleRepository} = useAppServices()
   const session = useSession()

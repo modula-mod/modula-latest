@@ -256,7 +256,25 @@
     "verify:phase7m-b10": "node scripts/verify-phase7m-b10.mjs",
     "verify:phase7n-a": "node scripts/verify-phase7n-a.mjs",
     "verify:pvp-ui-1": "node scripts/verify-pvp-ui-1.mjs",
-    "verify:pvp-ui-1r": "node scripts/verify-pvp-ui-1r.mjs"
+    "verify:pvp-ui-1r": "node scripts/verify-pvp-ui-1r.mjs",
+    "verify:extension-contracts": "node scripts/verify-pvp-platform-2.mjs contracts",
+    "verify:extension-manifest": "node scripts/verify-pvp-platform-2.mjs manifest",
+    "verify:extension-points": "node scripts/verify-pvp-platform-2.mjs points",
+    "verify:extension-dependency-graph": "node scripts/verify-pvp-platform-2.mjs graph",
+    "verify:extension-lifecycle": "node scripts/verify-pvp-platform-2.mjs lifecycle",
+    "verify:extension-capabilities": "node scripts/verify-pvp-platform-2.mjs capabilities",
+    "verify:extension-contributions": "node scripts/verify-pvp-platform-2.mjs contributions",
+    "verify:extension-isolation": "node scripts/verify-pvp-platform-2.mjs isolation",
+    "verify:extension-events": "node scripts/verify-pvp-platform-2.mjs events",
+    "verify:extension-jobs": "node scripts/verify-pvp-platform-2.mjs jobs",
+    "verify:extension-service-fabric": "node scripts/verify-pvp-platform-2.mjs service-fabric",
+    "verify:extension-provenance": "node scripts/verify-pvp-platform-2.mjs provenance",
+    "verify:extension-security": "node scripts/verify-pvp-platform-2.mjs security",
+    "verify:vault-notes-reference": "node scripts/verify-pvp-platform-2.mjs vault-notes",
+    "verify:vault-ai-reference": "node scripts/verify-pvp-platform-2.mjs vault-ai",
+    "verify:vault-voice-reference": "node scripts/verify-pvp-platform-2.mjs vault-voice",
+    "verify:extension-cross-account-isolation": "node scripts/verify-pvp-platform-2.mjs cross-account",
+    "verify:pvp-platform-2": "node scripts/verify-pvp-platform-2.mjs all"
   },
   "private": true
 }

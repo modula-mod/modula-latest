@@ -56,7 +56,7 @@ An account may have 0 or 1 logical Vault Notes installation. Extra family rows a
 
 | Candidate | Result |
 | --- | --- |
-| `modula-mod/modula-vault-notes` | Exists, public, maintainer push via Mac HTTPS (`modula-mod` gh identity). HEAD after identity overlay `d92e445`. Tags `vault-notes-v1.0.0` and `vault-notes-v1.1.0`. `pnpm build`, `pnpm test`, `pnpm verify` all pass. Manifest ID is now `digital.modula.vault-notes`. Version remains 1.1.0. |
+| `modula-mod/modula-vault-notes` | Exists, public, and independently versioned. Current main/tag `vault-notes-v1.2.0` resolve to `c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce`; `pnpm verify` passes. The manifest ID is `digital.modula.vault-notes`, Standard is 2.1.0, and the module remains standalone while exposing extension points. |
 | `modula-mod/modula-module-vault-notes` | Outcome **C**: private, recoverable from Mac. Cloud agents saw GitHub 404 (D/E). Contains unique historical Greenfield source for production `0.1.0` (`915bbf2`) and `0.2.0` (`54ab8ed`), plus an older MMS 0.3 host-rendered JSON prototype. Last push before archival: 2026-07-26. Archived with README redirect. History retained. Not deleted. |
 
 No third Vault Notes repository is created.
@@ -74,11 +74,11 @@ manifest                  module.manifest.json (canonical ID in source as of d92
     ↓
 repository                modula-mod/modula-vault-notes
     ↓
-commit SHA                tagged release commit f443972 (current 1.1.0)
+commit SHA                c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce
     ↓
-release/tag               vault-notes-v1.1.0 (current)
+release/tag               vault-notes-v1.2.0 (current)
     ↓
-artifact checksum         46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a
+artifact checksum         98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935
 ```
 
 Every arrow must resolve. Product Hub must not claim `modula-mod/modula-module-vault-notes` as live source. Historical 0.2.0 rows may keep that repository as provenance of the bytes that were imported; they are not the current lineage.

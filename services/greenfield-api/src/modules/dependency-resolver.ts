@@ -32,6 +32,9 @@ export type DependencyResolutionPlan = {
   provides: Array<{id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}>
   installable: boolean
   circular: boolean
+  cyclePath: string[]
+  graphDepth: number
+  graphNodes: number
   errors: string[]
   warnings: string[]
 }
@@ -42,7 +45,7 @@ export class GreenfieldModuleDependencyResolver {
   async resolve(input: DependencyResolutionInput): Promise<DependencyResolutionPlan> {
     const errors: string[] = []
     const warnings: string[] = []
-    const requests = input.manifest
+    const manifestRequests = input.manifest
       ? dependencyRequestsFromManifest(input.manifest)
       : (input.dependencies ?? []).map(dependency => ({
           relation: dependency.optional ? 'optional' as const : 'requires' as const,
@@ -53,9 +56,29 @@ export class GreenfieldModuleDependencyResolver {
           blocking: !dependency.optional,
           reason: dependency.reason,
         }))
+    const extensionTargets = input.manifest && (input.manifest as any).extensionProduct?.targets
+      ? ((input.manifest as any).extensionProduct.targets as Array<{productId: string; versionRange: string}>).map(target => ({
+          relation: 'requires' as const,
+          moduleId: target.productId,
+          provides: null,
+          versionRange: target.versionRange,
+          optional: false,
+          blocking: true,
+          reason: 'Standard 2.1 extension target',
+        }))
+      : []
+    const requests = [...manifestRequests, ...extensionTargets].filter((request, index, all) =>
+      all.findIndex(candidate => candidate.moduleId === request.moduleId && candidate.provides === request.provides && candidate.relation === request.relation) === index,
+    )
     const provides = input.manifest ? dependencyProvidesFromManifest(input.manifest) : []
-    const circular = await this.detectCircular(input.moduleId, requests)
-    if (circular) errors.push('Circular module dependency graph rejected')
+    const graphPolicy = ((input.manifest as any)?.extensionProduct?.graphPolicy ?? {}) as {maxDepth?: number; maxNodes?: number}
+    const graph = await this.inspectGraph(input.moduleId, requests, {
+      maxDepth: Math.min(graphPolicy.maxDepth ?? 16, 32),
+      maxNodes: Math.min(graphPolicy.maxNodes ?? 256, 1024),
+    })
+    const circular = graph.cyclePath.length > 0
+    if (circular) errors.push(`DEPENDENCY_CYCLE: ${graph.cyclePath.join(' -> ')}`)
+    if (graph.limitExceeded) errors.push(`DEPENDENCY_GRAPH_BOUNDS_EXCEEDED: maxDepth=${graph.maxDepth}, maxNodes=${graph.maxNodes}`)
     const dependencies = []
     for (const dependency of requests) {
       if (dependency.moduleId === input.moduleId) {
@@ -86,7 +109,7 @@ export class GreenfieldModuleDependencyResolver {
       if (isConflict && installed) errors.push(`Conflicting module ${resolved?.moduleId ?? dependency.moduleId ?? dependency.provides} is installed`)
     }
     dependencies.sort((a, b) => a.moduleId.localeCompare(b.moduleId))
-    return {dependencies, provides, installable: errors.length === 0, circular, errors, warnings}
+    return {dependencies, provides, installable: errors.length === 0, circular, cyclePath: graph.cyclePath, graphDepth: graph.depth, graphNodes: graph.nodes, errors, warnings}
   }
 
   async activeDependants(accountId: string, moduleId: string) {
@@ -102,29 +125,66 @@ export class GreenfieldModuleDependencyResolver {
     return rows
   }
 
-  private async detectCircular(moduleId: string, dependencies: GreenfieldModuleDependencyRequest[]): Promise<boolean> {
-    const required = dependencies.filter(dependency => dependency.relation === 'requires' && dependency.moduleId).map(dependency => dependency.moduleId!)
-    if (required.includes(moduleId)) return true
+  private async inspectGraph(moduleId: string, dependencies: GreenfieldModuleDependencyRequest[], limits: {maxDepth: number; maxNodes: number}) {
+    const proposed = dependencies
+      .filter(dependency => dependency.relation === 'requires' && dependency.moduleId)
+      .map(dependency => dependency.moduleId!)
+      .sort()
+    const adjacency = new Map<string, string[]>([[moduleId, proposed]])
     const visited = new Set<string>()
-    const stack = [...required]
-    while (stack.length > 0) {
-      const next = stack.pop()!
-      if (visited.has(next)) continue
-      visited.add(next)
-      const rows = await this.db
-        .selectFrom('greenfield_module_dependencies')
-        .innerJoin('greenfield_module_releases', 'greenfield_module_releases.release_id', 'greenfield_module_dependencies.release_id')
-        .select(['greenfield_module_dependencies.dependency_module_id'])
-        .where('greenfield_module_releases.module_id', '=', next)
-        .where('greenfield_module_dependencies.optional', '=', false)
-        .where('greenfield_module_releases.release_state', '=', 'published')
-        .execute()
-      for (const row of rows) {
-        if (row.dependency_module_id === moduleId) return true
-        stack.push(row.dependency_module_id)
-      }
+    const active = new Set<string>()
+    let cyclePath: string[] = []
+    let depth = 0
+    let limitExceeded = false
+
+    const neighbours = async (productId: string): Promise<string[]> => {
+      const cached = adjacency.get(productId)
+      if (cached) return cached
+      const [dependencies, targets] = await Promise.all([
+        this.db
+          .selectFrom('greenfield_module_dependencies')
+          .innerJoin('greenfield_module_releases', 'greenfield_module_releases.release_id', 'greenfield_module_dependencies.release_id')
+          .select(['greenfield_module_dependencies.dependency_module_id'])
+          .where('greenfield_module_releases.module_id', '=', productId)
+          .where('greenfield_module_dependencies.optional', '=', false)
+          .where('greenfield_module_releases.release_state', '=', 'published')
+          .execute(),
+        this.db
+          .selectFrom('greenfield_extension_targets')
+          .innerJoin('greenfield_module_releases', 'greenfield_module_releases.release_id', 'greenfield_extension_targets.release_id')
+          .select(['greenfield_extension_targets.target_product_id'])
+          .where('greenfield_module_releases.module_id', '=', productId)
+          .where('greenfield_module_releases.release_state', '=', 'published')
+          .execute(),
+      ])
+      const result = Array.from(new Set([
+        ...dependencies.map(row => row.dependency_module_id),
+        ...targets.map(row => row.target_product_id),
+      ])).sort()
+      adjacency.set(productId, result)
+      return result
     }
-    return false
+
+    const visit = async (productId: string, path: string[]): Promise<void> => {
+      if (cyclePath.length || limitExceeded) return
+      depth = Math.max(depth, path.length)
+      if (path.length > limits.maxDepth || visited.size >= limits.maxNodes) {
+        limitExceeded = true
+        return
+      }
+      if (active.has(productId)) {
+        const first = path.indexOf(productId)
+        cyclePath = [...path.slice(first), productId]
+        return
+      }
+      if (visited.has(productId)) return
+      active.add(productId)
+      for (const next of await neighbours(productId)) await visit(next, [...path, productId])
+      active.delete(productId)
+      visited.add(productId)
+    }
+    await visit(moduleId, [])
+    return {cyclePath, depth, nodes: visited.size, limitExceeded, maxDepth: limits.maxDepth, maxNodes: limits.maxNodes}
   }
 
   private async isInstalled(accountId: string, moduleId: string, version: string | null): Promise<boolean> {
