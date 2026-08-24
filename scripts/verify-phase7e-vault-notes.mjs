@@ -24,6 +24,7 @@ for (const script of [
 
 run('pnpm', ['--filter', '@modula/greenfield-api', 'typecheck'], 'Greenfield API typecheck passes')
 run('pnpm', ['--filter', '@modula/greenfield-worker', 'typecheck'], 'Greenfield worker typecheck passes')
+run('pnpm', ['--filter', '@modula/greenfield-contracts', 'build'], 'Greenfield contracts build passes before runtime tests')
 
 await withIsolatedDatabase('Vault Notes final lifecycle proof', async env => {
   run(

@@ -36,6 +36,7 @@ export class GreenfieldModuleRegistryService {
         'greenfield_module_releases.license_status',
         'greenfield_module_releases.trust_level',
         'greenfield_module_releases.published_at',
+        'greenfield_module_releases.product_kind',
         'greenfield_module_versions.manifest',
         'greenfield_publishers.publisher_id',
         'greenfield_publishers.display_name',
@@ -43,6 +44,7 @@ export class GreenfieldModuleRegistryService {
       .$if(Boolean(filters.publisher), qb => qb.where('greenfield_module_releases.publisher_id', '=', filters.publisher!))
       .$if(Boolean(filters.trust), qb => qb.where('greenfield_module_releases.trust_level', '=', filters.trust as any))
       .$if(Boolean(filters.status), qb => qb.where('greenfield_module_releases.release_state', '=', filters.status as any))
+      .$if((filters.productKind ?? 'module') !== 'all', qb => qb.where('greenfield_module_releases.product_kind', '=', (filters.productKind ?? 'module') as any))
       .orderBy('greenfield_module_releases.module_id')
       .orderBy('greenfield_module_releases.version', 'desc')
       .execute()
@@ -61,6 +63,7 @@ export class GreenfieldModuleRegistryService {
         const installable = row.release_state === 'published'
         byModule.set(canonicalId, {
           moduleId: canonicalId,
+          productKind: row.product_kind,
           name: manifest.name,
           description: manifest.description,
           publisherId: row.publisher_id,
@@ -87,7 +90,7 @@ export class GreenfieldModuleRegistryService {
     const placeholders = await this.db
       .selectFrom('greenfield_extension_catalogue')
       .selectAll()
-      .where('kind', '=', 'module')
+      .$if((filters.productKind ?? 'module') !== 'all', qb => qb.where('kind', '=', filters.productKind ?? 'module'))
       .execute()
     for (const row of placeholders) {
       const manifest = (row.manifest ?? {}) as any
@@ -100,6 +103,7 @@ export class GreenfieldModuleRegistryService {
       if (filters.status && filters.status !== row.catalogue_status && filters.status !== manifest.state) continue
       byModule.set(moduleId, {
         moduleId,
+        productKind: row.kind as any,
         name: row.name,
         description: row.description,
         publisherId: 'modula',
@@ -142,6 +146,7 @@ export class GreenfieldModuleRegistryService {
       })
       return {
         moduleId: latest.moduleId,
+        productKind: (latest.manifest as any).extensionProduct?.kind ?? 'module',
         name: latest.manifest.name,
         description: latest.manifest.description,
         publisher: latest.manifest.publisher,

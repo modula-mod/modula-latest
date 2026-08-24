@@ -418,4 +418,75 @@ describe('Greenfield Module Manifest v2 validation', () => {
     ]))
     expect(diagnostics.find(diagnostic => diagnostic.section === 'marketplace')?.operational).toBe(true)
   })
+
+  it('accepts a Standard 2.1 module that remains usable without extensions', () => {
+    const manifest = validStandard20Manifest({
+      standardVersion: '2.1.0',
+      sectionVersions: createDefaultModuleSectionVersions('2.1.0'),
+      extensionProduct: {
+        version: '1.0.0',
+        kind: 'module',
+        targets: [],
+        extensionPoints: [{
+          id: 'digital.modula.vault-notes.editor.command',
+          title: 'Editor commands',
+          contributionKinds: ['editor.command'],
+          requiredCapability: 'notes.editor.contribute',
+          platforms: ['web', 'ios', 'android'],
+          maxContributions: 40,
+        }],
+        contributions: [],
+        retention: {defaultMode: 'KEEP_DATA', supportsUserChoice: true, metadataNamespace: 'digital.modula.vault-notes'},
+        graphPolicy: {maxDepth: 8, maxNodes: 128},
+      },
+    })
+    const result = validateGreenfieldModuleManifest(manifest)
+    expect(result.valid, result.issues.map(issue => `${issue.code} ${issue.path}`).join('\n')).toBe(true)
+  })
+
+  it('accepts a targeted declarative plugin and rejects executable escape hatches', () => {
+    const extensionProduct = {
+      version: '1.0.0',
+      kind: 'plugin',
+      targets: [{
+        productId: 'digital.modula.documents',
+        versionRange: '>=1.1.0 <2.0.0',
+        requiredCapabilities: ['documents.read'],
+        requiredExtensionPoints: ['digital.modula.documents.editor.command'],
+      }],
+      extensionPoints: [],
+      contributions: [{
+        id: 'digital.modula.vault-notes.contribution.copy-markdown',
+        title: 'Copy as Markdown',
+        kind: 'editor.command',
+        extensionPoint: 'digital.modula.documents.editor.command',
+        functionId: 'digital.modula.vault-notes.function.copy-markdown',
+        requiredCapability: 'documents.read',
+        availability: {platforms: ['web'], requiresOnline: false},
+      }],
+      retention: {defaultMode: 'DELETE_DATA', supportsUserChoice: false, metadataNamespace: 'digital.modula.vault-notes'},
+      graphPolicy: {maxDepth: 8, maxNodes: 128},
+    }
+    const valid = validateGreenfieldModuleManifest(validStandard20Manifest({
+      standardVersion: '2.1.0',
+      sectionVersions: createDefaultModuleSectionVersions('2.1.0'),
+      permissions: [
+        {permission: 'notes.read', reason: 'Read one selected note'},
+        {permission: 'media.audio.capture', reason: 'Capture user-requested audio'},
+        {permission: 'transcription.request', reason: 'Request approved transcription'},
+      ],
+      extensionProduct,
+    }))
+    expect(valid.valid, valid.issues.map(issue => `${issue.code} ${issue.path}`).join('\n')).toBe(true)
+
+    const unsafe = structuredClone(extensionProduct) as any
+    unsafe.targets[0].requiredCapabilities = ['documents.*']
+    unsafe.contributions[0].remoteEntry = 'https://untrusted.example/plugin.js'
+    const rejected = validateGreenfieldModuleManifest(validStandard20Manifest({
+      standardVersion: '2.1.0',
+      sectionVersions: createDefaultModuleSectionVersions('2.1.0'),
+      extensionProduct: unsafe,
+    }))
+    expect(rejected.issues.map(issue => issue.code)).toEqual(expect.arrayContaining(['WILDCARD_CONTRACT_DENIED', 'UNDECLARED_EXTENSION_FIELD']))
+  })
 })

@@ -1,4 +1,4 @@
-import type {GreenfieldModuleManifestV1} from '@modula/greenfield-module-manifest'
+import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {moduleIdFamily, resolveCanonicalModuleId, rewriteLegacyVaultNotesId} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
@@ -13,7 +13,7 @@ export type GreenfieldModuleRuntimeContext = {
   version: string
   extensionVersionId: string
   releaseState: string
-  manifest: GreenfieldModuleManifestV1
+  manifest: GreenfieldModuleManifest
   grantedPermissions: string[]
 }
 
@@ -55,7 +55,7 @@ export class GreenfieldModuleRuntimeAccessService {
       .where('release_id', '=', row.release_id)
       .orderBy('reviewed_at', 'desc')
       .executeTakeFirst()
-    const manifest = row.manifest as GreenfieldModuleManifestV1
+    const manifest = row.manifest as GreenfieldModuleManifest
     const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteLegacyVaultNotesId(permission.permission))
     return {
       accountId,

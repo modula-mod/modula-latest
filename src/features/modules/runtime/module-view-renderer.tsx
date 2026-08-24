@@ -9,11 +9,12 @@ import type {
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import type {ModuleAIProductActionDefinition, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
+import type {ModuleAIProductActionDefinition, ModuleHostExtensionContribution, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
 import {ModuleAIActionMenu, SchemaSettingsRenderer} from '@/features/modules/components'
 import {useModuleRecordMutations, useModuleRecordsQuery} from '@/features/modules/hooks'
 import {ModuleActionBar} from '@/features/modules/runtime/module-action-bar'
 import {ModuleEmptyState} from '@/features/modules/runtime/module-empty-state'
+import {ModuleExtensionContributions} from '@/features/modules/runtime/module-extension-contributions'
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
 import {primaryActionFor} from '@/features/modules/runtime/module-action-runner'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
@@ -21,7 +22,7 @@ import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function ModuleViewRenderer({moduleId, view, aiActions = []}: {moduleId: string; view: ModuleRuntimeView; aiActions?: ModuleAIProductActionDefinition[]}) {
+export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionContributions = []}: {moduleId: string; view: ModuleRuntimeView; aiActions?: ModuleAIProductActionDefinition[]; extensionContributions?: ModuleHostExtensionContribution[]}) {
   const router = useRouter()
   const {moduleRepository} = useAppServices()
   const {colours, radius, spacing} = useThemeTokens()
@@ -188,6 +189,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = []}: {moduleId: 
               moduleId={moduleId}
               collection={collection}
               aiActions={aiActions}
+              extensionContributions={extensionContributions}
               onEdit={() => {
                 setEditing(record)
                 setDraft(record.data)
@@ -258,6 +260,7 @@ function RecordRow({
   moduleId,
   collection,
   aiActions,
+  extensionContributions,
   onEdit,
   onDelete,
 }: {
@@ -266,6 +269,7 @@ function RecordRow({
   moduleId: string
   collection: string
   aiActions: ModuleAIProductActionDefinition[]
+  extensionContributions: ModuleHostExtensionContribution[]
   onEdit: () => void
   onDelete: () => void
 }) {
@@ -299,6 +303,7 @@ function RecordRow({
           actions={aiActions}
         />
       </View>
+      <ModuleExtensionContributions moduleId={moduleId} contributions={extensionContributions} record={record} />
     </View>
   )
 }

@@ -28,11 +28,13 @@ import type {
   ModuleContribution,
   ModuleDetail,
   ModuleHealth,
+  ModuleHostComposition,
   ModuleInstallPreview,
   ModuleInstallabilityProjection,
   ModuleRecord,
   ModuleRecordPage,
   ModuleRepository,
+  ModuleProductRelationships,
   ModuleRuntimeSummary,
   ModuleRuntimeView,
   ModuleSettingsDocument,
@@ -112,7 +114,7 @@ export class ApiModuleRepository implements ModuleRepository {
   ): Promise<ModuleCatalogueItem[]> {
     return localOnlyFallback(
       this.client.get(
-        {path: '/v1/registry/modules', query: {q: input.q, limit: input.limit ?? 50}},
+        {path: '/v1/registry/products', query: {q: input.q, limit: input.limit ?? 50}},
         decodeCataloguePage,
       ),
       () => filterCatalogue(LOCAL_CATALOGUE, input),
@@ -127,7 +129,7 @@ export class ApiModuleRepository implements ModuleRepository {
 
   async getModule(moduleId: string, options: {includeInstalled?: boolean} = {}): Promise<ModuleDetail | null> {
     return localOnlyFallback(
-      this.client.get({path: `/v1/registry/modules/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
+      this.client.get({path: `/v1/registry/products/${encodeURIComponent(moduleId)}`}, decodeModuleDetail),
       () => {
         const fallback = LOCAL_CATALOGUE.find(item => item.moduleId === moduleId)
         if (!fallback) return null
@@ -179,12 +181,12 @@ export class ApiModuleRepository implements ModuleRepository {
     )
   }
 
-  installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview> {
-    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/install-preview`, authenticated: true, body: {version}}, decodeInstallPreview)
+  installPreview(moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' = 'web'): Promise<ModuleInstallPreview> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/install-preview`, authenticated: true, body: {version, platform}}, decodeInstallPreview)
   }
 
-  install(moduleId: string, input: {version?: string; enable?: boolean} = {}): Promise<unknown> {
-    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {version: input.version, idempotencyKey: idempotencyKey('install', moduleId)}}, value => value)
+  install(moduleId: string, input: {version?: string; enable?: boolean; approvedPermissions?: string[]; platform?: 'ios' | 'android' | 'web' | 'desktop'} = {}): Promise<unknown> {
+    return this.client.post({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {version: input.version, platform: input.platform ?? 'web', approvedPermissions: input.approvedPermissions, idempotencyKey: idempotencyKey('install', moduleId)}}, value => value)
   }
 
   enable(moduleId: string): Promise<unknown> {
@@ -207,8 +209,8 @@ export class ApiModuleRepository implements ModuleRepository {
     }, value => value)
   }
 
-  uninstall(moduleId: string, choice: 'keepData' | 'exportThenDelete' | 'deleteData' = 'keepData'): Promise<unknown> {
-    return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {choice, recentAuth: false, confirmDelete: false, idempotencyKey: idempotencyKey('uninstall', moduleId)}}, value => value)
+  uninstall(moduleId: string, choice: 'keepData' | 'exportThenDelete' | 'deleteData' = 'keepData', options: {removeDependants?: boolean} = {}): Promise<unknown> {
+    return this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/install`, authenticated: true, body: {choice, removeDependants: options.removeDependants, recentAuth: false, confirmDelete: false, idempotencyKey: idempotencyKey('uninstall', moduleId)}}, value => value)
   }
 
   uninstallPreview(moduleId: string): Promise<ModuleUninstallPreview> {
@@ -342,6 +344,22 @@ export class ApiModuleRepository implements ModuleRepository {
       () => null,
     )
   }
+
+  getProductRelationships(productId: string): Promise<ModuleProductRelationships> {
+    return this.client.get({path: `/v1/registry/products/${encodeURIComponent(productId)}/relationships`}, decodeProductRelationships)
+  }
+
+  getHostComposition(moduleId: string, input: {platform?: string; route?: string; online?: boolean} = {}): Promise<ModuleHostComposition> {
+    return this.client.get({path: `/v1/module-host/${encodeURIComponent(moduleId)}/composition`, authenticated: true, query: input}, decodeHostComposition)
+  }
+
+  invokeExtensionContribution(extensionProductId: string, contributionId: string, input: {targetProductId: string; actionId: string; requiredCapabilities?: string[]; resource?: {type: 'moduleRecord'; id: string; collection?: string}; variables?: Record<string, unknown>}): Promise<unknown> {
+    return this.client.post({path: `/v1/extensions/${encodeURIComponent(extensionProductId)}/contributions/${encodeURIComponent(contributionId)}/invoke`, authenticated: true, body: input}, value => value)
+  }
+
+  reportExtensionContributionFailure(extensionProductId: string, contributionId: string, errorCode: string): Promise<unknown> {
+    return this.client.post({path: `/v1/extensions/${encodeURIComponent(extensionProductId)}/contributions/${encodeURIComponent(contributionId)}/fail`, authenticated: true, body: {errorCode}}, value => value)
+  }
 }
 
 function decodeCataloguePage(value: unknown): ModuleCatalogueItem[] {
@@ -380,7 +398,7 @@ function decodeCatalogueItem(value: unknown): ModuleCatalogueItem {
     description: String(row.description ?? ''),
     publisherId: String(row.publisherId ?? row.publisher_id ?? 'modula'),
     publisherName: String(row.publisherName ?? row.publisher ?? 'Modula'),
-    kind: moduleId.includes('dimon') ? 'system' : 'module',
+    kind: moduleId.includes('dimon') ? 'system' : productKind(row.productKind ?? row.product_kind),
     category: categoryFor(moduleId, String(row.description ?? '')),
     trustLevel: String(row.trustLevel ?? row.trust ?? 'untrustedManifest'),
     latestVersion,
@@ -527,6 +545,8 @@ function decodeInstalledModule(value: unknown): InstalledModule {
     updateState: typeof row.updateState === 'string' ? row.updateState : 'Current',
     configurationState: typeof row.configurationState === 'string' ? row.configurationState : 'Configured',
     grantedPermissions: arrayOfStrings(row.grantedPermissions ?? row.granted_permissions),
+    productKind: productKind(row.productKind ?? row.product_kind),
+    lifecycleState: typeof row.lifecycleState === 'string' ? row.lifecycleState : typeof row.lifecycle_state === 'string' ? row.lifecycle_state : undefined,
   }
 }
 
@@ -671,12 +691,15 @@ function decodeInstallPreview(value: unknown): ModuleInstallPreview {
   return {
     moduleId: String(row.moduleId ?? ''),
     version: String(row.version ?? ''),
+    productKind: productKind(row.productKind),
     compatible: Boolean(row.compatible),
     incompatibilityReasons: Array.isArray(row.incompatibilityReasons) ? row.incompatibilityReasons.map(String) : [],
     trust: (row.trust ?? {level: 'unknown', publisherStatus: 'pending', releaseStatus: 'unknown'}) as ModuleInstallPreview['trust'],
     permissions: Array.isArray(row.permissions) ? row.permissions as ModuleInstallPreview['permissions'] : [],
     dependencies: Array.isArray(row.dependencies) ? row.dependencies as ModuleInstallPreview['dependencies'] : [],
     dependencyWarnings: Array.isArray(row.dependencyWarnings) ? row.dependencyWarnings.map(String) : [],
+    extensionTargets: Array.isArray(row.extensionTargets) ? row.extensionTargets as ModuleInstallPreview['extensionTargets'] : [],
+    extensionContributions: Array.isArray(row.extensionContributions) ? row.extensionContributions as ModuleInstallPreview['extensionContributions'] : [],
     provides: Array.isArray(row.provides) ? row.provides as ModuleInstallPreview['provides'] : [],
     contributions: (row.contributions ?? {}) as Record<string, number>,
     migrationsRequired: Boolean(row.migrationsRequired),
@@ -1022,13 +1045,32 @@ function decodeContribution(value: unknown): ModuleContribution {
   }
 }
 
+function decodeProductRelationships(value: unknown): ModuleProductRelationships {
+  const row = isRecord(value) ? value : {}
+  return {
+    productId: String(row.productId ?? ''),
+    targets: Array.isArray(row.targets) ? row.targets as ModuleProductRelationships['targets'] : [],
+    extensions: Array.isArray(row.extensions) ? row.extensions as ModuleProductRelationships['extensions'] : [],
+  }
+}
+
+function decodeHostComposition(value: unknown): ModuleHostComposition {
+  return value as ModuleHostComposition
+}
+
+function productKind(value: unknown): ModuleCatalogueItem['kind'] {
+  if (value === 'addon' || value === 'plugin' || value === 'function' || value === 'tool' || value === 'widget' || value === 'connector' || value === 'service') return value
+  return 'module'
+}
+
 function decodeUninstallPreview(value: unknown): ModuleUninstallPreview {
   const row = (value ?? {}) as Record<string, unknown>
   return {
     moduleId: String(row.moduleId ?? row.module_id ?? ''),
     version: String(row.version ?? ''),
     dependantModules: Array.isArray(row.dependantModules) ? row.dependantModules : [],
-    recordCount: Number(row.recordCount ?? 0),
+    dependantExtensions: Array.isArray(row.dependantExtensions) ? row.dependantExtensions as ModuleUninstallPreview['dependantExtensions'] : [],
+    recordCount: Number(row.recordCount ?? row.recordCounts ?? 0),
     activeJobs: Array.isArray(row.activeJobs) ? row.activeJobs : [],
     registeredContributions: Array.isArray(row.registeredContributions) ? row.registeredContributions : [],
     dataChoices: ['keepData', 'exportThenDelete', 'deleteData'],
@@ -1038,7 +1080,18 @@ function decodeUninstallPreview(value: unknown): ModuleUninstallPreview {
 
 function applyInstalledState(item: ModuleCatalogueItem, installed?: InstalledModule): ModuleCatalogueItem {
   if (!installed) return item
-  const state = installed.status === 'enabled' ? 'enabled' : installed.status === 'disabled' || installed.status === 'installedDisabled' ? 'disabled' : 'installed'
+  const lifecycle = installed.lifecycleState
+  const state = lifecycle === 'ENABLED' || installed.status === 'enabled'
+    ? 'enabled'
+    : lifecycle === 'DISABLED' || installed.status === 'disabled' || installed.status === 'installedDisabled'
+      ? 'disabled'
+      : lifecycle === 'UPDATE_AVAILABLE'
+        ? 'updateAvailable'
+        : lifecycle === 'INCOMPATIBLE'
+          ? 'incompatible'
+          : lifecycle === 'QUARANTINED'
+            ? 'quarantined'
+            : 'installed'
   return {
     ...item,
     installationState: state,

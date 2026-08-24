@@ -4,7 +4,7 @@ import {useRouter, type Href} from 'expo-router'
 
 import {AppText} from '@/components/primitives/AppText'
 import {SchemaSettingsRenderer, ModuleStatusPill} from '@/features/modules/components'
-import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery, useModuleRuntimeQuery} from '@/features/modules/hooks'
+import {useInstalledModulesQuery, useModuleBackendDiagnosticsQuery, useModuleContributionQuery, useModuleDetailQuery, useModuleHealthQuery, useModuleRelationshipsQuery, useModuleRuntimeQuery} from '@/features/modules/hooks'
 import {safeModuleId} from '@/features/modules/validation/module-route'
 import {
   SettingsLinkRow,
@@ -30,6 +30,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
   const runtime = useModuleRuntimeQuery(id)
   const backendDiagnostics = useModuleBackendDiagnosticsQuery(id)
   const contributions = useModuleContributionQuery({moduleId: id})
+  const relationships = useModuleRelationshipsQuery(id)
   const installedModules = useInstalledModulesQuery()
   const {colours, radius, spacing} = useThemeTokens()
   const [automaticUpdates, setAutomaticUpdates] = useState(true)
@@ -47,6 +48,7 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
 
   const transition = async (kind: 'enable' | 'disable' | 'update' | 'uninstall' | 'preview-uninstall') => {
     if (!module) return
+    let removeDependants = false
     if (kind === 'disable') {
       const confirmed = await confirmModulaAction({
         title: 'Disable module',
@@ -57,21 +59,29 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
       if (!confirmed) return
     }
     if (kind === 'uninstall') {
+      const preview = await services.moduleRepository.uninstallPreview(module.moduleId)
+      const dependantNames = [
+        ...preview.dependantModules.map(item => String((item as {module_id?: unknown}).module_id ?? 'dependent module')),
+        ...preview.dependantExtensions.map(item => item.productId),
+      ]
       const confirmed = await confirmModulaAction({
         title: 'Uninstall module',
-        message: `Type-name deletion is required only for Delete data. This action keeps ${module.name} data by default.`,
-        confirmLabel: 'Uninstall and keep data',
+        message: dependantNames.length
+          ? `${dependantNames.join(', ')} depend on ${module.name}. Remove these products and keep their data?`
+          : `Type-name deletion is required only for Delete data. This action keeps ${module.name} data by default.`,
+        confirmLabel: dependantNames.length ? 'Remove products, keep data' : 'Uninstall and keep data',
         cancelLabel: 'Cancel',
         destructive: true,
       })
       if (!confirmed) return
+      removeDependants = dependantNames.length > 0
     }
     setBusy(kind)
     try {
       if (kind === 'enable') await services.moduleRepository.enable(module.moduleId)
       if (kind === 'disable') await services.moduleRepository.disable(module.moduleId)
       if (kind === 'update') await services.moduleRepository.update(module.moduleId)
-      if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData')
+      if (kind === 'uninstall') await services.moduleRepository.uninstall(module.moduleId, 'keepData', {removeDependants})
       if (kind === 'preview-uninstall') {
         const preview = await services.moduleRepository.uninstallPreview(module.moduleId)
         setUninstallPreview(`${preview.recordCount} records · ${preview.registeredContributions.length} contributions · default: keep data`)
@@ -121,6 +131,29 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
           .filter(permission => !permission.startsWith('ai.')),
       )
       await Promise.all([detail.refetch(), installedModules.refetch()])
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const manageExtension = async (extensionId: string, kind: 'enable' | 'disable' | 'update' | 'uninstall') => {
+    if (kind === 'uninstall') {
+      const confirmed = await confirmModulaAction({
+        title: 'Uninstall extension',
+        message: 'The host module and its records remain installed. Extension-owned data is kept by default.',
+        confirmLabel: 'Uninstall and keep data',
+        cancelLabel: 'Cancel',
+        destructive: true,
+      })
+      if (!confirmed) return
+    }
+    setBusy(`${kind}:${extensionId}`)
+    try {
+      if (kind === 'enable') await services.moduleRepository.enable(extensionId)
+      if (kind === 'disable') await services.moduleRepository.disable(extensionId)
+      if (kind === 'update') await services.moduleRepository.update(extensionId)
+      if (kind === 'uninstall') await services.moduleRepository.uninstall(extensionId, 'keepData')
+      await Promise.all([installedModules.refetch(), relationships.refetch(), contributions.refetch()])
     } finally {
       setBusy(null)
     }
@@ -315,6 +348,40 @@ export function ModuleManagementScreen({moduleId}: {moduleId: unknown}) {
           <SettingsSection title="Module settings">
             <View style={[styles.panel, {padding: spacing[4]}]}>
               <SchemaSettingsRenderer moduleId={module.moduleId} />
+            </View>
+          </SettingsSection>
+
+          <SettingsSection title="Extensions">
+            <View style={[styles.panel, {gap: spacing[3], padding: spacing[4]}]}>
+              {(relationships.data?.extensions ?? []).length ? relationships.data?.extensions.map(extension => {
+                const extensionInstall = installedModules.data?.find(item => item.moduleId === extension.productId)
+                const enabled = extensionInstall?.status === 'enabled'
+                return (
+                  <View key={extension.productId} style={[styles.contribution, {borderColor: colours.border, borderRadius: radius.medium, gap: spacing[2], padding: spacing[3]}]}>
+                    <View style={{gap: spacing[1]}}>
+                      <AppText variant="label">{extension.name}</AppText>
+                      <AppText variant="caption" colour="textSecondary">{extension.productKind} · {extension.version} · {extensionInstall?.status ?? 'Not installed'}</AppText>
+                    </View>
+                    <View style={[styles.actions, {gap: spacing[2]}]}>
+                      {extensionInstall ? (
+                        <ModulaButton
+                          label={enabled ? 'Disable' : 'Enable'}
+                          role="secondary"
+                          loading={busy === `${enabled ? 'disable' : 'enable'}:${extension.productId}`}
+                          onPress={() => void manageExtension(extension.productId, enabled ? 'disable' : 'enable')}
+                        />
+                      ) : (
+                        <ModulaButton label="Get" role="secondary" onPress={() => router.push(`/marketplace/${encodeURIComponent(extension.productId)}` as Href)} />
+                      )}
+                      {extensionInstall ? <ModulaButton label="Check update" role="secondary" loading={busy === `update:${extension.productId}`} onPress={() => void manageExtension(extension.productId, 'update')} /> : null}
+                      {extensionInstall ? <ModulaButton label="Settings and permissions" role="plain" onPress={() => router.push(`/settings/modules/${encodeURIComponent(extension.productId)}` as Href)} /> : null}
+                      {extensionInstall ? <ModulaButton label="Uninstall" role="destructive" loading={busy === `uninstall:${extension.productId}`} onPress={() => void manageExtension(extension.productId, 'uninstall')} /> : null}
+                    </View>
+                  </View>
+                )
+              }) : (
+                <AppText variant="caption" colour="textSecondary">No published extensions target this module.</AppText>
+              )}
             </View>
           </SettingsSection>
 

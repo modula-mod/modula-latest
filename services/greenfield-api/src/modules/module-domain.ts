@@ -86,6 +86,8 @@ export type GreenfieldModuleInstallationRow = {
   version: string
   extensionVersionId: string
   grantedPermissions?: string[]
+  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
+  lifecycleState?: string
 }
 
 export const INSTALLED_MODULE_STATES: GreenfieldModuleInstallationStatus[] = [

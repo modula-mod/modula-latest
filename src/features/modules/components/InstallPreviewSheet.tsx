@@ -141,6 +141,28 @@ export function InstallPreviewSheet({
           <AppText variant="caption" colour="textSecondary">
             {copy.privacy}
           </AppText>
+          {preview?.extensionTargets.length ? (
+            <View style={{gap: spacing[2]}} testID="extension-target-review">
+              <AppText variant="headline">Works with</AppText>
+              {preview.extensionTargets.map(target => (
+                <View key={target.productId} style={{gap: spacing[1]}}>
+                  <AppText variant="label">{target.productId} {target.versionRange}</AppText>
+                  <AppText variant="caption" colour={target.compatible ? 'textSecondary' : 'destructive'}>
+                    {target.compatible
+                      ? `Installed ${target.installedVersion ?? ''}`.trim()
+                      : target.installed
+                        ? `Installed ${target.installedVersion ?? 'version'} is incompatible`
+                        : 'Required product is not installed'}
+                  </AppText>
+                  {target.requiredCapabilities.length ? (
+                    <AppText variant="caption" colour="textTertiary">
+                      Scoped capabilities: {target.requiredCapabilities.join(', ')}
+                    </AppText>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+          ) : null}
           <AppPressable
             accessibilityLabel={technicalOpen ? 'Hide technical permissions' : 'Technical permissions'}
             onPress={() => setTechnicalOpen(open => !open)}>

@@ -38,7 +38,9 @@ export function verifyDependencyRuntimeSource() {
   ], 'Standard 2 dependency runtime migration persists resolved relations')
   includes('services/greenfield-api/src/modules/dependency-resolver.ts', [
     'satisfiesSemverRange',
-    'detectCircular',
+    'inspectGraph',
+    'DEPENDENCY_CYCLE',
+    'DEPENDENCY_GRAPH_BOUNDS_EXCEEDED',
     'resolveProvidedContract',
     "dependency.relation === 'conflicts'",
     'Recommended dependency',

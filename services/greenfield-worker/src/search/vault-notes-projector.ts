@@ -19,7 +19,7 @@ export async function projectVaultNotesRecord(db: ModulaWorkerDb, projector: Sea
     .where('record_id', '=', recordId)
     .executeTakeFirst()
 
-  if (!row || context.event.eventType.endsWith('.deleted') || context.event.eventType.endsWith('.permanently-deleted')) {
+  if (!row || isDeleteEvent(context.event.eventType)) {
     await projector.tombstone({...context, entityId: recordId}, {
       sourceVersion: projector.sourceVersionFor(context, Number(context.event.payload?.sourceVersion ?? Date.now())),
       accountId: context.event.accountId ?? row?.account_id,
@@ -35,6 +35,10 @@ export async function projectVaultNotesRecord(db: ModulaWorkerDb, projector: Sea
     return
   }
   await projector.upsert({...context, entityId: row.record_id}, noteDocument(row, projector.sourceVersionFor(context, row.revision), await folderName(db, row.account_id, field(row.data, 'folderId'))))
+}
+
+function isDeleteEvent(eventType: string): boolean {
+  return eventType.endsWith('.deleted') || eventType.endsWith('.deleted.v1') || eventType.endsWith('.permanently-deleted') || eventType.endsWith('.permanently-deleted.v1')
 }
 
 function noteDocument(row: {record_id: string; account_id: string; revision: number; data: unknown; created_at: Date; updated_at: Date; deleted_at: Date | null}, sourceVersion: number, folder?: string): GreenfieldSearchDocument {

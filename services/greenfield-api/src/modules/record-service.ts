@@ -146,7 +146,7 @@ export class GreenfieldModuleRecordService {
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId, accountId, moduleId: canonicalId, collection, operation: 'create', revision: 1, previousHash: null, eventHash, payloadHash, metadata: {visibility}})
       await new AuditRepository(trx).append('module.record.created', {moduleId: canonicalId, collection, visibility, eventHash}, {type: 'moduleRecord', id: recordId})
-      await this.publishRecordDomainEvent(trx, {accountId, moduleId: canonicalId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null})
+      await this.publishRecordDomainEvent(trx, {accountId, moduleId: canonicalId, collection, recordId, operation: 'create', revision: 1, schemaRef: context.collectionDefinition.schemaRef, data, previousData: null, eventDeclarations: context.runtime.manifest.contributions.events ?? []})
     })
     return this.get(accountId, canonicalId, collection, recordId)
   }
@@ -202,7 +202,7 @@ export class GreenfieldModuleRecordService {
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.runtime.accountId, moduleId: context.runtime.moduleId, collection: current.collection, operation: 'purge', revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {purged: true}})
       await new AuditRepository(trx).append('module.record.purged', {moduleId: context.runtime.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
-      await this.publishRecordDomainEvent(trx, {accountId: context.runtime.accountId, moduleId: context.runtime.moduleId, collection: current.collection, recordId: current.record_id, operation: 'purge', revision: nextRevision, schemaRef: context.collectionDefinition.schemaRef, data: current.data as Record<string, unknown>, previousData: current.data as Record<string, unknown>})
+      await this.publishRecordDomainEvent(trx, {accountId: context.runtime.accountId, moduleId: context.runtime.moduleId, collection: current.collection, recordId: current.record_id, operation: 'purge', revision: nextRevision, schemaRef: context.collectionDefinition.schemaRef, data: current.data as Record<string, unknown>, previousData: current.data as Record<string, unknown>, eventDeclarations: context.runtime.manifest.contributions.events ?? []})
     })
     return {purged: true, recordId: current.record_id, revision: nextRevision}
   }
@@ -260,7 +260,7 @@ export class GreenfieldModuleRecordService {
         .execute()
       await this.insertRecordEvent(trx, {eventId, recordId: current.record_id, accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, operation, revision: nextRevision, previousHash: previous?.event_hash ?? null, eventHash, payloadHash, metadata: {visibility, changeSource, provenance: redactedVersionMetadata(versionMetadata)}})
       await new AuditRepository(trx).append(`module.record.${operation === 'delete' ? 'deleted' : 'updated'}`, {moduleId: context.moduleId, collection: current.collection, eventHash}, {type: 'moduleRecord', id: current.record_id})
-      await this.publishRecordDomainEvent(trx, {accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, recordId: current.record_id, operation, revision: nextRevision, schemaRef: collectionDefinition.schemaRef, data, previousData: current.data as Record<string, unknown>})
+      await this.publishRecordDomainEvent(trx, {accountId: context.accountId, moduleId: context.moduleId, collection: current.collection, recordId: current.record_id, operation, revision: nextRevision, schemaRef: collectionDefinition.schemaRef, data, previousData: current.data as Record<string, unknown>, eventDeclarations: context.manifest.contributions.events ?? []})
     })
     return operation === 'delete' ? {deleted: true, recordId: current.record_id, revision: nextRevision} : this.get(context.accountId, context.moduleId, current.collection, current.record_id)
   }
@@ -346,9 +346,10 @@ export class GreenfieldModuleRecordService {
       schemaRef: string
       data: Record<string, unknown>
       previousData: Record<string, unknown> | null
+      eventDeclarations: Array<{eventType: string; direction: string}>
     },
   ) {
-    const eventType = moduleRecordEventType(input.moduleId, input.collection, input.operation, input.data, input.previousData)
+    const eventType = moduleRecordEventType(input.moduleId, input.collection, input.operation, input.data, input.previousData, input.eventDeclarations)
     await new GreenfieldEventBus(trx).publish({
       eventType,
       aggregateType: input.collection === 'folder' ? 'vault-folder' : input.collection,
@@ -466,18 +467,18 @@ function moduleRecordEventType(
   operation: ModuleRecordOperation,
   data: Record<string, unknown>,
   previousData: Record<string, unknown> | null,
+  declarations: Array<{eventType: string; direction: string}> = [],
 ): string {
   const moduleSlug = moduleId.split('.').at(-1) ?? moduleId
   const normalizedCollection = collection.replace(/[^a-z0-9-]+/g, '-')
-  if (operation === 'create') return `${moduleSlug}.${normalizedCollection}.created`
-  if (operation === 'delete') return `${moduleSlug}.${normalizedCollection}.deleted`
-  if (operation === 'restore') return `${moduleSlug}.${normalizedCollection}.restored`
-  if (operation === 'purge') return `${moduleSlug}.${normalizedCollection}.permanently-deleted`
+  let action = operation === 'create' ? 'created' : operation === 'delete' ? 'deleted' : operation === 'restore' ? 'restored' : operation === 'purge' ? 'permanently-deleted' : 'updated'
   if (collection === 'note' && previousData) {
-    if (previousData.archived !== true && data.archived === true) return `${moduleSlug}.${normalizedCollection}.archived`
-    if (previousData.archived === true && data.archived !== true) return `${moduleSlug}.${normalizedCollection}.unarchived`
+    if (previousData.archived !== true && data.archived === true) action = 'archived'
+    if (previousData.archived === true && data.archived !== true) action = 'unarchived'
   }
-  return `${moduleSlug}.${normalizedCollection}.updated`
+  const declaredCollection = collection === 'folder' ? 'collection' : normalizedCollection
+  const declared = declarations.find(event => event.direction === 'emits' && new RegExp(`\\.${declaredCollection}\\.${action}\\.v\\d+$`).test(event.eventType))
+  return declared?.eventType ?? `${moduleSlug}.${normalizedCollection}.${action}.v1`
 }
 
 function redactedRecordEventPayload(input: {

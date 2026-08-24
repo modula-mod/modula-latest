@@ -4,6 +4,8 @@ import {moduleError} from './module-errors.js'
 import {GreenfieldModuleInstallationService} from './installation-service.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
 import {GreenfieldModulePermissionService} from './permission-service.js'
+import {satisfiesSemverRange} from '@modula/greenfield-module-manifest'
+import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
 
 export class GreenfieldModuleUpdateService {
   constructor(
@@ -22,6 +24,13 @@ export class GreenfieldModuleUpdateService {
     if (diff.highRiskIncrease && !input.approvedPermissionIncrease) {
       throw moduleError('VALIDATION_FAILED', 'High-risk permission increase requires renewed approval')
     }
+    const extensionFabric = new GreenfieldExtensionFabricService(this.db)
+    const targetReview = await extensionFabric.targetReview(accountId, next)
+    if (targetReview.errors.length > 0) throw moduleError('CONFLICT', `Extension update is incompatible: ${targetReview.errors.join(', ')}`)
+    const dependantExtensions = await extensionFabric.activeDependants(accountId, moduleId, {recursive: false})
+    const incompatibleExtensions = dependantExtensions
+      .filter(dependant => !satisfiesSemverRange(next.version, dependant.versionRange))
+      .map(dependant => ({productId: dependant.productId, installationId: dependant.installationId, versionRange: dependant.versionRange}))
     return installations.enqueueTransition(accountId, moduleId, 'updating', 'module.update.requested', 'module.update', input.idempotencyKey, {
       targetReleaseId: next.releaseId,
       targetVersion: next.version,
@@ -31,6 +40,7 @@ export class GreenfieldModuleUpdateService {
         previousExtensionVersionId: installed.extensionVersionId,
       },
       permissionIncrease: diff.permissionIncrease,
+      incompatibleExtensions,
     })
   }
 }

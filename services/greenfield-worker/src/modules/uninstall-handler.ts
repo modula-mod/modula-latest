@@ -3,6 +3,7 @@ import {unregisterModuleContributions} from './contribution-registration-handler
 import {permanentModuleJob} from './module-job-errors.js'
 import {removeStandard2Runtime, setStandard2RuntimeStatus} from './standard2-runtime-registration.js'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 
 export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -30,6 +31,12 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
       action: 'uninstall',
       status: 'removed',
       jobsPaused: true,
+    })
+    await projectExtensionLifecycle(trx as any, {
+      installationId: p.installationId,
+      accountId: installed.account_id,
+      productId: moduleId,
+      state: 'NOT_INSTALLED',
     })
     if (choice === 'deleteData') {
       await trx

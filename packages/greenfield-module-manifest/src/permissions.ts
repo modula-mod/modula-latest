@@ -47,6 +47,7 @@ const RECORD_PERMISSION_PATTERN =
   /^records:module\.[a-z0-9-]+(\.[a-z0-9-]+)+\.[a-z0-9-]+:(read|write|delete)$/
 const FUNCTION_INVOKE_PATTERN = /^functions:[a-z0-9-]+(\.[a-z0-9-]+)+\.function\.[a-z0-9-]+:invoke$/
 const NETWORK_REQUEST_PATTERN = /^network:[a-z0-9.-]+:request$/
+const PRODUCT_CAPABILITY_PATTERN = /^[a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)*\.(read|create|update|delete|search|manage|export|contribute|subscribe|invoke|execute|record|transcribe|request|capture|playback)$/
 
 export function isSupportedModulePermission(permission: string): boolean {
   return (
@@ -54,7 +55,8 @@ export function isSupportedModulePermission(permission: string): boolean {
     RESERVED_DIMON_PERMISSIONS.includes(permission as (typeof RESERVED_DIMON_PERMISSIONS)[number]) ||
     RECORD_PERMISSION_PATTERN.test(permission) ||
     FUNCTION_INVOKE_PATTERN.test(permission) ||
-    NETWORK_REQUEST_PATTERN.test(permission)
+    NETWORK_REQUEST_PATTERN.test(permission) ||
+    PRODUCT_CAPABILITY_PATTERN.test(permission)
   )
 }
 
@@ -67,6 +69,8 @@ export function classifyPermissionRisk(permission: string): GreenfieldModulePerm
     return 'restricted'
   }
   if (permission.endsWith(':delete') || permission === 'functions:register' || permission === 'jobs:create') return 'high'
+  if (permission.endsWith('.delete') || permission.endsWith('.export')) return 'high'
+  if (permission.endsWith('.create') || permission.endsWith('.update') || permission.endsWith('.manage')) return 'medium'
   if (permission.endsWith(':write') || permission.includes(':register')) return 'medium'
   return 'low'
 }

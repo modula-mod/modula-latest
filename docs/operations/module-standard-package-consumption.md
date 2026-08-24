@@ -1,8 +1,28 @@
 # Module Standard Package Consumption
 
-Phase 7E Block 6 started with the main application consuming Modula Module Standard 1.0 through local `file:../modula-mod/modula-module-standard/...` dependencies. Block 10 advances the development target to Standard 1.2 so provider-neutral AI product actions are owned by the external Standard repository. This remains development-only. It preserves fast local iteration while the Standard, validators, SDK and reference modules are still evolving together, but it is not an immutable production dependency.
+## Current Phase 2 release
 
-## Current Development Links
+PVP Platform Phase 2 extends the same package family through the real immutable
+Module Standard 2.1 release:
+
+- Standard tag: `mms-v2.1.0`;
+- Standard commit: `d5a99a4bf1dec789b4d96df5182ae3a95a87f3d7`;
+- contract addition: extension product contracts, extension points,
+  contributions, retention, and bounded graph policy;
+- Vault Notes tag: `vault-notes-v1.2.0`;
+- Vault Notes commit: `c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce`;
+- Vault Notes artifact: `modula-vault-notes-1.2.0.tgz`;
+- Vault Notes checksum:
+  `98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935`.
+
+The Standard 1.2 and Vault Notes 1.1 text below is retained as historical
+provenance. It is not the current extension-platform release.
+
+## Historical Phase 7E record
+
+Phase 7E Block 6 started with the main application consuming Modula Module Standard 1.0 through local `file:../modula-mod/modula-module-standard/...` dependencies. Block 10 advanced the development target to Standard 1.2 so provider-neutral AI product actions were owned by the external Standard repository. The following record explains that earlier transition and is not the current Phase 2 release identity.
+
+### Phase 7E development links
 
 The main app currently consumes these local Standard 1.2 packages:
 

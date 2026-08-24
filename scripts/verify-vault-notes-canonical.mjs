@@ -33,17 +33,17 @@ function read(file) {
 const identity = read('packages/greenfield-contracts/src/canonical-module-identity.ts')
 record('CANONICAL ID DECLARED', identity.includes("CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'"))
 record('CANONICAL REPO DECLARED', identity.includes("CANONICAL_VAULT_NOTES_REPOSITORY = 'modula-mod/modula-vault-notes'"))
-record('ARTIFACT SHA DECLARED', identity.includes('46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a'))
+record('ARTIFACT SHA DECLARED', identity.includes('98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935'))
 record('LEGACY ALIAS DECLARED', identity.includes("'modula.vault-notes'"))
-record('NO THIRD PRODUCT', !identity.includes('vault-notes-something') && !identity.includes('1.2.0'))
+record('NO THIRD PRODUCT', !identity.includes('vault-notes-something') && !identity.includes('modula-module-vault-notes/current'))
 
 const decision = read('docs/architecture/vault-notes-canonical-identity.md')
 record('DECISION DOC', decision.includes('CANONICAL MODULE ID:') && decision.includes('digital.modula.vault-notes'))
 record('ONE PRODUCT LANGUAGE', decision.includes('There is one Vault Notes') && !decision.includes('both are technically valid'))
 
 const lineage = read('docs/architecture/vault-notes-release-lineage.md')
-record('LINEAGE DOC', lineage.includes('Selected current version: 1.1.0'))
-record('NO INVENTED 1.2.0', lineage.includes('Why not invent 1.2.0'))
+record('LINEAGE DOC', lineage.includes('Selected current version: 1.2.0'))
+record('REAL 1.2.0 RELEASE', lineage.includes('vault-notes-v1.2.0') && lineage.includes('98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935'))
 
 const policy = read('services/greenfield-api/src/modules/beta-catalogue-policy.ts')
 record('LEGACY PRODUCT HIDDEN', policy.includes("'modula.vault-notes': 'digital.modula.vault-notes'"))

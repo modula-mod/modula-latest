@@ -1,6 +1,7 @@
 import type {ModulaWorkerDb} from '../database.js'
 import {permanentModuleJob} from './module-job-errors.js'
 import {setStandard2RuntimeStatus} from './standard2-runtime-registration.js'
+import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 
 export async function handleModuleDisable(db: ModulaWorkerDb, payload: unknown): Promise<void> {
   const p = payload as any
@@ -20,6 +21,12 @@ export async function handleModuleDisable(db: ModulaWorkerDb, payload: unknown):
       action: 'disable',
       status: 'disabled',
       jobsPaused: true,
+    })
+    await projectExtensionLifecycle(trx as any, {
+      installationId: p.installationId,
+      accountId: p.accountId,
+      productId: p.moduleId,
+      state: 'DISABLED',
     })
     await trx.updateTable('greenfield_extension_installations').set({status: 'disabled', updated_at: new Date()}).where('installation_id', '=', p.installationId).execute()
   })

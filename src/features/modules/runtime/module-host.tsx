@@ -1,14 +1,15 @@
-import {View} from 'react-native'
+import {Platform, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {ModuleViewRenderer} from '@/features/modules/runtime/module-view-renderer'
 import {ModuleErrorBoundary, ModuleErrorState} from '@/features/modules/runtime/module-error-boundary'
 import {ModuleInstallIdentity} from '@/features/modules/runtime/module-install-identity'
+import {ModuleExtensionContributions} from '@/features/modules/runtime/module-extension-contributions'
 import {ModuleLoadingState} from '@/features/modules/runtime/module-loading-state'
 import {ModulePermissionGate} from '@/features/modules/runtime/module-permission-gate'
 import {resolveModuleRouteView} from '@/features/modules/runtime/module-route-resolver'
 import {isInstalledModuleState} from '@/features/modules/identity/installPresentation'
-import {useModuleDetailQuery, useModuleViewsQuery} from '@/features/modules/hooks'
+import {useModuleDetailQuery, useModuleHostCompositionQuery, useModuleViewsQuery} from '@/features/modules/hooks'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -17,6 +18,8 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
   const {spacing} = useThemeTokens()
   const detail = useModuleDetailQuery(moduleId)
   const views = useModuleViewsQuery(moduleId)
+  const route = path.join('/')
+  const composition = useModuleHostCompositionQuery(moduleId, route, Platform.OS)
 
   const openSettings = () => router.push(`/settings/modules/${encodeURIComponent(moduleId)}` as Href)
   const returnToBoard = () => router.push('/board' as Href)
@@ -80,7 +83,13 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
         />
       }>
       <ModulePermissionGate available={view.available !== false} reason="Permission required">
-        <ModuleViewRenderer moduleId={moduleId} view={view} aiActions={detail.data.ai?.productActions ?? []} />
+        <ModuleExtensionContributions moduleId={moduleId} contributions={composition.data?.extensions ?? []} />
+        <ModuleViewRenderer
+          moduleId={moduleId}
+          view={view}
+          aiActions={detail.data.ai?.productActions ?? []}
+          extensionContributions={composition.data?.extensions ?? []}
+        />
       </ModulePermissionGate>
     </ModuleErrorBoundary>
   )

@@ -9,6 +9,8 @@ export type GreenfieldModuleInstallationStatus =
   | 'disabling'
   | 'disabled'
   | 'updating'
+  | 'updateAvailable'
+  | 'incompatible'
   | 'uninstalling'
   | 'failed'
   | 'quarantined'
@@ -21,10 +23,12 @@ export const GREENFIELD_MODULE_INSTALLATION_TRANSITIONS: Record<GreenfieldModule
   installing: ['installedDisabled', 'failed'],
   installedDisabled: ['enabling', 'quarantined', 'uninstalling'],
   enabling: ['enabled', 'failed', 'quarantined'],
-  enabled: ['disabling', 'updating', 'quarantined', 'uninstalling'],
+  enabled: ['disabling', 'updating', 'updateAvailable', 'incompatible', 'quarantined', 'uninstalling'],
   disabling: ['disabled', 'failed', 'quarantined'],
-  disabled: ['enabling', 'updating', 'quarantined', 'uninstalling'],
+  disabled: ['enabling', 'updating', 'updateAvailable', 'incompatible', 'quarantined', 'uninstalling'],
   updating: ['enabled', 'disabled', 'failed', 'quarantined'],
+  updateAvailable: ['updating', 'enabled', 'disabled', 'incompatible', 'uninstalling'],
+  incompatible: ['disabled', 'updateAvailable', 'uninstalling'],
   uninstalling: ['removed', 'failed'],
   failed: ['resolving', 'uninstalling', 'quarantined'],
   quarantined: ['uninstalling'],

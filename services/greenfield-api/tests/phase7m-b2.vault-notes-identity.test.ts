@@ -113,15 +113,15 @@ describe('Vault Notes canonical identity', () => {
   it('records canonical source provenance for the current release', () => {
     expect(isCanonicalVaultNotesRepository(CANONICAL_VAULT_NOTES_REPOSITORY)).toBe(true)
     expect(isLegacyVaultNotesRepository('modula-mod/modula-module-vault-notes')).toBe(true)
-    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.1.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.1.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toBe('f443972d53f94b6f192a37bcce8742bdf18a99b5')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.2.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.2.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toBe('c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce')
   })
 
   it('records the current release artifact checksum', () => {
     expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toMatch(/^[0-9a-f]{64}$/)
     expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toBe(
-      '46f918b07dc7d9c2734be4e6bb7729c137d316ceaa3f9d272da1bd7f78ad253a',
+      '98489d3c145fc4768c1bb86e8f470a1e58e509d0acee62fe3324410430cff935',
     )
   })
 
@@ -133,9 +133,11 @@ describe('Vault Notes canonical identity', () => {
     expect(upgraded!.version).toBe('1.1.0')
   })
 
-  it('does not invent version 1.2.0', () => {
-    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).not.toBe('1.2.0')
-    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).not.toContain('1.2.0')
+  it('uses the real immutable 1.2.0 release created for the extension-point contract', () => {
+    expect(CANONICAL_VAULT_NOTES_CURRENT_VERSION).toBe('1.2.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_TAG).toBe('vault-notes-v1.2.0')
+    expect(CANONICAL_VAULT_NOTES_CURRENT_COMMIT).toMatch(/^[0-9a-f]{40}$/)
+    expect(CANONICAL_VAULT_NOTES_ARTIFACT_SHA256).toMatch(/^[0-9a-f]{64}$/)
   })
 
   it('keep-data uninstall then reinstall restores the same notes', () => {

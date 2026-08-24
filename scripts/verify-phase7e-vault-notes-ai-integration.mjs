@@ -31,6 +31,13 @@ includes('src/features/modules/runtime/module-view-renderer.tsx', [
   'record={record}',
 ], 'module host exposes one generic AI entry point on module records')
 
+includes('src/features/modules/runtime/module-extension-contributions.tsx', [
+  'ModuleExtensionContributions',
+  'ModuleErrorBoundary',
+  'invokeExtensionContribution',
+  'The module is unaffected',
+], 'generic Module Host renders extension contributions without Vault AI special cases')
+
 includes('src/features/modules/screens/ModuleManagementScreen.tsx', [
   'Revoke AI access',
   'grantedAiPermissions',
@@ -45,12 +52,24 @@ includes('services/greenfield-api/tests/phase7e.ai-product-actions.test.ts', [
   'rejects stale AI application',
 ], 'AI product action integration tests cover optional AI, preview/apply and stale conflict')
 
-includes('docs/validation/phase7e-ai-product-integration.md', [
-  'Vault Notes 1.1',
-  'deterministic provider',
-  'explicit application',
-  'No production deployment',
-], 'AI product integration validation documentation exists')
+includes('services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts', [
+  'digital.modula.vault-notes.ai',
+  'keepData',
+  'removeDependants',
+], 'Vault AI reference journey covers dynamic contribution, honest provider state, denied escalation and retention')
 
-pass('Vault Notes AI integration is routed through generic module host and Greenfield AI product action APIs')
+includes('services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts', [
+  'denies undeclared capability escalation and cross-account resource access',
+  'notes.delete',
+  "code: 'FORBIDDEN'",
+], 'extension broker integration denies Vault AI capability escalation')
+
+includes('docs/validation/pvp-platform-2-vault-ai-reference.md', [
+  'independent repository',
+  'vendor-neutral',
+  'PROVIDER_NOT_CONFIGURED',
+  'Core Vault Notes availability',
+], 'current Vault AI reference validation documentation exists')
+
+pass('Vault AI is routed through the generic extension Host and Greenfield capability broker; legacy generic AI product actions remain compatible')
 finish('Phase 7E Vault Notes AI integration verifier')

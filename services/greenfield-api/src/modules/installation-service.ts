@@ -19,6 +19,7 @@ import {GreenfieldModulePermissionService} from './permission-service.js'
 import {GreenfieldModuleRegistryService} from './registry-service.js'
 import {allRuntimePermissionKeys, GreenfieldModuleRuntime2Service} from './runtime2-service.js'
 import {GreenfieldModuleIdentityMigrationService} from './identity-migration-service.js'
+import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
 import {
   isVaultNotesModuleId,
   moduleIdFamily,
@@ -44,6 +45,7 @@ export class GreenfieldModuleInstallationService {
   private readonly dependencies: GreenfieldModuleDependencyResolver
   private readonly permissions: GreenfieldModulePermissionService
   private readonly runtime2: GreenfieldModuleRuntime2Service
+  private readonly extensionFabric: GreenfieldExtensionFabricService
 
   constructor(
     private readonly db: ModulaDb,
@@ -53,6 +55,7 @@ export class GreenfieldModuleInstallationService {
     this.dependencies = new GreenfieldModuleDependencyResolver(db)
     this.permissions = new GreenfieldModulePermissionService(db)
     this.runtime2 = new GreenfieldModuleRuntime2Service(db)
+    this.extensionFabric = new GreenfieldExtensionFabricService(db)
   }
 
   async listInstalled(accountId: string): Promise<GreenfieldModuleInstallationRow[]> {
@@ -68,20 +71,29 @@ export class GreenfieldModuleInstallationService {
         'greenfield_module_releases.module_id',
         'greenfield_module_releases.version',
         'greenfield_module_releases.extension_version_id',
+        'greenfield_module_releases.product_kind',
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
       .where('greenfield_extension_installations.status', '!=', 'removed')
       .orderBy('greenfield_module_releases.module_id')
       .execute()
     const installations = await Promise.all(rows.map(async row => {
-      const review = await this.db
-        .selectFrom('greenfield_module_permission_reviews')
-        .select(['granted_permissions'])
-        .where('account_id', '=', accountId)
-        .where('installation_id', '=', row.installation_id)
-        .where('release_id', '=', row.release_id)
-        .orderBy('reviewed_at', 'desc')
-        .executeTakeFirst()
+      const [review, projection] = await Promise.all([
+        this.db
+          .selectFrom('greenfield_module_permission_reviews')
+          .select(['granted_permissions'])
+          .where('account_id', '=', accountId)
+          .where('installation_id', '=', row.installation_id)
+          .where('release_id', '=', row.release_id)
+          .orderBy('reviewed_at', 'desc')
+          .executeTakeFirst(),
+        this.db
+          .selectFrom('greenfield_extension_runtime_projection')
+          .select('state')
+          .where('account_id', '=', accountId)
+          .where('installation_id', '=', row.installation_id)
+          .executeTakeFirst(),
+      ])
       return {
       installationId: row.installation_id,
       accountId: row.account_id,
@@ -90,6 +102,8 @@ export class GreenfieldModuleInstallationService {
       version: row.version,
       extensionVersionId: row.extension_version_id,
       grantedPermissions: arrayOfStrings(review?.granted_permissions),
+      productKind: row.product_kind,
+      lifecycleState: projection?.state,
       }
     }))
     return collapseVaultNotesInstallations(installations)
@@ -101,14 +115,15 @@ export class GreenfieldModuleInstallationService {
     return (await this.listInstalled(accountId)).find(row => family.has(row.moduleId) || resolveCanonicalModuleId(row.moduleId) === canonicalId)
   }
 
-  async installPreview(accountId: string, moduleId: string, version?: string): Promise<GreenfieldModuleInstallPreview> {
+  async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web'): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status']).where('publisher_id', '=', release.publisherId).executeTakeFirst()
     const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
+    const extensionReview = await this.extensionFabric.targetReview(accountId, release)
     const compatibility = new GreenfieldModuleCompatibilityService(this.config).evaluate(release, {
-      platform: 'server',
+      platform,
       publisherStatus: publisher?.status,
-      unavailableDependencies: !dependencyPlan.installable,
+      unavailableDependencies: !dependencyPlan.installable || extensionReview.errors.length > 0,
     })
     const permissions = this.permissions.review(release.manifest)
     const license = new GreenfieldModuleLicenseService().summarize(release.manifest)
@@ -116,6 +131,7 @@ export class GreenfieldModuleInstallationService {
     return {
       moduleId,
       version: release.version,
+      productKind: extensionReview.productKind,
       compatible: compatibility.compatible,
       incompatibilityReasons: compatibility.reasons,
       trust: {
@@ -131,6 +147,8 @@ export class GreenfieldModuleInstallationService {
       permissions,
       dependencies: dependencyPlan.dependencies,
       dependencyWarnings: dependencyPlan.warnings,
+      extensionTargets: extensionReview.targets,
+      extensionContributions: extensionReview.contributions,
       provides: dependencyPlan.provides,
       contributions: {
         routes: counts.routes,
@@ -152,13 +170,14 @@ export class GreenfieldModuleInstallationService {
     }
   }
 
-  async install(accountId: string, moduleId: string, input: {version?: string; idempotencyKey: string; approvedPermissions?: string[]}) {
+  async install(accountId: string, moduleId: string, input: {version?: string; idempotencyKey: string; approvedPermissions?: string[]; platform?: 'ios' | 'android' | 'web' | 'desktop' | 'server'}) {
     if (!this.config.moduleInstallationEnabled) throw moduleError('CAPABILITY_DISABLED', 'Greenfield module installation is disabled')
     if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     await this.permissions.enforceModuleInstallCapability(accountId)
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const existingFamily = (await this.listInstalled(accountId)).find(row =>
-      isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId),
+      resolveCanonicalModuleId(row.moduleId) === canonicalId ||
+      (isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId)),
     )
     if (existingFamily && existingFamily.status !== 'removed') {
       return {planId: existingFamily.installationId, installationId: existingFamily.installationId, status: existingFamily.status, idempotent: true}
@@ -174,7 +193,7 @@ export class GreenfieldModuleInstallationService {
     }
 
     const release = input.version ? await this.registry.getVersion(canonicalId, input.version) : await this.registry.latestPublished(canonicalId)
-    const preview = await this.installPreview(accountId, canonicalId, release.version)
+    const preview = await this.installPreview(accountId, canonicalId, release.version, input.platform ?? 'web')
     const dependencyPlan = await this.dependencies.resolve({moduleId: canonicalId, manifest: release.manifest, accountId})
     if (!preview.compatible) throw moduleError('VALIDATION_FAILED', `Module is incompatible: ${preview.incompatibilityReasons.join(', ')}`)
     const declaredPermissions = Array.from(new Set([
@@ -249,6 +268,12 @@ export class GreenfieldModuleInstallationService {
         dependencyPlan,
         grantedPermissions,
         deniedPermissions,
+      })
+      await this.extensionFabric.persistInstallPlanState(trx, {
+        installationId: installed.installation_id,
+        accountId,
+        release,
+        grantedPermissions,
       })
       await this.recordLifecycle(trx, accountId, moduleId, 'module.install.requested', 'permissionReview', 'installing', {planId, releaseId: release.releaseId})
       await new AuditRepository(trx).append('module.install.requested', {moduleId, version: release.version, grantedPermissions}, {type: 'module', id: moduleId})
@@ -341,6 +366,7 @@ export class GreenfieldModuleInstallationService {
         payload: {installationId: installed.installationId, moduleId, accountId, previousStatus: installed.status, idempotencyKey, ...payload},
       })
     })
+    await this.extensionFabric.transition(accountId, installed.installationId, runtimeStateForInstallationStatus(nextStatus))
     return {installationId: installed.installationId, moduleId, status: nextStatus}
   }
 
@@ -349,6 +375,7 @@ export class GreenfieldModuleInstallationService {
     if (!row) throw moduleError('NOT_FOUND', 'Installation not found')
     assertTransitionOrConflict(row.status as GreenfieldModuleInstallationStatus, status)
     await this.db.updateTable('greenfield_extension_installations').set({status, updated_at: new Date()}).where('installation_id', '=', installationId).execute()
+    await this.extensionFabric.transition(row.account_id, installationId, runtimeStateForInstallationStatus(status))
   }
 
   private async recordLifecycle(
@@ -373,6 +400,27 @@ export class GreenfieldModuleInstallationService {
         created_at: new Date(),
       })
       .execute()
+  }
+}
+
+function runtimeStateForInstallationStatus(status: GreenfieldModuleInstallationStatus) {
+  switch (status) {
+    case 'resolving': return 'RESOLVING' as const
+    case 'installing': return 'INSTALLING' as const
+    case 'installedDisabled': return 'INSTALLED' as const
+    case 'enabling': return 'ENABLING' as const
+    case 'enabled': return 'ENABLED' as const
+    case 'disabling': return 'DISABLING' as const
+    case 'disabled': return 'DISABLED' as const
+    case 'uninstalling': return 'UNINSTALLING' as const
+    case 'updating': return 'UPDATING' as const
+    case 'updateAvailable': return 'UPDATE_AVAILABLE' as const
+    case 'incompatible': return 'INCOMPATIBLE' as const
+    case 'quarantined': return 'QUARANTINED' as const
+    case 'failed': return 'FAILED' as const
+    case 'notInstalled':
+    case 'removed': return 'NOT_INSTALLED' as const
+    case 'permissionReview': return 'RESOLVING' as const
   }
 }
 

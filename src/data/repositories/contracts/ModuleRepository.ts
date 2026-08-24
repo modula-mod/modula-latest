@@ -10,11 +10,13 @@ import type {
 
 export type ProductHubExtensionKind =
   | 'module'
+  | 'addon'
   | 'tool'
   | 'function'
   | 'plugin'
   | 'connector'
   | 'widget'
+  | 'service'
   | 'system'
 
 export type ProductHubCategory =
@@ -191,11 +193,14 @@ export type InstalledModule = {
   updateState?: string
   configurationState?: string
   grantedPermissions?: string[]
+  productKind?: ProductHubExtensionKind
+  lifecycleState?: string
 }
 
 export type ModuleInstallPreview = {
   moduleId: string
   version: string
+  productKind: ProductHubExtensionKind
   compatible: boolean
   incompatibilityReasons: string[]
   trust: {level: string; publisherStatus: string; releaseStatus: string}
@@ -214,6 +219,21 @@ export type ModuleInstallPreview = {
     reason?: string
   }[]
   dependencyWarnings?: string[]
+  extensionTargets: {
+    productId: string
+    versionRange: string
+    installedVersion: string | null
+    installed: boolean
+    compatible: boolean
+    requiredCapabilities: string[]
+    requiredExtensionPoints: string[]
+  }[]
+  extensionContributions: {
+    id: string
+    kind: string
+    extensionPoint: string
+    requiredCapability: string | null
+  }[]
   provides?: {id: string; title: string; version: string; kind: 'service' | 'api' | 'record' | 'capability' | 'engine' | 'integration' | 'ui'}[]
   contributions: Record<string, number>
   migrationsRequired: boolean
@@ -224,6 +244,7 @@ export type ModuleUninstallPreview = {
   moduleId: string
   version: string
   dependantModules: unknown[]
+  dependantExtensions: {productId: string; productKind?: string; version?: string; state?: string}[]
   recordCount: number
   activeJobs: unknown[]
   registeredContributions: unknown[]
@@ -268,6 +289,53 @@ export type ModuleContribution = {
   available: boolean
   disabledReason: string | null
   installationStatus: string
+}
+
+export type ModuleProductRelationship = {
+  productId: string
+  productKind: ProductHubExtensionKind
+  name: string
+  description: string
+  version: string
+  versionRange: string
+  requiredCapabilities: string[]
+}
+
+export type ModuleProductRelationships = {
+  productId: string
+  targets: ModuleProductRelationship[]
+  extensions: ModuleProductRelationship[]
+}
+
+export type ModuleHostExtensionContribution = {
+  contribution_registration_id: string
+  extension_product_id: string
+  contribution_id: string
+  contribution_kind: string
+  extension_point: string
+  contract_id: string
+  required_capability: string | null
+  platforms: string[]
+  requires_online: boolean
+  priority: number
+  status: string
+  last_error_code: string | null
+  declaration: {
+    title?: string
+    actionId?: string
+    functionId?: string
+    requiredCapability?: string
+  }
+}
+
+export type ModuleHostComposition = {
+  target: {productId: string; installationId: string; version: string; status: string}
+  route: string | null
+  platform: string
+  core: {manifest: Record<string, unknown>; extensionPoints: Record<string, unknown>[]}
+  extensions: ModuleHostExtensionContribution[]
+  failureIsolation: boolean
+  arbitraryRemoteCode: false
 }
 
 export type ModuleRuntimeSummary = {
@@ -395,13 +463,13 @@ export interface ModuleRepository {
   getModule(moduleId: string, options?: {includeInstalled?: boolean}): Promise<ModuleDetail | null>
   rateModule(moduleId: string, rating: number): Promise<GreenfieldModuleRating>
   listInstalled(): Promise<InstalledModule[]>
-  installPreview(moduleId: string, version?: string): Promise<ModuleInstallPreview>
-  install(moduleId: string, input?: {version?: string; enable?: boolean}): Promise<unknown>
+  installPreview(moduleId: string, version?: string, platform?: 'ios' | 'android' | 'web' | 'desktop'): Promise<ModuleInstallPreview>
+  install(moduleId: string, input?: {version?: string; enable?: boolean; approvedPermissions?: string[]; platform?: 'ios' | 'android' | 'web' | 'desktop'}): Promise<unknown>
   enable(moduleId: string): Promise<unknown>
   disable(moduleId: string): Promise<unknown>
   update(moduleId: string, version?: string): Promise<unknown>
   reviewPermissions(moduleId: string, approvedPermissions: string[]): Promise<unknown>
-  uninstall(moduleId: string, choice?: 'keepData' | 'exportThenDelete' | 'deleteData'): Promise<unknown>
+  uninstall(moduleId: string, choice?: 'keepData' | 'exportThenDelete' | 'deleteData', options?: {removeDependants?: boolean}): Promise<unknown>
   uninstallPreview(moduleId: string): Promise<ModuleUninstallPreview>
   listViews(moduleId: string): Promise<ModuleRuntimeView[]>
   getView(moduleId: string, viewId: string): Promise<ModuleRuntimeView | null>
@@ -422,4 +490,8 @@ export interface ModuleRepository {
   disableBackend(moduleId: string): Promise<ModuleBackendMetadata | null>
   listContributions(input?: {surface?: string; moduleId?: string; enabledOnly?: boolean}): Promise<ModuleContribution[]>
   getRuntimeSummary(moduleId: string): Promise<ModuleRuntimeSummary | null>
+  getProductRelationships(productId: string): Promise<ModuleProductRelationships>
+  getHostComposition(moduleId: string, input?: {platform?: string; route?: string; online?: boolean}): Promise<ModuleHostComposition>
+  invokeExtensionContribution(extensionProductId: string, contributionId: string, input: {targetProductId: string; actionId: string; requiredCapabilities?: string[]; resource?: {type: 'moduleRecord'; id: string; collection?: string}; variables?: Record<string, unknown>}): Promise<unknown>
+  reportExtensionContributionFailure(extensionProductId: string, contributionId: string, errorCode: string): Promise<unknown>
 }

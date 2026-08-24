@@ -35,6 +35,14 @@ export class ModuleBackendGatewayService {
     payload: Record<string, unknown>
     idempotencyKey?: string
     requestId?: string
+    extensionInvocation?: {
+      consumerProductId: string
+      targetProductId: string
+      targetInstallationId: string
+      serviceId: string
+      scope: {type: 'installation' | 'resource' | 'action'; ref: string | null}
+      capabilities: string[]
+    }
   }) {
     const backend = await this.repository.ensureDefinitionForContext(input.context)
     if (!backendUsesModuleRuntime(input.context.manifest)) throw moduleError('VALIDATION_FAILED', 'Module does not use a module backend')
@@ -60,8 +68,12 @@ export class ModuleBackendGatewayService {
       backend,
       actorId: input.actorId,
       permissions: action.permissions,
-      capabilities: [action.actionId],
+      capabilities: input.extensionInvocation?.capabilities ?? [action.actionId],
       requestId: input.requestId,
+      extensionInvocation: input.extensionInvocation ? {
+        ...input.extensionInvocation,
+        actionId: input.actionId,
+      } : undefined,
     })
     const endpoint = await resolveBackendEndpoint(backend, installation.resolvedOrigin ?? undefined)
     const started = Date.now()

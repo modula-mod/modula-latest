@@ -4,6 +4,7 @@ import {permanentModuleJob} from './module-job-errors.js'
 import {registerModuleContributions} from './contribution-registration-handler.js'
 import {registerModuleSchemas} from './schema-registration-handler.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
+import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 
 type InstallPayload = {
   planId: string
@@ -40,6 +41,12 @@ export async function handleModuleInstall(db: ModulaWorkerDb, _config: WorkerCon
       releaseId: p.releaseId!,
       status: 'disabled',
       jobsPaused: true,
+    })
+    await projectExtensionLifecycle(trx as any, {
+      installationId: p.installationId!,
+      accountId: p.accountId!,
+      productId: p.moduleId!,
+      state: 'INSTALLED',
     })
     await trx.updateTable('greenfield_extension_installations').set({status: 'installedDisabled', updated_at: now}).where('installation_id', '=', p.installationId!).execute()
     await trx.updateTable('greenfield_module_install_plans').set({status: 'completed', updated_at: now}).where('plan_id', '=', p.planId!).execute()

@@ -30,6 +30,16 @@ export const SEARCH_PROJECTOR_BY_EVENT: Record<string, {projectorId: string; ent
   'vault-notes.folder.created': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
   'vault-notes.folder.updated': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
   'vault-notes.folder.deleted': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
+  'vault.note.created.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault.note.updated.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault.note.archived.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault.note.deleted.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault-notes.note.unarchived.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault-notes.note.restored.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault-notes.note.permanently-deleted.v1': {projectorId: 'search.vault-notes-projector', entityType: 'note'},
+  'vault.collection.created.v1': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
+  'vault.collection.updated.v1': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
+  'vault-notes.folder.deleted.v1': {projectorId: 'search.vault-notes-projector', entityType: 'vault-folder'},
 }
 
 export function isSearchOperationalEvent(eventType: string): boolean {

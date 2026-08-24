@@ -37,7 +37,6 @@ export function canonicalizeVaultNotesManifest(manifest: GreenfieldModuleManifes
   rewritten.integrity = {
     ...rewritten.integrity,
     manifestSha256: manifestChecksum(withoutChecksum),
-    releaseSha256: rewritten.integrity?.releaseSha256 ?? rewritten.integrity?.manifestSha256 ?? '',
   }
   return rewritten
 }

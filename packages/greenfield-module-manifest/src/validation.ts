@@ -6,6 +6,9 @@ import {
 } from './compatibility.js'
 import {
   MODULA_MODULE_STANDARD_2_VERSION,
+  MODULA_MODULE_STANDARD_VERSION,
+  MODULA_EXTENSION_CONTRIBUTION_KINDS,
+  MODULA_EXTENSION_PRODUCT_KINDS,
   MODULE_STANDARD_20_PERMISSION_CATEGORIES,
   MODULE_STANDARD_20_SECTION_NAMES,
 } from '@modula/module-standard'
@@ -84,6 +87,7 @@ const ROOT_KEYS = new Set([
   'localization',
   'appearance',
   'onboarding',
+  'extensionProduct',
 ])
 
 const PLATFORMS = new Set<GreenfieldModulePlatform>(['ios', 'android', 'web', 'desktop', 'server'])
@@ -111,8 +115,12 @@ export function validateGreenfieldModuleManifest(
   if (manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_VERSION && hasStandard20RootFields(manifest)) {
     add('$.standardVersion', 'STANDARD_2_REQUIRES_MANIFEST_V2', 'Standard 2.0 contract fields require Greenfield Module Manifest v2')
   }
-  if (manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION && manifest.standardVersion !== MODULA_MODULE_STANDARD_2_VERSION) {
-    add('$.standardVersion', 'UNSUPPORTED_STANDARD_VERSION', 'Greenfield Module Manifest v2 requires Modula Module Standard 2.0.0')
+  if (
+    manifest.manifestVersion === GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION &&
+    manifest.standardVersion !== MODULA_MODULE_STANDARD_2_VERSION &&
+    manifest.standardVersion !== MODULA_MODULE_STANDARD_VERSION
+  ) {
+    add('$.standardVersion', 'UNSUPPORTED_STANDARD_VERSION', 'Greenfield Module Manifest v2 requires Modula Module Standard 2.0.0 or 2.1.0')
   }
   if (!isGreenfieldModuleId(manifest.moduleId)) {
     add('$.moduleId', 'INVALID_MODULE_ID', 'Module ID must be a lowercase reverse-domain identifier')
@@ -329,6 +337,7 @@ const STANDARD_20_ROOT_FIELDS = new Set([
   'localization',
   'appearance',
   'onboarding',
+  'extensionProduct',
 ])
 
 const VERSIONED_STANDARD_20_SECTIONS = [
@@ -387,6 +396,152 @@ function validateStandard20Extensions(manifest: Record<string, any>, add: (path:
   validateCompatibilityMatrix(manifest.compatibilityMatrix, add)
   validateVersionedObject(manifest.marketplace, '$.marketplace', add)
   validateEngineReadiness(manifest.engineReadiness, add)
+  validateExtensionProduct(manifest.extensionProduct, manifest.moduleId, manifest.standardVersion, add)
+}
+
+const EXTENSION_PRODUCT_KINDS = new Set<string>(MODULA_EXTENSION_PRODUCT_KINDS)
+const EXTENSION_CONTRIBUTION_KINDS = new Set<string>(MODULA_EXTENSION_CONTRIBUTION_KINDS)
+const TARGET_REQUIRED_PRODUCT_KINDS = new Set(['addon', 'plugin', 'function', 'tool', 'widget'])
+const SAFE_CONTRACT_ID = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$/
+
+function validateExtensionProduct(
+  value: any,
+  moduleId: string,
+  standardVersion: string,
+  add: (path: string, code: string, message: string) => void,
+) {
+  if (value === undefined) return
+  if (standardVersion !== MODULA_MODULE_STANDARD_VERSION) {
+    add('$.extensionProduct', 'EXTENSION_PRODUCT_REQUIRES_STANDARD_2_1', `extensionProduct requires Standard ${MODULA_MODULE_STANDARD_VERSION}`)
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add('$.extensionProduct', 'INVALID_EXTENSION_PRODUCT', 'extensionProduct must be an object')
+    return
+  }
+  rejectUnknown(value, '$.extensionProduct', ['version', 'kind', 'targets', 'extensionPoints', 'contributions', 'retention', 'graphPolicy'], add)
+  if (!isSemver(value.version)) add('$.extensionProduct.version', 'INVALID_SEMVER', 'extensionProduct version must be semantic')
+  const kind = String(value.kind)
+  if (!EXTENSION_PRODUCT_KINDS.has(kind)) add('$.extensionProduct.kind', 'INVALID_EXTENSION_PRODUCT_KIND', 'Unsupported extension product kind')
+
+  if (!Array.isArray(value.targets) || value.targets.length > 40) {
+    add('$.extensionProduct.targets', 'INVALID_EXTENSION_TARGETS', 'targets must be a bounded array')
+  } else {
+    if (TARGET_REQUIRED_PRODUCT_KINDS.has(kind) && value.targets.length === 0) add('$.extensionProduct.targets', 'MISSING_EXTENSION_TARGET', `${kind} products require a target`)
+    if (kind === 'module' && value.targets.length > 0) add('$.extensionProduct.targets', 'MODULE_TARGETS_PRODUCT', 'Modules must remain independently usable')
+    value.targets.forEach((target: any, index: number) => {
+      const path = `$.extensionProduct.targets[${index}]`
+      if (!target || typeof target !== 'object' || Array.isArray(target)) {
+        add(path, 'INVALID_EXTENSION_TARGET', 'Extension targets must be objects')
+        return
+      }
+      rejectUnknown(target, path, ['productId', 'versionRange', 'requiredCapabilities', 'requiredExtensionPoints'], add)
+      if (!isGreenfieldModuleId(target.productId)) add(`${path}.productId`, 'INVALID_PRODUCT_ID', 'Target productId must be a reverse-domain ID')
+      if (target.productId === moduleId) add(`${path}.productId`, 'SELF_EXTENSION_TARGET', 'A product cannot target itself')
+      if (!isSemverRange(target.versionRange)) add(`${path}.versionRange`, 'INVALID_SEMVER_RANGE', 'Target versionRange must be semantic')
+      validateContractIds(target.requiredCapabilities, `${path}.requiredCapabilities`, add)
+      validateContractIds(target.requiredExtensionPoints, `${path}.requiredExtensionPoints`, add)
+    })
+  }
+
+  if (!Array.isArray(value.extensionPoints) || value.extensionPoints.length > 200) {
+    add('$.extensionProduct.extensionPoints', 'INVALID_EXTENSION_POINTS', 'extensionPoints must be a bounded array')
+  } else {
+    value.extensionPoints.forEach((point: any, index: number) => {
+      const path = `$.extensionProduct.extensionPoints[${index}]`
+      if (!point || typeof point !== 'object' || Array.isArray(point)) {
+        add(path, 'INVALID_EXTENSION_POINT', 'Extension points must be objects')
+        return
+      }
+      rejectUnknown(point, path, ['id', 'title', 'contributionKinds', 'requiredCapability', 'platforms', 'maxContributions'], add)
+      if (typeof point.id !== 'string' || !point.id.startsWith(`${moduleId}.`)) add(`${path}.id`, 'EXTENSION_POINT_OUTSIDE_NAMESPACE', 'Extension points must use the product namespace')
+      checkBoundedString(point.title, `${path}.title`, 1, 160, add)
+      validateKinds(point.contributionKinds, `${path}.contributionKinds`, EXTENSION_CONTRIBUTION_KINDS, add)
+      if (point.requiredCapability !== undefined) validateContractId(point.requiredCapability, `${path}.requiredCapability`, add)
+      validatePlatforms(point.platforms, `${path}.platforms`, add)
+      if (point.maxContributions !== undefined && (!Number.isInteger(point.maxContributions) || point.maxContributions < 1 || point.maxContributions > 100)) {
+        add(`${path}.maxContributions`, 'INVALID_EXTENSION_POINT_LIMIT', 'maxContributions must be 1..100')
+      }
+    })
+  }
+
+  if (!Array.isArray(value.contributions) || value.contributions.length > 500) {
+    add('$.extensionProduct.contributions', 'INVALID_EXTENSION_CONTRIBUTIONS', 'contributions must be a bounded array')
+  } else {
+    if (kind === 'module' && value.contributions.length > 0) add('$.extensionProduct.contributions', 'MODULE_CROSS_PRODUCT_CONTRIBUTION', 'Core module UI stays in its own registries')
+    value.contributions.forEach((contribution: any, index: number) => validateExtensionContribution(contribution, index, moduleId, add))
+  }
+
+  if (!value.retention || typeof value.retention !== 'object' || Array.isArray(value.retention)) {
+    add('$.extensionProduct.retention', 'INVALID_EXTENSION_RETENTION', 'retention is required')
+  } else {
+    rejectUnknown(value.retention, '$.extensionProduct.retention', ['defaultMode', 'supportsUserChoice', 'metadataNamespace'], add)
+    if (!['KEEP_DATA', 'DELETE_DATA'].includes(value.retention.defaultMode)) add('$.extensionProduct.retention.defaultMode', 'INVALID_RETENTION_MODE', 'Retention must be KEEP_DATA or DELETE_DATA')
+    if (typeof value.retention.supportsUserChoice !== 'boolean') add('$.extensionProduct.retention.supportsUserChoice', 'INVALID_BOOLEAN', 'supportsUserChoice must be boolean')
+    if (value.retention.metadataNamespace !== undefined && value.retention.metadataNamespace !== moduleId) add('$.extensionProduct.retention.metadataNamespace', 'INVALID_METADATA_NAMESPACE', 'Metadata namespace must equal the owning product ID')
+  }
+  if (value.graphPolicy !== undefined) {
+    if (!value.graphPolicy || typeof value.graphPolicy !== 'object' || Array.isArray(value.graphPolicy)) {
+      add('$.extensionProduct.graphPolicy', 'INVALID_GRAPH_POLICY', 'graphPolicy must be an object')
+    } else {
+      rejectUnknown(value.graphPolicy, '$.extensionProduct.graphPolicy', ['maxDepth', 'maxNodes'], add)
+      if (!Number.isInteger(value.graphPolicy.maxDepth) || value.graphPolicy.maxDepth < 1 || value.graphPolicy.maxDepth > 16) add('$.extensionProduct.graphPolicy.maxDepth', 'INVALID_GRAPH_DEPTH', 'maxDepth must be 1..16')
+      if (!Number.isInteger(value.graphPolicy.maxNodes) || value.graphPolicy.maxNodes < 1 || value.graphPolicy.maxNodes > 256) add('$.extensionProduct.graphPolicy.maxNodes', 'INVALID_GRAPH_NODES', 'maxNodes must be 1..256')
+    }
+  }
+}
+
+function validateExtensionContribution(value: any, index: number, moduleId: string, add: (path: string, code: string, message: string) => void) {
+  const path = `$.extensionProduct.contributions[${index}]`
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    add(path, 'INVALID_EXTENSION_CONTRIBUTION', 'Extension contributions must be objects')
+    return
+  }
+  rejectUnknown(value, path, ['id', 'title', 'kind', 'extensionPoint', 'actionId', 'functionId', 'viewId', 'widgetId', 'requiredCapability', 'availability', 'priority'], add)
+  if (typeof value.id !== 'string' || !value.id.startsWith(`${moduleId}.`)) add(`${path}.id`, 'CONTRIBUTION_OUTSIDE_NAMESPACE', 'Contribution ID must use the extension namespace')
+  checkBoundedString(value.title, `${path}.title`, 1, 160, add)
+  if (!EXTENSION_CONTRIBUTION_KINDS.has(value.kind)) add(`${path}.kind`, 'INVALID_EXTENSION_CONTRIBUTION_KIND', 'Unsupported contribution kind')
+  validateContractId(value.extensionPoint, `${path}.extensionPoint`, add)
+  const contracts = ['actionId', 'functionId', 'viewId', 'widgetId'].filter(field => typeof value[field] === 'string')
+  if (contracts.length === 0) add(path, 'MISSING_CONTRIBUTION_CONTRACT', 'A contribution must reference an action, function, view, or widget')
+  for (const field of contracts) {
+    if (!value[field].startsWith(`${moduleId}.`)) add(`${path}.${field}`, 'CONTRACT_OUTSIDE_NAMESPACE', 'Contribution contracts must use the extension namespace')
+  }
+  if (value.requiredCapability !== undefined) validateContractId(value.requiredCapability, `${path}.requiredCapability`, add)
+  if (value.availability !== undefined) {
+    if (!value.availability || typeof value.availability !== 'object' || Array.isArray(value.availability)) add(`${path}.availability`, 'INVALID_AVAILABILITY', 'availability must be an object')
+    else {
+      rejectUnknown(value.availability, `${path}.availability`, ['platforms', 'requiresOnline', 'requiredCapabilities'], add)
+      validatePlatforms(value.availability.platforms, `${path}.availability.platforms`, add)
+      validateContractIds(value.availability.requiredCapabilities, `${path}.availability.requiredCapabilities`, add)
+    }
+  }
+}
+
+function validateKinds(value: unknown, path: string, allowed: Set<string>, add: (path: string, code: string, message: string) => void) {
+  if (!Array.isArray(value) || value.length < 1 || value.length > allowed.size) add(path, 'INVALID_CONTRIBUTION_KINDS', 'Contribution kinds must be a non-empty bounded array')
+  else value.forEach((entry, index) => { if (!allowed.has(String(entry))) add(`${path}[${index}]`, 'INVALID_EXTENSION_CONTRIBUTION_KIND', 'Unsupported contribution kind') })
+}
+
+function validateContractIds(value: unknown, path: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!Array.isArray(value) || value.length > 120) add(path, 'INVALID_CONTRACT_IDS', 'Contract IDs must be a bounded array')
+  else value.forEach((entry, index) => validateContractId(entry, `${path}[${index}]`, add))
+}
+
+function validateContractId(value: unknown, path: string, add: (path: string, code: string, message: string) => void) {
+  if (typeof value !== 'string' || !SAFE_CONTRACT_ID.test(value)) add(path, 'INVALID_CONTRACT_ID', 'Contract IDs must be lowercase dotted identifiers')
+  if (typeof value === 'string' && value.includes('*')) add(path, 'WILDCARD_CONTRACT_DENIED', 'Wildcard contracts are prohibited')
+}
+
+function validatePlatforms(value: unknown, path: string, add: (path: string, code: string, message: string) => void) {
+  if (value === undefined) return
+  if (!Array.isArray(value) || value.length > 5) add(path, 'INVALID_PLATFORMS', 'Platforms must be a bounded array')
+  else value.forEach((platform, index) => { if (!PLATFORMS.has(platform)) add(`${path}[${index}]`, 'UNSUPPORTED_PLATFORM', `Unsupported platform ${String(platform)}`) })
+}
+
+function rejectUnknown(value: Record<string, unknown>, path: string, allowed: string[], add: (path: string, code: string, message: string) => void) {
+  const permitted = new Set(allowed)
+  for (const key of Object.keys(value)) if (!permitted.has(key)) add(`${path}.${key}`, 'UNDECLARED_EXTENSION_FIELD', `Undeclared extension field ${key}`)
 }
 
 function validateSectionVersions(value: any, add: (path: string, code: string, message: string) => void) {
