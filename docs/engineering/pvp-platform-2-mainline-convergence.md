@@ -246,3 +246,92 @@ The dependency register was updated to match. The committed-native-project
 Doctor advisory remains governed by
 `docs/architecture/native-project-policy.md`; it is not suppressed and is not
 treated as permission to regenerate the tracked native projects blindly.
+
+## Convergence verification
+
+The exact verified convergence commit is
+`fed2c6dadc52262447537bf5f8e728ba3327c7b2`. All source, build, and disposable
+runtime gates below ran from that clean commit on `core.modula.digital`.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| `CI=true pnpm install --frozen-lockfile` | PASS | Lockfile accepted with pnpm 11.11.0. |
+| `CI=true pnpm lint` | PASS | Included by both Phase 7N-A and PVP-UI-1R gates. |
+| `CI=true pnpm typecheck` | PASS | Included by both Phase 7N-A and PVP-UI-1R gates. |
+| `CI=true pnpm build:web` | PASS | 178 static routes exported. |
+| `CI=true pnpm verify:web-build` | PASS | Production web artifact and release marker verified. |
+| `CI=true pnpm exec expo install --check` | PASS | Dependencies are up to date for installed SDK 57. |
+| `CI=true pnpm exec expo-doctor` | PASS_WITH_EXPECTED_WARNING | 19/20; only the accepted committed-native-project advisory remains. |
+| `git diff --check` | PASS | No whitespace errors. |
+| `CI=true pnpm verify:phase7n-a` | PASS | B9/B10, Vault canonical identity, UI baseline, web, Expo, P0/P1 gates. |
+| `CI=true pnpm verify:pvp-ui-1r` | PASS | Visual reset, native adapters, accessibility, presentation, and no-fake-metrics gates. |
+| Auth source verifiers | PASS | Password, email OTP, TOTP, passkeys, recovery, sessions, and step-up. |
+| Social source verifier | PASS | Phase 7I-F5 social contract and reaction checks. |
+| Marketplace source verifier | PASS | Registry, install/update/uninstall, Vault and generic runtime checks. |
+| `verify:phase7e-module-backend-runtime` | PASS | Standard verifier, API build, and 6 isolated database tests. |
+| `verify:phase7e-vault-notes` | PASS | External verifier, API/worker typecheck, 11 API tests, 2 worker tests, and migration rollback. |
+| Standard 2 source/runtime proof | PASS | API/worker builds, no-product-mocks, and 5 isolated database tests passed. |
+| Standard 2 production-cutover sub-gate | NOT RUN / NOT AUTHORISED | The aggregate correctly remains red because this branch is not main and production still runs older accepted releases. |
+
+The Standard 2 aggregate is not relabelled as green: its source/runtime portion
+passed, while its final production-cutover assertion failed exactly because
+production deployment is outside this authorisation. No assertion was removed
+or weakened to hide that boundary.
+
+## Disposable database evidence
+
+The convergence gates used a new isolated PostgreSQL 16.9 instance named
+`modula-pvp-platform2-pg`, bound only to `127.0.0.1:55438`. Existing production
+and preview databases were not used for writes.
+
+| Database gate | Result |
+| --- | --- |
+| Disposable PostgreSQL health | PASS |
+| Standard 2 migration chain and runtime tests | PASS |
+| Module backend runtime tests | PASS (6 tests) |
+| Vault Notes API lifecycle/data/search/security | PASS (11 tests) |
+| Vault Notes worker search projection | PASS (2 tests) |
+| Migration 022 rollback and table-removal proof | PASS |
+| Production migration | NO |
+
+## Vault Notes source convergence
+
+The Vault Notes checkout was fetched independently. `origin/main` had advanced
+from `4f2c3c9` to the canonical-identity commit `d92e445`; the remaining valid
+Phase 7M-B10 publisher metadata and immutable artifact provenance existed at
+`b439d89` as a direct descendant. That one valid product commit was verified
+with the repository's full `pnpm verify` gate, fast-forwarded to Vault Notes
+`main`, pushed, and fetched back.
+
+| Vault Notes branch | Tip | Classification | Decision |
+| --- | --- | --- | --- |
+| `origin/main` (audit baseline) | `d92e4455cd56f95b0109e3dc8f1df0c8a52c60da` | `ALREADY_INTEGRATED` | Canonical identity base. |
+| `origin/phase7i-trusted-production-alpha` | `4f2c3c9ef18a862ca4f896c3f59bf2e821b38c11` | `ALREADY_INTEGRATED` | Ancestor of main. |
+| `origin/cursor/phase7m-b10-marketplace-metadata` | `b439d89be7466c338310c9c31283ccec4e898786` | `MERGE_FULL` | Verified and fast-forwarded to main. |
+| `origin/archive/pre-7n-a-b10-vault-notes-20260821` | `b439d89be7466c338310c9c31283ccec4e898786` | `ARCHIVE_ONLY` | Same preserved tip; no separate merge. |
+| `origin/cursor/cloud-env-setup-8dcd` | `e2ad0d2` | `ARCHIVE_ONLY` | Cloud Agent bootstrap is unrelated to runtime/product convergence and uses environment-specific sudo/setup behavior. |
+
+`UNKNOWN = 0` for the fetched Vault Notes heads. The two non-main tips were
+also preserved as annotated archive tags:
+
+| Archive tag | Tag object | Preserved commit |
+| --- | --- | --- |
+| `archive/pre-pvp-platform-2/cursor/phase7m-b10-marketplace-metadata/2026-08-24` | `d0083c9e9cdafa83208dfce5ae529f2e6fe0d599` | `b439d89be7466c338310c9c31283ccec4e898786` |
+| `archive/pre-pvp-platform-2/cursor/cloud-env-setup-8dcd/2026-08-24` | `b85cab9ad01f3888700b89f2343b04cd00a3bd46` | `e2ad0d2` |
+
+Vault Notes local `main` and `origin/main` now both resolve to
+`b439d89be7466c338310c9c31283ccec4e898786`.
+
+## Read-only production identity
+
+Production was inspected without mutation. At verification time:
+
+| Surface | Deployed commit |
+| --- | --- |
+| `https://modula.digital/version.json` | `ff6be1b722c1974cf0f0093adfc5af95165f9d96` |
+| `https://api.modula.digital/v1/version` | `e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a` |
+| Production API image label | `e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a` |
+| Production worker image label | `e5d4b946fdf80fb82f0ae0963bdd3a087ff5e97a` |
+
+This deliberately remains separate from source acceptance. Production was not
+deployed and no production registry or database state was changed.
