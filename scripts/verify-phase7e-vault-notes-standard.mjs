@@ -26,7 +26,7 @@ for (const [field, expected] of Object.entries({
   if (standardManifest[field] === expected) pass(`${field} is ${expected}`)
   else fail(`${field} must be ${expected}`)
 }
-if (standardManifest.id === 'modula.vault-notes') pass('stable module id is modula.vault-notes')
+if (standardManifest.id === 'digital.modula.vault-notes') pass('stable module id is digital.modula.vault-notes')
 else fail('stable module id mismatch')
 
 includes('package.json', [

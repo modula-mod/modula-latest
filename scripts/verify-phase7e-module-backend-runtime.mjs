@@ -28,8 +28,8 @@ for (const verifier of [
 
 run('pnpm', ['verify'], 'external Standard 1.1 verifier passes', process.env, standardRoot)
 includes('src/features/marketplace/screens/ModuleDetailScreen.tsx', [
-  'Section title="Backend"',
-  'Section title="Data location"',
+  '<AppText variant="label">Backend</AppText>',
+  '<AppText variant="label">Data location</AppText>',
   'Platform permissions',
   'Module backend permissions',
   'External service permissions',
@@ -51,7 +51,7 @@ includes('src/data/repositories/api/ApiModuleRepository.ts', [
   'frontend-only',
 ], 'frontend module repository consumes backend diagnostics and management routes')
 run('pnpm', ['--filter', '@modula/greenfield-module-manifest', 'build'], 'Greenfield manifest package builds')
-run('pnpm', ['--filter', '@modula/greenfield-api', 'build'], 'Greenfield API builds')
+run('pnpm', ['--filter', '@modula/greenfield-api...', 'build'], 'Greenfield API builds')
 await runIsolatedRuntimeTest()
 
 finish('Phase 7E module backend runtime verifier')
@@ -66,13 +66,15 @@ async function runIsolatedRuntimeTest() {
   }
   const parsed = new URL(baseUrl)
   const dbName = `modula_backend_verify_${process.pid}_${Date.now()}`.toLowerCase()
-  const create = spawnSync(
-    'docker',
-    ['compose', '-f', 'ops/docker/compose.preview.yml', 'exec', '-T', 'greenfield-postgres', 'createdb', '-U', 'modula_admin', '-O', parsed.username || 'modula_migrator', dbName],
-    {cwd: root, encoding: 'utf8', shell: false},
-  )
+  const adminUrl = adminDatabaseUrl(parsed, env)
+  const create = spawnSync('createdb', ['--owner', parsed.username || 'modula_migrator', dbName], {
+    cwd: root,
+    encoding: 'utf8',
+    env: pgCommandEnv(adminUrl, env),
+    shell: false,
+  })
   if (create.status !== 0) {
-    fail(`unable to create isolated module backend verifier database through preview Postgres container`)
+    fail('unable to create isolated module backend verifier database through supplied test Postgres server')
     return
   }
   try {
@@ -86,12 +88,32 @@ async function runIsolatedRuntimeTest() {
     }
     run('pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.module-backend-runtime.test.ts'], 'isolated module backend runtime tests', testEnv)
   } finally {
-    spawnSync(
-      'docker',
-      ['compose', '-f', 'ops/docker/compose.preview.yml', 'exec', '-T', 'greenfield-postgres', 'dropdb', '-U', 'modula_admin', '--if-exists', dbName],
-      {cwd: root, stdio: 'ignore', shell: false},
-    )
+    spawnSync('dropdb', ['--if-exists', dbName], {
+      cwd: root,
+      env: pgCommandEnv(adminUrl, env),
+      stdio: 'ignore',
+      shell: false,
+    })
     pass('dropped isolated module backend verifier database')
+  }
+}
+
+function adminDatabaseUrl(baseUrl, env) {
+  if (env.MODULA_TEST_DATABASE_ADMIN_URL) return new URL(env.MODULA_TEST_DATABASE_ADMIN_URL)
+  const adminUrl = new URL(baseUrl.toString())
+  adminUrl.pathname = `/${env.MODULA_TEST_DATABASE_ADMIN_DB ?? 'postgres'}`
+  return adminUrl
+}
+
+function pgCommandEnv(url, env) {
+  return {
+    ...process.env,
+    ...env,
+    PGHOST: url.hostname,
+    PGPORT: url.port || '5432',
+    PGUSER: decodeURIComponent(url.username),
+    PGPASSWORD: decodeURIComponent(url.password),
+    PGDATABASE: decodeURIComponent(url.pathname.replace(/^\//, '') || 'postgres'),
   }
 }
 
