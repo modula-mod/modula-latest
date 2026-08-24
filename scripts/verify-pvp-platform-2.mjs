@@ -102,7 +102,7 @@ function behaviouralChecks(mode) {
   const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
   record('DISPOSABLE DATABASE URL PROVIDED', Boolean(databaseUrl), databaseUrl ? 'configured' : 'MODULA_TEST_DATABASE_URL is required; no silent skip')
   if (!databaseUrl) return
-  run('CURRENT MANIFEST CONTRACT BUILD', 'pnpm', ['--filter', '@modula/greenfield-module-manifest', 'build'])
+  run('CURRENT GREENFIELD PREREQUISITES', 'pnpm', ['--filter', '@modula/greenfield-api...', 'build'])
   run('EXTENSION FABRIC DB INTEGRATION', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/pvp-platform-2.extension-fabric.test.ts'], root, {...process.env, CI: 'true'})
   if (mode === 'all' || mode === 'contributions' || mode === 'isolation' || mode === 'provenance' || mode === 'cross-account') {
     run('IMMUTABLE REFERENCE JOURNEY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/pvp-platform-2.reference-products.test.ts'], root, {...process.env, CI: 'true'})
