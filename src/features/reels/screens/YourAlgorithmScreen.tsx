@@ -16,9 +16,8 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import type {ReelItem} from '@/domain/discovery'
 import {selectionHaptic} from '@/lib/haptics'
-import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -102,28 +101,30 @@ export function YourAlgorithmScreen() {
   ]
 
   const headerRight = (
-    <View style={[styles.headerActions, {gap: HEADER_ICON_PAIR_GAP}]}>
-      <ChromeIconMenu
-        systemImage="ellipsis"
-        icon="more"
-        accessibilityLabel="Algorithm options"
-        title="Your algorithm"
-        actions={moreActions}
-        onAction={runChrome}
-      />
-      <ChromeIconMenu
-        systemImage="line.3.horizontal.decrease"
-        icon="settings"
-        accessibilityLabel="Filter algorithm"
-        title="Filters"
-        actions={[
-          {id: 'political', label: 'Political content'},
-          {id: 'sensitive', label: 'Sensitive content'},
-          {id: 'contentPrefs', label: 'More content preferences'},
-        ]}
-        onAction={runChrome}
-      />
-    </View>
+    <ChromeGlassControlGroup
+      items={[
+        {
+          kind: 'menu',
+          icon: 'more',
+          accessibilityLabel: 'Algorithm options',
+          title: 'Your algorithm',
+          actions: moreActions,
+          onAction: runChrome,
+        },
+        {
+          kind: 'menu',
+          icon: 'settings',
+          accessibilityLabel: 'Filter algorithm',
+          title: 'Filters',
+          actions: [
+            {id: 'political', label: 'Political content'},
+            {id: 'sensitive', label: 'Sensitive content'},
+            {id: 'contentPrefs', label: 'More content preferences'},
+          ],
+          onAction: runChrome,
+        },
+      ]}
+    />
   )
 
   return (
@@ -328,10 +329,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 14,
     paddingVertical: 10,
-  },
-  headerActions: {
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   screen: {
     flex: 1,

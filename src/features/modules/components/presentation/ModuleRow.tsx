@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -14,31 +14,43 @@ export function ModuleRow({
   onPress,
   onAction,
   showSeparator = true,
+  muted = false,
 }: {
   item: ModuleCatalogueItem
   onPress: () => void
   onAction?: () => void
   showSeparator?: boolean
+  muted?: boolean
 }) {
   const {colours, spacing} = useThemeTokens()
+  const {fontScale} = useWindowDimensions()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
+  const stacked = fontScale >= 1.2
+  const comingSoon = presentation.primaryAction === 'Soon'
+  const quiet = muted || comingSoon
+
   return (
-    <View>
-      <View style={[styles.row, {gap: spacing[3], paddingVertical: spacing[3]}]}>
+    <View testID={quiet ? 'coming-soon-row' : 'module-row'}>
+      <View
+        style={[
+          styles.row,
+          stacked ? styles.stacked : null,
+          {gap: spacing[3], paddingVertical: spacing[3]},
+        ]}>
         <AppPressable
           accessibilityLabel={`Open ${copy.name}`}
           onPress={onPress}
           style={styles.identity}>
           <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={56} variant="icon" />
           <View style={styles.flex}>
-            <AppText variant="label" numberOfLines={1}>
+            <AppText variant="productName" numberOfLines={stacked ? 2 : 1}>
               {copy.name}
             </AppText>
-            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+            <AppText variant="productSubtitle" colour="textSecondary" numberOfLines={stacked ? 2 : 1}>
               {copy.short}
             </AppText>
-            <AppText variant="micro" colour="textTertiary" numberOfLines={1}>
+            <AppText variant="publisher" colour="textTertiary" numberOfLines={1}>
               {copy.publisher}
             </AppText>
           </View>
@@ -73,5 +85,9 @@ const styles = StyleSheet.create({
   rule: {
     height: StyleSheet.hairlineWidth,
     marginLeft: 68,
+  },
+  stacked: {
+    alignItems: 'flex-start',
+    flexDirection: 'column',
   },
 })

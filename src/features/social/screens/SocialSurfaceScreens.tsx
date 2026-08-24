@@ -21,7 +21,7 @@ import {
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -241,18 +241,17 @@ export function MessagesInboxScreen() {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader
         title="Messages"
-        right={
-          <ChromeOverflowMenu
-            accessibilityLabel="Filter messages"
-            title="Filter"
-            actions={[
-              {id: 'all', label: 'All', icon: 'messages'},
-              {id: 'unread', label: 'Unread', icon: 'activity'},
-              {id: 'pinned', label: 'Pinned', icon: 'bookmark'},
-            ]}
-            onAction={id => setFilter(id as 'all' | 'unread' | 'pinned')}
-          />
-        }
+        overflow={{
+          accessibilityLabel: 'Filter messages',
+          title: 'Filter',
+          icon: 'more',
+          actions: [
+            {id: 'all', label: 'All', icon: 'messages'},
+            {id: 'unread', label: 'Unread', icon: 'activity'},
+            {id: 'pinned', label: 'Pinned', icon: 'bookmark'},
+          ],
+          onAction: id => setFilter(id as 'all' | 'unread' | 'pinned'),
+        }}
       />
       <ResponsiveContent>
         <ScrollView
@@ -494,28 +493,34 @@ export function MessageThreadScreen() {
     <ScreenShell
       title={thread.name}
       right={
-        <ChromeOverflowMenu
-          accessibilityLabel="Thread actions"
-          title="Thread actions"
-          actions={[
+        <ChromeGlassControlGroup
+          items={[
             {
-              id: 'forward',
-              label: 'Forward',
-              icon: 'share',
-              disabled: true,
-              disabledReason: forwardRestrictionReason,
+              kind: 'menu',
+              icon: 'more',
+              accessibilityLabel: 'Thread actions',
+              title: 'Thread actions',
+              actions: [
+                {
+                  id: 'forward',
+                  label: 'Forward',
+                  icon: 'share',
+                  disabled: true,
+                  disabledReason: forwardRestrictionReason,
+                },
+                {id: 'mute', label: 'Mute preview', icon: 'notifications'},
+                {id: 'delete', label: 'Delete preview', icon: 'trash', style: 'destructive'},
+              ],
+              onAction: id => {
+                if (id === 'forward') {
+                  Alert.alert(
+                    'Forward Preview',
+                    'Forwarding is not connected to a remote messaging service in this Preview.',
+                  )
+                }
+              },
             },
-            {id: 'mute', label: 'Mute preview', icon: 'notifications'},
-            {id: 'delete', label: 'Delete preview', icon: 'trash', style: 'destructive'},
           ]}
-          onAction={id => {
-            if (id === 'forward') {
-              Alert.alert(
-                'Forward Preview',
-                'Forwarding is not connected to a remote messaging service in this Preview.',
-              )
-            }
-          }}
         />
       }>
       <AppText variant="headline">@{thread.handle}</AppText>

@@ -22,7 +22,7 @@ export function ModuleFeatureCard({
     <AppPressable
       accessibilityLabel={`Open ${copy.name}`}
       onPress={onPress}
-      style={[styles.card, {width, gap: spacing[2]}]}>
+      style={[styles.card, {width, gap: spacing[2], opacity: item.installationState === 'comingSoon' ? 0.72 : 1}]}>
       <View
         style={{
           backgroundColor: colours.surfaceRaised,
@@ -33,10 +33,10 @@ export function ModuleFeatureCard({
         }}>
         <ModuleArtwork moduleId={item.moduleId} name={copy.name} variant="scene" sceneHeight={128} />
       </View>
-      <AppText variant="label" numberOfLines={1}>
+      <AppText variant="productName" numberOfLines={1}>
         {copy.name}
       </AppText>
-      <AppText variant="caption" colour="textSecondary" numberOfLines={2}>
+      <AppText variant="productSubtitle" colour="textSecondary" numberOfLines={2}>
         {copy.short}
       </AppText>
     </AppPressable>

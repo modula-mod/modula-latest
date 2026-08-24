@@ -10,6 +10,7 @@ import {
   ModulaPrimitivesLabScreen,
   ProductHeroLabScreen,
 } from '@/platform/ui/dev/modula-primitives-lab'
+import {PvpUi1LabBlocks} from '@/platform/ui/dev/pvp-ui-1-lab'
 
 export function ModulaUiLabRouteScreen() {
   const {installReview, productHero, productOverview} = useLocalSearchParams<{
@@ -29,7 +30,8 @@ export function ModulaUiLabRouteScreen() {
     return <ProductHeroLabScreen initialOverviewOffset={productOverview === '1'} />
   }
   return (
-    <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — quality compare plus flagship primitive matrix for Direction M.">
+    <SettingsScreen title="Modula UI Lab" caption="UI Lab 2.0 — PVP-UI-1R directions plus Product Hub specimens.">
+      <PvpUi1LabBlocks />
       <ModulaPrimitivesLabScreen initialInstallReviewOpen={installReview === '1'} />
     </SettingsScreen>
   )

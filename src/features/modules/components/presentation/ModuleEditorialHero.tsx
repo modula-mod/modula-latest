@@ -1,4 +1,6 @@
-import {StyleSheet, View} from 'react-native'
+import {Link, type Href} from 'expo-router'
+import {Pressable, StyleSheet, View} from 'react-native'
+import {LinearGradient} from 'expo-linear-gradient'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -10,48 +12,85 @@ import {resolveModuleInstallPresentation} from '@/features/modules/identity/inst
 import {productCopyFor} from '@/features/modules/identity/productCopy'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+/**
+ * Direction A — Editorial Story.
+ * Artwork owns the frame. Copy lives in the image. Product identity is attached
+ * to the same story, not a second card.
+ */
 export function ModuleEditorialHero({
   item,
   onPress,
   onAction,
+  href,
 }: {
   item: ModuleCatalogueItem
   onPress: () => void
   onAction?: () => void
+  href?: string
 }) {
   const {colours, radius, spacing} = useThemeTokens()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
-  return (
+  const cover = (
     <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: colours.surfaceRaised,
-          borderRadius: radius.xlarge,
-        },
-      ]}
-      testID="module-editorial-hero">
-      <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
-        <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} />
-        <View style={[styles.copy, {gap: spacing[1], padding: spacing[4]}]}>
-          {copy.eyebrow ? (
-            <AppText variant="micro" colour="textTertiary">
-              {copy.eyebrow.toUpperCase()}
-            </AppText>
-          ) : null}
-          <AppText variant="display">{copy.name}</AppText>
-          <AppText variant="body" colour="textSecondary">
-            {copy.tagline}
+      style={{
+        borderCurve: 'continuous',
+        borderRadius: radius.xlarge,
+        overflow: 'hidden',
+        width: '100%',
+      }}>
+      <ProductCover moduleId={item.moduleId} name={copy.name} inset={false} size="editorial" />
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.18)', 'rgba(0,0,0,0.72)']}
+        locations={[0.42, 0.68, 1]}
+        pointerEvents="none"
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[styles.story, {padding: spacing[4]}]} pointerEvents="none">
+        {copy.eyebrow ? (
+          <AppText variant="editorialEyebrow" style={styles.overlayEyebrow}>
+            {copy.eyebrow.toUpperCase()}
           </AppText>
-        </View>
-      </AppPressable>
-      <View style={[styles.actionRow, {gap: spacing[3], paddingHorizontal: spacing[4], paddingBottom: spacing[4]}]}>
+        ) : null}
+        <AppText variant="editorialTitle" style={styles.overlayTitle}>
+          {copy.name}
+        </AppText>
+        <AppText variant="editorialSubtitle" style={styles.overlaySubtitle}>
+          {copy.tagline}
+        </AppText>
+      </View>
+    </View>
+  )
+
+  return (
+    <View style={styles.feature} testID="module-editorial-hero">
+      {href ? (
+        <Link href={href as Href} asChild>
+          <Pressable accessibilityRole="link" accessibilityLabel={`Open featured ${copy.name}`}>
+            <Link.AppleZoom>{cover}</Link.AppleZoom>
+          </Pressable>
+        </Link>
+      ) : (
+        <AppPressable accessibilityLabel={`Open featured ${copy.name}`} onPress={onPress}>
+          {cover}
+        </AppPressable>
+      )}
+      <View
+        style={[
+          styles.actionRow,
+          {
+            gap: spacing[3],
+            paddingTop: spacing[4],
+            borderTopColor: colours.separator,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            marginTop: spacing[3],
+          },
+        ]}>
         <AppPressable accessibilityLabel={`Open ${copy.name}`} onPress={onPress} style={styles.identity}>
-          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={44} />
+          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={52} variant="icon" />
           <View style={styles.flex}>
-            <AppText variant="label">{copy.name}</AppText>
-            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+            <AppText variant="productName">{copy.name}</AppText>
+            <AppText variant="productSubtitle" colour="textSecondary" numberOfLines={1}>
               {copy.short}
             </AppText>
           </View>
@@ -64,8 +103,11 @@ export function ModuleEditorialHero({
 
 const styles = StyleSheet.create({
   actionRow: {alignItems: 'center', flexDirection: 'row'},
-  card: {overflow: 'hidden', width: '100%'},
-  copy: {alignItems: 'flex-start'},
+  feature: {width: '100%'},
   flex: {flex: 1, minWidth: 0},
   identity: {alignItems: 'center', flex: 1, flexDirection: 'row', gap: 12, minWidth: 0},
+  overlayEyebrow: {color: 'rgba(255,255,255,0.82)', letterSpacing: 0.8},
+  overlaySubtitle: {color: 'rgba(255,255,255,0.86)'},
+  overlayTitle: {color: '#FFFFFF'},
+  story: {bottom: 0, left: 0, position: 'absolute', right: 0},
 })

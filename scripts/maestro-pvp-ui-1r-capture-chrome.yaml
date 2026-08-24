@@ -1,0 +1,50 @@
+appId: digital.modula.app
+---
+- launchApp
+- extendedWaitUntil:
+    visible: ".*(DEVELOPMENT SERVERS|Unlock Modula|Sign in|Following|For you|Product Hub).*"
+    timeout: 45000
+- tapOn:
+    text: "http://127.0.0.1:8092"
+    optional: true
+- tapOn:
+    text: "127.0.0.1:8092"
+    optional: true
+- extendedWaitUntil:
+    visible: ".*(Unlock Modula|Sign in|Following|For you).*"
+    timeout: 90000
+- tapOn:
+    text: "Development demo"
+    optional: true
+- runFlow:
+    when:
+      visible: "Unlock Modula"
+    commands:
+      - tapOn:
+          point: "50%,58%"
+      - tapOn:
+          point: "50%,58%"
+      - tapOn:
+          point: "50%,82%"
+      - tapOn:
+          point: "75%,58%"
+      - tapOn:
+          point: "50%,58%"
+      - tapOn:
+          point: "75%,58%"
+      - extendedWaitUntil:
+          notVisible: "Unlock Modula"
+          timeout: 20000
+- extendedWaitUntil:
+    visible: "Following"
+    timeout: 60000
+- waitForAnimationToEnd:
+    timeout: 2500
+- takeScreenshot: home-control-group
+- openLink: modula:///product
+- extendedWaitUntil:
+    visible: "Product Hub"
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 10000
+- takeScreenshot: product-hub-control-group

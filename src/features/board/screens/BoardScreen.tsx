@@ -14,17 +14,13 @@ import {useInstalledModulesQuery, useModuleContributionQuery} from '@/features/m
 import {useProductPreferences} from '@/features/product/hooks/useProductPreferences'
 import {BOARD_WIDGET_CATALOG} from '@/features/product/data/boardWidgets'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {PageIntro} from '@/platform/ui/chrome/page-intro'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
-import {
-  plainHeaderCustomItem,
-  supportsPlainHeaderItems,
-} from '@/platform/ui/navigation/plain-header-items'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -194,33 +190,31 @@ export function BoardScreen() {
 
   useLayoutEffect(() => {
     const renderMenu = () => (
-      <ChromeOverflowMenu
-        chrome="plain"
-        accessibilityLabel="Board layout menu"
-        title="Board"
-        actions={[
-          {id: 'customize', label: 'Customize pinned spaces', icon: 'appearance'},
-          {id: 'marketplace', label: 'Open Product Hub', icon: 'modules'},
-          {id: 'saved', label: 'Open Saved', icon: 'bookmark'},
-          {id: 'compose', label: 'Quick compose', icon: 'create'},
+      <ChromeGlassControlGroup
+        items={[
+          {
+            kind: 'menu',
+            icon: 'more',
+            accessibilityLabel: 'Board layout menu',
+            title: 'Board',
+            actions: [
+              {id: 'customize', label: 'Customize pinned spaces', icon: 'appearance'},
+              {id: 'marketplace', label: 'Open Product Hub', icon: 'modules'},
+              {id: 'saved', label: 'Open Saved', icon: 'bookmark'},
+              {id: 'compose', label: 'Quick compose', icon: 'create'},
+            ],
+            onAction: id => {
+              if (id === 'customize') setCustomizeOpen(true)
+              if (id === 'marketplace') router.push('/product' as Href)
+              if (id === 'saved') router.push('/saved' as Href)
+              if (id === 'compose') router.push('/compose' as Href)
+            },
+          },
         ]}
-        onAction={id => {
-          if (id === 'customize') setCustomizeOpen(true)
-          if (id === 'marketplace') router.push('/product' as Href)
-          if (id === 'saved') router.push('/saved' as Href)
-          if (id === 'compose') router.push('/compose' as Href)
-        }}
       />
     )
     navigation.setOptions({
       headerRight: renderMenu,
-      ...(supportsPlainHeaderItems()
-        ? {
-            unstable_headerRightItems: () => [
-              plainHeaderCustomItem(renderMenu()),
-            ],
-          }
-        : null),
     })
   }, [navigation, router])
 

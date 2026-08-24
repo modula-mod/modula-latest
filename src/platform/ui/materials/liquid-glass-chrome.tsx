@@ -42,6 +42,7 @@ type ExpoGlassViewComponent = ComponentType<{
   style?: StyleProp<ViewStyle>
   glassEffectStyle?: string
   colorScheme?: 'light' | 'dark'
+  isInteractive?: boolean
   children?: ReactNode
 }>
 
@@ -144,12 +145,14 @@ export function LiquidGlassChrome({
   const callstack = loadedCallstackLiquidGlass
   if (callstack?.isLiquidGlassSupported) {
     const Glass = callstack.LiquidGlassView
+    // No elevation shadow / overflow clip — system liquid glass (Home) needs
+    // the material to extend past the layout box.
     return (
       <Glass
         interactive={interactive}
         effect={effect}
-        style={[styles.base, styles.shadow, style]}>
-        {children}
+        style={style}>
+        {flow ? children : <View style={styles.foreground}>{children}</View>}
       </Glass>
     )
   }
@@ -158,9 +161,10 @@ export function LiquidGlassChrome({
     return (
       <LoadedExpoGlassView
         glassEffectStyle={effect}
+        isInteractive={interactive}
         colorScheme={isDark ? 'dark' : 'light'}
-        style={[styles.base, styles.shadow, style]}>
-        {children}
+        style={style}>
+        {flow ? children : <View style={styles.foreground}>{children}</View>}
       </LoadedExpoGlassView>
     )
   }

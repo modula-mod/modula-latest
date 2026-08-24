@@ -30,7 +30,6 @@ import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {
   ActivityHeaderRight,
-  activityHeaderRightItems,
 } from '@/platform/ui/navigation/activity-stack-header'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
@@ -107,10 +106,6 @@ export function ActivityScreen() {
   const openFilters = useCallback(() => setFilterSheetOpen(true), [])
 
   useLayoutEffect(() => {
-    const rightItems = activityHeaderRightItems({
-      onMarkRead: markAllRead,
-      onOpenFilters: openFilters,
-    })
     navigation.setOptions({
       headerRight: () => (
         <ActivityHeaderRight
@@ -118,7 +113,6 @@ export function ActivityScreen() {
           onOpenFilters={openFilters}
         />
       ),
-      ...(rightItems ? {unstable_headerRightItems: () => rightItems} : null),
     })
   }, [markAllRead, navigation, openFilters])
 

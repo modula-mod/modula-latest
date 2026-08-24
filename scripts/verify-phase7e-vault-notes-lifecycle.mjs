@@ -3,6 +3,7 @@ import {fail, finish, includes, json, pass, vaultNotesRoot} from './phase7e-vaul
 
 const manifest = json('modula.module.json')
 const actionIds = new Set((Array.isArray(manifest.actions) ? manifest.actions : []).map(action => String(action.id ?? '')))
+const actionNamespace = `${String(manifest.id ?? '')}.action.`
 for (const action of [
   'note.create',
   'note.open',
@@ -26,7 +27,7 @@ for (const action of [
   'tag.assign',
   'tag.remove',
 ]) {
-  const expectedId = `digital.modula.vault-notes.action.${action}`
+  const expectedId = `${actionNamespace}${action}`
   if (actionIds.has(expectedId)) pass(`${action} declared`)
   else fail(`${action} action missing`)
 }

@@ -6,7 +6,7 @@ import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
@@ -305,7 +305,7 @@ export function SettingsContextRow({
   )
 }
 
-/** Header overflow (⋯) — Board-style circular chrome control. */
+/** Header overflow (⋯) — shared liquid-glass control group (single glyph). */
 export function SettingsOverflowMenu({
   title,
   actions,
@@ -316,11 +316,17 @@ export function SettingsOverflowMenu({
   onAction: (id: string) => void
 }) {
   return (
-    <ChromeOverflowMenu
-      title={title}
-      actions={actions}
-      onAction={onAction}
-      accessibilityLabel="More settings actions"
+    <ChromeGlassControlGroup
+      items={[
+        {
+          kind: 'menu',
+          icon: 'more',
+          accessibilityLabel: 'More settings actions',
+          title,
+          actions,
+          onAction,
+        },
+      ]}
     />
   )
 }

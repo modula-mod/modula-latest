@@ -48,6 +48,15 @@ export type TypographySemanticAlias =
   | 'metricLabel'
   | 'sectionTitle'
   | 'secondaryBody'
+  | 'screenLargeTitle'
+  | 'screenCompactTitle'
+  | 'editorialEyebrow'
+  | 'editorialTitle'
+  | 'editorialSubtitle'
+  | 'sectionAccessory'
+  | 'productName'
+  | 'productSubtitle'
+  | 'buttonLabel'
 
 export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   TypographySemanticAlias,
@@ -64,4 +73,13 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   metricLabel: 'micro',
   sectionTitle: 'headline',
   secondaryBody: 'caption',
+  screenLargeTitle: 'display',
+  screenCompactTitle: 'headline',
+  editorialEyebrow: 'micro',
+  editorialTitle: 'display',
+  editorialSubtitle: 'body',
+  sectionAccessory: 'caption',
+  productName: 'headline',
+  productSubtitle: 'caption',
+  buttonLabel: 'label',
 }

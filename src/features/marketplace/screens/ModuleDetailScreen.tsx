@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
-import {useLocalSearchParams, useRouter, type Href} from 'expo-router'
+import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -273,13 +273,16 @@ export function ModuleDetailScreen() {
           onScroll={event => setScrollOffset(event.nativeEvent.contentOffset.y)}
           scrollEventThrottle={16}>
           <View style={styles.coverRegion}>
-            <ProductCover
-              moduleId={module.moduleId}
-              name={copy.name}
-              inset={false}
-              transitionToCanvas
-            />
+            <Link.AppleZoomTarget>
+              <ProductCover
+                moduleId={module.moduleId}
+                name={copy.name}
+                inset={false}
+                transitionToCanvas
+              />
+            </Link.AppleZoomTarget>
             <ProductTopChrome
+              // Share + overflow use ChromeGlassControlGroup (Home-sized capsule).
               productName={copy.name}
               top={insets.top + spacing[2]}
               onBack={goBack}
@@ -547,6 +550,21 @@ function InformationDetail({module, section}: {module: ModuleDetail; section: st
       ) : null}
       {section === 'technical' ? (
         <>
+          <AppText variant="label">Backend</AppText>
+          <InfoRow label="Mode" value={backendModeLabel(module.backend.mode)} />
+          <InfoRow label="Provider" value={module.backend.provider} />
+          <InfoRow label="Deployment" value={displayLabel(module.backend.deploymentOwnership)} />
+          <InfoRow label="Endpoint" value={module.backend.endpoint ?? 'Resolved during installation'} />
+          <InfoRow label="Protocol" value={module.backend.protocolVersion ?? 'Not required'} />
+          <InfoRow label="Status" value={displayLabel(module.backend.status)} />
+          <InfoRow label="Self-hosting" value={module.backend.selfHostingSupported ? 'Supported' : 'Not supported'} />
+          <InfoRow label="External data processing" value={module.backend.externalDataProcessing ? 'Yes' : 'No'} />
+          <AppText variant="label">Data location</AppText>
+          <InfoRow label="Primary store" value={dataLocationLabel(module.backend.dataLocation)} />
+          <InfoRow label="Regions" value={module.backend.regions.length ? module.backend.regions.join(', ') : 'Not declared'} />
+          <InfoRow label="Platform permissions" value={permissionList(platformPermissions(module))} />
+          <InfoRow label="Module backend permissions" value={permissionList(module.backend.backendPermissions)} />
+          <InfoRow label="External service permissions" value={permissionList(externalPermissions(module))} />
           <AppText variant="label">Technical permissions</AppText>
           {module.permissions.map(permission => (
             <InfoRow key={permission.permission} label={permission.permission} value={permission.reason} />
@@ -700,6 +718,45 @@ function numberOrNull(value: unknown): number | null {
 
 function stringOrNull(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function platformPermissions(module: ModuleDetail): string[] {
+  const backend = new Set(module.backend.backendPermissions)
+  return module.permissions
+    .map(permission => permission.permission)
+    .filter(permission => !backend.has(permission) && !isExternalPermission(permission))
+}
+
+function externalPermissions(module: ModuleDetail): string[] {
+  return module.permissions
+    .map(permission => permission.permission)
+    .filter(isExternalPermission)
+}
+
+function isExternalPermission(permission: string): boolean {
+  return permission.startsWith('network:') || permission.startsWith('connector:') || permission.startsWith('dimon:')
+}
+
+function permissionList(permissions: string[]): string {
+  return permissions.length ? permissions.join(', ') : 'None declared'
+}
+
+function backendModeLabel(mode: ModuleDetail['backend']['mode']): string {
+  if (mode === 'greenfield-managed') return 'Greenfield-managed'
+  if (mode === 'module-managed') return 'Module-managed'
+  if (mode === 'frontend-only') return 'Frontend-only'
+  return 'Hybrid'
+}
+
+function dataLocationLabel(value: string): string {
+  if (value === 'greenfield') return 'Greenfield'
+  if (value === 'module-backend') return 'Module provider'
+  if (value === 'device') return 'Device'
+  return displayLabel(value)
+}
+
+function displayLabel(value: string): string {
+  return value.replace(/-/g, ' ').replace(/^./, char => char.toUpperCase())
 }
 
 function formatBytes(value: number | null): string {

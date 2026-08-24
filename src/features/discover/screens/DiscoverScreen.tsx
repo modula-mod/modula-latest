@@ -29,7 +29,7 @@ import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {type ModulaIconName} from '@/platform/ui/icons'
 import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
@@ -160,67 +160,72 @@ export function DiscoverScreen() {
                   body="People, topics, modules, and media."
                 />
               </View>
-              <ChromeOverflowMenu
-                chrome="plain"
-                accessibilityLabel="Discover filter menu"
-                title="Discover filters"
-                actions={[
-                  {id: 'For You', label: 'For You', icon: 'sparkles'},
-                  {id: 'People', label: 'People', icon: 'people'},
-                  {id: 'Communities', label: 'Communities', icon: 'community'},
-                  {id: 'Marketplace', label: 'Marketplace', icon: 'marketplace'},
-                  {id: 'Media', label: 'Media', icon: 'photo'},
+              <ChromeGlassControlGroup
+                items={[
                   {
-                    id: 'more',
-                    label: 'More',
+                    kind: 'menu',
                     icon: 'more',
-                    children: [
-                      {id: 'interests', label: 'Edit interests — Preview'},
-                      {id: 'feeds', label: 'Custom feeds — Preview'},
-                      {id: 'inspire', label: 'Inspire next'},
-                      {id: 'live', label: 'Live presence'},
+                    accessibilityLabel: 'Discover filter menu',
+                    title: 'Discover filters',
+                    actions: [
+                      {id: 'For You', label: 'For You', icon: 'sparkles'},
+                      {id: 'People', label: 'People', icon: 'people'},
+                      {id: 'Communities', label: 'Communities', icon: 'community'},
+                      {id: 'Marketplace', label: 'Marketplace', icon: 'marketplace'},
+                      {id: 'Media', label: 'Media', icon: 'photo'},
+                      {
+                        id: 'more',
+                        label: 'More',
+                        icon: 'more',
+                        children: [
+                          {id: 'interests', label: 'Edit interests — Preview'},
+                          {id: 'feeds', label: 'Custom feeds — Preview'},
+                          {id: 'inspire', label: 'Inspire next'},
+                          {id: 'live', label: 'Live presence'},
+                        ],
+                      },
+                      {id: 'customize', label: 'Customize Discover layout', icon: 'appearance'},
+                      {id: 'media-grid', label: 'Media grid', icon: 'photo'},
+                      {id: 'open-marketplace', label: 'Open Marketplace', icon: 'marketplace'},
+                      {id: 'open-communities', label: 'Open Communities', icon: 'community'},
                     ],
+                    onAction: id => {
+                      if (id === 'open-marketplace') {
+                        router.push('/marketplace' as Href)
+                        return
+                      }
+                      if (id === 'open-communities') {
+                        router.push('/communities' as Href)
+                        return
+                      }
+                      if (id === 'interests') {
+                        router.push('/discover/interests' as Href)
+                        return
+                      }
+                      if (id === 'feeds') {
+                        router.push('/discover/feeds' as Href)
+                        return
+                      }
+                      if (id === 'inspire') {
+                        router.push('/discover/inspire' as Href)
+                        return
+                      }
+                      if (id === 'live') {
+                        router.push('/discover/live' as Href)
+                        return
+                      }
+                      if (id === 'customize') {
+                        router.push('/product/layout-discover' as Href)
+                        return
+                      }
+                      if (id === 'media-grid') {
+                        router.push('/discover/media' as Href)
+                        return
+                      }
+                      setCategory(id as Category)
+                    },
                   },
-                  {id: 'customize', label: 'Customize Discover layout', icon: 'appearance'},
-                  {id: 'media-grid', label: 'Media grid', icon: 'photo'},
-                  {id: 'open-marketplace', label: 'Open Marketplace', icon: 'marketplace'},
-                  {id: 'open-communities', label: 'Open Communities', icon: 'community'},
                 ]}
-                onAction={id => {
-                  if (id === 'open-marketplace') {
-                    router.push('/marketplace' as Href)
-                    return
-                  }
-                  if (id === 'open-communities') {
-                    router.push('/communities' as Href)
-                    return
-                  }
-                  if (id === 'interests') {
-                    router.push('/discover/interests' as Href)
-                    return
-                  }
-                  if (id === 'feeds') {
-                    router.push('/discover/feeds' as Href)
-                    return
-                  }
-                  if (id === 'inspire') {
-                    router.push('/discover/inspire' as Href)
-                    return
-                  }
-                  if (id === 'live') {
-                    router.push('/discover/live' as Href)
-                    return
-                  }
-                  if (id === 'customize') {
-                    router.push('/product/layout-discover' as Href)
-                    return
-                  }
-                  if (id === 'media-grid') {
-                    router.push('/discover/media' as Href)
-                    return
-                  }
-                  setCategory(id as Category)
-                }}
               />
             </View>
             <SectionEnter delay={20}>

@@ -6,18 +6,18 @@ No package should enter the project merely because an example repository uses it
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
 | @node-rs/argon2 | ^2.0.2 | Server-side Argon2id password hashing for sovereign accounts | No (Node native binding) | N/A (backend only) | MIT | node-rs maintained package; required for Phase 6R password credentials | Phase 6R |
-| @expo/ui | ~57.0.7 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo | ~57.0.8 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-constants | ~57.0.7 | App config / constants access | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-dev-client | ~57.0.9 | Development-client runtime for native validation builds | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| @expo/ui | ~57.0.13 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo | ~57.0.16 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-constants | ~57.0.14 | App config / constants access | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-dev-client | ~57.0.15 | Development-client runtime for native validation builds | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
 | expo-device | ~57.0.1 | Device info (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-font | ~57.0.1 | Font loading support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-glass-effect | ~57.0.1 | Template glass effect module (unused in Phase 0 UI) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-image | ~57.0.1 | Image component (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
-| expo-image-picker | ~57.0.6 | Image picker capability for profile/media surfaces | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-image-picker | ~57.0.13 | Image picker capability for profile/media surfaces | Yes | Official SDK 57 | See package LICENSE | Existing SDK 57 dependency; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
 | expo-linking | ~57.0.4 | Deep linking support | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-router | ~57.0.8 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 |
-| expo-splash-screen | ~57.0.5 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module; Phase 7B patch aligned by `pnpm exec expo install --check` | Phase 0 / chrome pass |
+| expo-router | ~57.0.16 | File-based navigation | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
+| expo-splash-screen | ~57.0.8 | Native splash screen + Modula brand hold (`ModulaSplashOverlay`) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; studied `react-native-custom-splash` patterns (logo + bg + hide) but kept admitted Expo API — no speculative native splash module; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 / chrome pass |
 | expo-status-bar | ~57.0.1 | Status bar control | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-symbols | ~57.0.1 | SF Symbols helper (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | expo-system-ui | ~57.0.1 | System UI styling | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |

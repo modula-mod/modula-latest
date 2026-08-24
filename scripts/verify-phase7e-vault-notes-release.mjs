@@ -20,8 +20,8 @@ const provenancePath = join(vaultNotesRoot, 'release/vault-notes-v1.1.0.provenan
 if (!existsSync(provenancePath)) fail('Vault Notes release provenance is missing')
 else {
   const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'))
-  if (provenance.moduleId === 'digital.modula.vault-notes' && provenance.moduleVersion === '1.1.0') pass('release provenance identifies canonical Vault Notes 1.1')
-  else fail('release provenance identity mismatch')
+  if (provenance.moduleId === manifest.moduleId && provenance.moduleVersion === manifest.version) pass('release provenance identifies immutable Vault Notes 1.1 source lineage')
+  else fail('release provenance identity does not match the released source manifest')
   if (provenance.releaseTag === releaseTag) pass('release provenance records immutable tag')
   else fail('release provenance tag mismatch')
   if (provenance.releaseCommit === tag) pass('release provenance records immutable release tag commit')
@@ -44,6 +44,15 @@ else {
     fail('immutable package artifact is missing')
   }
 }
+
+includes('packages/greenfield-contracts/src/canonical-module-identity.ts', [
+  "CANONICAL_VAULT_NOTES_MODULE_ID = 'digital.modula.vault-notes'",
+  "'modula.vault-notes'",
+], 'canonical Vault Notes identity and immutable release alias')
+includes('services/greenfield-api/src/modules/canonical-manifest.ts', [
+  'canonicalizeVaultNotesManifest',
+  'rewriteLegacyVaultNotesValue',
+], 'Greenfield canonical manifest overlay')
 
 includes('scripts/registry/import-module.mjs', [
   'Module repository working tree must be clean',

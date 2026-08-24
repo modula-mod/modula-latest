@@ -25,17 +25,17 @@ export function SectionHeader({
     <View style={[styles.row, {gap: spacing[2]}]}>
       {icon ? <ModulaIcon name={icon} size={18} colour={colours.textTertiary} /> : null}
       <View style={styles.flex}>
-        <AppText variant={eyebrow ? 'micro' : 'headline'} colour={eyebrow ? 'textTertiary' : 'text'}>
+      <AppText variant={eyebrow ? 'editorialEyebrow' : 'sectionTitle'} colour={eyebrow ? 'textTertiary' : 'text'}>
           {eyebrow ? title.toUpperCase() : title}
         </AppText>
         {subtitle ? (
-          <AppText variant="caption" colour="textSecondary">
+          <AppText variant="sectionAccessory" colour="textSecondary">
             {subtitle}
           </AppText>
         ) : null}
       </View>
       {trailing ? (
-        <AppText variant="caption" colour="textSecondary">
+        <AppText variant="sectionAccessory" colour="accent">
           {trailing}
         </AppText>
       ) : null}

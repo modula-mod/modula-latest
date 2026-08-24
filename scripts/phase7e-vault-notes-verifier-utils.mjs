@@ -102,10 +102,9 @@ export async function withIsolatedDatabase(label, callback) {
   let dropMode = null
   let created = false
   try {
-    const adminConnectionString = adminConnectionStringFor(baseUrl)
+    const adminConnectionString = adminConnectionStringFor(baseUrl, templateDb)
     if (adminConnectionString) {
       const adminUrl = new URL(adminConnectionString)
-      adminUrl.pathname = `/${templateDb}`
       adminPool = new Pool({connectionString: adminUrl.toString(), max: 1, application_name: 'modula-vault-notes-verify-admin'})
       try {
         await adminPool.query(createDatabaseSql)
@@ -175,12 +174,14 @@ export async function verifyTableAbsent(env, table) {
   }
 }
 
-function adminConnectionStringFor(baseUrl) {
+function adminConnectionStringFor(baseUrl, templateDb) {
+  if (process.env.MODULA_TEST_DATABASE_ADMIN_URL) return process.env.MODULA_TEST_DATABASE_ADMIN_URL
   if (process.env.MODULA_DATABASE_ADMIN_URL) return process.env.MODULA_DATABASE_ADMIN_URL
   if (!process.env.MODULA_ADMIN_PASSWORD) return null
   const adminUrl = new URL(baseUrl)
   adminUrl.username = 'modula_admin'
   adminUrl.password = process.env.MODULA_ADMIN_PASSWORD
+  adminUrl.pathname = `/${templateDb}`
   return adminUrl.toString()
 }
 

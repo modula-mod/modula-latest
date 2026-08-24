@@ -5,13 +5,12 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {AppText} from '@/components/primitives/AppText'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
-import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
 import {
   ChromeGlassControlGroup,
+  type ChromeGlassGroupItem,
   type ChromeGlassGroupMenu,
 } from '@/platform/ui/menus/chrome-glass-control-group'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
-import {OVERLAY_GLASS_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {OVERLAY_GLASS_HIT, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {
   CHROME_BLUR_INTENSITY,
   CHROME_FADE_EXTENSION,
@@ -22,16 +21,19 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type SecondaryScreenHeaderProps = {
   title: string
+  /** Prefer `items` / share+overflow — still accepted for one-off trails. */
   right?: ReactNode
   onBack?: () => void
   onShare?: () => void
   /** Trailing overflow — grouped with share when both are set. */
   overflow?: Omit<ChromeGlassGroupMenu, 'kind'>
+  /** Explicit shared control-group items (wins over share/overflow helpers). */
+  items?: ChromeGlassGroupItem[]
 }
 
 /**
- * Secondary-route chrome: extraLarge glass back + trailing ControlGroup
- * when share and overflow are both present (Expo UI ControlGroup).
+ * Secondary-route chrome: glass back + trailing `ChromeGlassControlGroup`
+ * whenever there are trailing actions.
  */
 export function SecondaryScreenHeader({
   title,
@@ -39,6 +41,7 @@ export function SecondaryScreenHeader({
   onBack,
   onShare,
   overflow,
+  items,
 }: SecondaryScreenHeaderProps) {
   const insets = useSafeAreaInsets()
   const {spacing} = useThemeTokens()
@@ -46,6 +49,9 @@ export function SecondaryScreenHeader({
   const blurHeight = rowHeight + CHROME_FADE_EXTENSION
 
   const trail = (() => {
+    if (items?.length) {
+      return <ChromeGlassControlGroup items={items} />
+    }
     if (onShare && overflow) {
       return (
         <ChromeGlassControlGroup
@@ -63,18 +69,29 @@ export function SecondaryScreenHeader({
     }
     if (overflow) {
       return (
-        <ChromeOverflowMenu
-          chrome="glass"
-          accessibilityLabel={overflow.accessibilityLabel}
-          title={overflow.title}
-          actions={overflow.actions}
-          onAction={overflow.onAction}
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'menu',
+              ...overflow,
+              icon: overflow.icon ?? 'more',
+            },
+          ]}
         />
       )
     }
     if (onShare) {
       return (
-        <ChromeCircleButton icon="share" accessibilityLabel="Share" onPress={onShare} />
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'button',
+              icon: 'share',
+              accessibilityLabel: 'Share',
+              onPress: onShare,
+            },
+          ]}
+        />
       )
     }
     return right ?? <View style={styles.slotSpacer} />
@@ -138,12 +155,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexGrow: 0,
     flexShrink: 0,
-    gap: 8,
     justifyContent: 'flex-end',
+    minWidth: TOOLBAR_HIT,
   },
   slotSpacer: {
-    height: OVERLAY_GLASS_HIT,
-    width: OVERLAY_GLASS_HIT,
+    height: TOOLBAR_HIT,
+    width: TOOLBAR_HIT,
   },
   title: {
     flex: 1,

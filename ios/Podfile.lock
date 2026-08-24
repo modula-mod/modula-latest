@@ -3002,7 +3002,7 @@ SPEC CHECKSUMS:
   ExpoLinking: 2e9ead00fcb0d3e623a8d4935fadae3cdb6d4d97
   ExpoLocalAuthentication: 96989637e567a10cdeabe61e5c6026d30c0dc53f
   ExpoLogBox: 2c4225a62f1cfb943e6b2df4fa4fe2d136e06fb6
-  ExpoModulesCore: e70182ffcd3ced2c7113e6fae394f03f9a99da4e
+  ExpoModulesCore: 4ee3d76649f9ac0e09c4e2cad986c0a3ed6ff4f8
   ExpoModulesJSI: ea64813990c7650f3a2d469f176a54c3c7b2c66a
   ExpoModulesWorklets: 539791c19ac17aaa37632c7fa396ec17d91b3ad6
   ExpoModulesWorkletsAdapter: 03df0819e10fdb83401f595b4ce8070e3485806b
@@ -3017,7 +3017,7 @@ SPEC CHECKSUMS:
   ExpoWebBrowser: 9b98d939d5f1c5dd8f523f0a0683056fb1204434
   EXUpdatesInterface: 92d2aa5194b6fb93ca8ab749db75665cb28b2e60
   FBLazyVector: 3c3be9a019176b5699455f7f66c5444b78a411c6
-  hermes-engine: 2a2b8cef007565da0b0ae34a1d0b2d789d157646
+  hermes-engine: 0d13f76a27823bfd1cf0827e328077602fad1356
   LiquidGlass: 9dd6be7ac113cae8b84f895d8a3eede578dbef98
   RCTDeprecation: bccb6545c26db881ecddfd83a3f9ea82aba1605f
   RCTRequired: b2f74764d596fc0051f00fee94b49bf41a6f7f5a

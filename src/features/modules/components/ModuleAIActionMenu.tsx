@@ -10,7 +10,7 @@ import type {
 } from '@/data/repositories/contracts'
 import {useModuleAIMutations} from '@/features/modules/hooks'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
-import {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -90,20 +90,25 @@ export function ModuleAIActionMenu({
 
   return (
     <>
-      <ChromeOverflowMenu
-        chrome="plain"
-        title="AI tools"
-        accessibilityLabel="AI tools"
-        actions={runnableActions.map(action => ({
-          id: action.id,
-          label: action.name,
-          disabled: action.context.sources.includes('selected-content') && !selectedText,
-          disabledReason: 'Select note text first.',
-        }))}
-        onAction={id => {
-          const action = runnableActions.find(item => item.id === id)
-          if (action) void start(action)
-        }}
+      <ChromeGlassControlGroup
+        items={[
+          {
+            kind: 'menu',
+            icon: 'more',
+            title: 'AI tools',
+            accessibilityLabel: 'AI tools',
+            actions: runnableActions.map(action => ({
+              id: action.id,
+              label: action.name,
+              disabled: action.context.sources.includes('selected-content') && !selectedText,
+              disabledReason: 'Select note text first.',
+            })),
+            onAction: id => {
+              const action = runnableActions.find(item => item.id === id)
+              if (action) void start(action)
+            },
+          },
+        ]}
       />
       <ModuleAIExecutionSheet
         isPresented={Boolean(selectedAction)}

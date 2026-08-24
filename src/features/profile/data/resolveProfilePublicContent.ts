@@ -6,7 +6,6 @@ import {
   type ProfileViewerRelationship,
 } from '@/features/profile/contracts/profile'
 import type {ProfileModulePreview} from '@/features/profile/contracts/profileModules'
-import {demoProfileModules} from '@/features/profile/data/demoProfileModules'
 
 /**
  * Public profile modules for snapshot preview and the full Modules tab.
@@ -17,15 +16,11 @@ export function resolvePublicProfileModules(
   viewer: ProfileViewerRelationship,
   catalogue: ModuleCatalogueItem[] = [],
 ): ProfileModulePreview[] {
-  const demo = demoProfileModules[profile.id] ?? []
-  const demoById = new Map(demo.map(module => [module.id, module]))
   const catalogueById = new Map(catalogue.map(item => [item.moduleId, item]))
 
   return profile.featuredModuleIds
     .map(moduleId => {
       const normalized = normalizeLegacyProfileModuleId(moduleId)
-      const fromDemo = demoById.get(moduleId) ?? demoById.get(normalized)
-      if (fromDemo) return fromDemo
       const fromCatalogue =
         catalogueById.get(moduleId) ?? catalogueById.get(normalized)
       return fromCatalogue ? catalogueItemToPreview(fromCatalogue) : null

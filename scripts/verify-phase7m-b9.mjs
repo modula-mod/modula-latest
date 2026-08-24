@@ -121,9 +121,15 @@ record('TECHNICAL PERMISSIONS DISCLOSURE', installSheet.includes('Technical perm
 
 console.log('\n# Marketplace and search')
 const landingName = 'src/features/modules/screens/ProductHubMarketplaceScreen.tsx'
-for (const marker of ['ModuleEditorialHero', 'ModuleRow', 'ModuleShelf', 'New for Modula', 'Made by Modula']) {
+const landing = read(landingName)
+for (const marker of ['ModuleEditorialHero', 'ModuleRow', 'New for Modula', 'Made by Modula']) {
   contains(landingName, marker, `LANDING ${marker.toUpperCase()}`)
 }
+record(
+  'LANDING MODULE SHELF',
+  landing.includes('ModuleShelf') || landing.includes('ModuleIconShelf'),
+  landingName,
+)
 absent(landingName, 'ModuleCatalogueCard', 'OLD REGISTRY CARD GRID REMOVED')
 absent(landingName, 'CATALOGUE', 'REGISTRY LANGUAGE REMOVED')
 const searchMachine = read('src/features/modules/state/productHubSearchMachine.ts')
