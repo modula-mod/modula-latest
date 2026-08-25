@@ -108,3 +108,28 @@ The cutover branch fixes those two defects without changing production account d
 - Greenfield API matrix: `30/30 test files PASS`, each on a separately created database
 - Greenfield worker matrix: `8/8 test files PASS`, each on a separately migrated database
 - Exact-backup aggregate `CI=true pnpm verify:pvp-platform-2`: `PASS`
+
+## Registry cutover gate
+
+Read-only production inspection found that the registry had not yet converged even though migration 039 was live:
+
+- Published Vault Notes releases: `0.1.0` and `0.2.0`
+- Immutable Vault Notes `1.2.0`: absent
+- Immutable Formatting, AI, and Voice `0.1.0` releases: absent
+- Positively identified quarantined search-test releases: `3`
+- Visible Vault Notes products: `2`
+
+The auditable `registry:publish-reference-products` command was added with dry-run as the default. It verifies clean reference repositories, immutable tag commits, Greenfield manifest checksums, and local release artifact checksums before mutation. Apply mode imports and publishes through `GreenfieldModuleReleaseService`, preserves historical Vault Notes releases as `superseded`, and removes test releases only when every field matches the bounded known-test signature. It never reads or prints provider credentials.
+
+The command was exercised against another fresh restore of the exact production backup:
+
+- Initial dry run: four immutable imports required, two historical releases visible, three known test fixtures present
+- Apply: `PASS`
+- Historical Vault Notes `0.1.0` and `0.2.0`: `superseded`, not deleted
+- Known quarantined search fixtures: `3 removed`
+- Visible Vault Notes products: `1`
+- Second apply: `PASS`, changes `0`
+- Final dry run: `PASS`, changes required `0`
+- Aggregate `CI=true pnpm verify:pvp-platform-2` after convergence: `PASS`
+
+This rehearsal changes only the disposable restored database. Production registry mutation remains gated on merge, exact-SHA build, and a final production dry run.

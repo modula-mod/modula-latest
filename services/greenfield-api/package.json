@@ -13,7 +13,8 @@
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:status": "tsx scripts/db-status.ts",
     "db:rollback": "tsx scripts/db-rollback.ts",
-    "db:seed": "tsx scripts/db-seed.ts"
+    "db:seed": "tsx scripts/db-seed.ts",
+    "registry:publish-reference-products": "tsx scripts/publish-reference-products.ts"
   },
   "dependencies": {
     "@atproto/oauth-client-node": "^0.3.2",
