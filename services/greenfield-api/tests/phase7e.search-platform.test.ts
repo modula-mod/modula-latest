@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {manifestChecksum} from '@modula/greenfield-module-manifest'
 import {loadConfig} from '../src/config/index.js'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {migrateUp} from '../src/database/migrate.js'
@@ -282,7 +283,7 @@ async function seedProfileAccount(db: ModulaDb, accountId: string, actorId: stri
 }
 
 function testManifest(moduleId: string, suffix: string) {
-  return {
+  const manifest = {
     manifestVersion: 1,
     moduleId,
     name: `Search Module ${suffix}`,
@@ -304,4 +305,6 @@ function testManifest(moduleId: string, suffix: string) {
     integrity: {manifestSha256: '', releaseSha256: 'abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd'},
     extensions: {releaseNotes: `Release notes ${suffix}`, channel: 'stable', categories: ['productivity']},
   } as any
+  manifest.integrity.manifestSha256 = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
+  return manifest
 }
