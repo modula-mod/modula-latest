@@ -24,7 +24,7 @@ import {
   ProductPlatformRow,
   ProductPreviewCarousel,
   ProductRatingPanel,
-  ProductStickyHeader,
+  ProductScrollChrome,
   ProductTabs,
   ProductTopChrome,
   ProductWhatsNew,
@@ -73,8 +73,9 @@ export function ModuleDetailScreen() {
   const [selectedTab, setSelectedTab] = useState<ProductTabId>('overview')
   const [informationOpen, setInformationOpen] = useState<string | null>(null)
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false)
-  const [heroActionBottom, setHeroActionBottom] = useState(360)
   const [scrollOffset, setScrollOffset] = useState(0)
+  const [productLeadY, setProductLeadY] = useState(0)
+  const [tabsOffsetInLead, setTabsOffsetInLead] = useState(0)
   const [ratingBusy, setRatingBusy] = useState(false)
   const [userRating, setUserRating] = useState<number | null>(null)
 
@@ -231,7 +232,10 @@ export function ModuleDetailScreen() {
   const previewFrames = previewsFor(module)
   const stackedIdentity = width < 330
   const heroArtworkSize = Math.min(116, Math.max(94, Math.round(width * 0.25)))
-  const stickyVisible = scrollOffset > heroActionBottom
+  const scrollChromeStart = Math.max(0, productLeadY + tabsOffsetInLead - insets.top - spacing[2])
+  const scrollChromeOpacity = productLeadY + tabsOffsetInLead
+    ? Math.min(1, Math.max(0, (scrollOffset - scrollChromeStart) / 28))
+    : 0
 
   const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
   const openInstall = () => {
@@ -279,7 +283,7 @@ export function ModuleDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <StatusBar style={scrollOffset < 210 ? 'light' : scheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={scrollChromeOpacity > 0.5 || scrollOffset >= 210 ? (scheme === 'dark' ? 'light' : 'dark') : 'light'} />
       <ResponsiveContent maxWidth={920}>
         <ScrollView
           contentContainerStyle={{paddingBottom: tabPadding + spacing[8]}}
@@ -307,6 +311,7 @@ export function ModuleDetailScreen() {
           </View>
 
           <View
+            onLayout={event => setProductLeadY(event.nativeEvent.layout.y)}
             style={[
               styles.productLead,
               {gap: spacing[3], marginTop: -60, paddingHorizontal: spacing[4]},
@@ -321,13 +326,7 @@ export function ModuleDetailScreen() {
                   privateByDesign={isVaultNotesModuleId(module.moduleId)}
                   verified={module.trustLevel === 'firstParty'}
                 />
-                <View
-                  onLayout={event => {
-                    const {y, height} = event.nativeEvent.layout
-                    setHeroActionBottom(y + height + 230)
-                  }}
-                  style={{marginTop: spacing[2]}}
-                  testID="module-hero-install">
+                <View style={{marginTop: spacing[2]}} testID="module-hero-install">
                   <ProductActionGroup
                     presentation={presentation}
                     productName={copy.name}
@@ -339,7 +338,11 @@ export function ModuleDetailScreen() {
             </View>
 
             <ProductMetadataStrip items={metadata} />
-            <ProductTabs selected={selectedTab} onSelect={setSelectedTab} />
+            <View
+              onLayout={event => setTabsOffsetInLead(event.nativeEvent.layout.y)}
+              style={{opacity: scrollChromeOpacity > 0.98 ? 0 : 1}}>
+              <ProductTabs selected={selectedTab} onSelect={setSelectedTab} />
+            </View>
           </View>
 
           <View
@@ -376,13 +379,16 @@ export function ModuleDetailScreen() {
         </ScrollView>
       </ResponsiveContent>
 
-      <ProductStickyHeader
-        visible={stickyVisible}
-        top={insets.top + spacing[1]}
-        moduleId={module.moduleId}
-        name={copy.name}
-        presentation={presentation}
-        onPrimary={onPrimary}
+      <ProductScrollChrome
+        actions={overflowActions}
+        onAction={onOverflow}
+        onBack={goBack}
+        onShare={shareModule}
+        onSelect={setSelectedTab}
+        opacity={scrollChromeOpacity}
+        productName={copy.name}
+        selected={selectedTab}
+        top={insets.top}
       />
 
       <InstallPreviewSheet

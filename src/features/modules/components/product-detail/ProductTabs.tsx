@@ -16,14 +16,25 @@ export const PRODUCT_TABS: {id: ProductTabId; label: string}[] = [
 /** Longest product tab label — sized so nothing truncates in the scroll rail. */
 const PRODUCT_TAB_SEGMENT_MIN_WIDTH = 108
 
-export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSelect: (tab: ProductTabId) => void}) {
+export function ProductTabs({
+  selected,
+  onSelect,
+  variant = 'rail',
+}: {
+  selected: ProductTabId
+  onSelect: (tab: ProductTabId) => void
+  /** `rail` — standalone capsule. `inline` — nested inside scroll chrome glass. */
+  variant?: 'rail' | 'inline'
+}) {
   const {colours, radius} = useThemeTokens()
   const {width} = useWindowDimensions()
+  const inline = variant === 'inline'
   return (
     <View
       style={[
         styles.rail,
-        {
+        inline ? styles.inlineRail : null,
+        !inline && {
           backgroundColor: colours.surface,
           borderRadius: radius.round,
         },
@@ -32,7 +43,7 @@ export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSel
       <ModulaSegmentedPicker
         accessibilityLabel="Product sections"
         appearance="segmented"
-        maxWidth={Math.max(280, width - 32)}
+        maxWidth={inline ? Math.max(220, width - 168) : Math.max(280, width - 32)}
         onValueChange={value => onSelect(value as ProductTabId)}
         options={PRODUCT_TABS.map(tab => ({value: tab.id, label: tab.label}))}
         scrollable
@@ -44,5 +55,6 @@ export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSel
 }
 
 const styles = StyleSheet.create({
+  inlineRail: {minHeight: 34, paddingVertical: 0},
   rail: {justifyContent: 'center', minHeight: 42, overflow: 'hidden', paddingVertical: 4},
 })
