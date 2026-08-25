@@ -4,14 +4,16 @@ import {AppText} from '@/components/primitives/AppText'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
 import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
-import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
+import {OVERLAY_GROUP_MIN_WIDTH, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
+/** Space reserved for the fixed back control (44pt hit + edge inset). */
+const FIXED_BACK_GUTTER = 12 + TOOLBAR_HIT
+
 /**
- * Compact product chrome that morphs in while scrolling — full-width liquid
- * glass, back control, artwork, title, and primary action (App Store style).
+ * Morphing liquid-glass backdrop + compact product row while scrolling.
+ * Back / trailing actions live in {@link ProductFixedChrome} and never move.
  */
 export function ProductStickyHeader({
   progress,
@@ -19,7 +21,6 @@ export function ProductStickyHeader({
   moduleId,
   name,
   presentation,
-  onBack,
   onPrimary,
 }: {
   /** 0 = hidden, 1 = fully visible — driven by scroll offset. */
@@ -28,71 +29,59 @@ export function ProductStickyHeader({
   moduleId: string
   name: string
   presentation: ModuleInstallPresentation
-  onBack: () => void
   onPrimary: () => void
 }) {
   const {colours, spacing} = useThemeTokens()
   const visible = progress > 0.02
-  const slideY = (1 - progress) * -10
+  const slideY = (1 - progress) * -8
+  const trailingGutter = 12 + OVERLAY_GROUP_MIN_WIDTH
 
   return (
     <View
       pointerEvents={visible ? 'box-none' : 'none'}
-      style={[
-        styles.shell,
-        {
-          opacity: progress,
-          transform: [{translateY: slideY}],
-        },
-      ]}
+      style={[styles.shell, {opacity: progress, transform: [{translateY: slideY}]}]}
       testID="product-sticky-header">
       <LiquidGlassChrome
         contentLayout="flow"
         fallback="regular"
-        interactive
+        interactive={false}
+        style={[styles.backdrop, {borderBottomColor: colours.border}]}
+      />
+      <View
         style={[
-          styles.bar,
+          styles.row,
           {
-            borderBottomColor: colours.border,
+            gap: spacing[2],
+            paddingBottom: spacing[2],
+            paddingLeft: FIXED_BACK_GUTTER,
+            paddingRight: trailingGutter,
+            paddingTop: top + spacing[1],
           },
         ]}>
-        <View
-          style={[
-            styles.row,
-            {
-              gap: HEADER_ICON_PAIR_GAP,
-              paddingBottom: spacing[2],
-              paddingHorizontal: spacing[3],
-              paddingTop: top + spacing[1],
-            },
-          ]}>
-          <ModulaBackButton accessibilityLabel="Back" chrome="glass" onPress={onBack} />
-          <ModuleArtwork moduleId={moduleId} name={name} variant="compact" />
-          <AppText variant="label" numberOfLines={1} style={styles.title}>
-            {name}
-          </AppText>
-          <ModuleAction
-            presentation={presentation}
-            productName={name}
-            onPress={onPrimary}
-            tone="product"
-          />
-        </View>
-      </LiquidGlassChrome>
+        <ModuleArtwork moduleId={moduleId} name={name} variant="compact" />
+        <AppText variant="label" numberOfLines={1} style={styles.title}>
+          {name}
+        </AppText>
+        <ModuleAction
+          presentation={presentation}
+          productName={name}
+          onPress={onPrimary}
+          tone="product"
+        />
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  bar: {
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    width: '100%',
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
     minHeight: 44,
-    width: '100%',
   },
   shell: {
     left: 0,

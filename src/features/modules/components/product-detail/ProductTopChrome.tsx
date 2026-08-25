@@ -5,10 +5,12 @@ import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
-export function ProductTopChrome({
+/**
+ * Fixed overlay chrome — back and trailing actions never scroll or morph.
+ */
+export function ProductFixedChrome({
   productName,
   top,
-  fade = 1,
   onBack,
   onShare,
   actions,
@@ -16,18 +18,13 @@ export function ProductTopChrome({
 }: {
   productName: string
   top: number
-  /** Crossfade with sticky header while scrolling (1 = fully visible). */
-  fade?: number
   onBack: () => void
   onShare: () => void
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
   return (
-    <View
-      pointerEvents={fade > 0.02 ? 'box-none' : 'none'}
-      style={[styles.chrome, {opacity: fade, top}]}
-      testID="product-top-chrome">
+    <View pointerEvents="box-none" style={[styles.chrome, {top}]} testID="product-fixed-chrome">
       <ModulaBackButton accessibilityLabel="Back" chrome="glass" onPress={onBack} />
       <ChromeGlassControlGroup
         items={[
@@ -50,6 +47,9 @@ export function ProductTopChrome({
   )
 }
 
+/** @deprecated Use {@link ProductFixedChrome} — kept for existing imports. */
+export const ProductTopChrome = ProductFixedChrome
+
 const styles = StyleSheet.create({
   chrome: {
     alignItems: 'center',
@@ -59,6 +59,6 @@ const styles = StyleSheet.create({
     left: 12,
     position: 'absolute',
     right: 12,
-    zIndex: 2,
+    zIndex: 6,
   },
 })

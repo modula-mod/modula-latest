@@ -24,9 +24,9 @@ import {
   ProductPlatformRow,
   ProductPreviewCarousel,
   ProductRatingPanel,
+  ProductFixedChrome,
   ProductStickyHeader,
   ProductTabs,
-  ProductTopChrome,
   ProductWhatsNew,
   type ProductCapabilityItem,
   type ProductInformationItem,
@@ -296,15 +296,6 @@ export function ModuleDetailScreen() {
                 transitionToCanvas
               />
             </Link.AppleZoomTarget>
-            <ProductTopChrome
-              fade={1 - stickyProgress}
-              productName={copy.name}
-              top={insets.top + spacing[2]}
-              onBack={goBack}
-              onShare={shareModule}
-              actions={overflowActions}
-              onAction={onOverflow}
-            />
           </View>
 
           <View
@@ -380,11 +371,19 @@ export function ModuleDetailScreen() {
       <ProductStickyHeader
         moduleId={module.moduleId}
         name={copy.name}
-        onBack={goBack}
         onPrimary={onPrimary}
         presentation={presentation}
         progress={stickyProgress}
         top={insets.top}
+      />
+
+      <ProductFixedChrome
+        actions={overflowActions}
+        onAction={onOverflow}
+        onBack={goBack}
+        onShare={shareModule}
+        productName={copy.name}
+        top={insets.top + spacing[2]}
       />
 
       <InstallPreviewSheet
