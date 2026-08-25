@@ -8,6 +8,7 @@ import type {ModulaActionItem} from '@/platform/ui/menus/types'
 export function ProductTopChrome({
   productName,
   top,
+  fade = 1,
   onBack,
   onShare,
   actions,
@@ -15,13 +16,18 @@ export function ProductTopChrome({
 }: {
   productName: string
   top: number
+  /** Crossfade with sticky header while scrolling (1 = fully visible). */
+  fade?: number
   onBack: () => void
   onShare: () => void
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
   return (
-    <View pointerEvents="box-none" style={[styles.chrome, {top}]} testID="product-top-chrome">
+    <View
+      pointerEvents={fade > 0.02 ? 'box-none' : 'none'}
+      style={[styles.chrome, {opacity: fade, top}]}
+      testID="product-top-chrome">
       <ModulaBackButton accessibilityLabel="Back" chrome="glass" onPress={onBack} />
       <ChromeGlassControlGroup
         items={[
