@@ -77,8 +77,9 @@ export function ModulaSegmentedPicker({
             opacity: option.disabled ? 0.45 : 1,
             paddingHorizontal: spacing[3],
             paddingVertical: spacing[2],
-            minWidth: scrollable ? segmentMinWidth - 8 : undefined,
+            minWidth: scrollable ? segmentMinWidth : undefined,
             flex: scrollable ? undefined : 1,
+            flexShrink: scrollable ? 0 : undefined,
             borderRadius: radius.round,
             // Scrollable menu (plain): muted selected chip. Glass/segmented: raised thumb.
             backgroundColor: !selected
@@ -105,8 +106,9 @@ export function ModulaSegmentedPicker({
             color: selected ? colours.text : colours.textSecondary,
             textAlign: 'center',
             fontWeight: selected ? '600' : '500',
+            flexShrink: scrollable ? 0 : undefined,
           }}
-          numberOfLines={1}>
+          numberOfLines={scrollable ? undefined : 1}>
           {option.label}
         </AppText>
       </AppPressable>
