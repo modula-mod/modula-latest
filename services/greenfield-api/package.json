@@ -8,6 +8,7 @@
     "start": "node dist/main.js",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "pnpm --filter @modula/greenfield-api... build",
     "test": "vitest run",
     "test:watch": "vitest",
     "db:migrate": "tsx scripts/db-migrate.ts",
