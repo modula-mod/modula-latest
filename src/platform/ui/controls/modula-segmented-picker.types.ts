@@ -28,8 +28,9 @@ export type ModulaSegmentedPickerProps = {
    */
   appearance?: ModulaSegmentedAppearance
   /**
-   * Horizontal scroll when segments do not fit the viewport.
-   * With `appearance="segmented"`, wraps native UISegmentedControl in ScrollView.
+   * Horizontal navigation when segments do not fit the viewport.
+   * With `appearance="segmented"`, keeps native UISegmentedControl fixed width
+   * and slides a label window (swipe) instead of scrolling the native view.
    */
   scrollable?: boolean
   /** Min width per scrollable segment button (default 86). */
