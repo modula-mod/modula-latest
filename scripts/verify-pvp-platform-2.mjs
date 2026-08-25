@@ -9,6 +9,7 @@ const knownModes = new Set([
   'all', 'contracts', 'manifest', 'points', 'graph', 'lifecycle', 'capabilities',
   'contributions', 'isolation', 'events', 'jobs', 'service-fabric', 'provenance',
   'security', 'vault-notes', 'vault-ai', 'vault-voice', 'cross-account',
+  'runtime-grants',
 ])
 if (!knownModes.has(requestedMode)) {
   console.error(`Unknown PVP Platform 2 verifier mode: ${requestedMode}`)
@@ -94,10 +95,15 @@ function staticChecks(mode) {
     source('NO ARBITRARY EXECUTABLE UI', 'packages/greenfield-module-manifest/src/validation.ts', ['rejectUnknown', 'UNDECLARED_EXTENSION_FIELD', 'WILDCARD_CONTRACT_DENIED'])
     source('CHECKSUM TAMPER TEST', 'services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts', ['quarantines an artifact', 'denies undeclared capability escalation', 'cross-account resource access'])
   }
+  if (all || mode === 'runtime-grants' || mode === 'security') {
+    source('PHASE 2 RUNTIME ROLE GRANTS', 'services/greenfield-api/migrations/040_pvp_platform_2_runtime_grants.sql', ['greenfield_module_ratings', 'greenfield_extension_runtime_projection', 'TO modula_api, modula_worker', 'TO modula_backup'])
+    source('RUNTIME GRANTS ROLLBACK', 'services/greenfield-api/migrations/040_pvp_platform_2_runtime_grants.down.sql', ['FROM modula_api, modula_worker', 'FROM modula_backup', "VALUES ('schema_version', '039')"])
+    source('RUNTIME GRANTS DB ASSERTION', 'services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts', ['has_table_privilege', 'phase2RuntimeTables', 'modula_backup SELECT'])
+  }
 }
 
 function behaviouralChecks(mode) {
-  const databaseModes = new Set(['all', 'graph', 'lifecycle', 'capabilities', 'contributions', 'isolation', 'events', 'jobs', 'service-fabric', 'provenance', 'security', 'cross-account'])
+  const databaseModes = new Set(['all', 'graph', 'lifecycle', 'capabilities', 'contributions', 'isolation', 'events', 'jobs', 'service-fabric', 'provenance', 'security', 'cross-account', 'runtime-grants'])
   if (!databaseModes.has(mode)) return
   const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
   record('DISPOSABLE DATABASE URL PROVIDED', Boolean(databaseUrl), databaseUrl ? 'configured' : 'MODULA_TEST_DATABASE_URL is required; no silent skip')
