@@ -31,8 +31,7 @@ export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSel
       testID="product-tabs">
       <ModulaSegmentedPicker
         accessibilityLabel="Product sections"
-        appearance="track"
-        embedded
+        appearance="segmented"
         maxWidth={Math.max(280, width - 32)}
         onValueChange={value => onSelect(value as ProductTabId)}
         options={PRODUCT_TABS.map(tab => ({value: tab.id, label: tab.label}))}
