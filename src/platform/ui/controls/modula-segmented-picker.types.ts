@@ -29,8 +29,8 @@ export type ModulaSegmentedPickerProps = {
   appearance?: ModulaSegmentedAppearance
   /**
    * Horizontal scroll when segments do not fit the viewport.
-   * With `appearance="segmented"`, uses UIKit UISegmentedControl inside a
-   * clipped ScrollView (SwiftUI Host bleeds labels when scrolled).
+   * On iOS, `appearance="segmented"` + scrollable uses the shared token track
+   * because UISegmentedControl cannot be scrolled without label bleed.
    */
   scrollable?: boolean
   /** Min width per scrollable segment button (default 86). */

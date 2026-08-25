@@ -50,10 +50,10 @@ export function ModulaSegmentedPicker({
     viewportWidth,
     plain ? viewportWidth : options.length * segmentMinWidth,
   )
-  const trackWidth = nestInGlass
-    ? Math.min(viewportWidth, Math.max(options.length * 96, 280))
-    : scrollable
-      ? contentWidth
+  const trackWidth = scrollable
+    ? contentWidth
+    : nestInGlass
+      ? Math.min(viewportWidth, Math.max(options.length * 96, 280))
       : ('100%' as const)
 
   const segments = options.map(option => {
@@ -144,7 +144,7 @@ export function ModulaSegmentedPicker({
                 padding: 3,
                 gap: 2,
                 width: trackWidth,
-                maxWidth: viewportWidth,
+                maxWidth: scrollable ? contentWidth : viewportWidth,
                 minHeight: TRACK_HEIGHT,
                 alignSelf: nestInGlass ? 'center' : 'stretch',
               },
