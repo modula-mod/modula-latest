@@ -132,4 +132,58 @@ The command was exercised against another fresh restore of the exact production 
 - Final dry run: `PASS`, changes required `0`
 - Aggregate `CI=true pnpm verify:pvp-platform-2` after convergence: `PASS`
 
-This rehearsal changes only the disposable restored database. Production registry mutation remains gated on merge, exact-SHA build, and a final production dry run.
+The registry command was merged, rebuilt, and run against production only after the final dry run reported the same bounded change set:
+
+- Vault Notes `1.2.0`: `published`
+- Vault Formatting `0.1.0`: `published`
+- Vault AI `0.1.0`: `published`, provider requirement remains explicit
+- Vault Voice `0.1.0`: `published`, provider requirement remains explicit
+- Historical Vault Notes `0.1.0` and `0.2.0`: `superseded`
+- Known quarantined search fixtures removed: `3`
+- Visible Vault Notes products: `1`
+- Final production dry run: changes required `0`
+
+## Exact-SHA Phase 2 deployment
+
+The clean detached worktree `/root/modula-builds/5483321fbd1f81d96c1fab7185c25e635a743e8e` produced the API, worker, and web artifacts. The API and worker images carry the exact Git revision label; the web release was switched atomically with the previous release retained.
+
+- Product main at build: `5483321fbd1f81d96c1fab7185c25e635a743e8e`
+- Public web `/version.json`: `5483321fbd1f81d96c1fab7185c25e635a743e8e`
+- Greenfield API `/v1/version`: `5483321fbd1f81d96c1fab7185c25e635a743e8e`
+- API image revision: `5483321fbd1f81d96c1fab7185c25e635a743e8e`
+- Worker image revision: `5483321fbd1f81d96c1fab7185c25e635a743e8e`
+- API health: `PASS`
+- Worker state: `running`, restart count `0`
+- Web artifact checksum verification: `PASS`
+
+## Runtime-role defect and migration 040 rehearsal
+
+After the exact deployment, the public registry list succeeded but product-detail and relationship requests returned `500`. Direct execution under the production `modula_api` role established the exact failures:
+
+- Product detail: PostgreSQL `42501`, `permission denied for table greenfield_module_ratings`
+- Product relationships: PostgreSQL `42501`, `permission denied for table greenfield_extension_targets`
+
+Migrations 038 and 039 had created eleven tables without granting the API and worker roles access. No manual production `GRANT` was issued. The repair is the auditable migration `040_pvp_platform_2_runtime_grants`, with a down migration, a static verifier, and database assertions covering all `99` required table privileges.
+
+A second fresh pre-040 production backup was captured with ACLs included:
+
+- Backup: `/var/backups/modula/greenfield/pvp-platform-3/20260825T020515Z/greenfield-production-pre-040.dump`
+- Size: `1240213` bytes
+- Mode and owner: `0600 root:root`
+- SHA-256: `5ccf238903bf6fc5d92d531da964c24b56f66091a056fc2c6aa4b7854bfebe1e`
+- Format validation: `pg_restore -l` passed
+- ACL entries: `205`
+
+That exact archive was restored to the disposable database `modula_pvp2_pre040_exact`. Before 040 it reproduced both live `42501` failures. After 040:
+
+- Pending migrations: `0`
+- `modula_api`: `44/44` required privileges
+- `modula_worker`: `44/44` required privileges
+- `modula_backup`: `11/11` required privileges
+- Product detail under `modula_api`: `PASS`, Vault Notes `1.2.0`
+- Relationships under `modula_api`: `PASS`, three registered extensions
+- Migration 040 down: runtime grants `0/44`, schema version `039`
+- Migration 040 reapply: runtime grants `44/44`, schema version `040`
+- `CI=true pnpm verify:pvp-platform-2`: `PASS`
+
+Production migration 040 remains unapplied until this source is reviewed, merged, and rebuilt from the resulting exact main SHA.

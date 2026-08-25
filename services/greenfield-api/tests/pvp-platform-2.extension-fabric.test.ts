@@ -1,5 +1,6 @@
 import {createHash, randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
+import {sql} from 'kysely'
 import {
   GREENFIELD_MODULE_MANIFEST_STANDARD_2_VERSION,
   createDefaultModuleSectionVersions,
@@ -33,6 +34,19 @@ const editorPoint = 'fabric-notes.editor.command'
 const afterSavePoint = 'fabric-notes.note.after-save'
 const editorCapability = 'notes.editor.contribute'
 const eventsCapability = 'notes.events.subscribe'
+const phase2RuntimeTables = [
+  'greenfield_module_ratings',
+  'greenfield_extension_targets',
+  'greenfield_extension_points',
+  'greenfield_extension_installation_edges',
+  'greenfield_extension_contribution_registrations',
+  'greenfield_extension_capability_grants',
+  'greenfield_extension_service_assertions',
+  'greenfield_extension_event_subscriptions',
+  'greenfield_extension_job_executions',
+  'greenfield_extension_entity_metadata',
+  'greenfield_extension_runtime_projection',
+] as const
 
 describeIfDb('PVP Platform 2 governed extension fabric', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
@@ -70,6 +84,26 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     await app?.close()
     await workerDb?.destroy()
     await db?.destroy()
+  })
+
+  it('grants every Phase 2 table to the required runtime and backup roles', async () => {
+    for (const role of ['modula_api', 'modula_worker']) {
+      for (const table of phase2RuntimeTables) {
+        for (const privilege of ['SELECT', 'INSERT', 'UPDATE', 'DELETE']) {
+          const result = await sql<{allowed: boolean}>`
+            SELECT has_table_privilege(${role}, ${`public.${table}`}, ${privilege}) AS allowed
+          `.execute(db)
+          expect(result.rows[0]?.allowed, `${role} ${privilege} on ${table}`).toBe(true)
+        }
+      }
+    }
+
+    for (const table of phase2RuntimeTables) {
+      const result = await sql<{allowed: boolean}>`
+        SELECT has_table_privilege('modula_backup', ${`public.${table}`}, 'SELECT') AS allowed
+      `.execute(db)
+      expect(result.rows[0]?.allowed, `modula_backup SELECT on ${table}`).toBe(true)
+    }
   })
 
   it('installs a standalone module, then resolves a targeted plugin with real permission review', async () => {
