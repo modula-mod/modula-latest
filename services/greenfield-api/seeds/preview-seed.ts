@@ -163,24 +163,33 @@ export async function runSeed(connectionString: string): Promise<void> {
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
-    await client.query(
-      `INSERT INTO greenfield_accounts (account_id, primary_handle, status, created_at, updated_at)
-       VALUES ('account-phase6s-fixture','phase6s.fixture.modula','active',$1,$1)
-       ON CONFLICT (account_id) DO UPDATE SET status='active', updated_at=EXCLUDED.updated_at`,
-      [UPDATED],
-    )
-    await client.query(
-      `INSERT INTO greenfield_handles (handle, account_id, status, created_at)
-       VALUES ('phase6s.fixture.modula','account-phase6s-fixture','active',$1)
-       ON CONFLICT (handle) DO NOTHING`,
-      [UPDATED],
-    )
-    await client.query(
-      `INSERT INTO greenfield_handle_history (history_id, account_id, handle, action, created_at)
-       VALUES ('handle-history-phase6s-fixture','account-phase6s-fixture','phase6s.fixture.modula','claimed',$1)
-       ON CONFLICT (history_id) DO NOTHING`,
-      [UPDATED],
-    )
+    for (const p of profiles) {
+      const seedSlug = p.actorId.replace(/^actor-/, '')
+      const accountId = p.actorId === 'actor-phase6s-fixture'
+        ? 'account-phase6s-fixture'
+        : `account-preview-${seedSlug}`
+      const historyId = p.actorId === 'actor-phase6s-fixture'
+        ? 'handle-history-phase6s-fixture'
+        : `handle-history-preview-${seedSlug}`
+      await client.query(
+        `INSERT INTO greenfield_accounts (account_id, primary_handle, status, created_at, updated_at)
+         VALUES ($1,$2,'active',$3,$3)
+         ON CONFLICT (account_id) DO UPDATE SET status='active', updated_at=EXCLUDED.updated_at`,
+        [accountId, p.handle, UPDATED],
+      )
+      await client.query(
+        `INSERT INTO greenfield_handles (handle, account_id, status, created_at)
+         VALUES ($1,$2,'active',$3)
+         ON CONFLICT (handle) DO NOTHING`,
+        [p.handle, accountId, UPDATED],
+      )
+      await client.query(
+        `INSERT INTO greenfield_handle_history (history_id, account_id, handle, action, created_at)
+         VALUES ($1,$2,$3,'claimed',$4)
+         ON CONFLICT (history_id) DO NOTHING`,
+        [historyId, accountId, p.handle, UPDATED],
+      )
+    }
     await client.query(
       `INSERT INTO greenfield_appearance_preferences (
         account_id, mode, variant, surface, accent_id, custom_accent, text_scale,
@@ -191,7 +200,10 @@ export async function runSeed(connectionString: string): Promise<void> {
       ON CONFLICT (account_id) DO NOTHING`,
     )
     for (const p of profiles) {
-      const accountId = p.actorId === 'actor-phase6s-fixture' ? 'account-phase6s-fixture' : null
+      const seedSlug = p.actorId.replace(/^actor-/, '')
+      const accountId = p.actorId === 'actor-phase6s-fixture'
+        ? 'account-phase6s-fixture'
+        : `account-preview-${seedSlug}`
       await client.query(
         `INSERT INTO actors (id, account_id, kind, created_at, updated_at, deleted_at, version)
          VALUES ($1,$2,$3,$4,$4,NULL,1)
