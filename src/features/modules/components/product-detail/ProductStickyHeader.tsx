@@ -8,11 +8,9 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /** Space reserved for the fixed back control (44pt hit + edge inset). */
 const FIXED_BACK_GUTTER = 12 + TOOLBAR_HIT
-const IDENTITY_ICON = 28
 
 /**
- * Morphing liquid-glass backdrop + identity capsule (icon + title in-line).
- * Primary CTA morphs into the fixed trailing control group.
+ * Morphing liquid-glass backdrop + visible identity capsule (icon + title).
  */
 export function ProductStickyHeader({
   progress,
@@ -26,7 +24,7 @@ export function ProductStickyHeader({
   top: number
   moduleId: string
   name: string
-  /** Width of the fixed trailing capsule so title doesn’t collide. */
+  /** Width of the fixed trailing chrome so title doesn’t collide. */
   trailingReservedWidth: number
 }) {
   const {colours, spacing} = useThemeTokens()
@@ -54,32 +52,21 @@ export function ProductStickyHeader({
             paddingTop: top + spacing[1],
           },
         ]}>
-        <LiquidGlassChrome
-          contentLayout="flow"
-          fallback="clear"
-          interactive={false}
+        <View
           style={[
             styles.identityCapsule,
             {
+              backgroundColor: colours.surfaceRaised,
               borderColor: colours.border,
               gap: spacing[2],
-              maxWidth: '100%',
               paddingHorizontal: spacing[2],
             },
           ]}>
-          <ModuleArtwork
-            moduleId={moduleId}
-            name={name}
-            size={IDENTITY_ICON}
-            variant="compact"
-          />
-          <AppText
-            variant="label"
-            numberOfLines={1}
-            style={styles.title}>
+          <ModuleArtwork moduleId={moduleId} name={name} variant="compact" />
+          <AppText variant="label" numberOfLines={1} style={styles.title}>
             {name}
           </AppText>
-        </LiquidGlassChrome>
+        </View>
       </View>
     </View>
   )
@@ -98,6 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexShrink: 1,
     height: OVERLAY_GROUP_HIT,
+    maxWidth: '100%',
     minHeight: OVERLAY_GROUP_HIT,
     overflow: 'hidden',
   },

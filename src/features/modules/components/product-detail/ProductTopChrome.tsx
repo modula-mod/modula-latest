@@ -4,27 +4,28 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
+  OVERLAY_GROUP_MIN_WIDTH,
 } from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Filled primary button slot inside the trailing glass capsule. */
-export const PRODUCT_PRIMARY_SLOT_WIDTH = 72
+/** Compact filled primary chip next to the Product Hub–sized control group. */
+const PRIMARY_CHIP_WIDTH = 58
 
 export function productTrailingCapsuleWidth(includePrimary: boolean): number {
-  const icons = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP
-  return includePrimary ? icons + PRODUCT_PRIMARY_SLOT_WIDTH + OVERLAY_GROUP_GAP : icons
+  return includePrimary
+    ? OVERLAY_GROUP_MIN_WIDTH + OVERLAY_GROUP_GAP + PRIMARY_CHIP_WIDTH
+    : OVERLAY_GROUP_MIN_WIDTH
 }
 
 /**
- * Fixed overlay chrome — back never moves. Trailing share/more live in one
- * liquid-glass capsule; the primary action morphs in as a filled button chip.
+ * Fixed overlay chrome — back never moves.
+ * Trailing share/more uses the same {@link ChromeGlassControlGroup} as Product Hub.
+ * Primary (Open) morphs in as a compact chip beside that group — no stretched capsule.
  */
 export function ProductFixedChrome({
   productName,
@@ -39,7 +40,7 @@ export function ProductFixedChrome({
 }: {
   productName: string
   top: number
-  /** Sticky morph progress (0–1). Primary joins the trailing capsule when > 0. */
+  /** Sticky morph progress (0–1). Primary chip appears beside the control group. */
   progress?: number
   presentation: ModuleInstallPresentation
   onBack: () => void
@@ -50,98 +51,79 @@ export function ProductFixedChrome({
 }) {
   const {colours, radius} = useThemeTokens()
   const primaryProgress = Math.min(1, Math.max(0, (progress - 0.12) / 0.4))
-  const showPrimary = primaryProgress > 0.02
+  const showPrimary = primaryProgress > 0.15
   const label = primaryLabel(presentation)
   const soon = presentation.primaryAction === 'Soon'
   const blocked = presentation.primaryAction === 'Can’t install on this device'
   const disabled =
     soon || blocked || (!presentation.installable && presentation.primaryAction === 'Install')
-  const primary = label === 'Install' || label === 'Update'
+  const accentPrimary = label === 'Install' || label === 'Update'
   const buttonFill = soon
     ? colours.surfaceMuted
-    : primary
+    : accentPrimary
       ? colours.accent
       : colours.text
   const buttonLabel = soon
     ? colours.textTertiary
-    : primary
+    : accentPrimary
       ? colours.accentForeground
       : colours.canvas
-
-  const iconsWidth = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP
-  const primaryWidth = (PRODUCT_PRIMARY_SLOT_WIDTH + OVERLAY_GROUP_GAP) * primaryProgress
-  const capsuleWidth = iconsWidth + primaryWidth
 
   return (
     <View pointerEvents="box-none" style={[styles.chrome, {top}]} testID="product-fixed-chrome">
       <ModulaBackButton accessibilityLabel="Back" chrome="glass" onPress={onBack} />
-      <LiquidGlassChrome
-        contentLayout="flow"
-        fallback="regular"
-        interactive
-        style={[styles.capsule, {minWidth: capsuleWidth, width: capsuleWidth}]}>
-        <View style={[styles.row, {minWidth: capsuleWidth, width: capsuleWidth}]}>
-          {showPrimary ? (
-            <View
-              style={[
-                styles.primarySlot,
-                {
-                  opacity: primaryProgress,
-                  width: PRODUCT_PRIMARY_SLOT_WIDTH * primaryProgress,
-                },
-              ]}>
-              <AppPressable
-                accessibilityLabel={
-                  soon ? `${productName} coming soon` : `${label} ${productName}`
-                }
-                accessibilityState={{disabled}}
-                disabled={disabled || primaryProgress < 0.55}
-                hitSlop={4}
-                onPress={disabled ? undefined : onPrimary}
-                style={[
-                  styles.primaryButton,
-                  {
-                    backgroundColor: buttonFill,
-                    borderRadius: radius.round,
-                    opacity: disabled ? 0.55 : 1,
-                  },
-                ]}
-                testID="product-sticky-primary">
-                <AppText
-                  variant="buttonLabel"
-                  numberOfLines={1}
-                  style={{
-                    color: buttonLabel,
-                    fontSize: 14,
-                    fontWeight: '700',
-                    includeFontPadding: false,
-                    lineHeight: 16,
-                  }}>
-                  {label}
-                </AppText>
-              </AppPressable>
-            </View>
-          ) : null}
-          <View style={styles.hit}>
-            <ModulaIconButton
-              icon="share"
-              chrome="plain"
-              accessibilityLabel={`Share ${productName}`}
-              onPress={onShare}
-            />
-          </View>
-          <View style={styles.hit}>
-            <ChromeIconMenu
-              icon="more"
-              chrome="plain"
-              accessibilityLabel="More actions"
-              title={productName}
-              actions={actions}
-              onAction={onAction}
-            />
-          </View>
-        </View>
-      </LiquidGlassChrome>
+      <View style={styles.trailing}>
+        {showPrimary ? (
+          <AppPressable
+            accessibilityLabel={
+              soon ? `${productName} coming soon` : `${label} ${productName}`
+            }
+            accessibilityState={{disabled}}
+            disabled={disabled || primaryProgress < 0.55}
+            hitSlop={4}
+            onPress={disabled ? undefined : onPrimary}
+            style={[
+              styles.primaryChip,
+              {
+                backgroundColor: buttonFill,
+                borderRadius: radius.round,
+                opacity: primaryProgress,
+                transform: [{scale: 0.92 + 0.08 * primaryProgress}],
+              },
+            ]}
+            testID="product-sticky-primary">
+            <AppText
+              variant="buttonLabel"
+              numberOfLines={1}
+              style={{
+                color: buttonLabel,
+                fontSize: 13,
+                fontWeight: '700',
+                includeFontPadding: false,
+                lineHeight: 15,
+              }}>
+              {label}
+            </AppText>
+          </AppPressable>
+        ) : null}
+        <ChromeGlassControlGroup
+          items={[
+            {
+              kind: 'button',
+              icon: 'share',
+              accessibilityLabel: `Share ${productName}`,
+              onPress: onShare,
+            },
+            {
+              kind: 'menu',
+              accessibilityLabel: 'More actions',
+              title: productName,
+              actions,
+              onAction,
+            },
+          ]}
+        />
+      </View>
     </View>
   )
 }
@@ -157,14 +139,6 @@ function primaryLabel(presentation: ModuleInstallPresentation): string {
 export const ProductTopChrome = ProductFixedChrome
 
 const styles = StyleSheet.create({
-  capsule: {
-    borderRadius: OVERLAY_GROUP_HIT / 2,
-    flexGrow: 0,
-    flexShrink: 0,
-    height: OVERLAY_GROUP_HIT,
-    minHeight: OVERLAY_GROUP_HIT,
-    overflow: 'hidden',
-  },
   chrome: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -175,35 +149,21 @@ const styles = StyleSheet.create({
     right: 12,
     zIndex: 6,
   },
-  hit: {
+  primaryChip: {
     alignItems: 'center',
     flexGrow: 0,
     flexShrink: 0,
-    height: OVERLAY_GROUP_HIT,
+    height: 28,
     justifyContent: 'center',
-    width: OVERLAY_GROUP_HIT,
-  },
-  primaryButton: {
-    alignItems: 'center',
-    height: 32,
-    justifyContent: 'center',
-    minWidth: 56,
+    minWidth: PRIMARY_CHIP_WIDTH,
     paddingHorizontal: 12,
   },
-  primarySlot: {
-    alignItems: 'center',
-    height: OVERLAY_GROUP_HIT,
-    justifyContent: 'center',
-    overflow: 'hidden',
-    paddingLeft: 6,
-  },
-  row: {
+  trailing: {
     alignItems: 'center',
     flexDirection: 'row',
     flexGrow: 0,
     flexShrink: 0,
     gap: OVERLAY_GROUP_GAP,
     height: OVERLAY_GROUP_HIT,
-    justifyContent: 'flex-end',
   },
 })
