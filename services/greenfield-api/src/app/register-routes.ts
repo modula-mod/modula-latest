@@ -63,6 +63,7 @@ import {registerAiRoutes} from '../ai/index.js'
 import {registerPhase6sRoutes} from './register-phase6s-routes.js'
 import {registerPhase7fStoriesRoutes} from './register-phase7f-stories-routes.js'
 import {sendBrowserVisibleMedia} from './media-response.js'
+import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -546,6 +547,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerBackendFabricRoutes(app, db, config)
   await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)

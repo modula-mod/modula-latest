@@ -239,11 +239,36 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
         scope: {type: 'action', ref: 'vault.format.heading'},
       },
     })
-    expect(issued.claims).toMatchObject({consumer: formattingId, target: coreId, actionId: 'vault.format.heading'})
+    expect(issued.claims).toMatchObject({
+      subject: 'service.greenfield.gateway',
+      consumer: formattingId,
+      target: 'formatting-service',
+      targetProductId: coreId,
+      targetInstallationId: coreInstallationId,
+      actionId: 'vault.format.heading',
+      traceId: `service-request-${suffix}`,
+      scope: {
+        accountId: accountA,
+        productId: coreId,
+        installationId: coreInstallationId,
+        operations: [editorCapability, 'vault.format.heading'],
+      },
+    })
     expect(issued.claims.expiresAt - issued.claims.issuedAt).toBeLessThanOrEqual(900)
+    const resolved = await new ModuleBackendTokenService(db, loadConfig()).resolveServiceAssertion(issued.token, coreId)
+    expect(resolved).toMatchObject({
+      consumerProductId: formattingId,
+      targetServiceId: 'formatting-service',
+      targetProductId: coreId,
+      targetInstallationId: coreInstallationId,
+      accountId: accountA,
+      requestId: `service-request-${suffix}`,
+      traceId: `service-request-${suffix}`,
+    })
     const assertion = await db.selectFrom('greenfield_extension_service_assertions').selectAll().where('jti', '=', issued.claims.jti!).executeTakeFirstOrThrow()
     expect(assertion.raw_user_bearer_forwarded).toBe(false)
     expect(assertion.capabilities).toEqual([editorCapability])
+    expect(assertion.consumed_at).not.toBeNull()
     expect(assertion.expires_at.getTime() - assertion.issued_at.getTime()).toBeLessThanOrEqual(15 * 60_000)
   })
 

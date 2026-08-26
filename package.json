@@ -278,7 +278,8 @@
     "verify:vault-voice-reference": "node scripts/verify-pvp-platform-2.mjs vault-voice",
     "verify:extension-cross-account-isolation": "node scripts/verify-pvp-platform-2.mjs cross-account",
     "verify:pvp-platform-2": "node scripts/verify-pvp-platform-2.mjs all",
-    "verify:greenfield-backend-v1:data-ledger": "node scripts/verify-greenfield-backend-v1-data-ledger.mjs"
+    "verify:greenfield-backend-v1:data-ledger": "node scripts/verify-greenfield-backend-v1-data-ledger.mjs",
+    "verify:greenfield-backend-v1:service-fabric": "node scripts/verify-greenfield-backend-v1-service-fabric.mjs"
   },
   "private": true
 }
