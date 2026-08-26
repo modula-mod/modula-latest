@@ -86,6 +86,7 @@
     "build:web-contracts": "pnpm --filter @modula/api-contracts build && pnpm --filter @modula/greenfield-contracts build && pnpm --filter @modula/greenfield-module-manifest build && pnpm --filter @modula/greenfield-module-ui-contracts build && pnpm --filter @modula/greenfield-module-registry-contracts build",
     "prebuild:web": "pnpm build:web-contracts",
     "build:web": "EXPO_PUBLIC_APP_ENV=production EXPO_PUBLIC_DATA_SOURCE=remote EXPO_PUBLIC_API_URL=https://api.modula.digital sh -c 'expo export --platform web && node scripts/write-web-version.mjs'",
+    "verify:greenfield-images": "node scripts/verify-greenfield-image-build-graph.mjs",
     "verify:web-build": "node scripts/verify-web-build.mjs",
     "verify:web-dist-routes": "node scripts/resolve-web-dist-file.mjs",
     "verify:mdhs-0.1": "node scripts/verify-mdhs-0.1.mjs",
