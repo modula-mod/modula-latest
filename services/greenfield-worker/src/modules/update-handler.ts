@@ -15,6 +15,15 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
       const oldRelease = await trx.selectFrom('greenfield_module_releases').select('release_id').where('extension_version_id', '=', old.extension_version_id).executeTakeFirst()
       if (oldRelease) await unregisterModuleContributions(trx as any, oldRelease.release_id)
     }
+    // The data-ledger scope guard resolves the installation's authoritative
+    // release through extension_version_id. Reconcile that control-plane link
+    // before projecting release-scoped runtime resources so an upgrade cannot
+    // momentarily bind an installation to two different releases.
+    await trx
+      .updateTable('greenfield_extension_installations')
+      .set({extension_version_id: release.extension_version_id, status: p.previousStatus === 'enabled' ? 'enabled' : 'disabled', updated_at: new Date()})
+      .where('installation_id', '=', p.installationId)
+      .execute()
     await registerModuleContributions(trx as any, release.release_id, release.extension_version_id, {enableExecutable: p.previousStatus === 'enabled'})
     await projectStandard2Runtime(trx as any, {
       installationId: p.installationId,
@@ -45,10 +54,5 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
         .where('account_id', '=', p.accountId)
         .execute()
     }
-    await trx
-      .updateTable('greenfield_extension_installations')
-      .set({extension_version_id: release.extension_version_id, status: p.previousStatus === 'enabled' ? 'enabled' : 'disabled', updated_at: new Date()})
-      .where('installation_id', '=', p.installationId)
-      .execute()
   })
 }
