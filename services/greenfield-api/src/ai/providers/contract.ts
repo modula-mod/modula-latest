@@ -94,6 +94,7 @@ export type ProviderHealthResult = {
 
 export interface GreenfieldAIProviderAdapter {
   readonly providerId: string
+  readonly credentialMode?: 'greenfield-encrypted' | 'credential-broker'
   discoverModels(
     context: ProviderExecutionContext
   ): Promise<DiscoveredAIModel[]>

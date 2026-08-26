@@ -280,7 +280,8 @@
     "verify:pvp-platform-2": "node scripts/verify-pvp-platform-2.mjs all",
     "verify:greenfield-backend-v1:data-ledger": "node scripts/verify-greenfield-backend-v1-data-ledger.mjs",
     "verify:greenfield-backend-v1:service-fabric": "node scripts/verify-greenfield-backend-v1-service-fabric.mjs",
-    "verify:greenfield-backend-v1:secret-fabric": "node scripts/verify-greenfield-backend-v1-secret-fabric.mjs"
+    "verify:greenfield-backend-v1:secret-fabric": "node scripts/verify-greenfield-backend-v1-secret-fabric.mjs",
+    "verify:greenfield-backend-v1:ai-engine": "node scripts/verify-greenfield-backend-v1-ai-engine.mjs"
   },
   "private": true
 }
