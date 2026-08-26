@@ -1,23 +1,25 @@
-import {StyleSheet, View} from 'react-native'
+import {Platform, StyleSheet, View} from 'react-native'
+import {BlurView} from 'expo-blur'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {AppText} from '@/components/primitives/AppText'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {OVERLAY_GROUP_HIT, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {
   CHROME_BLUR_INTENSITY,
   CHROME_FADE_EXTENSION,
 } from '@/platform/ui/navigation/chrome-insets'
+import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /** Space reserved for the fixed back control (44pt hit + edge inset). */
 const FIXED_BACK_GUTTER = 12 + TOOLBAR_HIT
+/** Matches control-group icon optical size; forces inline with title. */
 const IDENTITY_ICON = 28
 
 /**
- * Sticky product chrome: Expo progressive blur band + liquid-glass identity capsule.
- * Primary CTA morphs into the fixed trailing {@link ChromeGlassControlGroup}.
+ * Sticky product chrome: progressive blur + visible glass identity capsule.
+ * Icon and title share one centered row inside the capsule.
  */
 export function ProductStickyHeader({
   progress,
@@ -26,19 +28,20 @@ export function ProductStickyHeader({
   name,
   trailingReservedWidth,
 }: {
-  /** 0 = hidden, 1 = fully visible — driven by scroll offset. */
   progress: number
   top: number
   moduleId: string
   name: string
-  /** Width of the fixed trailing chrome so title doesn’t collide. */
   trailingReservedWidth: number
 }) {
-  const {spacing} = useThemeTokens()
+  const {colours, scheme, spacing} = useThemeTokens()
+  const {reduceTransparency} = useSystemAccessibility()
   const visible = progress > 0.02
   const slideY = (1 - progress) * -8
   const rowHeight = top + OVERLAY_GROUP_HIT + spacing[2]
   const blurHeight = rowHeight + CHROME_FADE_EXTENSION
+  const isDark = scheme === 'dark'
+  const useBlur = !reduceTransparency && Platform.OS !== 'web'
 
   return (
     <View
@@ -70,32 +73,52 @@ export function ProductStickyHeader({
             paddingTop: top,
           },
         ]}>
-        <LiquidGlassChrome
-          contentLayout="flow"
-          fallback="regular"
-          interactive={false}
+        <View
           style={[
             styles.identityCapsule,
             {
-              gap: spacing[2],
+              borderColor: isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.1)',
               maxWidth: '100%',
               paddingHorizontal: spacing[2],
             },
           ]}>
-          <View style={styles.identityInner}>
-            <ModuleArtwork
-              moduleId={moduleId}
-              name={name}
-              size={IDENTITY_ICON}
-              variant="compact"
+          {useBlur ? (
+            <BlurView
+              intensity={72}
+              pointerEvents="none"
+              style={StyleSheet.absoluteFill}
+              tint={isDark ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
             />
-            <View style={styles.titleWrap}>
-              <AppText variant="label" numberOfLines={1} style={styles.title}>
-                {name}
-              </AppText>
-            </View>
+          ) : (
+            <View
+              pointerEvents="none"
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: isDark ? 'rgba(40,48,52,0.88)' : 'rgba(245,247,248,0.92)',
+                },
+              ]}
+            />
+          )}
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.35)',
+              },
+            ]}
+          />
+          <View style={styles.identityInner}>
+            <ModuleArtwork moduleId={moduleId} name={name} size={IDENTITY_ICON} variant="icon" />
+            <AppText
+              numberOfLines={1}
+              style={[styles.title, {color: colours.text}]}
+              variant="label">
+              {name}
+            </AppText>
           </View>
-        </LiquidGlassChrome>
+        </View>
       </View>
     </View>
   )
@@ -105,6 +128,7 @@ const styles = StyleSheet.create({
   identityCapsule: {
     alignSelf: 'flex-start',
     borderRadius: OVERLAY_GROUP_HIT / 2,
+    borderWidth: StyleSheet.hairlineWidth,
     flexShrink: 1,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
@@ -115,7 +139,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     flexShrink: 1,
-    height: OVERLAY_GROUP_HIT,
+    gap: 8,
+    height: IDENTITY_ICON,
     minWidth: 0,
   },
   row: {
@@ -132,14 +157,12 @@ const styles = StyleSheet.create({
     zIndex: 4,
   },
   title: {
-    includeFontPadding: false,
-    lineHeight: 17,
-    textAlignVertical: 'center',
-  },
-  titleWrap: {
     flexShrink: 1,
-    height: OVERLAY_GROUP_HIT,
-    justifyContent: 'center',
+    fontSize: 15,
+    fontWeight: '600',
+    includeFontPadding: false,
+    lineHeight: IDENTITY_ICON,
     minWidth: 0,
+    textAlignVertical: 'center',
   },
 })

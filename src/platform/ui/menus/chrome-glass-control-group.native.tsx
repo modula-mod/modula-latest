@@ -113,29 +113,47 @@ function loadExpoGlass(): ExpoGlassModule | null {
   return cachedExpoGlass
 }
 
-function groupWidth(items: ChromeGlassGroupItem[]): number {
-  return overlayGroupWidthForKinds(
-    items.map(item => (item.kind === 'action' ? 'action' : 'icon')),
-  )
+function resolvedWidth(items: ChromeGlassGroupItem[], actionReveal: number): number {
+  const reveal = Math.min(1, Math.max(0, actionReveal))
+  const leadingAction = items[0]?.kind === 'action'
+  if (!leadingAction) {
+    return overlayGroupWidthForKinds(items.map(item => (item.kind === 'action' ? 'action' : 'icon')))
+  }
+  const rest = items.slice(1).map(item => (item.kind === 'action' ? 'action' : 'icon') as 'action' | 'icon')
+  const base = overlayGroupWidthForKinds(rest.length ? rest : ['icon'])
+  return base + (OVERLAY_GROUP_ACTION_WIDTH + OVERLAY_GROUP_GAP) * reveal
 }
 
 /**
  * THE shared Home-style control group.
  *
  * One liquid-glass capsule. Plain 44pt glyphs inside with 22pt gap.
- * Optional `action` chips (Open) sit in the same capsule — never a second glass.
+ * Leading `action` chips morph in via `actionReveal` (0–1) — no snap.
  */
-export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
+export function ChromeGlassControlGroup({
+  items,
+  actionReveal = 1,
+}: {
+  items: ChromeGlassGroupItem[]
+  /** Continuous 0–1 reveal for a leading `action` slot (smooth morph). */
+  actionReveal?: number
+}) {
   const {reduceTransparency} = useSystemAccessibility()
-  const width = groupWidth(items)
+  const reveal = Math.min(1, Math.max(0, actionReveal))
+  const width = resolvedWidth(items, reveal)
   const capsuleStyle: StyleProp<ViewStyle> = [
     styles.capsule,
     {minWidth: width, width},
   ]
   const content = (
     <View style={[styles.row, {minWidth: width, width}]}>
-      {items.map(item => (
-        <GroupSlot key={item.accessibilityLabel} item={item} />
+      {items.map((item, index) => (
+        <GroupSlot
+          key={item.accessibilityLabel}
+          item={item}
+          reveal={item.kind === 'action' && index === 0 ? reveal : 1}
+          trailingGap={index < items.length - 1}
+        />
       ))}
     </View>
   )
@@ -174,7 +192,15 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
   )
 }
 
-function GroupSlot({item}: {item: ChromeGlassGroupItem}) {
+function GroupSlot({
+  item,
+  reveal,
+  trailingGap,
+}: {
+  item: ChromeGlassGroupItem
+  reveal: number
+  trailingGap: boolean
+}) {
   const {colours, radius} = useThemeTokens()
 
   if (item.kind === 'action') {
@@ -191,38 +217,49 @@ function GroupSlot({item}: {item: ChromeGlassGroupItem}) {
         : tone === 'accent'
           ? colours.accentForeground
           : colours.canvas
+    const enabled = reveal > 0.55 && !item.disabled
 
     return (
-      <View style={styles.actionHit}>
-        <AppPressable
-          accessibilityLabel={item.accessibilityLabel}
-          accessibilityState={{disabled: !!item.disabled}}
-          disabled={item.disabled}
-          hitSlop={4}
-          onPress={item.disabled ? undefined : item.onPress}
-          style={[
-            styles.actionChip,
-            {backgroundColor: fill, borderRadius: radius.round, opacity: item.disabled ? 0.55 : 1},
-          ]}>
-          <AppText
-            variant="buttonLabel"
-            numberOfLines={1}
-            style={{
-              color: labelColour,
-              fontSize: 13,
-              fontWeight: '700',
-              includeFontPadding: false,
-              lineHeight: 15,
-            }}>
-            {item.label}
-          </AppText>
-        </AppPressable>
+      <View
+        style={[
+          styles.actionSlot,
+          {
+            marginRight: trailingGap ? OVERLAY_GROUP_GAP * reveal : 0,
+            opacity: reveal,
+            width: OVERLAY_GROUP_ACTION_WIDTH * reveal,
+          },
+        ]}>
+        <View style={styles.actionHit}>
+          <AppPressable
+            accessibilityLabel={item.accessibilityLabel}
+            accessibilityState={{disabled: !enabled}}
+            disabled={!enabled}
+            hitSlop={4}
+            onPress={enabled ? item.onPress : undefined}
+            style={[
+              styles.actionChip,
+              {backgroundColor: fill, borderRadius: radius.round, opacity: item.disabled ? 0.55 : 1},
+            ]}>
+            <AppText
+              variant="buttonLabel"
+              numberOfLines={1}
+              style={{
+                color: labelColour,
+                fontSize: 13,
+                fontWeight: '700',
+                includeFontPadding: false,
+                lineHeight: 15,
+              }}>
+              {item.label}
+            </AppText>
+          </AppPressable>
+        </View>
       </View>
     )
   }
 
   return (
-    <View style={styles.hit}>
+    <View style={[styles.hit, trailingGap ? styles.hitGap : null]}>
       {item.kind === 'button' ? (
         <ModulaIconButton
           icon={item.icon}
@@ -254,11 +291,15 @@ const styles = StyleSheet.create({
   },
   actionHit: {
     alignItems: 'center',
-    flexGrow: 0,
-    flexShrink: 0,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
     width: OVERLAY_GROUP_ACTION_WIDTH,
+  },
+  actionSlot: {
+    flexGrow: 0,
+    flexShrink: 0,
+    height: OVERLAY_GROUP_HIT,
+    overflow: 'hidden',
   },
   capsule: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
@@ -275,12 +316,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: OVERLAY_GROUP_HIT,
   },
+  hitGap: {
+    marginRight: OVERLAY_GROUP_GAP,
+  },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
     flexGrow: 0,
     flexShrink: 0,
-    gap: HEADER_ICON_PAIR_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
   },

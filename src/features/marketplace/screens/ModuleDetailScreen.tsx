@@ -29,6 +29,7 @@ import {
   ProductTabs,
   ProductWhatsNew,
   productTrailingCapsuleWidth,
+  productActionReveal,
   type ProductCapabilityItem,
   type ProductInformationItem,
   type ProductMetadataItem,
@@ -374,7 +375,7 @@ export function ModuleDetailScreen() {
         name={copy.name}
         progress={stickyProgress}
         top={insets.top}
-        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.45)}
+        trailingReservedWidth={productTrailingCapsuleWidth(productActionReveal(stickyProgress))}
       />
 
       <ProductFixedChrome

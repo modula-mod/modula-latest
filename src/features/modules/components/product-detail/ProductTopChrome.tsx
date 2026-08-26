@@ -7,22 +7,26 @@ import {
   type ChromeGlassGroupItem,
 } from '@/platform/ui/menus/chrome-glass-control-group'
 import {
+  OVERLAY_GROUP_ACTION_WIDTH,
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_MIN_WIDTH,
-  overlayGroupWidthForKinds,
 } from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
-export function productTrailingCapsuleWidth(includePrimary: boolean): number {
-  return includePrimary
-    ? overlayGroupWidthForKinds(['action', 'icon', 'icon'])
-    : OVERLAY_GROUP_MIN_WIDTH
+/** Continuous trailing width while Open morphs into the control group. */
+export function productTrailingCapsuleWidth(actionReveal: number): number {
+  const reveal = Math.min(1, Math.max(0, actionReveal))
+  return OVERLAY_GROUP_MIN_WIDTH + (OVERLAY_GROUP_ACTION_WIDTH + OVERLAY_GROUP_GAP) * reveal
+}
+
+export function productActionReveal(progress: number): number {
+  return Math.min(1, Math.max(0, (progress - 0.08) / 0.55))
 }
 
 /**
  * Fixed overlay chrome — back never moves.
- * Share/more always use {@link ChromeGlassControlGroup} (Product Hub capsule).
- * As sticky progress rises, Open morphs into that same glass group as an action chip.
+ * Share/more + Open live in one {@link ChromeGlassControlGroup}; Open morphs
+ * in smoothly via `actionReveal` (no snap).
  */
 export function ProductFixedChrome({
   productName,
@@ -37,7 +41,6 @@ export function ProductFixedChrome({
 }: {
   productName: string
   top: number
-  /** Sticky morph progress (0–1). Primary joins the control group when high. */
   progress?: number
   presentation: ModuleInstallPresentation
   onBack: () => void
@@ -46,7 +49,7 @@ export function ProductFixedChrome({
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
-  const includePrimary = progress > 0.45
+  const reveal = productActionReveal(progress)
   const label = primaryLabel(presentation)
   const soon = presentation.primaryAction === 'Soon'
   const blocked = presentation.primaryAction === 'Can’t install on this device'
@@ -60,20 +63,14 @@ export function ProductFixedChrome({
         : ('product' as const)
 
   const trailItems: ChromeGlassGroupItem[] = [
-    ...(includePrimary
-      ? [
-          {
-            kind: 'action' as const,
-            label,
-            accessibilityLabel: soon
-              ? `${productName} coming soon`
-              : `${label} ${productName}`,
-            onPress: onPrimary,
-            disabled,
-            tone,
-          },
-        ]
-      : []),
+    {
+      kind: 'action',
+      label,
+      accessibilityLabel: soon ? `${productName} coming soon` : `${label} ${productName}`,
+      onPress: onPrimary,
+      disabled,
+      tone,
+    },
     {
       kind: 'button',
       icon: 'share',
@@ -92,7 +89,7 @@ export function ProductFixedChrome({
   return (
     <View pointerEvents="box-none" style={[styles.chrome, {top}]} testID="product-fixed-chrome">
       <ModulaBackButton accessibilityLabel="Back" chrome="glass" onPress={onBack} />
-      <ChromeGlassControlGroup items={trailItems} />
+      <ChromeGlassControlGroup actionReveal={reveal} items={trailItems} />
     </View>
   )
 }
