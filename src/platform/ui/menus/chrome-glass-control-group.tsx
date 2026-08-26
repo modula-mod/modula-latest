@@ -1,18 +1,23 @@
 import {StyleSheet, View} from 'react-native'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 import {
+  OVERLAY_GROUP_ACTION_WIDTH,
   OVERLAY_GROUP_GAP,
   OVERLAY_GROUP_HIT,
   OVERLAY_GROUP_MIN_WIDTH,
   overlayGroupWidth,
+  overlayGroupWidthForKinds,
   TOOLBAR_HIT,
 } from '@/platform/ui/menus/toolbar-chrome'
 import {HEADER_ICON_PAIR_GAP} from '@/platform/ui/navigation/plain-header-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ChromeGlassGroupButton = {
   kind: 'button'
@@ -30,7 +35,19 @@ export type ChromeGlassGroupMenu = {
   onAction: (id: string) => void
 }
 
-export type ChromeGlassGroupItem = ChromeGlassGroupButton | ChromeGlassGroupMenu
+export type ChromeGlassGroupAction = {
+  kind: 'action'
+  label: string
+  accessibilityLabel: string
+  onPress: () => void
+  disabled?: boolean
+  tone?: 'product' | 'accent' | 'muted'
+}
+
+export type ChromeGlassGroupItem =
+  | ChromeGlassGroupButton
+  | ChromeGlassGroupMenu
+  | ChromeGlassGroupAction
 
 if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_GAP) {
   throw new Error('Overlay group must match Home header sizes (44pt hit, 22pt gap)')
@@ -39,14 +56,19 @@ if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
   throw new Error('overlayGroupWidth(2) must equal OVERLAY_GROUP_MIN_WIDTH')
 }
 
+function groupWidth(items: ChromeGlassGroupItem[]): number {
+  return overlayGroupWidthForKinds(
+    items.map(item => (item.kind === 'action' ? 'action' : 'icon')),
+  )
+}
+
 /**
  * THE shared Home-style control group (web / Android).
  *
- * One liquid-glass capsule. Plain 44pt glyphs, 22pt gap. Same API as the
- * native file — never separate glass discs.
+ * One liquid-glass capsule. Plain 44pt glyphs, 22pt gap. Optional action chips.
  */
 export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}) {
-  const width = overlayGroupWidth(items.length)
+  const width = groupWidth(items)
   return (
     <LiquidGlassChrome
       interactive
@@ -55,32 +77,99 @@ export function ChromeGlassControlGroup({items}: {items: ChromeGlassGroupItem[]}
       style={[styles.capsule, {minWidth: width, width}]}>
       <View style={[styles.row, {minWidth: width, width}]}>
         {items.map(item => (
-          <View key={item.accessibilityLabel} style={styles.hit}>
-            {item.kind === 'button' ? (
-              <ModulaIconButton
-                icon={item.icon}
-                chrome="plain"
-                accessibilityLabel={item.accessibilityLabel}
-                onPress={item.onPress}
-              />
-            ) : (
-              <ChromeIconMenu
-                icon={item.icon ?? 'more'}
-                chrome="plain"
-                accessibilityLabel={item.accessibilityLabel}
-                title={item.title}
-                actions={item.actions}
-                onAction={item.onAction}
-              />
-            )}
-          </View>
+          <GroupSlot key={item.accessibilityLabel} item={item} />
         ))}
       </View>
     </LiquidGlassChrome>
   )
 }
 
+function GroupSlot({item}: {item: ChromeGlassGroupItem}) {
+  const {colours, radius} = useThemeTokens()
+
+  if (item.kind === 'action') {
+    const tone = item.tone ?? 'product'
+    const fill =
+      tone === 'muted'
+        ? colours.surfaceMuted
+        : tone === 'accent'
+          ? colours.accent
+          : colours.text
+    const labelColour =
+      tone === 'muted'
+        ? colours.textTertiary
+        : tone === 'accent'
+          ? colours.accentForeground
+          : colours.canvas
+
+    return (
+      <View style={styles.actionHit}>
+        <AppPressable
+          accessibilityLabel={item.accessibilityLabel}
+          accessibilityState={{disabled: !!item.disabled}}
+          disabled={item.disabled}
+          hitSlop={4}
+          onPress={item.disabled ? undefined : item.onPress}
+          style={[
+            styles.actionChip,
+            {backgroundColor: fill, borderRadius: radius.round, opacity: item.disabled ? 0.55 : 1},
+          ]}>
+          <AppText
+            variant="buttonLabel"
+            numberOfLines={1}
+            style={{
+              color: labelColour,
+              fontSize: 13,
+              fontWeight: '700',
+              includeFontPadding: false,
+              lineHeight: 15,
+            }}>
+            {item.label}
+          </AppText>
+        </AppPressable>
+      </View>
+    )
+  }
+
+  return (
+    <View style={styles.hit}>
+      {item.kind === 'button' ? (
+        <ModulaIconButton
+          icon={item.icon}
+          chrome="plain"
+          accessibilityLabel={item.accessibilityLabel}
+          onPress={item.onPress}
+        />
+      ) : (
+        <ChromeIconMenu
+          icon={item.icon ?? 'more'}
+          chrome="plain"
+          accessibilityLabel={item.accessibilityLabel}
+          title={item.title}
+          actions={item.actions}
+          onAction={item.onAction}
+        />
+      )}
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
+  actionChip: {
+    alignItems: 'center',
+    height: 26,
+    justifyContent: 'center',
+    minWidth: 48,
+    paddingHorizontal: 10,
+  },
+  actionHit: {
+    alignItems: 'center',
+    flexGrow: 0,
+    flexShrink: 0,
+    height: OVERLAY_GROUP_HIT,
+    justifyContent: 'center',
+    width: OVERLAY_GROUP_ACTION_WIDTH,
+  },
   capsule: {
     borderRadius: OVERLAY_GROUP_HIT / 2,
     flexGrow: 0,

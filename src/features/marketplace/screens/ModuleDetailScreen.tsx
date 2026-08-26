@@ -374,7 +374,7 @@ export function ModuleDetailScreen() {
         name={copy.name}
         progress={stickyProgress}
         top={insets.top}
-        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.2)}
+        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.45)}
       />
 
       <ProductFixedChrome
