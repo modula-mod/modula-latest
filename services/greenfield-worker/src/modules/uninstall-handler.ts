@@ -21,6 +21,25 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
     .where('module_id', 'in', family)
     .where('deleted_at', 'is', null)
     .executeTakeFirst()
+  const ledgerResources = await db
+    .selectFrom('greenfield_data_resources')
+    .leftJoin('greenfield_data_retention_policies', 'greenfield_data_retention_policies.resource_id', 'greenfield_data_resources.resource_id')
+    .select([
+      'greenfield_data_resources.resource_id',
+      'greenfield_data_retention_policies.legal_hold',
+    ])
+    .where('greenfield_data_resources.installation_id', '=', p.installationId)
+    .execute()
+  const bindingModes = new Map<string, string[]>()
+  for (const resource of ledgerResources) {
+    const bindings = await db
+      .selectFrom('greenfield_data_storage_bindings')
+      .select(['storage_mode'])
+      .where('resource_id', '=', resource.resource_id)
+      .where('state', '!=', 'RETIRED')
+      .execute()
+    bindingModes.set(resource.resource_id, bindings.map(binding => binding.storage_mode))
+  }
   await db.transaction().execute(async trx => {
     if (release) await unregisterModuleContributions(trx as any, release.release_id)
     await setStandard2RuntimeStatus(trx as any, {
@@ -54,6 +73,41 @@ export async function handleModuleUninstall(db: ModulaWorkerDb, payload: unknown
         .where('module_id', 'in', family)
         .where('deleted_at', 'is', null)
         .execute()
+    }
+    for (const resource of ledgerResources) {
+      const modes = bindingModes.get(resource.resource_id) ?? []
+      const greenfieldOnly = modes.length > 0 && modes.every(mode => mode === 'greenfield-records')
+      const lifecycleState = choice === 'exportThenDelete'
+        ? 'EXPORT_PENDING'
+        : choice === 'deleteData' && resource.legal_hold
+          ? 'RETAINED'
+          : choice === 'deleteData' && greenfieldOnly
+            ? 'DELETED'
+            : choice === 'deleteData'
+              ? 'DELETE_PENDING'
+              : 'RETAINED'
+      await trx
+        .updateTable('greenfield_data_resources')
+        .set({
+          lifecycle_state: lifecycleState,
+          deleted_at: lifecycleState === 'DELETED' ? new Date() : null,
+          updated_at: new Date(),
+        })
+        .where('resource_id', '=', resource.resource_id)
+        .execute()
+      await trx
+        .updateTable('greenfield_data_storage_bindings')
+        .set({state: 'RETIRED', retired_at: new Date(), updated_at: new Date()})
+        .where('resource_id', '=', resource.resource_id)
+        .execute()
+      if (lifecycleState === 'DELETED') {
+        await trx
+          .updateTable('greenfield_data_resource_owners')
+          .set({released_at: new Date()})
+          .where('resource_id', '=', resource.resource_id)
+          .where('released_at', 'is', null)
+          .execute()
+      }
     }
     await removeStandard2Runtime(trx as any, p.installationId)
     await trx

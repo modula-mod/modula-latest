@@ -30,6 +30,7 @@ import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
+import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -67,6 +68,7 @@ export async function registerModuleRoutes(
   const backendWebhooks = new ModuleBackendWebhookService(db, config)
   const backendGateway = new ModuleBackendGatewayService(db, config)
   const extensionFabric = new GreenfieldExtensionFabricService(db)
+  const dataLedger = new GreenfieldDataLedgerService(db)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -310,6 +312,82 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await runtime2.runtimeSummary(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module runtime lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/data-resources', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const query = (request.query as {installationId?: string; cursor?: string; limit?: string}) ?? {}
+      return reply.send(successEnvelope(await dataLedger.list(auth.accountId, canonicalModuleParam(request), {
+        installationId: stringOrUndefined(query.installationId),
+        cursor: stringOrUndefined(query.cursor),
+        limit: query.limit === undefined ? undefined : Number(query.limit),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module data resource lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/data-resources', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = ((request.body as Record<string, unknown>) ?? {}) as any
+      return reply.code(201).send(successEnvelope(await dataLedger.register(auth.accountId, canonicalModuleParam(request), {
+        ...body,
+        idempotencyKey: idempotencyKey(request, body),
+        requestId: request.id,
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module data resource registration failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/data-resources/:resourceId', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await dataLedger.get(
+        auth.accountId,
+        canonicalModuleParam(request),
+        String((request.params as {resourceId?: string}).resourceId ?? ''),
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module data resource lookup failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/data-resources/:resourceId/migrations', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = ((request.body as Record<string, unknown>) ?? {}) as any
+      return reply.code(201).send(successEnvelope(await dataLedger.recordMigration(
+        auth.accountId,
+        canonicalModuleParam(request),
+        String((request.params as {resourceId?: string}).resourceId ?? ''),
+        {...body, requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module data migration recording failed')
+    }
+  })
+
+  app.post('/v1/modules/:moduleId/data-resources/:resourceId/schemas', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = ((request.body as Record<string, unknown>) ?? {}) as any
+      return reply.code(201).send(successEnvelope(await dataLedger.declareSchemaVersion(
+        auth.accountId,
+        canonicalModuleParam(request),
+        String((request.params as {resourceId?: string}).resourceId ?? ''),
+        {...body, requestId: request.id},
+      ), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module data schema declaration failed')
     }
   })
 

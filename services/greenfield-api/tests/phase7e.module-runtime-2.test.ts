@@ -256,6 +256,13 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
       .where('greenfield_extension_installations.installation_id', '=', installationId)
       .executeTakeFirstOrThrow()
     expect(updatedInstallation).toMatchObject({status: 'enabled', version: '2.0.1'})
+    const updatedResources = await db
+      .selectFrom('greenfield_data_resources')
+      .select(['release_id'])
+      .where('installation_id', '=', installationId)
+      .execute()
+    expect(updatedResources).toHaveLength(8)
+    expect(updatedResources.every(resource => resource.release_id === updateRelease.releaseId)).toBe(true)
     runtime = await runtimeSummary()
     expect(runtime.status).toBe('enabled')
 

@@ -274,7 +274,8 @@
     "verify:vault-ai-reference": "node scripts/verify-pvp-platform-2.mjs vault-ai",
     "verify:vault-voice-reference": "node scripts/verify-pvp-platform-2.mjs vault-voice",
     "verify:extension-cross-account-isolation": "node scripts/verify-pvp-platform-2.mjs cross-account",
-    "verify:pvp-platform-2": "node scripts/verify-pvp-platform-2.mjs all"
+    "verify:pvp-platform-2": "node scripts/verify-pvp-platform-2.mjs all",
+    "verify:greenfield-backend-v1:data-ledger": "node scripts/verify-greenfield-backend-v1-data-ledger.mjs"
   },
   "private": true
 }

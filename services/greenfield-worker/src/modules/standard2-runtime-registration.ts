@@ -68,6 +68,15 @@ export async function setStandard2RuntimeStatus(
   await db.updateTable('greenfield_module_api_registrations').set({status: input.status, updated_at: now} as any).where('installation_id', '=', input.installationId).execute()
   await db.updateTable('greenfield_module_hook_registrations').set({status: input.status, updated_at: now} as any).where('installation_id', '=', input.installationId).execute()
   await db.updateTable('greenfield_module_storage_allocations').set({status: input.status === 'registered' ? 'allocated' : input.status === 'removed' ? 'released' : input.status, updated_at: now} as any).where('installation_id', '=', input.installationId).execute()
+  await db.updateTable('greenfield_data_resources').set({
+    lifecycle_state: input.status === 'registered' ? 'ACTIVE' : input.status === 'removed' ? 'RETAINED' : input.status === 'quarantined' ? 'QUARANTINED' : 'DISABLED',
+    updated_at: now,
+  }).where('installation_id', '=', input.installationId).execute()
+  await db.updateTable('greenfield_data_storage_bindings').set({
+    state: input.status === 'removed' ? 'RETIRED' : input.status === 'quarantined' ? 'DEGRADED' : 'ACTIVE',
+    retired_at: input.status === 'removed' ? now : null,
+    updated_at: now,
+  }).where('resource_id', 'in', db.selectFrom('greenfield_data_resources').select('resource_id').where('installation_id', '=', input.installationId)).execute()
   await db.updateTable('greenfield_module_job_registrations').set({status: input.status === 'registered' ? 'registered' : input.status === 'removed' ? 'removed' : input.jobsPaused ? 'paused' : 'disabled', paused: input.jobsPaused, updated_at: now} as any).where('installation_id', '=', input.installationId).execute()
   await db.updateTable('greenfield_module_ui_contribution_registrations').set({status: input.status, updated_at: now} as any).where('installation_id', '=', input.installationId).execute()
   await recordLifecycleTransaction(db, input, lifecycleStagesFor(input.status), now)
@@ -272,7 +281,8 @@ function assertNoHookCycles(hooks: Record<string, unknown>[]): void {
 }
 
 async function insertStorage(db: ModulaWorkerDb, input: RuntimeInput, manifest: Record<string, unknown>, now: Date) {
-  const rows = versionedItems(manifest.storageModel).map(storage => ({
+  const declarations = versionedItems(manifest.storageModel)
+  const rows = declarations.map(storage => ({
     allocation_id: `module-storage:${input.installationId}:${String(storage.id)}`,
     installation_id: input.installationId,
     account_id: input.accountId,
@@ -292,6 +302,189 @@ async function insertStorage(db: ModulaWorkerDb, input: RuntimeInput, manifest: 
     updated_at: now,
   }))
   if (rows.length) await db.insertInto('greenfield_module_storage_allocations').values(rows as any).execute()
+  for (const [index, row] of rows.entries()) await reconcileDataLedgerStorage(db, input, manifest, row, declarations[index]!, now)
+}
+
+async function reconcileDataLedgerStorage(
+  db: ModulaWorkerDb,
+  input: RuntimeInput,
+  manifest: Record<string, unknown>,
+  allocation: {
+    allocation_id: string
+    storage_key: string
+    storage_kind: string
+    retention_policy: string
+    encrypted: boolean
+    status: string
+    declaration: unknown
+  },
+  declaration: Record<string, unknown>,
+  now: Date,
+) {
+  const resourceId = `data-resource:${allocation.allocation_id}`
+  const storageMode = dataStorageMode(allocation.storage_kind)
+  const schemaVersion = stringOrNull(declaration.version) ?? '1.0.0'
+  const schemaId = stringOrNull(declaration.schemaId) ?? allocation.storage_key
+  const schemaSha256 = /^[0-9a-f]{64}$/.test(String(declaration.schemaSha256 ?? '')) ? String(declaration.schemaSha256) : null
+  const classification = allocation.encrypted ? 'sensitive' : 'private'
+  const lifecycleState = input.status === 'registered' ? 'ACTIVE' : input.status === 'quarantined' ? 'QUARANTINED' : input.status === 'removed' ? 'RETAINED' : 'DISABLED'
+
+  await db
+    .insertInto('greenfield_data_resources')
+    .values({
+      resource_id: resourceId,
+      resource_key: allocation.storage_key,
+      owner_account_id: input.accountId,
+      product_id: input.moduleId,
+      installation_id: input.installationId,
+      release_id: input.releaseId,
+      schema_id: schemaId,
+      schema_version: schemaVersion,
+      primary_storage_mode: storageMode,
+      backend_service_id: null,
+      export_handler: `${input.moduleId}.data.export`,
+      delete_handler: `${input.moduleId}.data.delete`,
+      encryption_classification: classification,
+      lifecycle_state: lifecycleState,
+      idempotency_key: `standard-2-storage:${allocation.allocation_id}`,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+    })
+    .onConflict(conflict => conflict.columns(['installation_id', 'resource_key']).doUpdateSet({
+      release_id: input.releaseId,
+      schema_id: schemaId,
+      schema_version: schemaVersion,
+      primary_storage_mode: storageMode,
+      export_handler: `${input.moduleId}.data.export`,
+      delete_handler: `${input.moduleId}.data.delete`,
+      encryption_classification: classification,
+      lifecycle_state: lifecycleState,
+      updated_at: now,
+      deleted_at: null,
+    }))
+    .execute()
+
+  await db
+    .insertInto('greenfield_data_resource_owners')
+    .values({
+      owner_binding_id: `data-owner:${allocation.allocation_id}`,
+      resource_id: resourceId,
+      account_id: input.accountId,
+      owner_role: 'primary',
+      provenance: 'standard-2-storage-allocation',
+      created_at: now,
+      released_at: null,
+    })
+    .onConflict(conflict => conflict.columns(['resource_id', 'account_id', 'owner_role']).doUpdateSet({released_at: null}))
+    .execute()
+
+  await db
+    .insertInto('greenfield_data_storage_bindings')
+    .values({
+      binding_id: `data-binding:${allocation.allocation_id}`,
+      resource_id: resourceId,
+      storage_mode: storageMode,
+      service_id: null,
+      locator_ref: `greenfield://allocation/${allocation.allocation_id}`,
+      credential_ref: null,
+      encryption_classification: classification,
+      state: input.status === 'removed' ? 'RETIRED' : input.status === 'quarantined' ? 'DEGRADED' : 'ACTIVE',
+      metadata: jsonb({source: 'greenfield_module_storage_allocations', storageKind: allocation.storage_kind}),
+      created_at: now,
+      updated_at: now,
+      retired_at: input.status === 'removed' ? now : null,
+    })
+    .onConflict(conflict => conflict.columns(['resource_id', 'storage_mode', 'locator_ref']).doUpdateSet({
+      encryption_classification: classification,
+      state: input.status === 'removed' ? 'RETIRED' : input.status === 'quarantined' ? 'DEGRADED' : 'ACTIVE',
+      updated_at: now,
+      retired_at: input.status === 'removed' ? now : null,
+    }))
+    .execute()
+
+  await db
+    .updateTable('greenfield_data_schema_versions')
+    .set({state: 'SUPERSEDED', superseded_at: now})
+    .where('resource_id', '=', resourceId)
+    .where('state', '=', 'ACTIVE')
+    .where('version', '!=', schemaVersion)
+    .execute()
+  await db
+    .insertInto('greenfield_data_schema_versions')
+    .values({
+      schema_version_id: `data-schema:${allocation.allocation_id}:${schemaVersion}`,
+      resource_id: resourceId,
+      schema_id: schemaId,
+      version: schemaVersion,
+      definition_sha256: schemaSha256,
+      compatibility: 'UNSPECIFIED',
+      release_id: input.releaseId,
+      state: 'ACTIVE',
+      declared_at: now,
+      activated_at: now,
+      superseded_at: null,
+    })
+    .onConflict(conflict => conflict.columns(['resource_id', 'version']).doUpdateSet({
+      schema_id: schemaId,
+      definition_sha256: schemaSha256,
+      release_id: input.releaseId,
+      state: 'ACTIVE',
+      activated_at: now,
+      superseded_at: null,
+    }))
+    .execute()
+
+  const retentionMode = allocation.retention_policy === 'delete-on-uninstall'
+    ? 'DELETE_ON_UNINSTALL'
+    : allocation.retention_policy === 'archive-on-uninstall'
+      ? 'ARCHIVE_ON_UNINSTALL'
+      : 'RETAIN'
+  await db
+    .insertInto('greenfield_data_retention_policies')
+    .values({
+      retention_policy_id: `data-retention:${allocation.allocation_id}`,
+      resource_id: resourceId,
+      mode: retentionMode,
+      ttl_days: null,
+      legal_hold: false,
+      policy_version: '1.0.0',
+      metadata: jsonb({declaredPolicy: allocation.retention_policy}),
+      created_at: now,
+      updated_at: now,
+    })
+    .onConflict(conflict => conflict.column('resource_id').doUpdateSet({
+      mode: retentionMode,
+      metadata: jsonb({declaredPolicy: allocation.retention_policy}),
+      updated_at: now,
+    }))
+    .execute()
+
+  const backup = backupPolicyForManifest(manifest)
+  await db
+    .insertInto('greenfield_data_backup_policies')
+    .values({
+      backup_policy_id: `data-backup:${allocation.allocation_id}`,
+      resource_id: resourceId,
+      responsibility: backup.responsibility,
+      mode: backup.mode,
+      schedule_ref: null,
+      recovery_point_objective_seconds: null,
+      recovery_time_objective_seconds: null,
+      last_backup_ref: null,
+      last_backup_at: null,
+      last_restore_test_at: null,
+      metadata: jsonb({declaredResponsibility: backup.declared}),
+      created_at: now,
+      updated_at: now,
+    })
+    .onConflict(conflict => conflict.column('resource_id').doUpdateSet({
+      responsibility: backup.responsibility,
+      mode: backup.mode,
+      metadata: jsonb({declaredResponsibility: backup.declared}),
+      updated_at: now,
+    }))
+    .execute()
 }
 
 async function insertJobs(db: ModulaWorkerDb, input: RuntimeInput, manifest: Record<string, unknown>, now: Date) {
@@ -427,6 +620,25 @@ function arrayOfStrings(value: unknown): string[] {
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+}
+
+function dataStorageMode(storageKind: string): 'greenfield-records' | 'object-storage' {
+  return storageKind === 'object-storage' || storageKind === 'attachments' ? 'object-storage' : 'greenfield-records'
+}
+
+function backupPolicyForManifest(manifest: Record<string, unknown>): {
+  responsibility: 'GREENFIELD' | 'PRODUCT_SERVICE' | 'EXTERNAL_PROVIDER'
+  mode: 'MANAGED' | 'DECLARED' | 'EXTERNAL'
+  declared: string
+} {
+  const backend = asRecord(manifest.backend)
+  const data = asRecord(backend.data)
+  const declared = String(data.backupResponsibility ?? 'greenfield')
+  if (declared === 'publisher' || declared === 'shared') {
+    return {responsibility: 'PRODUCT_SERVICE', mode: 'DECLARED', declared}
+  }
+  if (declared === 'customer') return {responsibility: 'EXTERNAL_PROVIDER', mode: 'EXTERNAL', declared}
+  return {responsibility: 'GREENFIELD', mode: 'MANAGED', declared: 'greenfield'}
 }
 
 function stringOrNull(value: unknown): string | null {
