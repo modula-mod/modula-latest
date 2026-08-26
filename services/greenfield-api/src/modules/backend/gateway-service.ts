@@ -39,7 +39,6 @@ export class ModuleBackendGatewayService {
       consumerProductId: string
       targetProductId: string
       targetInstallationId: string
-      serviceId: string
       scope: {type: 'installation' | 'resource' | 'action'; ref: string | null}
       capabilities: string[]
     }
@@ -63,17 +62,28 @@ export class ModuleBackendGatewayService {
     const latestHealth = await this.repository.latestHealth(input.context.installationId)
     if ((latestHealth?.failure_count ?? 0) >= 3 && latestHealth?.circuit_state === 'open') throw moduleError('CAPABILITY_DISABLED', 'Module backend circuit is open')
 
+    const serviceInvocation = input.extensionInvocation ? {
+      ...input.extensionInvocation,
+      serviceId: backendServiceIdentity(input.context, backend),
+      actionId: input.actionId,
+    } : {
+      consumerProductId: input.context.moduleId,
+      targetProductId: input.context.moduleId,
+      targetInstallationId: input.context.installationId,
+      serviceId: backendServiceIdentity(input.context, backend),
+      actionId: input.actionId,
+      scope: {type: 'action' as const, ref: input.actionId},
+      capabilities: [input.actionId],
+    }
     const scoped = await this.tokens.issue({
       context: input.context,
       backend,
       actorId: input.actorId,
       permissions: action.permissions,
-      capabilities: input.extensionInvocation?.capabilities ?? [action.actionId],
+      capabilities: serviceInvocation.capabilities,
       requestId: input.requestId,
-      extensionInvocation: input.extensionInvocation ? {
-        ...input.extensionInvocation,
-        actionId: input.actionId,
-      } : undefined,
+      traceId: input.requestId,
+      extensionInvocation: serviceInvocation,
     })
     const endpoint = await resolveBackendEndpoint(backend, installation.resolvedOrigin ?? undefined)
     const started = Date.now()
@@ -114,6 +124,14 @@ export class ModuleBackendGatewayService {
       throw error
     }
   }
+}
+
+export function backendServiceIdentity(context: GreenfieldModuleRuntimeContext, backend: {trust?: {deploymentIdentity?: string}}): string {
+  const serviceId = backend.trust?.deploymentIdentity?.trim() || `service.${context.moduleId}.backend`
+  if (!/^[a-z][a-z0-9]*(?:[._:-][a-z0-9]+)*$/.test(serviceId) || serviceId.length > 180) {
+    throw moduleError('VALIDATION_FAILED', 'Module backend service identity is invalid')
+  }
+  return serviceId
 }
 
 const BACKEND_RETRY_DELAYS_MS = [100, 300] as const

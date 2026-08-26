@@ -246,7 +246,6 @@ export async function registerModuleRoutes(
           consumerProductId: extensionProductId,
           targetProductId: String(body.targetProductId ?? ''),
           targetInstallationId: brokered.targetInstallationId,
-          serviceId: String(body.serviceId ?? 'extension-backend'),
           scope: brokered.scope,
           capabilities: brokered.capabilities,
         },

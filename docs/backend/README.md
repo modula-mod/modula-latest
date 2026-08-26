@@ -174,6 +174,31 @@ CI=true MODULA_TEST_DATABASE_URL=<disposable-db> pnpm verify:greenfield-backend-
 Service Fabric owns validated targets, service identity, assertions, gateway
 policy, bounded retry, timeout, circuit state and audit.
 
+The public client never selects a service identity or sends an arbitrary target
+URL. Greenfield derives the service identity from the reviewed release binding,
+resolves the registered origin, validates every DNS result against the SSRF
+policy, permits only declared origins or reviewed self-hosted hostnames, enforces
+the declared port list, requires HTTPS, and follows zero redirects.
+
+Every normal or extension-backed gateway action receives a short-lived service
+assertion. The signed claims bind issuer, Greenfield gateway subject, consumer
+product, target service, target product and installation, account scope,
+capabilities, action, audience, `jti`, request ID and trace ID. The database
+stores only its SHA-256 token hash and has a check constraint fixing
+`raw_user_bearer_forwarded` to false.
+
+Product services call Greenfield through the stable backend SDK routes under
+`/v1/backend/products/:productId`. These routes accept only
+`x-modula-service-assertion`; presenting an `Authorization` bearer is rejected.
+The implemented V1 boundary covers identity context, safe account state,
+installation state, effective capability grants, Greenfield Records and the
+data-resource ledger. Event and job transports consume the same verified
+identity in the Event/Job checkpoint rather than defining a second auth model.
+
+Record and resource mutations require an idempotency key. Greenfield reserves
+that key before mutation, detects mismatched replays and returns the recorded
+result for an identical replay. The key is scoped by product and operation.
+
 ```mermaid
 sequenceDiagram
   participant G as Greenfield
@@ -190,6 +215,12 @@ sequenceDiagram
   W->>S: scoped request
   S-->>W: contract response
   W-->>G: result + health + audit
+```
+
+Checkpoint verifier:
+
+```text
+CI=true MODULA_TEST_DATABASE_URL=<disposable-db> pnpm verify:greenfield-backend-v1:service-fabric
 ```
 
 ## Engine contracts
