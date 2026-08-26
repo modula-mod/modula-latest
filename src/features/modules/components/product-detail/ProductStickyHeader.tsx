@@ -2,39 +2,35 @@ import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
-import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
-import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {OVERLAY_GROUP_MIN_WIDTH, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /** Space reserved for the fixed back control (44pt hit + edge inset). */
 const FIXED_BACK_GUTTER = 12 + TOOLBAR_HIT
 
 /**
- * Morphing liquid-glass backdrop + compact product row while scrolling.
- * Back / trailing actions live in {@link ProductFixedChrome} and never move.
+ * Morphing liquid-glass backdrop + compact identity while scrolling.
+ * Primary CTA morphs into the fixed trailing control group.
  */
 export function ProductStickyHeader({
   progress,
   top,
   moduleId,
   name,
-  presentation,
-  onPrimary,
+  trailingReservedWidth,
 }: {
   /** 0 = hidden, 1 = fully visible — driven by scroll offset. */
   progress: number
   top: number
   moduleId: string
   name: string
-  presentation: ModuleInstallPresentation
-  onPrimary: () => void
+  /** Width of the fixed trailing capsule so title doesn’t collide. */
+  trailingReservedWidth: number
 }) {
   const {colours, spacing} = useThemeTokens()
   const visible = progress > 0.02
   const slideY = (1 - progress) * -8
-  const trailingGutter = 12 + OVERLAY_GROUP_MIN_WIDTH
 
   return (
     <View
@@ -54,7 +50,7 @@ export function ProductStickyHeader({
             gap: spacing[2],
             paddingBottom: spacing[2],
             paddingLeft: FIXED_BACK_GUTTER,
-            paddingRight: trailingGutter,
+            paddingRight: 12 + trailingReservedWidth,
             paddingTop: top + spacing[1],
           },
         ]}>
@@ -62,12 +58,6 @@ export function ProductStickyHeader({
         <AppText variant="label" numberOfLines={1} style={styles.title}>
           {name}
         </AppText>
-        <ModuleAction
-          presentation={presentation}
-          productName={name}
-          onPress={onPrimary}
-          tone="product"
-        />
       </View>
     </View>
   )

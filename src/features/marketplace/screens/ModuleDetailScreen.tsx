@@ -28,6 +28,7 @@ import {
   ProductStickyHeader,
   ProductTabs,
   ProductWhatsNew,
+  productTrailingCapsuleWidth,
   type ProductCapabilityItem,
   type ProductInformationItem,
   type ProductMetadataItem,
@@ -371,18 +372,20 @@ export function ModuleDetailScreen() {
       <ProductStickyHeader
         moduleId={module.moduleId}
         name={copy.name}
-        onPrimary={onPrimary}
-        presentation={presentation}
         progress={stickyProgress}
         top={insets.top}
+        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.2)}
       />
 
       <ProductFixedChrome
         actions={overflowActions}
         onAction={onOverflow}
         onBack={goBack}
+        onPrimary={onPrimary}
         onShare={shareModule}
+        presentation={presentation}
         productName={copy.name}
+        progress={stickyProgress}
         top={insets.top + spacing[2]}
       />
 
