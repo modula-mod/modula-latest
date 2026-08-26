@@ -73,6 +73,7 @@ source('SCOPED SDK ROUTES', 'services/greenfield-api/src/backend-fabric/routes.t
   '/installations/:installationId/resources',
   '/resources/:resourceId/schemas',
   '/resources/:resourceId/migrations',
+  '/secrets/lease',
 ])
 source('MUTATION IDEMPOTENCY', 'services/greenfield-api/src/backend-fabric/routes.ts', [
   'executeIdempotent',
@@ -90,6 +91,7 @@ source('SERVICE ISOLATION DB TEST', 'services/greenfield-api/tests/greenfield-ba
   'crossAccount',
   'idempotency conflict detection',
   'zero raw user bearer forwarding',
+  'single-use secret lease',
 ])
 
 const sdkRoot = resolve(process.env.MODULA_BACKEND_SDK_ROOT ?? '/root/modula-platform/modula-backend-sdk')
