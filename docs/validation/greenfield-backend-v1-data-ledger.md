@@ -2,15 +2,15 @@
 
 Recorded: 2026-08-26
 
-Production migration 041: **NOT APPLIED**
+Production migration 041: **APPLIED**
 
-Production deployment for this checkpoint: **NOT STARTED**
+Production deployment for this checkpoint: **PASS**
 
 ## Baseline
 
 - Product repository: `modula-mod/modula-latest`
-- Programme worktree: `/root/modula-worktrees/greenfield-backend-v1-completion`
-- Branch: `cursor/greenfield-backend-v1-completion`
+- Programme source commit: `8519cbd217171ae60fc7dd45042b10a967e04915`
+- Mainline merge commit: `e6cd2eb35d2a07770be5061a0eb633b64c5f4f05`
 - Baseline main and live web/API/worker SHA:
   `8bce5a40d296131ccebe60b819a53667dd3a25f9`
 - Production schema before this checkpoint: `040`
@@ -25,9 +25,9 @@ owners and ACLs so runtime-role behavior can be rehearsed exactly.
 | Evidence | Value |
 | --- | --- |
 | Format | PostgreSQL custom (`pg_dump -Fc`) |
-| Artifact | `/var/backups/modula/greenfield/greenfield-backend-v1/20260825T211305Z/greenfield-production-pre-gbv1-041.dump` |
-| Size | `1,262,270` bytes |
-| SHA-256 | `3417109ee2e87847d08dc6f5d7530192d586d872bc686117823b434a0b6b7354` |
+| Artifact | `/var/backups/modula/greenfield/greenfield-backend-v1/20260826T015711Z/greenfield-production-pre-gbv1-041.dump` |
+| Size | `1,273,046` bytes |
+| SHA-256 | `f6b0b16ed7202198e3b3930fab74810c3518f1180575a6096f3f58ade225b4b0` |
 | Mode/owner | `0600`, `root:root` |
 | ACL entries | `205` |
 | Format validation | `pg_restore -l` passed |
@@ -35,7 +35,7 @@ owners and ACLs so runtime-role behavior can be rehearsed exactly.
 ## Isolated restore and migration rehearsal
 
 The exact archive restored with owners and ACLs into
-`modula_gbv1_pre041_20260825t211305z` in loopback-only PostgreSQL container
+`modula_gbv1_pre041_20260826t015711z` in loopback-only PostgreSQL container
 `modula-pvp-platform2-pg` at `127.0.0.1:55438`.
 
 Pre-migration status:
@@ -122,10 +122,47 @@ used for clean regression runs:
 - truthful uninstall state projection;
 - architecture constitution and checkpoint verifier.
 
-## Open gates
+## Production convergence
 
-- Source review, mainline merge and exact-SHA production deployment are open.
-- Production migration 041 is open and must not be applied before merge/build.
+The functional source was merged before mutation. The exact mainline commit
+`e6cd2eb35d2a07770be5061a0eb633b64c5f4f05` was checked out detached under
+`/root/modula-builds/`, built into immutable API and worker images, and exported
+as an immutable web release.
+
+Migration result:
+
+- production schema version: `041`;
+- production pending migrations: `0`;
+- all seven data-ledger tables exist;
+- `modula_api` has `SELECT`, `INSERT`, `UPDATE` and `DELETE` on all seven;
+- `modula_worker` has `SELECT`, `INSERT`, `UPDATE` and `DELETE` on all seven;
+- `modula_backup` has `SELECT` on all seven;
+- initial production resource count: `0` (no acceptance fixtures or fake data
+  were inserted).
+
+Deployment result:
+
+- web, API and worker reported the exact same mainline revision;
+- API and worker were replaced independently with `--no-deps`; PostgreSQL and
+  Redis were not recreated;
+- API and worker health passed with restart counts of zero;
+- the public web cutover verifier passed checksums, version metadata, assets and
+  all eleven production routes;
+- unauthenticated access to the new ledger route returned `401 UNAUTHENTICATED`,
+  proving route registration and the account-authentication guard without fake
+  records;
+- the previous immutable web release was retained for rollback.
+
+The first exact-SHA export also identified a deterministic-build defect:
+`pnpm build:web` depended on contract `dist/` output produced by an earlier
+typecheck. The root build now compiles every web-facing workspace contract in
+dependency order through `prebuild:web`, and a clean checkout verifies the
+single-command build path. Exact-SHA convergence is repeated after that build
+repair reaches main; the live version endpoints remain the authority for that
+post-report revision.
+
+## Remaining programme gates
+
 - Stable backend-service assertion routes are part of the Service Fabric
   checkpoint; current routes are authenticated account routes.
 - Module-owned delete handlers, export orchestration and recovery verification
