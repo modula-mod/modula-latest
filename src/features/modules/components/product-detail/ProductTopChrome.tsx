@@ -1,4 +1,5 @@
-import {StyleSheet, View} from 'react-native'
+import {useEffect, useRef, useState} from 'react'
+import {Animated, StyleSheet, View} from 'react-native'
 
 import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
@@ -19,14 +20,15 @@ export function productTrailingCapsuleWidth(actionReveal: number): number {
   return OVERLAY_GROUP_MIN_WIDTH + (OVERLAY_GROUP_ACTION_WIDTH + OVERLAY_GROUP_GAP) * reveal
 }
 
+/** Sticky progress → whether the Open chip should be expanded. */
 export function productActionReveal(progress: number): number {
-  return Math.min(1, Math.max(0, (progress - 0.08) / 0.55))
+  return progress > 0.38 ? 1 : 0
 }
 
 /**
  * Fixed overlay chrome — back never moves.
- * Share/more + Open live in one {@link ChromeGlassControlGroup}; Open morphs
- * in smoothly via `actionReveal` (no snap).
+ * Open springs into the same {@link ChromeGlassControlGroup} as share/more
+ * (spring morph — not scroll-linked width stretching).
  */
 export function ProductFixedChrome({
   productName,
@@ -49,7 +51,25 @@ export function ProductFixedChrome({
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
-  const reveal = productActionReveal(progress)
+  const target = productActionReveal(progress)
+  const anim = useRef(new Animated.Value(target)).current
+  const [reveal, setReveal] = useState(target)
+
+  useEffect(() => {
+    const listener = anim.addListener(({value}) => setReveal(value))
+    Animated.spring(anim, {
+      toValue: target,
+      damping: 22,
+      stiffness: 220,
+      mass: 0.75,
+      overshootClamping: true,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
+      useNativeDriver: false,
+    }).start()
+    return () => anim.removeListener(listener)
+  }, [anim, target])
+
   const label = primaryLabel(presentation)
   const soon = presentation.primaryAction === 'Soon'
   const blocked = presentation.primaryAction === 'Can’t install on this device'

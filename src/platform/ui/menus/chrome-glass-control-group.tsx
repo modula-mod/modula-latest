@@ -146,7 +146,12 @@ function GroupSlot({
             onPress={enabled ? item.onPress : undefined}
             style={[
               styles.actionChip,
-              {backgroundColor: fill, borderRadius: radius.round, opacity: item.disabled ? 0.55 : 1},
+              {
+                backgroundColor: fill,
+                borderRadius: radius.round,
+                opacity: item.disabled ? 0.55 : 1,
+                transform: [{scale: 0.88 + 0.12 * reveal}],
+              },
             ]}>
             <AppText
               variant="buttonLabel"
