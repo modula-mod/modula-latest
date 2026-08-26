@@ -3,6 +3,7 @@ import type {GreenfieldAIProviderAdapter} from './contract.js'
 import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'
 import {OllamaGreenfieldAIProviderAdapter} from './ollama-provider.js'
 import {OpenAIGreenfieldAIProviderAdapter} from './openai-provider.js'
+import {ModulaAIBackendProviderAdapter} from './modula-ai-backend-provider.js'
 
 export class GreenfieldAIProviderAdapterRegistry {
   private readonly adapters = new Map<string, GreenfieldAIProviderAdapter>()
@@ -22,13 +23,28 @@ export class GreenfieldAIProviderAdapterRegistry {
   }
 }
 
-export function createDefaultProviderAdapterRegistry(input: {allowDevelopmentMock?: boolean} = {}): GreenfieldAIProviderAdapterRegistry {
+export function createDefaultProviderAdapterRegistry(input: {
+  allowDevelopmentMock?: boolean
+  aiBackend?: {baseUrl: string; issuer: string; signingKey: string; maximumTimeoutMs: number}
+} = {}): GreenfieldAIProviderAdapterRegistry {
   const registry = new GreenfieldAIProviderAdapterRegistry()
   if (input.allowDevelopmentMock) {
     registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))
   }
-  registry.register(new OpenAIGreenfieldAIProviderAdapter('provider:openai'))
-  registry.register(new OllamaGreenfieldAIProviderAdapter('provider:ollama'))
-  registry.register(new OllamaGreenfieldAIProviderAdapter('provider:local'))
+  if (input.aiBackend) {
+    for (const [providerId, backendProviderId] of [
+      ['provider:openai', 'openai'],
+      ['provider:gemini', 'gemini'],
+      ['provider:anthropic', 'anthropic'],
+      ['provider:ollama', 'local'],
+      ['provider:local', 'local'],
+    ] as const) {
+      registry.register(new ModulaAIBackendProviderAdapter({providerId, backendProviderId, ...input.aiBackend}))
+    }
+  } else {
+    registry.register(new OpenAIGreenfieldAIProviderAdapter('provider:openai'))
+    registry.register(new OllamaGreenfieldAIProviderAdapter('provider:ollama'))
+    registry.register(new OllamaGreenfieldAIProviderAdapter('provider:local'))
+  }
   return registry
 }

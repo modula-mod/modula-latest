@@ -108,6 +108,14 @@ export class GreenfieldAIProviderRuntimeService {
     this.tools = new GreenfieldAIToolBroker(db)
     this.adapters = options.adapterRegistry ?? createDefaultProviderAdapterRegistry({
       allowDevelopmentMock: config.nodeEnv === 'test',
+      ...(config.aiBackendUrl ? {
+        aiBackend: {
+          baseUrl: config.aiBackendUrl,
+          issuer: config.publicApiUrl,
+          signingKey: serviceAssertionSigningKey(config),
+          maximumTimeoutMs: config.aiBackendTimeoutMs,
+        },
+      } : {}),
     })
     this.limits = {
       maxInputUnits: 12_000,
@@ -419,7 +427,9 @@ export class GreenfieldAIProviderRuntimeService {
 
   async verifyProvider(providerId: string, scope: {scopeType: 'platform' | 'organisation' | 'account' | 'development'; scopeId?: string | null}): Promise<Record<string, unknown>> {
     const adapter = this.adapters.require(providerId)
-    const credentials = await this.credentials.resolveCredential({providerId, scopes: [scope, {scopeType: 'platform'}]})
+    const credentials = adapter.credentialMode === 'credential-broker'
+      ? undefined
+      : await this.credentials.resolveCredential({providerId, scopes: [scope, {scopeType: 'platform'}]})
     const health = await adapter.health({providerId, credentials})
     await this.runtime.recordHealth({
       providerId,
@@ -624,10 +634,12 @@ export class GreenfieldAIProviderRuntimeService {
   }): Promise<AttemptSuccess> {
     const model = await this.repository.requireModel(input.target.modelId)
     const adapter = this.adapters.require(input.target.providerId)
-    const credentials = await this.credentials.resolveCredential({
-      providerId: input.target.providerId,
-      scopes: credentialScopes(input.target.providerId, input.input.accountId),
-    })
+    const credentials = adapter.credentialMode === 'credential-broker'
+      ? undefined
+      : await this.credentials.resolveCredential({
+          providerId: input.target.providerId,
+          scopes: credentialScopes(input.target.providerId, input.input.accountId),
+        })
     const controller = new AbortController()
     this.cancellations.set(input.executionId, controller)
     this.activeTargets.set(input.executionId, {adapter, providerId: input.target.providerId})
@@ -1095,4 +1107,11 @@ function clampTimeout(value: number | undefined, fallback: number): number {
 function clampOutputUnits(value: unknown, fallback: number): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
   return Math.max(1, Math.min(fallback, Math.trunc(value)))
+}
+
+function serviceAssertionSigningKey(config: AppConfig): string {
+  if (config.checkpointSigningKey) return config.checkpointSigningKey
+  if (config.sessionPepper) return config.sessionPepper
+  if (config.environment === 'production') throw moduleError('CAPABILITY_DISABLED', 'AI service assertion signing key is not configured')
+  return 'development-module-backend-token-signing-key'
 }

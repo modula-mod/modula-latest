@@ -44,6 +44,8 @@ const envSchema = z.object({
   MODULA_MEDIA_UPLOAD_MAX_BYTES: z.coerce.number().int().positive().default(2_097_152),
   MODULA_SECRETS_SERVICE_URL: z.string().url().optional(),
   MODULA_SECRETS_SERVICE_TIMEOUT_MS: z.coerce.number().int().min(100).max(10_000).default(2_000),
+  MODULA_AI_BACKEND_URL: z.string().url().optional(),
+  MODULA_AI_BACKEND_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
   MODULA_ENVIRONMENT: z.enum(['development', 'preview', 'production']).default('development'),
   MODULA_MINIMUM_CLIENT_VERSION: z.string().default('0.1.0'),
   MODULA_SESSION_TTL_HOURS: z.coerce.number().int().positive().default(720),
@@ -151,6 +153,8 @@ export type AppConfig = {
   mediaUploadMaxBytes: number
   secretsServiceUrl: string | null
   secretsServiceTimeoutMs: number
+  aiBackendUrl: string | null
+  aiBackendTimeoutMs: number
   environment: 'development' | 'preview' | 'production'
   minimumClientVersion: string
   /** Derived: true when the explicit write gate for the current environment is enabled. */
@@ -266,6 +270,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     refuse('MODULA_SEARCH_DEFAULT_LIMIT must be less than or equal to MODULA_SEARCH_MAX_LIMIT')
   }
   const secretsServiceUrl = validateSecretsServiceUrl(raw.MODULA_SECRETS_SERVICE_URL, raw.MODULA_ENVIRONMENT)
+  const aiBackendUrl = validateAIBackendUrl(raw.MODULA_AI_BACKEND_URL, raw.MODULA_ENVIRONMENT)
 
   const environment = raw.MODULA_ENVIRONMENT
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
@@ -405,6 +410,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     mediaUploadMaxBytes: raw.MODULA_MEDIA_UPLOAD_MAX_BYTES,
     secretsServiceUrl,
     secretsServiceTimeoutMs: raw.MODULA_SECRETS_SERVICE_TIMEOUT_MS,
+    aiBackendUrl,
+    aiBackendTimeoutMs: raw.MODULA_AI_BACKEND_TIMEOUT_MS,
     environment,
     minimumClientVersion: raw.MODULA_MINIMUM_CLIENT_VERSION,
     mutationsEnabled,
@@ -454,6 +461,21 @@ function validateSecretsServiceUrl(value: string | undefined, environment: 'deve
   }
   if (target.protocol !== 'https:' && !(target.protocol === 'http:' && (environment === 'development' || target.hostname === 'modula-secrets-service'))) {
     refuse('secrets service URL must use HTTPS or the approved private service identity')
+  }
+  return target.origin
+}
+
+function validateAIBackendUrl(value: string | undefined, environment: 'development' | 'preview' | 'production'): string | null {
+  if (!value) return null
+  const target = new URL(value)
+  if (target.username || target.password || target.pathname !== '/' || target.search || target.hash) {
+    refuse('AI backend URL must be an origin without credentials, path, query or fragment')
+  }
+  if (target.protocol !== 'https:' && !(target.protocol === 'http:' && (environment === 'development' || target.hostname === 'modula-ai-backend'))) {
+    refuse('AI backend URL must use HTTPS or the approved private service identity')
+  }
+  if (environment === 'production' && target.origin !== 'http://modula-ai-backend:4040') {
+    refuse('Production AI backend URL must use the approved private service identity and port')
   }
   return target.origin
 }
