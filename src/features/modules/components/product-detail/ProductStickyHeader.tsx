@@ -3,14 +3,15 @@ import {StyleSheet, View} from 'react-native'
 import {AppText} from '@/components/primitives/AppText'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
-import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
+import {OVERLAY_GROUP_HIT, TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /** Space reserved for the fixed back control (44pt hit + edge inset). */
 const FIXED_BACK_GUTTER = 12 + TOOLBAR_HIT
+const IDENTITY_ICON = 28
 
 /**
- * Morphing liquid-glass backdrop + compact identity while scrolling.
+ * Morphing liquid-glass backdrop + identity capsule (icon + title in-line).
  * Primary CTA morphs into the fixed trailing control group.
  */
 export function ProductStickyHeader({
@@ -47,17 +48,38 @@ export function ProductStickyHeader({
         style={[
           styles.row,
           {
-            gap: spacing[2],
             paddingBottom: spacing[2],
             paddingLeft: FIXED_BACK_GUTTER,
-            paddingRight: 12 + trailingReservedWidth,
+            paddingRight: 12 + trailingReservedWidth + spacing[2],
             paddingTop: top + spacing[1],
           },
         ]}>
-        <ModuleArtwork moduleId={moduleId} name={name} variant="compact" />
-        <AppText variant="label" numberOfLines={1} style={styles.title}>
-          {name}
-        </AppText>
+        <LiquidGlassChrome
+          contentLayout="flow"
+          fallback="clear"
+          interactive={false}
+          style={[
+            styles.identityCapsule,
+            {
+              borderColor: colours.border,
+              gap: spacing[2],
+              maxWidth: '100%',
+              paddingHorizontal: spacing[2],
+            },
+          ]}>
+          <ModuleArtwork
+            moduleId={moduleId}
+            name={name}
+            size={IDENTITY_ICON}
+            variant="compact"
+          />
+          <AppText
+            variant="label"
+            numberOfLines={1}
+            style={styles.title}>
+            {name}
+          </AppText>
+        </LiquidGlassChrome>
       </View>
     </View>
   )
@@ -68,10 +90,21 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  identityCapsule: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: OVERLAY_GROUP_HIT / 2,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    flexShrink: 1,
+    height: OVERLAY_GROUP_HIT,
+    minHeight: OVERLAY_GROUP_HIT,
+    overflow: 'hidden',
+  },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 44,
+    minHeight: OVERLAY_GROUP_HIT,
   },
   shell: {
     left: 0,
@@ -80,5 +113,11 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 4,
   },
-  title: {flex: 1, minWidth: 0},
+  title: {
+    flexShrink: 1,
+    includeFontPadding: false,
+    lineHeight: 18,
+    minWidth: 0,
+    textAlignVertical: 'center',
+  },
 })

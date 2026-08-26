@@ -14,8 +14,8 @@ import {
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-/** Compact primary label slot inside the trailing glass capsule. */
-export const PRODUCT_PRIMARY_SLOT_WIDTH = 64
+/** Filled primary button slot inside the trailing glass capsule. */
+export const PRODUCT_PRIMARY_SLOT_WIDTH = 72
 
 export function productTrailingCapsuleWidth(includePrimary: boolean): number {
   const icons = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP
@@ -24,8 +24,7 @@ export function productTrailingCapsuleWidth(includePrimary: boolean): number {
 
 /**
  * Fixed overlay chrome — back never moves. Trailing share/more live in one
- * liquid-glass capsule; the primary action (Open / Install / …) morphs into
- * that same capsule as the sticky header appears.
+ * liquid-glass capsule; the primary action morphs in as a filled button chip.
  */
 export function ProductFixedChrome({
   productName,
@@ -49,7 +48,7 @@ export function ProductFixedChrome({
   actions: ModulaActionItem[]
   onAction: (id: string) => void
 }) {
-  const {colours} = useThemeTokens()
+  const {colours, radius} = useThemeTokens()
   const primaryProgress = Math.min(1, Math.max(0, (progress - 0.12) / 0.4))
   const showPrimary = primaryProgress > 0.02
   const label = primaryLabel(presentation)
@@ -57,6 +56,17 @@ export function ProductFixedChrome({
   const blocked = presentation.primaryAction === 'Can’t install on this device'
   const disabled =
     soon || blocked || (!presentation.installable && presentation.primaryAction === 'Install')
+  const primary = label === 'Install' || label === 'Update'
+  const buttonFill = soon
+    ? colours.surfaceMuted
+    : primary
+      ? colours.accent
+      : colours.text
+  const buttonLabel = soon
+    ? colours.textTertiary
+    : primary
+      ? colours.accentForeground
+      : colours.canvas
 
   const iconsWidth = OVERLAY_GROUP_HIT * 2 + OVERLAY_GROUP_GAP
   const primaryWidth = (PRODUCT_PRIMARY_SLOT_WIDTH + OVERLAY_GROUP_GAP) * primaryProgress
@@ -88,12 +98,25 @@ export function ProductFixedChrome({
                 disabled={disabled || primaryProgress < 0.55}
                 hitSlop={4}
                 onPress={disabled ? undefined : onPrimary}
-                style={styles.primaryHit}
+                style={[
+                  styles.primaryButton,
+                  {
+                    backgroundColor: buttonFill,
+                    borderRadius: radius.round,
+                    opacity: disabled ? 0.55 : 1,
+                  },
+                ]}
                 testID="product-sticky-primary">
                 <AppText
                   variant="buttonLabel"
                   numberOfLines={1}
-                  style={{color: colours.text, fontSize: 15, fontWeight: '700'}}>
+                  style={{
+                    color: buttonLabel,
+                    fontSize: 14,
+                    fontWeight: '700',
+                    includeFontPadding: false,
+                    lineHeight: 16,
+                  }}>
                   {label}
                 </AppText>
               </AppPressable>
@@ -160,17 +183,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: OVERLAY_GROUP_HIT,
   },
-  primaryHit: {
+  primaryButton: {
     alignItems: 'center',
-    height: OVERLAY_GROUP_HIT,
+    height: 32,
     justifyContent: 'center',
-    paddingHorizontal: 4,
+    minWidth: 56,
+    paddingHorizontal: 12,
   },
   primarySlot: {
     alignItems: 'center',
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'center',
     overflow: 'hidden',
+    paddingLeft: 6,
   },
   row: {
     alignItems: 'center',
@@ -180,6 +205,5 @@ const styles = StyleSheet.create({
     gap: OVERLAY_GROUP_GAP,
     height: OVERLAY_GROUP_HIT,
     justifyContent: 'flex-end',
-    paddingLeft: 2,
   },
 })
