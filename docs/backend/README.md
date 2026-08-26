@@ -277,6 +277,25 @@ flowchart TD
 Git is provenance and configuration storage, never a synchronous runtime secret
 database. Decryption keys remain outside repositories and images.
 
+The canonical private repositories are:
+
+- `modula-mod/modula-secrets-service`: assertion-authenticated broker and
+  `modula-secrets-sync` reconciliation code;
+- `modula-mod/modula-secret-manifests`: signed, age-encrypted manifests only.
+
+Product backends request `POST /v1/backend/products/:productId/secrets/lease`
+with their short-lived Greenfield service assertion and a `secret://` handle.
+Greenfield forwards only that service assertion to the configured private
+broker origin. The broker validates the signature, exact service ACL, namespace,
+purpose and `secrets.use` capability, then returns a single-use short lease.
+The lease response contains no secret value; direct value use is reserved for
+explicitly trusted services with `secrets.use.direct`.
+
+Runtime snapshots use AES-256-GCM and remain available without GitHub. Sync
+requires a clean exact commit, the expected GitHub repository, a valid external
+SSH commit signature, valid age ciphertext, schema validation and health. The
+age identity and runtime keys remain root-owned mode `0600` outside Git.
+
 ## Event delivery
 
 ```mermaid

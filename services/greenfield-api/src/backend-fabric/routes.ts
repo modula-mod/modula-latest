@@ -10,6 +10,7 @@ import {moduleError} from '../modules/module-errors.js'
 import {ModuleBackendTokenService, type ResolvedServiceAssertion} from '../modules/backend/token-service.js'
 import {GreenfieldModuleRecordService} from '../modules/record-service.js'
 import {collectionPermission, GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
+import {CredentialBrokerClient} from '../secrets/index.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 
 type RouteConfig = Record<string, unknown>
@@ -23,10 +24,11 @@ export async function registerBackendFabricRoutes(
   const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
   const records = new GreenfieldModuleRecordService(db)
   const ledger = new GreenfieldDataLedgerService(db)
+  const credentialBroker = new CredentialBrokerClient(config)
   const readConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
   const writeConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
 
-  const authenticate = async (request: FastifyRequest): Promise<{productId: string; assertion: ResolvedServiceAssertion}> => {
+  const authenticate = async (request: FastifyRequest): Promise<{productId: string; assertion: ResolvedServiceAssertion; rawAssertion: string}> => {
     if (request.headers.authorization !== undefined) {
       throw moduleError('UNAUTHENTICATED', 'Raw user bearer forwarding is forbidden on the backend service API')
     }
@@ -35,7 +37,7 @@ export async function registerBackendFabricRoutes(
     const productId = String((request.params as {productId?: string}).productId ?? '')
     const assertion = await assertions.resolveServiceAssertion(header.trim(), productId)
     if (!assertion) throw moduleError('UNAUTHENTICATED', 'Service assertion is invalid, expired or outside the product scope')
-    return {productId, assertion}
+    return {productId, assertion, rawAssertion: header.trim()}
   }
 
   app.get('/v1/backend/products/:productId/identity/context', readConfig, async (request, reply) => {
@@ -209,13 +211,30 @@ export async function registerBackendFabricRoutes(
       return ledger.recordMigration(assertion.accountId, productId, resourceParam(request), migrationInput(request.body, request.id))
     })
   })
+
+  app.post('/v1/backend/products/:productId/secrets/lease', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion, rawAssertion}) => {
+      requireAssertionOperation(assertion, 'secrets.use')
+      await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const body = requireObject(request.body)
+      const reference = secretReference(body.reference)
+      const purpose = requiredString(body.purpose, 'purpose')
+      return credentialBroker.lease({
+        serviceAssertion: rawAssertion,
+        reference,
+        purpose,
+        requestId: request.id,
+        traceId: assertion.traceId,
+      })
+    }, 201)
+  })
 }
 
 async function serviceRoute<T>(
   reply: FastifyReply,
   request: FastifyRequest,
-  authenticate: (request: FastifyRequest) => Promise<{productId: string; assertion: ResolvedServiceAssertion}>,
-  operation: (context: {productId: string; assertion: ResolvedServiceAssertion}) => Promise<T>,
+  authenticate: (request: FastifyRequest) => Promise<{productId: string; assertion: ResolvedServiceAssertion; rawAssertion: string}>,
+  operation: (context: {productId: string; assertion: ResolvedServiceAssertion; rawAssertion: string}) => Promise<T>,
   successStatus = 200,
 ) {
   try {
@@ -394,6 +413,12 @@ function requiredString(value: unknown, field: string): string {
   return value.trim()
 }
 
+function secretReference(value: unknown): string {
+  const reference = requiredString(value, 'reference')
+  if (!/^secret:\/\/[a-z0-9][a-z0-9._/-]{2,250}$/.test(reference)) throw moduleError('VALIDATION_FAILED', 'reference must be a bounded secret:// handle')
+  return reference
+}
+
 function stringOrUndefined(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined
 }
@@ -417,6 +442,7 @@ const EXPOSED_DOMAIN_CODES = new Set<ApiErrorCode>([
   'NOTE_REVISION_CONFLICT',
   'CAPABILITY_DISABLED',
   'UNAUTHENTICATED',
+  'RATE_LIMITED',
 ])
 
 function domainCode(error: unknown): ApiErrorCode {

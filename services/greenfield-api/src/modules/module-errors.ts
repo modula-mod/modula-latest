@@ -13,6 +13,8 @@ export type ModuleDomainErrorCode =
   | 'AI_RESULT_OWNERSHIP_MISMATCH'
   | 'CAPABILITY_DISABLED'
   | 'UNAUTHENTICATED'
+  | 'RATE_LIMITED'
+  | 'SERVER_ERROR'
 
 export class ModuleDomainError extends Error {
   readonly code: ModuleDomainErrorCode

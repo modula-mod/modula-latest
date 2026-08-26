@@ -1,4 +1,6 @@
 import {randomUUID} from 'node:crypto'
+import {createServer as createHttpServer, type Server} from 'node:http'
+import type {AddressInfo} from 'node:net'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {sql} from 'kysely'
 import {createServer} from '../src/app/create-server.js'
@@ -25,15 +27,34 @@ const writeRecords = `records:module.${productId}.entry:write`
 const deleteRecords = `records:module.${productId}.entry:delete`
 const readData = `data:module.${productId}:read`
 const writeData = `data:module.${productId}:write`
+const useSecrets = 'secrets.use'
 
 describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let assertion = ''
   let readOnlyAssertion = ''
+  let brokerServer: Server
+  let brokerRequests = 0
+  let brokerAssertion = ''
 
   beforeAll(async () => {
     configureTestEnv()
+    brokerServer = createHttpServer(async (request, response) => {
+      brokerRequests += 1
+      brokerAssertion = String(request.headers['x-modula-service-assertion'] ?? '')
+      expect(request.headers.authorization).toBeUndefined()
+      expect(request.url).toBe('/v1/secrets/lease')
+      for await (const chunk of request) void chunk
+      response.writeHead(201, {'content-type': 'application/json', 'cache-control': 'no-store'})
+      response.end(JSON.stringify({ok: true, data: {
+        reference: 'secret://engine.ai/provider/test/primary', namespace: 'engine.ai', version: 'v1', state: 'CURRENT',
+        manifestCommit: 'e'.repeat(40), environment: 'test', leaseId: `lease:${suffix}`,
+        expiresAt: new Date(Date.now() + 30_000).toISOString(), useToken: `use-token-${'x'.repeat(40)}`,
+      }}))
+    })
+    await new Promise<void>(resolve => brokerServer.listen(0, '127.0.0.1', resolve))
+    process.env.MODULA_SECRETS_SERVICE_URL = `http://127.0.0.1:${(brokerServer.address() as AddressInfo).port}`
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -44,8 +65,8 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
     const issued = await new ModuleBackendTokenService(db, loadConfig()).issue({
       context,
       actorId: actorA,
-      permissions: [readRecords, writeRecords, deleteRecords, readData, writeData],
-      capabilities: [readRecords, writeRecords, deleteRecords, readData, writeData],
+      permissions: [readRecords, writeRecords, deleteRecords, readData, writeData, useSecrets],
+      capabilities: [readRecords, writeRecords, deleteRecords, readData, writeData, useSecrets],
       requestId: `service-fabric-request-${suffix}`,
       traceId: `service-fabric-trace-${suffix}`,
       backend: {
@@ -86,6 +107,7 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
   afterAll(async () => {
     await app?.close()
     await db?.destroy()
+    await new Promise<void>(resolve => brokerServer?.close(() => resolve()))
   })
 
   it('requires a verified service assertion and rejects raw bearer forwarding', async () => {
@@ -242,6 +264,34 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
     expect(rows).toHaveLength(2)
     expect(rows.every(row => row.raw_user_bearer_forwarded === false)).toBe(true)
     expect(rows.every(row => row.consumed_at !== null)).toBe(true)
+  })
+
+  it('brokers a value-free, single-use secret lease through the trusted configured service', async () => {
+    const leased = await app.inject({
+      method: 'POST',
+      url: `/v1/backend/products/${productId}/secrets/lease`,
+      headers: serviceHeaders(),
+      payload: {reference: 'secret://engine.ai/provider/test/primary', purpose: 'ai.generate'},
+    })
+    expect(leased.statusCode, leased.body).toBe(201)
+    expect(leased.json().data).toMatchObject({
+      reference: 'secret://engine.ai/provider/test/primary',
+      namespace: 'engine.ai',
+      state: 'CURRENT',
+      manifestCommit: 'e'.repeat(40),
+    })
+    expect(leased.json().data).not.toHaveProperty('value')
+    expect(brokerRequests).toBe(1)
+    expect(brokerAssertion).toBe(assertion)
+
+    const denied = await app.inject({
+      method: 'POST',
+      url: `/v1/backend/products/${productId}/secrets/lease`,
+      headers: {'x-modula-service-assertion': readOnlyAssertion},
+      payload: {reference: 'secret://engine.ai/provider/test/primary', purpose: 'ai.generate'},
+    })
+    expect(denied.statusCode).toBe(403)
+    expect(brokerRequests).toBe(1)
   })
 
   async function seedPlatformState(): Promise<void> {
