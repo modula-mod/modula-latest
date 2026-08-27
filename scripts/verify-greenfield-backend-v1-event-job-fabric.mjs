@@ -48,6 +48,7 @@ source('CANONICAL JOB LIFECYCLE MIGRATION', 'services/greenfield-api/migrations/
   "'GREENFIELD_WORKER','SERVICE_PULL'",
   'background_jobs_service_idempotency_idx',
   'greenfield_job_scope_guard',
+  'TO modula_backup',
 ])
 source('FAILURE PAYLOAD REDACTION', 'services/greenfield-api/migrations/043_greenfield_backend_v1_event_job_fabric.sql', [
   "payload = '{}'::jsonb",
@@ -58,6 +59,7 @@ source('FAILURE PAYLOAD REDACTION', 'services/greenfield-api/migrations/043_gree
 source('REVERSIBLE EVENT JOB MIGRATION', 'services/greenfield-api/migrations/043_greenfield_backend_v1_event_job_fabric.down.sql', [
   'DROP TRIGGER IF EXISTS background_jobs_scope_guard',
   'DROP TRIGGER IF EXISTS greenfield_domain_events_scope_guard',
+  'FROM modula_backup',
   "value='042'",
 ])
 source('SCOPED BACKEND EVENT ROUTE', 'services/greenfield-api/src/backend-fabric/routes.ts', [

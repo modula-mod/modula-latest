@@ -216,6 +216,7 @@ ALTER TABLE job_failures
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON background_jobs, job_failures TO modula_api, modula_worker;
 GRANT SELECT, INSERT, UPDATE, DELETE ON greenfield_domain_events TO modula_api, modula_worker;
+GRANT SELECT ON background_jobs, job_failures, greenfield_domain_events TO modula_backup;
 
 INSERT INTO schema_metadata (key, value) VALUES ('schema_version', '043')
 ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value, updated_at=NOW();

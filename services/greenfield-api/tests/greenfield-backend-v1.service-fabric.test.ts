@@ -89,6 +89,15 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
     await new Promise<void>(resolve => brokerServer?.close(() => resolve()))
   })
 
+  it('grants the backup role read-only event and job ledger access', async () => {
+    for (const table of ['background_jobs', 'job_failures', 'greenfield_domain_events']) {
+      const result = await sql<{allowed: boolean}>`
+        SELECT has_table_privilege('modula_backup', ${`public.${table}`}, 'SELECT') AS allowed
+      `.execute(db)
+      expect(result.rows[0]?.allowed, `modula_backup SELECT on ${table}`).toBe(true)
+    }
+  })
+
   it('requires a verified service assertion and rejects raw bearer forwarding', async () => {
     const missing = await app.inject({method: 'GET', url: `/v1/backend/products/${productId}/identity/context`})
     expect(missing.statusCode).toBe(401)

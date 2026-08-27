@@ -1,3 +1,5 @@
+REVOKE SELECT ON background_jobs, job_failures, greenfield_domain_events FROM modula_backup;
+
 ALTER TABLE job_failures
   DROP CONSTRAINT IF EXISTS job_failures_payload_redacted_check,
   DROP CONSTRAINT IF EXISTS job_failures_payload_fingerprint_check,
