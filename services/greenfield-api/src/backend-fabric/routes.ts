@@ -12,6 +12,12 @@ import {GreenfieldModuleRecordService} from '../modules/record-service.js'
 import {collectionPermission, GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
 import {CredentialBrokerClient} from '../secrets/index.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
+import {
+  GreenfieldBackendEventJobService,
+  type BackendEventPublishInput,
+  type BackendJobClaimInput,
+  type BackendJobEnqueueInput,
+} from './event-job-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -25,6 +31,7 @@ export async function registerBackendFabricRoutes(
   const records = new GreenfieldModuleRecordService(db)
   const ledger = new GreenfieldDataLedgerService(db)
   const credentialBroker = new CredentialBrokerClient(config)
+  const eventJobs = new GreenfieldBackendEventJobService(db)
   const readConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
   const writeConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
 
@@ -37,6 +44,17 @@ export async function registerBackendFabricRoutes(
     const productId = String((request.params as {productId?: string}).productId ?? '')
     const assertion = await assertions.resolveServiceAssertion(header.trim(), productId)
     if (!assertion) throw moduleError('UNAUTHENTICATED', 'Service assertion is invalid, expired or outside the product scope')
+    const service = await db
+      .selectFrom('greenfield_module_service_registrations')
+      .select('service_registration_id')
+      .where('installation_id', '=', assertion.targetInstallationId)
+      .where('account_id', '=', assertion.accountId)
+      .where('module_id', '=', assertion.targetProductId)
+      .where('service_id', '=', assertion.targetServiceId)
+      .where('status', '=', 'registered')
+      .where('health_state', 'in', ['healthy', 'degraded'])
+      .executeTakeFirst()
+    if (!service) throw moduleError('FORBIDDEN', 'Target service registration is disabled, unhealthy or unavailable')
     return {productId, assertion, rawAssertion: header.trim()}
   }
 
@@ -212,6 +230,89 @@ export async function registerBackendFabricRoutes(
     })
   })
 
+  app.post('/v1/backend/products/:productId/events', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'events.publish')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const input = eventPublishInput(request.body)
+      if (requiredIdempotencyKey(request) !== input.eventId) throw moduleError('VALIDATION_FAILED', 'Event idempotency key must equal eventId')
+      return executeIdempotent(db, assertion, request, `events.publish:${input.eventType}`, () => eventJobs.publishEvent(assertion, runtime, input))
+    }, 202)
+  })
+
+  app.post('/v1/backend/products/:productId/jobs', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.enqueue')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const input = jobEnqueueInput(request.body)
+      if (requiredIdempotencyKey(request) !== input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Job idempotency header must equal the body idempotencyKey')
+      return executeIdempotent(db, assertion, request, `jobs.enqueue:${input.action}`, () => eventJobs.enqueueJob(assertion, runtime, input))
+    }, 201)
+  })
+
+  app.post('/v1/backend/products/:productId/jobs/claim', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.claim')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return eventJobs.claimJobs(assertion, runtime, jobClaimInput(request.body))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/jobs/:jobId/start', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.execute')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return eventJobs.startJob(assertion, runtime, jobIdParam(request))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/jobs/:jobId/succeed', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.execute')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const body = requireObject(request.body)
+      return eventJobs.succeedJob(assertion, runtime, jobIdParam(request), nullableString(body.resultReference, 'resultReference'))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/jobs/:jobId/fail', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.execute')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const body = requireObject(request.body)
+      return eventJobs.failJob(
+        assertion,
+        runtime,
+        jobIdParam(request),
+        requiredString(body.errorClass, 'errorClass'),
+        requiredBoolean(body.retryable, 'retryable'),
+      )
+    })
+  })
+
+  app.get('/v1/backend/products/:productId/jobs/:jobId/result', readConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireAssertionOperation(assertion, 'jobs.result')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return eventJobs.jobResult(assertion, runtime, jobIdParam(request))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/jobs/:jobId/cancel', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'jobs.cancel')
+      const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return eventJobs.cancelJob(assertion, runtime, jobIdParam(request))
+    })
+  })
+
   app.post('/v1/backend/products/:productId/secrets/lease', writeConfig, async (request, reply) => {
     return serviceRoute(reply, request, authenticate, async ({productId, assertion, rawAssertion}) => {
       requireAssertionOperation(assertion, 'secrets.use')
@@ -372,6 +473,59 @@ function migrationInput(value: unknown, requestId: string): RecordDataMigrationI
   }
 }
 
+function eventPublishInput(value: unknown): BackendEventPublishInput {
+  const body = requireObject(value)
+  const classification = requiredString(body.classification, 'classification')
+  if (!['public', 'internal', 'private', 'sensitive', 'restricted'].includes(classification)) {
+    throw moduleError('VALIDATION_FAILED', 'classification is not supported')
+  }
+  return {
+    eventId: requiredString(body.eventId, 'eventId'),
+    eventType: requiredString(body.eventType, 'eventType'),
+    schemaVersion: requiredString(body.schemaVersion, 'schemaVersion'),
+    producer: requiredString(body.producer, 'producer'),
+    accountId: nullableString(body.accountId, 'accountId'),
+    installationId: nullableString(body.installationId, 'installationId'),
+    occurredAt: requiredString(body.occurredAt, 'occurredAt'),
+    traceId: requiredString(body.traceId, 'traceId'),
+    classification: classification as BackendEventPublishInput['classification'],
+    payload: requireObject(body.payload),
+  }
+}
+
+function jobEnqueueInput(value: unknown): BackendJobEnqueueInput {
+  const body = requireObject(value)
+  if (!Object.prototype.hasOwnProperty.call(body, 'input')) throw moduleError('VALIDATION_FAILED', 'input is required')
+  return {
+    jobId: requiredString(body.jobId, 'jobId'),
+    ownerAccountId: requiredString(body.ownerAccountId, 'ownerAccountId'),
+    productId: requiredString(body.productId, 'productId'),
+    installationId: requiredString(body.installationId, 'installationId'),
+    action: requiredString(body.action, 'action'),
+    serviceId: requiredString(body.serviceId, 'serviceId'),
+    maximumAttempts: requiredInteger(body.maximumAttempts, 'maximumAttempts'),
+    timeoutMs: requiredInteger(body.timeoutMs, 'timeoutMs'),
+    idempotencyKey: requiredString(body.idempotencyKey, 'idempotencyKey'),
+    traceId: requiredString(body.traceId, 'traceId'),
+    input: body.input,
+  }
+}
+
+function jobClaimInput(value: unknown): BackendJobClaimInput {
+  if (value === undefined || value === null) return {}
+  const body = requireObject(value)
+  let actions: string[] | undefined
+  if (body.actions !== undefined) {
+    if (!Array.isArray(body.actions) || !body.actions.every(item => typeof item === 'string')) throw moduleError('VALIDATION_FAILED', 'actions must be an array of strings')
+    actions = body.actions.map(item => item.trim())
+  }
+  return {
+    actions,
+    maxJobs: optionalInteger(body.maxJobs, 'maxJobs'),
+    leaseDurationMs: optionalInteger(body.leaseDurationMs, 'leaseDurationMs'),
+  }
+}
+
 function optionalDate(value: unknown, field: string): Date | null | undefined {
   if (value === undefined) return undefined
   if (value === null) return null
@@ -399,6 +553,10 @@ function resourceParam(request: FastifyRequest): string {
   return requiredString((request.params as {resourceId?: unknown}).resourceId, 'resourceId')
 }
 
+function jobIdParam(request: FastifyRequest): string {
+  return requiredString((request.params as {jobId?: unknown}).jobId, 'jobId')
+}
+
 function installationParam(request: FastifyRequest): string {
   return requiredString((request.params as {installationId?: unknown}).installationId, 'installationId')
 }
@@ -411,6 +569,25 @@ function requireObject(value: unknown): Record<string, unknown> {
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== 'string' || !value.trim() || value.length > 240) throw moduleError('VALIDATION_FAILED', `${field} is required`)
   return value.trim()
+}
+
+function nullableString(value: unknown, field: string): string | null {
+  if (value === undefined || value === null) return null
+  return requiredString(value, field)
+}
+
+function requiredInteger(value: unknown, field: string): number {
+  if (typeof value !== 'number' || !Number.isInteger(value)) throw moduleError('VALIDATION_FAILED', `${field} must be an integer`)
+  return value
+}
+
+function optionalInteger(value: unknown, field: string): number | undefined {
+  return value === undefined ? undefined : requiredInteger(value, field)
+}
+
+function requiredBoolean(value: unknown, field: string): boolean {
+  if (typeof value !== 'boolean') throw moduleError('VALIDATION_FAILED', `${field} must be a boolean`)
+  return value
 }
 
 function secretReference(value: unknown): string {

@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto'
-import type {EventDataClassification, EventVisibility, GreenfieldDomainEvent} from '@modula/greenfield-contracts'
+import type {EventDataClassification, EventProducerKind, EventVisibility, GreenfieldDomainEvent} from '@modula/greenfield-contracts'
 import {getEventSchema} from '@modula/greenfield-schema-registry'
 import type {Kysely, Transaction} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
@@ -17,6 +17,12 @@ export type GreenfieldDomainEventRecord = {
   aggregateVersion: number | null
   accountId: string | null
   actorId: string | null
+  producerKind: EventProducerKind
+  producerId: string
+  productId: string | null
+  installationId: string | null
+  releaseId: string | null
+  traceId: string
   requestId: string
   correlationId: string
   causationId: string | null
@@ -30,6 +36,7 @@ export type GreenfieldDomainEventRecord = {
 }
 
 export type GreenfieldDomainEventInput = {
+  eventId?: string
   eventType: string
   eventVersion?: string
   aggregateType: string
@@ -37,6 +44,12 @@ export type GreenfieldDomainEventInput = {
   aggregateVersion?: number | null
   accountId?: string | null
   actorId?: string | null
+  producerKind?: EventProducerKind
+  producerId?: string
+  productId?: string | null
+  installationId?: string | null
+  releaseId?: string | null
+  traceId?: string | null
   requestId?: string | null
   correlationId?: string | null
   causationId?: string | null
@@ -77,9 +90,10 @@ export class GreenfieldDomainEventRepository {
     }
 
     const now = new Date()
-    const eventId = `event-${uuidv7()}`
+    const eventId = input.eventId ?? `event-${uuidv7()}`
     const requestId = input.requestId ?? eventId
     const correlationId = input.correlationId ?? requestId
+    const traceId = input.traceId ?? correlationId
     try {
       const inserted = await this.db
         .insertInto('greenfield_domain_events')
@@ -92,6 +106,12 @@ export class GreenfieldDomainEventRepository {
           aggregate_version: input.aggregateVersion ?? null,
           account_id: input.accountId ?? null,
           actor_id: input.actorId ?? null,
+          producer_kind: input.producerKind ?? (input.productId ? 'product' : 'service'),
+          producer_id: input.producerId ?? 'service.greenfield-api',
+          product_id: input.productId ?? null,
+          installation_id: input.installationId ?? null,
+          release_id: input.releaseId ?? null,
+          trace_id: traceId,
           request_id: requestId,
           correlation_id: correlationId,
           causation_id: input.causationId ?? null,
@@ -190,6 +210,12 @@ export class GreenfieldDomainEventRepository {
           aggregateId: event.aggregate_id,
           requestId: event.request_id,
           correlationId: event.correlation_id,
+          traceId: event.trace_id,
+          producerKind: event.producer_kind,
+          producerId: event.producer_id,
+          productId: event.product_id,
+          installationId: event.installation_id,
+          releaseId: event.release_id,
           visibility: event.visibility,
           classification: event.classification,
         },
@@ -224,6 +250,9 @@ export function toGreenfieldDomainEventEnvelope(row: Database['greenfield_domain
     eventVersion: row.event_version,
     aggregateType: row.aggregate_type,
     aggregateId: row.aggregate_id,
+    producerKind: row.producer_kind,
+    producerId: row.producer_id,
+    traceId: row.trace_id,
     requestId: row.request_id,
     correlationId: row.correlation_id,
     occurredAt: row.occurred_at.toISOString(),
@@ -236,6 +265,9 @@ export function toGreenfieldDomainEventEnvelope(row: Database['greenfield_domain
   if (row.aggregate_version !== null) envelope.aggregateVersion = row.aggregate_version
   if (row.account_id !== null) envelope.accountId = row.account_id
   if (row.actor_id !== null) envelope.actorId = row.actor_id
+  if (row.product_id !== null) envelope.productId = row.product_id
+  if (row.installation_id !== null) envelope.installationId = row.installation_id
+  if (row.release_id !== null) envelope.releaseId = row.release_id
   if (row.causation_id !== null) envelope.causationId = row.causation_id
   return envelope
 }
@@ -250,6 +282,12 @@ function toDomainEventRecord(row: Database['greenfield_domain_events']): Greenfi
     aggregateVersion: row.aggregate_version,
     accountId: row.account_id,
     actorId: row.actor_id,
+    producerKind: row.producer_kind,
+    producerId: row.producer_id,
+    productId: row.product_id,
+    installationId: row.installation_id,
+    releaseId: row.release_id,
+    traceId: row.trace_id,
     requestId: row.request_id,
     correlationId: row.correlation_id,
     causationId: row.causation_id,

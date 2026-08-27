@@ -2,7 +2,7 @@ import {createHash} from 'node:crypto'
 import type {ModulaWorkerDb} from '../database.js'
 
 type DispatchPayload = {
-  event?: {eventId?: string; eventType?: string; accountId?: string; requestId?: string; payload?: Record<string, unknown>}
+  event?: {eventId?: string; eventType?: string; accountId?: string; requestId?: string; traceId?: string; payload?: Record<string, unknown>}
   subscriberId?: string
 }
 
@@ -76,7 +76,9 @@ export async function handleExtensionEventDispatch(db: ModulaWorkerDb, payload: 
         id: `job-${executionId}`,
         job_type: 'extension.job.execute',
         payload: {executionId, accountId: event.accountId, extensionProductId: subscription.extension_product_id, requestId: event.requestId ?? event.eventId},
-        status: 'pending',
+        status: 'QUEUED',
+        action: 'extension.job.execute',
+        trace_id: event.traceId ?? event.requestId ?? event.eventId,
         priority: 100,
         available_at: now,
         lease_owner: null,

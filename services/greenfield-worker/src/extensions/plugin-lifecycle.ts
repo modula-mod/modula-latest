@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto'
 import {sql} from 'kysely'
 import type {ModulaWorkerDb} from '../database.js'
 import {PermanentJobError} from '../jobs/errors.js'
@@ -45,9 +46,11 @@ export async function handlePluginLifecycle(
         id: `plugin-fail-${Date.now()}`,
             job_id: payload.backgroundJobId ?? `plugin-${payload.extensionId}`,
         job_type: jobType,
-        payload,
+        payload: {},
+        payload_fingerprint: `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`,
         error_code: code,
-        error_message: message,
+        error_class: code,
+        error_message: `Plugin lifecycle failed with ${code}`,
         permanent: code === 'PLUGIN_TIMEOUT' || Boolean(payload.simulateFailure),
         created_at: new Date(),
       })

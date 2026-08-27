@@ -414,7 +414,7 @@ describeIf('Phase 6S social product integration', () => {
       .selectFrom('background_jobs')
       .select(['payload'])
       .where('job_type', '=', `notification.${kind}`)
-      .where('status', '=', 'pending')
+      .where('status', '=', 'QUEUED')
       .orderBy('created_at', 'desc')
       .execute()
     const payload = job.find(row => (row.payload as any)?.resourceId === resourceId)?.payload

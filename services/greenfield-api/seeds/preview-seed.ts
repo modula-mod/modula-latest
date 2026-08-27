@@ -573,17 +573,19 @@ export async function runSeed(connectionString: string): Promise<void> {
     )
     await client.query(
       `INSERT INTO background_jobs (
-        id, job_type, payload, status, priority, available_at, lease_owner, lease_expires_at,
+        id, job_type, action, trace_id, payload, status, priority, available_at, lease_owner, lease_expires_at,
         attempt_count, maximum_attempts, last_error, created_at, updated_at, completed_at
       )
       VALUES
-        ('background-phase6s-plugin-throw','plugin.enable','{"accountId":"account-phase6s-fixture","extensionId":"modula.core.moderationPlugin","simulateFailure":true}'::jsonb,'pending',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
-        ('background-phase6s-plugin-timeout','plugin.enable','{"accountId":"account-phase6s-fixture","extensionId":"modula.core.mediaFunctions","simulateTimeout":true}'::jsonb,'pending',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
-        ('background-phase6s-function-invalid-payload','function.invoke','{"jobId":"function-job-phase6s-invalid-payload","accountId":"account-phase6s-fixture","functionId":"modula.function.linkPreview","input":{"__phase6sFailureMode":"invalidPayload"},"timeoutMs":1000}'::jsonb,'pending',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
-        ('background-phase6s-function-timeout','function.invoke','{"jobId":"function-job-phase6s-timeout","accountId":"account-phase6s-fixture","functionId":"modula.function.generatePostSummaryPreview","input":{"__phase6sFailureMode":"timeout"},"timeoutMs":100}'::jsonb,'pending',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
-        ('background-phase6s-function-example','function.invoke','{"jobId":"function-job-phase6s-example","accountId":"account-phase6s-fixture","functionId":"modula.function.linkPreview","input":{"url":"https://modula.digital"},"timeoutMs":10000}'::jsonb,'pending',10,NOW(),NULL,NULL,0,3,NULL,NOW(),NOW(),NULL)
+        ('background-phase6s-plugin-throw','plugin.enable','plugin.enable','preview-seed:background-phase6s-plugin-throw','{"accountId":"account-phase6s-fixture","extensionId":"modula.core.moderationPlugin","simulateFailure":true}'::jsonb,'QUEUED',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
+        ('background-phase6s-plugin-timeout','plugin.enable','plugin.enable','preview-seed:background-phase6s-plugin-timeout','{"accountId":"account-phase6s-fixture","extensionId":"modula.core.mediaFunctions","simulateTimeout":true}'::jsonb,'QUEUED',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
+        ('background-phase6s-function-invalid-payload','function.invoke','function.invoke','preview-seed:background-phase6s-function-invalid-payload','{"jobId":"function-job-phase6s-invalid-payload","accountId":"account-phase6s-fixture","functionId":"modula.function.linkPreview","input":{"__phase6sFailureMode":"invalidPayload"},"timeoutMs":1000}'::jsonb,'QUEUED',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
+        ('background-phase6s-function-timeout','function.invoke','function.invoke','preview-seed:background-phase6s-function-timeout','{"jobId":"function-job-phase6s-timeout","accountId":"account-phase6s-fixture","functionId":"modula.function.generatePostSummaryPreview","input":{"__phase6sFailureMode":"timeout"},"timeoutMs":100}'::jsonb,'QUEUED',10,NOW(),NULL,NULL,0,1,NULL,NOW(),NOW(),NULL),
+        ('background-phase6s-function-example','function.invoke','function.invoke','preview-seed:background-phase6s-function-example','{"jobId":"function-job-phase6s-example","accountId":"account-phase6s-fixture","functionId":"modula.function.linkPreview","input":{"url":"https://modula.digital"},"timeoutMs":10000}'::jsonb,'QUEUED',10,NOW(),NULL,NULL,0,3,NULL,NOW(),NOW(),NULL)
       ON CONFLICT (id) DO UPDATE SET
-        status='pending',
+        action=EXCLUDED.action,
+        trace_id=EXCLUDED.trace_id,
+        status='QUEUED',
         available_at=NOW(),
         lease_owner=NULL,
         lease_expires_at=NULL,
@@ -591,7 +593,7 @@ export async function runSeed(connectionString: string): Promise<void> {
         last_error=NULL,
         updated_at=NOW(),
         completed_at=NULL
-      WHERE background_jobs.status = 'dead_letter'
+      WHERE background_jobs.status = 'DEAD_LETTER'
         AND background_jobs.last_error LIKE 'Unsupported job type %'`,
     )
     await client.query(

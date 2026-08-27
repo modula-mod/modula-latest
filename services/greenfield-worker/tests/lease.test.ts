@@ -1,14 +1,15 @@
 import {randomUUID} from 'node:crypto'
 import {readFileSync} from 'node:fs'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
-import {claimNextJob} from '../src/jobs/claim.js'
+import {claimNextJob, reapExpiredLeases} from '../src/jobs/claim.js'
 import {createDb, type ModulaWorkerDb} from '../src/database.js'
 
 describe('lease exclusivity', () => {
   it('uses SKIP LOCKED claim SQL', () => {
     const src = readFileSync(new URL('../src/jobs/claim.ts', import.meta.url), 'utf8')
     expect(src).toContain('FOR UPDATE SKIP LOCKED')
-    expect(src).toContain("status = 'leased'")
+    expect(src).toContain("status = 'LEASED'")
+    expect(src).toContain("dispatch_mode = 'GREENFIELD_WORKER'")
   })
 })
 
@@ -29,7 +30,7 @@ describeLive('lease exclusivity (live database)', () => {
     if (jobIds.length > 0) {
       await db
         .updateTable('background_jobs')
-        .set({status: 'completed', lease_owner: null, lease_expires_at: null})
+        .set({status: 'SUCCEEDED', lease_owner: null, lease_expires_at: null})
         .where('id', 'in', jobIds)
         .execute()
     }
@@ -45,7 +46,9 @@ describeLive('lease exclusivity (live database)', () => {
         id: jobId,
         job_type: 'notification.create',
         payload: {smoke: true} as never,
-        status: 'pending',
+        status: 'QUEUED',
+        action: 'notification.create',
+        trace_id: jobId,
         priority: -1_000,
         available_at: new Date(),
         attempt_count: 0,
@@ -63,7 +66,7 @@ describeLive('lease exclusivity (live database)', () => {
 
     const claimed = [a, b, c].filter(job => job?.id === jobId)
     expect(claimed).toHaveLength(1)
-    expect(claimed[0]?.status).toBe('leased')
+    expect(claimed[0]?.status).toBe('LEASED')
   })
 
   it('does not reclaim a job whose lease has not expired', async () => {
@@ -75,7 +78,9 @@ describeLive('lease exclusivity (live database)', () => {
         id: jobId,
         job_type: 'notification.create',
         payload: {smoke: true} as never,
-        status: 'pending',
+        status: 'QUEUED',
+        action: 'notification.create',
+        trace_id: jobId,
         priority: -1_000,
         available_at: new Date(),
         attempt_count: 0,
@@ -90,5 +95,42 @@ describeLive('lease exclusivity (live database)', () => {
 
     const second = await claimNextJob(db, 'worker-b', 60_000)
     expect(second?.id).not.toBe(jobId)
+  })
+
+  it('dead-letters exhausted expired leases without retaining their payload', async () => {
+    const jobId = `test-lease-${randomUUID()}`
+    jobIds.push(jobId)
+    await db
+      .insertInto('background_jobs')
+      .values({
+        id: jobId,
+        job_type: 'notification.create',
+        payload: {apiKey: 'must-not-survive'} as never,
+        status: 'LEASED',
+        action: 'notification.create',
+        trace_id: jobId,
+        priority: -1_000,
+        available_at: new Date(0),
+        lease_owner: 'crashed-worker',
+        lease_expires_at: new Date(0),
+        attempt_count: 1,
+        maximum_attempts: 1,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .execute()
+
+    // The reaper intentionally processes a bounded batch across the shared queue.
+    // Other suites may leave additional expired fixtures, so assert that this
+    // invocation did work and prove this job's state below instead of assuming
+    // exclusive ownership of the database.
+    expect(await reapExpiredLeases(db)).toBeGreaterThanOrEqual(1)
+    const job = await db.selectFrom('background_jobs').select(['status', 'error_class', 'finished_at']).where('id', '=', jobId).executeTakeFirstOrThrow()
+    expect(job).toMatchObject({status: 'DEAD_LETTER', error_class: 'WORKER_LEASE_EXPIRED'})
+    expect(job.finished_at).not.toBeNull()
+    const failure = await db.selectFrom('job_failures').select(['payload', 'payload_fingerprint', 'error_message']).where('job_id', '=', jobId).executeTakeFirstOrThrow()
+    expect(failure.payload).toEqual({})
+    expect(failure.payload_fingerprint).toMatch(/^sha256:[a-f0-9]{64}$/)
+    expect(failure.error_message).not.toContain('must-not-survive')
   })
 })

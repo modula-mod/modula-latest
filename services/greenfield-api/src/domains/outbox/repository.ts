@@ -88,6 +88,7 @@ export class OutboxRepository {
   async enqueue(trx: Transaction<Database> | ModulaDb, input: EnqueueOutboxEventInput): Promise<void> {
     const now = new Date()
     const outboxId = `outbox-${randomUUID()}`
+    const jobId = `job-${randomUUID()}`
     await trx
       .insertInto('outbox_events')
       .values({
@@ -106,10 +107,12 @@ export class OutboxRepository {
     await trx
       .insertInto('background_jobs')
       .values({
-        id: `job-${randomUUID()}`,
+        id: jobId,
         job_type: input.eventType,
         payload: {...input.payload, outboxEventId: outboxId, aggregateType: input.aggregateType, aggregateId: input.aggregateId},
-        status: 'pending',
+        status: 'QUEUED',
+        action: input.eventType,
+        trace_id: outboxId,
         priority: 100,
         available_at: now,
         lease_owner: null,

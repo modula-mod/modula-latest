@@ -23,7 +23,7 @@ import {handleExtensionEventDispatch} from '../modules/extension-event-handler.j
 import {handleNotificationCreate} from '../notifications/create.js'
 import {handleSocialNotification} from '../notifications/social.js'
 import {handleSearchIndex, handleSearchReindex} from '../search/index.js'
-import {claimNextJob, completeJob, deadLetterJob, scheduleRetry} from './claim.js'
+import {claimNextJob, completeJob, deadLetterJob, markJobRunning, scheduleRetry} from './claim.js'
 import {errorCodeFor, isPermanentFailure, messageFor} from './errors.js'
 import {computeNextAvailableAt} from './retry.js'
 
@@ -32,7 +32,9 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
   if (!job) return false
 
   try {
-    switch (job.job_type) {
+    await markJobRunning(db, job.id, config.workerId)
+    await withTimeout((async () => {
+      switch (job.job_type) {
       case 'notification.create':
         await handleNotificationCreate(db, job.payload)
         break
@@ -180,23 +182,37 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
         break
       case 'audit.checkpoint':
         break
-      default:
-        throw Object.assign(new Error(`Unsupported job type ${job.job_type}`), {
-          code: 'UNSUPPORTED_RECORD_TYPE',
-        })
-    }
+        default:
+          throw Object.assign(new Error(`Unsupported job type ${job.job_type}`), {
+            code: 'UNSUPPORTED_RECORD_TYPE',
+          })
+      }
+    })(), job.timeout_ms)
     await completeJob(db, job.id)
   } catch (error: unknown) {
     const code = errorCodeFor(error)
     const message = messageFor(error)
-    const permanent = isPermanentFailure(error) || job.attempt_count >= job.maximum_attempts
-    if (permanent) {
-      await deadLetterJob(db, job, code, message, true)
+    const permanent = isPermanentFailure(error)
+    const exhausted = job.attempt_count >= job.maximum_attempts
+    if (permanent || exhausted) {
+      await deadLetterJob(db, job, code, message, permanent)
     } else {
-      await scheduleRetry(db, job.id, computeNextAvailableAt(job.attempt_count + 1), message)
+      await scheduleRetry(db, job.id, computeNextAvailableAt(job.attempt_count + 1), code, message)
     }
   }
   return true
+}
+
+async function withTimeout<T>(operation: Promise<T>, timeoutMs: number): Promise<T> {
+  let timer: NodeJS.Timeout | undefined
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => reject(Object.assign(new Error('Job execution exceeded its declared timeout'), {code: 'JOB_TIMEOUT'})), timeoutMs)
+  })
+  try {
+    return await Promise.race([operation, timeout])
+  } finally {
+    if (timer) clearTimeout(timer)
+  }
 }
 
 function withBackgroundJobId(payload: unknown, backgroundJobId: string): unknown {

@@ -41,10 +41,11 @@ export async function drainOutboxOnce(db: ModulaWorkerDb, batchSize: number): Pr
         .executeTakeFirst()
 
       if (!alreadyEnqueued) {
+        const jobId = randomUUID()
         await trx
           .insertInto('background_jobs')
           .values({
-            id: randomUUID(),
+            id: jobId,
             job_type: event.event_type,
             payload: {
               outboxId: event.id,
@@ -52,7 +53,9 @@ export async function drainOutboxOnce(db: ModulaWorkerDb, batchSize: number): Pr
               aggregateId: event.aggregate_id,
               ...(event.payload as object),
             },
-            status: 'pending',
+            status: 'QUEUED',
+            action: event.event_type,
+            trace_id: event.id,
             priority: 100,
             available_at: now,
             lease_owner: null,
