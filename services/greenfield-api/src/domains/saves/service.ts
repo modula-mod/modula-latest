@@ -1,13 +1,17 @@
 import {randomUUID} from 'node:crypto'
+import type {SocialPostDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import {AuditRepository} from '../audit/repository.js'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
+import {PostRepository} from '../posts/repository.js'
 
 export class SaveService {
   private readonly policies: GreenfieldPolicyEngine
+  private readonly posts: PostRepository
 
   constructor(private readonly db: ModulaDb) {
     this.policies = new GreenfieldPolicyEngine(db)
+    this.posts = new PostRepository(db)
   }
 
   async save(actorId: string, postId: string) {
@@ -28,6 +32,8 @@ export class SaveService {
   }
   async listSaves(actorId: string, requestedActorId = actorId) {
     if (requestedActorId !== actorId) throw Object.assign(new Error('Saves are private'), {code: 'FORBIDDEN'})
-    return this.db.selectFrom('post_saves').innerJoin('posts', 'posts.id', 'post_saves.post_id').selectAll('posts').where('post_saves.actor_id', '=', actorId).where('post_saves.deleted_at', 'is', null).where('posts.deleted_at', 'is', null).orderBy('post_saves.created_at', 'desc').execute()
+    const rows = await this.db.selectFrom('post_saves').select(['post_id']).where('actor_id', '=', actorId).where('deleted_at', 'is', null).orderBy('created_at', 'desc').execute()
+    const hydrated = await Promise.all(rows.map(row => this.posts.getById(row.post_id, actorId)))
+    return hydrated.filter((post): post is SocialPostDto => post !== null).map(post => ({...post, saved: true}))
   }
 }

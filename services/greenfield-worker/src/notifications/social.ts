@@ -58,6 +58,7 @@ export async function handleSocialNotification(
     throw new PermanentJobError('VALIDATION_FAILED', 'recipientActorId and resourceId required')
   }
   if (actorId && actorId === recipientActorId) return
+  if (actorId && await blockedEitherDirection(db, actorId, recipientActorId)) return
 
   const category = kind === 'extension' ? 'module' : 'social'
   const prefs = await db
@@ -138,6 +139,19 @@ export async function handleSocialNotification(
       version: 1,
     })
     .execute()
+}
+
+async function blockedEitherDirection(db: ModulaWorkerDb, actorA: string, actorB: string): Promise<boolean> {
+  const row = await db
+    .selectFrom('blocks')
+    .select('id')
+    .where('deleted_at', 'is', null)
+    .where(({eb, or, and}) => or([
+      and([eb('blocker_actor_id', '=', actorA), eb('blocked_actor_id', '=', actorB)]),
+      and([eb('blocker_actor_id', '=', actorB), eb('blocked_actor_id', '=', actorA)]),
+    ]))
+    .executeTakeFirst()
+  return Boolean(row)
 }
 
 function categoryDisabled(value: unknown, category: string): boolean {

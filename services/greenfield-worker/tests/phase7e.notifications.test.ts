@@ -26,6 +26,7 @@ describeLive('Phase 7E notification worker', () => {
 
   afterAll(async () => {
     if (db) {
+      await db.deleteFrom('blocks').where('blocker_actor_id', 'in', [recipientActorId, actorId]).execute()
       await db.deleteFrom('notifications').where('recipient_actor_id', '=', recipientActorId).execute()
       await db.deleteFrom('notification_preferences').where('actor_id', '=', recipientActorId).execute()
       await db.deleteFrom('actors').where('id', 'in', [recipientActorId, actorId]).execute()
@@ -131,6 +132,38 @@ describeLive('Phase 7E notification worker', () => {
     expect(row.category).toBe('social')
     expect(row.aggregate_count).toBe(2)
     expect(row.body).toBe('2 people reacted to your post')
+  })
+
+  it('suppresses generic and social notifications across a block in either direction', async () => {
+    await db.insertInto('blocks').values({
+      id: randomUUID(),
+      blocker_actor_id: recipientActorId,
+      blocked_actor_id: actorId,
+      created_at: new Date(),
+      updated_at: new Date(),
+      deleted_at: null,
+      version: 1,
+    }).execute()
+
+    await handleNotificationCreate(db, {
+      recipientActorId,
+      actorId,
+      type: 'mention',
+      dedupeKey: 'blocked:generic',
+      resourceId: 'blocked-generic',
+    })
+    await handleSocialNotification(db, 'reply', {
+      recipientActorId,
+      actorId,
+      resourceType: 'post',
+      resourceId: 'blocked-social',
+    })
+
+    const rows = await db.selectFrom('notifications').select('id')
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('resource_id', 'in', ['blocked-generic', 'blocked-social'])
+      .execute()
+    expect(rows).toHaveLength(0)
   })
 })
 

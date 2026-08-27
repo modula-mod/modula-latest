@@ -412,7 +412,7 @@ export class StoryService {
     }
   }
 
-  private async canViewGroup(
+  async canViewGroup(
     viewerActorId: string | null,
     ownerActorId: string,
     visibility: 'public' | 'followers' | 'close',

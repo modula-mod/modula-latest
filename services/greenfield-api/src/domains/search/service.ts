@@ -69,7 +69,7 @@ export class GreenfieldSearchService {
     const query = normalizeSearchQuery(String(raw.query ?? raw.q ?? ''), limits)
     const limit = Math.min(Number(raw.limit ?? 10) || 10, 20)
     return {
-      suggestions: await this.repository.suggestions({query, accountId: actor.accountId, limit}),
+      suggestions: await this.repository.suggestions({query, accountId: actor.accountId, actorId: actor.actorId, limit}),
       requestId: actor.requestId,
     }
   }

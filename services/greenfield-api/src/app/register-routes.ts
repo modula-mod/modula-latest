@@ -6,6 +6,8 @@ import {
   type AtmosphereFeedMode,
   type CreatePostInput,
   type CreateReportInput,
+  type ModerationActionType,
+  type ReportStatus,
   type SearchType,
   type UpdatePostInput,
 } from '@modula/api-contracts'
@@ -35,6 +37,8 @@ import {NotificationRepository} from '../domains/notifications/repository.js'
 import {GreenfieldPolicyEngine} from '../domains/policy/index.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
+import {ReactionService} from '../domains/reactions/service.js'
+import {PostShareService, type PostShareChannel} from '../domains/shares/service.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
 import {ProfileWriteService} from '../domains/profiles/writes.js'
 import {GreenfieldSearchService} from '../domains/search/index.js'
@@ -141,6 +145,8 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const discovery = new DiscoveryRepository(db)
   const sessions = new SessionService(db, config)
   const postWrites = new PostWriteService(db, config)
+  const reactions = new ReactionService(db)
+  const postShares = new PostShareService(db)
   const postMediaStorage = new PostMediaStorage(config)
   const profileWrites = new ProfileWriteService(db)
   const moderation = new ModerationRepository(db)
@@ -1536,14 +1542,51 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
         if (!auth) return
         try {
           const {postId} = request.params as {postId: string}
-          await postWrites.setEngagement(auth.actorId, postId, kind, enabled)
-          return reply.send(successEnvelope({ok: true}, request.id))
+          if (kind === 'like') {
+            const current = await reactions.listReactions(auth.actorId, postId)
+            if (enabled && current.viewerReaction !== 'like') await reactions.setReaction(auth.actorId, postId, 'like')
+            if (!enabled && current.viewerReaction === 'like') await reactions.setReaction(auth.actorId, postId, null)
+          } else {
+            await postWrites.setEngagement(auth.actorId, postId, kind, enabled)
+          }
+          const post = await posts.getById(postId, auth.actorId)
+          if (!post) return sendError(reply, 'NOT_FOUND', 'Post not found', request.id)
+          return reply.send(successEnvelope({
+            liked: post.liked,
+            saved: post.saved,
+            reposted: post.reposted,
+            likeCount: post.likeCount,
+            reactionCount: post.reactionCount,
+            viewerReaction: post.viewerReaction,
+            replyCount: post.replyCount,
+            repostCount: post.repostCount,
+            quoteCount: post.quoteCount,
+          }, request.id))
         } catch (error: any) {
           return mapDomainError(reply, error, request.id, 'Engagement failed')
         }
       },
     })
   }
+
+  app.post('/v1/posts/:postId/share', writeConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    try {
+      const {postId} = request.params as {postId: string}
+      const body = (request.body ?? {}) as {channel?: PostShareChannel; idempotencyKey?: string}
+      const share = await postShares.record({
+        actorId: auth.actorId,
+        postId,
+        channel: body.channel ?? 'native',
+        idempotencyKey: idempotencyKey(request, body),
+      })
+      return reply.code(201).send(successEnvelope(share, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Share failed')
+    }
+  })
 
   app.get('/v1/profiles/:handle', profileConfig, async (request, reply) => {
     const {handle} = request.params as {handle: string}
@@ -1741,6 +1784,82 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
 
+  app.get('/v1/reports/me', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'report:create')
+    if (!auth) return
+    try {
+      const query = request.query as Record<string, unknown>
+      return reply.send(successEnvelope({items: await moderation.listForReporter(auth.actorId, parseLimit(query.limit))}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to load reports')
+    }
+  })
+
+  app.get('/v1/admin/moderation/reports', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    try {
+      const query = request.query as Record<string, unknown>
+      const limit = parseLimit(query.limit)
+      const cursor = decodeCursor(query.cursor)
+      const items = await moderation.listReports({
+        status: typeof query.status === 'string' ? query.status : undefined,
+        limit,
+        cursor,
+      })
+      return reply.send(successEnvelope(toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to load moderation queue')
+    }
+  })
+
+  app.get('/v1/admin/moderation/reports/:reportId', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    try {
+      const {reportId} = request.params as {reportId: string}
+      return reply.send(successEnvelope(await moderation.getReport(reportId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to load report')
+    }
+  })
+
+  app.patch('/v1/admin/moderation/reports/:reportId', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    try {
+      const {reportId} = request.params as {reportId: string}
+      const body = (request.body ?? {}) as {status?: ReportStatus; resolution?: string; expectedVersion?: number}
+      return reply.send(successEnvelope(await moderation.reviewReport({
+        reportId,
+        reviewerActorId: auth.actorId,
+        status: body.status as ReportStatus,
+        resolution: body.resolution,
+        expectedVersion: Number(body.expectedVersion),
+      }), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to review report')
+    }
+  })
+
+  app.post('/v1/admin/moderation/reports/:reportId/actions', writeConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:moderation')
+    if (!auth) return
+    try {
+      const {reportId} = request.params as {reportId: string}
+      const body = (request.body ?? {}) as {actionType?: ModerationActionType; note?: string; expectedVersion?: number}
+      return reply.send(successEnvelope(await moderation.applyAction({
+        reportId,
+        reviewerActorId: auth.actorId,
+        actionType: body.actionType as ModerationActionType,
+        note: body.note,
+        expectedVersion: Number(body.expectedVersion),
+      }), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to apply moderation action')
+    }
+  })
+
   app.get('/v1/notifications', feedConfig, async (request, reply) => {
     const auth = requireCapability(request, reply, 'social:read')
     if (!auth) return
@@ -1900,6 +2019,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       .innerJoin('posts', 'posts.id', 'post_media.post_id')
       .select([
         'post_media.id as media_id',
+        'posts.id as post_id',
         'posts.author_actor_id as author_actor_id',
         'posts.audience as audience',
       ])
@@ -1908,26 +2028,24 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       .where('posts.deleted_at', 'is', null)
       .executeTakeFirst()
     if (!row) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
-    if (row.audience !== 'public' && request.auth?.actorId !== row.author_actor_id) {
-      return sendError(reply, 'FORBIDDEN', 'Media unavailable', request.id)
-    }
+    if (!await posts.getById(row.post_id, request.auth?.actorId ?? null)) return sendError(reply, 'FORBIDDEN', 'Media unavailable', request.id)
     const stored = await postMediaStorage.readPostMedia(mediaFile)
     if (!stored) return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
     return sendBrowserVisibleMedia(reply, stored.contentType, stored.bytes)
   })
 
   app.get('/v1/discover', feedConfig, async (request, reply) => {
-    const data = await discovery.getDiscover()
+    const data = await discovery.getDiscover(request.auth?.actorId ?? null)
     return reply.send(successEnvelope(data, request.id))
   })
 
   app.get('/v1/activity', feedConfig, async (request, reply) => {
-    const data = await discovery.listActivity()
+    const data = await discovery.listActivity(request.auth?.actorId ?? null)
     return reply.send(successEnvelope(data, request.id))
   })
 
   app.get('/v1/reels', feedConfig, async (request, reply) => {
-    const data = await discovery.listReels()
+    const data = await discovery.listReels(request.auth?.actorId ?? null)
     return reply.send(successEnvelope(data, request.id))
   })
 

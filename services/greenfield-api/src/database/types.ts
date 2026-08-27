@@ -30,7 +30,7 @@ export type AuthenticationChallengeResult = 'succeeded' | 'failed' | 'expired' |
 export type AuthenticationDeliveryChannel = 'email' | 'authenticator' | 'webauthn' | 'recovery' | 'internal' | 'external'
 export type SecurityEventSeverity = 'info' | 'notice' | 'warning' | 'critical'
 export type NotificationType = 'follow' | 'like' | 'repost' | 'reply' | 'mention' | 'module_event'
-export type ReportTargetType = 'profile' | 'post' | 'story' | 'message' | 'other'
+export type ReportTargetType = 'profile' | 'post' | 'comment' | 'story' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type BackgroundJobStatus = 'QUEUED' | 'LEASED' | 'RUNNING' | 'RETRYING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'DEAD_LETTER'
@@ -763,6 +763,10 @@ export interface Database {
     category: ReportCategory
     details: string
     status: ReportStatus
+    evidence_refs: unknown
+    reviewed_by_actor_id: string | null
+    reviewed_at: Date | null
+    resolution: string | null
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
@@ -776,6 +780,14 @@ export interface Database {
     metadata: unknown
     created_at: Date
     updated_at: Date
+  }
+  greenfield_post_shares: {
+    share_id: string
+    actor_id: string
+    post_id: string
+    channel: 'copy-link' | 'native' | 'direct' | 'external'
+    idempotency_key: string | null
+    created_at: Date
   }
   background_jobs: {
     id: string

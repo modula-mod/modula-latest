@@ -6,6 +6,7 @@ export class NotificationRepository {
   constructor(private readonly db: ModulaDb) {}
 
   async listForActor(actorId: string, limit: number, cursor: string | null): Promise<NotificationDto[]> {
+    const excludedActorIds = await this.excludedActorIds(actorId)
     let query = this.db
       .selectFrom('notifications')
       .selectAll()
@@ -14,6 +15,12 @@ export class NotificationRepository {
       .orderBy('created_at', 'desc')
       .orderBy('id', 'desc')
       .limit(limit + 1)
+    if (excludedActorIds.length > 0) {
+      query = query.where(({eb, or}) => or([
+        eb('actor_id', 'is', null),
+        eb('actor_id', 'not in', excludedActorIds),
+      ]))
+    }
     if (cursor) {
       const [createdAt, id] = cursor.split('|')
       if (!createdAt || !id) throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
@@ -39,6 +46,20 @@ export class NotificationRepository {
       readAt: row.read_at?.toISOString() ?? null,
       createdAt: row.created_at.toISOString(),
     }))
+  }
+
+  private async excludedActorIds(actorId: string): Promise<string[]> {
+    const [blocks, mutes] = await Promise.all([
+      this.db.selectFrom('blocks').select(['blocker_actor_id', 'blocked_actor_id'])
+        .where('deleted_at', 'is', null)
+        .where(({eb, or}) => or([eb('blocker_actor_id', '=', actorId), eb('blocked_actor_id', '=', actorId)]))
+        .execute(),
+      this.db.selectFrom('mutes').select('muted_actor_id')
+        .where('muter_actor_id', '=', actorId).where('deleted_at', 'is', null).execute(),
+    ])
+    const excluded = new Set(mutes.map(row => row.muted_actor_id))
+    for (const row of blocks) excluded.add(row.blocker_actor_id === actorId ? row.blocked_actor_id : row.blocker_actor_id)
+    return [...excluded]
   }
 
   async markRead(actorId: string, notificationId: string): Promise<boolean> {

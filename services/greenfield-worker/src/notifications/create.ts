@@ -85,6 +85,7 @@ export async function handleNotificationCreate(db: ModulaWorkerDb, rawPayload: u
   const payload = parsePayload(rawPayload)
 
   if (payload.actorId && payload.actorId === payload.recipientActorId) return // never notify yourself
+  if (payload.actorId && await blockedEitherDirection(db, payload.actorId, payload.recipientActorId)) return
 
   const preferences = await db
     .selectFrom('notification_preferences')
@@ -157,6 +158,19 @@ export async function handleNotificationCreate(db: ModulaWorkerDb, rawPayload: u
       version: 1,
     })
     .execute()
+}
+
+async function blockedEitherDirection(db: ModulaWorkerDb, actorA: string, actorB: string): Promise<boolean> {
+  const row = await db
+    .selectFrom('blocks')
+    .select('id')
+    .where('deleted_at', 'is', null)
+    .where(({eb, or, and}) => or([
+      and([eb('blocker_actor_id', '=', actorA), eb('blocked_actor_id', '=', actorB)]),
+      and([eb('blocker_actor_id', '=', actorB), eb('blocked_actor_id', '=', actorA)]),
+    ]))
+    .executeTakeFirst()
+  return Boolean(row)
 }
 
 function parseCategory(value: unknown): NotificationCategory | undefined {

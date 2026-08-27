@@ -1,5 +1,7 @@
 import type {ModulaProfileDto} from './profiles.js'
 
+export type PostReactionType = 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'
+
 export type PostKind = 'text' | 'media' | 'link' | 'module'
 export type FeedMode = 'following' | 'forYou' | 'modules'
 export type PostAudience = 'public' | 'followers' | 'private'
@@ -45,6 +47,8 @@ export type SocialPostDto = {
   feed: FeedMode
   text?: string
   liked: boolean
+  viewerReaction?: PostReactionType | null
+  reactionCount?: number
   saved: boolean
   reposted: boolean
   likeCount: number
