@@ -38,6 +38,8 @@ export const AUTHENTICATION_CHALLENGE_PURPOSES: AuthenticationChallengePurpose[]
   'totp_enrollment',
   'step_up',
   'account_recovery',
+  'apple_authentication',
+  'apple_linking',
 ]
 
 export const AUTHENTICATION_STRENGTH_RANK: Record<AuthenticationStrength, number> = {

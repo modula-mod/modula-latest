@@ -62,6 +62,11 @@ const envSchema = z.object({
   MODULA_ACCESS_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(15),
   MODULA_REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
   MODULA_EMAIL_VERIFICATION_TTL_HOURS: z.coerce.number().int().positive().default(24),
+  MODULA_APPLE_AUTH_ENABLED: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
+  MODULA_APPLE_CLIENT_IDS: z.string().optional(),
   MODULA_SUPPORT_EMAIL: z.string().email().default('support@modula.digital'),
   MODULA_CHECKPOINT_SIGNING_KEY: z.string().optional(),
   MODULA_SESSION_PEPPER: z.string().optional(),
@@ -167,6 +172,8 @@ export type AppConfig = {
   accessTokenTtlMinutes: number
   refreshTokenTtlDays: number
   emailVerificationTtlHours: number
+  appleAuthEnabled: boolean
+  appleClientIds: string[]
   mailSupportEmail: string
   checkpointSigningKey?: string
   sessionPepper?: string
@@ -287,6 +294,20 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const productionWritesEnabled = Boolean(raw.MODULA_PRODUCTION_WRITES_ENABLED)
   if (environment === 'production' && registrationMode === 'open' && !productionWritesEnabled) {
     refuse('open production registration requires MODULA_PRODUCTION_WRITES_ENABLED=true')
+  }
+  const appleClientIds = Array.from(
+    new Set(
+      (raw.MODULA_APPLE_CLIENT_IDS ?? '')
+        .split(',')
+        .map(value => value.trim())
+        .filter(Boolean),
+    ),
+  )
+  if (appleClientIds.some(value => !/^[A-Za-z0-9][A-Za-z0-9.-]{1,254}$/.test(value))) {
+    refuse('MODULA_APPLE_CLIENT_IDS contains an invalid client identifier')
+  }
+  if (raw.MODULA_APPLE_AUTH_ENABLED === true && appleClientIds.length === 0) {
+    refuse('MODULA_APPLE_CLIENT_IDS is required when MODULA_APPLE_AUTH_ENABLED=true')
   }
 
   let currentKey: EncryptionKeyMaterial
@@ -423,6 +444,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     accessTokenTtlMinutes: raw.MODULA_ACCESS_TOKEN_TTL_MINUTES,
     refreshTokenTtlDays: raw.MODULA_REFRESH_TOKEN_TTL_DAYS,
     emailVerificationTtlHours: raw.MODULA_EMAIL_VERIFICATION_TTL_HOURS,
+    appleAuthEnabled: raw.MODULA_APPLE_AUTH_ENABLED === true,
+    appleClientIds,
     mailSupportEmail: raw.MODULA_SUPPORT_EMAIL,
     checkpointSigningKey: raw.MODULA_CHECKPOINT_SIGNING_KEY,
     sessionPepper: raw.MODULA_SESSION_PEPPER,
