@@ -1,0 +1,13 @@
+DROP TRIGGER IF EXISTS greenfield_engine_service_guard ON greenfield_engine_service_registrations;
+DROP FUNCTION IF EXISTS greenfield_engine_service_guard();
+DROP TRIGGER IF EXISTS greenfield_engine_job_activation_guard ON greenfield_engine_job_registrations;
+DROP TRIGGER IF EXISTS greenfield_engine_event_activation_guard ON greenfield_engine_event_consumer_registrations;
+DROP TRIGGER IF EXISTS greenfield_engine_metric_activation_guard ON greenfield_engine_usage_metric_registrations;
+DROP FUNCTION IF EXISTS greenfield_engine_activation_guard();
+DROP TABLE IF EXISTS greenfield_engine_usage_metric_registrations;
+DROP TABLE IF EXISTS greenfield_engine_event_consumer_registrations;
+DROP TABLE IF EXISTS greenfield_engine_job_registrations;
+DROP TABLE IF EXISTS greenfield_engine_service_registrations;
+DROP TABLE IF EXISTS greenfield_engine_capability_registrations;
+DROP TABLE IF EXISTS greenfield_engine_registrations;
+UPDATE schema_metadata SET value='043', updated_at=NOW() WHERE key='schema_version';
