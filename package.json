@@ -284,7 +284,8 @@
     "verify:greenfield-backend-v1:ai-engine": "node scripts/verify-greenfield-backend-v1-ai-engine.mjs",
     "verify:greenfield-backend-v1:event-job-fabric": "node scripts/verify-greenfield-backend-v1-event-job-fabric.mjs",
     "verify:greenfield-backend-v1:engine-fabric": "node scripts/verify-greenfield-backend-v1-engine-fabric.mjs",
-    "verify:greenfield-backend-v1:auth": "node scripts/verify-greenfield-backend-v1-auth.mjs"
+    "verify:greenfield-backend-v1:auth": "node scripts/verify-greenfield-backend-v1-auth.mjs",
+    "verify:greenfield-backend-v1:social": "node scripts/verify-greenfield-backend-v1-social.mjs"
   },
   "private": true
 }

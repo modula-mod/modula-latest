@@ -63,6 +63,18 @@ export class ProfileWriteService {
     if (target.actor_id === followerActorId) {
       throw Object.assign(new Error('Cannot follow yourself'), {code: 'VALIDATION_FAILED'})
     }
+    const blocked = await this.db
+      .selectFrom('blocks')
+      .select('id')
+      .where('deleted_at', 'is', null)
+      .where(({eb, or, and}) =>
+        or([
+          and([eb('blocker_actor_id', '=', followerActorId), eb('blocked_actor_id', '=', target.actor_id)]),
+          and([eb('blocker_actor_id', '=', target.actor_id), eb('blocked_actor_id', '=', followerActorId)]),
+        ]),
+      )
+      .executeTakeFirst()
+    if (blocked) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
     await this.db.transaction().execute(async trx => {
       const existing = await trx
         .selectFrom('follows')
@@ -71,6 +83,7 @@ export class ProfileWriteService {
         .where('followed_actor_id', '=', target.actor_id)
         .executeTakeFirst()
       const now = new Date()
+      let changed = false
       if (!existing) {
         await trx
           .insertInto('follows')
@@ -84,13 +97,16 @@ export class ProfileWriteService {
             version: 1,
           })
           .execute()
+        changed = true
       } else if (existing.deleted_at) {
         await trx
           .updateTable('follows')
           .set({deleted_at: null, updated_at: now, version: existing.version + 1})
           .where('id', '=', existing.id)
           .execute()
+        changed = true
       }
+      if (!changed) return
       await new OutboxRepository(this.db).enqueue(trx, {
         eventType: 'notification.create',
         aggregateType: 'follow',

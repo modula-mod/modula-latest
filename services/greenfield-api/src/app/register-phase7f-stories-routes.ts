@@ -127,11 +127,12 @@ export async function registerPhase7fStoriesRoutes(
     if (!item || item.deleted_at || item.expires_at <= new Date() || item.status !== 'ready') {
       return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)
     }
-    const visible = await stories.listRail(request.auth?.actorId ?? null)
-    const canView =
-      request.auth?.actorId === item.owner_actor_id ||
-      visible.some(entry => entry.ownerActorId === item.owner_actor_id && !entry.groupId.startsWith('add:'))
-    if (!canView && item.visibility !== 'public') {
+    const canView = await stories.canViewGroup(
+      request.auth?.actorId ?? null,
+      item.owner_actor_id,
+      item.visibility,
+    )
+    if (!canView) {
       return sendError(reply, 'FORBIDDEN', 'Media unavailable', request.id)
     }
     try {

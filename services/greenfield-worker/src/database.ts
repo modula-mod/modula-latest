@@ -336,6 +336,15 @@ export interface Database {
     updated_at: Date
     version: number
   }
+  blocks: {
+    id: string
+    blocker_actor_id: string
+    blocked_actor_id: string
+    created_at: Date
+    updated_at: Date
+    deleted_at: Date | null
+    version: number
+  }
   atproto_connections: {
     id: string
     actor_id: string

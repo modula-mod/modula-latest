@@ -8,8 +8,9 @@ export class DiscoveryRepository {
     this.profiles = new ProfileRepository(db)
   }
 
-  async getDiscover(): Promise<DiscoverResultDto> {
-    const suggestedProfiles = await this.profiles.listPublic()
+  async getDiscover(viewerActorId: string | null = null): Promise<DiscoverResultDto> {
+    const excluded = await this.excludedActorIds(viewerActorId)
+    const suggestedProfiles = await this.profiles.listPublic(viewerActorId, excluded)
     const trendingTopics = await this.db
       .selectFrom('trending_topics')
       .selectAll()
@@ -22,7 +23,18 @@ export class DiscoveryRepository {
       .where('deleted_at', 'is', null)
       .orderBy('sort_order', 'asc')
       .execute()
-    const reels = await this.listReels()
+    const reels = await this.listReels(viewerActorId, excluded)
+    let mediaQuery = this.db
+      .selectFrom('post_media')
+      .innerJoin('posts', 'posts.id', 'post_media.post_id')
+      .selectAll('post_media')
+      .where('post_media.deleted_at', 'is', null)
+      .where('posts.deleted_at', 'is', null)
+      .where('posts.audience', '=', 'public')
+      .orderBy('posts.created_at', 'desc')
+      .limit(24)
+    if (excluded.length) mediaQuery = mediaQuery.where('posts.author_actor_id', 'not in', excluded)
+    const media = await mediaQuery.execute()
     return {
       suggestedProfiles,
       trendingTopics: trendingTopics.map(t => ({
@@ -31,29 +43,31 @@ export class DiscoveryRepository {
         postCount: t.post_count,
       })),
       featuredModules: featuredModules.map(m => m.payload as Record<string, unknown>),
-      media: reels.map(reel => ({
-        id: `media-${reel.id}`,
+      media: media.map(item => ({
+        id: item.id,
         kind: 'image' as const,
-        url: `https://modula.digital/media/reel/${reel.id}.jpg`,
-        altText: reel.caption,
-        colour: reel.colour,
-        aspectRatio: 9 / 16,
-        title: reel.source,
+        ...(item.url ? {url: item.url} : {}),
+        ...(item.alt_text ? {altText: item.alt_text} : {}),
+        ...(item.colour ? {colour: item.colour} : {}),
+        ...(item.aspect_ratio ? {aspectRatio: Number(item.aspect_ratio)} : {}),
+        ...(item.title ? {title: item.title} : {}),
       })),
       reels,
     }
   }
 
-  async listReels(): Promise<ReelItemDto[]> {
-    const rows = await this.db
+  async listReels(viewerActorId: string | null = null, suppliedExcluded?: string[]): Promise<ReelItemDto[]> {
+    const excluded = suppliedExcluded ?? await this.excludedActorIds(viewerActorId)
+    let query = this.db
       .selectFrom('reels')
       .selectAll()
       .where('deleted_at', 'is', null)
       .orderBy('created_at', 'desc')
-      .execute()
+    if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
+    const rows = await query.execute()
     const out: ReelItemDto[] = []
     for (const row of rows) {
-      const author = await this.profiles.getByActorId(row.author_actor_id)
+      const author = await this.profiles.getByActorId(row.author_actor_id, viewerActorId)
       if (!author) continue
       out.push({
         id: row.id,
@@ -69,16 +83,18 @@ export class DiscoveryRepository {
     return out
   }
 
-  async listActivity(): Promise<ActivityItemDto[]> {
-    const rows = await this.db
+  async listActivity(viewerActorId: string | null = null): Promise<ActivityItemDto[]> {
+    const excluded = await this.excludedActorIds(viewerActorId)
+    let query = this.db
       .selectFrom('activity_items')
       .selectAll()
       .where('deleted_at', 'is', null)
       .orderBy('occurred_at', 'desc')
-      .execute()
+    if (excluded.length) query = query.where(({eb, or}) => or([eb('actor_id', 'is', null), eb('actor_id', 'not in', excluded)]))
+    const rows = await query.execute()
     const out: ActivityItemDto[] = []
     for (const row of rows) {
-      const actor = row.actor_id ? await this.profiles.getByActorId(row.actor_id) : undefined
+      const actor = row.actor_id ? await this.profiles.getByActorId(row.actor_id, viewerActorId) : undefined
       out.push({
         id: row.id,
         group: row.group_key,
@@ -92,5 +108,14 @@ export class DiscoveryRepository {
       })
     }
     return out
+  }
+
+  private async excludedActorIds(viewerActorId: string | null): Promise<string[]> {
+    if (!viewerActorId) return []
+    const [blocked, muted] = await Promise.all([
+      this.profiles.blockedActorIds(viewerActorId),
+      this.db.selectFrom('mutes').select('muted_actor_id').where('muter_actor_id', '=', viewerActorId).where('deleted_at', 'is', null).execute(),
+    ])
+    return [...new Set([...blocked, ...muted.map(row => row.muted_actor_id)])]
   }
 }

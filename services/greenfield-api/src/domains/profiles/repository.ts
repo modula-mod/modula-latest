@@ -40,9 +40,13 @@ export class ProfileRepository {
     return this.hydrate(row, viewerActorId)
   }
 
-  async listPublic(): Promise<ModulaProfileDto[]> {
-    const rows = await this.db.selectFrom('profiles').selectAll().where('deleted_at', 'is', null).where('visibility', '=', 'public').orderBy('joined_at', 'asc').execute()
-    return Promise.all(rows.map(row => this.hydrate(row, null)))
+  async listPublic(viewerActorId: string | null = null, excludedActorIds: string[] = []): Promise<ModulaProfileDto[]> {
+    const blocked = viewerActorId ? await this.blockedActorIds(viewerActorId) : []
+    const excluded = [...new Set([...blocked, ...excludedActorIds])]
+    let query = this.db.selectFrom('profiles').selectAll().where('deleted_at', 'is', null).where('visibility', '=', 'public').orderBy('joined_at', 'asc')
+    if (excluded.length) query = query.where('actor_id', 'not in', excluded)
+    const rows = await query.execute()
+    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
 
   async listFollowers(handle: string, limit: number, cursor: string | null, viewerActorId: string | null = null) {

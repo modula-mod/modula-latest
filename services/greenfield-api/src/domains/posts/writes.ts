@@ -6,6 +6,7 @@ import {GreenfieldEventBus} from '../../events/index.js'
 import {AuditRepository} from '../audit/repository.js'
 import {PostMediaStorage} from '../media/post-media-storage.js'
 import {OutboxRepository} from '../outbox/repository.js'
+import {GreenfieldPolicyEngine} from '../policy/index.js'
 import {PostRepository} from './repository.js'
 
 export type PostWriteContext = {
@@ -18,12 +19,14 @@ export class PostWriteService {
   private readonly audit: AuditRepository
   private readonly outbox: OutboxRepository
   private readonly mediaStorage: PostMediaStorage
+  private readonly policies: GreenfieldPolicyEngine
 
   constructor(private readonly db: ModulaDb, config: AppConfig) {
     this.posts = new PostRepository(db)
     this.audit = new AuditRepository(db)
     this.outbox = new OutboxRepository(db)
     this.mediaStorage = new PostMediaStorage(config)
+    this.policies = new GreenfieldPolicyEngine(db)
   }
 
   async create(actorId: string, input: CreatePostInput, context: PostWriteContext = {}): Promise<SocialPostDto> {
@@ -325,6 +328,11 @@ export class PostWriteService {
       .where('deleted_at', 'is', null)
       .executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({
+      actorId,
+      action: `post.${kind}`,
+      resource: {type: 'post', id: postId, ownerActorId: post.author_actor_id, visibility: post.audience},
+    })
 
     const table = kind === 'like' ? 'post_likes' : kind === 'save' ? 'post_saves' : 'post_reposts'
     const countColumn = kind === 'like' ? 'like_count' : kind === 'repost' ? 'repost_count' : null

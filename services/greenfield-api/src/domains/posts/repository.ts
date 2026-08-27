@@ -121,6 +121,20 @@ export class PostRepository {
       .orderBy('sort_order', 'asc')
       .execute()
 
+    let viewerReaction: Database['greenfield_reactions']['reaction_type'] | null = null
+    let saved = false
+    let reposted = false
+    if (viewerActorId) {
+      const [reaction, save, repost] = await Promise.all([
+        this.db.selectFrom('greenfield_reactions').select('reaction_type').where('actor_id', '=', viewerActorId).where('post_id', '=', row.id).executeTakeFirst(),
+        this.db.selectFrom('post_saves').select('id').where('actor_id', '=', viewerActorId).where('post_id', '=', row.id).where('deleted_at', 'is', null).executeTakeFirst(),
+        this.db.selectFrom('post_reposts').select('id').where('actor_id', '=', viewerActorId).where('post_id', '=', row.id).where('deleted_at', 'is', null).executeTakeFirst(),
+      ])
+      viewerReaction = reaction?.reaction_type ?? null
+      saved = Boolean(save)
+      reposted = Boolean(repost)
+    }
+
     let quotedPost: SocialPostDto | null | undefined
     if (depth === 0) {
       const quoteLink = await this.db
@@ -159,13 +173,17 @@ export class PostRepository {
       createdAt: row.created_at.toISOString(),
       feed: row.feed,
       text: row.text ?? undefined,
-      liked: false,
-      saved: false,
-      reposted: false,
+      liked: viewerReaction === 'like',
+      viewerReaction,
+      reactionCount: row.reaction_count,
+      saved,
+      reposted,
       likeCount: row.like_count,
       replyCount: row.reply_count,
       repostCount: row.repost_count,
       quoteCount: row.quote_count,
+      audience: row.audience,
+      version: row.version,
       ...(quotedPost !== undefined ? {quotedPost} : {}),
     }
 

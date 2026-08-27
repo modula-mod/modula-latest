@@ -162,9 +162,9 @@ export class SearchRepository {
     })
   }
 
-  async suggestions(input: {query: string; accountId: string | null; limit: number}): Promise<Array<{query: string; label: string; entityType?: GreenfieldSearchEntityType; entityId?: string; source: 'profile-handle' | 'module-name' | 'recent-search'}>> {
+  async suggestions(input: {query: string; accountId: string | null; actorId: string | null; limit: number}): Promise<Array<{query: string; label: string; entityType?: GreenfieldSearchEntityType; entityId?: string; source: 'profile-handle' | 'module-name' | 'recent-search'}>> {
     const pattern = `${escapeLike(input.query.toLowerCase())}%`
-    const documents = await this.db
+    let documentQuery = this.db
       .selectFrom('search_documents')
       .select(['entity_type', 'entity_id', 'title', 'metadata'])
       .where('status', '=', 'active')
@@ -178,7 +178,17 @@ export class SearchRepository {
       )
       .orderBy('updated_at', 'desc')
       .limit(input.limit)
-      .execute()
+    if (input.actorId) {
+      const blocked = await this.db
+        .selectFrom('blocks')
+        .select(['blocker_actor_id', 'blocked_actor_id'])
+        .where('deleted_at', 'is', null)
+        .where(({eb, or}) => or([eb('blocker_actor_id', '=', input.actorId!), eb('blocked_actor_id', '=', input.actorId!)]))
+        .execute()
+      const excluded = blocked.map(row => row.blocker_actor_id === input.actorId ? row.blocked_actor_id : row.blocker_actor_id)
+      if (excluded.length) documentQuery = documentQuery.where(({eb, or}) => or([eb('owner_id', 'is', null), eb('owner_id', 'not in', excluded)]))
+    }
+    const documents = await documentQuery.execute()
 
     const recent = input.accountId
       ? await this.db

@@ -49,8 +49,13 @@ export class CommentService {
   }
 
   async createReply(actorId: string, parentCommentId: string, text: string) {
-    let parent = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', parentCommentId).executeTakeFirst()
+    let parent = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', parentCommentId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!parent) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({
+      actorId,
+      action: 'comment.reply',
+      resource: {type: 'comment', id: parentCommentId, ownerActorId: parent.author_actor_id},
+    })
     // Flatten deeper replies into the nearest supported thread level (max depth 4).
     while (parent.depth >= 4 && parent.parent_comment_id) {
       const ancestor = await this.db
