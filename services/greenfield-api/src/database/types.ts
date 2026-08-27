@@ -33,6 +33,11 @@ export type NotificationType = 'follow' | 'like' | 'repost' | 'reply' | 'mention
 export type ReportTargetType = 'profile' | 'post' | 'comment' | 'story' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
+export type DeveloperProgrammeState = 'NOT_ENROLLED' | 'PENDING' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'TERMINATED'
+export type DeveloperProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'backend-service' | 'backend-engine' | 'game-module'
+export type DeveloperProductVisibility = 'PRIVATE' | 'INTERNAL' | 'UNLISTED' | 'BETA' | 'PUBLIC'
+export type DeveloperReleaseChannel = 'DEVELOPMENT' | 'INTERNAL' | 'ALPHA' | 'BETA' | 'RC' | 'STABLE'
+export type DeveloperReviewState = 'DRAFT' | 'SUBMITTED' | 'AUTOMATED_REVIEW' | 'MANUAL_REVIEW' | 'CHANGES_REQUIRED' | 'APPROVED' | 'REJECTED' | 'PUBLISHED' | 'SUSPENDED' | 'REMOVED'
 export type BackgroundJobStatus = 'QUEUED' | 'LEASED' | 'RUNNING' | 'RETRYING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'DEAD_LETTER'
 export type BackgroundJobOwnerType = 'platform' | 'account' | 'organisation' | 'product' | 'installation'
 export type BackgroundJobDispatchMode = 'GREENFIELD_WORKER' | 'SERVICE_PULL'
@@ -1127,6 +1132,21 @@ export interface Database {
   greenfield_connection_sync_state: {sync_state_id: string; connection_id: string; resource_kind: string; cursor_metadata: unknown; status: GreenfieldConnectionSyncStatus; last_started_at: Date | null; last_completed_at: Date | null; failure_code: string | null; created_at: Date; updated_at: Date}
   greenfield_connection_events: {event_id: string; account_id: string; provider_id: string; connection_id: string | null; event_type: string; from_state: GreenfieldConnectionState | null; to_state: GreenfieldConnectionState | null; metadata: unknown; created_at: Date}
   greenfield_connector_oauth_states: {state_id: string; account_id: string; provider_id: string; state_hash: string; status: GreenfieldConnectorOAuthStateStatus; redirect_uri: string; pkce_challenge: string | null; pkce_challenge_method: 'S256' | null; pkce_verifier_key_version: string | null; pkce_verifier_nonce: Buffer | null; pkce_verifier_auth_tag: Buffer | null; pkce_verifier_ciphertext: Buffer | null; idempotency_key: string | null; failure_code: string | null; failure_message: string | null; created_at: Date; authorising_at: Date | null; expires_at: Date; consumed_at: Date | null; cancelled_at: Date | null; failed_at: Date | null; replay_detected_at: Date | null; consume_attempt_count: number}
+  greenfield_developer_profiles: {account_id: string; display_name: string; biography: string; website: string | null; status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED'; created_at: Date; updated_at: Date}
+  greenfield_developer_organisations: {organisation_id: string; slug: string; display_name: string; status: 'ACTIVE' | 'SUSPENDED' | 'CLOSED'; created_by_account_id: string; created_at: Date; updated_at: Date}
+  greenfield_developer_organisation_memberships: {membership_id: string; organisation_id: string; account_id: string; role: 'OWNER' | 'ADMIN' | 'DEVELOPER' | 'RELEASE_MANAGER' | 'VIEWER'; state: 'INVITED' | 'ACTIVE' | 'SUSPENDED' | 'REMOVED'; invited_by_account_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_publisher_owners: {publisher_owner_id: string; publisher_id: string; owner_type: 'ACCOUNT' | 'ORGANISATION'; account_id: string | null; organisation_id: string | null; created_at: Date}
+  greenfield_developer_agreements: {agreement_id: string; version: string; document_hash: string; effective_at: Date; superseded_at: Date | null; created_at: Date}
+  greenfield_developer_agreement_acceptances: {acceptance_id: string; agreement_id: string; agreement_version: string; accepted_by_account_id: string; accepted_at: Date; document_hash: string}
+  greenfield_developer_programme_memberships: {programme_membership_id: string; account_id: string | null; organisation_id: string | null; state: DeveloperProgrammeState; state_reason: string | null; started_at: Date | null; ended_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_developer_products: {product_id: string; publisher_id: string; owner_account_id: string | null; owner_organisation_id: string | null; extension_id: string | null; kind: DeveloperProductKind; display_name: string; description: string; visibility: DeveloperProductVisibility; state: 'DRAFT' | 'ACTIVE' | 'SUSPENDED' | 'ARCHIVED'; created_at: Date; updated_at: Date}
+  greenfield_developer_source_connections: {source_connection_id: string; product_id: string; provider: 'github' | 'gitlab' | 'bitbucket' | 'self-hosted-git'; repository: string; repository_id: string | null; default_branch: string; credential_ref: string | null; state: 'PENDING' | 'ACTIVE' | 'REVOKED' | 'ERROR'; created_by_account_id: string; created_at: Date; updated_at: Date; revoked_at: Date | null}
+  greenfield_developer_builds: {build_id: string; product_id: string; source_connection_id: string | null; source_sha: string; state: 'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED'; builder_identity: string; artifact_ref: string | null; artifact_sha256: string | null; sbom_ref: string | null; provenance_ref: string | null; created_by_account_id: string; created_at: Date; started_at: Date | null; finished_at: Date | null}
+  greenfield_developer_releases: {developer_release_id: string; product_id: string; build_id: string; module_release_id: string | null; version: string; channel: DeveloperReleaseChannel; state: 'DRAFT' | 'CANDIDATE' | 'QUARANTINED' | 'RELEASED' | 'REVOKED' | 'SUPERSEDED'; released_at: Date | null; created_at: Date; updated_at: Date}
+  greenfield_developer_test_groups: {test_group_id: string; product_id: string; name: string; kind: 'OWNER' | 'TEAM' | 'INTERNAL' | 'ALPHA' | 'BETA' | 'NAMED'; created_by_account_id: string; created_at: Date; updated_at: Date}
+  greenfield_developer_test_group_members: {test_group_id: string; account_id: string; state: 'INVITED' | 'ACTIVE' | 'REMOVED'; added_at: Date}
+  greenfield_developer_release_test_groups: {developer_release_id: string; test_group_id: string; assigned_at: Date}
+  greenfield_developer_review_submissions: {review_submission_id: string; product_id: string; developer_release_id: string | null; state: DeveloperReviewState; checks: unknown; submitted_by_account_id: string; reviewer_account_id: string | null; decision_reason: string | null; submitted_at: Date | null; decided_at: Date | null; created_at: Date; updated_at: Date}
   greenfield_story_groups: {
     group_id: string
     owner_actor_id: string
