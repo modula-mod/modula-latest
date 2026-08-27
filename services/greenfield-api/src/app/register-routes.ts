@@ -38,6 +38,7 @@ import {PostWriteService} from '../domains/posts/writes.js'
 import {ProfileRepository} from '../domains/profiles/repository.js'
 import {ProfileWriteService} from '../domains/profiles/writes.js'
 import {GreenfieldSearchService} from '../domains/search/index.js'
+import {GreenfieldEngineRegistryService} from '../domains/engines/service.js'
 import {checkReadiness} from '../domains/system/health.js'
 import {
   GreenfieldConnectorProviderRegistry,
@@ -146,6 +147,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const notificationPreferences = new NotificationPreferencesService(db)
   const policies = new GreenfieldPolicyEngine(db)
   const search = new GreenfieldSearchService(db, config)
+  const engines = new GreenfieldEngineRegistryService(db)
   const boardLayouts = new BoardLayoutService(db)
   const atproto = new AtprotoService(db, config)
   const greenfieldSessions = new GreenfieldSessionService(db, config)
@@ -269,6 +271,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
             emailVerificationRequired: true,
           },
           capabilities,
+          engines: await engines.publicTopology(),
         },
         request.id,
       ),
@@ -2109,6 +2112,29 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return reply.send(successEnvelope(await search.health(), request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Search health lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/engines', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope({items: await engines.list()}, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Engine topology lookup failed')
+    }
+  })
+
+  app.get('/v1/admin/ops/engines/:engineId', profileConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    try {
+      const {engineId} = request.params as {engineId: string}
+      const engine = await engines.get(engineId)
+      if (!engine) return sendError(reply, 'NOT_FOUND', 'Engine not found', request.id)
+      return reply.send(successEnvelope(engine, request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Engine topology lookup failed')
     }
   })
 
