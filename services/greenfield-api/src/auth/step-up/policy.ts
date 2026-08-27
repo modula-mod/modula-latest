@@ -10,6 +10,7 @@ export type SensitiveAuthAction =
   | 'disable_totp'
   | 'regenerate_recovery_codes'
   | 'revoke_all_sessions'
+  | 'link_external_identity'
   | 'change_mail_forwarding'
   | 'account_export'
   | 'account_delete'
@@ -43,6 +44,7 @@ const ACTION_POLICIES: Record<
   disable_totp: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   regenerate_recovery_codes: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   revoke_all_sessions: {requiredStrength: 'medium', acceptableMethods: [['passkey'], ['password'], ['apple']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
+  link_external_identity: {requiredStrength: 'medium', acceptableMethods: [['passkey'], ['password'], ['apple']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   change_mail_forwarding: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   account_export: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},
   account_delete: {requiredStrength: 'strong', acceptableMethods: [['passkey'], ['password', 'totp']], recentWindowSeconds: DEFAULT_RECENT_WINDOW_SECONDS},

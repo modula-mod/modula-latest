@@ -56,6 +56,7 @@ import {assertSafeHttpsUrl, isBlockedIp} from '../security/ssrf.js'
 import {TotpService} from '../auth/mfa/totp.js'
 import {RecoveryCodeService} from '../auth/mfa/recovery-codes.js'
 import {PasskeyService} from '../auth/passkeys/service.js'
+import {AppleAuthenticationService} from '../auth/apple/service.js'
 import {evaluateStepUpRequirement, type SensitiveAuthAction} from '../auth/step-up/policy.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {decodeCursor, parseLimit, toCursorPage} from '../transport/pagination.js'
@@ -160,6 +161,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const totp = new TotpService(db, config)
   const recoveryCodes = new RecoveryCodeService(db, config)
   const passkeys = new PasskeyService(db, config)
+  const appleAuthentication = new AppleAuthenticationService(db, config, greenfieldSessions)
   const repositories = new RepositoryService(db)
   const records = new RecordService(db)
   const extensions = new ExtensionRegistry(db)
@@ -234,6 +236,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     const capabilities = {
       ...PHASE6_PREVIEW_CAPABILITIES,
       authentication: true,
+      appleAuthentication: appleAuthentication.status().configured,
       mutations: mutationsAllowed,
       greenfieldAccounts: true,
       greenfieldSessions: true,
@@ -269,6 +272,9 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
           registration: {
             mode: config.registrationMode,
             emailVerificationRequired: true,
+          },
+          authentication: {
+            apple: appleAuthentication.status(),
           },
           capabilities,
           engines: await engines.publicTopology(),
@@ -665,6 +671,43 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     if (!auth) return
     return reply.send(successEnvelope(await passkeys.list(auth.accountId), request.id))
   })
+
+  app.get('/v1/auth/apple/status', healthConfig, async (request, reply) => {
+    return reply.send(successEnvelope(appleAuthentication.status(), request.id))
+  })
+  app.post('/v1/auth/apple/link/options', authWriteConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('link_external_identity', auth, reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await appleAuthentication.beginLink(auth.accountId), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Apple linking failed')
+    }
+  })
+  app.post('/v1/auth/apple/link', authWriteConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    if (!requireStepUp('link_external_identity', auth, reply, request.id)) return
+    try {
+      return reply.send(
+        successEnvelope(
+          await appleAuthentication.completeLink({
+            accountId: auth.accountId,
+            challengeId: bodyString(request.body, 'challengeId'),
+            nonce: bodyString(request.body, 'nonce'),
+            idToken: bodyString(request.body, 'idToken'),
+            sessionId: auth.sessionId,
+            ipHash: requestIpHash(request, config) ?? null,
+            userAgent: request.headers['user-agent'],
+          }),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Apple linking failed')
+    }
+  })
   app.post('/v1/auth/passkeys/registration/options', writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
@@ -897,6 +940,54 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Passkey sign-in failed')
+    }
+  })
+  app.post('/v1/sessions/apple/options', authWriteConfig, async (request, reply) => {
+    try {
+      return reply.send(
+        successEnvelope(
+          await appleAuthentication.beginAuthentication({ipHash: requestIpHash(request, config) ?? null}),
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Apple sign-in failed')
+    }
+  })
+  app.post('/v1/sessions/apple', authWriteConfig, async (request, reply) => {
+    try {
+      const issued = await appleAuthentication.completeAuthentication({
+        challengeId: bodyString(request.body, 'challengeId'),
+        nonce: bodyString(request.body, 'nonce'),
+        idToken: bodyString(request.body, 'idToken'),
+        userAgent: request.headers['user-agent'],
+        ipHash: requestIpHash(request, config) ?? null,
+        clientName: bodyString(request.body, 'clientName').slice(0, 120) || null,
+        platform: bodyString(request.body, 'platform').slice(0, 80) || null,
+      })
+      const email = await accountPrimaryEmail(issued.accountId)
+      if (email) {
+        await mail.queueNewSignIn({
+          accountId: issued.accountId,
+          email: email.identifier,
+          displayName: displayNameFromIdentityMetadata(email.metadata, email.primary_handle),
+          correlationId: request.id,
+        })
+      }
+      return reply.send(
+        successEnvelope(
+          {
+            accessToken: issued.accessToken,
+            refreshToken: issued.refreshToken,
+            sessionId: issued.sessionId,
+            accessExpiresAt: issued.accessExpiresAt.toISOString(),
+            refreshExpiresAt: issued.refreshExpiresAt.toISOString(),
+          },
+          request.id,
+        ),
+      )
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Apple sign-in failed')
     }
   })
   app.post('/v1/sessions/refresh', authWriteConfig, async (request, reply) => {
