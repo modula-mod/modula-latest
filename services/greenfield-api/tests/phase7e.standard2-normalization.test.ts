@@ -46,8 +46,10 @@ describe('Phase 7E Standard 2.0 manifest normalization', () => {
     expect(normalized.apis.items).toHaveLength(1)
     expect(normalized.hooks.items).toHaveLength(1)
     expect(normalized.capabilities.provides.map(provider => provider.id)).toEqual(['modula.reference.records'])
-    expect(unsupportedSections).toEqual(expect.arrayContaining(['services', 'apis', 'hooks', 'jobs', 'storage', 'ui', 'automation']))
+    expect(unsupportedSections).toEqual(expect.arrayContaining(['services', 'apis', 'hooks', 'storage', 'ui', 'automation']))
+    expect(unsupportedSections).not.toContain('jobs')
     expect(normalized.diagnostics.runtimeSupport.sections.services).toBe('DECLARATIVE_ONLY')
+    expect(normalized.diagnostics.runtimeSupport.sections.jobs).toBe('SUPPORTED')
   })
 })
 

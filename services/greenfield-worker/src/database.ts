@@ -1,7 +1,10 @@
-import {Kysely, PostgresDialect} from 'kysely'
+import {Kysely, PostgresDialect, type Generated} from 'kysely'
 import pg from 'pg'
 
-export type BackgroundJobStatus = 'pending' | 'leased' | 'completed' | 'failed' | 'dead_letter'
+export type BackgroundJobStatus = 'QUEUED' | 'LEASED' | 'RUNNING' | 'RETRYING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'DEAD_LETTER'
+export type BackgroundJobOwnerType = 'platform' | 'account' | 'organisation' | 'product' | 'installation'
+export type BackgroundJobDispatchMode = 'GREENFIELD_WORKER' | 'SERVICE_PULL'
+export type EventProducerKind = 'platform' | 'product' | 'service' | 'connector' | 'user'
 export type MailJobStatus = 'queued' | 'sending' | 'sent' | 'failed' | 'retrying' | 'dead-letter'
 export type MailFailureCategory = 'temporary' | 'permanent' | 'authentication' | 'rate-limit' | 'DNS' | 'TLS' | 'invalid-recipient'
 export type MailIdentityState = 'pending' | 'queued' | 'provisioning' | 'active' | 'suspended' | 'released' | 'failed' | 'adoption_required'
@@ -63,6 +66,23 @@ export interface Database {
     created_at: Date
     updated_at: Date
     completed_at: Date | null
+    owner_type: Generated<BackgroundJobOwnerType>
+    owner_id: Generated<string>
+    owner_account_id: Generated<string | null>
+    product_id: Generated<string | null>
+    installation_id: Generated<string | null>
+    release_id: Generated<string | null>
+    action: string
+    service_id: Generated<string>
+    dispatch_mode: Generated<BackgroundJobDispatchMode>
+    timeout_ms: Generated<number>
+    idempotency_key: Generated<string | null>
+    trace_id: string
+    started_at: Generated<Date | null>
+    finished_at: Generated<Date | null>
+    result_reference: Generated<string | null>
+    error_class: Generated<string | null>
+    error_code: Generated<string | null>
   }
   job_failures: {
     id: string
@@ -72,6 +92,8 @@ export interface Database {
     error_code: string
     error_message: string
     permanent: boolean
+    payload_fingerprint: string
+    error_class: string | null
     created_at: Date
   }
   greenfield_mail_jobs: {
@@ -202,6 +224,12 @@ export interface Database {
     aggregate_version: number | null
     account_id: string | null
     actor_id: string | null
+    producer_kind: EventProducerKind
+    producer_id: string
+    product_id: string | null
+    installation_id: string | null
+    release_id: string | null
+    trace_id: string
     request_id: string
     correlation_id: string
     causation_id: string | null

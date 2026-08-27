@@ -200,7 +200,7 @@ export class ModuleBackendTokenService {
       this.db.selectFrom('module_backend_sessions').selectAll().where('token_hash', '=', tokenHash).executeTakeFirst(),
       this.db.selectFrom('greenfield_extension_service_assertions').selectAll().where('token_hash', '=', tokenHash).executeTakeFirst(),
     ])
-    if (!session || !assertion || session.revoked_at || assertion.revoked_at) return null
+    if (!session || !assertion || session.revoked_at || assertion.revoked_at || assertion.consumed_at) return null
     const now = Date.now()
     if (session.expires_at.getTime() <= now || assertion.expires_at.getTime() <= now) return null
     const claims = this.verify(rawToken) as (ModuleSessionClaims & Partial<ExtensionServiceClaims>) | null
@@ -221,12 +221,14 @@ export class ModuleBackendTokenService {
     if (!sameStrings(claims.scope.operations, [...new Set([...permissions, ...capabilities, assertion.action_id])])) return null
     if (!scopeMatchesAssertion(claims.scope, assertion.scope_type, assertion.scope_ref)) return null
     if (claims.issuedAt * 1000 !== assertion.issued_at.getTime() || claims.expiresAt * 1000 !== assertion.expires_at.getTime()) return null
-    await this.db
+    const consumed = await this.db
       .updateTable('greenfield_extension_service_assertions')
       .set({consumed_at: new Date()})
       .where('assertion_id', '=', assertion.assertion_id)
       .where('consumed_at', 'is', null)
-      .execute()
+      .returning('assertion_id')
+      .executeTakeFirst()
+    if (!consumed) return null
     return {
       issuer: claims.issuer,
       subject: claims.subject,

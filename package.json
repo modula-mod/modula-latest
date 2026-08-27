@@ -281,7 +281,8 @@
     "verify:greenfield-backend-v1:data-ledger": "node scripts/verify-greenfield-backend-v1-data-ledger.mjs",
     "verify:greenfield-backend-v1:service-fabric": "node scripts/verify-greenfield-backend-v1-service-fabric.mjs",
     "verify:greenfield-backend-v1:secret-fabric": "node scripts/verify-greenfield-backend-v1-secret-fabric.mjs",
-    "verify:greenfield-backend-v1:ai-engine": "node scripts/verify-greenfield-backend-v1-ai-engine.mjs"
+    "verify:greenfield-backend-v1:ai-engine": "node scripts/verify-greenfield-backend-v1-ai-engine.mjs",
+    "verify:greenfield-backend-v1:event-job-fabric": "node scripts/verify-greenfield-backend-v1-event-job-fabric.mjs"
   },
   "private": true
 }

@@ -139,7 +139,9 @@ async function enqueueBackgroundJobDelivery(
         deliveryId: context.delivery.delivery_id,
         subscriberId: context.delivery.subscriber_id,
       },
-      status: 'pending',
+      status: 'QUEUED',
+      action: jobType,
+      trace_id: context.event.traceId,
       priority: 100,
       available_at: now,
       lease_owner: null,
@@ -162,6 +164,9 @@ function toEnvelope(row: Database['greenfield_domain_events']): GreenfieldDomain
     eventVersion: row.event_version,
     aggregateType: row.aggregate_type,
     aggregateId: row.aggregate_id,
+    producerKind: row.producer_kind,
+    producerId: row.producer_id,
+    traceId: row.trace_id,
     requestId: row.request_id,
     correlationId: row.correlation_id,
     occurredAt: row.occurred_at.toISOString(),
@@ -174,6 +179,9 @@ function toEnvelope(row: Database['greenfield_domain_events']): GreenfieldDomain
   if (row.aggregate_version !== null) envelope.aggregateVersion = row.aggregate_version
   if (row.account_id !== null) envelope.accountId = row.account_id
   if (row.actor_id !== null) envelope.actorId = row.actor_id
+  if (row.product_id !== null) envelope.productId = row.product_id
+  if (row.installation_id !== null) envelope.installationId = row.installation_id
+  if (row.release_id !== null) envelope.releaseId = row.release_id
   if (row.causation_id !== null) envelope.causationId = row.causation_id
   return envelope
 }

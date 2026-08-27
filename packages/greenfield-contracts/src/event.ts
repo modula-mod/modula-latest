@@ -2,6 +2,7 @@ export type GreenfieldRecordOperation = 'create' | 'update' | 'delete'
 
 export type EventVisibility = 'public' | 'account' | 'actor' | 'internal' | 'restricted'
 export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensitive' | 'restricted'
+export type EventProducerKind = 'platform' | 'product' | 'service' | 'connector' | 'user'
 
 export interface GreenfieldDomainEvent<TPayload = unknown> {
   eventId: string
@@ -12,6 +13,12 @@ export interface GreenfieldDomainEvent<TPayload = unknown> {
   aggregateVersion?: number
   accountId?: string
   actorId?: string
+  producerKind: EventProducerKind
+  producerId: string
+  productId?: string
+  installationId?: string
+  releaseId?: string
+  traceId: string
   requestId: string
   correlationId: string
   causationId?: string
