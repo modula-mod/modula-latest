@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS greenfield_developer_review_submissions;
+DROP TABLE IF EXISTS greenfield_developer_release_test_groups;
+DROP TABLE IF EXISTS greenfield_developer_test_group_members;
+DROP TABLE IF EXISTS greenfield_developer_test_groups;
+DROP TABLE IF EXISTS greenfield_developer_releases;
+DROP TABLE IF EXISTS greenfield_developer_builds;
+DROP TABLE IF EXISTS greenfield_developer_source_connections;
+DROP TABLE IF EXISTS greenfield_developer_products;
+DROP TABLE IF EXISTS greenfield_developer_programme_memberships;
+DROP TABLE IF EXISTS greenfield_developer_agreement_acceptances;
+DROP TABLE IF EXISTS greenfield_developer_agreements;
+DROP TABLE IF EXISTS greenfield_publisher_owners;
+DROP TABLE IF EXISTS greenfield_developer_organisation_memberships;
+DROP TABLE IF EXISTS greenfield_developer_organisations;
+DROP TABLE IF EXISTS greenfield_developer_profiles;
+UPDATE schema_metadata SET value='046', updated_at=NOW() WHERE key='schema_version';
