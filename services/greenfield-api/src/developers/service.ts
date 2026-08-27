@@ -5,6 +5,7 @@ import type {
   DeveloperProductVisibility,
   DeveloperProgrammeState,
 } from '@modula/api-contracts'
+import {createPublicKey} from 'node:crypto'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
@@ -194,6 +195,62 @@ export class DeveloperService {
     return this.db.insertInto('greenfield_developer_source_connections').values({source_connection_id: uuidv7(), product_id: productId, provider: provider as any, repository, repository_id: optionalText(input.repositoryId, 200) || null, default_branch: optionalText(input.defaultBranch, 120) || 'main', credential_ref: credentialRef, state: 'ACTIVE', created_by_account_id: accountId, created_at: now, updated_at: now, revoked_at: null}).returningAll().executeTakeFirstOrThrow()
   }
 
+  async registerBuildService(operatorAccountId: string, input: {serviceId?: unknown; displayName?: unknown; publicKeyPem?: unknown; signingKeyId?: unknown; runnerImage?: unknown}) {
+    await this.requireAdmin(operatorAccountId)
+    const serviceId = requiredText(input.serviceId, 160, 'Service ID is required')
+    if (!/^service\.[a-z0-9][a-z0-9.-]+$/.test(serviceId)) invalid('Invalid build service ID')
+    const publicKeyPem = requiredText(input.publicKeyPem, 4_096, 'Public key is required')
+    try { if (createPublicKey(publicKeyPem).asymmetricKeyType !== 'ed25519') invalid('Build service must use an Ed25519 public key') } catch { invalid('Invalid build service public key') }
+    const runnerImage = requiredText(input.runnerImage, 500, 'Runner image is required')
+    if (!/@sha256:[0-9a-f]{64}$/.test(runnerImage)) invalid('Runner image must be digest pinned')
+    const now = new Date()
+    return this.db.insertInto('greenfield_build_service_registrations').values({service_id: serviceId, display_name: requiredText(input.displayName, 120, 'Display name is required'), public_key_pem: publicKeyPem, signing_key_id: requiredText(input.signingKeyId, 200, 'Signing key ID is required'), runner_image: runnerImage, state: 'ACTIVE', registered_by_account_id: operatorAccountId, registered_at: now, updated_at: now, last_health_at: null})
+      .onConflict(oc => oc.column('service_id').doUpdateSet({display_name: requiredText(input.displayName, 120, 'Display name is required'), public_key_pem: publicKeyPem, signing_key_id: requiredText(input.signingKeyId, 200, 'Signing key ID is required'), runner_image: runnerImage, state: 'ACTIVE', registered_by_account_id: operatorAccountId, updated_at: now})).returningAll().executeTakeFirstOrThrow()
+  }
+
+  async requestBuild(accountId: string, productId: string, input: {sourceConnectionId?: unknown; sourceSha?: unknown; idempotencyKey?: unknown}) {
+    await this.requireProductAccess(accountId, productId)
+    const sourceConnectionId = requiredText(input.sourceConnectionId, 160, 'Source connection is required')
+    const source = await this.db.selectFrom('greenfield_developer_source_connections').selectAll().where('source_connection_id', '=', sourceConnectionId).where('product_id', '=', productId).where('state', '=', 'ACTIVE').executeTakeFirst()
+    if (!source) notFound('Active source connection not found')
+    let repository: URL
+    try { repository = new URL(source.repository) } catch { invalid('Build source must be an approved HTTPS repository URL') }
+    if (repository!.protocol !== 'https:' || repository!.username || repository!.password) invalid('Build source must be an approved HTTPS repository URL')
+    const sourceSha = requiredText(input.sourceSha, 40, 'Exact source SHA is required').toLowerCase()
+    if (!/^[0-9a-f]{40}$/.test(sourceSha)) invalid('Exact 40-character source SHA is required')
+    const idempotencyKey = requiredText(input.idempotencyKey, 200, 'Idempotency key is required')
+    const now = new Date()
+    const inserted = await this.db.insertInto('greenfield_developer_builds').values({build_id: uuidv7(), product_id: productId, source_connection_id: sourceConnectionId, source_sha: sourceSha, state: 'QUEUED', builder_identity: 'service.modula-build', artifact_ref: null, artifact_sha256: null, sbom_ref: null, provenance_ref: null, created_by_account_id: accountId, created_at: now, started_at: null, finished_at: null, request_id: uuidv7(), idempotency_key: idempotencyKey, attempt_count: 0, maximum_attempts: 3, lease_owner: null, lease_expires_at: null, failure_code: null, failure_summary: null, manifest_sha256: null, sbom_sha256: null, licence_inventory_ref: null, provenance_signature: null})
+      .onConflict(oc => oc.columns(['product_id', 'idempotency_key']).doNothing()).returningAll().executeTakeFirst()
+    return inserted ?? this.db.selectFrom('greenfield_developer_builds').selectAll().where('product_id', '=', productId).where('idempotency_key', '=', idempotencyKey).executeTakeFirstOrThrow()
+  }
+
+  async createRelease(accountId: string, productId: string, input: {buildId?: unknown; version?: unknown; channel?: unknown}) {
+    await this.requireProductAccess(accountId, productId)
+    const buildId = requiredText(input.buildId, 160, 'Build is required')
+    const build = await this.db.selectFrom('greenfield_developer_builds').selectAll().where('build_id', '=', buildId).where('product_id', '=', productId).where('state', '=', 'SUCCEEDED').executeTakeFirst()
+    if (!build) forbidden('A successful product build is required')
+    const provenance = await this.db.selectFrom('greenfield_build_provenance').select('build_id').where('build_id', '=', buildId).where('signature_verified', '=', true).executeTakeFirst()
+    if (!provenance) forbidden('Verified build provenance is required')
+    const version = requiredText(input.version, 80, 'Release version is required')
+    if (!/^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/.test(version)) invalid('Release version must be SemVer')
+    const channel = String(input.channel)
+    if (!['DEVELOPMENT', 'INTERNAL', 'ALPHA', 'BETA', 'RC', 'STABLE'].includes(channel)) invalid('Invalid release channel')
+    const now = new Date()
+    return this.db.insertInto('greenfield_developer_releases').values({developer_release_id: uuidv7(), product_id: productId, build_id: buildId, module_release_id: null, version, channel: channel as any, state: 'CANDIDATE', released_at: null, created_at: now, updated_at: now}).returningAll().executeTakeFirstOrThrow()
+  }
+
+  async assignReleaseTestGroup(accountId: string, productId: string, releaseId: string, testGroupId: string) {
+    await this.requireProductAccess(accountId, productId)
+    const [release, group] = await Promise.all([
+      this.db.selectFrom('greenfield_developer_releases').select('developer_release_id').where('developer_release_id', '=', releaseId).where('product_id', '=', productId).executeTakeFirst(),
+      this.db.selectFrom('greenfield_developer_test_groups').select('test_group_id').where('test_group_id', '=', testGroupId).where('product_id', '=', productId).executeTakeFirst(),
+    ])
+    if (!release || !group) notFound('Release or test group not found')
+    const assigned = await this.db.insertInto('greenfield_developer_release_test_groups').values({developer_release_id: releaseId, test_group_id: testGroupId, assigned_at: new Date()}).onConflict(oc => oc.columns(['developer_release_id', 'test_group_id']).doNothing()).returningAll().executeTakeFirst()
+    return assigned ?? {developer_release_id: releaseId, test_group_id: testGroupId}
+  }
+
   async createTestGroup(accountId: string, productId: string, input: {name?: unknown; kind?: unknown}) {
     await this.requireProductAccess(accountId, productId)
     const kind = String(input.kind)
@@ -207,9 +264,14 @@ export class DeveloperService {
     await this.assertPublicPublishingReady(accountId, product.publisher_id)
     const releaseId = requiredText(input.developerReleaseId, 120, 'Developer release is required')
     const release = await this.db.selectFrom('greenfield_developer_releases').selectAll().where('developer_release_id', '=', releaseId).where('product_id', '=', productId).executeTakeFirst()
-    if (!release) notFound('Developer release not found')
+    if (!release || release.state !== 'CANDIDATE') forbidden('Candidate developer release not found')
     const now = new Date()
-    return this.db.insertInto('greenfield_developer_review_submissions').values({review_submission_id: uuidv7(), product_id: productId, developer_release_id: releaseId, state: 'SUBMITTED', checks: objectValue(input.checks), submitted_by_account_id: accountId, reviewer_account_id: null, decision_reason: null, submitted_at: now, decided_at: null, created_at: now, updated_at: now}).returningAll().executeTakeFirstOrThrow()
+    return this.db.transaction().execute(async trx => {
+      const review = await trx.insertInto('greenfield_developer_review_submissions').values({review_submission_id: uuidv7(), product_id: productId, developer_release_id: releaseId, state: 'SUBMITTED', checks: objectValue(input.checks), submitted_by_account_id: accountId, reviewer_account_id: null, decision_reason: null, submitted_at: now, decided_at: null, created_at: now, updated_at: now}).returningAll().executeTakeFirstOrThrow()
+      const kinds = ['manifest', 'permissions', 'network', 'backend', 'storage', 'dependencies', 'provenance', 'licence', 'security', 'compatibility', 'export-delete'] as const
+      await trx.insertInto('greenfield_release_review_checks').values(kinds.map(kind => ({review_check_id: uuidv7(), review_submission_id: review.review_submission_id, check_kind: kind, state: 'PENDING' as const, evidence_ref: null, failure_code: null, checked_at: null, created_at: now, updated_at: now}))).execute()
+      return review
+    })
   }
 
   private async requireProductAccess(accountId: string, productId: string) {
