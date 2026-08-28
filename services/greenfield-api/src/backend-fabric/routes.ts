@@ -5,6 +5,7 @@ import type {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {GreenfieldDataLedgerService, type DeclareDataSchemaVersionInput, type RecordDataMigrationInput, type RegisterDataResourceInput} from '../data-ledger/index.js'
+import {GreenfieldEntitlementService} from '../entitlements/service.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
 import {ModuleBackendTokenService, type ResolvedServiceAssertion} from '../modules/backend/token-service.js'
@@ -32,6 +33,7 @@ export async function registerBackendFabricRoutes(
   const ledger = new GreenfieldDataLedgerService(db)
   const credentialBroker = new CredentialBrokerClient(config)
   const eventJobs = new GreenfieldBackendEventJobService(db)
+  const entitlements = new GreenfieldEntitlementService(db)
   const readConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
   const writeConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
 
@@ -311,6 +313,38 @@ export async function registerBackendFabricRoutes(
       const runtime = await scopedRuntime(runtimeAccess, assertion, productId, true)
       return eventJobs.cancelJob(assertion, runtime, jobIdParam(request))
     })
+  })
+
+  app.get('/v1/backend/products/:productId/accounts/:accountId/entitlements', readConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireAssertionOperation(assertion, 'entitlements.read')
+      const accountId = String((request.params as {accountId?: string}).accountId ?? '')
+      if (accountId !== assertion.accountId) throw moduleError('FORBIDDEN', 'Service assertion cannot read another account entitlement')
+      await scopedRuntime(runtimeAccess, assertion, productId, false)
+      return entitlements.listAccount(accountId, productId)
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/entitlements/check', readConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireAssertionOperation(assertion, 'entitlements.read')
+      const body = requireObject(request.body)
+      const accountId = requiredString(body.accountId, 'accountId')
+      if (accountId !== assertion.accountId) throw moduleError('FORBIDDEN', 'Service assertion cannot check another account entitlement')
+      await scopedRuntime(runtimeAccess, assertion, productId, false)
+      return entitlements.check(accountId, productId, requiredString(body.capability, 'capability'))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/usage', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      requireAssertionOperation(assertion, 'entitlements.usage')
+      await scopedRuntime(runtimeAccess, assertion, productId, true)
+      const body = requireObject(request.body)
+      if (requiredIdempotencyKey(request) !== body.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Usage idempotency header must equal the body idempotencyKey')
+      return entitlements.recordUsage(assertion.targetServiceId, assertion.accountId, productId, assertion.targetInstallationId, body)
+    }, 201)
   })
 
   app.post('/v1/backend/products/:productId/secrets/lease', writeConfig, async (request, reply) => {
