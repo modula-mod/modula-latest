@@ -2,6 +2,7 @@
 import {existsSync, readFileSync, statSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
 import {join, resolve} from 'node:path'
+import {createGreenfieldVerifierDatabaseFixture} from './greenfield-backend-v1-database-fixture.mjs'
 
 const root = process.cwd()
 const failures = []
@@ -51,7 +52,7 @@ source('GREENFIELD SECRET SDK BOUNDARY', join(root, 'services/greenfield-api/src
 source('GREENFIELD SECRET BEHAVIOUR TEST', join(root, 'services/greenfield-api/tests/greenfield-backend-v1.service-fabric.test.ts'), [
   'single-use secret lease',
   "not.toHaveProperty('value')",
-  'expect(brokerAssertion).toBe(assertion)',
+  "expect(brokerAssertion).toBe(brokerHeaders['x-modula-service-assertion'])",
 ])
 
 record('SECRETS SERVICE REPOSITORY', existsSync(join(serviceRoot, '.git')), serviceRoot)
@@ -92,10 +93,16 @@ const runtimeSnapshot = '/var/lib/modula-secrets/active.enc.json'
 const snapshot = existsSync(runtimeSnapshot) ? readFileSync(runtimeSnapshot, 'utf8') : ''
 record('ENCRYPTED RUNTIME SNAPSHOT', Boolean(snapshot) && snapshot.includes('aes-256-gcm') && !/schemaVersion|secrets:|provider.*value/i.test(snapshot), runtimeSnapshot)
 
-const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
-record('DISPOSABLE DATABASE URL PROVIDED', Boolean(databaseUrl), databaseUrl ? 'configured' : 'MODULA_TEST_DATABASE_URL is required')
-if (databaseUrl) {
-  run('GREENFIELD SECRET LEASE BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.service-fabric.test.ts'], root, {...process.env, CI: 'true'})
+const fixture = createGreenfieldVerifierDatabaseFixture('secret_fabric')
+record('DISPOSABLE DATABASE AVAILABLE', Boolean(fixture), fixture?.databaseName ?? 'configure MODULA_TEST_DATABASE_URL or run preview Postgres')
+if (fixture) {
+  try {
+    const testEnvironment = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
+    run('GREENFIELD SECRET LEASE BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.service-fabric.test.ts'], root, testEnvironment)
+  } finally {
+    fixture.cleanup()
+    record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
+  }
 }
 run('GREENFIELD TYPECHECK', 'pnpm', ['typecheck'], root, {...process.env, CI: 'true'})
 run('GIT DIFF CHECK', 'git', ['diff', '--check'])

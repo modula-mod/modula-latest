@@ -2,6 +2,7 @@
 import {existsSync, readFileSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
 import {join} from 'node:path'
+import {createGreenfieldVerifierDatabaseFixture} from './greenfield-backend-v1-database-fixture.mjs'
 
 const root = process.cwd()
 const failures = []
@@ -86,11 +87,17 @@ source('BEHAVIOURAL DB TEST', 'services/greenfield-api/tests/greenfield-backend-
   'unsafe-secret',
 ])
 
-const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
-record('DISPOSABLE DATABASE URL PROVIDED', Boolean(databaseUrl), databaseUrl ? 'configured' : 'MODULA_TEST_DATABASE_URL is required; no silent skip')
-if (databaseUrl) {
-  run('GREENFIELD PREREQUISITES', 'pnpm', ['--filter', '@modula/greenfield-api...', 'build'], {...process.env, CI: 'true'})
-  run('DATA LEDGER DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.data-ledger.test.ts'], {...process.env, CI: 'true'})
+const fixture = createGreenfieldVerifierDatabaseFixture('data_ledger')
+record('DISPOSABLE DATABASE AVAILABLE', Boolean(fixture), fixture?.databaseName ?? 'configure MODULA_TEST_DATABASE_URL or run preview Postgres')
+if (fixture) {
+  try {
+    const testEnvironment = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
+    run('GREENFIELD PREREQUISITES', 'pnpm', ['--filter', '@modula/greenfield-api...', 'build'], testEnvironment)
+    run('DATA LEDGER DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.data-ledger.test.ts'], testEnvironment)
+  } finally {
+    fixture.cleanup()
+    record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
+  }
 }
 run('GIT DIFF CHECK', 'git', ['diff', '--check'])
 
