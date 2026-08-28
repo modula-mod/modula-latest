@@ -110,7 +110,7 @@ async function verifyProductionConvergence() {
     .sort()
   const pending = source.filter(id => !applied.includes(id))
   const unknown = applied.filter(id => !source.includes(id))
-  record('PRODUCTION SCHEMA', schema === '052', schema)
+  record('PRODUCTION SCHEMA', schema === '053', schema)
   record('PRODUCTION MIGRATION LEDGER', applied.length === source.length && unknown.length === 0, `${applied.length}/${source.length}; unknown=${unknown.length}`)
   record('PENDING MIGRATIONS', pending.length === 0, pending.join(',') || '0')
 

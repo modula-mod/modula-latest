@@ -43,10 +43,39 @@ describeIfDb('Greenfield Backend V1 migration ledger security', () => {
     ])
   })
 
+  it('gives the dedicated backup role complete read-only table coverage', async () => {
+    const coverage = await sql<{
+      missing_select: number
+      writable_tables: number
+    }>`
+      SELECT
+        count(*) FILTER (
+          WHERE NOT has_table_privilege(
+            'modula_backup',
+            format('%I.%I', namespace.nspname, relation.relname),
+            'SELECT'
+          )
+        )::int AS missing_select,
+        count(*) FILTER (
+          WHERE has_table_privilege(
+            'modula_backup',
+            format('%I.%I', namespace.nspname, relation.relname),
+            'INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER'
+          )
+        )::int AS writable_tables
+      FROM pg_class relation
+      JOIN pg_namespace namespace ON namespace.oid = relation.relnamespace
+      WHERE namespace.nspname = 'public'
+        AND relation.relkind IN ('r', 'p')
+    `.execute(db)
+
+    expect(coverage.rows).toEqual([{missing_select: 0, writable_tables: 0}])
+  })
+
   it('retains the exact migration ledger and schema version', async () => {
     const version = await db.selectFrom('schema_metadata').select('value').where('key', '=', 'schema_version').executeTakeFirstOrThrow()
     const latest = await sql<{id: string}>`SELECT id FROM schema_migrations ORDER BY id DESC LIMIT 1`.execute(db)
-    expect(version.value).toBe('052')
-    expect(latest.rows[0]?.id).toBe('052_greenfield_backend_v1_migration_ledger_security')
+    expect(version.value).toBe('053')
+    expect(latest.rows[0]?.id).toBe('053_greenfield_backend_v1_backup_acl_reconciliation')
   })
 })

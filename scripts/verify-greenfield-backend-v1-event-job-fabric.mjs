@@ -198,7 +198,7 @@ function verifyProductionState() {
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const require043 = process.env.MODULA_REQUIRE_PRODUCTION_043 === '1'
   const version = Number(schema)
-  record('PRODUCTION SCHEMA DISCOVERED', require043 ? version >= 43 : version >= 42 && version <= 52, schema)
+  record('PRODUCTION SCHEMA DISCOVERED', require043 ? version >= 43 : version >= 42 && version <= 53, schema)
   if (!require043 || version < 43) return
   const unsafeFailures = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM job_failures WHERE payload <> '{}'::jsonb"])
   const activeJobs = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM background_jobs WHERE status IN ('QUEUED','LEASED','RUNNING','RETRYING')"])
