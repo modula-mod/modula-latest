@@ -6,6 +6,7 @@ import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {GreenfieldDataLedgerService, type DeclareDataSchemaVersionInput, type RecordDataMigrationInput, type RegisterDataResourceInput} from '../data-ledger/index.js'
 import {GreenfieldEntitlementService} from '../entitlements/service.js'
+import {GreenfieldAccountDataService} from '../account-data/service.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
 import {ModuleBackendTokenService, type ResolvedServiceAssertion} from '../modules/backend/token-service.js'
@@ -34,6 +35,7 @@ export async function registerBackendFabricRoutes(
   const credentialBroker = new CredentialBrokerClient(config)
   const eventJobs = new GreenfieldBackendEventJobService(db)
   const entitlements = new GreenfieldEntitlementService(db)
+  const accountData = new GreenfieldAccountDataService(db)
   const readConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 240, timeWindow: '1 minute'}}} : {}
   const writeConfig: RouteConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
 
@@ -363,6 +365,33 @@ export async function registerBackendFabricRoutes(
       })
     }, 201)
   })
+
+  app.post('/v1/backend/products/:productId/data-requests/claim', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      const body = requireObject(request.body)
+      const requestType = dataRequestType(body.requestType)
+      requireAssertionOperation(assertion, requestType === 'EXPORT' ? 'data.export' : 'data.delete')
+      await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return accountData.claimServiceDomains({accountId: assertion.accountId, productId, installationId: assertion.targetInstallationId, serviceId: assertion.targetServiceId}, requestType, optionalInteger(body.maxDomains, 'maxDomains'))
+    })
+  })
+
+  app.post('/v1/backend/products/:productId/data-request-domains/:domainId/complete', writeConfig, async (request, reply) => {
+    return serviceRoute(reply, request, authenticate, async ({productId, assertion}) => {
+      requireMutations(config)
+      const body = requireObject(request.body)
+      const requestType = dataRequestType(body.requestType)
+      requireAssertionOperation(assertion, requestType === 'EXPORT' ? 'data.export' : 'data.delete')
+      await scopedRuntime(runtimeAccess, assertion, productId, true)
+      return accountData.completeServiceDomain(
+        {accountId: assertion.accountId, productId, installationId: assertion.targetInstallationId, serviceId: assertion.targetServiceId},
+        requiredString((request.params as {domainId?: unknown}).domainId, 'domainId'),
+        requestType,
+        body,
+      )
+    })
+  })
 }
 
 async function serviceRoute<T>(
@@ -621,6 +650,11 @@ function optionalInteger(value: unknown, field: string): number | undefined {
 
 function requiredBoolean(value: unknown, field: string): boolean {
   if (typeof value !== 'boolean') throw moduleError('VALIDATION_FAILED', `${field} must be a boolean`)
+  return value
+}
+
+function dataRequestType(value: unknown): 'EXPORT' | 'DELETE' {
+  if (value !== 'EXPORT' && value !== 'DELETE') throw moduleError('VALIDATION_FAILED', 'requestType must be EXPORT or DELETE')
   return value
 }
 
