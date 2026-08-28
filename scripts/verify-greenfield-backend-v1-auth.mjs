@@ -129,7 +129,7 @@ function verifyProductionState() {
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const required = process.env.MODULA_REQUIRE_PRODUCTION_045 === '1'
   const version = Number(schema)
-  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 45 : version >= 43 && version <= 52, schema)
+  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 45 : version >= 43 && version <= 53, schema)
   if (!required || version < 45) return
   const appleChallenges = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM pg_constraint WHERE conname='greenfield_auth_challenges_purpose_check' AND pg_get_constraintdef(oid) LIKE '%apple_authentication%'"])
   record('PRODUCTION APPLE CHALLENGE CONTRACT', appleChallenges === '1', appleChallenges)

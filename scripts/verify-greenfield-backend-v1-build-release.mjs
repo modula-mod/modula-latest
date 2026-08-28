@@ -69,5 +69,5 @@ function productionState() {
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const version = Number(schema)
-  record('PRODUCTION SCHEMA DISCOVERED', process.env.MODULA_REQUIRE_PRODUCTION_048 === '1' ? version >= 48 : version >= 43 && version <= 52, schema)
+  record('PRODUCTION SCHEMA DISCOVERED', process.env.MODULA_REQUIRE_PRODUCTION_048 === '1' ? version >= 48 : version >= 43 && version <= 53, schema)
 }

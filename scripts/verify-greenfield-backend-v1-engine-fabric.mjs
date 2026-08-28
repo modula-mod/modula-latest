@@ -133,7 +133,7 @@ function verifyProductionState() {
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const required = process.env.MODULA_REQUIRE_PRODUCTION_044 === '1'
   const version = Number(schema)
-  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 44 : version >= 43 && version <= 52, schema)
+  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 44 : version >= 43 && version <= 53, schema)
   if (!required || version < 44) return
   const count = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', 'SELECT count(*) FROM greenfield_engine_registrations'])
   const invalid = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM greenfield_engine_service_registrations service JOIN greenfield_engine_registrations engine USING(engine_id) WHERE engine.runtime_status <> 'READY'"])
