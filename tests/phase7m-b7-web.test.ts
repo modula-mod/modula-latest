@@ -92,7 +92,8 @@ test.describe('Phase 7M-B7 exact web route gate', () => {
       expect(response?.status(), `${route} HTTP status`).toBeLessThan(400)
       if (route === '/marketplace') {
         await expect(page.getByText('Loading catalogue.', {exact: true})).toBeHidden()
-        await expect(page.getByText('FEATURED', {exact: true})).toBeVisible()
+        await expect(page.getByRole('heading', {name: 'Product Hub', level: 1})).toBeVisible()
+        await expect(page.getByRole('link', {name: 'Open featured Vault Notes'})).toBeVisible()
       }
       if (route === '/module/digital.modula.vault-notes') {
         await expect(page.getByText('Loading module', {exact: true})).toBeHidden()
