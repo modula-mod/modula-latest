@@ -1,3 +1,4 @@
+export * from '@/components/data/classifyShellError'
 export * from '@/components/data/InitialLoadingState'
 export * from '@/components/data/InlineLoadingState'
 export * from '@/components/data/NetworkStatusBanner'

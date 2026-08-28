@@ -25,7 +25,7 @@ const BASE_TYPOGRAPHY: TypographyTokens = {
   bodyStrong: {fontSize: 16, lineHeight: 22, fontWeight: '600', letterSpacing: 0},
   label: {fontSize: 14, lineHeight: 18, fontWeight: '600', letterSpacing: 0},
   caption: {fontSize: 13, lineHeight: 18, fontWeight: '400', letterSpacing: 0},
-  micro: {fontSize: 11, lineHeight: 14, fontWeight: '500', letterSpacing: 0},
+  micro: {fontSize: 12, lineHeight: 16, fontWeight: '500', letterSpacing: 0},
 }
 
 function resolveMode(
