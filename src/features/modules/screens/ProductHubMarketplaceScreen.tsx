@@ -5,6 +5,8 @@ import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
+import {EmptyState} from '@/components/primitives/EmptyState'
+import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {useSession} from '@/auth/runtime'
 import type {ModuleCatalogueItem, ProductHubCategory} from '@/data/repositories/contracts'
 import {isLegacyVaultNotesModuleId} from '@modula/greenfield-contracts'
@@ -22,6 +24,10 @@ import {
   PRODUCT_HUB_COLLECTIONS,
 } from '@/features/modules/components/presentation'
 import {useModuleCatalogueQuery} from '@/features/modules/hooks'
+import {
+  presentProductHubCatalogue,
+  type ProductHubCatalogueKind,
+} from '@/features/modules/presentation/productHubCatalogueState'
 import {marketplaceCanvas} from '@/features/modules/identity/marketplaceCanvas'
 import {isInstalledModuleState, resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
 import {productCopyFor} from '@/features/modules/identity/productCopy'
@@ -35,9 +41,8 @@ import {
   rememberProductHubOffset,
 } from '@/features/modules/state/productHubScroll'
 import {selectionHaptic} from '@/lib/haptics'
-import {PageIntro} from '@/platform/ui/chrome/page-intro'
-import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
+import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {
   CHROME_BLUR_INTENSITY,
@@ -89,6 +94,12 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
     () => (catalogue.data ?? []).filter(item => !isLegacyVaultNotesModuleId(item.moduleId)),
     [catalogue.data],
   )
+  const catalogueState = presentProductHubCatalogue({
+    data: catalogue.data === undefined ? undefined : items,
+    isPending: catalogue.isPending,
+    isError: catalogue.isError,
+    error: catalogue.error,
+  })
 
   const featured = items.find(item => item.featured) ?? items.find(item => item.installable) ?? items[0]
   const featuredId = featured?.moduleId
@@ -197,7 +208,9 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
               {segment === 'installed' ? (
                 <InstalledMode
                   yours={yours}
-                  pending={catalogue.isPending}
+                  state={catalogueState.kind}
+                  error={catalogue.error}
+                  onRetry={() => void catalogue.refetch()}
                   onOpen={openModule}
                   onAction={onAction}
                 />
@@ -205,7 +218,9 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
               {segment === 'updates' ? (
                 <UpdatesMode
                   updates={updates}
-                  pending={catalogue.isPending}
+                  state={catalogueState.kind}
+                  error={catalogue.error}
+                  onRetry={() => void catalogue.refetch()}
                   onOpen={openModule}
                   onAction={onAction}
                 />
@@ -220,7 +235,9 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
                   updates={updates}
                   items={items}
                   featuredId={featuredId}
-                  pending={catalogue.isPending}
+                  state={catalogueState.kind}
+                  error={catalogue.error}
+                  onRetry={() => void catalogue.refetch()}
                   wide={wide}
                   desktop={desktop}
                   onOpen={openModule}
@@ -281,7 +298,9 @@ function EditorialLanding({
   updates,
   items,
   featuredId,
-  pending,
+  state,
+  error,
+  onRetry,
   wide,
   desktop,
   onOpen,
@@ -296,7 +315,9 @@ function EditorialLanding({
   updates: ModuleCatalogueItem[]
   items: ModuleCatalogueItem[]
   featuredId?: string
-  pending: boolean
+  state: ProductHubCatalogueKind
+  error: unknown
+  onRetry: () => void
   wide: boolean
   desktop: boolean
   onOpen: (moduleId: string) => void
@@ -304,11 +325,24 @@ function EditorialLanding({
   onBrowse: (category: ProductHubCategory) => void
 }) {
   const {spacing} = useThemeTokens()
-  if (pending) {
+  if (state === 'initial-loading') {
+    return <InitialLoadingState label="Loading Product Hub" />
+  }
+  if (state === 'full-failure') {
     return (
-      <AppText variant="caption" colour="textSecondary">
-        Loading catalogue.
-      </AppText>
+      <QueryErrorState
+        error={error}
+        onRetry={onRetry}
+      />
+    )
+  }
+  if (state === 'successful-empty') {
+    return (
+      <EmptyState
+        icon="modules"
+        title="Nothing in Product Hub yet"
+        description="Modules you can install will appear here when the catalogue is available."
+      />
     )
   }
   const comingSoonLead = comingSoon[0]
@@ -351,6 +385,11 @@ function EditorialLanding({
 
   return (
     <View style={[styles.landing, wide ? styles.landingWide : null, {gap: spacing[8]}]}>
+      {state === 'partial' ? (
+        <AppText variant="caption" colour="textSecondary" testID="product-hub-partial">
+          Some catalogue details couldn’t refresh. Showing last known products.
+        </AppText>
+      ) : null}
       {featured ? (
         <SectionEnter delay={0}>
           <View testID="product-hub-featured">
@@ -430,44 +469,37 @@ function EditorialLanding({
           subtitle={`${updates.length} update${updates.length === 1 ? '' : 's'} available`}
         />
       ) : null}
-
-      {!items.length ? (
-        <PageIntro
-          eyebrow="Product Hub"
-          icon="modules"
-          title="Nothing here yet"
-          body="Modules you can install will appear here."
-        />
-      ) : null}
     </View>
   )
 }
 
 function InstalledMode({
   yours,
-  pending,
+  state,
+  error,
+  onRetry,
   onOpen,
   onAction,
 }: {
   yours: ModuleCatalogueItem[]
-  pending: boolean
+  state: ProductHubCatalogueKind
+  error: unknown
+  onRetry: () => void
   onOpen: (moduleId: string) => void
   onAction: (item: ModuleCatalogueItem) => void
 }) {
-  if (pending) {
-    return (
-      <AppText variant="caption" colour="textSecondary">
-        Loading catalogue.
-      </AppText>
-    )
+  if (state === 'initial-loading') {
+    return <InitialLoadingState label="Loading installed modules" />
+  }
+  if (state === 'full-failure') {
+    return <QueryErrorState error={error} onRetry={onRetry} />
   }
   if (!yours.length) {
     return (
-      <PageIntro
-        eyebrow="Installed"
+      <EmptyState
         icon="modules"
         title="No modules installed"
-        body="Modules you install will appear here."
+        description="Install from Product Hub. Installed modules will appear here."
       />
     )
   }
@@ -488,29 +520,31 @@ function InstalledMode({
 
 function UpdatesMode({
   updates,
-  pending,
+  state,
+  error,
+  onRetry,
   onOpen,
   onAction,
 }: {
   updates: ModuleCatalogueItem[]
-  pending: boolean
+  state: ProductHubCatalogueKind
+  error: unknown
+  onRetry: () => void
   onOpen: (moduleId: string) => void
   onAction: (item: ModuleCatalogueItem) => void
 }) {
-  if (pending) {
-    return (
-      <AppText variant="caption" colour="textSecondary">
-        Loading catalogue.
-      </AppText>
-    )
+  if (state === 'initial-loading') {
+    return <InitialLoadingState label="Checking for updates" />
+  }
+  if (state === 'full-failure') {
+    return <QueryErrorState error={error} onRetry={onRetry} />
   }
   if (!updates.length) {
     return (
-      <PageIntro
-        eyebrow="Updates"
+      <EmptyState
         icon="update"
         title="You’re up to date"
-        body="When a module has an update, it will appear here."
+        description="When a module has an update, it will appear here."
       />
     )
   }
