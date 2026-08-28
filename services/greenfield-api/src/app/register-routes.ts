@@ -72,6 +72,7 @@ import {sendBrowserVisibleMedia} from './media-response.js'
 import {registerBackendFabricRoutes} from '../backend-fabric/routes.js'
 import {registerDeveloperRoutes} from '../developers/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
+import {registerAccountDataRoutes} from '../account-data/routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -2550,6 +2551,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
 
   await registerDeveloperRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
+  await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
 }
 
 function idempotencyKey(request: any, body: unknown): string | undefined {
