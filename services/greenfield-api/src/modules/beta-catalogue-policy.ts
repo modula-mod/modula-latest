@@ -34,12 +34,12 @@ export function classifyBetaModule(input: {
     }
   }
 
-  if (/^digital\.modula\.search-[0-9a-f]+$/i.test(input.moduleId)) {
+  if (/^test\.modula\./i.test(input.moduleId) || /^digital\.modula\.search-[0-9a-f]+$/i.test(input.moduleId) || input.manifest?.testOnly === true) {
     return {
       classification: 'TEST_ONLY',
       visibleInBeta: false,
       reasonCode: 'module.generated_fixture',
-      reason: 'Generated search fixture is hidden from the beta Product Hub.',
+      reason: 'Test-only product is hidden from the beta Product Hub.',
     }
   }
 

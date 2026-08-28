@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import type {ModuleBackendDefinition} from '@modula/greenfield-module-manifest'
-import {assertBackendTargetPolicy} from '../src/modules/backend/network-policy.js'
+import {assertBackendTargetPolicy, resolveBackendEndpoint} from '../src/modules/backend/network-policy.js'
 
 describe('Greenfield Backend V1 registered service target policy', () => {
   it('accepts an exact registered HTTPS origin on an allowed port', () => {
@@ -48,6 +48,20 @@ describe('Greenfield Backend V1 registered service target policy', () => {
       hosts: ['api.example.com'],
       ports: [443],
     }), new URL('https://api.example.com/backend?tenant=one'), true)).toThrowError(expect.objectContaining({code: 'VALIDATION_FAILED'}))
+  })
+
+  it('keeps every resolved service path on the exact registered origin', async () => {
+    const definition = backend({
+      strategy: 'registry',
+      origins: ['https://8.8.8.8'],
+      hosts: ['8.8.8.8'],
+      ports: [443],
+    })
+    const resolved = await resolveBackendEndpoint(definition)
+    expect(resolved.urlFor('/v1/actions?kind=verify')).toBe('https://8.8.8.8/v1/actions?kind=verify')
+    for (const maliciousPath of ['//attacker.example/v1', '/../admin', '/%2e%2e/admin', '/%2f%2fattacker.example/v1', '/%5c%5cattacker.example/v1', '/v1#fragment']) {
+      expect(() => resolved.urlFor(maliciousPath)).toThrowError(expect.objectContaining({code: 'VALIDATION_FAILED'}))
+    }
   })
 })
 

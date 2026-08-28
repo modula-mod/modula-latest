@@ -66,8 +66,20 @@ function endpoint(origin: string): ResolvedBackendEndpoint {
   return {
     origin,
     urlFor(path: string) {
-      if (!path.startsWith('/') || path.includes('://') || path.includes('..') || path.includes('\\')) throw moduleError('VALIDATION_FAILED', 'Unsafe backend path')
-      return new URL(path, origin).toString()
+      let decoded: string
+      try {
+        decoded = decodeURIComponent(path)
+      } catch {
+        throw moduleError('VALIDATION_FAILED', 'Unsafe backend path')
+      }
+      const pathOnly = decoded.split(/[?#]/, 1)[0] ?? ''
+      const unsafe = !path.startsWith('/') || path.startsWith('//') || decoded.startsWith('//')
+        || decoded.includes('://') || decoded.includes('\\') || decoded.includes('#') || /[\u0000-\u001f\u007f]/.test(decoded)
+        || pathOnly.split('/').some(segment => segment === '..')
+      if (unsafe) throw moduleError('VALIDATION_FAILED', 'Unsafe backend path')
+      const resolved = new URL(path, origin)
+      if (resolved.origin !== origin || resolved.username || resolved.password) throw moduleError('VALIDATION_FAILED', 'Unsafe backend path')
+      return resolved.toString()
     },
   }
 }
