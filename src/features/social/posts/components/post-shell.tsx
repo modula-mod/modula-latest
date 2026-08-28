@@ -5,9 +5,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated'
-import {Gesture, GestureDetector} from 'react-native-gesture-handler'
-import {scheduleOnRN} from 'react-native-worklets'
-import * as Haptics from 'expo-haptics'
+import {GestureDetector} from 'react-native-gesture-handler'
 
 import type {ReactionType, SocialPost} from '@/domain/social'
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
@@ -27,10 +25,10 @@ import {
   postSpringConfig,
   usePostInteraction,
 } from '@/features/social/posts/interactions/post-interaction-context'
+import {createPostCommentsPan} from '@/features/social/posts/interactions/post-ui-worklets'
 import {PostContentRenderer} from '@/features/social/posts/renderers/post-content-renderer'
 import {
   commentsModeForSnap,
-  commentsSnapTarget,
   canOpenComments,
 } from '@/features/social/posts/state/post-interaction-machine'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
@@ -113,30 +111,11 @@ function PostShellInner({post, active = true, compact, presentation = 'feed'}: P
 
   const bottomPan = useMemo(
     () =>
-      Gesture.Pan()
-        .enabled(canOpenComments(mode))
-        .activeOffsetY([-9999, -10])
-        .failOffsetX([-24, 24])
-        .onBegin(() => scheduleOnRN(setMode, 'commentsDragging'))
-        .onUpdate(event => {
-          const next = Math.min(1, Math.max(0, -event.translationY / 280))
-          commentsProgress.set(next)
-        })
-        .onEnd(event => {
-          const snap = commentsSnapTarget(commentsProgress.get(), event.velocityY)
-          commentsProgress.set(
-            withSpring(POST_MOTION.commentsSnapPoints[snap], {
-              ...postSpringConfig('comments'),
-              velocity: event.velocityY,
-            }),
-          )
-          scheduleOnRN(setMode, commentsModeForSnap(snap))
-          if (snap !== 'closed') {
-            scheduleOnRN(() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined)
-            })
-          }
-        }),
+      createPostCommentsPan({
+        commentsProgress,
+        enabled: canOpenComments(mode),
+        setMode,
+      }),
     [commentsProgress, mode, setMode],
   )
 

@@ -8,7 +8,6 @@ import {
 import {useSharedValue} from 'react-native-reanimated'
 
 import type {PostInteractionMode} from '@/features/social/posts/state/post-interaction-types'
-import {POST_MOTION} from '@/features/social/posts/tokens/post-motion'
 
 type PostInteractionContextValue = {
   mode: PostInteractionMode
@@ -70,10 +69,4 @@ export function usePostInteraction(): PostInteractionContextValue {
   return context
 }
 
-export function postSpringConfig(kind: 'rail' | 'comments' | 'player') {
-  const config = POST_MOTION[`${kind}Snap`]
-  return {
-    damping: config.damping,
-    stiffness: config.stiffness,
-  }
-}
+export {postSpringConfig} from '@/features/social/posts/interactions/post-ui-worklets'
