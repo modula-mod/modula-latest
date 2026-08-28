@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "sourceRevision": "replace-with-exact-main-sha",
+  "databases": [
+    {
+      "id": "greenfield-core",
+      "role": "GREENFIELD_CORE",
+      "urlEnv": "MODULA_RECOVERY_GREENFIELD_DATABASE_URL"
+    },
+    {
+      "id": "example-managed-module",
+      "role": "MODULE_DATABASE",
+      "urlEnv": "MODULA_RECOVERY_EXAMPLE_MODULE_DATABASE_URL",
+      "resourceIds": ["replace-with-data-resource-id"]
+    }
+  ],
+  "assets": [
+    {
+      "id": "greenfield-media",
+      "role": "MANAGED_ASSETS",
+      "pathEnv": "MODULA_RECOVERY_GREENFIELD_MEDIA_ROOT"
+    }
+  ]
+}

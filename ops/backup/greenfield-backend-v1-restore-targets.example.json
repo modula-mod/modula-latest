@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "databases": [
+    {
+      "id": "greenfield-core",
+      "urlEnv": "MODULA_RECOVERY_RESTORE_GREENFIELD_DATABASE_URL",
+      "checks": [
+        {
+          "name": "schema-version",
+          "sql": "SELECT value FROM schema_metadata WHERE key='schema_version'",
+          "expect": "050"
+        }
+      ]
+    },
+    {
+      "id": "example-managed-module",
+      "urlEnv": "MODULA_RECOVERY_RESTORE_EXAMPLE_MODULE_DATABASE_URL"
+    }
+  ],
+  "assets": [
+    {
+      "id": "greenfield-media",
+      "pathEnv": "MODULA_RECOVERY_RESTORE_GREENFIELD_MEDIA_ROOT"
+    }
+  ]
+}

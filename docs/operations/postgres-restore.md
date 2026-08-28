@@ -1,5 +1,10 @@
 # PostgreSQL restore (Phase 5)
 
+> Historical Phase 5 procedure. Greenfield Backend V1 uses
+> `docs/operations/greenfield-backend-v1-recovery.md`, which adds encrypted
+> multi-database/assets sets, signed manifests, managed-resource coverage and
+> destructive-target guards.
+
 ## Policy
 - Daily logical backup
 - Weekly isolated restore test

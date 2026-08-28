@@ -411,6 +411,10 @@ developers, entitlements, events, jobs, secret metadata and build/release
 metadata. Secret values and external decryption keys follow their own recovery
 procedure. A backup is not accepted until an isolated restore succeeds.
 
+The executable Backend V1 procedure, encrypted-set format, external-key
+requirements and isolated-target safety guards are documented in
+[`docs/operations/greenfield-backend-v1-recovery.md`](../operations/greenfield-backend-v1-recovery.md).
+
 ## Security and observability
 
 Request and trace context propagates account, organisation, product, release,
