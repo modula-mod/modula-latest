@@ -20,7 +20,6 @@ const routes = [
   {path: '/settings/accessibility', name: 'web-accessibility'},
   {path: '/settings/display-and-text', name: 'web-display-and-text'},
   {path: '/settings/display-and-text/larger-text', name: 'web-larger-text'},
-  {path: '/settings/accessibility/hover-text', name: 'web-hover-text'},
   {path: '/settings/motion', name: 'web-motion'},
 ]
 

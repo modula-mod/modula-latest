@@ -56,7 +56,7 @@ const personalisationRows: SettingsNavRow[] = [
     icon: 'accessibility',
     iconDomain: 'accessibility',
     route: '/settings/accessibility',
-    keywords: ['voiceover', 'motion', 'contrast', 'text size', 'bold', 'hover text', 'display'],
+    keywords: ['voiceover', 'motion', 'contrast', 'text size', 'bold', 'display'],
   },
   {
     title: 'Language',
@@ -64,6 +64,23 @@ const personalisationRows: SettingsNavRow[] = [
     iconDomain: 'language',
     route: '/settings/language',
     keywords: ['translate', 'locale'],
+  },
+]
+
+const moduleRows: SettingsNavRow[] = [
+  {
+    title: 'Product Hub',
+    icon: 'modules',
+    iconDomain: 'modules',
+    route: '/product',
+    keywords: ['marketplace', 'catalogue', 'install'],
+  },
+  {
+    title: 'Installed',
+    icon: 'modules',
+    iconDomain: 'modules',
+    route: '/settings/modules',
+    keywords: ['installed', 'products', 'extensions', 'updates'],
   },
 ]
 
@@ -91,13 +108,6 @@ const platformRows: SettingsNavRow[] = [
     iconDomain: 'data',
     route: '/settings/data',
     keywords: ['cache', 'saved', 'export', 'media'],
-  },
-  {
-    title: 'Modules',
-    icon: 'modules',
-    iconDomain: 'modules',
-    route: '/settings/modules',
-    keywords: ['installed', 'products', 'extensions'],
   },
   {
     title: 'Connections',
@@ -216,6 +226,7 @@ export function SettingsHomeScreen() {
 
   const groups: {title: string; rows: SettingsNavRow[]; footer?: string}[] = [
     {title: 'Profile & Account', rows: filter(profileRows)},
+    {title: 'Modules', rows: filter(moduleRows)},
     {title: 'Personalisation', rows: filter(personalisationRows)},
     {title: 'Privacy & Communication', rows: filter(privacyRows)},
     {title: 'Platform', rows: filter(platformRows)},

@@ -11,8 +11,7 @@ import {useAppearance} from '@/theme/runtime/useAppearance'
 
 export function AccessibilityScreen() {
   const router = useRouter()
-  const {systemAccessibility, resolved} = useAppearance()
-  const screenReaderValue = systemAccessibility.screenReaderEnabled ? 'On' : 'Off'
+  const {resolved} = useAppearance()
   const motionValue = resolved.accessibility.reduceMotion ? 'On' : 'Off'
 
   return (
@@ -35,21 +34,12 @@ export function AccessibilityScreen() {
         icon="accessibility"
         iconDomain="accessibility"
         title="Accessibility"
-        body="Adapt Modula for vision, motion, hearing, and speech. System features stay in your device settings — Modula cannot turn them on or off."
+        body="Text, motion, and contrast controls that Modula can actually change. VoiceOver, Hover Text, and other system features stay in your device settings."
       />
 
       <SettingsSection
         title="Vision"
-        footer="VoiceOver, Hover Text, and Spoken Content stay in your device settings.">
-        <SettingsLinkRow
-          row={{
-            title: 'VoiceOver',
-            icon: 'eye',
-            iconDomain: 'accessibility',
-            value: screenReaderValue,
-            route: '/settings/accessibility/voiceover',
-          }}
-        />
+        footer="VoiceOver, Hover Text, Zoom, and Spoken Content stay in your device settings.">
         <SettingsLinkRow
           row={{
             title: 'Display & Text Size',
@@ -61,112 +51,18 @@ export function AccessibilityScreen() {
         />
         <SettingsLinkRow
           row={{
-            title: 'Hover Text',
-            icon: 'search',
-            iconDomain: 'accessibility',
-            route: '/settings/accessibility/hover-text',
-            keywords: ['pointer', 'magnify'],
-          }}
-        />
-        <SettingsLinkRow
-          row={{
             title: 'Motion',
             icon: 'motion',
             iconDomain: 'accessibility',
             route: '/settings/motion',
             value: motionValue,
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Read & Speak',
-            icon: 'text',
-            iconDomain: 'accessibility',
-            route: '/settings/accessibility/read-and-speak',
+            keywords: ['reduce motion'],
           }}
           last
         />
       </SettingsSection>
 
-      <SettingsSection title="Physical and Motor">
-        <SettingsLinkRow
-          row={{
-            title: 'Touch',
-            icon: 'switch',
-            iconDomain: 'interaction',
-            route: '/settings/touch',
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Voice Control',
-            icon: 'comment',
-            iconDomain: 'speech',
-            route: '/settings/accessibility/voice-control',
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Switch Control',
-            icon: 'switch',
-            iconDomain: 'interaction',
-            route: '/settings/accessibility/switch-control',
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Keyboard',
-            icon: 'text',
-            iconDomain: 'interaction',
-            route: '/settings/accessibility/keyboard',
-          }}
-          last
-        />
-      </SettingsSection>
-
-      <SettingsSection title="Hearing">
-        <SettingsLinkRow
-          row={{
-            title: 'Captions',
-            icon: 'note',
-            iconDomain: 'hearing',
-            route: '/settings/accessibility/captions',
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Live Captions',
-            icon: 'comment',
-            iconDomain: 'hearing',
-            route: '/settings/accessibility/live-captions',
-          }}
-          last
-        />
-      </SettingsSection>
-
-      <SettingsSection
-        title="Speech"
-        footer="System features stay in your device settings. Modula does not pretend to enable or disable them.">
-        <SettingsLinkRow
-          row={{
-            title: 'Live Speech',
-            icon: 'comment',
-            iconDomain: 'speech',
-            route: '/settings/accessibility/live-speech',
-          }}
-        />
-        <SettingsLinkRow
-          row={{
-            title: 'Assistive Access',
-            icon: 'people',
-            iconDomain: 'interaction',
-            route: '/settings/accessibility/assistive-access',
-          }}
-          last
-        />
-      </SettingsSection>
-
-      <SettingsSection title="General">
+      <SettingsSection title="Appearance">
         <SettingsLinkRow
           row={{
             title: 'Appearance',

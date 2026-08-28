@@ -41,6 +41,7 @@ export type {ModulaLiquidGlassTabBarProps}
 const TAB_ICONS: Record<string, AppIconName> = {
   index: 'home',
   discover: 'discover',
+  hub: 'modules',
   create: 'create',
   activity: 'activity',
   profile: 'profile',
