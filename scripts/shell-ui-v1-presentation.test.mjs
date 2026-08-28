@@ -53,7 +53,11 @@ absent('src/features/activity/screens/ActivityScreen.tsx', 'Mute preview', 'NO D
 absent('src/features/activity/screens/ActivityScreen.tsx', 'digital.modula.vault-notes', 'ACTIVITY NOT HARDCODED VAULT')
 contains('src/features/settings/screens/SettingsHomeScreen.tsx', 'ModulaSearchField', 'SETTINGS SEARCH FIELD')
 absent('src/features/settings/screens/SettingsHomeScreen.tsx', 'runtimeEnvironment.appEnvironment', 'NO ENV ON SETTINGS HOME')
+absent('src/features/settings/screens/AccessibilityScreen.tsx', 'setHapticFeedback', 'A11Y HAPTIC IS BOUND OR OMITTED')
+contains('src/features/profile/tabs/AboutProfileTab.tsx', 'label="Joined"', 'PROFILE JOINED LABEL')
+contains('src/features/discover/screens/DiscoverScreen.tsx', 'accessibilityLabel="Search people, topics, and modules"', 'DISCOVER SEARCH LABEL')
 contains('src/features/feed/screens/HomeFeedScreen.tsx', 'colours.canvas', 'HOME OLED CANVAS')
+contains('src/features/feed/screens/HomeFeedScreen.tsx', 'segmentMinWidth={112}', 'HOME MODE TABS READABLE')
 contains('src/features/feed/data/useHomeFeedQuery.ts', 'placeholderData: keepPreviousData', 'FEED KEEP PREVIOUS')
 
 if (failures.length) {

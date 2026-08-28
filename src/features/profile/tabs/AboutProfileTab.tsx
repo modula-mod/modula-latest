@@ -55,7 +55,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           <InfoItem label="Website" value={profile.website.domain} />
         ) : null}
         <InfoItem
-          label="Modula member since"
+          label="Joined"
           value={new Date(profile.joinedAt).toLocaleDateString(undefined, {
             month: 'long',
             year: 'numeric',
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   infoItem: {
     flexBasis: '46%',
     flexGrow: 1,
-    gap: 3,
+    gap: 4,
     minWidth: 180,
   },
   wrap: {

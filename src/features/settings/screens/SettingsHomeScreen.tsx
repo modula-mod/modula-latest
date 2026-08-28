@@ -11,7 +11,6 @@ import {
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {canAccessDeveloperLabs} from '@/lib/platform'
 import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
-import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -45,7 +44,7 @@ const accountRows: SettingsNavRow[] = [
   },
   {
     title: 'Modules',
-    description: 'Installed Greenfield modules, settings, updates and data.',
+    description: 'Installed modules, settings, and updates.',
     icon: 'modules',
     route: '/settings/modules',
   },
@@ -167,7 +166,6 @@ export function SettingsHomeScreen() {
   const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
-  const [advancedOpen, setAdvancedOpen] = useState(false)
 
   const appearanceValue = `${label(preferences.mode)} · ${label(preferences.surfaceType)}`
   const accessibilityValue = resolved.accessibility.reduceMotion
@@ -210,7 +208,11 @@ export function SettingsHomeScreen() {
       />
       <ResponsiveContent>
         <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
+          contentContainerStyle={{
+            gap: spacing[5],
+            padding: spacing[4],
+            paddingBottom: tabPadding + spacing[6],
+          }}
           keyboardShouldPersistTaps="handled">
           <ModulaSearchField
             value={query}
@@ -246,19 +248,6 @@ export function SettingsHomeScreen() {
               />
             ))}
           </SettingsSection>
-
-          <ModulaDisclosureGroup
-            label="Advanced preferences"
-            isExpanded={advancedOpen}
-            onIsExpandedChange={setAdvancedOpen}
-            rows={[
-              'Data saver and autoplay live under Content & Media.',
-              'Mute words and blocked accounts live under Privacy.',
-              'Developer diagnostics are hidden unless developer labs are enabled.',
-            ]}
-          >
-            {null}
-          </ModulaDisclosureGroup>
 
           {canAccessDeveloperLabs() ? (
             <SettingsSection title="Developer">
@@ -302,10 +291,6 @@ function label(value: string): string {
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 16,
-    paddingBottom: 40,
-  },
   screen: {
     flex: 1,
   },

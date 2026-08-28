@@ -24,7 +24,6 @@ export function AccessibilityScreen() {
   const [textScalePreview, setTextScalePreview] = useState<TextScale>(
     preferences.textScale,
   )
-  const [hapticFeedback, setHapticFeedback] = useState(true)
 
   return (
     <SettingsScreen
@@ -130,12 +129,6 @@ export function AccessibilityScreen() {
           }
           value={resolved.accessibility.reduceMotion}
           onValueChange={actions.setReduceMotion}
-        />
-        <SettingsToggleRow
-          label="Haptic feedback"
-          description="Respect device haptics where available."
-          value={hapticFeedback}
-          onValueChange={setHapticFeedback}
           last
         />
       </SettingsSection>

@@ -1,4 +1,4 @@
-import {StyleSheet, View} from 'react-native'
+import {View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -8,7 +8,11 @@ export function OfflineState({local}: {local: boolean}) {
   return (
     <View
       accessibilityRole="alert"
-      style={[styles.wrap, {paddingHorizontal: spacing[4], paddingVertical: spacing[3]}]}>
+      style={{
+        gap: spacing[1],
+        paddingHorizontal: spacing[4],
+        paddingVertical: spacing[3],
+      }}>
       <AppText variant="headline">You’re offline</AppText>
       <AppText variant="body" colour="textSecondary">
         {local
@@ -18,9 +22,3 @@ export function OfflineState({local}: {local: boolean}) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  wrap: {
-    gap: 4,
-  },
-})

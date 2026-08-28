@@ -5,6 +5,7 @@ import {
   StyleSheet,
   UIManager,
   View,
+  useWindowDimensions,
 } from 'react-native'
 import {GestureDetector} from 'react-native-gesture-handler'
 import Animated, {
@@ -78,6 +79,7 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
 export function HomeFeedScreen() {
   const router = useRouter()
   const {colours, motion} = useThemeTokens()
+  const {height: windowHeight} = useWindowDimensions()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
   // Transparent header + nested Animated.FlatList does not reliably get UIKit
@@ -206,7 +208,12 @@ export function HomeFeedScreen() {
               refreshing={refreshing}>
               <GestureDetector gesture={listGesture}>
                 <Animated.FlatList
-                  style={styles.screen}
+                  style={[
+                    styles.screen,
+                    Platform.OS === 'web'
+                      ? {minHeight: Math.max(480, windowHeight - 160)}
+                      : null,
+                  ]}
                   data={posts}
                   keyExtractor={item => item.id}
                   renderItem={({item}) => <SocialPost post={item} compact />}
@@ -274,6 +281,7 @@ export function HomeFeedScreen() {
                     ) : null
                   }
                   contentContainerStyle={{
+                    flexGrow: 1,
                     paddingTop: headerClearance + fadePad,
                     paddingBottom: tabPadding,
                   }}
@@ -458,6 +466,8 @@ function HomeLayoutHeader({
           <ModulaSegmentedPicker
             appearance="segmented"
             accessibilityLabel="Feed mode"
+            scrollable
+            segmentMinWidth={112}
             options={modeOrder.map(next => ({
               value: next,
               label: next,
@@ -530,11 +540,10 @@ function ComposerPrompt() {
         style={[
           styles.prompt,
           {
-            backgroundColor: colours.surface,
-            borderRadius: radius.large,
             marginHorizontal: spacing[3],
             marginBottom: spacing[2],
-            padding: spacing[3],
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[2],
             gap: spacing[2],
           },
         ]}>

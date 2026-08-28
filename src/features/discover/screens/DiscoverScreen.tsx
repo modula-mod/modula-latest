@@ -260,6 +260,8 @@ export function DiscoverScreen() {
                     placeholderTextColor={colours.textTertiary}
                     style={[styles.searchInput, {color: colours.text}]}
                     returnKeyType="search"
+                    accessibilityRole="search"
+                    accessibilityLabel="Search people, topics, and modules"
                   />
                     <AppPressable
                       accessibilityLabel="Open inspire destinations"

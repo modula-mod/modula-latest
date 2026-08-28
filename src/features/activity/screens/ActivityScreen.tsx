@@ -15,7 +15,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
@@ -280,7 +279,7 @@ export function ActivityScreen() {
                 {
                   backgroundColor:
                     filter === id ? colours.accentSubtle : colours.surfaceRaised,
-                  borderRadius: 12,
+                  borderRadius: radius.medium,
                 },
               ]}>
               <AppText
@@ -363,13 +362,11 @@ function ActivityRow({
         accessibilityLabel={item.description}
         onPress={openDestination}
         style={styles.rowPress}>
-        <Surface
-          variant="plain"
+        <View
           style={[
             styles.row,
             {
-              backgroundColor: colours.surface,
-              borderRadius: radius.large,
+              borderBottomColor: colours.border,
               gap: spacing[3],
               paddingHorizontal: spacing[3],
               paddingVertical: spacing[3],
@@ -452,7 +449,7 @@ function ActivityRow({
               </View>
             ) : null}
           </View>
-        </Surface>
+        </View>
       </AppPressable>
     </ModulaContextMenu>
   )
@@ -469,7 +466,7 @@ const styles = StyleSheet.create({
   filterRow: {
     justifyContent: 'center',
     minHeight: 48,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
   },
   iconAvatar: {
     alignItems: 'center',
@@ -482,6 +479,7 @@ const styles = StyleSheet.create({
   },
   row: {
     alignItems: 'flex-start',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     width: '100%',
   },

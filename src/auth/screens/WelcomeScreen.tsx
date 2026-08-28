@@ -44,6 +44,7 @@ export function WelcomeScreen() {
       <View
         style={[
           styles.composition,
+          {gap: spacing[6]},
         ]}>
         <View style={[styles.hero, {gap: spacing[3]}]}>
           <AppText variant="caption" colour="accent">
@@ -84,7 +85,6 @@ const styles = StyleSheet.create({
   },
   composition: {
     flexGrow: 1,
-    gap: 22,
     justifyContent: 'space-between',
     maxWidth: 480,
     minHeight: 700,

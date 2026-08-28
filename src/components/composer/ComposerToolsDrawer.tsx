@@ -80,34 +80,22 @@ function isComingSoonTool(tool: ComposerToolItem): boolean {
 }
 
 function availabilitySentence(tool: ComposerToolItem): string {
-  if (isComingSoonTool(tool)) {
-    return 'Coming Soon. This control does not attach anything to the draft.'
-  }
+  if (isComingSoonTool(tool)) return 'Coming Soon'
   if (tool.availability === 'requiresInstall') {
-    return `Requires install. Open ${tool.requiresModule ?? 'the module'} to review permissions.`
+    return tool.requiresModule ? `Install ${tool.requiresModule}` : 'Install required'
   }
   if (tool.availability === 'requiresEnable') {
-    return `Requires enable. Turn on ${tool.requiresModule ?? 'the module'} in module settings.`
+    return tool.requiresModule ? `Enable ${tool.requiresModule}` : 'Enable required'
   }
-  if (tool.availability === 'requiresConfiguration') {
-    return `Requires configuration. Finish ${tool.requiresModule ?? 'module'} settings first.`
-  }
+  if (tool.availability === 'requiresConfiguration') return 'Setup needed'
   if (tool.availability === 'unavailable') {
-    if (isAiRewrite(tool)) {
-      return 'Unavailable. An Agents manifest must grant composer rewrite scope before this can run.'
-    }
-    if (isNftAttach(tool)) {
-      return 'Unavailable. DIMON is inactive, so Composer will not attach NFT claims.'
-    }
-    if (tool.requiresModule) {
-      return `Unavailable. Enable the ${tool.requiresModule} module before using this tool.`
-    }
-    return 'Unavailable in this build.'
+    if (isAiRewrite(tool)) return 'Unavailable'
+    if (isNftAttach(tool)) return 'Unavailable'
+    if (tool.requiresModule) return `Needs ${tool.requiresModule}`
+    return 'Unavailable'
   }
-  if (tool.availability === 'preview') {
-    return 'Preview state. A reviewed module manifest must enable this capability before it can run.'
-  }
-  return 'Available from a registered manifest.'
+  if (tool.availability === 'preview') return 'Preview'
+  return 'Ready'
 }
 
 function unavailableMessage(tool: ComposerToolItem): string {
@@ -309,7 +297,7 @@ export function ComposerToolsDrawer({
                             {tool.name}
                           </AppText>
                           <AppText
-                            variant="micro"
+                            variant="caption"
                             colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}>
                             {availabilitySentence(tool)}
                           </AppText>

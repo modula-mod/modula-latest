@@ -108,7 +108,7 @@ export function AppearanceScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <AppText variant="caption" colour="textTertiary">
-            Colour, chrome, and accessibility-safe fallbacks — not Apple Settings.
+            Colour, materials, and how Modula looks on this device.
           </AppText>
 
           <ChromePreview
