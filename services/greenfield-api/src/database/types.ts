@@ -1007,6 +1007,7 @@ export interface Database {
   greenfield_extensions: {extension_id: string; slug: string; publisher_account_id: string | null; status: string; created_at: Date; updated_at: Date}
   greenfield_extension_versions: {extension_version_id: string; extension_id: string; version: string; manifest: unknown; status: string; created_at: Date}
   greenfield_extension_installations: {installation_id: string; extension_version_id: string; account_id: string; status: string; config: unknown; created_at: Date; updated_at: Date}
+  greenfield_account_default_providers: {account_id: string; capability_role: string; provider_product_id: string; provider_installation_id: string; selected_by_account_id: string; selected_at: Date; updated_at: Date}
   greenfield_extension_capabilities: {capability_id: string; installation_id: string; capability: string; granted_at: Date; revoked_at: Date | null}
   greenfield_functions: {function_id: string; extension_version_id: string | null; name: string; kind: 'remoteHttp' | 'background' | 'native'; config: unknown; timeout_ms: number; created_at: Date}
   greenfield_tools: {tool_id: string; slug: string; display_name: string; availability: string; manifest: unknown; created_at: Date; updated_at: Date}

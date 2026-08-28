@@ -1,0 +1,32 @@
+{
+  "manifestVersion": 1,
+  "moduleId": "test.modula.module-owned-backend",
+  "name": "Module-owned Backend Reference",
+  "description": "TEST_ONLY reference module for dedicated PostgreSQL and service-fabric acceptance.",
+  "version": "1.0.0",
+  "publisher": {"publisherId": "modula", "displayName": "Modula"},
+  "source": {"provider": "github", "repository": "modula-mod/modula-latest", "commit": "0123456789abcdef0123456789abcdef01234567", "manifestPath": "fixtures/modules/module-owned-backend/module.manifest.json"},
+  "license": {"status": "firstParty", "evidenceIds": ["first-party-test-fixture-policy"]},
+  "trust": {"requestedLevel": "firstParty"},
+  "compatibility": {"minimumGreenfieldVersion": "0.1.0", "minimumModulaHostVersion": "0.1.0", "protocolVersions": ["greenfield.v1"], "platforms": ["server", "web"]},
+  "permissions": [
+    {"permission": "records:module.test.modula.module-owned-backend.record:read", "reason": "Read account-scoped records from the dedicated backend.", "risk": "low"},
+    {"permission": "records:module.test.modula.module-owned-backend.record:write", "reason": "Write account-scoped records to the dedicated backend.", "risk": "medium"},
+    {"permission": "events:subscribe", "reason": "Publish versioned record events through Greenfield.", "risk": "medium"},
+    {"permission": "jobs:create", "reason": "Run declared maintenance jobs through Greenfield.", "risk": "high"}
+  ],
+  "contributions": {"routes": [{"id": "test.modula.module-owned-backend.home", "title": "Reference Backend", "path": "/module/test.modula.module-owned-backend", "routeKind": "module"}]},
+  "backend": {
+    "mode": "module-managed",
+    "protocolVersion": "1.0.0",
+    "endpoints": {"baseUrlStrategy": "registry", "apiVersion": "v1", "discoveryPath": "/.well-known/modula-module", "healthPath": "/v1/health", "capabilitiesPath": "/v1/capabilities", "actionsPath": "/v1/actions", "eventsPath": "/v1/events", "webhooksPath": "/v1/webhooks/modula", "allowedHosts": ["module-owned-backend.test"]},
+    "authentication": {"type": "greenfield-token-exchange", "tokenExchangeRequired": true, "audience": "modula-module:test.modula.module-owned-backend", "tokenTtlSeconds": 300, "sessionExchangePath": "/v1/session/exchange"},
+    "trust": {"publisherId": "modula", "allowedOrigins": ["https://module-owned-backend.test"], "releaseChecksum": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc", "backendBuildChecksum": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+    "data": {"primaryStore": "module-backend", "categories": [{"id": "records", "description": "Reference records", "location": "module-backend", "classification": "restricted", "exportable": true, "deletable": true}], "exportSupported": true, "deletionSupported": true, "backupResponsibility": "greenfield", "residency": ["GB"]},
+    "deployment": {"ownership": "modula-hosted", "multiTenant": true, "regions": ["eu-west"], "dataResidency": ["GB"], "selfHostingSupported": false},
+    "network": {"denyPrivateRanges": true, "denyLocalhost": true, "denyLinkLocal": true, "denyMetadataEndpoints": true, "allowRedirects": false, "allowedPorts": [443], "developmentAllowsLocalhost": false},
+    "lifecycle": {"states": ["unconfigured", "discovering", "verifying", "available", "degraded", "unreachable", "incompatible", "revoked", "quarantined", "disabled"], "initialState": "unconfigured"},
+    "actions": [{"actionId": "test.modula.module-owned-backend.records.compact", "method": "POST", "path": "/v1/actions/records.compact", "inputSchema": "schemas/compact.input.json", "outputSchema": "schemas/compact.output.json", "permissions": ["jobs:create"], "idempotent": true, "sideEffects": "internal-write", "confirmation": "none", "timeoutMs": 5000}]
+  },
+  "integrity": {"manifestSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "releaseSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+}
