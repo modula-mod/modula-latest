@@ -7,6 +7,8 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
+import {ModuleBackendTokenService} from '../src/modules/backend/token-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
 import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
@@ -117,6 +119,44 @@ describeIfDb('PVP Platform 2 immutable reference products', () => {
 
     await transition('formatting', 'enable')
     expect((await composition(tokenA)).extensions.some((item: any) => item.extension_product_id === ids.formatting)).toBe(true)
+  })
+
+  it('issues Vault AI a single-purpose assertion for its own add-on backend without host authority', async () => {
+    const installationId = installations.get('ai')!
+    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountA, ids.ai, {requireEnabled: true})
+    const actor = await db.selectFrom('actors').select('id').where('account_id', '=', accountA).executeTakeFirstOrThrow()
+    const actionId = context.manifest.backend?.actions?.[0]?.actionId
+    expect(actionId).toBe('digital.modula.vault-notes.ai.function.summarise')
+    const issued = await new ModuleBackendTokenService(db, loadConfig()).issue({
+      context,
+      backend: context.manifest.backend!,
+      actorId: actor.id,
+      permissions: context.grantedPermissions,
+      capabilities: ['ai.request'],
+      requestId: `vault-ai-own-backend-${suffix}`,
+      extensionInvocation: {
+        consumerProductId: ids.ai,
+        targetProductId: ids.ai,
+        targetInstallationId: installationId,
+        actionId: actionId!,
+        serviceId: 'service.digital.modula.vault-notes.ai.backend',
+        scope: {type: 'installation', ref: installationId},
+      },
+    })
+    expect(await new ModuleBackendTokenService(db, loadConfig()).resolveServiceAssertion(issued.token, ids.notes)).toBeNull()
+    const resolved = await new ModuleBackendTokenService(db, loadConfig()).resolveServiceAssertion(issued.token, ids.ai)
+    expect(resolved).toMatchObject({
+      consumerProductId: ids.ai,
+      targetProductId: ids.ai,
+      targetInstallationId: installationId,
+      targetServiceId: 'service.digital.modula.vault-notes.ai.backend',
+      actionId,
+      accountId: accountA,
+    })
+    expect(resolved?.scope.productId).toBe(ids.ai)
+    expect(resolved?.scope.installationId).toBe(installationId)
+    const stored = await db.selectFrom('greenfield_extension_service_assertions').select(['raw_user_bearer_forwarded', 'consumer_product_id', 'target_product_id']).where('jti', '=', issued.claims.jti!).executeTakeFirstOrThrow()
+    expect(stored).toMatchObject({raw_user_bearer_forwarded: false, consumer_product_id: ids.ai, target_product_id: ids.ai})
   })
 
   it('keeps the reference host and dependency projection account isolated', async () => {
