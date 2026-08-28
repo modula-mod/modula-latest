@@ -76,7 +76,7 @@ CI=true pnpm verify:greenfield-backend-v1:recovery
 ```
 
 This creates isolated source and target databases, a real managed-module
-database and real asset files; migrates the source through migration 050;
+database and real asset files; migrates the source through migration 052;
 backs up, verifies and deliberately tampers with a ciphertext; restores the
 untampered set; verifies ACLs and zero pending migrations; reruns account-data
 behavior; and removes every generated fixture.

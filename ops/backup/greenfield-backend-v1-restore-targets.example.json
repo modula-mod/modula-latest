@@ -8,7 +8,7 @@
         {
           "name": "schema-version",
           "sql": "SELECT value FROM schema_metadata WHERE key='schema_version'",
-          "expect": "050"
+          "expect": "052"
         }
       ]
     },
