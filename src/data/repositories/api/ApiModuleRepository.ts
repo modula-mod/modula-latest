@@ -43,6 +43,7 @@ import type {
   ModuleUninstallPreview,
   ProductHubCategory,
 } from '@/data/repositories/contracts/ModuleRepository'
+import {preserveAuthoritativeCatalogue} from './preserveAuthoritativeCatalogue'
 
 const LOCAL_CATALOGUE: ModuleCatalogueItem[] = [
   {
@@ -120,10 +121,12 @@ export class ApiModuleRepository implements ModuleRepository {
       () => filterCatalogue(LOCAL_CATALOGUE, input),
     ).then(async remote => {
       if (runtimeEnvironment.dataSource === 'local' && remote === LOCAL_CATALOGUE) return remote
-      if (!options.includeInstalled) return filterCatalogue(remote, input)
-      const installed = await this.listInstalled()
-      const byId = new Map(installed.map(item => [item.moduleId, item]))
-      return filterCatalogue(remote.map(item => applyInstalledState(item, byId.get(item.moduleId))), input)
+      const authoritative = filterCatalogue(remote, input)
+      if (!options.includeInstalled) return authoritative
+      return preserveAuthoritativeCatalogue(authoritative, () => this.listInstalled(), (items, installed) => {
+        const byId = new Map(installed.map(item => [item.moduleId, item]))
+        return items.map(item => applyInstalledState(item, byId.get(item.moduleId)))
+      })
     })
   }
 

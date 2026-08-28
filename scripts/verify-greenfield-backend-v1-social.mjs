@@ -85,7 +85,7 @@ async function runDatabaseChecks() {
     run('SOCIAL COMPLETION BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.social-completion.test.ts'], root, testEnv)
     run('EXISTING SOCIAL JOURNEYS', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase6s.social.test.ts', 'tests/phase7i.f5-stories.test.ts'], root, testEnv)
     run('NOTIFICATION BLOCK GUARDS', 'pnpm', ['--filter', '@modula/greenfield-worker', 'exec', 'vitest', 'run', 'tests/phase7e.notifications.test.ts'], root, testEnv)
-    run('MIGRATION 046 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void (async()=>{const down=await migrateDown(process.env.MODULA_TEST_DATABASE_URL);if(down!=='046_greenfield_backend_v1_social_completion')process.exit(1);const applied=await migrateUp(process.env.MODULA_TEST_DATABASE_URL);if(!applied.includes('046_greenfield_backend_v1_social_completion'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 046 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '046_greenfield_backend_v1_social_completion'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
@@ -132,5 +132,6 @@ function verifyProductionState() {
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const required = process.env.MODULA_REQUIRE_PRODUCTION_046 === '1'
-  record('PRODUCTION SCHEMA DISCOVERED', required ? schema === '046' : ['043', '044', '045', '046'].includes(schema), schema)
+  const version = Number(schema)
+  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 46 : version >= 43 && version <= 52, schema)
 }

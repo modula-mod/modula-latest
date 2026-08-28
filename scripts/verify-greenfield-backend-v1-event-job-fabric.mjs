@@ -144,7 +144,7 @@ async function runIsolatedDatabaseChecks() {
     run('FULL MIGRATION CHAIN THROUGH 043', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied => { if (!applied.includes('043_greenfield_backend_v1_event_job_fabric')) process.exit(1) })"], join(root, 'services/greenfield-api'), migrateEnv)
     run('EVENT JOB API BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.service-fabric.test.ts', 'tests/phase7e.internal-events.test.ts'], root, testEnv)
     run('EVENT JOB WORKER BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-worker', 'exec', 'vitest', 'run', 'tests/lease.test.ts', 'tests/phase7e.event-delivery.test.ts', 'tests/phase7e.search-projector.test.ts', 'tests/phase7e.vault-notes-search-projector.test.ts'], root, testEnv)
-    run('MIGRATION 043 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void (async()=>{const down=await migrateDown(process.env.MODULA_TEST_DATABASE_URL);if(down!=='043_greenfield_backend_v1_event_job_fabric')process.exit(1);const applied=await migrateUp(process.env.MODULA_TEST_DATABASE_URL);if(!applied.includes('043_greenfield_backend_v1_event_job_fabric'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 043 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '043_greenfield_backend_v1_event_job_fabric'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
@@ -197,8 +197,9 @@ function verifyProductionState() {
     .split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice('POSTGRES_DB='.length) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const require043 = process.env.MODULA_REQUIRE_PRODUCTION_043 === '1'
-  record('PRODUCTION SCHEMA DISCOVERED', require043 ? schema === '043' : ['042', '043'].includes(schema), schema)
-  if (!require043 || schema !== '043') return
+  const version = Number(schema)
+  record('PRODUCTION SCHEMA DISCOVERED', require043 ? version >= 43 : version >= 42 && version <= 52, schema)
+  if (!require043 || version < 43) return
   const unsafeFailures = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM job_failures WHERE payload <> '{}'::jsonb"])
   const activeJobs = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM background_jobs WHERE status IN ('QUEUED','LEASED','RUNNING','RETRYING')"])
   record('PRODUCTION FAILURE PAYLOADS REDACTED', unsafeFailures === '0', unsafeFailures)

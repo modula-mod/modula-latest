@@ -83,7 +83,7 @@ async function runDatabaseChecks() {
     run('ENGINE LEDGER AND ROUTE BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.engine-fabric.test.ts'], root, testEnv)
     run('SEARCH AND MEDIA REFERENCE JOURNEYS', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.search-platform.test.ts', 'tests/phase7c.media-storage.test.ts', 'tests/phase7l.media-headers.test.ts'], root, testEnv)
     run('SEARCH MEDIA NOTIFICATION WORKERS', 'pnpm', ['--filter', '@modula/greenfield-worker', 'exec', 'vitest', 'run', 'tests/phase7e.search-projector.test.ts', 'tests/phase7e.vault-notes-search-projector.test.ts', 'tests/phase7e.notifications.test.ts'], root, testEnv)
-    run('MIGRATION 044 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void (async()=>{const down=await migrateDown(process.env.MODULA_TEST_DATABASE_URL);if(down!=='044_greenfield_backend_v1_engine_fabric')process.exit(1);const applied=await migrateUp(process.env.MODULA_TEST_DATABASE_URL);if(!applied.includes('044_greenfield_backend_v1_engine_fabric'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 044 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '044_greenfield_backend_v1_engine_fabric'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
@@ -132,8 +132,9 @@ function verifyProductionState() {
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const required = process.env.MODULA_REQUIRE_PRODUCTION_044 === '1'
-  record('PRODUCTION SCHEMA DISCOVERED', required ? schema === '044' : ['043', '044'].includes(schema), schema)
-  if (!required || schema !== '044') return
+  const version = Number(schema)
+  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 44 : version >= 43 && version <= 52, schema)
+  if (!required || version < 44) return
   const count = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', 'SELECT count(*) FROM greenfield_engine_registrations'])
   const invalid = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM greenfield_engine_service_registrations service JOIN greenfield_engine_registrations engine USING(engine_id) WHERE engine.runtime_status <> 'READY'"])
   const revision = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', 'SELECT count(DISTINCT source_revision) || chr(58) || min(source_revision) FROM greenfield_engine_registrations'])

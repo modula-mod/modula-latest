@@ -79,7 +79,7 @@ async function runDatabaseChecks() {
     run('FULL MIGRATION CHAIN THROUGH 045', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied => { if (!applied.includes('045_greenfield_backend_v1_apple_auth')) process.exit(1) })"], join(root, 'services/greenfield-api'), migrateEnv)
     run('APPLE AUTH BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.apple-auth.test.ts'], root, testEnv)
     run('EXISTING AUTH JOURNEYS', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield.accounts.test.ts'], root, testEnv)
-    run('MIGRATION 045 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void (async()=>{const down=await migrateDown(process.env.MODULA_TEST_DATABASE_URL);if(down!=='045_greenfield_backend_v1_apple_auth')process.exit(1);const applied=await migrateUp(process.env.MODULA_TEST_DATABASE_URL);if(!applied.includes('045_greenfield_backend_v1_apple_auth'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 045 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '045_greenfield_backend_v1_apple_auth'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
@@ -128,8 +128,9 @@ function verifyProductionState() {
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
   const required = process.env.MODULA_REQUIRE_PRODUCTION_045 === '1'
-  record('PRODUCTION SCHEMA DISCOVERED', required ? schema === '045' : ['043', '044', '045'].includes(schema), schema)
-  if (!required || schema !== '045') return
+  const version = Number(schema)
+  record('PRODUCTION SCHEMA DISCOVERED', required ? version >= 45 : version >= 43 && version <= 52, schema)
+  if (!required || version < 45) return
   const appleChallenges = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM pg_constraint WHERE conname='greenfield_auth_challenges_purpose_check' AND pg_get_constraintdef(oid) LIKE '%apple_authentication%'"])
   record('PRODUCTION APPLE CHALLENGE CONTRACT', appleChallenges === '1', appleChallenges)
 }
