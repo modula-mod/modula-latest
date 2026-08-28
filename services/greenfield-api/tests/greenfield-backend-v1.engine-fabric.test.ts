@@ -39,11 +39,14 @@ describeIfDb('Greenfield Backend V1 trusted engine fabric', () => {
     const engines = await new GreenfieldEngineRegistryService(db).list()
     expect(engines).toHaveLength(10)
     expect(engines.filter(engine => engine.runtimeStatus === 'READY').map(engine => engine.engineId).sort()).toEqual([
-      'engine.ai', 'engine.media', 'engine.notifications', 'engine.search',
+      'engine.ai', 'engine.entitlements', 'engine.media', 'engine.notifications', 'engine.search',
     ])
-    expect(engines.filter(engine => engine.runtimeStatus === 'CONTRACT_ONLY')).toHaveLength(6)
+    expect(engines.filter(engine => engine.runtimeStatus === 'CONTRACT_ONLY')).toHaveLength(5)
     expect(engines.every(engine => engine.source.repository === 'modula-mod/modula-backend-engines')).toBe(true)
-    expect(new Set(engines.map(engine => engine.source.revision))).toEqual(new Set(['a5511d3065326e5b29f0ab786a6975921b9db286']))
+    expect(new Set(engines.map(engine => engine.source.revision))).toEqual(new Set([
+      'a5511d3065326e5b29f0ab786a6975921b9db286',
+      'bcef62e4b4e9b6b9a29b7bee52278d7a68a21061',
+    ]))
     expect(engines.filter(engine => engine.runtimeStatus === 'CONTRACT_ONLY').every(engine => engine.services.length === 0)).toBe(true)
   })
 

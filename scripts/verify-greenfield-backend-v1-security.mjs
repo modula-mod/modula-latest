@@ -51,6 +51,7 @@ source('PUBLISHER IMPERSONATION TEST', 'services/greenfield-api/tests/greenfield
 source('TEST PRODUCT PUBLICATION GUARD', 'services/greenfield-api/src/modules/beta-catalogue-policy.ts', ["/^test\\.modula\\./i", "classification: 'TEST_ONLY'", 'visibleInBeta: false'])
 source('REMOTE ARBITRARY JS REJECTION', 'packages/greenfield-module-manifest/tests/manifest.test.ts', ['rejects executable escape hatches', 'remoteEntry', 'UNDECLARED_EXTENSION_FIELD'])
 source('DATA URL AND SECRET METADATA GUARDS', 'services/greenfield-api/tests/greenfield-backend-v1.data-ledger.test.ts', ['arbitrary storage URLs and plaintext-secret metadata', 'secret://product/'])
+source('MIGRATION LEDGER RUNTIME WRITE GUARD', 'services/greenfield-api/migrations/052_greenfield_backend_v1_migration_ledger_security.sql', ['REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER', 'schema_metadata', 'schema_migrations'])
 externalSource('BUILD OUTPUT PATH AND ARCHIVE POLICY', join(buildService, 'src/artifact-policy.ts'), ['isSafeArchivePath', 'contains a link or special file', 'Artifact checksum mismatch'])
 externalSource('BUILD REQUEST TRAVERSAL POLICY', join(buildService, 'src/pipeline.ts'), ['Invalid build ID', 'approved HTTPS Git origin'])
 externalSource('DEDICATED DATABASE ROLE POLICY', join(backendSdk, 'packages/backend-testkit/src/index.ts'), ['NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION', 'REVOKE ALL ON DATABASE', 'REVOKE CREATE ON SCHEMA public FROM PUBLIC'])
@@ -89,7 +90,7 @@ function runDatabaseChecks(preview) {
   try {
     const migrateEnv = {...process.env, CI: 'true', MODULA_TEST_DATABASE_URL: fixture.migratorUrl}
     const testEnv = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
-    run('FULL MIGRATION CHAIN THROUGH 050', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied=>{if(!applied.includes('050_greenfield_backend_v1_account_data_orchestration'))process.exit(1)})"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('FULL MIGRATION CHAIN THROUGH 052', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied=>{if(!applied.includes('052_greenfield_backend_v1_migration_ledger_security'))process.exit(1)})"], join(root, 'services/greenfield-api'), migrateEnv)
     run('GREENFIELD SECURITY BEHAVIOUR MATRIX', 'pnpm', [
       '--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', '--maxWorkers=1', '--fileParallelism=false',
       'tests/phase6.security.test.ts',
@@ -100,6 +101,7 @@ function runDatabaseChecks(preview) {
       'tests/greenfield-backend-v1.build-release.test.ts',
       'tests/greenfield-backend-v1.entitlements-usage.test.ts',
       'tests/greenfield-backend-v1.developer-domain.test.ts',
+      'tests/greenfield-backend-v1.migration-ledger-security.test.ts',
       'tests/phase7l.product-hub-policy.test.ts',
     ], root, testEnv)
   } finally {
@@ -164,5 +166,5 @@ function productionState() {
   if (!output('docker', ['container', 'inspect', container])) return record('PRODUCTION DATABASE DISCOVERED', true, 'not present on this host')
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
-  record('PRODUCTION SCHEMA DISCOVERED', ['043','044','045','046','047','048','049','050'].includes(schema), `${schema} (production mutation deferred)`)
+  record('PRODUCTION SCHEMA DISCOVERED', ['043','044','045','046','047','048','049','050','051','052'].includes(schema), `${schema} (production mutation deferred)`)
 }
