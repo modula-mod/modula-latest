@@ -18,7 +18,6 @@ export function PostCounter({value, selected, overlay}: PostCounterProps) {
             ? '#FF6B6B'
             : 'rgba(255,255,255,0.86)'
           : undefined,
-        fontSize: 11,
         fontVariant: ['tabular-nums'],
         marginTop: 2,
         textAlign: 'center',

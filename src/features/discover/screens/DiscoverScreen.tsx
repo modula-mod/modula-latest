@@ -275,6 +275,7 @@ export function DiscoverScreen() {
               <ModulaSegmentedPicker
                 appearance="plain"
                 scrollable
+                segmentMinWidth={112}
                 accessibilityLabel="Discover category"
                 options={categories.map(item => ({value: item, label: item}))}
                 value={category}

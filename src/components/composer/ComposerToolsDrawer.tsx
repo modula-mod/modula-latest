@@ -204,7 +204,7 @@ export function ComposerToolsDrawer({
       const result = await services.toolsRepository.invokeFunction(tool.toolId, {})
       setInvocationState(result.state)
       if (result.jobId) {
-        setInvocationMessage(`Queued as job ${result.jobId}. Composer stays usable.`)
+        setInvocationMessage('Queued. You can keep writing.')
         return
       }
       if (result.state === 'failed') {
@@ -222,9 +222,9 @@ export function ComposerToolsDrawer({
       detent="large"
       header={
         <View style={{gap: spacing[1], paddingBottom: spacing[3]}}>
-          <AppText variant="headline">Create</AppText>
+          <AppText variant="headline">Tools</AppText>
           <AppText variant="caption" colour="textSecondary">
-            Registered tools only. Preview and required-module states stay honest.
+            Photo, camera, and tools from modules you have installed.
           </AppText>
         </View>
       }
@@ -254,8 +254,7 @@ export function ComposerToolsDrawer({
               },
             ]}>
             <AppText variant="caption" colour="accent">
-              Function: {invocationState}
-              {invocationMessage ? ` · ${invocationMessage}` : ''}
+              {invocationMessage ?? 'Working…'}
             </AppText>
           </View>
         ) : null}

@@ -78,12 +78,6 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           </View>
         </View>
       ) : null}
-      <View style={{gap: spacing[2]}}>
-        <SectionHeader title="Interests" icon="sparkles" />
-        <AppText variant="body" colour="textSecondary">
-          Profile OS, governed intelligence, modular tools, design systems and public workflows.
-        </AppText>
-      </View>
     </View>
   )
 }
@@ -116,5 +110,6 @@ const styles = StyleSheet.create({
   },
   wrap: {
     minWidth: 0,
+    paddingBottom: 24,
   },
 })

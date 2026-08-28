@@ -332,7 +332,7 @@ function ActivityRow({
   const openDestination = () => {
     onOpen()
     if (item.type === 'moduleUpdate') {
-      router.push('/marketplace/digital.modula.vault-notes' as Href)
+      router.push('/modules' as Href)
       return
     }
     if (item.type === 'teamInvitation') {
@@ -353,23 +353,11 @@ function ActivityRow({
       accessibilityLabel={`Activity actions for ${item.description}`}
       actions={[
         {id: 'open', label: 'Open'},
-        {id: 'markRead', label: unread ? 'Mark as read' : 'Mark as unread'},
-        {id: 'mute', label: 'Mute preview'},
-        {id: 'copy', label: 'Copy text'},
-        {id: 'remove', label: 'Remove preview', style: 'destructive'},
+        {id: 'markRead', label: unread ? 'Mark as read' : 'Already read'},
       ]}
       onAction={id => {
         if (id === 'open') openDestination()
         if (id === 'markRead') onMarkRead()
-        if (id === 'copy' && item.description) {
-          void import('expo-clipboard').then(mod =>
-            mod.setStringAsync(
-              item.actor
-                ? `${item.actor.displayName} ${item.description}`
-                : item.description,
-            ),
-          )
-        }
       }}>
       <AppPressable
         accessibilityLabel={item.description}

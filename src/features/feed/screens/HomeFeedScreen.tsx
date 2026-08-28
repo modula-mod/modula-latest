@@ -190,7 +190,7 @@ export function HomeFeedScreen() {
   }, [motion.slow, pullDistance, refreshing])
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <HomeSearchModal
         visible={searchOpen}
         onClose={() => setSearchOpen(false)}
@@ -256,8 +256,8 @@ export function HomeFeedScreen() {
                     ) : (
                       <EmptyState
                         icon="home"
-                        title="This feed is quiet."
-                        description="Switch modes or publish a local post to start the conversation."
+                        title="This feed is quiet"
+                        description="Posts from people you follow will appear here. You can also publish one."
                         action={
                           <ModulaButton
                             label="Create post"

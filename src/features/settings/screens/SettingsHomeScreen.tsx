@@ -1,10 +1,7 @@
 import {useState} from 'react'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
-import {AppText} from '@/components/primitives/AppText'
-import {runtimeEnvironment} from '@/config/runtimeEnvironment'
 import {
   SettingsLinkRow,
   SettingsOverflowMenu,
@@ -13,7 +10,7 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {canAccessDeveloperLabs} from '@/lib/platform'
-import {PageIntro} from '@/platform/ui/chrome/page-intro'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -167,7 +164,7 @@ const developerRows: SettingsNavRow[] = [
 
 export function SettingsHomeScreen() {
   const {preferences, resolved} = useAppearance()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -215,33 +212,12 @@ export function SettingsHomeScreen() {
         <ScrollView
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled">
-          <PageIntro
-            eyebrow="Preferences"
-            icon="settings"
-            body="Account, appearance, and how Modula behaves."
+          <ModulaSearchField
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search settings"
+            accessibilityLabel="Search settings"
           />
-          <View
-            style={[
-              styles.search,
-              {
-                backgroundColor: colours.surface,
-                borderColor: colours.separator,
-                borderRadius: radius.large,
-                borderWidth: StyleSheet.hairlineWidth,
-                gap: spacing[2],
-                paddingHorizontal: spacing[3],
-              },
-            ]}>
-            <AppIcon name="search" colour={colours.textTertiary} size={18} />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search"
-              placeholderTextColor={colours.textTertiary}
-              accessibilityLabel="Search settings"
-              style={[styles.searchInput, {color: colours.text}]}
-            />
-          </View>
 
           <SettingsSection title="Account">
             {filteredAccount.map((row, index) => (
@@ -285,7 +261,7 @@ export function SettingsHomeScreen() {
           </ModulaDisclosureGroup>
 
           {canAccessDeveloperLabs() ? (
-            <SettingsSection title="Development">
+            <SettingsSection title="Developer">
               {filteredDeveloper.map((row, index) => (
                 <SettingsLinkRow
                   key={row.title}
@@ -315,10 +291,6 @@ export function SettingsHomeScreen() {
               />
             </SettingsSection>
           ) : null}
-
-          <AppText variant="caption" colour="textSecondary">
-            Modula 0.1.0 · {runtimeEnvironment.appEnvironment}
-          </AppText>
         </ScrollView>
       </ResponsiveContent>
     </View>
@@ -336,15 +308,5 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
-  },
-  search: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 44,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    minHeight: 44,
   },
 })
