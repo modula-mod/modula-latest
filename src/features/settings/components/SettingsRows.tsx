@@ -173,10 +173,10 @@ export function SettingsHero({
         styles.hero,
         {
           backgroundColor: colours.surface,
-          borderColor: colours.separator,
-          borderRadius: radius.large,
+          borderRadius: radius.medium,
           gap: spacing[3],
-          padding: spacing[4],
+          paddingHorizontal: spacing[5],
+          paddingVertical: spacing[6],
         },
       ]}>
       <View
@@ -184,12 +184,17 @@ export function SettingsHero({
         importantForAccessibility="no"
         style={[
           styles.heroTile,
-          {backgroundColor: token.background, borderRadius: radius.medium},
+          {backgroundColor: token.background, borderRadius: radius.round},
         ]}>
         <ModulaIcon name={icon} size={28} colour={token.foreground} />
       </View>
-      <AppText variant="heroTitle">{title}</AppText>
-      <AppText variant="heroDescription" colour="textSecondary">
+      <AppText variant="heroTitle" style={styles.heroTitle}>
+        {title}
+      </AppText>
+      <AppText
+        variant="heroDescription"
+        colour="textSecondary"
+        style={styles.heroBody}>
         {body}
       </AppText>
     </View>
@@ -215,7 +220,7 @@ export function SettingsIconTile({
   name: ModulaIconName
   domain?: SettingsIconDomain
 }) {
-  const {settingsIcons, radius} = useThemeTokens()
+  const {settingsIcons} = useThemeTokens()
   const token = settingsIcons[settingsIconDomain(name, domain)]
   return (
     <View
@@ -223,7 +228,7 @@ export function SettingsIconTile({
       importantForAccessibility="no"
       style={[
         styles.iconTile,
-        {backgroundColor: token.background, borderRadius: radius.small},
+        {backgroundColor: token.background},
       ]}>
       <ModulaIcon name={name} size={16} colour={token.foreground} />
     </View>
@@ -239,11 +244,7 @@ export function SettingsSection({
   footer?: string
   children: ReactNode
 }) {
-  const {colours, spacing, radius, accessibility} = useThemeTokens()
-  const groupedSurface =
-    accessibility.reduceTransparency || accessibility.increaseContrast
-      ? colours.surface
-      : colours.surface
+  const {colours, spacing, radius} = useThemeTokens()
 
   return (
     <View style={{gap: spacing[2]}}>
@@ -263,9 +264,8 @@ export function SettingsSection({
         style={[
           styles.list,
           {
-            backgroundColor: groupedSurface,
-            borderColor: colours.separator,
-            borderRadius: radius.large,
+            backgroundColor: colours.surface,
+            borderRadius: radius.medium,
           },
         ]}>
         {children}
@@ -279,24 +279,30 @@ function RowChrome({
   last,
   children,
   stacked,
+  leading,
 }: {
   last?: boolean
   stacked?: boolean
+  leading?: ReactNode
   children: ReactNode
 }) {
   const {colours, spacing} = useThemeTokens()
   return (
-    <View
-      style={[
-        stacked ? styles.rowStacked : styles.row,
-        {
-          borderBottomColor: last ? 'transparent' : colours.separator,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          gap: spacing[3],
-        },
-      ]}>
-      {children}
+    <View style={[styles.row, {paddingLeft: spacing[4]}]}>
+      {leading}
+      <View
+        style={[
+          stacked ? styles.rowBodyStacked : styles.rowBody,
+          {
+            borderBottomColor: last ? 'transparent' : colours.separator,
+            marginLeft: leading ? spacing[3] : 0,
+            paddingRight: spacing[4],
+            paddingVertical: spacing[3],
+            gap: spacing[3],
+          },
+        ]}>
+        {children}
+      </View>
     </View>
   )
 }
@@ -359,13 +365,17 @@ export function SettingsLinkRow({
           router.push(row.route as Href)
         }
       }}>
-      <RowChrome last={last} stacked={stacked}>
-        {row.icon ? (
-          <SettingsIconTile
-            name={settingsIconName(row.icon) ?? 'settings'}
-            domain={row.iconDomain}
-          />
-        ) : null}
+      <RowChrome
+        last={last}
+        stacked={stacked}
+        leading={
+          row.icon ? (
+            <SettingsIconTile
+              name={settingsIconName(row.icon) ?? 'settings'}
+              domain={row.iconDomain}
+            />
+          ) : undefined
+        }>
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{title}</AppText>
           {row.description ? (
@@ -404,8 +414,10 @@ export function SettingsInfoRow({
       accessible
       accessibilityRole="text"
       accessibilityLabel={[label, value, description].filter(Boolean).join(', ')}>
-      <RowChrome last={last} stacked={stacked}>
-        {icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : null}
+      <RowChrome
+        last={last}
+        stacked={stacked}
+        leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{label}</AppText>
           {description ? (
@@ -418,6 +430,38 @@ export function SettingsInfoRow({
         {!stacked && value ? <TrailingValue value={value} /> : null}
       </RowChrome>
     </View>
+  )
+}
+
+export function SettingsChoiceRow({
+  label,
+  selected,
+  onPress,
+  last,
+}: {
+  label: string
+  selected: boolean
+  onPress: () => void
+  last?: boolean
+}) {
+  const {colours} = useThemeTokens()
+  return (
+    <AppPressable
+      accessibilityLabel={label}
+      accessibilityRole="radio"
+      accessibilityState={{selected}}
+      onPress={onPress}>
+      <RowChrome last={last}>
+        <View style={styles.rowText}>
+          <AppText variant="rowTitle">{label}</AppText>
+        </View>
+        {selected ? (
+          <View accessible={false} importantForAccessibility="no">
+            <ModulaIcon name="check" size={18} colour={colours.accent} />
+          </View>
+        ) : null}
+      </RowChrome>
+    </AppPressable>
   )
 }
 
@@ -465,12 +509,16 @@ export function SettingsAdaptiveRow({
   value,
   onValueChange,
   last,
+  icon,
+  iconDomain,
 }: {
   label: string
   description?: string
   value: SystemAdaptivePreference
   onValueChange: (next: SystemAdaptivePreference) => void
   last?: boolean
+  icon?: ModulaIconName
+  iconDomain?: SettingsIconDomain
 }) {
   return (
     <SettingsMenuRow
@@ -478,6 +526,8 @@ export function SettingsAdaptiveRow({
       description={description}
       value={adaptivePreferenceLabel(value)}
       menuTitle={label}
+      icon={icon}
+      iconDomain={iconDomain}
       actions={SYSTEM_ADAPTIVE_OPTIONS.map(option => ({
         id: option.value,
         label: option.label,
@@ -526,8 +576,10 @@ export function SettingsMenuRow({
       onAction={onAction}
       accessibilityLabel={`${title}${value ? `, ${value}` : ''}`}
       trigger={
-        <RowChrome last={last} stacked={stacked}>
-          {icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : null}
+        <RowChrome
+          last={last}
+          stacked={stacked}
+          leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
           <View style={styles.rowText}>
             <AppText variant="rowTitle">{title}</AppText>
             {description ? (
@@ -650,7 +702,10 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   hero: {
-    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+  },
+  heroBody: {
+    textAlign: 'center',
   },
   heroTile: {
     alignItems: 'center',
@@ -658,29 +713,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 52,
   },
+  heroTitle: {
+    textAlign: 'center',
+  },
   iconTile: {
     alignItems: 'center',
-    height: 30,
+    borderRadius: 7,
+    height: 29,
     justifyContent: 'center',
-    width: 30,
+    width: 29,
   },
   list: {
-    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
   row: {
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     minHeight: 52,
     width: '100%',
   },
-  rowStacked: {
-    alignItems: 'flex-start',
+  rowBody: {
+    alignItems: 'center',
     borderBottomWidth: StyleSheet.hairlineWidth,
+    flex: 1,
     flexDirection: 'row',
     minHeight: 52,
-    width: '100%',
+  },
+  rowBodyStacked: {
+    alignItems: 'flex-start',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+    flexDirection: 'row',
+    minHeight: 52,
   },
   rowText: {
     flex: 1,

@@ -257,8 +257,11 @@ Icon tiles: 30pt rounded square, `ModulaIcon` (SF on iOS / SVG elsewhere), colou
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/settings` | `SettingsHomeScreen` | Appearance + static nav | No | Profile & Account, Personalisation, Privacy & Communication, Platform, About, Developer (gated) | Tiles | Appearance mode, Accessibility text size, Language English | Search matches titles, descriptions, keywords. No env/SHA |
 | `/settings/appearance` | `AppearanceScreen` | `useAppearance` | No | Theme preview, accent, mode, family/surface, Display & Text link, System adaptation, Advanced | Mode tiles + adaptive rows | System/On/Off | Same store as Accessibility |
-| `/settings/display-and-text` | `DisplayAndTextScreen` | Same appearance store | Yes | Text, Visual accessibility, Motion, Controls | Adaptive rows | System/On/Off | Strongest a11y control page |
-| `/settings/accessibility` | `AccessibilityScreen` | System + appearance | Yes | Vision, Interaction, Hearing, Speech & cognitive | Info + nav | Active / Uses device settings | **No fake VoiceOver switch** |
+| `/settings/display-and-text` | `DisplayAndTextScreen` | Appearance store | Yes | Bold Text, Larger Text (push), On/Off Labels, then single-item contrast groups | Adaptive + nav | System/On/Off | Apple Display & Text Size grouping |
+| `/settings/display-and-text/larger-text` | `LargerTextScreen` | Appearance store | Yes | System + custom scales | Choice rows | Checkmark | Apple Larger Text is a child route |
+| `/settings/accessibility` | `AccessibilityScreen` | System + appearance | Yes | Vision / Physical and Motor / Hearing / Speech / General | **Link rows only** | On/Off where known | Chevron always pushes |
+| `/settings/accessibility/hover-text` | `SystemAccessibilityFeatureScreen` | System | Yes | Status + Open iPhone Settings | Info + link | No fake toggle | iPhone-owned; honesty footer |
+| `/settings/motion` | `MotionScreen` | Appearance store | Yes | Reduce Motion | Adaptive | System/On/Off | Child of Accessibility |
 | `/settings/account` | `AccountScreen` | Session | No | Identity, Security, Data, Danger, Sign out | Tiles | Handle/email | Destructive sign-out separated |
 | `/settings/account/*` | handle/email/password/sessions/export/mail | Greenfield account APIs | No | Inherit SettingsSection | Tiles where linked | Real values | |
 | `/settings/privacy` | `PrivacySafetyScreen` | Local preview toggles | Yes | Audience, Safety | Tiles | Coming Soon where honest | No fake mute API |

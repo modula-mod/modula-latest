@@ -1,9 +1,7 @@
-import {Platform} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {
   SettingsHero,
-  SettingsInfoRow,
   SettingsLinkRow,
   SettingsOverflowMenu,
   SettingsScreen,
@@ -11,23 +9,11 @@ import {
 } from '@/features/settings/components/SettingsRows'
 import {useAppearance} from '@/theme/runtime/useAppearance'
 
-function platformNoun(): string {
-  if (Platform.OS === 'ios') return 'iPhone'
-  if (Platform.OS === 'android') return 'Android'
-  return 'device'
-}
-
 export function AccessibilityScreen() {
   const router = useRouter()
   const {systemAccessibility, resolved} = useAppearance()
-  const noun = platformNoun()
-  const screenReaderValue = systemAccessibility.screenReaderEnabled
-    ? 'Active'
-    : `Uses your ${noun} settings`
-  const motionValue = resolved.accessibility.reduceMotion ? 'Reduced' : 'System'
-  const displayValue = resolved.accessibility.followSystemTextSize
-    ? 'System'
-    : 'Custom'
+  const screenReaderValue = systemAccessibility.screenReaderEnabled ? 'On' : 'Off'
+  const motionValue = resolved.accessibility.reduceMotion ? 'On' : 'Off'
 
   return (
     <SettingsScreen
@@ -37,7 +23,7 @@ export function AccessibilityScreen() {
           title="Accessibility"
           actions={[
             {id: 'appearance', label: 'Open Appearance'},
-            {id: 'display', label: 'Display & Text'},
+            {id: 'display', label: 'Display & Text Size'},
           ]}
           onAction={id => {
             if (id === 'appearance') router.push('/settings/appearance' as Href)
@@ -49,25 +35,37 @@ export function AccessibilityScreen() {
         icon="accessibility"
         iconDomain="accessibility"
         title="Accessibility"
-        body={`Modula follows your ${noun} accessibility settings and adds app-specific controls for text, motion, contrast, and interaction.`}
+        body="Adapt Modula for vision, motion, hearing, and speech. System features stay in your device settings — Modula cannot turn them on or off."
       />
 
-      <SettingsSection title="Vision">
-        <SettingsInfoRow
-          icon="eye"
-          iconDomain="accessibility"
-          label="VoiceOver"
-          value={screenReaderValue}
-          description="Modula cannot turn the system screen reader on or off."
+      <SettingsSection
+        title="Vision"
+        footer="VoiceOver, Hover Text, and Spoken Content stay in your device settings.">
+        <SettingsLinkRow
+          row={{
+            title: 'VoiceOver',
+            icon: 'eye',
+            iconDomain: 'accessibility',
+            value: screenReaderValue,
+            route: '/settings/accessibility/voiceover',
+          }}
         />
         <SettingsLinkRow
           row={{
-            title: 'Display & Text',
+            title: 'Display & Text Size',
             icon: 'text',
             iconDomain: 'language',
             route: '/settings/display-and-text',
-            value: displayValue,
-            keywords: ['dynamic type', 'bold', 'contrast'],
+            keywords: ['dynamic type', 'bold', 'contrast', 'larger text'],
+          }}
+        />
+        <SettingsLinkRow
+          row={{
+            title: 'Hover Text',
+            icon: 'search',
+            iconDomain: 'accessibility',
+            route: '/settings/accessibility/hover-text',
+            keywords: ['pointer', 'magnify'],
           }}
         />
         <SettingsLinkRow
@@ -75,101 +73,106 @@ export function AccessibilityScreen() {
             title: 'Motion',
             icon: 'motion',
             iconDomain: 'accessibility',
-            route: '/settings/display-and-text',
+            route: '/settings/motion',
             value: motionValue,
           }}
         />
-        <SettingsInfoRow
-          icon="text"
-          iconDomain="accessibility"
-          label="Read & Speak"
-          value={`Uses your ${noun} settings`}
-          description="Post and settings text stay selectable for Spoken Content."
-        />
-        <SettingsInfoRow
-          icon="search"
-          iconDomain="accessibility"
-          label="Hover Text"
-          value={`Uses your ${noun} settings`}
+        <SettingsLinkRow
+          row={{
+            title: 'Read & Speak',
+            icon: 'text',
+            iconDomain: 'accessibility',
+            route: '/settings/accessibility/read-and-speak',
+          }}
           last
         />
       </SettingsSection>
 
-      <SettingsSection title="Interaction & motor">
+      <SettingsSection title="Physical and Motor">
         <SettingsLinkRow
           row={{
-            title: 'Touch & Gestures',
+            title: 'Touch',
             icon: 'switch',
             iconDomain: 'interaction',
-            route: '/settings/display-and-text',
-            value: '44 pt targets',
+            route: '/settings/touch',
           }}
         />
-        <SettingsInfoRow
-          icon="comment"
-          iconDomain="speech"
-          label="Voice Control"
-          value={`Uses your ${noun} settings`}
-          description="Controls expose names Voice Control can speak."
+        <SettingsLinkRow
+          row={{
+            title: 'Voice Control',
+            icon: 'comment',
+            iconDomain: 'speech',
+            route: '/settings/accessibility/voice-control',
+          }}
         />
-        <SettingsInfoRow
-          icon="switch"
-          iconDomain="interaction"
-          label="Switch Control"
-          value={`Uses your ${noun} settings`}
+        <SettingsLinkRow
+          row={{
+            title: 'Switch Control',
+            icon: 'switch',
+            iconDomain: 'interaction',
+            route: '/settings/accessibility/switch-control',
+          }}
         />
-        <SettingsInfoRow
-          icon="text"
-          iconDomain="interaction"
-          label="Keyboard"
-          value={Platform.OS === 'web' ? 'Tab and arrows' : `Uses your ${noun} settings`}
+        <SettingsLinkRow
+          row={{
+            title: 'Keyboard',
+            icon: 'text',
+            iconDomain: 'interaction',
+            route: '/settings/accessibility/keyboard',
+          }}
           last
         />
       </SettingsSection>
 
       <SettingsSection title="Hearing">
-        <SettingsInfoRow
-          icon="note"
-          iconDomain="hearing"
-          label="Captions"
-          value="When media includes captions"
+        <SettingsLinkRow
+          row={{
+            title: 'Captions',
+            icon: 'note',
+            iconDomain: 'hearing',
+            route: '/settings/accessibility/captions',
+          }}
         />
-        <SettingsInfoRow
-          icon="comment"
-          iconDomain="hearing"
-          label="Live Captions"
-          value={`Uses your ${noun} settings`}
+        <SettingsLinkRow
+          row={{
+            title: 'Live Captions',
+            icon: 'comment',
+            iconDomain: 'hearing',
+            route: '/settings/accessibility/live-captions',
+          }}
           last
         />
       </SettingsSection>
 
       <SettingsSection
-        title="Speech & cognitive"
+        title="Speech"
         footer="System features stay in your device settings. Modula does not pretend to enable or disable them.">
-        <SettingsInfoRow
-          icon="comment"
-          iconDomain="speech"
-          label="Live Speech"
-          value={`Uses your ${noun} settings`}
+        <SettingsLinkRow
+          row={{
+            title: 'Live Speech',
+            icon: 'comment',
+            iconDomain: 'speech',
+            route: '/settings/accessibility/live-speech',
+          }}
         />
-        <SettingsInfoRow
-          icon="people"
-          iconDomain="interaction"
-          label="Assistive Access"
-          value="Compatible layout"
-          description="Major actions stay tappable. Full Assistive Access optimisation is not claimed."
+        <SettingsLinkRow
+          row={{
+            title: 'Assistive Access',
+            icon: 'people',
+            iconDomain: 'interaction',
+            route: '/settings/accessibility/assistive-access',
+          }}
           last
         />
       </SettingsSection>
 
-      <SettingsSection title="Related">
+      <SettingsSection title="General">
         <SettingsLinkRow
           row={{
             title: 'Appearance',
             icon: 'appearance',
             iconDomain: 'appearance',
             route: '/settings/appearance',
-            description: 'Theme, OLED, accent, and Surface Type.',
           }}
           last
         />

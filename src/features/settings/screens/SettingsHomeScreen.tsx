@@ -56,7 +56,7 @@ const personalisationRows: SettingsNavRow[] = [
     icon: 'accessibility',
     iconDomain: 'accessibility',
     route: '/settings/accessibility',
-    keywords: ['voiceover', 'motion', 'contrast', 'text size', 'bold'],
+    keywords: ['voiceover', 'motion', 'contrast', 'text size', 'bold', 'hover text', 'display'],
   },
   {
     title: 'Language',

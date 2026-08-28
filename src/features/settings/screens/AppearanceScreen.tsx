@@ -15,7 +15,6 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
-import {SystemAdaptationSection} from '@/features/settings/components/SystemAdaptationSection'
 import {SettingsLinkRow, SettingsSection, SettingsToggleRow} from '@/features/settings/components/SettingsRows'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
@@ -240,20 +239,17 @@ export function AppearanceScreen() {
             ) : null}
           </MaterialSurface>
 
-          <SettingsSection title="System adaptation">
+          <SettingsSection>
             <SettingsLinkRow
               row={{
-                title: 'Display & Text',
+                title: 'Display & Text Size',
                 icon: 'text',
                 iconDomain: 'language',
                 route: '/settings/display-and-text',
-                description: 'Text size, bold, contrast, transparency, and motion.',
               }}
               last
             />
           </SettingsSection>
-
-          <SystemAdaptationSection />
 
           <SettingsSection
             title="Advanced"

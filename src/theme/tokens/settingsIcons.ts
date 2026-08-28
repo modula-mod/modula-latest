@@ -1,4 +1,3 @@
-import {mixHex, strongestReadableForeground} from '@/theme/accents/colourMath'
 import type {
   ResolvedAppearanceMode,
   SettingsIconDomain,
@@ -12,8 +11,9 @@ type DomainHue = {
 }
 
 /**
- * Semantic Settings icon-tile colours. Meaning is carried by the glyph and
- * label — colour is accent only (Differentiate Without Color still works).
+ * Saturated Settings icon tiles (Telegram / Apple Settings).
+ * White glyph on a domain colour. Meaning is the glyph + label — colour is
+ * accent only, so Differentiate Without Color still works.
  */
 const DOMAIN_HUES: Record<SettingsIconDomain, DomainHue> = {
   profile: {light: '#5B8DEF', dark: '#4C7CE0'},
@@ -37,10 +37,9 @@ const DOMAIN_HUES: Record<SettingsIconDomain, DomainHue> = {
 
 export function resolveSettingsIconTokens(
   mode: ResolvedAppearanceMode,
-  increaseContrast: boolean,
+  _increaseContrast: boolean,
 ): SettingsIconTokens {
   const isDark = mode !== 'light'
-  const canvas = mode === 'oled' ? '#000000' : isDark ? '#111827' : '#F4F4F5'
   const entries = Object.entries(DOMAIN_HUES) as [
     SettingsIconDomain,
     DomainHue,
@@ -48,16 +47,10 @@ export function resolveSettingsIconTokens(
 
   return Object.fromEntries(
     entries.map(([domain, hue]) => {
-      const base = isDark ? hue.dark : hue.light
-      const background = increaseContrast
-        ? base
-        : mixHex(base, canvas, isDark ? 0.28 : 0.18)
-      const foreground = increaseContrast
-        ? strongestReadableForeground(background)
-        : isDark
-          ? '#F8FAFC'
-          : strongestReadableForeground(background)
-      const token: SettingsIconToken = {background, foreground}
+      const token: SettingsIconToken = {
+        background: isDark ? hue.dark : hue.light,
+        foreground: '#FFFFFF',
+      }
       return [domain, token]
     }),
   ) as SettingsIconTokens

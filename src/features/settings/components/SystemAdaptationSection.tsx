@@ -52,6 +52,8 @@ export function SystemAdaptationSection() {
         />
         <SettingsAdaptiveRow
           label="Bold Text"
+          icon="text"
+          iconDomain="language"
           value={preferences.boldText}
           onValueChange={actions.setBoldText}
           last
@@ -60,20 +62,25 @@ export function SystemAdaptationSection() {
 
       <SettingsSection
         title="Visual accessibility"
-        footer="System means Modula follows the current operating-system preference.">
+        footer="Adds markers so selected, unread, and warning states are not colour-only. System means Modula follows the current operating-system preference.">
         <SettingsAdaptiveRow
           label="Increase Contrast"
+          icon="contrast"
+          iconDomain="appearance"
           value={preferences.increaseContrast}
           onValueChange={actions.setIncreaseContrast}
         />
         <SettingsAdaptiveRow
           label="Reduce Transparency"
+          icon="appearance"
+          iconDomain="appearance"
           value={preferences.reduceTransparency}
           onValueChange={actions.setReduceTransparency}
         />
         <SettingsAdaptiveRow
           label="Differentiate Without Color"
-          description="Adds markers so selected, unread, and warning states are not colour-only."
+          icon="filter"
+          iconDomain="accessibility"
           value={preferences.differentiateWithoutColor}
           onValueChange={actions.setDifferentiateWithoutColor}
           last
@@ -85,6 +92,8 @@ export function SystemAdaptationSection() {
         footer="When Reduce Motion is on, Modula prefers fades over large movement.">
         <SettingsAdaptiveRow
           label="Reduce Motion"
+          icon="motion"
+          iconDomain="accessibility"
           value={preferences.reduceMotion}
           onValueChange={actions.setReduceMotion}
           last
@@ -96,6 +105,8 @@ export function SystemAdaptationSection() {
         footer="On/Off labels are a Modula preference. iOS On/Off Labels cannot be read through public APIs.">
         <SettingsAdaptiveRow
           label="On/Off Indicators"
+          icon="switch"
+          iconDomain="interaction"
           value={preferences.showSwitchLabels}
           onValueChange={actions.setShowSwitchLabels}
           last
