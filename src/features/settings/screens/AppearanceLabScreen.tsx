@@ -65,13 +65,13 @@ export function AppearanceLabScreen() {
     if (preset.accentId) actions.setAccent(preset.accentId)
     if (preset.surfaceType) actions.setSurfaceType(preset.surfaceType)
     if (typeof preset.increaseContrast === 'boolean') {
-      actions.setIncreaseContrast(preset.increaseContrast)
+      actions.setIncreaseContrast(preset.increaseContrast ? 'on' : 'system')
     }
     if (typeof preset.reduceTransparency === 'boolean') {
-      actions.setReduceTransparency(preset.reduceTransparency)
+      actions.setReduceTransparency(preset.reduceTransparency ? 'on' : 'system')
     }
     if (typeof preset.reduceMotion === 'boolean') {
-      actions.setReduceMotion(preset.reduceMotion)
+      actions.setReduceMotion(preset.reduceMotion ? 'on' : 'system')
     }
   }
 

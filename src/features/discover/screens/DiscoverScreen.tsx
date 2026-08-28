@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {parseProfileId} from '@/api/contracts'
@@ -24,10 +24,9 @@ import {useProductPreferences} from '@/features/product/hooks/useProductPreferen
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {PageIntro} from '@/platform/ui/chrome/page-intro'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {StackedAvatars} from '@/platform/ui/avatars'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
@@ -138,7 +137,7 @@ export function DiscoverScreen() {
   const layoutEmpty = hasResults && visibleSectionIds.length === 0
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ResponsiveContent>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
@@ -153,12 +152,11 @@ export function DiscoverScreen() {
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
-              <View style={{flex: 1}}>
-                <PageIntro
-                  eyebrow="Explore"
-                  icon="discover"
-                  body="People, topics, modules, and media."
-                />
+              <View style={{flex: 1, gap: spacing[1]}}>
+                <AppText variant="title1">Discover</AppText>
+                <AppText variant="caption" colour="textSecondary">
+                  People, topics, modules, and media.
+                </AppText>
               </View>
               <ChromeGlassControlGroup
                 items={[
@@ -229,49 +227,12 @@ export function DiscoverScreen() {
               />
             </View>
             <SectionEnter delay={20}>
-              <AppPressable
-                accessibilityLabel="Edit interests Preview"
-                onPress={() => router.push('/discover/interests' as Href)}
-                style={styles.cta}>
-                <AppText variant="label">Choose interests — Preview</AppText>
-              </AppPressable>
-            </SectionEnter>
-            <SectionEnter delay={40}>
-              <LiquidGlassChrome
-                interactive
-                fallback="regular"
-                style={[
-                  styles.searchGlass,
-                  {borderRadius: radius.round, borderColor: colours.border},
-                ]}>
-                <View
-                  style={[
-                    styles.search,
-                    {
-                      borderRadius: radius.round,
-                      paddingHorizontal: spacing[4],
-                    },
-                  ]}>
-                  <AppIcon name="search" colour={colours.textSecondary} />
-                  <TextInput
-                    value={query}
-                    onChangeText={setQuery}
-                    placeholder="Where next — people, topics, modules"
-                    placeholderTextColor={colours.textTertiary}
-                    style={[styles.searchInput, {color: colours.text}]}
-                    returnKeyType="search"
-                    accessibilityRole="search"
-                    accessibilityLabel="Search people, topics, and modules"
-                  />
-                    <AppPressable
-                      accessibilityLabel="Open inspire destinations"
-                      onPress={() => router.push('/discover/inspire' as Href)}>
-                      <AppText variant="caption" colour="textSecondary">
-                        Inspire
-                      </AppText>
-                    </AppPressable>
-                </View>
-              </LiquidGlassChrome>
+              <ModulaSearchField
+                value={query}
+                onChangeText={setQuery}
+                placeholder="Search people, topics, and modules"
+                accessibilityLabel="Search people, topics, and modules"
+              />
             </SectionEnter>
             <SectionEnter delay={60} from="right">
               <ModulaSegmentedPicker

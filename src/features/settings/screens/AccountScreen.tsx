@@ -4,6 +4,7 @@ import {AppButton} from '@/components/primitives/AppButton'
 import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {
+  SettingsDestructiveRow,
   SettingsLinkRow,
   SettingsOverflowMenu,
   SettingsScreen,
@@ -132,19 +133,22 @@ export function AccountScreen() {
             />
           </SettingsSection>
 
-          <AppButton
-            variant="secondary"
-            onPress={() => {
-              void confirmModulaAction({
-                title: 'Sign out?',
-                message: 'You can sign back in with this Modula Account anytime.',
-                confirmLabel: 'Sign out',
-              }).then(ok => {
-                if (ok) void signOut()
-              })
-            }}>
-            Sign out
-          </AppButton>
+          <SettingsSection>
+            <SettingsDestructiveRow
+              last
+              label="Sign out"
+              description="You can sign back in with this Modula Account anytime."
+              onPress={() => {
+                void confirmModulaAction({
+                  title: 'Sign out?',
+                  message: 'You can sign back in with this Modula Account anytime.',
+                  confirmLabel: 'Sign out',
+                }).then(ok => {
+                  if (ok) void signOut()
+                })
+              }}
+            />
+          </SettingsSection>
         </>
       ) : (
         <>

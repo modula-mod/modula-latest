@@ -216,7 +216,7 @@ export function HomeFeedScreen() {
                   ]}
                   data={posts}
                   keyExtractor={item => item.id}
-                  renderItem={({item}) => <SocialPost post={item} compact />}
+                  renderItem={({item}) => <SocialPost post={item} />}
                   contentInsetAdjustmentBehavior="never"
                   bounces
                   alwaysBounceVertical
@@ -540,11 +540,15 @@ function ComposerPrompt() {
         style={[
           styles.prompt,
           {
-            marginHorizontal: spacing[3],
-            marginBottom: spacing[2],
+            marginHorizontal: spacing[4],
+            marginBottom: spacing[3],
             paddingHorizontal: spacing[3],
-            paddingVertical: spacing[2],
-            gap: spacing[2],
+            paddingVertical: spacing[3],
+            gap: spacing[3],
+            backgroundColor: colours.surface,
+            borderColor: colours.separator,
+            borderRadius: radius.large,
+            borderWidth: StyleSheet.hairlineWidth,
           },
         ]}>
         <Avatar
@@ -554,7 +558,7 @@ function ComposerPrompt() {
           }
           uri={profile?.avatarUri}
           colour={profile?.coverColour}
-          size={48}
+          size={40}
         />
         <AppPressable
           accessibilityLabel="Create a post"
@@ -565,13 +569,13 @@ function ComposerPrompt() {
               flex: 1,
               borderRadius: radius.round,
               paddingHorizontal: spacing[4],
-              backgroundColor: colours.surfaceMuted,
+              backgroundColor: colours.canvas,
               minHeight: 44,
               justifyContent: 'center',
             },
           ]}>
           <AppText variant="body" colour="textSecondary">
-            Start a post
+            What’s happening?
           </AppText>
         </AppPressable>
         <ModulaIconButton

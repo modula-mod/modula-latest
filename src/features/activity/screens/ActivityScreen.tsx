@@ -75,7 +75,7 @@ function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
 export function ActivityScreen() {
   const navigation = useNavigation()
   const {activityRepository} = useAppServices()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
@@ -359,19 +359,31 @@ function ActivityRow({
         if (id === 'markRead') onMarkRead()
       }}>
       <AppPressable
-        accessibilityLabel={item.description}
+        accessibilityLabel={`${unread ? 'Unread. ' : ''}${item.description}. ${item.timestamp}`}
         onPress={openDestination}
         style={styles.rowPress}>
         <View
           style={[
             styles.row,
             {
-              borderBottomColor: colours.border,
+              borderBottomColor: colours.separator,
               gap: spacing[3],
               paddingHorizontal: spacing[3],
               paddingVertical: spacing[3],
             },
           ]}>
+          {unread ? (
+            <View
+              accessible={false}
+              importantForAccessibility="no"
+              style={[
+                styles.unreadBar,
+                {backgroundColor: colours.textMain},
+              ]}
+            />
+          ) : (
+            <View style={styles.unreadBarSpacer} />
+          )}
           {item.actor && profileRoute ? (
             <View>
               <Avatar
@@ -404,7 +416,7 @@ function ActivityRow({
           <View style={styles.body}>
             {item.actor ? (
               <AppText variant="body">
-                <AppText variant="label">
+                <AppText variant={unread ? 'bodyStrong' : 'label'}>
                   {uniqueActors.length > 1
                     ? `${item.actor.displayName} and ${uniqueActors.length - 1} others`
                     : item.actor.displayName}
@@ -412,11 +424,8 @@ function ActivityRow({
                 {item.description}
               </AppText>
             ) : (
-              <AppText variant="body">{item.description}</AppText>
+              <AppText variant={unread ? 'bodyStrong' : 'body'}>{item.description}</AppText>
             )}
-            <AppText variant="caption" colour="textSecondary">
-              {item.timestamp}
-            </AppText>
             {item.preview ? (
               <View
                 style={[
@@ -449,6 +458,9 @@ function ActivityRow({
               </View>
             ) : null}
           </View>
+          <AppText variant="caption" colour="textTertiary" style={styles.timestamp}>
+            {item.timestamp}
+          </AppText>
         </View>
       </AppPressable>
     </ModulaContextMenu>
@@ -488,6 +500,20 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  timestamp: {
+    flexShrink: 0,
+    marginTop: 2,
+    maxWidth: 88,
+    textAlign: 'right',
+  },
+  unreadBar: {
+    alignSelf: 'stretch',
+    borderRadius: 2,
+    width: 4,
+  },
+  unreadBarSpacer: {
+    width: 4,
   },
   unreadDot: {
     borderRadius: 5,

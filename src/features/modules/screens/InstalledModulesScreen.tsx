@@ -8,6 +8,7 @@ import {
 
 import {AppText} from '@/components/primitives/AppText'
 import {
+  SettingsHero,
   SettingsLinkRow,
   SettingsScreen,
   SettingsSection,
@@ -25,7 +26,13 @@ export function InstalledModulesScreen() {
     <SettingsScreen
       title="Modules"
       caption="Installed Greenfield modules, versions, health, configuration and update state. Marketplace discovery lives in Product Hub.">
-      <SettingsSection title="Installed modules">
+      <SettingsHero
+        icon="modules"
+        iconDomain="modules"
+        title="Modules"
+        body="Installed products on this account. Open a row for settings and updates. Browse more in Product Hub."
+      />
+      <SettingsSection title="Installed">
         {installed.isPending ? (
           <View style={{padding: spacing[4]}}>
             <AppText variant="caption" colour="textSecondary">Loading installed modules.</AppText>

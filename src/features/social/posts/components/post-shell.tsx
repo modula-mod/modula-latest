@@ -17,6 +17,7 @@ import {useSavePostMutation} from '@/features/feed/data'
 import {useReactionMutation} from '@/features/social/data/useReactionMutation'
 import {useCommentsQuery} from '@/features/social/data/useCommentsQuery'
 import {PostActionRail} from '@/features/social/posts/components/post-action-rail'
+import {PostInlineActions} from '@/features/social/posts/components/post-inline-actions'
 import {PostBottomHandle} from '@/features/social/posts/components/post-bottom-handle'
 import {PostCaption} from '@/features/social/posts/components/post-caption'
 import {PostHeader} from '@/features/social/posts/components/post-header'
@@ -149,6 +150,65 @@ function PostShellInner({post, active = true, compact, presentation = 'feed'}: P
   const detail = presentation === 'detail'
   const detailWidth = width >= 768 ? 680 : width
   const detailHeight = Math.max(height - 64, detailWidth / aspectRatio)
+  const listLayout = !mediaFirst && presentation === 'feed'
+
+  const comments = (
+    <>
+      <CommentsSurface
+        postId={post.id}
+        commentCount={post.replyCount}
+        comments={commentsQuery.data}
+        isLoading={commentsQuery.isLoading}
+        isError={commentsQuery.isError}
+        onRetry={() => void commentsQuery.refetch()}
+        onRequireAuth={prompt.show}
+      />
+      <ProtectedActionPrompt
+        visible={prompt.visible}
+        onClose={prompt.hide}
+        description="Sign in to react, save, or comment in this local Modula build."
+      />
+    </>
+  )
+
+  const actions = {
+    onReact,
+    onSave: () => protectedRun(() => save.mutate({postId: post.id, saved: !post.saved})),
+    onShare: () => void runPostOverflowAction('share', post, {moderationRepository}),
+    onCommentPress: openComments,
+  }
+
+  if (listLayout) {
+    return (
+      <View
+        testID="post-shell"
+        accessibilityLabel={`${post.author.displayName}. ${post.text ?? ''}`.trim()}
+        onLayout={onLayout}
+        style={[
+          styles.listShell,
+          {
+            backgroundColor: colours.canvas,
+            borderBottomColor: colours.separator,
+            paddingHorizontal: spacing[4],
+            paddingVertical: spacing[3],
+          },
+        ]}>
+        <PostHeader post={post} overlay={false} />
+        <PostContentRenderer
+          content={content}
+          active={active}
+          layout="flow"
+          onDoubleTapLike={onDoubleTapLike}
+        />
+        <PostInlineActions
+          post={post}
+          contextActions={contextActions}
+          {...actions}
+        />
+        {comments}
+      </View>
+    )
+  }
 
   return (
     <View
@@ -184,29 +244,16 @@ function PostShellInner({post, active = true, compact, presentation = 'feed'}: P
         post={post}
         contextActions={contextActions}
         onReact={onReact}
-        onSave={() => protectedRun(() => save.mutate({postId: post.id, saved: !post.saved}))}
-        onShare={() => void runPostOverflowAction('share', post, {moderationRepository})}
-        onCommentPress={openComments}
+        onSave={actions.onSave}
+        onShare={actions.onShare}
+        onCommentPress={actions.onCommentPress}
       />
       <GestureDetector gesture={bottomPan}>
         <View style={styles.bottomZone}>
           <PostBottomHandle progress={commentsProgress} />
         </View>
       </GestureDetector>
-      <CommentsSurface
-        postId={post.id}
-        commentCount={post.replyCount}
-        comments={commentsQuery.data}
-        isLoading={commentsQuery.isLoading}
-        isError={commentsQuery.isError}
-        onRetry={() => void commentsQuery.refetch()}
-        onRequireAuth={prompt.show}
-      />
-      <ProtectedActionPrompt
-        visible={prompt.visible}
-        onClose={prompt.hide}
-        description="Sign in to react, save, or comment in this local Modula build."
-      />
+      {comments}
     </View>
   )
 }
@@ -227,6 +274,10 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
     right: 0,
+  },
+  listShell: {
+    width: '100%',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   shell: {
     overflow: 'hidden',

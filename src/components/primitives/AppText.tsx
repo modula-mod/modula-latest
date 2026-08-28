@@ -34,7 +34,7 @@ export function AppText({
   children,
   ...rest
 }: AppTextProps) {
-  const {colours, typography} = useThemeTokens()
+  const {colours, typography, accessibility} = useThemeTokens()
   const {fontScale} = useWindowDimensions()
   const typeStyle = typography[resolveVariant(variant)]
   const suppliedStyle = StyleSheet.flatten(style)
@@ -42,17 +42,15 @@ export function AppText({
   const colourStyle: TextStyle = {
     color: colours[colour],
   }
-  // React Native scales the glyph size for Dynamic Type but an explicit
-  // lineHeight remains device-independent on iOS. Scale that metric alongside
-  // the font so accessibility sizes do not crop ascenders and descenders.
-  const dynamicLineHeight: TextStyle = {
-    lineHeight: Math.round(baseLineHeight * Math.max(1, fontScale)),
-  }
+  const followSystem = accessibility.followSystemTextSize
+  const dynamicLineHeight: TextStyle = followSystem
+    ? {lineHeight: Math.round(baseLineHeight * Math.max(1, fontScale))}
+    : {lineHeight: baseLineHeight}
 
   return (
     <Text
       {...rest}
-      allowFontScaling
+      allowFontScaling={followSystem}
       style={[typeStyle, colourStyle, style, dynamicLineHeight]}>
       {children}
     </Text>

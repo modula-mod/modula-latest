@@ -4,7 +4,9 @@ import type {
   AppearanceMode,
   AppearancePreferences,
   SurfaceType,
+  SystemAdaptivePreference,
   TextScale,
+  TextScalePreference,
   ThemeFamily,
 } from '@/theme/contracts'
 import {
@@ -16,6 +18,7 @@ import {
   THEME_FAMILIES,
 } from '@/theme/contracts'
 import {expandHexColour} from '@/theme/accents/colourMath'
+import {migrateAdaptivePreference} from '@/theme/accessibility/adaptivePreference'
 import {DEFAULT_APPEARANCE_PREFERENCES} from '@/theme/data/defaults'
 
 export function isAppearanceMode(value: unknown): value is AppearanceMode {
@@ -48,8 +51,26 @@ export function isValidStoredHexColour(value: unknown): value is string {
   return typeof value === 'string' && expandHexColour(value) !== null
 }
 
-function booleanOrDefault(value: unknown, fallback: boolean): boolean {
-  return typeof value === 'boolean' ? value : fallback
+function migrateTextScalePreference(
+  candidate: Record<string, unknown>,
+  defaults: AppearancePreferences,
+): TextScalePreference {
+  const raw = candidate.textScalePreference
+  if (raw && typeof raw === 'object') {
+    const row = raw as Record<string, unknown>
+    if (row.mode === 'system') return {mode: 'system'}
+    if (row.mode === 'custom' && isTextScale(row.scale)) {
+      return {mode: 'custom', scale: row.scale}
+    }
+  }
+  if (candidate.textScaleMode === 'system') return {mode: 'system'}
+  if (candidate.textScaleMode === 'custom' && isTextScale(candidate.textScale)) {
+    return {mode: 'custom', scale: candidate.textScale}
+  }
+  if (isTextScale(candidate.textScale) && candidate.textScale !== 1) {
+    return {mode: 'custom', scale: candidate.textScale}
+  }
+  return defaults.textScalePreference
 }
 
 export function migrateAppearancePreferences(
@@ -60,17 +81,19 @@ export function migrateAppearancePreferences(
   }
 
   const candidate = input as Record<string, unknown>
-  const schemaVersion =
-    candidate.schemaVersion === 1
-      ? 1
-      : DEFAULT_APPEARANCE_PREFERENCES.schemaVersion
   const defaults = DEFAULT_APPEARANCE_PREFERENCES
   const customAccent = isValidStoredHexColour(candidate.customAccent)
     ? expandHexColour(candidate.customAccent)
     : null
+  const textScalePreference = migrateTextScalePreference(candidate, defaults)
+  const textScale = isTextScale(candidate.textScale)
+    ? candidate.textScale
+    : textScalePreference.mode === 'custom'
+      ? textScalePreference.scale
+      : defaults.textScale
 
   return {
-    schemaVersion,
+    schemaVersion: 2,
     mode: isAppearanceMode(candidate.mode) ? candidate.mode : defaults.mode,
     family: isThemeFamily(candidate.family) ? candidate.family : defaults.family,
     accentId: isAccentId(candidate.accentId)
@@ -80,28 +103,64 @@ export function migrateAppearancePreferences(
     surfaceType: isSurfaceType(candidate.surfaceType)
       ? candidate.surfaceType
       : defaults.surfaceType,
-    textScale: isTextScale(candidate.textScale)
-      ? candidate.textScale
-      : defaults.textScale,
-    boldText: booleanOrDefault(candidate.boldText, defaults.boldText),
-    reduceMotion: booleanOrDefault(
+    textScale,
+    textScalePreference,
+    boldText: migrateAdaptivePreference(candidate.boldText, defaults.boldText),
+    reduceMotion: migrateAdaptivePreference(
       candidate.reduceMotion,
       defaults.reduceMotion,
     ),
-    reduceTransparency: booleanOrDefault(
+    reduceTransparency: migrateAdaptivePreference(
       candidate.reduceTransparency,
       defaults.reduceTransparency,
     ),
-    increaseContrast: booleanOrDefault(
+    increaseContrast: migrateAdaptivePreference(
       candidate.increaseContrast,
       defaults.increaseContrast,
     ),
-    showSwitchLabels: booleanOrDefault(
+    differentiateWithoutColor: migrateAdaptivePreference(
+      candidate.differentiateWithoutColor,
+      defaults.differentiateWithoutColor,
+    ),
+    showSwitchLabels: migrateAdaptivePreference(
       candidate.showSwitchLabels,
       defaults.showSwitchLabels,
     ),
     advancedChromeEffect: isAdvancedChromeEffect(candidate.advancedChromeEffect)
       ? candidate.advancedChromeEffect
       : defaults.advancedChromeEffect,
+  }
+}
+
+export function mergeLocalAdaptivePreferences(
+  server: AppearancePreferences,
+  local: AppearancePreferences,
+): AppearancePreferences {
+  const merge = (
+    incoming: SystemAdaptivePreference,
+    current: SystemAdaptivePreference,
+  ): SystemAdaptivePreference => {
+    if (incoming === 'on') return 'on'
+    if (current === 'off') return 'off'
+    return incoming
+  }
+
+  return {
+    ...server,
+    advancedChromeEffect: local.advancedChromeEffect,
+    showSwitchLabels: local.showSwitchLabels,
+    differentiateWithoutColor: local.differentiateWithoutColor,
+    textScalePreference:
+      local.textScalePreference.mode === 'custom'
+        ? local.textScalePreference
+        : server.textScalePreference,
+    textScale:
+      local.textScalePreference.mode === 'custom'
+        ? local.textScale
+        : server.textScale,
+    boldText: merge(server.boldText, local.boldText),
+    reduceMotion: merge(server.reduceMotion, local.reduceMotion),
+    reduceTransparency: merge(server.reduceTransparency, local.reduceTransparency),
+    increaseContrast: merge(server.increaseContrast, local.increaseContrast),
   }
 }

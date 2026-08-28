@@ -37,12 +37,20 @@ export function PostHeader({post, overlay = true, opacity = 1}: PostHeaderProps)
       pointerEvents="box-none"
       style={[
         styles.root,
-        {
-          opacity,
-          paddingHorizontal: POST_GEOMETRY.headerInset,
-          paddingTop: spacing[3],
-          zIndex: postLayerZ('chrome'),
-        },
+        overlay
+          ? {
+              opacity,
+              paddingHorizontal: POST_GEOMETRY.headerInset,
+              paddingTop: spacing[3],
+              position: 'absolute',
+              zIndex: postLayerZ('chrome'),
+            }
+          : {
+              opacity,
+              paddingHorizontal: spacing[1],
+              paddingBottom: spacing[2],
+              position: 'relative',
+            },
       ]}>
       <AppPressable
         accessibilityLabel={`Open ${post.author.displayName} profile`}
@@ -70,7 +78,7 @@ export function PostHeader({post, overlay = true, opacity = 1}: PostHeaderProps)
           </View>
           {location ? (
             <AppText variant="caption" numberOfLines={1} style={{color: subInk}}>
-              📍 {location}
+              {location}
             </AppText>
           ) : null}
         </View>
@@ -99,10 +107,10 @@ const styles = StyleSheet.create({
   },
   root: {
     left: 0,
-    position: 'absolute',
     right: 0,
     top: 0,
   },
+  overlayRoot: {},
   verified: {
     alignItems: 'center',
     borderRadius: 999,

@@ -57,6 +57,12 @@ export type TypographySemanticAlias =
   | 'productName'
   | 'productSubtitle'
   | 'buttonLabel'
+  | 'rowTitle'
+  | 'rowTrailing'
+  | 'heroTitle'
+  | 'heroDescription'
+  | 'footnote'
+  | 'sectionHeader'
 
 export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   TypographySemanticAlias,
@@ -82,4 +88,10 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   productName: 'headline',
   productSubtitle: 'caption',
   buttonLabel: 'label',
+  rowTitle: 'body',
+  rowTrailing: 'caption',
+  heroTitle: 'title1',
+  heroDescription: 'body',
+  footnote: 'caption',
+  sectionHeader: 'caption',
 }

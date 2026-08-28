@@ -1,134 +1,163 @@
-import Slider from '@react-native-community/slider'
-import {useState} from 'react'
-import {StyleSheet, View} from 'react-native'
+import {Platform} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppText} from '@/components/primitives/AppText'
 import {
+  SettingsHero,
+  SettingsInfoRow,
   SettingsLinkRow,
   SettingsOverflowMenu,
   SettingsScreen,
   SettingsSection,
-  SettingsToggleRow,
 } from '@/features/settings/components/SettingsRows'
-import {TEXT_SCALES, type TextScale} from '@/theme/contracts'
 import {useAppearance} from '@/theme/runtime/useAppearance'
-import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+
+function platformNoun(): string {
+  if (Platform.OS === 'ios') return 'iPhone'
+  if (Platform.OS === 'android') return 'Android'
+  return 'device'
+}
 
 export function AccessibilityScreen() {
   const router = useRouter()
-  const {preferences, resolved, systemAccessibility} = useAppearance()
-  const actions = useAppearanceActions()
-  const {colours, spacing, radius} = useThemeTokens()
-  const [textScalePreview, setTextScalePreview] = useState<TextScale>(
-    preferences.textScale,
-  )
+  const {systemAccessibility, resolved} = useAppearance()
+  const noun = platformNoun()
+  const screenReaderValue = systemAccessibility.screenReaderEnabled
+    ? 'Active'
+    : `Uses your ${noun} settings`
+  const motionValue = resolved.accessibility.reduceMotion ? 'Reduced' : 'System'
+  const displayValue = resolved.accessibility.followSystemTextSize
+    ? 'System'
+    : 'Custom'
 
   return (
     <SettingsScreen
       title="Accessibility"
-      caption="Keep Modula legible, operable, and calm across device settings."
       right={
         <SettingsOverflowMenu
           title="Accessibility"
           actions={[
             {id: 'appearance', label: 'Open Appearance'},
-            {id: 'reset-scale', label: 'Reset text size'},
+            {id: 'display', label: 'Display & Text'},
           ]}
           onAction={id => {
             if (id === 'appearance') router.push('/settings/appearance' as Href)
-            if (id === 'reset-scale') {
-              setTextScalePreview(1)
-              actions.setTextScale(1)
-            }
+            if (id === 'display') router.push('/settings/display-and-text' as Href)
           }}
         />
       }>
-      <SettingsSection title="Text size">
-        <View style={[styles.sliderPanel, {gap: spacing[3], padding: spacing[4]}]}>
-          <View style={styles.sliderLabels}>
-            <AppText variant="caption">A</AppText>
-            <AppText
-              variant="body"
-              style={{
-                fontSize: 16 * textScalePreview,
-                lineHeight: 22 * textScalePreview,
-              }}>
-              Sample readable text
-            </AppText>
-            <AppText variant="title2">A</AppText>
-          </View>
-          <Slider
-            minimumValue={0}
-            maximumValue={TEXT_SCALES.length - 1}
-            step={1}
-            value={TEXT_SCALES.indexOf(preferences.textScale)}
-            minimumTrackTintColor={colours.accent}
-            maximumTrackTintColor={colours.borderStrong}
-            thumbTintColor={colours.accent}
-            accessibilityLabel="Text size"
-            onValueChange={value =>
-              setTextScalePreview(TEXT_SCALES[Math.round(value)] ?? 1)
-            }
-            onSlidingComplete={value => {
-              const scale = TEXT_SCALES[Math.round(value)] ?? 1
-              setTextScalePreview(scale)
-              actions.setTextScale(scale)
-            }}
-          />
-        </View>
-      </SettingsSection>
+      <SettingsHero
+        icon="accessibility"
+        iconDomain="accessibility"
+        title="Accessibility"
+        body={`Modula follows your ${noun} accessibility settings and adds app-specific controls for text, motion, contrast, and interaction.`}
+      />
 
       <SettingsSection title="Vision">
-        <SettingsToggleRow
-          label="Bold text"
-          description={
-            systemAccessibility.boldText && !preferences.boldText
-              ? 'Controlled by device'
-              : undefined
-          }
-          value={resolved.accessibility.boldText}
-          onValueChange={actions.setBoldText}
+        <SettingsInfoRow
+          icon="eye"
+          iconDomain="accessibility"
+          label="VoiceOver"
+          value={screenReaderValue}
+          description="Modula cannot turn the system screen reader on or off."
         />
-        <SettingsToggleRow
-          label="Increase contrast"
-          description={
-            systemAccessibility.increaseContrast && !preferences.increaseContrast
-              ? 'Controlled by device'
-              : undefined
-          }
-          value={resolved.accessibility.increaseContrast}
-          onValueChange={actions.setIncreaseContrast}
+        <SettingsLinkRow
+          row={{
+            title: 'Display & Text',
+            icon: 'text',
+            iconDomain: 'language',
+            route: '/settings/display-and-text',
+            value: displayValue,
+            keywords: ['dynamic type', 'bold', 'contrast'],
+          }}
         />
-        <SettingsToggleRow
-          label="Reduce transparency"
-          description={
-            systemAccessibility.reduceTransparency && !preferences.reduceTransparency
-              ? 'Controlled by device'
-              : 'Forces opaque chrome over Glass / Glay'
-          }
-          value={resolved.accessibility.reduceTransparency}
-          onValueChange={actions.setReduceTransparency}
+        <SettingsLinkRow
+          row={{
+            title: 'Motion',
+            icon: 'motion',
+            iconDomain: 'accessibility',
+            route: '/settings/display-and-text',
+            value: motionValue,
+          }}
         />
-        <SettingsToggleRow
-          label="Button shapes"
-          value={preferences.showSwitchLabels}
-          onValueChange={actions.setShowSwitchLabels}
+        <SettingsInfoRow
+          icon="text"
+          iconDomain="accessibility"
+          label="Read & Speak"
+          value={`Uses your ${noun} settings`}
+          description="Post and settings text stay selectable for Spoken Content."
+        />
+        <SettingsInfoRow
+          icon="search"
+          iconDomain="accessibility"
+          label="Hover Text"
+          value={`Uses your ${noun} settings`}
           last
         />
       </SettingsSection>
 
-      <SettingsSection title="Motion">
-        <SettingsToggleRow
-          label="Reduce motion"
-          description={
-            systemAccessibility.reduceMotion && !preferences.reduceMotion
-              ? 'Controlled by device'
-              : undefined
-          }
-          value={resolved.accessibility.reduceMotion}
-          onValueChange={actions.setReduceMotion}
+      <SettingsSection title="Interaction & motor">
+        <SettingsLinkRow
+          row={{
+            title: 'Touch & Gestures',
+            icon: 'switch',
+            iconDomain: 'interaction',
+            route: '/settings/display-and-text',
+            value: '44 pt targets',
+          }}
+        />
+        <SettingsInfoRow
+          icon="comment"
+          iconDomain="speech"
+          label="Voice Control"
+          value={`Uses your ${noun} settings`}
+          description="Controls expose names Voice Control can speak."
+        />
+        <SettingsInfoRow
+          icon="switch"
+          iconDomain="interaction"
+          label="Switch Control"
+          value={`Uses your ${noun} settings`}
+        />
+        <SettingsInfoRow
+          icon="text"
+          iconDomain="interaction"
+          label="Keyboard"
+          value={Platform.OS === 'web' ? 'Tab and arrows' : `Uses your ${noun} settings`}
+          last
+        />
+      </SettingsSection>
+
+      <SettingsSection title="Hearing">
+        <SettingsInfoRow
+          icon="note"
+          iconDomain="hearing"
+          label="Captions"
+          value="When media includes captions"
+        />
+        <SettingsInfoRow
+          icon="comment"
+          iconDomain="hearing"
+          label="Live Captions"
+          value={`Uses your ${noun} settings`}
+          last
+        />
+      </SettingsSection>
+
+      <SettingsSection
+        title="Speech & cognitive"
+        footer="System features stay in your device settings. Modula does not pretend to enable or disable them.">
+        <SettingsInfoRow
+          icon="comment"
+          iconDomain="speech"
+          label="Live Speech"
+          value={`Uses your ${noun} settings`}
+        />
+        <SettingsInfoRow
+          icon="people"
+          iconDomain="interaction"
+          label="Assistive Access"
+          value="Compatible layout"
+          description="Major actions stay tappable. Full Assistive Access optimisation is not claimed."
           last
         />
       </SettingsSection>
@@ -137,48 +166,14 @@ export function AccessibilityScreen() {
         <SettingsLinkRow
           row={{
             title: 'Appearance',
-            description: 'Colour mode, accent, and Surface Type.',
             icon: 'appearance',
+            iconDomain: 'appearance',
             route: '/settings/appearance',
+            description: 'Theme, OLED, accent, and Surface Type.',
           }}
           last
         />
       </SettingsSection>
-
-      <View
-        style={[
-          styles.statusCard,
-          {
-            borderColor: colours.border,
-            backgroundColor: colours.surfaceRaised,
-            borderRadius: radius.large,
-            padding: spacing[4],
-            gap: spacing[2],
-          },
-        ]}>
-        <AppText variant="label">Device status</AppText>
-        <AppText variant="caption" colour="textSecondary">
-          Screen reader:{' '}
-          {systemAccessibility.screenReaderEnabled ? 'Enabled' : 'Disabled'}
-        </AppText>
-        <AppText variant="caption" colour="textSecondary">
-          Larger action targets: Enabled · Haptics: Device controlled
-        </AppText>
-      </View>
     </SettingsScreen>
   )
 }
-
-const styles = StyleSheet.create({
-  sliderLabels: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  sliderPanel: {
-    width: '100%',
-  },
-  statusCard: {
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-})

@@ -3,7 +3,11 @@ import type {
   AppearanceRepository,
   SyncedAppearancePreferences,
 } from '@/data/repositories/contracts/AppearanceRepository'
-import type {AppearancePreferences, TextScale} from '@/theme/contracts'
+import type {AppearancePreferences} from '@/theme/contracts'
+import {
+  encodeAdaptiveForGreenfield,
+  encodeTextScaleForGreenfield,
+} from '@/theme/accessibility/adaptivePreference'
 import {migrateAppearancePreferences} from '@/theme/storage/migrateAppearancePreferences'
 
 function decodeAppearance(value: unknown): SyncedAppearancePreferences {
@@ -36,11 +40,11 @@ function encodeAppearance(
     surface: preferences.surfaceType,
     accentId: preferences.accentId,
     customAccent: preferences.customAccent,
-    textScale: preferences.textScale as TextScale,
-    boldText: preferences.boldText,
-    reduceMotion: preferences.reduceMotion,
-    reduceTransparency: preferences.reduceTransparency,
-    increaseContrast: preferences.increaseContrast,
+    textScale: encodeTextScaleForGreenfield(preferences.textScalePreference),
+    boldText: encodeAdaptiveForGreenfield(preferences.boldText),
+    reduceMotion: encodeAdaptiveForGreenfield(preferences.reduceMotion),
+    reduceTransparency: encodeAdaptiveForGreenfield(preferences.reduceTransparency),
+    increaseContrast: encodeAdaptiveForGreenfield(preferences.increaseContrast),
     expectedVersion,
   }
 }

@@ -1,12 +1,23 @@
 # Shell UI V1 — Route audit
 
-**Mission:** Shell UI V1 native product experience reconstruction  
-**Source:** `origin/main` `a0d4d7966f4a3ae8f12736d1bb8dff169a3d0227`  
+**Mission:** Shell UI V1 native Settings, accessibility, and shell reconstruction (continuation)  
 **Worktree:** `/Users/msjoy/Developer/modula-worktrees/shell-ui-v1-reconstruction`  
 **Branch:** `cursor/shell-ui-v1-reconstruction`  
-**Inventory date:** 2026-08-28  
+**SHELL_UI_CONTINUATION_BRANCH_SHA:** `a64194ff792456654e5f889990dc5d7857dfb183`  
+**SHELL_UI_CONTINUATION_MAIN_SHA:** `a0d4d7966f4a3ae8f12736d1bb8dff169a3d0227`  
+**Inventory date:** 2026-08-28 (continuation)
 
-This audit is of the **latest remote main**, not a previous phase branch. Installed Expo SDK 57.0.16 / React Native 0.86.2 / Expo Router 57.0.16 / `@expo/ui` 57.0.13 / Reanimated 4.5.1 / Gesture Handler 2.32.0.
+`origin/main` had not advanced past `a0d4d79` at continuation start. No merge from main was required at that point.
+
+Foundation/correctness work on `a64194f` is kept (Product Hub flash-to-empty, truthful Profile, dead a11y controls removed, OLED canvas, desktop feed height, Settings search field). It is **not** the completed visual reconstruction.
+
+This audit is of the **current shell branch**. Installed Expo SDK 57.0.16 / React Native 0.86.2 / Expo Router 57.0.16 / `@expo/ui` 57.0.13 / Reanimated 4.5.1.
+
+Routes live under `src/app/`. Feature logic lives under `src/features/`. Platform adapters live under `src/platform/ui/`. Accessibility adapter: `src/platform/accessibility/` + `src/theme/accessibility/`.
+
+**Do not create** a second design system. Settings primitives live in `src/features/settings/components/SettingsRows.tsx`.
+
+---
 
 Routes live under `src/app/` (186 files). Feature logic lives under `src/features/`. Platform adapters live under `src/platform/ui/`.
 
@@ -229,6 +240,39 @@ Routes live under `src/app/` (186 files). Feature logic lives under `src/feature
 | Empty | `EmptyState` / `PageIntro` | What / why / action |
 | Error | `QueryErrorState` | Classify offline / permission / not found / unexpected; no stack traces |
 | Lists | `FlatList` / query pages | Do not convert feeds to `ScrollView + map` |
+
+---
+
+## Settings system (continuation)
+
+Shared primitives: `SettingsScreen`, `SettingsHero`, `SettingsSection`, `SettingsIconTile`, `SettingsLinkRow`, `SettingsToggleRow`, `SettingsAdaptiveRow`, `SettingsMenuRow`, `SettingsInfoRow`, `SettingsDestructiveRow`, `SettingsFooter`, `SettingsOverflowMenu`.
+
+Icon tiles: 30pt rounded square, `ModulaIcon` (SF on iOS / SVG elsewhere), colours from `settingsIcons.*` tokens. Tiles are decorative (`accessible={false}`). Chevrons are decorative. Switch rows expose one labelled switch.
+
+`System` = follow the OS preference. Stored as `SystemAdaptivePreference`. Greenfield still receives booleans (`on` → true, otherwise false). Local `off` is preserved across sync.
+
+### Reachable Settings routes
+
+| Route | Component | Data | Hero | Groups | Icons | Trailing | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `/settings` | `SettingsHomeScreen` | Appearance + static nav | No | Profile & Account, Personalisation, Privacy & Communication, Platform, About, Developer (gated) | Tiles | Appearance mode, Accessibility text size, Language English | Search matches titles, descriptions, keywords. No env/SHA |
+| `/settings/appearance` | `AppearanceScreen` | `useAppearance` | No | Theme preview, accent, mode, family/surface, Display & Text link, System adaptation, Advanced | Mode tiles + adaptive rows | System/On/Off | Same store as Accessibility |
+| `/settings/display-and-text` | `DisplayAndTextScreen` | Same appearance store | Yes | Text, Visual accessibility, Motion, Controls | Adaptive rows | System/On/Off | Strongest a11y control page |
+| `/settings/accessibility` | `AccessibilityScreen` | System + appearance | Yes | Vision, Interaction, Hearing, Speech & cognitive | Info + nav | Active / Uses device settings | **No fake VoiceOver switch** |
+| `/settings/account` | `AccountScreen` | Session | No | Identity, Security, Data, Danger, Sign out | Tiles | Handle/email | Destructive sign-out separated |
+| `/settings/account/*` | handle/email/password/sessions/export/mail | Greenfield account APIs | No | Inherit SettingsSection | Tiles where linked | Real values | |
+| `/settings/privacy` | `PrivacySafetyScreen` | Local preview toggles | Yes | Audience, Safety | Tiles | Coming Soon where honest | No fake mute API |
+| `/settings/security` | `SecuritySettingsScreen` | Session/app lock | Yes | Sessions, Credentials, App Lock | Tiles | Coming Soon for passkeys/TOTP | |
+| `/settings/notifications` | `NotificationsSettingsScreen` | Activity notification prefs | No | Delivery, Activity | Toggles | Bundling style | Distinct from Activity feed |
+| `/settings/modules` | `InstalledModulesScreen` | Installed modules query | Yes | Installed, Discovery | Product icon fallback | Status | Prefer name over id |
+| `/settings/data` | `DataStorageScreen` | Local preview | No | Libraries | Tiles | | No internal DB dump |
+| `/settings/language` | Language screen | Translate preview | No | Translate, Tools | Tiles | | Only real locales |
+| `/settings/content` | Content screen | Local preview | No | Playback, Reactions | Tiles | | |
+| `/settings/connections` | Connections | Atproto optional | No | Services | Tiles | | |
+| `/settings/developer*` | Developer labs | Gated | No | Builders, labs | Tiles | | Not on consumer home |
+| `/settings/about` `/help` `/dimon` `/marketplace` | Extra screens | Static/preview | No | Inherit | Tiles | | |
+
+Notifications vs Activity: Activity is the event stream (`/activity`). Settings Notifications are preference toggles. Not duplicates.
 
 ---
 
