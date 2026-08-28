@@ -2,6 +2,7 @@
 import {existsSync, readFileSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
 import {join, resolve} from 'node:path'
+import {createGreenfieldVerifierDatabaseFixture} from './greenfield-backend-v1-database-fixture.mjs'
 
 const root = process.cwd()
 const failures = []
@@ -107,11 +108,17 @@ if (sdkPresent) {
 run('GREENFIELD PREREQUISITES', 'pnpm', ['--filter', '@modula/greenfield-api...', 'build'], root, {...process.env, CI: 'true'})
 run('NETWORK TARGET POLICY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.network-policy.test.ts'], root, {...process.env, CI: 'true'})
 
-const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
-record('DISPOSABLE DATABASE URL PROVIDED', Boolean(databaseUrl), databaseUrl ? 'configured' : 'MODULA_TEST_DATABASE_URL is required; no silent skip')
-if (databaseUrl) {
-  run('SERVICE FABRIC DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.service-fabric.test.ts'], root, {...process.env, CI: 'true'})
-  run('EXTENSION FABRIC REGRESSION', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/pvp-platform-2.extension-fabric.test.ts'], root, {...process.env, CI: 'true'})
+const fixture = createGreenfieldVerifierDatabaseFixture('service_fabric')
+record('DISPOSABLE DATABASE AVAILABLE', Boolean(fixture), fixture?.databaseName ?? 'configure MODULA_TEST_DATABASE_URL or run preview Postgres')
+if (fixture) {
+  try {
+    const testEnvironment = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
+    run('SERVICE FABRIC DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.service-fabric.test.ts'], root, testEnvironment)
+    run('EXTENSION FABRIC REGRESSION', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/pvp-platform-2.extension-fabric.test.ts'], root, testEnvironment)
+  } finally {
+    fixture.cleanup()
+    record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
+  }
 }
 run('GIT DIFF CHECK', 'git', ['diff', '--check'])
 
