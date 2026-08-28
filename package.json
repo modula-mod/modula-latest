@@ -289,7 +289,8 @@
     "verify:greenfield-backend-v1:developer": "node scripts/verify-greenfield-backend-v1-developer.mjs",
     "verify:greenfield-backend-v1:build-release": "node scripts/verify-greenfield-backend-v1-build-release.mjs",
     "verify:greenfield-backend-v1:entitlements": "node scripts/verify-greenfield-backend-v1-entitlements.mjs",
-    "verify:greenfield-backend-v1:account-data": "node scripts/verify-greenfield-backend-v1-account-data.mjs"
+    "verify:greenfield-backend-v1:account-data": "node scripts/verify-greenfield-backend-v1-account-data.mjs",
+    "verify:greenfield-backend-v1:recovery": "node scripts/verify-greenfield-backend-v1-recovery.mjs"
   },
   "private": true
 }
