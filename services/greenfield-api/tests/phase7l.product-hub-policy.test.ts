@@ -80,6 +80,14 @@ describe('Phase 7L-B Product Hub beta catalogue policy', () => {
       classification: 'TEST_ONLY',
       visibleInBeta: false,
     })
+    expect(classifyBetaModule({moduleId: 'test.modula.reference-notes', status: 'published'})).toMatchObject({
+      classification: 'TEST_ONLY',
+      visibleInBeta: false,
+    })
+    expect(classifyBetaModule({moduleId: 'example.test-fixture', status: 'published', manifest: {testOnly: true}})).toMatchObject({
+      classification: 'TEST_ONLY',
+      visibleInBeta: false,
+    })
   })
 
   it('can show non-fixture quarantined products as security review required', () => {

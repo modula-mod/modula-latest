@@ -207,6 +207,20 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
     expect(list.json().data.items[0].data.body).toBe('Account A private content')
   })
 
+  it('rejects SQL injection collection input without widening scope or mutating records', async () => {
+    const before = await db.selectFrom('greenfield_module_records').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow()
+    const maliciousCollection = encodeURIComponent("entry' OR '1'='1").replaceAll("'", '%27')
+    const response = await app.inject({
+      method: 'GET',
+      url: `/v1/backend/products/${productId}/records/${maliciousCollection}`,
+      headers: await serviceHeaders(),
+    })
+    expect(response.statusCode).toBe(403)
+    expect(response.json().error.code).toBe('FORBIDDEN')
+    const after = await db.selectFrom('greenfield_module_records').select(db.fn.countAll<string>().as('count')).executeTakeFirstOrThrow()
+    expect(after.count).toBe(before.count)
+  })
+
   it('registers and reads ledger resources only within the target installation', async () => {
     const key = `resource-register-${suffix}`
     const payload = {

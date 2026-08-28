@@ -407,7 +407,6 @@ describe('Greenfield Module Manifest v2 validation', () => {
       'services',
       'apis',
       'hooks',
-      'jobs',
       'storage',
       'widgets',
       'navigation',
