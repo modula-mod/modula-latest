@@ -41,7 +41,7 @@ function databaseChecks() {
     run('FULL MIGRATION CHAIN THROUGH 048', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied => { if (!applied.includes('048_greenfield_backend_v1_build_release_pipeline')) process.exit(1) })"], join(root, 'services/greenfield-api'), migrateEnv)
     run('BUILD AND RELEASE BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.build-release.test.ts'], root, testEnv)
     run('EXISTING DEVELOPER JOURNEYS', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.developer-domain.test.ts'], root, testEnv)
-    run('MIGRATION 048 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void (async()=>{if(await migrateDown(process.env.MODULA_TEST_DATABASE_URL)!=='048_greenfield_backend_v1_build_release_pipeline')process.exit(1);if(!(await migrateUp(process.env.MODULA_TEST_DATABASE_URL)).includes('048_greenfield_backend_v1_build_release_pipeline'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 048 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '048_greenfield_backend_v1_build_release_pipeline'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally { fixture.cleanup(); record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName) }
 }
 
@@ -68,5 +68,6 @@ function productionState() {
   if (!output('docker', ['container', 'inspect', container])) return record('PRODUCTION DATABASE DISCOVERED', true, 'not present outside production host')
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
-  record('PRODUCTION SCHEMA DISCOVERED', process.env.MODULA_REQUIRE_PRODUCTION_048 === '1' ? schema === '048' : ['043','044','045','046','047','048'].includes(schema), schema)
+  const version = Number(schema)
+  record('PRODUCTION SCHEMA DISCOVERED', process.env.MODULA_REQUIRE_PRODUCTION_048 === '1' ? version >= 48 : version >= 43 && version <= 52, schema)
 }

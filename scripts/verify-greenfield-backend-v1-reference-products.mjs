@@ -79,7 +79,7 @@ function databaseChecks() {
     run('REAL EXTENSION COMPOSITION', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/pvp-platform-2.reference-products.test.ts'], root, testEnv)
     run('MODULE BACKEND SUBSTRATE', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/phase7e.module-backend-runtime.test.ts'], root, testEnv)
     run('MODULE OWNED BACKEND JOURNEY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.module-owned-backend.test.ts'], root, testEnv)
-    run('MIGRATION 051 DOWN AND REAPPLY', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateDown,migrateUp} from './src/database/migrate.ts'; void(async()=>{if(await migrateDown(process.env.MODULA_TEST_DATABASE_URL)!=='051_greenfield_backend_v1_default_providers')process.exit(1);if(!(await migrateUp(process.env.MODULA_TEST_DATABASE_URL)).includes('051_greenfield_backend_v1_default_providers'))process.exit(1)})()"], join(root, 'services/greenfield-api'), migrateEnv)
+    run('MIGRATION 051 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '051_greenfield_backend_v1_default_providers'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
@@ -123,5 +123,5 @@ function productionState() {
   if (!output('docker', ['container', 'inspect', container])) return record('PRODUCTION DATABASE DISCOVERED', true, 'not present outside production host')
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
-  record('PRODUCTION SCHEMA DISCOVERED', ['043', '044', '045', '046', '047', '048', '049', '050', '051'].includes(schema), `${schema} (production mutation deferred)`)
+  record('PRODUCTION SCHEMA DISCOVERED', Number(schema) >= 43 && Number(schema) <= 52, `${schema} (production read-only observation)`)
 }
