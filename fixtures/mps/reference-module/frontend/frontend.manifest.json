@@ -1,0 +1,422 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "family": "route.open",
+      "icon": "system.plus",
+      "id": "newNote",
+      "label": "New note",
+      "route": "/new"
+    },
+    {
+      "family": "route.open",
+      "id": "openNote",
+      "label": "Open note",
+      "route": "/note/:noteId"
+    },
+    {
+      "family": "route.open",
+      "id": "editNote",
+      "label": "Edit note",
+      "route": "/note/:noteId/edit"
+    },
+    {
+      "family": "record.create",
+      "id": "createNote",
+      "inputBinding": "noteForm",
+      "label": "Save",
+      "recordType": "note"
+    },
+    {
+      "family": "record.update",
+      "id": "updateNote",
+      "inputBinding": "noteForm",
+      "label": "Save changes",
+      "recordIdBinding": "note",
+      "recordType": "note"
+    },
+    {
+      "confirm": true,
+      "family": "record.delete",
+      "id": "deleteNote",
+      "label": "Delete",
+      "recordIdBinding": "note",
+      "recordType": "note"
+    },
+    {
+      "capability": "share.native@1",
+      "family": "share",
+      "id": "shareNote",
+      "label": "Share"
+    },
+    {
+      "family": "settings.update",
+      "id": "saveSettings",
+      "label": "Save settings",
+      "settingsKey": "referenceNotes.preferences"
+    }
+  ],
+  "capabilities": {
+    "optional": [
+      "share.native@1"
+    ],
+    "required": [
+      "ui.richText@1"
+    ]
+  },
+  "entry": "home",
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "declarative",
+  "mpsVersion": "1.0-RC",
+  "navigation": {
+    "backBehavior": "host",
+    "rootView": "home",
+    "secondary": [
+      {
+        "id": "settings",
+        "label": "Settings",
+        "viewId": "settings"
+      }
+    ],
+    "tabs": [
+      {
+        "icon": "system.note",
+        "id": "notes",
+        "label": "Notes",
+        "viewId": "home"
+      }
+    ]
+  },
+  "platformRequirements": {
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "productId": "digital.modula.reference-notes",
+  "releaseVersion": "0.1.0",
+  "routes": [
+    {
+      "path": "/",
+      "viewId": "home"
+    },
+    {
+      "path": "/new",
+      "presentation": "sheet",
+      "viewId": "editor"
+    },
+    {
+      "path": "/note/:noteId",
+      "viewId": "detail"
+    },
+    {
+      "path": "/note/:noteId/edit",
+      "presentation": "sheet",
+      "viewId": "editor"
+    },
+    {
+      "path": "/settings",
+      "viewId": "settings"
+    }
+  ],
+  "schema": "modula.frontend.1.0",
+  "settings": {
+    "viewId": "settings"
+  },
+  "views": [
+    {
+      "bindings": [
+        {
+          "id": "notes",
+          "query": {
+            "filterParam": "filter",
+            "limit": 100,
+            "searchParam": "q",
+            "sortParam": "sort"
+          },
+          "recordType": "note",
+          "source": "record.query"
+        }
+      ],
+      "id": "home",
+      "kind": "collection",
+      "root": {
+        "children": [
+          {
+            "children": [
+              {
+                "binding": "notes",
+                "text": "Search notes",
+                "type": "search"
+              },
+              {
+                "action": "newNote",
+                "text": "New note",
+                "type": "button"
+              }
+            ],
+            "text": "Notes actions",
+            "type": "toolbar"
+          },
+          {
+            "accessibility": {
+              "label": "Notes",
+              "role": "list"
+            },
+            "action": "openNote",
+            "binding": "notes",
+            "type": "recordList"
+          }
+        ],
+        "layout": {
+          "direction": "vertical",
+          "gap": "regular",
+          "responsive": [
+            {
+              "class": "compact",
+              "columns": 1
+            },
+            {
+              "class": "wide",
+              "columns": 2
+            }
+          ]
+        },
+        "type": "stack"
+      },
+      "states": {
+        "empty": {
+          "children": [
+            {
+              "action": "newNote",
+              "text": "Create your first note",
+              "type": "button"
+            }
+          ],
+          "text": "No notes yet",
+          "type": "emptyState"
+        },
+        "error": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "Notes could not be loaded",
+          "type": "errorState"
+        },
+        "loading": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "Loading notes",
+          "type": "loadingState"
+        },
+        "offline": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "Notes are temporarily unavailable offline",
+          "type": "errorState"
+        }
+      },
+      "title": "Notes"
+    },
+    {
+      "bindings": [
+        {
+          "id": "note",
+          "recordIdParam": "noteId",
+          "recordType": "note",
+          "source": "record.detail"
+        }
+      ],
+      "id": "detail",
+      "kind": "detail",
+      "root": {
+        "children": [
+          {
+            "children": [
+              {
+                "action": "editNote",
+                "text": "Edit",
+                "type": "button"
+              },
+              {
+                "action": "shareNote",
+                "text": "Share",
+                "type": "button"
+              },
+              {
+                "action": "deleteNote",
+                "text": "Delete",
+                "type": "button"
+              }
+            ],
+            "text": "Note actions",
+            "type": "toolbar"
+          },
+          {
+            "accessibility": {
+              "role": "header"
+            },
+            "binding": "note",
+            "type": "text",
+            "valuePath": "title"
+          },
+          {
+            "binding": "note",
+            "type": "text",
+            "valuePath": "body"
+          }
+        ],
+        "layout": {
+          "direction": "vertical",
+          "gap": "regular"
+        },
+        "type": "stack"
+      },
+      "states": {
+        "error": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "This note is unavailable",
+          "type": "errorState"
+        },
+        "loading": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "Loading note",
+          "type": "loadingState"
+        },
+        "permissionDenied": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "You do not have permission to read this note",
+          "type": "errorState"
+        }
+      },
+      "title": "Note"
+    },
+    {
+      "bindings": [
+        {
+          "id": "note",
+          "recordIdParam": "noteId",
+          "recordType": "note",
+          "source": "record.detail"
+        },
+        {
+          "id": "noteForm",
+          "source": "installation"
+        }
+      ],
+      "id": "editor",
+      "kind": "form",
+      "root": {
+        "accessibility": {
+          "label": "Note editor",
+          "role": "form"
+        },
+        "children": [
+          {
+            "binding": "noteForm",
+            "field": {
+              "id": "title",
+              "label": "Title",
+              "required": true,
+              "type": "text",
+              "validation": {
+                "maxLength": 240
+              }
+            },
+            "type": "field"
+          },
+          {
+            "binding": "noteForm",
+            "field": {
+              "capability": "ui.richText@1",
+              "id": "body",
+              "label": "Body",
+              "type": "richText"
+            },
+            "type": "field"
+          },
+          {
+            "children": [
+              {
+                "action": "createNote",
+                "text": "Create note",
+                "type": "button"
+              },
+              {
+                "action": "updateNote",
+                "text": "Save changes",
+                "type": "button"
+              }
+            ],
+            "type": "row"
+          }
+        ],
+        "type": "section"
+      },
+      "states": {
+        "capabilityUnavailable": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "This host needs the rich text editor capability",
+          "type": "errorState"
+        }
+      },
+      "title": "Edit note"
+    },
+    {
+      "bindings": [
+        {
+          "id": "preferences",
+          "settingsKey": "referenceNotes.preferences",
+          "source": "settings"
+        }
+      ],
+      "id": "settings",
+      "kind": "settings",
+      "root": {
+        "accessibility": {
+          "label": "Notes settings",
+          "role": "form"
+        },
+        "children": [
+          {
+            "binding": "preferences",
+            "field": {
+              "id": "archiveOnDelete",
+              "label": "Archive before deleting",
+              "type": "boolean"
+            },
+            "type": "field"
+          },
+          {
+            "action": "saveSettings",
+            "text": "Save",
+            "type": "button"
+          }
+        ],
+        "type": "section"
+      },
+      "title": "Notes settings"
+    }
+  ]
+}

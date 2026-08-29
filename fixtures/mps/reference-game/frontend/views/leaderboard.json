@@ -1,0 +1,8 @@
+{
+  "id": "leaderboard",
+  "kind": "collection",
+  "title": "Leaderboard",
+  "bindings": [{"id": "scores", "source": "record.query", "recordType": "score", "query": {"limit": 100}}],
+  "root": {"type": "recordList", "binding": "scores", "accessibility": {"label": "Leaderboard scores", "role": "list"}},
+  "states": {"empty": {"type": "emptyState", "text": "No scores yet"}}
+}

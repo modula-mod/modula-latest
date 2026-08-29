@@ -1,0 +1,8 @@
+{
+  "id": "home",
+  "kind": "collection",
+  "title": "Alt notes",
+  "bindings": [{"id": "notes", "source": "record.query", "recordType": "note", "query": {"limit": 50}}],
+  "root": {"type": "grid", "binding": "notes", "layout": {"columns": 1, "responsive": [{"class": "wide", "columns": 3}]}, "accessibility": {"label": "Alternative notes", "role": "list"}},
+  "states": {"empty": {"type": "emptyState", "text": "No alternative notes"}}
+}

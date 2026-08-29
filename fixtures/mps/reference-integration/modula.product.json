@@ -1,0 +1,136 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-integration",
+    "kind": "integration",
+    "version": "0.1.0",
+    "displayName": "Reference Integration",
+    "description": "Product-to-product integration using contracts rather than database access.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-integration/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "b5d3342ad7eb12c259959f26017b6a678e2b2f8a77d4ccd187f5b89c45efaf84"
+    }
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "d42cb5ff70bc0d6576ebd720cdeb5553c3dc9c63c88915dba106b79f0781ee98",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "none"
+  },
+  "relationships": [
+    {
+      "type": "targets",
+      "productId": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    },
+    {
+      "type": "providesFor",
+      "productId": "digital.modula.reference-notes"
+    }
+  ],
+  "frontend": {
+    "mode": "host-contribution",
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "b5d3342ad7eb12c259959f26017b6a678e2b2f8a77d4ccd187f5b89c45efaf84",
+      "schemaVersion": "1.0.0"
+    }
+  },
+  "backend": {
+    "mode": "none"
+  },
+  "contributions": [
+    {
+      "id": "digital.modula.reference-integration.sync",
+      "target": "digital.modula.reference-notes/note.action@1",
+      "label": "Sync contract"
+    }
+  ],
+  "events": [
+    {
+      "direction": "subscribes",
+      "type": "digital.modula.reference-notes.note.created.v1",
+      "schemaVersion": "1.0.0"
+    }
+  ]
+}

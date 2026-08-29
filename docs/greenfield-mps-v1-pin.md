@@ -5,8 +5,8 @@ MPS main** commit. There is no floating draft-branch reference.
 
 | Repo | Ref |
 | --- | --- |
-| `modula-mod/modula-product-standard` | `47d2662625533b02ad02d009c1cfd176dca6471e` (`main`) |
-| Greenfield Backend V1 baseline | `29256c06c6b7f932fb1a9acc6e7e32bfce47e28b` |
+| `modula-mod/modula-product-standard` | `0181de563e6f5312ba5cd75fdb4a019611781b9e` (`main`) |
+| Greenfield Backend V1 baseline | `aab39cba5fc45ad9375372f5e169a7923a98218e` |
 
 Copied JSON fixtures under `fixtures/mps/` match that MPS main commit and do
 not float.

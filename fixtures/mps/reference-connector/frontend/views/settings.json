@@ -1,0 +1,20 @@
+{
+  "id": "settings",
+  "kind": "settings",
+  "title": "Connector settings",
+  "bindings": [
+    {"id": "preferences", "source": "settings", "settingsKey": "referenceConnector.preferences"}
+  ],
+  "root": {
+    "type": "section",
+    "accessibility": {"label": "External notes connector settings", "role": "form"},
+    "children": [
+      {
+        "type": "field",
+        "binding": "preferences",
+        "field": {"id": "syncEnabled", "type": "boolean", "label": "Enable note synchronization"}
+      },
+      {"type": "button", "text": "Save", "action": "saveSettings", "accessibility": {"label": "Save connector settings", "role": "button"}}
+    ]
+  }
+}

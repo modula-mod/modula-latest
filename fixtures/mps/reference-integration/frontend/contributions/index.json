@@ -1,0 +1,1 @@
+[{"id": "syncAction", "target": "digital.modula.reference-notes/note.action@1", "component": {"type": "button", "text": "Sync contract", "action": "sync"}, "action": "sync"}]

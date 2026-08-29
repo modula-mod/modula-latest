@@ -1,0 +1,4 @@
+[
+  {"id": "start", "family": "capability.invoke", "label": "Start game", "capability": "game.runtime@1"},
+  {"id": "leaderboard", "family": "route.open", "label": "Leaderboard", "route": "/leaderboard"}
+]

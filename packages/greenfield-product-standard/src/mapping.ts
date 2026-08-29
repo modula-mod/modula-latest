@@ -12,6 +12,7 @@ export type GreenfieldProductProjection = {
   aliases: string[]
   relationships: NormalizedMpsProduct['relationships']
   frontendMode: NormalizedMpsProduct['frontendMode']
+  frontendArtifact: NormalizedMpsProduct['frontendArtifact']
   backendMode: NormalizedMpsProduct['backendMode']
   greenfieldBackendMode: NormalizedMpsProduct['greenfieldBackendMode']
   storageMode: string | null
@@ -43,6 +44,7 @@ export function projectGreenfieldProduct(product: NormalizedMpsProduct): Greenfi
     aliases: product.aliases,
     relationships: product.relationships,
     frontendMode: product.frontendMode,
+    frontendArtifact: product.frontendArtifact,
     backendMode: product.backendMode,
     greenfieldBackendMode: product.greenfieldBackendMode,
     storageMode: product.backendMode === 'none' ? null : product.storageMode,

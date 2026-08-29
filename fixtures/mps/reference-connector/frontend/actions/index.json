@@ -1,0 +1,14 @@
+[
+  {
+    "id": "connectProvider",
+    "family": "extension.invoke",
+    "label": "Connect provider",
+    "commandId": "digital.modula.reference-connector.connect"
+  },
+  {
+    "id": "saveSettings",
+    "family": "settings.update",
+    "label": "Save connector settings",
+    "settingsKey": "referenceConnector.preferences"
+  }
+]

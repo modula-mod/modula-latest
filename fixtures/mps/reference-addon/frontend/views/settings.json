@@ -1,0 +1,7 @@
+{
+  "id": "settings",
+  "kind": "settings",
+  "title": "Summary settings",
+  "bindings": [{"id": "preferences", "source": "settings", "settingsKey": "referenceAddon.preferences"}],
+  "root": {"type": "section", "accessibility": {"label": "Summary settings", "role": "form"}, "children": [{"type": "field", "binding": "preferences", "field": {"id": "concise", "type": "boolean", "label": "Prefer concise summaries"}}, {"type": "button", "text": "Save", "action": "saveSettings"}]}
+}

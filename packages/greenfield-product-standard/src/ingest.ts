@@ -1,6 +1,7 @@
 import {adaptLegacyToMpsShape, detectManifestFormat, type DetectedManifestFormat} from './adapters.js'
 import {FORBIDDEN_SECRET_KEYS, ingestError, type IngestDiagnostic} from './diagnostics.js'
 import {greenfieldBackendModeFromMps, isMpsProductKind, registryKindFromDeclared, type MpsProductKind} from './kinds.js'
+import type {MpsFrontendArtifactMetadata} from './frontend.js'
 
 const PRODUCT_ID_PATTERN = /^(?=.{3,128}$)[a-z][a-z0-9]*(\.[a-z0-9]+(?:-[a-z0-9]+)*)+$/
 const PROTOCOL_PATTERN = /^greenfield\.v[1-9][0-9]*$/
@@ -21,6 +22,7 @@ export type NormalizedMpsProduct = {
   aliases: string[]
   relationships: Array<{type: string; productId: string; versionRange?: string}>
   frontendMode: 'none' | 'declarative' | 'host-contribution'
+  frontendArtifact: MpsFrontendArtifactMetadata | null
   backendMode: 'none' | 'greenfield-records' | 'service' | 'engine-backed'
   greenfieldBackendMode: 'frontend-only' | 'greenfield-managed' | 'module-managed'
   storageMode: string | null
@@ -125,6 +127,29 @@ export function ingestProductManifest(input: {
   if (!FRONTEND_MODES.has(frontendMode)) {
     diagnostics.push(ingestError('MPS-FRONTEND-001', 'frontend.mode', `Unsupported frontend mode "${frontendMode}".`))
   }
+  const frontendArtifact = isRecord(frontend.artifact) ? frontend.artifact : null
+  if (format === 'modula.product.json' && frontendMode !== 'none' && !frontendArtifact) {
+    diagnostics.push(ingestError('MPS-FRONTEND-010', 'frontend.artifact', 'Product-owned frontend modes require an immutable frontend artifact.'))
+  }
+  if (frontendMode === 'none' && frontendArtifact) {
+    diagnostics.push(ingestError('MPS-FRONTEND-009', 'frontend.artifact', 'frontend.mode none cannot declare a frontend artifact.'))
+  }
+  const frontendArtifactMetadata: MpsFrontendArtifactMetadata | null = frontendArtifact ? {
+    path: String(frontendArtifact.path ?? ''),
+    mediaType: String(frontendArtifact.mediaType ?? '') as MpsFrontendArtifactMetadata['mediaType'],
+    sha256: String(frontendArtifact.sha256 ?? ''),
+    schemaVersion: String(frontendArtifact.schemaVersion ?? ''),
+    entryView: frontendArtifact.entryView ? String(frontendArtifact.entryView) : undefined,
+  } : null
+  if (frontendArtifactMetadata && (!/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))(?!.*\\)[A-Za-z0-9._/-]+$/.test(frontendArtifactMetadata.path)
+    || frontendArtifactMetadata.mediaType !== 'application/vnd.modula.frontend+json'
+    || !/^[a-f0-9]{64}$/.test(frontendArtifactMetadata.sha256)
+    || frontendArtifactMetadata.schemaVersion !== '1.0.0')) {
+    diagnostics.push(ingestError('MPS-FRONTEND-011', 'frontend.artifact', 'Frontend artifact metadata is invalid.'))
+  }
+  if (format === 'modula.product.json' && kindRaw === 'module' && frontendMode === 'none' && !isRecord(frontend.headless)) {
+    diagnostics.push(ingestError('MPS-FRONTEND-007', 'frontend', 'Application modules require a frontend or an explicit specialized headless declaration.'))
+  }
   const backendMode = String(backend.mode ?? 'none')
   if (!BACKEND_MODES.has(backendMode)) {
     diagnostics.push(ingestError('MPS-BACKEND-001', 'backend.mode', `Unsupported backend mode "${backendMode}".`))
@@ -190,6 +215,7 @@ export function ingestProductManifest(input: {
         }))
       : [],
     frontendMode: frontendMode as NormalizedMpsProduct['frontendMode'],
+    frontendArtifact: frontendArtifactMetadata,
     backendMode: backendMode as NormalizedMpsProduct['backendMode'],
     greenfieldBackendMode: greenfieldBackendModeFromMps(backendMode as NormalizedMpsProduct['backendMode']),
     storageMode: storage.mode ? String(storage.mode) : backendMode === 'greenfield-records' ? 'greenfield-records' : null,

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "commandId": "digital.modula.reference-integration.sync",
+      "family": "extension.invoke",
+      "id": "sync",
+      "label": "Sync contract"
+    }
+  ],
+  "contributions": [
+    {
+      "action": "sync",
+      "component": {
+        "action": "sync",
+        "text": "Sync contract",
+        "type": "button"
+      },
+      "id": "syncAction",
+      "target": "digital.modula.reference-notes/note.action@1"
+    }
+  ],
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "host-contribution",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-integration",
+  "releaseVersion": "0.1.0",
+  "schema": "modula.frontend.1.0"
+}

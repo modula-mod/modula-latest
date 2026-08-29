@@ -1,5 +1,5 @@
 import {readFileSync} from 'node:fs'
-import {join, resolve} from 'node:path'
+import {join, resolve, sep} from 'node:path'
 import {createDb} from '../src/database/client.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 
@@ -8,6 +8,7 @@ type MpsProduct = {
   version: string
   root: string
   bytes: string
+  frontend: {path: string; bytes: Buffer} | null
 }
 
 const {apply, roots} = parseArgs(process.argv.slice(2))
@@ -37,7 +38,7 @@ try {
       })
       continue
     }
-    const ingested = await ingest.ingest({filename: 'modula.product.json', bytes: product.bytes})
+    const ingested = await ingest.ingest({filename: 'modula.product.json', bytes: product.bytes, frontend: product.frontend})
     if (!ingested || ingested.productId !== product.productId || ingested.version !== product.version) {
       fail(`MPS ingest did not persist ${product.productId}@${product.version}`)
     }
@@ -86,11 +87,24 @@ function parseArgs(args: string[]): {apply: boolean; roots: string[]} {
 function loadProduct(inputRoot: string): MpsProduct {
   const root = resolve(inputRoot)
   const bytes = readFileSync(join(root, 'modula.product.json'), 'utf8')
-  const parsed = JSON.parse(bytes) as {identity?: {id?: unknown; version?: unknown}}
+  const parsed = JSON.parse(bytes) as {
+    identity?: {id?: unknown; version?: unknown}
+    frontend?: {mode?: unknown; artifact?: {path?: unknown}}
+  }
   const productId = typeof parsed.identity?.id === 'string' ? parsed.identity.id : ''
   const version = typeof parsed.identity?.version === 'string' ? parsed.identity.version : ''
   if (!productId || !version) fail(`MPS identity is incomplete in ${root}`)
-  return {productId, version, root, bytes}
+  const artifactPath = typeof parsed.frontend?.artifact?.path === 'string' ? parsed.frontend.artifact.path : null
+  const frontendFile = artifactPath ? resolveProductArtifact(root, artifactPath) : null
+  const frontend = artifactPath && frontendFile ? {path: artifactPath, bytes: readFileSync(frontendFile)} : null
+  if (parsed.frontend?.mode !== 'none' && !frontend) fail(`MPS frontend artifact is incomplete in ${root}`)
+  return {productId, version, root, bytes, frontend}
+}
+
+function resolveProductArtifact(root: string, artifactPath: string): string {
+  const file = resolve(root, artifactPath)
+  if (!file.startsWith(`${root}${sep}`)) fail(`MPS artifact path escapes the product root: ${artifactPath}`)
+  return file
 }
 
 function fail(message: string): never {

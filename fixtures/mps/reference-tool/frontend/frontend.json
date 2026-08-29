@@ -1,0 +1,12 @@
+{
+  "sourceSchema": "modula.frontend.source.1",
+  "frontendSchemaVersion": "1.0.0",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-tool",
+  "releaseVersion": "0.1.0",
+  "mode": "host-contribution",
+  "hostRuntime": {"versionRange": ">=1.0.0 <2.0.0"},
+  "actionFiles": ["frontend/actions/index.json"],
+  "contributionFiles": ["frontend/contributions/index.json"],
+  "accessibility": {"declaration": "host-baseline-with-product-semantics", "screenReader": true, "scalableText": true, "keyboardNavigation": true, "reduceMotion": true}
+}

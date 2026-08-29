@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import {ScrollView, Share, StyleSheet, TextInput, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import type {
   GreenfieldModuleAction,
@@ -55,6 +55,10 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       router.push(action.target.routePath as Href)
       return
     }
+    if (action.kind === 'share') {
+      await Share.share({message: String(input.text ?? input.title ?? view.title)})
+      return
+    }
     await moduleRepository.runAction(moduleId, action.actionId, input)
   }
 
@@ -107,7 +111,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       <View style={{gap: spacing[2]}}>
         <AppText variant="display">{view.title}</AppText>
         <ModuleActionBar
-          actions={allActions}
+          actions={view.toolbar ?? []}
           onAction={action => { void runAction(action) }}
         />
         {view.kind === 'collection' ? (

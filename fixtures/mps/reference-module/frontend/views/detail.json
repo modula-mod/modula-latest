@@ -1,0 +1,20 @@
+{
+  "id": "detail",
+  "kind": "detail",
+  "title": "Note",
+  "bindings": [{"id": "note", "source": "record.detail", "recordType": "note", "recordIdParam": "noteId"}],
+  "root": {
+    "type": "stack",
+    "layout": {"direction": "vertical", "gap": "regular"},
+    "children": [
+      {"type": "toolbar", "text": "Note actions", "children": [{"type": "button", "text": "Edit", "action": "editNote"}, {"type": "button", "text": "Share", "action": "shareNote"}, {"type": "button", "text": "Delete", "action": "deleteNote"}]},
+      {"type": "text", "binding": "note", "valuePath": "title", "accessibility": {"role": "header"}},
+      {"type": "text", "binding": "note", "valuePath": "body"}
+    ]
+  },
+  "states": {
+    "loading": {"type": "loadingState", "text": "Loading note", "accessibility": {"role": "status"}},
+    "error": {"type": "errorState", "text": "This note is unavailable", "accessibility": {"role": "status"}},
+    "permissionDenied": {"type": "errorState", "text": "You do not have permission to read this note", "accessibility": {"role": "status"}}
+  }
+}

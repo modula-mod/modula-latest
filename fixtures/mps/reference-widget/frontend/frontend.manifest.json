@@ -1,0 +1,49 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "contributions": [
+    {
+      "bindings": [
+        {
+          "id": "recent",
+          "query": {
+            "limit": 5
+          },
+          "recordType": "note",
+          "source": "record.query"
+        }
+      ],
+      "component": {
+        "children": [
+          {
+            "accessibility": {
+              "label": "Recent notes",
+              "role": "list"
+            },
+            "binding": "recent",
+            "type": "recordList"
+          }
+        ],
+        "text": "Recent notes",
+        "type": "section"
+      },
+      "id": "recentNotes",
+      "target": "digital.modula.reference-notes/home.section@1"
+    }
+  ],
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "host-contribution",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-widget",
+  "releaseVersion": "0.1.0",
+  "schema": "modula.frontend.1.0"
+}

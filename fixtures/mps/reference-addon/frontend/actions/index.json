@@ -1,0 +1,4 @@
+[
+  {"id": "summarise", "family": "function.invoke", "label": "Summarise", "functionId": "digital.modula.reference-addon.summarise"},
+  {"id": "saveSettings", "family": "settings.update", "label": "Save", "settingsKey": "referenceAddon.preferences"}
+]

@@ -35,6 +35,7 @@ import type {
   ModuleRecordPage,
   ModuleRepository,
   ModuleProductRelationships,
+  ProductFrontendRuntime,
   ModuleRuntimeSummary,
   ModuleRuntimeView,
   ModuleSettingsDocument,
@@ -238,6 +239,13 @@ export class ApiModuleRepository implements ModuleRepository {
         return views.find(view => view.viewId === viewId) ?? views[0] ?? null
       },
     )
+  }
+
+  getProductFrontend(moduleId: string): Promise<ProductFrontendRuntime> {
+    return this.client.get({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/frontend`,
+      authenticated: true,
+    }, decodeProductFrontend)
   }
 
   listRecords(moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number} = {}): Promise<ModuleRecordPage> {
@@ -788,6 +796,23 @@ function numberValue(value: unknown): number {
 
 function decodeRuntimeView(value: unknown): ModuleRuntimeView {
   return value as ModuleRuntimeView
+}
+
+function decodeProductFrontend(value: unknown): ProductFrontendRuntime {
+  if (!isRecord(value) || (value.source !== 'legacy' && value.source !== 'mps')) {
+    throw new Error('Product frontend response is invalid')
+  }
+  if (value.source === 'legacy') return value as ProductFrontendRuntime
+  if (!isRecord(value.frontend)
+    || value.frontend.schema !== 'modula.frontend.1.0'
+    || value.frontend.frontendSchemaVersion !== '1.0.0'
+    || value.frontend.productId !== value.productId
+    || value.frontend.releaseVersion !== value.version
+    || !isRecord(value.artifact)
+    || !/^[a-f0-9]{64}$/.test(String(value.artifact.sha256 ?? ''))) {
+    throw new Error('Verified product frontend projection is incoherent')
+  }
+  return value as ProductFrontendRuntime
 }
 
 function decodeAIDeclaration(value: unknown): ModuleAIDeclaration | undefined {

@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict'
+import {createHash} from 'node:crypto'
 import test from 'node:test'
 import {readFileSync} from 'node:fs'
 import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {ingestProductManifest} from '../ingest.js'
 import {projectGreenfieldProduct} from '../mapping.js'
+import {validateMpsFrontendArtifact} from '../frontend.js'
 import {toMpsEventType} from '../adapters.js'
 import {greenfieldBackendModeFromMps, registryKindFromDeclared} from '../kinds.js'
 
@@ -35,10 +37,44 @@ test('reference module ingest is generic', () => {
   assert.equal(projection.productId, 'digital.modula.reference-notes')
   assert.equal(projection.registryKind, 'module')
   assert.equal(projection.frontendMode, 'declarative')
+  assert.equal(projection.frontendArtifact?.path, 'frontend/frontend.manifest.json')
+  assert.match(projection.frontendArtifact?.sha256 ?? '', /^[a-f0-9]{64}$/)
   assert.equal(projection.backendMode, 'greenfield-records')
   assert.equal(projection.familyId, 'digital.modula.reference-vault')
   assert.equal(projection.protocol, 'greenfield.v1')
   assert.equal(projection.presentationAssets.length > 0, true)
+})
+
+test('frontend artifact is identity-bound, hash-bound, and rejects executable escape hatches', () => {
+  const product = ingestProductManifest({filename: 'modula.product.json', bytes: fixture('reference-module')}).product!
+  const bytes = readFileSync(join(here, '../../../..', 'fixtures/mps/reference-module/frontend/frontend.manifest.json'))
+  const valid = validateMpsFrontendArtifact({
+    bytes,
+    metadata: product.frontendArtifact!,
+    productId: product.productId,
+    version: product.version,
+    mode: 'declarative',
+  })
+  assert.equal(valid.ok, true, valid.diagnostics.map(item => item.message).join('; '))
+  const tampered = validateMpsFrontendArtifact({
+    bytes: Buffer.concat([bytes, Buffer.from(' ')]),
+    metadata: product.frontendArtifact!,
+    productId: product.productId,
+    version: product.version,
+    mode: 'declarative',
+  })
+  assert.equal(tampered.diagnostics.some(item => item.code === 'MPS-FRONTEND-013'), true)
+  const executable = JSON.parse(bytes.toString('utf8'))
+  executable.views[0].root.rawJs = 'alert(1)'
+  const executableBytes = Buffer.from(`${JSON.stringify(executable)}\n`)
+  const unsafe = validateMpsFrontendArtifact({
+    bytes: executableBytes,
+    metadata: {...product.frontendArtifact!, sha256: createHash('sha256').update(executableBytes).digest('hex')},
+    productId: product.productId,
+    version: product.version,
+    mode: 'declarative',
+  })
+  assert.equal(unsafe.diagnostics.some(item => item.code === 'MPS-FRONTEND-SECURITY-001'), true)
 })
 
 test('backend-free plugin does not bind fake infrastructure', () => {

@@ -359,6 +359,7 @@ export class GreenfieldExtensionFabricService {
     const rows = await this.db
       .selectFrom('greenfield_extension_contribution_registrations')
       .innerJoin('greenfield_extension_runtime_projection', 'greenfield_extension_runtime_projection.installation_id', 'greenfield_extension_contribution_registrations.installation_id')
+      .leftJoin('greenfield_release_frontends', 'greenfield_release_frontends.release_id', 'greenfield_extension_runtime_projection.release_id')
       .select([
         'greenfield_extension_contribution_registrations.contribution_registration_id',
         'greenfield_extension_contribution_registrations.extension_product_id',
@@ -373,6 +374,9 @@ export class GreenfieldExtensionFabricService {
         'greenfield_extension_contribution_registrations.status',
         'greenfield_extension_contribution_registrations.last_error_code',
         'greenfield_extension_contribution_registrations.declaration',
+        'greenfield_release_frontends.frontend_id',
+        'greenfield_release_frontends.artifact_sha256 as frontend_artifact_sha256',
+        'greenfield_release_frontends.runtime_projection as frontend_runtime_projection',
       ])
       .where('greenfield_extension_contribution_registrations.account_id', '=', accountId)
       .where('greenfield_extension_contribution_registrations.target_product_id', '=', targetProductId)
@@ -383,12 +387,41 @@ export class GreenfieldExtensionFabricService {
       .orderBy('greenfield_extension_contribution_registrations.extension_product_id')
       .orderBy('greenfield_extension_contribution_registrations.contribution_id')
       .execute()
-    const contributions = rows.filter(row => {
+    const contributions: Array<Record<string, unknown>> = []
+    for (const row of rows) {
       const platforms = arrayOfStrings(row.platforms)
-      if (platforms.length && !platforms.includes(platform)) return false
-      if (row.requires_online && input.online === false) return false
-      return true
-    })
+      if (platforms.length && !platforms.includes(platform)) continue
+      if (row.requires_online && input.online === false) continue
+      const {frontend_id, frontend_artifact_sha256, frontend_runtime_projection, ...registration} = row
+      if (!frontend_id) {
+        contributions.push({...registration, frontend_source: 'legacy', frontend_artifact_sha256: null})
+        continue
+      }
+      const frontend = isRecord(frontend_runtime_projection) ? frontend_runtime_projection : null
+      const declared = Array.isArray(frontend?.contributions)
+        ? frontend.contributions.filter(isRecord).find(contribution =>
+          contribution.id === registration.contribution_id
+          && contribution.target === registration.extension_point,
+        )
+        : null
+      if (!declared) continue
+      const action = Array.isArray(frontend?.actions)
+        ? frontend.actions.filter(isRecord).find(candidate => candidate.id === declared.action)
+        : null
+      const base = isRecord(registration.declaration) ? registration.declaration : {}
+      contributions.push({
+        ...registration,
+        frontend_source: 'mps',
+        frontend_artifact_sha256,
+        declaration: {
+          ...base,
+          title: localizedText(action?.label, localizedText(declared.title, registration.contribution_id)),
+          actionId: typeof declared.action === 'string' ? declared.action : base.actionId,
+          frontend: isRecord(declared.component) ? declared.component : null,
+          source: 'mps-product-frontend',
+        },
+      })
+    }
     const points = await this.db
       .selectFrom('greenfield_extension_points')
       .select(['point_key', 'title', 'contribution_kinds', 'required_capability', 'platforms', 'max_contributions'])
@@ -857,6 +890,16 @@ function extensionProduct(manifest: GreenfieldModuleManifest): ModulaExtensionPr
 
 function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : []
+}
+
+function localizedText(value: unknown, fallback: string): string {
+  if (typeof value === 'string' && value.trim()) return value
+  if (isRecord(value) && typeof value.default === 'string' && value.default.trim()) return value.default
+  return fallback
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
 function eventVersion(eventType: string): number {

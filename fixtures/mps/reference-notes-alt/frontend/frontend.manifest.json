@@ -1,0 +1,70 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "entry": "home",
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "declarative",
+  "mpsVersion": "1.0-RC",
+  "navigation": {
+    "backBehavior": "host",
+    "rootView": "home"
+  },
+  "productId": "digital.modula.reference-notes-alt",
+  "releaseVersion": "0.1.0",
+  "routes": [
+    {
+      "path": "/",
+      "viewId": "home"
+    }
+  ],
+  "schema": "modula.frontend.1.0",
+  "views": [
+    {
+      "bindings": [
+        {
+          "id": "notes",
+          "query": {
+            "limit": 50
+          },
+          "recordType": "note",
+          "source": "record.query"
+        }
+      ],
+      "id": "home",
+      "kind": "collection",
+      "root": {
+        "accessibility": {
+          "label": "Alternative notes",
+          "role": "list"
+        },
+        "binding": "notes",
+        "layout": {
+          "columns": 1,
+          "responsive": [
+            {
+              "class": "wide",
+              "columns": 3
+            }
+          ]
+        },
+        "type": "grid"
+      },
+      "states": {
+        "empty": {
+          "text": "No alternative notes",
+          "type": "emptyState"
+        }
+      },
+      "title": "Alt notes"
+    }
+  ]
+}

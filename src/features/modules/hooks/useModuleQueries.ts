@@ -45,23 +45,33 @@ export function useModuleRelationshipsQuery(moduleId: string) {
   })
 }
 
-export function useModuleHostCompositionQuery(moduleId: string, route?: string, platform = 'web') {
+export function useModuleHostCompositionQuery(moduleId: string, route?: string, platform = 'web', enabled = true) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.composition(moduleId, route, platform),
     queryFn: () => moduleRepository.getHostComposition(moduleId, {platform, route}),
-    enabled: Boolean(moduleId) && session.status === 'signedIn',
+    enabled: Boolean(moduleId) && session.status === 'signedIn' && enabled,
   })
 }
 
-export function useModuleViewsQuery(moduleId: string) {
+export function useModuleViewsQuery(moduleId: string, enabled = true) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.views(moduleId),
     queryFn: () => moduleRepository.listViews(moduleId),
-    enabled: Boolean(moduleId) && session.status === 'signedIn',
+    enabled: Boolean(moduleId) && session.status === 'signedIn' && enabled,
+  })
+}
+
+export function useModuleFrontendQuery(moduleId: string, enabled = true) {
+  const {moduleRepository} = useAppServices()
+  const session = useSession()
+  return useQuery({
+    queryKey: moduleQueryKeys.frontend(moduleId),
+    queryFn: () => moduleRepository.getProductFrontend(moduleId),
+    enabled: Boolean(moduleId) && session.status === 'signedIn' && enabled,
   })
 }
 
@@ -148,6 +158,8 @@ export function useModuleLifecycleMutations(moduleId: string) {
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.detail(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.runtime(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.backend(moduleId)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.frontend(moduleId)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.views(moduleId)}),
       queryClient.invalidateQueries({queryKey: moduleQueryKeys.catalogueRoot}),
     ])
   }

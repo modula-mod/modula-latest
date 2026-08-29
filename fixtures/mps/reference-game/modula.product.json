@@ -34,7 +34,10 @@
   "release": {
     "channel": "development",
     "notes": "Reference fixture. Not for publication.",
-    "builder": "mps-reference"
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "b10be65396a5bce4d67921417f595ffcf35d1fc34b1c40c1c3c30e2d5b92566b"
+    }
   },
   "security": {
     "baseline": "mps-1.0",
@@ -97,32 +100,12 @@
   },
   "frontend": {
     "mode": "declarative",
-    "views": [
-      {
-        "id": "home",
-        "kind": "dashboard",
-        "title": "Play",
-        "route": "/"
-      },
-      {
-        "id": "board",
-        "kind": "detail",
-        "title": "Leaderboard",
-        "route": "/leaderboard"
-      }
-    ],
-    "routes": [
-      {
-        "path": "/",
-        "viewId": "home"
-      },
-      {
-        "path": "/leaderboard",
-        "viewId": "board"
-      }
-    ],
-    "navigation": {
-      "rootView": "home"
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "b10be65396a5bce4d67921417f595ffcf35d1fc34b1c40c1c3c30e2d5b92566b",
+      "schemaVersion": "1.0.0",
+      "entryView": "home"
     }
   },
   "backend": {

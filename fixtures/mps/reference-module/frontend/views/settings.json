@@ -1,0 +1,14 @@
+{
+  "id": "settings",
+  "kind": "settings",
+  "title": "Notes settings",
+  "bindings": [{"id": "preferences", "source": "settings", "settingsKey": "referenceNotes.preferences"}],
+  "root": {
+    "type": "section",
+    "accessibility": {"label": "Notes settings", "role": "form"},
+    "children": [
+      {"type": "field", "binding": "preferences", "field": {"id": "archiveOnDelete", "type": "boolean", "label": "Archive before deleting"}},
+      {"type": "button", "text": "Save", "action": "saveSettings"}
+    ]
+  }
+}
