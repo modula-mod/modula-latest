@@ -116,7 +116,7 @@ run(
 
 const fixture = createGreenfieldVerifierDatabaseFixture('mps_v1')
 if (!fixture) {
-  record('DISPOSABLE DATABASE AVAILABLE', true, 'SKIPPED — set MODULA_TEST_DATABASE_URL or start preview Postgres')
+  record('DISPOSABLE DATABASE AVAILABLE', false, 'REQUIRED — set MODULA_TEST_DATABASE_URL or start preview Postgres')
 } else {
   record('DISPOSABLE DATABASE AVAILABLE', true, fixture.databaseName)
   try {
@@ -137,6 +137,26 @@ if (!fixture) {
       'pnpm',
       ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-mps-v1.ingest.test.ts'],
       testEnv,
+    )
+    run(
+      'MIGRATION 054 ROLLBACK TO 053',
+      'pnpm',
+      [
+        '--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e',
+        "import {migrateDown, migrateStatus} from './src/database/migrate.ts'; void migrateDown(process.env.MODULA_TEST_DATABASE_URL).then(async id => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (id !== '054_greenfield_mps_v1_product_contract' || status.pending[0] !== '054_greenfield_mps_v1_product_contract') process.exit(1) })",
+      ],
+      migrateEnv,
+      join(ROOT, 'services/greenfield-api'),
+    )
+    run(
+      'MIGRATION 054 REAPPLY',
+      'pnpm',
+      [
+        '--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e',
+        "import {migrateUp, migrateStatus} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(async applied => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('054_greenfield_mps_v1_product_contract') || status.pending.length !== 0) process.exit(1) })",
+      ],
+      migrateEnv,
+      join(ROOT, 'services/greenfield-api'),
     )
   } finally {
     fixture.cleanup()
