@@ -677,6 +677,11 @@ function validateReleaseEvidence(
   if (!/^[0-9a-f]{40}$/.test(evidence.releaseCommit)) throw moduleError('VALIDATION_FAILED', 'Release evidence requires an exact 40-character commit')
   if (!/^[0-9a-f]{64}$/.test(evidence.artifactSha256) || /^0+$/.test(evidence.artifactSha256)) throw moduleError('VALIDATION_FAILED', 'Release evidence requires a non-zero artifact SHA-256')
   if (evidence.manifestSha256 && evidence.manifestSha256 !== computedManifestSha) throw moduleError('VALIDATION_FAILED', 'Release evidence manifest checksum does not match the imported manifest')
+  const signatureKeyId = manifest.integrity.signatureKeyId
+  const signature = manifest.integrity.signature
+  if (Boolean(signatureKeyId) !== Boolean(signature)) throw moduleError('VALIDATION_FAILED', 'Release signature and key ID must be declared together')
+  if (signatureKeyId && !/^[A-Za-z0-9._:-]{3,160}$/.test(signatureKeyId)) throw moduleError('VALIDATION_FAILED', 'Release signature key ID is malformed')
+  if (signature && !/^[A-Za-z0-9_-]{86}$/.test(signature)) throw moduleError('VALIDATION_FAILED', 'Release signature is not a canonical Ed25519 base64url value')
 }
 
 function mapRelease(row: any): GreenfieldModuleReleaseRecord {

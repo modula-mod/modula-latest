@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {execFileSync} from 'node:child_process'
 import {existsSync, readdirSync, readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
 import {dirname, join, resolve} from 'node:path'
@@ -825,7 +826,7 @@ function workerConfig(): WorkerConfig {
 }
 
 function manifestForTest(): GreenfieldModuleManifest {
-  const manifest = structuredClone(readJson('module.manifest.json')) as GreenfieldModuleManifest
+  const manifest = readTaggedVaultJson('vault-notes-v1.2.0', 'module.manifest.json') as GreenfieldModuleManifest
   const canonical = canonicalizeVaultNotesManifest(manifest)
   canonical.integrity.manifestSha256 = manifestChecksum({...canonical, integrity: {...canonical.integrity, manifestSha256: ''}})
   return canonical
@@ -842,6 +843,10 @@ function immutableReleaseEvidence(manifest: GreenfieldModuleManifest) {
     artifactSha256: provenance.packageChecksum as string,
     manifestSha256: manifest.integrity.manifestSha256,
   }
+}
+
+function readTaggedVaultJson(ref: string, path: string): unknown {
+  return JSON.parse(execFileSync('git', ['show', `${ref}:${path}`], {cwd: vaultNotesRoot, encoding: 'utf8'}))
 }
 
 function syntheticHistoricalEvidence(manifest: GreenfieldModuleManifest) {

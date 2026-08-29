@@ -149,6 +149,24 @@ export async function registerModuleRoutes(
     }
   })
 
+  app.post('/v1/admin/product-standard/ingest', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      if (!requireRegistry(reply, request.id)) return
+      const body = (request.body as {filename?: unknown; bytes?: unknown; manifest?: unknown; releaseId?: unknown} | null) ?? {}
+      const filename = typeof body.filename === 'string' && body.filename.trim() ? body.filename : 'modula.product.json'
+      const bytes = typeof body.bytes === 'string'
+        ? body.bytes
+        : JSON.stringify(body.manifest && typeof body.manifest === 'object' ? body.manifest : body)
+      const releaseId = typeof body.releaseId === 'string' && body.releaseId.trim() ? body.releaseId : null
+      return reply.code(201).send(successEnvelope(await mpsIngest.ingest({filename, bytes, releaseId}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'MPS product ingest failed')
+    }
+  })
+
   app.get('/v1/registry/modules/:moduleId/versions', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {

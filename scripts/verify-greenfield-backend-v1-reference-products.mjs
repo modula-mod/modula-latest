@@ -123,5 +123,5 @@ function productionState() {
   if (!output('docker', ['container', 'inspect', container])) return record('PRODUCTION DATABASE DISCOVERED', true, 'not present outside production host')
   const database = output('docker', ['inspect', container, '--format', '{{range .Config.Env}}{{println .}}{{end}}']).split('\n').find(line => line.startsWith('POSTGRES_DB='))?.slice(12) ?? 'modula'
   const schema = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT value FROM schema_metadata WHERE key='schema_version'"])
-  record('PRODUCTION SCHEMA DISCOVERED', Number(schema) >= 43 && Number(schema) <= 53, `${schema} (production read-only observation)`)
+  record('PRODUCTION SCHEMA DISCOVERED', Number(schema) >= 43 && Number(schema) <= 54, `${schema} (production read-only observation)`)
 }
