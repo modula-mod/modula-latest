@@ -16,6 +16,7 @@ COPY packages/greenfield-module-registry-contracts/package.json packages/greenfi
 COPY packages/greenfield-protocol/package.json packages/greenfield-protocol/
 COPY packages/greenfield-schema-registry/package.json packages/greenfield-schema-registry/
 COPY packages/dimon-contracts/package.json packages/dimon-contracts/
+COPY packages/greenfield-product-standard/package.json packages/greenfield-product-standard/
 COPY services/greenfield-worker/package.json services/greenfield-worker/
 COPY patches ./patches
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
