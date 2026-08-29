@@ -7,6 +7,8 @@ import {spawnSync} from 'node:child_process'
 const root = process.cwd()
 const failures = []
 const enginesRoot = resolve(process.env.MODULA_BACKEND_ENGINES_ROOT ?? '/root/modula-platform/modula-backend-engines')
+const legacyEngineRevision = 'a5511d3065326e5b29f0ab786a6975921b9db286'
+const entitlementEngineRevision = 'bcef62e4b4e9b6b9a29b7bee52278d7a68a21061'
 
 function record(label, passed, detail = '') {
   console.log(`${label.padEnd(52)} ${passed ? 'PASS' : 'FAIL'}${detail ? `  ${detail}` : ''}`)
@@ -43,6 +45,9 @@ source('CONTRACT-ONLY SERVICE GUARD', 'services/greenfield-api/migrations/044_gr
 source('REVERSIBLE ENGINE MIGRATION', 'services/greenfield-api/migrations/044_greenfield_backend_v1_engine_fabric.down.sql', [
   'DROP TRIGGER IF EXISTS greenfield_engine_service_guard', "value='043'",
 ])
+source('ENTITLEMENT ENGINE PROVENANCE UPGRADE', 'services/greenfield-api/migrations/049_greenfield_backend_v1_entitlements_usage.sql', [
+  `source_revision='${entitlementEngineRevision}'`, "WHERE engine_id='engine.entitlements'",
+])
 source('ENGINE TOPOLOGY SERVICE', 'services/greenfield-api/src/domains/engines/service.ts', [
   'GreenfieldEngineRegistryService', 'publicTopology', 'source_repository', 'source_revision',
 ], ['credentialValue', 'rawSecret'])
@@ -56,9 +61,12 @@ source('ENGINE BEHAVIOUR TEST', 'services/greenfield-api/tests/greenfield-backen
 record('BACKEND ENGINES REPOSITORY', existsSync(join(enginesRoot, '.git')), enginesRoot)
 if (existsSync(join(enginesRoot, '.git'))) {
   run('BACKEND ENGINES VERIFY', 'pnpm', ['verify'], enginesRoot, {...process.env, CI: 'true'})
-  run('BACKEND ENGINES MAIN CONVERGENCE', 'sh', ['-ceu', 'test "$(git branch --show-current)" = main; test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"; test "$(git rev-parse HEAD)" = a5511d3065326e5b29f0ab786a6975921b9db286; test -z "$(git status --porcelain)"'], enginesRoot)
+  run('BACKEND ENGINES MAIN CONVERGENCE', 'sh', ['-ceu', 'test "$(git branch --show-current)" = main; test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"; test -z "$(git status --porcelain)"'], enginesRoot)
 }
 
+run('GREENFIELD API AND WORKER WORKSPACE BUILD', 'pnpm', [
+  '--filter', '@modula/greenfield-api...', '--filter', '@modula/greenfield-worker...', 'build',
+], root, {...process.env, CI: 'true'})
 run('GREENFIELD API TYPECHECK', 'pnpm', ['--filter', '@modula/greenfield-api', 'typecheck'], root, {...process.env, CI: 'true'})
 run('GREENFIELD WORKER TYPECHECK', 'pnpm', ['--filter', '@modula/greenfield-worker', 'typecheck'], root, {...process.env, CI: 'true'})
 await runDatabaseChecks()
@@ -137,8 +145,15 @@ function verifyProductionState() {
   if (!required || version < 44) return
   const count = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', 'SELECT count(*) FROM greenfield_engine_registrations'])
   const invalid = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', "SELECT count(*) FROM greenfield_engine_service_registrations service JOIN greenfield_engine_registrations engine USING(engine_id) WHERE engine.runtime_status <> 'READY'"])
-  const revision = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', 'SELECT count(DISTINCT source_revision) || chr(58) || min(source_revision) FROM greenfield_engine_registrations'])
+  const revision = output('docker', ['exec', container, 'psql', '-U', 'modula_admin', '-d', database, '-Atqc', `SELECT
+    count(*) FILTER (WHERE engine_id='engine.entitlements' AND source_revision='${entitlementEngineRevision}') || chr(58) ||
+    count(*) FILTER (WHERE engine_id<>'engine.entitlements' AND source_revision='${legacyEngineRevision}') || chr(58) ||
+    count(*) FILTER (WHERE source_revision IS NULL OR NOT (
+      (engine_id='engine.entitlements' AND source_revision='${entitlementEngineRevision}') OR
+      (engine_id<>'engine.entitlements' AND source_revision='${legacyEngineRevision}')
+    ))
+    FROM greenfield_engine_registrations`])
   record('PRODUCTION ENGINE COUNT', count === '10', count)
   record('PRODUCTION CONTRACT-ONLY SERVICES', invalid === '0', invalid)
-  record('PRODUCTION ENGINE PROVENANCE', revision === '1:a5511d3065326e5b29f0ab786a6975921b9db286', revision)
+  record('PRODUCTION ENGINE PROVENANCE', revision === '1:9:0', revision)
 }
