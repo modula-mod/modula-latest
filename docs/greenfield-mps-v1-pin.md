@@ -1,15 +1,15 @@
 # Greenfield × MPS pin
 
-MPS 1.0-RC is consumed as an external contract. This branch pins the MPS
-convergence commit until that PR merges to `modula-product-standard` main.
+MPS 1.0-RC is consumed as an external contract. Greenfield pins the **merged
+MPS main** commit. There is no floating draft-branch reference.
 
 | Repo | Ref |
 | --- | --- |
-| `modula-mod/modula-product-standard` | `ca0c680b0844eb144c243ccafc922aca719eb34c` (`cursor/mps-v1-rc-convergence-a0be`) |
+| `modula-mod/modula-product-standard` | `47d2662625533b02ad02d009c1cfd176dca6471e` (`main`) |
 | Greenfield Backend V1 baseline | `29256c06c6b7f932fb1a9acc6e7e32bfce47e28b` |
 
-Until MPS main absorbs that commit, Greenfield tests use copied JSON fixtures
-under `fixtures/mps/` so they do not float on MPS `main`.
+Copied JSON fixtures under `fixtures/mps/` match that MPS main commit and do
+not float.
 
 | Contract | Version |
 | --- | --- |
