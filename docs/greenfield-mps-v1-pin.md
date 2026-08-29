@@ -5,7 +5,7 @@ convergence commit until that PR merges to `modula-product-standard` main.
 
 | Repo | Ref |
 | --- | --- |
-| `modula-mod/modula-product-standard` | `bf48c3f581787783d1c2aaf6acaba9a46e56250d` (`cursor/mps-v1-rc-convergence-a0be`) |
+| `modula-mod/modula-product-standard` | `ca0c680b0844eb144c243ccafc922aca719eb34c` (`cursor/mps-v1-rc-convergence-a0be`) |
 | Greenfield Backend V1 baseline | `29256c06c6b7f932fb1a9acc6e7e32bfce47e28b` |
 
 Until MPS main absorbs that commit, Greenfield tests use copied JSON fixtures
