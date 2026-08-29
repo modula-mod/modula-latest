@@ -1,0 +1,20 @@
+{
+  "id": "home",
+  "kind": "collection",
+  "title": "Notes",
+  "bindings": [{"id": "notes", "source": "record.query", "recordType": "note", "query": {"searchParam": "q", "filterParam": "filter", "sortParam": "sort", "limit": 100}}],
+  "root": {
+    "type": "stack",
+    "layout": {"direction": "vertical", "gap": "regular", "responsive": [{"class": "compact", "columns": 1}, {"class": "wide", "columns": 2}]},
+    "children": [
+      {"type": "toolbar", "text": "Notes actions", "children": [{"type": "search", "text": "Search notes", "binding": "notes"}, {"type": "button", "text": "New note", "action": "newNote"}]},
+      {"type": "recordList", "binding": "notes", "action": "openNote", "accessibility": {"label": "Notes", "role": "list"}}
+    ]
+  },
+  "states": {
+    "loading": {"type": "loadingState", "text": "Loading notes", "accessibility": {"role": "status"}},
+    "empty": {"type": "emptyState", "text": "No notes yet", "children": [{"type": "button", "text": "Create your first note", "action": "newNote"}]},
+    "error": {"type": "errorState", "text": "Notes could not be loaded", "accessibility": {"role": "status"}},
+    "offline": {"type": "errorState", "text": "Notes are temporarily unavailable offline", "accessibility": {"role": "status"}}
+  }
+}

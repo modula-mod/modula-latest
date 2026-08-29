@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto'
 import {execFileSync} from 'node:child_process'
 import {readFileSync} from 'node:fs'
-import {join, resolve} from 'node:path'
+import {join, resolve, sep} from 'node:path'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {createDb} from '../src/database/client.js'
 import type {GreenfieldModuleReleaseRecord} from '../src/modules/module-domain.js'
@@ -22,6 +22,7 @@ type ProductRelease = {
   productId: string
   version: string
   mpsBytes: string
+  frontend: {path: string; bytes: Buffer} | null
   manifest: GreenfieldModuleManifest
   provenance: ReleaseProvenance
 }
@@ -69,7 +70,12 @@ try {
     }
     assertStoredProvenance(product, release)
     if (release.releaseState !== 'published') fail(`Release ${product.productId}@${product.version} is ${release.releaseState}`)
-    const ingested = await mps.ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: release.releaseId})
+    const ingested = await mps.ingest({
+      filename: 'modula.product.json',
+      bytes: product.mpsBytes,
+      releaseId: release.releaseId,
+      frontend: product.frontend,
+    })
     if (!ingested || ingested.productId !== product.productId || ingested.version !== product.version) {
       fail(`MPS ingest did not persist ${product.productId}@${product.version}`)
     }
@@ -111,7 +117,10 @@ function loadProduct(inputRoot: string): ProductRelease {
   const root = resolve(inputRoot)
   if (git(root, ['status', '--short'])) fail(`Product repository is dirty: ${root}`)
   const mpsBytes = readFileSync(join(root, 'modula.product.json'), 'utf8')
-  const mps = JSON.parse(mpsBytes) as {identity?: {id?: unknown; version?: unknown}}
+  const mps = JSON.parse(mpsBytes) as {
+    identity?: {id?: unknown; version?: unknown}
+    frontend?: {mode?: unknown; artifact?: {path?: unknown}}
+  }
   const manifest = readJson<GreenfieldModuleManifest>(join(root, 'module.manifest.json'))
   const productId = typeof mps.identity?.id === 'string' ? mps.identity.id : ''
   const version = typeof mps.identity?.version === 'string' ? mps.identity.version : ''
@@ -135,7 +144,17 @@ function loadProduct(inputRoot: string): ProductRelease {
   if (sha256(join(root, 'release', packageFile)) !== provenance.packageChecksum) {
     fail(`Release artifact checksum mismatch for ${productId}@${version}`)
   }
-  return {root, productId, version, mpsBytes, manifest, provenance}
+  const frontendPath = typeof mps.frontend?.artifact?.path === 'string' ? mps.frontend.artifact.path : null
+  const frontendFile = frontendPath ? resolveProductArtifact(root, frontendPath) : null
+  const frontend = frontendPath && frontendFile ? {path: frontendPath, bytes: readFileSync(frontendFile)} : null
+  if (mps.frontend?.mode !== 'none' && !frontend) fail(`MPS frontend artifact is incomplete for ${productId}@${version}`)
+  return {root, productId, version, mpsBytes, frontend, manifest, provenance}
+}
+
+function resolveProductArtifact(root: string, artifactPath: string): string {
+  const file = resolve(root, artifactPath)
+  if (!file.startsWith(`${root}${sep}`)) fail(`MPS artifact path escapes the product root: ${artifactPath}`)
+  return file
 }
 
 function assertStoredProvenance(product: ProductRelease, release: GreenfieldModuleReleaseRecord): void {

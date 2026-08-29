@@ -8,6 +8,7 @@ export const moduleQueryKeys = {
       : ['modules', 'detail', moduleId] as const,
   installed: ['modules', 'installed'] as const,
   views: (moduleId: string) => ['modules', 'views', moduleId] as const,
+  frontend: (moduleId: string) => ['modules', 'frontend', moduleId] as const,
   view: (moduleId: string, viewId: string) => ['modules', 'view', moduleId, viewId] as const,
   recordsCollection: (moduleId: string, collection: string) => ['modules', 'records', moduleId, collection] as const,
   records: (moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string}) =>

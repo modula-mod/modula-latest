@@ -32,6 +32,7 @@ import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
 import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.js'
+import {GreenfieldProductFrontendService} from '../../product-standard/frontend-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -71,6 +72,7 @@ export async function registerModuleRoutes(
   const extensionFabric = new GreenfieldExtensionFabricService(db)
   const dataLedger = new GreenfieldDataLedgerService(db)
   const mpsIngest = new GreenfieldMpsIngestService(db)
+  const productFrontends = new GreenfieldProductFrontendService(db)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -155,13 +157,22 @@ export async function registerModuleRoutes(
     try {
       await publishers.requireAdminAccount(auth.accountId)
       if (!requireRegistry(reply, request.id)) return
-      const body = (request.body as {filename?: unknown; bytes?: unknown; manifest?: unknown; releaseId?: unknown} | null) ?? {}
+      const body = (request.body as {
+        filename?: unknown
+        bytes?: unknown
+        manifest?: unknown
+        releaseId?: unknown
+        frontend?: {path?: unknown; bytes?: unknown}
+      } | null) ?? {}
       const filename = typeof body.filename === 'string' && body.filename.trim() ? body.filename : 'modula.product.json'
       const bytes = typeof body.bytes === 'string'
         ? body.bytes
         : JSON.stringify(body.manifest && typeof body.manifest === 'object' ? body.manifest : body)
       const releaseId = typeof body.releaseId === 'string' && body.releaseId.trim() ? body.releaseId : null
-      return reply.code(201).send(successEnvelope(await mpsIngest.ingest({filename, bytes, releaseId}), request.id))
+      const frontend = typeof body.frontend?.path === 'string' && typeof body.frontend.bytes === 'string'
+        ? {path: body.frontend.path, bytes: body.frontend.bytes}
+        : null
+      return reply.code(201).send(successEnvelope(await mpsIngest.ingest({filename, bytes, releaseId, frontend}), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'MPS product ingest failed')
     }
@@ -616,6 +627,16 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await views.listViews(auth.accountId, canonicalModuleParam(request)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module views lookup failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/frontend', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await productFrontends.resolve(auth.accountId, canonicalModuleParam(request)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Product frontend lookup failed')
     }
   })
 

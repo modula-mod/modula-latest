@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs'
 import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
-import {randomUUID} from 'node:crypto'
+import {createHash, randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {sql} from 'kysely'
 import pg from 'pg'
@@ -26,19 +26,24 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
   afterAll(async () => db?.destroy())
 
   it('ingests a reference module generically with family and release-bound assets', async () => {
-    const bytes = readFileSync(join(fixtures, 'reference-module/modula.product.json'), 'utf8')
-    const ingested = await service.ingest({filename: 'modula.product.json', bytes})
+    const product = readProduct('reference-module')
+    const ingested = await service.ingest({filename: 'modula.product.json', ...product})
     expect(ingested?.productId).toBe('digital.modula.reference-notes')
     expect(ingested?.kind).toBe('module')
     expect(ingested?.backendMode).toBe('greenfield-records')
     expect(ingested?.familyId).toBe('digital.modula.reference-vault')
     expect(ingested?.assets.some(asset => asset.role === 'product.icon')).toBe(true)
     expect(ingested?.fakeBackendBound).toBe(false)
+    expect(ingested?.frontend).toMatchObject({
+      mode: 'declarative',
+      entryView: 'home',
+      routeCount: 5,
+      artifact: {sha256: '1995ee5feb55de76c33280253a943433fe21b2770a4c63b8ead8a9bab2231c70'},
+    })
   })
 
   it('ingests a backend-free plugin without fake storage or services', async () => {
-    const bytes = readFileSync(join(fixtures, 'reference-plugin/modula.product.json'), 'utf8')
-    const ingested = await service.ingest({filename: 'modula.product.json', bytes})
+    const ingested = await service.ingest({filename: 'modula.product.json', ...readProduct('reference-plugin')})
     expect(ingested?.backendMode).toBe('none')
     expect(ingested?.storageMode).toBeNull()
     expect(ingested?.greenfieldBackendMode).toBe('frontend-only')
@@ -51,10 +56,8 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
   })
 
   it('lets two notes providers coexist from metadata rather than names', async () => {
-    const notes = readFileSync(join(fixtures, 'reference-module/modula.product.json'), 'utf8')
-    const alt = readFileSync(join(fixtures, 'reference-notes-alt/modula.product.json'), 'utf8')
-    await service.ingest({filename: 'modula.product.json', bytes: notes})
-    await service.ingest({filename: 'modula.product.json', bytes: alt})
+    await service.ingest({filename: 'modula.product.json', ...readProduct('reference-module')})
+    await service.ingest({filename: 'modula.product.json', ...readProduct('reference-notes-alt')})
     const providers = await db.selectFrom('greenfield_mps_ingestions')
       .select(['product_id', 'projection'])
       .where('registry_kind', '=', 'module')
@@ -86,15 +89,47 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
       ['reference-game', 'digital.modula.reference-game', 'game'],
     ] as const
     for (const [name, productId, kind] of kinds) {
-      const bytes = readFileSync(join(fixtures, name, 'modula.product.json'), 'utf8')
-      const ingested = await service.ingest({filename: 'modula.product.json', bytes})
+      const ingested = await service.ingest({filename: 'modula.product.json', ...readProduct(name)})
       expect(ingested?.productId, name).toBe(productId)
       expect(ingested?.kind, name).toBe(kind)
       expect(ingested?.fakeBackendBound, name).toBe(false)
     }
   })
 
-  it('grants runtime DML and backup SELECT on every 054 object', async () => {
+  it('rejects missing, modified, and executable frontend artifacts', async () => {
+    const product = readProduct('reference-addon')
+    await expect(service.ingest({filename: 'modula.product.json', bytes: product.bytes}))
+      .rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+    await expect(service.ingest({
+      filename: 'modula.product.json',
+      bytes: product.bytes,
+      frontend: {...product.frontend!, bytes: `${product.frontend!.bytes.toString('utf8')}\n`},
+    })).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+
+    const artifact = JSON.parse(product.frontend!.bytes.toString('utf8')) as Record<string, unknown>
+    artifact.rawJs = 'globalThis.compromised = true'
+    const unsafeBytes = JSON.stringify(artifact)
+    const manifest = JSON.parse(product.bytes) as {frontend: {artifact: {sha256: string}}}
+    manifest.frontend.artifact.sha256 = createHash('sha256').update(unsafeBytes).digest('hex')
+    await expect(service.ingest({
+      filename: 'modula.product.json',
+      bytes: JSON.stringify(manifest),
+      frontend: {path: product.frontend!.path, bytes: unsafeBytes},
+    })).rejects.toMatchObject({code: 'VALIDATION_FAILED'})
+  })
+
+  it('keeps a product release immutable while allowing an identical replay', async () => {
+    const product = readProduct('reference-widget')
+    const first = await service.ingest({filename: 'modula.product.json', ...product})
+    const replay = await service.ingest({filename: 'modula.product.json', ...product})
+    expect(replay?.ingestionId).toBe(first?.ingestionId)
+    const manifest = JSON.parse(product.bytes) as {identity: {description: string}}
+    manifest.identity.description = 'A changed release behind the same version'
+    await expect(service.ingest({filename: 'modula.product.json', bytes: JSON.stringify(manifest), frontend: product.frontend}))
+      .rejects.toMatchObject({code: 'CONFLICT'})
+  })
+
+  it('grants runtime DML and backup SELECT on every MPS runtime object', async () => {
     const tables = [
       'greenfield_product_families',
       'greenfield_product_family_members',
@@ -103,6 +138,7 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
       'greenfield_mps_ingestions',
       'greenfield_release_presentation_assets',
       'greenfield_product_privacy_declarations',
+      'greenfield_release_frontends',
     ]
     for (const table of tables) {
       for (const role of ['modula_api', 'modula_worker']) {
@@ -124,8 +160,7 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
   })
 
   it('lets the API runtime role ingest and read family, relationship, asset, privacy, and alias rows', async () => {
-    const bytes = readFileSync(join(fixtures, 'reference-module/modula.product.json'), 'utf8')
-    await service.ingest({filename: 'modula.product.json', bytes})
+    await service.ingest({filename: 'modula.product.json', ...readProduct('reference-module')})
     const client = new pg.Client({connectionString: databaseUrl})
     await client.connect()
     try {
@@ -179,3 +214,11 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
     }
   })
 })
+
+function readProduct(name: string): {bytes: string; frontend: {path: string; bytes: Buffer} | null} {
+  const root = join(fixtures, name)
+  const bytes = readFileSync(join(root, 'modula.product.json'), 'utf8')
+  const manifest = JSON.parse(bytes) as {frontend?: {artifact?: {path?: unknown}}}
+  const path = typeof manifest.frontend?.artifact?.path === 'string' ? manifest.frontend.artifact.path : null
+  return {bytes, frontend: path ? {path, bytes: readFileSync(join(root, path))} : null}
+}

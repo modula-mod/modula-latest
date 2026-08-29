@@ -1,0 +1,19 @@
+{
+  "id": "editor",
+  "kind": "form",
+  "title": "Edit note",
+  "bindings": [
+    {"id": "note", "source": "record.detail", "recordType": "note", "recordIdParam": "noteId"},
+    {"id": "noteForm", "source": "installation"}
+  ],
+  "root": {
+    "type": "section",
+    "accessibility": {"label": "Note editor", "role": "form"},
+    "children": [
+      {"type": "field", "binding": "noteForm", "field": {"id": "title", "type": "text", "label": "Title", "required": true, "validation": {"maxLength": 240}}},
+      {"type": "field", "binding": "noteForm", "field": {"id": "body", "type": "richText", "label": "Body", "capability": "ui.richText@1"}},
+      {"type": "row", "children": [{"type": "button", "text": "Create note", "action": "createNote"}, {"type": "button", "text": "Save changes", "action": "updateNote"}]}
+    ]
+  },
+  "states": {"capabilityUnavailable": {"type": "errorState", "text": "This host needs the rich text editor capability", "accessibility": {"role": "status"}}}
+}

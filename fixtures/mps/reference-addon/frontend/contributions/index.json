@@ -1,0 +1,10 @@
+[
+  {
+    "id": "summariseAction",
+    "target": "digital.modula.reference-notes/note.action@1",
+    "component": {"type": "button", "text": "Summarise", "action": "summarise"},
+    "action": "summarise",
+    "settingsView": "settings",
+    "requiredCapabilities": ["ai.generate"]
+  }
+]

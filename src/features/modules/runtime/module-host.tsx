@@ -8,8 +8,9 @@ import {ModuleExtensionContributions} from '@/features/modules/runtime/module-ex
 import {ModuleLoadingState} from '@/features/modules/runtime/module-loading-state'
 import {ModulePermissionGate} from '@/features/modules/runtime/module-permission-gate'
 import {resolveModuleRouteView} from '@/features/modules/runtime/module-route-resolver'
+import {adaptMpsFrontendView, resolveMpsFrontendRoute} from '@/features/modules/runtime/mps-frontend-adapter'
 import {isInstalledModuleState} from '@/features/modules/identity/installPresentation'
-import {useModuleDetailQuery, useModuleHostCompositionQuery, useModuleViewsQuery} from '@/features/modules/hooks'
+import {useModuleDetailQuery, useModuleFrontendQuery, useModuleHostCompositionQuery, useModuleViewsQuery} from '@/features/modules/hooks'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -17,9 +18,11 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
   const router = useRouter()
   const {spacing} = useThemeTokens()
   const detail = useModuleDetailQuery(moduleId)
-  const views = useModuleViewsQuery(moduleId)
+  const frontendEnabled = detail.data?.installationState === 'enabled'
+  const frontend = useModuleFrontendQuery(moduleId, frontendEnabled)
+  const views = useModuleViewsQuery(moduleId, frontend.data?.source === 'legacy')
   const route = path.join('/')
-  const composition = useModuleHostCompositionQuery(moduleId, route, Platform.OS)
+  const composition = useModuleHostCompositionQuery(moduleId, route, Platform.OS, frontendEnabled)
 
   const openSettings = () => router.push(`/settings/modules/${encodeURIComponent(moduleId)}` as Href)
   const returnToBoard = () => router.push('/board' as Href)
@@ -46,6 +49,9 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
   if (detail.data.installationState === 'disabled') {
     return <ModuleErrorState title="Module disabled" body="Enable this module from Settings before opening its hosted route." onOpenSettings={openSettings} />
   }
+  if (detail.data.installationState === 'installed') {
+    return <ModuleErrorState title="Module not enabled" body="Enable this module from Settings before opening its product experience." onOpenSettings={openSettings} />
+  }
   if (!isInstalledModuleState(detail.data.installationState)) {
     return (
       <ModuleInstallIdentity
@@ -55,16 +61,45 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
     )
   }
 
-  if (views.isPending) return <ModuleLoadingState />
+  if (frontend.isPending) return <ModuleLoadingState />
+  if (frontend.isError || !frontend.data) {
+    return (
+      <ModuleErrorState
+        title="Verified product frontend unavailable"
+        body="The active release could not provide a verified, compatible frontend. No legacy or unverified UI was loaded."
+        onRetry={() => { void frontend.refetch() }}
+        onOpenSettings={openSettings}
+      />
+    )
+  }
 
-  const view = resolveModuleRouteView(views.data ?? [], path)
+  if (frontend.data.source === 'mps' && frontend.data.mode !== 'declarative') {
+    return (
+      <ModuleErrorState
+        title="No standalone product view"
+        body="This product contributes to approved host surfaces and does not declare a standalone module route."
+        onOpenSettings={openSettings}
+      />
+    )
+  }
+
+  if (frontend.data.source === 'legacy' && views.isPending) return <ModuleLoadingState />
+  const resolvedMps = frontend.data.source === 'mps'
+    ? resolveMpsFrontendRoute(frontend.data.frontend, path)
+    : null
+  const view = frontend.data.source === 'mps'
+    ? resolvedMps ? adaptMpsFrontendView({frontend: frontend.data.frontend, resolved: resolvedMps}) : null
+    : resolveModuleRouteView(views.data ?? [], path)
   if (!view) {
     return (
       <View style={{gap: spacing[3]}}>
         <ModuleErrorState
           title="Module route not found"
           body="The module did not register a compatible view for this route."
-          onRetry={() => { void views.refetch() }}
+          onRetry={() => {
+            if (frontend.data.source === 'legacy') void views.refetch()
+            else void frontend.refetch()
+          }}
           onOpenSettings={openSettings}
         />
         <ModulaButton label="Return to Board" role="secondary" onPress={returnToBoard} />
@@ -78,7 +113,7 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
         <ModuleErrorState
           title="Module failed to load"
           body="This module surface failed inside the hosted renderer. Other Modula surfaces are unaffected."
-          onRetry={() => { void views.refetch() }}
+          onRetry={() => { void frontend.refetch(); if (frontend.data.source === 'legacy') void views.refetch() }}
           onOpenSettings={openSettings}
         />
       }>

@@ -1,0 +1,266 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-addon",
+    "kind": "addon",
+    "version": "0.1.0",
+    "displayName": "Reference Add-on",
+    "description": "Add-on targeting Reference Notes with a host contribution and capability dependency.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-addon/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "5e2b51ef9b44cd085c73d3e7c58ad3e0112c6b80b56057a1d892f70aa5c4de85"
+    }
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "5568ddbff29c91bd7e312f47f10c8f0892e746404cb8024c14fd0efe001368b5",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "none"
+  },
+  "family": {
+    "id": "digital.modula.reference-vault",
+    "role": "member"
+  },
+  "relationships": [
+    {
+      "type": "targets",
+      "productId": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    },
+    {
+      "type": "extends",
+      "productId": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    },
+    {
+      "type": "belongsToFamily",
+      "productId": "digital.modula.reference-vault"
+    }
+  ],
+  "frontend": {
+    "mode": "host-contribution",
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "5e2b51ef9b44cd085c73d3e7c58ad3e0112c6b80b56057a1d892f70aa5c4de85",
+      "schemaVersion": "1.0.0"
+    }
+  },
+  "backend": {
+    "mode": "engine-backed",
+    "engineRequirements": [
+      {
+        "capability": "ai.generate"
+      }
+    ]
+  },
+  "capabilities": {
+    "requires": [
+      "notes.read.selected",
+      "ai.generate"
+    ],
+    "provides": [
+      "notes.summarise"
+    ]
+  },
+  "dependencies": [
+    {
+      "type": "product",
+      "id": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    },
+    {
+      "type": "capability",
+      "id": "ai.generate"
+    }
+  ],
+  "optionalDependencies": [
+    {
+      "type": "product",
+      "id": "digital.modula.reference-voice",
+      "versionRange": "^0.1.0"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "digital.modula.reference-addon.summarise",
+      "target": "digital.modula.reference-notes/note.action@1",
+      "label": "Summarise",
+      "icon": "asset://product/icon",
+      "action": "function.invoke",
+      "priority": 80,
+      "capabilities": [
+        "ai.generate"
+      ],
+      "availability": {
+        "platforms": [
+          "ios",
+          "android",
+          "web"
+        ],
+        "requiresOnline": true
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "reference-addon.summarize",
+      "timeoutClass": "standard",
+      "idempotency": "required",
+      "retryClass": "bounded",
+      "requiredCapabilities": [
+        "ai.generate"
+      ]
+    }
+  ],
+  "data": {
+    "resources": [
+      {
+        "id": "derived-summaries",
+        "type": "greenfield-records",
+        "owner": "PRODUCT_OWNED_DATA",
+        "schemaVersion": "1.0.0",
+        "backupOwner": "product",
+        "backupMethodClass": "publisher",
+        "exportSupported": true,
+        "deleteOwner": "product",
+        "sensitivity": "private"
+      }
+    ],
+    "uninstall": {
+      "keepData": false,
+      "deleteData": true,
+      "accountDeletion": "delete"
+    },
+    "export": {
+      "supported": true,
+      "format": "application/json",
+      "owner": "product"
+    }
+  },
+  "permissions": [
+    {
+      "id": "notes.read.selected",
+      "reason": "Read notes you explicitly select for processing.",
+      "category": "records",
+      "risk": "medium"
+    },
+    {
+      "id": "ai.request",
+      "reason": "Invoke a configured AI engine through Greenfield.",
+      "category": "AI",
+      "risk": "medium"
+    }
+  ],
+  "privacy": {
+    "dataAccessed": [
+      "selected note"
+    ],
+    "dataCreated": [
+      "summaries"
+    ],
+    "dataTransmitted": [
+      "engine capability ai.generate"
+    ],
+    "externalProcessors": [
+      "engine-resolved-by-greenfield"
+    ],
+    "retention": "derived summaries until uninstall",
+    "export": "supported",
+    "deletion": "supported"
+  },
+  "usage": {
+    "meters": [
+      {
+        "id": "ai-calls",
+        "capability": "ai.generate",
+        "unit": "invocations"
+      }
+    ]
+  },
+  "entitlements": [
+    {
+      "id": "ai.standard",
+      "reason": "AI add-on requires an AI entitlement granted by Greenfield."
+    }
+  ]
+}

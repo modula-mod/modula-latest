@@ -257,6 +257,84 @@ export type ModuleRuntimeView = GreenfieldModuleView & {
   available?: boolean
 }
 
+export type MpsFrontendRoute = {
+  path: string
+  viewId?: string
+  redirectTo?: string
+  presentation?: string
+}
+
+export type MpsFrontendComponent = Record<string, unknown> & {
+  type: string
+  children?: MpsFrontendComponent[]
+}
+
+export type MpsFrontendView = Record<string, unknown> & {
+  id: string
+  kind: 'collection' | 'detail' | 'form' | 'dashboard' | 'settings' | 'emptyState'
+  title: string | Record<string, unknown>
+  root: MpsFrontendComponent
+  bindings?: Record<string, unknown>[]
+  states?: Record<string, MpsFrontendComponent>
+}
+
+export type MpsFrontendAction = Record<string, unknown> & {
+  id: string
+  family: string
+  label: string | Record<string, unknown>
+}
+
+export type MpsFrontendArtifact = {
+  schema: 'modula.frontend.1.0'
+  frontendSchemaVersion: '1.0.0'
+  mpsVersion: '1.0-RC' | '1.0'
+  productId: string
+  releaseVersion: string
+  mode: 'declarative' | 'host-contribution'
+  entry?: string
+  hostRuntime: {versionRange: string}
+  routes?: MpsFrontendRoute[]
+  views?: MpsFrontendView[]
+  actions?: MpsFrontendAction[]
+  contributions?: Record<string, unknown>[]
+  settings?: {viewId: string}
+  capabilities?: {required?: string[]; optional?: string[]}
+  accessibility: Record<string, unknown>
+}
+
+export type ProductFrontendRuntime =
+  | {
+      source: 'legacy'
+      productId: string
+      version: string
+      releaseId: string
+      installationId: string
+      installationStatus: 'enabled'
+    }
+  | {
+      source: 'mps'
+      productId: string
+      version: string
+      releaseId: string
+      installationId: string
+      installationStatus: 'enabled'
+      mode: 'declarative' | 'host-contribution'
+      artifact: {
+        role: 'product.frontend'
+        path: string
+        mediaType: 'application/vnd.modula.frontend+json'
+        sha256: string
+        schemaVersion: '1.0.0'
+        verifiedAt: string
+      }
+      mpsVersion: '1.0-RC' | '1.0'
+      entryView: string | null
+      routeCount: number
+      compatibility: Record<string, unknown>
+      requiredCapabilities: string[]
+      frontend: MpsFrontendArtifact
+    }
+
 export type ModuleRecord = {
   record_id: string
   recordId?: string
@@ -320,11 +398,15 @@ export type ModuleHostExtensionContribution = {
   priority: number
   status: string
   last_error_code: string | null
+  frontend_source?: 'mps' | 'legacy'
+  frontend_artifact_sha256?: string | null
   declaration: {
     title?: string
     actionId?: string
     functionId?: string
     requiredCapability?: string
+    source?: 'mps-product-frontend'
+    frontend?: MpsFrontendComponent | null
   }
 }
 
@@ -473,6 +555,7 @@ export interface ModuleRepository {
   uninstallPreview(moduleId: string): Promise<ModuleUninstallPreview>
   listViews(moduleId: string): Promise<ModuleRuntimeView[]>
   getView(moduleId: string, viewId: string): Promise<ModuleRuntimeView | null>
+  getProductFrontend(moduleId: string): Promise<ProductFrontendRuntime>
   listRecords(moduleId: string, collection: string, input?: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number}): Promise<ModuleRecordPage>
   createRecord(moduleId: string, collection: string, data: Record<string, unknown>): Promise<ModuleRecord>
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord>

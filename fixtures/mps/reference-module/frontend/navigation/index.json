@@ -1,0 +1,6 @@
+{
+  "rootView": "home",
+  "tabs": [{"id": "notes", "viewId": "home", "label": "Notes", "icon": "system.note"}],
+  "secondary": [{"id": "settings", "viewId": "settings", "label": "Settings"}],
+  "backBehavior": "host"
+}

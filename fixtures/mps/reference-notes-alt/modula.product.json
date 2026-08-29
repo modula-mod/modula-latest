@@ -34,7 +34,10 @@
   "release": {
     "channel": "development",
     "notes": "Reference fixture. Not for publication.",
-    "builder": "mps-reference"
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "b8cc7bdb6f28319ae8b1d50e5d5d2ad7400079ccd1edc4f5fb1ed12a21ec3d42"
+    }
   },
   "security": {
     "baseline": "mps-1.0",
@@ -99,22 +102,12 @@
   },
   "frontend": {
     "mode": "declarative",
-    "views": [
-      {
-        "id": "home",
-        "kind": "collection",
-        "title": "Alt notes",
-        "route": "/"
-      }
-    ],
-    "routes": [
-      {
-        "path": "/",
-        "viewId": "home"
-      }
-    ],
-    "navigation": {
-      "rootView": "home"
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "b8cc7bdb6f28319ae8b1d50e5d5d2ad7400079ccd1edc4f5fb1ed12a21ec3d42",
+      "schemaVersion": "1.0.0",
+      "entryView": "home"
     }
   },
   "backend": {

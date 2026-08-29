@@ -1,0 +1,93 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "commandId": "digital.modula.reference-connector.connect",
+      "family": "extension.invoke",
+      "id": "connectProvider",
+      "label": "Connect provider"
+    },
+    {
+      "family": "settings.update",
+      "id": "saveSettings",
+      "label": "Save connector settings",
+      "settingsKey": "referenceConnector.preferences"
+    }
+  ],
+  "contributions": [
+    {
+      "action": "connectProvider",
+      "component": {
+        "accessibility": {
+          "label": "Connect external notes provider",
+          "role": "button"
+        },
+        "action": "connectProvider",
+        "text": "Connect provider",
+        "type": "button"
+      },
+      "id": "connectAction",
+      "target": "digital.modula.reference-notes/note.action@1"
+    }
+  ],
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "host-contribution",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-connector",
+  "releaseVersion": "0.1.0",
+  "schema": "modula.frontend.1.0",
+  "settings": {
+    "viewId": "settings"
+  },
+  "views": [
+    {
+      "bindings": [
+        {
+          "id": "preferences",
+          "settingsKey": "referenceConnector.preferences",
+          "source": "settings"
+        }
+      ],
+      "id": "settings",
+      "kind": "settings",
+      "root": {
+        "accessibility": {
+          "label": "External notes connector settings",
+          "role": "form"
+        },
+        "children": [
+          {
+            "binding": "preferences",
+            "field": {
+              "id": "syncEnabled",
+              "label": "Enable note synchronization",
+              "type": "boolean"
+            },
+            "type": "field"
+          },
+          {
+            "accessibility": {
+              "label": "Save connector settings",
+              "role": "button"
+            },
+            "action": "saveSettings",
+            "text": "Save",
+            "type": "button"
+          }
+        ],
+        "type": "section"
+      },
+      "title": "Connector settings"
+    }
+  ]
+}

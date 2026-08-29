@@ -34,7 +34,10 @@
   "release": {
     "channel": "development",
     "notes": "Reference fixture. Not for publication.",
-    "builder": "mps-reference"
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "0ebed9d17ff1e35fa06a23de50b6dcae80b68cf9aa5f6590f54b84ef65b2f093"
+    }
   },
   "security": {
     "baseline": "mps-1.0",
@@ -105,7 +108,13 @@
     }
   ],
   "frontend": {
-    "mode": "host-contribution"
+    "mode": "host-contribution",
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "0ebed9d17ff1e35fa06a23de50b6dcae80b68cf9aa5f6590f54b84ef65b2f093",
+      "schemaVersion": "1.0.0"
+    }
   },
   "backend": {
     "mode": "none"

@@ -17,3 +17,5 @@ export {
   registryKindFromDeclared,
 } from './kinds.js'
 export type {MpsProductKind, RegistryProductKind} from './kinds.js'
+export {validateMpsFrontendArtifact} from './frontend.js'
+export type {MpsFrontendArtifact, MpsFrontendArtifactMetadata, MpsFrontendValidation} from './frontend.js'

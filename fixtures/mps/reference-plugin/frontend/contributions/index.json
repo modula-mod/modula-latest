@@ -1,0 +1,1 @@
+[{"id": "wordCountToolbar", "target": "digital.modula.reference-notes/editor.toolbar@1", "component": {"type": "button", "text": "Word count", "action": "wordCount"}, "action": "wordCount"}]

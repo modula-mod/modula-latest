@@ -1,0 +1,89 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "family": "function.invoke",
+      "functionId": "digital.modula.reference-addon.summarise",
+      "id": "summarise",
+      "label": "Summarise"
+    },
+    {
+      "family": "settings.update",
+      "id": "saveSettings",
+      "label": "Save",
+      "settingsKey": "referenceAddon.preferences"
+    }
+  ],
+  "contributions": [
+    {
+      "action": "summarise",
+      "component": {
+        "action": "summarise",
+        "text": "Summarise",
+        "type": "button"
+      },
+      "id": "summariseAction",
+      "requiredCapabilities": [
+        "ai.generate"
+      ],
+      "settingsView": "settings",
+      "target": "digital.modula.reference-notes/note.action@1"
+    }
+  ],
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "host-contribution",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-addon",
+  "releaseVersion": "0.1.0",
+  "schema": "modula.frontend.1.0",
+  "settings": {
+    "viewId": "settings"
+  },
+  "views": [
+    {
+      "bindings": [
+        {
+          "id": "preferences",
+          "settingsKey": "referenceAddon.preferences",
+          "source": "settings"
+        }
+      ],
+      "id": "settings",
+      "kind": "settings",
+      "root": {
+        "accessibility": {
+          "label": "Summary settings",
+          "role": "form"
+        },
+        "children": [
+          {
+            "binding": "preferences",
+            "field": {
+              "id": "concise",
+              "label": "Prefer concise summaries",
+              "type": "boolean"
+            },
+            "type": "field"
+          },
+          {
+            "action": "saveSettings",
+            "text": "Save",
+            "type": "button"
+          }
+        ],
+        "type": "section"
+      },
+      "title": "Summary settings"
+    }
+  ]
+}

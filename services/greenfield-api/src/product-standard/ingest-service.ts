@@ -1,6 +1,11 @@
 import {createHash} from 'node:crypto'
 import {sql} from 'kysely'
-import {ingestProductManifest, projectGreenfieldProduct} from '@modula/greenfield-product-standard'
+import {
+  ingestProductManifest,
+  projectGreenfieldProduct,
+  validateMpsFrontendArtifact,
+  type MpsFrontendArtifact,
+} from '@modula/greenfield-product-standard'
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
@@ -8,7 +13,12 @@ import {moduleError} from '../modules/module-errors.js'
 export class GreenfieldMpsIngestService {
   constructor(private readonly db: ModulaDb) {}
 
-  async ingest(input: {filename: string; bytes: string | Buffer; releaseId?: string | null}) {
+  async ingest(input: {
+    filename: string
+    bytes: string | Buffer
+    releaseId?: string | null
+    frontend?: {path: string; bytes: string | Buffer} | null
+  }) {
     const result = ingestProductManifest({filename: input.filename, bytes: input.bytes})
     if (!result.ok || !result.product) {
       throw moduleError('VALIDATION_FAILED', result.diagnostics.map(item => `${item.code}: ${item.message}`).join('; ') || 'Invalid MPS manifest')
@@ -21,6 +31,51 @@ export class GreenfieldMpsIngestService {
     const manifestSha256 = createHash('sha256')
       .update(typeof input.bytes === 'string' ? input.bytes : input.bytes)
       .digest('hex')
+    let frontendArtifact: MpsFrontendArtifact | null = null
+    if (product.frontendArtifact) {
+      if (!input.frontend || input.frontend.path !== product.frontendArtifact.path) {
+        throw moduleError('VALIDATION_FAILED', `Verified frontend artifact ${product.frontendArtifact.path} is required`)
+      }
+      const validated = validateMpsFrontendArtifact({
+        bytes: input.frontend.bytes,
+        metadata: product.frontendArtifact,
+        productId: product.productId,
+        version: product.version,
+        mode: product.frontendMode as 'declarative' | 'host-contribution',
+      })
+      if (!validated.ok || !validated.artifact) {
+        throw moduleError('VALIDATION_FAILED', validated.diagnostics.map(item => `${item.code}: ${item.message}`).join('; ') || 'Invalid MPS frontend artifact')
+      }
+      frontendArtifact = validated.artifact
+    } else if (input.frontend) {
+      throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
+    }
+    const existing = await this.db.selectFrom('greenfield_mps_ingestions')
+      .select(['ingestion_id', 'release_id', 'manifest_sha256'])
+      .where('product_id', '=', product.productId)
+      .where('version', '=', product.version)
+      .executeTakeFirst()
+    if (existing) {
+      const storedFrontend = await this.db.selectFrom('greenfield_release_frontends')
+        .select(['artifact_sha256', 'release_id'])
+        .where('ingestion_id', '=', existing.ingestion_id)
+        .executeTakeFirst()
+      if (existing.manifest_sha256 !== manifestSha256
+        || (product.frontendArtifact?.sha256 ?? null) !== (storedFrontend?.artifact_sha256 ?? null)) {
+        throw moduleError('CONFLICT', `Product release ${product.productId}@${product.version} is immutable`)
+      }
+      if (input.releaseId && existing.release_id && existing.release_id !== input.releaseId) {
+        throw moduleError('CONFLICT', `Product release ${product.productId}@${product.version} is already bound to another registry release`)
+      }
+      if (input.releaseId && !existing.release_id) {
+        await this.db.transaction().execute(async trx => {
+          await trx.updateTable('greenfield_mps_ingestions').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+          if (storedFrontend) await trx.updateTable('greenfield_release_frontends').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+          await trx.updateTable('greenfield_release_presentation_assets').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+        })
+      }
+      return this.get(product.productId, product.version)
+    }
     const ingestionId = uuidv7()
     const now = new Date()
 
@@ -84,21 +139,6 @@ export class GreenfieldMpsIngestService {
           projection: sql`${JSON.stringify(projection)}::jsonb`,
           ingested_at: now,
         })
-        .onConflict(oc => oc.columns(['product_id', 'version']).doUpdateSet({
-          release_id: input.releaseId ?? null,
-          manifest_sha256: manifestSha256,
-          manifest_format: product.format,
-          registry_kind: product.kind as any,
-          frontend_mode: product.frontendMode,
-          backend_mode: product.backendMode,
-          storage_mode: projection.storageMode,
-          greenfield_backend_mode: product.greenfieldBackendMode,
-          test_fixture: product.testFixture,
-          visibility: product.visibility,
-          manifest: sql`${JSON.stringify(product.raw)}::jsonb`,
-          projection: sql`${JSON.stringify(projection)}::jsonb`,
-          ingested_at: now,
-        }))
         .execute()
 
       const stored = await trx.selectFrom('greenfield_mps_ingestions')
@@ -106,6 +146,31 @@ export class GreenfieldMpsIngestService {
         .where('product_id', '=', product.productId)
         .where('version', '=', product.version)
         .executeTakeFirstOrThrow()
+
+      if (product.frontendArtifact && frontendArtifact) {
+        await trx.insertInto('greenfield_release_frontends').values({
+          frontend_id: uuidv7(),
+          ingestion_id: stored.ingestion_id,
+          release_id: input.releaseId ?? null,
+          product_id: product.productId,
+          version: product.version,
+          frontend_mode: product.frontendMode as 'declarative' | 'host-contribution',
+          artifact_role: 'product.frontend',
+          artifact_path: product.frontendArtifact.path,
+          media_type: product.frontendArtifact.mediaType,
+          artifact_sha256: product.frontendArtifact.sha256,
+          schema_version: product.frontendArtifact.schemaVersion as '1.0.0',
+          mps_version: frontendArtifact.mpsVersion,
+          entry_view: frontendArtifact.entry ?? null,
+          route_count: frontendArtifact.routes?.length ?? 0,
+          routes: sql`${JSON.stringify(frontendArtifact.routes ?? [])}::jsonb`,
+          compatibility: sql`${JSON.stringify(frontendArtifact.hostRuntime)}::jsonb`,
+          required_capabilities: sql`${JSON.stringify(frontendArtifact.capabilities?.required ?? [])}::jsonb`,
+          runtime_projection: sql`${JSON.stringify(frontendArtifact)}::jsonb`,
+          verified_at: now,
+          created_at: now,
+        }).execute()
+      }
 
       await trx.deleteFrom('greenfield_release_presentation_assets').where('ingestion_id', '=', stored.ingestion_id).execute()
       if (product.presentationAssets.length > 0) {
@@ -192,6 +257,10 @@ export class GreenfieldMpsIngestService {
       .selectAll()
       .where('ingestion_id', '=', row.ingestion_id)
       .executeTakeFirst()
+    const frontend = await this.db.selectFrom('greenfield_release_frontends')
+      .select(['frontend_mode', 'artifact_path', 'media_type', 'artifact_sha256', 'schema_version', 'mps_version', 'entry_view', 'route_count', 'compatibility', 'required_capabilities', 'verified_at'])
+      .where('ingestion_id', '=', row.ingestion_id)
+      .executeTakeFirst()
     return {
       ingestionId: row.ingestion_id,
       productId: row.product_id,
@@ -212,6 +281,21 @@ export class GreenfieldMpsIngestService {
         sha256: asset.sha256,
         developmentAsset: asset.development_asset,
       })),
+      frontend: frontend ? {
+        mode: frontend.frontend_mode,
+        artifact: {
+          path: frontend.artifact_path,
+          mediaType: frontend.media_type,
+          sha256: frontend.artifact_sha256,
+          schemaVersion: frontend.schema_version,
+        },
+        mpsVersion: frontend.mps_version,
+        entryView: frontend.entry_view,
+        routeCount: frontend.route_count,
+        compatibility: frontend.compatibility,
+        requiredCapabilities: frontend.required_capabilities,
+        verifiedAt: frontend.verified_at.toISOString(),
+      } : null,
       privacy: privacy?.declaration ?? null,
       projection: row.projection,
       fakeBackendBound: row.backend_mode !== 'none' && row.greenfield_backend_mode === 'frontend-only' ? true : false,

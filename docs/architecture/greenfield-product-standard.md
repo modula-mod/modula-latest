@@ -14,4 +14,9 @@ protocol. These three version lines are independent.
 
 See `docs/GREENFIELD-V1-CORE-FREEZE.md` and `docs/greenfield-mps-convergence-matrix.md`.
 
+MPS also owns the authoritative generic frontend contract. Greenfield stores a
+verified, immutable, exact-release projection and serves it only to an enabled
+account installation. Greenfield does not define product-specific UI and does
+not fetch arbitrary frontend URLs. See `docs/MODULA-PRODUCT-HOST-V1.md`.
+
 Host security posture: **IN_PLACE_REMEDIATED — NOT CLEAN-IMAGE_REBUILT**.

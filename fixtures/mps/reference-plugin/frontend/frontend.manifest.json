@@ -1,0 +1,39 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "commandId": "digital.modula.reference-plugin.word-count",
+      "family": "extension.invoke",
+      "id": "wordCount",
+      "label": "Word count"
+    }
+  ],
+  "contributions": [
+    {
+      "action": "wordCount",
+      "component": {
+        "action": "wordCount",
+        "text": "Word count",
+        "type": "button"
+      },
+      "id": "wordCountToolbar",
+      "target": "digital.modula.reference-notes/editor.toolbar@1"
+    }
+  ],
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "host-contribution",
+  "mpsVersion": "1.0-RC",
+  "productId": "digital.modula.reference-plugin",
+  "releaseVersion": "0.1.0",
+  "schema": "modula.frontend.1.0"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "home",
+  "kind": "dashboard",
+  "title": "Play",
+  "root": {"type": "grid", "layout": {"columns": 1, "responsive": [{"class": "wide", "columns": 2}]}, "children": [{"type": "button", "text": "Start game", "action": "start"}, {"type": "button", "text": "View leaderboard", "action": "leaderboard"}]},
+  "states": {"capabilityUnavailable": {"type": "errorState", "text": "This game needs a compatible host runtime", "accessibility": {"role": "status"}}}
+}

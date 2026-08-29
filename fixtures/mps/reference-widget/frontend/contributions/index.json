@@ -1,0 +1,8 @@
+[
+  {
+    "id": "recentNotes",
+    "target": "digital.modula.reference-notes/home.section@1",
+    "bindings": [{"id": "recent", "source": "record.query", "recordType": "note", "query": {"limit": 5}}],
+    "component": {"type": "section", "text": "Recent notes", "children": [{"type": "recordList", "binding": "recent", "accessibility": {"label": "Recent notes", "role": "list"}}]}
+  }
+]

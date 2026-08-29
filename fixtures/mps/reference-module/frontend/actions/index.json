@@ -1,0 +1,10 @@
+[
+  {"id": "newNote", "family": "route.open", "label": "New note", "icon": "system.plus", "route": "/new"},
+  {"id": "openNote", "family": "route.open", "label": "Open note", "route": "/note/:noteId"},
+  {"id": "editNote", "family": "route.open", "label": "Edit note", "route": "/note/:noteId/edit"},
+  {"id": "createNote", "family": "record.create", "label": "Save", "recordType": "note", "inputBinding": "noteForm"},
+  {"id": "updateNote", "family": "record.update", "label": "Save changes", "recordType": "note", "recordIdBinding": "note", "inputBinding": "noteForm"},
+  {"id": "deleteNote", "family": "record.delete", "label": "Delete", "recordType": "note", "recordIdBinding": "note", "confirm": true},
+  {"id": "shareNote", "family": "share", "label": "Share", "capability": "share.native@1"},
+  {"id": "saveSettings", "family": "settings.update", "label": "Save settings", "settingsKey": "referenceNotes.preferences"}
+]

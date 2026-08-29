@@ -1,0 +1,139 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/frontend.schema.json",
+  "accessibility": {
+    "declaration": "host-baseline-with-product-semantics",
+    "keyboardNavigation": true,
+    "reduceMotion": true,
+    "scalableText": true,
+    "screenReader": true
+  },
+  "actions": [
+    {
+      "capability": "game.runtime@1",
+      "family": "capability.invoke",
+      "id": "start",
+      "label": "Start game"
+    },
+    {
+      "family": "route.open",
+      "id": "leaderboard",
+      "label": "Leaderboard",
+      "route": "/leaderboard"
+    }
+  ],
+  "capabilities": {
+    "required": [
+      "game.runtime@1"
+    ]
+  },
+  "entry": "home",
+  "frontendSchemaVersion": "1.0.0",
+  "hostRuntime": {
+    "versionRange": ">=1.0.0 <2.0.0"
+  },
+  "mode": "declarative",
+  "mpsVersion": "1.0-RC",
+  "navigation": {
+    "backBehavior": "host",
+    "rootView": "home",
+    "secondary": [
+      {
+        "id": "leaderboard",
+        "label": "Leaderboard",
+        "viewId": "leaderboard"
+      }
+    ]
+  },
+  "platformRequirements": {
+    "nativeCapabilities": [
+      "game.runtime@1"
+    ],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "productId": "digital.modula.reference-game",
+  "releaseVersion": "0.1.0",
+  "routes": [
+    {
+      "path": "/",
+      "viewId": "home"
+    },
+    {
+      "path": "/leaderboard",
+      "viewId": "leaderboard"
+    }
+  ],
+  "schema": "modula.frontend.1.0",
+  "views": [
+    {
+      "id": "home",
+      "kind": "dashboard",
+      "root": {
+        "children": [
+          {
+            "action": "start",
+            "text": "Start game",
+            "type": "button"
+          },
+          {
+            "action": "leaderboard",
+            "text": "View leaderboard",
+            "type": "button"
+          }
+        ],
+        "layout": {
+          "columns": 1,
+          "responsive": [
+            {
+              "class": "wide",
+              "columns": 2
+            }
+          ]
+        },
+        "type": "grid"
+      },
+      "states": {
+        "capabilityUnavailable": {
+          "accessibility": {
+            "role": "status"
+          },
+          "text": "This game needs a compatible host runtime",
+          "type": "errorState"
+        }
+      },
+      "title": "Play"
+    },
+    {
+      "bindings": [
+        {
+          "id": "scores",
+          "query": {
+            "limit": 100
+          },
+          "recordType": "score",
+          "source": "record.query"
+        }
+      ],
+      "id": "leaderboard",
+      "kind": "collection",
+      "root": {
+        "accessibility": {
+          "label": "Leaderboard scores",
+          "role": "list"
+        },
+        "binding": "scores",
+        "type": "recordList"
+      },
+      "states": {
+        "empty": {
+          "text": "No scores yet",
+          "type": "emptyState"
+        }
+      },
+      "title": "Leaderboard"
+    }
+  ]
+}

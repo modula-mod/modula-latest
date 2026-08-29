@@ -37,6 +37,7 @@ These are considered stable for ordinary products:
 - entitlements / offers / usage (real money remains NOT_CONFIGURED)
 - developer / build / release tooling
 - generic MPS ingestion (parse → validate → normalize → profile → compatibility → security → release binding → registry)
+- exact-release product frontend projection (verified artifact metadata + validated declarative runtime representation)
 
 ## What may still change after freeze
 
@@ -73,5 +74,6 @@ and `@modula/greenfield-product-standard`) must not branch on Vault IDs.
 
 Generic MPS tables ship in migration **054** (`greenfield_product_families`,
 release-bound presentation assets, privacy declarations, identity aliases,
-ingest audit). Production apply only after rehearsal on the in-place-remediated
-host.
+ingest audit). Migration **055** adds the immutable product frontend projection
+and artifact hash. Production apply only after ACL-preserving backup and exact
+restore/up/down/reapply rehearsal on the in-place-remediated host.

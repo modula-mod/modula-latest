@@ -1,0 +1,1 @@
+[{"id": "shareAction", "target": "digital.modula.reference-notes/note.action@1", "component": {"type": "button", "text": "Share snapshot", "action": "shareSnapshot"}, "action": "shareSnapshot"}]

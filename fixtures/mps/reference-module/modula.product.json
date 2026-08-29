@@ -9,7 +9,7 @@
     "displayName": {
       "default": "Reference Notes",
       "locales": {
-        "fr": "Notes de r\u00e9f\u00e9rence"
+        "fr": "Notes de référence"
       }
     },
     "slug": "reference-notes",
@@ -41,7 +41,10 @@
   "release": {
     "channel": "development",
     "notes": "Reference fixture. Not for publication.",
-    "builder": "mps-reference"
+    "builder": "mps-reference",
+    "provenance": {
+      "frontendSha256": "1995ee5feb55de76c33280253a943433fe21b2770a4c63b8ead8a9bab2231c70"
+    }
   },
   "security": {
     "baseline": "mps-1.0",
@@ -106,120 +109,13 @@
   },
   "frontend": {
     "mode": "declarative",
-    "views": [
-      {
-        "id": "home",
-        "kind": "collection",
-        "title": "Notes",
-        "route": "/",
-        "actions": [
-          "create"
-        ],
-        "emptyState": "empty"
-      },
-      {
-        "id": "detail",
-        "kind": "detail",
-        "title": "Note",
-        "route": "/note/:id"
-      },
-      {
-        "id": "compose",
-        "kind": "form",
-        "title": "Edit note",
-        "route": "/note/:id/edit",
-        "fields": [
-          {
-            "id": "title",
-            "type": "text",
-            "label": "Title",
-            "required": true
-          },
-          {
-            "id": "body",
-            "type": "multilineText",
-            "label": "Body"
-          },
-          {
-            "id": "secret",
-            "type": "text",
-            "label": "Unlock hint",
-            "sensitive": true
-          },
-          {
-            "id": "folder",
-            "type": "recordReference",
-            "label": "Folder",
-            "recordType": "folder"
-          }
-        ]
-      },
-      {
-        "id": "dashboard",
-        "kind": "dashboard",
-        "title": "Overview",
-        "route": "/dashboard"
-      },
-      {
-        "id": "settings",
-        "kind": "settings",
-        "title": "Settings",
-        "route": "/settings"
-      },
-      {
-        "id": "empty",
-        "kind": "emptyState",
-        "title": "No notes",
-        "route": "/empty"
-      }
-    ],
-    "routes": [
-      {
-        "path": "/",
-        "viewId": "home"
-      },
-      {
-        "path": "/note/:id",
-        "viewId": "detail"
-      },
-      {
-        "path": "/settings",
-        "viewId": "settings"
-      }
-    ],
-    "navigation": {
-      "rootView": "home",
-      "tabs": [
-        {
-          "id": "notes",
-          "viewId": "home",
-          "label": "Notes",
-          "icon": "asset://product/icon"
-        }
-      ],
-      "deepLinks": [
-        {
-          "pattern": "modula://notes/:id",
-          "viewId": "detail"
-        }
-      ],
-      "backBehavior": "host",
-      "modalIntent": "sheet"
-    },
-    "actions": [
-      {
-        "id": "create",
-        "family": "record.create",
-        "label": "New note",
-        "icon": "asset://product/icon"
-      },
-      {
-        "id": "open",
-        "family": "route.open",
-        "label": "Open",
-        "route": "/note/:id"
-      }
-    ]
+    "artifact": {
+      "path": "frontend/frontend.manifest.json",
+      "mediaType": "application/vnd.modula.frontend+json",
+      "sha256": "1995ee5feb55de76c33280253a943433fe21b2770a4c63b8ead8a9bab2231c70",
+      "schemaVersion": "1.0.0",
+      "entryView": "home"
+    }
   },
   "backend": {
     "mode": "greenfield-records",

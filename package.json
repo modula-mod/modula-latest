@@ -294,7 +294,8 @@
     "verify:greenfield-backend-v1:security": "node scripts/verify-greenfield-backend-v1-security.mjs",
     "verify:greenfield-backend-v1:reference-products": "node scripts/verify-greenfield-backend-v1-reference-products.mjs",
     "verify:greenfield-backend-v1": "node scripts/verify-greenfield-backend-v1.mjs",
-    "verify:greenfield-mps-v1": "node scripts/verify-greenfield-mps-v1.mjs"
+    "verify:greenfield-mps-v1": "node scripts/verify-greenfield-mps-v1.mjs",
+    "verify:product-frontend-v1": "node scripts/verify-product-frontend-v1.mjs"
   },
   "private": true
 }

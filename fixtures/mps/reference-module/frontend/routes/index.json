@@ -1,0 +1,7 @@
+[
+  {"path": "/", "viewId": "home"},
+  {"path": "/new", "viewId": "editor", "presentation": "sheet"},
+  {"path": "/note/:noteId", "viewId": "detail"},
+  {"path": "/note/:noteId/edit", "viewId": "editor", "presentation": "sheet"},
+  {"path": "/settings", "viewId": "settings"}
+]

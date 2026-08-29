@@ -71,12 +71,17 @@ source('packages/greenfield-product-standard/src/ingest.ts', [
 source('packages/greenfield-product-standard/src/adapters.ts', ['adaptLegacyProductDocument'], 'ADAPTER')
 source(
   'services/greenfield-api/src/product-standard/ingest-service.ts',
-  ['GreenfieldMpsIngestService', 'greenfield_release_presentation_assets'],
+  ['GreenfieldMpsIngestService', 'validateMpsFrontendArtifact', 'greenfield_release_frontends'],
   'API_INGEST',
 )
 source(
+  'services/greenfield-api/src/product-standard/frontend-service.ts',
+  ['GreenfieldProductFrontendService', "source: 'legacy'", "source: 'mps'", 'runtime_projection'],
+  'FRONTEND_RUNTIME_PROJECTION',
+)
+source(
   'services/greenfield-api/src/modules/routes/index.ts',
-  ['/v1/admin/product-standard/ingest', '/v1/product-standard/products/:productId'],
+  ['/v1/admin/product-standard/ingest', '/v1/product-standard/products/:productId', '/v1/modules/:moduleId/frontend'],
   'API_INGEST_ROUTE',
 )
 source(
@@ -105,6 +110,13 @@ source('services/greenfield-api/migrations/054_greenfield_mps_v1_product_contrac
   'TO modula_api, modula_worker',
   'TO modula_backup',
 ], 'MIGRATION_054')
+source('services/greenfield-api/migrations/055_mps_product_frontend_runtime.sql', [
+  'greenfield_release_frontends',
+  'runtime_projection',
+  'artifact_sha256',
+  'greenfield_release_frontends_immutable',
+  'TO modula_backup',
+], 'MIGRATION_055')
 
 scanJsForVaultBranch(join(ROOT, 'packages/greenfield-product-standard/src'))
 scanJsForVaultBranch(join(ROOT, 'services/greenfield-api/src/product-standard'))
@@ -149,11 +161,11 @@ if (!fixture) {
     const migrateEnv = {...process.env, CI: 'true', MODULA_TEST_DATABASE_URL: fixture.migratorUrl}
     const testEnv = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
     run(
-      'FULL MIGRATION CHAIN THROUGH 054',
+      'FULL MIGRATION CHAIN THROUGH 055',
       'pnpm',
       [
         '--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e',
-        "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied => { if (!applied.includes('054_greenfield_mps_v1_product_contract')) process.exit(1) })",
+        "import {migrateUp, migrateStatus} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(async applied => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('055_mps_product_frontend_runtime') || status.pending.length !== 0) process.exit(1) })",
       ],
       migrateEnv,
       join(ROOT, 'services/greenfield-api'),
@@ -171,21 +183,21 @@ if (!fixture) {
       testEnv,
     )
     run(
-      'MIGRATION 054 ROLLBACK TO 053',
+      'MIGRATION 055 ROLLBACK TO 054',
       'pnpm',
       [
         '--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e',
-        "import {migrateDown, migrateStatus} from './src/database/migrate.ts'; void migrateDown(process.env.MODULA_TEST_DATABASE_URL).then(async id => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (id !== '054_greenfield_mps_v1_product_contract' || status.pending[0] !== '054_greenfield_mps_v1_product_contract') process.exit(1) })",
+        "import {migrateDown, migrateStatus} from './src/database/migrate.ts'; void migrateDown(process.env.MODULA_TEST_DATABASE_URL).then(async id => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (id !== '055_mps_product_frontend_runtime' || status.pending[0] !== '055_mps_product_frontend_runtime') process.exit(1) })",
       ],
       migrateEnv,
       join(ROOT, 'services/greenfield-api'),
     )
     run(
-      'MIGRATION 054 REAPPLY',
+      'MIGRATION 055 REAPPLY',
       'pnpm',
       [
         '--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e',
-        "import {migrateUp, migrateStatus} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(async applied => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('054_greenfield_mps_v1_product_contract') || status.pending.length !== 0) process.exit(1) })",
+        "import {migrateUp, migrateStatus} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(async applied => { const status = await migrateStatus(process.env.MODULA_TEST_DATABASE_URL); if (!applied.includes('055_mps_product_frontend_runtime') || status.pending.length !== 0) process.exit(1) })",
       ],
       migrateEnv,
       join(ROOT, 'services/greenfield-api'),

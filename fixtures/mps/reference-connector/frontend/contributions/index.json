@@ -1,0 +1,13 @@
+[
+  {
+    "id": "connectAction",
+    "target": "digital.modula.reference-notes/note.action@1",
+    "component": {
+      "type": "button",
+      "text": "Connect provider",
+      "action": "connectProvider",
+      "accessibility": {"label": "Connect external notes provider", "role": "button"}
+    },
+    "action": "connectProvider"
+  }
+]
