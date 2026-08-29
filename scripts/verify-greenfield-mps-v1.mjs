@@ -74,6 +74,11 @@ source(
   ['GreenfieldMpsIngestService', 'greenfield_release_presentation_assets'],
   'API_INGEST',
 )
+source(
+  'services/greenfield-api/src/modules/routes/index.ts',
+  ['/v1/admin/product-standard/ingest', '/v1/product-standard/products/:productId'],
+  'API_INGEST_ROUTE',
+)
 source('services/greenfield-api/migrations/054_greenfield_mps_v1_product_contract.sql', [
   'GRANT SELECT, INSERT, UPDATE, DELETE ON',
   'TO modula_api, modula_worker',
