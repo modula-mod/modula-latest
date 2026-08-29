@@ -142,6 +142,18 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
          ON CONFLICT (family_id, product_id) DO UPDATE SET member_role = EXCLUDED.member_role
          RETURNING product_id`,
       )
+      const relationship = await client.query(
+        `INSERT INTO greenfield_product_relationships (
+           relationship_id, product_id, relationship_type, target_product_id
+         ) VALUES (
+           'rel:runtime-acl',
+           'digital.modula.reference-notes',
+           'belongsToFamily',
+           'digital.modula.reference-vault'
+         )
+         ON CONFLICT (relationship_id) DO UPDATE SET target_product_id = EXCLUDED.target_product_id
+         RETURNING relationship_type`,
+      )
       const relationships = await client.query(
         `SELECT count(*)::int AS c FROM greenfield_product_relationships WHERE product_id = 'digital.modula.reference-notes'`,
       )
@@ -156,6 +168,7 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
       )
       expect(family.rows[0]?.family_id).toBe('digital.modula.runtime-acl-family')
       expect(member.rows[0]?.product_id).toBe('digital.modula.reference-notes')
+      expect(relationship.rows[0]?.relationship_type).toBe('belongsToFamily')
       expect(Number(relationships.rows[0]?.c)).toBeGreaterThan(0)
       expect(Number(assets.rows[0]?.c)).toBeGreaterThan(0)
       expect(Number(privacy.rows[0]?.c)).toBeGreaterThan(0)

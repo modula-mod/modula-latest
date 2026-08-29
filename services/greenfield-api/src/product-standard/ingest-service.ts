@@ -49,8 +49,12 @@ export class GreenfieldMpsIngestService {
       }
 
       await trx.deleteFrom('greenfield_product_relationships').where('product_id', '=', product.productId).execute()
-      if (product.relationships.length > 0) {
-        await trx.insertInto('greenfield_product_relationships').values(product.relationships.map(rel => ({
+      const relationships = [...product.relationships]
+      if (product.familyId && !relationships.some(rel => rel.type === 'belongsToFamily' && rel.productId === product.familyId)) {
+        relationships.push({type: 'belongsToFamily', productId: product.familyId})
+      }
+      if (relationships.length > 0) {
+        await trx.insertInto('greenfield_product_relationships').values(relationships.map(rel => ({
           relationship_id: uuidv7(),
           product_id: product.productId,
           relationship_type: rel.type as any,
