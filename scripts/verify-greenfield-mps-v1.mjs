@@ -79,6 +79,27 @@ source(
   ['/v1/admin/product-standard/ingest', '/v1/product-standard/products/:productId'],
   'API_INGEST_ROUTE',
 )
+source(
+  'services/greenfield-api/scripts/publish-mps-products.ts',
+  ['--product-root', 'GreenfieldModuleReleaseService', 'GreenfieldMpsIngestService', 'artifactSha256'],
+  'GENERIC_MPS_PUBLISHER',
+)
+source(
+  'services/greenfield-api/package.json',
+  ['registry:ingest-mps-products', 'registry:publish-mps-products'],
+  'GENERIC_MPS_OPERATOR_COMMANDS',
+)
+for (const rel of [
+  'services/greenfield-api/scripts/ingest-mps-products.ts',
+  'services/greenfield-api/scripts/publish-mps-products.ts',
+]) {
+  const text = readFileSync(join(ROOT, rel), 'utf8')
+  record(
+    `PRODUCT-NEUTRAL ${rel.split('/').at(-1)}`,
+    !/digital\.modula\.vault|modula-vault|ProductName/.test(text),
+    rel,
+  )
+}
 source('services/greenfield-api/migrations/054_greenfield_mps_v1_product_contract.sql', [
   'GRANT SELECT, INSERT, UPDATE, DELETE ON',
   'TO modula_api, modula_worker',
@@ -141,6 +162,12 @@ if (!fixture) {
       'MPS INGEST DB BEHAVIOUR',
       'pnpm',
       ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-mps-v1.ingest.test.ts'],
+      testEnv,
+    )
+    run(
+      'MPS PUBLISH DB SECURITY',
+      'pnpm',
+      ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-mps-v1.publish.test.ts'],
       testEnv,
     )
     run(

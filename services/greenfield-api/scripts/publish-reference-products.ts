@@ -5,7 +5,6 @@ import {join, resolve} from 'node:path'
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {createDb, type ModulaDb} from '../src/database/client.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
-import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 
 type ProductName = 'notes' | 'formatting' | 'ai' | 'voice'
 
@@ -32,26 +31,26 @@ const definitions: Array<Omit<ReferenceProduct, 'root' | 'manifest' | 'provenanc
   {
     name: 'notes',
     moduleId: 'digital.modula.vault-notes',
-    version: '1.3.0',
-    provenanceFile: 'vault-notes-v1.3.0.provenance.json',
+    version: '1.2.0',
+    provenanceFile: 'vault-notes-v1.2.0.provenance.json',
   },
   {
     name: 'formatting',
     moduleId: 'digital.modula.vault-notes.formatting',
-    version: '0.2.0',
-    provenanceFile: 'vault-formatting-v0.2.0.provenance.json',
+    version: '0.1.0',
+    provenanceFile: 'vault-formatting-v0.1.0.provenance.json',
   },
   {
     name: 'ai',
     moduleId: 'digital.modula.vault-notes.ai',
-    version: '0.2.0',
-    provenanceFile: 'vault-ai-v0.2.0.provenance.json',
+    version: '0.1.0',
+    provenanceFile: 'vault-ai-v0.1.0.provenance.json',
   },
   {
     name: 'voice',
     moduleId: 'digital.modula.vault-notes.voice',
-    version: '0.2.0',
-    provenanceFile: 'vault-voice-v0.2.0.provenance.json',
+    version: '0.1.0',
+    provenanceFile: 'vault-voice-v0.1.0.provenance.json',
   },
 ]
 
@@ -79,7 +78,6 @@ try {
       ? 0
       : 3
   } else {
-    const mpsIngest = new GreenfieldMpsIngestService(db)
     for (const product of products) {
       let release = await releases.getRelease(product.moduleId, product.version)
       if (release) assertExistingRelease(product, release)
@@ -100,14 +98,6 @@ try {
       assertExistingRelease(product, release)
       if (release.releaseState !== 'published') {
         fail(`Reference release ${product.moduleId}@${product.version} is ${release.releaseState}, expected published`)
-      }
-      const ingested = await mpsIngest.ingest({
-        filename: 'modula.product.json',
-        bytes: readFileSync(join(product.root, 'modula.product.json'), 'utf8'),
-        releaseId: release.releaseId,
-      })
-      if (!ingested || ingested.productId !== product.moduleId || ingested.version !== product.version) {
-        fail(`MPS ingest did not persist ${product.moduleId}@${product.version}`)
       }
     }
 
@@ -168,7 +158,7 @@ async function inspectRegistry(db: ModulaDb, products: ReferenceProduct[]) {
     .selectFrom('greenfield_module_releases')
     .select(['release_id', 'module_id', 'version', 'release_state'])
     .where('module_id', '=', 'digital.modula.vault-notes')
-    .where('version', '!=', products[0]!.version)
+    .where('version', '!=', '1.2.0')
     .where('release_state', '=', 'published')
     .orderBy('version')
     .execute()

@@ -9,12 +9,15 @@ if (!connectionString) throw new Error('MODULA_TEST_DATABASE_URL is required')
 
 const migrations = resolve(import.meta.dirname, '../migrations')
 const through052 = await mkdtemp(join(tmpdir(), 'modula-gbv1-through-052-'))
+const through053 = await mkdtemp(join(tmpdir(), 'modula-gbv1-through-053-'))
 const pool = new pg.Pool({connectionString})
 
 try {
   for (const file of await readdir(migrations)) {
-    if (!file.endsWith('.sql') || file.includes('.down.') || Number(file.slice(0, 3)) > 52) continue
-    await cp(join(migrations, file), join(through052, file))
+    if (!file.endsWith('.sql')) continue
+    const number = Number(file.slice(0, 3))
+    if (number <= 52) await cp(join(migrations, file), join(through052, file))
+    if (number <= 53) await cp(join(migrations, file), join(through053, file))
   }
 
   const baseline = await migrateUp(connectionString, through052)
@@ -25,7 +28,7 @@ try {
   await pool.query('REVOKE SELECT ON greenfield_extension_installations FROM modula_backup')
   if (await canBackupInstallations()) throw new Error('historical backup ACL gap was not reproduced')
 
-  const reconciled = await migrateUp(connectionString)
+  const reconciled = await migrateUp(connectionString, through053)
   if (!reconciled.includes('053_greenfield_backend_v1_backup_acl_reconciliation')) {
     throw new Error('migration 053 was not applied')
   }
@@ -38,17 +41,19 @@ try {
   `)
   if (audit.rows[0]?.count !== '1') throw new Error('reconciled ACL was not audited')
 
-  const removed = await migrateDown(connectionString)
+  const removed = await migrateDown(connectionString, through053)
   if (removed !== '053_greenfield_backend_v1_backup_acl_reconciliation') {
     throw new Error(`unexpected migration removed: ${String(removed)}`)
   }
   if (await canBackupInstallations()) throw new Error('migration 053 down did not restore the prior ACL')
 
-  const reapplied = await migrateUp(connectionString)
+  const reapplied = await migrateUp(connectionString, through053)
   if (!reapplied.includes('053_greenfield_backend_v1_backup_acl_reconciliation')) {
     throw new Error('migration 053 was not reapplied')
   }
   if (!await canBackupInstallations()) throw new Error('reapplied migration did not restore backup SELECT')
+
+  await migrateUp(connectionString)
 
   const status = await migrateStatus(connectionString)
   if (status.pending.length) throw new Error(`pending migrations remain: ${status.pending.join(',')}`)
@@ -56,6 +61,7 @@ try {
 } finally {
   await pool.end()
   await rm(through052, {recursive: true, force: true})
+  await rm(through053, {recursive: true, force: true})
 }
 
 async function canBackupInstallations(): Promise<boolean> {

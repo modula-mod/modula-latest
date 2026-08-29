@@ -1,4 +1,5 @@
 import {readFileSync} from 'node:fs'
+import {execFileSync} from 'node:child_process'
 import {join} from 'node:path'
 import {randomUUID} from 'node:crypto'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
@@ -31,6 +32,12 @@ const ids = {
   voice: 'digital.modula.vault-notes.voice',
 }
 const versions = {notes: '1.2.0', formatting: '0.1.0', ai: '0.1.0', voice: '0.1.0'}
+const releaseTags = {
+  notes: 'vault-notes-v1.2.0',
+  formatting: 'vault-formatting-v0.1.0',
+  ai: 'vault-ai-v0.1.0',
+  voice: 'vault-voice-v0.1.0',
+}
 const suffix = randomUUID().slice(0, 8)
 
 describeIfDb('PVP Platform 2 immutable reference products', () => {
@@ -57,7 +64,7 @@ describeIfDb('PVP Platform 2 immutable reference products', () => {
     accountA = first.accountId
     tokenB = (await register(`reference-b-${suffix}@example.com`, `referenceb${suffix}`.slice(0, 20))).token
     for (const product of ['notes', 'formatting', 'ai', 'voice'] as const) {
-      const manifest = JSON.parse(readFileSync(join(roots[product], 'module.manifest.json'), 'utf8')) as GreenfieldModuleManifest
+      const manifest = JSON.parse(execFileSync('git', ['show', `${releaseTags[product]}:module.manifest.json`], {cwd: roots[product], encoding: 'utf8'})) as GreenfieldModuleManifest
       const provenanceName = product === 'notes' ? 'vault-notes-v1.2.0.provenance.json' : product === 'formatting' ? 'vault-formatting-v0.1.0.provenance.json' : product === 'ai' ? 'vault-ai-v0.1.0.provenance.json' : 'vault-voice-v0.1.0.provenance.json'
       const provenance = JSON.parse(readFileSync(join(roots[product], 'release', provenanceName), 'utf8'))
       expect(manifest.moduleId).toBe(ids[product])
