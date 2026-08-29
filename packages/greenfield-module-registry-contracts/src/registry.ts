@@ -3,7 +3,7 @@ import type {GreenfieldModuleReleaseStatus} from './release.js'
 
 export type GreenfieldRegistryModuleSummary = {
   moduleId: string
-  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
+  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service' | 'engine' | 'game' | 'integration' | 'theme'
   name: string
   description: string
   publisherId: string
@@ -89,7 +89,7 @@ export type GreenfieldRegistryFilter = {
   platform?: GreenfieldModulePlatform
   status?: string
   compatible?: boolean
-  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service' | 'all'
+  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service' | 'engine' | 'game' | 'integration' | 'theme' | 'all'
   capability?: string
   limit?: number
   cursor?: string

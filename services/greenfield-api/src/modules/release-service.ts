@@ -636,6 +636,7 @@ export class GreenfieldModuleReleaseService {
     }> = []
     for (const group of CONTRIBUTION_GROUPS) {
       const contributionType = CONTRIBUTION_TYPE_BY_GROUP[group]
+      if (!contributionType) continue
       for (const contribution of contributions[group] ?? []) {
         const anyContribution = contribution as any
         rows.push({

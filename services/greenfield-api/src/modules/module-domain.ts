@@ -1,3 +1,4 @@
+import type {GreenfieldExtensionProductKind} from '@modula/greenfield-contracts'
 import type {GreenfieldModuleManifest, GreenfieldModulePermission} from '@modula/greenfield-module-manifest'
 import {
   GREENFIELD_MODULE_INSTALLATION_TRANSITIONS,
@@ -86,7 +87,7 @@ export type GreenfieldModuleInstallationRow = {
   version: string
   extensionVersionId: string
   grantedPermissions?: string[]
-  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
+  productKind?: GreenfieldExtensionProductKind
   lifecycleState?: string
 }
 
