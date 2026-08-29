@@ -1,5 +1,5 @@
 export type DeveloperProgrammeState = 'NOT_ENROLLED' | 'PENDING' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'TERMINATED'
-export type DeveloperProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'backend-service' | 'backend-engine' | 'game-module'
+export type DeveloperProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'backend-service' | 'backend-engine' | 'game-module' | 'service' | 'engine' | 'game' | 'integration' | 'theme'
 export type DeveloperProductVisibility = 'PRIVATE' | 'INTERNAL' | 'UNLISTED' | 'BETA' | 'PUBLIC'
 export type DeveloperReleaseChannel = 'DEVELOPMENT' | 'INTERNAL' | 'ALPHA' | 'BETA' | 'RC' | 'STABLE'
 export type DeveloperReviewState = 'DRAFT' | 'SUBMITTED' | 'AUTOMATED_REVIEW' | 'MANUAL_REVIEW' | 'CHANGES_REQUIRED' | 'APPROVED' | 'REJECTED' | 'PUBLISHED' | 'SUSPENDED' | 'REMOVED'

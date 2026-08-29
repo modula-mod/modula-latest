@@ -1,7 +1,7 @@
 export type GreenfieldModuleInstallPreview = {
   moduleId: string
   version: string
-  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
+  productKind?: 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service' | 'engine' | 'game' | 'integration' | 'theme'
   compatible: boolean
   incompatibilityReasons: string[]
   trust: {

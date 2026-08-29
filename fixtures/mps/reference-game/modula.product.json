@@ -1,0 +1,191 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-game",
+    "kind": "game",
+    "version": "0.1.0",
+    "displayName": "Reference Game",
+    "description": "Game product declaring runtime, saves, sessions, leaderboards, assets, and native requirements.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-game/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "e70a18b8bc2199101202a39690fd6fc9116a8a1bf9ae3bf6435942cf11d2cdeb",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "nativeCapabilities": [
+      "haptics",
+      "advanced-audio"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "none"
+  },
+  "frontend": {
+    "mode": "declarative",
+    "views": [
+      {
+        "id": "home",
+        "kind": "dashboard",
+        "title": "Play",
+        "route": "/"
+      },
+      {
+        "id": "board",
+        "kind": "detail",
+        "title": "Leaderboard",
+        "route": "/leaderboard"
+      }
+    ],
+    "routes": [
+      {
+        "path": "/",
+        "viewId": "home"
+      },
+      {
+        "path": "/leaderboard",
+        "viewId": "board"
+      }
+    ],
+    "navigation": {
+      "rootView": "home"
+    }
+  },
+  "backend": {
+    "mode": "greenfield-records",
+    "records": [
+      {
+        "id": "save",
+        "schemaVersion": "1.0.0"
+      },
+      {
+        "id": "session",
+        "schemaVersion": "1.0.0"
+      }
+    ]
+  },
+  "data": {
+    "resources": [
+      {
+        "id": "saves",
+        "type": "greenfield-records",
+        "owner": "GREENFIELD_HOSTED_DATA",
+        "schemaVersion": "1.0.0",
+        "exportSupported": true,
+        "deleteOwner": "greenfield"
+      }
+    ],
+    "uninstall": {
+      "keepData": true,
+      "deleteData": true,
+      "accountDeletion": "delete"
+    },
+    "export": {
+      "supported": true,
+      "format": "application/json",
+      "owner": "greenfield"
+    }
+  },
+  "capabilities": {
+    "provides": [
+      "game.save",
+      "game.session",
+      "game.leaderboard"
+    ],
+    "providerRoles": [
+      "game.provider"
+    ]
+  },
+  "privacy": {
+    "dataCreated": [
+      "saves",
+      "leaderboard names"
+    ],
+    "retention": "account",
+    "export": "json",
+    "deletion": "supported"
+  },
+  "usage": {
+    "meters": [
+      {
+        "id": "sessions",
+        "capability": "game.session",
+        "unit": "sessions"
+      }
+    ]
+  }
+}

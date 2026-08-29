@@ -1,0 +1,376 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-notes",
+    "kind": "module",
+    "version": "0.1.0",
+    "displayName": {
+      "default": "Reference Notes",
+      "locales": {
+        "fr": "Notes de r\u00e9f\u00e9rence"
+      }
+    },
+    "slug": "reference-notes",
+    "subtitle": "Declarative notes module used to prove MPS",
+    "description": "Reference module with presentation, declarative UI, Greenfield-hosted records, permissions, events, and extension points.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-module/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "9534b516b144c7e8e22a1a6ab181ade6b39fe527587d17863f18d051000ad120",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "none"
+  },
+  "family": {
+    "id": "digital.modula.reference-vault",
+    "role": "member"
+  },
+  "frontend": {
+    "mode": "declarative",
+    "views": [
+      {
+        "id": "home",
+        "kind": "collection",
+        "title": "Notes",
+        "route": "/",
+        "actions": [
+          "create"
+        ],
+        "emptyState": "empty"
+      },
+      {
+        "id": "detail",
+        "kind": "detail",
+        "title": "Note",
+        "route": "/note/:id"
+      },
+      {
+        "id": "compose",
+        "kind": "form",
+        "title": "Edit note",
+        "route": "/note/:id/edit",
+        "fields": [
+          {
+            "id": "title",
+            "type": "text",
+            "label": "Title",
+            "required": true
+          },
+          {
+            "id": "body",
+            "type": "multilineText",
+            "label": "Body"
+          },
+          {
+            "id": "secret",
+            "type": "text",
+            "label": "Unlock hint",
+            "sensitive": true
+          },
+          {
+            "id": "folder",
+            "type": "recordReference",
+            "label": "Folder",
+            "recordType": "folder"
+          }
+        ]
+      },
+      {
+        "id": "dashboard",
+        "kind": "dashboard",
+        "title": "Overview",
+        "route": "/dashboard"
+      },
+      {
+        "id": "settings",
+        "kind": "settings",
+        "title": "Settings",
+        "route": "/settings"
+      },
+      {
+        "id": "empty",
+        "kind": "emptyState",
+        "title": "No notes",
+        "route": "/empty"
+      }
+    ],
+    "routes": [
+      {
+        "path": "/",
+        "viewId": "home"
+      },
+      {
+        "path": "/note/:id",
+        "viewId": "detail"
+      },
+      {
+        "path": "/settings",
+        "viewId": "settings"
+      }
+    ],
+    "navigation": {
+      "rootView": "home",
+      "tabs": [
+        {
+          "id": "notes",
+          "viewId": "home",
+          "label": "Notes",
+          "icon": "asset://product/icon"
+        }
+      ],
+      "deepLinks": [
+        {
+          "pattern": "modula://notes/:id",
+          "viewId": "detail"
+        }
+      ],
+      "backBehavior": "host",
+      "modalIntent": "sheet"
+    },
+    "actions": [
+      {
+        "id": "create",
+        "family": "record.create",
+        "label": "New note",
+        "icon": "asset://product/icon"
+      },
+      {
+        "id": "open",
+        "family": "route.open",
+        "label": "Open",
+        "route": "/note/:id"
+      }
+    ]
+  },
+  "backend": {
+    "mode": "greenfield-records",
+    "records": [
+      {
+        "id": "note",
+        "schemaPath": "schemas/note.schema.json",
+        "schemaVersion": "1.0.0",
+        "title": "Note"
+      }
+    ]
+  },
+  "storage": {
+    "mode": "greenfield-records"
+  },
+  "data": {
+    "resources": [
+      {
+        "id": "notes",
+        "type": "greenfield-records",
+        "owner": "GREENFIELD_HOSTED_DATA",
+        "schemaVersion": "1.0.0",
+        "schemaPath": "schemas/note.schema.json",
+        "retention": "account-lifetime",
+        "backupOwner": "greenfield",
+        "backupMethodClass": "platform",
+        "exportOwner": "greenfield",
+        "exportFormat": "application/json",
+        "exportSupported": true,
+        "deleteOwner": "greenfield",
+        "sensitivity": "private",
+        "encryption": "platform-default"
+      }
+    ],
+    "uninstall": {
+      "keepData": true,
+      "deleteData": true,
+      "accountDeletion": "delete"
+    },
+    "export": {
+      "supported": true,
+      "format": "application/json",
+      "owner": "greenfield",
+      "handler": "greenfield.export"
+    },
+    "migrations": [
+      {
+        "id": "notes-1.0.0-to-1.1.0",
+        "fromSchemaVersion": "1.0.0",
+        "toSchemaVersion": "1.1.0",
+        "reversible": true,
+        "backupRequired": true,
+        "dataLoss": "none"
+      }
+    ]
+  },
+  "permissions": [
+    {
+      "id": "notes.read.selected",
+      "reason": "Read notes you explicitly open.",
+      "category": "records",
+      "required": true,
+      "risk": "low"
+    },
+    {
+      "id": "notes.write",
+      "reason": "Create and update your notes.",
+      "category": "records",
+      "required": true,
+      "risk": "medium"
+    }
+  ],
+  "capabilities": {
+    "provides": [
+      "notes.provider",
+      "notes.create",
+      "notes.search"
+    ],
+    "requires": [],
+    "requests": [],
+    "providerRoles": [
+      "notes.provider"
+    ]
+  },
+  "extensionPoints": [
+    {
+      "id": "digital.modula.reference-notes/editor.toolbar@1",
+      "title": "Editor toolbar",
+      "contributionKinds": [
+        "toolbar.action"
+      ],
+      "maxContributions": 20,
+      "requiredCapability": "notes.editor.contribute"
+    },
+    {
+      "id": "digital.modula.reference-notes/note.action@1",
+      "title": "Note actions",
+      "contributionKinds": [
+        "menu.item"
+      ],
+      "maxContributions": 40
+    }
+  ],
+  "events": [
+    {
+      "direction": "produces",
+      "type": "digital.modula.reference-notes.note.created.v1",
+      "schemaVersion": "1.0.0",
+      "schemaPath": "contracts/note.created.v1.json"
+    }
+  ],
+  "privacy": {
+    "dataAccessed": [
+      "user-authored notes"
+    ],
+    "dataCreated": [
+      "notes"
+    ],
+    "dataTransmitted": [
+      "none-by-default"
+    ],
+    "retention": "until account deletion",
+    "export": "JSON export via Greenfield",
+    "deletion": "uninstall deleteData and account deletion",
+    "analytics": "none",
+    "telemetry": "none"
+  },
+  "accessibility": {
+    "screenReader": true,
+    "scalableText": true,
+    "reduceMotion": true,
+    "keyboardNavigation": true,
+    "highContrast": true
+  },
+  "localization": {
+    "defaultLocale": "en",
+    "locales": [
+      "en",
+      "fr"
+    ]
+  },
+  "support": {
+    "documentation": "https://modula.digital/docs",
+    "support": "https://modula.digital/support",
+    "privacy": "https://modula.digital/privacy",
+    "securityContact": "https://modula.digital/security",
+    "publisherContact": "https://modula.digital/support"
+  },
+  "offers": [
+    {
+      "model": "free"
+    }
+  ]
+}

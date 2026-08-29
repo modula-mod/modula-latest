@@ -1,0 +1,146 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-service",
+    "kind": "service",
+    "version": "0.1.0",
+    "displayName": "Reference Service",
+    "description": "Infrastructure service product with health, capabilities, network, and secret requirements.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-service/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "a88a37d5bc5d69e9d6b6f404384342717143eb22d869143b9a5aa1230b06e84f",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "service-fabric-only"
+  },
+  "frontend": {
+    "mode": "none"
+  },
+  "backend": {
+    "mode": "service",
+    "service": {
+      "id": "digital.modula.reference-service.api",
+      "protocolVersion": "1.0.0",
+      "type": "https+json",
+      "health": {
+        "path": "/health",
+        "timeoutMs": 2000
+      },
+      "timeouts": {
+        "defaultMs": 5000,
+        "maxMs": 30000
+      },
+      "idempotency": "required",
+      "providedCapabilities": [
+        "search.query"
+      ],
+      "consumedCapabilities": [],
+      "assertions": {
+        "audience": "modula-service:digital.modula.reference-service.api",
+        "version": "greenfield.service-assertion.v1"
+      }
+    }
+  },
+  "services": [
+    {
+      "id": "digital.modula.reference-service.api",
+      "protocolVersion": "1.0.0",
+      "health": {
+        "path": "/health"
+      }
+    }
+  ],
+  "secrets": [
+    {
+      "id": "service.signing",
+      "scope": "backend",
+      "purpose": "Service identity signing material via broker"
+    }
+  ],
+  "engines": {
+    "trustClass": "approved-infrastructure-service",
+    "capabilities": [
+      "search.query"
+    ]
+  }
+}

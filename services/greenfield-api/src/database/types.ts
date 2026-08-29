@@ -34,7 +34,7 @@ export type ReportTargetType = 'profile' | 'post' | 'comment' | 'story' | 'messa
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
 export type DeveloperProgrammeState = 'NOT_ENROLLED' | 'PENDING' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'TERMINATED'
-export type DeveloperProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'backend-service' | 'backend-engine' | 'game-module'
+export type DeveloperProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'backend-service' | 'backend-engine' | 'game-module' | 'service' | 'engine' | 'game' | 'integration' | 'theme'
 export type DeveloperProductVisibility = 'PRIVATE' | 'INTERNAL' | 'UNLISTED' | 'BETA' | 'PUBLIC'
 export type DeveloperReleaseChannel = 'DEVELOPMENT' | 'INTERNAL' | 'ALPHA' | 'BETA' | 'RC' | 'STABLE'
 export type DeveloperReviewState = 'DRAFT' | 'SUBMITTED' | 'AUTOMATED_REVIEW' | 'MANUAL_REVIEW' | 'CHANGES_REQUIRED' | 'APPROVED' | 'REJECTED' | 'PUBLISHED' | 'SUSPENDED' | 'REMOVED'
@@ -142,7 +142,7 @@ export type GreenfieldModuleSecretStatus = 'active' | 'rotated' | 'revoked' | 'd
 export type GreenfieldModuleJobRegistrationStatus = 'registered' | 'paused' | 'disabled' | 'quarantined' | 'removed'
 export type GreenfieldModuleUiContributionSurface = 'board' | 'profile-tabs' | 'settings' | 'composer-tools' | 'context-menu' | 'search-provider' | 'module-route' | 'widget'
 export type GreenfieldModuleServiceInvocationStatus = 'accepted' | 'completed' | 'failed' | 'denied' | 'timed-out'
-export type GreenfieldExtensionProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service'
+export type GreenfieldExtensionProductKind = 'module' | 'addon' | 'plugin' | 'function' | 'tool' | 'widget' | 'connector' | 'service' | 'engine' | 'game' | 'integration' | 'theme'
 export type GreenfieldExtensionContributionKind = 'view.section' | 'toolbar.action' | 'editor.command' | 'editor.attachment' | 'menu.item' | 'contextMenu.item' | 'settings.section' | 'home.section' | 'widget' | 'record.decorator' | 'search.provider' | 'composer.tool' | 'background.action'
 export type GreenfieldExtensionRuntimeState = 'NOT_INSTALLED' | 'RESOLVING' | 'INSTALLING' | 'INSTALLED' | 'ENABLING' | 'ENABLED' | 'DISABLING' | 'DISABLED' | 'UNINSTALLING' | 'UPDATE_AVAILABLE' | 'UPDATING' | 'INCOMPATIBLE' | 'QUARANTINED' | 'FAILED'
 export type GreenfieldExtensionContributionStatus = 'registered' | 'enabled' | 'disabled' | 'incompatible' | 'failed' | 'quarantined' | 'removed'
@@ -1194,4 +1194,11 @@ export interface Database {
     viewer_actor_id: string
     viewed_at: Date
   }
+  greenfield_product_families: {family_id: string; display_name: string; created_at: Date; updated_at: Date}
+  greenfield_product_family_members: {family_id: string; product_id: string; member_role: 'root' | 'member'; created_at: Date}
+  greenfield_product_relationships: {relationship_id: string; product_id: string; relationship_type: 'belongsToFamily' | 'extends' | 'targets' | 'requires' | 'optionallyRequires' | 'replaces' | 'supersedes' | 'compatibleWith' | 'providesFor'; target_product_id: string; version_range: string | null; created_at: Date}
+  greenfield_product_identity_aliases: {alias_id: string; canonical_product_id: string; reason: string; created_at: Date}
+  greenfield_mps_ingestions: {ingestion_id: string; product_id: string; version: string; release_id: string | null; manifest_sha256: string; product_standard: string; manifest_format: string; registry_kind: GreenfieldExtensionProductKind; frontend_mode: 'none' | 'declarative' | 'host-contribution'; backend_mode: 'none' | 'greenfield-records' | 'service' | 'engine-backed'; storage_mode: string | null; greenfield_backend_mode: string; test_fixture: boolean; visibility: string; manifest: unknown; projection: unknown; ingested_at: Date}
+  greenfield_release_presentation_assets: {asset_id: string; ingestion_id: string; release_id: string | null; product_id: string; version: string; role: string; artifact_path: string; media_type: string; width: number | null; height: number | null; sha256: string | null; development_asset: boolean; created_at: Date}
+  greenfield_product_privacy_declarations: {ingestion_id: string; product_id: string; version: string; data_accessed: unknown; data_created: unknown; data_transmitted: unknown; processors: unknown; retention: string | null; export_policy: string | null; deletion_policy: string | null; telemetry: string | null; declaration: unknown; created_at: Date}
 }
