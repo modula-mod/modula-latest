@@ -1,0 +1,130 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-engine",
+    "kind": "engine",
+    "version": "0.1.0",
+    "displayName": "Reference Engine",
+    "description": "Trusted infrastructure engine profile for ai.generate without naming a vendor.",
+    "status": "development",
+    "visibility": "internal",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-engine/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "9f59ceedc869f4b57fdc915b4dc839ecd87d0b816ccba341b4adf341f5b99b1b",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "service-fabric-only"
+  },
+  "frontend": {
+    "mode": "none"
+  },
+  "backend": {
+    "mode": "engine-backed",
+    "engineRequirements": [
+      {
+        "capability": "ai.generate"
+      }
+    ]
+  },
+  "engines": {
+    "trustClass": "first-party-trusted-engine",
+    "capabilities": [
+      "ai.generate",
+      "ai.embed"
+    ]
+  },
+  "capabilities": {
+    "provides": [
+      "ai.generate",
+      "ai.embed"
+    ],
+    "providerRoles": [
+      "ai.provider"
+    ]
+  },
+  "secrets": [
+    {
+      "id": "engine.provider.primary",
+      "scope": "engine",
+      "purpose": "Upstream provider authentication via secret broker"
+    }
+  ]
+}

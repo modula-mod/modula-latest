@@ -7,6 +7,10 @@ export type GreenfieldExtensionKind =
   | 'connector'
   | 'widget'
   | 'service'
+  | 'engine'
+  | 'game'
+  | 'integration'
+  | 'theme'
   | 'bridge'
 
 export type GreenfieldExtensionProductKind = Exclude<GreenfieldExtensionKind, 'bridge'>

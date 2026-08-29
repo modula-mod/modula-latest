@@ -11,7 +11,7 @@ import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {AuditRepository} from '../domains/audit/repository.js'
 
-const PRODUCT_KINDS = new Set<DeveloperProductKind>(['module', 'addon', 'plugin', 'function', 'tool', 'widget', 'connector', 'backend-service', 'backend-engine', 'game-module'])
+const PRODUCT_KINDS = new Set<DeveloperProductKind>(['module', 'addon', 'plugin', 'function', 'tool', 'widget', 'connector', 'backend-service', 'backend-engine', 'game-module', 'service', 'engine', 'game', 'integration', 'theme'])
 const VISIBILITIES = new Set<DeveloperProductVisibility>(['PRIVATE', 'INTERNAL', 'UNLISTED', 'BETA', 'PUBLIC'])
 const PROGRAMME_STATES = new Set<DeveloperProgrammeState>(['NOT_ENROLLED', 'PENDING', 'ACTIVE', 'PAST_DUE', 'SUSPENDED', 'TERMINATED'])
 

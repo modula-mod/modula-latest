@@ -31,6 +31,7 @@ import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
+import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -69,6 +70,7 @@ export async function registerModuleRoutes(
   const backendGateway = new ModuleBackendGatewayService(db, config)
   const extensionFabric = new GreenfieldExtensionFabricService(db)
   const dataLedger = new GreenfieldDataLedgerService(db)
+  const mpsIngest = new GreenfieldMpsIngestService(db)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -120,6 +122,30 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await extensionFabric.relationships(String((request.params as any).productId)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry product relationship lookup failed')
+    }
+  })
+
+  app.get('/v1/product-standard/products/:productId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const productId = String((request.params as {productId?: string}).productId ?? '')
+      const ingested = await mpsIngest.getLatest(productId)
+      if (!ingested) throw moduleError('NOT_FOUND', 'MPS product ingestion not found')
+      return reply.send(successEnvelope(ingested, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'MPS product lookup failed')
+    }
+  })
+
+  app.get('/v1/product-standard/products/:productId/versions/:version', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const params = request.params as {productId?: string; version?: string}
+      const ingested = await mpsIngest.get(String(params.productId ?? ''), String(params.version ?? ''))
+      if (!ingested) throw moduleError('NOT_FOUND', 'MPS product ingestion not found')
+      return reply.send(successEnvelope(ingested, request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'MPS product version lookup failed')
     }
   })
 

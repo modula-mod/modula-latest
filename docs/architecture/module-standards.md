@@ -2,7 +2,10 @@
 
 **Status:** Living standard for external modules (GitHub packages / Registry)  
 **Host boundary:** `docs/architecture/module-boundary.md`  
-**Manifest contract:** `GreenfieldModuleManifest` in `@modula/greenfield-module-manifest` and Modula Module Standard 2.0 in `../modula-mod/modula-module-standard`
+**External product contract:** Modula Product Standard (MPS) 1.0-RC — `modula.product.json`  
+**Platform protocol:** Greenfield Protocol `greenfield.v1`  
+**Module profile:** Module Standard 2.1 (`../modula-mod/modula-module-standard`)  
+**Legacy module manifest:** `GreenfieldModuleManifest` in `@modula/greenfield-module-manifest` (adapter → MPS)  
 **Boilerplate:** `templates/modula-module/`
 
 ---

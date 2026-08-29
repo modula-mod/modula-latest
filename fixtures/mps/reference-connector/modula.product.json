@@ -1,0 +1,161 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-connector",
+    "kind": "connector",
+    "version": "0.1.0",
+    "displayName": "Reference Connector",
+    "description": "OAuth connector to an external notes provider without real credentials.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-connector/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "c4ab4944a6987d230999adcc13ce50f65dff15e05f8a207c5c64f5b2040149d3",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "approved-external-provider",
+    "destinations": [
+      {
+        "class": "approved-provider",
+        "hostPattern": "api.example-notes.test",
+        "purpose": "OAuth token exchange"
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "type": "targets",
+      "productId": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    }
+  ],
+  "frontend": {
+    "mode": "none"
+  },
+  "backend": {
+    "mode": "none"
+  },
+  "connectors": {
+    "providerId": "example.external.notes",
+    "authMethod": "oauth2",
+    "oauth": {
+      "authorizationUrlDeclared": true,
+      "tokenUrlDeclared": true,
+      "scopes": [
+        "notes.read"
+      ]
+    },
+    "syncDirection": "pull",
+    "resources": [
+      "notes"
+    ],
+    "webhooks": false,
+    "revocation": "required"
+  },
+  "secrets": [
+    {
+      "id": "provider.external.oauth",
+      "scope": "connector",
+      "purpose": "OAuth client authentication via secret broker"
+    }
+  ],
+  "privacy": {
+    "dataAccessed": [
+      "external notes metadata"
+    ],
+    "dataTransmitted": [
+      "oauth tokens via secret broker"
+    ],
+    "externalProcessors": [
+      "example.external.notes"
+    ],
+    "retention": "until disconnection",
+    "export": "not-applicable",
+    "deletion": "revoke and delete connector state"
+  },
+  "contributions": [
+    {
+      "id": "digital.modula.reference-connector.connect",
+      "target": "digital.modula.reference-notes/note.action@1",
+      "label": "Connect provider"
+    }
+  ]
+}

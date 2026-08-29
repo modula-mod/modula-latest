@@ -1,0 +1,121 @@
+{
+  "$schema": "https://modula.digital/schemas/product-standard/1.0-rc/product.schema.json",
+  "schema": "modula.product.1.0",
+  "productStandard": "1.0-RC",
+  "identity": {
+    "id": "digital.modula.reference-plugin",
+    "kind": "plugin",
+    "version": "0.1.0",
+    "displayName": "Reference Plugin",
+    "description": "Backend-free declarative contribution plugin.",
+    "status": "development",
+    "visibility": "private",
+    "testFixture": true
+  },
+  "publisher": {
+    "id": "modula",
+    "displayName": "Modula",
+    "website": "https://modula.digital",
+    "supportUrl": "https://modula.digital/support"
+  },
+  "source": {
+    "repository": "modula-mod/modula-product-standard",
+    "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifestPath": "examples/reference-plugin/modula.product.json",
+    "provider": "github"
+  },
+  "licence": {
+    "spdx": "MIT",
+    "evidence": [
+      "LICENSE"
+    ],
+    "declaredByPublisher": true
+  },
+  "release": {
+    "channel": "development",
+    "notes": "Reference fixture. Not for publication.",
+    "builder": "mps-reference"
+  },
+  "security": {
+    "baseline": "mps-1.0",
+    "rawUserBearerForwarding": "forbidden",
+    "crossProductDatabaseAccess": "forbidden",
+    "arbitraryRemoteCode": "forbidden-by-default"
+  },
+  "presentation": {
+    "icon": {
+      "role": "product.icon",
+      "path": "assets/icon/icon.svg",
+      "mediaType": "image/svg+xml",
+      "sha256": "00d9000b7654d6ae041aab6967ca399b5959d480c41bdd487fd14255e6243292",
+      "developmentAsset": true
+    },
+    "cover": {
+      "role": "product.cover",
+      "path": "assets/cover/default.png",
+      "mediaType": "image/png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "371918b2de29331c5f08584525469c4ed0d03a6a500b042db37593b41ec47f3b",
+      "developmentAsset": true
+    },
+    "assets": [
+      {
+        "role": "product.icon",
+        "path": "assets/icon/icon-1024.png",
+        "mediaType": "image/png",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "956d246df1b7f8e2512de7630344025b3b6b690bcd7550bc7aab25adc393cb73",
+        "developmentAsset": true
+      }
+    ]
+  },
+  "compatibility": {
+    "productStandard": "^1.0.0-rc",
+    "greenfieldProtocol": "greenfield.v1",
+    "host": ">=1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ]
+  },
+  "marketplace": {
+    "category": "reference",
+    "testFixture": true
+  },
+  "telemetry": {
+    "destinationClass": "none",
+    "optOut": "not-applicable",
+    "purpose": "none"
+  },
+  "network": {
+    "class": "none"
+  },
+  "family": {
+    "id": "digital.modula.reference-vault",
+    "role": "member"
+  },
+  "relationships": [
+    {
+      "type": "targets",
+      "productId": "digital.modula.reference-notes",
+      "versionRange": "^0.1.0"
+    }
+  ],
+  "frontend": {
+    "mode": "host-contribution"
+  },
+  "backend": {
+    "mode": "none"
+  },
+  "contributions": [
+    {
+      "id": "digital.modula.reference-plugin.word-count",
+      "target": "digital.modula.reference-notes/editor.toolbar@1",
+      "label": "Word count",
+      "priority": 40
+    }
+  ]
+}
