@@ -126,33 +126,34 @@ export class GreenfieldMpsIngestService {
         }))).execute()
       }
 
-      if (product.privacy) {
+      const privacy = product.privacy
+      if (privacy) {
         await trx.insertInto('greenfield_product_privacy_declarations')
           .values({
             ingestion_id: stored.ingestion_id,
             product_id: product.productId,
             version: product.version,
-            data_accessed: sql`${JSON.stringify(product.privacy.dataAccessed ?? [])}::jsonb`,
-            data_created: sql`${JSON.stringify(product.privacy.dataCreated ?? [])}::jsonb`,
-            data_transmitted: sql`${JSON.stringify(product.privacy.dataTransmitted ?? [])}::jsonb`,
-            processors: sql`${JSON.stringify(product.privacy.externalProcessors ?? [])}::jsonb`,
-            retention: typeof product.privacy.retention === 'string' ? product.privacy.retention : null,
-            export_policy: typeof product.privacy.export === 'string' ? product.privacy.export : null,
-            deletion_policy: typeof product.privacy.deletion === 'string' ? product.privacy.deletion : null,
-            telemetry: typeof product.privacy.telemetry === 'string' ? product.privacy.telemetry : null,
-            declaration: sql`${JSON.stringify(product.privacy)}::jsonb`,
+            data_accessed: sql`${JSON.stringify(privacy.dataAccessed ?? [])}::jsonb`,
+            data_created: sql`${JSON.stringify(privacy.dataCreated ?? [])}::jsonb`,
+            data_transmitted: sql`${JSON.stringify(privacy.dataTransmitted ?? [])}::jsonb`,
+            processors: sql`${JSON.stringify(privacy.externalProcessors ?? [])}::jsonb`,
+            retention: typeof privacy.retention === 'string' ? privacy.retention : null,
+            export_policy: typeof privacy.export === 'string' ? privacy.export : null,
+            deletion_policy: typeof privacy.deletion === 'string' ? privacy.deletion : null,
+            telemetry: typeof privacy.telemetry === 'string' ? privacy.telemetry : null,
+            declaration: sql`${JSON.stringify(privacy)}::jsonb`,
             created_at: now,
           })
           .onConflict(oc => oc.column('ingestion_id').doUpdateSet({
-            data_accessed: sql`${JSON.stringify(product.privacy.dataAccessed ?? [])}::jsonb`,
-            data_created: sql`${JSON.stringify(product.privacy.dataCreated ?? [])}::jsonb`,
-            data_transmitted: sql`${JSON.stringify(product.privacy.dataTransmitted ?? [])}::jsonb`,
-            processors: sql`${JSON.stringify(product.privacy.externalProcessors ?? [])}::jsonb`,
-            retention: typeof product.privacy.retention === 'string' ? product.privacy.retention : null,
-            export_policy: typeof product.privacy.export === 'string' ? product.privacy.export : null,
-            deletion_policy: typeof product.privacy.deletion === 'string' ? product.privacy.deletion : null,
-            telemetry: typeof product.privacy.telemetry === 'string' ? product.privacy.telemetry : null,
-            declaration: sql`${JSON.stringify(product.privacy)}::jsonb`,
+            data_accessed: sql`${JSON.stringify(privacy.dataAccessed ?? [])}::jsonb`,
+            data_created: sql`${JSON.stringify(privacy.dataCreated ?? [])}::jsonb`,
+            data_transmitted: sql`${JSON.stringify(privacy.dataTransmitted ?? [])}::jsonb`,
+            processors: sql`${JSON.stringify(privacy.externalProcessors ?? [])}::jsonb`,
+            retention: typeof privacy.retention === 'string' ? privacy.retention : null,
+            export_policy: typeof privacy.export === 'string' ? privacy.export : null,
+            deletion_policy: typeof privacy.deletion === 'string' ? privacy.deletion : null,
+            telemetry: typeof privacy.telemetry === 'string' ? privacy.telemetry : null,
+            declaration: sql`${JSON.stringify(privacy)}::jsonb`,
           }))
           .execute()
       }
