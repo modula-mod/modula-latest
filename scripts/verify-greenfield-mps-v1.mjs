@@ -144,6 +144,7 @@ for (const name of fixtures) {
   }
 }
 
+run('MODULE MANIFEST DEPENDENCY BUILD', 'pnpm', ['--filter', '@modula/greenfield-module-manifest', 'build'])
 run('PACKAGE BUILD', 'pnpm', ['--filter', '@modula/greenfield-product-standard', 'build'])
 run(
   'PACKAGE INGEST TESTS',
