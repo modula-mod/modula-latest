@@ -115,6 +115,16 @@ Run:
 
 `CI=true pnpm verify:product-frontend-v1`
 
+`CI=true pnpm verify:reference-tasks-zero-core`
+
+`CI=true pnpm verify:platform-foundation-v1`
+
+The product-frontend verifier includes the Reference Tasks disposable runtime
+journey. The platform-foundation verifier composes MPS, the canonical generator,
+Greenfield MPS convergence, the generic Product Host, and the neutral product
+update proof. The production Greenfield backend verifier remains a separate
+exact-deployment acceptance gate.
+
 Host V1 may be declared stable only after Vault-owned frontend migration,
 Reference Tasks zero-core generation, and a frontend update without a Shell
 deployment all pass.

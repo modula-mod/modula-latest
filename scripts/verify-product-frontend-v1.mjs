@@ -25,6 +25,12 @@ function run(label, command, args, env = process.env, cwd = ROOT) {
   record(label, result.status === 0, result.status === 0 ? '' : (result.stderr || result.stdout || `exit ${result.status}`).slice(0, 3000))
 }
 
+function runStreaming(label, command, args, env = process.env, cwd = ROOT) {
+  console.log(`\n$ ${command} ${args.join(' ')}  # ${label}`)
+  const result = spawnSync(command, args, {cwd, env, stdio: 'inherit', shell: false})
+  record(label, result.status === 0, result.status === 0 ? '' : `exit ${String(result.status)}`)
+}
+
 function scan(dir, matcher, label) {
   const hits = []
   const visit = current => {
@@ -115,6 +121,13 @@ if (!fixture) {
     record('DISPOSABLE DATABASE REMOVED', true, fixture.databaseName)
   }
 }
+
+runStreaming(
+  'REFERENCE TASKS ZERO-CORE RUNTIME',
+  'node',
+  ['scripts/verify-reference-tasks-zero-core.mjs'],
+  {...process.env, CI: 'true', MODULA_HOST_ROOT: ROOT},
+)
 
 if (failures.length) {
   console.error('\nverify:product-frontend-v1 FAIL')
