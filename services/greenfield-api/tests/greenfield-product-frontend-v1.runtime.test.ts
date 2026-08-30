@@ -65,6 +65,10 @@ describeIfDb('MPS product-owned frontend exact-release runtime', () => {
         path: mps.frontend.artifact.path,
         bytes: readFileSync(join(fixtureRoot, mps.frontend.artifact.path)),
       },
+      schemas: [{
+        path: 'schemas/note.schema.json',
+        bytes: readFileSync(join(fixtureRoot, 'schemas/note.schema.json')),
+      }],
     })
 
     const account = await registerAccount(`frontend-${suffix}@example.com`, `frontend${suffix}`.slice(0, 20))
@@ -97,6 +101,21 @@ describeIfDb('MPS product-owned frontend exact-release runtime', () => {
       },
       frontend: {productId, releaseVersion: version, entry: 'home'},
     })
+  })
+
+  it('projects product record schemas into the same exact release runtime', async () => {
+    const collection = await db.selectFrom('greenfield_module_record_collections')
+      .select(['release_id', 'module_id', 'collection', 'fields', 'searchable_fields', 'filterable_fields', 'sortable_fields', 'schema_definition'])
+      .where('release_id', '=', releaseId)
+      .where('module_id', '=', productId)
+      .where('collection', '=', 'note')
+      .executeTakeFirstOrThrow()
+    expect(collection.release_id).toBe(releaseId)
+    expect((collection.fields as Array<{fieldId: string}>).map(field => field.fieldId)).toEqual(['id', 'title', 'body', 'tags'])
+    expect(collection.searchable_fields).toEqual(['id', 'title', 'body', 'tags'])
+    expect(collection.filterable_fields).toEqual(['id', 'title'])
+    expect(collection.sortable_fields).toEqual(['id', 'title'])
+    expect(collection.schema_definition).toMatchObject({type: 'object', additionalProperties: false})
   })
 
   it('does not expose the frontend while the installation is disabled', async () => {

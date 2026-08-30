@@ -163,6 +163,7 @@ export async function registerModuleRoutes(
         manifest?: unknown
         releaseId?: unknown
         frontend?: {path?: unknown; bytes?: unknown}
+        schemas?: Array<{path?: unknown; bytes?: unknown}>
       } | null) ?? {}
       const filename = typeof body.filename === 'string' && body.filename.trim() ? body.filename : 'modula.product.json'
       const bytes = typeof body.bytes === 'string'
@@ -172,7 +173,14 @@ export async function registerModuleRoutes(
       const frontend = typeof body.frontend?.path === 'string' && typeof body.frontend.bytes === 'string'
         ? {path: body.frontend.path, bytes: body.frontend.bytes}
         : null
-      return reply.code(201).send(successEnvelope(await mpsIngest.ingest({filename, bytes, releaseId, frontend}), request.id))
+      if (body.schemas !== undefined && !Array.isArray(body.schemas)) throw moduleError('VALIDATION_FAILED', 'MPS schemas must be an array')
+      const schemas = (body.schemas ?? []).map((schema, index) => {
+        if (typeof schema.path !== 'string' || typeof schema.bytes !== 'string') {
+          throw moduleError('VALIDATION_FAILED', `MPS schema artifact ${index} is invalid`)
+        }
+        return {path: schema.path, bytes: schema.bytes}
+      })
+      return reply.code(201).send(successEnvelope(await mpsIngest.ingest({filename, bytes, releaseId, frontend, schemas}), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'MPS product ingest failed')
     }

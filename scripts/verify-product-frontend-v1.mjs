@@ -70,6 +70,7 @@ source('src/features/modules/runtime/mps-frontend-adapter.ts', [
 ], 'EXISTING RENDERER ADAPTER')
 source('services/greenfield-api/scripts/publish-mps-products.ts', [
   'frontend: product.frontend',
+  'schemas: product.schemas',
   'resolveProductArtifact',
 ], 'GENERIC FRONTEND PUBLISH')
 
@@ -78,6 +79,12 @@ scan('src/features/modules/runtime', /(?:eval\s*\(|from\s+['\"]react-native-webv
 
 run('API WORKSPACE CONTRACTS BUILD', 'pnpm', ['--filter', '@modula/greenfield-api^...', 'build'])
 run('PRODUCT STANDARD TESTS', 'pnpm', ['--filter', '@modula/greenfield-product-standard', 'test'], {...process.env, CI: 'true'})
+run(
+  'MPS RECORD RUNTIME PROJECTION',
+  'pnpm',
+  ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-mps-record-projection.test.ts'],
+  {...process.env, CI: 'true'},
+)
 run('HOST TYPES', 'pnpm', ['exec', 'tsc', '--noEmit'])
 run(
   'GENERIC RENDERER ADAPTER',

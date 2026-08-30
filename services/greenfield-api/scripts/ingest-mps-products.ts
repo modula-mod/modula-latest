@@ -9,6 +9,7 @@ type MpsProduct = {
   root: string
   bytes: string
   frontend: {path: string; bytes: Buffer} | null
+  schemas: Array<{path: string; bytes: Buffer}>
 }
 
 const {apply, roots} = parseArgs(process.argv.slice(2))
@@ -38,7 +39,7 @@ try {
       })
       continue
     }
-    const ingested = await ingest.ingest({filename: 'modula.product.json', bytes: product.bytes, frontend: product.frontend})
+    const ingested = await ingest.ingest({filename: 'modula.product.json', bytes: product.bytes, frontend: product.frontend, schemas: product.schemas})
     if (!ingested || ingested.productId !== product.productId || ingested.version !== product.version) {
       fail(`MPS ingest did not persist ${product.productId}@${product.version}`)
     }
@@ -90,6 +91,7 @@ function loadProduct(inputRoot: string): MpsProduct {
   const parsed = JSON.parse(bytes) as {
     identity?: {id?: unknown; version?: unknown}
     frontend?: {mode?: unknown; artifact?: {path?: unknown}}
+    backend?: {records?: Array<{schemaPath?: unknown}>}
   }
   const productId = typeof parsed.identity?.id === 'string' ? parsed.identity.id : ''
   const version = typeof parsed.identity?.version === 'string' ? parsed.identity.version : ''
@@ -98,7 +100,11 @@ function loadProduct(inputRoot: string): MpsProduct {
   const frontendFile = artifactPath ? resolveProductArtifact(root, artifactPath) : null
   const frontend = artifactPath && frontendFile ? {path: artifactPath, bytes: readFileSync(frontendFile)} : null
   if (parsed.frontend?.mode !== 'none' && !frontend) fail(`MPS frontend artifact is incomplete in ${root}`)
-  return {productId, version, root, bytes, frontend}
+  const schemaPaths = [...new Set((parsed.backend?.records ?? [])
+    .map(record => record.schemaPath)
+    .filter((path): path is string => typeof path === 'string'))]
+  const schemas = schemaPaths.map(path => ({path, bytes: readFileSync(resolveProductArtifact(root, path))}))
+  return {productId, version, root, bytes, frontend, schemas}
 }
 
 function resolveProductArtifact(root: string, artifactPath: string): string {

@@ -71,7 +71,7 @@ source('packages/greenfield-product-standard/src/ingest.ts', [
 source('packages/greenfield-product-standard/src/adapters.ts', ['adaptLegacyProductDocument'], 'ADAPTER')
 source(
   'services/greenfield-api/src/product-standard/ingest-service.ts',
-  ['GreenfieldMpsIngestService', 'validateMpsFrontendArtifact', 'greenfield_release_frontends'],
+  ['GreenfieldMpsIngestService', 'validateMpsFrontendArtifact', 'greenfield_release_frontends', 'projectMpsRecordCollections'],
   'API_INGEST',
 )
 source(

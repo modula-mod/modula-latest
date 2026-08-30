@@ -16,9 +16,9 @@ NO UNKNOWN. MPS open questions MPS-Q001–Q010 are resolved in the Product Stand
 | Presentation | marketplace copy fields | Partial | Ingest marketplace block | Greenfield | ingest | ADAPTER_REQUIRED |
 | Assets | artifact hashes, no roles | Missing roles | `greenfield_release_presentation_assets` | Greenfield | 054 + ingest | GENERIC_GREENFIELD_EXTENSION_REQUIRED |
 | Frontend | Module Host views/routes | Host exists | Map MPS frontend modes; no remote JS | Greenfield | mapping.ts | ADAPTER_REQUIRED |
-| Backend | `backend_mode` enum | frontend-only / greenfield-managed / module-managed | Map MPS none / greenfield-records / service / engine-backed | BOTH | mapping.ts | MPS_CORRECTION_REQUIRED |
+| Backend | `backend_mode` enum | frontend-only / greenfield-managed / module-managed | Map MPS none / greenfield-records / service / engine-backed | BOTH | mapping.ts + exact-release record projection | MPS_CORRECTION_REQUIRED |
 | Storage | data ledger + module-owned DB TEST_ONLY | Exists | Logical storage.mode mapping; no table names in MPS | Greenfield | mapping.ts | ADAPTER_REQUIRED |
-| Data | records + export/delete | Exists | Privacy + data declarations | Greenfield | 054 privacy | ADAPTER_REQUIRED |
+| Data | records + export/delete | Exists | Privacy + data declarations; validate and project packaged record schemas | Greenfield | 054 privacy + MPS record projection | ADAPTER_REQUIRED |
 | Capabilities | capability broker | Exists | provides/requires/requests | Greenfield | ingest | ALREADY_SUPPORTED |
 | Permissions | permission policy | Exists | machine + human | Greenfield | ingest | ALREADY_SUPPORTED |
 | Providers | multiple providers + defaults | Exists TEST_ONLY | notes.provider + reference-notes | Greenfield | fixtures | ALREADY_SUPPORTED |

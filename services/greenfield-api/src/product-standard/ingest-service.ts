@@ -9,6 +9,11 @@ import {
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
+import {
+  projectMpsRecordCollections,
+  type MpsRecordCollectionProjection,
+  type MpsSchemaArtifact,
+} from './record-projection.js'
 
 export class GreenfieldMpsIngestService {
   constructor(private readonly db: ModulaDb) {}
@@ -18,6 +23,7 @@ export class GreenfieldMpsIngestService {
     bytes: string | Buffer
     releaseId?: string | null
     frontend?: {path: string; bytes: string | Buffer} | null
+    schemas?: MpsSchemaArtifact[]
   }) {
     const result = ingestProductManifest({filename: input.filename, bytes: input.bytes})
     if (!result.ok || !result.product) {
@@ -50,6 +56,13 @@ export class GreenfieldMpsIngestService {
     } else if (input.frontend) {
       throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
     }
+    const recordCollections = input.releaseId
+      ? projectMpsRecordCollections({
+          manifest: product.raw,
+          frontend: frontendArtifact as Record<string, unknown> | null,
+          schemas: input.schemas ?? [],
+        })
+      : []
     const existing = await this.db.selectFrom('greenfield_mps_ingestions')
       .select(['ingestion_id', 'release_id', 'manifest_sha256'])
       .where('product_id', '=', product.productId)
@@ -67,11 +80,14 @@ export class GreenfieldMpsIngestService {
       if (input.releaseId && existing.release_id && existing.release_id !== input.releaseId) {
         throw moduleError('CONFLICT', `Product release ${product.productId}@${product.version} is already bound to another registry release`)
       }
-      if (input.releaseId && !existing.release_id) {
+      if (input.releaseId) {
         await this.db.transaction().execute(async trx => {
-          await trx.updateTable('greenfield_mps_ingestions').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
-          if (storedFrontend) await trx.updateTable('greenfield_release_frontends').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
-          await trx.updateTable('greenfield_release_presentation_assets').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+          if (!existing.release_id) {
+            await trx.updateTable('greenfield_mps_ingestions').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+            if (storedFrontend) await trx.updateTable('greenfield_release_frontends').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+            await trx.updateTable('greenfield_release_presentation_assets').set({release_id: input.releaseId!}).where('ingestion_id', '=', existing.ingestion_id).execute()
+          }
+          await projectRecordCollections(trx, input.releaseId!, product.productId, recordCollections)
         })
       }
       return this.get(product.productId, product.version)
@@ -170,6 +186,10 @@ export class GreenfieldMpsIngestService {
           verified_at: now,
           created_at: now,
         }).execute()
+      }
+
+      if (input.releaseId) {
+        await projectRecordCollections(trx, input.releaseId, product.productId, recordCollections)
       }
 
       await trx.deleteFrom('greenfield_release_presentation_assets').where('ingestion_id', '=', stored.ingestion_id).execute()
@@ -308,5 +328,50 @@ export class GreenfieldMpsIngestService {
       .where('alias_id', '=', productId)
       .executeTakeFirst()
     return alias?.canonical_product_id ?? productId
+  }
+}
+
+async function projectRecordCollections(
+  db: any,
+  releaseId: string,
+  productId: string,
+  collections: MpsRecordCollectionProjection[],
+) {
+  for (const collection of collections) {
+    const values = {
+      collection_id: `mps-collection:${releaseId}:${collection.collection}`,
+      release_id: releaseId,
+      module_id: productId,
+      collection: collection.collection,
+      schema_ref: collection.schemaRef,
+      default_visibility: collection.defaultVisibility,
+      fields: sql`${JSON.stringify(collection.fields)}::jsonb`,
+      searchable_fields: sql`${JSON.stringify(collection.searchableFields)}::jsonb`,
+      filterable_fields: sql`${JSON.stringify(collection.filterableFields)}::jsonb`,
+      sortable_fields: sql`${JSON.stringify(collection.sortableFields)}::jsonb`,
+      folder_field: null,
+      reference_fields: sql`${JSON.stringify(collection.referenceFields)}::jsonb`,
+      schema_definition: sql`${JSON.stringify(collection.schemaDefinition)}::jsonb`,
+      retention_policy: collection.retentionPolicy,
+      registration_status: 'registered',
+      created_at: new Date(),
+      updated_at: new Date(),
+    }
+    await db.insertInto('greenfield_module_record_collections')
+      .values(values)
+      .onConflict((conflict: any) => conflict.column('collection_id').doUpdateSet({
+        schema_ref: values.schema_ref,
+        default_visibility: values.default_visibility,
+        fields: values.fields,
+        searchable_fields: values.searchable_fields,
+        filterable_fields: values.filterable_fields,
+        sortable_fields: values.sortable_fields,
+        reference_fields: values.reference_fields,
+        schema_definition: values.schema_definition,
+        retention_policy: values.retention_policy,
+        registration_status: values.registration_status,
+        updated_at: values.updated_at,
+      }))
+      .execute()
   }
 }

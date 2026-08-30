@@ -23,6 +23,7 @@ type ProductRelease = {
   version: string
   mpsBytes: string
   frontend: {path: string; bytes: Buffer} | null
+  schemas: Array<{path: string; bytes: Buffer}>
   manifest: GreenfieldModuleManifest
   provenance: ReleaseProvenance
 }
@@ -75,6 +76,7 @@ try {
       bytes: product.mpsBytes,
       releaseId: release.releaseId,
       frontend: product.frontend,
+      schemas: product.schemas,
     })
     if (!ingested || ingested.productId !== product.productId || ingested.version !== product.version) {
       fail(`MPS ingest did not persist ${product.productId}@${product.version}`)
@@ -120,6 +122,7 @@ function loadProduct(inputRoot: string): ProductRelease {
   const mps = JSON.parse(mpsBytes) as {
     identity?: {id?: unknown; version?: unknown}
     frontend?: {mode?: unknown; artifact?: {path?: unknown}}
+    backend?: {records?: Array<{schemaPath?: unknown}>}
   }
   const manifest = readJson<GreenfieldModuleManifest>(join(root, 'module.manifest.json'))
   const productId = typeof mps.identity?.id === 'string' ? mps.identity.id : ''
@@ -137,6 +140,9 @@ function loadProduct(inputRoot: string): ProductRelease {
   if (git(root, ['rev-parse', `${releaseTag}^{commit}`]) !== provenance.releaseCommit) {
     fail(`Immutable tag mismatch for ${productId}@${version}`)
   }
+  if (git(root, ['rev-parse', 'HEAD']) !== provenance.releaseCommit) {
+    fail(`Product checkout must be pinned to immutable tag ${releaseTag} for ${productId}@${version}`)
+  }
   const computedManifestSha = manifestChecksum({...manifest, integrity: {...manifest.integrity, manifestSha256: ''}})
   if (computedManifestSha !== provenance.greenfieldManifestChecksum || manifest.integrity.manifestSha256 !== computedManifestSha) {
     fail(`Greenfield manifest checksum mismatch for ${productId}@${version}`)
@@ -144,11 +150,25 @@ function loadProduct(inputRoot: string): ProductRelease {
   if (sha256(join(root, 'release', packageFile)) !== provenance.packageChecksum) {
     fail(`Release artifact checksum mismatch for ${productId}@${version}`)
   }
+  const packagePath = join(root, 'release', packageFile)
+  assertPackagedFile(packagePath, root, 'modula.product.json')
   const frontendPath = typeof mps.frontend?.artifact?.path === 'string' ? mps.frontend.artifact.path : null
   const frontendFile = frontendPath ? resolveProductArtifact(root, frontendPath) : null
   const frontend = frontendPath && frontendFile ? {path: frontendPath, bytes: readFileSync(frontendFile)} : null
   if (mps.frontend?.mode !== 'none' && !frontend) fail(`MPS frontend artifact is incomplete for ${productId}@${version}`)
-  return {root, productId, version, mpsBytes, frontend, manifest, provenance}
+  if (frontendPath) assertPackagedFile(packagePath, root, frontendPath)
+  const schemaPaths = [...new Set((mps.backend?.records ?? [])
+    .map(record => record.schemaPath)
+    .filter((path): path is string => typeof path === 'string'))]
+  const schemas = schemaPaths.map(path => ({path, bytes: readFileSync(resolveProductArtifact(root, path))}))
+  for (const path of schemaPaths) assertPackagedFile(packagePath, root, path)
+  return {root, productId, version, mpsBytes, frontend, schemas, manifest, provenance}
+}
+
+function assertPackagedFile(packagePath: string, root: string, relativePath: string): void {
+  const packaged = execFileSync('tar', ['-xOf', packagePath, `package/${relativePath}`])
+  const source = readFileSync(resolveProductArtifact(root, relativePath))
+  if (!packaged.equals(source)) fail(`Packaged artifact differs from tagged source: ${relativePath}`)
 }
 
 function resolveProductArtifact(root: string, artifactPath: string): string {
