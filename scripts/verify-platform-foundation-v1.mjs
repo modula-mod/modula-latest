@@ -29,6 +29,7 @@ if (failures.length === 0) {
     CI: 'true',
     MODULA_HOST_ROOT: hostRoot,
   })
+  run('VAULT PRODUCT RELEASES', 'pnpm', ['verify:vault-products'], hostRoot, {...process.env, CI: 'true'})
   run('FINAL GIT DIFF CHECK', 'git', ['diff', '--check'], hostRoot, process.env)
 }
 
@@ -44,6 +45,7 @@ console.log('GREENFIELD × MPS'.padEnd(52) + ' PASS')
 console.log('PRODUCT FRONTEND'.padEnd(52) + ' PASS')
 console.log('GENERATOR'.padEnd(52) + ' PASS')
 console.log('NEUTRAL PRODUCT'.padEnd(52) + ' PASS')
+console.log('VAULT PRODUCTS'.padEnd(52) + ' PASS')
 console.log('CI=true pnpm verify:platform-foundation-v1\nPASS')
 
 function run(label, command, args, cwd, env) {
