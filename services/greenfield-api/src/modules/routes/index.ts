@@ -961,11 +961,23 @@ function idempotencyKey(request: FastifyRequest, body: unknown): string {
 }
 
 function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery {
-  const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo'])
+  const reserved = new Set(['cursor', 'limit', 'sort', 'direction', 'q', 'folder', 'createdFrom', 'createdTo', 'updatedFrom', 'updatedTo', 'recordState'])
   const filters: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(query ?? {})) {
-    if (!reserved.has(key) && typeof value !== 'object') filters[key] = value
+    if (key.startsWith('filter.')) {
+      const field = key.slice('filter.'.length)
+      if (!field || typeof value !== 'string') throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      let decoded: unknown
+      try {
+        decoded = JSON.parse(value)
+      } catch {
+        throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      }
+      if (!(decoded === null || ['string', 'number', 'boolean'].includes(typeof decoded))) throw moduleError('VALIDATION_FAILED', 'Invalid encoded module record filter')
+      filters[field] = decoded
+    } else if (!reserved.has(key) && typeof value !== 'object') filters[key] = value
   }
+  if (query.recordState !== undefined && query.recordState !== 'active' && query.recordState !== 'deleted') throw moduleError('VALIDATION_FAILED', 'Invalid module record state')
   const direction: 'asc' | 'desc' | undefined = query.direction === 'asc' ? 'asc' : query.direction === 'desc' ? 'desc' : undefined
   return {
     cursor: stringOrUndefined(query.cursor),
@@ -978,6 +990,7 @@ function normalizeRecordQuery(query: Record<string, unknown>): ModuleRecordQuery
     createdTo: stringOrUndefined(query.createdTo),
     updatedFrom: stringOrUndefined(query.updatedFrom),
     updatedTo: stringOrUndefined(query.updatedTo),
+    recordState: query.recordState === 'deleted' ? 'deleted' : query.recordState === 'active' ? 'active' : undefined,
     filters,
   }
 }

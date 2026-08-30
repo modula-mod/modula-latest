@@ -255,6 +255,9 @@ export type ModuleUninstallPreview = {
 export type ModuleRuntimeView = GreenfieldModuleView & {
   allowedActions?: GreenfieldModuleAction[]
   available?: boolean
+  recordBinding?: {source: 'record.detail'; collection: string; recordId: string}
+  recordListActionIds?: string[]
+  searchEnabled?: boolean
 }
 
 export type MpsFrontendRoute = {
@@ -556,10 +559,13 @@ export interface ModuleRepository {
   listViews(moduleId: string): Promise<ModuleRuntimeView[]>
   getView(moduleId: string, viewId: string): Promise<ModuleRuntimeView | null>
   getProductFrontend(moduleId: string): Promise<ProductFrontendRuntime>
-  listRecords(moduleId: string, collection: string, input?: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number}): Promise<ModuleRecordPage>
+  listRecords(moduleId: string, collection: string, input?: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number; filters?: Record<string, string | number | boolean | null>; recordState?: 'active' | 'deleted'}): Promise<ModuleRecordPage>
+  getRecord(moduleId: string, collection: string, recordId: string): Promise<ModuleRecord>
   createRecord(moduleId: string, collection: string, data: Record<string, unknown>): Promise<ModuleRecord>
   updateRecord(moduleId: string, collection: string, recordId: string, data: Record<string, unknown>, expectedRevision?: number): Promise<ModuleRecord>
   deleteRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown>
+  restoreRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<ModuleRecord>
+  purgeRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown>
   runAction(moduleId: string, actionId: string, input?: Record<string, unknown>): Promise<unknown>
   executeAIAction(moduleId: string, actionId: string, input: ModuleAIActionExecutionRequest): Promise<ModuleAIActionExecutionResponse>
   applyAIExecution(moduleId: string, executionId: string, input: ApplyAIExecutionRequest): Promise<ApplyAIExecutionResponse>

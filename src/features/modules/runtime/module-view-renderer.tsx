@@ -1,9 +1,8 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, Share, StyleSheet, TextInput, View} from 'react-native'
+import {FlatList, ScrollView, Share, StyleSheet, TextInput, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import type {
   GreenfieldModuleAction,
-  GreenfieldModuleFieldDefinition,
   GreenfieldModuleLayoutNode,
 } from '@modula/greenfield-module-ui-contracts'
 
@@ -11,12 +10,13 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleAIProductActionDefinition, ModuleHostExtensionContribution, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
 import {ModuleAIActionMenu, SchemaSettingsRenderer} from '@/features/modules/components'
-import {useModuleRecordMutations, useModuleRecordsQuery} from '@/features/modules/hooks'
+import {useModuleRecordMutations, useModuleRecordQuery, useModuleRecordsQuery, useModuleSettingsMutation, useModuleSettingsQuery} from '@/features/modules/hooks'
 import {ModuleActionBar} from '@/features/modules/runtime/module-action-bar'
 import {ModuleEmptyState} from '@/features/modules/runtime/module-empty-state'
 import {ModuleExtensionContributions} from '@/features/modules/runtime/module-extension-contributions'
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
 import {primaryActionFor} from '@/features/modules/runtime/module-action-runner'
+import {resolveRuntimeActionRoute, shapeMpsActionInput} from '@/features/modules/runtime/mps-frontend-adapter'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
@@ -28,17 +28,37 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
   const {colours, radius, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
   const collection = view.collection ?? view.query?.collection ?? ''
-  const recordsQuery = useModuleRecordsQuery(moduleId, collection, {q: query || undefined, sort: 'updatedAt', direction: 'desc'})
+  const recordsQuery = useModuleRecordsQuery(moduleId, view.kind === 'collection' ? collection : '', {
+    q: query || undefined,
+    sort: 'updatedAt',
+    direction: 'desc',
+    filters: view.query?.filters,
+    recordState: view.query?.recordState,
+  })
+  const recordQuery = useModuleRecordQuery(moduleId, view.recordBinding?.collection ?? '', view.recordBinding?.recordId ?? '')
+  const settingsQuery = useModuleSettingsQuery(moduleId, view.kind === 'settings')
+  const settingsMutation = useModuleSettingsMutation(moduleId)
   const mutations = useModuleRecordMutations(moduleId, collection)
   const createAction = primaryActionFor(view.allowedActions ?? view.toolbar, 'record.create')
+  const updateAction = primaryActionFor(view.allowedActions ?? view.toolbar, 'record.update')
+  const settingsAction = primaryActionFor(view.allowedActions ?? view.toolbar, 'settings.update')
+  const formAction = view.kind === 'settings' ? settingsAction : view.recordBinding ? updateAction : createAction
   const fields = useMemo(
-    () => createAction?.inputSchema.fields ?? [],
-    [createAction?.inputSchema.fields],
+    () => formAction?.inputSchema.fields ?? [],
+    [formAction?.inputSchema.fields],
   )
-  const [draft, setDraft] = useState<Record<string, unknown>>({})
-  const [editing, setEditing] = useState<ModuleRecord | null>(null)
   const records = recordsQuery.data?.items ?? []
   const allActions = view.allowedActions ?? view.toolbar ?? []
+  const sourceDraft = view.kind === 'form'
+    ? recordQuery.data
+      ? {source: `record:${recordQuery.data.record_id}:${recordQuery.data.revision}`, values: recordQuery.data.data}
+      : {source: view.recordBinding ? `record:loading:${view.recordBinding.recordId}` : 'new', values: {}}
+    : view.kind === 'settings' && settingsQuery.data
+      ? {source: `settings:${settingsQuery.data.installationId}:${settingsQuery.data.version}`, values: settingsQuery.data.values}
+      : {source: 'none', values: {}}
+  const [editedDraft, setEditedDraft] = useState<{source: string; values: Record<string, unknown>}>({source: '', values: {}})
+  const draft = editedDraft.source === sourceDraft.source ? editedDraft.values : sourceDraft.values
+  const updateDraftField = (name: string, value: unknown) => setEditedDraft({source: sourceDraft.source, values: {...draft, [name]: value}})
 
   const runAction = async (action: GreenfieldModuleAction, input: Record<string, unknown> = {}) => {
     if (action.confirmationPolicy === 'confirm' || action.confirmationPolicy === 'confirmDestructive' || action.confirmationPolicy === 'recentAuth') {
@@ -51,44 +71,60 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       })
       if (!confirmed) return
     }
-    if (action.kind === 'route.open' && action.target?.routePath) {
-      router.push(action.target.routePath as Href)
+    const shaped = shapeMpsActionInput(action, input)
+    const recordIdField = action.target?.recordIdField ?? 'recordId'
+    const boundRecord = recordQuery.data
+    if (boundRecord && shaped[recordIdField] === undefined) shaped[recordIdField] = boundRecord.record_id
+    if (boundRecord && shaped.expectedRevision === undefined) shaped.expectedRevision = boundRecord.revision
+    if (action.kind === 'route.open') {
+      const route = resolveRuntimeActionRoute(action, shaped)
+      if (!route) throw new Error('Module route action is missing required route parameters')
+      router.push(route as Href)
       return
     }
     if (action.kind === 'share') {
-      await Share.share({message: String(input.text ?? input.title ?? view.title)})
+      await Share.share({message: String(shaped.text ?? shaped.title ?? boundRecord?.data.title ?? view.title)})
       return
     }
-    await moduleRepository.runAction(moduleId, action.actionId, input)
-  }
-
-  const saveDraft = async () => {
-    if (!collection) return
-    if (editing) {
-      mutations.update.mutate({recordId: editing.record_id, data: draft, expectedRevision: editing.revision}, {onSuccess: () => {
-        setDraft({})
-        setEditing(null)
-      }})
+    if (action.kind === 'dismiss') {
+      router.back()
       return
     }
-    if (createAction) {
-      await runAction(createAction, draft)
-        .then(async () => {
-          setDraft({})
-          await recordsQuery.refetch()
-        })
-        .catch(() => mutations.create.mutate(draft, {onSuccess: () => setDraft({})}))
-    } else {
-      mutations.create.mutate(draft, {onSuccess: () => setDraft({})})
+    if (action.kind === 'record.create') {
+      await mutations.create.mutateAsync(shaped)
+      setEditedDraft({source: sourceDraft.source, values: {}})
+      return
     }
+    const recordId = typeof shaped[recordIdField] === 'string' ? shaped[recordIdField] : ''
+    const expectedRevision = typeof shaped.expectedRevision === 'number' ? shaped.expectedRevision : undefined
+    if (action.kind === 'record.update' && recordId) {
+      await mutations.update.mutateAsync({recordId, data: recordDataForAction(shaped, recordIdField), expectedRevision})
+      return
+    }
+    if (action.kind === 'record.delete' && recordId) return void await mutations.remove.mutateAsync({recordId, expectedRevision})
+    if (action.kind === 'record.restore' && recordId) return void await mutations.restore.mutateAsync({recordId, expectedRevision})
+    if (action.kind === 'record.purge' && recordId) return void await mutations.purge.mutateAsync({recordId, expectedRevision})
+    if (action.kind === 'settings.update') return void await settingsMutation.mutateAsync(shaped)
+    await moduleRepository.runAction(moduleId, action.actionId, shaped)
   }
 
   if (view.kind === 'settings') {
+    if (!fields.length) {
+      return (
+        <View style={{gap: spacing[4]}}>
+          <AppText variant="display">{view.title}</AppText>
+          <SchemaSettingsRenderer moduleId={moduleId} />
+        </View>
+      )
+    }
     return (
-      <View style={{gap: spacing[4]}}>
+      <ScrollView contentContainerStyle={{gap: spacing[4]}} keyboardShouldPersistTaps="handled">
         <AppText variant="display">{view.title}</AppText>
-        <SchemaSettingsRenderer moduleId={moduleId} />
-      </View>
+        {fields.map(field => (
+          <ModuleFieldRenderer key={field.fieldId} field={field} value={draft[field.name]} onChange={value => updateDraftField(field.name, value)} />
+        ))}
+        {view.layout.map(node => <LayoutNode key={node.id} node={node} actions={allActions} data={draft} onAction={action => runAction(action, draft)} />)}
+      </ScrollView>
     )
   }
 
@@ -106,7 +142,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
     )
   }
 
-  return (
+  const header = (
     <View style={{gap: spacing[4]}}>
       <View style={{gap: spacing[2]}}>
         <AppText variant="display">{view.title}</AppText>
@@ -114,7 +150,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
           actions={view.toolbar ?? []}
           onAction={action => { void runAction(action) }}
         />
-        {view.kind === 'collection' ? (
+        {view.kind === 'collection' && view.searchEnabled ? (
           <View
             style={[
               styles.search,
@@ -137,93 +173,79 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
         ) : null}
       </View>
 
-      {view.layout.length ? (
-        <View style={{gap: spacing[3]}}>
-          {view.layout.map(node => (
-            <LayoutNode key={node.id} node={node} actions={allActions} onAction={runAction} />
-          ))}
-        </View>
-      ) : null}
-
-      {allActions.filter(action => action.kind !== 'record.create').length ? (
-        <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
-          {allActions.filter(action => action.kind !== 'record.create').map(action => (
-            <ModulaButton
-              key={action.actionId}
-              label={action.label}
-              role={action.destructive ? 'destructive' : 'secondary'}
-              onPress={() => { void runAction(action) }}
-            />
-          ))}
-        </View>
-      ) : null}
-
-      {fields.length ? (
+      {view.kind === 'form' && recordQuery.isPending && view.recordBinding ? <AppText variant="caption" colour="textSecondary">Loading record.</AppText> : null}
+      {view.kind === 'form' && fields.length ? (
         <View style={[styles.panel, {backgroundColor: colours.surfaceRaised, borderColor: colours.border, borderRadius: radius.large, gap: spacing[3], padding: spacing[4]}]}>
-          <AppText variant="headline">{editing ? 'Edit record' : createAction?.label ?? 'Create record'}</AppText>
+          <AppText variant="headline">{view.recordBinding ? updateAction?.label ?? 'Edit record' : createAction?.label ?? 'Create record'}</AppText>
           {fields.map(field => (
             <ModuleFieldRenderer
               key={field.fieldId}
               field={field}
               value={draft[field.name]}
-              onChange={value => setDraft(current => ({...current, [field.name]: value}))}
+              onChange={value => updateDraftField(field.name, value)}
             />
           ))}
-          <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
-            <ModulaButton
-              label={editing ? 'Save' : 'Create'}
-              accessibilityLabel={editing ? 'Edit note' : 'Create note'}
-              loading={mutations.create.isPending || mutations.update.isPending}
-              onPress={() => { void saveDraft() }}
-            />
-            {editing ? <ModulaButton label="Cancel" role="secondary" onPress={() => { setEditing(null); setDraft({}) }} /> : null}
-          </View>
         </View>
       ) : null}
-
-      {recordsQuery.isPending ? (
-        <AppText variant="caption" colour="textSecondary">Loading records.</AppText>
-      ) : records.length ? (
-        <ScrollView contentContainerStyle={{gap: spacing[3]}}>
-          {records.map(record => (
-            <RecordRow
-              key={record.record_id}
-              record={record}
-              fields={fields}
-              moduleId={moduleId}
-              collection={collection}
-              aiActions={aiActions}
-              extensionContributions={extensionContributions}
-              onEdit={() => {
-                setEditing(record)
-                setDraft(record.data)
-              }}
-              onDelete={() => mutations.remove.mutate({recordId: record.record_id, expectedRevision: record.revision})}
-            />
+      {view.layout.length ? (
+        <View style={{gap: spacing[3]}}>
+          {view.layout.map(node => (
+            <LayoutNode key={node.id} node={node} actions={allActions} data={recordQuery.data?.data ?? draft} onAction={action => runAction(action, draft)} />
           ))}
-        </ScrollView>
-      ) : (
-        <ModuleEmptyState
-          title={view.emptyState?.title ?? view.title}
-          body={view.emptyState?.body ?? 'Create the first record when you are ready.'}
-          primaryAction={
-            createAction
-              ? {label: createAction.label, onPress: () => { void runAction(createAction, draft) }}
-              : undefined
-          }
-        />
-      )}
+        </View>
+      ) : null}
     </View>
   )
+
+  if (view.kind === 'collection') {
+    return (
+      <FlatList
+        contentContainerStyle={{gap: spacing[3], paddingBottom: spacing[6]}}
+        data={records}
+        keyExtractor={record => record.record_id}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={header}
+        ListEmptyComponent={recordsQuery.isPending
+          ? <AppText variant="caption" colour="textSecondary">Loading records.</AppText>
+          : <ModuleEmptyState title={view.emptyState?.title ?? view.title} body={view.emptyState?.body ?? 'Create the first record when you are ready.'} primaryAction={createAction ? {label: createAction.label, onPress: () => { void runAction(createAction, draft) }} : undefined} />}
+        renderItem={({item}) => (
+          <RecordRow
+            record={item}
+            actions={allActions}
+            recordListActionIds={view.recordListActionIds ?? []}
+            moduleId={moduleId}
+            collection={collection}
+            aiActions={aiActions}
+            extensionContributions={extensionContributions}
+            onAction={runAction}
+          />
+        )}
+      />
+    )
+  }
+
+  if (view.recordBinding && recordQuery.isError) return <ModuleEmptyState title="Record unavailable" body="This record could not be loaded for the current product and account." />
+  return (
+    <ScrollView contentContainerStyle={{gap: spacing[4], paddingBottom: spacing[6]}} keyboardShouldPersistTaps="handled">
+      {header}
+    </ScrollView>
+  )
+}
+
+function recordDataForAction(input: Record<string, unknown>, recordIdField: string): Record<string, unknown> {
+  const omitted = new Set([recordIdField, 'recordId', 'expectedRevision', 'idempotencyKey', 'confirm'])
+  return Object.fromEntries(Object.entries(input).filter(([key]) => !omitted.has(key)))
 }
 
 function LayoutNode({
   node,
   actions,
+  data,
   onAction,
 }: {
   node: GreenfieldModuleLayoutNode
   actions: GreenfieldModuleAction[]
+  data: Record<string, unknown>
   onAction: (action: GreenfieldModuleAction) => Promise<void>
 }) {
   const {colours, radius, spacing} = useThemeTokens()
@@ -232,13 +254,13 @@ function LayoutNode({
       <View style={[styles.panel, {backgroundColor: colours.surface, borderColor: colours.border, borderRadius: radius.large, gap: spacing[2], padding: spacing[4]}]}>
         {node.title ? <AppText variant="headline">{node.title}</AppText> : null}
         {node.text ? <AppText variant="caption" colour="textSecondary">{node.text}</AppText> : null}
-        {node.children?.map(child => <LayoutNode key={child.id} node={child} actions={actions} onAction={onAction} />)}
+        {node.children?.map(child => <LayoutNode key={child.id} node={child} actions={actions} data={data} onAction={onAction} />)}
       </View>
     )
   }
-  if (node.component === 'text') return <AppText variant="body" colour="textSecondary">{node.text ?? node.label ?? ''}</AppText>
+  if (node.component === 'text') return <AppText variant="body" colour="textSecondary">{displayValue(node.field ? data[node.field] : undefined, node.text ?? node.label ?? '')}</AppText>
   if (node.component === 'label') return <AppText variant="label">{node.label ?? node.text ?? ''}</AppText>
-  if (node.component === 'metadata') return <AppText variant="micro" colour="textTertiary">{node.label ?? node.text ?? node.field ?? ''}</AppText>
+  if (node.component === 'metadata') return <AppText variant="micro" colour="textTertiary">{displayValue(node.field ? data[node.field] : undefined, node.label ?? node.text ?? node.field ?? '')}</AppText>
   if (node.component === 'badge') {
     return (
       <View style={[styles.badge, {backgroundColor: colours.accentSubtle, borderColor: colours.accentBorder, borderRadius: radius.round, paddingHorizontal: spacing[2], paddingVertical: spacing[1]}]}>
@@ -260,46 +282,58 @@ function LayoutNode({
 
 function RecordRow({
   record,
-  fields,
+  actions,
+  recordListActionIds,
   moduleId,
   collection,
   aiActions,
   extensionContributions,
-  onEdit,
-  onDelete,
+  onAction,
 }: {
   record: ModuleRecord
-  fields: GreenfieldModuleFieldDefinition[]
+  actions: GreenfieldModuleAction[]
+  recordListActionIds: string[]
   moduleId: string
   collection: string
   aiActions: ModuleAIProductActionDefinition[]
   extensionContributions: ModuleHostExtensionContribution[]
-  onEdit: () => void
-  onDelete: () => void
+  onAction: (action: GreenfieldModuleAction, input: Record<string, unknown>) => Promise<void>
 }) {
   const {spacing} = useThemeTokens()
-  const titleField = fields.find(field => field.name === 'title') ?? fields[0]
-  const title = titleField ? String(record.data[titleField.name] ?? 'Untitled') : 'Record'
-  const body = fields.find(field => field.name === 'body')
-  const tags = record.data.tags
+  const title = String(record.data.title ?? record.data.name ?? record.data.label ?? 'Untitled')
+  const body = record.data.plainTextProjection ?? record.data.body ?? record.data.description
+  const tags = record.data.tagIds ?? record.data.tags ?? record.data.labels
   const tagCount = Array.isArray(tags) ? tags.length : 0
   const updated = record.updated_at ?? record.updatedAt ?? ''
+  const rowActions = recordListActionIds.flatMap(id => {
+    const action = actions.find(candidate => candidate.actionId === id)
+    return action ? [action] : []
+  })
+  const openAction = rowActions.find(action => action.kind === 'route.open')
+  const secondaryActions = rowActions.filter(action => action !== openAction)
+  const recordInput = (action: GreenfieldModuleAction) => ({
+    [action.target?.recordIdField ?? 'recordId']: record.record_id,
+    expectedRevision: record.revision,
+  })
   return (
     <View style={{gap: spacing[2], paddingVertical: spacing[3]}}>
-      <AppText variant="headline">{title}</AppText>
-      {body && record.data[body.name] ? (
-        <AppText variant="caption" colour="textSecondary" numberOfLines={2}>{String(record.data[body.name])}</AppText>
-      ) : null}
+      <AppPressable accessibilityLabel={openAction ? `Open ${title}` : title} disabled={!openAction} onPress={() => { if (openAction) void onAction(openAction, recordInput(openAction)) }}>
+        <View style={{gap: spacing[2]}}>
+          <AppText variant="headline">{title}</AppText>
+          {body ? <AppText variant="caption" colour="textSecondary" numberOfLines={2}>{displayValue(body, '')}</AppText> : null}
+        </View>
+      </AppPressable>
       <AppText variant="micro" colour="textTertiary">
         {[updated ? relativeDay(updated) : null, tagCount ? `${tagCount} tags` : null].filter(Boolean).join('  ·  ')}
       </AppText>
+      {secondaryActions.length ? (
+        <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
+          {secondaryActions.map(action => (
+            <ModulaButton key={action.actionId} label={action.label} role={action.destructive ? 'destructive' : 'secondary'} onPress={() => { void onAction(action, recordInput(action)) }} />
+          ))}
+        </View>
+      ) : null}
       <View style={{alignItems: 'center', flexDirection: 'row', gap: spacing[2]}}>
-        <AppPressable accessibilityLabel="Edit record" onPress={onEdit}>
-          <AppText variant="label" colour="accent">Edit</AppText>
-        </AppPressable>
-        <AppPressable accessibilityLabel="Delete record" onPress={onDelete}>
-          <AppText variant="label" colour="destructive">Delete</AppText>
-        </AppPressable>
         <ModuleAIActionMenu
           moduleId={moduleId}
           collection={collection}
@@ -310,6 +344,15 @@ function RecordRow({
       <ModuleExtensionContributions moduleId={moduleId} contributions={extensionContributions} record={record} />
     </View>
   )
+}
+
+function displayValue(value: unknown, fallback: string): string {
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (value && typeof value === 'object') {
+    const text = JSON.stringify(value)
+    return text.length <= 2_000 ? text : `${text.slice(0, 1_997)}...`
+  }
+  return fallback
 }
 
 function relativeDay(value: string): string {

@@ -78,7 +78,7 @@ export function useModuleFrontendQuery(moduleId: string, enabled = true) {
 export function useModuleRecordsQuery(
   moduleId: string,
   collection: string,
-  input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'} = {},
+  input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; filters?: Record<string, string | number | boolean | null>; recordState?: 'active' | 'deleted'} = {},
 ) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
@@ -89,13 +89,23 @@ export function useModuleRecordsQuery(
   })
 }
 
-export function useModuleSettingsQuery(moduleId: string) {
+export function useModuleRecordQuery(moduleId: string, collection: string, recordId: string) {
+  const {moduleRepository} = useAppServices()
+  const session = useSession()
+  return useQuery({
+    queryKey: moduleQueryKeys.record(moduleId, collection, recordId),
+    queryFn: () => moduleRepository.getRecord(moduleId, collection, recordId),
+    enabled: Boolean(moduleId && collection && recordId) && session.status === 'signedIn',
+  })
+}
+
+export function useModuleSettingsQuery(moduleId: string, enabled = true) {
   const {moduleRepository} = useAppServices()
   const session = useSession()
   return useQuery({
     queryKey: moduleQueryKeys.settings(moduleId),
     queryFn: () => moduleRepository.getSettings(moduleId),
-    enabled: Boolean(moduleId) && session.status === 'signedIn',
+    enabled: Boolean(moduleId) && session.status === 'signedIn' && enabled,
   })
 }
 
@@ -175,7 +185,12 @@ export function useModuleLifecycleMutations(moduleId: string) {
 export function useModuleRecordMutations(moduleId: string, collection: string) {
   const {moduleRepository} = useAppServices()
   const queryClient = useQueryClient()
-  const invalidate = () => queryClient.invalidateQueries({queryKey: moduleQueryKeys.recordsCollection(moduleId, collection)})
+  const invalidate = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.recordsCollection(moduleId, collection)}),
+      queryClient.invalidateQueries({queryKey: moduleQueryKeys.recordCollection(moduleId, collection)}),
+    ])
+  }
   return {
     create: useMutation({mutationFn: (data: Record<string, unknown>) => moduleRepository.createRecord(moduleId, collection, data), onSuccess: invalidate}),
     update: useMutation({
@@ -188,7 +203,26 @@ export function useModuleRecordMutations(moduleId: string, collection: string) {
         moduleRepository.deleteRecord(moduleId, collection, input.recordId, input.expectedRevision),
       onSuccess: invalidate,
     }),
+    restore: useMutation({
+      mutationFn: (input: {recordId: string; expectedRevision?: number}) =>
+        moduleRepository.restoreRecord(moduleId, collection, input.recordId, input.expectedRevision),
+      onSuccess: invalidate,
+    }),
+    purge: useMutation({
+      mutationFn: (input: {recordId: string; expectedRevision?: number}) =>
+        moduleRepository.purgeRecord(moduleId, collection, input.recordId, input.expectedRevision),
+      onSuccess: invalidate,
+    }),
   }
+}
+
+export function useModuleSettingsMutation(moduleId: string) {
+  const {moduleRepository} = useAppServices()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (values: Record<string, unknown>) => moduleRepository.updateSettings(moduleId, values),
+    onSuccess: () => queryClient.invalidateQueries({queryKey: moduleQueryKeys.settings(moduleId)}),
+  })
 }
 
 export function useModuleAIMutations(moduleId: string, collection: string) {

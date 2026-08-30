@@ -11,8 +11,10 @@ export const moduleQueryKeys = {
   frontend: (moduleId: string) => ['modules', 'frontend', moduleId] as const,
   view: (moduleId: string, viewId: string) => ['modules', 'view', moduleId, viewId] as const,
   recordsCollection: (moduleId: string, collection: string) => ['modules', 'records', moduleId, collection] as const,
-  records: (moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string}) =>
+  recordCollection: (moduleId: string, collection: string) => ['modules', 'record', moduleId, collection] as const,
+  records: (moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; filters?: Record<string, string | number | boolean | null>; recordState?: 'active' | 'deleted'}) =>
     ['modules', 'records', moduleId, collection, input] as const,
+  record: (moduleId: string, collection: string, recordId: string) => ['modules', 'record', moduleId, collection, recordId] as const,
   settings: (moduleId: string) => ['modules', 'settings', moduleId] as const,
   settingsSchema: (moduleId: string) => ['modules', 'settings-schema', moduleId] as const,
   health: (moduleId: string) => ['modules', 'health', moduleId] as const,

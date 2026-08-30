@@ -2,6 +2,7 @@ import {Switch, TextInput, View} from 'react-native'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 
 import {AppText} from '@/components/primitives/AppText'
+import {richTextDocumentFromText, richTextEditingText} from '@/features/modules/runtime/mps-frontend-adapter'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleFieldRenderer({
@@ -28,7 +29,9 @@ export function ModuleFieldRenderer({
       </View>
     )
   }
-  const textValue = field.type === 'json'
+  const textValue = field.type === 'richText'
+    ? richTextEditingText(value)
+    : field.type === 'json'
     ? value === undefined
       ? ''
       : JSON.stringify(value, null, 2)
@@ -48,7 +51,8 @@ export function ModuleFieldRenderer({
         accessibilityLabel={field.label}
         value={textValue}
         onChangeText={text => {
-          if (field.type === 'tags' || field.type === 'multiSelect') onChange(text.split(',').map(item => item.trim()).filter(Boolean))
+          if (field.type === 'richText') onChange(richTextDocumentFromText(text))
+          else if (field.type === 'tags' || field.type === 'multiSelect') onChange(text.split(',').map(item => item.trim()).filter(Boolean))
           else if (field.type === 'json') {
             try {
               onChange(text.trim() ? JSON.parse(text) : {})
@@ -63,14 +67,14 @@ export function ModuleFieldRenderer({
         placeholder={field.placeholder}
         placeholderTextColor={colours.textTertiary}
         keyboardType={field.type === 'number' ? 'numeric' : 'default'}
-        multiline={field.type === 'multilineText' || field.type === 'json'}
+        multiline={field.type === 'multilineText' || field.type === 'richText' || field.type === 'json'}
         style={{
           backgroundColor: colours.surface,
           borderColor: colours.border,
           borderRadius: radius.medium,
           borderWidth: 1,
           color: colours.text,
-          minHeight: field.type === 'multilineText' || field.type === 'json' ? 112 : 44,
+          minHeight: field.type === 'multilineText' || field.type === 'richText' || field.type === 'json' ? 112 : 44,
           padding: spacing[3],
         }}
       />

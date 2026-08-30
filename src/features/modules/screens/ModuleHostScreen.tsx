@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {EmptyState} from '@/components/primitives/EmptyState'
@@ -65,17 +65,15 @@ export function ModuleHostScreen({moduleId, path}: {moduleId: unknown; path?: un
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       {header}
       <ResponsiveContent maxWidth={820}>
-        <ScrollView
-          contentContainerStyle={[styles.content, {gap: spacing[5]}]}
-          keyboardShouldPersistTaps="handled">
+        <View style={[styles.content, {gap: spacing[5]}]}>
           <ModuleHost moduleId={id} path={segments} />
-        </ScrollView>
+        </View>
       </ResponsiveContent>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {padding: 16, paddingBottom: 40},
+  content: {flex: 1, padding: 16, paddingBottom: 40},
   screen: {flex: 1},
 })

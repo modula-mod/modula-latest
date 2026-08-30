@@ -70,6 +70,14 @@ Settings use Greenfield's generic product settings service. Route and share
 actions are host-mediated. Unsupported action/capability families are not
 executed as remote code or arbitrary network calls.
 
+Collection bindings may declare bounded scalar filters and an explicit active
+or deleted record state. The host preserves scalar types over the API boundary;
+Greenfield validates filter fields against the installed release. Declarative
+forms may add bounded defaults and the versioned `richText.plainText@1`
+projection. Restore and permanent purge use the existing Greenfield lifecycle
+endpoints, and purge always requires product-declared confirmation plus the
+host confirmation surface.
+
 Host contributions remain declared, permission checked, installation scoped,
 enable/disable aware and failure isolated. For an MPS frontend release, the
 host contribution presentation is selected from the exact release frontend
