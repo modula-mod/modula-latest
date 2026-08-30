@@ -114,6 +114,12 @@ export type GreenfieldModuleActionKind =
   | 'settings.update'
   | 'share'
   | 'dismiss'
+export type GreenfieldModuleActionEventKind =
+  | GreenfieldModuleActionKind
+  | 'record.read'
+  | 'service.invoke'
+  | 'extension.invoke'
+  | 'capability.invoke'
 export type GreenfieldModuleRuntimeRegistrationStatus = 'declared' | 'registered' | 'disabled' | 'quarantined' | 'revoked'
 export type GreenfieldModuleRuntimeVisibility = 'private' | 'teams' | 'followers' | 'public' | 'system'
 export type GreenfieldModuleRetentionPolicy = 'keepOnUninstall' | 'deleteOnUninstall' | 'exportRequired'
@@ -1056,7 +1062,7 @@ export interface Database {
   greenfield_module_records: {record_id: string; account_id: string; module_id: string; installation_id: string | null; collection: string; schema_ref: string; visibility: GreenfieldModuleRuntimeVisibility; data: unknown; search_text: string; folder_ref: string | null; source_uri: string | null; retained_after_uninstall: boolean; revision: number; created_at: Date; updated_at: Date; deleted_at: Date | null}
   greenfield_module_record_events: {event_id: string; record_id: string; account_id: string; module_id: string; collection: string; operation: 'create' | 'update' | 'delete' | 'restore' | 'move' | 'purge'; revision: number; previous_hash: string | null; event_hash: string; payload_hash: string; metadata: unknown; created_at: Date}
   greenfield_module_record_versions: {version_id: string; record_id: string; account_id: string; module_id: string; collection: string; revision: number; next_revision: number; data_snapshot: unknown; payload_hash: string; change_source: 'update' | 'restore' | 'import' | 'delete' | 'ai-assisted'; metadata: unknown; created_at: Date}
-  greenfield_module_action_events: {event_id: string; account_id: string; module_id: string; action_id: string; action_kind: GreenfieldModuleActionKind; idempotency_key: string | null; status: 'validated' | 'completed' | 'failed' | 'queued' | 'cancelled'; input_hash: string; result: unknown; error_code: string | null; created_at: Date}
+  greenfield_module_action_events: {event_id: string; account_id: string; module_id: string; action_id: string; action_kind: GreenfieldModuleActionEventKind; idempotency_key: string | null; status: 'validated' | 'completed' | 'failed' | 'queued' | 'cancelled'; input_hash: string; result: unknown; error_code: string | null; created_at: Date}
   greenfield_module_export_jobs: {export_id: string; account_id: string; module_id: string; installation_id: string | null; format: 'json' | 'markdown' | 'plain-text' | 'zip'; state: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'; manifest: unknown; record_count: number; output_ref: string | null; failure_code: string | null; created_by: string | null; created_at: Date; updated_at: Date; completed_at: Date | null}
   greenfield_module_data_retention: {retention_id: string; account_id: string; module_id: string; installation_id: string | null; choice: GreenfieldModuleDataRetentionChoice; record_count: number; export_id: string | null; completed_at: Date | null; created_at: Date}
   greenfield_module_resolved_dependencies: {resolution_id: string; plan_id: string | null; installation_id: string | null; account_id: string; release_id: string; module_id: string; relation: GreenfieldModuleDependencyRelation; target_module_id: string | null; provided_contract: string | null; requested_range: string; resolved_module_id: string | null; resolved_version: string | null; installed: boolean; satisfied: boolean; blocking: boolean; degraded: boolean; reason: string | null; created_at: Date; updated_at: Date}
