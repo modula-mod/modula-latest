@@ -262,6 +262,11 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(favourited.result.data.favourite).toBe(true)
     const archived = await runAction('digital.modula.vault-notes.actions.note.archive', {recordId: note.record_id, expectedRevision: 5, archived: true})
     expect(archived.result.data.archived).toBe(true)
+    const filteredRecords = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/records/note?filter.archived=true`, headers: {authorization: `Bearer ${token}`}})
+    expect(filteredRecords.statusCode).toBe(200)
+    expect(filteredRecords.json().data.items.some((item: any) => item.record_id === note.record_id)).toBe(true)
+    const invalidState = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/records/note?recordState=all`, headers: {authorization: `Bearer ${token}`}})
+    expect(invalidState.statusCode).toBe(400)
 
     const deleted = await app.inject({
       method: 'DELETE',
@@ -272,6 +277,12 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     expect(deleted.statusCode).toBe(200)
     await drainSearchDeliveries(16)
     await expectSearch(`saved phrase ${suffix}`, note.record_id, false)
+    const activeRecords = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/records/note`, headers: {authorization: `Bearer ${token}`}})
+    expect(activeRecords.statusCode).toBe(200)
+    expect(activeRecords.json().data.items.some((item: any) => item.record_id === note.record_id)).toBe(false)
+    const deletedRecords = await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/records/note?recordState=deleted`, headers: {authorization: `Bearer ${token}`}})
+    expect(deletedRecords.statusCode).toBe(200)
+    expect(deletedRecords.json().data.items.some((item: any) => item.record_id === note.record_id)).toBe(true)
 
     const restore = await app.inject({
       method: 'POST',

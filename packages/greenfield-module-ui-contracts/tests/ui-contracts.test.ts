@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest'
-import {validateGreenfieldModuleCollection, validateGreenfieldModuleView} from '../src/index.js'
+import {validateGreenfieldModuleAction, validateGreenfieldModuleCollection, validateGreenfieldModuleView} from '../src/index.js'
 
 const moduleId = 'digital.modula.vault-notes'
 
@@ -86,5 +86,47 @@ describe('Greenfield module UI contracts', () => {
       retentionPolicy: 'keepOnUninstall',
     })
     expect(result.valid).toBe(true)
+  })
+
+  it('validates neutral query filters, rich-text transforms, and confirmed purge', () => {
+    const taskModuleId = 'example.modula.reference-tasks'
+    const action = {
+      actionId: `${taskModuleId}.actions.purge-task`,
+      kind: 'record.purge' as const,
+      label: 'Delete permanently',
+      inputSchema: {fields: [{fieldId: 'description', name: 'description', type: 'richText' as const, label: 'Description'}]},
+      capability: `records:module.${taskModuleId}.task:delete`,
+      confirmationPolicy: 'confirmDestructive' as const,
+      destructive: true,
+      successDestination: {kind: 'stay' as const},
+      errorPresentation: {kind: 'inline' as const},
+      requiresIdempotencyKey: true,
+      inputDefaults: {completed: false},
+      inputTransforms: [{target: 'plainTextProjection', source: 'description', transform: 'richText.plainText@1' as const}],
+      target: {collection: 'task'},
+    }
+    const view = validateGreenfieldModuleView({
+      viewId: `${taskModuleId}.views.trash`,
+      moduleId: taskModuleId,
+      kind: 'collection',
+      title: 'Deleted tasks',
+      collection: 'task',
+      query: {
+        collection: 'task',
+        defaultLimit: 25,
+        maxLimit: 100,
+        allowedSortFields: ['updatedAt'],
+        allowedFilterFields: ['completed'],
+        searchableFields: ['title'],
+        filters: {completed: false},
+        recordState: 'deleted',
+      },
+      requiredCapabilities: [],
+      toolbar: [action],
+      layout: [{id: 'tasks', component: 'recordList', collection: 'task'}],
+    })
+    expect(view.valid).toBe(true)
+    expect(validateGreenfieldModuleAction(action, taskModuleId).valid).toBe(true)
+    expect(validateGreenfieldModuleAction({...action, destructive: false}, taskModuleId).issues.map(issue => issue.code)).toContain('PURGE_REQUIRES_CONFIRMATION')
   })
 })

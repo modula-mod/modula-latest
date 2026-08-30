@@ -17,10 +17,16 @@ import type {
 const ACTION_FAMILIES = new Set<GreenfieldModuleActionKind>([
   'route.open',
   'record.create',
+  'record.read',
   'record.update',
   'record.delete',
+  'record.restore',
+  'record.purge',
   'record.query',
   'function.invoke',
+  'service.invoke',
+  'extension.invoke',
+  'capability.invoke',
   'settings.update',
   'share',
   'dismiss',
@@ -59,12 +65,17 @@ export function adaptMpsFrontendView(input: {
   const {frontend, resolved} = input
   const view = resolved.view
   const collection = collectionFor(view)
+  const recordBinding = recordBindingFor(view, resolved.params)
   const fields = fieldsFor(view.root)
   const actions = (frontend.actions ?? [])
-    .map(action => adaptAction(frontend.productId, action, collection, fields, resolved.params))
-    .filter((action): action is GreenfieldModuleAction => Boolean(action))
+    .flatMap(action => {
+      const adapted = adaptAction(frontend.productId, action, view, collection, fields, resolved.params)
+      return adapted && actionAvailableForRoute(action, adapted, Boolean(recordBinding)) ? [adapted] : []
+    })
   const actionIds = actionReferences(view.root)
   const allowedActions = actions.filter(action => actionIds.has(action.actionId))
+  const toolbarIds = toolbarActionReferences(view.root)
+  const toolbar = allowedActions.filter(action => toolbarIds.has(action.actionId))
   const layout = adaptLayout(view.root)
   const empty = view.states?.empty
 
@@ -74,17 +85,13 @@ export function adaptMpsFrontendView(input: {
     kind: view.kind,
     title: localizedText(view.title, titleize(view.id)),
     collection: collection || undefined,
-    query: collection ? {
-      collection,
-      defaultLimit: 50,
-      maxLimit: 100,
-      allowedSortFields: [],
-      allowedFilterFields: [],
-      searchableFields: [],
-    } : undefined,
+    query: collection ? queryFor(view, collection) : undefined,
     layout: layout.length ? layout : [{id: `${view.id}.root`, component: 'section', text: localizedText(view.title, view.id)}],
-    toolbar: allowedActions,
+    toolbar,
     allowedActions,
+    recordBinding,
+    recordListActionIds: recordListActionReferences(view.root),
+    searchEnabled: componentTypes(view.root).has('search'),
     emptyState: empty ? {
       title: localizedText(empty.text ?? empty.title, 'Nothing here yet'),
       body: typeof empty.description === 'string' ? empty.description : undefined,
@@ -93,6 +100,19 @@ export function adaptMpsFrontendView(input: {
     requiredCapabilities: frontend.capabilities?.required ?? [],
     available: true,
   }
+}
+
+function componentTypes(root: MpsFrontendComponent): Set<string> {
+  const types = new Set<string>()
+  visit(root, component => types.add(component.type))
+  return types
+}
+
+function actionAvailableForRoute(source: MpsFrontendAction, action: GreenfieldModuleAction, hasRecordBinding: boolean): boolean {
+  if (action.kind === 'record.create' && hasRecordBinding) return false
+  if ((action.kind === 'record.update' || action.kind === 'record.delete' || action.kind === 'record.restore' || action.kind === 'record.purge')
+    && typeof source.recordIdBinding === 'string' && !hasRecordBinding) return false
+  return true
 }
 
 function matchRoute(routes: MpsFrontendRoute[], requestedPath: string): {route: MpsFrontendRoute; params: Record<string, string>} | null {
@@ -118,7 +138,10 @@ function segments(path: string): string[] {
 }
 
 function interpolateRoute(route: string, params: Record<string, string>): string {
-  return route.replace(/:([A-Za-z][A-Za-z0-9]*)/g, (_, name: string) => encodeURIComponent(params[name] ?? `:${name}`))
+  return route.replace(/:([A-Za-z][A-Za-z0-9]*)/g, (_, name: string) => {
+    const value = params[name]
+    return value === undefined ? `:${name}` : encodeURIComponent(value)
+  })
 }
 
 function decodeURIComponentSafe(value: string): string {
@@ -135,6 +158,34 @@ function collectionFor(view: MpsFrontendView): string {
     && typeof candidate.recordType === 'string',
   )
   return typeof binding?.recordType === 'string' ? binding.recordType : ''
+}
+
+function recordBindingFor(view: MpsFrontendView, params: Record<string, string>): ModuleRuntimeView['recordBinding'] {
+  const binding = view.bindings?.find(candidate => candidate.source === 'record.detail' && typeof candidate.recordType === 'string')
+  const recordIdParam = typeof binding?.recordIdParam === 'string' ? binding.recordIdParam : ''
+  const recordId = recordIdParam ? params[recordIdParam] : undefined
+  return binding && typeof binding.recordType === 'string' && recordId
+    ? {source: 'record.detail', collection: binding.recordType, recordId}
+    : undefined
+}
+
+function queryFor(view: MpsFrontendView, collection: string): NonNullable<ModuleRuntimeView['query']> {
+  const binding = view.bindings?.find(candidate => candidate.source === 'record.query' && candidate.recordType === collection)
+  const declaration = isRecord(binding?.query) ? binding.query : {}
+  const filters = isRecord(declaration.filters)
+    ? Object.fromEntries(Object.entries(declaration.filters).filter((entry): entry is [string, string | number | boolean | null] => entry[1] === null || ['string', 'number', 'boolean'].includes(typeof entry[1])))
+    : undefined
+  const defaultLimit = typeof declaration.limit === 'number' ? Math.max(1, Math.min(100, declaration.limit)) : 50
+  return {
+    collection,
+    defaultLimit,
+    maxLimit: 100,
+    allowedSortFields: [],
+    allowedFilterFields: filters ? Object.keys(filters) : [],
+    searchableFields: [],
+    filters,
+    recordState: declaration.recordState === 'deleted' ? 'deleted' : 'active',
+  }
 }
 
 function fieldsFor(root: MpsFrontendComponent): GreenfieldModuleFieldDefinition[] {
@@ -163,8 +214,8 @@ function fieldsFor(root: MpsFrontendComponent): GreenfieldModuleFieldDefinition[
 }
 
 function fieldType(value: unknown): GreenfieldModuleFieldDefinition['type'] {
-  if (value === 'richText') return 'multilineText'
-  if (value === 'assetReference') return 'text'
+  if (value === 'richText') return 'richText'
+  if (value === 'assetReference') return 'assetReference'
   if (value === 'text' || value === 'multilineText' || value === 'boolean' || value === 'singleSelect'
     || value === 'multiSelect' || value === 'date' || value === 'dateTime' || value === 'number'
     || value === 'tags' || value === 'url' || value === 'recordReference' || value === 'json') return value
@@ -174,33 +225,57 @@ function fieldType(value: unknown): GreenfieldModuleFieldDefinition['type'] {
 function adaptAction(
   productId: string,
   action: MpsFrontendAction,
+  view: MpsFrontendView,
   collection: string,
   fields: GreenfieldModuleFieldDefinition[],
   params: Record<string, string>,
 ): GreenfieldModuleAction | null {
   if (!ACTION_FAMILIES.has(action.family as GreenfieldModuleActionKind)) return null
   const kind = action.family as GreenfieldModuleActionKind
-  const destructive = kind === 'record.delete' || action.destructive === true
+  const destructive = kind === 'record.delete' || kind === 'record.purge' || action.destructive === true
   const declaredRoute = typeof action.route === 'string' ? interpolateRoute(action.route, params) : undefined
   return {
     actionId: action.id,
     kind,
     label: localizedText(action.label, titleize(action.id)),
-    inputSchema: {fields: kind === 'record.create' || kind === 'record.update' ? fields : []},
+    inputSchema: {fields: kind === 'record.create' || kind === 'record.update' || kind === 'settings.update' ? fields : []},
     capability: typeof action.capability === 'string' ? action.capability : `frontend.action.${kind}`,
     confirmationPolicy: destructive || action.confirm === true ? 'confirmDestructive' : 'none',
     destructive,
     successDestination: kind === 'dismiss' ? {kind: 'dismiss'} : {kind: 'stay'},
     errorPresentation: {kind: 'inline'},
     requiresIdempotencyKey: kind.startsWith('record.') || kind === 'settings.update' || kind === 'function.invoke',
+    inputDefaults: isRecord(action.input) && isRecord(action.input.defaults) ? action.input.defaults : undefined,
+    inputTransforms: isRecord(action.input) && Array.isArray(action.input.transforms)
+      ? action.input.transforms.filter(isRecord).flatMap(transform =>
+        typeof transform.target === 'string' && typeof transform.source === 'string' && transform.transform === 'richText.plainText@1'
+          ? [{target: transform.target, source: transform.source, transform: 'richText.plainText@1' as const}]
+          : [],
+      )
+      : undefined,
     target: {
       collection: typeof action.recordType === 'string' ? action.recordType : collection || undefined,
-      recordIdField: typeof action.recordIdParam === 'string' ? action.recordIdParam : 'recordId',
+      recordIdField: recordIdFieldFor(action, view),
       routePath: declaredRoute === undefined ? undefined : `/module/${encodeURIComponent(productId)}${declaredRoute === '/' ? '' : declaredRoute}`,
       functionId: typeof action.functionId === 'string' ? action.functionId : undefined,
+      serviceId: typeof action.serviceId === 'string' ? action.serviceId : undefined,
+      commandId: typeof action.commandId === 'string' ? action.commandId : undefined,
       settingsKeys: typeof action.settingsKey === 'string' ? [action.settingsKey] : undefined,
     },
   }
+}
+
+function recordIdFieldFor(action: MpsFrontendAction, view: MpsFrontendView): string {
+  if (typeof action.recordIdParam === 'string') return action.recordIdParam
+  if (typeof action.recordIdBinding === 'string') {
+    const binding = view.bindings?.find(candidate => candidate.id === action.recordIdBinding)
+    if (typeof binding?.recordIdParam === 'string') return binding.recordIdParam
+  }
+  if (typeof action.route === 'string') {
+    const parameter = action.route.match(/:([A-Za-z][A-Za-z0-9]*)/)
+    if (parameter?.[1]) return parameter[1]
+  }
+  return 'recordId'
 }
 
 function adaptLayout(root: MpsFrontendComponent): GreenfieldModuleLayoutNode[] {
@@ -211,8 +286,9 @@ function adaptLayout(root: MpsFrontendComponent): GreenfieldModuleLayoutNode[] {
     const children = component.children?.map(convert).filter((child): child is GreenfieldModuleLayoutNode => Boolean(child))
     if (component.type === 'recordList' || component.type === 'recordRow' || component.type === 'field'
       || component.type === 'search' || component.type === 'filter' || component.type === 'sort') return null
+    if (component.type === 'toolbar') return null
     if (component.type === 'stack' || component.type === 'row' || component.type === 'grid' || component.type === 'scroll'
-      || component.type === 'toolbar' || component.type === 'tabs' || component.type === 'picker' || component.type === 'menu') {
+      || component.type === 'tabs' || component.type === 'picker' || component.type === 'menu') {
       return {id, component: 'section', title: textOrUndefined(component.title), text: textOrUndefined(component.text), children}
     }
     if (component.type === 'section' || component.type === 'text' || component.type === 'label' || component.type === 'metadata'
@@ -236,10 +312,82 @@ function adaptLayout(root: MpsFrontendComponent): GreenfieldModuleLayoutNode[] {
   return converted ? [converted] : []
 }
 
+function toolbarActionReferences(root: MpsFrontendComponent): Set<string> {
+  const ids = new Set<string>()
+  visit(root, component => {
+    if (component.type !== 'toolbar') return
+    if (typeof component.action === 'string') ids.add(component.action)
+    if (Array.isArray(component.actions)) component.actions.filter((id): id is string => typeof id === 'string').forEach(id => ids.add(id))
+    component.children?.forEach(child => {
+      if (typeof child.action === 'string') ids.add(child.action)
+    })
+  })
+  return ids
+}
+
+function recordListActionReferences(root: MpsFrontendComponent): string[] {
+  const ids = new Set<string>()
+  visit(root, component => {
+    if (component.type !== 'recordList' && component.type !== 'recordRow') return
+    if (typeof component.action === 'string') ids.add(component.action)
+    if (Array.isArray(component.actions)) component.actions.filter((id): id is string => typeof id === 'string').forEach(id => ids.add(id))
+  })
+  return [...ids]
+}
+
+export function resolveRuntimeActionRoute(action: GreenfieldModuleAction, input: Record<string, unknown>): string | null {
+  const path = action.target?.routePath
+  if (!path) return null
+  let unresolved = false
+  const resolved = path.replace(/:([A-Za-z][A-Za-z0-9]*)/g, (_, name: string) => {
+    const value = input[name]
+    if (typeof value !== 'string' || !value) {
+      unresolved = true
+      return `:${name}`
+    }
+    return encodeURIComponent(value)
+  })
+  return unresolved ? null : resolved
+}
+
+export function shapeMpsActionInput(action: GreenfieldModuleAction, input: Record<string, unknown>): Record<string, unknown> {
+  const shaped = {...(action.inputDefaults ?? {}), ...input}
+  for (const transform of action.inputTransforms ?? []) {
+    if (transform.transform === 'richText.plainText@1') shaped[transform.target] = richTextPlainText(shaped[transform.source])
+  }
+  return shaped
+}
+
+function richTextPlainText(value: unknown): string {
+  if (typeof value === 'string') return value
+  if (!isRecord(value) || value.schemaVersion !== '1.0.0' || !Array.isArray(value.blocks)) return ''
+  return value.blocks.filter(isRecord).map(block => {
+    if (Array.isArray(block.items)) return block.items.filter(item => typeof item === 'string').join('\n')
+    if (Array.isArray(block.inlines)) return block.inlines.filter(isRecord).map(item => typeof item.text === 'string' ? item.text : '').join('')
+    return typeof block.text === 'string' ? block.text : typeof block.title === 'string' ? block.title : ''
+  }).join('\n').replace(/\n{3,}/g, '\n\n').trim()
+}
+
+export function richTextEditingText(value: unknown): string {
+  return richTextPlainText(value)
+}
+
+export function richTextDocumentFromText(text: string): Record<string, unknown> {
+  return {
+    schemaVersion: '1.0.0',
+    blocks: text.split(/\n{2,}/).filter(paragraph => paragraph.trim().length > 0).map((paragraph, index) => ({
+      id: `block-${index + 1}`,
+      type: 'paragraph',
+      text: paragraph.trim(),
+    })),
+  }
+}
+
 function actionReferences(root: MpsFrontendComponent): Set<string> {
   const ids = new Set<string>()
   visit(root, component => {
     if (typeof component.action === 'string') ids.add(component.action)
+    if (Array.isArray(component.actions)) component.actions.filter((id): id is string => typeof id === 'string').forEach(id => ids.add(id))
   })
   return ids
 }

@@ -76,13 +76,13 @@ source('services/greenfield-api/scripts/publish-mps-products.ts', [
 scan('src/features/modules/runtime', /if\s*\([^)]*(?:productId|moduleId)[^)]*(?:===|==)[^)]*(?:vault-notes|reference-tasks)/i, 'PRODUCT-SPECIFIC HOST BRANCHES')
 scan('src/features/modules/runtime', /(?:eval\s*\(|from\s+['\"]react-native-webview['\"]|remoteBundle)/i, 'ARBITRARY FRONTEND EXECUTION')
 
-run('PRODUCT STANDARD BUILD', 'pnpm', ['--filter', '@modula/greenfield-product-standard', 'build'])
+run('API WORKSPACE CONTRACTS BUILD', 'pnpm', ['--filter', '@modula/greenfield-api^...', 'build'])
 run('PRODUCT STANDARD TESTS', 'pnpm', ['--filter', '@modula/greenfield-product-standard', 'test'], {...process.env, CI: 'true'})
 run('HOST TYPES', 'pnpm', ['exec', 'tsc', '--noEmit'])
 run(
   'GENERIC RENDERER ADAPTER',
   'pnpm',
-  ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '--tsconfig', '../../tsconfig.json', '../../scripts/test-mps-frontend-adapter.ts'],
+  ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '--tsconfig', '../../tsconfig.json', '../../scripts/test-mps-frontend-adapter.ts', '--require-vault'],
 )
 
 const fixture = createGreenfieldVerifierDatabaseFixture('product_frontend_v1')

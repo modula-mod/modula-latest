@@ -36,12 +36,16 @@ export type GreenfieldModuleComponentKind = (typeof GREENFIELD_MODULE_COMPONENTS
 export const GREENFIELD_MODULE_ACTION_KINDS = [
   'route.open',
   'record.create',
+  'record.read',
   'record.update',
   'record.delete',
   'record.restore',
   'record.purge',
   'record.query',
   'function.invoke',
+  'service.invoke',
+  'extension.invoke',
+  'capability.invoke',
   'settings.update',
   'share',
   'dismiss',
@@ -62,6 +66,8 @@ export const GREENFIELD_MODULE_FIELD_TYPES = [
   'url',
   'recordReference',
   'json',
+  'assetReference',
+  'richText',
 ] as const
 
 export type GreenfieldModuleFieldType = (typeof GREENFIELD_MODULE_FIELD_TYPES)[number]
@@ -109,6 +115,8 @@ export type GreenfieldModuleQueryDefinition = {
   searchableFields: string[]
   folderField?: string
   referenceFields?: string[]
+  filters?: Record<string, string | number | boolean | null>
+  recordState?: 'active' | 'deleted'
 }
 
 export type GreenfieldModuleActionInputSchema = {
@@ -138,11 +146,15 @@ export type GreenfieldModuleAction = {
   successDestination: GreenfieldModuleSuccessDestination
   errorPresentation: GreenfieldModuleErrorPresentation
   requiresIdempotencyKey: boolean
+  inputDefaults?: Record<string, unknown>
+  inputTransforms?: Array<{target: string; source: string; transform: 'richText.plainText@1'}>
   target?: {
     collection?: string
     recordIdField?: string
     routePath?: string
     functionId?: string
+    serviceId?: string
+    commandId?: string
     settingsKeys?: string[]
   }
 }
@@ -321,7 +333,7 @@ function validateAction(input: unknown, path: string, moduleId: string, add: (pa
     return
   }
   const action = input as Partial<GreenfieldModuleAction>
-  checkKnownKeys(action, path, ['actionId', 'kind', 'label', 'inputSchema', 'capability', 'confirmationPolicy', 'destructive', 'successDestination', 'errorPresentation', 'requiresIdempotencyKey', 'target'], add)
+  checkKnownKeys(action, path, ['actionId', 'kind', 'label', 'inputSchema', 'capability', 'confirmationPolicy', 'destructive', 'successDestination', 'errorPresentation', 'requiresIdempotencyKey', 'inputDefaults', 'inputTransforms', 'target'], add)
   if (!isModuleNamespacedIdentifier(moduleId, action.actionId ?? '')) add(`${path}.actionId`, 'ACTION_ID_NOT_NAMESPACED', 'Action ID must be module-namespaced')
   if (!ACTION_KIND_SET.has(String(action.kind))) add(`${path}.kind`, 'UNSUPPORTED_ACTION_KIND', 'Action kind is not supported')
   checkBoundedString(action.label, `${path}.label`, 1, 80, add)
@@ -332,10 +344,30 @@ function validateAction(input: unknown, path: string, moduleId: string, add: (pa
   if (action.destructive && action.confirmationPolicy !== 'confirmDestructive' && action.confirmationPolicy !== 'recentAuth') {
     add(`${path}.confirmationPolicy`, 'DESTRUCTIVE_CONFIRMATION_REQUIRED', 'Destructive actions require destructive confirmation or recent authentication')
   }
+  if (action.kind === 'record.purge' && (action.destructive !== true || action.confirmationPolicy !== 'confirmDestructive')) {
+    add(path, 'PURGE_REQUIRES_CONFIRMATION', 'Permanent record purge must be destructive and require destructive confirmation')
+  }
   validateSuccessDestination(action.successDestination, `${path}.successDestination`, moduleId, add)
   validateErrorPresentation(action.errorPresentation, `${path}.errorPresentation`, add)
   if (typeof action.requiresIdempotencyKey !== 'boolean') add(`${path}.requiresIdempotencyKey`, 'INVALID_IDEMPOTENCY_FLAG', 'requiresIdempotencyKey must be boolean')
+  validateActionInputShaping(action, path, add)
   validateActionTarget(action.target, `${path}.target`, add)
+}
+
+function validateActionInputShaping(action: Partial<GreenfieldModuleAction>, path: string, add: (path: string, code: string, message: string) => void): void {
+  if (action.inputDefaults !== undefined && (!isRecord(action.inputDefaults) || Object.keys(action.inputDefaults).length > 32 || !boundedLiteral(action.inputDefaults, 0))) {
+    add(`${path}.inputDefaults`, 'INVALID_INPUT_DEFAULTS', 'Action input defaults must be bounded JSON literals')
+  }
+  if (action.inputTransforms !== undefined) {
+    if (!Array.isArray(action.inputTransforms) || action.inputTransforms.length > 16) add(`${path}.inputTransforms`, 'INVALID_INPUT_TRANSFORMS', 'Action input transforms must be bounded')
+    else action.inputTransforms.forEach((transform, index) => {
+      if (!isRecord(transform) || transform.transform !== 'richText.plainText@1') add(`${path}.inputTransforms[${index}]`, 'INVALID_INPUT_TRANSFORM', 'Unsupported action input transform')
+      else {
+        checkFieldName(transform.target, `${path}.inputTransforms[${index}].target`, add)
+        checkFieldName(transform.source, `${path}.inputTransforms[${index}].source`, add)
+      }
+    })
+  }
 }
 
 function validateActionInputSchema(input: unknown, path: string, add: (path: string, code: string, message: string) => void): void {
@@ -427,7 +459,7 @@ function validateQuery(input: unknown, path: string, add: (path: string, code: s
     return
   }
   const query = input as Partial<GreenfieldModuleQueryDefinition>
-  checkKnownKeys(query, path, ['collection', 'defaultLimit', 'maxLimit', 'sort', 'allowedSortFields', 'allowedFilterFields', 'searchableFields', 'folderField', 'referenceFields'], add)
+  checkKnownKeys(query, path, ['collection', 'defaultLimit', 'maxLimit', 'sort', 'allowedSortFields', 'allowedFilterFields', 'searchableFields', 'folderField', 'referenceFields', 'filters', 'recordState'], add)
   checkCollection(query.collection, `${path}.collection`, add)
   if (query.defaultLimit !== undefined) checkLimit(query.defaultLimit, `${path}.defaultLimit`, add)
   if (query.maxLimit !== undefined) checkLimit(query.maxLimit, `${path}.maxLimit`, add)
@@ -436,6 +468,14 @@ function validateQuery(input: unknown, path: string, add: (path: string, code: s
   validateFieldList(query.searchableFields, `${path}.searchableFields`, add)
   if (query.folderField !== undefined) checkFieldName(query.folderField, `${path}.folderField`, add)
   if (query.referenceFields !== undefined) validateFieldList(query.referenceFields, `${path}.referenceFields`, add)
+  if (query.recordState !== undefined && query.recordState !== 'active' && query.recordState !== 'deleted') add(`${path}.recordState`, 'INVALID_RECORD_STATE', 'Record state must be active or deleted')
+  if (query.filters !== undefined) {
+    if (!isRecord(query.filters) || Object.keys(query.filters).length > 24) add(`${path}.filters`, 'INVALID_QUERY_FILTERS', 'Query filters must be bounded literals')
+    else for (const [field, value] of Object.entries(query.filters)) {
+      checkFieldName(field, `${path}.filters.${field}`, add)
+      if (!(value === null || ['string', 'number', 'boolean'].includes(typeof value))) add(`${path}.filters.${field}`, 'INVALID_QUERY_FILTER', 'Query filter values must be scalar literals')
+    }
+  }
   if (query.sort !== undefined) {
     if (!Array.isArray(query.sort) || query.sort.length > 8) {
       add(`${path}.sort`, 'INVALID_SORT', 'Sort must be a bounded array')
@@ -494,11 +534,13 @@ function validateActionTarget(input: unknown, path: string, add: (path: string, 
     return
   }
   const target = input as NonNullable<GreenfieldModuleAction['target']>
-  checkKnownKeys(target, path, ['collection', 'recordIdField', 'routePath', 'functionId', 'settingsKeys'], add)
+  checkKnownKeys(target, path, ['collection', 'recordIdField', 'routePath', 'functionId', 'serviceId', 'commandId', 'settingsKeys'], add)
   if (target.collection !== undefined) checkCollection(target.collection, `${path}.collection`, add)
   if (target.recordIdField !== undefined) checkFieldName(target.recordIdField, `${path}.recordIdField`, add)
   if (target.routePath !== undefined) checkBoundedString(target.routePath, `${path}.routePath`, 1, 240, add)
   if (target.functionId !== undefined) checkBoundedString(target.functionId, `${path}.functionId`, 1, 200, add)
+  if (target.serviceId !== undefined) checkBoundedString(target.serviceId, `${path}.serviceId`, 1, 200, add)
+  if (target.commandId !== undefined) checkBoundedString(target.commandId, `${path}.commandId`, 1, 200, add)
   if (target.settingsKeys !== undefined) validateFieldList(target.settingsKeys, `${path}.settingsKeys`, add)
 }
 
@@ -512,6 +554,14 @@ function rejectForbiddenKeys(input: unknown, path: string, add: (path: string, c
     if (FORBIDDEN_KEYS.has(key)) add(`${path}.${key}`, 'FORBIDDEN_DECLARATIVE_KEY', `${key} is not supported in module UI declarations`)
     rejectForbiddenKeys(value, `${path}.${key}`, add)
   }
+}
+
+function boundedLiteral(value: unknown, depth: number): boolean {
+  if (depth > 12) return false
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return true
+  if (Array.isArray(value)) return value.length <= 128 && value.every(child => boundedLiteral(child, depth + 1))
+  if (!isRecord(value) || Object.keys(value).length > 64) return false
+  return Object.entries(value).every(([key, child]) => FIELD_PATTERN.test(key) && boundedLiteral(child, depth + 1))
 }
 
 function checkKnownKeys(input: Record<string, unknown>, path: string, allowed: string[], add: (path: string, code: string, message: string) => void): void {

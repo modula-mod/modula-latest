@@ -16,6 +16,21 @@ function fixture(name: string) {
   return readFileSync(join(here, '../../../..', 'fixtures/mps', name, 'modula.product.json'), 'utf8')
 }
 
+function validateFrontendMutation(mutator: (artifact: Record<string, unknown>) => void) {
+  const product = ingestProductManifest({filename: 'modula.product.json', bytes: fixture('reference-module')}).product!
+  const source = readFileSync(join(here, '../../../..', 'fixtures/mps/reference-module/frontend/frontend.manifest.json'), 'utf8')
+  const artifact = JSON.parse(source) as Record<string, unknown>
+  mutator(artifact)
+  const bytes = Buffer.from(`${JSON.stringify(artifact)}\n`)
+  return validateMpsFrontendArtifact({
+    bytes,
+    metadata: {...product.frontendArtifact!, sha256: createHash('sha256').update(bytes).digest('hex')},
+    productId: product.productId,
+    version: product.version,
+    mode: 'declarative',
+  })
+}
+
 test('kind aliases map developer names onto MPS registry kinds', () => {
   assert.equal(registryKindFromDeclared('backend-service'), 'service')
   assert.equal(registryKindFromDeclared('game-module'), 'game')
@@ -75,6 +90,48 @@ test('frontend artifact is identity-bound, hash-bound, and rejects executable es
     mode: 'declarative',
   })
   assert.equal(unsafe.diagnostics.some(item => item.code === 'MPS-FRONTEND-SECURITY-001'), true)
+})
+
+test('frontend mirror accepts bounded query, lifecycle, defaults, and rich-text transforms', () => {
+  const result = validateFrontendMutation(artifact => {
+    const views = artifact.views as Array<Record<string, unknown>>
+    const homeBindings = views[0]!.bindings as Array<Record<string, unknown>>
+    homeBindings[0]!.query = {filters: {archived: false}, limit: 25, recordState: 'deleted'}
+    const actions = artifact.actions as Array<Record<string, unknown>>
+    actions.push(
+      {id: 'restoreNote', family: 'record.restore', label: 'Restore', recordType: 'note'},
+      {id: 'purgeNote', family: 'record.purge', label: 'Delete permanently', recordType: 'note', confirm: true},
+    )
+    const create = actions.find(action => action.id === 'createNote')!
+    create.input = {
+      defaults: {archived: false, tags: []},
+      transforms: [{target: 'plainTextProjection', source: 'body', transform: 'richText.plainText@1'}],
+    }
+  })
+  assert.equal(result.ok, true, result.diagnostics.map(item => item.message).join('; '))
+})
+
+test('frontend mirror rejects unsafe lifecycle and input shaping', () => {
+  const purge = validateFrontendMutation(artifact => {
+    const actions = artifact.actions as Array<Record<string, unknown>>
+    actions.push({id: 'purgeNote', family: 'record.purge', label: 'Delete permanently', recordType: 'note'})
+  })
+  assert.equal(purge.diagnostics.some(item => item.code === 'MPS-FRONTEND-136'), true)
+
+  const transform = validateFrontendMutation(artifact => {
+    const actions = artifact.actions as Array<Record<string, unknown>>
+    actions.find(action => action.id === 'createNote')!.input = {
+      transforms: [{target: 'plainTextProjection', source: 'body', transform: 'javascript.eval'}],
+    }
+  })
+  assert.equal(transform.diagnostics.some(item => item.code === 'MPS-FRONTEND-139'), true)
+
+  const filter = validateFrontendMutation(artifact => {
+    const views = artifact.views as Array<Record<string, unknown>>
+    const homeBindings = views[0]!.bindings as Array<Record<string, unknown>>
+    homeBindings[0]!.query = {filters: {archived: {not: true}}}
+  })
+  assert.equal(filter.diagnostics.some(item => item.code === 'MPS-FRONTEND-138'), true)
 })
 
 test('backend-free plugin does not bind fake infrastructure', () => {

@@ -27,6 +27,7 @@ export type ModuleRecordQuery = {
   updatedFrom?: string
   updatedTo?: string
   filters?: Record<string, unknown>
+  recordState?: 'active' | 'deleted'
 }
 
 export class GreenfieldModuleRecordService {
@@ -59,10 +60,15 @@ export class GreenfieldModuleRecordService {
       .where('account_id', '=', accountId)
       .where('module_id', 'in', [...moduleIdFamily(moduleId)])
       .where('collection', '=', collection)
-      .where('deleted_at', 'is', null)
+
+    query = input.recordState === 'deleted'
+      ? query.where('deleted_at', 'is not', null)
+      : query.where('deleted_at', 'is', null)
 
     for (const [field, value] of Object.entries(filters)) {
-      query = query.where(sql`greenfield_module_records.data ->> ${field}`, '=', String(value)) as typeof query
+      query = value === null
+        ? query.where(sql`greenfield_module_records.data ->> ${field}`, 'is', null) as typeof query
+        : query.where(sql`greenfield_module_records.data ->> ${field}`, '=', String(value)) as typeof query
     }
     if (input.q) {
       if (definition.searchableFields.length === 0) throw moduleError('VALIDATION_FAILED', 'Collection is not searchable')
@@ -387,7 +393,7 @@ function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unkno
     }
     return
   }
-  if (['text', 'multilineText', 'url', 'recordReference', 'date', 'dateTime'].includes(field.type) && typeof value !== 'string') {
+  if (['text', 'multilineText', 'url', 'recordReference', 'assetReference', 'date', 'dateTime'].includes(field.type) && typeof value !== 'string') {
     throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be text`)
   }
   if (field.type === 'number' && typeof value !== 'number') throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be numeric`)
@@ -397,6 +403,7 @@ function validateFieldValue(field: GreenfieldModuleFieldDefinition, value: unkno
     throw moduleError('VALIDATION_FAILED', `Field ${field.name} must be a string array`)
   }
   if (field.type === 'json') validateJsonField(field.name, value)
+  if (field.type === 'richText') validateJsonField(field.name, value)
 }
 
 function requireRecordData(value: unknown): Record<string, unknown> {

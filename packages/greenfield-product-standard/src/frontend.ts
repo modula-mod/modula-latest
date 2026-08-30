@@ -7,7 +7,7 @@ const COMPONENTS = new Set([
   'emptyState', 'errorState', 'loadingState', 'media', 'progress',
 ])
 const ACTIONS = new Set([
-  'route.open', 'record.create', 'record.read', 'record.update', 'record.delete', 'record.query', 'function.invoke',
+  'route.open', 'record.create', 'record.read', 'record.update', 'record.delete', 'record.restore', 'record.purge', 'record.query', 'function.invoke',
   'service.invoke', 'extension.invoke', 'capability.invoke', 'settings.update', 'share', 'dismiss',
 ])
 const VIEW_KINDS = new Set(['collection', 'detail', 'form', 'dashboard', 'settings', 'emptyState'])
@@ -108,6 +108,8 @@ export function validateMpsFrontendArtifact(input: {
   const viewIds = uniqueIds(views, 'views', diagnostics)
   const actionIds = uniqueIds(actions, 'actions', diagnostics)
   const resourceIds = uniqueIds(resources, 'resources', diagnostics)
+  const fieldIds = new Set<string>()
+  for (const view of views) collectFieldIds(view.root, fieldIds)
   uniqueIds(contributions, 'contributions', diagnostics)
   const routePaths = new Set<string>()
   for (const [index, route] of routes.entries()) {
@@ -121,6 +123,7 @@ export function validateMpsFrontendArtifact(input: {
     const bindings = Array.isArray(view.bindings) ? view.bindings.filter(isRecord) : []
     for (const [bindingIndex, binding] of bindings.entries()) {
       if (!DATA_SOURCES.has(String(binding.source))) diagnostics.push(error('MPS-FRONTEND-106', `views/${index}/bindings/${bindingIndex}`, 'Frontend data binding source is unsupported.'))
+      inspectRecordQuery(binding.query, `views/${index}/bindings/${bindingIndex}/query`, diagnostics)
     }
     inspectComponent(view.root, `views/${index}/root`, actionIds, resourceIds, diagnostics, {nodes: 0}, 1)
     if (isRecord(view.states)) for (const [state, component] of Object.entries(view.states)) inspectComponent(component, `views/${index}/states/${state}`, actionIds, resourceIds, diagnostics, {nodes: 0}, 1)
@@ -128,9 +131,11 @@ export function validateMpsFrontendArtifact(input: {
   for (const [index, action] of actions.entries()) {
     if (!ACTIONS.has(String(action.family))) diagnostics.push(error('MPS-FRONTEND-107', `actions/${index}/family`, 'Frontend action family is unsupported.'))
     if (action.family === 'route.open' && (typeof action.route !== 'string' || !routePaths.has(action.route))) diagnostics.push(error('MPS-FRONTEND-108', `actions/${index}/route`, 'route.open requires a declared product route.'))
-    if (action.family === 'record.create' || action.family === 'record.read' || action.family === 'record.update' || action.family === 'record.delete' || action.family === 'record.query') {
+    if (String(action.family).startsWith('record.')) {
       if (typeof action.recordType !== 'string' || !action.recordType) diagnostics.push(error('MPS-FRONTEND-109', `actions/${index}/recordType`, 'Record actions require a record type.'))
     }
+    if (action.family === 'record.purge' && action.confirm !== true) diagnostics.push(error('MPS-FRONTEND-136', `actions/${index}/confirm`, 'record.purge requires explicit destructive confirmation.'))
+    inspectActionInput(action.input, fieldIds, `actions/${index}/input`, diagnostics)
   }
   const capabilities = [...(artifact.capabilities?.required ?? []), ...(artifact.capabilities?.optional ?? [])]
   for (const capability of capabilities) if (!CAPABILITY_PATTERN.test(capability)) diagnostics.push(error('MPS-FRONTEND-110', 'capabilities', `Invalid frontend capability ${capability}.`))
@@ -144,6 +149,60 @@ export function validateMpsFrontendArtifact(input: {
   if (artifact.mode === 'host-contribution' && contributions.length === 0) diagnostics.push(error('MPS-FRONTEND-112', 'contributions', 'Host-contribution frontend requires a contribution.'))
   if (input.metadata.entryView !== artifact.entry) diagnostics.push(error('MPS-FRONTEND-016', 'entry', 'Frontend entry metadata does not match the artifact.'))
   return {ok: diagnostics.length === 0, artifact: diagnostics.length === 0 ? artifact : undefined, sha256, diagnostics}
+}
+
+function collectFieldIds(value: unknown, ids: Set<string>): void {
+  if (!isRecord(value)) return
+  if (value.type === 'field' && isRecord(value.field) && typeof value.field.id === 'string') ids.add(value.field.id)
+  if (Array.isArray(value.children)) value.children.forEach(child => collectFieldIds(child, ids))
+}
+
+function inspectRecordQuery(value: unknown, path: string, diagnostics: IngestDiagnostic[]): void {
+  if (value === undefined) return
+  if (!isRecord(value)) {
+    diagnostics.push(error('MPS-FRONTEND-138', path, 'Record query must be an object.'))
+    return
+  }
+  if (value.recordState !== undefined && value.recordState !== 'active' && value.recordState !== 'deleted') {
+    diagnostics.push(error('MPS-FRONTEND-138', `${path}/recordState`, 'Record state must be active or deleted.'))
+  }
+  if (value.filters !== undefined) {
+    if (!isRecord(value.filters) || Object.keys(value.filters).length > 24) diagnostics.push(error('MPS-FRONTEND-138', `${path}/filters`, 'Record query filters exceed bounded literal semantics.'))
+    else for (const [key, child] of Object.entries(value.filters)) {
+      if (!/^[a-zA-Z][a-zA-Z0-9_.]{0,159}$/.test(key) || !(child === null || ['string', 'number', 'boolean'].includes(typeof child))) {
+        diagnostics.push(error('MPS-FRONTEND-138', `${path}/filters/${key}`, 'Record query filters must use safe scalar literals.'))
+      }
+    }
+  }
+}
+
+function inspectActionInput(value: unknown, fields: Set<string>, path: string, diagnostics: IngestDiagnostic[]): void {
+  if (value === undefined) return
+  if (!isRecord(value)) {
+    diagnostics.push(error('MPS-FRONTEND-139', path, 'Action input shaping must be an object.'))
+    return
+  }
+  if (value.defaults !== undefined && (!isRecord(value.defaults) || Object.keys(value.defaults).length > 32 || !boundedLiteral(value.defaults, 0))) {
+    diagnostics.push(error('MPS-FRONTEND-139', `${path}/defaults`, 'Action defaults exceed bounded literal semantics.'))
+  }
+  if (value.transforms !== undefined) {
+    if (!Array.isArray(value.transforms) || value.transforms.length > 16) diagnostics.push(error('MPS-FRONTEND-139', `${path}/transforms`, 'Action transforms exceed bounded semantics.'))
+    else for (const [index, transform] of value.transforms.entries()) {
+      if (!isRecord(transform) || transform.transform !== 'richText.plainText@1' || typeof transform.target !== 'string' || typeof transform.source !== 'string') {
+        diagnostics.push(error('MPS-FRONTEND-139', `${path}/transforms/${index}`, 'Action transform is unsupported.'))
+      } else if (!fields.has(transform.source)) {
+        diagnostics.push(error('MPS-FRONTEND-137', `${path}/transforms/${index}/source`, `Input transform references unknown field ${transform.source}.`))
+      }
+    }
+  }
+}
+
+function boundedLiteral(value: unknown, depth: number): boolean {
+  if (depth > 12) return false
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return true
+  if (Array.isArray(value)) return value.length <= 128 && value.every(child => boundedLiteral(child, depth + 1))
+  if (!isRecord(value) || Object.keys(value).length > 64) return false
+  return Object.entries(value).every(([key, child]) => /^[a-zA-Z][a-zA-Z0-9_.-]{0,159}$/.test(key) && boundedLiteral(child, depth + 1))
 }
 
 function uniqueIds(values: unknown[], path: string, diagnostics: IngestDiagnostic[]): Set<string> {

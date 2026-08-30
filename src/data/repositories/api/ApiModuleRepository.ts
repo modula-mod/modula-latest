@@ -248,10 +248,25 @@ export class ApiModuleRepository implements ModuleRepository {
     }, decodeProductFrontend)
   }
 
-  listRecords(moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number} = {}): Promise<ModuleRecordPage> {
+  listRecords(moduleId: string, collection: string, input: {q?: string; folder?: string; sort?: string; direction?: 'asc' | 'desc'; cursor?: string; limit?: number; filters?: Record<string, string | number | boolean | null>; recordState?: 'active' | 'deleted'} = {}): Promise<ModuleRecordPage> {
+    const {filters, ...query} = input
+    const encodedFilters = Object.fromEntries(
+      Object.entries(filters ?? {}).map(([field, value]) => [`filter.${field}`, JSON.stringify(value)]),
+    )
     return localOnlyFallback(
-      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: input}, decodeRecordPage),
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}`, authenticated: true, query: {...query, ...encodedFilters}}, decodeRecordPage),
       () => ({moduleId, collection, items: localRecords(moduleId, collection, input.q), nextCursor: null, limit: input.limit ?? 25}),
+    )
+  }
+
+  getRecord(moduleId: string, collection: string, recordId: string): Promise<ModuleRecord> {
+    return localOnlyFallback(
+      this.client.get({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true}, decodeRecord),
+      () => {
+        const record = localRecords(moduleId, collection).find(item => item.record_id === recordId)
+        if (!record) throw new Error('Local record not found')
+        return record
+      },
     )
   }
 
@@ -274,6 +289,22 @@ export class ApiModuleRepository implements ModuleRepository {
       this.client.delete({path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}`, authenticated: true, body: {expectedRevision}}, value => value),
       () => deleteLocalRecord(moduleId, collection, recordId, expectedRevision),
     )
+  }
+
+  restoreRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<ModuleRecord> {
+    return this.client.post({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/restore`,
+      authenticated: true,
+      body: {expectedRevision},
+    }, decodeRecord)
+  }
+
+  purgeRecord(moduleId: string, collection: string, recordId: string, expectedRevision?: number): Promise<unknown> {
+    return this.client.delete({
+      path: `/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/permanent`,
+      authenticated: true,
+      body: {expectedRevision, confirm: true},
+    }, value => value)
   }
 
   runAction(moduleId: string, actionId: string, input: Record<string, unknown> = {}): Promise<unknown> {
