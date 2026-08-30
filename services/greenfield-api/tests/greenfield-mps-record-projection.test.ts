@@ -98,4 +98,36 @@ describe('MPS record runtime projection', () => {
       schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(schema)}],
     })).toThrow(/not declared by record schema/)
   })
+
+  it('projects generic local JSON Schema references and scalar constants', () => {
+    const referencedSchema = {
+      ...schema,
+      required: [...schema.required, 'source', 'schemaVersion'],
+      properties: {
+        ...schema.properties,
+        source: {$ref: './source.schema.json'},
+        schemaVersion: {const: '1.0.0'},
+      },
+    }
+    const [collection] = projectMpsRecordCollections({
+      manifest,
+      frontend,
+      schemas: [{path: 'schemas/task.schema.json', bytes: JSON.stringify(referencedSchema)}],
+    })
+    expect(collection.fields).toEqual(expect.arrayContaining([
+      expect.objectContaining({fieldId: 'source', type: 'json', required: true}),
+      expect.objectContaining({fieldId: 'schemaVersion', type: 'text', required: true}),
+    ]))
+    expect(() => projectMpsRecordCollections({
+      manifest,
+      frontend,
+      schemas: [{
+        path: 'schemas/task.schema.json',
+        bytes: JSON.stringify({
+          ...schema,
+          properties: {...schema.properties, source: {$ref: 'https://untrusted.example/source.schema.json'}},
+        }),
+      }],
+    })).toThrow(/Unsafe MPS record schema field reference/)
+  })
 })

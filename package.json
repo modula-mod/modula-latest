@@ -297,6 +297,7 @@
     "verify:greenfield-mps-v1": "node scripts/verify-greenfield-mps-v1.mjs",
     "verify:product-frontend-v1": "node scripts/verify-product-frontend-v1.mjs",
     "verify:reference-tasks-zero-core": "node scripts/verify-reference-tasks-zero-core.mjs",
+    "verify:vault-products": "node scripts/verify-vault-mps-releases.mjs",
     "verify:platform-foundation-v1": "node scripts/verify-platform-foundation-v1.mjs"
   },
   "private": true

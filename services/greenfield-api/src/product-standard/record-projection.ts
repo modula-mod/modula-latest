@@ -139,6 +139,15 @@ function fieldDefinition(
 
 function schemaFieldType(schema: Record<string, unknown>): GreenfieldModuleFieldType {
   if (Array.isArray(schema.enum) && schema.enum.every(value => typeof value === 'string')) return 'singleSelect'
+  if (typeof schema.const === 'boolean') return 'boolean'
+  if (typeof schema.const === 'number') return 'number'
+  if (typeof schema.const === 'string') return schema.const.length > 500 ? 'multilineText' : 'text'
+  if (typeof schema.$ref === 'string') {
+    const [path] = schema.$ref.split('#', 1)
+    const safeLocalReference = path ? SAFE_PATH.test(path) : schema.$ref.startsWith('#/')
+    if (!safeLocalReference) throw moduleError('VALIDATION_FAILED', `Unsafe MPS record schema field reference ${schema.$ref}`)
+    return 'json'
+  }
   if (schema.type === 'boolean') return 'boolean'
   if (schema.type === 'number' || schema.type === 'integer') return 'number'
   if (schema.type === 'string' && schema.format === 'date') return 'date'

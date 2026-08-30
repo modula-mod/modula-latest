@@ -78,6 +78,10 @@ projection. Restore and permanent purge use the existing Greenfield lifecycle
 endpoints, and purge always requires product-declared confirmation plus the
 host confirmation surface.
 
+Closed product record schemas may use safe local JSON Schema references for
+nested JSON values and scalar `const` declarations. Greenfield projects those
+generically; remote or traversing schema references are rejected.
+
 Host contributions remain declared, permission checked, installation scoped,
 enable/disable aware and failure isolated. For an MPS frontend release, the
 host contribution presentation is selected from the exact release frontend
