@@ -10,6 +10,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const apiDatabaseUrl = process.env.MODULA_TEST_API_DATABASE_URL ?? databaseUrl
 const describeIfDb = databaseUrl ? describe : describe.skip
 const fixtures = join(dirname(fileURLToPath(import.meta.url)), '../../../fixtures/mps')
 
@@ -19,7 +20,7 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
 
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
-    db = createDb(databaseUrl!)
+    db = createDb(apiDatabaseUrl!)
     service = new GreenfieldMpsIngestService(db)
   })
 
@@ -161,7 +162,7 @@ describeIfDb('Greenfield × MPS 1.0-RC ingestion', () => {
 
   it('lets the API runtime role ingest and read family, relationship, asset, privacy, and alias rows', async () => {
     await service.ingest({filename: 'modula.product.json', ...readProduct('reference-module')})
-    const client = new pg.Client({connectionString: databaseUrl})
+    const client = new pg.Client({connectionString: apiDatabaseUrl})
     await client.connect()
     try {
       await client.query('SET ROLE modula_api')
