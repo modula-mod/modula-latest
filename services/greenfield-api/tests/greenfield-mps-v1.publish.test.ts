@@ -8,6 +8,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService, type GreenfieldModuleReleaseEvidence} from '../src/modules/release-service.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
+const apiDatabaseUrl = process.env.MODULA_TEST_API_DATABASE_URL ?? databaseUrl
 const describeIfDb = databaseUrl ? describe : describe.skip
 const fixturePath = join(process.cwd(), '../../fixtures/modules/module-owned-backend/module.manifest.json')
 
@@ -17,7 +18,7 @@ describeIfDb('generic MPS release publication', () => {
 
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
-    db = createDb(databaseUrl!)
+    db = createDb(apiDatabaseUrl!)
     releases = new GreenfieldModuleReleaseService(db)
   })
 
