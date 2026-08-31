@@ -1,5 +1,17 @@
 # Intended production web routing for Expo Router preview builds.
 # Apply via deployment script to Hestia custom include, not by blindly rewriting generated templates.
+location = /service-worker.js {
+    root /var/www/modula/current;
+    add_header Cache-Control "no-store" always;
+    try_files $uri =404;
+}
+
+location = /manifest.webmanifest {
+    root /var/www/modula/current;
+    add_header Cache-Control "no-cache, must-revalidate" always;
+    try_files $uri =404;
+}
+
 location /_expo/ {
     root /var/www/modula/current;
     add_header Cache-Control "public, max-age=31536000, immutable";
