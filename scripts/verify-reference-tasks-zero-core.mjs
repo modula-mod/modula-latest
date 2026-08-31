@@ -1,25 +1,26 @@
 #!/usr/bin/env node
 import {spawnSync} from 'node:child_process'
-import {existsSync} from 'node:fs'
+import {existsSync, readFileSync} from 'node:fs'
 import {resolve} from 'node:path'
 
 const hostRoot = resolve(process.env.MODULA_HOST_ROOT ?? process.cwd())
-const productRoot = resolve(process.env.MODULA_REFERENCE_TASKS_ROOT ?? '/root/modula-mod/modula-reference-tasks')
-const release020Root = resolve(process.env.REFERENCE_TASKS_RELEASE_020_ROOT ?? '/root/modula-mod/modula-reference-tasks-release-0.2.0')
-const release021Root = resolve(process.env.REFERENCE_TASKS_RELEASE_021_ROOT ?? '/root/modula-mod/modula-reference-tasks-release-0.2.1')
+const productRoot = resolve(process.env.MODULA_REFERENCE_TASKS_ROOT ?? '/root/modula-mod/modula-reference-tasks-mps1')
+const productStandardRoot = resolve(process.env.MODULA_PRODUCT_STANDARD_ROOT ?? '/root/modula-mod/modula-product-standard')
+const release010Root = resolve(process.env.REFERENCE_TASKS_MPS1_RELEASE_010_ROOT ?? '/root/modula-mod/modula-reference-tasks-mps1-release-0.1.0')
+const release011Root = resolve(process.env.REFERENCE_TASKS_MPS1_RELEASE_011_ROOT ?? '/root/modula-mod/modula-reference-tasks-mps1-release-0.1.1')
 const proof = resolve(productRoot, 'tests/runtime-proof.ts')
 const failures = []
 
 const releases = [
   {
-    root: release020Root,
-    version: '0.2.0',
-    commit: 'd8ac5490a59915529c296671ac2a1d44baaec041',
+    root: release010Root,
+    version: '0.1.0',
+    commit: 'f44a10249694ee5d62a0c7986b12a27f564ccb30',
   },
   {
-    root: release021Root,
-    version: '0.2.1',
-    commit: '15befbc0e0ce93f738557cd2a2b0b748928df30f',
+    root: release011Root,
+    version: '0.1.1',
+    commit: '1d452fae70d2bbb141871877fe34e7be55615b44',
   },
 ]
 
@@ -29,12 +30,15 @@ console.log('ZERO-CORE PRODUCT RUNTIME VERIFIER\n')
 
 record('HOST CHECKOUT', existsSync(resolve(hostRoot, 'package.json')), hostRoot)
 record('REFERENCE TASKS PRODUCT', existsSync(resolve(productRoot, 'modula.product.json')), productRoot)
+record('MPS 1.0 COMPILER', existsSync(resolve(productStandardRoot, 'packages/product-frontend/dist/cli.js')), productStandardRoot)
 record('PRODUCT-OWNED RUNTIME PROOF', existsSync(proof), proof)
 record('PRODUCT MAIN CLEAN', git(productRoot, ['status', '--porcelain']) === '', productRoot)
 record(
-  'CANONICAL GENERATOR ANCESTRY',
-  gitStatus(productRoot, ['merge-base', '--is-ancestor', 'c6fc55bc0fc4fa008b21eeb9801b4284d2a1a6f7', 'HEAD']) === 0,
-  'c6fc55bc0fc4fa008b21eeb9801b4284d2a1a6f7',
+  'CANONICAL GENERATOR TSX SCAFFOLD',
+  fileIncludes(resolve(productRoot, 'README.md'), 'canonical Modula product generator')
+    && fileIncludes(resolve(productRoot, 'AGENTS.md'), 'typed TS/TSX with @modula/product-ui')
+    && fileIncludes(resolve(productRoot, 'frontend/index.tsx'), "from '@modula/product-ui'"),
+  'generated TSX product scaffold',
 )
 
 for (const release of releases) {
@@ -44,6 +48,16 @@ for (const release of releases) {
 }
 
 if (failures.length === 0) {
+  for (const release of releases) {
+    runProductVerify(release)
+  }
+
+  if (failures.length > 0) {
+    console.error('\nverify:reference-tasks-zero-core FAIL')
+    for (const failure of failures) console.error(`- ${failure}`)
+    process.exit(1)
+  }
+
   console.log('\n$ pnpm --filter @modula/greenfield-api exec tsx <product>/tests/runtime-proof.ts')
   const result = spawnSync(
     'pnpm',
@@ -54,8 +68,9 @@ if (failures.length === 0) {
         ...process.env,
         CI: 'true',
         MODULA_HOST_ROOT: hostRoot,
-        REFERENCE_TASKS_RELEASE_020_ROOT: release020Root,
-        REFERENCE_TASKS_RELEASE_021_ROOT: release021Root,
+        MODULA_PRODUCT_STANDARD_ROOT: productStandardRoot,
+        REFERENCE_TASKS_MPS1_RELEASE_010_ROOT: release010Root,
+        REFERENCE_TASKS_MPS1_RELEASE_011_ROOT: release011Root,
       },
       encoding: 'utf8',
       maxBuffer: 20 * 1024 * 1024,
@@ -89,6 +104,20 @@ function git(cwd, args) {
   return result.status === 0 ? result.stdout.trim() : ''
 }
 
-function gitStatus(cwd, args) {
-  return spawnSync('git', args, {cwd, stdio: 'ignore', shell: false}).status
+function fileIncludes(file, value) {
+  return existsSync(file) && readFileSync(file, 'utf8').includes(value)
+}
+
+function runProductVerify(release) {
+  console.log(`\n$ pnpm verify  # Reference Tasks ${release.version} TSX build, preview, MPS validation`)
+  const result = spawnSync('pnpm', ['verify'], {
+    cwd: release.root,
+    env: {...process.env, CI: 'true', MODULA_PRODUCT_STANDARD_ROOT: productStandardRoot},
+    encoding: 'utf8',
+    maxBuffer: 20 * 1024 * 1024,
+    shell: false,
+  })
+  if (result.stdout) process.stdout.write(result.stdout)
+  if (result.stderr) process.stderr.write(result.stderr)
+  record(`RELEASE ${release.version} TSX BUILD / PREVIEW / MPS VERIFY`, result.status === 0, result.status === 0 ? 'PASS' : `exit ${String(result.status)}`)
 }
