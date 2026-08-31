@@ -43,6 +43,89 @@ function walk(dir) {
   return entries
 }
 
+const precacheUrls = [
+  '/',
+  ...walk(distDir)
+    .map(file => path.relative(distDir, file).split(path.sep).join('/'))
+    .filter(file =>
+      file.startsWith('_expo/static/') ||
+      file.startsWith('pwa/') ||
+      file === 'favicon.ico' ||
+      file === 'manifest.webmanifest',
+    )
+    .sort()
+    .map(file => `/${file}`),
+]
+
+const serviceWorker = `/* Modula shell service worker. Generated from ${version.commit}. */
+const RELEASE_SHA = ${JSON.stringify(version.commit)}
+const CACHE_PREFIX = 'modula-shell-'
+const RELEASE_CACHE = CACHE_PREFIX + RELEASE_SHA
+const PRECACHE_URLS = ${JSON.stringify(precacheUrls)}
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(RELEASE_CACHE)
+      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting()),
+  )
+})
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(
+        keys
+          .filter(key => key.startsWith(CACHE_PREFIX) && key !== RELEASE_CACHE)
+          .map(key => caches.delete(key)),
+      ))
+      .then(() => self.clients.claim()),
+  )
+})
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
+})
+
+self.addEventListener('fetch', event => {
+  const request = event.request
+  if (request.method !== 'GET') return
+  const url = new URL(request.url)
+  if (url.origin !== self.location.origin) return
+
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirstNavigation(request))
+    return
+  }
+
+  if (url.pathname.startsWith('/_expo/static/') || url.pathname.startsWith('/pwa/')) {
+    event.respondWith(cacheFirstImmutable(request))
+  }
+})
+
+async function networkFirstNavigation(request) {
+  const cache = await caches.open(RELEASE_CACHE)
+  try {
+    const response = await fetch(new Request(request, {cache: 'reload'}))
+    if (response.ok) await cache.put(request, response.clone())
+    return response
+  } catch {
+    return (await cache.match(request)) || (await cache.match('/')) || Response.error()
+  }
+}
+
+async function cacheFirstImmutable(request) {
+  const cache = await caches.open(RELEASE_CACHE)
+  const cached = await cache.match(request)
+  if (cached) return cached
+  const response = await fetch(request)
+  if (response.ok) await cache.put(request, response.clone())
+  return response
+}
+`
+
+writeFileSync(path.join(distDir, 'service-worker.js'), serviceWorker)
+
 const checksumLines = walk(distDir)
   .filter(file => path.basename(file) !== 'checksums.sha256')
   .sort()

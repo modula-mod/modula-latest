@@ -52,7 +52,17 @@ if (!existsSync(distDir)) fail('dist directory does not exist')
 
 const files = walk(distDir)
 const relativeFiles = files.map(file => path.relative(distDir, file))
-for (const required of ['index.html', 'version.json', 'release.json', 'checksums.sha256', '_expo/.routes.json']) {
+for (const required of [
+  'index.html',
+  'version.json',
+  'release.json',
+  'checksums.sha256',
+  'service-worker.js',
+  'manifest.webmanifest',
+  'pwa/icon-192.png',
+  'pwa/icon-512.png',
+  '_expo/.routes.json',
+]) {
   if (!relativeFiles.includes(required)) fail(`missing required artifact ${required}`)
 }
 
@@ -102,9 +112,35 @@ if (!hasExpectedApi) fail(`expected production API origin ${expectedApiOrigin} w
 
 const index = readFileSync(path.join(distDir, 'index.html'), 'utf8')
 if (!index.includes('/_expo/static/')) fail('index.html does not reference Expo static assets')
+if (!index.includes('rel="manifest" href="/manifest.webmanifest"')) fail('index.html does not link the web app manifest')
+if (!index.includes("register('/service-worker.js'")) fail('index.html does not register the shell service worker')
+
+const manifest = JSON.parse(readFileSync(path.join(distDir, 'manifest.webmanifest'), 'utf8'))
+if (manifest.id !== '/' || manifest.start_url !== '/' || manifest.scope !== '/') {
+  fail('web app manifest does not own the canonical root scope')
+}
+if (manifest.display !== 'standalone') fail(`web app manifest display is ${manifest.display}`)
+for (const requiredSize of ['192x192', '512x512']) {
+  if (!manifest.icons?.some(icon => icon.sizes === requiredSize && icon.type === 'image/png')) {
+    fail(`web app manifest is missing the ${requiredSize} PNG icon`)
+  }
+}
+
+const serviceWorker = readFileSync(path.join(distDir, 'service-worker.js'), 'utf8')
+if (!serviceWorker.includes(head)) fail('service worker cache is not bound to HEAD')
+if (!serviceWorker.includes("const CACHE_PREFIX = 'modula-shell-'")) fail('service worker lacks a release-scoped cache')
+if (!serviceWorker.includes("request.mode === 'navigate'")) fail('service worker lacks network-first navigation handling')
+if (!serviceWorker.includes("cache: 'reload'")) fail('service worker navigation does not bypass stale browser cache')
+if (!serviceWorker.includes('caches.delete(key)')) fail('service worker does not retire stale Modula release caches')
+if (/\b(?:eval|importScripts)\s*\(/.test(serviceWorker)) fail('service worker contains remote execution primitives')
 
 const checksumManifest = readFileSync(path.join(distDir, 'checksums.sha256'), 'utf8')
 for (const requiredChecksum of ['index.html', 'version.json', 'release.json']) {
+  if (!checksumManifest.includes(`./${requiredChecksum}`)) {
+    fail(`checksums.sha256 does not include ${requiredChecksum}`)
+  }
+}
+for (const requiredChecksum of ['service-worker.js', 'manifest.webmanifest', 'pwa/icon-192.png', 'pwa/icon-512.png']) {
   if (!checksumManifest.includes(`./${requiredChecksum}`)) {
     fail(`checksums.sha256 does not include ${requiredChecksum}`)
   }
@@ -143,6 +179,9 @@ if (!nginxSnippet.includes('location = /index') || !nginxSnippet.includes('retur
 }
 if (!nginxSnippet.includes('rewrite ^ /+not-found.html last;')) {
   fail('nginx snippet does not route unmatched paths to the exported not-found document')
+}
+if (!nginxSnippet.includes('location = /service-worker.js') || !nginxSnippet.includes('Cache-Control "no-store"')) {
+  fail('nginx snippet does not force service-worker.js revalidation')
 }
 for (const template of collectDynamicHtmlTemplates(distDir)) {
   const rewrite = nginxRewriteForTemplate(template)
