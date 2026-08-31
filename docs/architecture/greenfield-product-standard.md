@@ -4,7 +4,7 @@ These three contracts are **not** the same version:
 
 | Contract | Role | Version |
 | --- | --- | --- |
-| **Modula Product Standard (MPS)** | External product contract (`modula.product.json`) | 1.0-RC |
+| **Modula Product Standard (MPS)** | External product contract (`modula.product.json`) | 1.0 |
 | **Greenfield Protocol** | Platform protocol (records, assertions, ledger, fabrics) | `greenfield.v1` |
 | **Module Standard** | Module profile inside MPS | 2.1 |
 

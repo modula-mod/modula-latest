@@ -1,9 +1,9 @@
-# Greenfield × MPS 1.0-RC convergence matrix
+# Greenfield × MPS 1.0 convergence matrix
 
 Classifications: `ALREADY_SUPPORTED` | `ADAPTER_REQUIRED` | `GENERIC_GREENFIELD_EXTENSION_REQUIRED` | `MPS_CORRECTION_REQUIRED` | `NOT_APPLICABLE`.
 
 NO UNKNOWN. MPS open questions MPS-Q001–Q010 are resolved in the Product Standard
-`DECISIONS.md` (MPS 1.0-RC).
+`DECISIONS.md` (MPS 1.0).
 
 | MPS concept | Greenfield primitive | Current compatibility | Required change | Owner | Verification | Classification |
 | --- | --- | --- | --- | --- | --- | --- |

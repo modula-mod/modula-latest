@@ -10,8 +10,10 @@ is that product repository. Define the experience through the MPS frontend
 contract and consume it through the generic host.
 
 - Do not add product-ID or product-name branches to the Module Host or renderer.
-- Do not download or execute arbitrary JavaScript, JSX, HTML, CSS, native code,
-  remote bundles, or generic WebView product UIs.
+- Product repositories may author controlled `@modula/product-ui` TypeScript/TSX,
+  which MPS statically compiles during release build. Do not download or execute
+  product source, arbitrary JavaScript, JSX, HTML, CSS, native code, remote
+  bundles, or generic WebView product UIs.
 - Do not bypass installation, release verification, permissions, capabilities,
   entitlement, account, or product data boundaries.
 - New generic primitives require an MPS contract, validator/testkit coverage,

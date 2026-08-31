@@ -50,7 +50,7 @@ function run(label, command, args, env = process.env, cwd = ROOT) {
 }
 
 console.log('MODULA')
-console.log('GREENFIELD × MPS 1.0-RC')
+console.log('GREENFIELD × MPS 1.0')
 console.log('CONVERGENCE VERIFIER\n')
 
 source('docs/GREENFIELD-V1-CORE-FREEZE.md', [
@@ -138,7 +138,7 @@ for (const name of fixtures) {
     continue
   }
   const json = JSON.parse(readFileSync(file, 'utf8'))
-  record(`FIXTURE ${name}`, json.productStandard === '1.0-RC' && !json.services?.urls, json.productStandard)
+  record(`LEGACY RC FIXTURE ${name}`, json.productStandard === '1.0-RC' && !json.services?.urls, json.productStandard)
   if (name === 'reference-plugin' && json.backend?.mode !== 'none') {
     record('PLUGIN_BACKEND', false, String(json.backend?.mode))
   }

@@ -1,7 +1,7 @@
 # Greenfield V1 core freeze
 
-Status: **PRODUCT-STANDARD-COMPATIBLE / CORE-FREEZE-CANDIDATE** after MPS 1.0-RC
-ingestion lands.
+Status: **PRODUCT-STANDARD-COMPATIBLE / CORE-FREEZE-CANDIDATE** after MPS 1.0
+ingestion lands. Final acceptance remains gated on the live and recovery proof.
 
 NORMAL NEW PRODUCT REQUIRES GREENFIELD CORE CODE CHANGE = **NO**
 
@@ -13,7 +13,7 @@ Host security posture remains:
 
 | Contract | Role | Version |
 | --- | --- | --- |
-| Modula Product Standard (MPS) | External product contract (`modula.product.json`) | 1.0-RC |
+| Modula Product Standard (MPS) | External product contract (`modula.product.json`) | 1.0 |
 | Greenfield Protocol | Platform protocol (records, assertions, ledger) | `greenfield.v1` |
 | Module Standard | Module profile inside MPS | 2.1 |
 

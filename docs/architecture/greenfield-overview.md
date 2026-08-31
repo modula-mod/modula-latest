@@ -2,7 +2,7 @@
 
 Greenfield is the production backend runtime for Modula's profile-first module platform. It owns accounts, repositories, records, extension catalogue state, module registry state, lifecycle jobs, audit events, and safe public API envelopes.
 
-The **external product contract** is the Modula Product Standard (MPS 1.0-RC).
+The **external product contract** is the Modula Product Standard (MPS 1.0).
 The **platform protocol** is Greenfield Protocol `greenfield.v1`. The **module
 profile** is Module Standard 2.1. See `docs/architecture/greenfield-product-standard.md`.
 
