@@ -33,6 +33,8 @@ import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
 import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.js'
 import {GreenfieldProductFrontendService} from '../../product-standard/frontend-service.js'
+import {GreenfieldAIExtensionActionService} from '../../ai/extension-action-service.js'
+import {statusForAiError} from '../../ai/errors.js'
 
 type RouteConfig = Record<string, unknown>
 
@@ -73,6 +75,7 @@ export async function registerModuleRoutes(
   const dataLedger = new GreenfieldDataLedgerService(db)
   const mpsIngest = new GreenfieldMpsIngestService(db)
   const productFrontends = new GreenfieldProductFrontendService(db)
+  const extensionAi = new GreenfieldAIExtensionActionService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
     if (!config.moduleRegistryEnabled) {
@@ -292,6 +295,16 @@ export async function registerModuleRoutes(
       const extensionProductId = String((request.params as any).extensionProductId)
       const context = await runtimeAccess.resolve(auth.accountId, extensionProductId, {requireEnabled: true})
       if (!backendGateway.canHandle(context, String(body.actionId ?? ''))) {
+        if (extensionAi.canHandle(context, String(body.actionId ?? ''))) {
+          const result = await extensionAi.execute({
+            accountId: auth.accountId,
+            context,
+            actionId: String(body.actionId ?? ''),
+            resource: brokered.resource,
+            requestId: request.id,
+          })
+          return reply.send(successEnvelope({authorized: true, executor: 'AI_GATEWAY', ...brokered, result}, request.id))
+        }
         return reply.send(successEnvelope({authorized: true, executor: 'DECLARATIVE_ONLY', ...brokered}, request.id))
       }
       const result = await backendGateway.executeAction({
@@ -1022,6 +1035,9 @@ function sendError(reply: FastifyReply, code: any, message: string, requestId: s
 
 function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fallback: string) {
   const code = error && typeof error === 'object' && 'code' in error ? (error as any).code : 'SERVER_ERROR'
+  if (typeof code === 'string' && code.startsWith('AI_')) {
+    return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
+  }
   if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
