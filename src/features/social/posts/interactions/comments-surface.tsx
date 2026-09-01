@@ -10,9 +10,8 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native'
-import {Gesture, GestureDetector} from 'react-native-gesture-handler'
+import {GestureDetector} from 'react-native-gesture-handler'
 import Animated, {Extrapolation, interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from 'react-native-reanimated'
-import {scheduleOnRN} from 'react-native-worklets'
 
 import type {PostId} from '@/api/contracts'
 import {useSession} from '@/auth/runtime'
@@ -25,7 +24,8 @@ import {CommentPreview} from '@/features/social/components/comment-preview'
 import {useCommentMutations} from '@/features/social/data/useCommentsQuery'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
 import {postSpringConfig, usePostInteraction} from '@/features/social/posts/interactions/post-interaction-context'
-import {commentsModeForSnap, commentsSnapTarget} from '@/features/social/posts/state/post-interaction-machine'
+import {createCommentsSheetPan} from '@/features/social/posts/interactions/post-ui-worklets'
+import {commentsModeForSnap} from '@/features/social/posts/state/post-interaction-machine'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
 import {postLayerZ} from '@/features/social/posts/tokens/post-layout'
 import {POST_MOTION} from '@/features/social/posts/tokens/post-motion'
@@ -89,27 +89,12 @@ export function CommentsSurface({
 
   const sheetPan = useMemo(
     () =>
-      Gesture.Pan()
-        .activeOffsetY([-8, 8])
-        .failOffsetX([-24, 24])
-        .onBegin(() => {
-          dragStart.set(commentsProgress.get())
-          scheduleOnRN(setMode, 'commentsDragging')
-        })
-        .onUpdate(event => {
-          const next = Math.min(1, Math.max(0, dragStart.get() - event.translationY / 360))
-          commentsProgress.set(next)
-        })
-        .onEnd(event => {
-          const snap = commentsSnapTarget(commentsProgress.get(), event.velocityY)
-          const value = POST_MOTION.commentsSnapPoints[snap]
-          commentsProgress.set(
-            reduceMotion
-              ? withTiming(value, {duration: 120})
-              : withSpring(value, {...postSpringConfig('comments'), velocity: event.velocityY}),
-          )
-          scheduleOnRN(setMode, commentsModeForSnap(snap))
-        }),
+      createCommentsSheetPan({
+        commentsProgress,
+        dragStart,
+        reduceMotion,
+        setMode,
+      }),
     [commentsProgress, dragStart, reduceMotion, setMode],
   )
 

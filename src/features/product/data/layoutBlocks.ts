@@ -128,6 +128,13 @@ export const TAB_LAYOUT_BLOCKS: readonly LayoutBlock[] = [
     icon: 'discover',
   },
   {
+    id: 'modules',
+    slot: 'tabs',
+    label: 'Modules',
+    description: 'Product Hub — installed and available modules.',
+    icon: 'modules',
+  },
+  {
     id: 'create',
     slot: 'tabs',
     label: 'Create',
@@ -304,4 +311,13 @@ export function sanitizeOrderedIds(
     if (!unique.includes(id)) unique.unshift(id)
   }
   return unique.length ? unique : [...fallback]
+}
+
+/** Keep Modules on the tab bar when older prefs predate the hub tab. */
+export function ensureModulesTabId(ids: readonly string[]): string[] {
+  if (ids.includes('modules')) return [...ids]
+  const next = [...ids]
+  const discover = next.indexOf('discover')
+  next.splice(discover >= 0 ? discover + 1 : Math.min(1, next.length), 0, 'modules')
+  return next
 }

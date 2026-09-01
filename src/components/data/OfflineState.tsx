@@ -1,11 +1,24 @@
+import {View} from 'react-native'
+
 import {AppText} from '@/components/primitives/AppText'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function OfflineState({local}: {local: boolean}) {
+  const {spacing} = useThemeTokens()
   return (
-    <AppText variant="caption" colour="textSecondary">
-      {local
-        ? 'You’re offline. Local Modula data remains available.'
-        : 'You’re offline. Some content may be unavailable.'}
-    </AppText>
+    <View
+      accessibilityRole="alert"
+      style={{
+        gap: spacing[1],
+        paddingHorizontal: spacing[4],
+        paddingVertical: spacing[3],
+      }}>
+      <AppText variant="headline">You’re offline</AppText>
+      <AppText variant="body" colour="textSecondary">
+        {local
+          ? 'Last-known Modula data on this device is still available.'
+          : 'Connect to the network to refresh. Last-known content stays visible where it was already loaded.'}
+      </AppText>
+    </View>
   )
 }

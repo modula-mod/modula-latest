@@ -5,11 +5,14 @@ import {getUserFacingErrorMessage, isModulaApiError} from '@/api/contracts'
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
-import {Surface} from '@/components/primitives/Surface'
+import {
+  classifyShellError,
+  shellErrorTitle,
+} from '@/components/data/classifyShellError'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function QueryErrorState({
-  title = 'Could not load this surface',
+  title,
   error,
   onRetry,
 }: {
@@ -19,18 +22,22 @@ export function QueryErrorState({
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false)
   const {spacing} = useThemeTokens()
+  const kind = classifyShellError(error)
+  const heading = title ?? shellErrorTitle(kind)
   const apiError = isModulaApiError(error) ? error : null
 
   return (
-    <Surface variant="contained" style={[styles.wrap, {gap: spacing[3], padding: spacing[4]}]}>
+    <View
+      accessibilityRole="alert"
+      style={[styles.wrap, {gap: spacing[3], padding: spacing[4]}]}>
       <View style={{gap: spacing[1]}}>
-        <AppText variant="headline">{title}</AppText>
+        <AppText variant="headline">{heading}</AppText>
         <AppText variant="body" colour="textSecondary">
           {getUserFacingErrorMessage(error)}
         </AppText>
       </View>
       {onRetry ? <AppButton onPress={onRetry}>Retry</AppButton> : null}
-      {apiError ? (
+      {__DEV__ && apiError ? (
         <View style={{gap: spacing[2]}}>
           <AppPressable
             accessibilityLabel="Toggle developer error details"
@@ -46,12 +53,13 @@ export function QueryErrorState({
           ) : null}
         </View>
       ) : null}
-    </Surface>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
   wrap: {
-    margin: 16,
+    marginHorizontal: 16,
+    marginVertical: 8,
   },
 })

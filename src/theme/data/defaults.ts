@@ -5,18 +5,20 @@ import type {
 } from '@/theme/contracts'
 
 export const DEFAULT_APPEARANCE_PREFERENCES: AppearancePreferences = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   mode: 'system',
   family: 'standard',
   accentId: 'modulaTeal',
   customAccent: null,
   surfaceType: 'native',
   textScale: 1,
-  boldText: false,
-  reduceMotion: false,
-  reduceTransparency: false,
-  increaseContrast: false,
-  showSwitchLabels: false,
+  textScalePreference: {mode: 'system'},
+  boldText: 'system',
+  reduceMotion: 'system',
+  reduceTransparency: 'system',
+  increaseContrast: 'system',
+  differentiateWithoutColor: 'system',
+  showSwitchLabels: 'system',
   advancedChromeEffect: 'off',
 }
 
@@ -28,6 +30,7 @@ export const DEFAULT_SYSTEM_ACCESSIBILITY: SystemAccessibilityState = {
   screenReaderEnabled: false,
   grayscaleEnabled: false,
   invertColoursEnabled: false,
+  differentiateWithoutColor: false,
 }
 
 export const DEFAULT_MOTION_TOKENS: MotionTokens = {

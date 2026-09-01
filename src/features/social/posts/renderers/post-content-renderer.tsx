@@ -11,14 +11,20 @@ type PostContentRendererProps = {
   content: PostContent
   active?: boolean
   onDoubleTapLike: () => void
+  layout?: 'fill' | 'flow'
 }
 
-export function PostContentRenderer({content, active, onDoubleTapLike}: PostContentRendererProps) {
+export function PostContentRenderer({
+  content,
+  active,
+  onDoubleTapLike,
+  layout = 'fill',
+}: PostContentRendererProps) {
   switch (content.kind) {
     case 'image':
       return <ImagePostRenderer content={content} onDoubleTapLike={onDoubleTapLike} />
     case 'text':
-      return <TextPostRenderer content={content} />
+      return <TextPostRenderer content={content} layout={layout} />
     case 'link':
       return <LinkPostRenderer content={content} />
     case 'poll':

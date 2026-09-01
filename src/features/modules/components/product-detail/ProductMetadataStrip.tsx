@@ -26,14 +26,14 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
           style={[styles.divider, {backgroundColor: colours.separator}]}
         />
       ) : null}
-      <AppText variant="metricValue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={styles.value}>
+      <AppText variant="metricValue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9} style={styles.value}>
         {item.value}
       </AppText>
-      <AppText variant="metricLabel" colour="textTertiary" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.82} style={styles.label}>
+      <AppText variant="metricLabel" colour="textTertiary" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9} style={styles.label}>
         {item.label.toUpperCase()}
       </AppText>
       {item.detail ? (
-        <AppText variant="micro" colour="textSecondary" numberOfLines={2} style={styles.detail}>
+        <AppText variant="caption" colour="textSecondary" numberOfLines={2} style={styles.detail}>
           {item.detail}
         </AppText>
       ) : null}
@@ -57,12 +57,12 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
 
 const styles = StyleSheet.create({
   content: {alignItems: 'stretch', flexDirection: 'row'},
-  detail: {fontSize: 8.5, lineHeight: 11, textAlign: 'center'},
+  detail: {textAlign: 'center'},
   divider: {bottom: 10, left: 0, position: 'absolute', top: 10, width: StyleSheet.hairlineWidth},
   fitItem: {flex: 1, minWidth: 0},
   frame: {borderWidth: StyleSheet.hairlineWidth, overflow: 'hidden'},
   item: {alignItems: 'center', justifyContent: 'center', minHeight: 66, paddingHorizontal: 4, paddingVertical: 7},
-  label: {fontSize: 8.5, fontWeight: '700', letterSpacing: 0.2, lineHeight: 11},
+  label: {fontWeight: '700', letterSpacing: 0.2, textAlign: 'center'},
   scrollItem: {minWidth: 90},
-  value: {fontSize: 14, fontVariant: ['tabular-nums'], lineHeight: 18, textAlign: 'center'},
+  value: {fontVariant: ['tabular-nums'], textAlign: 'center'},
 })

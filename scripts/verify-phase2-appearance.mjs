@@ -98,8 +98,11 @@ const storage = text('src/theme/storage/appearanceStorage.ts')
 if (!storage.includes('modula.appearance.preferences.v1')) {
   fail('Appearance storage key is missing or not namespaced')
 }
-if (!contracts.includes('schemaVersion: 1')) {
-  fail('Appearance schema version 1 is missing')
+if (!contracts.includes('schemaVersion: 2')) {
+  fail('Appearance schema version 2 is missing')
+}
+if (!contracts.includes('SystemAdaptivePreference')) {
+  fail('SystemAdaptivePreference is missing from appearance contracts')
 }
 
 const config = text('app.config.ts')

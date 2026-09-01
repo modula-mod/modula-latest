@@ -357,10 +357,10 @@ function MetricCopy({
           {metricDisplayValue(metric)}
         </AppText>
         <AppText
-          variant="micro"
+          variant="metricLabel"
           numberOfLines={1}
           colour={selected ? 'textSecondary' : 'textTertiary'}
-          style={[textStyle, selected ? styles.labelSelected : styles.labelNeighbor]}>
+          style={textStyle}>
           {metric.label}
         </AppText>
       </View>
@@ -514,27 +514,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
   },
-  labelNeighbor: {
-    lineHeight: 12,
-  },
-  labelSelected: {
-    lineHeight: 12,
-  },
   single: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   valueNeighbor: {
-    fontSize: 13,
     fontWeight: '600',
     letterSpacing: -0.1,
-    lineHeight: 16,
   },
   valueSelected: {
     fontSize: 18,
     fontWeight: '700',
     letterSpacing: -0.3,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   window: {
     overflow: 'hidden',

@@ -5,8 +5,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated'
-import {Gesture, GestureDetector} from 'react-native-gesture-handler'
-import {scheduleOnRN} from 'react-native-worklets'
+import {GestureDetector} from 'react-native-gesture-handler'
 import * as Haptics from 'expo-haptics'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
@@ -19,12 +18,12 @@ import {
   postSpringConfig,
   usePostInteraction,
 } from '@/features/social/posts/interactions/post-interaction-context'
+import {createRailPan} from '@/features/social/posts/interactions/post-ui-worklets'
 import {PostContextMenu} from '@/features/social/posts/interactions/post-context-menu'
 import {ReactionPicker} from '@/features/social/posts/interactions/reaction-picker'
 import {
   canOpenContext,
   canStartReaction,
-  railReleaseTarget,
 } from '@/features/social/posts/state/post-interaction-machine'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
 import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
@@ -40,8 +39,6 @@ type PostActionRailProps = {
   onShare: () => void
   onCommentPress: () => void
 }
-
-const RAIL_DRAG_DISTANCE = 140
 
 function RailButton({
   label,
@@ -115,29 +112,13 @@ export function PostActionRail({
 
   const railPan = useMemo(
     () =>
-      Gesture.Pan()
-        .enabled(canOpenContext(mode))
-        .activeOffsetY([8, 9999])
-        .failOffsetX([-24, 24])
-        .onBegin(() => scheduleOnRN(setMode, 'railDragging'))
-        .onUpdate(event => {
-          const next = Math.min(1, Math.max(0, event.translationY / RAIL_DRAG_DISTANCE))
-          railProgress.set(next)
-          if (next >= POST_MOTION.railThresholds.commit) {
-            scheduleOnRN(hapticSelection)
-          }
-        })
-        .onEnd(event => {
-          const target = railReleaseTarget(railProgress.get(), event.velocityY)
-          if (target === 'open') {
-            railProgress.set(withSpring(1, postSpringConfig('rail')))
-            scheduleOnRN(setMode, 'contextOpen')
-            scheduleOnRN(hapticLight)
-          } else {
-            railProgress.set(withSpring(0, postSpringConfig('rail')))
-            scheduleOnRN(setMode, 'idle')
-          }
-        }),
+      createRailPan({
+        railProgress,
+        enabled: canOpenContext(mode),
+        setMode,
+        onCommitHaptic: hapticSelection,
+        onOpenHaptic: hapticLight,
+      }),
     [mode, railProgress, setMode],
   )
 

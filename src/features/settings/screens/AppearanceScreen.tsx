@@ -1,4 +1,3 @@
-import Slider from '@react-native-community/slider'
 import {LinearGradient} from 'expo-linear-gradient'
 import type {ReactNode} from 'react'
 import {useMemo, useState} from 'react'
@@ -16,8 +15,8 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
+import {SettingsLinkRow, SettingsSection, SettingsToggleRow} from '@/features/settings/components/SettingsRows'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -26,7 +25,6 @@ import {validateCustomAccent} from '@/theme/accents'
 import {ACCENT_PRESETS} from '@/theme/accents/resolveAccent'
 import {
   SURFACE_TYPES,
-  TEXT_SCALES,
   THEME_FAMILIES,
   type AppearanceMode,
   type SurfaceType,
@@ -83,7 +81,7 @@ const surfaceLabels: Record<SurfaceType, string> = {
 const PREVIEW_SURFACES: SurfaceType[] = ['glass', 'glay', 'solid']
 
 export function AppearanceScreen() {
-  const {preferences, resolved, systemAccessibility} = useAppearance()
+  const {preferences, resolved} = useAppearance()
   const actions = useAppearanceActions()
   const {colours, spacing, radius} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
@@ -93,7 +91,6 @@ export function AppearanceScreen() {
   const [customInput, setCustomInput] = useState(
     preferences.customAccent ?? resolved.accent.base,
   )
-  const [textScalePreview, setTextScalePreview] = useState(preferences.textScale)
   const customValidation = useMemo(
     () => validateCustomAccent(customInput),
     [customInput],
@@ -108,7 +105,7 @@ export function AppearanceScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <AppText variant="caption" colour="textTertiary">
-            Colour, chrome, and accessibility-safe fallbacks — not Apple Settings.
+            Colour, materials, and how Modula looks on this device.
           </AppText>
 
           <ChromePreview
@@ -242,136 +239,43 @@ export function AppearanceScreen() {
             ) : null}
           </MaterialSurface>
 
-          <Section title="Text size">
-            <MaterialSurface
-              role="card"
-              style={[
-                styles.sliderPanel,
-                {
-                  gap: spacing[3],
-                  borderRadius: radius.large,
-                  borderColor: colours.border,
-                },
-              ]}>
-              <View style={styles.sliderLabels}>
-                <AppText variant="caption">A</AppText>
-                <AppText
-                  variant="body"
-                  style={{
-                    fontSize: 16 * textScalePreview,
-                    lineHeight: 22 * textScalePreview,
-                  }}>
-                  Sample text
-                </AppText>
-                <AppText variant="title2">A</AppText>
-              </View>
-              <Slider
-                minimumValue={0}
-                maximumValue={TEXT_SCALES.length - 1}
-                step={1}
-                value={TEXT_SCALES.indexOf(preferences.textScale)}
-                minimumTrackTintColor={colours.accent}
-                maximumTrackTintColor={colours.borderStrong}
-                thumbTintColor={colours.accent}
-                accessibilityLabel="Text size"
-                onValueChange={value => {
-                  setTextScalePreview(TEXT_SCALES[Math.round(value)] ?? 1)
-                }}
-                onSlidingComplete={value => {
-                  const scale = TEXT_SCALES[Math.round(value)] ?? 1
-                  setTextScalePreview(scale)
-                  actions.setTextScale(scale)
-                }}
-              />
-            </MaterialSurface>
-          </Section>
-
-          <Section title="Interface">
-            <MaterialSurface
-              role="card"
-              style={[
-                styles.optionList,
-                {borderRadius: radius.large, borderColor: colours.border},
-              ]}>
-              <SwitchRow
-                title="Reduce Transparency"
-                value={resolved.accessibility.reduceTransparency}
-                storedValue={preferences.reduceTransparency}
-                onValueChange={actions.setReduceTransparency}
-                deviceOverride={systemAccessibility.reduceTransparency}
-              />
-              <SwitchRow
-                title="Increase Contrast"
-                value={resolved.accessibility.increaseContrast}
-                storedValue={preferences.increaseContrast}
-                onValueChange={actions.setIncreaseContrast}
-                deviceOverride={systemAccessibility.increaseContrast}
-              />
-              <SwitchRow
-                title="Bold Text"
-                value={resolved.accessibility.boldText}
-                storedValue={preferences.boldText}
-                onValueChange={actions.setBoldText}
-                deviceOverride={systemAccessibility.boldText}
-              />
-              <SwitchRow
-                title="Reduce Motion"
-                value={resolved.accessibility.reduceMotion}
-                storedValue={preferences.reduceMotion}
-                onValueChange={actions.setReduceMotion}
-                deviceOverride={systemAccessibility.reduceMotion}
-              />
-              <SwitchRow
-                title="Show ON/OFF Labels"
-                value={preferences.showSwitchLabels}
-                storedValue={preferences.showSwitchLabels}
-                onValueChange={actions.setShowSwitchLabels}
-                last
-              />
-            </MaterialSurface>
-            <AppText variant="caption" colour="textTertiary">
-              Reduce Transparency forces opaque chrome and wins over Glass / Glay / Native
-              previews.
-            </AppText>
-          </Section>
-
-          <Section title="Advanced">
-            <MaterialSurface
-              role="card"
-              style={[
-                styles.optionList,
-                {borderRadius: radius.large, borderColor: colours.border},
-              ]}>
-              <SwitchRow
-                title="Camera masked blur"
-                value={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
-                storedValue={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
-                onValueChange={enabled => {
-                  actions.setAdvancedChromeEffect(
-                    enabled ? 'cameraMaskedBlur' : 'off',
-                  )
-                }}
-                last
-              />
-            </MaterialSurface>
-            <AppText variant="caption" colour="textTertiary">
-              Preview — live camera cut through chrome glyphs. Needs camera permission;
-              nothing is recorded. Reduce Transparency disables the blur layer.
-            </AppText>
-            <AdvancedCameraMaskedBlurPreview
-              active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
-              disabledByTransparency={resolved.accessibility.reduceTransparency}
+          <SettingsSection>
+            <SettingsLinkRow
+              row={{
+                title: 'Display & Text Size',
+                icon: 'text',
+                iconDomain: 'language',
+                route: '/settings/display-and-text',
+              }}
+              last
             />
-            <AppText variant="caption" colour="textTertiary">
-              Join island — Telegram-style avatar meatball (Skia). Same Preview surface as
-              Presence; needs a native rebuild with @shopify/react-native-skia.
-            </AppText>
-            <ModulaJoinIsland
-              name="Modula"
-              avatarColour={colours.accent}
-              caption="Appearance Advanced motion Preview."
+          </SettingsSection>
+
+          <SettingsSection
+            title="Advanced"
+            footer="Preview — live camera cut through chrome glyphs. Needs camera permission; nothing is recorded. Reduce Transparency disables the blur layer.">
+            <SettingsToggleRow
+              label="Camera masked blur"
+              value={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+              onValueChange={enabled => {
+                actions.setAdvancedChromeEffect(enabled ? 'cameraMaskedBlur' : 'off')
+              }}
+              last
             />
-          </Section>
+          </SettingsSection>
+          <AdvancedCameraMaskedBlurPreview
+            active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
+            disabledByTransparency={resolved.accessibility.reduceTransparency}
+          />
+          <AppText variant="caption" colour="textTertiary">
+            Join island — Telegram-style avatar meatball (Skia). Same Preview surface as
+            Presence; needs a native rebuild with @shopify/react-native-skia.
+          </AppText>
+          <ModulaJoinIsland
+            name="Modula"
+            avatarColour={colours.accent}
+            caption="Appearance Advanced motion Preview."
+          />
 
           <AppPressable
             accessibilityLabel="Reset appearance"
@@ -721,58 +625,6 @@ function LinkRow({
       </AppText>
       <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
     </AppPressable>
-  )
-}
-
-function SwitchRow({
-  title,
-  value,
-  storedValue,
-  onValueChange,
-  deviceOverride = false,
-  last = false,
-}: {
-  title: string
-  value: boolean
-  storedValue: boolean
-  onValueChange: (value: boolean) => void
-  deviceOverride?: boolean
-  last?: boolean
-}) {
-  const {preferences} = useAppearance()
-  const {colours, spacing} = useThemeTokens()
-  return (
-    <View
-      style={[
-        styles.switchRow,
-        {
-          gap: spacing[3],
-          borderBottomColor: colours.separator,
-          borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
-          paddingHorizontal: spacing[4],
-          minHeight: 52,
-          alignItems: 'center',
-        },
-      ]}>
-      <View style={{flex: 1, gap: spacing[1]}}>
-        <AppText variant="label">{title}</AppText>
-        {deviceOverride && !storedValue ? (
-          <AppText variant="micro" colour="textTertiary">
-            Enabled by your device. Modula will keep it active.
-          </AppText>
-        ) : null}
-      </View>
-      {preferences.showSwitchLabels ? (
-        <AppText variant="micro" colour={value ? 'accent' : 'textTertiary'}>
-          {value ? 'ON' : 'OFF'}
-        </AppText>
-      ) : null}
-      <ModulaSwitch
-        accessibilityLabel={title}
-        value={value}
-        onValueChange={onValueChange}
-      />
-    </View>
   )
 }
 

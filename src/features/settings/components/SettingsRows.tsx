@@ -1,8 +1,7 @@
 import type {ReactNode} from 'react'
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
@@ -10,20 +9,99 @@ import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {ModulaIcon} from '@/platform/ui/icons/modula-icon'
+import {
+  MODULA_ICONS,
+  type ModulaIconName,
+} from '@/platform/ui/icons/modula-icon-registry'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
+import {
+  adaptivePreferenceLabel,
+  SYSTEM_ADAPTIVE_OPTIONS,
+} from '@/theme/accessibility/adaptivePreference'
+import type {SettingsIconDomain, SystemAdaptivePreference} from '@/theme/contracts'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type SettingsNavRow = {
   title: string
   description?: string
-  icon?: AppIconName
+  icon?: ModulaIconName | string
+  iconDomain?: SettingsIconDomain
   value?: string
   route?: string
   onPress?: () => void
   preview?: boolean
   comingSoon?: boolean
+  keywords?: string[]
+}
+
+const ICON_DOMAIN: Partial<Record<ModulaIconName, SettingsIconDomain>> = {
+  account: 'profile',
+  profile: 'profile',
+  people: 'profile',
+  notifications: 'notifications',
+  privacy: 'privacy',
+  eye: 'privacy',
+  storage: 'data',
+  saved: 'data',
+  bookmark: 'data',
+  download: 'data',
+  folder: 'data',
+  appearance: 'appearance',
+  palette: 'appearance',
+  contrast: 'appearance',
+  accessibility: 'accessibility',
+  motion: 'accessibility',
+  text: 'language',
+  community: 'language',
+  modules: 'modules',
+  module: 'modules',
+  marketplace: 'modules',
+  board: 'modules',
+  update: 'modules',
+  security: 'security',
+  key: 'security',
+  warning: 'security',
+  developer: 'developer',
+  settings: 'developer',
+  photo: 'content',
+  image: 'content',
+  camera: 'content',
+  filter: 'content',
+  integrations: 'connections',
+  link: 'connections',
+  info: 'info',
+  mail: 'info',
+  clock: 'info',
+  switch: 'account',
+}
+
+export function settingsIconName(icon?: string): ModulaIconName | undefined {
+  if (!icon) return undefined
+  return icon in MODULA_ICONS ? (icon as ModulaIconName) : 'settings'
+}
+
+export function settingsIconDomain(
+  icon?: ModulaIconName,
+  domain?: SettingsIconDomain,
+): SettingsIconDomain {
+  return domain ?? (icon ? ICON_DOMAIN[icon] : undefined) ?? 'info'
+}
+
+export function matchesSettingsQuery(row: SettingsNavRow, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  const haystack = [
+    row.title,
+    row.description ?? '',
+    row.value ?? '',
+    ...(row.keywords ?? []),
+  ]
+    .join(' ')
+    .toLowerCase()
+  return haystack.includes(q)
 }
 
 /**
@@ -65,25 +143,114 @@ export function SettingsScreen({
 
 export function SettingsCaption({children}: {children: ReactNode}) {
   return (
-    <AppText variant="caption" colour="textTertiary">
+    <AppText variant="footnote" colour="textTertiary">
       {children}
     </AppText>
   )
 }
 
+export function SettingsHero({
+  icon,
+  iconDomain,
+  title,
+  body,
+}: {
+  icon: ModulaIconName
+  iconDomain?: SettingsIconDomain
+  title: string
+  body: string
+}) {
+  const {colours, spacing, radius, settingsIcons} = useThemeTokens()
+  const domain = settingsIconDomain(icon, iconDomain)
+  const token = settingsIcons[domain]
+
+  return (
+    <View
+      accessible
+      accessibilityRole="summary"
+      accessibilityLabel={`${title}. ${body}`}
+      style={[
+        styles.hero,
+        {
+          backgroundColor: colours.surface,
+          borderRadius: radius.medium,
+          gap: spacing[3],
+          paddingHorizontal: spacing[5],
+          paddingVertical: spacing[6],
+        },
+      ]}>
+      <View
+        accessible={false}
+        importantForAccessibility="no"
+        style={[
+          styles.heroTile,
+          {backgroundColor: token.background, borderRadius: radius.round},
+        ]}>
+        <ModulaIcon name={icon} size={28} colour={token.foreground} />
+      </View>
+      <AppText variant="heroTitle" style={styles.heroTitle}>
+        {title}
+      </AppText>
+      <AppText
+        variant="heroDescription"
+        colour="textSecondary"
+        style={styles.heroBody}>
+        {body}
+      </AppText>
+    </View>
+  )
+}
+
+export function SettingsFooter({children}: {children: ReactNode}) {
+  const {spacing} = useThemeTokens()
+  return (
+    <AppText
+      variant="footnote"
+      colour="textTertiary"
+      style={{paddingHorizontal: spacing[4]}}>
+      {children}
+    </AppText>
+  )
+}
+
+export function SettingsIconTile({
+  name,
+  domain,
+}: {
+  name: ModulaIconName
+  domain?: SettingsIconDomain
+}) {
+  const {settingsIcons} = useThemeTokens()
+  const token = settingsIcons[settingsIconDomain(name, domain)]
+  return (
+    <View
+      accessible={false}
+      importantForAccessibility="no"
+      style={[
+        styles.iconTile,
+        {backgroundColor: token.background},
+      ]}>
+      <ModulaIcon name={name} size={16} colour={token.foreground} />
+    </View>
+  )
+}
+
 export function SettingsSection({
   title,
+  footer,
   children,
 }: {
   title?: string
+  footer?: string
   children: ReactNode
 }) {
   const {colours, spacing, radius} = useThemeTokens()
+
   return (
     <View style={{gap: spacing[2]}}>
       {title ? (
         <AppText
-          variant="caption"
+          variant="sectionHeader"
           colour="textTertiary"
           style={{
             letterSpacing: 0.6,
@@ -98,12 +265,64 @@ export function SettingsSection({
           styles.list,
           {
             backgroundColor: colours.surface,
-            borderColor: colours.separator,
-            borderRadius: radius.large,
+            borderRadius: radius.medium,
           },
         ]}>
         {children}
       </View>
+      {footer ? <SettingsFooter>{footer}</SettingsFooter> : null}
+    </View>
+  )
+}
+
+function RowChrome({
+  last,
+  children,
+  stacked,
+  leading,
+}: {
+  last?: boolean
+  stacked?: boolean
+  leading?: ReactNode
+  children: ReactNode
+}) {
+  const {colours, spacing} = useThemeTokens()
+  return (
+    <View style={[styles.row, {paddingLeft: spacing[4]}]}>
+      {leading}
+      <View
+        style={[
+          stacked ? styles.rowBodyStacked : styles.rowBody,
+          {
+            borderBottomColor: last ? 'transparent' : colours.separator,
+            marginLeft: leading ? spacing[3] : 0,
+            paddingRight: spacing[4],
+            paddingVertical: spacing[3],
+            gap: spacing[3],
+          },
+        ]}>
+        {children}
+      </View>
+    </View>
+  )
+}
+
+function TrailingValue({value}: {value: string}) {
+  return (
+    <AppText
+      variant="rowTrailing"
+      colour="textTertiary"
+      style={styles.trailing}>
+      {value}
+    </AppText>
+  )
+}
+
+function DecorativeChevron() {
+  const {colours} = useThemeTokens()
+  return (
+    <View accessible={false} importantForAccessibility="no">
+      <ModulaIcon name="chevronRight" size={16} colour={colours.textTertiary} />
     </View>
   )
 }
@@ -116,18 +335,25 @@ export function SettingsLinkRow({
   last?: boolean
 }) {
   const router = useRouter()
-  const {colours, spacing} = useThemeTokens()
+  const {fontScale} = useWindowDimensions()
+  const stacked = fontScale >= 1.6
   const title = row.comingSoon
     ? row.title
     : row.preview
       ? `${row.title} — Preview`
       : row.title
   const value = row.comingSoon ? row.value ?? 'Coming Soon' : row.value
-  const accessibilityLabel = row.comingSoon ? `${row.title} — Coming Soon` : title
+  const accessibilityLabel = [
+    row.comingSoon ? `${row.title}, Coming Soon` : title,
+    value,
+  ]
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <AppPressable
       accessibilityLabel={accessibilityLabel}
+      accessibilityRole="button"
       accessibilityState={row.comingSoon ? {disabled: true} : undefined}
       onPress={() => {
         if (row.comingSoon) return
@@ -138,31 +364,103 @@ export function SettingsLinkRow({
         if (row.route) {
           router.push(row.route as Href)
         }
-      }}
-      style={[
-        styles.row,
-        {
-          borderBottomColor: last ? 'transparent' : colours.separator,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          gap: spacing[3],
-        },
-      ]}>
-      {row.icon ? <AppIcon name={row.icon} colour={colours.text} size={20} /> : null}
-      <View style={styles.rowText}>
-        <AppText variant="body">{title}</AppText>
-        {row.description ? (
-          <AppText variant="caption" colour="textTertiary" numberOfLines={1}>
-            {row.description}
-          </AppText>
+      }}>
+      <RowChrome
+        last={last}
+        stacked={stacked}
+        leading={
+          row.icon ? (
+            <SettingsIconTile
+              name={settingsIconName(row.icon) ?? 'settings'}
+              domain={row.iconDomain}
+            />
+          ) : undefined
+        }>
+        <View style={styles.rowText}>
+          <AppText variant="rowTitle">{title}</AppText>
+          {row.description ? (
+            <AppText variant="caption" colour="textTertiary">
+              {row.description}
+            </AppText>
+          ) : null}
+          {stacked && value ? <TrailingValue value={value} /> : null}
+        </View>
+        {!stacked && value ? <TrailingValue value={value} /> : null}
+        {row.comingSoon ? null : <DecorativeChevron />}
+      </RowChrome>
+    </AppPressable>
+  )
+}
+
+export function SettingsInfoRow({
+  icon,
+  iconDomain,
+  label,
+  value,
+  description,
+  last,
+}: {
+  icon?: ModulaIconName
+  iconDomain?: SettingsIconDomain
+  label: string
+  value?: string
+  description?: string
+  last?: boolean
+}) {
+  const {fontScale} = useWindowDimensions()
+  const stacked = fontScale >= 1.6
+  return (
+    <View
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={[label, value, description].filter(Boolean).join(', ')}>
+      <RowChrome
+        last={last}
+        stacked={stacked}
+        leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
+        <View style={styles.rowText}>
+          <AppText variant="rowTitle">{label}</AppText>
+          {description ? (
+            <AppText variant="caption" colour="textTertiary">
+              {description}
+            </AppText>
+          ) : null}
+          {stacked && value ? <TrailingValue value={value} /> : null}
+        </View>
+        {!stacked && value ? <TrailingValue value={value} /> : null}
+      </RowChrome>
+    </View>
+  )
+}
+
+export function SettingsChoiceRow({
+  label,
+  selected,
+  onPress,
+  last,
+}: {
+  label: string
+  selected: boolean
+  onPress: () => void
+  last?: boolean
+}) {
+  const {colours} = useThemeTokens()
+  return (
+    <AppPressable
+      accessibilityLabel={label}
+      accessibilityRole="radio"
+      accessibilityState={{selected}}
+      onPress={onPress}>
+      <RowChrome last={last}>
+        <View style={styles.rowText}>
+          <AppText variant="rowTitle">{label}</AppText>
+        </View>
+        {selected ? (
+          <View accessible={false} importantForAccessibility="no">
+            <ModulaIcon name="check" size={18} colour={colours.accent} />
+          </View>
         ) : null}
-      </View>
-      {value ? (
-        <AppText variant="caption" colour="textTertiary" numberOfLines={1}>
-          {value}
-        </AppText>
-      ) : null}
-      {row.comingSoon ? null : <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />}
+      </RowChrome>
     </AppPressable>
   )
 }
@@ -182,40 +480,68 @@ export function SettingsToggleRow({
   last?: boolean
   preview?: boolean
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {accessibility} = useThemeTokens()
   const title = preview ? `${label} — Preview` : label
 
   return (
-    <View
-      style={[
-        styles.row,
-        {
-          borderBottomColor: last ? 'transparent' : colours.separator,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
-          gap: spacing[3],
-        },
-      ]}>
+    <RowChrome last={last}>
       <View style={styles.rowText}>
-        <AppText variant="label">{title}</AppText>
+        <AppText variant="rowTitle">{title}</AppText>
         {description ? (
           <AppText variant="caption" colour="textSecondary">
             {description}
           </AppText>
         ) : null}
       </View>
-      <SystemSwitch
-        value={value}
-        onValueChange={onValueChange}
-        label={title}
-      />
-    </View>
+      {accessibility.showSwitchLabels ? (
+        <AppText variant="micro" colour={value ? 'accent' : 'textTertiary'}>
+          {value ? 'On' : 'Off'}
+        </AppText>
+      ) : null}
+      <SystemSwitch value={value} onValueChange={onValueChange} label={title} />
+    </RowChrome>
   )
 }
 
-/**
- * Value row that opens a ModulaMenu / action sheet of options.
- */
+export function SettingsAdaptiveRow({
+  label,
+  description,
+  value,
+  onValueChange,
+  last,
+  icon,
+  iconDomain,
+}: {
+  label: string
+  description?: string
+  value: SystemAdaptivePreference
+  onValueChange: (next: SystemAdaptivePreference) => void
+  last?: boolean
+  icon?: ModulaIconName
+  iconDomain?: SettingsIconDomain
+}) {
+  return (
+    <SettingsMenuRow
+      label={label}
+      description={description}
+      value={adaptivePreferenceLabel(value)}
+      menuTitle={label}
+      icon={icon}
+      iconDomain={iconDomain}
+      actions={SYSTEM_ADAPTIVE_OPTIONS.map(option => ({
+        id: option.value,
+        label: option.label,
+      }))}
+      onAction={id => {
+        if (id === 'system' || id === 'on' || id === 'off') {
+          onValueChange(id)
+        }
+      }}
+      last={last}
+    />
+  )
+}
+
 export function SettingsMenuRow({
   label,
   description,
@@ -225,6 +551,8 @@ export function SettingsMenuRow({
   last,
   preview,
   menuTitle,
+  icon,
+  iconDomain,
 }: {
   label: string
   description?: string
@@ -234,8 +562,11 @@ export function SettingsMenuRow({
   last?: boolean
   preview?: boolean
   menuTitle?: string
+  icon?: ModulaIconName
+  iconDomain?: SettingsIconDomain
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {fontScale} = useWindowDimensions()
+  const stacked = fontScale >= 1.6
   const title = preview ? `${label} — Preview` : label
 
   return (
@@ -243,43 +574,62 @@ export function SettingsMenuRow({
       title={menuTitle ?? label}
       actions={actions}
       onAction={onAction}
-      accessibilityLabel={`${title}. ${value ?? 'Choose option'}`}
+      accessibilityLabel={`${title}${value ? `, ${value}` : ''}`}
       trigger={
-        <View
-          style={[
-            styles.row,
-            {
-              borderBottomColor: last ? 'transparent' : colours.separator,
-              paddingHorizontal: spacing[4],
-              paddingVertical: spacing[3],
-              gap: spacing[3],
-            },
-          ]}>
+        <RowChrome
+          last={last}
+          stacked={stacked}
+          leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
           <View style={styles.rowText}>
-            <AppText variant="label">{title}</AppText>
+            <AppText variant="rowTitle">{title}</AppText>
             {description ? (
               <AppText variant="caption" colour="textSecondary">
                 {description}
               </AppText>
             ) : null}
+            {stacked && value ? <TrailingValue value={value} /> : null}
           </View>
-          {value ? (
-            <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
-              {value}
-            </AppText>
-          ) : null}
-          <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
-        </View>
+          {!stacked && value ? <TrailingValue value={value} /> : null}
+          <DecorativeChevron />
+        </RowChrome>
       }
     />
   )
 }
 
-/**
- * Long-press actions on a settings row.
- * Uses the imperative action sheet (not SwiftUI Host ContextMenu) so full-width
- * list rows are not crush-sized by Expo UI Host intrinsic layout.
- */
+export function SettingsDestructiveRow({
+  label,
+  description,
+  onPress,
+  last,
+}: {
+  label: string
+  description?: string
+  onPress: () => void
+  last?: boolean
+}) {
+  const {colours} = useThemeTokens()
+  return (
+    <AppPressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      onPress={onPress}>
+      <RowChrome last={last}>
+        <View style={styles.rowText}>
+          <AppText variant="rowTitle" style={{color: colours.destructive}}>
+            {label}
+          </AppText>
+          {description ? (
+            <AppText variant="caption" colour="textTertiary">
+              {description}
+            </AppText>
+          ) : null}
+        </View>
+      </RowChrome>
+    </AppPressable>
+  )
+}
+
 export function SettingsContextRow({
   title,
   actions,
@@ -305,7 +655,6 @@ export function SettingsContextRow({
   )
 }
 
-/** Header overflow (⋯) — shared liquid-glass control group (single glyph). */
 export function SettingsOverflowMenu({
   title,
   actions,
@@ -333,7 +682,6 @@ export function SettingsOverflowMenu({
 
 /**
  * @deprecated Prefer SettingsCaption — header already owns the screen title.
- * Kept so existing call sites only show the body as a caption.
  */
 export function SettingsInfoBlock({
   title: _title,
@@ -353,16 +701,50 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     width: '100%',
   },
+  hero: {
+    alignItems: 'center',
+  },
+  heroBody: {
+    textAlign: 'center',
+  },
+  heroTile: {
+    alignItems: 'center',
+    height: 52,
+    justifyContent: 'center',
+    width: 52,
+  },
+  heroTitle: {
+    textAlign: 'center',
+  },
+  iconTile: {
+    alignItems: 'center',
+    borderRadius: 7,
+    height: 29,
+    justifyContent: 'center',
+    width: 29,
+  },
   list: {
-    borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
   row: {
     alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    minHeight: 48,
+    minHeight: 52,
     width: '100%',
+  },
+  rowBody: {
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+    flexDirection: 'row',
+    minHeight: 52,
+  },
+  rowBodyStacked: {
+    alignItems: 'flex-start',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flex: 1,
+    flexDirection: 'row',
+    minHeight: 52,
   },
   rowText: {
     flex: 1,
@@ -371,5 +753,10 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  trailing: {
+    flexShrink: 1,
+    maxWidth: '42%',
+    textAlign: 'right',
   },
 })

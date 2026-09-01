@@ -15,7 +15,6 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
-import {Surface} from '@/components/primitives/Surface'
 import {useSession} from '@/auth/runtime'
 import {ActivityDigestStrip} from '@/features/activity/components/ActivityDigestStrip'
 import {useActivityQuery} from '@/features/activity/data'
@@ -76,7 +75,7 @@ function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
 export function ActivityScreen() {
   const navigation = useNavigation()
   const {activityRepository} = useAppServices()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
@@ -280,7 +279,7 @@ export function ActivityScreen() {
                 {
                   backgroundColor:
                     filter === id ? colours.accentSubtle : colours.surfaceRaised,
-                  borderRadius: 12,
+                  borderRadius: radius.medium,
                 },
               ]}>
               <AppText
@@ -332,7 +331,7 @@ function ActivityRow({
   const openDestination = () => {
     onOpen()
     if (item.type === 'moduleUpdate') {
-      router.push('/marketplace/digital.modula.vault-notes' as Href)
+      router.push('/modules' as Href)
       return
     }
     if (item.type === 'teamInvitation') {
@@ -353,40 +352,38 @@ function ActivityRow({
       accessibilityLabel={`Activity actions for ${item.description}`}
       actions={[
         {id: 'open', label: 'Open'},
-        {id: 'markRead', label: unread ? 'Mark as read' : 'Mark as unread'},
-        {id: 'mute', label: 'Mute preview'},
-        {id: 'copy', label: 'Copy text'},
-        {id: 'remove', label: 'Remove preview', style: 'destructive'},
+        {id: 'markRead', label: unread ? 'Mark as read' : 'Already read'},
       ]}
       onAction={id => {
         if (id === 'open') openDestination()
         if (id === 'markRead') onMarkRead()
-        if (id === 'copy' && item.description) {
-          void import('expo-clipboard').then(mod =>
-            mod.setStringAsync(
-              item.actor
-                ? `${item.actor.displayName} ${item.description}`
-                : item.description,
-            ),
-          )
-        }
       }}>
       <AppPressable
-        accessibilityLabel={item.description}
+        accessibilityLabel={`${unread ? 'Unread. ' : ''}${item.description}. ${item.timestamp}`}
         onPress={openDestination}
         style={styles.rowPress}>
-        <Surface
-          variant="plain"
+        <View
           style={[
             styles.row,
             {
-              backgroundColor: colours.surface,
-              borderRadius: radius.large,
+              borderBottomColor: colours.separator,
               gap: spacing[3],
               paddingHorizontal: spacing[3],
               paddingVertical: spacing[3],
             },
           ]}>
+          {unread ? (
+            <View
+              accessible={false}
+              importantForAccessibility="no"
+              style={[
+                styles.unreadBar,
+                {backgroundColor: colours.textMain},
+              ]}
+            />
+          ) : (
+            <View style={styles.unreadBarSpacer} />
+          )}
           {item.actor && profileRoute ? (
             <View>
               <Avatar
@@ -419,7 +416,7 @@ function ActivityRow({
           <View style={styles.body}>
             {item.actor ? (
               <AppText variant="body">
-                <AppText variant="label">
+                <AppText variant={unread ? 'bodyStrong' : 'label'}>
                   {uniqueActors.length > 1
                     ? `${item.actor.displayName} and ${uniqueActors.length - 1} others`
                     : item.actor.displayName}
@@ -427,11 +424,8 @@ function ActivityRow({
                 {item.description}
               </AppText>
             ) : (
-              <AppText variant="body">{item.description}</AppText>
+              <AppText variant={unread ? 'bodyStrong' : 'body'}>{item.description}</AppText>
             )}
-            <AppText variant="caption" colour="textSecondary">
-              {item.timestamp}
-            </AppText>
             {item.preview ? (
               <View
                 style={[
@@ -464,7 +458,10 @@ function ActivityRow({
               </View>
             ) : null}
           </View>
-        </Surface>
+          <AppText variant="caption" colour="textTertiary" style={styles.timestamp}>
+            {item.timestamp}
+          </AppText>
+        </View>
       </AppPressable>
     </ModulaContextMenu>
   )
@@ -481,7 +478,7 @@ const styles = StyleSheet.create({
   filterRow: {
     justifyContent: 'center',
     minHeight: 48,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
   },
   iconAvatar: {
     alignItems: 'center',
@@ -494,6 +491,7 @@ const styles = StyleSheet.create({
   },
   row: {
     alignItems: 'flex-start',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     width: '100%',
   },
@@ -502,6 +500,20 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+  },
+  timestamp: {
+    flexShrink: 0,
+    marginTop: 2,
+    maxWidth: 88,
+    textAlign: 'right',
+  },
+  unreadBar: {
+    alignSelf: 'stretch',
+    borderRadius: 2,
+    width: 4,
+  },
+  unreadBarSpacer: {
+    width: 4,
   },
   unreadDot: {
     borderRadius: 5,

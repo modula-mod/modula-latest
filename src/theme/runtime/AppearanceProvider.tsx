@@ -14,7 +14,9 @@ import type {
   AppearanceMode,
   AppearancePreferences,
   SurfaceType,
+  SystemAdaptivePreference,
   TextScale,
+  TextScalePreference,
   ThemeFamily,
 } from '@/theme/contracts'
 import {useSystemAccessibility} from '@/theme/accessibility'
@@ -39,6 +41,7 @@ import {
   isSurfaceType,
   isTextScale,
   isThemeFamily,
+  mergeLocalAdaptivePreferences,
 } from '@/theme/storage/migrateAppearancePreferences'
 import {
   loadAppearanceCache,
@@ -168,11 +171,12 @@ export function AppearanceProvider({children}: PropsWithChildren) {
             versionRef.current = server.version
             warnedSyncFailureRef.current = false
             // Advanced chrome is local Preview — preserve across sync until Greenfield owns it.
-            setPreferences({
-              ...server.preferences,
-              advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
-              showSwitchLabels: preferencesRef.current.showSwitchLabels,
-            })
+            setPreferences(
+              mergeLocalAdaptivePreferences(
+                server.preferences,
+                preferencesRef.current,
+              ),
+            )
           })
           .catch(error => {
             if (!warnedSyncFailureRef.current) {
@@ -185,11 +189,12 @@ export function AppearanceProvider({children}: PropsWithChildren) {
                 .then(server => {
                   versionRef.current = server.version
                   warnedSyncFailureRef.current = false
-                  setPreferences({
-                    ...server.preferences,
-                    advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
-                    showSwitchLabels: preferencesRef.current.showSwitchLabels,
-                  })
+                  setPreferences(
+                    mergeLocalAdaptivePreferences(
+                      server.preferences,
+                      preferencesRef.current,
+                    ),
+                  )
                 })
                 .catch(() => undefined)
             }, 30_000)
@@ -208,11 +213,12 @@ export function AppearanceProvider({children}: PropsWithChildren) {
         if (!active) return
         if (server.version >= versionRef.current) {
           versionRef.current = server.version
-          setPreferences({
-            ...server.preferences,
-            advancedChromeEffect: preferencesRef.current.advancedChromeEffect,
-            showSwitchLabels: preferencesRef.current.showSwitchLabels,
-          })
+          setPreferences(
+            mergeLocalAdaptivePreferences(
+              server.preferences,
+              preferencesRef.current,
+            ),
+          )
         } else {
           syncToServer(preferencesRef.current)
         }
@@ -277,22 +283,41 @@ export function AppearanceProvider({children}: PropsWithChildren) {
       },
       setTextScale: (textScale: TextScale) => {
         if (isTextScale(textScale)) {
-          updatePreferences(prev => ({...prev, textScale}))
+          updatePreferences(prev => ({
+            ...prev,
+            textScale,
+            textScalePreference: {mode: 'custom', scale: textScale},
+          }))
         }
       },
-      setBoldText: (boldText: boolean) => {
+      setTextScalePreference: (textScalePreference: TextScalePreference) => {
+        updatePreferences(prev => ({
+          ...prev,
+          textScalePreference,
+          textScale:
+            textScalePreference.mode === 'custom'
+              ? textScalePreference.scale
+              : prev.textScale,
+        }))
+      },
+      setBoldText: (boldText: SystemAdaptivePreference) => {
         updatePreferences(prev => ({...prev, boldText}))
       },
-      setReduceMotion: (reduceMotion: boolean) => {
+      setReduceMotion: (reduceMotion: SystemAdaptivePreference) => {
         updatePreferences(prev => ({...prev, reduceMotion}))
       },
-      setReduceTransparency: (reduceTransparency: boolean) => {
+      setReduceTransparency: (reduceTransparency: SystemAdaptivePreference) => {
         updatePreferences(prev => ({...prev, reduceTransparency}))
       },
-      setIncreaseContrast: (increaseContrast: boolean) => {
+      setIncreaseContrast: (increaseContrast: SystemAdaptivePreference) => {
         updatePreferences(prev => ({...prev, increaseContrast}))
       },
-      setShowSwitchLabels: (showSwitchLabels: boolean) => {
+      setDifferentiateWithoutColor: (
+        differentiateWithoutColor: SystemAdaptivePreference,
+      ) => {
+        updatePreferences(prev => ({...prev, differentiateWithoutColor}))
+      },
+      setShowSwitchLabels: (showSwitchLabels: SystemAdaptivePreference) => {
         updatePreferences(prev => ({...prev, showSwitchLabels}))
       },
       setAdvancedChromeEffect: (advancedChromeEffect: AdvancedChromeEffect) => {

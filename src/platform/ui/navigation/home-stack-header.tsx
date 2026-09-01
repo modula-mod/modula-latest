@@ -70,7 +70,13 @@ export function HomeHeaderTitle() {
       pointerEvents="none"
       style={[styles.titleWrap, obscureStyle]}>
       {visible ? (
-        <AppText variant="headline" style={{color: colours.text}}>
+        <AppText
+          variant="title1"
+          style={{
+            color: colours.text,
+            letterSpacing: 0.6,
+            fontWeight: '700',
+          }}>
           Modula
         </AppText>
       ) : null}

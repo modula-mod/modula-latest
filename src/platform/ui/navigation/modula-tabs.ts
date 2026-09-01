@@ -1,4 +1,10 @@
-export type ModulaTabId = 'home' | 'discover' | 'create' | 'activity' | 'profile'
+export type ModulaTabId =
+  | 'home'
+  | 'discover'
+  | 'modules'
+  | 'create'
+  | 'activity'
+  | 'profile'
 
 export type ModulaTabDefinition = {
   id: ModulaTabId
@@ -26,6 +32,13 @@ export const MODULA_TABS: readonly ModulaTabDefinition[] = [
     label: 'Discover',
     sfSymbol: {default: 'safari', selected: 'safari.fill'},
     materialSymbol: 'explore',
+  },
+  {
+    id: 'modules',
+    routeName: 'hub',
+    label: 'Modules',
+    sfSymbol: {default: 'square.stack.3d.up', selected: 'square.stack.3d.up.fill'},
+    materialSymbol: 'deployed_code',
   },
   {
     id: 'create',
