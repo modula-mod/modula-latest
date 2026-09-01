@@ -15,12 +15,13 @@ export function ModuleFieldRenderer({
   onChange: (value: unknown) => void
 }) {
   const {colours, radius, spacing} = useThemeTokens()
+  const label = field.required ? `${field.label} *` : field.label
   if (field.type === 'boolean') {
     return (
       <View style={{alignItems: 'center', flexDirection: 'row', gap: spacing[3], justifyContent: 'space-between'}}>
-        <AppText variant="label">{field.label}</AppText>
+        <AppText variant="label">{label}</AppText>
         <Switch
-          accessibilityLabel={field.label}
+          accessibilityLabel={label}
           value={Boolean(value)}
           onValueChange={onChange}
           trackColor={{false: colours.border, true: colours.accentSubtle}}
@@ -45,10 +46,10 @@ export function ModuleFieldRenderer({
         ? value
         : ''
   return (
-    <View style={{gap: spacing[1]}}>
-      <AppText variant="caption" colour="textSecondary">{field.label}</AppText>
+    <View style={{gap: spacing[2]}}>
+      <AppText variant="label">{label}</AppText>
       <TextInput
-        accessibilityLabel={field.label}
+        accessibilityLabel={label}
         value={textValue}
         onChangeText={text => {
           if (field.type === 'richText') onChange(richTextDocumentFromText(text))
@@ -64,7 +65,7 @@ export function ModuleFieldRenderer({
             onChange(text.trim() === '' ? undefined : Number.isFinite(parsed) ? parsed : text)
           } else onChange(text)
         }}
-        placeholder={field.placeholder}
+        placeholder={field.placeholder ?? defaultPlaceholder(field.type)}
         placeholderTextColor={colours.textTertiary}
         keyboardType={field.type === 'number' ? 'numeric' : 'default'}
         multiline={field.type === 'multilineText' || field.type === 'richText' || field.type === 'json'}
@@ -75,10 +76,18 @@ export function ModuleFieldRenderer({
           borderWidth: 1,
           color: colours.text,
           minHeight: field.type === 'multilineText' || field.type === 'richText' || field.type === 'json' ? 112 : 44,
-          padding: spacing[3],
+          paddingHorizontal: spacing[3],
+          paddingVertical: spacing[3],
+          textAlignVertical: field.type === 'multilineText' || field.type === 'richText' || field.type === 'json' ? 'top' : 'center',
         }}
       />
       {field.helpText ? <AppText variant="micro" colour="textTertiary">{field.helpText}</AppText> : null}
     </View>
   )
+}
+
+function defaultPlaceholder(type: GreenfieldModuleFieldDefinition['type']): string | undefined {
+  if (type === 'tags' || type === 'multiSelect') return 'Add items separated by commas'
+  if (type === 'recordReference') return 'Optional'
+  return undefined
 }

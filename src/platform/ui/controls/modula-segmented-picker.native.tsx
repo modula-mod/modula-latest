@@ -1,7 +1,7 @@
 import {SegmentedControl as ExpoSegmentedControl} from '@expo/ui/community/segmented-control'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import {LinearGradient} from 'expo-linear-gradient'
-import {useCallback, useEffect, useMemo, useRef} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {
   Animated,
   PanResponder,
@@ -81,13 +81,11 @@ function ScrollableNativeSegmentedControl({
   const enabled = options.every(option => !option.disabled)
   const contentWidth = Math.max(viewportWidth, options.length * segmentMinWidth)
   const maxOffset = Math.max(0, contentWidth - viewportWidth)
-  const translateX = useRef(new Animated.Value(0)).current
-  const dragOrigin = useRef(0)
+  const [translateX] = useState(() => new Animated.Value(0))
 
   const animateTo = useCallback(
     (offset: number, animated = true) => {
       const next = snapOffset(offset, segmentMinWidth, maxOffset)
-      dragOrigin.current = next
       if (animated) {
         Animated.spring(translateX, {
           toValue: -next,
@@ -107,24 +105,24 @@ function ScrollableNativeSegmentedControl({
     animateTo(centeredOffset(selectedIndex, segmentMinWidth, viewportWidth, maxOffset))
   }, [animateTo, maxOffset, segmentMinWidth, selectedIndex, viewportWidth])
 
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
+  const panResponder = useMemo(() => {
+    let dragOrigin = 0
+    return PanResponder.create({
         onMoveShouldSetPanResponder: (_event, gesture) =>
           maxOffset > 0 &&
           Math.abs(gesture.dx) > Math.abs(gesture.dy) &&
           Math.abs(gesture.dx) > 6,
         onPanResponderGrant: () => {
           translateX.stopAnimation(value => {
-            dragOrigin.current = -value
+            dragOrigin = -value
           })
         },
         onPanResponderMove: (_event, gesture) => {
-          const next = clampOffset(dragOrigin.current - gesture.dx, maxOffset)
+          const next = clampOffset(dragOrigin - gesture.dx, maxOffset)
           translateX.setValue(-next)
         },
         onPanResponderRelease: (_event, gesture) => {
-          const projected = clampOffset(dragOrigin.current - gesture.dx, maxOffset)
+          const projected = clampOffset(dragOrigin - gesture.dx, maxOffset)
           if (Math.abs(gesture.dx) >= SWIPE_THRESHOLD_PX || Math.abs(gesture.vx) > 0.35) {
             const direction = gesture.dx + gesture.vx * 40
             const page = snapOffset(
@@ -139,9 +137,8 @@ function ScrollableNativeSegmentedControl({
           }
           animateTo(projected)
         },
-      }),
-    [animateTo, maxOffset, segmentMinWidth, translateX],
-  )
+      })
+  }, [animateTo, maxOffset, segmentMinWidth, translateX])
 
   if (contentWidth <= viewportWidth) {
     return (

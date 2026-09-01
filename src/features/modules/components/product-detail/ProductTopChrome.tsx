@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {Animated, StyleSheet, View} from 'react-native'
 
 import type {ModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
@@ -52,7 +52,7 @@ export function ProductFixedChrome({
   onAction: (id: string) => void
 }) {
   const target = productActionReveal(progress)
-  const anim = useRef(new Animated.Value(target)).current
+  const [anim] = useState(() => new Animated.Value(target))
   const [reveal, setReveal] = useState(target)
 
   useEffect(() => {

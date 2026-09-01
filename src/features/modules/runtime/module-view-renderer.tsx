@@ -6,6 +6,7 @@ import type {
   GreenfieldModuleLayoutNode,
 } from '@modula/greenfield-module-ui-contracts'
 
+import {getUserFacingErrorMessage} from '@/api/contracts'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleAIProductActionDefinition, ModuleHostExtensionContribution, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
@@ -27,6 +28,8 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
   const {moduleRepository} = useAppServices()
   const {colours, radius, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
+  const [pendingActionId, setPendingActionId] = useState<string | null>(null)
+  const [actionFeedback, setActionFeedback] = useState<{kind: 'error' | 'success'; message: string} | null>(null)
   const collection = view.collection ?? view.query?.collection ?? ''
   const recordsQuery = useModuleRecordsQuery(moduleId, view.kind === 'collection' ? collection : '', {
     q: query || undefined,
@@ -60,52 +63,83 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
   const draft = editedDraft.source === sourceDraft.source ? editedDraft.values : sourceDraft.values
   const updateDraftField = (name: string, value: unknown) => setEditedDraft({source: sourceDraft.source, values: {...draft, [name]: value}})
 
+  const completeAction = (action: GreenfieldModuleAction) => {
+    if (action.successDestination.kind === 'dismiss') {
+      if (router.canGoBack()) router.back()
+      else router.replace(`/module/${encodeURIComponent(moduleId)}` as Href)
+      return
+    }
+    if (action.successDestination.kind === 'route') {
+      router.replace(action.successDestination.path as Href)
+      return
+    }
+    setActionFeedback({kind: 'success', message: `${action.label} complete.`})
+  }
+
   const runAction = async (action: GreenfieldModuleAction, input: Record<string, unknown> = {}) => {
-    if (action.confirmationPolicy === 'confirm' || action.confirmationPolicy === 'confirmDestructive' || action.confirmationPolicy === 'recentAuth') {
-      const confirmed = await confirmModulaAction({
-        title: action.label,
-        message: action.destructive ? 'This module action is destructive and will be audited.' : 'Run this module action?',
-        confirmLabel: action.label,
-        cancelLabel: 'Cancel',
-        destructive: action.destructive,
-      })
-      if (!confirmed) return
+    setActionFeedback(null)
+    setPendingActionId(action.actionId)
+    try {
+      if (action.confirmationPolicy === 'confirm' || action.confirmationPolicy === 'confirmDestructive' || action.confirmationPolicy === 'recentAuth') {
+        const confirmed = await confirmModulaAction({
+          title: action.label,
+          message: action.destructive ? 'This module action is destructive and will be audited.' : 'Run this module action?',
+          confirmLabel: action.label,
+          cancelLabel: 'Cancel',
+          destructive: action.destructive,
+        })
+        if (!confirmed) return
+      }
+      const shaped = shapeMpsActionInput(action, input)
+      const validationError = validateActionInput(action, shaped)
+      if (validationError) {
+        setActionFeedback({kind: 'error', message: validationError})
+        return
+      }
+      const recordIdField = action.target?.recordIdField ?? 'recordId'
+      const boundRecord = recordQuery.data
+      if (boundRecord && shaped[recordIdField] === undefined) shaped[recordIdField] = boundRecord.record_id
+      if (boundRecord && shaped.expectedRevision === undefined) shaped.expectedRevision = boundRecord.revision
+      if (action.kind === 'route.open') {
+        const route = resolveRuntimeActionRoute(action, shaped)
+        if (!route) throw new Error('Module route action is missing required route parameters')
+        router.push(route as Href)
+        return
+      }
+      if (action.kind === 'share') {
+        await Share.share({message: String(shaped.text ?? shaped.title ?? boundRecord?.data.title ?? view.title)})
+        return
+      }
+      if (action.kind === 'dismiss') {
+        if (router.canGoBack()) router.back()
+        else router.replace(`/module/${encodeURIComponent(moduleId)}` as Href)
+        return
+      }
+      if (action.kind === 'record.create') {
+        await mutations.create.mutateAsync(shaped)
+        setEditedDraft({source: sourceDraft.source, values: {}})
+        completeAction(action)
+        return
+      }
+      const recordId = typeof shaped[recordIdField] === 'string' ? shaped[recordIdField] : ''
+      const expectedRevision = typeof shaped.expectedRevision === 'number' ? shaped.expectedRevision : undefined
+      if (action.kind === 'record.update') {
+        if (!recordId) throw new Error('The record is not available to update.')
+        await mutations.update.mutateAsync({recordId, data: recordDataForAction(shaped, recordIdField), expectedRevision})
+        completeAction(action)
+        return
+      }
+      if (action.kind === 'record.delete' && recordId) await mutations.remove.mutateAsync({recordId, expectedRevision})
+      else if (action.kind === 'record.restore' && recordId) await mutations.restore.mutateAsync({recordId, expectedRevision})
+      else if (action.kind === 'record.purge' && recordId) await mutations.purge.mutateAsync({recordId, expectedRevision})
+      else if (action.kind === 'settings.update') await settingsMutation.mutateAsync(shaped)
+      else await moduleRepository.runAction(moduleId, action.actionId, shaped)
+      completeAction(action)
+    } catch (error) {
+      setActionFeedback({kind: 'error', message: getUserFacingErrorMessage(error)})
+    } finally {
+      setPendingActionId(null)
     }
-    const shaped = shapeMpsActionInput(action, input)
-    const recordIdField = action.target?.recordIdField ?? 'recordId'
-    const boundRecord = recordQuery.data
-    if (boundRecord && shaped[recordIdField] === undefined) shaped[recordIdField] = boundRecord.record_id
-    if (boundRecord && shaped.expectedRevision === undefined) shaped.expectedRevision = boundRecord.revision
-    if (action.kind === 'route.open') {
-      const route = resolveRuntimeActionRoute(action, shaped)
-      if (!route) throw new Error('Module route action is missing required route parameters')
-      router.push(route as Href)
-      return
-    }
-    if (action.kind === 'share') {
-      await Share.share({message: String(shaped.text ?? shaped.title ?? boundRecord?.data.title ?? view.title)})
-      return
-    }
-    if (action.kind === 'dismiss') {
-      router.back()
-      return
-    }
-    if (action.kind === 'record.create') {
-      await mutations.create.mutateAsync(shaped)
-      setEditedDraft({source: sourceDraft.source, values: {}})
-      return
-    }
-    const recordId = typeof shaped[recordIdField] === 'string' ? shaped[recordIdField] : ''
-    const expectedRevision = typeof shaped.expectedRevision === 'number' ? shaped.expectedRevision : undefined
-    if (action.kind === 'record.update' && recordId) {
-      await mutations.update.mutateAsync({recordId, data: recordDataForAction(shaped, recordIdField), expectedRevision})
-      return
-    }
-    if (action.kind === 'record.delete' && recordId) return void await mutations.remove.mutateAsync({recordId, expectedRevision})
-    if (action.kind === 'record.restore' && recordId) return void await mutations.restore.mutateAsync({recordId, expectedRevision})
-    if (action.kind === 'record.purge' && recordId) return void await mutations.purge.mutateAsync({recordId, expectedRevision})
-    if (action.kind === 'settings.update') return void await settingsMutation.mutateAsync(shaped)
-    await moduleRepository.runAction(moduleId, action.actionId, shaped)
   }
 
   if (view.kind === 'settings') {
@@ -123,6 +157,16 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
         {fields.map(field => (
           <ModuleFieldRenderer key={field.fieldId} field={field} value={draft[field.name]} onChange={value => updateDraftField(field.name, value)} />
         ))}
+        <ActionFeedback feedback={actionFeedback} />
+        {settingsAction ? (
+          <ModulaButton
+            fullWidth
+            label={settingsAction.label}
+            loading={pendingActionId === settingsAction.actionId}
+            onPress={() => { void runAction(settingsAction, draft) }}
+            testID="module-settings-submit"
+          />
+        ) : null}
         {view.layout.map(node => <LayoutNode key={node.id} node={node} actions={allActions} data={draft} onAction={action => runAction(action, draft)} />)}
       </ScrollView>
     )
@@ -144,12 +188,15 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
 
   const header = (
     <View style={{gap: spacing[4]}}>
-      <View style={{gap: spacing[2]}}>
-        <AppText variant="display">{view.title}</AppText>
+      <View style={{gap: spacing[3]}}>
+        <View style={[styles.headingRow, {gap: spacing[3]}]}>
+          <AppText variant="display" style={styles.heading}>{view.title}</AppText>
         <ModuleActionBar
           actions={view.toolbar ?? []}
           onAction={action => { void runAction(action) }}
         />
+        </View>
+        <ModuleExtensionContributions moduleId={moduleId} contributions={extensionContributions} />
         {view.kind === 'collection' && view.searchEnabled ? (
           <View
             style={[
@@ -171,12 +218,12 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
             />
           </View>
         ) : null}
+        {view.kind !== 'form' ? <ActionFeedback feedback={actionFeedback} /> : null}
       </View>
 
       {view.kind === 'form' && recordQuery.isPending && view.recordBinding ? <AppText variant="caption" colour="textSecondary">Loading record.</AppText> : null}
       {view.kind === 'form' && fields.length ? (
         <View style={[styles.panel, {backgroundColor: colours.surfaceRaised, borderColor: colours.border, borderRadius: radius.large, gap: spacing[3], padding: spacing[4]}]}>
-          <AppText variant="headline">{view.recordBinding ? updateAction?.label ?? 'Edit record' : createAction?.label ?? 'Create record'}</AppText>
           {fields.map(field => (
             <ModuleFieldRenderer
               key={field.fieldId}
@@ -185,6 +232,16 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
               onChange={value => updateDraftField(field.name, value)}
             />
           ))}
+          <ActionFeedback feedback={actionFeedback} />
+          {formAction ? (
+            <ModulaButton
+              fullWidth
+              label={formAction.label}
+              loading={pendingActionId === formAction.actionId}
+              onPress={() => { void runAction(formAction, draft) }}
+              testID="module-form-submit"
+            />
+          ) : null}
         </View>
       ) : null}
       {view.layout.length ? (
@@ -230,6 +287,27 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       {header}
     </ScrollView>
   )
+}
+
+function ActionFeedback({feedback}: {feedback: {kind: 'error' | 'success'; message: string} | null}) {
+  if (!feedback) return null
+  return (
+    <AppText
+      variant="caption"
+      colour={feedback.kind === 'error' ? 'destructive' : 'accent'}
+      accessibilityLiveRegion="polite">
+      {feedback.message}
+    </AppText>
+  )
+}
+
+function validateActionInput(action: GreenfieldModuleAction, input: Record<string, unknown>): string | null {
+  const missing = action.inputSchema.fields?.find(field => field.required && isEmptyInput(input[field.name]))
+  return missing ? `${missing.label} is required.` : null
+}
+
+function isEmptyInput(value: unknown): boolean {
+  return value === undefined || value === null || (typeof value === 'string' && value.trim() === '')
 }
 
 function recordDataForAction(input: Record<string, unknown>, recordIdField: string): Record<string, unknown> {
@@ -374,6 +452,8 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderWidth: StyleSheet.hairlineWidth,
   },
+  heading: {flex: 1, minWidth: 0},
+  headingRow: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
   panel: {borderWidth: StyleSheet.hairlineWidth},
   search: {
     borderWidth: StyleSheet.hairlineWidth,

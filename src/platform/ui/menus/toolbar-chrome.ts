@@ -37,7 +37,7 @@ export function overlayGroupItemWidth(kind: 'icon' | 'action'): number {
 }
 
 /** Capsule width for a mixed icon / action slot list. */
-export function overlayGroupWidthForKinds(kinds: Array<'icon' | 'action'>): number {
+export function overlayGroupWidthForKinds(kinds: ('icon' | 'action')[]): number {
   if (!kinds.length) return OVERLAY_GROUP_HIT
   return kinds.reduce(
     (sum, kind, index) =>
