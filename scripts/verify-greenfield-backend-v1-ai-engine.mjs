@@ -72,6 +72,18 @@ source('AI ADAPTER BEHAVIOUR', join(root, 'services/greenfield-api/tests/greenfi
   'PROVIDER_NOT_CONFIGURED',
   'AI_MODEL_UNAVAILABLE',
 ])
+source('GENERIC EXTENSION AI BROKER', join(root, 'services/greenfield-api/src/ai/extension-action-service.ts'), [
+  'signed-extension-product-action',
+  'brokeredResource',
+  'ai.context.private',
+  'GREENFIELD_MODULE_AI_CAPABILITIES',
+], ['vault-notes', 'vault-ai', 'vault-voice'])
+source('EXTENSION AI SECURITY BEHAVIOUR', join(root, 'services/greenfield-api/tests/greenfield-backend-v1.extension-ai-action.test.ts'), [
+  'solely from the brokered target record',
+  'fails closed for undeclared actions',
+  'requires the signed AI and private-context permission grants',
+  'maps honest runtime unavailability to 503',
+])
 
 for (const [label, repository] of [
   ['BACKEND ENGINES', enginesRoot],
@@ -96,7 +108,7 @@ source('AI BROKER-ONLY CREDENTIAL CLIENT', join(aiRoot, 'src/credential-client.t
 ], ['authorization', 'Bearer '])
 
 run('GREENFIELD AI TYPECHECK', 'pnpm', ['--filter', '@modula/greenfield-api', 'typecheck'], root, {...process.env, CI: 'true'})
-run('GREENFIELD ADAPTER TEST', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.ai-backend-adapter.test.ts'], root, {...process.env, CI: 'true'})
+run('GREENFIELD ADAPTER AND EXTENSION TESTS', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.ai-backend-adapter.test.ts', 'tests/greenfield-backend-v1.extension-ai-action.test.ts'], root, {...process.env, CI: 'true'})
 await runIsolatedDatabaseChecks()
 verifyProductionContainer('AI BACKEND PRODUCTION', 'modula-ai-ai-backend-1', aiRoot)
 verifyProductionContainer('SECRETS SERVICE PRODUCTION', 'modula-secrets-secrets-service-1', secretsRoot)
@@ -118,7 +130,7 @@ async function runIsolatedDatabaseChecks() {
     const migrateEnv = {...process.env, CI: 'true', MODULA_TEST_DATABASE_URL: fixture.migratorUrl}
     const testEnv = {...process.env, CI: 'true', NODE_ENV: 'test', MODULA_TEST_DATABASE_URL: fixture.testUrl}
     run('FULL MIGRATION CHAIN THROUGH 042', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'tsx', '-e', "import {migrateUp} from './src/database/migrate.ts'; void migrateUp(process.env.MODULA_TEST_DATABASE_URL).then(applied => { if (!applied.includes('042_greenfield_backend_v1_ai_engine')) process.exit(1) })"], join(root, 'services/greenfield-api'), migrateEnv)
-    run('AI ENGINE DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.ai-engine.test.ts', 'tests/phase7e.ai-provider-runtime.test.ts'], root, testEnv)
+    run('AI ENGINE DB BEHAVIOUR', 'pnpm', ['--filter', '@modula/greenfield-api', 'exec', 'vitest', 'run', 'tests/greenfield-backend-v1.ai-engine.test.ts', 'tests/greenfield-backend-v1.extension-ai-prompt.test.ts', 'tests/phase7e.ai-provider-runtime.test.ts'], root, testEnv)
     run('MIGRATION 042 DOWN AND REAPPLY', 'pnpm', ['exec', 'tsx', 'scripts/verify-migration-cycle.ts', '042_greenfield_backend_v1_ai_engine'], join(root, 'services/greenfield-api'), migrateEnv)
   } finally {
     fixture.cleanup()

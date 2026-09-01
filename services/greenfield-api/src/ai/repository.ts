@@ -266,6 +266,31 @@ export class GreenfieldAIRepository {
     return this.requirePrompt(input.promptId, input.version)
   }
 
+  async registerPromptIfAbsent(input: AIPromptRegistrationInput): Promise<AIPromptRecord> {
+    const now = new Date()
+    const templateHash = sha256(input.promptTemplate)
+    await this.db
+      .insertInto('greenfield_ai_prompts')
+      .values({
+        prompt_id: input.promptId,
+        version: input.version,
+        owner: input.owner,
+        module_id: input.moduleId ?? null,
+        purpose: input.purpose,
+        variables: jsonb(input.variables ?? []),
+        output_schema: jsonb(input.outputSchema ?? {}),
+        safety_policy: jsonb(input.safetyPolicy ?? {}),
+        lifecycle_status: input.lifecycleStatus ?? 'active',
+        prompt_template: input.promptTemplate,
+        template_hash: templateHash,
+        created_at: now,
+        updated_at: now,
+      })
+      .onConflict(oc => oc.columns(['prompt_id', 'version']).doNothing())
+      .execute()
+    return this.requirePrompt(input.promptId, input.version)
+  }
+
   async requirePrompt(promptId: string, version?: string): Promise<AIPromptRecord> {
     const query = this.db.selectFrom('greenfield_ai_prompts').selectAll().where('prompt_id', '=', promptId)
     const row = version
