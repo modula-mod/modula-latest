@@ -17,6 +17,7 @@ export {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
 export {ChromeIconMenu} from '@/platform/ui/menus/chrome-icon-menu'
 export {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 export type {
+  ChromeGlassGroupAction,
   ChromeGlassGroupButton,
   ChromeGlassGroupItem,
   ChromeGlassGroupMenu,

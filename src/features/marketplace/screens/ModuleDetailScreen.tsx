@@ -24,10 +24,11 @@ import {
   ProductPlatformRow,
   ProductPreviewCarousel,
   ProductRatingPanel,
+  ProductFixedChrome,
   ProductStickyHeader,
   ProductTabs,
-  ProductTopChrome,
   ProductWhatsNew,
+  productTrailingCapsuleWidth,
   type ProductCapabilityItem,
   type ProductInformationItem,
   type ProductMetadataItem,
@@ -231,7 +232,8 @@ export function ModuleDetailScreen() {
   const previewFrames = previewsFor(module)
   const stackedIdentity = width < 330
   const heroArtworkSize = Math.min(116, Math.max(94, Math.round(width * 0.25)))
-  const stickyVisible = scrollOffset > heroActionBottom
+  const stickyStart = Math.max(0, heroActionBottom - insets.top - 48)
+  const stickyProgress = Math.min(1, Math.max(0, (scrollOffset - stickyStart) / 56))
 
   const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
   const openInstall = () => {
@@ -279,7 +281,7 @@ export function ModuleDetailScreen() {
 
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
-      <StatusBar style={scrollOffset < 210 ? 'light' : scheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={stickyProgress > 0.5 || scrollOffset >= 210 ? (scheme === 'dark' ? 'light' : 'dark') : 'light'} />
       <ResponsiveContent maxWidth={920}>
         <ScrollView
           contentContainerStyle={{paddingBottom: tabPadding + spacing[8]}}
@@ -295,15 +297,6 @@ export function ModuleDetailScreen() {
                 transitionToCanvas
               />
             </Link.AppleZoomTarget>
-            <ProductTopChrome
-              // Share + overflow use ChromeGlassControlGroup (Home-sized capsule).
-              productName={copy.name}
-              top={insets.top + spacing[2]}
-              onBack={goBack}
-              onShare={shareModule}
-              actions={overflowActions}
-              onAction={onOverflow}
-            />
           </View>
 
           <View
@@ -377,12 +370,23 @@ export function ModuleDetailScreen() {
       </ResponsiveContent>
 
       <ProductStickyHeader
-        visible={stickyVisible}
-        top={insets.top + spacing[1]}
         moduleId={module.moduleId}
         name={copy.name}
-        presentation={presentation}
+        progress={stickyProgress}
+        top={insets.top}
+        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.1 ? 1 : 0)}
+      />
+
+      <ProductFixedChrome
+        actions={overflowActions}
+        onAction={onOverflow}
+        onBack={goBack}
         onPrimary={onPrimary}
+        onShare={shareModule}
+        presentation={presentation}
+        productName={copy.name}
+        progress={stickyProgress}
+        top={insets.top + spacing[2]}
       />
 
       <InstallPreviewSheet

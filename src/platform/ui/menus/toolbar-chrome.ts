@@ -28,3 +28,20 @@ export function overlayGroupWidth(itemCount: number): number {
   const count = Math.max(1, itemCount)
   return count * OVERLAY_GROUP_HIT + Math.max(0, count - 1) * OVERLAY_GROUP_GAP
 }
+
+/** Compact filled action chip width inside a control group (e.g. Open). */
+export const OVERLAY_GROUP_ACTION_WIDTH = 56
+
+export function overlayGroupItemWidth(kind: 'icon' | 'action'): number {
+  return kind === 'action' ? OVERLAY_GROUP_ACTION_WIDTH : OVERLAY_GROUP_HIT
+}
+
+/** Capsule width for a mixed icon / action slot list. */
+export function overlayGroupWidthForKinds(kinds: Array<'icon' | 'action'>): number {
+  if (!kinds.length) return OVERLAY_GROUP_HIT
+  return kinds.reduce(
+    (sum, kind, index) =>
+      sum + overlayGroupItemWidth(kind) + (index > 0 ? OVERLAY_GROUP_GAP : 0),
+    0,
+  )
+}
