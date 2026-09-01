@@ -24,6 +24,7 @@ import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config
 import {handleModuleInstall} from '../../greenfield-worker/src/modules/installation-handler.js'
 import {handleModuleEnable} from '../../greenfield-worker/src/modules/enable-handler.js'
 import {handleModuleDisable} from '../../greenfield-worker/src/modules/disable-handler.js'
+import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
 import {handleExtensionEventDispatch} from '../../greenfield-worker/src/modules/extension-event-handler.js'
 import {handleExtensionJob} from '../../greenfield-worker/src/modules/extension-job-handler.js'
 
@@ -68,6 +69,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
   let formattingInstallationId = ''
   let coreReleaseId = ''
   let formattingReleaseId = ''
+  let formattingFrontendSha = ''
   let backgroundReleaseId = ''
 
   beforeAll(async () => {
@@ -86,7 +88,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     accountB = second.accountId
     coreReleaseId = (await publish(coreManifest())).releaseId
     formattingReleaseId = (await publish(formattingManifest())).releaseId
-    await persistMpsFormattingFrontend()
+    formattingFrontendSha = await persistMpsFormattingFrontend('0.1.0', formattingReleaseId, 'vault.format.heading')
     backgroundReleaseId = (await publish(backgroundManifest())).releaseId
   })
 
@@ -397,6 +399,54 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     expect(await db.selectFrom('greenfield_extension_job_executions').select('execution_id').where('account_id', '=', accountB).where('extension_product_id', '=', backgroundId).execute()).toEqual([])
   })
 
+  it('reprojects an immutable extension frontend and permissions when the product updates', async () => {
+    const actionId = 'vault.format.heading.v2'
+    const updateRelease = await publish(formattingManifest('0.2.0', actionId))
+    const updateFrontendSha = await persistMpsFormattingFrontend('0.2.0', updateRelease.releaseId, actionId)
+    expect(updateFrontendSha).not.toBe(formattingFrontendSha)
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${formattingId}/update`,
+      headers: {authorization: `Bearer ${tokenA}`, 'idempotency-key': `formatting-update-${suffix}`},
+      payload: {version: '0.2.0'},
+    })
+    expect(response.statusCode, response.body).toBe(202)
+    expect(response.json().data.status).toBe('updating')
+    await handleModuleUpdate(workerDb, {
+      installationId: formattingInstallationId,
+      targetReleaseId: updateRelease.releaseId,
+      previousStatus: 'enabled',
+      moduleId: formattingId,
+      accountId: accountA,
+    })
+
+    const projection = await db
+      .selectFrom('greenfield_extension_runtime_projection')
+      .select(['release_id', 'version', 'state'])
+      .where('installation_id', '=', formattingInstallationId)
+      .executeTakeFirstOrThrow()
+    expect(projection).toMatchObject({release_id: updateRelease.releaseId, version: '0.2.0', state: 'ENABLED'})
+    const host = await composition()
+    const updatedContributions = host.extensions.filter((row: any) => row.extension_product_id === formattingId)
+    expect(updatedContributions).toEqual([expect.objectContaining({
+      extension_product_id: formattingId,
+      contract_id: actionId,
+      frontend_source: 'mps',
+      frontend_artifact_sha256: updateFrontendSha,
+      declaration: expect.objectContaining({source: 'mps-product-frontend', actionId}),
+    })])
+    expect(JSON.stringify(updatedContributions)).not.toContain(formattingFrontendSha)
+    const review = await db
+      .selectFrom('greenfield_module_permission_reviews')
+      .select(['release_id', 'granted_permissions', 'denied_permissions'])
+      .where('installation_id', '=', formattingInstallationId)
+      .where('release_id', '=', updateRelease.releaseId)
+      .executeTakeFirstOrThrow()
+    expect(review.granted_permissions).toEqual([editorCapability])
+    expect(review.denied_permissions).toEqual([])
+  })
+
   it('rejects deterministic A to B to C to A dependency cycles with a bounded path', async () => {
     const cycleA = `digital.modula.cycle-a.${suffix}`
     const cycleB = `digital.modula.cycle-b.${suffix}`
@@ -436,30 +486,30 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     return releases.publishRelease(manifest.moduleId, manifest.version)
   }
 
-  async function persistMpsFormattingFrontend() {
-    const ingestionId = `mps-ingestion:${formattingId}:0.1.0`
+  async function persistMpsFormattingFrontend(version: string, releaseId: string, actionId: string) {
+    const ingestionId = `mps-ingestion:${formattingId}:${version}`
     const frontend = {
       schema: 'modula.frontend.1.0',
       frontendSchemaVersion: '1.0.0',
       mpsVersion: '1.0',
       productId: formattingId,
-      releaseVersion: '0.1.0',
+      releaseVersion: version,
       mode: 'host-contribution',
       hostRuntime: {versionRange: '>=1.0.0 <2.0.0'},
-      actions: [{id: 'vault.format.heading', family: 'function.invoke', functionId: 'vault.format.heading', label: 'Format heading'}],
+      actions: [{id: actionId, family: 'function.invoke', functionId: actionId, label: 'Format heading'}],
       contributions: [{
         id: 'format.heading',
         target: `${coreId}/editor.command@1`,
-        action: 'vault.format.heading',
-        component: {type: 'button', text: 'Format heading', action: 'vault.format.heading'},
+        action: actionId,
+        component: {type: 'button', text: 'Format heading', action: actionId},
       }],
     }
     const artifactSha256 = createHash('sha256').update(JSON.stringify(frontend)).digest('hex')
     await db.insertInto('greenfield_mps_ingestions').values({
       ingestion_id: ingestionId,
       product_id: formattingId,
-      version: '0.1.0',
-      release_id: formattingReleaseId,
+      version,
+      release_id: releaseId,
       manifest_sha256: 'c'.repeat(64),
       product_standard: '1.0',
       manifest_format: 'modula.product.json',
@@ -470,16 +520,16 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
       greenfield_backend_mode: 'none',
       test_fixture: true,
       visibility: 'private',
-      manifest: sql`${JSON.stringify({identity: {id: formattingId, version: '0.1.0'}})}::jsonb`,
-      projection: sql`${JSON.stringify({productId: formattingId, version: '0.1.0'})}::jsonb`,
+      manifest: sql`${JSON.stringify({identity: {id: formattingId, version}})}::jsonb`,
+      projection: sql`${JSON.stringify({productId: formattingId, version})}::jsonb`,
       ingested_at: new Date(),
     }).execute()
     await db.insertInto('greenfield_release_frontends').values({
-      frontend_id: `frontend:${formattingId}:0.1.0`,
+      frontend_id: `frontend:${formattingId}:${version}`,
       ingestion_id: ingestionId,
-      release_id: formattingReleaseId,
+      release_id: releaseId,
       product_id: formattingId,
-      version: '0.1.0',
+      version,
       frontend_mode: 'host-contribution',
       artifact_role: 'product.frontend',
       artifact_path: 'frontend/frontend.manifest.json',
@@ -496,6 +546,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
       verified_at: new Date(),
       created_at: new Date(),
     }).execute()
+    return artifactSha256
   }
 
   async function registerAccount(email: string, handle: string) {
@@ -619,11 +670,11 @@ function backgroundManifest(): GreenfieldModuleManifest {
   })
 }
 
-function formattingManifest(): GreenfieldModuleManifest {
-  return manifest(formattingId, '0.1.0', {
+function formattingManifest(version = '0.1.0', actionId = 'vault.format.heading'): GreenfieldModuleManifest {
+  return manifest(formattingId, version, {
     permissions: [{permission: editorCapability, reason: 'Register declared editor commands', risk: 'low'}],
     extensionProduct: {
-      version: '0.1.0',
+      version,
       kind: 'plugin',
       targets: [{productId: coreId, versionRange: '>=1.1.0 <2.0.0', requiredCapabilities: [editorCapability], requiredExtensionPoints: [editorPoint]}],
       extensionPoints: [],
@@ -632,7 +683,7 @@ function formattingManifest(): GreenfieldModuleManifest {
         title: 'Format heading',
         kind: 'editor.command',
         extensionPoint: editorPoint,
-        actionId: 'vault.format.heading',
+        actionId,
         requiredCapability: editorCapability,
         availability: {platforms: ['ios', 'android', 'web'], requiresOnline: false},
         priority: 20,

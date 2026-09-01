@@ -255,6 +255,48 @@ export class GreenfieldExtensionFabricService {
     }
   }
 
+  async persistUpdatePlanState(trx: any, input: PersistInstallInput): Promise<void> {
+    const subscriptions = await trx
+      .selectFrom('greenfield_extension_event_subscriptions')
+      .select('subscription_id')
+      .where('account_id', '=', input.accountId)
+      .where('installation_id', '=', input.installationId)
+      .execute()
+    for (const subscription of subscriptions) {
+      await trx
+        .updateTable('greenfield_event_subscriptions')
+        .set({enabled: false, updated_at: new Date()})
+        .where('subscriber_id', '=', subscription.subscription_id)
+        .execute()
+    }
+    const now = new Date()
+    await trx
+      .updateTable('greenfield_extension_contribution_registrations')
+      .set({status: 'removed', updated_at: now})
+      .where('account_id', '=', input.accountId)
+      .where('installation_id', '=', input.installationId)
+      .execute()
+    await trx
+      .updateTable('greenfield_extension_installation_edges')
+      .set({state: 'removed', updated_at: now})
+      .where('account_id', '=', input.accountId)
+      .where('source_installation_id', '=', input.installationId)
+      .execute()
+    await trx
+      .updateTable('greenfield_extension_capability_grants')
+      .set({state: 'revoked', revoked_at: now, updated_at: now})
+      .where('account_id', '=', input.accountId)
+      .where('consumer_installation_id', '=', input.installationId)
+      .execute()
+    await trx
+      .updateTable('greenfield_extension_event_subscriptions')
+      .set({status: 'removed', updated_at: now})
+      .where('account_id', '=', input.accountId)
+      .where('installation_id', '=', input.installationId)
+      .execute()
+    await this.persistInstallPlanState(trx, input)
+  }
+
   async transition(accountId: string, installationId: string, state: GreenfieldExtensionRuntimeState, error?: {code: string; message: string}): Promise<void> {
     const now = new Date()
     const registrationStatus = contributionStatusForState(state)

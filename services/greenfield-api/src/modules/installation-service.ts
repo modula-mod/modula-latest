@@ -349,6 +349,7 @@ export class GreenfieldModuleInstallationService {
     jobType: string,
     idempotencyKey: string,
     payload: Record<string, unknown> = {},
+    prepare?: (trx: any, installed: GreenfieldModuleInstallationRow) => Promise<void>,
   ) {
     if (!idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     const installed = await this.getInstalled(accountId, moduleId)
@@ -356,6 +357,7 @@ export class GreenfieldModuleInstallationService {
     assertTransitionOrConflict(installed.status, nextStatus)
     const now = new Date()
     await this.db.transaction().execute(async trx => {
+      if (prepare) await prepare(trx, installed)
       await trx.updateTable('greenfield_extension_installations').set({status: nextStatus, updated_at: now}).where('installation_id', '=', installed.installationId).execute()
       await this.recordLifecycle(trx, accountId, moduleId, eventName, installed.status, nextStatus, {idempotencyKey, ...payload})
       await new AuditRepository(trx).append(eventName, {moduleId, from: installed.status, to: nextStatus}, {type: 'moduleInstallation', id: installed.installationId})
