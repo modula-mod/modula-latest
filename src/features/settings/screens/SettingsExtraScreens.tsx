@@ -6,6 +6,7 @@ import {useSession} from '@/auth/runtime'
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {AppText} from '@/components/primitives/AppText'
 import {
+  SettingsHero,
   SettingsLinkRow,
   SettingsMenuRow,
   SettingsOverflowMenu,
@@ -59,6 +60,12 @@ export function PrivacySafetyScreen() {
           }}
         />
       }>
+      <SettingsHero
+        icon="privacy"
+        iconDomain="privacy"
+        title="Privacy"
+        body="Choose who can see your posts and how Modula treats sensitive media. Mute and block lists appear when Greenfield exposes them."
+      />
       <SettingsSection title="Audience">
         <SettingsToggleRow
           label="Private account"
@@ -342,6 +349,12 @@ export function SecuritySettingsScreen() {
           }}
         />
       }>
+      <SettingsHero
+        icon="security"
+        iconDomain="security"
+        title="Security"
+        body="Sessions, credentials, and local App Lock. Only controls backed by Greenfield or on-device storage are shown."
+      />
       <SettingsSection title="Sessions">
         <SettingsLinkRow
           row={{

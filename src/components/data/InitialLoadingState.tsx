@@ -1,19 +1,17 @@
-import {StyleSheet, View} from 'react-native'
+import {ActivityIndicator, StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function InitialLoadingState({label = 'Loading Modula'}: {label?: string}) {
-  const {colours, radius, spacing} = useThemeTokens()
+export function InitialLoadingState({label = 'Loading'}: {label?: string}) {
+  const {colours, spacing} = useThemeTokens()
   return (
-    <View style={[styles.wrap, {gap: spacing[3], padding: spacing[6]}]}>
-      <View
-        style={[
-          styles.block,
-          {backgroundColor: colours.surfaceRaised, borderRadius: radius.large},
-        ]}
-      />
-      <AppText variant="caption" colour="textSecondary">
+    <View
+      accessibilityRole="progressbar"
+      accessibilityLabel={label}
+      style={[styles.wrap, {gap: spacing[3], padding: spacing[6]}]}>
+      <ActivityIndicator color={colours.accent} />
+      <AppText variant="body" colour="textSecondary" style={styles.center}>
         {label}
       </AppText>
     </View>
@@ -21,11 +19,12 @@ export function InitialLoadingState({label = 'Loading Modula'}: {label?: string}
 }
 
 const styles = StyleSheet.create({
-  block: {
-    height: 96,
-    width: '100%',
+  center: {
+    textAlign: 'center',
   },
   wrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
     minHeight: 180,
   },
 })

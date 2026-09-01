@@ -1,4 +1,4 @@
-import {useInfiniteQuery} from '@tanstack/react-query'
+import {keepPreviousData, useInfiniteQuery} from '@tanstack/react-query'
 
 import {queryKeys, queryNetworkMode} from '@/data/query'
 import type {FeedMode} from '@/domain/social'
@@ -19,6 +19,7 @@ export function useHomeFeedQuery(mode: FeedMode) {
     queryKey: queryKeys.feed.home(mode, accountId),
     networkMode: queryNetworkMode(),
     initialPageParam: null as string | null,
+    placeholderData: keepPreviousData,
     queryFn: ({pageParam}) =>
       feedRepository.getHomeFeed({mode, cursor: pageParam, limit: 6}),
     getNextPageParam: lastPage => lastPage.nextCursor,

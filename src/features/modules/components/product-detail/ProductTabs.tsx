@@ -13,28 +13,30 @@ export const PRODUCT_TABS: {id: ProductTabId; label: string}[] = [
   {id: 'related', label: 'Related'},
 ]
 
+/** Longest product tab label — sized so nothing truncates in the scroll rail. */
+const PRODUCT_TAB_SEGMENT_MIN_WIDTH = 108
+
 export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSelect: (tab: ProductTabId) => void}) {
   const {colours, radius} = useThemeTokens()
-  const {fontScale, width} = useWindowDimensions()
-  const scrollable = fontScale > 1.08 || width < 390
+  const {width} = useWindowDimensions()
   return (
     <View
       style={[
         styles.rail,
         {
-          backgroundColor: scrollable ? colours.surface : 'transparent',
+          backgroundColor: colours.surface,
           borderRadius: radius.round,
         },
       ]}
       testID="product-tabs">
       <ModulaSegmentedPicker
         accessibilityLabel="Product sections"
-        appearance={scrollable ? 'plain' : 'segmented'}
+        appearance="segmented"
         maxWidth={Math.max(280, width - 32)}
         onValueChange={value => onSelect(value as ProductTabId)}
         options={PRODUCT_TABS.map(tab => ({value: tab.id, label: tab.label}))}
-        scrollable={scrollable}
-        segmentMinWidth={88}
+        scrollable
+        segmentMinWidth={PRODUCT_TAB_SEGMENT_MIN_WIDTH}
         value={selected}
       />
     </View>

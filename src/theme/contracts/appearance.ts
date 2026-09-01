@@ -36,22 +36,65 @@ export type SurfaceType =
 
 export type TextScale = 0.9 | 1 | 1.1 | 1.2 | 1.3
 
+/**
+ * Modula override for a system accessibility preference.
+ * `system` means follow the operating-system setting — not factory default.
+ */
+export type SystemAdaptivePreference = 'system' | 'on' | 'off'
+
+/**
+ * Text size: follow OS Dynamic Type, or apply a Modula-only scale.
+ */
+export type TextScalePreference =
+  | {mode: 'system'}
+  | {mode: 'custom'; scale: TextScale}
+
 /** Preview chrome effects under Appearance → Advanced. */
 export type AdvancedChromeEffect = 'off' | 'cameraMaskedBlur'
 
+export type SettingsIconDomain =
+  | 'profile'
+  | 'account'
+  | 'notifications'
+  | 'privacy'
+  | 'data'
+  | 'appearance'
+  | 'accessibility'
+  | 'language'
+  | 'modules'
+  | 'security'
+  | 'developer'
+  | 'content'
+  | 'connections'
+  | 'info'
+  | 'hearing'
+  | 'speech'
+  | 'interaction'
+
+export type SettingsIconToken = {
+  background: string
+  foreground: string
+}
+
+export type SettingsIconTokens = Record<SettingsIconDomain, SettingsIconToken>
+
 export type AppearancePreferences = {
-  schemaVersion: 1
+  schemaVersion: 2
   mode: AppearanceMode
   family: ThemeFamily
   accentId: AccentId
   customAccent: string | null
   surfaceType: SurfaceType
+  /** Last custom scale (Greenfield wire). Ignored when textScalePreference is system. */
   textScale: TextScale
-  boldText: boolean
-  reduceMotion: boolean
-  reduceTransparency: boolean
-  increaseContrast: boolean
-  showSwitchLabels: boolean
+  textScalePreference: TextScalePreference
+  boldText: SystemAdaptivePreference
+  reduceMotion: SystemAdaptivePreference
+  reduceTransparency: SystemAdaptivePreference
+  increaseContrast: SystemAdaptivePreference
+  differentiateWithoutColor: SystemAdaptivePreference
+  /** On/Off switch labels. Local-only; no public OS detection API in RN 0.86. */
+  showSwitchLabels: SystemAdaptivePreference
   /**
    * Living camera cutout chrome (Motionary-style masked blur).
    * Preview / local preference — not yet a Greenfield sync field.
@@ -67,6 +110,23 @@ export type SystemAccessibilityState = {
   screenReaderEnabled: boolean
   grayscaleEnabled: boolean
   invertColoursEnabled: boolean
+  /**
+   * iOS Differentiate Without Color is not exposed by React Native
+   * AccessibilityInfo. Always false until a public API exists.
+   */
+  differentiateWithoutColor: boolean
+}
+
+export type ResolvedAccessibility = {
+  boldText: boolean
+  reduceMotion: boolean
+  reduceTransparency: boolean
+  increaseContrast: boolean
+  differentiateWithoutColor: boolean
+  showSwitchLabels: boolean
+  followSystemTextSize: boolean
+  textScale: TextScale
+  screenReaderEnabled: boolean
 }
 
 export type ResolvedAppearance = {
@@ -75,18 +135,13 @@ export type ResolvedAppearance = {
   resolvedFamily: ThemeFamily
   isDark: boolean
   isOLED: boolean
-  accessibility: {
-    boldText: boolean
-    reduceMotion: boolean
-    reduceTransparency: boolean
-    increaseContrast: boolean
-    screenReaderEnabled: boolean
-  }
+  accessibility: ResolvedAccessibility
   colours: SemanticColours
   accent: AccentTokens
   typography: TypographyTokens
   materials: MaterialTokenMap
   motion: MotionTokens
+  settingsIcons: SettingsIconTokens
 }
 
 export const APPEARANCE_MODES = [
@@ -136,6 +191,32 @@ export const SURFACE_TYPES = [
 ] as const satisfies readonly SurfaceType[]
 
 export const TEXT_SCALES = [0.9, 1, 1.1, 1.2, 1.3] as const satisfies readonly TextScale[]
+
+export const SYSTEM_ADAPTIVE_PREFERENCES = [
+  'system',
+  'on',
+  'off',
+] as const satisfies readonly SystemAdaptivePreference[]
+
+export const SETTINGS_ICON_DOMAINS = [
+  'profile',
+  'account',
+  'notifications',
+  'privacy',
+  'data',
+  'appearance',
+  'accessibility',
+  'language',
+  'modules',
+  'security',
+  'developer',
+  'content',
+  'connections',
+  'info',
+  'hearing',
+  'speech',
+  'interaction',
+] as const satisfies readonly SettingsIconDomain[]
 
 export const ADVANCED_CHROME_EFFECTS = [
   'off',

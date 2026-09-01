@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {Modal, Platform, StyleSheet, View} from 'react-native'
 import Animated, {
   useAnimatedStyle,
@@ -15,7 +15,6 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
 import {CustomReactionPicker} from '@/features/social/posts/interactions/custom-reaction-picker'
 import {postSpringConfig} from '@/features/social/posts/interactions/post-interaction-context'
-import {reactionIndexFromX} from '@/features/social/posts/state/post-interaction-machine'
 import {
   CUSTOM_REACTIONS,
   DEFAULT_REACTIONS,
@@ -26,6 +25,12 @@ import {POST_GEOMETRY} from '@/features/social/posts/tokens/post-geometry'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const SLOT = 52
+
+function reactionIndexFromX(x: number, slotWidth: number, count: number): number {
+  'worklet'
+  if (slotWidth <= 0 || count <= 0) return 0
+  return Math.min(count - 1, Math.max(0, Math.floor(x / slotWidth)))
+}
 
 type ReactionPickerProps = {
   visible: boolean
@@ -87,36 +92,45 @@ function ReactionPickerRail({
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined)
   }, [bloom])
 
+  const applyHoverIndex = useCallback((index: number) => {
+    setHoverIndex(current => {
+      if (current !== index) {
+        void Haptics.selectionAsync().catch(() => undefined)
+      }
+      return index
+    })
+  }, [])
+
+  const commitHover = useCallback(
+    (index: number) => {
+      const target = options[index]
+      if (!target) return
+      if (target.type === 'custom') {
+        onOpenCustom()
+        return
+      }
+      onSelect(
+        currentReaction === (target.type as ReactionType)
+          ? null
+          : (target.type as ReactionType),
+      )
+    },
+    [currentReaction, onOpenCustom, onSelect, options],
+  )
+
   const pan = useMemo(
     () =>
       Gesture.Pan()
         .onUpdate(event => {
+          'worklet'
           const next = reactionIndexFromX(event.x, SLOT, options.length)
-          scheduleOnRN((index: number) => {
-            setHoverIndex(current => {
-              if (current !== index) {
-                void Haptics.selectionAsync().catch(() => undefined)
-              }
-              return index
-            })
-          }, next)
+          scheduleOnRN(applyHoverIndex, next)
         })
         .onEnd(() => {
-          scheduleOnRN((index: number) => {
-            const target = options[index]
-            if (!target) return
-            if (target.type === 'custom') {
-              onOpenCustom()
-              return
-            }
-            onSelect(
-              currentReaction === (target.type as ReactionType)
-                ? null
-                : (target.type as ReactionType),
-            )
-          }, hoverIndex)
+          'worklet'
+          scheduleOnRN(commitHover, hoverIndex)
         }),
-    [currentReaction, hoverIndex, onOpenCustom, onSelect, options],
+    [applyHoverIndex, commitHover, hoverIndex, options.length],
   )
 
   const bloomStyle = useAnimatedStyle(() => ({

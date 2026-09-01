@@ -50,10 +50,10 @@ export function ModulaSegmentedPicker({
     viewportWidth,
     plain ? viewportWidth : options.length * segmentMinWidth,
   )
-  const trackWidth = nestInGlass
-    ? Math.min(viewportWidth, Math.max(options.length * 96, 280))
-    : scrollable
-      ? contentWidth
+  const trackWidth = scrollable
+    ? contentWidth
+    : nestInGlass
+      ? Math.min(viewportWidth, Math.max(options.length * 96, 280))
       : ('100%' as const)
 
   const segments = options.map(option => {
@@ -77,8 +77,9 @@ export function ModulaSegmentedPicker({
             opacity: option.disabled ? 0.45 : 1,
             paddingHorizontal: spacing[3],
             paddingVertical: spacing[2],
-            minWidth: scrollable ? segmentMinWidth - 8 : undefined,
+            minWidth: scrollable ? segmentMinWidth : undefined,
             flex: scrollable ? undefined : 1,
+            flexShrink: scrollable ? 0 : undefined,
             borderRadius: radius.round,
             // Scrollable menu (plain): muted selected chip. Glass/segmented: raised thumb.
             backgroundColor: !selected
@@ -105,8 +106,9 @@ export function ModulaSegmentedPicker({
             color: selected ? colours.text : colours.textSecondary,
             textAlign: 'center',
             fontWeight: selected ? '600' : '500',
+            flexShrink: scrollable ? 0 : undefined,
           }}
-          numberOfLines={1}>
+          numberOfLines={scrollable ? undefined : 1}>
           {option.label}
         </AppText>
       </AppPressable>
@@ -142,7 +144,7 @@ export function ModulaSegmentedPicker({
                 padding: 3,
                 gap: 2,
                 width: trackWidth,
-                maxWidth: viewportWidth,
+                maxWidth: scrollable ? contentWidth : viewportWidth,
                 minHeight: TRACK_HEIGHT,
                 alignSelf: nestInGlass ? 'center' : 'stretch',
               },

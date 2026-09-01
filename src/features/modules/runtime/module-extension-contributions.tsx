@@ -26,7 +26,7 @@ export function ModuleExtensionContributions({
   if (!visible.length) return null
   return (
     <View accessibilityLabel="Installed extension actions" style={{gap: spacing[2]}} testID={record ? 'record-extension-contributions' : 'module-extension-contributions'}>
-      {!record ? <AppText variant="label">Extensions</AppText> : null}
+      {!record ? <AppText variant="caption" colour="textSecondary">Tools</AppText> : null}
       <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
         {visible.map(contribution => (
           <ModuleErrorBoundary

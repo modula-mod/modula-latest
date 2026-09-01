@@ -12,5 +12,5 @@ export {ProductPreviewCarousel, type ProductPreviewFrame} from './ProductPreview
 export {ProductRatingPanel} from './ProductRatingPanel'
 export {ProductStickyHeader} from './ProductStickyHeader'
 export {ProductTabs, PRODUCT_TABS, type ProductTabId} from './ProductTabs'
-export {ProductTopChrome} from './ProductTopChrome'
+export {ProductFixedChrome, ProductTopChrome, productActionReveal, productTrailingCapsuleWidth} from './ProductTopChrome'
 export {ProductWhatsNew} from './ProductWhatsNew'

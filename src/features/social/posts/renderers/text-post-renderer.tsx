@@ -4,12 +4,31 @@ import {AppText} from '@/components/primitives/AppText'
 import type {TextPostContent} from '@/features/social/posts/types/post'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-export function TextPostRenderer({content}: {content: TextPostContent}) {
+export function TextPostRenderer({
+  content,
+  layout = 'fill',
+}: {
+  content: TextPostContent
+  layout?: 'fill' | 'flow'
+}) {
   const {colours, spacing} = useThemeTokens()
+  const flow = layout === 'flow'
 
   return (
-    <View style={[styles.root, {backgroundColor: colours.surface2, padding: spacing[5]}]}>
-      <AppText variant="headline" style={{color: colours.textMain, lineHeight: 32}}>
+    <View
+      style={[
+        flow ? styles.flow : styles.fill,
+        {
+          backgroundColor: flow ? 'transparent' : colours.surface2,
+          padding: flow ? spacing[1] : spacing[5],
+        },
+      ]}>
+      <AppText
+        variant={flow ? 'body' : 'headline'}
+        style={{
+          color: colours.textMain,
+          lineHeight: flow ? undefined : 32,
+        }}>
         {content.body}
       </AppText>
     </View>
@@ -17,8 +36,11 @@ export function TextPostRenderer({content}: {content: TextPostContent}) {
 }
 
 const styles = StyleSheet.create({
-  root: {
+  fill: {
     ...StyleSheet.absoluteFill,
     justifyContent: 'center',
+  },
+  flow: {
+    width: '100%',
   },
 })

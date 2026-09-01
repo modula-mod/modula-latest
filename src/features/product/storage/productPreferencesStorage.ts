@@ -12,6 +12,7 @@ import {
   PROFILE_LAYOUT_BLOCKS,
   TAB_LAYOUT_BLOCKS,
   sanitizeOrderedIds,
+  ensureModulesTabId,
   type ChromeDensity,
   type MotionDensity,
   type SurfacePreviewId,
@@ -224,13 +225,15 @@ function mergePreferences(raw: unknown): ProductPreferences {
           DISCOVER_LAYOUT_BLOCKS,
           DEFAULT_DISCOVER_BLOCK_IDS,
         ),
-    tabBarIds: migrateLayout
-      ? [...DEFAULT_TAB_BAR_IDS]
-      : sanitizeOrderedIds(
-          value.tabBarIds,
-          TAB_LAYOUT_BLOCKS,
-          DEFAULT_TAB_BAR_IDS,
-        ),
+    tabBarIds: ensureModulesTabId(
+      migrateLayout
+        ? [...DEFAULT_TAB_BAR_IDS]
+        : sanitizeOrderedIds(
+            value.tabBarIds,
+            TAB_LAYOUT_BLOCKS,
+            DEFAULT_TAB_BAR_IDS,
+          ),
+    ),
     activityBlockIds: migrateLayout
       ? [...DEFAULT_ACTIVITY_BLOCK_IDS]
       : sanitizeOrderedIds(

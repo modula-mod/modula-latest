@@ -5,6 +5,7 @@ import {
   StyleSheet,
   UIManager,
   View,
+  useWindowDimensions,
 } from 'react-native'
 import {GestureDetector} from 'react-native-gesture-handler'
 import Animated, {
@@ -78,6 +79,7 @@ const modeToFeed: Record<FeedModeLabel, RepositoryFeedMode> = {
 export function HomeFeedScreen() {
   const router = useRouter()
   const {colours, motion} = useThemeTokens()
+  const {height: windowHeight} = useWindowDimensions()
   const reduceMotion = useReduceMotion()
   const tabPadding = useFloatingTabBarContentPadding()
   // Transparent header + nested Animated.FlatList does not reliably get UIKit
@@ -190,7 +192,7 @@ export function HomeFeedScreen() {
   }, [motion.slow, pullDistance, refreshing])
 
   return (
-    <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
+    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <HomeSearchModal
         visible={searchOpen}
         onClose={() => setSearchOpen(false)}
@@ -206,10 +208,15 @@ export function HomeFeedScreen() {
               refreshing={refreshing}>
               <GestureDetector gesture={listGesture}>
                 <Animated.FlatList
-                  style={styles.screen}
+                  style={[
+                    styles.screen,
+                    Platform.OS === 'web'
+                      ? {minHeight: Math.max(480, windowHeight - 160)}
+                      : null,
+                  ]}
                   data={posts}
                   keyExtractor={item => item.id}
-                  renderItem={({item}) => <SocialPost post={item} compact />}
+                  renderItem={({item}) => <SocialPost post={item} />}
                   contentInsetAdjustmentBehavior="never"
                   bounces
                   alwaysBounceVertical
@@ -256,8 +263,8 @@ export function HomeFeedScreen() {
                     ) : (
                       <EmptyState
                         icon="home"
-                        title="This feed is quiet."
-                        description="Switch modes or publish a local post to start the conversation."
+                        title="This feed is quiet"
+                        description="Posts from people you follow will appear here. You can also publish one."
                         action={
                           <ModulaButton
                             label="Create post"
@@ -274,6 +281,7 @@ export function HomeFeedScreen() {
                     ) : null
                   }
                   contentContainerStyle={{
+                    flexGrow: 1,
                     paddingTop: headerClearance + fadePad,
                     paddingBottom: tabPadding,
                   }}
@@ -458,6 +466,8 @@ function HomeLayoutHeader({
           <ModulaSegmentedPicker
             appearance="segmented"
             accessibilityLabel="Feed mode"
+            scrollable
+            segmentMinWidth={112}
             options={modeOrder.map(next => ({
               value: next,
               label: next,
@@ -530,12 +540,15 @@ function ComposerPrompt() {
         style={[
           styles.prompt,
           {
+            marginHorizontal: spacing[4],
+            marginBottom: spacing[3],
+            paddingHorizontal: spacing[3],
+            paddingVertical: spacing[3],
+            gap: spacing[3],
             backgroundColor: colours.surface,
+            borderColor: colours.separator,
             borderRadius: radius.large,
-            marginHorizontal: spacing[3],
-            marginBottom: spacing[2],
-            padding: spacing[3],
-            gap: spacing[2],
+            borderWidth: StyleSheet.hairlineWidth,
           },
         ]}>
         <Avatar
@@ -545,7 +558,7 @@ function ComposerPrompt() {
           }
           uri={profile?.avatarUri}
           colour={profile?.coverColour}
-          size={48}
+          size={40}
         />
         <AppPressable
           accessibilityLabel="Create a post"
@@ -556,13 +569,13 @@ function ComposerPrompt() {
               flex: 1,
               borderRadius: radius.round,
               paddingHorizontal: spacing[4],
-              backgroundColor: colours.surfaceMuted,
+              backgroundColor: colours.canvas,
               minHeight: 44,
               justifyContent: 'center',
             },
           ]}>
           <AppText variant="body" colour="textSecondary">
-            Start a post
+            What’s happening?
           </AppText>
         </AppPressable>
         <ModulaIconButton

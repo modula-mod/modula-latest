@@ -55,7 +55,7 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           <InfoItem label="Website" value={profile.website.domain} />
         ) : null}
         <InfoItem
-          label="Modula member since"
+          label="Joined"
           value={new Date(profile.joinedAt).toLocaleDateString(undefined, {
             month: 'long',
             year: 'numeric',
@@ -78,12 +78,6 @@ export function AboutProfileTab({profile, viewer}: ProfileTabRendererProps) {
           </View>
         </View>
       ) : null}
-      <View style={{gap: spacing[2]}}>
-        <SectionHeader title="Interests" icon="sparkles" />
-        <AppText variant="body" colour="textSecondary">
-          Profile OS, governed intelligence, modular tools, design systems and public workflows.
-        </AppText>
-      </View>
     </View>
   )
 }
@@ -111,10 +105,11 @@ const styles = StyleSheet.create({
   infoItem: {
     flexBasis: '46%',
     flexGrow: 1,
-    gap: 3,
+    gap: 4,
     minWidth: 180,
   },
   wrap: {
     minWidth: 0,
+    paddingBottom: 24,
   },
 })

@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+/** Shell UI V1 source gates: presentation adapters, typography, no fake consumer actions. */
+import {existsSync, readFileSync} from 'node:fs'
+import path from 'node:path'
+
+const root = process.cwd()
+const failures = []
+const read = name => (existsSync(path.join(root, name)) ? readFileSync(path.join(root, name), 'utf8') : '')
+const record = (label, ok, detail = '') => {
+  console.log(`${label.padEnd(48)} ${ok ? 'PASS' : 'FAIL'}${detail ? `  ${detail}` : ''}`)
+  if (!ok) failures.push(label)
+}
+const contains = (file, value, label) => record(label, read(file).includes(value), file)
+const absent = (file, value, label) => record(label, !read(file).includes(value), file)
+
+console.log('SHELL UI V1 — presentation verifier\n')
+
+contains('docs/shell-ui-v1-route-audit.md', 'SHELL_UI_START_MAIN_SHA'.includes('x') ? '' : 'a0d4d796', 'ROUTE AUDIT START SHA')
+contains('docs/shell-ui-v1-route-audit.md', '/product', 'ROUTE AUDIT PRODUCT HUB')
+contains('docs/shell-ui-v1-route-audit.md', '/compose', 'ROUTE AUDIT COMPOSER')
+contains('docs/shell-ui-v1-mps-debt.md', 'moduleArtwork.ts', 'MPS DEBT ARTWORK')
+contains('docs/shell-ui-v1-mps-debt.md', 'presentProductHubCatalogue', 'MPS DEBT HUB ADAPTER')
+
+console.log('\n# Shared primitives')
+contains('src/theme/runtime/resolveAppearance.ts', 'fontSize: 12', 'MICRO TYPE 12PT')
+contains('src/theme/contracts/typography.ts', "metricLabel: 'caption'", 'METRIC LABEL IS CAPTION')
+contains('src/components/data/classifyShellError.ts', "case 'offline'", 'ERROR KIND OFFLINE')
+contains('src/components/data/QueryErrorState.tsx', '__DEV__ && apiError', 'DEV-ONLY ERROR DETAILS')
+absent('src/components/data/QueryErrorState.tsx', 'Surface variant="contained"', 'ERROR NOT CARD-SOUP')
+contains('src/components/data/InitialLoadingState.tsx', 'ActivityIndicator', 'NATIVE INITIAL LOADER')
+contains('src/components/primitives/AppText.tsx', 'allowFontScaling', 'DYNAMIC TYPE')
+
+console.log('\n# Product Hub')
+contains('src/features/modules/hooks/useModuleQueries.ts', 'placeholderData: keepPreviousData', 'CATALOGUE KEEP PREVIOUS')
+contains('src/features/modules/presentation/productHubCatalogueState.ts', "'initial-loading'", 'HUB INITIAL LOADING')
+contains('src/features/modules/presentation/productHubCatalogueState.ts', "'successful-empty'", 'HUB SUCCESS EMPTY')
+contains('src/features/modules/presentation/productHubCatalogueState.ts', "'partial'", 'HUB PARTIAL')
+contains('src/features/modules/presentation/productHubCatalogueState.ts', "'full-failure'", 'HUB FULL FAILURE')
+contains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'presentProductHubCatalogue', 'HUB USES ADAPTER')
+contains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'product-hub-partial', 'HUB PARTIAL BANNER')
+absent('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', 'Loading catalogue.', 'HUB NO CAPTION LOADER')
+
+console.log('\n# Module detail typography')
+absent('src/features/modules/components/product-detail/ProductMetadataStrip.tsx', 'fontSize: 8.5', 'METADATA NOT 8.5PT')
+absent('src/features/modules/components/product-detail/ProductCapabilityStrip.tsx', 'fontSize: 9.5', 'CAPABILITY NOT 9.5PT')
+contains('src/features/modules/components/product-detail/ProductMetadataStrip.tsx', 'minHeight: 66', 'METADATA MIN HEIGHT')
+contains('src/features/modules/components/product-detail/ProductCapabilityStrip.tsx', 'minHeight: 78', 'CAPABILITY MIN HEIGHT')
+contains('src/features/modules/components/product-detail/ProductPreviewCarousel.tsx', 'Screenshots not available', 'HONEST PREVIEW EMPTY')
+
+console.log('\n# Consumer truthfulness')
+absent('src/features/profile/tabs/AboutProfileTab.tsx', 'Profile OS, governed intelligence', 'NO FAKE PROFILE INTERESTS')
+absent('src/features/activity/screens/ActivityScreen.tsx', 'Mute preview', 'NO DECORATIVE MUTE')
+absent('src/features/activity/screens/ActivityScreen.tsx', 'digital.modula.vault-notes', 'ACTIVITY NOT HARDCODED VAULT')
+contains('src/features/settings/screens/SettingsHomeScreen.tsx', 'ModulaSearchField', 'SETTINGS SEARCH FIELD')
+absent('src/features/settings/screens/SettingsHomeScreen.tsx', 'runtimeEnvironment.appEnvironment', 'NO ENV ON SETTINGS HOME')
+absent('src/features/settings/screens/AccessibilityScreen.tsx', 'setHapticFeedback', 'A11Y HAPTIC IS BOUND OR OMITTED')
+contains('src/features/profile/tabs/AboutProfileTab.tsx', 'label="Joined"', 'PROFILE JOINED LABEL')
+contains('src/features/discover/screens/DiscoverScreen.tsx', 'accessibilityLabel="Search people, topics, and modules"', 'DISCOVER SEARCH LABEL')
+contains('src/features/feed/screens/HomeFeedScreen.tsx', 'colours.canvas', 'HOME OLED CANVAS')
+contains('src/features/feed/screens/HomeFeedScreen.tsx', 'segmentMinWidth={112}', 'HOME MODE TABS READABLE')
+contains('src/features/feed/data/useHomeFeedQuery.ts', 'placeholderData: keepPreviousData', 'FEED KEEP PREVIOUS')
+
+console.log('\n# Settings system')
+contains('src/theme/contracts/appearance.ts', 'SystemAdaptivePreference', 'ADAPTIVE PREFERENCE TYPE')
+contains('src/theme/contracts/appearance.ts', 'schemaVersion: 2', 'APPEARANCE SCHEMA 2')
+contains('src/theme/data/defaults.ts', "boldText: 'system'", 'DEFAULT BOLD IS SYSTEM')
+contains('src/features/settings/components/SettingsRows.tsx', 'SettingsIconTile', 'SETTINGS ICON TILE')
+contains('src/theme/tokens/settingsIcons.ts', "foreground: '#FFFFFF'", 'SETTINGS TILE WHITE GLYPH')
+contains('src/features/settings/components/SettingsRows.tsx', 'SettingsHero', 'SETTINGS HERO')
+contains('src/features/settings/components/SettingsRows.tsx', 'SettingsAdaptiveRow', 'SETTINGS ADAPTIVE ROW')
+contains('src/features/settings/screens/SettingsHomeScreen.tsx', 'Personalisation', 'SETTINGS ROOT PERSONALISATION GROUP')
+contains('src/features/settings/screens/SettingsHomeScreen.tsx', 'Privacy & Communication', 'SETTINGS ROOT PRIVACY GROUP')
+absent('src/features/settings/screens/AccessibilityScreen.tsx', 'SettingsToggleRow', 'A11Y HAS NO FAKE TOGGLES')
+contains('src/features/settings/screens/AccessibilityScreen.tsx', 'SettingsHero', 'A11Y INTRO HERO')
+contains('src/app/settings/display-and-text/index.tsx', 'DisplayAndTextScreen', 'DISPLAY AND TEXT ROUTE')
+contains('src/app/settings/display-and-text/larger-text.tsx', 'LargerTextScreen', 'LARGER TEXT ROUTE')
+contains('src/features/settings/screens/AccessibilityScreen.tsx', 'Display & Text Size', 'A11Y DISPLAY TEXT SIZE LABEL')
+contains('src/features/settings/screens/DisplayAndTextScreen.tsx', '/settings/display-and-text/larger-text', 'LARGER TEXT CHILD ROUTE')
+absent('src/features/settings/screens/AccessibilityScreen.tsx', 'hover-text', 'A11Y HAS NO EMPTY HOVER TEXT PAGE')
+absent('src/app/settings/accessibility/[feature].tsx', 'SystemAccessibilityFeatureScreen', 'NO CATCH-ALL A11Y INFO ROUTES')
+contains('src/platform/ui/navigation/modula-tabs.ts', "label: 'Modules'", 'MODULES TAB EXISTS')
+contains('src/app/(tabs)/hub/index.tsx', 'ProductHubScreen', 'MODULES TAB HOSTS PRODUCT HUB')
+contains('src/features/settings/screens/SettingsHomeScreen.tsx', "title: 'Modules'", 'SETTINGS MODULES GROUP')
+contains('src/platform/accessibility/index.ts', 'useModulaAccessibility', 'A11Y ADAPTER')
+contains('docs/accessibility-support-matrix.md', 'SYSTEM_ONLY', 'A11Y MATRIX EXISTS')
+contains('docs/accessibility-nutrition-label-readiness.md', 'VoiceOver', 'NUTRITION LABEL DOC')
+contains('src/features/social/posts/components/post-inline-actions.tsx', 'PostInlineActions', 'HOME INLINE ACTIONS')
+contains('src/features/social/posts/components/post-shell.tsx', 'listLayout', 'TEXT POST LIST LAYOUT')
+contains('src/features/discover/screens/DiscoverScreen.tsx', 'ModulaSearchField', 'DISCOVER SEARCH FIELD')
+
+if (failures.length) {
+  console.error(`\nshell-ui-v1-presentation FAIL (${failures.length})`)
+  failures.forEach(failure => console.error(`- ${failure}`))
+  process.exit(1)
+}
+console.log('\nshell-ui-v1-presentation PASS')

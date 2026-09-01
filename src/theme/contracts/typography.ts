@@ -33,8 +33,8 @@ export const TYPOGRAPHY_ROLES = [
 /**
  * 7M semantic vocabulary resolved onto the canonical roles. Aliases keep one
  * source of truth: they never define their own sizes.
- * `metadata` intentionally maps to `caption` (13pt) — not `micro` — so
- * timestamps and secondary metadata stay readable.
+ * `metadata` and `metricLabel` map to `caption` (13pt) — not `micro` — so
+ * timestamps, product rails, and profile metrics stay readable.
  */
 export type TypographySemanticAlias =
   | 'titleLarge'
@@ -57,6 +57,12 @@ export type TypographySemanticAlias =
   | 'productName'
   | 'productSubtitle'
   | 'buttonLabel'
+  | 'rowTitle'
+  | 'rowTrailing'
+  | 'heroTitle'
+  | 'heroDescription'
+  | 'footnote'
+  | 'sectionHeader'
 
 export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   TypographySemanticAlias,
@@ -70,7 +76,7 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   moduleSubtitle: 'body',
   publisher: 'caption',
   metricValue: 'headline',
-  metricLabel: 'micro',
+  metricLabel: 'caption',
   sectionTitle: 'headline',
   secondaryBody: 'caption',
   screenLargeTitle: 'display',
@@ -82,4 +88,10 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   productName: 'headline',
   productSubtitle: 'caption',
   buttonLabel: 'label',
+  rowTitle: 'body',
+  rowTrailing: 'caption',
+  heroTitle: 'title1',
+  heroDescription: 'body',
+  footnote: 'caption',
+  sectionHeader: 'caption',
 }

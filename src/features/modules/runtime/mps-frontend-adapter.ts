@@ -69,14 +69,14 @@ export function adaptMpsFrontendView(input: {
   const fields = fieldsFor(view.root)
   const actions = (frontend.actions ?? [])
     .flatMap(action => {
-      const adapted = adaptAction(frontend.productId, action, view, collection, fields, resolved.params)
+      const adapted = adaptAction(frontend.productId, action, view, collection, fields, resolved.params, resolved.route.presentation)
       return adapted && actionAvailableForRoute(action, adapted, Boolean(recordBinding)) ? [adapted] : []
     })
   const actionIds = actionReferences(view.root)
   const allowedActions = actions.filter(action => actionIds.has(action.actionId))
   const toolbarIds = toolbarActionReferences(view.root)
   const toolbar = allowedActions.filter(action => toolbarIds.has(action.actionId))
-  const layout = adaptLayout(view.root)
+  const layout = adaptLayout(view.root, view.kind)
   const empty = view.states?.empty
 
   return {
@@ -86,7 +86,7 @@ export function adaptMpsFrontendView(input: {
     title: localizedText(view.title, titleize(view.id)),
     collection: collection || undefined,
     query: collection ? queryFor(view, collection) : undefined,
-    layout: layout.length ? layout : [{id: `${view.id}.root`, component: 'section', text: localizedText(view.title, view.id)}],
+    layout,
     toolbar,
     allowedActions,
     recordBinding,
@@ -229,6 +229,7 @@ function adaptAction(
   collection: string,
   fields: GreenfieldModuleFieldDefinition[],
   params: Record<string, string>,
+  presentation: string | undefined,
 ): GreenfieldModuleAction | null {
   if (!ACTION_FAMILIES.has(action.family as GreenfieldModuleActionKind)) return null
   const kind = action.family as GreenfieldModuleActionKind
@@ -242,7 +243,9 @@ function adaptAction(
     capability: typeof action.capability === 'string' ? action.capability : `frontend.action.${kind}`,
     confirmationPolicy: destructive || action.confirm === true ? 'confirmDestructive' : 'none',
     destructive,
-    successDestination: kind === 'dismiss' ? {kind: 'dismiss'} : {kind: 'stay'},
+    successDestination: kind === 'dismiss' || ((presentation === 'sheet' || presentation === 'modal') && (kind === 'record.create' || kind === 'record.update'))
+      ? {kind: 'dismiss'}
+      : {kind: 'stay'},
     errorPresentation: {kind: 'inline'},
     requiresIdempotencyKey: kind.startsWith('record.') || kind === 'settings.update' || kind === 'function.invoke',
     inputDefaults: isRecord(action.input) && isRecord(action.input.defaults) ? action.input.defaults : undefined,
@@ -278,8 +281,9 @@ function recordIdFieldFor(action: MpsFrontendAction, view: MpsFrontendView): str
   return 'recordId'
 }
 
-function adaptLayout(root: MpsFrontendComponent): GreenfieldModuleLayoutNode[] {
+function adaptLayout(root: MpsFrontendComponent, viewKind: MpsFrontendView['kind']): GreenfieldModuleLayoutNode[] {
   let sequence = 0
+  const suppressFormControls = viewKind === 'form' || viewKind === 'settings'
   const convert = (component: MpsFrontendComponent): GreenfieldModuleLayoutNode | null => {
     sequence += 1
     const id = typeof component.id === 'string' ? component.id : `node-${sequence}`
@@ -289,9 +293,19 @@ function adaptLayout(root: MpsFrontendComponent): GreenfieldModuleLayoutNode[] {
     if (component.type === 'toolbar') return null
     if (component.type === 'stack' || component.type === 'row' || component.type === 'grid' || component.type === 'scroll'
       || component.type === 'tabs' || component.type === 'picker' || component.type === 'menu') {
-      return {id, component: 'section', title: textOrUndefined(component.title), text: textOrUndefined(component.text), children}
+      const title = textOrUndefined(component.title)
+      const text = textOrUndefined(component.text)
+      if (!title && !text && children?.length === 1) return children[0]!
+      return title || text || children?.length ? {id, component: 'section', title, text, children} : null
     }
-    if (component.type === 'section' || component.type === 'text' || component.type === 'label' || component.type === 'metadata'
+    if (component.type === 'button' && suppressFormControls) return null
+    if (component.type === 'section') {
+      const title = textOrUndefined(component.title)
+      const text = textOrUndefined(component.text)
+      if (!title && !text && children?.length === 1) return children[0]!
+      return title || text || children?.length ? {id, component: 'section', title, text, children} : null
+    }
+    if (component.type === 'text' || component.type === 'label' || component.type === 'metadata'
       || component.type === 'badge' || component.type === 'image' || component.type === 'icon' || component.type === 'divider'
       || component.type === 'button' || component.type === 'emptyState' || component.type === 'errorState' || component.type === 'loadingState') {
       return {

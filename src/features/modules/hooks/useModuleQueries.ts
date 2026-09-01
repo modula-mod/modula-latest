@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {keepPreviousData, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 
 import {useSession} from '@/auth/runtime'
 import type {ProductHubCategory} from '@/data/repositories/contracts'
@@ -12,6 +12,7 @@ export function useModuleCatalogueQuery(input: {q?: string; category?: ProductHu
   return useQuery({
     queryKey: moduleQueryKeys.catalogue(input, viewer),
     queryFn: () => moduleRepository.listCatalogue(input, {includeInstalled: viewer === 'signedIn'}),
+    placeholderData: keepPreviousData,
   })
 }
 

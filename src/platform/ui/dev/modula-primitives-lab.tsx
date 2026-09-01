@@ -31,6 +31,7 @@ import {
   ProductTabs,
   ProductTopChrome,
   ProductWhatsNew,
+  productTrailingCapsuleWidth,
   type ProductTabId,
 } from '@/features/modules/components/product-detail'
 import type {ModuleCatalogueItem, ModuleDetail} from '@/data/repositories/contracts'
@@ -138,7 +139,9 @@ export function ProductHeroLabScreen({
             productName={SAMPLE_MODULE.name}
             top={insets.top + spacing[2]}
             onBack={() => undefined}
+            onPrimary={() => undefined}
             onShare={() => undefined}
+            presentation={presentation}
             actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
             onAction={() => undefined}
           />
@@ -540,7 +543,9 @@ export function ModulaPrimitivesLabScreen({
             productName={SAMPLE_MODULE.name}
             top={12}
             onBack={() => undefined}
+            onPrimary={() => setInstallReview(true)}
             onShare={() => undefined}
+            presentation={installPresentation}
             actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
             onAction={() => undefined}
           />
@@ -608,12 +613,11 @@ export function ModulaPrimitivesLabScreen({
       <LabBlock title="ProductStickyHeader">
         <View style={styles.stickyPreview}>
           <ProductStickyHeader
-            visible
             top={0}
             moduleId={SAMPLE_MODULE.moduleId}
             name={SAMPLE_MODULE.name}
-            presentation={installPresentation}
-            onPrimary={() => setInstallReview(true)}
+            progress={1}
+            trailingReservedWidth={productTrailingCapsuleWidth(1)}
           />
         </View>
       </LabBlock>

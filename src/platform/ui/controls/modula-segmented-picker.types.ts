@@ -28,8 +28,9 @@ export type ModulaSegmentedPickerProps = {
    */
   appearance?: ModulaSegmentedAppearance
   /**
-   * Horizontal scrollable menu. Prefer with `appearance="plain"`.
-   * (UISegmentedControl itself cannot scroll.)
+   * Horizontal scroll when segments do not fit the viewport.
+   * With `appearance="segmented"`, uses UIKit UISegmentedControl translated
+   * inside a clipped viewport (ScrollView compositing bleeds native labels).
    */
   scrollable?: boolean
   /** Min width per scrollable segment button (default 86). */

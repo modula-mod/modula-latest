@@ -27,7 +27,7 @@ assert(collection.allowedActions?.some(action => action.actionId === 'newNote' &
 assert.deepEqual(collection.toolbar?.map(action => action.actionId), ['newNote'])
 assert.deepEqual(collection.recordListActionIds, ['openNote'])
 assert.equal(collection.searchEnabled, true)
-assert(collection.layout.length > 0)
+assert.equal(collection.layout.length, 0, 'record/query-only structures do not render empty nested panels')
 const openNote = collection.allowedActions?.find(action => action.actionId === 'openNote')
 assert(openNote, 'record list route action is projected')
 assert.equal(resolveRuntimeActionRoute(openNote, {noteId: 'note/123'}), '/module/digital.modula.reference-notes/note/note%2F123')
@@ -38,6 +38,8 @@ const editor = adaptMpsFrontendView({frontend, resolved: editorRoute})
 const create = editor.allowedActions?.find(action => action.actionId === 'createNote')
 assert(create, 'create action is projected')
 assert.equal(editor.allowedActions?.some(action => action.actionId === 'updateNote'), false)
+assert.deepEqual(create.successDestination, {kind: 'dismiss'})
+assert.equal(editor.layout.length, 0, 'form controls are rendered once by the generic form host')
 assert.deepEqual(create.inputSchema.fields?.map(field => [field.name, field.type]), [
   ['title', 'text'],
   ['body', 'richText'],
@@ -118,6 +120,7 @@ if (vaultRoot) {
   const vaultHome = adaptMpsFrontendView({frontend: vault, resolved: vaultHomeRoute})
   assert.deepEqual(vaultHome.query?.filters, {archived: false})
   assert.equal(vaultHome.query?.recordState, 'active')
+  assert.equal(vaultHome.layout.length, 0, 'Vault Notes collection does not emit empty structural cards')
 
   const vaultNewRoute = resolveMpsFrontendRoute(vault, ['new'])
   assert(vaultNewRoute, 'Vault Notes new-note route resolves')
@@ -130,6 +133,8 @@ if (vaultRoot) {
   ])
   const vaultCreate = vaultEditor.allowedActions?.find(action => action.actionId === 'createNote')
   assert(vaultCreate, 'Vault Notes create action is product-owned')
+  assert.deepEqual(vaultCreate.successDestination, {kind: 'dismiss'})
+  assert.equal(vaultEditor.layout.length, 0, 'Vault Notes form controls are not duplicated as layout cards')
   const vaultInput = shapeMpsActionInput(vaultCreate, {title: 'Owned by Vault Notes', document: richTextDocumentFromText('Indexed safely')})
   assert.equal(vaultInput.plainTextProjection, 'Indexed safely')
   assert.equal(vaultInput.archived, false)

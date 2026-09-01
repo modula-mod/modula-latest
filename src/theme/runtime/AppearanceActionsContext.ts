@@ -5,7 +5,9 @@ import type {
   AdvancedChromeEffect,
   AppearanceMode,
   SurfaceType,
+  SystemAdaptivePreference,
   TextScale,
+  TextScalePreference,
   ThemeFamily,
 } from '@/theme/contracts'
 
@@ -16,11 +18,13 @@ export type AppearanceActionsContextValue = {
   setCustomAccent: (hex: string) => void
   setSurfaceType: (surfaceType: SurfaceType) => void
   setTextScale: (scale: TextScale) => void
-  setBoldText: (enabled: boolean) => void
-  setReduceMotion: (enabled: boolean) => void
-  setReduceTransparency: (enabled: boolean) => void
-  setIncreaseContrast: (enabled: boolean) => void
-  setShowSwitchLabels: (enabled: boolean) => void
+  setTextScalePreference: (preference: TextScalePreference) => void
+  setBoldText: (value: SystemAdaptivePreference) => void
+  setReduceMotion: (value: SystemAdaptivePreference) => void
+  setReduceTransparency: (value: SystemAdaptivePreference) => void
+  setIncreaseContrast: (value: SystemAdaptivePreference) => void
+  setDifferentiateWithoutColor: (value: SystemAdaptivePreference) => void
+  setShowSwitchLabels: (value: SystemAdaptivePreference) => void
   setAdvancedChromeEffect: (effect: AdvancedChromeEffect) => void
   resetAppearance: () => void
 }

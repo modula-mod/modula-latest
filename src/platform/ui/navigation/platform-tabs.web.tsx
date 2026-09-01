@@ -17,6 +17,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 const webIcons: Record<string, AppIconName> = {
   index: 'home',
   discover: 'discover',
+  hub: 'modules',
   create: 'create',
   activity: 'activity',
   profile: 'profile',

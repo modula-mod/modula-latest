@@ -33,6 +33,7 @@ async function readSystemAccessibility(): Promise<SystemAccessibilityState> {
     grayscaleEnabled,
     invertColoursEnabled,
     increaseContrast: highTextContrast || darkerSystemColors,
+    differentiateWithoutColor: false,
   }
 }
 

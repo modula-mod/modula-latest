@@ -178,6 +178,8 @@ export function HomeStickyFeedModes({
             <ModulaSegmentedPicker
               appearance="track"
               embedded
+              scrollable
+              segmentMinWidth={112}
               accessibilityLabel="Feed mode"
               options={options}
               value={mode}

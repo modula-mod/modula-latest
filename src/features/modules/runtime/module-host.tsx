@@ -4,7 +4,6 @@ import {useRouter, type Href} from 'expo-router'
 import {ModuleViewRenderer} from '@/features/modules/runtime/module-view-renderer'
 import {ModuleErrorBoundary, ModuleErrorState} from '@/features/modules/runtime/module-error-boundary'
 import {ModuleInstallIdentity} from '@/features/modules/runtime/module-install-identity'
-import {ModuleExtensionContributions} from '@/features/modules/runtime/module-extension-contributions'
 import {ModuleLoadingState} from '@/features/modules/runtime/module-loading-state'
 import {ModulePermissionGate} from '@/features/modules/runtime/module-permission-gate'
 import {resolveModuleRouteView} from '@/features/modules/runtime/module-route-resolver'
@@ -118,7 +117,6 @@ export function ModuleHost({moduleId, path}: {moduleId: string; path: string[]})
         />
       }>
       <ModulePermissionGate available={view.available !== false} reason="Permission required">
-        <ModuleExtensionContributions moduleId={moduleId} contributions={composition.data?.extensions ?? []} />
         <ModuleViewRenderer
           moduleId={moduleId}
           view={view}
