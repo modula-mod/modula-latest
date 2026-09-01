@@ -363,6 +363,7 @@ export class GreenfieldExtensionFabricService {
       .select([
         'greenfield_extension_contribution_registrations.contribution_registration_id',
         'greenfield_extension_contribution_registrations.extension_product_id',
+        'greenfield_extension_contribution_registrations.target_product_id',
         'greenfield_extension_contribution_registrations.contribution_id',
         'greenfield_extension_contribution_registrations.contribution_kind',
         'greenfield_extension_contribution_registrations.extension_point',
@@ -401,7 +402,11 @@ export class GreenfieldExtensionFabricService {
       const declared = Array.isArray(frontend?.contributions)
         ? frontend.contributions.filter(isRecord).find(contribution =>
           contribution.id === registration.contribution_id
-          && contribution.target === registration.extension_point,
+          && frontendContributionTargetsExtensionPoint(
+            contribution.target,
+            registration.extension_point,
+            registration.target_product_id,
+          ),
         )
         : null
       if (!declared) continue
@@ -896,6 +901,18 @@ function localizedText(value: unknown, fallback: string): string {
   if (typeof value === 'string' && value.trim()) return value
   if (isRecord(value) && typeof value.default === 'string' && value.default.trim()) return value.default
   return fallback
+}
+
+export function frontendContributionTargetsExtensionPoint(
+  target: unknown,
+  extensionPoint: string,
+  targetProductId: string,
+): boolean {
+  if (typeof target !== 'string') return false
+  if (target === extensionPoint) return true
+  const versioned = target.match(/^([a-z][a-z0-9]*(?:\.[a-z0-9]+(?:-[a-z0-9]+)*)+)\/([a-z][a-z0-9]*(?:[.-][a-z0-9]+)*)@([1-9][0-9]*)$/)
+  if (!versioned || versioned[1] !== targetProductId || versioned[3] !== '1') return false
+  return `${versioned[1]}.${versioned[2]}` === extensionPoint
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

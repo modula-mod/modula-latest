@@ -11,7 +11,10 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleDependencyResolver} from '../src/modules/dependency-resolver.js'
-import {GreenfieldExtensionFabricService} from '../src/modules/extension-fabric-service.js'
+import {
+  GreenfieldExtensionFabricService,
+  frontendContributionTargetsExtensionPoint,
+} from '../src/modules/extension-fabric-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {executeWithBoundedRetry} from '../src/modules/backend/gateway-service.js'
@@ -30,8 +33,8 @@ const suffix = randomUUID().slice(0, 8)
 const coreId = `digital.modula.fabric-notes.${suffix}`
 const formattingId = `digital.modula.fabric-notes.${suffix}.formatting`
 const backgroundId = `digital.modula.fabric-notes.${suffix}.background`
-const editorPoint = 'fabric-notes.editor.command'
-const afterSavePoint = 'fabric-notes.note.after-save'
+const editorPoint = `${coreId}.editor.command`
+const afterSavePoint = `${coreId}.note.after-save`
 const editorCapability = 'notes.editor.contribute'
 const eventsCapability = 'notes.events.subscribe'
 const phase2RuntimeTables = [
@@ -49,6 +52,12 @@ const phase2RuntimeTables = [
 ] as const
 
 describeIfDb('PVP Platform 2 governed extension fabric', () => {
+  it('maps only a matching target product and supported extension-point major', () => {
+    expect(frontendContributionTargetsExtensionPoint(`${coreId}/editor.command@1`, editorPoint, coreId)).toBe(true)
+    expect(frontendContributionTargetsExtensionPoint(`${coreId}/editor.command@2`, editorPoint, coreId)).toBe(false)
+    expect(frontendContributionTargetsExtensionPoint('digital.modula.other/editor.command@1', editorPoint, coreId)).toBe(false)
+  })
+
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let workerDb: ModulaWorkerDb
@@ -77,6 +86,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     accountB = second.accountId
     coreReleaseId = (await publish(coreManifest())).releaseId
     formattingReleaseId = (await publish(formattingManifest())).releaseId
+    await persistMpsFormattingFrontend()
     backgroundReleaseId = (await publish(backgroundManifest())).releaseId
   })
 
@@ -159,6 +169,9 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
       contribution_kind: 'editor.command',
       extension_point: editorPoint,
       contract_id: 'vault.format.heading',
+      frontend_source: 'mps',
+      frontend_artifact_sha256: expect.stringMatching(/^[0-9a-f]{64}$/),
+      declaration: expect.objectContaining({source: 'mps-product-frontend', actionId: 'vault.format.heading'}),
     })])
     expect(JSON.stringify(host.core.manifest)).not.toContain(formattingId)
 
@@ -421,6 +434,68 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     if (existing) return existing
     await releases.importPendingReview(manifest, releaseEvidence(manifest))
     return releases.publishRelease(manifest.moduleId, manifest.version)
+  }
+
+  async function persistMpsFormattingFrontend() {
+    const ingestionId = `mps-ingestion:${formattingId}:0.1.0`
+    const frontend = {
+      schema: 'modula.frontend.1.0',
+      frontendSchemaVersion: '1.0.0',
+      mpsVersion: '1.0',
+      productId: formattingId,
+      releaseVersion: '0.1.0',
+      mode: 'host-contribution',
+      hostRuntime: {versionRange: '>=1.0.0 <2.0.0'},
+      actions: [{id: 'vault.format.heading', family: 'function.invoke', functionId: 'vault.format.heading', label: 'Format heading'}],
+      contributions: [{
+        id: 'format.heading',
+        target: `${coreId}/editor.command@1`,
+        action: 'vault.format.heading',
+        component: {type: 'button', text: 'Format heading', action: 'vault.format.heading'},
+      }],
+    }
+    const artifactSha256 = createHash('sha256').update(JSON.stringify(frontend)).digest('hex')
+    await db.insertInto('greenfield_mps_ingestions').values({
+      ingestion_id: ingestionId,
+      product_id: formattingId,
+      version: '0.1.0',
+      release_id: formattingReleaseId,
+      manifest_sha256: 'c'.repeat(64),
+      product_standard: '1.0',
+      manifest_format: 'modula.product.json',
+      registry_kind: 'plugin',
+      frontend_mode: 'host-contribution',
+      backend_mode: 'none',
+      storage_mode: null,
+      greenfield_backend_mode: 'none',
+      test_fixture: true,
+      visibility: 'private',
+      manifest: sql`${JSON.stringify({identity: {id: formattingId, version: '0.1.0'}})}::jsonb`,
+      projection: sql`${JSON.stringify({productId: formattingId, version: '0.1.0'})}::jsonb`,
+      ingested_at: new Date(),
+    }).execute()
+    await db.insertInto('greenfield_release_frontends').values({
+      frontend_id: `frontend:${formattingId}:0.1.0`,
+      ingestion_id: ingestionId,
+      release_id: formattingReleaseId,
+      product_id: formattingId,
+      version: '0.1.0',
+      frontend_mode: 'host-contribution',
+      artifact_role: 'product.frontend',
+      artifact_path: 'frontend/frontend.manifest.json',
+      media_type: 'application/vnd.modula.frontend+json',
+      artifact_sha256: artifactSha256,
+      schema_version: '1.0.0',
+      mps_version: '1.0',
+      entry_view: null,
+      route_count: 0,
+      routes: sql`${JSON.stringify([])}::jsonb`,
+      compatibility: sql`${JSON.stringify({versionRange: '>=1.0.0 <2.0.0'})}::jsonb`,
+      required_capabilities: sql`${JSON.stringify([])}::jsonb`,
+      runtime_projection: sql`${JSON.stringify(frontend)}::jsonb`,
+      verified_at: new Date(),
+      created_at: new Date(),
+    }).execute()
   }
 
   async function registerAccount(email: string, handle: string) {
