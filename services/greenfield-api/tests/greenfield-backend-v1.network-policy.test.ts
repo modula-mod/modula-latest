@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import type {ModuleBackendDefinition} from '@modula/greenfield-module-manifest'
 import {assertBackendTargetPolicy, resolveBackendEndpoint} from '../src/modules/backend/network-policy.js'
+import {safeLookup} from '../src/security/ssrf.js'
 
 describe('Greenfield Backend V1 registered service target policy', () => {
   it('accepts an exact registered HTTPS origin on an allowed port', () => {
@@ -62,6 +63,28 @@ describe('Greenfield Backend V1 registered service target policy', () => {
     for (const maliciousPath of ['//attacker.example/v1', '/../admin', '/%2e%2e/admin', '/%2f%2fattacker.example/v1', '/%5c%5cattacker.example/v1', '/v1#fragment']) {
       expect(() => resolved.urlFor(maliciousPath)).toThrowError(expect.objectContaining({code: 'VALIDATION_FAILED'}))
     }
+  })
+
+  it('returns the address-array callback shape requested by Node 24 HTTPS lookups', async () => {
+    const addresses = await new Promise<import('node:dns').LookupAddress[]>((resolve, reject) => {
+      safeLookup('8.8.8.8', {all: true}, (error, resolved) => {
+        if (error) reject(error)
+        else resolve(resolved)
+      })
+    })
+    expect(addresses).toEqual([{address: '8.8.8.8', family: 4}])
+
+    await new Promise<void>((resolve, reject) => {
+      safeLookup('127.0.0.1', {all: true}, (error, resolved) => {
+        try {
+          expect(error).toBeInstanceOf(Error)
+          expect(resolved).toEqual([])
+          resolve()
+        } catch (assertionError) {
+          reject(assertionError)
+        }
+      })
+    })
   })
 })
 

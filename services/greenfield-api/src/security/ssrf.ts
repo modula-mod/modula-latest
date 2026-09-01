@@ -136,33 +136,56 @@ export async function assertSafeHttpsUrl(rawUrl: string): Promise<URL> {
   return url
 }
 
-function safeLookup(
+export function safeLookup(
+  hostname: string,
+  options: dns.LookupAllOptions,
+  callback: (err: NodeJS.ErrnoException | null, addresses: LookupAddress[]) => void,
+): void
+export function safeLookup(
+  hostname: string,
+  options: dns.LookupOneOptions,
+  callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void,
+): void
+export function safeLookup(
   hostname: string,
   options: dns.LookupOptions,
-  callback: (err: NodeJS.ErrnoException | null, address: string, family: number) => void,
+  callback: ((err: NodeJS.ErrnoException | null, address: string, family: number) => void)
+    | ((err: NodeJS.ErrnoException | null, addresses: LookupAddress[]) => void),
 ): void {
-  dns.lookup(hostname, {...options, all: true, verbatim: true}, (err, addresses) => {
+  const lookupOptions: dns.LookupAllOptions = {...options, all: true, verbatim: true}
+  dns.lookup(hostname, lookupOptions, (err, addresses) => {
+    const finishWithError = (error: NodeJS.ErrnoException) => {
+      if (options.all) {
+        const allCallback = callback as (err: NodeJS.ErrnoException, addresses: LookupAddress[]) => void
+        allCallback(error, [])
+      } else {
+        const oneCallback = callback as (err: NodeJS.ErrnoException, address: string, family: number) => void
+        oneCallback(error, '', 4)
+      }
+    }
     if (err) {
-      callback(err, '', 4)
+      finishWithError(err)
       return
     }
     const list = addresses as LookupAddress[]
     if (list.length === 0) {
-      callback(new Error(`No addresses resolved for ${hostname}`), '', 4)
+      finishWithError(new Error(`No addresses resolved for ${hostname}`))
       return
     }
     for (const candidate of list) {
       if (isBlockedIp(candidate.address, candidate.family)) {
-        callback(
-          new SsrfBlockedError(`Blocked outbound request to disallowed address ${candidate.address} for host ${hostname}`),
-          '',
-          4,
-        )
+        finishWithError(new SsrfBlockedError(`Blocked outbound request to disallowed address ${candidate.address} for host ${hostname}`))
         return
       }
     }
+    if (options.all) {
+      const allCallback = callback as (err: null, addresses: LookupAddress[]) => void
+      allCallback(null, list)
+      return
+    }
     const chosen = list[0]!
-    callback(null, chosen.address, chosen.family)
+    const oneCallback = callback as (err: null, address: string, family: number) => void
+    oneCallback(null, chosen.address, chosen.family)
   })
 }
 
