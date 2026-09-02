@@ -5,6 +5,7 @@ import {AppText} from '@/components/primitives/AppText'
 import type {ModuleHostExtensionContribution, ModuleRecord} from '@/data/repositories/contracts'
 import {ModuleErrorBoundary} from '@/features/modules/runtime/module-error-boundary'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -23,19 +24,41 @@ export function ModuleExtensionContributions({
   const allowed = record ? RECORD_CONTRIBUTION_KINDS : SURFACE_CONTRIBUTION_KINDS
   const visible = contributions.filter(contribution => allowed.has(contribution.contribution_kind))
   const {spacing} = useThemeTokens()
+  const [isPresented, setIsPresented] = useState(false)
   if (!visible.length) return null
   return (
-    <View accessibilityLabel="Installed extension actions" style={{gap: spacing[2]}} testID={record ? 'record-extension-contributions' : 'module-extension-contributions'}>
-      {!record ? <AppText variant="caption" colour="textSecondary">Tools</AppText> : null}
-      <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
-        {visible.map(contribution => (
-          <ModuleErrorBoundary
-            key={contribution.contribution_registration_id}
-            fallback={<UnavailableContribution contribution={contribution} />}>
-            <ContributionAction moduleId={moduleId} contribution={contribution} record={record} />
-          </ModuleErrorBoundary>
-        ))}
-      </View>
+    <View accessibilityLabel="Installed extension actions" testID={record ? 'record-extension-contributions' : 'module-extension-contributions'}>
+      <ModulaButton
+        label={visible.length === 1 ? 'Tools' : `Tools · ${visible.length}`}
+        role="secondary"
+        accessibilityLabel={`${visible.length} installed product ${visible.length === 1 ? 'tool' : 'tools'}`}
+        onPress={() => setIsPresented(true)}
+        testID={record ? 'record-tools-button' : 'module-tools-button'}
+      />
+      <ModulaSheet
+        isPresented={isPresented}
+        onDismiss={() => setIsPresented(false)}
+        detent="medium"
+        accessibilityLabel="Installed product tools"
+        header={(
+          <View style={{gap: spacing[1], paddingBottom: spacing[3]}}>
+            <AppText variant="headline">{record ? 'Record tools' : 'Product tools'}</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              Actions supplied by products you installed and enabled.
+            </AppText>
+          </View>
+        )}
+        testID={record ? 'record-tools-sheet' : 'module-tools-sheet'}>
+        <View style={{gap: spacing[2]}}>
+          {visible.map(contribution => (
+            <ModuleErrorBoundary
+              key={contribution.contribution_registration_id}
+              fallback={<UnavailableContribution contribution={contribution} />}>
+              <ContributionAction moduleId={moduleId} contribution={contribution} record={record} />
+            </ModuleErrorBoundary>
+          ))}
+        </View>
+      </ModulaSheet>
     </View>
   )
 }
@@ -73,6 +96,7 @@ function ContributionAction({moduleId, contribution, record}: {moduleId: string;
   return (
     <View style={{gap: spacing[1]}}>
       <ModulaButton
+        fullWidth
         label={title}
         role="secondary"
         loading={pending}

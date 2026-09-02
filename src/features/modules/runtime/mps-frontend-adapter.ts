@@ -78,12 +78,16 @@ export function adaptMpsFrontendView(input: {
   const toolbar = allowedActions.filter(action => toolbarIds.has(action.actionId))
   const layout = adaptLayout(view.root, view.kind)
   const empty = view.states?.empty
+  const declaredTitle = localizedText(view.title, titleize(view.id))
+  const title = view.kind === 'form' && !recordBinding && collection
+    ? `New ${titleize(collection)}`
+    : declaredTitle
 
   return {
     viewId: `${frontend.productId}.${view.id}`,
     moduleId: frontend.productId,
     kind: view.kind,
-    title: localizedText(view.title, titleize(view.id)),
+    title,
     collection: collection || undefined,
     query: collection ? queryFor(view, collection) : undefined,
     layout,
