@@ -35,6 +35,7 @@ assert.equal(resolveRuntimeActionRoute(openNote, {noteId: 'note/123'}), '/module
 const editorRoute = resolveMpsFrontendRoute(frontend, ['new'])
 assert(editorRoute, 'new route resolves')
 const editor = adaptMpsFrontendView({frontend, resolved: editorRoute})
+assert.equal(editor.title, 'New Note')
 const create = editor.allowedActions?.find(action => action.actionId === 'createNote')
 assert(create, 'create action is projected')
 assert.equal(editor.allowedActions?.some(action => action.actionId === 'updateNote'), false)
@@ -57,6 +58,7 @@ assert.equal(detailView.allowedActions?.some(action => action.actionId === 'upda
 const editRoute = resolveMpsFrontendRoute(frontend, ['note', 'note-123', 'edit'])
 assert(editRoute, 'edit route resolves')
 const editView = adaptMpsFrontendView({frontend, resolved: editRoute})
+assert.equal(editView.title, 'Edit note')
 assert.equal(editView.allowedActions?.some(action => action.actionId === 'createNote'), false)
 assert.equal(editView.allowedActions?.some(action => action.actionId === 'updateNote'), true)
 
@@ -125,6 +127,7 @@ if (vaultRoot) {
   const vaultNewRoute = resolveMpsFrontendRoute(vault, ['new'])
   assert(vaultNewRoute, 'Vault Notes new-note route resolves')
   const vaultEditor = adaptMpsFrontendView({frontend: vault, resolved: vaultNewRoute})
+  assert.equal(vaultEditor.title, 'New Note')
   assert.deepEqual(vaultEditor.allowedActions?.find(action => action.actionId === 'createNote')?.inputSchema.fields?.map(field => [field.name, field.type]), [
     ['title', 'text'],
     ['document', 'richText'],
