@@ -479,20 +479,20 @@ function expectStaticAssetResponsesHealthy(responses: AssetResponse[]) {
   })
   expect(mimeFailures, JSON.stringify(mimeFailures, null, 2)).toEqual([])
 
-  const ioniconsFont = responses.find(response => {
+  const iconFontResponses = responses.filter(response => {
     const path = new URL(response.url).pathname
     return /ionicons/i.test(path) && /\.(?:ttf|otf|woff2?)$/i.test(path)
   })
-  expect(ioniconsFont, JSON.stringify(responses, null, 2)).toBeTruthy()
+  expect(iconFontResponses, JSON.stringify(iconFontResponses, null, 2)).toEqual([])
 }
 
-async function expectIoniconsReady(page: Page) {
+async function expectSemanticIconsReady(page: Page) {
   const audit = await page.evaluate(async () => {
     if (!('fonts' in document)) {
       return {
         fontsApiAvailable: false,
-        ioniconsReady: false,
         loadedIoniconsFamilies: [],
+        modulaSvgPathCount: 0,
         privateUseGlyphCount: 0,
       }
     }
@@ -506,18 +506,16 @@ async function expectIoniconsReady(page: Page) {
 
     return {
       fontsApiAvailable: true,
-      ioniconsReady: loadedIoniconsFamilies.some(family =>
-        document.fonts.check(`16px ${JSON.stringify(family)}`),
-      ),
       loadedIoniconsFamilies,
+      modulaSvgPathCount: document.querySelectorAll('svg path').length,
       privateUseGlyphCount,
     }
   })
 
   expect(audit.fontsApiAvailable).toBe(true)
-  expect(audit.ioniconsReady).toBe(true)
-  expect(audit.loadedIoniconsFamilies, JSON.stringify(audit, null, 2)).not.toHaveLength(0)
-  expect(audit.privateUseGlyphCount, JSON.stringify(audit, null, 2)).toBeGreaterThan(0)
+  expect(audit.loadedIoniconsFamilies, JSON.stringify(audit, null, 2)).toEqual([])
+  expect(audit.modulaSvgPathCount, JSON.stringify(audit, null, 2)).toBeGreaterThan(0)
+  expect(audit.privateUseGlyphCount, JSON.stringify(audit, null, 2)).toBe(0)
 }
 
 async function expectNoFallbackGlyphText(page: Page) {
@@ -725,7 +723,7 @@ test('email OTP login reaches Home and survives reload', async ({page}) => {
   const code = await latestMailCode(account.accountId, 'passwordless-login')
   const otpResponse = page.waitForResponse(matchesApiResponse('/v1/sessions/email-code', 'POST'))
   const meResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/me', 'GET'))
-  await page.getByTestId('sign-in-email-code').fill(code)
+  await page.getByTestId('sign-in-email-code-input').fill(code)
   await page.getByTestId('sign-in-email-code-submit').click()
   expect((await otpResponse).status()).toBe(200)
   expect((await meResponse).status()).toBe(200)
@@ -759,7 +757,7 @@ test('wrong OTP leaves no session and shows OTP-domain error', async ({page}) =>
   await requestEmailCode(page, account)
   const code = await latestMailCode(account.accountId, 'passwordless-login')
   const response = page.waitForResponse(matchesApiResponse('/v1/sessions/email-code', 'POST'))
-  await page.getByTestId('sign-in-email-code').fill(wrongCodeFor(code))
+  await page.getByTestId('sign-in-email-code-input').fill(wrongCodeFor(code))
   await page.getByTestId('sign-in-email-code-submit').click()
   const otp = await response
   expect(otp.status()).toBe(401)
@@ -777,19 +775,17 @@ test('email verification browser flow rejects wrong code, activates account, and
   const code = await latestMailCode(account.accountId, 'verification-code')
 
   const wrongResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/verify-email', 'POST'))
-  await page.getByTestId('verify-email-code').fill(wrongCodeFor(code))
-  await page.getByTestId('verify-email-submit').click()
+  await page.getByTestId('verify-email-code-input').fill(wrongCodeFor(code))
   const wrongVerification = await wrongResponse
   expect(wrongVerification.status()).toBe(401)
   const wrongEnvelope = (await wrongVerification.json()) as ApiEnvelope<unknown>
   expect(wrongEnvelope.ok).toBe(false)
   if (!wrongEnvelope.ok) expect(wrongEnvelope.error.code).toBe('CHALLENGE_INVALID')
-  await expect(page.getByText('That verification code is invalid or expired.')).toBeVisible()
+  await expect(page.getByText('That code is not valid. Check the email and try again.')).toBeVisible()
   await expectNoStoredSession(page)
 
   const verifyResponse = page.waitForResponse(matchesApiResponse('/v1/accounts/verify-email', 'POST'))
-  await page.getByTestId('verify-email-code').fill(code)
-  await page.getByTestId('verify-email-submit').click()
+  await page.getByTestId('verify-email-code-input').fill(code)
   const verified = await verifyResponse
   expect(verified.status()).toBe(200)
   await expect(page).toHaveURL(/\/sign-in/)
@@ -1016,10 +1012,15 @@ test('settings expose honest mail, sessions, and Coming Soon security controls',
   await passwordLogin(page, account)
 
   await gotoProtectedRoute(page, '/settings/security')
-  await expect(page.getByLabel('Passkeys — Coming Soon')).toBeVisible()
-  await expect(page.getByLabel('Authenticator app (TOTP) — Coming Soon')).toBeVisible()
-  await expect(page.getByLabel('Recovery codes — Coming Soon')).toBeVisible()
-  await page.getByLabel('Passkeys — Coming Soon').click()
+  const passkeys = page.getByRole('button', {name: /^Passkeys, Coming Soon/})
+  const totp = page.getByRole('button', {name: /^Authenticator app \(TOTP\), Coming Soon/})
+  const recoveryCodes = page.getByRole('button', {name: /^Recovery codes, Coming Soon/})
+  await expect(passkeys).toBeVisible()
+  await expect(totp).toBeVisible()
+  await expect(recoveryCodes).toBeVisible()
+  await expect(passkeys).toBeDisabled()
+  await expect(totp).toBeDisabled()
+  await expect(recoveryCodes).toBeDisabled()
   await expect(page).toHaveURL(/\/settings\/security/)
 
   const sessionsResponse = page.waitForResponse(
@@ -1049,28 +1050,28 @@ test('authenticated Home, Activity, Profile, Product Hub, and Settings render cl
   const account = await createVerifiedAccount('routes')
 
   await passwordLogin(page, account)
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   await reloadAndExpectRestored(page, account)
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   await gotoProtectedRoute(page, '/activity')
   await expect(page.getByText('No activity yet').or(page.getByText('Today')).first()).toBeVisible()
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   await gotoProtectedRoute(page, '/profile')
   await expect(page.getByText(`@${account.handle}`).first()).toBeVisible({timeout: 15_000})
   await expect(page.getByText('Posts').first()).toBeVisible()
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   await gotoProtectedRoute(page, '/marketplace')
   await expect(page.getByText('Product Hub').first()).toBeVisible()
   await expect(page.getByLabel('Search Product Hub')).toBeVisible()
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   await gotoProtectedRoute(page, '/settings')
@@ -1078,7 +1079,7 @@ test('authenticated Home, Activity, Profile, Product Hub, and Settings render cl
   await expect(page.getByText('Account').first()).toBeVisible()
   await expect(page.getByText('Security').first()).toBeVisible()
   await expect(page.getByText('Appearance').first()).toBeVisible()
-  await expectIoniconsReady(page)
+  await expectSemanticIconsReady(page)
   await expectNoFallbackGlyphText(page)
 
   expectStaticAssetResponsesHealthy(assetResponses)
