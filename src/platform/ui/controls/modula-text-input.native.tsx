@@ -70,7 +70,7 @@ export function ModulaTextInput({
   testID,
   ref,
 }: ModulaTextInputProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {accessibility, colours, controls, radius, spacing, typography} = useThemeTokens()
   const inputRef = useRef<RNTextInput>(null)
 
   useImperativeHandle(ref, () => inputRef.current as RNTextInput)
@@ -80,11 +80,13 @@ export function ModulaTextInput({
       style={[
         styles.shell,
         {
-          minHeight: multiline ? 112 : 48,
+          minHeight: multiline
+            ? controls.inputHeight.multilineMinimum
+            : controls.inputHeight.singleLine,
           borderColor: colours.border,
           backgroundColor: colours.surfaceRaised,
           borderRadius: radius.medium,
-          paddingHorizontal: spacing[3],
+          paddingHorizontal: spacing[4],
           paddingVertical: multiline ? spacing[3] : 0,
         },
         style,
@@ -109,12 +111,16 @@ export function ModulaTextInput({
         onBlur={onBlur}
         maxLength={maxLength}
         accessibilityLabel={accessibilityLabel}
+        allowFontScaling={accessibility.followSystemTextSize}
         testID={testID}
         style={[
           styles.field,
           {
             color: colours.text,
-            minHeight: multiline ? 88 : 48,
+            ...typography.body,
+            minHeight: multiline
+              ? controls.inputHeight.multilineMinimum - spacing[6]
+              : controls.inputHeight.singleLine,
             paddingVertical: multiline ? 0 : spacing[3],
           },
           textStyle,
@@ -126,8 +132,6 @@ export function ModulaTextInput({
 
 const styles = StyleSheet.create({
   field: {
-    fontSize: 17,
-    lineHeight: 22,
     margin: 0,
     padding: 0,
     width: '100%',

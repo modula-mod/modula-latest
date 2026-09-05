@@ -14,8 +14,8 @@ import Animated, {
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {AppText} from '@/components/primitives/AppText'
-import {HydrationStableIonicon, type AppIoniconName} from '@/components/primitives/AppIcon'
 import {useReduceMotion} from '@/lib/accessibility'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {
   PULL_ACTION_ARM_DISTANCE,
   type PullActionId,
@@ -36,12 +36,12 @@ type ActionSpec = {
   id: PullActionId
   index: PullActionSelection
   label: string
-  icon: AppIoniconName
+  icon: ModulaIconName
 }
 
 const ACTIONS: readonly ActionSpec[] = [
-  {id: 'search', index: 0, label: 'Search', icon: 'search-outline'},
-  {id: 'refresh', index: 1, label: 'Refresh', icon: 'refresh'},
+  {id: 'search', index: 0, label: 'Search', icon: 'search'},
+  {id: 'refresh', index: 1, label: 'Refresh', icon: 'reset'},
   {id: 'close', index: 2, label: 'Close', icon: 'close'},
 ]
 
@@ -233,10 +233,10 @@ function ActionIcon({
   return (
     <Animated.View style={[styles.slot, slotStyle]}>
       <Animated.View style={[styles.iconLayer, idleIconStyle]}>
-        <HydrationStableIonicon name={action.icon} size={ICON_IDLE} colour={muted} />
+        <ModulaIcon name={action.icon} size={ICON_IDLE} colour={muted} />
       </Animated.View>
       <Animated.View style={[styles.iconLayer, focusedIconStyle]}>
-        <HydrationStableIonicon name={action.icon} size={ICON_FOCUS} colour={accent} />
+        <ModulaIcon name={action.icon} size={ICON_FOCUS} colour={accent} />
       </Animated.View>
     </Animated.View>
   )

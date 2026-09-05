@@ -10,7 +10,6 @@ import {
 import {useNavigation, useRouter, type Href} from 'expo-router'
 
 import {QueryErrorState} from '@/components/data'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
@@ -26,12 +25,13 @@ import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {
   ActivityHeaderRight,
 } from '@/platform/ui/navigation/activity-stack-header'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
-import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
+import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {ActivityListSkeleton} from '@/platform/ui/skeletons'
@@ -75,11 +75,13 @@ function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
 export function ActivityScreen() {
   const navigation = useNavigation()
   const {activityRepository} = useAppServices()
-  const {colours, spacing, radius} = useThemeTokens()
+  const {colours, controls, spacing, radius} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
+  const headerClearance = useSecondaryChromeSpacerHeight()
+  const topPadding = Platform.OS === 'web' ? headerClearance + fadePad : fadePad
   const activityQuery = useActivityQuery()
   const [filter, setFilter] = useState<ActivityFilter>('all')
   const [filterSheetOpen, setFilterSheetOpen] = useState(false)
@@ -144,7 +146,7 @@ export function ActivityScreen() {
         <EmptyState
           icon="activity"
           title="No activity yet"
-          description="Local likes, replies, mentions, and module updates will appear here."
+          description="Likes, replies, mentions, and product updates will appear here."
         />
       </View>
     )
@@ -165,7 +167,7 @@ export function ActivityScreen() {
             styles.content,
             {
               gap: spacing[5],
-              paddingTop: fadePad,
+              paddingTop: topPadding,
               paddingBottom: tabPadding,
             },
           ]}
@@ -215,7 +217,12 @@ export function ActivityScreen() {
             const groupBody = (
               <View style={{gap: spacing[3]}}>
                 <SectionHeader title={group} icon="activity" />
-                <View style={{gap: spacing[2]}}>
+                <View
+                  style={{
+                    backgroundColor: colours.surface,
+                    borderRadius: radius.medium,
+                    overflow: 'hidden',
+                  }}>
                   {items.map((item, itemIndex) => {
                     const row = (
                       <ActivityRow
@@ -279,7 +286,8 @@ export function ActivityScreen() {
                 {
                   backgroundColor:
                     filter === id ? colours.accentSubtle : colours.surfaceRaised,
-                  borderRadius: radius.medium,
+                  borderBottomColor: colours.separator,
+                  minHeight: controls.listRow.minimum,
                 },
               ]}>
               <AppText
@@ -312,7 +320,7 @@ function ActivityRow({
 }) {
   const router = useRouter()
   const session = useSession()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = item.actor
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
@@ -369,7 +377,8 @@ function ActivityRow({
               borderBottomColor: colours.separator,
               gap: spacing[3],
               paddingHorizontal: spacing[3],
-              paddingVertical: spacing[3],
+              minHeight: controls.listRow.minimum,
+              paddingVertical: spacing[2],
             },
           ]}>
           {unread ? (
@@ -390,7 +399,7 @@ function ActivityRow({
                 name={item.actor.displayName}
                 uri={item.actor.avatarUri}
                 colour={item.actor.coverColour}
-                size={48}
+                size={40}
               />
               {unread ? (
                 <View
@@ -410,7 +419,7 @@ function ActivityRow({
                   borderRadius: radius.round,
                 },
               ]}>
-              <AppIcon name={item.icon ?? 'activity'} colour={colours.text} />
+              <ModulaIcon name={item.icon ?? 'activity'} colour={colours.text} />
             </View>
           )}
           <View style={styles.body}>
@@ -476,8 +485,8 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   filterRow: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
-    minHeight: 48,
     paddingHorizontal: 16,
   },
   iconAvatar: {

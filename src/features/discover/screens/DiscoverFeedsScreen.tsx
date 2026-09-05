@@ -2,19 +2,19 @@ import {useState} from 'react'
 import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {selectionHaptic} from '@/lib/haptics'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 /** Custom feeds / pin feed sheet — Preview. */
 export function DiscoverFeedsScreen() {
   const router = useRouter()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const discover = useDiscoverQuery()
   const [pinnedIds, setPinnedIds] = useState<string[]>([])
   const feeds = (discover.data?.trendingTopics ?? []).map(topic => ({
@@ -60,6 +60,7 @@ export function DiscoverFeedsScreen() {
                     borderColor: colours.border,
                     borderRadius: radius.md,
                     gap: spacing[3],
+                    minHeight: controls.listRow.minimum,
                     padding: spacing[3],
                   },
                 ]}>
@@ -69,7 +70,7 @@ export function DiscoverFeedsScreen() {
                     {feed.description}
                   </AppText>
                 </View>
-                <AppIcon
+                <ModulaIcon
                   name={feed.pinned ? 'bookmark' : 'saved'}
                   colour={feed.pinned ? colours.accent : colours.textTertiary}
                 />
@@ -93,6 +94,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
-    minHeight: 64,
   },
 })

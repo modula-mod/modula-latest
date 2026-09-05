@@ -8,12 +8,13 @@ import type {
 } from '@/features/profile/contracts/profile'
 import {useFollowProfileMutation} from '@/features/profile/data-query'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
-import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {selectionHaptic} from '@/lib/haptics'
 import {parseProfileId} from '@/api/contracts'
 import {shareProfile} from '@/features/profile/services/shareProfile'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileActionsProps = {
   profile: ModulaProfile
@@ -48,6 +49,7 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
   const canFollow = useCapability('social:follow')
   const prompt = useProtectedPrompt()
   const followMutation = useFollowProfileMutation()
+  const {colours, controls} = useThemeTokens()
 
   if (viewer.canEdit) {
     return null
@@ -81,11 +83,17 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
           if (id === 'share' || id === 'copy') void shareProfile(profile)
         }}
         trigger={
-          <ModulaIconButton
-            icon="more"
-            chrome="plain"
-            accessibilityLabel="More profile actions"
-          />
+          <View
+            pointerEvents="none"
+            style={[
+              styles.menuTarget,
+              {
+                minHeight: controls.touchTarget.minimum,
+                minWidth: controls.touchTarget.minimum,
+              },
+            ]}>
+            <ModulaIcon name="more" colour={colours.text} size={controls.iconSize.toolbar} />
+          </View>
         }
       />
       <ProtectedActionPrompt visible={prompt.visible} onClose={prompt.hide} />
@@ -94,6 +102,10 @@ export function ProfileActions({profile, viewer}: ProfileActionsProps) {
 }
 
 const styles = StyleSheet.create({
+  menuTarget: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   row: {
     alignItems: 'center',
     flexDirection: 'row',

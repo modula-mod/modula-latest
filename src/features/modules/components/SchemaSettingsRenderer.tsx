@@ -41,12 +41,13 @@ export function SchemaSettingsRenderer({moduleId}: {moduleId: string}) {
       {schema.data.fields.map(field => (
         <ModuleFieldRenderer
           key={field.fieldId}
+          moduleId={moduleId}
           field={field}
           value={values[field.name]}
           onChange={value => setDraft(current => ({...current, [field.name]: value}))}
         />
       ))}
-      <ModulaButton label="Save settings" accessibilityLabel="Open module settings" onPress={save} />
+      <ModulaButton label="Save settings" accessibilityLabel="Save module settings" size="prominent" onPress={save} />
     </View>
   )
 }

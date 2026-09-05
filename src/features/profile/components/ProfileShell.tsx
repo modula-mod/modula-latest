@@ -191,7 +191,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     )
   }
 
-  if (!profile || !ownerProfile) {
+  if (!profile || ((mode === 'owner' || mode === 'preview') && !ownerProfile)) {
     return (
       <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
         <ResponsiveContent>
@@ -223,7 +223,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
       profile={profile}
       viewer={viewer}
       presentation={presentation}
-      ownerHandle={ownerProfile.handle}
+      ownerHandle={ownerProfile?.handle ?? ''}
       showStats={presentation.layoutId !== 'minimal'}
       showActions={presentation.layoutId !== 'minimal'}
       compact={presentation.layoutId === 'minimal' || isExpanded}
@@ -291,7 +291,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
               profile={profile}
               viewer={viewer}
               presentation={presentation}
-              ownerHandle={ownerProfile.handle}
+              ownerHandle={ownerProfile?.handle ?? ''}
               showStats={false}
               showActions
               compact

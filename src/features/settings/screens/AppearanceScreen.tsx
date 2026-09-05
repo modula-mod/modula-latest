@@ -5,18 +5,19 @@ import {
   Modal,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native'
 
 import {ProgressiveBlurEdges} from '@/components/materials/ProgressiveBlurEdges'
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
 import {SettingsLinkRow, SettingsSection, SettingsToggleRow} from '@/features/settings/components/SettingsRows'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
@@ -104,7 +105,7 @@ export function AppearanceScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          <AppText variant="caption" colour="textTertiary">
+          <AppText variant="caption" colour="textSecondary">
             Colour, materials, and how Modula looks on this device.
           </AppText>
 
@@ -159,7 +160,7 @@ export function AppearanceScreen() {
             </View>
             {isDarkDepth(preferences.mode) ? (
               <View style={{gap: spacing[2]}}>
-                <AppText variant="caption" colour="textTertiary">
+                <AppText variant="caption" colour="textSecondary">
                   Dark depth
                 </AppText>
                 <ModulaSegmentedPicker
@@ -193,11 +194,11 @@ export function AppearanceScreen() {
             {familiesOpen ? (
               <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
                 {preferences.mode === 'light' ? (
-                  <AppText variant="caption" colour="textTertiary">
+                  <AppText variant="caption" colour="textSecondary">
                     Families apply to Dim, Dark, and OLED. Selection stays saved.
                   </AppText>
                 ) : (
-                  <AppText variant="caption" colour="textTertiary">
+                  <AppText variant="caption" colour="textSecondary">
                     Non-standard families are Preview palettes.
                   </AppText>
                 )}
@@ -222,8 +223,8 @@ export function AppearanceScreen() {
             />
             {surfacesOpen ? (
               <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
-                <AppText variant="caption" colour="textTertiary">
-                  Chrome-layer contracts only — full glass engines remain deferred.
+                <AppText variant="caption" colour="textSecondary">
+                  Choose how toolbars and grouped surfaces appear.
                 </AppText>
                 <View style={[styles.wrapRow, {gap: spacing[2]}]}>
                   {SURFACE_TYPES.map(surfaceType => (
@@ -253,7 +254,7 @@ export function AppearanceScreen() {
 
           <SettingsSection
             title="Advanced"
-            footer="Preview — live camera cut through chrome glyphs. Needs camera permission; nothing is recorded. Reduce Transparency disables the blur layer.">
+            footer="Uses the live camera behind supported chrome. Nothing is recorded. Reduce Transparency disables the blur layer.">
             <SettingsToggleRow
               label="Camera masked blur"
               value={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
@@ -267,9 +268,8 @@ export function AppearanceScreen() {
             active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
             disabledByTransparency={resolved.accessibility.reduceTransparency}
           />
-          <AppText variant="caption" colour="textTertiary">
-            Join island — Telegram-style avatar meatball (Skia). Same Preview surface as
-            Presence; needs a native rebuild with @shopify/react-native-skia.
+          <AppText variant="caption" colour="textSecondary">
+            Preview a compact group-call control using the current appearance settings.
           </AppText>
           <ModulaJoinIsland
             name="Modula"
@@ -277,22 +277,13 @@ export function AppearanceScreen() {
             caption="Appearance Advanced motion Preview."
           />
 
-          <AppPressable
+          <ModulaButton
             accessibilityLabel="Reset appearance"
+            label="Reset Appearance"
+            role="destructive"
+            size="compact"
             onPress={actions.resetAppearance}
-            style={[
-              styles.resetButton,
-              {
-                borderColor: colours.destructive,
-                backgroundColor: colours.destructiveSubtle,
-                borderRadius: radius.round,
-              },
-            ]}>
-            <AppIcon name="reset" colour={colours.destructive} />
-            <AppText variant="label" style={{color: colours.destructive}}>
-              Reset Appearance
-            </AppText>
-          </AppPressable>
+          />
         </ScrollView>
       </ResponsiveContent>
 
@@ -321,24 +312,18 @@ export function AppearanceScreen() {
                   },
                 ]}
               />
-              <TextInput
+              <ModulaTextInput
                 value={customInput}
                 autoCapitalize="characters"
                 autoCorrect={false}
                 accessibilityLabel="Custom accent hex colour"
                 placeholder={resolved.accent.base}
-                placeholderTextColor={colours.textMuted}
                 onChangeText={setCustomInput}
-                style={[
-                  styles.input,
-                  {
-                    color: colours.textMain,
-                    borderColor: customValidation.valid
-                      ? colours.border
-                      : colours.destructive,
-                    backgroundColor: colours.surface1,
-                  },
-                ]}
+                style={{
+                  borderColor: customValidation.valid
+                    ? colours.border
+                    : colours.destructive,
+                }}
               />
             </View>
             {customValidation.message ? (
@@ -347,32 +332,25 @@ export function AppearanceScreen() {
               </AppText>
             ) : null}
             <View style={[styles.modalActions, {gap: spacing[2]}]}>
-              <AppPressable
+              <ModulaButton
                 accessibilityLabel="Cancel custom accent"
+                label="Cancel"
+                role="secondary"
+                size="compact"
                 onPress={() => setCustomModalVisible(false)}
-                style={[styles.modalButton, {borderColor: colours.border}]}>
-                <AppText variant="label">Cancel</AppText>
-              </AppPressable>
-              <AppPressable
+              />
+              <ModulaButton
                 accessibilityLabel="Apply custom accent"
+                label="Apply"
                 disabled={!customValidation.valid}
+                size="compact"
                 onPress={() => {
                   if (customValidation.valid) {
                     actions.setCustomAccent(customValidation.value)
                     setCustomModalVisible(false)
                   }
                 }}
-                style={[
-                  styles.modalButton,
-                  {
-                    backgroundColor: colours.accent,
-                    borderColor: colours.accent,
-                  },
-                ]}>
-                <AppText variant="label" colour="accentForeground">
-                  Apply
-                </AppText>
-              </AppPressable>
+              />
             </View>
           </MaterialSurface>
         </View>
@@ -455,16 +433,15 @@ function ChromePreview({
                   ]}
                 />
                 {selected ? (
-                  <AppIcon name="check" colour={colours.text} size={20} />
+                  <ModulaIcon name="check" colour={colours.text} size={20} />
                 ) : null}
               </AppPressable>
             )
           })}
         </View>
       </View>
-      <AppText variant="caption" colour="textTertiary">
-        Glass is more transparent chrome; Solid increases opacity for contrast. Preview only —
-        not Apple Liquid Glass.
+      <AppText variant="caption" colour="textSecondary">
+        Compare transparent and solid chrome against the same content.
       </AppText>
     </View>
   )
@@ -510,12 +487,12 @@ function ModeTile({
           style={[styles.modeSky, {borderTopLeftRadius: radius.large, borderTopRightRadius: radius.large}]}
         />
         <View style={styles.modeIconWrap}>
-          <AppIcon name={modeIcons[mode]} colour={palette.textMain} size={22} />
+          <ModulaIcon name={modeIcons[mode]} colour={palette.textMain} size={22} />
         </View>
       </View>
       <AppText
         variant="label"
-        style={{color: selected ? colours.accent : colours.text, textAlign: 'center'}}>
+        style={{color: colours.text, textAlign: 'center'}}>
         {modeLabels[mode]}
       </AppText>
     </AppPressable>
@@ -545,7 +522,7 @@ function ChoicePill({
           borderRadius: radius.round,
         },
       ]}>
-      <AppText variant="label" style={{color: selected ? colours.accent : colours.text}}>
+      <AppText variant="label" style={{color: colours.text}}>
         {label}
       </AppText>
     </AppPressable>
@@ -585,7 +562,7 @@ function AccentSwatch({
               borderColor: colours.borderStrong,
             },
           ]}>
-          {selected ? <AppIcon name="check" colour={colours.accentForeground} size={16} /> : null}
+          {selected ? <ModulaIcon name="check" colour={colours.accentForeground} size={16} /> : null}
         </View>
       </View>
     </AppPressable>
@@ -603,7 +580,7 @@ function LinkRow({
   onPress: () => void
   last?: boolean
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   return (
     <AppPressable
       accessibilityLabel={`${title}, ${value}`}
@@ -614,6 +591,7 @@ function LinkRow({
           borderBottomWidth: last ? 0 : StyleSheet.hairlineWidth,
           borderBottomColor: colours.separator,
           gap: spacing[3],
+          minHeight: controls.listRow.minimum,
           paddingHorizontal: spacing[4],
         },
       ]}>
@@ -623,7 +601,7 @@ function LinkRow({
       <AppText variant="caption" colour="textSecondary">
         {value}
       </AppText>
-      <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
+      <ModulaIcon name="chevronRight" colour={colours.textTertiary} size={16} />
     </AppPressable>
   )
 }
@@ -633,15 +611,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 999,
     borderWidth: 2,
-    height: 72,
+    height: 48,
     justifyContent: 'center',
-    width: 72,
+    width: 48,
   },
   bubbleRow: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingVertical: 36,
+    paddingVertical: 20,
   },
   choicePill: {
     borderWidth: StyleSheet.hairlineWidth,
@@ -653,7 +631,7 @@ const styles = StyleSheet.create({
   },
   chromeStage: {
     borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 168,
+    minHeight: 104,
     overflow: 'hidden',
   },
   content: {
@@ -666,8 +644,8 @@ const styles = StyleSheet.create({
   customSwatch: {
     borderRadius: 16,
     borderWidth: StyleSheet.hairlineWidth,
-    height: 52,
-    width: 52,
+    height: 42,
+    width: 42,
   },
   expandBlock: {
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -677,18 +655,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
-  input: {
-    borderRadius: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    fontSize: 16,
-    minHeight: 48,
-    paddingHorizontal: 14,
-  },
   linkRow: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 52,
   },
   modal: {
     margin: 18,
@@ -705,14 +674,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  modalButton: {
-    alignItems: 'center',
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    minHeight: 44,
-    paddingHorizontal: 18,
-  },
   modeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -723,57 +684,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modeSky: {
-    height: 54,
+    height: 36,
     width: '100%',
   },
   modeTile: {
-    height: 112,
+    height: 84,
     overflow: 'hidden',
     width: '100%',
   },
   modeTileWrap: {
-    width: '47%',
-  },
-  oledRow: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    gap: 12,
-    minHeight: 64,
-    paddingHorizontal: 14,
-  },
-  optionList: {
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-  },
-  resetButton: {
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    gap: 8,
-    minHeight: 46,
-    paddingHorizontal: 16,
+    flexBasis: 0,
+    flexGrow: 1,
+    minWidth: 92,
   },
   screen: {
     flex: 1,
-  },
-  sliderLabels: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  sliderPanel: {
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: 16,
   },
   swatch: {
     alignItems: 'center',
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
-    height: 44,
+    height: 34,
     justifyContent: 'center',
-    width: 44,
+    width: 34,
   },
   swatchItem: {
     alignItems: 'center',
@@ -782,19 +715,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 999,
     borderWidth: 3,
-    height: 56,
+    height: 44,
     justifyContent: 'center',
-    width: 56,
+    width: 44,
   },
   swatchRow: {
     alignItems: 'center',
     paddingRight: 8,
-  },
-  switchRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 56,
-    paddingVertical: 10,
   },
   wrapRow: {
     flexDirection: 'row',

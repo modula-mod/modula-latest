@@ -18,7 +18,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function AccountSessionsScreen() {
   const session = useSession()
   const services = useAppServices()
-  const {colours, spacing, radius} = useThemeTokens()
+  const {colours, controls, spacing, radius} = useThemeTokens()
   const [sessions, setSessions] = useState<GreenfieldSession[]>([])
   const [error, setError] = useState<string | null>(null)
 
@@ -105,6 +105,7 @@ export function AccountSessionsScreen() {
                     paddingHorizontal: spacing[4],
                     paddingVertical: spacing[3],
                     gap: spacing[1],
+                    minHeight: controls.listRow.minimum,
                   },
                 ]}>
                 <AppText variant="label">{item.platform ?? 'Device'}</AppText>
@@ -154,7 +155,6 @@ const styles = StyleSheet.create({
   },
   sessionRow: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    minHeight: 64,
     width: '100%',
   },
 })

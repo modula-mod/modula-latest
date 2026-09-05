@@ -8,12 +8,12 @@ import Animated, {
 import {GestureDetector} from 'react-native-gesture-handler'
 import * as Haptics from 'expo-haptics'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ReactionType, SocialPost} from '@/domain/social'
 import {PostCounter} from '@/features/social/posts/components/post-counter'
 import {PostSurface} from '@/features/social/posts/components/post-surface'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {
   postSpringConfig,
   usePostInteraction,
@@ -50,7 +50,7 @@ function RailButton({
   compact,
 }: {
   label: string
-  icon: AppIconName
+  icon: ModulaIconName
   selected?: boolean
   count?: number
   onPress: () => void
@@ -67,17 +67,20 @@ function RailButton({
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={POST_MOTION.reactionHoldMs}
-      style={[
-        styles.railButton,
-        {
-          backgroundColor: colours.mediaOverlayControlBackground,
-          borderColor: colours.borderStrong,
-        },
-      ]}>
-      <AppIcon name={icon} colour={ink} size={compact ? 22 : 24} />
-      {typeof count === 'number' && count > 0 ? (
-        <PostCounter value={count} selected={selected} overlay />
-      ) : null}
+      style={styles.railButton}>
+      <View
+        style={[
+          styles.railVisual,
+          {
+            backgroundColor: colours.mediaOverlayControlBackground,
+            borderColor: colours.borderStrong,
+          },
+        ]}>
+        <ModulaIcon name={icon} colour={ink} size={compact ? 18 : 20} />
+        {typeof count === 'number' && count > 0 ? (
+          <PostCounter value={count} selected={selected} overlay />
+        ) : null}
+      </View>
     </AppPressable>
   )
 }
@@ -320,11 +323,17 @@ const styles = StyleSheet.create({
   },
   railButton: {
     alignItems: 'center',
-    borderRadius: POST_GEOMETRY.actionButtonSize / 2,
-    borderWidth: StyleSheet.hairlineWidth,
     height: POST_GEOMETRY.actionButtonSize,
     justifyContent: 'center',
     width: POST_GEOMETRY.actionButtonSize,
+  },
+  railVisual: {
+    alignItems: 'center',
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
   },
   railSurface: {
     minHeight: 254,

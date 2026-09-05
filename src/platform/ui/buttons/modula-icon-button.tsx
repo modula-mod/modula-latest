@@ -1,12 +1,14 @@
 import {StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
+import {ModulaIcon} from '@/platform/ui/icons/modula-icon'
+import type {ModulaIconName} from '@/platform/ui/icons/modula-icon-registry'
 import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {controls as controlTokens} from '@/theme/foundations/controls'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ModulaIconButtonProps = {
-  icon: AppIconName
+  icon: ModulaIconName
   accessibilityLabel: string
   onPress?: () => void
   disabled?: boolean
@@ -35,8 +37,7 @@ export function ModulaIconButton({
   colour,
   size = chrome === 'glass' ? 24 : 22,
 }: ModulaIconButtonProps) {
-  const {colours} = useThemeTokens()
-  const hitStyle = chrome === 'glass' ? styles.glassTarget : styles.target
+  const {colours, controls, radius} = useThemeTokens()
 
   if (chrome === 'plain' || chrome === 'bordered') {
     return (
@@ -47,8 +48,8 @@ export function ModulaIconButton({
         accessibilityState={{disabled: !!disabled}}
         disabled={disabled}
         onPress={onPress}
-        style={[hitStyle, style]}>
-        <AppIcon
+        style={[styles.target, style]}>
+        <ModulaIcon
           name={icon}
           size={size}
           colour={colour ?? colours.text}
@@ -65,9 +66,19 @@ export function ModulaIconButton({
       accessibilityState={{disabled: !!disabled}}
       disabled={disabled}
       onPress={onPress}
-      style={[hitStyle, style]}>
-      <LiquidGlassChrome interactive fallback="clear" style={styles.glass}>
-        <AppIcon name={icon} size={24} colour={colour ?? colours.text} />
+      style={[styles.target, style]}>
+      <LiquidGlassChrome
+        interactive
+        fallback="clear"
+        style={[
+          styles.glass,
+          {
+            borderRadius: radius.round,
+            height: controls.iconButton.navigation,
+            width: controls.iconButton.navigation,
+          },
+        ]}>
+        <ModulaIcon name={icon} size={controls.iconSize.toolbar} colour={colour ?? colours.text} />
       </LiquidGlassChrome>
     </AppPressable>
   )
@@ -76,21 +87,12 @@ export function ModulaIconButton({
 const styles = StyleSheet.create({
   glass: {
     alignItems: 'center',
-    borderRadius: 26,
-    height: 52,
     justifyContent: 'center',
-    width: 52,
-  },
-  glassTarget: {
-    alignItems: 'center',
-    height: 52,
-    justifyContent: 'center',
-    minWidth: 52,
   },
   target: {
     alignItems: 'center',
-    height: 44,
+    height: controlTokens.touchTarget.minimum,
     justifyContent: 'center',
-    minWidth: 44,
+    minWidth: controlTokens.touchTarget.minimum,
   },
 })

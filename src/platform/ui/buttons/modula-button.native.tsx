@@ -1,5 +1,5 @@
 import {Button, Host} from '@expo/ui'
-import {StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
+import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -16,6 +16,7 @@ type ModulaButtonProps = {
   disabled?: boolean
   loading?: boolean
   fullWidth?: boolean
+  size?: 'compact' | 'regular' | 'prominent'
   accessibilityLabel?: string
   style?: StyleProp<ViewStyle>
   testID?: string
@@ -29,12 +30,14 @@ export function ModulaButton({
   disabled = false,
   loading = false,
   fullWidth = false,
+  size,
   accessibilityLabel,
   style,
   testID,
 }: ModulaButtonProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const isDisabled = disabled || loading
+  const resolvedSize = size ?? (role === 'quiet' || role === 'plain' ? 'compact' : 'regular')
 
   // Full-width product CTAs: stretch shell with theme chrome. Host+matchContents
   // alone sizes to the label width and looks broken on auth forms.
@@ -66,31 +69,36 @@ export function ModulaButton({
         style={[
           styles.stretch,
           {
-            backgroundColor,
-            borderColor,
-            borderRadius: radius.md,
-            paddingHorizontal: spacing[4],
-            paddingVertical: spacing[3],
             opacity: isDisabled ? 0.45 : 1,
-            minHeight: role === 'quiet' ? 40 : 48,
-            borderWidth:
-              role === 'secondary' || role === 'glass'
-                ? StyleSheet.hairlineWidth
-                : 0,
+            minHeight: controls.touchTarget.minimum,
             alignSelf: fullWidth ? 'stretch' : 'flex-start',
             width: fullWidth ? '100%' : undefined,
           },
           style,
         ]}>
-        <AppText
-          variant="label"
-          style={{
-            color: labelColour,
-            textAlign: 'center',
-            fontWeight: role === 'quiet' ? '500' : '600',
-          }}>
-          {loading ? `${label}…` : label}
-        </AppText>
+        <View
+          style={[
+            styles.visual,
+            {
+              backgroundColor,
+              borderColor,
+              borderRadius: radius.md,
+              minHeight: controls.controlHeight[resolvedSize],
+              paddingHorizontal: resolvedSize === 'compact' ? spacing[3] : spacing[4],
+              paddingVertical: resolvedSize === 'compact' ? spacing[1] : spacing[2],
+              width: fullWidth ? '100%' : undefined,
+            },
+          ]}>
+          <AppText
+            variant="label"
+            style={{
+              color: labelColour,
+              textAlign: 'center',
+              fontWeight: role === 'quiet' ? '500' : '600',
+            }}>
+            {loading ? `${label}…` : label}
+          </AppText>
+        </View>
       </AppPressable>
     )
   }
@@ -98,7 +106,7 @@ export function ModulaButton({
   return (
     <Host
       matchContents
-      style={[{minHeight: 44}, style]}
+      style={[{minHeight: controls.touchTarget.minimum}, style]}
       seedColor={role === 'destructive' ? colours.destructive : colours.accent}>
       <Button
         label={loading ? `${label}…` : label}
@@ -114,6 +122,11 @@ export function ModulaButton({
 const styles = StyleSheet.create({
   stretch: {
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  visual: {
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
   },
 })

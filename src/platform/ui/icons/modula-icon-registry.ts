@@ -65,8 +65,38 @@ export const MODULA_ICONS = {
     sf: 'plus',
     paths: [stroke('M12 5v14'), stroke('M5 12h14')],
   },
+  edit: {
+    sf: 'square.and.pencil',
+    paths: [
+      stroke('M13.8 5.2l5 5L9 20H4v-5L13.8 5.2z'),
+      stroke('M12.2 6.8l5 5'),
+    ],
+  },
   activity: {sf: 'heart', paths: [HEART]},
   like: {sf: 'heart', paths: [HEART]},
+  reactionLike: {
+    sf: 'hand.thumbsup',
+    paths: [stroke('M8.5 20H5V10h3.5v10z'), stroke('M8.5 10l3.2-6c.8.2 1.4.9 1.4 1.8v3H18c1.3 0 2.2 1.2 1.9 2.5l-1.5 6.5c-.3 1.3-1.4 2.2-2.7 2.2H8.5V10z')],
+  },
+  reactionLove: {sf: 'heart', paths: [HEART]},
+  reactionLaugh: {
+    sf: 'face.smiling',
+    paths: [stroke('M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17z'), fill('M9.2 9.3a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'), fill('M16.8 9.3a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'), stroke('M7.8 14c1.2 2 2.6 3 4.2 3s3-1 4.2-3')],
+  },
+  reactionFire: {
+    sf: 'flame',
+    paths: [stroke('M13.2 3.2c.8 4.4-2.7 5.4-2.1 8.2.3 1.2 1.3 1.9 2.3 1.7 1.8-.4 2.5-2.3 2-4.5 2.8 2.2 4.2 4.6 3.6 7.1-.7 3.2-3.5 5.1-7 5.1s-6.3-2.1-7-5.3c-.7-3.4 1.3-6.8 4.9-9.5-.2 2.5.6 3.6 1.5 3.8.9-2.6.2-4.5 1.8-6.6z')],
+  },
+  reactionSupport: {sf: 'heart', paths: [HEART, stroke('M8 12h8')]},
+  reactionCelebrate: {sf: 'sparkles', paths: SPARKLES},
+  reactionInsightful: {
+    sf: 'lightbulb',
+    paths: [stroke('M8.2 14.6a6 6 0 1 1 7.6 0c-1.2.9-1.8 2-1.8 3.4h-4c0-1.4-.6-2.5-1.8-3.4z'), stroke('M10 21h4')],
+  },
+  reactionCurious: {
+    sf: 'questionmark.circle',
+    paths: [stroke('M12 20.5a8.5 8.5 0 1 0 0-17 8.5 8.5 0 0 0 0 17z'), stroke('M9.5 9a2.7 2.7 0 0 1 5.2.9c0 2-2.7 2.1-2.7 4'), fill('M13 17.2a1 1 0 1 1-2 0 1 1 0 0 1 2 0z')],
+  },
   profile: {sf: 'person', paths: [PERSON_HEAD, PERSON_BODY]},
   account: {sf: 'person.crop.circle', paths: [PERSON_HEAD, PERSON_BODY]},
   menu: {
@@ -467,6 +497,35 @@ export const MODULA_ICONS = {
       stroke('M2.8 12c2.4-4.3 5.8-6.5 9.2-6.5s6.8 2.2 9.2 6.5c-2.4 4.3-5.8 6.5-9.2 6.5S5.2 16.3 2.8 12z'),
       stroke('M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'),
       stroke('M4.6 4.6l14.8 14.8'),
+    ],
+  },
+  backspace: {
+    sf: 'delete.left',
+    paths: [
+      stroke('M9.2 5.2h10.3a1.5 1.5 0 0 1 1.5 1.5v10.6a1.5 1.5 0 0 1-1.5 1.5H9.2L3 12l6.2-6.8z'),
+      stroke('M12.2 9l6 6'),
+      stroke('M18.2 9l-6 6'),
+    ],
+  },
+  fingerprint: {
+    sf: 'touchid',
+    paths: [
+      stroke('M7.2 9.4A5.2 5.2 0 0 1 12 6.2a5.2 5.2 0 0 1 5.2 5.2'),
+      stroke('M5 12.1A7 7 0 0 1 12 5a7 7 0 0 1 7 7.1'),
+      stroke('M8.6 12.1a3.4 3.4 0 0 1 6.8 0c0 4.6-1 7-2.1 8.2'),
+      stroke('M11.9 11.3c.8 0 1.4.6 1.4 1.4 0 3.7-.7 5.8-1.5 7.4'),
+      stroke('M8.1 14.1c.1 2.7-.6 4.6-1.4 5.8'),
+    ],
+  },
+  scan: {
+    sf: 'faceid',
+    paths: [
+      stroke('M4 9V5a1 1 0 0 1 1-1h4'),
+      stroke('M15 4h4a1 1 0 0 1 1 1v4'),
+      stroke('M20 15v4a1 1 0 0 1-1 1h-4'),
+      stroke('M9 20H5a1 1 0 0 1-1-1v-4'),
+      stroke('M8.5 11.5c.8-1 2-1.5 3.5-1.5s2.7.5 3.5 1.5'),
+      stroke('M9 15c.8.7 1.8 1 3 1s2.2-.3 3-1'),
     ],
   },
   download: {

@@ -1,10 +1,12 @@
 import {useState} from 'react'
-import {View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
+import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleHostExtensionContribution, ModuleRecord} from '@/data/repositories/contracts'
 import {ModuleErrorBoundary} from '@/features/modules/runtime/module-error-boundary'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -23,7 +25,7 @@ export function ModuleExtensionContributions({
 }) {
   const allowed = record ? RECORD_CONTRIBUTION_KINDS : SURFACE_CONTRIBUTION_KINDS
   const visible = contributions.filter(contribution => allowed.has(contribution.contribution_kind))
-  const {spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const [isPresented, setIsPresented] = useState(false)
   if (!visible.length) return null
   return (
@@ -31,6 +33,7 @@ export function ModuleExtensionContributions({
       <ModulaButton
         label={visible.length === 1 ? 'Tools' : `Tools · ${visible.length}`}
         role="secondary"
+        size="compact"
         accessibilityLabel={`${visible.length} installed product ${visible.length === 1 ? 'tool' : 'tools'}`}
         onPress={() => setIsPresented(true)}
         testID={record ? 'record-tools-button' : 'module-tools-button'}
@@ -49,7 +52,7 @@ export function ModuleExtensionContributions({
           </View>
         )}
         testID={record ? 'record-tools-sheet' : 'module-tools-sheet'}>
-        <View style={{gap: spacing[2]}}>
+        <View style={[styles.rows, {borderColor: colours.separator}]}>
           {visible.map(contribution => (
             <ModuleErrorBoundary
               key={contribution.contribution_registration_id}
@@ -65,7 +68,7 @@ export function ModuleExtensionContributions({
 
 function ContributionAction({moduleId, contribution, record}: {moduleId: string; contribution: ModuleHostExtensionContribution; record?: ModuleRecord}) {
   const {moduleRepository} = useAppServices()
-  const {spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   const [pending, setPending] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
   const title = contribution.declaration.title || contribution.contribution_id
@@ -94,16 +97,36 @@ function ContributionAction({moduleId, contribution, record}: {moduleId: string;
   }
 
   return (
-    <View style={{gap: spacing[1]}}>
-      <ModulaButton
-        fullWidth
-        label={title}
-        role="secondary"
-        loading={pending}
+    <View>
+      <AppPressable
         accessibilityLabel={`${title} from ${contribution.extension_product_id}`}
+        accessibilityState={{disabled: pending}}
+        disabled={pending}
         onPress={() => void invoke()}
-      />
-      {failure ? <AppText variant="micro" colour="destructive" accessibilityLiveRegion="polite">{failure}</AppText> : null}
+        style={[
+          styles.row,
+          {
+            borderBottomColor: colours.separator,
+            gap: spacing[3],
+            minHeight: controls.listRow.minimum,
+            paddingHorizontal: spacing[2],
+          },
+        ]}>
+        <View style={{flex: 1, gap: spacing[1]}}>
+          <AppText variant="body">{pending ? `${title}…` : title}</AppText>
+          <AppText variant="caption" colour="textSecondary">Installed product tool</AppText>
+        </View>
+        <ModulaIcon name="chevronRight" size={controls.iconSize.status} colour={colours.textTertiary} />
+      </AppPressable>
+      {failure ? (
+        <AppText
+          variant="caption"
+          colour="destructive"
+          accessibilityLiveRegion="polite"
+          style={{paddingHorizontal: spacing[2], paddingVertical: spacing[2]}}>
+          {failure}
+        </AppText>
+      ) : null}
     </View>
   )
 }
@@ -111,3 +134,12 @@ function ContributionAction({moduleId, contribution, record}: {moduleId: string;
 function UnavailableContribution({contribution}: {contribution: ModuleHostExtensionContribution}) {
   return <AppText variant="caption" colour="textSecondary">{contribution.declaration.title || contribution.contribution_id} unavailable</AppText>
 }
+
+const styles = StyleSheet.create({
+  row: {
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+  },
+  rows: {borderTopWidth: StyleSheet.hairlineWidth},
+})

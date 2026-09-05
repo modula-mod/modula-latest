@@ -1,13 +1,13 @@
 import {useState} from 'react'
 import {StyleSheet, TextInput, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 import {AppButton} from '@/components/primitives/AppButton'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useAppLock} from '@/features/security/app-lock/app-lock-context'
 import {APP_LOCK_ACCENT} from '@/features/security/app-lock/types'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type Props = {
@@ -64,7 +64,7 @@ export function UnlockPasswordScreen({
         },
       ]}>
       <View style={styles.header}>
-        <Ionicons name="lock-closed-outline" size={36} color={APP_LOCK_ACCENT} />
+        <ModulaIcon name="privacy" size={36} colour={APP_LOCK_ACCENT} />
         <AppText variant="headline" style={styles.center}>
           {title}
         </AppText>
@@ -83,7 +83,7 @@ export function UnlockPasswordScreen({
             paddingHorizontal: spacing[4],
           },
         ]}>
-        <Ionicons name="lock-closed" size={18} color={colours.textTertiary} />
+        <ModulaIcon name="privacy" size={18} colour={colours.textTertiary} />
         <TextInput
           value={password}
           onChangeText={text => {
@@ -102,7 +102,7 @@ export function UnlockPasswordScreen({
         <AppPressable
           accessibilityLabel={visible ? 'Hide password' : 'Show password'}
           onPress={() => setVisible(v => !v)}>
-          <Ionicons name={visible ? 'eye-off-outline' : 'eye-outline'} size={20} color={colours.textSecondary} />
+          <ModulaIcon name={visible ? 'eyeOff' : 'eye'} size={20} colour={colours.textSecondary} />
         </AppPressable>
       </View>
 

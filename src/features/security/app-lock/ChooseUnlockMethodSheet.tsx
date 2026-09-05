@@ -1,4 +1,3 @@
-import Ionicons from '@expo/vector-icons/Ionicons'
 import {StyleSheet, View} from 'react-native'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
@@ -10,14 +9,15 @@ import {
   UNLOCK_METHOD_COPY,
   type UnlockMethod,
 } from '@/features/security/app-lock/types'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const METHOD_ICONS: Record<UnlockMethod, keyof typeof Ionicons.glyphMap> = {
-  pin: 'grid-outline',
-  password: 'lock-closed-outline',
-  pattern: 'git-network-outline',
-  biometric: 'finger-print-outline',
+const METHOD_ICONS: Record<UnlockMethod, ModulaIconName> = {
+  pin: 'board',
+  password: 'privacy',
+  pattern: 'integrations',
+  biometric: 'fingerprint',
 }
 
 type Props = {
@@ -72,10 +72,10 @@ export function ChooseUnlockMethodSheet({
                   opacity: disabled ? 0.45 : 1,
                 },
               ]}>
-              <Ionicons
+              <ModulaIcon
                 name={METHOD_ICONS[method]}
                 size={22}
-                color={selected ? APP_LOCK_ACCENT : colours.textSecondary}
+                colour={selected ? APP_LOCK_ACCENT : colours.textSecondary}
               />
               <View style={styles.textCol}>
                 <AppText

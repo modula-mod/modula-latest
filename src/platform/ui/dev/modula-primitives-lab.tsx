@@ -42,12 +42,15 @@ import {
 } from '@/features/modules/state/productHubSearchMachine'
 import {StoryRingAvatar} from '@/platform/ui/avatars/StoryRingAvatar'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
 import {ModulaOTPField} from '@/platform/ui/controls/modula-otp-field'
 import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+import {ModulaSelectField} from '@/platform/ui/controls/modula-select-field'
 import {ModulaSecureField} from '@/platform/ui/controls/modula-secure-field'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
+import {ModulaTagInput} from '@/platform/ui/controls/modula-tag-input'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
@@ -58,6 +61,14 @@ import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {
+  SettingsDestructiveRow,
+  SettingsInfoRow,
+  SettingsLinkRow,
+  SettingsMenuRow,
+  SettingsSection,
+  SettingsToggleRow,
+} from '@/features/settings/components/SettingsRows'
 
 const SAMPLE_MODULE: ModuleCatalogueItem = {
   moduleId: 'digital.modula.vault-notes',
@@ -233,6 +244,10 @@ export function ModulaPrimitivesLabScreen({
   const [secure, setSecure] = useState('secret-value')
   const [otp, setOtp] = useState('')
   const [query, setQuery] = useState('')
+  const [fieldValue, setFieldValue] = useState('Ada')
+  const [multilineValue, setMultilineValue] = useState('A field that expands with content and system text size.')
+  const [selectValue, setSelectValue] = useState<string | undefined>('personal')
+  const [tags, setTags] = useState(['modula', 'design'])
   const [enabled, setEnabled] = useState(true)
   const [popover, setPopover] = useState(false)
   const [sheet, setSheet] = useState(false)
@@ -299,15 +314,23 @@ export function ModulaPrimitivesLabScreen({
       </LabBlock>
 
       <LabBlock title="Buttons">
-        <ModulaButton label="Primary" onPress={() => undefined} />
-        <ModulaButton label="Secondary" role="secondary" onPress={() => undefined} />
-        <ModulaButton label="Destructive" role="destructive" onPress={() => undefined} />
+        <View style={styles.wrapRow}>
+          <ModulaIconButton icon="share" accessibilityLabel="Icon button" chrome="bordered" onPress={() => undefined} />
+          <ModulaButton label="Compact" size="compact" role="secondary" onPress={() => undefined} />
+          <ModulaButton label="Regular" size="regular" role="secondary" onPress={() => undefined} />
+          <ModulaButton label="Primary" size="prominent" onPress={() => undefined} />
+          <ModulaButton label="Secondary" role="secondary" onPress={() => undefined} />
+          <ModulaButton label="Quiet" role="quiet" onPress={() => undefined} />
+          <ModulaButton label="Destructive" role="destructive" onPress={() => undefined} />
+          <ModulaButton label="Disabled" disabled onPress={() => undefined} />
+          <ModulaButton label="Loading" loading onPress={() => undefined} />
+        </View>
       </LabBlock>
 
       <LabBlock title="Toolbar chrome">
         <AppText variant="caption" colour="textSecondary">
-          Global back is ModulaBackButton. Overlay glass is extraLarge (Expo UI).
-          Trailing share + overflow is the Home-sized glass capsule (44pt, 22pt gap).
+          Global back is ModulaBackButton. Painted controls stay compact inside
+          44pt targets. Share and overflow have distinct adjacent tap regions.
         </AppText>
         <View style={styles.row}>
           <ModulaBackButton onPress={() => undefined} />
@@ -377,9 +400,50 @@ export function ModulaPrimitivesLabScreen({
       </LabBlock>
 
       <LabBlock title="Fields">
-        <ModulaFieldShell label="Name" support="Used on your profile.">
-          <ModulaTextInput value="Ada" onChangeText={() => undefined} />
+        <ModulaFieldShell label="Text" support="Used on your profile.">
+          <ModulaTextInput value={fieldValue} onChangeText={setFieldValue} />
         </ModulaFieldShell>
+        <ModulaFieldShell label="Multiline">
+          <ModulaTextInput multiline value={multilineValue} onChangeText={setMultilineValue} />
+        </ModulaFieldShell>
+        <ModulaFieldShell label="Select">
+          <ModulaSelectField
+            accessibilityLabel="Folder"
+            value={selectValue}
+            onChange={setSelectValue}
+            options={[
+              {value: 'personal', label: 'Personal'},
+              {value: 'work', label: 'Work'},
+            ]}
+          />
+        </ModulaFieldShell>
+        <ModulaFieldShell label="Tags">
+          <ModulaTagInput value={tags} onChange={setTags} />
+        </ModulaFieldShell>
+        <ModulaFieldShell label="Search">
+          <ModulaSearchField value={query} onChangeText={setQuery} placeholder="Search" />
+        </ModulaFieldShell>
+        <ModulaFieldShell label="Error" error="A concise field-level error.">
+          <ModulaTextInput value="" onChangeText={() => undefined} style={{borderColor: colours.destructive}} />
+        </ModulaFieldShell>
+        <ModulaFieldShell label="Disabled">
+          <ModulaTextInput value="Unavailable" editable={false} onChangeText={() => undefined} />
+        </ModulaFieldShell>
+      </LabBlock>
+
+      <LabBlock title="Settings rows">
+        <SettingsSection footer="Grouped rows share one surface and expand with larger text.">
+          <SettingsInfoRow icon="account" label="Icon row" value="Value" />
+          <SettingsToggleRow label="Switch row" value={enabled} onValueChange={setEnabled} />
+          <SettingsLinkRow row={{title: 'Navigation row', value: 'Detail', onPress: () => undefined}} />
+          <SettingsMenuRow
+            label="Picker row"
+            value="System"
+            actions={[{id: 'system', label: 'System'}, {id: 'light', label: 'Light'}]}
+            onAction={() => undefined}
+          />
+          <SettingsDestructiveRow label="Destructive row" onPress={() => undefined} last />
+        </SettingsSection>
       </LabBlock>
 
       <LabBlock title="OTP">
@@ -681,4 +745,5 @@ const styles = StyleSheet.create({
   heroSpecimenOverview: {paddingBottom: 20},
   row: {flexDirection: 'row', gap: 16},
   stickyPreview: {height: 72, position: 'relative'},
+  wrapRow: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 8},
 })

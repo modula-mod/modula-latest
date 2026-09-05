@@ -30,7 +30,7 @@ export function ModulaFieldShell({
   const {colours, spacing} = useThemeTokens()
 
   return (
-    <View style={[styles.root, {gap: spacing[1]}, style]} testID={testID}>
+    <View style={[styles.root, {gap: spacing[2]}, style]} testID={testID}>
       {label ? (
         <AppText variant="label" colour="textSecondary">
           {label}

@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {FlatList, ScrollView, Share, StyleSheet, TextInput, View} from 'react-native'
+import {FlatList, ScrollView, Share, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import type {
   GreenfieldModuleAction,
@@ -19,6 +19,7 @@ import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-rende
 import {primaryActionFor} from '@/features/modules/runtime/module-action-runner'
 import {resolveRuntimeActionRoute, shapeMpsActionInput} from '@/features/modules/runtime/mps-frontend-adapter'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -26,10 +27,11 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionContributions = []}: {moduleId: string; view: ModuleRuntimeView; aiActions?: ModuleAIProductActionDefinition[]; extensionContributions?: ModuleHostExtensionContribution[]}) {
   const router = useRouter()
   const {moduleRepository} = useAppServices()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
   const [pendingActionId, setPendingActionId] = useState<string | null>(null)
   const [actionFeedback, setActionFeedback] = useState<{kind: 'error' | 'success'; message: string} | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const collection = view.collection ?? view.query?.collection ?? ''
   const recordsQuery = useModuleRecordsQuery(moduleId, view.kind === 'collection' ? collection : '', {
     q: query || undefined,
@@ -61,7 +63,15 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       : {source: 'none', values: {}}
   const [editedDraft, setEditedDraft] = useState<{source: string; values: Record<string, unknown>}>({source: '', values: {}})
   const draft = editedDraft.source === sourceDraft.source ? editedDraft.values : sourceDraft.values
-  const updateDraftField = (name: string, value: unknown) => setEditedDraft({source: sourceDraft.source, values: {...draft, [name]: value}})
+  const updateDraftField = (name: string, value: unknown) => {
+    setEditedDraft({source: sourceDraft.source, values: {...draft, [name]: value}})
+    setFieldErrors(current => {
+      if (!current[name]) return current
+      const next = {...current}
+      delete next[name]
+      return next
+    })
+  }
 
   const completeAction = (action: GreenfieldModuleAction) => {
     if (action.successDestination.kind === 'dismiss') {
@@ -78,6 +88,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
 
   const runAction = async (action: GreenfieldModuleAction, input: Record<string, unknown> = {}) => {
     setActionFeedback(null)
+    setFieldErrors({})
     setPendingActionId(action.actionId)
     try {
       if (action.confirmationPolicy === 'confirm' || action.confirmationPolicy === 'confirmDestructive' || action.confirmationPolicy === 'recentAuth') {
@@ -93,7 +104,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       const shaped = shapeMpsActionInput(action, input)
       const validationError = validateActionInput(action, shaped)
       if (validationError) {
-        setActionFeedback({kind: 'error', message: validationError})
+        setFieldErrors({[validationError.fieldName]: validationError.message})
         return
       }
       const recordIdField = action.target?.recordIdField ?? 'recordId'
@@ -155,15 +166,22 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
       <ScrollView contentContainerStyle={{gap: spacing[4]}} keyboardShouldPersistTaps="handled">
         <AppText variant="display">{view.title}</AppText>
         {fields.map(field => (
-          <ModuleFieldRenderer key={field.fieldId} field={field} value={draft[field.name]} onChange={value => updateDraftField(field.name, value)} />
+          <ModuleFieldRenderer
+            key={field.fieldId}
+            moduleId={moduleId}
+            field={field}
+            value={draft[field.name]}
+            error={fieldErrors[field.name]}
+            onChange={value => updateDraftField(field.name, value)}
+          />
         ))}
         <ActionFeedback feedback={actionFeedback} />
         {settingsAction ? (
           <ModulaButton
-            fullWidth
             label={settingsAction.label}
             loading={pendingActionId === settingsAction.actionId}
             onPress={() => { void runAction(settingsAction, draft) }}
+            size="prominent"
             testID="module-settings-submit"
           />
         ) : null}
@@ -190,7 +208,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
     <View style={{gap: spacing[4]}}>
       <View style={{gap: spacing[3]}}>
         <View style={[styles.headingRow, {gap: spacing[3]}]}>
-          <AppText variant="display" style={styles.heading}>{view.title}</AppText>
+          <AppText variant="title1" style={styles.heading}>{view.title}</AppText>
         <ModuleActionBar
           actions={view.toolbar ?? []}
           onAction={action => { void runAction(action) }}
@@ -198,49 +216,41 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
         </View>
         <ModuleExtensionContributions moduleId={moduleId} contributions={extensionContributions} />
         {view.kind === 'collection' && view.searchEnabled ? (
-          <View
-            style={[
-              styles.search,
-              {
-                backgroundColor: colours.surface,
-                borderColor: colours.border,
-                borderRadius: radius.round,
-                paddingHorizontal: spacing[3],
-              },
-            ]}>
-            <TextInput
-              accessibilityLabel="Search module records"
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Search"
-              placeholderTextColor={colours.textTertiary}
-              style={{color: colours.text, flex: 1, minHeight: 44}}
-            />
-          </View>
+          <ModulaSearchField
+            accessibilityLabel="Search module records"
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search"
+            testID="module-record-search"
+          />
         ) : null}
         {view.kind !== 'form' ? <ActionFeedback feedback={actionFeedback} /> : null}
       </View>
 
       {view.kind === 'form' && recordQuery.isPending && view.recordBinding ? <AppText variant="caption" colour="textSecondary">Loading record.</AppText> : null}
       {view.kind === 'form' && fields.length ? (
-        <View style={[styles.panel, {backgroundColor: colours.surfaceRaised, borderColor: colours.border, borderRadius: radius.large, gap: spacing[3], padding: spacing[4]}]}>
+        <View style={[styles.form, {gap: spacing[4]}]}>
           {fields.map(field => (
             <ModuleFieldRenderer
               key={field.fieldId}
+              moduleId={moduleId}
               field={field}
               value={draft[field.name]}
+              error={fieldErrors[field.name]}
               onChange={value => updateDraftField(field.name, value)}
             />
           ))}
           <ActionFeedback feedback={actionFeedback} />
           {formAction ? (
-            <ModulaButton
-              fullWidth
-              label={formAction.label}
-              loading={pendingActionId === formAction.actionId}
-              onPress={() => { void runAction(formAction, draft) }}
-              testID="module-form-submit"
-            />
+            <View style={styles.formAction}>
+              <ModulaButton
+                label={formAction.label}
+                loading={pendingActionId === formAction.actionId}
+                onPress={() => { void runAction(formAction, draft) }}
+                size="prominent"
+                testID="module-form-submit"
+              />
+            </View>
           ) : null}
         </View>
       ) : null}
@@ -301,9 +311,14 @@ function ActionFeedback({feedback}: {feedback: {kind: 'error' | 'success'; messa
   )
 }
 
-function validateActionInput(action: GreenfieldModuleAction, input: Record<string, unknown>): string | null {
+function validateActionInput(
+  action: GreenfieldModuleAction,
+  input: Record<string, unknown>,
+): {fieldName: string; message: string} | null {
   const missing = action.inputSchema.fields?.find(field => field.required && isEmptyInput(input[field.name]))
-  return missing ? `${missing.label} is required.` : null
+  return missing
+    ? {fieldName: missing.name, message: `${missing.label} is required.`}
+    : null
 }
 
 function isEmptyInput(value: unknown): boolean {
@@ -329,7 +344,7 @@ function LayoutNode({
   const {colours, radius, spacing} = useThemeTokens()
   if (node.component === 'section') {
     return (
-      <View style={[styles.panel, {backgroundColor: colours.surface, borderColor: colours.border, borderRadius: radius.large, gap: spacing[2], padding: spacing[4]}]}>
+      <View style={[styles.section, {gap: spacing[2]}]}>
         {node.title ? <AppText variant="headline">{node.title}</AppText> : null}
         {node.text ? <AppText variant="caption" colour="textSecondary">{node.text}</AppText> : null}
         {node.children?.map(child => <LayoutNode key={child.id} node={child} actions={actions} data={data} onAction={onAction} />)}
@@ -454,9 +469,7 @@ const styles = StyleSheet.create({
   },
   heading: {flex: 1, minWidth: 0},
   headingRow: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
-  panel: {borderWidth: StyleSheet.hairlineWidth},
-  search: {
-    borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 46,
-  },
+  form: {width: '100%'},
+  formAction: {alignItems: 'flex-end'},
+  section: {width: '100%'},
 })

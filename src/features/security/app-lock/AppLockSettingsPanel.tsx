@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import {Alert, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -23,13 +22,14 @@ import {
   SettingsSection,
   SettingsToggleRow,
 } from '@/features/settings/components/SettingsRows'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-const TILE_ICONS: Record<UnlockMethod, keyof typeof Ionicons.glyphMap> = {
-  pin: 'grid-outline',
-  password: 'lock-closed-outline',
-  pattern: 'git-network-outline',
-  biometric: 'finger-print-outline',
+const TILE_ICONS: Record<UnlockMethod, ModulaIconName> = {
+  pin: 'board',
+  password: 'privacy',
+  pattern: 'integrations',
+  biometric: 'fingerprint',
 }
 
 type SetupState =
@@ -245,10 +245,10 @@ export function AppLockSettingsPanel() {
                     opacity: disabled ? 0.4 : 1,
                   },
                 ]}>
-                <Ionicons
+                <ModulaIcon
                   name={TILE_ICONS[method]}
                   size={22}
-                  color={selected ? APP_LOCK_ACCENT : colours.textSecondary}
+                  colour={selected ? APP_LOCK_ACCENT : colours.textSecondary}
                 />
                 <AppText
                   variant="caption"

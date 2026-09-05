@@ -13,7 +13,7 @@ export type ProductMetadataItem = {
 export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
   const {colours, radius} = useThemeTokens()
   const {fontScale, width} = useWindowDimensions()
-  const scrollable = fontScale > 1.15 || width < 390
+  const scrollable = fontScale > 1.15 || width < items.length * 92
   const content = items.map((item, index) => (
     <View
       key={item.id}

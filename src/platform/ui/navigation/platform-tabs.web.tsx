@@ -162,13 +162,13 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
             ) : (
               <AppIcon
                 name={webIcons[route.name] ?? 'home'}
-                colour={focused ? colours.accent : colours.textSecondary}
+                colour={focused ? colours.text : colours.textSecondary}
                 size={22}
               />
             )}
             <AppText
               variant="caption"
-              style={{color: focused ? colours.accent : colours.textSecondary}}>
+              style={{color: focused ? colours.text : colours.textSecondary}}>
               {label}
             </AppText>
           </AppPressable>
@@ -177,7 +177,7 @@ function WebTabRail({state, descriptors, navigation}: WebTabRailProps) {
 
       {rail ? (
         <View style={[styles.shortcuts, {gap: spacing[1], marginTop: spacing[3]}]}>
-          <AppText variant="micro" colour="textTertiary">
+          <AppText variant="micro" colour="textSecondary">
             MORE
           </AppText>
           {shortcuts.map(item => (

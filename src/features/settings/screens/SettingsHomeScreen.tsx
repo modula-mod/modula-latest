@@ -2,6 +2,10 @@ import {useState} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
+import {useSession} from '@/auth/runtime'
+import {AppPressable} from '@/components/primitives/AppPressable'
+import {AppText} from '@/components/primitives/AppText'
+import {Avatar} from '@/components/primitives/Avatar'
 import {
   matchesSettingsQuery,
   SettingsLinkRow,
@@ -12,6 +16,7 @@ import {
 import {PRODUCT_LAB_LINKS} from '@/features/product/data/productLabLinks'
 import {canAccessDeveloperLabs} from '@/lib/platform'
 import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -204,10 +209,12 @@ function labelMode(value: string): string {
 
 export function SettingsHomeScreen() {
   const {preferences} = useAppearance()
-  const {colours, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const [query, setQuery] = useState('')
   const router = useRouter()
+  const session = useSession()
+  const profile = session.status === 'signedIn' ? session.profile : null
 
   const appearanceValue = `${labelMode(preferences.mode)}`
   const accessibilityValue = textScaleLabel(preferences.textScalePreference)
@@ -271,6 +278,37 @@ export function SettingsHomeScreen() {
             paddingBottom: tabPadding + spacing[6],
           }}
           keyboardShouldPersistTaps="handled">
+          <AppPressable
+            accessibilityLabel={profile ? `Open profile for ${profile.displayName}` : 'Sign in to Modula'}
+            onPress={() => router.push((profile ? '/profile/edit' : '/sign-in') as Href)}
+            style={[
+              styles.accountSummary,
+              {
+                backgroundColor: colours.surface,
+                borderRadius: radius.medium,
+                gap: spacing[3],
+                minHeight: controls.listRow.minimum,
+                paddingHorizontal: spacing[4],
+                paddingVertical: spacing[3],
+              },
+            ]}>
+            <Avatar
+              name={profile?.displayName ?? 'Guest'}
+              uri={profile?.avatarUri}
+              colour={profile?.coverColour}
+              size={44}
+            />
+            <View style={styles.accountCopy}>
+              <AppText variant="headline" numberOfLines={1}>
+                {profile?.displayName ?? 'Guest profile'}
+              </AppText>
+              <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
+                {profile?.handle ? `@${profile.handle}` : 'Sign in to sync your profile and settings'}
+              </AppText>
+            </View>
+            <ModulaIcon name="chevronRight" size={controls.iconSize.status} colour={colours.textTertiary} />
+          </AppPressable>
+
           <ModulaSearchField
             value={query}
             onChangeText={setQuery}
@@ -301,6 +339,8 @@ export function SettingsHomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  accountCopy: {flex: 1, gap: 2, minWidth: 0},
+  accountSummary: {alignItems: 'center', flexDirection: 'row'},
   screen: {
     flex: 1,
   },

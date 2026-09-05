@@ -52,14 +52,14 @@ export function DrawerItem({item, onPress, selected = false, dense = false}: Dra
         ]}>
         <AppIcon
           name={item.icon}
-          colour={selected ? colours.accent : colours.textSecondary}
+          colour={selected ? colours.text : colours.textSecondary}
           size={dense ? 18 : 20}
         />
       </View>
       <View style={styles.body}>
         <AppText
           variant={dense ? 'body' : 'label'}
-          colour={selected ? 'accent' : 'text'}
+          colour="text"
           numberOfLines={1}>
           {item.label}
         </AppText>
@@ -71,7 +71,7 @@ export function DrawerItem({item, onPress, selected = false, dense = false}: Dra
       </View>
       <AppIcon
         name="chevronRight"
-        colour={selected ? colours.accent : colours.textTertiary}
+        colour={selected ? colours.text : colours.textTertiary}
         size={16}
       />
     </AppPressable>

@@ -1,4 +1,4 @@
-import {StyleSheet, type StyleProp, type ViewStyle} from 'react-native'
+import {StyleSheet, View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -12,6 +12,7 @@ type ModulaButtonProps = {
   disabled?: boolean
   loading?: boolean
   fullWidth?: boolean
+  size?: 'compact' | 'regular' | 'prominent'
   accessibilityLabel?: string
   style?: StyleProp<ViewStyle>
   testID?: string
@@ -25,12 +26,14 @@ export function ModulaButton({
   disabled = false,
   loading = false,
   fullWidth = false,
+  size,
   accessibilityLabel,
   style,
   testID,
 }: ModulaButtonProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const isDisabled = disabled || loading
+  const resolvedSize = size ?? (role === 'quiet' || role === 'plain' ? 'compact' : 'regular')
 
   const backgroundColor =
     role === 'primary'
@@ -57,35 +60,48 @@ export function ModulaButton({
       disabled={isDisabled}
       onPress={onPress}
       style={[
-        styles.base,
+        styles.target,
         {
-          backgroundColor,
-          borderColor,
-          borderRadius: radius.md,
-          paddingHorizontal: spacing[4],
-          paddingVertical: spacing[3],
           opacity: isDisabled ? 0.45 : 1,
-          minHeight: role === 'quiet' ? 40 : 48,
+          minHeight: controls.touchTarget.minimum,
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
           width: fullWidth ? '100%' : undefined,
         },
         style,
       ]}>
-      <AppText
-        variant="label"
-        style={{
-          color: labelColour,
-          textAlign: 'center',
-          fontWeight: role === 'quiet' ? '500' : '600',
-        }}>
-        {loading ? `${label}…` : label}
-      </AppText>
+      <View
+        style={[
+          styles.visual,
+          {
+            backgroundColor,
+            borderColor,
+            borderRadius: radius.md,
+            minHeight: controls.controlHeight[resolvedSize],
+            paddingHorizontal: resolvedSize === 'compact' ? spacing[3] : spacing[4],
+            paddingVertical: resolvedSize === 'compact' ? spacing[1] : spacing[2],
+            width: fullWidth ? '100%' : undefined,
+          },
+        ]}>
+        <AppText
+          variant="label"
+          style={{
+            color: labelColour,
+            textAlign: 'center',
+            fontWeight: role === 'quiet' ? '500' : '600',
+          }}>
+          {loading ? `${label}…` : label}
+        </AppText>
+      </View>
     </AppPressable>
   )
 }
 
 const styles = StyleSheet.create({
-  base: {
+  target: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  visual: {
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',

@@ -2,7 +2,8 @@ import type {ReactNode} from 'react'
 import {ScrollViewStyleReset, useServerDocumentContext} from 'expo-router/html'
 
 const registerServiceWorker = `
-if ('serviceWorker' in navigator) {
+const isLocalDevelopment = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+if ('serviceWorker' in navigator && !isLocalDevelopment) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .register('/service-worker.js', {scope: '/', updateViaCache: 'none'})

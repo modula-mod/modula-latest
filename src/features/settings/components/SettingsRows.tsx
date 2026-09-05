@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -143,7 +143,7 @@ export function SettingsScreen({
 
 export function SettingsCaption({children}: {children: ReactNode}) {
   return (
-    <AppText variant="footnote" colour="textTertiary">
+    <AppText variant="footnote" colour="textSecondary">
       {children}
     </AppText>
   )
@@ -160,7 +160,7 @@ export function SettingsHero({
   title: string
   body: string
 }) {
-  const {colours, spacing, radius, settingsIcons} = useThemeTokens()
+  const {colours, controls, spacing, radius, settingsIcons} = useThemeTokens()
   const domain = settingsIconDomain(icon, iconDomain)
   const token = settingsIcons[domain]
 
@@ -175,8 +175,8 @@ export function SettingsHero({
           backgroundColor: colours.surface,
           borderRadius: radius.medium,
           gap: spacing[3],
-          paddingHorizontal: spacing[5],
-          paddingVertical: spacing[6],
+          paddingHorizontal: spacing[4],
+          paddingVertical: spacing[3],
         },
       ]}>
       <View
@@ -184,19 +184,19 @@ export function SettingsHero({
         importantForAccessibility="no"
         style={[
           styles.heroTile,
-          {backgroundColor: token.background, borderRadius: radius.round},
+          {
+            backgroundColor: token.background,
+            borderRadius: radius.round,
+            height: controls.iconButton.regular,
+            width: controls.iconButton.regular,
+          },
         ]}>
-        <ModulaIcon name={icon} size={28} colour={token.foreground} />
+        <ModulaIcon name={icon} size={controls.iconSize.row} colour={token.foreground} />
       </View>
-      <AppText variant="heroTitle" style={styles.heroTitle}>
-        {title}
-      </AppText>
-      <AppText
-        variant="heroDescription"
-        colour="textSecondary"
-        style={styles.heroBody}>
-        {body}
-      </AppText>
+      <View style={styles.heroCopy}>
+        <AppText variant="headline">{title}</AppText>
+        <AppText variant="caption" colour="textSecondary">{body}</AppText>
+      </View>
     </View>
   )
 }
@@ -206,7 +206,7 @@ export function SettingsFooter({children}: {children: ReactNode}) {
   return (
     <AppText
       variant="footnote"
-      colour="textTertiary"
+      colour="textSecondary"
       style={{paddingHorizontal: spacing[4]}}>
       {children}
     </AppText>
@@ -220,7 +220,7 @@ export function SettingsIconTile({
   name: ModulaIconName
   domain?: SettingsIconDomain
 }) {
-  const {settingsIcons} = useThemeTokens()
+  const {controls, settingsIcons} = useThemeTokens()
   const token = settingsIcons[settingsIconDomain(name, domain)]
   return (
     <View
@@ -228,7 +228,11 @@ export function SettingsIconTile({
       importantForAccessibility="no"
       style={[
         styles.iconTile,
-        {backgroundColor: token.background},
+        {
+          backgroundColor: token.background,
+          height: controls.iconTile.small,
+          width: controls.iconTile.small,
+        },
       ]}>
       <ModulaIcon name={name} size={16} colour={token.foreground} />
     </View>
@@ -251,7 +255,7 @@ export function SettingsSection({
       {title ? (
         <AppText
           variant="sectionHeader"
-          colour="textTertiary"
+          colour="textSecondary"
           style={{
             letterSpacing: 0.6,
             paddingHorizontal: spacing[4],
@@ -286,9 +290,9 @@ function RowChrome({
   leading?: ReactNode
   children: ReactNode
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   return (
-    <View style={[styles.row, {paddingLeft: spacing[4]}]}>
+    <View style={[styles.row, {minHeight: controls.listRow.minimum, paddingLeft: spacing[4]}]}>
       {leading}
       <View
         style={[
@@ -299,6 +303,7 @@ function RowChrome({
             paddingRight: spacing[4],
             paddingVertical: spacing[3],
             gap: spacing[3],
+            minHeight: controls.listRow.minimum,
           },
         ]}>
         {children}
@@ -311,7 +316,7 @@ function TrailingValue({value}: {value: string}) {
   return (
     <AppText
       variant="rowTrailing"
-      colour="textTertiary"
+      colour="textSecondary"
       style={styles.trailing}>
       {value}
     </AppText>
@@ -343,18 +348,16 @@ export function SettingsLinkRow({
       ? `${row.title} — Preview`
       : row.title
   const value = row.comingSoon ? row.value ?? 'Coming Soon' : row.value
-  const accessibilityLabel = [
-    row.comingSoon ? `${row.title}, Coming Soon` : title,
-    value,
-  ]
-    .filter(Boolean)
-    .join(', ')
+  const accessibilityLabel = row.comingSoon
+    ? `${row.title}, Coming Soon`
+    : [title, value].filter(Boolean).join(', ')
 
   return (
     <AppPressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={row.comingSoon ? {disabled: true} : undefined}
+      disabled={row.comingSoon}
       onPress={() => {
         if (row.comingSoon) return
         if (row.onPress) {
@@ -379,7 +382,7 @@ export function SettingsLinkRow({
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{title}</AppText>
           {row.description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {row.description}
             </AppText>
           ) : null}
@@ -411,9 +414,13 @@ export function SettingsInfoRow({
   const stacked = fontScale >= 1.6
   return (
     <View
-      accessible
-      accessibilityRole="text"
-      accessibilityLabel={[label, value, description].filter(Boolean).join(', ')}>
+      accessible={Platform.OS === 'web' ? undefined : true}
+      accessibilityRole={Platform.OS === 'web' ? undefined : 'text'}
+      accessibilityLabel={
+        Platform.OS === 'web'
+          ? undefined
+          : [label, value, description].filter(Boolean).join(', ')
+      }>
       <RowChrome
         last={last}
         stacked={stacked}
@@ -421,7 +428,7 @@ export function SettingsInfoRow({
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{label}</AppText>
           {description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {description}
             </AppText>
           ) : null}
@@ -494,7 +501,7 @@ export function SettingsToggleRow({
         ) : null}
       </View>
       {accessibility.showSwitchLabels ? (
-        <AppText variant="micro" colour={value ? 'accent' : 'textTertiary'}>
+        <AppText variant="micro" colour={value ? 'accent' : 'textSecondary'}>
           {value ? 'On' : 'Off'}
         </AppText>
       ) : null}
@@ -620,7 +627,7 @@ export function SettingsDestructiveRow({
             {label}
           </AppText>
           {description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {description}
             </AppText>
           ) : null}
@@ -703,25 +710,17 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
+    flexDirection: 'row',
   },
-  heroBody: {
-    textAlign: 'center',
-  },
+  heroCopy: {flex: 1, gap: 2, minWidth: 0},
   heroTile: {
     alignItems: 'center',
-    height: 52,
     justifyContent: 'center',
-    width: 52,
-  },
-  heroTitle: {
-    textAlign: 'center',
   },
   iconTile: {
     alignItems: 'center',
     borderRadius: 7,
-    height: 29,
     justifyContent: 'center',
-    width: 29,
   },
   list: {
     overflow: 'hidden',
@@ -729,7 +728,6 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 52,
     width: '100%',
   },
   rowBody: {
@@ -737,14 +735,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     flex: 1,
     flexDirection: 'row',
-    minHeight: 52,
   },
   rowBodyStacked: {
     alignItems: 'flex-start',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flex: 1,
     flexDirection: 'row',
-    minHeight: 52,
   },
   rowText: {
     flex: 1,

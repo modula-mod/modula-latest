@@ -24,6 +24,7 @@ import {useSession} from '@/auth/runtime'
 import {useAppServices} from '@/runtime/useAppServices'
 import {validateCustomAccent} from '@/theme/accents'
 import {DEFAULT_APPEARANCE_PREFERENCES} from '@/theme/data/defaults'
+import {controls} from '@/theme/foundations/controls'
 import {inverted} from '@/theme/foundations/inverted'
 import {radius} from '@/theme/foundations/radius'
 import {spacing} from '@/theme/foundations/spacing'
@@ -59,6 +60,7 @@ function createTokenSet(
     scheme: resolved.isDark ? 'dark' : 'light',
     spacing,
     radius,
+    controls,
     inverted,
     material: resolved.materials.card,
     colours: {
