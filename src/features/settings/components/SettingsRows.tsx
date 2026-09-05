@@ -348,18 +348,16 @@ export function SettingsLinkRow({
       ? `${row.title} — Preview`
       : row.title
   const value = row.comingSoon ? row.value ?? 'Coming Soon' : row.value
-  const accessibilityLabel = [
-    row.comingSoon ? `${row.title}, Coming Soon` : title,
-    value,
-  ]
-    .filter(Boolean)
-    .join(', ')
+  const accessibilityLabel = row.comingSoon
+    ? `${row.title}, Coming Soon`
+    : [title, value].filter(Boolean).join(', ')
 
   return (
     <AppPressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={row.comingSoon ? {disabled: true} : undefined}
+      disabled={row.comingSoon}
       onPress={() => {
         if (row.comingSoon) return
         if (row.onPress) {
