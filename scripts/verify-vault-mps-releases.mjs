@@ -10,12 +10,12 @@ const products = [
   {
     root: resolve(process.env.MODULA_VAULT_NOTES_ROOT ?? '/root/modula-mod/modula-vault-notes'),
     productId: 'digital.modula.vault-notes',
-    version: '1.6.0',
-    tag: 'vault-notes-v1.6.0',
-    commit: '30f73030c32f9ab49f96fe89f22d28a1320d2ad1',
-    packageSha256: 'e44daa477920baf0293d27dfe4082844ba47dc91887bb4dc932bff5868334d27',
+    version: '1.7.0',
+    tag: 'vault-notes-v1.7.0',
+    commit: '106b57d40a456e2812e9b3a6e9f3bb32fb15e11d',
+    packageSha256: 'b3beb063b7464462d700ab12cc7a2c2c206aa7f05379fb750a9a54ba2c316ac0',
     frontendMode: 'declarative',
-    frontendSha256: '56251e8c5aaa28c3db0a74c38700df1adc7c68d287cf98de4a2bb9dc3066d9f7',
+    frontendSha256: '4af252f64b8b55d18d10c827f1c998845256b985cfa664326284107871595d7d',
   },
   {
     root: resolve(process.env.MODULA_VAULT_FORMATTING_ROOT ?? '/root/modula-mod/modula-vault-formatting'),
