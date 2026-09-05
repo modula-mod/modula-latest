@@ -16,7 +16,7 @@ import {ModuleActionBar} from '@/features/modules/runtime/module-action-bar'
 import {ModuleEmptyState} from '@/features/modules/runtime/module-empty-state'
 import {ModuleExtensionContributions} from '@/features/modules/runtime/module-extension-contributions'
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
-import {primaryActionFor} from '@/features/modules/runtime/module-action-runner'
+import {mutationCollectionFor, primaryActionFor} from '@/features/modules/runtime/module-action-runner'
 import {resolveRuntimeActionRoute, shapeMpsActionInput} from '@/features/modules/runtime/mps-frontend-adapter'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
@@ -32,7 +32,7 @@ export function ModuleViewRenderer({moduleId, view, aiActions = [], extensionCon
   const [pendingActionId, setPendingActionId] = useState<string | null>(null)
   const [actionFeedback, setActionFeedback] = useState<{kind: 'error' | 'success'; message: string} | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const collection = view.collection ?? view.query?.collection ?? ''
+  const collection = mutationCollectionFor(view)
   const recordsQuery = useModuleRecordsQuery(moduleId, view.kind === 'collection' ? collection : '', {
     q: query || undefined,
     sort: 'updatedAt',

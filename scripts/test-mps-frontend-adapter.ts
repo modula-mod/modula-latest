@@ -4,6 +4,7 @@ import {dirname, join, resolve} from 'node:path'
 import {fileURLToPath} from 'node:url'
 
 import type {MpsFrontendArtifact} from '@/data/repositories/contracts'
+import {mutationCollectionFor} from '@/features/modules/runtime/module-action-runner'
 import {
   adaptMpsFrontendView,
   resolveMpsFrontendRoute,
@@ -38,6 +39,8 @@ const editor = adaptMpsFrontendView({frontend, resolved: editorRoute})
 assert.equal(editor.title, 'New Note')
 const create = editor.allowedActions?.find(action => action.actionId === 'createNote')
 assert(create, 'create action is projected')
+assert.equal(create.target?.collection, 'note')
+assert.equal(mutationCollectionFor(editor), 'note', 'form-only views bind mutations from their action target')
 assert.equal(editor.allowedActions?.some(action => action.actionId === 'updateNote'), false)
 assert.deepEqual(create.successDestination, {kind: 'dismiss'})
 assert.equal(editor.layout.length, 0, 'form controls are rendered once by the generic form host')
@@ -136,6 +139,7 @@ if (vaultRoot) {
   ])
   const vaultCreate = vaultEditor.allowedActions?.find(action => action.actionId === 'createNote')
   assert(vaultCreate, 'Vault Notes create action is product-owned')
+  assert.equal(mutationCollectionFor(vaultEditor), 'note', 'Vault Notes form-only create targets its record collection')
   assert.deepEqual(vaultCreate.successDestination, {kind: 'dismiss'})
   assert.equal(vaultEditor.layout.length, 0, 'Vault Notes form controls are not duplicated as layout cards')
   const vaultInput = shapeMpsActionInput(vaultCreate, {title: 'Owned by Vault Notes', document: richTextDocumentFromText('Indexed safely')})
