@@ -20,6 +20,7 @@ export default function Root({children}: {children: ReactNode}) {
     <html lang="en" {...htmlAttributes}>
       <head>
         <meta charSet="utf-8" />
+        <title>Modula</title>
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta
           name="viewport"

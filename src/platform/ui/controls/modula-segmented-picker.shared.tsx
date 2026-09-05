@@ -66,7 +66,7 @@ export function ModulaSegmentedPicker({
     return (
       <AppPressable
         key={option.value}
-        accessibilityRole="button"
+        accessibilityRole="tab"
         accessibilityState={{selected, disabled: !!option.disabled}}
         accessibilityLabel={option.label}
         disabled={option.disabled}
