@@ -13,9 +13,8 @@ import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 /**
  * Shared SwiftUI modifiers for toolbar icons.
  *
- * Overlay glass uses extraLarge (Expo UI glass circle example) so back / share
- * read as App Store controls. Glyphs inside a ControlGroup or header capsule
- * stay plain — the group/capsule is the glass, not a second disc.
+ * Overlay glass uses the regular native size. The outer Host preserves the
+ * 44pt target; the painted control should not compete with the title.
  */
 export function toolbarIconModifiers(
   chrome: ToolbarChrome,
@@ -29,7 +28,7 @@ export function toolbarIconModifiers(
     buttonStyle(styleName),
     labelStyle('iconOnly'),
     buttonBorderShape('circle'),
-    controlSize('extraLarge'),
+    controlSize('regular'),
   ]
 }
 

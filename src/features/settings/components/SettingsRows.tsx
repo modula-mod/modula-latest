@@ -160,7 +160,7 @@ export function SettingsHero({
   title: string
   body: string
 }) {
-  const {colours, spacing, radius, settingsIcons} = useThemeTokens()
+  const {colours, controls, spacing, radius, settingsIcons} = useThemeTokens()
   const domain = settingsIconDomain(icon, iconDomain)
   const token = settingsIcons[domain]
 
@@ -175,8 +175,8 @@ export function SettingsHero({
           backgroundColor: colours.surface,
           borderRadius: radius.medium,
           gap: spacing[3],
-          paddingHorizontal: spacing[5],
-          paddingVertical: spacing[6],
+          paddingHorizontal: spacing[4],
+          paddingVertical: spacing[3],
         },
       ]}>
       <View
@@ -184,19 +184,19 @@ export function SettingsHero({
         importantForAccessibility="no"
         style={[
           styles.heroTile,
-          {backgroundColor: token.background, borderRadius: radius.round},
+          {
+            backgroundColor: token.background,
+            borderRadius: radius.round,
+            height: controls.iconButton.regular,
+            width: controls.iconButton.regular,
+          },
         ]}>
-        <ModulaIcon name={icon} size={28} colour={token.foreground} />
+        <ModulaIcon name={icon} size={controls.iconSize.row} colour={token.foreground} />
       </View>
-      <AppText variant="heroTitle" style={styles.heroTitle}>
-        {title}
-      </AppText>
-      <AppText
-        variant="heroDescription"
-        colour="textSecondary"
-        style={styles.heroBody}>
-        {body}
-      </AppText>
+      <View style={styles.heroCopy}>
+        <AppText variant="headline">{title}</AppText>
+        <AppText variant="caption" colour="textSecondary">{body}</AppText>
+      </View>
     </View>
   )
 }
@@ -220,7 +220,7 @@ export function SettingsIconTile({
   name: ModulaIconName
   domain?: SettingsIconDomain
 }) {
-  const {settingsIcons} = useThemeTokens()
+  const {controls, settingsIcons} = useThemeTokens()
   const token = settingsIcons[settingsIconDomain(name, domain)]
   return (
     <View
@@ -228,7 +228,11 @@ export function SettingsIconTile({
       importantForAccessibility="no"
       style={[
         styles.iconTile,
-        {backgroundColor: token.background},
+        {
+          backgroundColor: token.background,
+          height: controls.iconTile.small,
+          width: controls.iconTile.small,
+        },
       ]}>
       <ModulaIcon name={name} size={16} colour={token.foreground} />
     </View>
@@ -286,9 +290,9 @@ function RowChrome({
   leading?: ReactNode
   children: ReactNode
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   return (
-    <View style={[styles.row, {paddingLeft: spacing[4]}]}>
+    <View style={[styles.row, {minHeight: controls.listRow.minimum, paddingLeft: spacing[4]}]}>
       {leading}
       <View
         style={[
@@ -299,6 +303,7 @@ function RowChrome({
             paddingRight: spacing[4],
             paddingVertical: spacing[3],
             gap: spacing[3],
+            minHeight: controls.listRow.minimum,
           },
         ]}>
         {children}
@@ -703,25 +708,17 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
+    flexDirection: 'row',
   },
-  heroBody: {
-    textAlign: 'center',
-  },
+  heroCopy: {flex: 1, gap: 2, minWidth: 0},
   heroTile: {
     alignItems: 'center',
-    height: 52,
     justifyContent: 'center',
-    width: 52,
-  },
-  heroTitle: {
-    textAlign: 'center',
   },
   iconTile: {
     alignItems: 'center',
     borderRadius: 7,
-    height: 29,
     justifyContent: 'center',
-    width: 29,
   },
   list: {
     overflow: 'hidden',
@@ -729,7 +726,6 @@ const styles = StyleSheet.create({
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 52,
     width: '100%',
   },
   rowBody: {
@@ -737,14 +733,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     flex: 1,
     flexDirection: 'row',
-    minHeight: 52,
   },
   rowBodyStacked: {
     alignItems: 'flex-start',
     borderBottomWidth: StyleSheet.hairlineWidth,
     flex: 1,
     flexDirection: 'row',
-    minHeight: 52,
   },
   rowText: {
     flex: 1,

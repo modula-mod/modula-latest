@@ -1,11 +1,11 @@
 import {StyleSheet, View} from 'react-native'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ReactionType, SocialPost} from '@/domain/social'
 import {formatCompactCount} from '@/features/social/posts/types/post'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -26,7 +26,7 @@ function InlineAction({
   onPress,
 }: {
   label: string
-  icon: AppIconName
+  icon: ModulaIconName
   count?: number
   selected?: boolean
   onPress: () => void
@@ -41,7 +41,7 @@ function InlineAction({
       accessibilityState={{selected}}
       onPress={onPress}
       style={[styles.action, {gap: spacing[1], minWidth: 44, minHeight: 44}]}>
-      <AppIcon name={icon} colour={ink} size={20} />
+      <ModulaIcon name={icon} colour={ink} size={20} />
       {typeof count === 'number' && count > 0 ? (
         <AppText variant="caption" style={{color: ink}}>
           {formatCompactCount(count)}
@@ -121,7 +121,7 @@ export function PostInlineActions({
           })
         }}
         style={[styles.action, {minWidth: 44, minHeight: 44}]}>
-        <AppIcon name="more" colour={colours.textSecondary} size={20} />
+        <ModulaIcon name="more" colour={colours.textSecondary} size={20} />
       </AppPressable>
     </View>
   )

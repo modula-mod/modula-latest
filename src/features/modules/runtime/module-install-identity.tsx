@@ -26,24 +26,28 @@ export function ModuleInstallIdentity({
     router.push(`/marketplace/${encodeURIComponent(module.moduleId)}` as Href)
 
   return (
-    <View style={{gap: spacing[4], padding: spacing[4]}} testID="module-install-identity">
-      <ModuleArtwork moduleId={module.moduleId} name={module.name} size={120} variant="hero" />
+    <View style={{gap: spacing[3]}} testID="module-install-identity">
+      <ModuleArtwork moduleId={module.moduleId} name={module.name} size={88} variant="hero" />
       <ModuleArtworkTitle moduleId={module.moduleId} name={module.name} />
       <AppText variant="label">{presentation.customerStatus}</AppText>
-      <ModulaButton
-        label={presentation.primaryAction === 'Install' ? 'Install' : presentation.primaryAction}
-        accessibilityLabel={`${presentation.primaryAction} ${module.name}`}
-        disabled={!presentation.installable}
-        onPress={onInstall ?? openMarketplace}
-      />
-      {presentation.primaryAction === 'Install' ? (
+      <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
         <ModulaButton
-          label="Review on Product Hub"
-          role="secondary"
-          accessibilityLabel={`Review ${module.name} on Product Hub`}
-          onPress={openMarketplace}
+          label={presentation.primaryAction === 'Install' ? 'Install' : presentation.primaryAction}
+          accessibilityLabel={`${presentation.primaryAction} ${module.name}`}
+          disabled={!presentation.installable}
+          size="compact"
+          onPress={onInstall ?? openMarketplace}
         />
-      ) : null}
+        {presentation.primaryAction === 'Install' ? (
+          <ModulaButton
+            label="View in Product Hub"
+            role="quiet"
+            accessibilityLabel={`Review ${module.name} on Product Hub`}
+            size="compact"
+            onPress={openMarketplace}
+          />
+        ) : null}
+      </View>
     </View>
   )
 }

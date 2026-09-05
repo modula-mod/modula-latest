@@ -36,7 +36,7 @@ export function ModulaSearchField({
   style,
   testID,
 }: ModulaSearchFieldProps) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {accessibility, colours, controls, radius, spacing, typography} = useThemeTokens()
   const inputRef = useRef<RNTextInput>(null)
 
   return (
@@ -49,6 +49,7 @@ export function ModulaSearchField({
           borderRadius: radius.large,
           paddingHorizontal: spacing[3],
           gap: spacing[2],
+          minHeight: controls.inputHeight.search,
         },
         style,
       ]}>
@@ -65,8 +66,9 @@ export function ModulaSearchField({
         returnKeyType="search"
         accessibilityLabel={accessibilityLabel ?? placeholder}
         accessibilityRole="search"
+        allowFontScaling={accessibility.followSystemTextSize}
         testID={testID}
-        style={[styles.input, {color: colours.text}]}
+        style={[styles.input, {color: colours.text, ...typography.body}]}
       />
       {value.length > 0 ? (
         <Pressable
@@ -90,11 +92,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
-    minHeight: 44,
   },
   input: {
     flex: 1,
-    fontSize: 16,
     paddingVertical: 10,
   },
 })

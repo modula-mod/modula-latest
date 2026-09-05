@@ -1,15 +1,17 @@
 import {Button, Host} from '@expo/ui/swift-ui'
 import type {StyleProp, ViewStyle} from 'react-native'
 
-import type {AppIconName} from '@/components/primitives/AppIcon'
-import {sfSymbolForIcon} from '@/platform/ui/buttons/sf-symbol-for-icon'
+import {
+  modulaIconDefinition,
+  type ModulaIconName,
+} from '@/platform/ui/icons/modula-icon-registry'
 import {TOOLBAR_HIT, OVERLAY_GLASS_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers'
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
 type ModulaIconButtonProps = {
-  icon: AppIconName
+  icon: ModulaIconName
   accessibilityLabel: string
   onPress?: () => void
   disabled?: boolean
@@ -31,7 +33,7 @@ export function ModulaIconButton({
   style,
   testID,
 }: ModulaIconButtonProps) {
-  const systemImage = sfSymbolForIcon(icon)
+  const systemImage = modulaIconDefinition(icon).sf
   const glassOk =
     chrome === 'glass' &&
     (isNativeGlassRuntimeAvailable() || isCallstackLiquidGlassNativeAvailable())

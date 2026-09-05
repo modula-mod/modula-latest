@@ -7,7 +7,6 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {
@@ -17,6 +16,7 @@ import {
 import {useReduceMotion} from '@/lib/accessibility'
 import {selectionHaptic} from '@/lib/haptics'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type InspireNextListProps = {
@@ -46,7 +46,7 @@ export function InspireNextList({limit = 4, showSeeAll = true}: InspireNextListP
               <AppText variant="label" colour="accent">
                 See all
               </AppText>
-              <AppIcon name="chevronRight" colour={colours.accent} size={16} />
+              <ModulaIcon name="chevronRight" colour={colours.accent} size={16} />
             </AppPressable>
           ) : null}
         </View>
@@ -73,39 +73,40 @@ function InspireRow({item, index}: {item: InspireDestination; index: number}) {
 
   return (
     <SectionEnter delay={160 + index * 36}>
-      <AppPressable
-        accessibilityLabel={`Open ${item.title}`}
-        onPress={() => {
-          void selectionHaptic()
-          router.push(item.href as Href)
-        }}
+      <View
         style={[
           styles.row,
           {
-            backgroundColor: colours.surfaceRaised,
-            borderColor: colours.border,
-            borderRadius: radius.xlarge,
+            borderBottomColor: colours.separator,
             gap: spacing[3],
-            padding: spacing[3],
+            paddingVertical: spacing[2],
           },
         ]}>
-        <View
-          style={[
-            styles.thumb,
-            {backgroundColor: item.colour, borderRadius: radius.large},
-          ]}
-        />
-        <View style={styles.body}>
-          <AppText variant="label">{item.title}</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            {item.subtitle}
-          </AppText>
-          {item.highlights.map(line => (
-            <AppText key={line} variant="caption" colour="textTertiary" numberOfLines={1}>
-              · {line}
+        <AppPressable
+          accessibilityLabel={`Open ${item.title}`}
+          onPress={() => {
+            void selectionHaptic()
+            router.push(item.href as Href)
+          }}
+          style={[styles.identity, {gap: spacing[3]}]}>
+          <View
+            style={[
+              styles.thumb,
+              {backgroundColor: item.colour, borderRadius: radius.medium},
+            ]}
+          />
+          <View style={styles.body}>
+            <AppText variant="label">{item.title}</AppText>
+            <AppText variant="caption" colour="textSecondary">
+              {item.subtitle}
             </AppText>
-          ))}
-        </View>
+            {item.highlights.map(line => (
+              <AppText key={line} variant="caption" colour="textTertiary" numberOfLines={1}>
+                · {line}
+              </AppText>
+            ))}
+          </View>
+        </AppPressable>
         <AppPressable
           accessibilityLabel={saved ? `Unsave ${item.title}` : `Save ${item.title}`}
           accessibilityState={{selected: saved}}
@@ -122,14 +123,14 @@ function InspireRow({item, index}: {item: InspireDestination; index: number}) {
           }}
           style={styles.heartHit}>
           <Animated.View style={heartStyle}>
-            <AppIcon
+            <ModulaIcon
               name="bookmark"
               colour={saved ? colours.accent : colours.textTertiary}
               size={20}
             />
           </Animated.View>
         </AppPressable>
-      </AppPressable>
+      </View>
     </SectionEnter>
   )
 }
@@ -151,9 +152,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 44,
   },
+  identity: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    minWidth: 0,
+  },
   row: {
     alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
   },
   seeAll: {
@@ -163,7 +170,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   thumb: {
-    height: 56,
-    width: 56,
+    height: 48,
+    width: 48,
   },
 })

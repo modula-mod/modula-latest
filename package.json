@@ -255,6 +255,7 @@
     "verify:live-web-release": "node scripts/verify-phase7i-f5-auth-foundation.mjs live-web-release",
     "verify:mainline": "node scripts/verify-phase7i-f5-auth-foundation.mjs mainline",
     "verify:shell-ui-v1": "node scripts/shell-ui-v1-presentation.test.mjs && node scripts/shell-ui-v1-catalogue-state.test.mjs",
+    "verify:shell-ui-v2": "node scripts/verify-shell-ui-v2.mjs",
     "verify:phase7m-b8": "node scripts/verify-phase7m-b8.mjs",
     "verify:phase7m-b9": "node scripts/verify-phase7m-b9.mjs",
     "verify:phase7m-b10": "node scripts/verify-phase7m-b10.mjs",

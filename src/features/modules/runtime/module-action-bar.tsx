@@ -28,6 +28,7 @@ export function ModuleActionBar({
         <ModulaButton
           label={create.label}
           accessibilityLabel={create.label}
+          size="compact"
           onPress={() => onAction(create)}
         />
       ) : null}
@@ -41,6 +42,7 @@ export function ModuleActionBar({
           key={action.actionId}
           label={action.label}
           role={action.destructive ? 'destructive' : 'secondary'}
+          size="compact"
           onPress={() => onAction(action)}
         />
       ))}

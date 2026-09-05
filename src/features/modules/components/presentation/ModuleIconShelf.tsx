@@ -39,7 +39,7 @@ export function ModuleIconShelf({
               accessibilityLabel={`Open ${copy.name}`}
               onPress={() => onOpen(item.moduleId)}
               style={styles.item}>
-              <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={72} variant="icon" />
+              <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={64} variant="icon" />
               <AppText variant="productName" numberOfLines={2} style={styles.name}>
                 {copy.name}
               </AppText>
@@ -55,6 +55,6 @@ export function ModuleIconShelf({
 }
 
 const styles = StyleSheet.create({
-  item: {gap: 8, width: 108},
+  item: {gap: 8, width: 96},
   name: {minHeight: 40},
 })

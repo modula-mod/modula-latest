@@ -4,6 +4,11 @@ import {AccessibilityInfo} from 'react-native'
 import type {SystemAccessibilityState} from '@/theme/contracts'
 import {DEFAULT_SYSTEM_ACCESSIBILITY} from '@/theme/data/defaults'
 
+function readBoolean(method: undefined | (() => Promise<boolean>)): Promise<boolean> {
+  if (typeof method !== 'function') return Promise.resolve(false)
+  return method.call(AccessibilityInfo).catch(() => false)
+}
+
 async function readSystemAccessibility(): Promise<SystemAccessibilityState> {
   const [
     boldText,
@@ -15,14 +20,14 @@ async function readSystemAccessibility(): Promise<SystemAccessibilityState> {
     highTextContrast,
     darkerSystemColors,
   ] = await Promise.all([
-    AccessibilityInfo.isBoldTextEnabled().catch(() => false),
-    AccessibilityInfo.isReduceMotionEnabled().catch(() => false),
-    AccessibilityInfo.isReduceTransparencyEnabled().catch(() => false),
-    AccessibilityInfo.isScreenReaderEnabled().catch(() => false),
-    AccessibilityInfo.isGrayscaleEnabled().catch(() => false),
-    AccessibilityInfo.isInvertColorsEnabled().catch(() => false),
-    AccessibilityInfo.isHighTextContrastEnabled().catch(() => false),
-    AccessibilityInfo.isDarkerSystemColorsEnabled().catch(() => false),
+    readBoolean(AccessibilityInfo.isBoldTextEnabled),
+    readBoolean(AccessibilityInfo.isReduceMotionEnabled),
+    readBoolean(AccessibilityInfo.isReduceTransparencyEnabled),
+    readBoolean(AccessibilityInfo.isScreenReaderEnabled),
+    readBoolean(AccessibilityInfo.isGrayscaleEnabled),
+    readBoolean(AccessibilityInfo.isInvertColorsEnabled),
+    readBoolean(AccessibilityInfo.isHighTextContrastEnabled),
+    readBoolean(AccessibilityInfo.isDarkerSystemColorsEnabled),
   ])
 
   return {

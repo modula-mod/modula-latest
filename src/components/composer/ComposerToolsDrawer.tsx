@@ -3,11 +3,12 @@ import {Alert, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
+import type {AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ComposerToolItem, ComposerToolSection, FunctionInvocationState} from '@/data/repositories/contracts'
 import {sheetKeyboardBottomInset, useKeyboardHeight} from '@/platform/ui/keyboard'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -118,7 +119,7 @@ export function ComposerToolsDrawer({
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const services = useAppServices()
   const [tools, setTools] = useState<ComposerToolItem[]>([])
   const [invocationState, setInvocationState] = useState<FunctionInvocationState>('idle')
@@ -246,15 +247,23 @@ export function ComposerToolsDrawer({
             </AppText>
           </View>
         ) : null}
-        {sections.map(section => (
-          <View key={section} style={{gap: spacing[2]}}>
-            <AppText variant="label" colour="textSecondary">
-              {section}
-            </AppText>
-            <View style={[styles.grid, {gap: spacing[2]}]}>
-              {tools
-                .filter(tool => tool.section === section)
-                .map(tool => {
+        {sections.map(section => {
+          const sectionTools = tools.filter(tool => tool.section === section)
+          return (
+            <View key={section} style={{gap: spacing[2]}}>
+              <AppText variant="label" colour="textSecondary">
+                {section}
+              </AppText>
+              <View
+                style={[
+                  styles.group,
+                  {
+                    backgroundColor: colours.surface,
+                    borderColor: colours.border,
+                    borderRadius: radius.medium,
+                  },
+                ]}>
+                {sectionTools.map((tool, index) => {
                   const preview = tool.availability === 'preview'
                   const unavailable = tool.availability === 'unavailable' || tool.availability.startsWith('requires')
                   const label = tool.requiresModule
@@ -270,76 +279,56 @@ export function ComposerToolsDrawer({
                       style={[
                         styles.tool,
                         {
-                          backgroundColor: unavailable
-                            ? colours.surfaceMuted
-                            : preview
-                              ? colours.accentSubtle
-                              : colours.surface,
-                          borderColor: unavailable
-                            ? colours.border
-                            : preview
-                              ? colours.accentBorder
-                              : colours.border,
-                          borderRadius: radius.medium,
-                          padding: spacing[3],
+                          backgroundColor: preview ? colours.accentSubtle : 'transparent',
+                          borderBottomColor:
+                            index === sectionTools.length - 1 ? 'transparent' : colours.separator,
+                          minHeight: controls.listRow.minimum,
+                          paddingHorizontal: spacing[3],
+                          paddingVertical: spacing[2],
                           gap: spacing[2],
                           opacity: unavailable ? 0.7 : 1,
                         },
                       ]}>
-                      <View style={[styles.toolHeader, {gap: spacing[2]}]}>
-                        <AppIcon
-                          name={iconFor(tool)}
-                          colour={unavailable ? colours.textSecondary : colours.accent}
-                          size={22}
-                        />
-                        <View style={styles.toolText}>
-                          <AppText variant="caption" style={styles.toolName}>
-                            {tool.name}
-                          </AppText>
-                          <AppText
-                            variant="caption"
-                            colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}>
-                            {availabilitySentence(tool)}
-                          </AppText>
-                        </View>
-                      </View>
-                      {tool.description ? (
+                      <ModulaIcon
+                        name={iconFor(tool)}
+                        colour={unavailable ? colours.textSecondary : colours.accent}
+                        size={controls.iconSize.row}
+                      />
+                      <View style={styles.toolText}>
+                        <AppText variant="caption" style={styles.toolName}>
+                          {tool.name}
+                        </AppText>
                         <AppText
                           variant="micro"
-                          colour="textSecondary"
-                          style={styles.toolDescription}>
-                          {tool.description}
+                          colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}
+                          numberOfLines={1}>
+                          {tool.description ?? availabilitySentence(tool)}
                         </AppText>
-                      ) : null}
+                      </View>
+                      <AppText variant="micro" colour={preview ? 'accent' : 'textTertiary'}>
+                        {availabilitySentence(tool)}
+                      </AppText>
+                      <ModulaIcon name="chevronRight" colour={colours.textTertiary} size={16} />
                     </AppPressable>
                   )
                 })}
+              </View>
             </View>
-          </View>
-        ))}
+          )
+        })}
       </View>
     </ModulaSheet>
   )
 }
 
 const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  group: {
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
   },
   tool: {
-    alignItems: 'flex-start',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexBasis: '46%',
-    flexGrow: 1,
-    minHeight: 96,
-    minWidth: '46%',
-  },
-  toolDescription: {
-    width: '100%',
-  },
-  toolHeader: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     width: '100%',
   },

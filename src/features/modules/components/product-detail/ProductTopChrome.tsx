@@ -76,7 +76,7 @@ export function ProductFixedChrome({
   const disabled =
     soon || blocked || (!presentation.installable && presentation.primaryAction === 'Install')
   const tone =
-    label === 'Install' || label === 'Update'
+    label === 'Get' || label === 'Update'
       ? ('accent' as const)
       : soon
         ? ('muted' as const)
@@ -118,6 +118,7 @@ function primaryLabel(presentation: ModuleInstallPresentation): string {
   const label = presentation.primaryAction
   if (label === 'Soon') return 'Soon'
   if (label === 'Can’t install on this device') return 'N/A'
+  if (label === 'Install') return 'Get'
   return label
 }
 

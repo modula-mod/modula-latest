@@ -1,12 +1,12 @@
 import {useEffect, useState} from 'react'
 import {ActivityIndicator, StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useAppLock} from '@/features/security/app-lock/app-lock-context'
 import {APP_LOCK_ACCENT} from '@/features/security/app-lock/types'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type Props = {
@@ -57,7 +57,7 @@ export function UnlockBiometricScreen({onSwitchMethod, autoPrompt = true}: Props
         },
       ]}>
       <View style={styles.header}>
-        <Ionicons name="scan-outline" size={36} color={APP_LOCK_ACCENT} />
+        <ModulaIcon name="scan" size={36} colour={APP_LOCK_ACCENT} />
         <AppText variant="headline" style={styles.center}>
           Unlock with Device
         </AppText>
@@ -76,7 +76,7 @@ export function UnlockBiometricScreen({onSwitchMethod, autoPrompt = true}: Props
         {busy ? (
           <ActivityIndicator color={APP_LOCK_ACCENT} />
         ) : (
-          <Ionicons name="finger-print-outline" size={88} color={APP_LOCK_ACCENT} />
+          <ModulaIcon name="fingerprint" size={88} colour={APP_LOCK_ACCENT} />
         )}
       </AppPressable>
 

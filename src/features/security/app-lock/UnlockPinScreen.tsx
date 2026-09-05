@@ -1,12 +1,12 @@
 import {useCallback, useState} from 'react'
 import {StyleSheet, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useAppLock} from '@/features/security/app-lock/app-lock-context'
 import {APP_LOCK_ACCENT, PIN_LENGTH} from '@/features/security/app-lock/types'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const KEYS: {digit?: string; letters?: string; action?: 'backspace'}[][] = [
@@ -96,7 +96,7 @@ export function UnlockPinScreen({
         },
       ]}>
       <View style={styles.header}>
-        <Ionicons name="shield-checkmark-outline" size={36} color={APP_LOCK_ACCENT} />
+        <ModulaIcon name="security" size={36} colour={APP_LOCK_ACCENT} />
         <AppText variant="headline" style={styles.center}>
           {title}
         </AppText>
@@ -139,7 +139,7 @@ export function UnlockPinScreen({
                     accessibilityLabel="Delete"
                     onPress={backspace}
                     style={[styles.key, {borderColor: colours.border, borderRadius: radius.full}]}>
-                    <Ionicons name="backspace-outline" size={22} color={colours.text} />
+                    <ModulaIcon name="backspace" size={22} colour={colours.text} />
                   </AppPressable>
                 )
               }

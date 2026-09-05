@@ -3,7 +3,6 @@ import {LayoutChangeEvent, StyleSheet, View} from 'react-native'
 import {Gesture, GestureDetector} from 'react-native-gesture-handler'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 import Svg, {Line} from 'react-native-svg'
-import Ionicons from '@expo/vector-icons/Ionicons'
 import {runOnJS} from 'react-native-reanimated'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -14,6 +13,7 @@ import {
   APP_LOCK_ACCENT,
   PATTERN_MIN_NODES,
 } from '@/features/security/app-lock/types'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const NODE_COUNT = 9
@@ -146,7 +146,7 @@ export function UnlockPatternScreen({
         },
       ]}>
       <View style={styles.header}>
-        <Ionicons name="git-network-outline" size={36} color={APP_LOCK_ACCENT} />
+        <ModulaIcon name="integrations" size={36} colour={APP_LOCK_ACCENT} />
         <AppText variant="headline" style={styles.center}>
           {title}
         </AppText>

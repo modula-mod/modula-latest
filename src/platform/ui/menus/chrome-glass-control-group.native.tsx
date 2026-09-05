@@ -55,7 +55,7 @@ export type ChromeGlassGroupItem =
   | ChromeGlassGroupAction
 
 if (OVERLAY_GROUP_HIT !== TOOLBAR_HIT || HEADER_ICON_PAIR_GAP !== OVERLAY_GROUP_GAP) {
-  throw new Error('Overlay group must match Home header sizes (44pt hit, 22pt gap)')
+  throw new Error('Overlay group must match the shared toolbar hit and gap')
 }
 if (overlayGroupWidth(2) !== OVERLAY_GROUP_MIN_WIDTH) {
   throw new Error('overlayGroupWidth(2) must equal OVERLAY_GROUP_MIN_WIDTH')

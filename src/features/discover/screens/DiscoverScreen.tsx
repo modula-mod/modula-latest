@@ -1,12 +1,11 @@
 import {useMemo, useState} from 'react'
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {Platform, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {parseProfileId} from '@/api/contracts'
 import {useCapability, useProtectedPrompt, useSession} from '@/auth/runtime'
 import {ProtectedActionPrompt} from '@/auth/components/ProtectedActionPrompt'
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
@@ -30,8 +29,8 @@ import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
-import {type ModulaIconName} from '@/platform/ui/icons'
-import {useNativeHeaderFadePadding} from '@/platform/ui/navigation/chrome-insets'
+import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
+import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -49,6 +48,8 @@ export function DiscoverScreen() {
   const {colours, radius, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   const fadePad = useNativeHeaderFadePadding()
+  const headerClearance = useSecondaryChromeSpacerHeight()
+  const topPadding = Platform.OS === 'web' ? headerClearance + fadePad : fadePad
   const {preferences, update} = useProductPreferences()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
@@ -145,19 +146,16 @@ export function DiscoverScreen() {
             styles.content,
             {
               gap: spacing[5],
-              paddingTop: fadePad,
+              paddingTop: topPadding,
               paddingBottom: tabPadding,
             },
           ]}
           keyboardShouldPersistTaps="handled">
           <View style={{gap: spacing[3]}}>
             <View style={styles.titleRow}>
-              <View style={{flex: 1, gap: spacing[1]}}>
-                <AppText variant="title1">Discover</AppText>
-                <AppText variant="caption" colour="textSecondary">
-                  People, topics, modules, and media.
-                </AppText>
-              </View>
+              <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
+                People, topics, modules, and media.
+              </AppText>
               <ChromeGlassControlGroup
                 items={[
                   {
@@ -603,11 +601,11 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
               accessibilityLabel={topic.label}
               onPress={() => router.push(`/communities/${topic.id}` as Href)}
               style={[styles.topicRow, {borderBottomColor: colours.separator}]}>
-              <AppIcon name="community" colour={colours.text} size={18} />
+              <ModulaIcon name="community" colour={colours.text} size={18} />
               <AppText variant="label" style={styles.personBody}>
                 {topic.label}
               </AppText>
-              <AppIcon name="chevronRight" colour={colours.textTertiary} size={16} />
+              <ModulaIcon name="chevronRight" colour={colours.textTertiary} size={16} />
             </AppPressable>
           </ModulaContextMenu>
         ))}
@@ -643,14 +641,14 @@ function CommunitiesRail({topics}: {topics: DiscoverResult['trendingTopics']}) {
                 gap: spacing[3],
               },
             ]}>
-            <AppIcon name="community" colour={colours.text} />
+            <ModulaIcon name="community" colour={colours.text} />
             <View style={styles.personBody}>
               <AppText variant="label">{topic.label}</AppText>
               <AppText variant="caption" colour="textSecondary" numberOfLines={1}>
                 {topic.postCount.toLocaleString()} indexed posts
               </AppText>
             </View>
-            <AppIcon name="chevronRight" colour={colours.textTertiary} size={18} />
+            <ModulaIcon name="chevronRight" colour={colours.textTertiary} size={18} />
           </AppPressable>
         ))}
       </View>
@@ -670,7 +668,7 @@ function FeaturedModules({modules}: {modules: DiscoverResult['featuredModules']}
             accessibilityLabel={`Open ${module.name} in Marketplace`}
             onPress={() => router.push(`/marketplace/${module.id}` as Href)}
             style={[styles.moduleRow, {gap: spacing[3], paddingVertical: spacing[2]}]}>
-            <AppIcon name={module.icon} colour={colours.text} />
+            <ModulaIcon name={module.icon} colour={colours.text} />
             <View style={styles.personBody}>
               <AppText variant="label">{module.name}</AppText>
               <AppText variant="caption" colour="textSecondary">
@@ -709,7 +707,7 @@ function MediaGrid({result}: {result: DiscoverResult}) {
               styles.mediaTile,
               {backgroundColor: item.colour ?? colours.surfaceMuted, borderRadius: radius.medium},
             ]}>
-            <AppIcon name="play" colour={colours.surface} />
+            <ModulaIcon name="play" colour={colours.surface} />
           </AppPressable>
         ))}
       </View>
@@ -770,7 +768,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     gap: 12,
-    minHeight: 62,
+    minHeight: 52,
   },
   reelCard: {
     aspectRatio: 9 / 16,

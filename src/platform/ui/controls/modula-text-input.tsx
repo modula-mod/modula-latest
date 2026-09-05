@@ -64,7 +64,7 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(
     },
     ref,
   ) {
-    const {colours, radius, spacing} = useThemeTokens()
+    const {accessibility, colours, controls, radius, spacing, typography} = useThemeTokens()
 
     return (
       <TextInput
@@ -87,16 +87,20 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(
         onBlur={onBlur}
         maxLength={maxLength}
         accessibilityLabel={accessibilityLabel}
+        allowFontScaling={accessibility.followSystemTextSize}
         testID={testID}
         style={[
           {
-            minHeight: multiline ? 96 : 48,
+            minHeight: multiline
+              ? controls.inputHeight.multilineMinimum
+              : controls.inputHeight.singleLine,
             borderWidth: StyleSheet.hairlineWidth,
             borderColor: colours.border,
             backgroundColor: colours.surfaceRaised,
             borderRadius: radius.medium,
             color: colours.text,
-            paddingHorizontal: spacing[3],
+            ...typography.body,
+            paddingHorizontal: spacing[4],
             paddingVertical: spacing[2],
           },
           style as never,

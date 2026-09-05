@@ -12,7 +12,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ComposerToolsDrawer} from '@/components/composer/ComposerToolsDrawer'
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
+import type {AppIconName} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {ChromeCircleButton} from '@/components/primitives/ChromeCircleButton'
@@ -41,6 +41,8 @@ import {
   confirmModulaAction,
   keyboardScrollProps,
 } from '@/platform/ui'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {SelectionSheet} from '@/platform/ui/sheets/selection-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -584,26 +586,14 @@ export function ComposerScreen() {
             </AppText>
           </AppPressable>
         </View>
-        <AppPressable
+        <ModulaButton
           accessibilityLabel={isReplyMode ? 'Publish reply' : 'Publish post'}
-          accessibilityState={{disabled: !canPost}}
+          label={isEditMode ? 'Save' : isReplyMode ? 'Reply' : 'Post'}
           disabled={!canPost}
+          loading={isPublishing}
+          size="compact"
           onPress={() => void publish()}
-          style={[
-            styles.postButton,
-            {
-              backgroundColor: canPost ? colours.accent : colours.surfaceMuted,
-              borderRadius: radius.round,
-            },
-          ]}>
-          <AppText
-            variant="label"
-            style={{
-              color: canPost ? colours.accentForeground : colours.textTertiary,
-            }}>
-            {isEditMode ? 'Save' : isReplyMode ? 'Reply' : 'Post'}
-          </AppText>
-        </AppPressable>
+        />
       </View>
 
       <ScrollView
@@ -653,19 +643,22 @@ export function ComposerScreen() {
                 Keyboard.dismiss()
                 setAudienceOpen(true)
               }}
-              style={[
-                styles.audience,
-                {
-                  backgroundColor: colours.accentSubtle,
-                  borderColor: colours.accent,
-                  borderRadius: radius.round,
-                },
-              ]}>
-              <AppIcon name="people" colour={colours.accent} size={14} />
-              <AppText variant="label" style={{color: colours.accent}}>
-                {AUDIENCE_LABEL[audience]}
-              </AppText>
-              <AppIcon name="arrowDown" colour={colours.accent} size={12} />
+              style={styles.audienceTarget}>
+              <View
+                style={[
+                  styles.audience,
+                  {
+                    backgroundColor: colours.accentSubtle,
+                    borderColor: colours.accent,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <ModulaIcon name="people" colour={colours.accent} size={14} />
+                <AppText variant="label" style={{color: colours.accent}}>
+                  {AUDIENCE_LABEL[audience]}
+                </AppText>
+                <ModulaIcon name="arrowDown" colour={colours.accent} size={12} />
+              </View>
             </AppPressable>
           ) : (
             <AppText variant="label" colour="textSecondary">
@@ -679,19 +672,22 @@ export function ComposerScreen() {
                 Keyboard.dismiss()
                 setDestinationOpen(true)
               }}
-              style={[
-                styles.audience,
-                {
-                  backgroundColor: colours.surfaceMuted,
-                  borderColor: colours.border,
-                  borderRadius: radius.round,
-                },
-              ]}>
-              <AppIcon name="integrations" colour={colours.accent} size={14} />
-              <AppText variant="label" style={{color: colours.accent}}>
-                {DESTINATION_LABEL[effectiveDestination]}
-              </AppText>
-              <AppIcon name="arrowDown" colour={colours.accent} size={12} />
+              style={styles.audienceTarget}>
+              <View
+                style={[
+                  styles.audience,
+                  {
+                    backgroundColor: colours.surfaceMuted,
+                    borderColor: colours.border,
+                    borderRadius: radius.round,
+                  },
+                ]}>
+                <ModulaIcon name="integrations" colour={colours.accent} size={14} />
+                <AppText variant="label" style={{color: colours.accent}}>
+                  {DESTINATION_LABEL[effectiveDestination]}
+                </AppText>
+                <ModulaIcon name="arrowDown" colour={colours.accent} size={12} />
+              </View>
             </AppPressable>
           ) : null}
         </View>
@@ -757,7 +753,7 @@ export function ComposerScreen() {
                   styles.removeMedia,
                   {backgroundColor: colours.backdrop, borderRadius: radius.round},
                 ]}>
-                <AppIcon name="trash" colour={colours.surface} />
+                <ModulaIcon name="trash" colour={colours.surface} />
               </AppPressable>
             </View>
             <TextInput
@@ -832,7 +828,7 @@ export function ComposerScreen() {
                 setReplyOpen(true)
               }}
               style={[styles.replyPill, {gap: spacing[2]}]}>
-              <AppIcon name="messages" colour={colours.accent} size={16} />
+              <ModulaIcon name="messages" colour={colours.accent} size={16} />
               <AppText variant="label" style={{color: colours.accent}}>
                 {REPLY_LABEL[replyPermission]}
               </AppText>
@@ -844,7 +840,7 @@ export function ComposerScreen() {
                 disabled={!canUndo}
                 onPress={undo}
                 style={styles.iconHit}>
-                <AppIcon
+                <ModulaIcon
                   name="back"
                   colour={canUndo ? colours.textSecondary : colours.textTertiary}
                   size={18}
@@ -856,7 +852,7 @@ export function ComposerScreen() {
                 disabled={!canRedo}
                 onPress={redo}
                 style={styles.iconHit}>
-                <AppIcon
+                <ModulaIcon
                   name="chevronRight"
                   colour={canRedo ? colours.textSecondary : colours.textTertiary}
                   size={18}
@@ -872,7 +868,7 @@ export function ComposerScreen() {
               disabled={!canUndo}
               onPress={undo}
               style={styles.iconHit}>
-              <AppIcon
+              <ModulaIcon
                 name="back"
                 colour={canUndo ? colours.textSecondary : colours.textTertiary}
                 size={18}
@@ -884,7 +880,7 @@ export function ComposerScreen() {
               disabled={!canRedo}
               onPress={redo}
               style={styles.iconHit}>
-              <AppIcon
+              <ModulaIcon
                 name="chevronRight"
                 colour={canRedo ? colours.textSecondary : colours.textTertiary}
                 size={18}
@@ -914,7 +910,7 @@ export function ComposerScreen() {
               accessibilityLabel={item.label}
               onPress={item.onPress}
               style={styles.toolIcon}>
-              <AppIcon name={item.icon} colour={colours.textSecondary} />
+              <ModulaIcon name={item.icon} colour={colours.textSecondary} />
             </AppPressable>
           ))}
           <View style={[styles.toolbarDivider, {backgroundColor: colours.border}]} />
@@ -924,7 +920,7 @@ export function ComposerScreen() {
               comingSoonTool('Thread', 'Thread composer is not part of this beta.')
             }
             style={styles.toolIcon}>
-            <AppIcon name="create" colour={colours.accent} />
+            <ModulaIcon name="create" colour={colours.accent} />
           </AppPressable>
           <AppPressable
             accessibilityLabel="Open Composer Tools"
@@ -936,7 +932,7 @@ export function ComposerScreen() {
               styles.toolIcon,
               {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
             ]}>
-            <AppIcon name="tools" colour={colours.accent} />
+            <ModulaIcon name="tools" colour={colours.accent} />
           </AppPressable>
         </ScrollView>
       </View>
@@ -1053,6 +1049,10 @@ const styles = StyleSheet.create({
     minHeight: 32,
     paddingHorizontal: 12,
   },
+  audienceTarget: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   authorRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -1114,13 +1114,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 38,
     paddingHorizontal: 12,
-  },
-  postButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 40,
-    minWidth: 64,
-    paddingHorizontal: 14,
   },
   previewCard: {},
   removeMedia: {

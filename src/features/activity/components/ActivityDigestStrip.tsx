@@ -1,12 +1,12 @@
 import {StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ActivityItem} from '@/domain/activity'
 import {selectionHaptic} from '@/lib/haptics'
 import {StackedAvatars} from '@/platform/ui/avatars'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -84,7 +84,7 @@ export function ActivityDigestStrip({
               styles.iconWrap,
               {backgroundColor: colours.accent, borderRadius: radius.round},
             ]}>
-            <AppIcon name="activity" colour={colours.accentForeground} size={18} />
+            <ModulaIcon name="activity" colour={colours.accentForeground} size={18} />
           </View>
         )}
         <View style={styles.body}>
@@ -104,7 +104,7 @@ export function ActivityDigestStrip({
             router.push('/settings/notifications' as Href)
           }}
           style={styles.settingsHit}>
-          <AppIcon name="notifications" colour={colours.accent} size={18} />
+          <ModulaIcon name="notifications" colour={colours.accent} size={18} />
         </AppPressable>
       </AppPressable>
     </SectionEnter>

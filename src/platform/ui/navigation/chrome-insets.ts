@@ -4,9 +4,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context'
  * Shared shell chrome geometry — progressive blur headers + floating tab bar.
  * Keep SecondaryScreenHeader and ProgressiveBlurHeaderBackground in sync here.
  */
-export const CHROME_HEADER_ROW = 58
+export const CHROME_HEADER_ROW = 52
 /** Dissolve painted below the nav row; content may scroll under this zone. */
-export const CHROME_FADE_EXTENSION = 48
+export const CHROME_FADE_EXTENSION = 20
 export const CHROME_BLUR_INTENSITY = 58
 /**
  * Soft rise of shell bottom chrome above the home-indicator inset.

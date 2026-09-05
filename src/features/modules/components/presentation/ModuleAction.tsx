@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -29,13 +29,13 @@ export function ModuleAction({
   tone?: 'catalogue' | 'product'
   testID?: string
 }) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const label = presentation.primaryAction
   const soon = label === 'Soon'
   const blocked = label === 'Can’t install on this device'
-  const shown = soon ? 'Coming Soon' : blocked ? 'Unavailable' : label
-  const primary = shown === 'Install' || shown === 'Update'
-  const disabled = soon || loading || (!presentation.installable && shown === 'Install')
+  const shown = soon ? 'Coming Soon' : blocked ? 'Unavailable' : label === 'Install' ? 'Get' : label
+  const primary = label === 'Install' || label === 'Update'
+  const disabled = soon || loading || (!presentation.installable && label === 'Install')
   const productTone = tone === 'product' && !soon
   const backgroundColor = soon
     ? 'transparent'
@@ -62,27 +62,39 @@ export function ModuleAction({
       onPress={disabled ? undefined : onPress}
       testID={testID ?? `module-action-${shown.toLowerCase().replace(/\s+/g, '-')}`}
       style={[
-        styles.capsule,
-        compact && !fullWidth ? styles.compact : styles.regular,
+        styles.target,
         {
-          backgroundColor,
-          borderColor,
-          borderRadius: radius.round,
-          paddingHorizontal: compact && !fullWidth ? spacing[3] : spacing[4],
           alignSelf: fullWidth ? 'stretch' : 'flex-start',
+          minHeight: controls.touchTarget.minimum,
           width: fullWidth ? '100%' : undefined,
           opacity: loading ? 0.7 : 1,
         },
       ]}>
-      <AppText
-        variant="buttonLabel"
-        style={{
-          color: labelColour,
-          textAlign: 'center',
-          fontWeight: primary || productTone ? '700' : '500',
-        }}>
-        {loading ? (shown === 'Install' ? 'Installing…' : shown === 'Update' ? 'Updating…' : `${shown}…`) : shown}
-      </AppText>
+      <View
+        style={[
+          styles.capsule,
+          {
+            backgroundColor,
+            borderColor,
+            borderRadius: radius.round,
+            minHeight:
+              compact && !fullWidth
+                ? controls.controlHeight.compact
+                : controls.controlHeight.regular,
+            paddingHorizontal: compact && !fullWidth ? spacing[3] : spacing[4],
+            width: fullWidth ? '100%' : undefined,
+          },
+        ]}>
+        <AppText
+          variant="buttonLabel"
+          style={{
+            color: labelColour,
+            textAlign: 'center',
+            fontWeight: primary || productTone ? '700' : '500',
+          }}>
+          {loading ? (label === 'Install' ? 'Getting…' : label === 'Update' ? 'Updating…' : `${shown}…`) : shown}
+        </AppText>
+      </View>
     </AppPressable>
   )
 }
@@ -92,13 +104,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: StyleSheet.hairlineWidth,
     justifyContent: 'center',
+    paddingVertical: 6,
   },
-  compact: {
-    minHeight: 44,
-    paddingVertical: 10,
-  },
-  regular: {
-    minHeight: 44,
-    paddingVertical: 10,
+  target: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

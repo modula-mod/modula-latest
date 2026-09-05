@@ -16,19 +16,25 @@ export function ModuleHostScreen({moduleId, path}: {moduleId: unknown; path?: un
   const {colours, spacing} = useThemeTokens()
   const router = useRouter()
   const detail = useModuleDetailQuery(id ?? '')
+  const productName = detail.data?.name
+  const headerTitle = productName ?? (detail.isPending ? 'Opening product…' : 'Product unavailable')
+  const shareTitle = productName ?? 'Modula product'
+  const shareMessage = productName
+    ? `Open ${productName} in Modula.`
+    : 'Open this product in Modula.'
 
   const header = (
     <SecondaryScreenHeader
-      title={detail.data?.name ?? 'Module'}
+      title={headerTitle}
       onShare={() =>
         void shareModulaText({
-          title: id ? `Module ${id}` : 'Module',
-          message: id ? `Open ${id} in Modula.` : 'A Modula module.',
+          title: shareTitle,
+          message: shareMessage,
         })
       }
       overflow={{
-        accessibilityLabel: 'Module actions',
-        title: 'Module',
+        accessibilityLabel: `${shareTitle} actions`,
+        title: shareTitle,
         actions: [
           {id: 'hub', label: 'Product Hub', icon: 'modules'},
           {id: 'settings', label: 'Module settings', icon: 'settings'},
@@ -41,8 +47,8 @@ export function ModuleHostScreen({moduleId, path}: {moduleId: unknown; path?: un
           }
           if (actionId === 'share') {
             void shareModulaText({
-              title: id ? `Module ${id}` : 'Module',
-              message: id ? `Open ${id} in Modula.` : 'A Modula module.',
+              title: shareTitle,
+              message: shareMessage,
             })
           }
         },

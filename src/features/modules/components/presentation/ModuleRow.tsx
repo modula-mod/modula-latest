@@ -22,7 +22,7 @@ export function ModuleRow({
   showSeparator?: boolean
   muted?: boolean
 }) {
-  const {colours, spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   const {fontScale} = useWindowDimensions()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
@@ -36,13 +36,17 @@ export function ModuleRow({
         style={[
           styles.row,
           stacked ? styles.stacked : null,
-          {gap: spacing[3], paddingVertical: spacing[3]},
+          {
+            gap: spacing[3],
+            minHeight: controls.listRow.minimum,
+            paddingVertical: spacing[2],
+          },
         ]}>
         <AppPressable
           accessibilityLabel={`Open ${copy.name}`}
           onPress={onPress}
           style={styles.identity}>
-          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={56} variant="icon" />
+          <ModuleArtwork moduleId={item.moduleId} name={copy.name} size={48} variant="icon" />
           <View style={styles.flex}>
             <AppText variant="productName" numberOfLines={stacked ? 2 : 1}>
               {copy.name}
@@ -73,18 +77,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     gap: 12,
-    minHeight: 56,
     minWidth: 0,
   },
   row: {
     alignItems: 'center',
     flexDirection: 'row',
-    minHeight: 72,
     width: '100%',
   },
   rule: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: 68,
+    marginLeft: 60,
   },
   stacked: {
     alignItems: 'flex-start',

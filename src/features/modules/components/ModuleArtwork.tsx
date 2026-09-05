@@ -196,7 +196,7 @@ export function ModuleArtworkTitle({moduleId, name}: {moduleId: string; name?: s
   const {spacing} = useThemeTokens()
   return (
     <View style={{gap: spacing[1]}}>
-      <AppText variant="display">{pack.name}</AppText>
+      <AppText variant="title1">{pack.name}</AppText>
       <AppText variant="caption" colour="textSecondary">
         by {pack.publisher}
       </AppText>

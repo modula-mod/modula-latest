@@ -16,7 +16,6 @@ import Animated, {
 import {useRouter, type Href} from 'expo-router'
 
 import {PaginationIndicator, QueryErrorState} from '@/components/data'
-import {AppIcon} from '@/components/primitives/AppIcon'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
@@ -45,6 +44,7 @@ import {selectionHaptic} from '@/lib/haptics'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ModulaIcon} from '@/platform/ui/icons'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
@@ -406,7 +406,7 @@ function HomeLayoutHeader({
               gap: spacing[2],
             },
           ]}>
-          <AppIcon name="contrast" colour={colours.accent} size={16} />
+          <ModulaIcon name="contrast" colour={colours.accent} size={16} />
           <View style={[styles.focusCopy, {gap: spacing[1]}]}>
             <AppText variant="label" colour="accent">
               Focus
@@ -415,7 +415,7 @@ function HomeLayoutHeader({
               {focusBannerCopy}
             </AppText>
           </View>
-          <AppIcon name="chevronRight" colour={colours.accent} size={14} />
+          <ModulaIcon name="chevronRight" colour={colours.accent} size={14} />
         </AppPressable>
       ) : null,
     'merge-banner':
@@ -437,11 +437,11 @@ function HomeLayoutHeader({
                 gap: spacing[2],
               },
             ]}>
-            <AppIcon name="discover" colour={colours.accent} size={16} />
+            <ModulaIcon name="discover" colour={colours.accent} size={16} />
             <AppText variant="caption" colour="textSecondary" style={{flex: 1}}>
               Merge Feeds · {mergeCount} sources (local Preview)
             </AppText>
-            <AppIcon
+            <ModulaIcon
               name="chevronRight"
               colour={colours.textTertiary}
               size={14}
@@ -531,7 +531,7 @@ function HomeLayoutHeader({
 function ComposerPrompt() {
   const router = useRouter()
   const session = useSession()
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, controls, radius, spacing} = useThemeTokens()
   const profile = session.status === 'signedIn' ? session.profile : null
 
   return (
@@ -541,14 +541,9 @@ function ComposerPrompt() {
           styles.prompt,
           {
             marginHorizontal: spacing[4],
-            marginBottom: spacing[3],
-            paddingHorizontal: spacing[3],
-            paddingVertical: spacing[3],
-            gap: spacing[3],
-            backgroundColor: colours.surface,
-            borderColor: colours.separator,
-            borderRadius: radius.large,
-            borderWidth: StyleSheet.hairlineWidth,
+            marginBottom: spacing[2],
+            paddingVertical: spacing[1],
+            gap: spacing[2],
           },
         ]}>
         <Avatar
@@ -558,7 +553,7 @@ function ComposerPrompt() {
           }
           uri={profile?.avatarUri}
           colour={profile?.coverColour}
-          size={40}
+          size={36}
         />
         <AppPressable
           accessibilityLabel="Create a post"
@@ -569,8 +564,8 @@ function ComposerPrompt() {
               flex: 1,
               borderRadius: radius.round,
               paddingHorizontal: spacing[4],
-              backgroundColor: colours.canvas,
-              minHeight: 44,
+              backgroundColor: colours.surfaceRaised,
+              minHeight: controls.inputHeight.search,
               justifyContent: 'center',
             },
           ]}>
