@@ -111,17 +111,18 @@ Activity list.
 | Product-specific host cases | 0 |
 | Shell icon-font imports | 0 |
 | Browser icon-font requests across priority routes | 0 |
-| `CI=true pnpm build:web` | PASS (intermediate dirty-worktree export) |
-| `CI=true pnpm verify:web-build` | PASS, 217 files |
+| `CI=true pnpm build:web` | PASS, exact committed mission revision |
+| `CI=true pnpm verify:web-build` | PASS, release identity and artifact scan |
 | `CI=true pnpm verify:web-dist-routes` | PASS |
 | Vault Notes `pnpm verify` | PASS |
 | Product frontend API/DB/renderer/security stages | PASS |
-| Reference Tasks full clean-host journey | PENDING clean shell commit |
+| Reference Tasks full clean-host journey | PASS |
+| `CI=true pnpm verify:product-frontend-v1` | PASS |
+| Fresh detached checkout: frozen install, lint, typecheck, shell verifier, web build | PASS at `897c67b0a3b05d5d984f8bad0ef033235f5cc72e` |
 
-The intermediate web export necessarily reports the current committed baseline
-SHA because the UI delta is still uncommitted. A final production-mode export
-and web verifier must run again after the shell commit so `/version.json` binds
-the artifact to the actual mission SHA.
+The final production-mode export is built only after the implementation and
+acceptance record are committed. The web verifier checks that `/version.json`
+binds the artifact to that exact mission revision.
 
 ## Visual delta
 
@@ -147,7 +148,6 @@ visual gates rather than falsely passing from empty/auth-gated frames.
 | Standalone iPhone PWA, safe areas, keyboard, and cache replacement | NOT_RUN | Physical iPhone standalone PWA |
 | Android build/static or emulator acceptance | NOT_RUN | Android toolchain/emulator |
 | Founder before/after approval | PENDING | PR visual review |
-| Fresh clean-checkout gate | PENDING | After mission commit |
 | Merge, immutable production web release, public smoke | NOT_RUN | Only after all merge gates pass |
 
 Until those gates close, this mission must not be described as production
