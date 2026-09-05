@@ -333,7 +333,7 @@ export function NavigationDrawer() {
                   <View key={section.id} style={{gap: spacing[1]}}>
                     <AppText
                       variant="caption"
-                      colour="textTertiary"
+                      colour="textSecondary"
                       style={{
                         paddingHorizontal: spacing[2],
                         marginBottom: spacing[1],
@@ -376,7 +376,7 @@ export function NavigationDrawer() {
                     intensity={40}
                   />
                 </View>
-                <AppText variant="caption" colour="textTertiary">
+                <AppText variant="caption" colour="textSecondary">
                   Appearance · {resolvedColourMode === 'light' ? 'Light' : 'Dark'}
                 </AppText>
                 {session.status === 'signedIn' ? (
@@ -391,7 +391,7 @@ export function NavigationDrawer() {
                     </AppText>
                   </AppPressable>
                 ) : null}
-                <AppText variant="micro" colour="textTertiary">
+                <AppText variant="micro" colour="textSecondary">
                   Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
                 </AppText>
               </View>

@@ -105,7 +105,7 @@ export function AppearanceScreen() {
           contentContainerStyle={[styles.content, {gap: spacing[5], paddingBottom: tabPadding}]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
-          <AppText variant="caption" colour="textTertiary">
+          <AppText variant="caption" colour="textSecondary">
             Colour, materials, and how Modula looks on this device.
           </AppText>
 
@@ -160,7 +160,7 @@ export function AppearanceScreen() {
             </View>
             {isDarkDepth(preferences.mode) ? (
               <View style={{gap: spacing[2]}}>
-                <AppText variant="caption" colour="textTertiary">
+                <AppText variant="caption" colour="textSecondary">
                   Dark depth
                 </AppText>
                 <ModulaSegmentedPicker
@@ -194,11 +194,11 @@ export function AppearanceScreen() {
             {familiesOpen ? (
               <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
                 {preferences.mode === 'light' ? (
-                  <AppText variant="caption" colour="textTertiary">
+                  <AppText variant="caption" colour="textSecondary">
                     Families apply to Dim, Dark, and OLED. Selection stays saved.
                   </AppText>
                 ) : (
-                  <AppText variant="caption" colour="textTertiary">
+                  <AppText variant="caption" colour="textSecondary">
                     Non-standard families are Preview palettes.
                   </AppText>
                 )}
@@ -223,7 +223,7 @@ export function AppearanceScreen() {
             />
             {surfacesOpen ? (
               <View style={[styles.expandBlock, {borderTopColor: colours.separator, gap: spacing[2]}]}>
-                <AppText variant="caption" colour="textTertiary">
+                <AppText variant="caption" colour="textSecondary">
                   Choose how toolbars and grouped surfaces appear.
                 </AppText>
                 <View style={[styles.wrapRow, {gap: spacing[2]}]}>
@@ -268,7 +268,7 @@ export function AppearanceScreen() {
             active={preferences.advancedChromeEffect === 'cameraMaskedBlur'}
             disabledByTransparency={resolved.accessibility.reduceTransparency}
           />
-          <AppText variant="caption" colour="textTertiary">
+          <AppText variant="caption" colour="textSecondary">
             Preview a compact group-call control using the current appearance settings.
           </AppText>
           <ModulaJoinIsland
@@ -440,7 +440,7 @@ function ChromePreview({
           })}
         </View>
       </View>
-      <AppText variant="caption" colour="textTertiary">
+      <AppText variant="caption" colour="textSecondary">
         Compare transparent and solid chrome against the same content.
       </AppText>
     </View>
@@ -492,7 +492,7 @@ function ModeTile({
       </View>
       <AppText
         variant="label"
-        style={{color: selected ? colours.accent : colours.text, textAlign: 'center'}}>
+        style={{color: colours.text, textAlign: 'center'}}>
         {modeLabels[mode]}
       </AppText>
     </AppPressable>
@@ -522,7 +522,7 @@ function ChoicePill({
           borderRadius: radius.round,
         },
       ]}>
-      <AppText variant="label" style={{color: selected ? colours.accent : colours.text}}>
+      <AppText variant="label" style={{color: colours.text}}>
         {label}
       </AppText>
     </AppPressable>

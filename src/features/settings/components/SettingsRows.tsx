@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
@@ -143,7 +143,7 @@ export function SettingsScreen({
 
 export function SettingsCaption({children}: {children: ReactNode}) {
   return (
-    <AppText variant="footnote" colour="textTertiary">
+    <AppText variant="footnote" colour="textSecondary">
       {children}
     </AppText>
   )
@@ -206,7 +206,7 @@ export function SettingsFooter({children}: {children: ReactNode}) {
   return (
     <AppText
       variant="footnote"
-      colour="textTertiary"
+      colour="textSecondary"
       style={{paddingHorizontal: spacing[4]}}>
       {children}
     </AppText>
@@ -255,7 +255,7 @@ export function SettingsSection({
       {title ? (
         <AppText
           variant="sectionHeader"
-          colour="textTertiary"
+          colour="textSecondary"
           style={{
             letterSpacing: 0.6,
             paddingHorizontal: spacing[4],
@@ -316,7 +316,7 @@ function TrailingValue({value}: {value: string}) {
   return (
     <AppText
       variant="rowTrailing"
-      colour="textTertiary"
+      colour="textSecondary"
       style={styles.trailing}>
       {value}
     </AppText>
@@ -384,7 +384,7 @@ export function SettingsLinkRow({
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{title}</AppText>
           {row.description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {row.description}
             </AppText>
           ) : null}
@@ -416,9 +416,13 @@ export function SettingsInfoRow({
   const stacked = fontScale >= 1.6
   return (
     <View
-      accessible
-      accessibilityRole="text"
-      accessibilityLabel={[label, value, description].filter(Boolean).join(', ')}>
+      accessible={Platform.OS === 'web' ? undefined : true}
+      accessibilityRole={Platform.OS === 'web' ? undefined : 'text'}
+      accessibilityLabel={
+        Platform.OS === 'web'
+          ? undefined
+          : [label, value, description].filter(Boolean).join(', ')
+      }>
       <RowChrome
         last={last}
         stacked={stacked}
@@ -426,7 +430,7 @@ export function SettingsInfoRow({
         <View style={styles.rowText}>
           <AppText variant="rowTitle">{label}</AppText>
           {description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {description}
             </AppText>
           ) : null}
@@ -499,7 +503,7 @@ export function SettingsToggleRow({
         ) : null}
       </View>
       {accessibility.showSwitchLabels ? (
-        <AppText variant="micro" colour={value ? 'accent' : 'textTertiary'}>
+        <AppText variant="micro" colour={value ? 'accent' : 'textSecondary'}>
           {value ? 'On' : 'Off'}
         </AppText>
       ) : null}
@@ -625,7 +629,7 @@ export function SettingsDestructiveRow({
             {label}
           </AppText>
           {description ? (
-            <AppText variant="caption" colour="textTertiary">
+            <AppText variant="caption" colour="textSecondary">
               {description}
             </AppText>
           ) : null}

@@ -23,7 +23,7 @@ export function NotFoundScreen() {
         ]}>
         <AppText variant="title">Screen not found</AppText>
         <Link href={'/' as never}>
-          <AppText colour="accent">Return home</AppText>
+          <AppText style={styles.link}>Return home</AppText>
         </Link>
       </View>
     </>
@@ -35,5 +35,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+  },
+  link: {
+    textDecorationLine: 'underline',
   },
 })
