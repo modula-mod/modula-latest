@@ -2,7 +2,8 @@ import {useEffect, useRef} from 'react'
 import {Modal, Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {ModulaSheetLayout} from '@/platform/ui/sheets/modula-sheet-layout'
-import type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
+import {ModulaSheetHeader} from '@/platform/ui/sheets/modula-sheet-header'
+import {detentForPresentation, type ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {LAYERS} from '@/theme/tokens/layers'
@@ -16,9 +17,12 @@ export function ModulaSheet({
   isPresented,
   onDismiss,
   children,
+  presentation,
+  title,
+  subtitle,
   header,
   footer,
-  detent = 'medium',
+  detent,
   testID,
   scrollBody = true,
   obscureShellChrome = true,
@@ -26,11 +30,14 @@ export function ModulaSheet({
 }: ModulaSheetProps) {
   const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const {height} = useWindowDimensions()
+  const {height, width} = useWindowDimensions()
   const sheetRef = useRef<View>(null)
-  const structured = Boolean(header || footer)
+  const resolvedDetent = detent ?? detentForPresentation(presentation)
+  const resolvedHeader = header ?? (title ? <ModulaSheetHeader title={title} subtitle={subtitle} /> : undefined)
+  const structured = Boolean(resolvedHeader || footer)
   const maxHeight =
-    detent === 'full' ? height : detent === 'large' ? Math.round(height * 0.92) : Math.round(height * 0.56)
+    resolvedDetent === 'full' ? height : resolvedDetent === 'large' ? Math.round(height * 0.92) : Math.round(height * 0.56)
+  const desktopDialog = width >= 768
 
   useEffect(() => {
     if (!obscureShellChrome) return
@@ -79,7 +86,7 @@ export function ModulaSheet({
   }, [isPresented, onDismiss])
 
   const inner = structured ? (
-    <ModulaSheetLayout header={header} footer={footer} scrollBody={scrollBody} testID={testID}>
+    <ModulaSheetLayout header={resolvedHeader} footer={footer} scrollBody={scrollBody} testID={testID}>
       {children}
     </ModulaSheetLayout>
   ) : (
@@ -94,7 +101,11 @@ export function ModulaSheet({
       onRequestClose={onDismiss}
       testID={testID}
       accessibilityViewIsModal>
-      <View style={[styles.root, {zIndex: LAYERS.sheet}]}>
+      <View
+        style={[
+          styles.root,
+          {justifyContent: desktopDialog ? 'center' : 'flex-end', zIndex: LAYERS.sheet},
+        ]}>
         <Pressable
           accessibilityLabel="Dismiss"
           onPress={onDismiss}
@@ -114,8 +125,11 @@ export function ModulaSheet({
               padding: spacing[4],
               borderTopLeftRadius: radius.lg,
               borderTopRightRadius: radius.lg,
+              borderBottomLeftRadius: desktopDialog ? radius.lg : 0,
+              borderBottomRightRadius: desktopDialog ? radius.lg : 0,
               maxHeight,
-              minHeight: detent === 'medium' ? 240 : 320,
+              minHeight: resolvedDetent === 'medium' ? 240 : 320,
+              maxWidth: desktopDialog ? 560 : undefined,
             },
           ]}>
           {inner}
@@ -134,8 +148,8 @@ const styles = StyleSheet.create({
     top: 0,
   },
   root: {
+    alignItems: 'center',
     flex: 1,
-    justifyContent: 'flex-end',
   },
   sheet: {
     alignSelf: 'stretch',

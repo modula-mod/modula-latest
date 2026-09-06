@@ -1,10 +1,15 @@
 import type {ReactNode} from 'react'
-import {Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
+import {
+  ModulaIconTile,
+  ModulaListRow,
+  ModulaListSection,
+} from '@/platform/ui/lists'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
@@ -123,7 +128,7 @@ export function SettingsScreen({
   const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View role="main" style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={title} right={right} />
       <ResponsiveContent>
         <ScrollView
@@ -220,23 +225,7 @@ export function SettingsIconTile({
   name: ModulaIconName
   domain?: SettingsIconDomain
 }) {
-  const {controls, settingsIcons} = useThemeTokens()
-  const token = settingsIcons[settingsIconDomain(name, domain)]
-  return (
-    <View
-      accessible={false}
-      importantForAccessibility="no"
-      style={[
-        styles.iconTile,
-        {
-          backgroundColor: token.background,
-          height: controls.iconTile.small,
-          width: controls.iconTile.small,
-        },
-      ]}>
-      <ModulaIcon name={name} size={16} colour={token.foreground} />
-    </View>
-  )
+  return <ModulaIconTile icon={name} tone={settingsIconDomain(name, domain)} />
 }
 
 export function SettingsSection({
@@ -248,88 +237,7 @@ export function SettingsSection({
   footer?: string
   children: ReactNode
 }) {
-  const {colours, spacing, radius} = useThemeTokens()
-
-  return (
-    <View style={{gap: spacing[2]}}>
-      {title ? (
-        <AppText
-          variant="sectionHeader"
-          colour="textSecondary"
-          style={{
-            letterSpacing: 0.6,
-            paddingHorizontal: spacing[4],
-            textTransform: 'uppercase',
-          }}>
-          {title}
-        </AppText>
-      ) : null}
-      <View
-        style={[
-          styles.list,
-          {
-            backgroundColor: colours.surface,
-            borderRadius: radius.medium,
-          },
-        ]}>
-        {children}
-      </View>
-      {footer ? <SettingsFooter>{footer}</SettingsFooter> : null}
-    </View>
-  )
-}
-
-function RowChrome({
-  last,
-  children,
-  stacked,
-  leading,
-}: {
-  last?: boolean
-  stacked?: boolean
-  leading?: ReactNode
-  children: ReactNode
-}) {
-  const {colours, controls, spacing} = useThemeTokens()
-  return (
-    <View style={[styles.row, {minHeight: controls.listRow.minimum, paddingLeft: spacing[4]}]}>
-      {leading}
-      <View
-        style={[
-          stacked ? styles.rowBodyStacked : styles.rowBody,
-          {
-            borderBottomColor: last ? 'transparent' : colours.separator,
-            marginLeft: leading ? spacing[3] : 0,
-            paddingRight: spacing[4],
-            paddingVertical: spacing[3],
-            gap: spacing[3],
-            minHeight: controls.listRow.minimum,
-          },
-        ]}>
-        {children}
-      </View>
-    </View>
-  )
-}
-
-function TrailingValue({value}: {value: string}) {
-  return (
-    <AppText
-      variant="rowTrailing"
-      colour="textSecondary"
-      style={styles.trailing}>
-      {value}
-    </AppText>
-  )
-}
-
-function DecorativeChevron() {
-  const {colours} = useThemeTokens()
-  return (
-    <View accessible={false} importantForAccessibility="no">
-      <ModulaIcon name="chevronRight" size={16} colour={colours.textTertiary} />
-    </View>
-  )
+  return <ModulaListSection title={title} footer={footer}>{children}</ModulaListSection>
 }
 
 export function SettingsLinkRow({
@@ -340,8 +248,6 @@ export function SettingsLinkRow({
   last?: boolean
 }) {
   const router = useRouter()
-  const {fontScale} = useWindowDimensions()
-  const stacked = fontScale >= 1.6
   const title = row.comingSoon
     ? row.title
     : row.preview
@@ -353,11 +259,23 @@ export function SettingsLinkRow({
     : [title, value].filter(Boolean).join(', ')
 
   return (
-    <AppPressable
+    <ModulaListRow
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       accessibilityState={row.comingSoon ? {disabled: true} : undefined}
+      accessory={row.comingSoon ? 'none' : 'chevron'}
+      description={row.description}
       disabled={row.comingSoon}
+      last={last}
+      leading={
+        row.icon ? (
+          <SettingsIconTile
+            name={settingsIconName(row.icon) ?? 'settings'}
+            domain={row.iconDomain}
+          />
+        ) : undefined
+      }
+      metadata={value}
       onPress={() => {
         if (row.comingSoon) return
         if (row.onPress) {
@@ -367,31 +285,10 @@ export function SettingsLinkRow({
         if (row.route) {
           router.push(row.route as Href)
         }
-      }}>
-      <RowChrome
-        last={last}
-        stacked={stacked}
-        leading={
-          row.icon ? (
-            <SettingsIconTile
-              name={settingsIconName(row.icon) ?? 'settings'}
-              domain={row.iconDomain}
-            />
-          ) : undefined
-        }>
-        <View style={styles.rowText}>
-          <AppText variant="rowTitle">{title}</AppText>
-          {row.description ? (
-            <AppText variant="caption" colour="textSecondary">
-              {row.description}
-            </AppText>
-          ) : null}
-          {stacked && value ? <TrailingValue value={value} /> : null}
-        </View>
-        {!stacked && value ? <TrailingValue value={value} /> : null}
-        {row.comingSoon ? null : <DecorativeChevron />}
-      </RowChrome>
-    </AppPressable>
+      }}
+      title={title}
+      variant="navigation"
+    />
   )
 }
 
@@ -410,33 +307,15 @@ export function SettingsInfoRow({
   description?: string
   last?: boolean
 }) {
-  const {fontScale} = useWindowDimensions()
-  const stacked = fontScale >= 1.6
   return (
-    <View
-      accessible={Platform.OS === 'web' ? undefined : true}
-      accessibilityRole={Platform.OS === 'web' ? undefined : 'text'}
-      accessibilityLabel={
-        Platform.OS === 'web'
-          ? undefined
-          : [label, value, description].filter(Boolean).join(', ')
-      }>
-      <RowChrome
-        last={last}
-        stacked={stacked}
-        leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
-        <View style={styles.rowText}>
-          <AppText variant="rowTitle">{label}</AppText>
-          {description ? (
-            <AppText variant="caption" colour="textSecondary">
-              {description}
-            </AppText>
-          ) : null}
-          {stacked && value ? <TrailingValue value={value} /> : null}
-        </View>
-        {!stacked && value ? <TrailingValue value={value} /> : null}
-      </RowChrome>
-    </View>
+    <ModulaListRow
+      description={description}
+      last={last}
+      leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}
+      metadata={value}
+      title={label}
+      variant="value"
+    />
   )
 }
 
@@ -451,24 +330,18 @@ export function SettingsChoiceRow({
   onPress: () => void
   last?: boolean
 }) {
-  const {colours} = useThemeTokens()
   return (
-    <AppPressable
+    <ModulaListRow
+      accessory="check"
       accessibilityLabel={label}
       accessibilityRole="radio"
       accessibilityState={{selected}}
-      onPress={onPress}>
-      <RowChrome last={last}>
-        <View style={styles.rowText}>
-          <AppText variant="rowTitle">{label}</AppText>
-        </View>
-        {selected ? (
-          <View accessible={false} importantForAccessibility="no">
-            <ModulaIcon name="check" size={18} colour={colours.accent} />
-          </View>
-        ) : null}
-      </RowChrome>
-    </AppPressable>
+      last={last}
+      onPress={onPress}
+      selected={selected}
+      title={label}
+      variant="action"
+    />
   )
 }
 
@@ -487,26 +360,26 @@ export function SettingsToggleRow({
   last?: boolean
   preview?: boolean
 }) {
-  const {accessibility} = useThemeTokens()
+  const {accessibility, spacing} = useThemeTokens()
   const title = preview ? `${label} — Preview` : label
 
   return (
-    <RowChrome last={last}>
-      <View style={styles.rowText}>
-        <AppText variant="rowTitle">{title}</AppText>
-        {description ? (
-          <AppText variant="caption" colour="textSecondary">
-            {description}
-          </AppText>
-        ) : null}
-      </View>
-      {accessibility.showSwitchLabels ? (
-        <AppText variant="micro" colour={value ? 'accent' : 'textSecondary'}>
-          {value ? 'On' : 'Off'}
-        </AppText>
-      ) : null}
-      <SystemSwitch value={value} onValueChange={onValueChange} label={title} />
-    </RowChrome>
+    <ModulaListRow
+      description={description}
+      last={last}
+      title={title}
+      trailing={
+        <View style={[styles.toggleAccessory, {gap: spacing[2]}]}>
+          {accessibility.showSwitchLabels ? (
+            <AppText variant="micro" colour={value ? 'accent' : 'textSecondary'}>
+              {value ? 'On' : 'Off'}
+            </AppText>
+          ) : null}
+          <SystemSwitch value={value} onValueChange={onValueChange} label={title} />
+        </View>
+      }
+      variant="toggle"
+    />
   )
 }
 
@@ -572,8 +445,6 @@ export function SettingsMenuRow({
   icon?: ModulaIconName
   iconDomain?: SettingsIconDomain
 }) {
-  const {fontScale} = useWindowDimensions()
-  const stacked = fontScale >= 1.6
   const title = preview ? `${label} — Preview` : label
 
   return (
@@ -583,22 +454,15 @@ export function SettingsMenuRow({
       onAction={onAction}
       accessibilityLabel={`${title}${value ? `, ${value}` : ''}`}
       trigger={
-        <RowChrome
+        <ModulaListRow
+          accessory="chevron"
+          description={description}
           last={last}
-          stacked={stacked}
-          leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}>
-          <View style={styles.rowText}>
-            <AppText variant="rowTitle">{title}</AppText>
-            {description ? (
-              <AppText variant="caption" colour="textSecondary">
-                {description}
-              </AppText>
-            ) : null}
-            {stacked && value ? <TrailingValue value={value} /> : null}
-          </View>
-          {!stacked && value ? <TrailingValue value={value} /> : null}
-          <DecorativeChevron />
-        </RowChrome>
+          leading={icon ? <SettingsIconTile name={icon} domain={iconDomain} /> : undefined}
+          metadata={value}
+          title={title}
+          variant="navigation"
+        />
       }
     />
   )
@@ -615,25 +479,14 @@ export function SettingsDestructiveRow({
   onPress: () => void
   last?: boolean
 }) {
-  const {colours} = useThemeTokens()
   return (
-    <AppPressable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      onPress={onPress}>
-      <RowChrome last={last}>
-        <View style={styles.rowText}>
-          <AppText variant="rowTitle" style={{color: colours.destructive}}>
-            {label}
-          </AppText>
-          {description ? (
-            <AppText variant="caption" colour="textSecondary">
-              {description}
-            </AppText>
-          ) : null}
-        </View>
-      </RowChrome>
-    </AppPressable>
+    <ModulaListRow
+      description={description}
+      last={last}
+      onPress={onPress}
+      title={label}
+      variant="destructive"
+    />
   )
 }
 
@@ -717,42 +570,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconTile: {
-    alignItems: 'center',
-    borderRadius: 7,
-    justifyContent: 'center',
-  },
-  list: {
-    overflow: 'hidden',
-  },
-  row: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    width: '100%',
-  },
-  rowBody: {
-    alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    flexDirection: 'row',
-  },
-  rowBodyStacked: {
-    alignItems: 'flex-start',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flex: 1,
-    flexDirection: 'row',
-  },
-  rowText: {
-    flex: 1,
-    gap: 2,
-    minWidth: 0,
-  },
   screen: {
     flex: 1,
   },
-  trailing: {
-    flexShrink: 1,
-    maxWidth: '42%',
-    textAlign: 'right',
+  toggleAccessory: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 })

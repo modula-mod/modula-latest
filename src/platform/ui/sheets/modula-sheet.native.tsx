@@ -6,9 +6,12 @@ import {Modal, Platform, Pressable, StyleSheet, View, useWindowDimensions} from 
 
 import {useReduceMotion} from '@/lib/accessibility'
 import {ModulaSheetLayout} from '@/platform/ui/sheets/modula-sheet-layout'
+import {ModulaSheetHeader} from '@/platform/ui/sheets/modula-sheet-header'
 import {
+  detentForPresentation,
   nativeSnapPoints,
   snapPointsForDetent,
+  snapPointsForSemanticDetents,
   type ModulaSheetProps,
 } from '@/platform/ui/sheets/modula-sheet.types'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
@@ -30,9 +33,13 @@ export function ModulaSheet({
   isPresented,
   onDismiss,
   children,
+  presentation,
+  title,
+  subtitle,
   header,
   footer,
   detent,
+  detents,
   snapPoints,
   showDragIndicator = true,
   testID,
@@ -47,11 +54,15 @@ export function ModulaSheet({
   const reduceMotion = useReduceMotion()
   const useGlass = material === 'glass' && !reduceTransparency && Platform.OS === 'ios'
   const contentWidth = Math.max(280, windowWidth - 32)
-  const structured = Boolean(header || footer)
-  const resolvedSnapPoints = nativeSnapPoints(snapPoints ?? snapPointsForDetent(detent))
+  const resolvedDetent = detent ?? detentForPresentation(presentation)
+  const resolvedHeader = header ?? (title ? <ModulaSheetHeader title={title} subtitle={subtitle} /> : undefined)
+  const structured = Boolean(resolvedHeader || footer)
+  const resolvedSnapPoints = nativeSnapPoints(
+    snapPoints ?? snapPointsForSemanticDetents(detents) ?? snapPointsForDetent(resolvedDetent),
+  )
   const needsAccessibilityHeight = structured && fontScale > 1.2
   const maxBody = Math.round(
-    windowHeight * (detent === 'medium' && !needsAccessibilityHeight ? 0.56 : 0.92),
+    windowHeight * (resolvedDetent === 'medium' && !needsAccessibilityHeight ? 0.56 : 0.92),
   )
 
   useEffect(() => {
@@ -61,7 +72,7 @@ export function ModulaSheet({
   }, [isPresented, obscureShellChrome])
 
   const inner = structured ? (
-    <ModulaSheetLayout header={header} footer={footer} scrollBody={scrollBody} testID={testID}>
+    <ModulaSheetLayout header={resolvedHeader} footer={footer} scrollBody={scrollBody} testID={testID}>
       {children}
     </ModulaSheetLayout>
   ) : (

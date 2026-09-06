@@ -1,27 +1,15 @@
 import {useEffect, useMemo, useState} from 'react'
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native'
+import {View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {BlurBackdrop} from '@/components/materials/BlurBackdrop'
-import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
-import {Avatar} from '@/components/primitives/Avatar'
 import {useSession} from '@/auth/runtime'
+import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
 import {useDiscoverQuery} from '@/features/discover/data'
 import {getProfileRouteForIdentity} from '@/features/profile/navigation/openProfile'
 import {selectionHaptic} from '@/lib/haptics'
-import {useReduceMotion} from '@/lib/accessibility'
-import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+import {ModulaListAvatar, ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type HomeSearchModalProps = {
@@ -47,18 +35,12 @@ const ACTIONS: readonly SearchAction[] = [
   {id: 'presence', label: 'Live Presence', icon: 'play', href: '/discover/live'},
 ]
 
-/**
- * Glass search modal opened from the Home pull-action tray (Search).
- * Inspired by frosted command panels — Modula actions + people, not a clone.
- */
+/** Home search composed entirely from the shared search, sheet and list system. */
 export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
   const router = useRouter()
   const session = useSession()
-  const ownerProfileId =
-    session.status === 'signedIn' ? session.profile.id : null
-  const {colours, spacing, radius, scheme} = useThemeTokens()
-  const {reduceTransparency} = useSystemAccessibility()
-  const reduceMotion = useReduceMotion()
+  const ownerProfileId = session.status === 'signedIn' ? session.profile.id : null
+  const {colours, spacing} = useThemeTokens()
   const discoverQuery = useDiscoverQuery()
   const [query, setQuery] = useState('')
 
@@ -86,8 +68,7 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
 
   const actions = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return ACTIONS
-    return ACTIONS.filter(action => action.label.toLowerCase().includes(q))
+    return q ? ACTIONS.filter(action => action.label.toLowerCase().includes(q)) : ACTIONS
   }, [query])
 
   const go = (href: Href) => {
@@ -96,258 +77,69 @@ export function HomeSearchModal({visible, onClose}: HomeSearchModalProps) {
     router.push(href)
   }
 
-  const glassTint = scheme === 'dark' ? 'systemMaterialDark' : 'systemMaterialLight'
-  // Frosted glass wash — neutral, not accent-tinted or pink-card AI default.
-  const panelWash =
-    scheme === 'dark' ? 'rgba(18, 24, 28, 0.42)' : 'rgba(255, 255, 255, 0.52)'
-  const fieldWash =
-    scheme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.62)'
-
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType={reduceMotion ? 'none' : 'fade'}
-      onRequestClose={onClose}
-      statusBarTranslucent>
-      <KeyboardAvoidingView
-        style={styles.root}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Dismiss search"
-          onPress={onClose}
-          style={StyleSheet.absoluteFill}>
-          {reduceTransparency ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                {backgroundColor: colours.backdrop},
-              ]}
+    <ModulaSheet
+      accessibilityLabel="Search Modula"
+      detents={['large', 'full']}
+      isPresented={visible}
+      material="glass"
+      onDismiss={onClose}
+      presentation="interactive"
+      testID="home-search-sheet"
+      title="Search">
+      <View style={{gap: spacing[4]}}>
+        <ModulaSearchField
+          accessibilityLabel="Search Modula"
+          autoFocus
+          onChangeText={setQuery}
+          onEscape={onClose}
+          placeholder="Search Modula"
+          testID="home-search-input"
+          value={query}
+          variant="screen"
+        />
+
+        <ModulaListSection title="Actions">
+          {actions.map((action, index) => (
+            <ModulaListRow
+              key={action.id}
+              accessory="chevron"
+              last={index === actions.length - 1}
+              leading={<AppIcon name={action.icon} colour={colours.textSecondary} size={20} />}
+              onPress={() => go(action.href)}
+              title={action.label}
+              variant="navigation"
             />
-          ) : (
-            <BlurBackdrop
-              intensity={36}
-              tint={scheme === 'dark' ? 'dark' : 'light'}
-              style={StyleSheet.absoluteFill}
+          ))}
+          {actions.length === 0 ? (
+            <ModulaListRow last title="No matching actions" />
+          ) : null}
+        </ModulaListSection>
+
+        <ModulaListSection title="People with access">
+          {people.map(({profile, role}, index) => (
+            <ModulaListRow
+              key={profile.id}
+              last={index === people.length - 1}
+              leading={
+                <ModulaListAvatar
+                  colour={profile.coverColour}
+                  name={profile.displayName ?? profile.handle ?? 'Person'}
+                  size={36}
+                  uri={profile.avatarUri}
+                />
+              }
+              metadata={role}
+              onPress={() =>
+                go(getProfileRouteForIdentity(profile, ownerProfileId ?? '') as Href)
+              }
+              title={profile.displayName ?? profile.handle}
+              variant="person"
             />
-          )}
-          <View
-            style={[
-              StyleSheet.absoluteFill,
-              {backgroundColor: colours.backdrop, opacity: 0.35},
-            ]}
-          />
-        </Pressable>
-
-        <View
-          style={[styles.panelWrap, {paddingHorizontal: spacing[4]}]}
-          pointerEvents="box-none">
-          <View style={[styles.panelShell, {borderRadius: radius.xlarge}]}>
-            {reduceTransparency ? (
-              <View
-                style={[
-                  StyleSheet.absoluteFill,
-                  {
-                    backgroundColor: colours.surfaceRaised,
-                    borderRadius: radius.xlarge,
-                  },
-                ]}
-              />
-            ) : (
-              <>
-                <BlurBackdrop
-                  intensity={64}
-                  tint={glassTint}
-                  style={[
-                    StyleSheet.absoluteFill,
-                    {borderRadius: radius.xlarge},
-                  ]}
-                />
-                <View
-                  style={[
-                    StyleSheet.absoluteFill,
-                    {
-                      backgroundColor: panelWash,
-                      borderRadius: radius.xlarge,
-                    },
-                  ]}
-                />
-              </>
-            )}
-
-            <View
-              style={[
-                styles.panelBody,
-                {
-                  borderColor: colours.border,
-                  borderRadius: radius.xlarge,
-                  gap: spacing[4],
-                  padding: spacing[4],
-                },
-              ]}>
-              <View
-                style={[
-                  styles.searchField,
-                  {
-                    backgroundColor: fieldWash,
-                    borderColor: colours.border,
-                    borderRadius: radius.large,
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[3],
-                  },
-                ]}>
-                <AppIcon name="search" colour={colours.textSecondary} size={18} />
-                <TextInput
-                  autoFocus
-                  value={query}
-                  onChangeText={setQuery}
-                  placeholder="Search"
-                  placeholderTextColor={colours.textTertiary}
-                  accessibilityLabel="Search Modula"
-                  returnKeyType="search"
-                  style={[styles.searchInput, {color: colours.text}]}
-                />
-              </View>
-
-              <View style={{gap: spacing[2]}}>
-                <AppText variant="caption" colour="textTertiary">
-                  Actions
-                </AppText>
-                {actions.map(action => (
-                  <AppPressable
-                    key={action.id}
-                    accessibilityLabel={action.label}
-                    onPress={() => go(action.href)}
-                    style={[
-                      styles.actionRow,
-                      {borderRadius: radius.medium, gap: spacing[3]},
-                    ]}>
-                    <AppIcon
-                      name={action.icon}
-                      colour={colours.text}
-                      size={20}
-                    />
-                    <AppText variant="body" style={{flex: 1, color: colours.text}}>
-                      {action.label}
-                    </AppText>
-                    <AppIcon
-                      name="chevronRight"
-                      colour={colours.textTertiary}
-                      size={16}
-                    />
-                  </AppPressable>
-                ))}
-                {actions.length === 0 ? (
-                  <AppText variant="caption" colour="textTertiary">
-                    No matching actions
-                  </AppText>
-                ) : null}
-              </View>
-
-              <View style={{gap: spacing[2]}}>
-                <AppText variant="caption" colour="textTertiary">
-                  People with access
-                </AppText>
-                <ScrollView
-                  style={styles.peopleScroll}
-                  keyboardShouldPersistTaps="handled">
-                  {people.map(({profile, role}) => (
-                    <AppPressable
-                      key={profile.id}
-                      accessibilityLabel={`${profile.displayName ?? profile.handle}, ${role}`}
-                      onPress={() =>
-                        go(
-                          getProfileRouteForIdentity(
-                            profile,
-                            ownerProfileId ?? '',
-                          ) as Href,
-                        )
-                      }
-                      style={[
-                        styles.personRow,
-                        {borderRadius: radius.medium, gap: spacing[3]},
-                      ]}>
-                      <Avatar
-                        name={profile.displayName ?? profile.handle ?? 'Person'}
-                        uri={profile.avatarUri}
-                        colour={profile.coverColour}
-                        size={36}
-                      />
-                      <AppText
-                        variant="body"
-                        style={{flex: 1, color: colours.text}}
-                        numberOfLines={1}>
-                        {profile.displayName ?? profile.handle}
-                      </AppText>
-                      <AppText variant="caption" colour="textSecondary">
-                        {role}
-                        {role !== 'Owner' ? ' ▾' : ''}
-                      </AppText>
-                    </AppPressable>
-                  ))}
-                  {people.length === 0 ? (
-                    <AppText variant="caption" colour="textTertiary">
-                      No people to show yet
-                    </AppText>
-                  ) : null}
-                </ScrollView>
-              </View>
-            </View>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+          ))}
+          {people.length === 0 ? <ModulaListRow last title="No people to show yet" /> : null}
+        </ModulaListSection>
+      </View>
+    </ModulaSheet>
   )
 }
-
-const styles = StyleSheet.create({
-  actionRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 48,
-    paddingHorizontal: 4,
-    paddingVertical: 6,
-  },
-  panelBody: {
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-    width: '100%',
-    zIndex: 1,
-  },
-  panelShell: {
-    maxWidth: 420,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  panelWrap: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingBottom: 48,
-  },
-  peopleScroll: {
-    maxHeight: 220,
-  },
-  personRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    minHeight: 52,
-    paddingVertical: 6,
-  },
-  root: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  searchField: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    minHeight: 48,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 17,
-    paddingVertical: 10,
-  },
-})

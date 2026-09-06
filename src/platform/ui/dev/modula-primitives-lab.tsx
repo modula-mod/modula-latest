@@ -42,6 +42,7 @@ import {
 } from '@/features/modules/state/productHubSearchMachine'
 import {StoryRingAvatar} from '@/platform/ui/avatars/StoryRingAvatar'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaActionButton} from '@/platform/ui/buttons/modula-action-button'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
 import {ModulaOTPField} from '@/platform/ui/controls/modula-otp-field'
@@ -57,9 +58,16 @@ import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {ModulaActionSheet} from '@/platform/ui/sheets/modula-sheet-compositions'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ProductStatsRow} from '@/platform/ui/chrome/product-stats-row'
 import {ModulaPageTabView} from '@/platform/ui/tabs/modula-page-tab-view'
+import {ModulaTabs} from '@/platform/ui/tabs/modula-tabs-control'
+import {ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
+import {ModulaBadge, ModulaProductRow, ModulaUserRow} from '@/platform/ui/identity'
+import {ModulaEmptyState, ModulaInlineNotice, ModulaLoadingSection} from '@/platform/ui/feedback'
+import {ModulaToolbar} from '@/platform/ui/toolbars'
+import {UI_SYSTEM_LAB_MATRIX} from '@/platform/ui/dev/ui-system-lab-matrix'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {
   SettingsDestructiveRow,
@@ -251,6 +259,7 @@ export function ModulaPrimitivesLabScreen({
   const [enabled, setEnabled] = useState(true)
   const [popover, setPopover] = useState(false)
   const [sheet, setSheet] = useState(false)
+  const [actionSheet, setActionSheet] = useState(false)
   const [page, setPage] = useState('overview')
   const [productTab, setProductTab] = useState<ProductTabId>('overview')
   const [installReview, setInstallReview] = useState(initialInstallReviewOpen)
@@ -263,6 +272,15 @@ export function ModulaPrimitivesLabScreen({
       <AppText variant="body" colour="textSecondary">
         Typography, surface, icons, and controls in one matrix. Product screens import these wrappers — never SwiftUI directly.
       </AppText>
+
+      <LabBlock title="Acceptance matrix">
+        {Object.entries(UI_SYSTEM_LAB_MATRIX).map(([axis, values]) => (
+          <View key={axis} style={{gap: spacing[1]}}>
+            <AppText variant="label">{axis}</AppText>
+            <AppText variant="caption" colour="textSecondary">{values.join(' · ')}</AppText>
+          </View>
+        ))}
+      </LabBlock>
 
       <LabBlock title="Quality compare">
         <AppText variant="caption" colour="textSecondary">
@@ -324,7 +342,45 @@ export function ModulaPrimitivesLabScreen({
           <ModulaButton label="Destructive" role="destructive" onPress={() => undefined} />
           <ModulaButton label="Disabled" disabled onPress={() => undefined} />
           <ModulaButton label="Loading" loading onPress={() => undefined} />
+          <ModulaActionButton label="Get" emphasis="primary" onPress={() => undefined} />
+          <ModulaActionButton label="Open" onPress={() => undefined} />
         </View>
+      </LabBlock>
+
+      <LabBlock title="Semantic lists and rows">
+        <ModulaListSection title="Shared rows" footer="Settings and products inherit this geometry.">
+          <ModulaListRow title="Navigation" description="Shared list row" variant="navigation" onPress={() => undefined} />
+          <ModulaUserRow name="Ada Lovelace" handle="@ada" metadata="Following" />
+          <ModulaProductRow name="Vault Notes" subtitle="Private notes" action={{label: 'Open', onPress: () => undefined}} last />
+        </ModulaListSection>
+      </LabBlock>
+
+      <LabBlock title="Tabs">
+        <ModulaTabs
+          accessibilityLabel="UI Lab sections"
+          onValueChange={setSegment}
+          presentation="scrollable"
+          tabs={[
+            {id: 'Following', label: 'Following'},
+            {id: 'For You', label: 'For You'},
+            {id: 'Modules', label: 'Modules'},
+          ]}
+          value={segment}
+        />
+      </LabBlock>
+
+      <LabBlock title="Toolbar and badges">
+        <ModulaToolbar>
+          <ModulaIconButton icon="edit" accessibilityLabel="Edit" onPress={() => undefined} />
+          <ModulaIconButton icon="share" accessibilityLabel="Share" onPress={() => undefined} />
+          <ModulaBadge label="Beta" tone="warning" />
+        </ModulaToolbar>
+      </LabBlock>
+
+      <LabBlock title="Feedback, loading and empty states">
+        <ModulaInlineNotice message="Note saved" tone="success" />
+        <ModulaLoadingSection rows={2} />
+        <ModulaEmptyState title="Nothing here yet" description="Create an item to get started." />
       </LabBlock>
 
       <LabBlock title="Toolbar chrome">
@@ -401,10 +457,10 @@ export function ModulaPrimitivesLabScreen({
 
       <LabBlock title="Fields">
         <ModulaFieldShell label="Text" support="Used on your profile.">
-          <ModulaTextInput value={fieldValue} onChangeText={setFieldValue} />
+          <ModulaTextInput accessibilityLabel="Text" value={fieldValue} onChangeText={setFieldValue} />
         </ModulaFieldShell>
         <ModulaFieldShell label="Multiline">
-          <ModulaTextInput multiline value={multilineValue} onChangeText={setMultilineValue} />
+          <ModulaTextInput accessibilityLabel="Multiline" multiline value={multilineValue} onChangeText={setMultilineValue} />
         </ModulaFieldShell>
         <ModulaFieldShell label="Select">
           <ModulaSelectField
@@ -424,10 +480,10 @@ export function ModulaPrimitivesLabScreen({
           <ModulaSearchField value={query} onChangeText={setQuery} placeholder="Search" />
         </ModulaFieldShell>
         <ModulaFieldShell label="Error" error="A concise field-level error.">
-          <ModulaTextInput value="" onChangeText={() => undefined} style={{borderColor: colours.destructive}} />
+          <ModulaTextInput accessibilityLabel="Error" value="" onChangeText={() => undefined} style={{borderColor: colours.destructive}} />
         </ModulaFieldShell>
         <ModulaFieldShell label="Disabled">
-          <ModulaTextInput value="Unavailable" editable={false} onChangeText={() => undefined} />
+          <ModulaTextInput accessibilityLabel="Disabled" value="Unavailable" editable={false} onChangeText={() => undefined} />
         </ModulaFieldShell>
       </LabBlock>
 
@@ -473,10 +529,21 @@ export function ModulaPrimitivesLabScreen({
 
       <LabBlock title="Sheet">
         <ModulaButton label="Show sheet" role="secondary" onPress={() => setSheet(true)} />
-        <ModulaSheet isPresented={sheet} onDismiss={() => setSheet(false)} snapPoints={['half']}>
-          <AppText variant="headline">Sheet</AppText>
+        <ModulaButton label="Show action sheet" role="secondary" onPress={() => setActionSheet(true)} />
+        <ModulaSheet isPresented={sheet} onDismiss={() => setSheet(false)} presentation="interactive" title="Sheet">
           <AppText variant="body" colour="textSecondary">Install review and overflow actions use this adapter.</AppText>
         </ModulaSheet>
+        <ModulaActionSheet
+          actions={[
+            {id: 'share', label: 'Share', icon: 'share'},
+            {id: 'save', label: 'Save', icon: 'bookmark'},
+            {id: 'report', label: 'Report', icon: 'warning', style: 'destructive'},
+          ]}
+          isPresented={actionSheet}
+          onAction={() => undefined}
+          onDismiss={() => setActionSheet(false)}
+          title="Actions"
+        />
       </LabBlock>
 
       <LabBlock title="Popover">

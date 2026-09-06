@@ -1,12 +1,5 @@
 import {useEffect, useRef} from 'react'
-import {
-  LayoutAnimation,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  UIManager,
-  View,
-} from 'react-native'
+import {LayoutAnimation, Platform, ScrollView, StyleSheet, UIManager, View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -25,12 +18,16 @@ export type ModulaMotionTab = {
   id: string
   title: string
   accessibilityLabel?: string
+  disabled?: boolean
 }
 
 type ModulaMotionTabsProps = {
   tabs: ModulaMotionTab[]
   selectedTabId: string
   onSelectTab: (tabId: string) => void
+  accessibilityLabel?: string
+  style?: StyleProp<ViewStyle>
+  testID?: string
 }
 
 /**
@@ -44,6 +41,9 @@ export function ModulaMotionTabs({
   tabs,
   selectedTabId,
   onSelectTab,
+  accessibilityLabel,
+  style,
+  testID,
 }: ModulaMotionTabsProps) {
   const {colours, spacing} = useThemeTokens()
   const reduceMotion = useReduceMotion()
@@ -64,7 +64,11 @@ export function ModulaMotionTabs({
   }, [reduceMotion, selectedTabId])
 
   return (
-    <View style={[styles.wrap, {borderBottomColor: colours.separator}]}>
+    <View
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="tablist"
+      style={[styles.wrap, {borderBottomColor: colours.separator}, style]}
+      testID={testID}>
       <ScrollView
         ref={scroller}
         horizontal
@@ -80,15 +84,18 @@ export function ModulaMotionTabs({
               key={tab.id}
               accessibilityRole="tab"
               accessibilityLabel={tab.accessibilityLabel ?? tab.title}
-              accessibilityState={{selected}}
+              accessibilityState={{selected, disabled: tab.disabled}}
+              disabled={tab.disabled}
               onLayout={event => {
                 offsets.current[tab.id] = event.nativeEvent.layout.x
               }}
               onPress={() => {
-                void selectionHaptic()
-                onSelectTab(tab.id)
+                if (!tab.disabled) {
+                  void selectionHaptic()
+                  onSelectTab(tab.id)
+                }
               }}
-              style={styles.tab}>
+              style={[styles.tab, {opacity: tab.disabled ? 0.45 : 1}]}>
               <AppText
                 variant="label"
                 style={{

@@ -13,10 +13,17 @@ export const controls = {
     regular: 42,
     prominent: 46,
   },
+  actionButton: {
+    compact: 32,
+    regular: 36,
+    prominent: 42,
+  },
   iconButton: {
     compact: 32,
     regular: 36,
     navigation: 38,
+    floating: 44,
+    prominent: 48,
   },
   inputHeight: {
     search: 44,
@@ -25,6 +32,19 @@ export const controls = {
   },
   listRow: {
     minimum: 52,
+    compact: 44,
+    comfortable: 60,
+  },
+  toolbar: {
+    minimum: 44,
+    floating: 48,
+  },
+  sheet: {
+    handleWidth: 36,
+    handleHeight: 4,
+    compactFraction: 0.36,
+    mediumFraction: 0.56,
+    largeFraction: 0.92,
   },
   iconSize: {
     status: 16,

@@ -1,5 +1,5 @@
 import {useEffect, useRef} from 'react'
-import {Platform, Pressable, StyleSheet, TextInput, type View} from 'react-native'
+import {StyleSheet, type TextInput as RNTextInput} from 'react-native'
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -8,11 +8,10 @@ import Animated, {
 } from 'react-native-reanimated'
 import {scheduleOnRN} from 'react-native-worklets'
 
-import {AppText} from '@/components/primitives/AppText'
 import {selectionHaptic} from '@/lib/haptics'
 import {useReduceMotion} from '@/lib/accessibility'
-import {ModulaIcon} from '@/platform/ui/icons'
-import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
+import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {
   isProductHubSearchActive,
   type ProductHubSearchModel,
@@ -34,10 +33,9 @@ export function ProductHubSearchChrome({
   onCancel: () => void
   onSettled: () => void
 }) {
-  const {colours, radius, spacing, motion} = useThemeTokens()
+  const {motion} = useThemeTokens()
   const reduceMotion = useReduceMotion()
-  const inputRef = useRef<TextInput>(null)
-  const triggerRef = useRef<View>(null)
+  const inputRef = useRef<RNTextInput>(null)
   const active = isProductHubSearchActive(model.state) || model.state === 'SEARCH_COLLAPSING'
   const expanded = isProductHubSearchActive(model.state)
   const progress = useSharedValue(expanded ? 1 : compact ? 0 : 1)
@@ -75,11 +73,6 @@ export function ProductHubSearchChrome({
 
   const cancelSearch = () => {
     onCancel()
-    if (Platform.OS === 'web') {
-      setTimeout(() => {
-        ;(triggerRef.current as unknown as HTMLElement | null)?.focus?.()
-      }, reduceMotion ? 0 : duration)
-    }
   }
 
   const triggerSearch = () => {
@@ -89,117 +82,46 @@ export function ProductHubSearchChrome({
 
   if (compact && !active) {
     return (
-      <LiquidGlassChrome
-        interactive
-        fallback="regular"
-        style={[styles.glassTrigger, {borderRadius: radius.round}]}>
-        <Pressable
-          ref={triggerRef}
-          accessibilityRole="button"
-          accessibilityLabel="Search Product Hub"
-          onPress={triggerSearch}
-          testID="product-hub-search-trigger"
-          hitSlop={8}
-          style={styles.trigger}>
-          <ModulaIcon name="search" size={18} colour={colours.text} />
-        </Pressable>
-      </LiquidGlassChrome>
+      <ModulaIconButton
+        accessibilityLabel="Search Product Hub"
+        chrome="glass"
+        icon="search"
+        onPress={triggerSearch}
+        testID="product-hub-search-trigger"
+      />
     )
   }
 
   return (
     <Animated.View
-      style={[
-        styles.field,
-        {
-          backgroundColor: colours.surfaceRaised,
-          borderColor: colours.border,
-          borderRadius: radius.round,
-          paddingHorizontal: spacing[3],
-          flex: 1,
-          minWidth: 0,
-        },
-        fieldStyle,
-      ]}
+      style={[styles.field, fieldStyle]}
       testID="product-hub-search-field">
-      <ModulaIcon name="search" size={18} colour={colours.textTertiary} />
-      {expanded ? (
-        <TextInput
-          ref={inputRef}
-          value={model.query}
-          onChangeText={onChangeText}
-          onKeyPress={event => {
-            if (event.nativeEvent.key === 'Escape') cancelSearch()
-          }}
-          onSubmitEditing={() => undefined}
-          placeholder="Search modules, tools and more…"
-          placeholderTextColor={colours.textTertiary}
-          accessibilityLabel="Search Product Hub"
-          accessibilityRole="search"
-          returnKeyType="search"
-          autoCorrect={false}
-          autoCapitalize="none"
-          clearButtonMode="never"
-          style={[
-            styles.input,
-            {color: colours.text},
-            Platform.OS === 'web'
-              ? ({
-                  outlineWidth: 2,
-                  outlineColor: colours.accent,
-                  outlineOffset: 2,
-                } as object)
-              : null,
-          ]}
-          testID="product-hub-search-input"
-        />
-      ) : (
-        <Pressable
-          ref={triggerRef}
-          accessibilityRole="button"
-          accessibilityLabel="Search Product Hub"
-          onPress={triggerSearch}
-          style={styles.idleHit}>
-          <AppText variant="body" colour="textTertiary">
-            Search Product Hub
-          </AppText>
-        </Pressable>
-      )}
-      {expanded ? (
-        <>
-          {model.query ? (
-            <Pressable
-              accessibilityLabel="Clear search"
-              onPress={() => onChangeText('')}
-              hitSlop={8}
-              testID="product-hub-search-clear">
-              <ModulaIcon name="close" size={17} colour={colours.textTertiary} />
-            </Pressable>
-          ) : null}
-          <Pressable accessibilityLabel="Cancel search" onPress={cancelSearch} hitSlop={8} testID="product-hub-search-cancel">
-            <AppText variant="buttonLabel" colour="accent">
-              Cancel
-            </AppText>
-          </Pressable>
-        </>
-      ) : null}
+      <ModulaSearchField
+        ref={inputRef}
+        accessibilityLabel="Search Product Hub"
+        autoCapitalize="none"
+        autoCorrect={false}
+        editable={expanded}
+        onActivate={expanded ? undefined : triggerSearch}
+        onCancel={expanded ? cancelSearch : undefined}
+        onChangeText={onChangeText}
+        onEscape={cancelSearch}
+        placeholder="Search modules, tools and more…"
+        style={styles.sharedField}
+        testID="product-hub-search-input"
+        value={model.query}
+        variant="product"
+      />
     </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
   field: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    gap: 8,
-    minHeight: 44,
+    flex: 1,
+    minWidth: 0,
   },
-  glassTrigger: {
-    height: 36,
-    width: 36,
+  sharedField: {
+    flex: 1,
   },
-  idleHit: {flex: 1, justifyContent: 'center', minHeight: 44},
-  input: {flex: 1, fontSize: 16, minHeight: 44, paddingVertical: 8},
-  trigger: {alignItems: 'center', flex: 1, justifyContent: 'center'},
 })

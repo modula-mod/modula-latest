@@ -37,8 +37,11 @@ export const TYPOGRAPHY_ROLES = [
  * timestamps, product rails, and profile metrics stay readable.
  */
 export type TypographySemanticAlias =
+  | 'largeTitle'
   | 'titleLarge'
   | 'title'
+  | 'callout'
+  | 'subheadline'
   | 'metadata'
   | 'button'
   | 'moduleTitle'
@@ -68,8 +71,11 @@ export const TYPOGRAPHY_SEMANTIC_ALIASES: Record<
   TypographySemanticAlias,
   TypographyRole
 > = {
+  largeTitle: 'title1',
   titleLarge: 'title1',
   title: 'title2',
+  callout: 'body',
+  subheadline: 'label',
   metadata: 'caption',
   button: 'label',
   moduleTitle: 'display',

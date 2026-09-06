@@ -6,7 +6,6 @@ import {
   Keyboard,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -42,6 +41,8 @@ import {
   keyboardScrollProps,
 } from '@/platform/ui'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaComposerInput} from '@/platform/ui/composer'
+import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {SelectionSheet} from '@/platform/ui/sheets/selection-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -702,22 +703,12 @@ export function ComposerScreen() {
           />
         ) : null}
 
-        <TextInput
+        <ModulaComposerInput
           value={text}
           onChangeText={onChangeText}
-          placeholder="What are you building?"
-          placeholderTextColor={colours.textTertiary}
-          multiline
           autoFocus
-          accessibilityLabel="Post text"
-          style={[
-            styles.input,
-            {
-              color: colours.text,
-              fontSize: 18,
-              lineHeight: 25,
-            },
-          ]}
+          style={styles.input}
+          textStyle={{fontSize: 18, lineHeight: 25}}
         />
 
         {media ? (
@@ -756,13 +747,12 @@ export function ComposerScreen() {
                 <ModulaIcon name="trash" colour={colours.surface} />
               </AppPressable>
             </View>
-            <TextInput
+            <ModulaTextInput
               value={altText}
               onChangeText={setAltText}
               placeholder="Add alt text — Preview"
-              placeholderTextColor={colours.textTertiary}
               accessibilityLabel="Alt text Preview"
-              style={[styles.altInput, {color: colours.text, borderColor: colours.border}]}
+              style={styles.altInput}
             />
           </View>
         ) : null}
