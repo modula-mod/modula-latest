@@ -580,5 +580,5 @@ export type ModulaIconName = keyof typeof MODULA_ICONS
 export const MODULA_ICON_NAMES = Object.keys(MODULA_ICONS) as ModulaIconName[]
 
 export function modulaIconDefinition(name: ModulaIconName): ModulaIconDefinition {
-  return MODULA_ICONS[name]
+  return MODULA_ICONS[name] ?? MODULA_ICONS.module
 }
