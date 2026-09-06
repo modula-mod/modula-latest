@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {Alert, Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
@@ -24,11 +24,9 @@ import {
   ProductPlatformRow,
   ProductPreviewCarousel,
   ProductRatingPanel,
-  ProductFixedChrome,
-  ProductStickyHeader,
+  ProductNavigationChrome,
   ProductTabs,
   ProductWhatsNew,
-  productTrailingCapsuleWidth,
   type ProductCapabilityItem,
   type ProductInformationItem,
   type ProductMetadataItem,
@@ -44,7 +42,6 @@ import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {shareModulaText} from '@/platform/ui/share/share-modula-text'
-import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {useAppServices} from '@/runtime/useAppServices'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -62,7 +59,6 @@ export function ModuleDetailScreen() {
   const insets = useSafeAreaInsets()
   const {width} = useWindowDimensions()
   const {colours, scheme, spacing} = useThemeTokens()
-  const tabPadding = useFloatingTabBarContentPadding()
   const detail = useModuleDetailQuery(id)
   const relationships = useModuleRelationshipsQuery(id)
   const module = detail.data
@@ -78,6 +74,8 @@ export function ModuleDetailScreen() {
   const [scrollOffset, setScrollOffset] = useState(0)
   const [ratingBusy, setRatingBusy] = useState(false)
   const [userRating, setUserRating] = useState<number | null>(null)
+  const scrollRef = useRef<ScrollView>(null)
+  const scrollMetrics = useRef({contentHeight: 0, offset: 0, viewportHeight: 0})
 
   const installRequested = install === '1' || install === 'true'
   const installReviewOpen = installSheetOpen || installRequested
@@ -235,6 +233,24 @@ export function ModuleDetailScreen() {
   const stickyStart = Math.max(0, heroActionBottom - insets.top - 48)
   const stickyProgress = Math.min(1, Math.max(0, (scrollOffset - stickyStart) / 56))
 
+  const clampScrollOffset = () => {
+    const {contentHeight, offset, viewportHeight} = scrollMetrics.current
+    if (!contentHeight || !viewportHeight) return
+    const nextOffset = Math.min(offset, Math.max(0, contentHeight - viewportHeight))
+    if (nextOffset >= offset - 1) return
+    scrollMetrics.current.offset = nextOffset
+    scrollRef.current?.scrollTo({animated: false, y: nextOffset})
+    setScrollOffset(nextOffset)
+  }
+
+  const selectTab = (tab: ProductTabId) => {
+    setSelectedTab(tab)
+    const nextOffset = Math.min(scrollMetrics.current.offset, stickyStart)
+    scrollMetrics.current.offset = nextOffset
+    scrollRef.current?.scrollTo({animated: false, y: nextOffset})
+    setScrollOffset(nextOffset)
+  }
+
   const openModule = () => router.push(`/module/${encodeURIComponent(module.moduleId)}` as Href)
   const openInstall = () => {
     setInstallError(null)
@@ -284,9 +300,22 @@ export function ModuleDetailScreen() {
       <StatusBar style={stickyProgress > 0.5 || scrollOffset >= 210 ? (scheme === 'dark' ? 'light' : 'dark') : 'light'} />
       <ResponsiveContent maxWidth={920}>
         <ScrollView
-          contentContainerStyle={{paddingBottom: tabPadding + spacing[8]}}
+          ref={scrollRef}
+          contentContainerStyle={{paddingBottom: Math.max(insets.bottom, spacing[4]) + spacing[4]}}
           keyboardShouldPersistTaps="handled"
-          onScroll={event => setScrollOffset(event.nativeEvent.contentOffset.y)}
+          onContentSizeChange={(_width, contentHeight) => {
+            scrollMetrics.current.contentHeight = contentHeight
+            clampScrollOffset()
+          }}
+          onLayout={event => {
+            scrollMetrics.current.viewportHeight = event.nativeEvent.layout.height
+            clampScrollOffset()
+          }}
+          onScroll={event => {
+            const offset = event.nativeEvent.contentOffset.y
+            scrollMetrics.current.offset = offset
+            setScrollOffset(offset)
+          }}
           scrollEventThrottle={16}>
           <View style={styles.coverRegion}>
             <Link.AppleZoomTarget>
@@ -332,7 +361,7 @@ export function ModuleDetailScreen() {
             </View>
 
             <ProductMetadataStrip items={metadata} />
-            <ProductTabs selected={selectedTab} onSelect={setSelectedTab} />
+            <ProductTabs selected={selectedTab} onSelect={selectTab} />
           </View>
 
           <View
@@ -369,16 +398,9 @@ export function ModuleDetailScreen() {
         </ScrollView>
       </ResponsiveContent>
 
-      <ProductStickyHeader
-        moduleId={module.moduleId}
-        name={copy.name}
-        progress={stickyProgress}
-        top={insets.top}
-        trailingReservedWidth={productTrailingCapsuleWidth(stickyProgress > 0.1 ? 1 : 0)}
-      />
-
-      <ProductFixedChrome
+      <ProductNavigationChrome
         actions={overflowActions}
+        moduleId={module.moduleId}
         onAction={onOverflow}
         onBack={goBack}
         onPrimary={onPrimary}

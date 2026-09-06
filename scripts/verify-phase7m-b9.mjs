@@ -72,11 +72,11 @@ contains('src/features/modules/screens/ProductHubMarketplaceScreen.tsx', '!isLeg
 console.log('\n# Product-detail components')
 const productDir = 'src/features/modules/components/product-detail'
 for (const component of [
-  'ProductCover', 'ProductTopChrome', 'ProductBadge', 'ProductIdentity',
+  'ProductCover', 'ProductNavigationChrome', 'ProductBadge', 'ProductIdentity',
   'ProductActionGroup', 'ProductMetadataStrip', 'ProductTabs',
   'ProductCapabilityStrip', 'ProductWhatsNew', 'ProductPreviewCarousel',
   'ProductPlatformRow', 'ProductDescription', 'ProductInformationStrip',
-  'ProductInformationDisclosure', 'ProductStickyHeader',
+  'ProductInformationDisclosure', 'ProductNavigationChrome',
 ]) record(component.toUpperCase(), existsSync(file(`${productDir}/${component}.tsx`)))
 
 const detailName = 'src/features/marketplace/screens/ModuleDetailScreen.tsx'
@@ -110,7 +110,7 @@ contains('src/features/modules/components/presentation/ModuleAction.tsx', "shown
 contains(detailName, 'const stickyVisible = scrollOffset > heroActionBottom', 'STICKY VISIBILITY GATE')
 contains(detailName, 'visible={stickyVisible}', 'STICKY USES HERO GATE')
 record('ONE HERO CTA', (detail.match(/testID="module-hero-install"/g) ?? []).length === 1)
-record('ONE STICKY HEADER', (detail.match(/<ProductStickyHeader/g) ?? []).length === 1)
+record('ONE PRODUCT NAVIGATION CHROME', (detail.match(/<ProductNavigationChrome/g) ?? []).length === 1)
 const installSheet = read('src/features/modules/components/InstallPreviewSheet.tsx')
 const sheetLayout = read('src/platform/ui/sheets/modula-sheet-layout.tsx')
 record('INSTALL CTA COMPONENT', installSheet.includes('testID="module-install-confirm"') && installSheet.includes('footer={footer}'))
@@ -170,9 +170,9 @@ record('DIRECT FEATURE EXPO UI', directExpoUi.length === 0, directExpoUi.map(nam
 console.log('\n# UI Lab')
 const lab = read('src/platform/ui/dev/modula-primitives-lab.tsx')
 for (const primitive of [
-  'ProductCover', 'ProductTopChrome', 'ModuleArtwork', 'ProductIdentity', 'ProductActions',
+  'ProductCover', 'ModuleArtwork', 'ProductIdentity', 'ProductActions',
   'ProductMetadataStrip', 'ProductTabs', 'ProductCapabilityStrip', 'ProductPreviewCarousel',
-  'ProductStickyHeader', 'InstallReview', 'ModuleRow', 'EditorialHero', 'ProductHubSearch',
+  'ProductNavigationChrome', 'InstallReview', 'ModuleRow', 'EditorialHero', 'ProductHubSearch',
 ]) record(`UI LAB ${primitive.toUpperCase()}`, lab.includes(`title="${primitive}"`))
 
 const diff = spawnSync('git', ['diff', '--check'], {cwd: root, encoding: 'utf8'})
