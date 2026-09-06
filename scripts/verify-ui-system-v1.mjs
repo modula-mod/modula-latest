@@ -56,11 +56,14 @@ excludes('src/platform/ui/product-ui.ts', ['VaultNotes', 'TasksRow', 'CRMCard', 
 excludes('src/features/modules/runtime/module-view-renderer.tsx', ['digital.modula.vault-notes', 'Vault Notes'], 'PRODUCT-SPECIFIC HOST CASES')
 
 source('src/features/settings/components/SettingsRows.tsx', ['ModulaListRow', 'ModulaListSection', 'ModulaIconTile'], 'SETTINGS PROPAGATION')
+excludes('src/features/settings/components/SettingsRows.tsx', ['function RowChrome', 'function TrailingValue', 'function DecorativeChevron'], 'SETTINGS-SPECIFIC ROW RENDERERS')
 source('src/features/feed/components/HomeSearchModal.tsx', ['ModulaSheet', 'ModulaSearchField', 'ModulaListRow'], 'HOME PROPAGATION')
 source('src/features/modules/components/ProductHubSearchChrome.tsx', ['ModulaSearchField', 'ModulaIconButton'], 'PRODUCT HUB SEARCH PROPAGATION')
+source('src/features/modules/components/presentation/ModuleRow.tsx', ['ModulaProductRow'], 'PRODUCT HUB ROW PROPAGATION')
 source('src/features/activity/screens/ActivityScreen.tsx', ['SelectionSheet', 'ModulaActivityRow'], 'ACTIVITY PROPAGATION')
 source('src/components/composer/ComposerToolsDrawer.tsx', ['presentation="tools"', 'ModulaListRow', 'ModulaInlineNotice'], 'COMPOSER PROPAGATION')
 source('src/features/profile/components/ProfileOwnerToolbar.tsx', ['ModulaToolbar', 'ModulaActionButton', 'ModulaIconButton'], 'PROFILE PROPAGATION')
+source('src/features/profile/screens/ProfileConnectionsScreen.tsx', ['ModulaSearchField', 'ModulaUserRow'], 'PROFILE PERSON ROW PROPAGATION')
 source('src/shell/NavigationDrawer.tsx', ['ModulaDrawerFrame'], 'SHELL DRAWER PROPAGATION')
 
 for (const path of [
@@ -96,4 +99,5 @@ console.log('\nverify:ui-system-v1 PASS')
 console.log('SCREEN-SPECIFIC BUTTON IMPLEMENTATIONS = 0 (AUDITED NORMAL CASES)')
 console.log('SCREEN-SPECIFIC SHEET IMPLEMENTATIONS = 0 (AUDITED NORMAL CASES)')
 console.log('SCREEN-SPECIFIC SEARCH IMPLEMENTATIONS = 0 (AUDITED NORMAL CASES)')
+console.log('SCREEN-SPECIFIC SETTINGS ROW RENDERERS = 0')
 console.log('GENERIC PRODUCTS USE SAME COMPONENT SYSTEM = YES')

@@ -24,6 +24,7 @@ export type ModulaActionButtonProps = {
   icon?: ModulaIconName
   disabled?: boolean
   loading?: boolean
+  selected?: boolean
   loadingLabel?: string
   fullWidth?: boolean
   style?: StyleProp<ViewStyle>
@@ -43,6 +44,7 @@ export function ModulaActionButton({
   icon,
   disabled = false,
   loading = false,
+  selected,
   loadingLabel,
   fullWidth = false,
   style,
@@ -75,7 +77,7 @@ export function ModulaActionButton({
     <AppPressable
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="button"
-      accessibilityState={{busy: loading, disabled: blocked}}
+      accessibilityState={{busy: loading, disabled: blocked, selected}}
       disabled={blocked}
       onPress={onPress}
       testID={testID}

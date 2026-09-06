@@ -67,13 +67,13 @@ Visual evidence must be captured from the lab under the relevant combinations be
 
 ## Initial propagation
 
-- Settings sections, rows, separators, and icon tiles use the generic list system.
+- Settings compatibility APIs directly compose generic sections, rows, separators, and icon tiles; they own no row renderer.
 - Home search uses shared Sheet, Search, ListRow, and person rows.
-- Product Hub uses shared Search, Tabs, ActionButton, Badge, and module runtime primitives.
+- Product Hub uses shared Search, Tabs, ProductRow, ActionButton, Badge, and module runtime primitives.
 - Vault Notes and future products resolve fields, search, buttons, rows, toolbar, feedback, and states through the generic product UI bridge.
 - Activity uses SelectionSheet and ModulaActivityRow.
 - Composer uses semantic Tool sheet/list compositions and ComposerInput.
-- Profile connections and owner controls use shared Search, Toolbar, ActionButton, and IconButton.
+- Profile connections and owner controls use shared Search, UserRow, Toolbar, ActionButton, and IconButton.
 - Secondary routes use ModulaNavigationHeader; the shell name remains a compatibility export.
 - Shell navigation delegates drawer mechanics to ModulaDrawerFrame.
 
