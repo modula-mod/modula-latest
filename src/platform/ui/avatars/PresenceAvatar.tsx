@@ -1,8 +1,5 @@
-import {StyleSheet, View} from 'react-native'
-
-import {Avatar} from '@/components/primitives/Avatar'
+import {ModulaAvatar} from '@/platform/ui/avatars/modula-avatar'
 import type {PresenceStatus} from '@/platform/ui/avatars/types'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type PresenceAvatarProps = {
   name: string
@@ -10,13 +7,6 @@ type PresenceAvatarProps = {
   colour?: string
   size?: number
   status?: PresenceStatus
-}
-
-const STATUS_COLOUR: Record<PresenceStatus, string> = {
-  online: '#34C759',
-  away: '#FFD60A',
-  busy: '#FF453A',
-  offline: '#8E8E93',
 }
 
 /**
@@ -29,34 +19,5 @@ export function PresenceAvatar({
   size = 40,
   status = 'offline',
 }: PresenceAvatarProps) {
-  const {colours} = useThemeTokens()
-  const dot = Math.max(10, size * 0.28)
-
-  return (
-    <View style={{height: size, width: size}}>
-      <Avatar name={name} uri={uri} colour={colour} size={size} />
-      <View
-        style={[
-          styles.dot,
-          {
-            backgroundColor: STATUS_COLOUR[status],
-            borderColor: colours.canvas,
-            borderRadius: dot / 2,
-            height: dot,
-            width: dot,
-          },
-        ]}
-        accessibilityLabel={`${name} is ${status}`}
-      />
-    </View>
-  )
+  return <ModulaAvatar colour={colour} name={name} presence={status} size={size} uri={uri} />
 }
-
-const styles = StyleSheet.create({
-  dot: {
-    borderWidth: 2,
-    bottom: 0,
-    position: 'absolute',
-    right: 0,
-  },
-})

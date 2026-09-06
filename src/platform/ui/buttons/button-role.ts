@@ -2,6 +2,7 @@ export type ModulaButtonRole =
   | 'primary'
   | 'secondary'
   | 'quiet'
+  | 'inline'
   | 'plain'
   | 'destructive'
   | 'glass'
@@ -19,6 +20,7 @@ export function universalVariantForRole(
     case 'glass':
       return 'outlined'
     case 'quiet':
+    case 'inline':
     case 'plain':
     case 'icon':
       return 'text'

@@ -10,7 +10,6 @@ import {
 import {useNavigation, useRouter, type Href} from 'expo-router'
 
 import {QueryErrorState} from '@/components/data'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {Avatar} from '@/components/primitives/Avatar'
 import {EmptyState} from '@/components/primitives/EmptyState'
@@ -33,7 +32,8 @@ import {
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {useNativeHeaderFadePadding, useSecondaryChromeSpacerHeight} from '@/platform/ui/navigation/chrome-insets'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
-import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {SelectionSheet} from '@/platform/ui/sheets/selection-sheet'
+import {ModulaActivityRow} from '@/platform/ui/lists'
 import {ActivityListSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useAppServices} from '@/runtime/useAppServices'
@@ -75,7 +75,7 @@ function matchesFilter(item: ActivityItem, filter: ActivityFilter): boolean {
 export function ActivityScreen() {
   const navigation = useNavigation()
   const {activityRepository} = useAppServices()
-  const {colours, controls, spacing, radius} = useThemeTokens()
+  const {colours, spacing, radius} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const {preferences} = useProductPreferences()
   const tabPadding = useFloatingTabBarContentPadding()
@@ -227,6 +227,7 @@ export function ActivityScreen() {
                     const row = (
                       <ActivityRow
                         item={item}
+                        last={itemIndex === items.length - 1}
                         unread={!readIds.has(item.id)}
                         highlightUnread={showBlock('unread-cards')}
                         peers={activity.filter(
@@ -266,45 +267,23 @@ export function ActivityScreen() {
         </ScrollView>
       </ResponsiveContent>
 
-      <ModulaSheet
+      <SelectionSheet
         isPresented={filterSheetOpen}
         onDismiss={() => setFilterSheetOpen(false)}
-        snapPoints={[{fraction: 0.55}, 'full']}
-        testID="activity-filter-sheet">
-        <View style={{gap: spacing[3]}}>
-          <AppText variant="headline">Filter activity</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Filter notifications by type.
-          </AppText>
-          {filters.map(([id, label]) => (
-            <AppPressable
-              key={id}
-              accessibilityLabel={`Filter ${label}`}
-              onPress={() => applyFilter(id)}
-              style={[
-                styles.filterRow,
-                {
-                  backgroundColor:
-                    filter === id ? colours.accentSubtle : colours.surfaceRaised,
-                  borderBottomColor: colours.separator,
-                  minHeight: controls.listRow.minimum,
-                },
-              ]}>
-              <AppText
-                variant="label"
-                style={{color: filter === id ? colours.accent : colours.text}}>
-                {label}
-              </AppText>
-            </AppPressable>
-          ))}
-        </View>
-      </ModulaSheet>
+        onSelect={applyFilter}
+        options={filters.map(([id, label]) => ({id, label}))}
+        selectedId={filter}
+        subtitle="Filter notifications by type."
+        testID="activity-filter-sheet"
+        title="Filter activity"
+      />
     </View>
   )
 }
 
 function ActivityRow({
   item,
+  last,
   unread,
   highlightUnread: _highlightUnread,
   peers,
@@ -312,6 +291,7 @@ function ActivityRow({
   onMarkRead,
 }: {
   item: ActivityItem
+  last?: boolean
   unread: boolean
   highlightUnread: boolean
   peers: ActivityItem[]
@@ -320,7 +300,7 @@ function ActivityRow({
 }) {
   const router = useRouter()
   const session = useSession()
-  const {colours, controls, radius, spacing} = useThemeTokens()
+  const {colours, radius, spacing} = useThemeTokens()
   const ownerProfileId = session.status === 'signedIn' ? session.profile.id : ''
   const profileRoute = item.actor
     ? getProfileRouteForIdentity(item.actor, ownerProfileId)
@@ -366,21 +346,12 @@ function ActivityRow({
         if (id === 'open') openDestination()
         if (id === 'markRead') onMarkRead()
       }}>
-      <AppPressable
+      <ModulaActivityRow
         accessibilityLabel={`${unread ? 'Unread. ' : ''}${item.description}. ${item.timestamp}`}
+        last={last}
         onPress={openDestination}
-        style={styles.rowPress}>
-        <View
-          style={[
-            styles.row,
-            {
-              borderBottomColor: colours.separator,
-              gap: spacing[3],
-              paddingHorizontal: spacing[3],
-              minHeight: controls.listRow.minimum,
-              paddingVertical: spacing[2],
-            },
-          ]}>
+        leading={
+          <View style={[styles.leading, {gap: spacing[3]}]}>
           {unread ? (
             <View
               accessible={false}
@@ -422,6 +393,13 @@ function ActivityRow({
               <ModulaIcon name={item.icon ?? 'activity'} colour={colours.text} />
             </View>
           )}
+          </View>
+        }
+        trailing={
+          <AppText variant="caption" colour="textTertiary" style={styles.timestamp}>
+            {item.timestamp}
+          </AppText>
+        }>
           <View style={styles.body}>
             {item.actor ? (
               <AppText variant="body">
@@ -467,11 +445,7 @@ function ActivityRow({
               </View>
             ) : null}
           </View>
-          <AppText variant="caption" colour="textTertiary" style={styles.timestamp}>
-            {item.timestamp}
-          </AppText>
-        </View>
-      </AppPressable>
+      </ModulaActivityRow>
     </ModulaContextMenu>
   )
 }
@@ -484,11 +458,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
-  filterRow: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
   iconAvatar: {
     alignItems: 'center',
     height: 42,
@@ -498,14 +467,9 @@ const styles = StyleSheet.create({
   preview: {
     borderWidth: StyleSheet.hairlineWidth,
   },
-  row: {
-    alignItems: 'flex-start',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  leading: {
+    alignItems: 'stretch',
     flexDirection: 'row',
-    width: '100%',
-  },
-  rowPress: {
-    width: '100%',
   },
   screen: {
     flex: 1,

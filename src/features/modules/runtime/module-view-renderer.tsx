@@ -7,7 +7,6 @@ import type {
 } from '@modula/greenfield-module-ui-contracts'
 
 import {getUserFacingErrorMessage} from '@/api/contracts'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleAIProductActionDefinition, ModuleHostExtensionContribution, ModuleRecord, ModuleRuntimeView} from '@/data/repositories/contracts'
 import {ModuleAIActionMenu, SchemaSettingsRenderer} from '@/features/modules/components'
@@ -18,8 +17,15 @@ import {ModuleExtensionContributions} from '@/features/modules/runtime/module-ex
 import {ModuleFieldRenderer} from '@/features/modules/runtime/module-field-renderer'
 import {mutationCollectionFor, primaryActionFor} from '@/features/modules/runtime/module-action-runner'
 import {resolveRuntimeActionRoute, shapeMpsActionInput} from '@/features/modules/runtime/mps-frontend-adapter'
-import {ModulaButton} from '@/platform/ui/buttons/modula-button'
-import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+import {
+  ModulaBadge,
+  ModulaButton,
+  ModulaErrorState,
+  ModulaListRow,
+  ModulaLoadingSection,
+  ModulaSearchField,
+} from '@/platform/ui/product-ui'
+import {ModulaSeparator} from '@/platform/ui/lists'
 import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -341,7 +347,7 @@ function LayoutNode({
   data: Record<string, unknown>
   onAction: (action: GreenfieldModuleAction) => Promise<void>
 }) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {spacing} = useThemeTokens()
   if (node.component === 'section') {
     return (
       <View style={[styles.section, {gap: spacing[2]}]}>
@@ -355,21 +361,17 @@ function LayoutNode({
   if (node.component === 'label') return <AppText variant="label">{node.label ?? node.text ?? ''}</AppText>
   if (node.component === 'metadata') return <AppText variant="micro" colour="textTertiary">{displayValue(node.field ? data[node.field] : undefined, node.label ?? node.text ?? node.field ?? '')}</AppText>
   if (node.component === 'badge') {
-    return (
-      <View style={[styles.badge, {backgroundColor: colours.accentSubtle, borderColor: colours.accentBorder, borderRadius: radius.round, paddingHorizontal: spacing[2], paddingVertical: spacing[1]}]}>
-        <AppText variant="micro" colour="accent">{node.label ?? node.text ?? node.variant ?? 'Badge'}</AppText>
-      </View>
-    )
+    return <ModulaBadge label={node.label ?? node.text ?? node.variant ?? 'Badge'} tone="accent" />
   }
-  if (node.component === 'divider') return <View style={{backgroundColor: colours.separator, height: StyleSheet.hairlineWidth}} />
+  if (node.component === 'divider') return <ModulaSeparator />
   if (node.component === 'button' && node.actionId) {
     const action = actions.find(item => item.actionId === node.actionId)
     if (!action) return null
     return <ModulaButton label={node.label ?? action.label} role={action.destructive ? 'destructive' : 'secondary'} onPress={() => { void onAction(action) }} />
   }
   if (node.component === 'emptyState') return <ModuleEmptyState title={node.title ?? 'Nothing here'} body={node.text} />
-  if (node.component === 'errorState') return <AppText variant="caption" colour="destructive">{node.text ?? node.title ?? 'Module content unavailable'}</AppText>
-  if (node.component === 'loadingState') return <AppText variant="caption" colour="textSecondary">{node.text ?? 'Loading'}</AppText>
+  if (node.component === 'errorState') return <ModulaErrorState message={node.text ?? node.title ?? 'Module content unavailable'} scope="inline" />
+  if (node.component === 'loadingState') return <ModulaLoadingSection rows={1} />
   return null
 }
 
@@ -410,15 +412,14 @@ function RecordRow({
   })
   return (
     <View style={{gap: spacing[2], paddingVertical: spacing[3]}}>
-      <AppPressable accessibilityLabel={openAction ? `Open ${title}` : title} disabled={!openAction} onPress={() => { if (openAction) void onAction(openAction, recordInput(openAction)) }}>
-        <View style={{gap: spacing[2]}}>
-          <AppText variant="headline">{title}</AppText>
-          {body ? <AppText variant="caption" colour="textSecondary" numberOfLines={2}>{displayValue(body, '')}</AppText> : null}
-        </View>
-      </AppPressable>
-      <AppText variant="micro" colour="textTertiary">
-        {[updated ? relativeDay(updated) : null, tagCount ? `${tagCount} tags` : null].filter(Boolean).join('  ·  ')}
-      </AppText>
+      <ModulaListRow
+        accessory={openAction ? 'chevron' : 'none'}
+        description={body ? displayValue(body, '') : undefined}
+        metadata={[updated ? relativeDay(updated) : null, tagCount ? `${tagCount} tags` : null].filter(Boolean).join('  ·  ')}
+        onPress={openAction ? () => { void onAction(openAction, recordInput(openAction)) } : undefined}
+        title={title}
+        variant="navigation"
+      />
       {secondaryActions.length ? (
         <View style={{alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2]}}>
           {secondaryActions.map(action => (
@@ -463,10 +464,6 @@ function relativeDay(value: string): string {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignSelf: 'flex-start',
-    borderWidth: StyleSheet.hairlineWidth,
-  },
   heading: {flex: 1, minWidth: 0},
   headingRow: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
   form: {width: '100%'},

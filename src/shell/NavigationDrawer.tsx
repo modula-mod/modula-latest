@@ -1,19 +1,12 @@
 import {useEffect, useMemo, useRef, type ReactNode} from 'react'
 import {
   BackHandler,
-  Modal,
-  Pressable,
   StyleSheet,
   View,
   useWindowDimensions,
 } from 'react-native'
 import {usePathname, useRouter, type Href} from 'expo-router'
-import {Gesture, GestureDetector} from 'react-native-gesture-handler'
-import Animated, {
-  interpolate,
-  runOnJS,
-  useAnimatedStyle,
-} from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
@@ -24,6 +17,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {useSession, useSessionActions} from '@/auth/runtime'
 import {useReduceMotion} from '@/lib/accessibility'
 import {useMotionEntering} from '@/platform/ui/motion/useMotionEntering'
+import {ModulaDrawerFrame} from '@/platform/ui/drawers'
 import {isDevelopmentBuild, canAccessDeveloperLabs} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
@@ -136,48 +130,6 @@ export function NavigationDrawer() {
     }))
   }, [sections])
 
-  const backdropStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 1], [0, 1]),
-  }))
-
-  const drawerStyle = useAnimatedStyle(() => ({
-    transform: reduceMotion
-      ? []
-      : [
-          {
-            translateX: interpolate(progress.value, [0, 1], [-drawerWidth, 0]),
-          },
-          {
-            scale: interpolate(progress.value, [0, 1], [0.97, 1]),
-          },
-        ],
-    opacity: reduceMotion
-      ? interpolate(progress.value, [0, 1], [0, 1])
-      : interpolate(progress.value, [0, 0.2, 1], [0.85, 1, 1]),
-  }))
-
-  const pan = useMemo(
-    () =>
-      Gesture.Pan()
-        .activeOffsetX([-18, 18])
-        .failOffsetY([-24, 24])
-        .onUpdate(event => {
-          'worklet'
-          const next = 1 + event.translationX / drawerWidth
-          // Reanimated shared value, not React state.
-          // eslint-disable-next-line react-hooks/immutability
-          progress.value = Math.max(0, Math.min(1, next))
-        })
-        .onEnd(event => {
-          'worklet'
-          runOnJS(settleDrawer)({
-            velocityX: event.velocityX,
-            at: progress.value,
-          })
-        }),
-    [drawerWidth, progress, settleDrawer],
-  )
-
   useEffect(() => {
     if (phase === 'closed') return undefined
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -208,32 +160,14 @@ export function NavigationDrawer() {
   }
 
   return (
-    <Modal transparent visible animationType="none" onRequestClose={() => closeDrawer()}>
-      <View style={StyleSheet.absoluteFill}>
-        <Animated.View
-          pointerEvents="auto"
-          style={[
-            StyleSheet.absoluteFill,
-            {backgroundColor: colours.backdrop},
-            backdropStyle,
-          ]}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close navigation drawer"
-            onPress={() => closeDrawer()}
-            style={StyleSheet.absoluteFill}
-          />
-        </Animated.View>
-
-        <GestureDetector gesture={pan}>
-          <Animated.View
-            style={[
-              styles.drawerFrame,
-              drawerStyle,
-              {
-                width: drawerWidth,
-              },
-            ]}>
+    <ModulaDrawerFrame
+      accessibilityLabel="Navigation drawer"
+      isPresented
+      onDismiss={() => closeDrawer()}
+      onSettle={settleDrawer}
+      progress={progress}
+      testID="navigation-drawer"
+      width={drawerWidth}>
             <MaterialSurface
               role="modal"
               style={[
@@ -396,10 +330,7 @@ export function NavigationDrawer() {
                 </AppText>
               </View>
             </MaterialSurface>
-          </Animated.View>
-        </GestureDetector>
-      </View>
-    </Modal>
+    </ModulaDrawerFrame>
   )
 }
 
@@ -417,12 +348,6 @@ const styles = StyleSheet.create({
     borderRightWidth: StyleSheet.hairlineWidth,
     flex: 1,
     width: '100%',
-  },
-  drawerFrame: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    top: 0,
   },
   footer: {
     overflow: 'visible',

@@ -7,9 +7,14 @@ import type {SurfaceRole} from '@/theme/contracts'
 export type SurfaceVariant =
   | 'canvas'
   | 'plain'
+  | 'grouped'
   | 'raised'
   | 'muted'
   | 'contained'
+  | 'overlay'
+  | 'glass'
+  | 'floating'
+  | 'inset'
 
 type SurfaceProps = {
   variant?: SurfaceVariant
@@ -21,6 +26,10 @@ type SurfaceProps = {
 function roleForVariant(variant: SurfaceVariant): SurfaceRole {
   if (variant === 'canvas') return 'canvas'
   if (variant === 'plain') return 'content'
+  if (variant === 'grouped') return 'card'
+  if (variant === 'overlay' || variant === 'glass') return 'modal'
+  if (variant === 'floating') return 'floating'
+  if (variant === 'inset') return 'input'
   if (variant === 'contained') return 'card'
   if (variant === 'muted') return 'input'
   return 'card'

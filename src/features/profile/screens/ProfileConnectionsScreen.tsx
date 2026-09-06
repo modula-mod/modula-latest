@@ -1,5 +1,5 @@
 import {useMemo, useState} from 'react'
-import {FlatList, StyleSheet, TextInput, View} from 'react-native'
+import {FlatList, StyleSheet, View} from 'react-native'
 import {useRouter} from 'expo-router'
 
 import {parseProfileId} from '@/api/contracts'
@@ -17,6 +17,7 @@ import {getProfileRoute} from '@/features/profile/navigation/openProfile'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 
 export type ProfileConnectionsMode = 'followers' | 'following'
 
@@ -33,7 +34,7 @@ export function ProfileConnectionsScreen({
   const followersQuery = useFollowersQuery(handle)
   const followingQuery = useFollowingQuery(handle)
   const connectionsQuery = mode === 'followers' ? followersQuery : followingQuery
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
   const [query, setQuery] = useState('')
   const q = query.trim().toLowerCase()
   const connectionPages = connectionsQuery.data?.pages
@@ -64,25 +65,12 @@ export function ProfileConnectionsScreen({
             />
           ) : profileQuery.data ? (
             <>
-              <View
-                style={[
-                  styles.search,
-                  {
-                    backgroundColor: colours.surfaceRaised,
-                    borderColor: colours.border,
-                    borderRadius: radius.round,
-                    paddingHorizontal: spacing[4],
-                  },
-                ]}>
-                <TextInput
-                  value={query}
-                  onChangeText={setQuery}
-                  placeholder="Search profiles"
-                  placeholderTextColor={colours.textTertiary}
-                  style={[styles.searchInput, {color: colours.text}]}
-                  returnKeyType="search"
-                />
-              </View>
+              <ModulaSearchField
+                accessibilityLabel="Search profiles"
+                onChangeText={setQuery}
+                placeholder="Search profiles"
+                value={query}
+              />
               {filtered.length ? (
                 <FlatList
                   data={filtered}

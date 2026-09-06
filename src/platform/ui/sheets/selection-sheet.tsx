@@ -1,8 +1,7 @@
-import {ScrollView, StyleSheet, View} from 'react-native'
+import {View} from 'react-native'
 
 import {AppIcon, type AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
+import {ModulaListRow} from '@/platform/ui/lists'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -40,81 +39,46 @@ export function SelectionSheet<T extends string>({
   testID,
   snapPoints = ['half', 'full'],
 }: SelectionSheetProps<T>) {
-  const {colours, radius, spacing} = useThemeTokens()
+  const {colours, spacing} = useThemeTokens()
 
   return (
     <ModulaSheet
       isPresented={isPresented}
       onDismiss={onDismiss}
+      presentation="picker"
       snapPoints={snapPoints}
-      testID={testID}>
-      <ScrollView contentContainerStyle={{gap: spacing[3], paddingBottom: spacing[6]}}>
-        <View style={{gap: spacing[1]}}>
-          <AppText variant="headline">{title}</AppText>
-          {subtitle ? (
-            <AppText variant="caption" colour="textSecondary">
-              {subtitle}
-            </AppText>
-          ) : null}
-        </View>
+      subtitle={subtitle}
+      testID={testID}
+      title={title}>
+      <View style={{paddingBottom: spacing[6]}}>
         {options.map(option => {
           const selected = option.id === selectedId
           return (
-            <AppPressable
+            <ModulaListRow
               key={option.id}
               accessibilityLabel={`${option.label}${option.preview ? ' Preview' : ''}${selected ? ', selected' : ''}`}
               accessibilityRole="radio"
               accessibilityState={{selected}}
-              onPress={() => {
-                onSelect(option.id)
-                onDismiss()
-              }}
-              style={[
-                styles.row,
-                {
-                  backgroundColor: selected ? colours.accentSubtle : colours.surfaceRaised,
-                  borderColor: selected ? colours.accent : colours.border,
-                  borderRadius: radius.md,
-                  gap: spacing[3],
-                  padding: spacing[3],
-                },
-              ]}>
-              {option.icon ? (
+              accessory="check"
+              last={option.id === options.at(-1)?.id}
+              leading={option.icon ? (
                 <AppIcon
                   name={option.icon}
                   colour={selected ? colours.accent : colours.textSecondary}
                 />
-              ) : null}
-              <View style={styles.textCol}>
-                <AppText variant="label" style={{color: selected ? colours.accent : colours.text}}>
-                  {option.label}
-                  {option.preview ? ' — Preview' : ''}
-                </AppText>
-                {option.description ? (
-                  <AppText variant="caption" colour="textSecondary">
-                    {option.description}
-                  </AppText>
-                ) : null}
-              </View>
-              {selected ? <AppIcon name="check" colour={colours.accent} /> : null}
-            </AppPressable>
+              ) : undefined}
+              onPress={() => {
+                onSelect(option.id)
+                onDismiss()
+              }}
+              selected={selected}
+              title={`${option.label}${option.preview ? ' — Preview' : ''}`}
+              description={option.description}
+              variant="action"
+            />
           )
         })}
-      </ScrollView>
+      </View>
     </ModulaSheet>
   )
 }
-
-const styles = StyleSheet.create({
-  row: {
-    alignItems: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    minHeight: 56,
-  },
-  textCol: {
-    flex: 1,
-    gap: 2,
-    minWidth: 0,
-  },
-})

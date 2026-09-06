@@ -1,13 +1,16 @@
-import {Switch, View} from 'react-native'
+import {View} from 'react-native'
 import type {GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 
 import {AppText} from '@/components/primitives/AppText'
 import {useModuleRecordsQuery} from '@/features/modules/hooks'
 import {richTextDocumentFromText, richTextEditingText} from '@/features/modules/runtime/mps-frontend-adapter'
-import {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
-import {ModulaSelectField} from '@/platform/ui/controls/modula-select-field'
-import {ModulaTagInput} from '@/platform/ui/controls/modula-tag-input'
-import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
+import {
+  ModulaFieldShell,
+  ModulaSelectField,
+  ModulaSwitch,
+  ModulaTagInput,
+  ModulaTextInput,
+} from '@/platform/ui/product-ui'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export function ModuleFieldRenderer({
@@ -38,12 +41,10 @@ export function ModuleFieldRenderer({
             minHeight: controls.listRow.minimum,
           }}>
           <AppText variant="body">{label}</AppText>
-          <Switch
+          <ModulaSwitch
             accessibilityLabel={label}
             value={Boolean(value)}
             onValueChange={onChange}
-            trackColor={{false: colours.border, true: colours.accentSubtle}}
-            thumbColor={value ? colours.accent : colours.textMuted}
           />
         </View>
       </ModulaFieldShell>

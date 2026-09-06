@@ -33,6 +33,7 @@ import {
   keyboardScrollProps,
 } from '@/platform/ui'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 
 type EditProfileDraft = {
   avatarUri: string | null
@@ -161,11 +162,11 @@ export function EditProfileScreen() {
           {...keyboardScrollProps}
           contentContainerStyle={[styles.content, {gap: spacing[5], padding: spacing[4]}]}>
           <View style={styles.header}>
-            <HeaderButton label="Cancel" onPress={leave} />
+            <ModulaButton label="Cancel" onPress={leave} role="inline" size="compact" />
             <AppText variant="headline" style={styles.headerTitle}>
               Edit Profile
             </AppText>
-            <HeaderButton label="Save" onPress={() => void save()} primary />
+            <ModulaButton label="Save" onPress={() => void save()} size="compact" />
           </View>
           <AppText variant="caption" colour="textTertiary">
             Long-press the cover or photo to change it. Details save to Greenfield.
@@ -431,38 +432,6 @@ function isPublicHttpsMediaUri(value: string): boolean {
   } catch {
     return false
   }
-}
-
-function HeaderButton({
-  label,
-  onPress,
-  primary,
-}: {
-  label: string
-  onPress: () => void
-  primary?: boolean
-}) {
-  const {colours, radius, spacing} = useThemeTokens()
-  return (
-    <AppPressable
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={[
-        styles.headerButton,
-        {
-          backgroundColor: primary ? colours.accent : colours.surfaceRaised,
-          borderColor: primary ? 'transparent' : colours.border,
-          borderRadius: radius.round,
-          paddingHorizontal: spacing[3],
-        },
-      ]}>
-      <AppText
-        variant="label"
-        style={{color: primary ? colours.accentForeground : colours.text}}>
-        {label}
-      </AppText>
-    </AppPressable>
-  )
 }
 
 function ProfileField({

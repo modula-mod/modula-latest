@@ -1,9 +1,5 @@
-import {View} from 'react-native'
-
-import {AppText} from '@/components/primitives/AppText'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
-import {ModulaIcon} from '@/platform/ui/icons'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ModulaEmptyState as SharedEmptyState} from '@/platform/ui/feedback'
 
 export function ModuleEmptyState({
   title,
@@ -18,31 +14,26 @@ export function ModuleEmptyState({
   primaryAction?: {label: string; onPress: () => void}
   secondaryAction?: {label: string; onPress: () => void}
 }) {
-  const {colours, spacing} = useThemeTokens()
   return (
-    <View style={{gap: spacing[3], paddingVertical: spacing[6]}} testID="module-empty-state">
-      <ModulaIcon name="modules" colour={colours.textTertiary} size={28} />
-      <AppText variant="headline">{title}</AppText>
-      {body || message ? (
-        <AppText variant="body" colour="textSecondary">
-          {body ?? message}
-        </AppText>
-      ) : null}
-      {primaryAction ? (
+    <SharedEmptyState
+      description={body ?? message ?? 'No module content yet.'}
+      icon="modules"
+      primaryAction={primaryAction ? (
         <ModulaButton
           label={primaryAction.label}
           accessibilityLabel={primaryAction.label}
           onPress={primaryAction.onPress}
         />
-      ) : null}
-      {secondaryAction ? (
+      ) : undefined}
+      secondaryAction={secondaryAction ? (
         <ModulaButton
           label={secondaryAction.label}
           role="secondary"
           accessibilityLabel={secondaryAction.label}
           onPress={secondaryAction.onPress}
         />
-      ) : null}
-    </View>
+      ) : undefined}
+      title={title}
+    />
   )
 }

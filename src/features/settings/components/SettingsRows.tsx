@@ -5,6 +5,11 @@ import {useRouter, type Href} from 'expo-router'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
+import {
+  ModulaIconTile,
+  ModulaListRow,
+  ModulaListSection,
+} from '@/platform/ui/lists'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
@@ -123,7 +128,7 @@ export function SettingsScreen({
   const {colours, spacing} = useThemeTokens()
   const tabPadding = useFloatingTabBarContentPadding()
   return (
-    <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
+    <View role="main" style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <SecondaryScreenHeader title={title} right={right} />
       <ResponsiveContent>
         <ScrollView
@@ -220,23 +225,7 @@ export function SettingsIconTile({
   name: ModulaIconName
   domain?: SettingsIconDomain
 }) {
-  const {controls, settingsIcons} = useThemeTokens()
-  const token = settingsIcons[settingsIconDomain(name, domain)]
-  return (
-    <View
-      accessible={false}
-      importantForAccessibility="no"
-      style={[
-        styles.iconTile,
-        {
-          backgroundColor: token.background,
-          height: controls.iconTile.small,
-          width: controls.iconTile.small,
-        },
-      ]}>
-      <ModulaIcon name={name} size={16} colour={token.foreground} />
-    </View>
-  )
+  return <ModulaIconTile icon={name} tone={settingsIconDomain(name, domain)} />
 }
 
 export function SettingsSection({
@@ -248,35 +237,7 @@ export function SettingsSection({
   footer?: string
   children: ReactNode
 }) {
-  const {colours, spacing, radius} = useThemeTokens()
-
-  return (
-    <View style={{gap: spacing[2]}}>
-      {title ? (
-        <AppText
-          variant="sectionHeader"
-          colour="textSecondary"
-          style={{
-            letterSpacing: 0.6,
-            paddingHorizontal: spacing[4],
-            textTransform: 'uppercase',
-          }}>
-          {title}
-        </AppText>
-      ) : null}
-      <View
-        style={[
-          styles.list,
-          {
-            backgroundColor: colours.surface,
-            borderRadius: radius.medium,
-          },
-        ]}>
-        {children}
-      </View>
-      {footer ? <SettingsFooter>{footer}</SettingsFooter> : null}
-    </View>
-  )
+  return <ModulaListSection title={title} footer={footer}>{children}</ModulaListSection>
 }
 
 function RowChrome({
@@ -290,25 +251,10 @@ function RowChrome({
   leading?: ReactNode
   children: ReactNode
 }) {
-  const {colours, controls, spacing} = useThemeTokens()
   return (
-    <View style={[styles.row, {minHeight: controls.listRow.minimum, paddingLeft: spacing[4]}]}>
-      {leading}
-      <View
-        style={[
-          stacked ? styles.rowBodyStacked : styles.rowBody,
-          {
-            borderBottomColor: last ? 'transparent' : colours.separator,
-            marginLeft: leading ? spacing[3] : 0,
-            paddingRight: spacing[4],
-            paddingVertical: spacing[3],
-            gap: spacing[3],
-            minHeight: controls.listRow.minimum,
-          },
-        ]}>
-        {children}
-      </View>
-    </View>
+    <ModulaListRow last={last} leading={leading} stacked={stacked}>
+      {children}
+    </ModulaListRow>
   )
 }
 

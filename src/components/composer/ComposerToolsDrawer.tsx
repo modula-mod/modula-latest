@@ -1,14 +1,15 @@
 import {useEffect, useMemo, useState} from 'react'
-import {Alert, StyleSheet, View} from 'react-native'
+import {Alert, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
-import {AppText} from '@/components/primitives/AppText'
 import type {ComposerToolItem, ComposerToolSection, FunctionInvocationState} from '@/data/repositories/contracts'
 import {sheetKeyboardBottomInset, useKeyboardHeight} from '@/platform/ui/keyboard'
 import {ModulaIcon} from '@/platform/ui/icons'
+import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {ModulaInlineNotice} from '@/platform/ui/feedback'
+import {ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -119,7 +120,7 @@ export function ComposerToolsDrawer({
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const keyboardHeight = useKeyboardHeight()
-  const {colours, controls, radius, spacing} = useThemeTokens()
+  const {colours, controls, spacing} = useThemeTokens()
   const services = useAppServices()
   const [tools, setTools] = useState<ComposerToolItem[]>([])
   const [invocationState, setInvocationState] = useState<FunctionInvocationState>('idle')
@@ -208,61 +209,31 @@ export function ComposerToolsDrawer({
     <ModulaSheet
       isPresented={visible}
       onDismiss={onClose}
-      detent="large"
-      header={
-        <View style={{gap: spacing[1], paddingBottom: spacing[3]}}>
-          <AppText variant="headline">Tools</AppText>
-          <AppText variant="caption" colour="textSecondary">
-            Photo, camera, and tools from modules you have installed.
-          </AppText>
-        </View>
-      }
+      presentation="tools"
+      subtitle="Photo, camera, and tools from modules you have installed."
+      title="Tools"
       footer={
         <View style={{paddingBottom: bottomPad}}>
-          <AppPressable
+          <ModulaButton
             accessibilityLabel="Browse tools"
+            label="Browse tools"
+            role="inline"
             onPress={() => {
               onClose()
               onBrowseMarketplace()
-            }}>
-            <AppText variant="label">Browse tools</AppText>
-          </AppPressable>
+            }}
+          />
         </View>
       }
       testID="composer-tools-sheet">
       <View style={{gap: spacing[4]}}>
         {invocationState !== 'idle' ? (
-          <View
-            style={[
-              styles.status,
-              {
-                backgroundColor: colours.accentSubtle,
-                borderColor: colours.accentBorder,
-                borderRadius: radius.medium,
-                padding: spacing[3],
-              },
-            ]}>
-            <AppText variant="caption" colour="accent">
-              {invocationMessage ?? 'Working…'}
-            </AppText>
-          </View>
+          <ModulaInlineNotice message={invocationMessage ?? 'Working…'} />
         ) : null}
         {sections.map(section => {
           const sectionTools = tools.filter(tool => tool.section === section)
           return (
-            <View key={section} style={{gap: spacing[2]}}>
-              <AppText variant="label" colour="textSecondary">
-                {section}
-              </AppText>
-              <View
-                style={[
-                  styles.group,
-                  {
-                    backgroundColor: colours.surface,
-                    borderColor: colours.border,
-                    borderRadius: radius.medium,
-                  },
-                ]}>
+            <ModulaListSection key={section} title={section}>
                 {sectionTools.map((tool, index) => {
                   const preview = tool.availability === 'preview'
                   const unavailable = tool.availability === 'unavailable' || tool.availability.startsWith('requires')
@@ -272,74 +243,32 @@ export function ComposerToolsDrawer({
                       ? `${tool.name} — Preview`
                       : tool.name
                   return (
-                    <AppPressable
+                    <ModulaListRow
                       key={tool.toolId}
                       accessibilityLabel={label}
+                      accessory="chevron"
+                      description={tool.description ?? availabilitySentence(tool)}
+                      disabled={false}
+                      last={index === sectionTools.length - 1}
+                      leading={
+                        <ModulaIcon
+                          name={iconFor(tool)}
+                          colour={unavailable ? colours.textSecondary : colours.accent}
+                          size={controls.iconSize.row}
+                        />
+                      }
+                      metadata={availabilitySentence(tool)}
                       onPress={() => runTool(tool)}
-                      style={[
-                        styles.tool,
-                        {
-                          backgroundColor: preview ? colours.accentSubtle : 'transparent',
-                          borderBottomColor:
-                            index === sectionTools.length - 1 ? 'transparent' : colours.separator,
-                          minHeight: controls.listRow.minimum,
-                          paddingHorizontal: spacing[3],
-                          paddingVertical: spacing[2],
-                          gap: spacing[2],
-                          opacity: unavailable ? 0.7 : 1,
-                        },
-                      ]}>
-                      <ModulaIcon
-                        name={iconFor(tool)}
-                        colour={unavailable ? colours.textSecondary : colours.accent}
-                        size={controls.iconSize.row}
-                      />
-                      <View style={styles.toolText}>
-                        <AppText variant="caption" style={styles.toolName}>
-                          {tool.name}
-                        </AppText>
-                        <AppText
-                          variant="micro"
-                          colour={unavailable ? 'textSecondary' : preview ? 'accent' : 'textTertiary'}
-                          numberOfLines={1}>
-                          {tool.description ?? availabilitySentence(tool)}
-                        </AppText>
-                      </View>
-                      <AppText variant="micro" colour={preview ? 'accent' : 'textTertiary'}>
-                        {availabilitySentence(tool)}
-                      </AppText>
-                      <ModulaIcon name="chevronRight" colour={colours.textTertiary} size={16} />
-                    </AppPressable>
+                      style={{opacity: unavailable ? 0.7 : 1}}
+                      title={preview ? `${tool.name} — Preview` : tool.name}
+                      variant="navigation"
+                    />
                   )
                 })}
-              </View>
-            </View>
+            </ModulaListSection>
           )
         })}
       </View>
     </ModulaSheet>
   )
 }
-
-const styles = StyleSheet.create({
-  group: {
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
-  },
-  tool: {
-    alignItems: 'center',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    flexDirection: 'row',
-    width: '100%',
-  },
-  toolName: {
-    flexShrink: 1,
-  },
-  toolText: {
-    flex: 1,
-    minWidth: 0,
-  },
-  status: {
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-})

@@ -1,7 +1,6 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {useWindowDimensions} from 'react-native'
 
-import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {ModulaTabs} from '@/platform/ui/tabs/modula-tabs-control'
 
 export type ProductTabId = 'overview' | 'features' | 'permissions' | 'reviews' | 'related'
 
@@ -17,32 +16,17 @@ export const PRODUCT_TABS: {id: ProductTabId; label: string}[] = [
 const PRODUCT_TAB_SEGMENT_MIN_WIDTH = 108
 
 export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSelect: (tab: ProductTabId) => void}) {
-  const {colours, radius} = useThemeTokens()
   const {width} = useWindowDimensions()
   return (
-    <View
-      style={[
-        styles.rail,
-        {
-          backgroundColor: colours.surface,
-          borderRadius: radius.round,
-        },
-      ]}
-      testID="product-tabs">
-      <ModulaSegmentedPicker
-        accessibilityLabel="Product sections"
-        appearance="segmented"
-        maxWidth={Math.max(280, width - 32)}
-        onValueChange={value => onSelect(value as ProductTabId)}
-        options={PRODUCT_TABS.map(tab => ({value: tab.id, label: tab.label}))}
-        scrollable
-        segmentMinWidth={PRODUCT_TAB_SEGMENT_MIN_WIDTH}
-        value={selected}
-      />
-    </View>
+    <ModulaTabs
+      accessibilityLabel="Product sections"
+      maxWidth={Math.max(280, width - 32)}
+      onValueChange={value => onSelect(value as ProductTabId)}
+      presentation="scrollable"
+      segmentMinWidth={PRODUCT_TAB_SEGMENT_MIN_WIDTH}
+      tabs={PRODUCT_TABS}
+      testID="product-tabs"
+      value={selected}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  rail: {justifyContent: 'center', minHeight: 42, overflow: 'hidden', paddingVertical: 4},
-})

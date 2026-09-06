@@ -19,7 +19,7 @@ export function ProductStatsRow({items}: {items: ProductStatItem[]}) {
 
   return (
     <View
-      accessibilityRole="summary"
+      role="group"
       style={[styles.row, {paddingVertical: spacing[3]}]}>
       {items.map((item, index) => (
         <View

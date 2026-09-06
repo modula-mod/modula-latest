@@ -7,6 +7,12 @@
 export * from '@/platform/ui/buttons/button-role'
 export * from '@/platform/ui/icons'
 export {ModulaButton} from '@/platform/ui/buttons/modula-button'
+export {
+  ModulaActionButton,
+  type ModulaActionButtonEmphasis,
+  type ModulaActionButtonProps,
+  type ModulaActionButtonSize,
+} from '@/platform/ui/buttons/modula-action-button'
 export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 export {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
@@ -75,6 +81,11 @@ export {
   type ModulaTabId,
 } from '@/platform/ui/navigation/modula-tabs'
 export {nativeScreenHeaderOptions} from '@/platform/ui/navigation/native-screen-header'
+export {
+  ModulaNavigationHeader,
+  type ModulaNavigationHeaderPresentation,
+  type ModulaNavigationHeaderProps,
+} from '@/platform/ui/navigation/modula-navigation-header'
 export {PlatformTabs} from '@/platform/ui/navigation/platform-tabs'
 export {
   accountPanelReducer,
@@ -85,6 +96,19 @@ export {
   type PanelState,
 } from '@/platform/ui/navigation/account-panel-state'
 export {ModulaSheet, type ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet'
+export type {
+  ModulaSheetDetent,
+  ModulaSheetPresentation,
+  ModulaSheetSemanticDetent,
+  ModulaSheetSnapPoint,
+} from '@/platform/ui/sheets/modula-sheet.types'
+export {
+  ModulaActionSheet,
+  ModulaToolDrawer,
+  type ModulaActionSheetProps,
+  type ModulaToolDrawerItem,
+  type ModulaToolDrawerSection,
+} from '@/platform/ui/sheets/modula-sheet-compositions'
 export {
   SelectionSheet,
   type SelectionSheetOption,
@@ -102,8 +126,42 @@ export {
   meetsTouchTarget,
 } from '@/platform/ui/touch/touch-target'
 export * from '@/platform/ui/avatars'
+export {
+  ModulaActivityRow,
+  ModulaNotificationRow,
+  ModulaIconTile,
+  ModulaInsetSeparator,
+  ModulaListAccessoryView,
+  ModulaListAvatar,
+  ModulaListMetadata,
+  ModulaListRow,
+  ModulaListSection,
+  ModulaSectionSeparator,
+  ModulaSeparator,
+  ModulaList as ModulaListSurface,
+} from '@/platform/ui/lists'
+export type {
+  ModulaListAccessory,
+  ModulaListRowProps,
+  ModulaListRowVariant,
+  ModulaListSectionProps,
+  ModulaListProps as ModulaListSurfaceProps,
+} from '@/platform/ui/lists'
+export * from '@/platform/ui/forms'
+export * from '@/platform/ui/feedback'
+export * from '@/platform/ui/identity'
+export * from '@/platform/ui/drawers'
+export * from '@/platform/ui/composer'
+export * from '@/platform/ui/floating'
+export {
+  MODULA_PRODUCT_UI_V1_COMPONENTS,
+  type ModulaProductUiV1Component,
+} from '@/platform/ui/product-ui'
 export * from '@/platform/ui/skeletons'
 export * from '@/platform/ui/tabs'
+export * from '@/platform/ui/toolbars'
+export * from '@/platform/ui/motion'
+export {Surface, type SurfaceVariant} from '@/components/primitives/Surface'
 export {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 export {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-button'
 export {PageIntro} from '@/platform/ui/chrome/page-intro'

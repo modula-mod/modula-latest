@@ -2,7 +2,6 @@ import {LinearGradient} from 'expo-linear-gradient'
 import type {ReactNode} from 'react'
 import {useMemo, useState} from 'react'
 import {
-  Modal,
   ScrollView,
   StyleSheet,
   View,
@@ -19,6 +18,7 @@ import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-pic
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaJoinIsland} from '@/platform/ui/motion'
+import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -287,19 +287,36 @@ export function AppearanceScreen() {
         </ScrollView>
       </ResponsiveContent>
 
-      <Modal
-        transparent
-        visible={customModalVisible}
-        animationType="fade"
-        onRequestClose={() => setCustomModalVisible(false)}>
-        <View style={[styles.modalBackdrop, {backgroundColor: colours.backdrop}]}>
-          <MaterialSurface role="modal" style={[styles.modal, {gap: spacing[4]}]}>
-            <View style={{gap: spacing[1]}}>
-              <AppText variant="title2">Custom accent</AppText>
-              <AppText variant="body" colour="textSecondary">
-                Use #RGB or #RRGGBB. Modula chooses readable text automatically.
-              </AppText>
-            </View>
+      <ModulaSheet
+        footer={
+          <View style={[styles.modalActions, {gap: spacing[2]}]}>
+            <ModulaButton
+              accessibilityLabel="Cancel custom accent"
+              label="Cancel"
+              role="secondary"
+              size="compact"
+              onPress={() => setCustomModalVisible(false)}
+            />
+            <ModulaButton
+              accessibilityLabel="Apply custom accent"
+              label="Apply"
+              disabled={!customValidation.valid}
+              size="compact"
+              onPress={() => {
+                if (customValidation.valid) {
+                  actions.setCustomAccent(customValidation.value)
+                  setCustomModalVisible(false)
+                }
+              }}
+            />
+          </View>
+        }
+        isPresented={customModalVisible}
+        onDismiss={() => setCustomModalVisible(false)}
+        presentation="picker"
+        subtitle="Use #RGB or #RRGGBB. Modula chooses readable text automatically."
+        title="Custom accent">
+        <View style={{gap: spacing[4]}}>
             <View style={[styles.customPreview, {gap: spacing[3]}]}>
               <View
                 style={[
@@ -331,30 +348,8 @@ export function AppearanceScreen() {
                 {customValidation.message}
               </AppText>
             ) : null}
-            <View style={[styles.modalActions, {gap: spacing[2]}]}>
-              <ModulaButton
-                accessibilityLabel="Cancel custom accent"
-                label="Cancel"
-                role="secondary"
-                size="compact"
-                onPress={() => setCustomModalVisible(false)}
-              />
-              <ModulaButton
-                accessibilityLabel="Apply custom accent"
-                label="Apply"
-                disabled={!customValidation.valid}
-                size="compact"
-                onPress={() => {
-                  if (customValidation.valid) {
-                    actions.setCustomAccent(customValidation.value)
-                    setCustomModalVisible(false)
-                  }
-                }}
-              />
-            </View>
-          </MaterialSurface>
         </View>
-      </Modal>
+      </ModulaSheet>
     </View>
   )
 }

@@ -22,6 +22,7 @@ export type ModulaTextInputProps = {
   autoFocus?: boolean
   editable?: boolean
   multiline?: boolean
+  chrome?: 'field' | 'plain'
   keyboardType?: KeyboardTypeOptions
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
   autoCorrect?: boolean
@@ -44,10 +45,12 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(
       value,
       onChangeText,
       placeholder,
+      label,
       secureTextEntry,
       autoFocus,
       editable = true,
       multiline,
+      chrome = 'field',
       keyboardType,
       autoCapitalize,
       autoCorrect,
@@ -86,7 +89,7 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(
         onFocus={onFocus}
         onBlur={onBlur}
         maxLength={maxLength}
-        accessibilityLabel={accessibilityLabel}
+        accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
         allowFontScaling={accessibility.followSystemTextSize}
         testID={testID}
         style={[
@@ -94,13 +97,13 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(
             minHeight: multiline
               ? controls.inputHeight.multilineMinimum
               : controls.inputHeight.singleLine,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: colours.border,
-            backgroundColor: colours.surfaceRaised,
-            borderRadius: radius.medium,
+            borderWidth: chrome === 'plain' ? 0 : StyleSheet.hairlineWidth,
+            borderColor: chrome === 'plain' ? 'transparent' : colours.border,
+            backgroundColor: chrome === 'plain' ? 'transparent' : colours.surfaceRaised,
+            borderRadius: chrome === 'plain' ? 0 : radius.medium,
             color: colours.text,
             ...typography.body,
-            paddingHorizontal: spacing[4],
+            paddingHorizontal: chrome === 'plain' ? 0 : spacing[4],
             paddingVertical: spacing[2],
           },
           style as never,

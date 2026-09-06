@@ -23,6 +23,7 @@ export type ModulaTextInputProps = {
   autoFocus?: boolean
   editable?: boolean
   multiline?: boolean
+  chrome?: 'field' | 'plain'
   keyboardType?: KeyboardTypeOptions
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'
   autoCorrect?: boolean
@@ -51,10 +52,12 @@ export function ModulaTextInput({
   value,
   onChangeText,
   placeholder,
+  label,
   secureTextEntry,
   autoFocus,
   editable = true,
   multiline,
+  chrome = 'field',
   keyboardType,
   autoCapitalize,
   autoCorrect,
@@ -83,11 +86,11 @@ export function ModulaTextInput({
           minHeight: multiline
             ? controls.inputHeight.multilineMinimum
             : controls.inputHeight.singleLine,
-          borderColor: colours.border,
-          backgroundColor: colours.surfaceRaised,
-          borderRadius: radius.medium,
-          paddingHorizontal: spacing[4],
-          paddingVertical: multiline ? spacing[3] : 0,
+          borderColor: chrome === 'plain' ? 'transparent' : colours.border,
+          backgroundColor: chrome === 'plain' ? 'transparent' : colours.surfaceRaised,
+          borderRadius: chrome === 'plain' ? 0 : radius.medium,
+          paddingHorizontal: chrome === 'plain' ? 0 : spacing[4],
+          paddingVertical: multiline && chrome !== 'plain' ? spacing[3] : 0,
         },
         style,
       ]}>
@@ -110,7 +113,7 @@ export function ModulaTextInput({
         onFocus={onFocus}
         onBlur={onBlur}
         maxLength={maxLength}
-        accessibilityLabel={accessibilityLabel}
+        accessibilityLabel={accessibilityLabel ?? label ?? placeholder}
         allowFontScaling={accessibility.followSystemTextSize}
         testID={testID}
         style={[

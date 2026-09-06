@@ -36,28 +36,29 @@ export function ModulaTagInput({
       {value.length ? (
         <View style={[styles.chips, {gap: spacing[1]}]} accessibilityRole="list">
           {value.map(tag => (
-            <AppPressable
-              key={tag}
-              accessibilityLabel={`Remove ${tag} tag`}
-              onPress={() => onChange(value.filter(item => item !== tag))}
-              style={[styles.chipTarget, {minHeight: controls.touchTarget.minimum}]}>
-              <View
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: colours.accentSubtle,
-                    borderColor: colours.accentBorder,
-                    borderRadius: radius.round,
-                    gap: spacing[1],
-                    paddingHorizontal: spacing[2],
-                  },
-                ]}>
-                <AppText variant="caption" colour="accent" numberOfLines={1}>
-                  {tag}
-                </AppText>
-                <ModulaIcon name="close" size={controls.iconSize.status} colour={colours.accent} />
-              </View>
-            </AppPressable>
+            <View role="listitem" key={tag}>
+              <AppPressable
+                accessibilityLabel={`Remove ${tag} tag`}
+                onPress={() => onChange(value.filter(item => item !== tag))}
+                style={[styles.chipTarget, {minHeight: controls.touchTarget.minimum}]}>
+                <View
+                  style={[
+                    styles.chip,
+                    {
+                      backgroundColor: colours.accentSubtle,
+                      borderColor: colours.accentBorder,
+                      borderRadius: radius.round,
+                      gap: spacing[1],
+                      paddingHorizontal: spacing[2],
+                    },
+                  ]}>
+                  <AppText variant="caption" colour="accent" numberOfLines={1}>
+                    {tag}
+                  </AppText>
+                  <ModulaIcon name="close" size={controls.iconSize.status} colour={colours.accent} />
+                </View>
+              </AppPressable>
+            </View>
           ))}
         </View>
       ) : null}
