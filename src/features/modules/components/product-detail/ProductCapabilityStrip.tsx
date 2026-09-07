@@ -1,7 +1,8 @@
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
+import {ModulaHorizontalScroll} from '@/platform/ui/scroll'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ProductCapabilityItem = {
@@ -33,7 +34,7 @@ export function ProductCapabilityStrip({items}: {items: ProductCapabilityItem[]}
         <AppText variant="caption" numberOfLines={1} adjustsFontSizeToFit style={styles.label}>{item.label}</AppText>
       </View>
       <AppText variant="label" numberOfLines={1} adjustsFontSizeToFit>{item.value}</AppText>
-      <AppText variant="caption" colour="textTertiary" numberOfLines={2} adjustsFontSizeToFit>
+      <AppText variant="caption" colour="textSecondary" numberOfLines={2} adjustsFontSizeToFit>
         {item.detail}
       </AppText>
     </View>
@@ -43,9 +44,9 @@ export function ProductCapabilityStrip({items}: {items: ProductCapabilityItem[]}
       <AppText variant="sectionTitle" accessibilityRole="header">Trust &amp; capabilities</AppText>
       <View style={[styles.frame, {borderColor: colours.border, borderRadius: radius.xlarge}]}>
         {scrollable ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+          <ModulaHorizontalScroll accessibilityLabel="Scrollable product capabilities" contentContainerStyle={styles.content}>
             {content}
-          </ScrollView>
+          </ModulaHorizontalScroll>
         ) : (
           <View style={styles.content}>{content}</View>
         )}

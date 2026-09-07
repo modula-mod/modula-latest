@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "0.1.0",
   "dependencies": {
+    "@base-ui/react": "1.8.0",
     "@callstack/liquid-glass": "^0.8.0",
     "@expo/metro-runtime": "57.0.13",
     "@expo/ui": "~57.0.13",
@@ -63,6 +64,7 @@
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "~57.0.4",
@@ -301,7 +303,9 @@
     "verify:reference-tasks-zero-core": "node scripts/verify-reference-tasks-zero-core.mjs",
     "verify:vault-products": "node scripts/verify-vault-mps-releases.mjs",
     "verify:platform-foundation-v1": "node scripts/verify-platform-foundation-v1.mjs",
-    "verify:ui-system-v1": "node scripts/verify-ui-system-v1.mjs"
+    "verify:ui-system-v1": "node scripts/verify-ui-system-v1.mjs",
+    "verify:web-ui-adapter-v1": "node scripts/verify-web-ui-adapter-v1.mjs",
+    "verify:web-ui-adapter-v1:browser": "playwright test --config playwright.web-ui-adapter.config.ts"
   },
   "private": true
 }

@@ -1,18 +1,101 @@
-import {useEffect, useRef} from 'react'
-import {Modal, Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Dialog} from '@base-ui/react/dialog'
+import {Drawer} from '@base-ui/react/drawer'
+import type {ReactNode} from 'react'
 
-import {ModulaSheetLayout} from '@/platform/ui/sheets/modula-sheet-layout'
-import {ModulaSheetHeader} from '@/platform/ui/sheets/modula-sheet-header'
-import {detentForPresentation, type ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
+import {useResponsivePresentation} from '@/platform/ui/responsive'
+import {
+  detentForPresentation,
+  overlayIntentForSheet,
+  snapPointsForSemanticDetents,
+  webSnapPoints,
+  type ModulaSheetDesktopPresentation,
+  type ModulaSheetDirection,
+  type ModulaSheetProps,
+  type ModulaSheetSnapPoint,
+} from '@/platform/ui/sheets/modula-sheet.types'
+import type {ModulaResolvedPresentation} from '@/platform/ui/responsive'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
+import {useEffect} from 'react'
+import {useReduceMotion} from '@/lib/accessibility'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
-import {LAYERS} from '@/theme/tokens/layers'
-import {scrimColour} from '@/theme/tokens/scrim'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {modulaWebCssVariables} from '@/platform/web-ui/theme'
 
 export type {ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet.types'
 
-/** Accessible web/dialog fallback for ModulaSheet. */
+const presentationSize = (presentation: ModulaSheetProps['presentation']): 'small' | 'regular' | 'large' => {
+  if (presentation === 'compact' || presentation === 'actions' || presentation === 'picker' || presentation === 'context') return 'small'
+  if (presentation === 'interactive' || presentation === 'media') return 'large'
+  return 'regular'
+}
+
+function classNames(...values: (string | false | null | undefined)[]): string {
+  return values.filter(Boolean).join(' ')
+}
+
+function WebOverlayContents({
+  title,
+  subtitle,
+  header,
+  footer,
+  children,
+  scrollBody,
+  titleNode,
+  descriptionNode,
+  bodyNode,
+}: {
+  title?: string
+  subtitle?: string
+  header?: ReactNode
+  footer?: ReactNode
+  children: ReactNode
+  scrollBody: boolean
+  titleNode: (props: {className: string; children: ReactNode}) => ReactNode
+  descriptionNode: (props: {className: string; children: ReactNode}) => ReactNode
+  bodyNode: (props: {className: string; children: ReactNode; 'data-scroll': string}) => ReactNode
+}) {
+  const accessibleTitle = title ?? 'Modula panel'
+  const accessibleDescription = subtitle ?? 'Interactive Modula content'
+  return (
+    <div className="modula-web-overlay-content">
+      {header ? (
+        <>
+          {titleNode({className: 'modula-web-visually-hidden', children: accessibleTitle})}
+          {descriptionNode({className: 'modula-web-visually-hidden', children: accessibleDescription})}
+          <div className="modula-web-overlay-custom-header">{header}</div>
+        </>
+      ) : (
+        <div className="modula-web-overlay-header">
+          {titleNode({className: 'modula-web-overlay-title', children: accessibleTitle})}
+          {descriptionNode({
+            className: subtitle ? 'modula-web-overlay-description' : 'modula-web-visually-hidden',
+            children: accessibleDescription,
+          })}
+        </div>
+      )}
+      {bodyNode({
+        className: 'modula-web-overlay-body',
+        'data-scroll': String(scrollBody),
+        children,
+      })}
+      {footer ? <div className="modula-web-overlay-footer">{footer}</div> : null}
+    </div>
+  )
+}
+
+function defaultDesktopPresentation(
+  resolved: ModulaResolvedPresentation,
+  override: ModulaSheetDesktopPresentation | undefined,
+): 'drawer' | 'sheet' | 'dialog' {
+  if (resolved === 'drawer') return resolved
+  if (override) return override
+  return resolved === 'menu' || resolved === 'popover' ? 'dialog' : resolved
+}
+
+/**
+ * Modula-owned web adapter. Base UI is private implementation machinery; all
+ * screen and product code continues to consume the semantic Modula contract.
+ */
 export function ModulaSheet({
   isPresented,
   onDismiss,
@@ -23,21 +106,31 @@ export function ModulaSheet({
   header,
   footer,
   detent,
+  detents,
+  snapPoints,
+  activeSnapPoint,
+  onActiveSnapPointChange,
+  showDragIndicator = true,
+  direction = 'bottom',
+  desktopPresentation,
+  dialogSize: requestedDialogSize,
+  dismissOnOutsidePress = true,
   testID,
   scrollBody = true,
   obscureShellChrome = true,
   accessibilityLabel,
 }: ModulaSheetProps) {
-  const {colours, spacing, radius, resolvedColourMode} = useThemeTokens()
+  const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
-  const {height, width} = useWindowDimensions()
-  const sheetRef = useRef<View>(null)
+  const reduceMotion = useReduceMotion()
+  const semantic = useResponsivePresentation(overlayIntentForSheet(presentation), {anchored: false})
+  const resolved = defaultDesktopPresentation(semantic, desktopPresentation)
+  const variables = modulaWebCssVariables(tokens, {reduceTransparency})
   const resolvedDetent = detent ?? detentForPresentation(presentation)
-  const resolvedHeader = header ?? (title ? <ModulaSheetHeader title={title} subtitle={subtitle} /> : undefined)
-  const structured = Boolean(resolvedHeader || footer)
-  const maxHeight =
-    resolvedDetent === 'full' ? height : resolvedDetent === 'large' ? Math.round(height * 0.92) : Math.round(height * 0.56)
-  const desktopDialog = width >= 768
+  const semanticPoints = snapPoints ?? snapPointsForSemanticDetents(detents)
+  const resolvedPoints = webSnapPoints(semanticPoints)
+  const resolvedActivePoint = webSnapPoints(activeSnapPoint ? [activeSnapPoint] : undefined)?.[0] ?? null
+  const resolvedDirection: ModulaSheetDirection = direction
 
   useEffect(() => {
     if (!obscureShellChrome) return
@@ -45,114 +138,117 @@ export function ModulaSheet({
     return () => setShellChromeHoldObscure(false)
   }, [isPresented, obscureShellChrome])
 
-  useEffect(() => {
-    if (!isPresented || typeof document === 'undefined') return
-    const previous = document.activeElement as HTMLElement | null
-    const root = sheetRef.current as unknown as HTMLElement | null
-    const focusable = root?.querySelector?.<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+  if (resolved === 'drawer') {
+    const swipeDirection = resolvedDirection === 'bottom' ? 'down' : resolvedDirection
+    return (
+      <Drawer.Root
+        open={isPresented}
+        onOpenChange={open => { if (!open) onDismiss() }}
+        modal
+        disablePointerDismissal={!dismissOnOutsidePress}
+        swipeDirection={swipeDirection}
+        snapPoints={resolvedPoints}
+        snapPoint={resolvedActivePoint}
+        onSnapPointChange={point => onActiveSnapPointChange?.(pointToContract(point))}
+        snapToSequentialPoints>
+        <Drawer.VirtualKeyboardProvider>
+          <Drawer.Portal>
+            <Drawer.Backdrop
+              className="modula-web-ui modula-web-backdrop modula-web-drawer-backdrop"
+              data-reduce-motion={String(reduceMotion)}
+              style={variables}
+            />
+            <Drawer.Viewport
+              className="modula-web-ui modula-web-drawer-viewport"
+              data-direction={resolvedDirection}
+              data-reduce-motion={String(reduceMotion)}
+              style={variables}>
+              <Drawer.Popup
+                aria-label={accessibilityLabel}
+                className="modula-web-drawer-popup"
+                data-direction={resolvedDirection}
+                data-detent={resolvedDetent}
+                finalFocus
+                initialFocus
+                data-testid={testID}
+                style={variables}>
+                {showDragIndicator && resolvedDirection === 'bottom' ? (
+                  <div aria-hidden="true" className="modula-web-drawer-handle-target">
+                    <div className="modula-web-drawer-handle" />
+                  </div>
+                ) : null}
+                <WebOverlayContents
+                  bodyNode={props => <Drawer.Content {...props} />}
+                  descriptionNode={props => <Drawer.Description {...props} />}
+                  titleNode={props => <Drawer.Title {...props} />}
+                  title={title}
+                  subtitle={subtitle}
+                  header={header}
+                  footer={footer}
+                  scrollBody={scrollBody}>
+                  {children}
+                </WebOverlayContents>
+              </Drawer.Popup>
+            </Drawer.Viewport>
+          </Drawer.Portal>
+        </Drawer.VirtualKeyboardProvider>
+      </Drawer.Root>
     )
-    focusable?.focus()
+  }
 
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        onDismiss()
-        return
-      }
-      if (event.key !== 'Tab' || !root) return
-      const nodes = Array.from(
-        root.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ),
-      ).filter(node => !node.hasAttribute('disabled'))
-      if (!nodes.length) return
-      const first = nodes[0]
-      const last = nodes[nodes.length - 1]
-      const active = document.activeElement
-      if (event.shiftKey && active === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      previous?.focus?.()
-    }
-  }, [isPresented, onDismiss])
-
-  const inner = structured ? (
-    <ModulaSheetLayout header={resolvedHeader} footer={footer} scrollBody={scrollBody} testID={testID}>
-      {children}
-    </ModulaSheetLayout>
-  ) : (
-    children
-  )
-
+  const dialogSize = requestedDialogSize ?? presentationSize(presentation)
+  const edge = resolved === 'sheet'
   return (
-    <Modal
-      visible={isPresented}
-      transparent
-      animationType="fade"
-      onRequestClose={onDismiss}
-      testID={testID}
-      accessibilityViewIsModal>
-      <View
-        style={[
-          styles.root,
-          {justifyContent: desktopDialog ? 'center' : 'flex-end', zIndex: LAYERS.sheet},
-        ]}>
-        <Pressable
-          accessibilityLabel="Dismiss"
-          onPress={onDismiss}
-          style={[
-            styles.backdrop,
-            {backgroundColor: scrimColour(resolvedColourMode, reduceTransparency)},
-          ]}
+    <Dialog.Root
+      open={isPresented}
+      onOpenChange={open => { if (!open) onDismiss() }}
+      modal
+      disablePointerDismissal={!dismissOnOutsidePress}>
+      <Dialog.Portal>
+        <Dialog.Backdrop
+          className="modula-web-ui modula-web-backdrop"
+          data-reduce-motion={String(reduceMotion)}
+          style={variables}
         />
-        <View
-          ref={sheetRef}
-          accessibilityLabel={accessibilityLabel}
-          accessibilityRole="none"
-          style={[
-            styles.sheet,
-            {
-              backgroundColor: colours.surface,
-              padding: spacing[4],
-              borderTopLeftRadius: radius.lg,
-              borderTopRightRadius: radius.lg,
-              borderBottomLeftRadius: desktopDialog ? radius.lg : 0,
-              borderBottomRightRadius: desktopDialog ? radius.lg : 0,
-              maxHeight,
-              minHeight: resolvedDetent === 'medium' ? 240 : 320,
-              maxWidth: desktopDialog ? 560 : undefined,
-            },
-          ]}>
-          {inner}
-        </View>
-      </View>
-    </Modal>
+        <Dialog.Viewport
+          className="modula-web-ui modula-web-dialog-viewport"
+          data-edge={edge ? 'true' : 'false'}
+          data-reduce-motion={String(reduceMotion)}
+          style={variables}>
+          <Dialog.Popup
+            aria-label={accessibilityLabel}
+            className={classNames('modula-web-dialog-popup', edge && 'modula-web-edge-sheet')}
+            data-size={dialogSize}
+            data-side={resolvedDirection === 'left' ? 'left' : 'right'}
+            finalFocus
+            initialFocus
+            data-testid={testID}
+            style={variables}>
+            <WebOverlayContents
+              bodyNode={props => <div {...props} />}
+              descriptionNode={props => <Dialog.Description {...props} />}
+              titleNode={props => <Dialog.Title {...props} />}
+              title={title}
+              subtitle={subtitle}
+              header={header}
+              footer={footer}
+              scrollBody={scrollBody}>
+              {children}
+            </WebOverlayContents>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  root: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  sheet: {
-    alignSelf: 'stretch',
-    width: '100%',
-  },
-})
+function pointToContract(point: number | string | null): ModulaSheetSnapPoint | null {
+  if (point == null) return null
+  if (typeof point === 'number') {
+    if (point >= 0.99) return 'full'
+    if (Math.abs(point - 0.56) < 0.01) return 'half'
+    return {fraction: point}
+  }
+  const pixels = Number.parseFloat(point)
+  return Number.isFinite(pixels) && point.endsWith('px') ? {height: pixels} : null
+}

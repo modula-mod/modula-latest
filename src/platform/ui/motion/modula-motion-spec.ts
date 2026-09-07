@@ -5,10 +5,22 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 export type ModulaMotionName =
   | 'sheet.enter'
   | 'sheet.exit'
+  | 'drawer.enter'
+  | 'drawer.exit'
+  | 'drawer.snap'
   | 'drawer.expand'
   | 'drawer.collapse'
+  | 'drawerPage.forward'
+  | 'drawerPage.back'
+  | 'drawerHeight.change'
+  | 'drawerModal.enter'
+  | 'drawerModal.exit'
+  | 'dialog.enter'
+  | 'dialog.exit'
   | 'menu.open'
   | 'menu.close'
+  | 'popover.open'
+  | 'popover.close'
   | 'button.press'
   | 'list.insert'
   | 'list.remove'
@@ -29,12 +41,12 @@ function specFor(
   motion: MotionTokens,
   reduced: boolean,
 ): ModulaMotionSpec {
-  const overlay = name.startsWith('sheet.') || name.startsWith('drawer.')
-  const navigation = name.startsWith('navigation.')
+  const overlay = name.startsWith('sheet.') || name.startsWith('drawer.') || name.startsWith('dialog.') || name.startsWith('popover.') || name.startsWith('menu.')
+  const navigation = name.startsWith('navigation.') || name.startsWith('drawerPage.')
   const press = name === 'button.press'
-  const selection = name === 'tab.change' || name.startsWith('list.')
+  const selection = name === 'tab.change' || name === 'drawerHeight.change' || name.startsWith('list.')
   const spring = overlay
-    ? name.startsWith('sheet.')
+    ? name.startsWith('sheet.') || name.startsWith('dialog.') || name.startsWith('popover.') || name.startsWith('menu.')
       ? motion.springs.sheet
       : motion.springs.drawer
     : navigation

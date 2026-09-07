@@ -201,6 +201,7 @@ export function ModulaListRow({
 
   return (
     <AppPressable
+      aria-checked={accessibilityRole === 'radio' ? Boolean(accessibilityState?.checked) : undefined}
       accessibilityLabel={computedLabel || undefined}
       accessibilityRole={accessibilityRole ?? (variant === 'navigation' ? 'link' : 'button')}
       accessibilityState={state}

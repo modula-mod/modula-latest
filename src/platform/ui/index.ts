@@ -6,14 +6,15 @@
  */
 export * from '@/platform/ui/buttons/button-role'
 export * from '@/platform/ui/icons'
-export {ModulaButton} from '@/platform/ui/buttons/modula-button'
+export {ModulaButton, type ModulaButtonProps} from '@/platform/ui/buttons/modula-button'
 export {
   ModulaActionButton,
   type ModulaActionButtonEmphasis,
   type ModulaActionButtonProps,
   type ModulaActionButtonSize,
 } from '@/platform/ui/buttons/modula-action-button'
-export {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+export {ModulaIconButton, type ModulaIconButtonProps} from '@/platform/ui/buttons/modula-icon-button'
+export {ModulaButtonGroup} from '@/platform/ui/buttons/modula-button-group'
 export {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 export {ModulaTitleIconButton} from '@/platform/ui/buttons/modula-title-icon-button'
 export {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
@@ -28,6 +29,12 @@ export {ModulaCheckbox} from '@/platform/ui/controls/modula-checkbox'
 export type {ModulaCheckboxProps} from '@/platform/ui/controls/modula-checkbox'
 export {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 export type {ModulaTextInputProps} from '@/platform/ui/controls/modula-text-input'
+export {ModulaCombobox, type ModulaComboboxOption, type ModulaComboboxProps} from '@/platform/ui/controls/modula-combobox'
+export {
+  ModulaToggleGroup,
+  type ModulaToggleGroupItem,
+  type ModulaToggleGroupProps,
+} from '@/platform/ui/controls/modula-toggle-group'
 export {ModulaSecureInput} from '@/platform/ui/controls/modula-secure-input'
 export {ModulaSecureField} from '@/platform/ui/controls/modula-secure-field'
 export {ModulaFieldShell} from '@/platform/ui/controls/modula-field-shell'
@@ -98,10 +105,13 @@ export {
 export {ModulaSheet, type ModulaSheetProps} from '@/platform/ui/sheets/modula-sheet'
 export type {
   ModulaSheetDetent,
+  ModulaSheetDesktopPresentation,
+  ModulaSheetDirection,
   ModulaSheetPresentation,
   ModulaSheetSemanticDetent,
   ModulaSheetSnapPoint,
 } from '@/platform/ui/sheets/modula-sheet.types'
+export * from '@/platform/ui/responsive'
 export {
   ModulaActionSheet,
   ModulaToolDrawer,
@@ -151,6 +161,9 @@ export * from '@/platform/ui/forms'
 export * from '@/platform/ui/feedback'
 export * from '@/platform/ui/identity'
 export * from '@/platform/ui/drawers'
+export * from '@/platform/ui/dialogs'
+export * from '@/platform/ui/command'
+export * from '@/platform/ui/scroll'
 export * from '@/platform/ui/composer'
 export * from '@/platform/ui/floating'
 export {

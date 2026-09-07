@@ -5,7 +5,7 @@ import {View} from 'react-native'
 import {renderTapMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
-type ModulaMenuProps = {
+export type ModulaMenuProps = {
   trigger: ReactNode
   title?: string
   actions: ModulaActionItem[]

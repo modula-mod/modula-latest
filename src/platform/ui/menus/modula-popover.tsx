@@ -14,6 +14,7 @@ import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ModulaPopoverProps = {
   isOpen: boolean
+  onOpen?: () => void
   onDismiss: () => void
   /** The always-rendered anchor content (usually a button). */
   trigger: ReactNode
@@ -21,6 +22,7 @@ export type ModulaPopoverProps = {
   /** Preferred width of the popover card. */
   width?: number
   accessibilityLabel?: string
+  triggerTestID?: string
   testID?: string
 }
 
@@ -33,11 +35,13 @@ const POPOVER_GAP = 6
  */
 export function ModulaPopover({
   isOpen,
+  onOpen,
   onDismiss,
   trigger,
   children,
   width = 280,
   accessibilityLabel,
+  triggerTestID,
   testID,
 }: ModulaPopoverProps) {
   const anchorRef = useRef<RNView>(null)
@@ -90,7 +94,13 @@ export function ModulaPopover({
   return (
     <>
       <View ref={anchorRef} collapsable={false}>
-        {trigger}
+        <Pressable
+          accessibilityLabel={accessibilityLabel ?? 'Open popover'}
+          accessibilityRole="button"
+          onPress={onOpen}
+          testID={triggerTestID}>
+          {trigger}
+        </Pressable>
       </View>
       <Modal
         visible={isOpen}

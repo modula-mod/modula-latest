@@ -7,7 +7,7 @@ import {LiquidGlassChrome} from '@/platform/ui/materials/liquid-glass-chrome'
 import {controls as controlTokens} from '@/theme/foundations/controls'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type ModulaIconButtonProps = {
+export type ModulaIconButtonProps = {
   icon: ModulaIconName
   accessibilityLabel: string
   onPress?: () => void

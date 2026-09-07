@@ -5,6 +5,7 @@ No package should enter the project merely because an example repository uses it
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
+| @base-ui/react | 1.8.0 | Web-only accessible overlay, menu, select, combobox, tooltip, and toast mechanics behind Modula platform adapters | No | Native entry isolation is enforced by `verify:web-ui-adapter-v1`; iOS/Android continue to resolve existing native files | MIT | Existing hand-rolled web sheet lacked drawer gesture/snap/scroll-handoff and web menus used an alert fallback; imports are restricted to approved `.web.tsx` adapters | Web UI Adapter V1 |
 | @node-rs/argon2 | ^2.0.2 | Server-side Argon2id password hashing for sovereign accounts | No (Node native binding) | N/A (backend only) | MIT | node-rs maintained package; required for Phase 6R password credentials | Phase 6R |
 | @expo/ui | ~57.0.13 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
 | expo | ~57.0.16 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
@@ -36,6 +37,7 @@ No package should enter the project merely because an example repository uses it
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
+| @axe-core/playwright | 4.13.0 | Development-only accessibility assertions for the Web Adapter UI Lab and browser interaction suite | No | N/A (test-only) | MPL-2.0 | Axe runs against the adapter-owned lab subtree in Chromium; real Safari/VoiceOver remains a separate manual gate | Web UI Adapter V1 |
 | @types/react | ~19.2.2 | React TypeScript types | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | eslint | ^9.39.5 | Linting | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | eslint-config-expo | ~57.0.0 | Expo ESLint flat config | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |

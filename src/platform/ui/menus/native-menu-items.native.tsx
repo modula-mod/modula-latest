@@ -37,7 +37,7 @@ function renderPicker(action: ModulaActionItem, onAction: (id: string) => void) 
 }
 
 function renderLeafButton(action: ModulaActionItem, onAction: (id: string) => void) {
-  const systemImage = actionSystemImage(action)
+  const systemImage = action.checked ? 'checkmark' : actionSystemImage(action)
   return (
     <Button
       key={action.id}

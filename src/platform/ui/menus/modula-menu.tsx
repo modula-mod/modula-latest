@@ -4,7 +4,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 
-type ModulaMenuProps = {
+export type ModulaMenuProps = {
   trigger: ReactNode
   title?: string
   actions: ModulaActionItem[]

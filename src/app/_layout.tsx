@@ -19,6 +19,7 @@ import {hideExpoDevToolsButton} from '@/platform/ui/dev/hide-expo-dev-tools-butt
 import {PersistentShellTabBar} from '@/platform/ui/navigation/persistent-shell-tab-bar'
 import {ShellBottomProgressiveBlur} from '@/platform/ui/navigation/shell-bottom-progressive-blur'
 import {ModulaSplashOverlay} from '@/platform/ui/splash/ModulaSplashOverlay'
+import {ModulaToastProvider} from '@/platform/ui/feedback'
 import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
@@ -101,19 +102,21 @@ export default function RootLayout() {
           <QueryRuntimeProvider>
             <SessionProvider>
               <AppearanceProvider>
-                <AppLockProvider>
-                  <ProductPreferencesProvider>
-                    <ProfilePresentationProvider>
-                      <AccountPanelProvider>
-                        <ShellDrawerProvider>
-                          <RootNavigator />
-                          <NetworkStatusBanner />
-                          <AppLockGate />
-                        </ShellDrawerProvider>
-                      </AccountPanelProvider>
-                    </ProfilePresentationProvider>
-                  </ProductPreferencesProvider>
-                </AppLockProvider>
+                <ModulaToastProvider>
+                  <AppLockProvider>
+                    <ProductPreferencesProvider>
+                      <ProfilePresentationProvider>
+                        <AccountPanelProvider>
+                          <ShellDrawerProvider>
+                            <RootNavigator />
+                            <NetworkStatusBanner />
+                            <AppLockGate />
+                          </ShellDrawerProvider>
+                        </AccountPanelProvider>
+                      </ProfilePresentationProvider>
+                    </ProductPreferencesProvider>
+                  </AppLockProvider>
+                </ModulaToastProvider>
               </AppearanceProvider>
             </SessionProvider>
           </QueryRuntimeProvider>

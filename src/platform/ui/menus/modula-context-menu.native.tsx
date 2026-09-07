@@ -5,7 +5,7 @@ import {StyleSheet, View} from 'react-native'
 import {renderContextMenuItems} from '@/platform/ui/menus/native-menu-items'
 import type {ModulaActionItem, ModulaMenuFit} from '@/platform/ui/menus/types'
 
-type ModulaContextMenuProps = {
+export type ModulaContextMenuProps = {
   children: ReactNode
   title?: string
   actions: ModulaActionItem[]

@@ -1,8 +1,9 @@
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
+import {ModulaHorizontalScroll} from '@/platform/ui/scroll'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ProductInformationItem = {
@@ -44,9 +45,9 @@ export function ProductInformationStrip({items}: {items: ProductInformationItem[
   return (
     <View style={[styles.frame, {backgroundColor: colours.surfaceRaised, borderRadius: radius.xlarge}]} testID="product-information-strip">
       {scrollable ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <ModulaHorizontalScroll accessibilityLabel="Scrollable product information" contentContainerStyle={styles.content}>
           {content}
-        </ScrollView>
+        </ModulaHorizontalScroll>
       ) : (
         <View style={styles.content}>{content}</View>
       )}

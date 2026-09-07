@@ -9,7 +9,7 @@ import {
 } from '@/platform/ui/buttons/button-role'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
-type ModulaButtonProps = {
+export type ModulaButtonProps = {
   label: string
   onPress?: () => void
   role?: ModulaButtonRole

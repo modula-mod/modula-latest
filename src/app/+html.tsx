@@ -1,6 +1,8 @@
 import type {ReactNode} from 'react'
 import {ScrollViewStyleReset, useServerDocumentContext} from 'expo-router/html'
 
+import {MODULA_WEB_UI_CSS} from '@/platform/web-ui/styles'
+
 const registerServiceWorker = `
 const isLocalDevelopment = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
 if ('serviceWorker' in navigator && !isLocalDevelopment) {
@@ -32,6 +34,7 @@ export default function Root({children}: {children: ReactNode}) {
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/pwa/icon-192.png" />
         <ScrollViewStyleReset />
+        <style id="modula-web-ui-adapter-v1">{MODULA_WEB_UI_CSS}</style>
         {headNodes}
       </head>
       <body {...bodyAttributes}>

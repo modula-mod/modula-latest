@@ -1,6 +1,7 @@
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View, useWindowDimensions} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
+import {ModulaHorizontalScroll} from '@/platform/ui/scroll'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type ProductMetadataItem = {
@@ -29,7 +30,7 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
       <AppText variant="metricValue" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9} style={styles.value}>
         {item.value}
       </AppText>
-      <AppText variant="metricLabel" colour="textTertiary" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9} style={styles.label}>
+      <AppText variant="metricLabel" colour="textSecondary" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.9} style={styles.label}>
         {item.label.toUpperCase()}
       </AppText>
       {item.detail ? (
@@ -45,9 +46,9 @@ export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
       style={[styles.frame, {borderColor: colours.border, borderRadius: radius.xlarge}]}
       testID="product-metadata-strip">
       {scrollable ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.content}>
+        <ModulaHorizontalScroll accessibilityLabel="Scrollable product metadata" contentContainerStyle={styles.content}>
           {content}
-        </ScrollView>
+        </ModulaHorizontalScroll>
       ) : (
         <View style={styles.content}>{content}</View>
       )}
