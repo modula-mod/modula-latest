@@ -137,13 +137,14 @@ function GroupSlot({
             width: OVERLAY_GROUP_ACTION_WIDTH * reveal,
           },
         ]}>
-        <View style={styles.actionHit}>
-          <AppPressable
-            accessibilityLabel={item.accessibilityLabel}
-            accessibilityState={{disabled: !enabled}}
-            disabled={!enabled}
-            hitSlop={4}
-            onPress={enabled ? item.onPress : undefined}
+        <AppPressable
+          accessibilityLabel={item.accessibilityLabel}
+          accessibilityState={{disabled: !enabled}}
+          disabled={!enabled}
+          hitSlop={4}
+          onPress={enabled ? item.onPress : undefined}
+          style={styles.actionHit}>
+          <View
             style={[
               styles.actionChip,
               {
@@ -165,8 +166,8 @@ function GroupSlot({
               }}>
               {item.label}
             </AppText>
-          </AppPressable>
-        </View>
+          </View>
+        </AppPressable>
       </View>
     )
   }

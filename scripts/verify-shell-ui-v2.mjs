@@ -161,7 +161,7 @@ sourceExcludes('src/features/modules/screens/ModuleHostScreen.tsx', ["?? 'Module
 sourceExcludes('src/features/modules/runtime/module-view-renderer.tsx', ['digital.modula.vault-notes', 'Vault Notes'], 'PRODUCT-SPECIFIC VIEW BRANCHES')
 sourceIncludes('src/features/modules/components/presentation/ModuleAction.tsx', ["label === 'Install' ? 'Get'", 'ModulaActionButton'], 'COMPACT PRODUCT HUB ACTION')
 sourceIncludes('src/platform/ui/buttons/modula-action-button.tsx', ['actionButton[size]', 'touchTarget.minimum'], 'PRODUCT ACTION VISUAL/HIT SEPARATION')
-sourceIncludes('src/features/modules/components/product-detail/ProductTopChrome.tsx', ["if (label === 'Install') return 'Get'", "label === 'Get' || label === 'Update'"], 'COMPACT STICKY PRODUCT ACTION')
+sourceIncludes('src/features/modules/components/product-detail/ProductNavigationChrome.tsx', ["if (label === 'Install') return 'Get'", "label === 'Get' || label === 'Update'"], 'COMPACT STICKY PRODUCT ACTION')
 sourceIncludes('src/features/settings/components/SettingsRows.tsx', ['ModulaIconTile', 'ModulaListRow', 'ModulaListSection'], 'SETTINGS GROUPED ROW SYSTEM')
 sourceIncludes('src/features/settings/screens/AccessibilityScreen.tsx', ['VoiceOver', 'Voice Control', 'Switch Control', 'Assistive Access', 'Live Speech'], 'FIRST-CLASS ACCESSIBILITY ROUTE')
 sourceIncludes('src/components/composer/ComposerToolsDrawer.tsx', ['presentation="tools"', 'ModulaListRow', 'ModulaListSection'], 'COMPOSER TOOLS GROUPED ROWS')

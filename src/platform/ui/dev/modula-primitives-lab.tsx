@@ -27,11 +27,9 @@ import {
   ProductMetadataStrip,
   ProductPlatformRow,
   ProductPreviewCarousel,
-  ProductStickyHeader,
+  ProductNavigationChrome,
   ProductTabs,
-  ProductTopChrome,
   ProductWhatsNew,
-  productTrailingCapsuleWidth,
   type ProductTabId,
 } from '@/features/modules/components/product-detail'
 import type {ModuleCatalogueItem, ModuleDetail} from '@/data/repositories/contracts'
@@ -154,16 +152,6 @@ export function ProductHeroLabScreen({
             inset={false}
             transitionToCanvas
           />
-          <ProductTopChrome
-            productName={SAMPLE_MODULE.name}
-            top={insets.top + spacing[2]}
-            onBack={() => undefined}
-            onPrimary={() => undefined}
-            onShare={() => undefined}
-            presentation={presentation}
-            actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
-            onAction={() => undefined}
-          />
         </View>
         <View style={[styles.heroSpecimenLead, {gap: spacing[4], paddingHorizontal: spacing[4]}]}>
           <View style={[styles.heroSpecimenIdentity, {gap: spacing[4]}]}>
@@ -235,6 +223,18 @@ export function ProductHeroLabScreen({
           </View>
         </View>
       </ScrollView>
+      <ProductNavigationChrome
+        actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
+        moduleId={SAMPLE_MODULE.moduleId}
+        onAction={() => undefined}
+        onBack={() => undefined}
+        onPrimary={() => undefined}
+        onShare={() => undefined}
+        presentation={presentation}
+        productName={SAMPLE_MODULE.name}
+        progress={initialOverviewOffset ? 1 : 0}
+        top={insets.top + spacing[2]}
+      />
     </View>
   )
 }
@@ -667,10 +667,10 @@ export function ModulaPrimitivesLabScreen({
         <ProductCover moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} />
       </LabBlock>
 
-      <LabBlock title="ProductTopChrome">
+      <LabBlock title="ProductNavigationChrome">
         <View style={styles.chromePreview}>
           <ProductCover moduleId={SAMPLE_MODULE.moduleId} name={SAMPLE_MODULE.name} />
-          <ProductTopChrome
+          <ProductNavigationChrome
             productName={SAMPLE_MODULE.name}
             top={12}
             onBack={() => undefined}
@@ -741,14 +741,19 @@ export function ModulaPrimitivesLabScreen({
         </AppText>
       </LabBlock>
 
-      <LabBlock title="ProductStickyHeader">
+      <LabBlock title="ProductNavigationChrome · collapsed">
         <View style={styles.stickyPreview}>
-          <ProductStickyHeader
+          <ProductNavigationChrome
+            actions={[{id: 'details', label: 'Product details', icon: 'info'}]}
+            onAction={() => undefined}
+            onBack={() => undefined}
+            onPrimary={() => setInstallReview(true)}
+            onShare={() => undefined}
             top={0}
             moduleId={SAMPLE_MODULE.moduleId}
-            name={SAMPLE_MODULE.name}
+            productName={SAMPLE_MODULE.name}
             progress={1}
-            trailingReservedWidth={productTrailingCapsuleWidth(1)}
+            presentation={installPresentation}
           />
         </View>
       </LabBlock>
