@@ -2,7 +2,6 @@ import type {ReactNode} from 'react'
 import {ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
 import {
@@ -11,8 +10,8 @@ import {
   ModulaListSection,
 } from '@/platform/ui/lists'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaIcon} from '@/platform/ui/icons/modula-icon'
 import {
@@ -502,16 +501,15 @@ export function SettingsContextRow({
   children: ReactNode
 }) {
   return (
-    <AppPressable
-      accessibilityLabel={title}
-      onLongPress={() => {
-        void presentModulaActions({title, actions}).then(id => {
-          if (id) onAction(id)
-        })
-      }}
-      style={styles.contextWrap}>
-      {children}
-    </AppPressable>
+    <View style={styles.contextWrap}>
+      <ModulaContextMenu
+        accessibilityLabel={title}
+        actions={actions}
+        onAction={onAction}
+        title={title}>
+        {children}
+      </ModulaContextMenu>
+    </View>
   )
 }
 

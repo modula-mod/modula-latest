@@ -38,6 +38,7 @@ export function ModulaIconButton({
         aria-label={accessibilityLabel}
         className="modula-web-ui modula-web-icon-button"
         data-chrome={chrome}
+        data-reduce-transparency={reduceTransparency ? 'true' : undefined}
         data-testid={testID}
         disabled={disabled}
         onClick={onPress}

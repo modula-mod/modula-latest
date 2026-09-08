@@ -8,7 +8,7 @@ import type {SocialPost} from '@/domain/social'
 import {useRepostMutation, useSavePostMutation} from '@/features/feed/data'
 import {runPostOverflowAction} from '@/features/feed/postActions'
 import {selectionHaptic} from '@/lib/haptics'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useAppServices} from '@/runtime'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {ReactionControl} from './reaction-control'
@@ -42,36 +42,51 @@ export function PostActions({post}: {post: SocialPost}) {
     </AppPressable>
   )
 
-  const openRepostMenu = () => {
+  const runRepostAction = (choice: string) => {
     void selectionHaptic()
-    void presentModulaActions({
-      title: 'Repost or quote',
-      actions: [
-        ...(post.reposted
-          ? [{id: 'undo', label: 'Undo repost'}]
-          : [{id: 'repost', label: 'Repost'}]),
-        {id: 'quote', label: 'Quote post'},
-      ],
-      cancelLabel: 'Cancel',
-    }).then(choice => {
-      if (choice === 'repost') {
-        repost.mutate({postId: post.id, reposted: true})
-        return
-      }
-      if (choice === 'undo') {
-        repost.mutate({postId: post.id, reposted: false})
-        return
-      }
-      if (choice === 'quote') {
-        router.push(`/compose?quotePostId=${encodeURIComponent(post.id)}` as Href)
-      }
-    })
+    if (choice === 'repost') {
+      repost.mutate({postId: post.id, reposted: true})
+      return
+    }
+    if (choice === 'undo') {
+      repost.mutate({postId: post.id, reposted: false})
+      return
+    }
+    if (choice === 'quote') {
+      router.push(`/compose?quotePostId=${encodeURIComponent(post.id)}` as Href)
+    }
   }
 
   return (
     <View style={styles.actions}>
       {action('Reply', 'comment', post.replyCount, false, () => router.push(`/post/${post.id}` as Href), 'Comment on post')}
-      {action('Repost', 'repost', post.repostCount, post.reposted, openRepostMenu, 'Repost or quote')}
+      <ModulaMenu
+        accessibilityLabel="Repost or quote"
+        actions={[
+          ...(post.reposted
+            ? [{id: 'undo', label: 'Undo repost'}]
+            : [{id: 'repost', label: 'Repost'}]),
+          {id: 'quote', label: 'Quote post'},
+        ]}
+        onAction={runRepostAction}
+        title="Repost or quote"
+        trigger={(
+          <View style={styles.action}>
+            <AppIcon
+              name="repost"
+              colour={post.reposted ? colours.accent : colours.textSecondary}
+              size={20}
+            />
+            {post.repostCount > 0 ? (
+              <AppText
+                variant="caption"
+                style={{color: post.reposted ? colours.accent : colours.textSecondary}}>
+                {post.repostCount}
+              </AppText>
+            ) : null}
+          </View>
+        )}
+      />
       <ReactionControl post={post} />
       {action('Share', 'share', undefined, false, () => void runPostOverflowAction('share', post, {moderationRepository}), 'Open post actions')}
       {action('Save', 'bookmark', undefined, post.saved, () => save.mutate({postId: post.id, saved: !post.saved}), 'Save post')}

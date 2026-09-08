@@ -10,7 +10,7 @@ import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaInlineNotice} from '@/platform/ui/feedback'
 import {ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
-import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
+import {ModulaDrawer} from '@/platform/ui/drawers/modula-drawer'
 import {useAppServices} from '@/runtime/useAppServices'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -105,7 +105,7 @@ function unavailableMessage(tool: ComposerToolItem): string {
 }
 
 /**
- * Composer Tools via ModulaSheet (Expo UI BottomSheet on native).
+ * Composer Tools via the shared Modula Drawer contract.
  * Loads tools from the Greenfield registry with built-in fallback.
  */
 export function ComposerToolsDrawer({
@@ -206,7 +206,7 @@ export function ComposerToolsDrawer({
   }
 
   return (
-    <ModulaSheet
+    <ModulaDrawer
       isPresented={visible}
       onDismiss={onClose}
       presentation="tools"
@@ -247,7 +247,11 @@ export function ComposerToolsDrawer({
                       key={tool.toolId}
                       accessibilityLabel={label}
                       accessory="chevron"
-                      description={tool.description ?? availabilitySentence(tool)}
+                      description={
+                        tool.description && tool.description !== availabilitySentence(tool)
+                          ? tool.description
+                          : undefined
+                      }
                       disabled={false}
                       last={index === sectionTools.length - 1}
                       leading={
@@ -269,6 +273,6 @@ export function ComposerToolsDrawer({
           )
         })}
       </View>
-    </ModulaSheet>
+    </ModulaDrawer>
   )
 }

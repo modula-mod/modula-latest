@@ -60,6 +60,12 @@ Bottom drawers add `env(safe-area-inset-bottom)`. Overlays use dynamic viewport 
 
 No default shadcn palette, radius, typography, shadow, spacing, or Tailwind utility layer was admitted. The adapter maps the active Modula canvas, surfaces, text, accent, separator, radius, spacing, scrim, focus, and motion tokens to CSS custom properties. Solid, glass, frost, neumorphism, OLED, reduced transparency, and increased contrast therefore remain host-owned modes.
 
+### Navigation chrome and action dispatch
+
+Back, Close, and single-item More controls now share the same 44px `ChromeGlassControlGroup` shell and 20px semantic icon geometry. The painted surface uses a token-derived translucent wash with browser backdrop blur; Reduce Transparency replaces it with the opaque raised-surface token. Native SF Symbols resolve from the one canonical Modula icon registry, so missing entries cannot silently diverge through a second fallback map.
+
+Visible More buttons use `ModulaMenu` or `ModulaContextMenu`. A queued root presenter also adapts older imperative `presentModulaActions` callers to the same responsive Drawer/Dialog mechanics on web, closing the React Native Alert dead-end without changing the native ActionSheet/Alert path. Destructive confirmations use a queued `ModulaDialog` host on web. Menu-to-dialog handoff first releases the outgoing modal focus and scroll lock. Product-specific cases were not added.
+
 ## Dependency and provenance
 
 - `@base-ui/react` 1.8.0, MIT, upstream `mui/base-ui`: used through its public component APIs; no source was copied.

@@ -3,6 +3,36 @@ import {expect, test, type Page} from '@playwright/test'
 
 const ROUTE = '/settings/developer/modula-ui-lab'
 const EVIDENCE = 'docs/validation/web-ui-adapter-v1'
+const BASE_URL = process.env.MODULA_BROWSER_BASE_URL ?? 'http://127.0.0.1:4174'
+const BROWSER_ORIGIN = new URL(BASE_URL).origin
+
+test.beforeEach(async ({page}) => {
+  await page.route('https://api.modula.digital/**', async route => {
+    if (route.request().method() === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          'access-control-allow-origin': BROWSER_ORIGIN,
+          'access-control-allow-methods': 'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS',
+          'access-control-allow-headers': 'Accept, Authorization, Content-Type, X-Modula-Request-Id',
+        },
+      })
+      return
+    }
+    const requestHeaders = {...route.request().headers()}
+    delete requestHeaders.origin
+    delete requestHeaders.referer
+    const response = await route.fetch({headers: requestHeaders})
+    await route.fulfill({
+      response,
+      headers: {
+        ...response.headers(),
+        'access-control-allow-origin': BROWSER_ORIGIN,
+        'cross-origin-resource-policy': 'cross-origin',
+      },
+    })
+  })
+})
 
 async function openLab(page: Page, width: number, height: number) {
   const errors: string[] = []
@@ -44,8 +74,41 @@ test('desktop interaction, keyboard, focus return, axe, and 1440 evidence', asyn
   await expect(page.getByRole('menu')).toBeVisible()
   await page.keyboard.press('End')
   await page.keyboard.press('Home')
-  await page.keyboard.press('Escape')
+  await page.getByRole('menuitem', {name: 'Copy link'}).click()
+  await expect(page.getByText('copy action selected', {exact: true})).toBeVisible()
   await expect(page.getByRole('button', {name: 'Open adapter menu'})).toBeFocused()
+
+  await page.getByRole('button', {name: 'Open adapter menu'}).click()
+  await page.getByRole('menuitem', {name: 'Delete'}).click()
+  const confirmation = page.getByTestId('modula-confirmation-dialog')
+  await expect(confirmation).toBeVisible()
+  await expect(confirmation).toContainText('Delete example?')
+  await confirmation.getByRole('button', {name: 'Delete'}).click()
+  await expect(page.getByText('Delete action confirmed', {exact: true})).toBeVisible()
+
+  const sharedActionTrigger = page.getByRole('button', {name: 'Shared action presenter'})
+  await sharedActionTrigger.click()
+  const sharedActionDialog = page.getByRole('dialog').last()
+  await expect(sharedActionDialog).toContainText('Shared actions')
+  await sharedActionDialog.getByRole('button', {name: 'Copy example'}).click()
+  await expect(page.getByText('shared-copy selected', {exact: true})).toBeVisible()
+  await expect(sharedActionTrigger).toBeFocused()
+
+  const backBox = await page.getByRole('button', {name: 'Preview back control'}).boundingBox()
+  const moreBox = await page.getByRole('button', {name: 'Preview more options'}).boundingBox()
+  expect(backBox?.width).toBe(moreBox?.width)
+  expect(backBox?.height).toBe(moreBox?.height)
+  const chromeBlur = await page.getByRole('button', {name: 'Preview back control'}).evaluate(element => {
+    let node: Element | null = element
+    while (node) {
+      const style = getComputedStyle(node)
+      const filter = style.backdropFilter || style.getPropertyValue('-webkit-backdrop-filter')
+      if (filter && filter !== 'none') return filter
+      node = node.parentElement
+    }
+    return 'none'
+  })
+  expect(chromeBlur).toContain('blur')
 
   await page.getByTestId('web-adapter-context-target').click({button: 'right'})
   await expect(page.getByRole('menu')).toContainText('Context actions')
@@ -90,6 +153,37 @@ test('desktop navigator reuses one dialog shell at 1024', async ({page}) => {
   await page.screenshot({path: `${EVIDENCE}/drill-in-desktop-1024.png`})
   await page.keyboard.press('Escape')
   await expect(trigger).toBeFocused()
+  expect(errors, errors.join('\n')).toEqual([])
+})
+
+test('priority Profile and Activity More actions execute on mobile web', async ({page}) => {
+  const errors: string[] = []
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(message.text())
+  })
+  page.on('pageerror', error => errors.push(error.message))
+  await page.setViewportSize({width: 390, height: 844})
+  await page.emulateMedia({colorScheme: 'dark'})
+
+  await page.goto(new URL('/activity', BASE_URL).toString(), {waitUntil: 'networkidle'})
+  await page.getByRole('button', {name: 'Activity actions'}).click()
+  await expectSingleDrawerSurface(page)
+  await page.getByRole('button', {name: 'Filters'}).click()
+  const activityFilters = page.getByTestId('activity-filter-sheet')
+  await expect(activityFilters).toBeVisible()
+  await expect(activityFilters).toContainText('Filter activity')
+  await expectSingleDrawerSurface(page)
+  await expectNoAxeViolations(page, '[data-testid="activity-filter-sheet"]')
+  await page.screenshot({path: `${EVIDENCE}/activity-filter-390-dark.png`})
+  await page.keyboard.press('Escape')
+
+  await page.goto(new URL('/profile/andrei.modula', BASE_URL).toString(), {waitUntil: 'networkidle'})
+  await page.getByRole('button', {name: 'More profile actions'}).click()
+  await expectSingleDrawerSurface(page)
+  await expectNoAxeViolations(page, '.modula-web-drawer-popup[data-open]')
+  await page.screenshot({path: `${EVIDENCE}/profile-more-390-dark.png`})
+  await page.getByRole('button', {name: 'Report account'}).click()
+  await expect(page).toHaveURL(/\/report\?targetType=profile&targetId=/)
   expect(errors, errors.join('\n')).toEqual([])
 })
 
@@ -166,8 +260,32 @@ test('390 light drill-in stays one surface and restores state, scroll, and focus
 test('430 dark, OLED true nesting, keyboard, long scroll, and accessibility preferences', async ({page}) => {
   const errors = await openLab(page, 430, 844)
   await page.getByTestId('web-adapter-theme-dark').click()
+  await page.getByTestId('web-adapter-navigation-chrome').screenshot({
+    path: `${EVIDENCE}/navigation-chrome-430-dark.png`,
+  })
 
   const menuTrigger = page.getByRole('button', {name: 'Open adapter menu'})
+  await menuTrigger.click()
+  await expectSingleDrawerSurface(page)
+  await page.getByRole('button', {name: 'Copy link'}).click()
+  await expect(page.getByText('copy action selected', {exact: true})).toBeVisible()
+  await expect(menuTrigger).toBeFocused()
+
+  await menuTrigger.click()
+  await page.getByRole('button', {name: 'Delete'}).click()
+  const confirmation = page.getByTestId('modula-confirmation-dialog')
+  await expect(confirmation).toBeVisible()
+  await expectSingleDrawerSurface(page)
+  await confirmation.getByRole('button', {name: 'Delete'}).click()
+  await expect(page.getByText('Delete action confirmed', {exact: true})).toBeVisible()
+
+  const sharedActionTrigger = page.getByRole('button', {name: 'Shared action presenter'})
+  await sharedActionTrigger.click()
+  await expectSingleDrawerSurface(page)
+  await page.getByRole('button', {name: 'Copy example'}).click()
+  await expect(page.getByText('shared-copy selected', {exact: true})).toBeVisible()
+  await expect(sharedActionTrigger).toBeFocused()
+
   await menuTrigger.click()
   await expectSingleDrawerSurface(page)
   await page.getByRole('button', {name: 'Share'}).click()
@@ -200,7 +318,7 @@ test('430 dark, OLED true nesting, keyboard, long scroll, and accessibility pref
   await longShell.locator('.modula-web-overlay-body').evaluate(node => { (node as HTMLElement).scrollTop = (node as HTMLElement).scrollHeight })
   await expect(longShell.getByText('Scrollable row 24')).toBeVisible()
   await page.screenshot({path: `${EVIDENCE}/drawer-long-child-430-dark.png`})
-  await page.locator('.modula-web-drawer-backdrop').click({position: {x: 5, y: 5}})
+  await page.locator('.modula-web-drawer-backdrop:visible').click({position: {x: 5, y: 5}})
   await expect(longShell).toBeHidden()
 
   await page.getByTestId('web-adapter-theme-oled').click()
@@ -245,7 +363,7 @@ test('430 dark, OLED true nesting, keyboard, long scroll, and accessibility pref
 
 test('records the drill-in and drag-close interaction', async ({browser}) => {
   const context = await browser.newContext({
-    baseURL: process.env.MODULA_BROWSER_BASE_URL ?? 'http://127.0.0.1:8088',
+    baseURL: process.env.MODULA_BROWSER_BASE_URL ?? 'http://127.0.0.1:4174',
     recordVideo: {dir: 'test-results/web-ui-adapter-video', size: {width: 390, height: 844}},
     viewport: {width: 390, height: 844},
   })

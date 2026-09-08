@@ -27,6 +27,7 @@ import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
 import {SectionHeader} from '@/platform/ui/chrome/section-header'
 import {StackedAvatars} from '@/platform/ui/avatars'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+import {useModulaToast} from '@/platform/ui/feedback'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {SectionEnter} from '@/platform/ui/motion/section-enter'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
@@ -579,6 +580,7 @@ function SuggestedPeople({people}: {people: ModulaProfile[]}) {
 
 function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
   const router = useRouter()
+  const toast = useModulaToast()
   const {colours, spacing} = useThemeTokens()
   return (
     <Section title="Trending topics" icon="community">
@@ -595,7 +597,10 @@ function TrendingTopics({topics}: {topics: DiscoverResult['trendingTopics']}) {
             onAction={id => {
               if (id === 'open') {
                 router.push(`/communities/${topic.id}` as Href)
+                return
               }
+              if (id === 'pin') toast.show({message: 'Pinned topic feeds are not stored remotely yet.', tone: 'info'})
+              if (id === 'mute') toast.show({message: 'Topic mutes are not available in the current Greenfield API.', tone: 'warning'})
             }}>
             <AppPressable
               accessibilityLabel={topic.label}

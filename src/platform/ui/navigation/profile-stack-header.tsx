@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react'
 import {useRouter, type Href} from 'expo-router'
-import {StyleSheet, View} from 'react-native'
+import {Platform, StyleSheet, View} from 'react-native'
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -20,13 +20,94 @@ import {
 } from '@/platform/ui/navigation/plain-header-items'
 import {LAYERS} from '@/theme/tokens/layers'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {useSession} from '@/auth/runtime'
+import {parseProfileId} from '@/api/contracts'
+import type {ModulaProfile} from '@/features/profile/contracts/profile'
+import {copyProfileLink, shareProfile} from '@/features/profile/services/shareProfile'
+import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
+import {useModulaToast} from '@/platform/ui/feedback'
+import {useAppServices} from '@/runtime'
+
+function useOwnerProfileShareAction() {
+  const router = useRouter()
+  const session = useSession()
+  const toast = useModulaToast()
+
+  return (id: string) => {
+    if (id === 'qr') {
+      router.push('/share-profile' as Href)
+      return
+    }
+    if (session.status !== 'signedIn') {
+      router.push('/share-profile' as Href)
+      return
+    }
+    if (id === 'share') {
+      void shareProfile(session.profile).then(shared => {
+        if (!shared) toast.show({message: 'Profile sharing is unavailable in this browser.', tone: 'error'})
+      })
+    }
+    if (id === 'copy') {
+      void copyProfileLink(session.profile).then(copied => {
+        toast.show({message: copied ? 'Profile link copied.' : 'The profile link could not be copied.', tone: copied ? 'success' : 'error'})
+      })
+    }
+  }
+}
+
+function useVisitorProfileAction(profile: ModulaProfile) {
+  const router = useRouter()
+  const {moderationRepository} = useAppServices()
+  const toast = useModulaToast()
+
+  return (id: string) => {
+    if (id === 'share') {
+      void shareProfile(profile).then(shared => {
+        if (!shared) toast.show({message: 'Profile sharing is unavailable in this browser.', tone: 'error'})
+      })
+      return
+    }
+    if (id === 'copy') {
+      void copyProfileLink(profile).then(copied => {
+        toast.show({message: copied ? 'Profile link copied.' : 'The profile link could not be copied.', tone: copied ? 'success' : 'error'})
+      })
+      return
+    }
+    if (id === 'report') {
+      router.push(`/report?targetType=profile&targetId=${encodeURIComponent(profile.id)}` as Href)
+      return
+    }
+    if (id === 'mute') {
+      void moderationRepository.muteProfile(parseProfileId(profile.id)).then(() => {
+        toast.show({message: `@${profile.handle} is muted.`, tone: 'success'})
+      }).catch(error => {
+        toast.show({message: error instanceof Error ? error.message : 'Could not mute this account.', tone: 'error'})
+      })
+      return
+    }
+    if (id === 'block') {
+      void confirmModulaAction({
+        title: 'Block account?',
+        message: `Block @${profile.handle}? You will stop seeing each other where Greenfield applies blocks.`,
+        confirmLabel: 'Block',
+      }).then(confirmed => {
+        if (!confirmed) return
+        void moderationRepository.blockProfile(parseProfileId(profile.id)).then(() => {
+          toast.show({message: `@${profile.handle} is blocked.`, tone: 'success'})
+        }).catch(error => {
+          toast.show({message: error instanceof Error ? error.message : 'Could not block this account.', tone: 'error'})
+        })
+      })
+    }
+  }
+}
 
 function ProfileHeaderBack() {
-  return <ModulaBackButton chrome="plain" />
+  return <ModulaBackButton chrome={Platform.OS === 'web' ? 'glass' : 'plain'} />
 }
 
 function ProfileShareMenu() {
-  const router = useRouter()
+  const runShareAction = useOwnerProfileShareAction()
   return (
     <ChromeIconMenu
       systemImage="square.and.arrow.up"
@@ -39,11 +120,7 @@ function ProfileShareMenu() {
         {id: 'qr', label: 'QR / share sheet — Preview', icon: 'photo'},
         {id: 'copy', label: 'Copy profile link', icon: 'link'},
       ]}
-      onAction={id => {
-        if (id === 'share' || id === 'qr') {
-          router.push('/share-profile' as Href)
-        }
-      }}
+      onAction={runShareAction}
     />
   )
 }
@@ -81,6 +158,7 @@ export function ProfileHeaderLeft() {
 /** Android / web — shared `ChromeGlassControlGroup` (iOS uses header items). */
 export function ProfileHeaderRight() {
   const router = useRouter()
+  const runShareAction = useOwnerProfileShareAction()
   return (
     <ChromeGlassControlGroup
       items={[
@@ -94,11 +172,7 @@ export function ProfileHeaderRight() {
             {id: 'qr', label: 'QR / share sheet — Preview', icon: 'photo'},
             {id: 'copy', label: 'Copy profile link', icon: 'link'},
           ],
-          onAction: id => {
-            if (id === 'share' || id === 'qr') {
-              router.push('/share-profile' as Href)
-            }
-          },
+          onAction: runShareAction,
         },
         {
           kind: 'menu',
@@ -152,6 +226,7 @@ export function profileHeaderRightItems() {
  */
 export function ProfileCoverChrome({
   showBack,
+  profile,
   owner = true,
   title,
   scrollY,
@@ -159,6 +234,7 @@ export function ProfileCoverChrome({
   chromeHeight,
 }: {
   showBack: boolean
+  profile: ModulaProfile
   owner?: boolean
   title?: ReactNode
   scrollY?: SharedValue<number>
@@ -167,6 +243,7 @@ export function ProfileCoverChrome({
 }) {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const runVisitorAction = useVisitorProfileAction(profile)
   const {colours, spacing} = useThemeTokens()
   const canGoBack = useNavigationCanGoBack()
   const backVisible = showBack || canGoBack
@@ -218,7 +295,7 @@ export function ProfileCoverChrome({
                 kind: 'button',
                 icon: 'share',
                 accessibilityLabel: 'Share profile',
-                onPress: () => router.push('/share-profile' as Href),
+                onPress: () => void shareProfile(profile),
               },
               owner
                 ? {
@@ -247,12 +324,11 @@ export function ProfileCoverChrome({
                     actions: [
                       {id: 'share', label: 'Share profile', icon: 'share'},
                       {id: 'copy', label: 'Copy profile link', icon: 'link'},
+                      {id: 'mute', label: 'Mute account', icon: 'notifications'},
+                      {id: 'block', label: 'Block account', icon: 'privacy', style: 'destructive' as const},
+                      {id: 'report', label: 'Report account', icon: 'warning', style: 'destructive' as const},
                     ],
-                    onAction: (id: string) => {
-                      if (id === 'share' || id === 'copy') {
-                        router.push('/share-profile' as Href)
-                      }
-                    },
+                    onAction: runVisitorAction,
                   },
             ]}
           />

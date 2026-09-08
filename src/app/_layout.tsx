@@ -20,6 +20,8 @@ import {PersistentShellTabBar} from '@/platform/ui/navigation/persistent-shell-t
 import {ShellBottomProgressiveBlur} from '@/platform/ui/navigation/shell-bottom-progressive-blur'
 import {ModulaSplashOverlay} from '@/platform/ui/splash/ModulaSplashOverlay'
 import {ModulaToastProvider} from '@/platform/ui/feedback'
+import {ModulaActionPresenterProvider} from '@/platform/ui/menus/modula-action-presenter-provider'
+import {ModulaConfirmationProvider} from '@/platform/ui/menus/modula-confirmation-provider'
 import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
@@ -102,21 +104,25 @@ export default function RootLayout() {
           <QueryRuntimeProvider>
             <SessionProvider>
               <AppearanceProvider>
-                <ModulaToastProvider>
-                  <AppLockProvider>
-                    <ProductPreferencesProvider>
-                      <ProfilePresentationProvider>
-                        <AccountPanelProvider>
-                          <ShellDrawerProvider>
-                            <RootNavigator />
-                            <NetworkStatusBanner />
-                            <AppLockGate />
-                          </ShellDrawerProvider>
-                        </AccountPanelProvider>
-                      </ProfilePresentationProvider>
-                    </ProductPreferencesProvider>
-                  </AppLockProvider>
-                </ModulaToastProvider>
+                <ModulaActionPresenterProvider>
+                  <ModulaConfirmationProvider>
+                    <ModulaToastProvider>
+                      <AppLockProvider>
+                        <ProductPreferencesProvider>
+                          <ProfilePresentationProvider>
+                            <AccountPanelProvider>
+                              <ShellDrawerProvider>
+                                <RootNavigator />
+                                <NetworkStatusBanner />
+                                <AppLockGate />
+                              </ShellDrawerProvider>
+                            </AccountPanelProvider>
+                          </ProfilePresentationProvider>
+                        </ProductPreferencesProvider>
+                      </AppLockProvider>
+                    </ModulaToastProvider>
+                  </ModulaConfirmationProvider>
+                </ModulaActionPresenterProvider>
               </AppearanceProvider>
             </SessionProvider>
           </QueryRuntimeProvider>

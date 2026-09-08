@@ -117,24 +117,36 @@ function TouchModulaMenu({
 export function ModulaTouchActionDrawer({
   open,
   onOpenChange,
+  onDismiss,
   title = 'Actions',
+  message,
   actions,
   onAction,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDismiss?: () => void
   title?: string
+  message?: string
   actions: ModulaActionItem[]
   onAction: (actionId: string) => void
 }) {
-  const close = () => onOpenChange(false)
-  const select = (id: string) => { close(); onAction(id) }
-  const screens = touchActionScreens(title, actions, select)
+  const dismiss = () => {
+    onOpenChange(false)
+    onDismiss?.()
+  }
+  const select = (id: string) => {
+    onOpenChange(false)
+    // Release the outgoing modal's focus and scroll lock before an action
+    // navigates or presents the next semantic overlay.
+    requestAnimationFrame(() => requestAnimationFrame(() => onAction(id)))
+  }
+  const screens = touchActionScreens(title, actions, select, message)
   return (
     <ModulaDrawerNavigator
       initialRoute="root"
       isPresented={open}
-      onDismiss={close}
+      onDismiss={dismiss}
       presentation="actions"
       screens={screens}
     />
@@ -145,6 +157,7 @@ function touchActionScreens(
   title: string,
   actions: ModulaActionItem[],
   onAction: (actionId: string) => void,
+  message?: string,
 ): readonly ModulaDrawerScreen<string>[] {
   const screens: ModulaDrawerScreen<string>[] = []
   const add = (route: string, screenTitle: string, parentLabel: string | undefined, items: ModulaActionItem[]) => {
@@ -158,6 +171,7 @@ function touchActionScreens(
     screens.push({
       id: route,
       title: screenTitle,
+      subtitle: route === 'root' ? message : undefined,
       parentLabel,
       render: navigation => (
         <TouchMenuItems

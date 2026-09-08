@@ -1,4 +1,5 @@
 import {useRouter, type Href} from 'expo-router'
+import {Platform} from 'react-native'
 
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
@@ -10,7 +11,7 @@ type ActivityHeaderRightProps = {
 
 /** Leading back — glass disc (not a multi-item group). */
 export function ActivityHeaderLeft() {
-  return <ModulaBackButton chrome="plain" />
+  return <ModulaBackButton chrome={Platform.OS === 'web' ? 'glass' : 'plain'} />
 }
 
 /**

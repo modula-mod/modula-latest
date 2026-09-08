@@ -4,6 +4,7 @@ import {AppIcon} from '@/components/primitives/AppIcon'
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+import {controls} from '@/theme/foundations/controls'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ChromeOverflowMenuProps = {
@@ -34,7 +35,7 @@ export function ChromeOverflowMenu({
       accessibilityLabel={accessibilityLabel}
       trigger={
         <View pointerEvents="none" style={styles.target}>
-          <AppIcon name="more" colour={colours.text} />
+          <AppIcon name="more" colour={colours.text} size={controls.iconSize.toolbar} />
         </View>
       }
     />

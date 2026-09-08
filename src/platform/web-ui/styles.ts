@@ -449,19 +449,24 @@ export const MODULA_WEB_UI_CSS = String.raw`
 }
 
 .modula-web-menu-item {
+  width: 100%;
   display: grid;
   grid-template-columns: 1.25rem minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--modula-web-space-2);
   min-height: 36px;
   padding: var(--modula-web-space-2) var(--modula-web-space-3);
+  border: 0;
   border-radius: calc(var(--modula-web-radius-md) * .72);
   outline: 0;
   color: var(--modula-web-text);
+  background: transparent;
+  appearance: none;
   font: inherit;
   font-size: .875rem;
   line-height: 1.25;
   cursor: default;
+  text-align: left;
   user-select: none;
 }
 
@@ -516,6 +521,7 @@ export const MODULA_WEB_UI_CSS = String.raw`
   align-items: center;
   justify-content: center;
   min-height: 44px;
+  min-width: 44px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -582,6 +588,20 @@ export const MODULA_WEB_UI_CSS = String.raw`
   height: 38px;
   border-color: var(--modula-web-border);
   background: var(--modula-web-surface-raised);
+}
+
+.modula-web-icon-button[data-chrome='glass'] .modula-web-icon-button-visual {
+  width: 44px;
+  height: 44px;
+  background: color-mix(in srgb, var(--modula-web-surface-raised) 76%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(145%);
+  backdrop-filter: blur(22px) saturate(145%);
+}
+
+.modula-web-icon-button[data-chrome='glass'][data-reduce-transparency='true'] .modula-web-icon-button-visual {
+  background: var(--modula-web-surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .modula-web-input {

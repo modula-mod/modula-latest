@@ -45,6 +45,7 @@ import {ModulaComposerInput} from '@/platform/ui/composer'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {SelectionSheet} from '@/platform/ui/sheets/selection-sheet'
+import {controls} from '@/theme/foundations/controls'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type PollPreview = {
@@ -900,7 +901,11 @@ export function ComposerScreen() {
               accessibilityLabel={item.label}
               onPress={item.onPress}
               style={styles.toolIcon}>
-              <ModulaIcon name={item.icon} colour={colours.textSecondary} />
+              <ModulaIcon
+                name={item.icon}
+                colour={colours.textSecondary}
+                size={controls.iconSize.toolbar}
+              />
             </AppPressable>
           ))}
           <View style={[styles.toolbarDivider, {backgroundColor: colours.border}]} />
@@ -910,7 +915,7 @@ export function ComposerScreen() {
               comingSoonTool('Thread', 'Thread composer is not part of this beta.')
             }
             style={styles.toolIcon}>
-            <ModulaIcon name="create" colour={colours.accent} />
+            <ModulaIcon name="create" colour={colours.accent} size={controls.iconSize.toolbar} />
           </AppPressable>
           <AppPressable
             accessibilityLabel="Open Composer Tools"
@@ -922,7 +927,7 @@ export function ComposerScreen() {
               styles.toolIcon,
               {backgroundColor: colours.accentSubtle, borderRadius: radius.round},
             ]}>
-            <ModulaIcon name="tools" colour={colours.accent} />
+            <ModulaIcon name="tools" colour={colours.accent} size={controls.iconSize.toolbar} />
           </AppPressable>
         </ScrollView>
       </View>

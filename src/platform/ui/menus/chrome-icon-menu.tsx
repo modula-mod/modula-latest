@@ -5,6 +5,7 @@ import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 import {TOOLBAR_HIT} from '@/platform/ui/menus/toolbar-chrome'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {controls} from '@/theme/foundations/controls'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ChromeIconMenuProps = {
@@ -38,7 +39,7 @@ export function ChromeIconMenu({
       onAction={onAction}
       trigger={
         <View pointerEvents="none" style={styles.target}>
-          <AppIcon name={icon} colour={colours.text} size={22} />
+          <AppIcon name={icon} colour={colours.text} size={controls.iconSize.toolbar} />
         </View>
       }
     />

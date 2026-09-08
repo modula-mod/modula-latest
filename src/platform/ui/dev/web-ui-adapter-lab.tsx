@@ -2,6 +2,8 @@ import {useMemo, useState} from 'react'
 import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
+import {useHydrated} from '@/lib/useHydrated'
+import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaButtonGroup} from '@/platform/ui/buttons/modula-button-group'
 import {ModulaCommand} from '@/platform/ui/command/modula-command'
@@ -21,6 +23,9 @@ import {ModulaTooltip, useModulaToast} from '@/platform/ui/feedback'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
+import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
+import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
 import {ModulaEdgeSheet} from '@/platform/ui/sheets/modula-edge-sheet'
 import type {ModulaSheetDirection} from '@/platform/ui/sheets/modula-sheet.types'
@@ -75,6 +80,7 @@ export function WebUiAdapterLab() {
   const [input, setInput] = useState('')
   const [font, setFont] = useState('System')
   const [fontQuery, setFontQuery] = useState('')
+  const hydrated = useHydrated()
   useModulaCommandShortcut(() => setCommand(true))
   const commandActions = useMemo(() => [
     {id: 'new-note', label: 'Create note', description: 'Create a real local draft', icon: 'create' as const, onSelect: () => toast.show({message: 'Draft action selected', tone: 'info'})},
@@ -100,7 +106,9 @@ export function WebUiAdapterLab() {
   )
 
   return (
-    <View style={[styles.root, {gap: spacing[5]}]} testID="web-ui-adapter-lab">
+    <View
+      style={[styles.root, {gap: spacing[5]}]}
+      testID={hydrated ? 'web-ui-adapter-lab' : 'web-ui-adapter-lab-loading'}>
       <View style={{gap: spacing[1]}}>
         <AppText variant="display">Web Adapter V1</AppText>
         <AppText variant="body" colour="textSecondary">
@@ -150,6 +158,25 @@ export function WebUiAdapterLab() {
         </View>
       </LabSection>
 
+      <LabSection title="Navigation chrome">
+        <View style={styles.wrap}>
+          <ModulaBackButton
+            accessibilityLabel="Preview back control"
+            onPress={() => toast.show({message: 'Back control selected', tone: 'info'})}
+          />
+          <ChromeGlassControlGroup
+            items={[{
+              kind: 'menu',
+              icon: 'more',
+              accessibilityLabel: 'Preview more options',
+              title: 'Preview actions',
+              actions: [{id: 'inspect', label: 'Inspect action'}],
+              onAction: id => toast.show({message: `${id} selected`, tone: 'info'}),
+            }]}
+          />
+        </View>
+      </LabSection>
+
       <LabSection title="Menu and popover">
         <View style={styles.wrap}>
           <ModulaMenu
@@ -164,6 +191,17 @@ export function WebUiAdapterLab() {
             onAction={id => {
               if (id === 'notifications') setMenuChecked(value => !value)
               if (id === 'compact' || id === 'regular') setMenuRadio(id)
+              if (id === 'delete') {
+                void confirmModulaAction({
+                  title: 'Delete example?',
+                  message: 'This verifies that a menu can hand off safely to a confirmation dialog.',
+                  confirmLabel: 'Delete',
+                }).then(confirmed => {
+                  toast.show({message: confirmed ? 'Delete action confirmed' : 'Delete action cancelled', tone: 'info'})
+                })
+                return
+              }
+              toast.show({message: `${id} action selected`, tone: 'info'})
             }}
             title="Module actions"
             trigger={<AppText variant="buttonLabel">Open menu</AppText>}
@@ -188,6 +226,23 @@ export function WebUiAdapterLab() {
               <AppText variant="buttonLabel">Right-click / long-press</AppText>
             </View>
           </ModulaContextMenu>
+          <ModulaButton
+            label="Shared action presenter"
+            onPress={() => {
+              void presentModulaActions({
+                title: 'Shared actions',
+                message: 'Legacy callers use the same responsive Modula overlay host.',
+                actions: [
+                  {id: 'shared-copy', label: 'Copy example', icon: 'share'},
+                  {id: 'shared-remove', label: 'Remove example', icon: 'trash', style: 'destructive'},
+                ],
+              }).then(id => {
+                if (id) toast.show({message: `${id} selected`, tone: 'info'})
+              })
+            }}
+            role="secondary"
+            size="compact"
+          />
         </View>
       </LabSection>
 

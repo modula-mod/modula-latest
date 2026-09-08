@@ -1,4 +1,5 @@
 import {Alert, Platform, Share} from 'react-native'
+import * as Clipboard from 'expo-clipboard'
 
 import type {ModulaProfile} from '@/features/profile/contracts/profile'
 
@@ -31,7 +32,24 @@ export async function shareProfile(profile: ModulaProfile): Promise<boolean> {
     })
     return true
   } catch {
-    Alert.alert('Share unavailable', message)
+    if (Platform.OS !== 'web') Alert.alert('Share unavailable', message)
+    return false
+  }
+}
+
+export async function copyProfileLink(profile: ModulaProfile): Promise<boolean> {
+  const url = getProfilePreviewUrl(profile)
+  try {
+    await Clipboard.setStringAsync(url)
+    if (Platform.OS !== 'web') Alert.alert('Profile link copied', url)
+    return true
+  } catch (error) {
+    if (Platform.OS !== 'web') {
+      Alert.alert(
+        'Copy failed',
+        error instanceof Error ? error.message : 'The profile link could not be copied.',
+      )
+    }
     return false
   }
 }
