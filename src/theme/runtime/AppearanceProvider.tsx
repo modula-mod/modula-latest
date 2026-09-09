@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -18,6 +19,7 @@ import type {
   TextScale,
   TextScalePreference,
   ThemeFamily,
+  WebPresentation,
 } from '@/theme/contracts'
 import {useSystemAccessibility} from '@/theme/accessibility'
 import {useSession} from '@/auth/runtime'
@@ -40,6 +42,7 @@ import {
   isAdvancedChromeEffect,
   isAppearanceMode,
   isSurfaceType,
+  isWebPresentation,
   isTextScale,
   isThemeFamily,
   mergeLocalAdaptivePreferences,
@@ -48,7 +51,10 @@ import {
   loadAppearanceCache,
   saveAppearanceCache,
 } from '@/theme/storage/appearanceStorage'
+import {loadAppearanceCacheSync} from '@/theme/storage/appearanceStorageSync'
 import {useSystemUISync} from '@/theme/system'
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
 function createTokenSet(
   resolved: ReturnType<typeof resolveAppearance>,
@@ -104,6 +110,13 @@ export function AppearanceProvider({children}: PropsWithChildren) {
   const versionRef = useRef(0)
   const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const warnedSyncFailureRef = useRef(false)
+  useIsomorphicLayoutEffect(() => {
+    const cache = loadAppearanceCacheSync()
+    if (!cache) return
+    versionRef.current = cache.version
+    preferencesRef.current = cache.preferences
+    setPreferences(cache.preferences)
+  }, [])
 
   useEffect(() => {
     preferencesRef.current = preferences
@@ -281,6 +294,11 @@ export function AppearanceProvider({children}: PropsWithChildren) {
       setSurfaceType: (surfaceType: SurfaceType) => {
         if (isSurfaceType(surfaceType)) {
           updatePreferences(prev => ({...prev, surfaceType}))
+        }
+      },
+      setWebPresentation: (webPresentation: WebPresentation) => {
+        if (isWebPresentation(webPresentation)) {
+          updatePreferences(prev => ({...prev, webPresentation}))
         }
       },
       setTextScale: (textScale: TextScale) => {

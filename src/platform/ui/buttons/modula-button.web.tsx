@@ -1,9 +1,7 @@
 import {View, type StyleProp, type ViewStyle} from 'react-native'
 
 import type {ModulaButtonRole} from '@/platform/ui/buttons/button-role'
-import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
-import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
-import {modulaWebCssVariables} from '@/platform/web-ui/theme'
+import {KonstaButton} from '@/platform/ui/adapters/konsta/button.web'
 
 export type ModulaButtonProps = {
   label: string
@@ -31,26 +29,22 @@ export function ModulaButton({
   style,
   testID,
 }: ModulaButtonProps) {
-  const tokens = useThemeTokens()
-  const {reduceTransparency} = useSystemAccessibility()
   const blocked = disabled || loading
   const resolvedSize = size ?? (role === 'quiet' || role === 'plain' || role === 'inline' ? 'compact' : 'regular')
   return (
     <View style={[{alignSelf: fullWidth ? 'stretch' : 'flex-start'}, style]}>
-      <button
-        aria-busy={loading || undefined}
-        aria-label={accessibilityLabel ?? label}
-        className="modula-web-ui modula-web-button"
-        data-full-width={String(fullWidth)}
-        data-role={role}
-        data-size={resolvedSize}
-        data-testid={testID}
-        disabled={blocked}
-        onClick={onPress}
-        style={modulaWebCssVariables(tokens, {reduceTransparency})}
-        type="button">
-        <span className="modula-web-button-visual">{loading ? `${label}…` : label}</span>
-      </button>
+      <div className="modula-konsta-button-target" data-full-width={String(fullWidth)}>
+        <KonstaButton
+          accessibilityLabel={accessibilityLabel ?? label}
+          disabled={blocked}
+          label={label}
+          loading={loading}
+          onPress={onPress}
+          role={role}
+          size={resolvedSize}
+          testID={testID}
+        />
+      </div>
     </View>
   )
 }

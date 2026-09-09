@@ -94,7 +94,13 @@ const packageJson = JSON.parse(read('package.json'))
 const dependencies = {...packageJson.dependencies, ...packageJson.devDependencies}
 const forbiddenDependencies = Object.keys(dependencies).filter(name => name === 'svelte' || name.startsWith('@svelte/') || name === 'vaul-svelte' || name === 'bits-ui')
 record('SVELTE RUNTIME', forbiddenDependencies.length === 0, forbiddenDependencies.length ? forbiddenDependencies.join(', ') : '0')
-record('TAILWIND-WIDE MIGRATION', !dependencies.tailwindcss, dependencies.tailwindcss ? 'tailwindcss present' : 'NO')
+record(
+  'TAILWIND REMAINS WEB-SCOPED',
+  dependencies.tailwindcss === '4.3.3'
+    && read('src/styles/web.css').includes("@import 'tailwindcss/theme.css'")
+    && !read('src/styles/web.css').includes("@import 'tailwindcss/preflight.css'"),
+  dependencies.tailwindcss ?? 'missing',
+)
 record('BASE UI VERSION', dependencies['@base-ui/react'] === '1.8.0', dependencies['@base-ui/react'] ?? 'missing')
 
 const hostCases = [read('src/platform/ui/product-ui.ts'), read('src/features/modules/runtime/module-view-renderer.tsx')]

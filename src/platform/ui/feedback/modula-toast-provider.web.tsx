@@ -1,6 +1,7 @@
 import {Toast} from '@base-ui/react/toast'
 import {createContext, useContext, useMemo} from 'react'
 
+import {KonstaToastSurface} from '@/platform/ui/adapters/konsta/toast-surface.web'
 import type {
   ModulaToastController,
   ModulaToastInput,
@@ -9,6 +10,7 @@ import type {
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {modulaWebCssVariables} from '@/platform/web-ui/theme'
+import {useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 
 type ToastData = Pick<ModulaToastInput, 'actionLabel' | 'onAction'>
 const ToastContext = createContext<ModulaToastController | null>(null)
@@ -26,6 +28,7 @@ function ToastBridge({children}: ModulaToastProviderProps) {
   const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
+  const layer = useModulaOverlayLayer('toast')
   const controller = useMemo<ModulaToastController>(() => ({
     show(input) {
       return manager.add({
@@ -44,7 +47,7 @@ function ToastBridge({children}: ModulaToastProviderProps) {
     <ToastContext.Provider value={controller}>
       {children}
       <Toast.Portal>
-        <Toast.Viewport className="modula-web-ui modula-web-toast-viewport" style={variables}>
+        <Toast.Viewport className="modula-web-ui modula-web-toast-viewport" style={{...variables, zIndex: layer.content}}>
           {manager.toasts.map(toast => (
             <Toast.Root
               className="modula-web-toast"
@@ -52,20 +55,22 @@ function ToastBridge({children}: ModulaToastProviderProps) {
               key={toast.id}
               swipeDirection={['down', 'right']}
               toast={toast}>
-              <Toast.Content className="modula-web-toast-content">
-                <div className="modula-web-toast-copy">
-                  <Toast.Title className="modula-web-toast-title" />
-                  <Toast.Description className="modula-web-toast-description" />
-                </div>
-                {toast.data?.actionLabel && toast.data.onAction ? (
-                  <Toast.Action
-                    className="modula-web-toast-action"
-                    onClick={() => { toast.data?.onAction?.(); manager.close(toast.id) }}>
-                    {toast.data.actionLabel}
-                  </Toast.Action>
-                ) : null}
-                <Toast.Close aria-label="Dismiss notification" className="modula-web-toast-close">×</Toast.Close>
-              </Toast.Content>
+              <KonstaToastSurface>
+                <Toast.Content className="modula-web-toast-content">
+                  <div className="modula-web-toast-copy">
+                    <Toast.Title className="modula-web-toast-title" />
+                    <Toast.Description className="modula-web-toast-description" />
+                  </div>
+                  {toast.data?.actionLabel && toast.data.onAction ? (
+                    <Toast.Action
+                      className="modula-web-toast-action"
+                      onClick={() => { toast.data?.onAction?.(); manager.close(toast.id) }}>
+                      {toast.data.actionLabel}
+                    </Toast.Action>
+                  ) : null}
+                  <Toast.Close aria-label="Dismiss notification" className="modula-web-toast-close">×</Toast.Close>
+                </Toast.Content>
+              </KonstaToastSurface>
             </Toast.Root>
           ))}
         </Toast.Viewport>

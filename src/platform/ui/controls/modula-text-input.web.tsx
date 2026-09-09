@@ -10,6 +10,7 @@ import {
   type ViewStyle,
 } from 'react-native'
 
+import {KonstaListInputFrame} from '@/platform/ui/adapters/konsta/list-input-frame.web'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import {modulaWebCssVariables} from '@/platform/web-ui/theme'
@@ -121,9 +122,7 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(fun
     }
   }
 
-  return (
-    <View style={style}>
-      {multiline ? (
+  const input = multiline ? (
         <textarea
           {...common}
           enterKeyHint={returnKeyType as 'done' | 'enter' | 'go' | 'next' | 'previous' | 'search' | 'send' | undefined}
@@ -140,6 +139,13 @@ export const ModulaTextInput = forwardRef<RNTextInput, ModulaTextInputProps>(fun
           ref={elementRef as RefObject<HTMLInputElement>}
           type={inputType(keyboardType, secureTextEntry)}
         />
+      )
+  return (
+    <View style={style}>
+      {chrome === 'plain' ? input : (
+        <KonstaListInputFrame error={error} label={label}>
+          {input}
+        </KonstaListInputFrame>
       )}
       {error ? <span className="modula-web-input-error" id={errorId} role="alert">{error}</span> : null}
     </View>

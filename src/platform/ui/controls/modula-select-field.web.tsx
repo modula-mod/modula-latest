@@ -1,7 +1,9 @@
 import {Select} from '@base-ui/react/select'
 import {useState} from 'react'
 
+import {KonstaPopoverSurface} from '@/platform/ui/adapters/konsta/popover-surface.web'
 import {ModulaDrawer} from '@/platform/ui/drawers/modula-drawer'
+import {ModulaOverlayLayerScope, useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -116,6 +118,7 @@ function DesktopSelectField({
   const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
+  const layer = useModulaOverlayLayer('popover')
   const items = allowClear ? [{value: EMPTY_VALUE, label: 'None'}, ...options] : options
   return (
     <Select.Root
@@ -132,17 +135,21 @@ function DesktopSelectField({
         <Select.Icon aria-hidden="true">⌄</Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Positioner className="modula-web-menu-positioner" sideOffset={4}>
-          <Select.Popup className="modula-web-ui modula-web-menu-popup" style={variables}>
-            <Select.List className="modula-web-select-list">
-              {items.map(option => (
-                <Select.Item className="modula-web-menu-item" key={option.value} value={option.value}>
-                  <Select.ItemIndicator className="modula-web-menu-indicator">✓</Select.ItemIndicator>
-                  <Select.ItemText className="modula-web-menu-label">{option.label}</Select.ItemText>
-                </Select.Item>
-              ))}
-              {!loading && !items.length ? <div className="modula-web-select-empty">No choices available.</div> : null}
-            </Select.List>
+        <Select.Positioner className="modula-web-menu-positioner" sideOffset={4} style={{zIndex: layer.content}}>
+          <Select.Popup className="modula-web-ui modula-web-menu-popup" style={{...variables, zIndex: layer.content}}>
+            <KonstaPopoverSurface>
+              <ModulaOverlayLayerScope layer={layer.content}>
+                <Select.List className="modula-web-select-list">
+                  {items.map(option => (
+                    <Select.Item className="modula-web-menu-item" key={option.value} value={option.value}>
+                      <Select.ItemIndicator className="modula-web-menu-indicator">✓</Select.ItemIndicator>
+                      <Select.ItemText className="modula-web-menu-label">{option.label}</Select.ItemText>
+                    </Select.Item>
+                  ))}
+                  {!loading && !items.length ? <div className="modula-web-select-empty">No choices available.</div> : null}
+                </Select.List>
+              </ModulaOverlayLayerScope>
+            </KonstaPopoverSurface>
           </Select.Popup>
         </Select.Positioner>
       </Select.Portal>

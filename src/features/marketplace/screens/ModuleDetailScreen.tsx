@@ -1,11 +1,12 @@
 import {useEffect, useRef, useState} from 'react'
-import {Alert, Platform, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Alert, Platform, ScrollView, StyleSheet, View} from 'react-native'
 import {useLocalSearchParams, useRouter, type Href, Link} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
 import {useQueryClient} from '@tanstack/react-query'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {useSession} from '@/auth/runtime'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import type {GreenfieldRegistryDeclaration, ModuleDetail, ModuleInstallPreview, ModuleProductRelationship} from '@/data/repositories/contracts'
@@ -57,7 +58,7 @@ export function ModuleDetailScreen() {
   const session = useSession()
   const queryClient = useQueryClient()
   const insets = useSafeAreaInsets()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const {colours, scheme, spacing} = useThemeTokens()
   const detail = useModuleDetailQuery(id)
   const relationships = useModuleRelationshipsQuery(id)

@@ -1,5 +1,4 @@
-import {useWindowDimensions} from 'react-native'
-
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModulaTabs} from '@/platform/ui/tabs/modula-tabs-control'
 
 export type ProductTabId = 'overview' | 'features' | 'permissions' | 'reviews' | 'related'
@@ -16,7 +15,7 @@ export const PRODUCT_TABS: {id: ProductTabId; label: string}[] = [
 const PRODUCT_TAB_SEGMENT_MIN_WIDTH = 108
 
 export function ProductTabs({selected, onSelect}: {selected: ProductTabId; onSelect: (tab: ProductTabId) => void}) {
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   return (
     <ModulaTabs
       accessibilityLabel="Product sections"

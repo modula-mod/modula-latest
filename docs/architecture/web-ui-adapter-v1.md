@@ -58,7 +58,7 @@ Bottom drawers add `env(safe-area-inset-bottom)`. Overlays use dynamic viewport 
 
 ## Visual ownership
 
-No default shadcn palette, radius, typography, shadow, spacing, or Tailwind utility layer was admitted. The adapter maps the active Modula canvas, surfaces, text, accent, separator, radius, spacing, scrim, focus, and motion tokens to CSS custom properties. Solid, glass, frost, neumorphism, OLED, reduced transparency, and increased contrast therefore remain host-owned modes.
+No default shadcn palette, radius, typography, shadow, or spacing was admitted. The later Konsta web presentation layer adds Tailwind 4's theme registry and generated utilities only inside `src/styles/web.css`; Preflight remains omitted and no screen or native styling contract uses Tailwind. The adapter maps the active Modula canvas, surfaces, text, accent, separator, radius, spacing, scrim, focus, and motion tokens to CSS custom properties. Solid, glass, frost, neumorphism, OLED, reduced transparency, and increased contrast therefore remain host-owned modes.
 
 ### Navigation chrome and action dispatch
 
@@ -72,7 +72,7 @@ Visible More buttons use `ModulaMenu` or `ModulaContextMenu`. A queued root pres
 - shadcn/ui Base UI Drawer documentation was reviewed on 2026-09-07 for composition, responsive adaptation, nested drawer, and iOS Safari behavior. No shadcn component source or default styling was copied.
 - The `shadcn` CLI was used read-only to inspect the available registry; it is not a runtime or development dependency.
 - No Radix package was added because the checkout did not contain a mature Radix implementation needing preservation.
-- No Svelte, Vaul Svelte, Bits UI, Tailwind, or additional animation engine was added.
+- No Svelte, Vaul Svelte, Bits UI, or additional animation engine was added. Tailwind was not part of Web UI Adapter V1; it was admitted later as web-only Konsta build machinery with Preflight omitted.
 
 Upstream references:
 

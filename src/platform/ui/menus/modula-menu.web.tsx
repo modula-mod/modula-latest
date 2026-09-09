@@ -1,12 +1,14 @@
 import {Menu} from '@base-ui/react/menu'
 import {useState, type ElementType, type ReactNode} from 'react'
 
+import {KonstaPopoverSurface} from '@/platform/ui/adapters/konsta/popover-surface.web'
 import {
   ModulaDrawerNavigator,
   type ModulaDrawerScreen,
 } from '@/platform/ui/drawers/modula-drawer-navigator'
 import {ModulaIcon} from '@/platform/ui/icons'
 import type {ModulaActionItem} from '@/platform/ui/menus/types'
+import {ModulaOverlayLayerScope, useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -57,6 +59,7 @@ function DesktopModulaMenu({
   const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
+  const layer = useModulaOverlayLayer('popover')
   return (
     <Menu.Root disabled={disabled}>
       <Menu.Trigger
@@ -67,10 +70,14 @@ function DesktopModulaMenu({
         {trigger}
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner align="end" className="modula-web-menu-positioner" sideOffset={6}>
-          <Menu.Popup className="modula-web-ui modula-web-menu-popup" style={variables}>
-            {title ? <div className="modula-web-menu-group-label" role="presentation">{title}</div> : null}
-            <ModulaMenuItems actions={actions} onAction={onAction} parts={Menu} />
+        <Menu.Positioner align="end" className="modula-web-menu-positioner" sideOffset={6} style={{zIndex: layer.content}}>
+          <Menu.Popup className="modula-web-ui modula-web-menu-popup" style={{...variables, zIndex: layer.content}}>
+            <KonstaPopoverSurface>
+              <ModulaOverlayLayerScope layer={layer.content}>
+                {title ? <div className="modula-web-menu-group-label" role="presentation">{title}</div> : null}
+                <ModulaMenuItems actions={actions} onAction={onAction} parts={Menu} />
+              </ModulaOverlayLayerScope>
+            </KonstaPopoverSurface>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
@@ -271,6 +278,7 @@ function MenuAction({
 }) {
   const P = parts
   const {colours} = useThemeTokens()
+  const submenuLayer = useModulaOverlayLayer('popover')
   const leading = action.icon ? <ModulaIcon name={action.icon} size={16} colour={colours.text} /> : <span aria-hidden="true" />
   if (action.children?.length) {
     return (
@@ -283,9 +291,17 @@ function MenuAction({
             <span aria-hidden="true" className="modula-web-menu-trailing">›</span>
           </P.SubmenuTrigger>
           <P.Portal>
-            <P.Positioner align="start" className="modula-web-menu-positioner" sideOffset={4}>
-              <P.Popup className="modula-web-ui modula-web-menu-popup">
-                <ModulaMenuItems actions={action.children} onAction={onAction} parts={parts} />
+            <P.Positioner
+              align="start"
+              className="modula-web-menu-positioner"
+              sideOffset={4}
+              style={{zIndex: submenuLayer.content}}>
+              <P.Popup className="modula-web-ui modula-web-menu-popup" style={{zIndex: submenuLayer.content}}>
+                <KonstaPopoverSurface>
+                  <ModulaOverlayLayerScope layer={submenuLayer.content}>
+                    <ModulaMenuItems actions={action.children} onAction={onAction} parts={parts} />
+                  </ModulaOverlayLayerScope>
+                </KonstaPopoverSurface>
               </P.Popup>
             </P.Positioner>
           </P.Portal>

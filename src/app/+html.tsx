@@ -15,11 +15,39 @@ if ('serviceWorker' in navigator && !isLocalDevelopment) {
 }
 `
 
+const initializeWebPresentation = `
+try {
+  const raw = window.localStorage.getItem('modula.appearance.preferences.v1')
+  const parsed = raw ? JSON.parse(raw) : null
+  const preferences = parsed && typeof parsed === 'object' && parsed.preferences
+    ? parsed.preferences
+    : parsed
+  const presentation = preferences && preferences.webPresentation === 'material'
+    ? 'material'
+    : 'liquid'
+  const mode = preferences && typeof preferences.mode === 'string'
+    ? preferences.mode
+    : 'system'
+  const dark = mode === 'dim' || mode === 'dark' || mode === 'oled'
+    || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  document.documentElement.dataset.modulaPresentation = presentation
+  document.documentElement.dataset.modulaAppearance = mode === 'dim' || mode === 'dark' || mode === 'oled'
+    ? mode
+    : dark ? 'dark' : 'light'
+  document.documentElement.classList.toggle('k-ios', presentation === 'liquid')
+  document.documentElement.classList.toggle('k-material', presentation === 'material')
+  document.documentElement.classList.toggle('dark', dark)
+} catch {
+  document.documentElement.dataset.modulaPresentation = 'liquid'
+  document.documentElement.classList.add('k-ios')
+}
+`
+
 export default function Root({children}: {children: ReactNode}) {
   const {bodyAttributes, bodyNodes, htmlAttributes, headNodes} = useServerDocumentContext()
 
   return (
-    <html lang="en" {...htmlAttributes}>
+    <html lang="en" suppressHydrationWarning {...htmlAttributes}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -33,6 +61,7 @@ export default function Root({children}: {children: ReactNode}) {
         <meta name="apple-mobile-web-app-title" content="Modula" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/pwa/icon-192.png" />
+        <script dangerouslySetInnerHTML={{__html: initializeWebPresentation}} />
         <ScrollViewStyleReset />
         <style id="modula-web-ui-adapter-v1">{MODULA_WEB_UI_CSS}</style>
         {headNodes}

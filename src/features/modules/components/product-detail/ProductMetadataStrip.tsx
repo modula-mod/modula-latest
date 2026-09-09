@@ -1,6 +1,7 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModulaHorizontalScroll} from '@/platform/ui/scroll'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
@@ -13,7 +14,7 @@ export type ProductMetadataItem = {
 
 export function ProductMetadataStrip({items}: {items: ProductMetadataItem[]}) {
   const {colours, radius} = useThemeTokens()
-  const {fontScale, width} = useWindowDimensions()
+  const {fontScale, width} = useHydrationSafeWindowDimensions()
   const scrollable = fontScale > 1.15 || width < items.length * 92
   const content = items.map((item, index) => (
     <View

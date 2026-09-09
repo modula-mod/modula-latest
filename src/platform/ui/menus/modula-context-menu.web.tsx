@@ -1,8 +1,10 @@
 import {ContextMenu} from '@base-ui/react/context-menu'
 import {useState, type ReactNode} from 'react'
 
+import {KonstaPopoverSurface} from '@/platform/ui/adapters/konsta/popover-surface.web'
 import {ModulaMenuItems, ModulaTouchActionDrawer} from '@/platform/ui/menus/modula-menu.web'
 import type {ModulaActionItem, ModulaMenuFit} from '@/platform/ui/menus/types'
+import {ModulaOverlayLayerScope, useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -77,6 +79,7 @@ function DesktopContextMenu({
   const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
+  const layer = useModulaOverlayLayer('popover')
   return (
     <ContextMenu.Root>
       <ContextMenu.Trigger
@@ -85,10 +88,14 @@ function DesktopContextMenu({
         {children}
       </ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <ContextMenu.Positioner className="modula-web-menu-positioner">
-          <ContextMenu.Popup className="modula-web-ui modula-web-menu-popup" style={variables}>
-            {title ? <div className="modula-web-menu-group-label" role="presentation">{title}</div> : null}
-            <ModulaMenuItems actions={actions} onAction={onAction} parts={ContextMenu} />
+        <ContextMenu.Positioner className="modula-web-menu-positioner" style={{zIndex: layer.content}}>
+          <ContextMenu.Popup className="modula-web-ui modula-web-menu-popup" style={{...variables, zIndex: layer.content}}>
+            <KonstaPopoverSurface>
+              <ModulaOverlayLayerScope layer={layer.content}>
+                {title ? <div className="modula-web-menu-group-label" role="presentation">{title}</div> : null}
+                <ModulaMenuItems actions={actions} onAction={onAction} parts={ContextMenu} />
+              </ModulaOverlayLayerScope>
+            </KonstaPopoverSurface>
           </ContextMenu.Popup>
         </ContextMenu.Positioner>
       </ContextMenu.Portal>

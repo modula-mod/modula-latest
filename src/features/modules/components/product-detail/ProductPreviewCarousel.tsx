@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   View,
-  useWindowDimensions,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from 'react-native'
@@ -16,6 +15,7 @@ import {AppImage} from '@/components/primitives/AppImage'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {useReduceMotion} from '@/lib/accessibility'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
 import {ModulaIcon} from '@/platform/ui/icons'
 import {ModulaReelPlayer} from '@/platform/ui/video/modula-reel-player'
@@ -39,7 +39,7 @@ export function ProductPreviewCarousel({
   productName: string
   frames: ProductPreviewFrame[]
 }) {
-  const {width, height} = useWindowDimensions()
+  const {width, height} = useHydrationSafeWindowDimensions()
   const {colours, radius, spacing, resolvedColourMode} = useThemeTokens()
   const reduceMotion = useReduceMotion()
   const scrollRef = useRef<ScrollView>(null)

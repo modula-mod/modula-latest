@@ -33,6 +33,17 @@ No package should enter the project merely because an example repository uses it
 | react-native-web | ~0.21.0 | Web rendering | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-worklets | 0.10.0 | Worklets peer for Reanimated | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 
+## Konsta web presentation layer
+
+| Name | Package | Version | Repository | License | Purpose | Native use | Module use | Evidence |
+|---|---|---:|---|---|---|---|---|---|
+| Konsta UI | `konsta` | 5.4.0 | `konstaui/konsta` | MIT | Web-only Liquid/Material visual adapters behind Modula semantics | Native use prohibited | Direct module use prohibited | Exact `package.json` pin and pnpm lock resolution; `verify:konsta-web-presentation` |
+| Tailwind CSS | `tailwindcss` | 4.3.3 | `tailwindlabs/tailwindcss` | MIT | Web-only class generation required by Konsta; Preflight omitted | Prohibited | Prohibited | `src/styles/web.css`, production CSS audit |
+| Tailwind PostCSS plugin | `@tailwindcss/postcss` | 4.3.3 | `tailwindlabs/tailwindcss` | MIT | Compile the web-only Tailwind/Konsta stylesheet | Prohibited | Prohibited | `postcss.config.mjs` |
+| PostCSS | `postcss` | 8.5.28 | `postcss/postcss` | MIT | Web stylesheet processing | No runtime/native use | Prohibited | Exact development dependency |
+
+Removal path: replace the private web visual adapters with another Modula-compatible implementation, remove the Konsta stylesheet and PostCSS configuration, then remove all four packages. Semantic screens, compiled product artifacts, and native adapters must not change.
+
 ## Dev dependencies
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |

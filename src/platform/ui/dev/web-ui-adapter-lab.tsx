@@ -2,6 +2,7 @@ import {useMemo, useState} from 'react'
 import {StyleSheet, View} from 'react-native'
 
 import {AppText} from '@/components/primitives/AppText'
+import {Surface} from '@/components/primitives/Surface'
 import {useHydrated} from '@/lib/useHydrated'
 import {ModulaBackButton} from '@/platform/ui/buttons/modula-back-button'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
@@ -9,9 +10,19 @@ import {ModulaButtonGroup} from '@/platform/ui/buttons/modula-button-group'
 import {ModulaCommand} from '@/platform/ui/command/modula-command'
 import {useModulaCommandShortcut} from '@/platform/ui/command/use-modula-command-shortcut'
 import {ModulaCombobox} from '@/platform/ui/controls/modula-combobox'
+import {ModulaCheckbox} from '@/platform/ui/controls/modula-checkbox'
+import {ModulaChip} from '@/platform/ui/controls/modula-chip'
+import {ModulaProgress} from '@/platform/ui/controls/modula-progress'
+import {ModulaRadioGroup} from '@/platform/ui/controls/modula-radio-group'
+import {ModulaRange} from '@/platform/ui/controls/modula-range'
+import {ModulaSearchField} from '@/platform/ui/controls/modula-search-field'
+import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ModulaSelectField} from '@/platform/ui/controls/modula-select-field'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
+import {ModulaStepper} from '@/platform/ui/controls/modula-stepper'
+import {ModulaSwitch} from '@/platform/ui/controls/modula-switch'
 import {ModulaToggleGroup} from '@/platform/ui/controls/modula-toggle-group'
+import {ModulaList, ModulaListItem} from '@/platform/ui/controls/modula-list'
 import {ModulaDialog, type ModulaDialogSize} from '@/platform/ui/dialogs'
 import {
   ModulaDrawer,
@@ -19,7 +30,8 @@ import {
   type ModulaDrawerPresentation,
   type ModulaDrawerScreen,
 } from '@/platform/ui/drawers'
-import {ModulaTooltip, useModulaToast} from '@/platform/ui/feedback'
+import {ModulaNotification, ModulaTooltip, useModulaToast} from '@/platform/ui/feedback'
+import {ModulaFloatingButton, ModulaFloatingGroup} from '@/platform/ui/floating'
 import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaPopover} from '@/platform/ui/menus/modula-popover'
@@ -27,10 +39,14 @@ import {confirmModulaAction} from '@/platform/ui/menus/confirmModulaAction'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaListRow, ModulaListSection} from '@/platform/ui/lists'
+import {ModulaBreadcrumbs} from '@/platform/ui/navigation/modula-breadcrumbs'
+import {ModulaNavigationMenu} from '@/platform/ui/navigation/modula-navigation-menu'
+import {ModulaDataTable} from '@/platform/ui/data/modula-data-table'
 import {ModulaEdgeSheet} from '@/platform/ui/sheets/modula-edge-sheet'
 import type {ModulaSheetDirection} from '@/platform/ui/sheets/modula-sheet.types'
 import {ModulaTabs} from '@/platform/ui/tabs/modula-tabs-control'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {useAppearance} from '@/theme/runtime/useAppearance'
 import {useAppearanceActions} from '@/theme/runtime/useAppearanceActions'
 
 type DrawerSpecimen =
@@ -63,6 +79,7 @@ const TOOL_ACTIONS = ['Photo', 'Camera', 'Poll', 'File', 'Voice', 'AI']
 /** Development-only interaction matrix. Every specimen consumes Modula APIs. */
 export function WebUiAdapterLab() {
   const {spacing} = useThemeTokens()
+  const {preferences} = useAppearance()
   const appearance = useAppearanceActions()
   const toast = useModulaToast()
   const [drawer, setDrawer] = useState<DrawerSpecimen | null>(null)
@@ -78,6 +95,17 @@ export function WebUiAdapterLab() {
   const [tab, setTab] = useState('drawer')
   const [toggles, setToggles] = useState(['bold'])
   const [input, setInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [checked, setChecked] = useState(true)
+  const [switched, setSwitched] = useState(true)
+  const [choice, setChoice] = useState('weekly')
+  const [range, setRange] = useState(42)
+  const [stepper, setStepper] = useState(3)
+  const [chip, setChip] = useState('installed')
+  const [notificationVisible, setNotificationVisible] = useState(true)
+  const [draft, setDraft] = useState('An unsaved Vault Notes draft')
+  const [savedDraft, setSavedDraft] = useState('')
+  const [saveCount, setSaveCount] = useState(0)
   const [font, setFont] = useState('System')
   const [fontQuery, setFontQuery] = useState('')
   const hydrated = useHydrated()
@@ -132,14 +160,71 @@ export function WebUiAdapterLab() {
       </LabSection>
 
       <LabSection title="Appearance evidence">
+        <ModulaSegmentedPicker
+          accessibilityLabel="Web presentation"
+          appearance="segmented"
+          options={[
+            {value: 'liquid', label: 'Liquid'},
+            {value: 'material', label: 'Material'},
+          ]}
+          testID="web-adapter-presentation"
+          value={preferences.webPresentation}
+          onValueChange={value => {
+            if (value === 'liquid' || value === 'material') appearance.setWebPresentation(value)
+          }}
+        />
         <View style={styles.wrap}>
           <ModulaButton label="Preview light" onPress={() => appearance.setMode('light')} role="secondary" size="compact" testID="web-adapter-theme-light" />
           <ModulaButton label="Preview dark" onPress={() => appearance.setMode('dark')} role="secondary" size="compact" testID="web-adapter-theme-dark" />
           <ModulaButton label="Preview OLED" onPress={() => appearance.setMode('oled')} role="secondary" size="compact" testID="web-adapter-theme-oled" />
+          <ModulaButton label="Teal accent" onPress={() => appearance.setAccent('modulaTeal')} role="secondary" size="compact" testID="web-adapter-accent-teal" />
+          <ModulaButton label="Violet accent" onPress={() => appearance.setAccent('vividViolet')} role="secondary" size="compact" testID="web-adapter-accent-violet" />
           <ModulaButton label="Reduce motion" onPress={() => appearance.setReduceMotion('on')} role="secondary" size="compact" testID="web-adapter-reduce-motion" />
           <ModulaButton label="Reduce transparency" onPress={() => appearance.setReduceTransparency('on')} role="secondary" size="compact" testID="web-adapter-reduce-transparency" />
           <ModulaButton label="Increase contrast" onPress={() => appearance.setIncreaseContrast('on')} role="secondary" size="compact" testID="web-adapter-increase-contrast" />
         </View>
+      </LabSection>
+
+      <LabSection title="Surface presentation">
+        <View style={styles.surfaceGrid}>
+          <Surface variant="platform" style={styles.surfaceSpecimen}>
+            <AppText variant="label">Platform surface</AppText>
+            <AppText variant="caption" colour="textSecondary">Liquid translucency or Material elevation.</AppText>
+          </Surface>
+          <Surface variant="solid" style={styles.surfaceSpecimen}>
+            <AppText variant="label">Explicit solid</AppText>
+            <AppText variant="caption" colour="textSecondary">Remains solid in both presentations.</AppText>
+          </Surface>
+          <Surface variant="glass" style={styles.surfaceSpecimen}>
+            <AppText variant="label">Explicit glass</AppText>
+            <AppText variant="caption" colour="textSecondary">A deliberate Modula surface request.</AppText>
+          </Surface>
+        </View>
+        <ModulaFloatingGroup>
+          <ModulaFloatingButton icon="edit" label="Edit preview" onPress={() => toast.show({message: 'Edit selected', tone: 'info'})} />
+          <ModulaFloatingButton icon="share" label="Share preview" onPress={() => toast.show({message: 'Share selected', tone: 'info'})} />
+        </ModulaFloatingGroup>
+      </LabSection>
+
+      <LabSection title="Navigation primitives">
+        <ModulaBreadcrumbs
+          items={[
+            {id: 'hub', label: 'Product Hub', onPress: () => toast.show({message: 'Product Hub selected', tone: 'info'})},
+            {id: 'productivity', label: 'Productivity', onPress: () => toast.show({message: 'Productivity selected', tone: 'info'})},
+            {id: 'vault', label: 'Vault Notes'},
+          ]}
+          testID="web-adapter-breadcrumbs"
+        />
+        <ModulaNavigationMenu
+          accessibilityLabel="UI Lab navigation"
+          items={[
+            {id: 'home', label: 'Home', active: true, onPress: () => toast.show({message: 'Home selected', tone: 'info'})},
+            {id: 'hub', label: 'Product Hub', onPress: () => toast.show({message: 'Product Hub selected', tone: 'info'})},
+            {id: 'modules', label: 'Modules', onPress: () => toast.show({message: 'Modules selected', tone: 'info'})},
+            {id: 'disabled', label: 'Unavailable', disabled: true, onPress: () => undefined},
+          ]}
+          testID="web-adapter-navigation-menu"
+        />
       </LabSection>
 
       <LabSection title="Sheet matrix">
@@ -215,6 +300,7 @@ export function WebUiAdapterLab() {
             <View style={{gap: spacing[2]}}>
               <AppText variant="label">Quick options</AppText>
               <AppText variant="caption" colour="textSecondary">Anchored on desktop, touch-safe through the semantic API.</AppText>
+              <PresentationSpecimenControls />
             </View>
           </ModulaPopover>
           <ModulaContextMenu
@@ -257,6 +343,12 @@ export function WebUiAdapterLab() {
       </LabSection>
 
       <LabSection title="Form adapters">
+        <ModulaSearchField
+          onChangeText={setSearch}
+          placeholder="Search Modula primitives"
+          testID="web-adapter-search"
+          value={search}
+        />
         <ModulaSelectField
           accessibilityLabel="Theme"
           allowClear={false}
@@ -272,6 +364,150 @@ export function WebUiAdapterLab() {
           placeholder="Search providers"
           value={combo}
         />
+        <ModulaTextInput
+          accessibilityLabel="Example field"
+          label="Example field"
+          onChangeText={setInput}
+          placeholder="Type without duplicate events"
+          testID="web-adapter-form-input"
+          value={input}
+        />
+        <View style={styles.controlColumn}>
+          <ModulaCheckbox
+            label="Sync this workspace"
+            onValueChange={setChecked}
+            testID="web-adapter-checkbox"
+            value={checked}
+          />
+          <View style={styles.labelledControl}>
+            <AppText variant="body">Automatic updates</AppText>
+            <ModulaSwitch
+              accessibilityLabel="Automatic updates"
+              onValueChange={setSwitched}
+              testID="web-adapter-toggle"
+              value={switched}
+            />
+          </View>
+          <ModulaRadioGroup
+            choices={[
+              {id: 'daily', label: 'Daily', description: 'Run every day'},
+              {id: 'weekly', label: 'Weekly', description: 'Run once a week'},
+              {id: 'disabled', label: 'Unavailable', disabled: true},
+            ]}
+            label="Backup frequency"
+            onValueChange={setChoice}
+            testID="web-adapter-radio"
+            value={choice}
+          />
+          <ModulaRange
+            label="Blur strength"
+            max={100}
+            onValueChange={setRange}
+            testID="web-adapter-range"
+            value={range}
+          />
+          <ModulaStepper
+            label="Column count"
+            max={6}
+            min={1}
+            onValueChange={setStepper}
+            testID="web-adapter-stepper"
+            value={stepper}
+          />
+          <View style={styles.wrap}>
+            {['installed', 'productivity', 'developer'].map(value => (
+              <ModulaChip
+                filter
+                key={value}
+                label={value[0].toUpperCase() + value.slice(1)}
+                onPress={() => setChip(value)}
+                selected={chip === value}
+                testID={`web-adapter-chip-${value}`}
+              />
+            ))}
+          </View>
+        </View>
+      </LabSection>
+
+      <LabSection title="Feedback and data">
+        {notificationVisible ? (
+          <ModulaNotification
+            action={{label: 'Open', onPress: () => toast.show({message: 'Notification action selected', tone: 'info'})}}
+            description="Vault Notes finished syncing through the semantic feedback layer."
+            icon="notifications"
+            onDismiss={() => setNotificationVisible(false)}
+            testID="web-adapter-notification"
+            timestamp="Now"
+            title="Sync complete"
+          />
+        ) : (
+          <ModulaButton label="Restore notification" onPress={() => setNotificationVisible(true)} role="secondary" />
+        )}
+        <ModulaProgress label="Module installation" progress={0.64} testID="web-adapter-progress" />
+        <ModulaProgress label="Preparing preview" testID="web-adapter-preloader" />
+        <ModulaDataTable
+          accessibilityLabel="Installed module status"
+          columns={[
+            {id: 'module', label: 'Module'},
+            {id: 'state', label: 'State'},
+            {id: 'version', label: 'Version', numeric: true},
+          ]}
+          rows={[
+            {id: 'vault', cells: {module: 'Vault Notes', state: 'Installed', version: '1.7.0'}},
+            {id: 'crm', cells: {module: 'CRM', state: 'Compatible', version: '0.9.2'}},
+          ]}
+          testID="web-adapter-data-table"
+        />
+      </LabSection>
+
+      <LabSection title="List primitives">
+        <ModulaList testID="web-adapter-konsta-list">
+          <ModulaListItem
+            onPress={() => toast.show({message: 'Vault Notes selected', tone: 'info'})}
+            supportingText="Existing semantic row rendered by the web list adapter"
+            title="Vault Notes"
+          />
+          <ModulaListItem supportingText="Non-interactive detail row" title="Version 1.7.0" />
+        </ModulaList>
+      </LabSection>
+
+      <LabSection title="Floating action">
+        <ModulaFloatingButton
+          icon="create"
+          label="New note"
+          onPress={() => toast.show({message: 'New note action selected', tone: 'info'})}
+          prominent
+        />
+      </LabSection>
+
+      <LabSection title="State continuity">
+        <ModulaTextInput
+          accessibilityLabel="Unsaved note draft"
+          chrome="plain"
+          multiline
+          onChangeText={setDraft}
+          testID="web-adapter-unsaved-note"
+          value={draft}
+        />
+        <View style={styles.wrap}>
+          <ModulaButton
+            label="Open editor tools"
+            onPress={() => setDrawer('drill-in')}
+            role="secondary"
+            testID="web-adapter-open-editor-tools"
+          />
+          <ModulaButton
+            label="Save note"
+            onPress={() => {
+              setSavedDraft(draft)
+              setSaveCount(value => value + 1)
+            }}
+            testID="web-adapter-save-note"
+          />
+        </View>
+        <AppText colour="textSecondary" testID="web-adapter-save-evidence" variant="caption">
+          Saves: {saveCount}{savedDraft ? ` · ${savedDraft}` : ''}
+        </AppText>
       </LabSection>
 
       <LabSection title="Tabs and toggles">
@@ -314,6 +550,7 @@ export function WebUiAdapterLab() {
           onTrueNested={() => setNestedModal(true)}
           specimen={drawer}
         />
+        <PresentationSpecimenControls />
         <ModulaDrawer
           footer={<ModulaButton fullWidth label="Confirm" onPress={() => setNestedModal(false)} />}
           isPresented={nestedModal}
@@ -324,6 +561,7 @@ export function WebUiAdapterLab() {
           <View style={{gap: spacing[3]}}>
             <AppText variant="body">This separate modal context requires an explicit confirmation.</AppText>
             <AppText variant="caption" colour="textSecondary">The account tools surface remains available after this task closes.</AppText>
+            <PresentationSpecimenControls />
           </View>
         </ModulaDrawer>
       </ModulaDrawer>
@@ -334,7 +572,10 @@ export function WebUiAdapterLab() {
         onDismiss={() => setSheet(null)}
         presentation="configuration"
         title={`Sheet · ${sheet ?? 'right'}`}>
-        <AppText variant="body" colour="textSecondary">Edge panel for a persistent task; no snap gesture is required.</AppText>
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="body" colour="textSecondary">Edge panel for a persistent task; no snap gesture is required.</AppText>
+          <PresentationSpecimenControls />
+        </View>
       </ModulaEdgeSheet>
 
       <ModulaDialog
@@ -342,10 +583,61 @@ export function WebUiAdapterLab() {
         onDismiss={() => setDialog(null)}
         size={dialog ?? 'regular'}
         title={`Dialog · ${dialog ?? 'regular'}`}>
-        <AppText variant="body" colour="textSecondary">Focused, centered task with content-driven height.</AppText>
+        <View style={{gap: spacing[3]}}>
+          <AppText variant="body" colour="textSecondary">Focused, centered task with content-driven height.</AppText>
+          <PresentationSpecimenControls />
+          <ModulaMenu
+            accessibilityLabel="Open dialog menu"
+            actions={[
+              {id: 'dialog-copy', label: 'Copy value'},
+              {id: 'dialog-remove', label: 'Remove value', style: 'destructive'},
+            ]}
+            onAction={id => toast.show({message: `${id} selected`, tone: 'info'})}
+            title="Dialog actions"
+            trigger={<AppText variant="buttonLabel">Dialog menu</AppText>}
+          />
+        </View>
       </ModulaDialog>
 
       <ModulaCommand actions={commandActions} isOpen={command} onOpenChange={setCommand} testID="web-adapter-command" />
+    </View>
+  )
+}
+
+function PresentationSpecimenControls() {
+  const {preferences} = useAppearance()
+  const actions = useAppearanceActions()
+  return (
+    <View style={styles.controlColumn}>
+      <ModulaSegmentedPicker
+        accessibilityLabel="Change presentation while overlay is open"
+        appearance="segmented"
+        options={[
+          {value: 'liquid', label: 'Liquid'},
+          {value: 'material', label: 'Material'},
+        ]}
+        testID="web-adapter-open-overlay-presentation"
+        value={preferences.webPresentation}
+        onValueChange={value => {
+          if (value === 'liquid' || value === 'material') actions.setWebPresentation(value)
+        }}
+      />
+      <View style={styles.wrap}>
+        <ModulaButton
+          label="Teal accent"
+          onPress={() => actions.setAccent('modulaTeal')}
+          role="secondary"
+          size="compact"
+          testID="web-adapter-open-overlay-accent-teal"
+        />
+        <ModulaButton
+          label="Violet accent"
+          onPress={() => actions.setAccent('vividViolet')}
+          role="secondary"
+          size="compact"
+          testID="web-adapter-open-overlay-accent-violet"
+        />
+      </View>
     </View>
   )
 }
@@ -413,6 +705,7 @@ function createDrawerNavigationScreens(
       title: 'Tools',
       render: navigation => (
         <View style={styles.drawerNavigationSections}>
+          <PresentationSpecimenControls />
           <ModulaListSection title="Create">
             {['Photo', 'File', 'Voice', 'AI'].map((label, index, values) => (
               <ModulaListRow key={label} last={index === values.length - 1} title={label} variant="action" />
@@ -433,6 +726,7 @@ function createDrawerNavigationScreens(
       parentLabel: 'Tools',
       render: navigation => (
         <View style={styles.drawerNavigationSections}>
+          <PresentationSpecimenControls />
           <ModulaListSection title="Text">
             <ModulaListRow metadata={font} onPress={() => navigation.push('font')} testID="web-adapter-open-font" title="Font" variant="navigation" />
             <ModulaListRow metadata="Regular" title="Style" variant="navigation" />
@@ -454,6 +748,7 @@ function createDrawerNavigationScreens(
       parentLabel: 'Formatting',
       render: () => (
         <View style={styles.drawerNavigationSections}>
+          <PresentationSpecimenControls />
           <ModulaTextInput
             accessibilityLabel="Search fonts"
             onChangeText={setFontQuery}
@@ -499,8 +794,12 @@ function LabSection({title, children}: {title: string; children: React.ReactNode
 }
 
 const styles = StyleSheet.create({
+  controlColumn: {gap: 12},
   contextTarget: {minHeight: 44, justifyContent: 'center', paddingHorizontal: 12},
   drawerNavigationSections: {gap: 16},
+  labelledControl: {alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'},
   root: {paddingBottom: 48},
+  surfaceGrid: {display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 12},
+  surfaceSpecimen: {flex: 1, gap: 4, minWidth: 220, padding: 16},
   wrap: {alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 8},
 })

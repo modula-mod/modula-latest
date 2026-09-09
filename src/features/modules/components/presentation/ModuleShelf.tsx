@@ -1,7 +1,8 @@
 import type {ReactNode} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {HubSectionHeader} from '@/features/modules/components/presentation/HubSectionHeader'
 import {ModuleFeatureCard} from '@/features/modules/components/presentation/ModuleFeatureCard'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -21,7 +22,7 @@ export function ModuleShelf({
   icon?: ModulaIconName
 }) {
   const {spacing} = useThemeTokens()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const cardWidth = width >= 1100 ? 220 : width >= 768 ? 196 : 168
   if (!items.length) return null
   return (

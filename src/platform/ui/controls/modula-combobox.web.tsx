@@ -1,7 +1,9 @@
 import {Combobox} from '@base-ui/react/combobox'
 import {useId, useState} from 'react'
 
+import {KonstaPopoverSurface} from '@/platform/ui/adapters/konsta/popover-surface.web'
 import {ModulaDrawer} from '@/platform/ui/drawers/modula-drawer'
+import {ModulaOverlayLayerScope, useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -125,6 +127,7 @@ function DesktopCombobox({
   const tokens = useThemeTokens()
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
+  const layer = useModulaOverlayLayer('popover')
   const selected = options.find(option => option.value === value) ?? null
   return (
     <Combobox.Root
@@ -143,18 +146,22 @@ function DesktopCombobox({
         </div>
       </Combobox.InputGroup>
       <Combobox.Portal>
-        <Combobox.Positioner className="modula-web-menu-positioner" sideOffset={4}>
-          <Combobox.Popup className="modula-web-ui modula-web-menu-popup modula-web-combobox-popup" style={variables}>
-            <Combobox.Empty className="modula-web-select-empty">{noResultsLabel}</Combobox.Empty>
-            <Combobox.List className="modula-web-select-list">
-              {option => (
-                <Combobox.Item className="modula-web-menu-item" key={option.value} value={option}>
-                  <Combobox.ItemIndicator className="modula-web-menu-indicator">✓</Combobox.ItemIndicator>
-                  <span className="modula-web-menu-label">{option.label}</span>
-                  {option.description ? <span className="modula-web-menu-trailing">{option.description}</span> : null}
-                </Combobox.Item>
-              )}
-            </Combobox.List>
+        <Combobox.Positioner className="modula-web-menu-positioner" sideOffset={4} style={{zIndex: layer.content}}>
+          <Combobox.Popup className="modula-web-ui modula-web-menu-popup modula-web-combobox-popup" style={{...variables, zIndex: layer.content}}>
+            <KonstaPopoverSurface>
+              <ModulaOverlayLayerScope layer={layer.content}>
+                <Combobox.Empty className="modula-web-select-empty">{noResultsLabel}</Combobox.Empty>
+                <Combobox.List className="modula-web-select-list">
+                  {option => (
+                    <Combobox.Item className="modula-web-menu-item" key={option.value} value={option}>
+                      <Combobox.ItemIndicator className="modula-web-menu-indicator">✓</Combobox.ItemIndicator>
+                      <span className="modula-web-menu-label">{option.label}</span>
+                      {option.description ? <span className="modula-web-menu-trailing">{option.description}</span> : null}
+                    </Combobox.Item>
+                  )}
+                </Combobox.List>
+              </ModulaOverlayLayerScope>
+            </KonstaPopoverSurface>
           </Combobox.Popup>
         </Combobox.Positioner>
       </Combobox.Portal>

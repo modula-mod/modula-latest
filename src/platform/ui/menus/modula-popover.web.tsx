@@ -1,7 +1,9 @@
 import {Popover} from '@base-ui/react/popover'
 import type {ReactNode} from 'react'
 
+import {KonstaPopoverSurface} from '@/platform/ui/adapters/konsta/popover-surface.web'
 import {ModulaDrawer} from '@/platform/ui/drawers/modula-drawer'
+import {ModulaOverlayLayerScope, useModulaOverlayLayer} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -36,6 +38,7 @@ export function ModulaPopover({
   const {reduceTransparency} = useSystemAccessibility()
   const variables = modulaWebCssVariables(tokens, {reduceTransparency})
   const presentation = useResponsivePresentation('picker', {anchored: true})
+  const layer = useModulaOverlayLayer('popover')
   if (presentation === 'drawer') {
     return (
       <>
@@ -77,15 +80,21 @@ export function ModulaPopover({
         {trigger}
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner align="start" className="modula-web-popover-positioner" sideOffset={6}>
+        <Popover.Positioner
+          align="start"
+          className="modula-web-popover-positioner"
+          sideOffset={6}
+          style={{zIndex: layer.content}}>
           <Popover.Popup
             aria-label={accessibilityLabel}
             className="modula-web-ui modula-web-popover-popup"
             data-testid={testID}
             finalFocus
             initialFocus
-            style={{...variables, width}}>
-            {children}
+            style={{...variables, width, zIndex: layer.content}}>
+            <KonstaPopoverSurface>
+              <ModulaOverlayLayerScope layer={layer.content}>{children}</ModulaOverlayLayerScope>
+            </KonstaPopoverSurface>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

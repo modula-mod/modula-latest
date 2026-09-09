@@ -2,6 +2,11 @@ import {Dialog} from '@base-ui/react/dialog'
 import {Drawer} from '@base-ui/react/drawer'
 import type {ReactNode} from 'react'
 
+import {KonstaOverlaySurface} from '@/platform/ui/adapters/konsta/overlay-surfaces.web'
+import {
+  ModulaOverlayLayerScope,
+  useModulaOverlayLayer,
+} from '@/platform/ui/overlays/modula-overlay-stack'
 import {useResponsivePresentation} from '@/platform/ui/responsive'
 import {
   detentForPresentation,
@@ -15,7 +20,7 @@ import {
 } from '@/platform/ui/sheets/modula-sheet.types'
 import type {ModulaResolvedPresentation} from '@/platform/ui/responsive'
 import {setShellChromeHoldObscure} from '@/platform/ui/navigation/shell-chrome-obscure'
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import {useReduceMotion} from '@/lib/accessibility'
 import {useSystemAccessibility} from '@/theme/accessibility/useSystemAccessibility'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -131,12 +136,44 @@ export function ModulaSheet({
   const resolvedPoints = webSnapPoints(semanticPoints)
   const resolvedActivePoint = webSnapPoints(activeSnapPoint ? [activeSnapPoint] : undefined)?.[0] ?? null
   const resolvedDirection: ModulaSheetDirection = direction
+  const warnedUnsupportedSnapRef = useRef(false)
+  const requestedSnapInteraction = Boolean(
+    detents?.length
+      || snapPoints?.length
+      || activeSnapPoint != null
+      || onActiveSnapPointChange,
+  )
+  // A semantic dialog keeps dialog priority even when compact web presents it
+  // as a bottom drawer. This lets confirmations safely replace action sheets.
+  const layer = useModulaOverlayLayer(
+    desktopPresentation === 'dialog'
+      ? 'dialog'
+      : resolved === 'dialog'
+        ? 'dialog'
+        : resolved === 'sheet'
+          ? 'sheet'
+          : 'drawer',
+  )
 
   useEffect(() => {
     if (!obscureShellChrome) return
     setShellChromeHoldObscure(isPresented)
     return () => setShellChromeHoldObscure(false)
   }, [isPresented, obscureShellChrome])
+
+  useEffect(() => {
+    if (
+      !__DEV__
+      || !isPresented
+      || resolved === 'drawer'
+      || !requestedSnapInteraction
+      || warnedUnsupportedSnapRef.current
+    ) return
+    warnedUnsupportedSnapRef.current = true
+    console.warn(
+      'ModulaSheet snap points and detents require the drawer presentation on web; the current edge/dialog presentation keeps content-sized behavior.',
+    )
+  }, [isPresented, requestedSnapInteraction, resolved])
 
   if (resolved === 'drawer') {
     const swipeDirection = resolvedDirection === 'bottom' ? 'down' : resolvedDirection
@@ -156,38 +193,43 @@ export function ModulaSheet({
             <Drawer.Backdrop
               className="modula-web-ui modula-web-backdrop modula-web-drawer-backdrop"
               data-reduce-motion={String(reduceMotion)}
-              style={variables}
+              style={{...variables, zIndex: layer.backdrop}}
             />
             <Drawer.Viewport
               className="modula-web-ui modula-web-drawer-viewport"
               data-direction={resolvedDirection}
               data-reduce-motion={String(reduceMotion)}
-              style={variables}>
+              style={{...variables, zIndex: layer.content}}>
               <Drawer.Popup
                 aria-label={accessibilityLabel}
-                className="modula-web-drawer-popup"
+                className="modula-web-drawer-popup modula-web-konsta-overlay-host"
                 data-direction={resolvedDirection}
                 data-detent={resolvedDetent}
                 finalFocus
                 initialFocus
                 data-testid={testID}
                 style={variables}>
-                {showDragIndicator && resolvedDirection === 'bottom' ? (
-                  <div aria-hidden="true" className="modula-web-drawer-handle-target">
-                    <div className="modula-web-drawer-handle" />
-                  </div>
-                ) : null}
-                <WebOverlayContents
-                  bodyNode={props => <Drawer.Content {...props} />}
-                  descriptionNode={props => <Drawer.Description {...props} />}
-                  titleNode={props => <Drawer.Title {...props} />}
-                  title={title}
-                  subtitle={subtitle}
-                  header={header}
-                  footer={footer}
-                  scrollBody={scrollBody}>
-                  {children}
-                </WebOverlayContents>
+                <KonstaOverlaySurface
+                  kind={presentation === 'actions' || presentation === 'context' || presentation === 'compact' ? 'actions' : 'sheet'}>
+                  <ModulaOverlayLayerScope layer={layer.content}>
+                    {showDragIndicator && resolvedDirection === 'bottom' ? (
+                      <div aria-hidden="true" className="modula-web-drawer-handle-target">
+                        <div className="modula-web-drawer-handle" />
+                      </div>
+                    ) : null}
+                    <WebOverlayContents
+                      bodyNode={props => <Drawer.Content {...props} />}
+                      descriptionNode={props => <Drawer.Description {...props} />}
+                      titleNode={props => <Drawer.Title {...props} />}
+                      title={title}
+                      subtitle={subtitle}
+                      header={header}
+                      footer={footer}
+                      scrollBody={scrollBody}>
+                      {children}
+                    </WebOverlayContents>
+                  </ModulaOverlayLayerScope>
+                </KonstaOverlaySurface>
               </Drawer.Popup>
             </Drawer.Viewport>
           </Drawer.Portal>
@@ -208,33 +250,39 @@ export function ModulaSheet({
         <Dialog.Backdrop
           className="modula-web-ui modula-web-backdrop"
           data-reduce-motion={String(reduceMotion)}
-          style={variables}
+          style={{...variables, zIndex: layer.backdrop}}
         />
         <Dialog.Viewport
           className="modula-web-ui modula-web-dialog-viewport"
           data-edge={edge ? 'true' : 'false'}
           data-reduce-motion={String(reduceMotion)}
-          style={variables}>
+          style={{...variables, zIndex: layer.content}}>
           <Dialog.Popup
             aria-label={accessibilityLabel}
-            className={classNames('modula-web-dialog-popup', edge && 'modula-web-edge-sheet')}
+            className={classNames('modula-web-dialog-popup', 'modula-web-konsta-overlay-host', edge && 'modula-web-edge-sheet')}
             data-size={dialogSize}
             data-side={resolvedDirection === 'left' ? 'left' : 'right'}
             finalFocus
             initialFocus
             data-testid={testID}
             style={variables}>
-            <WebOverlayContents
-              bodyNode={props => <div {...props} />}
-              descriptionNode={props => <Dialog.Description {...props} />}
-              titleNode={props => <Dialog.Title {...props} />}
-              title={title}
-              subtitle={subtitle}
-              header={header}
-              footer={footer}
-              scrollBody={scrollBody}>
-              {children}
-            </WebOverlayContents>
+            <KonstaOverlaySurface
+              kind={edge ? (resolvedDirection === 'bottom' ? 'sheet' : 'panel') : 'dialog'}
+              side={resolvedDirection === 'right' ? 'right' : 'left'}>
+              <ModulaOverlayLayerScope layer={layer.content}>
+                <WebOverlayContents
+                  bodyNode={props => <div {...props} />}
+                  descriptionNode={props => <Dialog.Description {...props} />}
+                  titleNode={props => <Dialog.Title {...props} />}
+                  title={title}
+                  subtitle={subtitle}
+                  header={header}
+                  footer={footer}
+                  scrollBody={scrollBody}>
+                  {children}
+                </WebOverlayContents>
+              </ModulaOverlayLayerScope>
+            </KonstaOverlaySurface>
           </Dialog.Popup>
         </Dialog.Viewport>
       </Dialog.Portal>

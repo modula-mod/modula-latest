@@ -44,6 +44,7 @@ export const MODULA_WEB_UI_CSS = String.raw`
 .modula-web-backdrop[data-starting-style],
 .modula-web-backdrop[data-ending-style] {
   opacity: 0;
+  pointer-events: none;
 }
 
 @supports (-webkit-touch-callout: none) {
@@ -164,7 +165,7 @@ export const MODULA_WEB_UI_CSS = String.raw`
   background: var(--modula-web-separator);
 }
 
-.modula-web-drawer-popup[data-nested-drawer-open] > .modula-web-drawer-handle-target {
+.modula-web-drawer-popup[data-nested-drawer-open] .modula-web-drawer-handle-target {
   opacity: 0;
   visibility: hidden;
 }

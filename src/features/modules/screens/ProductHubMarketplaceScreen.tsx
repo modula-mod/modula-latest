@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useMemo, useReducer, useRef, useState} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 import {useSharedValue} from 'react-native-reanimated'
 import {useRouter, type Href} from 'expo-router'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
@@ -8,6 +8,7 @@ import {AppText} from '@/components/primitives/AppText'
 import {EmptyState} from '@/components/primitives/EmptyState'
 import {InitialLoadingState, QueryErrorState} from '@/components/data'
 import {useSession} from '@/auth/runtime'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import type {ModuleCatalogueItem, ProductHubCategory} from '@/data/repositories/contracts'
 import {isLegacyVaultNotesModuleId} from '@modula/greenfield-contracts'
 import {ProductHubHeader} from '@/features/modules/components/ProductHubHeader'
@@ -64,7 +65,7 @@ export function ProductHubMarketplaceContent({compact: _compact = false}: {compa
   const router = useRouter()
   const session = useSession()
   const insets = useSafeAreaInsets()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const {colours, spacing, resolvedColourMode} = useThemeTokens()
   const canvas = marketplaceCanvas(resolvedColourMode, colours.canvas)
   const tabPadding = useFloatingTabBarContentPadding()

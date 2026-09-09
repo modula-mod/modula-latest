@@ -52,6 +52,7 @@
     "expo-system-ui": "~57.0.2",
     "expo-video": "~57.0.2",
     "expo-web-browser": "~57.0.2",
+    "konsta": "5.4.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.2",
@@ -66,12 +67,15 @@
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "4.3.3",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "~57.0.4",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~57.0.1",
     "expo-doctor": "^1.20.0",
     "expo-mcp": "~0.2.4",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.3.3",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -305,7 +309,9 @@
     "verify:platform-foundation-v1": "node scripts/verify-platform-foundation-v1.mjs",
     "verify:ui-system-v1": "node scripts/verify-ui-system-v1.mjs",
     "verify:web-ui-adapter-v1": "node scripts/verify-web-ui-adapter-v1.mjs",
-    "verify:web-ui-adapter-v1:browser": "playwright test --config playwright.web-ui-adapter.config.ts"
+    "verify:web-ui-adapter-v1:browser": "playwright test --config playwright.web-ui-adapter.config.ts",
+    "verify:konsta-web-presentation": "node scripts/verify-konsta-web-presentation.mjs",
+    "verify:konsta-web-presentation:browser": "playwright test --config playwright.konsta-web-presentation.config.ts"
   },
   "private": true
 }

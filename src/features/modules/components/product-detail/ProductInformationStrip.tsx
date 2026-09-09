@@ -1,7 +1,8 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
 import {ModulaHorizontalScroll} from '@/platform/ui/scroll'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -16,7 +17,7 @@ export type ProductInformationItem = {
 
 export function ProductInformationStrip({items}: {items: ProductInformationItem[]}) {
   const {colours, radius, spacing} = useThemeTokens()
-  const {fontScale, width} = useWindowDimensions()
+  const {fontScale, width} = useHydrationSafeWindowDimensions()
   const scrollable = fontScale > 1.15 || width < 380
   const content = items.map((item, index) => {
     const body = (

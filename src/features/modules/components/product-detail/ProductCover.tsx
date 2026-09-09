@@ -1,10 +1,11 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {LinearGradient} from 'expo-linear-gradient'
 
 import {AppImage} from '@/components/primitives/AppImage'
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {moduleArtworkPack} from '@/features/modules/identity/moduleArtwork'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 const VAULT_NOTES_COVER = require('../../../../../assets/images/product-hub/vault-notes-cover.png')
@@ -35,7 +36,7 @@ export function ProductCover({
   transitionToCanvas?: boolean
   size?: 'detail' | 'editorial' | 'bleed' | 'split'
 }) {
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const {colours, radius} = useThemeTokens()
   const contentWidth = Math.min(width, 1120)
   const height =

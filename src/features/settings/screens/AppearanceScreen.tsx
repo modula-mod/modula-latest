@@ -13,6 +13,7 @@ import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {AdvancedCameraMaskedBlurPreview} from '@/features/settings/components/AdvancedCameraMaskedBlurPreview'
 import {SettingsLinkRow, SettingsSection, SettingsToggleRow} from '@/features/settings/components/SettingsRows'
+import {WebPresentationSettingsSection} from '@/features/settings/components/web-presentation-settings-section'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ModulaTextInput} from '@/platform/ui/controls/modula-text-input'
@@ -182,6 +183,8 @@ export function AppearanceScreen() {
               </View>
             ) : null}
           </Section>
+
+          <WebPresentationSettingsSection />
 
           <MaterialSurface
             role="card"
