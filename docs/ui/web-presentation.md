@@ -44,7 +44,7 @@ The document element and the application element receive the same presentation c
 
 ## Overlay ownership
 
-Every web overlay has one behavior owner. Konsta surfaces are kept permanently open inside that owner with their backdrop, fixed positioning, transform, and transition behavior disabled.
+Every web overlay has one behavior owner. Base UI/Modula renders the portal, backdrop, popup, and lifecycle. The Liquid/Material renderer inside that popup is a passive token-driven element; Konsta `Panel`, `Actions`, `Sheet`, `Dialog`, and `Popover` are not mounted because an always-open interactive primitive still creates a second lifecycle and positioning boundary.
 
 | Concern | Owner |
 |---|---|
@@ -55,7 +55,7 @@ Every web overlay has one behavior owner. Konsta surfaces are kept permanently o
 | Drawer pan/snap coordination | Base UI Drawer or the existing Modula navigation gesture |
 | Drawer page drill-in and retained page state | `ModulaDrawerNavigator` |
 | Motion tokens and reduced motion | Modula |
-| Surface, elevation, glass, component theme | Konsta visual adapter fed by Modula tokens |
+| Surface, elevation, glass, component theme | Passive presentation adapter using Konsta theme state and Modula tokens |
 
 Overlay layers are allocated relative to their parent scope. A menu opened from a dialog therefore resolves above that dialog even though the base popover token is normally below the base modal token. Persistent expanded navigation is nonmodal. Toasts announce status and never trap focus.
 
@@ -65,11 +65,11 @@ Escape normally cancels dialogs, including destructive confirmations. Destructiv
 
 | Interaction | Implementation |
 |---|---|
-| Left/right navigation panel | Konsta Panel as the visual surface behind the Modula navigation adapter |
-| Bottom drawer or sheet | Modula/Base UI behavior with Konsta Actions or Sheet as the visual surface |
+| Left/right navigation panel | Modula/Base UI behavior with a passive Liquid/Material surface |
+| Bottom drawer or sheet | Modula/Base UI behavior with a passive Liquid/Material surface |
 | Tools to Formatting to Font | Internal navigation within one `ModulaDrawerNavigator` shell |
 
-The drill-in path keeps one overlay, one surface, one handle, one scroll owner, and mounted page state. `ResizeObserver` drives restrained height changes. Focus and per-page scroll positions restore on Back. Konsta Panel is not used as a bottom sheet, and Konsta Sheet is not credited with snap, drag-dismissal, or drill-in behavior it does not implement.
+The drill-in path keeps one overlay, one surface, one handle, one scroll owner, and mounted page state. `ResizeObserver` drives restrained height changes. Focus and per-page scroll positions restore on Back. Konsta overlay primitives do not participate in drawer, sheet, snap, drag-dismissal, or drill-in behavior.
 
 Snap points and semantic detents are implemented by the Base UI Drawer path. An edge-sheet/dialog presentation does not silently accept those capabilities: development builds emit a specific warning when snap interaction props reach a presentation that cannot honor them. Directional sheets remain content-sized and use their documented dismissal behavior.
 
@@ -101,7 +101,7 @@ To create another adapter:
 
 | Konsta family | Modula disposition | Initial consumers / verification |
 |---|---|---|
-| Action Sheet | `ModulaActionSheet`; Base UI Drawer behavior + Konsta Actions visual | Post/module actions and UI Lab action drawer; keyboard/dismiss tests |
+| Action Sheet | `ModulaActionSheet`; Base UI Drawer behavior + passive Liquid/Material surface | Post/module actions and UI Lab action drawer; keyboard/dismiss tests |
 | Badge | `ModulaBadge` web adapter | Status labels and UI Lab |
 | Block, Block Header/Footer/Title | Mapped to `Surface`, `Section`, `Stack`, and list section semantics; Konsta Block is not canonical | Existing settings/product sections; excluded as a redundant public foundation |
 | Breadcrumbs | `ModulaBreadcrumbs` web adapter, hidden on compact layouts | UI Lab hierarchy; Axe |
@@ -110,7 +110,7 @@ To create another adapter:
 | Checkbox | `ModulaCheckbox` web adapter; native control retained | UI Lab form states |
 | Chip | `ModulaChip` and `ModulaFilterChip` web adapters | Product Hub filters and UI Lab |
 | Data Table | `ModulaDataTable`; Konsta table on expanded web, semantic cards on compact/native | UI Lab data section |
-| Dialog | `ModulaDialog` / confirmation host; Base UI behavior + Konsta Dialog visual | UI Lab, destructive Escape/focus tests |
+| Dialog | `ModulaDialog` / confirmation host; Base UI behavior + passive Liquid/Material surface | UI Lab, destructive Escape/focus tests |
 | FAB | Existing `ModulaFloatingButton` prominent web form uses Konsta FAB | UI Lab new-note action; global Tools behavior is unchanged |
 | Glass | `Surface variant="platform|glass"`; Konsta Glass only inside web implementation | UI Lab surface matrix |
 | List, List Item, List Button | Existing `ModulaList`/`ModulaListItem` web adapter; product `RecordList`/`Row` stays stable | UI Lab list section and generic product host |
@@ -119,8 +119,8 @@ To create another adapter:
 | Messagebar | Mapped to richer `ModulaComposerInput`/toolbar contract; Konsta Messagebar intentionally excluded | Composer needs attachments, actions, reply/edit/delivery semantics and must not inherit Konsta's data model |
 | Navbar | Mapped to `ModulaNavigationHeader`; Konsta Navbar intentionally excluded from custom hero/detail chrome | Existing shell headers retain Modula geometry |
 | Notification | `ModulaNotification` web adapter | UI Lab notification action/dismiss |
-| Panel | Web navigation drawer visual surface | Shell navigation and drawer tests |
-| Popover | `ModulaPopover`; Base UI behavior + Konsta Popover visual | UI Lab, responsive/portal tests |
+| Panel | Removed from overlay behavior; passive web navigation drawer surface | Shell navigation and drawer tests |
+| Popover | `ModulaPopover`; Base UI behavior + passive Liquid/Material surface | UI Lab, responsive/portal tests |
 | Popup | Mapped to `ModulaDialog`; Konsta Popup intentionally excluded as duplicate modal machinery | Dialog matrix |
 | Preloader | Indeterminate `ModulaProgress` / loading state adapter | UI Lab loading |
 | Progressbar | Determinate `ModulaProgress` adapter | UI Lab module install |
@@ -128,7 +128,7 @@ To create another adapter:
 | Range | `ModulaRange` web adapter; native Expo UI slider | UI Lab appearance value |
 | Searchbar | Existing `ModulaSearchField` API with Konsta Searchbar web visual | Product Hub and Vault Notes semantics, UI Lab |
 | Segmented | Existing `ModulaSegmentedPicker` API with Konsta Segmented web visual | Appearance live switch and UI Lab |
-| Sheet | `ModulaSheet`; Base UI behavior + Konsta Sheet visual | Settings, filters, UI Lab directional sheets |
+| Sheet | `ModulaSheet`; Base UI behavior + passive Liquid/Material surface | Settings, filters, UI Lab directional sheets |
 | Stepper | `ModulaStepper` web adapter and native semantic fallback | UI Lab numeric configuration |
 | Tabbar | Existing `PlatformTabs` remains canonical; Konsta Tabbar intentionally excluded from the shell | Native uses NativeTabs/custom native implementation; web keeps Modula's responsive rail/bottom geometry |
 | Toast | Existing queue/service and accessibility announcer with Konsta Toast visual | UI Lab, portal identity test |
