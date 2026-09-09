@@ -1,11 +1,12 @@
 import {useState} from 'react'
-import {Modal, Pressable, ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Modal, Pressable, ScrollView, StyleSheet, View} from 'react-native'
 import Svg, {Circle, Path, Rect} from 'react-native-svg'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {moduleArtworkPack} from '@/features/modules/identity/moduleArtwork'
 import {useReduceMotion} from '@/lib/accessibility'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {LAYERS} from '@/theme/tokens/layers'
 import {scrimColour} from '@/theme/tokens/scrim'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -40,7 +41,7 @@ export function ModulePreview({
   frames?: ModulePreviewFrame[]
 }) {
   const {colours, radius, spacing, resolvedColourMode} = useThemeTokens()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const reduceMotion = useReduceMotion()
   const [openId, setOpenId] = useState<string | null>(null)
   const cardWidth = Math.min(220, Math.round(width * 0.58))

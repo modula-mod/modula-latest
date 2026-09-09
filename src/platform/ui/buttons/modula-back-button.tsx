@@ -1,7 +1,8 @@
 import {useRouter} from 'expo-router'
-import type {StyleProp, ViewStyle} from 'react-native'
+import {View, type StyleProp, type ViewStyle} from 'react-native'
 
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 
 type ModulaBackButtonProps = {
@@ -31,6 +32,33 @@ export function ModulaBackButton({
   testID = 'modula-back',
 }: ModulaBackButtonProps) {
   const router = useRouter()
+  const goBack = () => {
+    if (onPress) {
+      onPress()
+      return
+    }
+    if (router.canGoBack()) {
+      router.back()
+      return
+    }
+    router.replace('/' as never)
+  }
+
+  if (chrome === 'glass') {
+    return (
+      <View style={style}>
+        <ChromeGlassControlGroup
+          items={[{
+            kind: 'button',
+            icon: 'back',
+            accessibilityLabel,
+            onPress: goBack,
+            testID,
+          }]}
+        />
+      </View>
+    )
+  }
 
   return (
     <ModulaIconButton
@@ -39,17 +67,7 @@ export function ModulaBackButton({
       accessibilityLabel={accessibilityLabel}
       style={style}
       testID={testID}
-      onPress={() => {
-        if (onPress) {
-          onPress()
-          return
-        }
-        if (router.canGoBack()) {
-          router.back()
-          return
-        }
-        router.replace('/' as never)
-      }}
+      onPress={goBack}
     />
   )
 }

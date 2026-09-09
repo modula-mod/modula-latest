@@ -1,9 +1,10 @@
 import {Link, type Href} from 'expo-router'
-import {Pressable, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {Pressable, StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
 import {ProductCover} from '@/features/modules/components/product-detail/ProductCover'
@@ -28,7 +29,7 @@ export function EditorialSplitHero({
   href?: string
 }) {
   const {colours, radius, spacing} = useThemeTokens()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
   const split = width >= 860

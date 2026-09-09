@@ -2,9 +2,13 @@ import type {ReactNode} from 'react'
 import {type StyleProp, type ViewStyle} from 'react-native'
 
 import {MaterialSurface} from '@/components/materials/MaterialSurface'
+import {SolidMaterialSurface} from '@/components/materials/SolidMaterialSurface'
 import type {SurfaceRole} from '@/theme/contracts'
+import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 export type SurfaceVariant =
+  | 'platform'
+  | 'solid'
   | 'canvas'
   | 'plain'
   | 'grouped'
@@ -24,6 +28,8 @@ type SurfaceProps = {
 }
 
 function roleForVariant(variant: SurfaceVariant): SurfaceRole {
+  if (variant === 'platform') return 'card'
+  if (variant === 'solid') return 'card'
   if (variant === 'canvas') return 'canvas'
   if (variant === 'plain') return 'content'
   if (variant === 'grouped') return 'card'
@@ -36,8 +42,17 @@ function roleForVariant(variant: SurfaceVariant): SurfaceRole {
 }
 
 export function Surface({variant = 'plain', children, style, role}: SurfaceProps) {
+  const {materials} = useThemeTokens()
+  const resolvedRole = role ?? roleForVariant(variant)
+  if (variant === 'solid') {
+    return (
+      <SolidMaterialSurface material={materials[resolvedRole]} style={style}>
+        {children}
+      </SolidMaterialSurface>
+    )
+  }
   return (
-    <MaterialSurface role={role ?? roleForVariant(variant)} style={style}>
+    <MaterialSurface role={resolvedRole} style={style}>
       {children}
     </MaterialSurface>
   )

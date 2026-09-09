@@ -22,6 +22,8 @@ export type ModulaActionItem = {
   disabled?: boolean
   /** Full explanation shown when a disabled action should remain visible. */
   disabledReason?: string
+  /** Checked menu item. Activation reports the action id so the owner updates state. */
+  checked?: boolean
   /**
    * Semantic Modula icon. Native menus map this to an SF Symbol.
    * Product screens must not pass raw SF Symbol names.

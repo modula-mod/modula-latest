@@ -11,6 +11,7 @@ export type {
   PresentModulaActionsOptions,
 } from '@/platform/ui/menus/types'
 export {ModulaMenu} from '@/platform/ui/menus/modula-menu'
+export type {ModulaMenuProps} from '@/platform/ui/menus/modula-menu'
 export {ModulaPopover} from '@/platform/ui/menus/modula-popover'
 export type {ModulaPopoverProps} from '@/platform/ui/menus/modula-popover'
 export {ChromeOverflowMenu} from '@/platform/ui/menus/chrome-overflow-menu'
@@ -24,6 +25,7 @@ export type {
 } from '@/platform/ui/menus/chrome-glass-control-group'
 export type {ToolbarChrome} from '@/platform/ui/menus/toolbar-chrome'
 export {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
+export type {ModulaContextMenuProps} from '@/platform/ui/menus/modula-context-menu'
 export {ModulaControlGroup} from '@/platform/ui/menus/modula-control-group'
 export type {ModulaControlGroupAction} from '@/platform/ui/menus/modula-control-group'
 export {ModulaDisclosureGroup} from '@/platform/ui/menus/modula-disclosure-group'

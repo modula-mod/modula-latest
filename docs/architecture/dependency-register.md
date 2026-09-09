@@ -5,6 +5,7 @@ No package should enter the project merely because an example repository uses it
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
+| @base-ui/react | 1.8.0 | Web-only accessible overlay, menu, select, combobox, tooltip, and toast mechanics behind Modula platform adapters | No | Native entry isolation is enforced by `verify:web-ui-adapter-v1`; iOS/Android continue to resolve existing native files | MIT | Existing hand-rolled web sheet lacked drawer gesture/snap/scroll-handoff and web menus used an alert fallback; imports are restricted to approved `.web.tsx` adapters | Web UI Adapter V1 |
 | @node-rs/argon2 | ^2.0.2 | Server-side Argon2id password hashing for sovereign accounts | No (Node native binding) | N/A (backend only) | MIT | node-rs maintained package; required for Phase 6R password credentials | Phase 6R |
 | @expo/ui | ~57.0.13 | Expo UI primitives (template) | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
 | expo | ~57.0.16 | Application framework | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template; PVP Platform Phase 2 patch-aligned by `pnpm exec expo install --check` | Phase 0 |
@@ -32,10 +33,22 @@ No package should enter the project merely because an example repository uses it
 | react-native-web | ~0.21.0 | Web rendering | No | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | react-native-worklets | 0.10.0 | Worklets peer for Reanimated | Yes | Official SDK 57 | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 
+## Konsta web presentation layer
+
+| Name | Package | Version | Repository | License | Purpose | Native use | Module use | Evidence |
+|---|---|---:|---|---|---|---|---|---|
+| Konsta UI | `konsta` | 5.4.0 | `konstaui/konsta` | MIT | Web-only Liquid/Material visual adapters behind Modula semantics | Native use prohibited | Direct module use prohibited | Exact `package.json` pin and pnpm lock resolution; `verify:konsta-web-presentation` |
+| Tailwind CSS | `tailwindcss` | 4.3.3 | `tailwindlabs/tailwindcss` | MIT | Web-only class generation required by Konsta; Preflight omitted | Prohibited | Prohibited | `src/styles/web.css`, production CSS audit |
+| Tailwind PostCSS plugin | `@tailwindcss/postcss` | 4.3.3 | `tailwindlabs/tailwindcss` | MIT | Compile the web-only Tailwind/Konsta stylesheet | Prohibited | Prohibited | `postcss.config.mjs` |
+| PostCSS | `postcss` | 8.5.28 | `postcss/postcss` | MIT | Web stylesheet processing | No runtime/native use | Prohibited | Exact development dependency |
+
+Removal path: replace the private web visual adapters with another Modula-compatible implementation, remove the Konsta stylesheet and PostCSS configuration, then remove all four packages. Semantic screens, compiled product artifacts, and native adapters must not change.
+
 ## Dev dependencies
 
 | Package | Version | Purpose | Native code | New Architecture verified | Licence | Evidence | Added in |
 |---|---:|---|---|---|---|---|---|
+| @axe-core/playwright | 4.13.0 | Development-only accessibility assertions for the Web Adapter UI Lab and browser interaction suite | No | N/A (test-only) | MPL-2.0 | Axe runs against the adapter-owned lab subtree in Chromium; real Safari/VoiceOver remains a separate manual gate | Web UI Adapter V1 |
 | @types/react | ~19.2.2 | React TypeScript types | No | N/A | See package LICENSE | Official Expo SDK 57 template | Phase 0 |
 | eslint | ^9.39.5 | Linting | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |
 | eslint-config-expo | ~57.0.0 | Expo ESLint flat config | No | N/A | See package LICENSE | Phase 0 quality tooling | Phase 0 |

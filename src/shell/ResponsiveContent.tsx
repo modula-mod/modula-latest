@@ -1,5 +1,5 @@
 import type {ReactNode} from 'react'
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 
 type ResponsiveContentProps = {
   children: ReactNode
@@ -10,12 +10,9 @@ export function ResponsiveContent({
   children,
   maxWidth = 680,
 }: ResponsiveContentProps) {
-  const {width} = useWindowDimensions()
-  const centered = width >= 768
-
   return (
     <View style={styles.outer}>
-      <View style={[styles.inner, centered && {maxWidth}]}>{children}</View>
+      <View style={[styles.inner, {maxWidth}]}>{children}</View>
     </View>
   )
 }

@@ -42,6 +42,7 @@ export function ModuleExtensionContributions({
         isPresented={isPresented}
         onDismiss={() => setIsPresented(false)}
         detent="medium"
+        presentation="tools"
         accessibilityLabel="Installed product tools"
         header={(
           <View style={{gap: spacing[1], paddingBottom: spacing[3]}}>

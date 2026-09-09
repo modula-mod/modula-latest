@@ -1,9 +1,10 @@
 import {useState} from 'react'
-import {ScrollView, StyleSheet, View, useWindowDimensions} from 'react-native'
+import {ScrollView, StyleSheet, View} from 'react-native'
 
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {
   ComingSoonEditorial,
   EditorialBleedHero,
@@ -51,7 +52,7 @@ type Direction = 'A' | 'B' | 'C'
  */
 export function PvpUi1rLabBlocks() {
   const {colours, spacing} = useThemeTokens()
-  const {width} = useWindowDimensions()
+  const {width} = useHydrationSafeWindowDimensions()
   const desktop = width >= 960
   const [direction, setDirection] = useState<Direction>('A')
 

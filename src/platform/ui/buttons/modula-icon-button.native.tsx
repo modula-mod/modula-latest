@@ -10,7 +10,7 @@ import {toolbarIconModifiers} from '@/platform/ui/menus/toolbar-chrome-modifiers
 import {isCallstackLiquidGlassNativeAvailable} from '@/platform/ui/navigation/liquid-glass-availability'
 import {isNativeGlassRuntimeAvailable} from '@/theme/materials/nativeMaterial'
 
-type ModulaIconButtonProps = {
+export type ModulaIconButtonProps = {
   icon: ModulaIconName
   accessibilityLabel: string
   onPress?: () => void

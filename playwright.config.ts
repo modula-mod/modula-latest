@@ -17,20 +17,24 @@ export default defineConfig({
   reporter: 'line',
   use: {
     ...devices['Desktop Chrome'],
+    baseURL,
     launchOptions: {
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ?? '/usr/bin/google-chrome',
     },
   },
   webServer: localBrowserOrigin
     ? {
-        command: 'pnpm build:web && node scripts/serve-web-dist.mjs',
+        command: 'pnpm build:web-contracts && pnpm exec expo start --web --port "$PORT" --clear',
         env: {
+          EXPO_PUBLIC_API_URL: 'https://api.modula.digital',
+          EXPO_PUBLIC_APP_ENV: 'development',
+          EXPO_PUBLIC_DATA_SOURCE: 'remote',
           HOST: localURL.hostname,
           PORT: localURL.port || '4174',
         },
         reuseExistingServer: false,
         timeout: 120_000,
-        url: baseURL,
+        url: new URL('/index', baseURL).toString(),
       }
     : undefined,
 })

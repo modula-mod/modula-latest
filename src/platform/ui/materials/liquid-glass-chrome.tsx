@@ -46,6 +46,11 @@ type ExpoGlassViewComponent = ComponentType<{
   children?: ReactNode
 }>
 
+type WebGlassStyle = ViewStyle & {
+  backdropFilter: string
+  WebkitBackdropFilter: string
+}
+
 let cachedCallstack: CallstackModule | null | undefined
 let cachedExpoGlassView: ExpoGlassViewComponent | null | undefined
 
@@ -105,7 +110,6 @@ export function LiquidGlassChrome({
   const effect = fallback === 'regular' ? 'regular' : 'clear'
   const resolvedBlur =
     blurIntensity ?? (fallback === 'regular' ? 78 : 64)
-  // `regular` is intentionally denser (segmented tracks, composer) than icon discs.
   // `regular` is denser so sticky chrome / tracks don’t read as see-through.
   const wash =
     fallback === 'regular'
@@ -170,11 +174,16 @@ export function LiquidGlassChrome({
   }
 
   if (Platform.OS === 'web') {
+    const webBlur = `blur(${Math.round(resolvedBlur * 0.28)}px) saturate(145%)`
     return (
       <View
         style={[
           styles.base,
           styles.shadow,
+          {
+            backdropFilter: webBlur,
+            WebkitBackdropFilter: webBlur,
+          } as WebGlassStyle,
           {
             backgroundColor: wash,
             borderColor: rim,

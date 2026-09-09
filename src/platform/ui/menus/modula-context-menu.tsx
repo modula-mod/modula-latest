@@ -4,7 +4,7 @@ import {Pressable} from 'react-native'
 import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import type {ModulaActionItem, ModulaMenuFit} from '@/platform/ui/menus/types'
 
-type ModulaContextMenuProps = {
+export type ModulaContextMenuProps = {
   children: ReactNode
   title?: string
   actions: ModulaActionItem[]

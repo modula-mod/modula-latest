@@ -9,6 +9,7 @@ import type {ProfileModulePreview} from '@/features/profile/contracts/profileMod
 import {ProfileVisibilityBadge} from '@/features/profile/components/ProfileVisibilityBadge'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 
 type ProfileModuleCardProps = {
   module: ProfileModulePreview
@@ -46,6 +47,13 @@ export function ProfileModuleCard({module}: ProfileModuleCardProps) {
       onAction={id => {
         if (id === 'open' || id === 'preview') open()
         if (id === 'pin') router.push('/board' as Href)
+        if (id === 'share') {
+          void shareModulaText({
+            title: module.name,
+            message: module.description,
+            url: `https://modula.digital${String(route)}`,
+          })
+        }
       }}>
       <AppPressable accessibilityLabel={`Open ${module.name}`} onPress={open}>
         <Surface

@@ -549,8 +549,9 @@ export function ModulaPrimitivesLabScreen({
       <LabBlock title="Popover">
         <ModulaPopover
           isOpen={popover}
+          onOpen={() => setPopover(true)}
           onDismiss={() => setPopover(false)}
-          trigger={<ModulaButton label={popover ? 'Hide popover' : 'Show popover'} role="secondary" onPress={() => setPopover(open => !open)} />}>
+          trigger={<AppText variant="buttonLabel">{popover ? 'Hide popover' : 'Show popover'}</AppText>}>
           <AppText variant="body">Popover sample.</AppText>
         </ModulaPopover>
       </LabBlock>
@@ -593,7 +594,7 @@ export function ModulaPrimitivesLabScreen({
 
       <LabBlock title="Drawer">
         <AppText variant="body" colour="textSecondary">
-          Navigation drawer is the existing shell adapter (`NavigationDrawer` + `ShellDrawerContext`). Do not add a second drawer primitive.
+          NavigationDrawer remains shell navigation. Semantic product drawers resolve through the separate Web Adapter V1 matrix above.
         </AppText>
       </LabBlock>
 

@@ -328,6 +328,7 @@ export function ProfileShell({mode, handle}: ProfileShellProps) {
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>
       <ProfileCoverChrome
         showBack
+        profile={profile}
         owner={viewer.canEdit}
         chromeHeight={stickyPad}
         scrollY={scrollY}

@@ -61,27 +61,24 @@ export function ProductHubLibraryControl({
   return (
     <ModulaPopover
       isOpen={open}
+      onOpen={() => setOpen(true)}
       onDismiss={() => setOpen(false)}
       width={220}
-      accessibilityLabel="Product Hub library"
+      accessibilityLabel={`Library, ${current}`}
       testID="product-hub-library-menu"
+      triggerTestID="product-hub-library-trigger"
       trigger={
         <LiquidGlassChrome
           interactive
           fallback="regular"
           contentLayout="flow"
           style={{borderRadius: radius.round}}>
-          <AppPressable
-            accessibilityLabel={`Library, ${current}`}
-            accessibilityRole="button"
-            onPress={() => setOpen(next => !next)}
-            testID="product-hub-library-trigger"
-            style={[styles.trigger, {paddingHorizontal: spacing[3], gap: spacing[1]}]}>
+          <View style={[styles.trigger, {paddingHorizontal: spacing[3], gap: spacing[1]}]}>
             <AppText variant="buttonLabel" numberOfLines={1}>
               {current}
             </AppText>
             <ModulaIcon name="modules" size={14} colour={colours.text} />
-          </AppPressable>
+          </View>
         </LiquidGlassChrome>
       }>
       <View style={{gap: spacing[1]}}>

@@ -1,7 +1,8 @@
-import type {StyleProp, ViewStyle} from 'react-native'
+import {View, type StyleProp, type ViewStyle} from 'react-native'
 
 import type {AppIconName} from '@/components/primitives/AppIcon'
 import {ModulaIconButton} from '@/platform/ui/buttons/modula-icon-button'
+import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 
 type ChromeCircleButtonProps = {
   icon: AppIconName
@@ -31,6 +32,22 @@ export function ChromeCircleButton({
   chrome = 'glass',
   style,
 }: ChromeCircleButtonProps) {
+  if (chrome === 'glass') {
+    return (
+      <View style={style}>
+        <ChromeGlassControlGroup
+          items={[{
+            kind: 'button',
+            icon,
+            accessibilityLabel,
+            disabled: !pressable || !onPress,
+            onPress,
+          }]}
+        />
+      </View>
+    )
+  }
+
   return (
     <ModulaIconButton
       icon={icon}

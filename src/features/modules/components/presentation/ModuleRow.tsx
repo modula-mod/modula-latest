@@ -1,6 +1,5 @@
-import {useWindowDimensions} from 'react-native'
-
 import type {ModuleCatalogueItem} from '@/data/repositories/contracts'
+import {useHydrationSafeWindowDimensions} from '@/lib/useHydrationSafeWindowDimensions'
 import {ModuleArtwork} from '@/features/modules/components/ModuleArtwork'
 import {ModuleAction} from '@/features/modules/components/presentation/ModuleAction'
 import {resolveModuleInstallPresentation} from '@/features/modules/identity/installPresentation'
@@ -20,7 +19,7 @@ export function ModuleRow({
   showSeparator?: boolean
   muted?: boolean
 }) {
-  const {fontScale} = useWindowDimensions()
+  const {fontScale} = useHydrationSafeWindowDimensions()
   const presentation = resolveModuleInstallPresentation(item)
   const copy = productCopyFor(item.moduleId, item.name, item.description)
   const stacked = fontScale >= 1.2

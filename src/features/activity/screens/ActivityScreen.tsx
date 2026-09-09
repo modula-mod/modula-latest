@@ -123,39 +123,61 @@ export function ActivityScreen() {
     }
   }, [filter, reduceMotion])
 
+  const applyFilter = (next: ActivityFilter) => {
+    void selectionHaptic()
+    setFilter(next)
+    setFilterSheetOpen(false)
+  }
+
+  const filterSheet = (
+    <SelectionSheet
+      isPresented={filterSheetOpen}
+      onDismiss={() => setFilterSheetOpen(false)}
+      onSelect={applyFilter}
+      options={filters.map(([id, label]) => ({id, label}))}
+      selectedId={filter}
+      subtitle="Filter notifications by type."
+      testID="activity-filter-sheet"
+      title="Filter activity"
+    />
+  )
+
   if (activityQuery.isLoading) {
     return (
-      <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
-        <ActivityListSkeleton />
-      </View>
+      <>
+        <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
+          <ActivityListSkeleton />
+        </View>
+        {filterSheet}
+      </>
     )
   }
 
   if (activityQuery.isError) {
     return (
-      <QueryErrorState
-        error={activityQuery.error}
-        onRetry={() => void activityQuery.refetch()}
-      />
+      <>
+        <QueryErrorState
+          error={activityQuery.error}
+          onRetry={() => void activityQuery.refetch()}
+        />
+        {filterSheet}
+      </>
     )
   }
 
   if (!activity.length) {
     return (
-      <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
-        <EmptyState
-          icon="activity"
-          title="No activity yet"
-          description="Likes, replies, mentions, and product updates will appear here."
-        />
-      </View>
+      <>
+        <View style={[styles.screen, {backgroundColor: colours.surfaceMuted}]}>
+          <EmptyState
+            icon="activity"
+            title="No activity yet"
+            description="Likes, replies, mentions, and product updates will appear here."
+          />
+        </View>
+        {filterSheet}
+      </>
     )
-  }
-
-  const applyFilter = (next: ActivityFilter) => {
-    void selectionHaptic()
-    setFilter(next)
-    setFilterSheetOpen(false)
   }
 
   return (
@@ -267,16 +289,7 @@ export function ActivityScreen() {
         </ScrollView>
       </ResponsiveContent>
 
-      <SelectionSheet
-        isPresented={filterSheetOpen}
-        onDismiss={() => setFilterSheetOpen(false)}
-        onSelect={applyFilter}
-        options={filters.map(([id, label]) => ({id, label}))}
-        selectedId={filter}
-        subtitle="Filter notifications by type."
-        testID="activity-filter-sheet"
-        title="Filter activity"
-      />
+      {filterSheet}
     </View>
   )
 }

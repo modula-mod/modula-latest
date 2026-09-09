@@ -9,6 +9,7 @@ import type {
   TextScale,
   TextScalePreference,
   ThemeFamily,
+  WebPresentation,
 } from '@/theme/contracts'
 
 export type AppearanceActionsContextValue = {
@@ -17,6 +18,7 @@ export type AppearanceActionsContextValue = {
   setAccent: (accentId: AccentId) => void
   setCustomAccent: (hex: string) => void
   setSurfaceType: (surfaceType: SurfaceType) => void
+  setWebPresentation: (presentation: WebPresentation) => void
   setTextScale: (scale: TextScale) => void
   setTextScalePreference: (preference: TextScalePreference) => void
   setBoldText: (value: SystemAdaptivePreference) => void

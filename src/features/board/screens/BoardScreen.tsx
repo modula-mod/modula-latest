@@ -25,6 +25,7 @@ import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
 import {BoardGridSkeleton} from '@/platform/ui/skeletons'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
+import {shareModulaText} from '@/platform/ui/share/share-modula-text'
 
 const ALL_PINNED_SPACES: {
   id: string
@@ -402,6 +403,13 @@ export function BoardScreen() {
                       if (id === 'open') router.push(space.route as Href)
                       if (id === 'unpin') {
                         setPinnedIds(prev => prev.filter(item => item !== space.id))
+                      }
+                      if (id === 'share') {
+                        void shareModulaText({
+                          title: space.label,
+                          message: space.description,
+                          url: `https://modula.digital${space.route}`,
+                        })
                       }
                     }}>
                     <AppPressable

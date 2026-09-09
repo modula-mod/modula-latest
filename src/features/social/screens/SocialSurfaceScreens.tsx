@@ -21,6 +21,7 @@ import {
   SettingsSection,
 } from '@/features/settings/components/SettingsRows'
 import {ModulaButton} from '@/platform/ui/buttons/modula-button'
+import {useModulaToast} from '@/platform/ui/feedback'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
 import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {ModulaSheet} from '@/platform/ui/sheets/modula-sheet'
@@ -200,6 +201,7 @@ export function MessagesInboxScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const {preferences} = useProductPreferences()
+  const toast = useModulaToast()
   const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
   const [filter, setFilter] = useState<'all' | 'unread' | 'pinned'>('all')
   const [query, setQuery] = useState('')
@@ -385,7 +387,10 @@ export function MessagesInboxScreen() {
                     else next.add(thread.id)
                     return next
                   })
+                  return
                 }
+                if (id === 'mute') toast.show({message: 'Conversation muting is not connected to a remote messaging service yet.', tone: 'info'})
+                if (id === 'delete') toast.show({message: 'Conversation deletion is not connected to a remote messaging service yet.', tone: 'warning'})
               }}>
               <AppPressable
                 accessibilityLabel={`Open conversation with ${thread.name}`}
@@ -473,6 +478,7 @@ export function MessageThreadScreen() {
   const router = useRouter()
   const {colours, radius, spacing} = useThemeTokens()
   const {preferences} = useProductPreferences()
+  const toast = useModulaToast()
   const glass = GLASS_PRIVACY_LABELS[preferences.glassPrivacyLevel]
   const forwardRestrictionReason = getForwardRestrictionReason(preferences.glassPrivacyLevel)
 
@@ -517,7 +523,10 @@ export function MessageThreadScreen() {
                     'Forward Preview',
                     'Forwarding is not connected to a remote messaging service in this Preview.',
                   )
+                  return
                 }
+                if (id === 'mute') toast.show({message: 'Conversation muting is not connected to a remote messaging service yet.', tone: 'info'})
+                if (id === 'delete') toast.show({message: 'Conversation deletion is not connected to a remote messaging service yet.', tone: 'warning'})
               },
             },
           ]}
@@ -1082,12 +1091,13 @@ export function ShareProfileSheetScreen() {
   const router = useRouter()
   const session = useSession()
   const {colours, spacing} = useThemeTokens()
+  const toast = useModulaToast()
   const handle = session.status === 'signedIn' ? session.profile.handle : 'andrei.modula'
   const displayName = session.status === 'signedIn' ? session.profile.displayName : 'Modula Founder'
   const profileUrl = `https://modula.digital/@${handle}`
   const copyProfileLink = async () => {
     await import('expo-clipboard').then(mod => mod.setStringAsync(profileUrl))
-    Alert.alert('Profile link copied', profileUrl)
+    toast.show({message: 'Profile link copied.', tone: 'success'})
   }
   return (
     <View style={[styles.screen, {backgroundColor: colours.canvas}]}>

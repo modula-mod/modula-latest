@@ -1,6 +1,5 @@
 import {StyleSheet, View} from 'react-native'
 
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {SettingsSection} from '@/features/settings/components/SettingsRows'
 import {SystemSwitch} from '@/components/system/SystemSwitch'
@@ -11,8 +10,8 @@ import {
   profileMetricRegistry,
   type ProfileMetricId,
 } from '@/features/profile/model/profile-metrics'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type ProfileMetricCustomizerProps = {
@@ -179,37 +178,35 @@ function MetricRow({
           paddingHorizontal: spacing[4],
         },
       ]}>
-      <AppPressable
+      <ModulaContextMenu
         accessibilityLabel={`${definition.label} metric. Drag handle, long press to reorder`}
-        onLongPress={() => {
-          void presentModulaActions({
-            title: definition.label,
-            actions: [
-              {id: 'up', label: 'Move up', icon: 'arrowUp', disabled: index === 0},
-              {
-                id: 'down',
-                label: 'Move down',
-                icon: 'arrowDown',
-                disabled: index === DEFAULT_PROFILE_METRIC_ORDER.length - 1,
-              },
-            ],
-          }).then(actionId => {
-            if (actionId === 'up') onMove(id, 'up')
-            if (actionId === 'down') onMove(id, 'down')
-          })
+        actions={[
+          {id: 'up', label: 'Move up', icon: 'arrowUp', disabled: index === 0},
+          {
+            id: 'down',
+            label: 'Move down',
+            icon: 'arrowDown',
+            disabled: index === DEFAULT_PROFILE_METRIC_ORDER.length - 1,
+          },
+        ]}
+        onAction={actionId => {
+          if (actionId === 'up') onMove(id, 'up')
+          if (actionId === 'down') onMove(id, 'down')
         }}
-        style={[styles.main, {gap: spacing[3]}]}>
-        <View style={styles.handle} accessibilityElementsHidden>
-          <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
-          <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
+        title={definition.label}>
+        <View style={[styles.main, {gap: spacing[3]}]}>
+          <View style={styles.handle} accessibilityElementsHidden>
+            <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
+            <View style={[styles.handleBar, {backgroundColor: colours.textTertiary}]} />
+          </View>
+          <View style={styles.body}>
+            <AppText variant="body">{definition.label}</AppText>
+            <AppText variant="caption" colour="textTertiary">
+              {enabled ? 'Visible' : 'Hidden'}
+            </AppText>
+          </View>
         </View>
-        <View style={styles.body}>
-          <AppText variant="body">{definition.label}</AppText>
-          <AppText variant="caption" colour="textTertiary">
-            {enabled ? 'Visible' : 'Hidden'}
-          </AppText>
-        </View>
-      </AppPressable>
+      </ModulaContextMenu>
       <SystemSwitch
         value={enabled}
         disabled={enabled && !canDisable}

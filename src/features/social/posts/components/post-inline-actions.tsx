@@ -6,7 +6,7 @@ import type {ReactionType, SocialPost} from '@/domain/social'
 import {formatCompactCount} from '@/features/social/posts/types/post'
 import type {PostContextAction} from '@/features/social/posts/state/post-interaction-types'
 import {ModulaIcon, type ModulaIconName} from '@/platform/ui/icons'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ModulaMenu} from '@/platform/ui/menus/modula-menu'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 
 type PostInlineActionsProps = {
@@ -105,24 +105,21 @@ export function PostInlineActions({
         selected={post.saved}
         onPress={onSave}
       />
-      <AppPressable
+      <ModulaMenu
         accessibilityLabel="More post actions"
-        onPress={() => {
-          void presentModulaActions({
-            title: 'Post',
-            actions: contextActions.map(action => ({
-              id: action.id,
-              label: action.label,
-              style: action.destructive ? 'destructive' : undefined,
-            })),
-          }).then(id => {
-            const match = contextActions.find(action => action.id === id)
-            match?.handler()
-          })
-        }}
-        style={[styles.action, {minWidth: 44, minHeight: 44}]}>
-        <ModulaIcon name="more" colour={colours.textSecondary} size={20} />
-      </AppPressable>
+        actions={contextActions.map(action => ({
+          id: action.id,
+          label: action.label,
+          style: action.destructive ? 'destructive' : undefined,
+        }))}
+        onAction={id => contextActions.find(action => action.id === id)?.handler()}
+        title="Post"
+        trigger={(
+          <View pointerEvents="none" style={[styles.action, {minWidth: 44, minHeight: 44}]}>
+            <ModulaIcon name="more" colour={colours.textSecondary} size={20} />
+          </View>
+        )}
+      />
     </View>
   )
 }

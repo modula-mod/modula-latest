@@ -1,6 +1,7 @@
 import type {AccentTokens, SemanticColours} from '@/theme/contracts/colours'
 import type {MaterialTokenMap, MotionTokens} from '@/theme/contracts/materials'
 import type {TypographyTokens} from '@/theme/contracts/typography'
+import type {WebPresentation} from '@/theme/contracts/web-presentation'
 
 export type AppearanceMode = 'system' | 'light' | 'dim' | 'dark' | 'oled'
 
@@ -85,6 +86,8 @@ export type AppearancePreferences = {
   accentId: AccentId
   customAccent: string | null
   surfaceType: SurfaceType
+  /** Browser-only presentation axis. Native renderers intentionally ignore it. */
+  webPresentation: WebPresentation
   /** Last custom scale (Greenfield wire). Ignored when textScalePreference is system. */
   textScale: TextScale
   textScalePreference: TextScalePreference

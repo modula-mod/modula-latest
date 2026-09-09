@@ -1,0 +1,644 @@
+/*
+ * Deliberately omit tailwindcss/preflight.css. Modula already owns the page,
+ * typography, form, icon, and content reset. Tailwind supplies only the theme
+ * registry and generated utilities required by the web adapter.
+ */
+@layer theme, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+/* Keep at the root: Konsta 5.4.0 registers its own `@source` directories. */
+@import 'konsta/react/theme.css';
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+ * Konsta is presentation machinery, never Modula's token authority.
+ * Runtime values are supplied by the web presentation provider.
+ */
+:root {
+  --modula-web-canvas: transparent;
+  --modula-web-surface: transparent;
+  --modula-web-surface-raised: transparent;
+  --modula-web-text: currentColor;
+  --modula-web-text-secondary: currentColor;
+  --modula-web-separator: currentColor;
+  --modula-web-focus: currentColor;
+}
+
+/* Neutralise Konsta's global `.dark` canvas and platform font ownership. */
+html.dark,
+html.k-ios,
+html.k-material,
+html.dark body {
+  color: var(--modula-web-text);
+  background: var(--modula-web-canvas);
+  font-family: inherit;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html[data-modula-presentation='liquid'],
+html[data-modula-presentation='material'] {
+  background: var(--modula-web-canvas);
+}
+
+.modula-konsta-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  color: var(--modula-web-text);
+  background: var(--modula-web-canvas);
+  font-family: inherit;
+}
+
+.modula-konsta-root.k-ios,
+.modula-konsta-root.k-material {
+  font-family: inherit;
+}
+
+/*
+ * A brand accent may be a valid fill while being too light for small text on
+ * the canvas. Secondary/glass actions therefore retain Modula's neutral text
+ * and surface semantics instead of inheriting Konsta's primary-colour outline.
+ */
+.modula-konsta-button[data-role='secondary'],
+.modula-konsta-button[data-role='glass'] {
+  color: var(--modula-web-text) !important;
+  border-color: var(--modula-web-border) !important;
+  background: var(--modula-web-surface-raised) !important;
+}
+
+/* Base UI owns all portal mechanics; the document root supplies its theme. */
+body > [data-base-ui-portal],
+body > [data-modula-overlay-root] {
+  color: var(--modula-web-text);
+  font-family: inherit;
+}
+
+/* Static export cannot know a browser's saved setting. Hide only the brief
+ * mismatched subtree until the pre-paint appearance layout effect reconciles it. */
+html[data-modula-presentation='material'] .modula-konsta-root[data-modula-presentation='liquid'],
+html[data-modula-presentation='liquid'] .modula-konsta-root[data-modula-presentation='material'] {
+  visibility: hidden;
+}
+
+/*
+ * Konsta supplies appearance only inside a Modula/Base UI overlay owner. Its
+ * fixed positioning and transitions are neutralised to avoid competing focus,
+ * gesture, dismissal, positioning, and animation systems.
+ */
+.modula-web-konsta-overlay-host {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.modula-konsta-overlay-surface,
+[data-modula-konsta-overlay-surface] {
+  display: flex !important;
+  position: relative !important;
+  inset: auto !important;
+  z-index: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  max-width: none !important;
+  max-height: 100% !important;
+  transform: none !important;
+  /* Tailwind v4 emits individual transform properties for -translate-* */
+  translate: 0 0 !important;
+  scale: 1 !important;
+  rotate: none !important;
+  transition: none !important;
+  overflow: hidden;
+  color: var(--modula-web-text);
+}
+
+[data-modula-konsta-overlay-surface='sheet'],
+[data-modula-konsta-overlay-surface='actions'] {
+  border-radius: inherit;
+}
+
+[data-modula-konsta-overlay-surface='panel'] {
+  min-height: 100%;
+  border-radius: inherit;
+}
+
+[data-modula-konsta-popover-surface] {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  transform: none !important;
+  translate: 0 0 !important;
+  scale: 1 !important;
+  transition: none !important;
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+[data-modula-konsta-popover-surface] > div:last-child {
+  max-height: inherit;
+  overflow: auto;
+  border-radius: inherit;
+}
+
+[data-modula-konsta-toast-surface] {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+[data-modula-konsta-toast-surface] > div {
+  width: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: none;
+}
+
+.modula-web-navigation-panel-backdrop {
+  background: transparent;
+}
+
+.modula-web-navigation-panel-host {
+  position: fixed;
+  top: max(0.5rem, env(safe-area-inset-top));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  overflow: visible;
+  border: 0;
+  border-radius: var(--modula-web-radius-lg);
+  outline: 0;
+  background: transparent;
+}
+
+.modula-web-navigation-panel-host[data-side='left'] {
+  left: max(0.5rem, env(safe-area-inset-left));
+}
+
+.modula-web-navigation-panel-host[data-side='right'] {
+  right: max(0.5rem, env(safe-area-inset-right));
+}
+
+.modula-web-navigation-panel-host[data-starting-style],
+.modula-web-navigation-panel-host[data-ending-style] {
+  transform: none;
+}
+
+.modula-konsta-dialog-surface {
+  padding: 0 !important;
+  border-radius: inherit;
+}
+
+/* Konsta Dialog's visual content wrappers must not add a second layout. */
+.modula-konsta-dialog-surface > div,
+.modula-konsta-dialog-surface > div > div {
+  display: contents;
+  width: auto;
+  padding: 0;
+  font-size: inherit;
+}
+
+.modula-konsta-segmented {
+  width: 100%;
+  min-height: 40px;
+  font-family: inherit;
+}
+
+.modula-konsta-segmented > button {
+  min-width: 44px;
+  min-height: 40px;
+  font-family: inherit;
+}
+
+.modula-konsta-segmented > button:focus-visible {
+  z-index: 2;
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: -2px;
+}
+
+.modula-konsta-button-target {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.modula-konsta-button-target[data-full-width='true'],
+.modula-konsta-button-target[data-full-width='true'] .modula-konsta-button {
+  width: 100%;
+}
+
+.modula-konsta-button {
+  position: relative;
+  overflow: visible !important;
+  font-family: inherit;
+}
+
+.modula-konsta-button::before {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: max(44px, 100%);
+  height: 44px;
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
+.modula-konsta-button[data-role='primary'] {
+  color: var(--modula-web-accent-foreground) !important;
+  background: var(--modula-web-accent) !important;
+}
+
+.modula-konsta-button[data-role='destructive'] {
+  color: var(--modula-web-danger-foreground) !important;
+  background: var(--modula-web-danger) !important;
+}
+
+.modula-konsta-button[data-role='glass'][data-role='glass'] {
+  background: color-mix(in srgb, var(--modula-web-surface-raised) 76%, transparent);
+  backdrop-filter: var(--modula-presentation-backdrop-filter);
+  -webkit-backdrop-filter: var(--modula-presentation-backdrop-filter);
+}
+
+.modula-konsta-button:focus-visible,
+.modula-konsta-toggle:focus-within {
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: 2px;
+}
+
+.modula-konsta-list-input {
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+.modula-konsta-list-input .modula-web-input {
+  min-height: 42px;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.modula-konsta-searchbar,
+.modula-konsta-searchbar input {
+  width: 100%;
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-searchbar:focus-within,
+.modula-konsta-checkbox:focus-within,
+.modula-konsta-radio:focus-within,
+.modula-konsta-range-wrap:focus-within {
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: 2px;
+}
+
+.modula-konsta-checkbox,
+.modula-konsta-radio {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--modula-web-space-3);
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-radio-group {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.modula-konsta-choice-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modula-konsta-choice-description {
+  color: var(--modula-web-text-secondary);
+  font-size: .8125rem;
+}
+
+.modula-konsta-chip-target {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--modula-web-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.modula-konsta-chip-target:disabled {
+  cursor: default;
+  opacity: .46;
+}
+
+.modula-konsta-chip-target:focus-visible {
+  border-radius: var(--modula-presentation-control-radius);
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: 2px;
+}
+
+.modula-konsta-chip {
+  pointer-events: none;
+  font: inherit;
+}
+
+.modula-konsta-badge {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  gap: var(--modula-web-space-1);
+  padding-inline: var(--modula-web-space-2);
+  border: 1px solid var(--modula-web-separator);
+  border-radius: 999px;
+  background: var(--modula-web-surface-raised) !important;
+  color: var(--modula-web-text-secondary) !important;
+  font: inherit;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+.modula-konsta-badge[data-tone='accent'] {
+  border-color: var(--modula-web-accent);
+  background: var(--modula-web-accent) !important;
+  color: var(--modula-web-accent-foreground) !important;
+}
+
+.modula-konsta-badge[data-tone='success'] { color: var(--modula-web-success) !important; }
+.modula-konsta-badge[data-tone='warning'] { color: var(--modula-web-warning) !important; }
+.modula-konsta-badge[data-tone='danger'],
+.modula-konsta-badge[data-tone='destructive'] { color: var(--modula-web-danger) !important; }
+.modula-konsta-badge[data-tone='info'] { color: var(--modula-web-info) !important; }
+
+.modula-konsta-range-wrap,
+.modula-konsta-range {
+  width: 100%;
+}
+
+.modula-konsta-progress {
+  width: 100%;
+}
+
+.modula-konsta-preloader {
+  color: var(--modula-web-accent);
+}
+
+.modula-konsta-stepper[aria-disabled='true'] {
+  opacity: .46;
+}
+
+.modula-konsta-stepper [role='button']:focus-visible {
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: -2px;
+}
+
+.modula-konsta-notification {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  border: 1px solid var(--modula-web-separator);
+  background: var(--modula-web-surface-overlay) !important;
+  color: var(--modula-web-text);
+  box-shadow: var(--modula-presentation-surface-shadow);
+  font: inherit;
+}
+
+.modula-konsta-notification-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--modula-web-space-2);
+  margin-top: var(--modula-web-space-2);
+}
+
+.modula-konsta-navigation-menu {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-navigation-item button {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+.modula-konsta-list {
+  width: 100%;
+  margin: 0;
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-list-item > button,
+.modula-konsta-list-item > a {
+  min-height: 44px;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+.modula-konsta-field-group,
+.modula-konsta-field-section {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: var(--modula-web-space-3);
+}
+
+.modula-konsta-field-section > h3 {
+  margin: 0;
+  color: var(--modula-web-text-secondary);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.modula-konsta-fab {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  color: var(--k-color-md-light-on-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+html.dark .modula-konsta-fab {
+  color: var(--k-color-md-dark-on-primary);
+}
+
+.modula-konsta-navigation-item button:focus-visible,
+.modula-konsta-breadcrumb-action:focus-visible {
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: -2px;
+}
+
+.modula-konsta-breadcrumbs {
+  padding: 0;
+  margin: 0;
+  color: var(--modula-web-text-secondary);
+  font: inherit;
+}
+
+.modula-konsta-breadcrumb-action {
+  padding: 4px;
+  border: 0;
+  background: transparent;
+  color: var(--modula-web-text);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--modula-web-accent);
+  text-underline-offset: 0.16em;
+  cursor: pointer;
+}
+
+.modula-konsta-data-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--modula-web-separator);
+  border-radius: var(--modula-web-radius-md);
+  background: var(--modula-web-surface);
+}
+
+.modula-konsta-data-table-wrap table {
+  width: 100%;
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-data-table-wrap th,
+.modula-konsta-data-table-wrap td {
+  border-color: var(--modula-web-separator) !important;
+}
+
+.modula-konsta-data-table-wrap [data-numeric='true'] {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+[data-modula-presentation='liquid'] {
+  --modula-presentation-backdrop-filter: blur(22px) saturate(1.28);
+  --modula-presentation-control-radius: 999px;
+  --modula-presentation-panel-radius: var(--modula-web-radius-lg);
+  --modula-presentation-surface-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 28%, transparent),
+    0 18px 48px color-mix(in srgb, var(--modula-web-shadow) 26%, transparent);
+}
+
+[data-modula-presentation='material'] {
+  --modula-presentation-backdrop-filter: none;
+  --modula-presentation-control-radius: var(--modula-web-radius-md);
+  --modula-presentation-panel-radius: var(--modula-web-radius-lg);
+  --modula-presentation-surface-shadow:
+    0 8px 24px color-mix(in srgb, var(--modula-web-shadow) 20%, transparent);
+}
+
+.modula-konsta-surface {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--modula-web-separator);
+  border-radius: var(--modula-presentation-panel-radius);
+  color: var(--modula-web-text);
+  border-color: var(--modula-web-separator);
+}
+
+[data-modula-presentation='liquid'] .modula-konsta-surface[data-variant='platform'] {
+  background: color-mix(in srgb, var(--modula-web-surface) 72%, transparent);
+  backdrop-filter: var(--modula-presentation-backdrop-filter);
+  -webkit-backdrop-filter: var(--modula-presentation-backdrop-filter);
+  box-shadow: var(--modula-presentation-surface-shadow);
+}
+
+[data-modula-presentation='material'] .modula-konsta-surface[data-variant='platform'] {
+  background: var(--modula-web-surface-raised);
+  box-shadow: var(--modula-presentation-surface-shadow);
+}
+
+.modula-konsta-floating-toolbar {
+  width: auto;
+  min-height: 44px;
+  padding: 0;
+  border-radius: var(--modula-presentation-control-radius);
+  color: var(--modula-web-text);
+  font: inherit;
+}
+
+.modula-konsta-floating-toolbar > div:last-child,
+.modula-konsta-toolbar-pane {
+  gap: var(--modula-web-space-1);
+  border-radius: inherit;
+}
+
+[data-modula-presentation='material'] .modula-konsta-floating-toolbar {
+  overflow: hidden;
+  background: var(--modula-web-surface-raised);
+  box-shadow: var(--modula-presentation-surface-shadow);
+}
+
+.modula-konsta-control:focus-visible,
+.modula-konsta-root button:focus-visible,
+.modula-konsta-root input:focus-visible,
+.modula-konsta-root select:focus-visible,
+.modula-konsta-root textarea:focus-visible {
+  outline: 2px solid var(--modula-web-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modula-konsta-root *,
+  .modula-konsta-root *::before,
+  .modula-konsta-root *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+.modula-konsta-root[data-reduce-motion='true'] *,
+.modula-konsta-root[data-reduce-motion='true'] *::before,
+.modula-konsta-root[data-reduce-motion='true'] *::after {
+  scroll-behavior: auto !important;
+  transition-duration: 1ms !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+@media (forced-colors: active) {
+  .modula-konsta-root button,
+  .modula-konsta-root input,
+  .modula-konsta-root select,
+  .modula-konsta-root textarea {
+    forced-color-adjust: auto;
+  }
+}

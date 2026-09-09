@@ -10,7 +10,6 @@ import Animated from 'react-native-reanimated'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
 
 import {ProgressiveBlurBand} from '@/components/materials/ProgressiveBlurBand'
-import {MaterialSurface} from '@/components/materials/MaterialSurface'
 import {Avatar} from '@/components/primitives/Avatar'
 import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
@@ -20,6 +19,7 @@ import {useMotionEntering} from '@/platform/ui/motion/useMotionEntering'
 import {ModulaDrawerFrame} from '@/platform/ui/drawers'
 import {isDevelopmentBuild, canAccessDeveloperLabs} from '@/lib/platform'
 import {DrawerItem} from '@/shell/DrawerItem'
+import {NavigationDrawerSurface} from '@/shell/NavigationDrawerSurface'
 import {useShellDrawer} from '@/shell/ShellDrawerContext'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
 import type {DrawerDestination, DrawerSectionId} from '@/types/navigation'
@@ -168,8 +168,7 @@ export function NavigationDrawer() {
       progress={progress}
       testID="navigation-drawer"
       width={drawerWidth}>
-            <MaterialSurface
-              role="modal"
+            <NavigationDrawerSurface
               style={[
                 styles.drawer,
                 {
@@ -329,7 +328,7 @@ export function NavigationDrawer() {
                   Modula 0.1.0 · {isDevelopmentBuild() ? 'Development' : 'Local'}
                 </AppText>
               </View>
-            </MaterialSurface>
+            </NavigationDrawerSurface>
     </ModulaDrawerFrame>
   )
 }

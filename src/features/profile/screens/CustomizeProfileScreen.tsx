@@ -3,7 +3,6 @@ import {Alert, ScrollView, StyleSheet, View} from 'react-native'
 import {useRouter, type Href} from 'expo-router'
 
 import {AppIcon} from '@/components/primitives/AppIcon'
-import {AppPressable} from '@/components/primitives/AppPressable'
 import {AppText} from '@/components/primitives/AppText'
 import {
   SettingsSection,
@@ -23,7 +22,7 @@ import {useProfile} from '@/features/profile/runtime/useProfile'
 import {useProfileActions} from '@/features/profile/runtime/useProfileActions'
 import {ModulaSegmentedPicker} from '@/platform/ui/controls/modula-segmented-picker'
 import {ChromeGlassControlGroup} from '@/platform/ui/menus/chrome-glass-control-group'
-import {presentModulaActions} from '@/platform/ui/menus/presentModulaActions'
+import {ModulaContextMenu} from '@/platform/ui/menus/modula-context-menu'
 import {useFloatingTabBarContentPadding} from '@/platform/ui/navigation/floating-tab-bar-inset'
 import {ResponsiveContent} from '@/shell/ResponsiveContent'
 import {SecondaryScreenHeader} from '@/shell/SecondaryScreenHeader'
@@ -206,39 +205,37 @@ export function CustomizeProfileScreen() {
                         paddingHorizontal: spacing[4],
                       },
                     ]}>
-                    <AppPressable
+                    <ModulaContextMenu
                       accessibilityLabel={`${manifest.title} tab. Long press to reorder`}
-                      onLongPress={() => {
-                        void presentModulaActions({
-                          title: manifest.title,
-                          actions: [
-                            {
-                              id: 'up',
-                              label: 'Move up',
-                              icon: 'arrowUp',
-                              disabled: index === 0,
-                            },
-                            {
-                              id: 'down',
-                              label: 'Move down',
-                              icon: 'arrowDown',
-                              disabled: index === draft.tabOrder.length - 1,
-                            },
-                          ],
-                        }).then(id => {
-                          if (id === 'up') setDraft(prev => moveTab(prev, tabId, 'up'))
-                          if (id === 'down') setDraft(prev => moveTab(prev, tabId, 'down'))
-                        })
+                      actions={[
+                        {
+                          id: 'up',
+                          label: 'Move up',
+                          icon: 'arrowUp',
+                          disabled: index === 0,
+                        },
+                        {
+                          id: 'down',
+                          label: 'Move down',
+                          icon: 'arrowDown',
+                          disabled: index === draft.tabOrder.length - 1,
+                        },
+                      ]}
+                      onAction={id => {
+                        if (id === 'up') setDraft(prev => moveTab(prev, tabId, 'up'))
+                        if (id === 'down') setDraft(prev => moveTab(prev, tabId, 'down'))
                       }}
-                      style={[styles.tabMain, {gap: spacing[3]}]}>
-                      <AppIcon name={manifest.icon} colour={colours.text} size={20} />
-                      <View style={styles.tabBody}>
-                        <AppText variant="body">{manifest.title}</AppText>
-                        <AppText variant="caption" colour="textTertiary" numberOfLines={2}>
-                          {description}
-                        </AppText>
+                      title={manifest.title}>
+                      <View style={[styles.tabMain, {gap: spacing[3]}]}>
+                        <AppIcon name={manifest.icon} colour={colours.text} size={20} />
+                        <View style={styles.tabBody}>
+                          <AppText variant="body">{manifest.title}</AppText>
+                          <AppText variant="caption" colour="textTertiary" numberOfLines={2}>
+                            {description}
+                          </AppText>
+                        </View>
                       </View>
-                    </AppPressable>
+                    </ModulaContextMenu>
                     <SystemSwitch
                       value={enabled}
                       disabled={tabId === 'posts'}

@@ -11,6 +11,7 @@ export const DEFAULT_APPEARANCE_PREFERENCES: AppearancePreferences = {
   accentId: 'modulaTeal',
   customAccent: null,
   surfaceType: 'native',
+  webPresentation: 'liquid',
   textScale: 1,
   textScalePreference: {mode: 'system'},
   boldText: 'system',

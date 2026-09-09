@@ -1,55 +1,7 @@
 import type {AppIconName} from '@/components/primitives/AppIcon'
+import {modulaIconDefinition} from '@/platform/ui/icons/modula-icon-registry'
 
-/** AppIcon → SF Symbol for Expo UI SwiftUI Button / Menu triggers. */
-export const SF_SYMBOL_FOR_ICON: Partial<Record<AppIconName, string>> = {
-  back: 'chevron.left',
-  more: 'ellipsis',
-  share: 'square.and.arrow.up',
-  create: 'plus',
-  search: 'magnifyingglass',
-  close: 'xmark',
-  check: 'checkmark',
-  settings: 'gearshape',
-  notifications: 'bell',
-  account: 'person.crop.circle',
-  reset: 'arrow.counterclockwise',
-  trash: 'trash',
-  messages: 'bubble.left.and.bubble.right',
-  menu: 'line.3.horizontal',
-  photo: 'photo',
-  play: 'play.fill',
-  pause: 'pause.fill',
-  skipBack: 'gobackward.10',
-  skipForward: 'goforward.30',
-  like: 'heart',
-  comment: 'bubble.right',
-  bookmark: 'bookmark',
-  discover: 'safari',
-  people: 'person.2',
-  board: 'square.grid.2x2',
-  appearance: 'paintbrush',
-  home: 'house',
-  activity: 'heart',
-  profile: 'person',
-  edit: 'square.and.pencil',
-  chevronRight: 'chevron.right',
-  warning: 'exclamationmark.triangle',
-  marketplace: 'bag',
-  modules: 'square.stack.3d.up',
-  developer: 'hammer',
-  contrast: 'circle.lefthalf.filled',
-  automation: 'cpu',
-  privacy: 'lock.shield',
-  reactionLike: 'hand.thumbsup',
-  reactionLove: 'heart.fill',
-  reactionLaugh: 'face.smiling',
-  reactionFire: 'flame',
-  reactionSupport: 'person.2',
-  reactionCelebrate: 'sparkles',
-  reactionInsightful: 'lightbulb',
-  reactionCurious: 'questionmark.circle',
-}
-
+/** Every menu trigger consumes the same exhaustive semantic icon registry. */
 export function sfSymbolForIcon(icon: AppIconName): string {
-  return SF_SYMBOL_FOR_ICON[icon] ?? 'circle'
+  return modulaIconDefinition(icon).sf
 }

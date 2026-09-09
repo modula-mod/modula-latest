@@ -7,7 +7,7 @@
  *   LAYER 0 — content
  *   LAYER 1 — raised / scroll-edge
  *   LAYER 2 — sticky + navigation
- *   LAYER 3 — popover / sheet / dialog
+ *   LAYER 3 — contextual and modal overlays
  */
 export const LAYERS = {
   content: 0,
@@ -18,6 +18,7 @@ export const LAYERS = {
   sheet: 24,
   dialog: 32,
   toast: 40,
+  critical: 48,
 } as const
 
 export type LayerId = keyof typeof LAYERS

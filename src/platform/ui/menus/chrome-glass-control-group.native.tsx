@@ -27,7 +27,9 @@ export type ChromeGlassGroupButton = {
   kind: 'button'
   icon: AppIconName
   accessibilityLabel: string
-  onPress: () => void
+  onPress?: () => void
+  disabled?: boolean
+  testID?: string
 }
 
 export type ChromeGlassGroupMenu = {
@@ -270,7 +272,9 @@ function GroupSlot({
           icon={item.icon}
           chrome="plain"
           accessibilityLabel={item.accessibilityLabel}
+          disabled={item.disabled}
           onPress={item.onPress}
+          testID={item.testID}
         />
       ) : (
         <ChromeIconMenu

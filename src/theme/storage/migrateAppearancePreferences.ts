@@ -8,6 +8,7 @@ import type {
   TextScale,
   TextScalePreference,
   ThemeFamily,
+  WebPresentation,
 } from '@/theme/contracts'
 import {
   ACCENT_IDS,
@@ -16,6 +17,7 @@ import {
   SURFACE_TYPES,
   TEXT_SCALES,
   THEME_FAMILIES,
+  WEB_PRESENTATIONS,
 } from '@/theme/contracts'
 import {expandHexColour} from '@/theme/accents/colourMath'
 import {migrateAdaptivePreference} from '@/theme/accessibility/adaptivePreference'
@@ -35,6 +37,10 @@ export function isAccentId(value: unknown): value is AccentId {
 
 export function isSurfaceType(value: unknown): value is SurfaceType {
   return SURFACE_TYPES.includes(value as SurfaceType)
+}
+
+export function isWebPresentation(value: unknown): value is WebPresentation {
+  return WEB_PRESENTATIONS.includes(value as WebPresentation)
 }
 
 export function isTextScale(value: unknown): value is TextScale {
@@ -103,6 +109,9 @@ export function migrateAppearancePreferences(
     surfaceType: isSurfaceType(candidate.surfaceType)
       ? candidate.surfaceType
       : defaults.surfaceType,
+    webPresentation: isWebPresentation(candidate.webPresentation)
+      ? candidate.webPresentation
+      : defaults.webPresentation,
     textScale,
     textScalePreference,
     boldText: migrateAdaptivePreference(candidate.boldText, defaults.boldText),
@@ -147,6 +156,7 @@ export function mergeLocalAdaptivePreferences(
 
   return {
     ...server,
+    webPresentation: local.webPresentation,
     advancedChromeEffect: local.advancedChromeEffect,
     showSwitchLabels: local.showSwitchLabels,
     differentiateWithoutColor: local.differentiateWithoutColor,

@@ -33,14 +33,9 @@ export function ExpoUiPlayground() {
       </ModulaContextMenu>
       <ModulaPopover
         isOpen={popover}
+        onOpen={() => setPopover(true)}
         onDismiss={() => setPopover(false)}
-        trigger={
-          <ModulaButton
-            label={popover ? 'Hide popover' : 'Show popover'}
-            role="secondary"
-            onPress={() => setPopover(open => !open)}
-          />
-        }>
+        trigger={<AppText variant="buttonLabel">{popover ? 'Hide popover' : 'Show popover'}</AppText>}>
         <AppText variant="body">Popover with focus and Escape.</AppText>
       </ModulaPopover>
       <ModulaButton label="Open sheet" role="secondary" onPress={() => setSheet(true)} />
