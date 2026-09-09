@@ -1,7 +1,6 @@
 import {GestureHandlerRootView} from 'react-native-gesture-handler'
 
 import {Stack, useGlobalSearchParams} from 'expo-router'
-import Head from 'expo-router/head'
 import {StatusBar} from 'expo-status-bar'
 import {useEffect} from 'react'
 import {StyleSheet} from 'react-native'
@@ -26,6 +25,7 @@ import {WebPresentationProvider} from '@/platform/ui/presentation'
 import {prepareModulaSplash} from '@/platform/ui/splash/modula-splash'
 import {AppServicesProvider} from '@/runtime'
 import {NavigationDrawer} from '@/shell/NavigationDrawer'
+import {ModulaDocumentHead} from '@/shell/ModulaDocumentHead'
 import {ShellDrawerProvider, useShellDrawer} from '@/shell/ShellDrawerContext'
 import {AppearanceProvider} from '@/theme/runtime/AppearanceProvider'
 import {useThemeTokens} from '@/theme/runtime/useThemeTokens'
@@ -47,9 +47,7 @@ function RootNavigator() {
 
   return (
     <>
-      <Head>
-        <title>Modula</title>
-      </Head>
+      <ModulaDocumentHead />
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
