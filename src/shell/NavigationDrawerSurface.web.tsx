@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react'
 import {View, type StyleProp, type ViewStyle} from 'react-native'
 
-/** Konsta Panel owns the single web drawer surface; this keeps content neutral. */
+/** Passive content wrapper; the web drawer frame owns its presentation surface. */
 export function NavigationDrawerSurface({
   children,
   style,

@@ -354,6 +354,42 @@ test('keeps dialog, sheet, popover, menu and toast presentation-aware in their p
   expect(await toast.evaluate(element => (window as Window & {__modulaToast?: Element}).__modulaToast === element)).toBe(true)
 })
 
+test('uses one passive overlay owner and leaves no invisible blocker after close', async ({page}) => {
+  await openCleanLab(page, 390, 844)
+  await page.getByRole('button', {name: 'Action drawer', exact: true}).click()
+
+  const surface = page.locator('[data-modula-konsta-overlay-surface="actions"]')
+  await expect(surface).toBeVisible()
+  expect(await surface.evaluate(element => getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
+  await expect(page.locator('.k-actions, .k-sheet, .k-dialog, .k-panel, .k-popover')).toHaveCount(0)
+
+  await page.keyboard.press('Escape')
+  await expect(surface).toBeHidden()
+  await expect(page.locator('.modula-web-backdrop')).toHaveCount(0)
+  await expect(page.locator('#root')).not.toHaveAttribute('data-base-ui-inert')
+})
+
+test('keeps shell drawer interactive across repeated cycles and routes Settings before close', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844})
+  await page.goto('/', {waitUntil: 'networkidle'})
+  const trigger = page.getByTestId('home-open-drawer')
+
+  for (let cycle = 0; cycle < 10; cycle += 1) {
+    await trigger.click()
+    const drawer = page.getByTestId('navigation-drawer')
+    await expect(drawer).toBeVisible()
+    expect(await drawer.evaluate(element => getComputedStyle(element).pointerEvents)).toBe('auto')
+    await page.keyboard.press('Escape')
+    await expect(drawer).toBeHidden()
+    await expect(page.locator('#root')).not.toHaveAttribute('data-base-ui-inert')
+  }
+
+  await trigger.click()
+  await page.getByRole('button', {name: 'Settings', exact: true}).click()
+  await expect(page).toHaveURL(/\/settings$/)
+  await expect(page.getByTestId('navigation-drawer')).toBeHidden()
+})
+
 test('Escape cancels destructive confirmation with safer initial focus', async ({page}) => {
   await openCleanLab(page, 1024, 900)
   const trigger = page.getByRole('button', {name: 'Open adapter menu'})

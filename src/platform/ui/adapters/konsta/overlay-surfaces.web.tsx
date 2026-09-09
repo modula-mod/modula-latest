@@ -1,4 +1,3 @@
-import {Actions, Dialog, Panel, Sheet} from 'konsta/react'
 import type {CSSProperties, PropsWithChildren} from 'react'
 
 type KonstaOverlaySurfaceProps = PropsWithChildren<{
@@ -25,10 +24,11 @@ const staticSurfaceStyle: CSSProperties = {
 }
 
 /**
- * Presentation-only Konsta surfaces. The owning Modula/Base UI overlay is
- * responsible for focus, dismissal, portal placement, scroll lock, gesture
- * state, positioning, and animation. These components render no backdrop and
- * remain permanently "opened" inside that owner.
+ * Passive presentation surface. The owning Modula/Base UI overlay is the only
+ * interactive runtime: it owns focus, dismissal, portal placement, scroll
+ * lock, gesture state, positioning, and animation. Konsta's theme classes and
+ * generated tokens still style this surface, but no Konsta overlay primitive
+ * is mounted here because those primitives retain their own open lifecycle.
  */
 export function KonstaOverlaySurface({
   children,
@@ -36,52 +36,14 @@ export function KonstaOverlaySurface({
   kind,
   side = 'left',
 }: KonstaOverlaySurfaceProps) {
-  if (kind === 'actions') {
-    return (
-      <Actions
-        backdrop={false}
-        className="modula-konsta-overlay-surface modula-konsta-actions-surface"
-        data-modula-konsta-overlay-surface="actions"
-        style={staticSurfaceStyle}
-        opened>
-        {children}
-      </Actions>
-    )
-  }
-  if (kind === 'dialog') {
-    return (
-      <Dialog
-        backdrop={false}
-        className="modula-konsta-overlay-surface modula-konsta-dialog-surface"
-        data-modula-konsta-overlay-surface="dialog"
-        style={staticSurfaceStyle}
-        opened>
-        {children}
-      </Dialog>
-    )
-  }
-  if (kind === 'panel') {
-    return (
-      <Panel
-        backdrop={false}
-        className="modula-konsta-overlay-surface modula-konsta-panel-surface"
-        data-modula-konsta-overlay-surface="panel"
-        floating={floating}
-        opened
-        side={side}
-        style={staticSurfaceStyle}>
-        {children}
-      </Panel>
-    )
-  }
   return (
-    <Sheet
-      backdrop={false}
-      className="modula-konsta-overlay-surface modula-konsta-sheet-surface"
-      data-modula-konsta-overlay-surface="sheet"
-      opened
+    <div
+      className={`modula-konsta-overlay-surface modula-konsta-${kind}-surface`}
+      data-floating={floating ? 'true' : undefined}
+      data-modula-konsta-overlay-surface={kind}
+      data-side={kind === 'panel' ? side : undefined}
       style={staticSurfaceStyle}>
       {children}
-    </Sheet>
+    </div>
   )
 }

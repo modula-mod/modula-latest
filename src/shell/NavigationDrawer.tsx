@@ -154,9 +154,10 @@ export function NavigationDrawer() {
   }
 
   const navigate = (route: DrawerDestination['route']) => {
-    closeDrawer({
-      afterClose: () => router.push(route as Href),
-    })
+    if (!routeSelected(pathname, route)) {
+      router.push(route as Href)
+    }
+    closeDrawer()
   }
 
   return (
@@ -187,9 +188,7 @@ export function NavigationDrawer() {
                 ]}>
                 <AppPressable
                   accessibilityLabel="Open profile"
-                  onPress={() =>
-                    closeDrawer({afterClose: () => router.push('/profile' as Href)})
-                  }
+                  onPress={() => navigate('/profile')}
                   style={[styles.headerIdentity, {gap: spacing[3]}]}>
                   <Avatar
                     name={
@@ -231,9 +230,7 @@ export function NavigationDrawer() {
 
                 <AppPressable
                   accessibilityLabel="View profile"
-                  onPress={() =>
-                    closeDrawer({afterClose: () => router.push('/profile' as Href)})
-                  }
+                  onPress={() => navigate('/profile')}
                   style={[
                     styles.profilePill,
                     {

@@ -27,7 +27,7 @@ export type ModulaDrawerFrameProps = {
 /**
  * Web navigation panel. Base UI exclusively owns the modal/focus/portal/
  * Escape/scroll-lock lifecycle, Modula Reanimated owns the pan animation, and
- * Konsta Panel exclusively supplies the Liquid/Material visual surface.
+ * a passive token-driven surface supplies the Liquid/Material presentation.
  */
 export function ModulaDrawerFrame({
   accessibilityLabel = 'Navigation drawer',
