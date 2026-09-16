@@ -1440,8 +1440,21 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       const muted = await moderation.mutedSet(viewerActorId)
       const excluded = Array.from(new Set([...blocked, ...muted]))
       const items = await posts.listHome(mode, limit, cursor, excluded, viewerActorId)
-      const page = toCursorPage(items, limit, item => `${item.createdAt}|${item.id}`)
-      return reply.send(successEnvelope(page, request.id))
+      const rankingVersion = mode === 'forYou' ? 'ranking-v1' : mode === 'following' ? 'following-graph-v1' : 'modules-chrono-v1'
+      const page = toCursorPage(items, limit, item => {
+        if (mode === 'forYou') {
+          const ageHours = (Date.now() - new Date(item.createdAt).getTime()) / 3_600_000
+          const score =
+            item.likeCount * 2 +
+            item.replyCount * 3 +
+            item.repostCount * 4 +
+            (item.reactionCount ?? 0) * 2 +
+            Math.max(0, 48 - ageHours)
+          return `${score}|${item.createdAt}|${item.id}`
+        }
+        return `${item.createdAt}|${item.id}`
+      })
+      return reply.send(successEnvelope({...page, rankingVersion}, request.id))
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Failed to load feed')
     }

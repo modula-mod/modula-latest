@@ -1,6 +1,7 @@
 import type {SocialPostDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
+import {sql} from 'kysely'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
 import {ProfileRepository} from '../profiles/repository.js'
 
@@ -44,7 +45,24 @@ export class PostRepository {
     return this.hydrate(row, authorActorId)
   }
 
+  /**
+   * Home feed modes (N3C / ranking-v1):
+   * - following: posts authored by accounts the viewer follows (requires viewerActorId; empty otherwise)
+   * - forYou: public posts scored deterministically (no ML):
+   *     score = like*2 + reply*3 + repost*4 + reaction*2 + max(0, 48 - ageHours)
+   *   Cursor encodes score|createdAt|id when ranking; createdAt|id for chronological modes.
+   * - modules: posts with feed=modules (module updates / announcements), reverse chronological
+   * Visibility/blocks/mutes are enforced by the route (audience=public + excludedActorIds).
+   */
   async listHome(mode: string, limit: number, cursor: string | null, excludedActorIds: string[] = [], viewerActorId: string | null = null): Promise<SocialPostDto[]> {
+    if (mode === 'following' && !viewerActorId) {
+      return []
+    }
+
+    if (mode === 'forYou') {
+      return this.listHomeForYou(limit, cursor, excludedActorIds, viewerActorId)
+    }
+
     let query = this.db
       .selectFrom('posts')
       .selectAll()
@@ -53,8 +71,19 @@ export class PostRepository {
       .orderBy('created_at', 'desc')
       .orderBy('id', 'desc')
       .limit(limit + 1)
-    if (mode === 'modules') query = query.where('feed', '=', 'modules')
-    else if (mode === 'forYou') query = query.where('feed', 'in', ['forYou', 'following'])
+
+    if (mode === 'modules') {
+      query = query.where('feed', '=', 'modules')
+    } else if (mode === 'following' && viewerActorId) {
+      query = query.where('author_actor_id', 'in', (eb) =>
+        eb
+          .selectFrom('follows')
+          .select('followed_actor_id')
+          .where('follower_actor_id', '=', viewerActorId)
+          .where('deleted_at', 'is', null),
+      )
+    }
+
     if (excludedActorIds.length > 0) query = query.where('author_actor_id', 'not in', excludedActorIds)
     if (cursor) {
       const [createdAt, id] = cursor.split('|')
@@ -66,6 +95,70 @@ export class PostRepository {
         ]),
       )
     }
+    const rows = await query.execute()
+    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
+  }
+
+  private async listHomeForYou(
+    limit: number,
+    cursor: string | null,
+    excludedActorIds: string[],
+    viewerActorId: string | null,
+  ): Promise<SocialPostDto[]> {
+    // ranking-v1: deterministic engagement + recency; not ML / not personalized.
+    const scoreExpr = sql<number>`(
+      (like_count * 2) + (reply_count * 3) + (repost_count * 4) + (reaction_count * 2)
+      + greatest(0, 48 - (extract(epoch from (now() - created_at)) / 3600.0))
+    )`
+
+    let query = this.db
+      .selectFrom('posts')
+      .selectAll()
+      .select(scoreExpr.as('ranking_score'))
+      .where('deleted_at', 'is', null)
+      .where('audience', '=', 'public')
+      .where('feed', 'in', ['forYou', 'following'])
+      .orderBy(scoreExpr, 'desc')
+      .orderBy('created_at', 'desc')
+      .orderBy('id', 'desc')
+      .limit(limit + 1)
+
+    if (excludedActorIds.length > 0) query = query.where('author_actor_id', 'not in', excludedActorIds)
+
+    if (cursor) {
+      const parts = cursor.split('|')
+      if (parts.length === 3) {
+        const [scoreRaw, createdAt, id] = parts
+        const score = Number(scoreRaw)
+        if (!Number.isFinite(score) || !createdAt || !id) {
+          throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
+        }
+        query = query.where(({eb, or, and}) =>
+          or([
+            eb(scoreExpr, '<', score),
+            and([
+              eb(scoreExpr, '=', score),
+              eb('created_at', '<', new Date(createdAt)),
+            ]),
+            and([
+              eb(scoreExpr, '=', score),
+              eb('created_at', '=', new Date(createdAt)),
+              eb('id', '<', id),
+            ]),
+          ]),
+        )
+      } else {
+        const [createdAt, id] = parts
+        if (!createdAt || !id) throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
+        query = query.where(({eb, or, and}) =>
+          or([
+            eb('created_at', '<', new Date(createdAt)),
+            and([eb('created_at', '=', new Date(createdAt)), eb('id', '<', id)]),
+          ]),
+        )
+      }
+    }
+
     const rows = await query.execute()
     return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
