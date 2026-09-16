@@ -30,7 +30,12 @@ export class PostRepository {
       resource: {type: 'post', id: postId, ownerActorId: row.author_actor_id, visibility: row.audience},
     })
     if (!decision.allowed) return null
-    return this.hydrate(row, viewerActorId)
+    try {
+      return await this.hydrate(row, viewerActorId)
+    } catch (error: any) {
+      if (error?.code === 'NOT_FOUND' || String(error?.message || '').startsWith('Missing author')) return null
+      throw error
+    }
   }
 
   async getByIdForAuthor(postId: string, authorActorId: string): Promise<SocialPostDto | null> {
@@ -96,7 +101,7 @@ export class PostRepository {
       )
     }
     const rows = await query.execute()
-    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
+    return this.hydrateMany(rows, viewerActorId)
   }
 
   private async listHomeForYou(
@@ -160,7 +165,7 @@ export class PostRepository {
     }
 
     const rows = await query.execute()
-    return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
+    return this.hydrateMany(rows, viewerActorId)
   }
 
   async listForHandle(
@@ -201,10 +206,27 @@ export class PostRepository {
     return Promise.all(rows.map(row => this.hydrate(row, viewerActorId)))
   }
 
+  
+  private async hydrateMany(rows: PostRow[], viewerActorId: string | null): Promise<SocialPostDto[]> {
+    const items: SocialPostDto[] = []
+    for (const row of rows) {
+      try {
+        items.push(await this.hydrate(row, viewerActorId))
+      } catch (error: any) {
+        // Skip rows with deleted/blocked authors so one bad seed cannot 500 the feed.
+        if (error?.code === 'NOT_FOUND' || String(error?.message || '').startsWith('Missing author')) {
+          continue
+        }
+        throw error
+      }
+    }
+    return items
+  }
+
   private async hydrate(row: PostRow, viewerActorId: string | null = null, depth = 0): Promise<SocialPostDto> {
-    const author = await this.profiles.getByActorId(row.author_actor_id)
+    const author = await this.profiles.getAuthorForReadablePost(row.author_actor_id, viewerActorId)
     if (!author) {
-      throw new Error(`Missing author for post ${row.id}`)
+      throw Object.assign(new Error(`Missing author for post ${row.id}`), {code: 'NOT_FOUND'})
     }
     const media = await this.db
       .selectFrom('post_media')

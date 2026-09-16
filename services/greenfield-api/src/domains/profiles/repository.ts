@@ -28,6 +28,19 @@ export class ProfileRepository {
     return this.hydrate(row, viewerActorId)
   }
 
+  /**
+   * Author attribution for a post the viewer is already allowed to read.
+   * Public posts may be authored by private profiles; visibility must not
+   * erase the author or turn feed/media reads into 500s.
+   * Blocks still hide the author (caller should skip/forbid the post).
+   */
+  async getAuthorForReadablePost(actorId: string, viewerActorId: string | null = null): Promise<ModulaProfileDto | null> {
+    const row = await this.db.selectFrom('profiles').selectAll().where('actor_id', '=', actorId).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!row) return null
+    if (viewerActorId && (await this.isBlockedEitherDirection(viewerActorId, row.actor_id))) return null
+    return this.hydrate(row, viewerActorId)
+  }
+
   async getById(profileId: string, viewerActorId: string | null = null): Promise<ModulaProfileDto | null> {
     const row = await this.db
       .selectFrom('profiles')
