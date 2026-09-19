@@ -1,7 +1,7 @@
 # Modula intelligence & system architecture
 
 **Status:** Canonical model (2026-07-18)  
-**Rule:** GAIA executes · AKI verifies · AGI Governor controls  
+**Rule:** GAIA proposes · AKI verifies · AGI Governor authorizes · Runtime executes · Ledger remembers
 **Honesty:** Preview UI may explain layers. No unrestricted agents, fake ledgers, or silent private-module access.
 
 ---
@@ -10,7 +10,7 @@
 
 | System | Primary responsibility | Simple interpretation |
 | --- | --- | --- |
-| **GAIA** | Context, interaction, execution | Intelligence users work with |
+| **GAIA** | Context, interpretation, structured planning and proposals | Intelligence users work with |
 | **AKI** | Verification, evidence, forensic reasoning | Checks GAIA |
 | **AGI Governor** | Goals, permissions, orchestration, governance | Authority above agents |
 | **Circuit Memory** | Private structured long-term memory | Learned muscle memory |
@@ -21,7 +21,7 @@
 | **Command Layer** | Common execution router | Bridge UI ↔ AI ↔ modules |
 | **Module Forge** | Creation & publication of modules | Developer construction system |
 
-Earlier notes that treated “AGI” as the direct executor are superseded: the Governor controls; GAIA executes through the Command Layer under AKI validation.
+Earlier notes that treated “AGI” or GAIA as the direct executor are superseded: the Governor authorizes and the registered Modula Runtime executes through a revalidating Command Layer.
 
 ---
 

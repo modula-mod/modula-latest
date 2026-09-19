@@ -1,9 +1,9 @@
 # Modula Local Intelligence
 
-**Status:** Mission 01 + 01A (shared semantics; no model runtime)  
+**Status:** Mission 01/01A shared semantics; native LI-02/LI-03 implemented separately; GAI-01 adds Greenfield governance
 **Package (Greenfield):** `@modula/intelligence-core`  
 **Native runtime owner:** `modula-native` (Swift) — not yet implemented  
-**Rule:** AI proposes. Modula validates. Modula authorizes. Modula executes.  
+**Rule:** GAIA proposes. AKI verifies. The Governor authorizes. The Runtime executes. The Ledger remembers.
 **Privacy:** `local-only` means local-only. No silent network fallback.
 
 ---
@@ -30,7 +30,7 @@
    remote AI         Apple / Modula models
 ```
 
-Greenfield defines shared intelligence **semantics**.  
+Greenfield defines shared intelligence **semantics** and owns governed shared/server missions.
 `modula-native` owns native **local intelligence**.  
 Expo is **not** the bridge between them.
 
@@ -71,6 +71,13 @@ Both sides align through documented contracts (see `intelligence-protocol.md`).
 - server intelligence
 - cross-device services
 - cloud escalation
+- mission ownership and workspace authority
+- AKI decisions, Governor authorizations and approvals
+- persistent shared Ledger entries
+
+### Offline native authority remains bounded
+
+Native may eventually execute explicitly local-only, narrowly scoped capabilities while offline. It may not fabricate Greenfield permission, workspace authority, approval, shared mission state, Governor authorization, or shared Ledger entries. Synchronization and reconciliation require a later explicit bridge; GAI-01 does not implement one.
 
 ---
 

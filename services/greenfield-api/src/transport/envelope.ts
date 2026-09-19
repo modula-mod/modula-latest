@@ -48,6 +48,9 @@ export function statusForError(code: ApiErrorCode): number {
   switch (code) {
     case 'BAD_REQUEST':
     case 'VALIDATION_FAILED':
+    case 'INVALID_ACTION_SCHEMA':
+    case 'CAPABILITY_UNKNOWN':
+    case 'AKI_ABSTAINED':
       return 400
     case 'UNAUTHENTICATED':
     case 'INVALID_CREDENTIALS':
@@ -66,13 +69,23 @@ export function statusForError(code: ApiErrorCode): number {
     case 'AI_ACTION_PERMISSION_REQUIRED':
     case 'AI_CONTEXT_PERMISSION_REQUIRED':
     case 'AI_RESULT_OWNERSHIP_MISMATCH':
+    case 'MISSION_ACCESS_DENIED':
+    case 'CAPABILITY_DENIED':
+    case 'PERMISSION_DENIED':
+    case 'AKI_DENIED':
+    case 'GOVERNOR_BLOCKED':
       return 403
     case 'NOT_FOUND':
     case 'AI_ACTION_NOT_DECLARED':
+    case 'MISSION_NOT_FOUND':
       return 404
     case 'CONFLICT':
     case 'NOTE_REVISION_CONFLICT':
     case 'AI_RESULT_ALREADY_APPLIED':
+    case 'INVALID_MISSION_STATE':
+    case 'APPROVAL_REQUIRED':
+    case 'APPROVAL_REJECTED':
+    case 'EXECUTION_ALREADY_COMPLETED':
       return 409
     case 'AI_RESULT_EXPIRED':
     case 'AI_RESULT_NOT_APPLICABLE':

@@ -21,6 +21,8 @@ COPY packages/greenfield-runtime/package.json packages/greenfield-runtime/
 COPY packages/greenfield-schema-registry/package.json packages/greenfield-schema-registry/
 COPY packages/greenfield-product-standard/package.json packages/greenfield-product-standard/
 COPY packages/dimon-contracts/package.json packages/dimon-contracts/
+COPY packages/intelligence-contracts/package.json packages/intelligence-contracts/
+COPY packages/intelligence-governance/package.json packages/intelligence-governance/
 COPY services/greenfield-api/package.json services/greenfield-api/
 COPY patches ./patches
 COPY --from=modula-module-standard / /modula-mod/modula-module-standard
@@ -49,6 +51,8 @@ RUN pnpm --filter @modula/api-contracts build \
  && pnpm --filter @modula/greenfield-schema-registry build \
  && pnpm --filter @modula/greenfield-product-standard build \
  && pnpm --filter @modula/dimon-contracts build \
+ && pnpm --filter @modula/intelligence-contracts build \
+ && pnpm --filter @modula/intelligence-governance build \
  && pnpm --filter @modula/greenfield-api build
 
 FROM node:24.18.0-bookworm-slim AS runtime
