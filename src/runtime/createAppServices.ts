@@ -25,6 +25,7 @@ import {
   ApiToolsRepository,
 } from '@/data/repositories/api'
 import type {AppServices} from '@/runtime/AppServices'
+import {createModulaAi} from '@/runtime/createModulaAi'
 
 export function createAppServices(): AppServices {
   const accessTokenStore = new AccessTokenStore()
@@ -113,5 +114,6 @@ export function createAppServices(): AppServices {
     accessTokenStore,
     sessionStorage,
     refreshCoordinator,
+    ai: createModulaAi(),
   }
 }

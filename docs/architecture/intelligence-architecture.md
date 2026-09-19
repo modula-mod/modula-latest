@@ -93,5 +93,7 @@ Host Preview routes (no production intelligence runtime yet):
 - `docs/architecture/dimon-future-integration-boundary.md`  
 - `docs/architecture/greenfield-mcp.md`
 - `docs/architecture/modula-cli.md`
+- `docs/architecture/local-intelligence.md` — shared intelligence semantics; native runtime owned by `modula-native`
+- `docs/architecture/intelligence-protocol.md` — cross-runtime vocabulary (privacy, capabilities, tools)
 - `docs/design/forge-builder-inspiration.md`  
 - `templates/modula-module/skill.md`  

@@ -125,6 +125,15 @@ export function DeveloperSettingsScreen() {
         />
         <SettingsLinkRow
           row={{
+            title: 'Intelligence Core Diagnostics',
+            description:
+              'Shared contracts, router, and local-only privacy probe (not the native LLM runtime).',
+            icon: 'developer',
+            route: '/settings/developer/local-intelligence',
+          }}
+        />
+        <SettingsLinkRow
+          row={{
             title: 'Session Lab',
             description: 'Auth and session diagnostics.',
             icon: 'account',

@@ -22,6 +22,7 @@ import type {
   StoriesRepository,
   ToolsRepository,
 } from '@/data/repositories/contracts'
+import type {ModulaIntelligence} from '@/runtime/createModulaAi'
 
 export type AppServices = {
   apiClient: ApiClient
@@ -46,4 +47,6 @@ export type AppServices = {
   accessTokenStore: AccessTokenStore
   sessionStorage: SessionStorage
   refreshCoordinator: SessionRefreshCoordinator
+  /** Shared intelligence-core facade (Greenfield semantics; not native on-device runtime). */
+  ai: ModulaIntelligence
 }
