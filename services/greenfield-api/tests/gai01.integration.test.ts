@@ -191,6 +191,19 @@ describeIfDb('GAI-01 governed intelligence database acceptance', () => {
     expect((await service.ledger(accountA, mission.id)).map(event => event.type)).toEqual(expect.arrayContaining(['execution.started', 'execution.failed', 'mission.failed']))
   })
 
+  it('expires stale approvals, blocks the mission, and appends immutable expiry events', async () => {
+    const mission = await service.createMission(accountA, {objective: REVERSIBLE_WRITE_FIXTURE_OBJECTIVE})
+    const pending = await service.start(accountA, mission.id)
+    const approval = pending.approvals[0]!
+    await db.updateTable('intelligence_approvals').set({expires_at: new Date(Date.now() - 1_000)}).where('approval_id', '=', approval.id).execute()
+    await expect(service.approve(accountA, mission.id, approval.id)).rejects.toMatchObject({code: 'APPROVAL_REJECTED'})
+    const detail = await service.detail(accountA, mission.id)
+    expect(detail.mission.status).toBe('blocked')
+    expect(detail.approvals[0]?.status).toBe('expired')
+    expect(detail.executions).toHaveLength(0)
+    expect((await service.ledger(accountA, mission.id)).map(event => event.type)).toEqual(expect.arrayContaining(['approval.expired', 'mission.blocked']))
+  })
+
   it('reconstructs a completed governed mission from stable ledger events and durable relationships', async () => {
     const correlationId = `corr-reconstruct-${suffix}`
     const mission = await service.createMission(accountA, {objective: REVERSIBLE_WRITE_FIXTURE_OBJECTIVE, correlationId})

@@ -104,7 +104,7 @@ export class IntelligenceRepository {
   }
 
   async resolveApproval(accountId: string, missionId: string, approvalId: string, status: 'approved' | 'rejected'): Promise<IntelligenceApproval> {
-    return this.db.transaction().execute(async trx => {
+    const outcome = await this.db.transaction().execute(async trx => {
       const missionRow = await trx.selectFrom('intelligence_missions').selectAll().where('mission_id', '=', missionId).forUpdate().executeTakeFirst()
       if (!missionRow) throw new IntelligenceError('MISSION_NOT_FOUND', 'Mission not found')
       if (missionRow.owner_account_id !== accountId) throw new IntelligenceError('MISSION_ACCESS_DENIED', 'Cannot resolve another account approval')
@@ -112,13 +112,23 @@ export class IntelligenceRepository {
       if (!row) throw new IntelligenceError('MISSION_NOT_FOUND', 'Approval not found')
       if (row.requested_account_id !== accountId) throw new IntelligenceError('MISSION_ACCESS_DENIED', 'Cannot resolve another account approval')
       if (row.status !== 'pending') throw new IntelligenceError('INVALID_MISSION_STATE', 'Approval is not pending')
-      if (row.expires_at && row.expires_at.getTime() <= Date.now()) throw new IntelligenceError('APPROVAL_REJECTED', 'Approval has expired')
       const now = new Date()
+      if (row.expires_at && row.expires_at.getTime() <= now.getTime()) {
+        assertMissionTransition(missionRow.status, 'blocked')
+        const expired = await trx.updateTable('intelligence_approvals').set({status: 'expired', resolved_at: now}).where('approval_id', '=', approvalId).where('status', '=', 'pending').returningAll().executeTakeFirstOrThrow()
+        await trx.updateTable('intelligence_missions').set({status: 'blocked', updated_at: now, completed_at: now}).where('mission_id', '=', missionId).executeTakeFirstOrThrow()
+        const mission = toMission(missionRow)
+        await this.append(trx, mission, 'approval.expired', {type: 'system'}, {status: 'expired', approvalWaitDurationMs: now.getTime() - row.requested_at.getTime()}, {proposalId: row.proposal_id, approvalId})
+        await this.append(trx, {...mission, status: 'blocked', updatedAt: now.toISOString(), completedAt: now.toISOString()}, 'mission.blocked', {type: 'system'}, {reasonCode: 'APPROVAL_REJECTED'}, {proposalId: row.proposal_id, approvalId})
+        return {expired: true as const, approval: toApproval(expired)}
+      }
       const updated = await trx.updateTable('intelligence_approvals').set({status, resolver_account_id: accountId, resolved_at: now}).where('approval_id', '=', approvalId).where('status', '=', 'pending').returningAll().executeTakeFirstOrThrow()
       const mission = toMission(missionRow)
       await this.append(trx, mission, status === 'approved' ? 'approval.approved' : 'approval.rejected', {type: 'user', id: accountId}, {status, approvalWaitDurationMs: now.getTime() - row.requested_at.getTime()}, {proposalId: row.proposal_id, approvalId})
-      return toApproval(updated)
+      return {expired: false as const, approval: toApproval(updated)}
     })
+    if (outcome.expired) throw new IntelligenceError('APPROVAL_REJECTED', 'Approval has expired')
+    return outcome.approval
   }
 
   async proposal(missionId: string, proposalId: string): Promise<ModulaActionProposal> {
