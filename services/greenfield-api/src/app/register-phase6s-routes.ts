@@ -49,7 +49,7 @@ export async function registerPhase6sRoutes(
   const reactions = new ReactionService(db)
   const comments = new CommentService(db)
   const quotes = new QuoteService(db)
-  const saves = new SaveService(db)
+  const saves = new SaveService(db, config.publicApiUrl)
   const mentions = new MentionService(db)
   const appearance = new AppearanceService(db)
   const recovery = new RecoveryService(db, config)

@@ -4,6 +4,7 @@ export type BackendCapability =
   | 'post:update'
   | 'post:delete'
   | 'post:engage'
+  | 'attachment:upload'
   | 'profile:update'
   | 'profile:manage'
   | 'profile:customize'
@@ -29,6 +30,7 @@ export const PREVIEW_ACTOR_CAPABILITIES: BackendCapability[] = [
   'post:update',
   'post:delete',
   'post:engage',
+  'attachment:upload',
   'profile:update',
   'profile:manage',
   'profile:customize',

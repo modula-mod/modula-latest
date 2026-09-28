@@ -7,6 +7,8 @@ export type PostKind = 'text' | 'media' | 'link' | 'module'
 export type FeedMode = 'following' | 'forYou' | 'modules'
 export type Audience = 'public' | 'followers' | 'private'
 export type ReplyPermission = 'everyone' | 'followers' | 'mentioned' | 'none'
+export type AttachmentKind = 'image' | 'video' | 'audio' | 'pdf' | 'document' | 'unknown'
+export type AttachmentStatus = 'created' | 'uploading' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'expired' | 'rejected'
 
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended'
 export type AuthenticationMethodType = 'passkey' | 'password' | 'email_otp' | 'totp' | 'recovery_code' | 'apple' | 'oidc'
@@ -342,6 +344,50 @@ export interface Database {
     updated_at: Date
     deleted_at: Date | null
     version: number
+  }
+  attachments: {
+    attachment_id: string
+    owner_account_id: string
+    kind: AttachmentKind
+    mime_type: string
+    original_filename: string
+    byte_size: string
+    checksum: string | null
+    storage_key: string | null
+    storage_provider: string
+    status: AttachmentStatus
+    width: number | null
+    height: number | null
+    duration_seconds: number | null
+    page_count: number | null
+    thumbnail_key: string | null
+    preview_key: string | null
+    metadata: unknown
+    attached_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  attachment_upload_sessions: {
+    upload_id: string
+    attachment_id: string
+    owner_account_id: string
+    expected_byte_size: string
+    expected_mime_type: string
+    expected_checksum: string | null
+    state: 'created' | 'uploading' | 'completed' | 'failed' | 'expired'
+    expires_at: Date
+    completed_at: Date | null
+    created_at: Date
+    updated_at: Date
+  }
+  post_content: {
+    content_id: string
+    post_id: string
+    content_type: 'image' | 'video' | 'audio' | 'pdf' | 'document'
+    attachment_id: string
+    sort_order: number
+    caption: string | null
+    created_at: Date
   }
   follows: {
     id: string

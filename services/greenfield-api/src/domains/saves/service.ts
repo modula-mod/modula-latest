@@ -9,9 +9,9 @@ export class SaveService {
   private readonly policies: GreenfieldPolicyEngine
   private readonly posts: PostRepository
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, publicApiUrl = '') {
     this.policies = new GreenfieldPolicyEngine(db)
-    this.posts = new PostRepository(db)
+    this.posts = new PostRepository(db, publicApiUrl)
   }
 
   async save(actorId: string, postId: string) {
