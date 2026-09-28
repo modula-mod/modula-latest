@@ -75,6 +75,7 @@ import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
 import {registerProviderRoutes} from '../providers/routes.js'
 import {registerIntelligenceRoutes} from '../intelligence/index.js'
+import {registerAttachmentRoutes} from './register-attachment-routes.js'
 
 function sendError(reply: any, code: any, message: string, requestId: string) {
   return reply.code(statusForError(code)).send(failureEnvelope(code, message, requestId))
@@ -145,8 +146,9 @@ function releaseIdentity(config: AppConfig) {
 }
 
 export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config: AppConfig): Promise<void> {
+  app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
-  const posts = new PostRepository(db)
+  const posts = new PostRepository(db, config.publicApiUrl)
   const discovery = new DiscoveryRepository(db)
   const sessions = new SessionService(db, config)
   const postWrites = new PostWriteService(db, config)
@@ -217,6 +219,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const writeConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 30, timeWindow: '1 minute'}}} : {}
 
   const mutationsAllowed = config.mutationsEnabled
+  await registerAttachmentRoutes(app, db, config, {writeConfig, feedConfig, mutationsAllowed})
 
   app.get('/version.json', healthConfig, async (_request, reply) => {
     return reply.header('Cache-Control', 'no-store').send(releaseIdentity(config))

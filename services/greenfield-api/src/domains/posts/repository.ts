@@ -1,4 +1,5 @@
-import type {SocialPostDto} from '@modula/api-contracts'
+import type {PostContentDto, SocialPostDto} from '@modula/api-contracts'
+import {toDto as attachmentDto} from '../attachments/service.js'
 import type {ModulaDb} from '../../database/client.js'
 import type {Database} from '../../database/types.js'
 import {sql} from 'kysely'
@@ -11,7 +12,7 @@ export class PostRepository {
   private readonly profiles: ProfileRepository
   private readonly policies: GreenfieldPolicyEngine
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, private readonly publicApiUrl = '') {
     this.profiles = new ProfileRepository(db)
     this.policies = new GreenfieldPolicyEngine(db)
   }
@@ -235,6 +236,23 @@ export class PostRepository {
       .where('deleted_at', 'is', null)
       .orderBy('sort_order', 'asc')
       .execute()
+    const richRows = await this.db
+      .selectFrom('post_content as content')
+      .innerJoin('attachments as attachment', 'attachment.attachment_id', 'content.attachment_id')
+      .select([
+        'content.content_id', 'content.content_type', 'content.sort_order', 'content.caption',
+        'attachment.attachment_id', 'attachment.kind', 'attachment.mime_type', 'attachment.original_filename',
+        'attachment.byte_size', 'attachment.checksum', 'attachment.status', 'attachment.width', 'attachment.height',
+        'attachment.duration_seconds', 'attachment.page_count', 'attachment.preview_key', 'attachment.thumbnail_key',
+      ])
+      .where('content.post_id', '=', row.id)
+      .orderBy('content.sort_order', 'asc')
+      .execute()
+    const content: PostContentDto[] = richRows.map(item => ({
+      id: item.content_id, type: item.content_type, order: item.sort_order,
+      caption: item.caption ?? undefined,
+      attachment: attachmentDto(item, this.publicApiUrl),
+    }))
 
     let viewerReaction: Database['greenfield_reactions']['reaction_type'] | null = null
     let saved = false
@@ -316,6 +334,7 @@ export class PostRepository {
           aspectRatio: item.aspect_ratio ? Number(item.aspect_ratio) : undefined,
           altText: item.alt_text ?? undefined,
         })),
+        content,
       }
     }
     if (row.kind === 'link') {

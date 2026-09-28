@@ -17,6 +17,40 @@ export type PostMediaDto = {
   altText?: string
 }
 
+export type AttachmentKind = 'image' | 'video' | 'audio' | 'pdf' | 'document' | 'unknown'
+export type AttachmentStatus = 'created' | 'uploading' | 'uploaded' | 'processing' | 'ready' | 'failed' | 'expired' | 'rejected'
+
+export type AttachmentDto = {
+  id: string
+  kind: AttachmentKind
+  mimeType: string
+  filename: string
+  byteSize: number
+  checksum?: string
+  status: AttachmentStatus
+  width?: number
+  height?: number
+  duration?: number
+  pageCount?: number
+  originalURL?: string
+  previewURL?: string
+  thumbnailURL?: string
+}
+
+export type PostContentDto = {
+  id: string
+  type: Exclude<AttachmentKind, 'unknown'>
+  order: number
+  caption?: string
+  attachment: AttachmentDto
+}
+
+export type CreatePostContentInput = {
+  type: Exclude<AttachmentKind, 'unknown'>
+  attachmentId: string
+  caption?: string
+}
+
 export type CreatePostMediaInput = {
   localId?: string
   kind: 'image'
@@ -60,6 +94,7 @@ export type SocialPostDto = {
   audience?: PostAudience
   version?: number
   media?: PostMediaDto[]
+  content?: PostContentDto[]
   glowColour?: string
   link?: PostLinkDto
   module?: PostModuleDto
@@ -71,6 +106,7 @@ export type CreatePostInput = {
   audience?: PostAudience
   replyPermission?: PostReplyPermission
   media?: CreatePostMediaInput[]
+  content?: CreatePostContentInput[]
   idempotencyKey?: string
   publishToAtproto?: boolean
 }

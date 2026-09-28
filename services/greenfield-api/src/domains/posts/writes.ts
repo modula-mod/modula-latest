@@ -22,7 +22,7 @@ export class PostWriteService {
   private readonly policies: GreenfieldPolicyEngine
 
   constructor(private readonly db: ModulaDb, config: AppConfig) {
-    this.posts = new PostRepository(db)
+    this.posts = new PostRepository(db, config.publicApiUrl)
     this.audit = new AuditRepository(db)
     this.outbox = new OutboxRepository(db)
     this.mediaStorage = new PostMediaStorage(config)
@@ -30,12 +30,19 @@ export class PostWriteService {
   }
 
   async create(actorId: string, input: CreatePostInput, context: PostWriteContext = {}): Promise<SocialPostDto> {
-    const text = (input.text ?? '').trim()
-    const mediaInput = input.media ?? []
-    if ((!text && mediaInput.length === 0) || text.length > 5000) {
+    const text = typeof input?.text === 'string' ? input.text.trim() : ''
+    const mediaInput = Array.isArray(input?.media) ? input.media : []
+    const contentInput = normalizeContentInput(input?.content)
+    if ((!text && mediaInput.length === 0 && contentInput.length === 0) || text.length > 5000) {
       throw Object.assign(new Error('Invalid post text'), {code: 'VALIDATION_FAILED'})
     }
-    if (input.publishToAtproto && mediaInput.length > 0) {
+    if (mediaInput.length > 0 && contentInput.length > 0) {
+      throw Object.assign(new Error('Use attachment content or legacy media, not both'), {code: 'VALIDATION_FAILED'})
+    }
+    if (contentInput.length > 10) {
+      throw Object.assign(new Error('A post supports at most 10 attachments'), {code: 'VALIDATION_FAILED'})
+    }
+    if (input.publishToAtproto && (mediaInput.length > 0 || contentInput.length > 0)) {
       throw Object.assign(new Error('AT Protocol media publishing is not supported'), {
         code: 'VALIDATION_FAILED',
       })
@@ -61,9 +68,31 @@ export class PostWriteService {
     const now = new Date()
     const actor = await this.db.selectFrom('actors').select('account_id').where('id', '=', actorId).executeTakeFirst()
     const persistedMedia = await this.mediaStorage.persistPostMedia({postId: id, media: mediaInput})
-    const kind = persistedMedia.length > 0 ? 'media' : 'text'
+    const kind = persistedMedia.length > 0 || contentInput.length > 0 ? 'media' : 'text'
     try {
       await this.db.transaction().execute(async trx => {
+        const attachments = contentInput.length === 0 ? [] : await trx
+          .selectFrom('attachments')
+          .selectAll()
+          .where('attachment_id', 'in', contentInput.map(item => item.attachmentId))
+          .forUpdate()
+          .execute()
+        if (!actor?.account_id || attachments.length !== contentInput.length) {
+          throw Object.assign(new Error('One or more attachments are unavailable'), {code: 'VALIDATION_FAILED'})
+        }
+        const byId = new Map(attachments.map(item => [item.attachment_id, item]))
+        for (const item of contentInput) {
+          const attachment = byId.get(item.attachmentId)
+          if (!attachment || attachment.owner_account_id !== actor.account_id) {
+            throw Object.assign(new Error('Cross-account attachment binding denied'), {code: 'FORBIDDEN'})
+          }
+          if (attachment.status !== 'ready' || attachment.attached_at) {
+            throw Object.assign(new Error('Attachment is not ready for publication'), {code: 'CONFLICT'})
+          }
+          if (attachment.kind !== item.type) {
+            throw Object.assign(new Error('Attachment content type mismatch'), {code: 'VALIDATION_FAILED'})
+          }
+        }
         await trx
           .insertInto('posts')
           .values({
@@ -82,7 +111,7 @@ export class PostWriteService {
             module_name: null,
             module_action_label: null,
             module_status: null,
-            glow_colour: persistedMedia.length > 0 ? '#369CAA' : null,
+            glow_colour: kind === 'media' ? '#369CAA' : null,
             like_count: 0,
             reaction_count: 0,
             quote_count: 0,
@@ -114,6 +143,18 @@ export class PostWriteService {
             })
             .execute()
         }
+        for (const [index, item] of contentInput.entries()) {
+          await trx.insertInto('post_content').values({
+            content_id: randomUUID(), post_id: id, content_type: item.type,
+            attachment_id: item.attachmentId, sort_order: index,
+            caption: boundedCaption(item.caption), created_at: now,
+          }).execute()
+          await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
+            .where('attachment_id', '=', item.attachmentId)
+            .where('owner_account_id', '=', actor.account_id)
+            .where('status', '=', 'ready')
+            .execute()
+        }
         const outbox = new OutboxRepository(this.db)
         await outbox.enqueue(trx, {
           eventType: 'search.index.post',
@@ -138,7 +179,7 @@ export class PostWriteService {
             },
           })
         }
-        await new AuditRepository(trx).append('post.created', {audience, feed, mediaCount: persistedMedia.length}, {
+        await new AuditRepository(trx).append('post.created', {audience, feed, mediaCount: persistedMedia.length + contentInput.length}, {
           type: 'post',
           id,
           actorId,
@@ -161,7 +202,7 @@ export class PostWriteService {
             audience,
             feed,
             kind,
-            mediaCount: persistedMedia.length,
+            mediaCount: persistedMedia.length + contentInput.length,
           },
           metadata: {
             source: 'greenfield.posts',
@@ -410,4 +451,38 @@ export class PostWriteService {
       }
     })
   }
+}
+
+function boundedCaption(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const caption = value.trim()
+  if (!caption) return null
+  if (caption.length > 500) throw Object.assign(new Error('Attachment caption is too long'), {code: 'VALIDATION_FAILED'})
+  return caption
+}
+
+function normalizeContentInput(value: unknown): NonNullable<CreatePostInput['content']> {
+  if (value === undefined) return []
+  if (!Array.isArray(value)) throw Object.assign(new Error('Post content must be an array'), {code: 'VALIDATION_FAILED'})
+  const allowed = new Set(['image', 'video', 'audio', 'pdf', 'document'])
+  return value.map(item => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw Object.assign(new Error('Invalid post content item'), {code: 'VALIDATION_FAILED'})
+    }
+    const source = item as Record<string, unknown>
+    if (typeof source.type !== 'string' || !allowed.has(source.type)) {
+      throw Object.assign(new Error('Unsupported post content type'), {code: 'VALIDATION_FAILED'})
+    }
+    if (typeof source.attachmentId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(source.attachmentId)) {
+      throw Object.assign(new Error('Invalid attachment ID'), {code: 'VALIDATION_FAILED'})
+    }
+    if (source.caption !== undefined && typeof source.caption !== 'string') {
+      throw Object.assign(new Error('Invalid attachment caption'), {code: 'VALIDATION_FAILED'})
+    }
+    return {
+      type: source.type as NonNullable<CreatePostInput['content']>[number]['type'],
+      attachmentId: source.attachmentId,
+      caption: source.caption as string | undefined,
+    }
+  })
 }

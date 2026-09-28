@@ -28,7 +28,7 @@ export async function registerPlugins(app: FastifyInstance, config: AppConfig): 
       cb(null, config.allowedOrigins.includes(origin))
     },
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Accept', 'Authorization', 'Content-Type', 'X-Modula-Request-Id'],
+    allowedHeaders: ['Accept', 'Authorization', 'Content-Type', 'X-Modula-Request-Id', 'X-Attachment-Checksum'],
     credentials: false,
   })
 
