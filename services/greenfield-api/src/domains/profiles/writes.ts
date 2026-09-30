@@ -45,6 +45,8 @@ export type ProfileWriteContext = {
   correlationId?: string | null
 }
 
+export type ProfileMediaKind = 'avatar' | 'cover'
+
 export class ProfileWriteService {
   private readonly profiles: ProfileRepository
 
@@ -274,7 +276,76 @@ export class ProfileWriteService {
         })
       }
     })
-    const updated = await this.profiles.getByActorId(actorId)
+    const updated = await this.profiles.getByActorId(actorId, actorId)
+    if (!updated) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
+    return updated
+  }
+
+  async updateMedia(
+    actorId: string,
+    accountId: string,
+    kind: ProfileMediaKind,
+    attachmentId: string | null,
+    publicApiUrl: string,
+    context: ProfileWriteContext = {},
+  ): Promise<ModulaProfileDto> {
+    if (attachmentId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(attachmentId)) {
+      throw Object.assign(new Error('Invalid attachment ID'), {code: 'VALIDATION_FAILED'})
+    }
+    await this.db.transaction().execute(async trx => {
+      const profile = await trx.selectFrom('profiles').selectAll()
+        .where('actor_id', '=', actorId).where('deleted_at', 'is', null).forUpdate().executeTakeFirst()
+      if (!profile) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
+      const existing = await trx.selectFrom('profile_media').select('attachment_id')
+        .where('profile_id', '=', profile.id).where('kind', '=', kind).executeTakeFirst()
+      const now = new Date()
+      let mediaUrl: string | null = null
+      if (attachmentId) {
+        const attachment = await trx.selectFrom('attachments').selectAll()
+          .where('attachment_id', '=', attachmentId).forUpdate().executeTakeFirst()
+        if (!attachment) throw Object.assign(new Error('Attachment not found'), {code: 'NOT_FOUND'})
+        if (attachment.owner_account_id !== accountId) {
+          throw Object.assign(new Error('Cross-account profile media binding denied'), {code: 'FORBIDDEN'})
+        }
+        if (attachment.kind !== 'image' || attachment.status !== 'ready') {
+          throw Object.assign(new Error('Profile media must be a ready image attachment'), {code: 'CONFLICT'})
+        }
+        if (attachment.attached_at && existing?.attachment_id !== attachmentId) {
+          throw Object.assign(new Error('Attachment is already bound'), {code: 'CONFLICT'})
+        }
+        mediaUrl = `${publicApiUrl.replace(/\/+$/, '')}/v1/attachments/${attachmentId}/content`
+        await trx.insertInto('profile_media').values({
+          profile_id: profile.id, kind, attachment_id: attachmentId, created_at: now, updated_at: now,
+        }).onConflict(conflict => conflict.columns(['profile_id', 'kind']).doUpdateSet({attachment_id: attachmentId, updated_at: now})).execute()
+        await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
+          .where('attachment_id', '=', attachmentId).execute()
+      } else {
+        await trx.deleteFrom('profile_media').where('profile_id', '=', profile.id).where('kind', '=', kind).execute()
+      }
+      if (existing && existing.attachment_id !== attachmentId) {
+        await trx.updateTable('attachments').set({attached_at: null, updated_at: now})
+          .where('attachment_id', '=', existing.attachment_id).execute()
+      }
+      const nextVersion = profile.version + 1
+      const changes = kind === 'avatar' ? {avatar_url: mediaUrl} : {cover_url: mediaUrl}
+      await trx.updateTable('profiles').set({...changes, updated_at: now, version: nextVersion})
+        .where('id', '=', profile.id).execute()
+      await new OutboxRepository(this.db).enqueue(trx, {
+        eventType: 'search.index.profile', aggregateType: 'profile', aggregateId: profile.id,
+        payload: {profileId: profile.id, actorId},
+      })
+      await new AuditRepository(trx).append(`profile.${kind}.updated`, {}, {type: 'profile', id: profile.id, actorId})
+      await new GreenfieldEventBus(trx).publish({
+        eventType: 'profile.updated', aggregateType: 'profile', aggregateId: profile.id,
+        aggregateVersion: nextVersion, accountId, actorId,
+        requestId: context.requestId ?? null,
+        correlationId: context.correlationId ?? context.requestId ?? null,
+        visibility: profile.visibility === 'public' ? 'public' : 'actor', classification: 'internal',
+        payload: {profileId: profile.id, actorId, mediaKind: kind, sourceVersion: nextVersion},
+        metadata: {source: 'greenfield.profiles'}, occurredAt: now,
+      })
+    })
+    const updated = await this.profiles.getByActorId(actorId, actorId)
     if (!updated) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
     return updated
   }

@@ -117,6 +117,31 @@ describeIfDb('Phase 7L profile update persistence', () => {
     expect(updated.focusStatus.label).toBe('Busy')
   })
 
+  it('returns a successful owner view when saving a private profile', async () => {
+    const suffix = randomUUID().replace(/-/g, '').slice(0, 10)
+    const handle = `p7lprivate${suffix}`.slice(0, 20)
+    const owner = await createVerifiedUser(handle, `phase7l-private-${suffix}@example.com`, 'Private Profile')
+
+    const makePrivate = await authed(owner.accessToken, 'PATCH', '/v1/profiles/me', {visibility: 'private'})
+    expect(makePrivate.statusCode, makePrivate.body).toBe(200)
+    expect(makePrivate.json().data.visibility).toBe('private')
+
+    const save = await authed(owner.accessToken, 'PATCH', '/v1/profiles/me', {
+      displayName: `Private Profile ${suffix}`,
+      bio: 'Owner-visible saved profile',
+    })
+    expect(save.statusCode, save.body).toBe(200)
+    expect(save.json().data).toMatchObject({
+      displayName: `Private Profile ${suffix}`,
+      bio: 'Owner-visible saved profile',
+      visibility: 'private',
+    })
+
+    const fresh = await authed(owner.accessToken, 'GET', `/v1/profiles/${handle}`)
+    expect(fresh.statusCode, fresh.body).toBe(200)
+    expect(fresh.json().data.bio).toBe('Owner-visible saved profile')
+  })
+
   it('rejects local or internal profile media URLs', async () => {
     const suffix = randomUUID().replace(/-/g, '').slice(0, 10)
     const handle = `p7lprofmedia${suffix}`.slice(0, 20)
