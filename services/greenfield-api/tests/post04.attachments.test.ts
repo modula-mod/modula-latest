@@ -84,6 +84,26 @@ describeIfDb('POST-04 attachment integration', () => {
     expect(post.content?.every(item => item.attachment.status === 'ready')).toBe(true)
   })
 
+  it('hydrates Reels from real video post attachments and excludes private or deleted posts', async () => {
+    // Container signature fixture tests the API contract, not AVPlayer decoding.
+    const video = Buffer.from('00000018667479706d703432000000006d70343269736f6d', 'hex')
+    const upload = await service.createUpload(owner.accountId, {filename: 'reel.mp4', mimeType: 'video/mp4', size: video.length})
+    await service.upload(owner.accountId, upload.uploadId, video)
+    const post = await posts.create(owner.actorId, {text: 'Video post #modula', audience: 'public', content: [{type: 'video', attachmentId: upload.attachmentId}]})
+    const response = await app.inject({method: 'GET', url: '/v1/reels', headers: {authorization: `Bearer ${bearer}`}})
+    expect(response.statusCode).toBe(200)
+    const reel = response.json().data.find((item: any) => item.id === post.id)
+    expect(reel.post.id).toBe(post.id)
+    expect(reel.post.content[0].attachment).toMatchObject({id: upload.attachmentId, kind: 'video', status: 'ready'})
+    expect(reel.post.content[0].attachment.originalURL).toContain(`/v1/attachments/${upload.attachmentId}/content`)
+    await db.updateTable('posts').set({audience: 'private'}).where('id', '=', post.id).execute()
+    const privateList = await app.inject({method: 'GET', url: '/v1/reels'})
+    expect(privateList.json().data.some((item: any) => item.id === post.id)).toBe(false)
+    await db.updateTable('posts').set({audience: 'public', deleted_at: new Date()}).where('id', '=', post.id).execute()
+    const deletedList = await app.inject({method: 'GET', url: '/v1/reels'})
+    expect(deletedList.json().data.some((item: any) => item.id === post.id)).toBe(false)
+  })
+
   it('blocks cross-account, mismatched bytes, reuse and unready publication', async () => {
     const upload = await service.createUpload(owner.accountId, {filename: 'private.pdf', mimeType: 'application/pdf', size: 8})
     await expect(service.upload(attacker.accountId, upload.uploadId, Buffer.from('%PDF-1\n'))).rejects.toMatchObject({code: 'FORBIDDEN'})

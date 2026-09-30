@@ -149,7 +149,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db, config.publicApiUrl)
-  const discovery = new DiscoveryRepository(db)
+  const discovery = new DiscoveryRepository(db, config.publicApiUrl)
   const sessions = new SessionService(db, config)
   const postWrites = new PostWriteService(db, config)
   const reactions = new ReactionService(db)

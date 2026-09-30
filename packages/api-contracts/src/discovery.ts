@@ -1,5 +1,5 @@
 import type {ModulaProfileDto} from './profiles.js'
-import type {PostMediaDto} from './posts.js'
+import type {PostMediaDto, SocialPostDto} from './posts.js'
 
 export type TrendingTopicDto = {
   id: string
@@ -18,6 +18,8 @@ export type ReelItemDto = {
   liked: boolean
   likeCount: number
   replyCount: number
+  /** Reels are a presentation of canonical video posts, not a second post domain. */
+  post?: SocialPostDto
 }
 
 export type DiscoverResultDto = {
