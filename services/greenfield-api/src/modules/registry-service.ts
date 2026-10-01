@@ -14,6 +14,7 @@ import {classifyBetaModule, installabilityForBetaModule} from './beta-catalogue-
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from './marketplace-service.js'
 import {GreenfieldRegistryPresentationService} from './registry-presentation-service.js'
+import {GreenfieldRegistryTrustService, productProjection, type RegistryTrustOptions} from './registry-trust-service.js'
 
 export type GreenfieldModuleRegistryOptions = {publicApiUrl?: string | null}
 
@@ -21,11 +22,13 @@ export class GreenfieldModuleRegistryService {
   private readonly releases: GreenfieldModuleReleaseService
   private readonly marketplace: GreenfieldModuleMarketplaceService
   readonly presentation: GreenfieldRegistryPresentationService
+  readonly trust: GreenfieldRegistryTrustService
 
   constructor(private readonly db: ModulaDb, options: GreenfieldModuleRegistryOptions = {}) {
     this.releases = new GreenfieldModuleReleaseService(db)
     this.marketplace = new GreenfieldModuleMarketplaceService(db)
     this.presentation = new GreenfieldRegistryPresentationService(db, options.publicApiUrl)
+    this.trust = new GreenfieldRegistryTrustService(db)
   }
 
   async listModules(filters: GreenfieldRegistryFilter = {}): Promise<{items: GreenfieldRegistryModuleSummary[]; nextCursor: string | null}> {
@@ -144,26 +147,31 @@ export class GreenfieldModuleRegistryService {
     return {items, nextCursor: byModule.size > limit ? String(limit) : null}
   }
 
-  async getModule(moduleId: string) {
+  async getModule(moduleId: string, trustOptions: RegistryTrustOptions = {}) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const releases = await this.listVersions(canonicalId)
     if (releases.length > 0) {
       const latest = releases[0]!
+      const latestPublishedVersion = releases.find(item => item.releaseState === 'published')?.version ?? null
       const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
-      const [marketplace, presentation] = await Promise.all([
+      const [marketplace, presentation, trust, product] = await Promise.all([
         this.marketplace.project({
           moduleId: latest.moduleId,
           manifest: latest.manifest,
           registryPublishedAt: latest.publishedAt,
         }),
         this.presentation.forRelease(latest.releaseId),
+        this.trust.forRelease(latest, trustOptions, latestPublishedVersion),
+        this.productProjectionFor(latest.releaseId),
       ])
       return {
         registryReleaseId: latest.releaseId,
+        product,
         presentation,
+        registryTrust: trust,
         moduleId: latest.moduleId,
         productKind: (latest.manifest as any).extensionProduct?.kind ?? 'module',
         name: latest.manifest.name,
@@ -307,13 +315,23 @@ export class GreenfieldModuleRegistryService {
     return release
   }
 
-  async getVersionDetail(moduleId: string, version: string) {
+  async getVersionDetail(moduleId: string, version: string, trustOptions: RegistryTrustOptions = {}) {
     const release = await this.getVersion(moduleId, version)
-    return {
-      ...release,
-      registryReleaseId: release.releaseId,
-      presentation: await this.presentation.forRelease(release.releaseId),
-    }
+    const latestPublishedVersion = (await this.listVersions(release.moduleId)).find(item => item.releaseState === 'published')?.version ?? null
+    const [presentation, trust, product] = await Promise.all([
+      this.presentation.forRelease(release.releaseId),
+      this.trust.forRelease(release, trustOptions, latestPublishedVersion),
+      this.productProjectionFor(release.releaseId),
+    ])
+    return {...release, registryReleaseId: release.releaseId, product, presentation, registryTrust: trust}
+  }
+
+  async productProjectionFor(releaseId: string) {
+    const ingestion = await this.db.selectFrom('greenfield_mps_ingestions')
+      .select(['manifest', 'manifest_sha256', 'product_standard'])
+      .where('release_id', '=', releaseId)
+      .executeTakeFirst()
+    return productProjection(ingestion)
   }
 
   async latestPublished(moduleId: string): Promise<GreenfieldModuleReleaseRecord> {

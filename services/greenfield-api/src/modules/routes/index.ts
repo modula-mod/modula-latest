@@ -29,6 +29,7 @@ import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
+import {parseTrustOptions} from '../registry-trust-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
 import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.js'
@@ -106,7 +107,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/modules/:moduleId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request)), request.id))
+      return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request), parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module lookup failed')
     }
@@ -115,7 +116,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/products/:productId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.getModule(String((request.params as any).productId)), request.id))
+      return reply.send(successEnvelope(await registry.getModule(String((request.params as any).productId), parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry product lookup failed')
     }
@@ -202,7 +203,7 @@ export async function registerModuleRoutes(
     if (!requireRegistry(reply, request.id)) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await registry.getVersionDetail(canonicalModuleParam(request), params.version), request.id))
+      return reply.send(successEnvelope(await registry.getVersionDetail(canonicalModuleParam(request), params.version, parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
     }
