@@ -202,7 +202,7 @@ describeIfDb('registry trust pipeline: automated GitHub release sync', () => {
   it('requires an authenticated admin for the sync route', async () => {
     const anonymous = await app.inject({method: 'POST', url: '/v1/admin/registry/sync', payload: {repository: REPOSITORY, releaseTag: 'x'}})
     expect(anonymous.statusCode).toBe(401)
-    const user = await registerAccount(app, `sync-${suffix}@example.com`, `sync${suffix}`)
+    const user = await registerAccount(app, `sync-${suffix}@example.com`, `sync${suffix}`, db)
     const forbidden = await app.inject({method: 'POST', url: '/v1/admin/registry/sync', headers: {authorization: `Bearer ${user.token}`}, payload: {repository: REPOSITORY, releaseTag: 'x'}})
     expect(forbidden.statusCode).toBe(403)
   })

@@ -34,7 +34,7 @@ describeIfDb('registry trust pipeline: listInstalled excludes uninstalled rows',
     app = created.app
     db = created.db
     await app.ready()
-    const account = await registerAccount(app, `state-${suffix}@example.com`, `state${suffix}`)
+    const account = await registerAccount(app, `state-${suffix}@example.com`, `state${suffix}`, db)
     token = account.token
     accountId = account.accountId
     const releases = new GreenfieldModuleReleaseService(db)

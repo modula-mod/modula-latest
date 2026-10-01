@@ -141,7 +141,22 @@ export function evidenceFor(manifest: GreenfieldModuleManifest, artifactSha256 =
   }
 }
 
-export async function registerAccount(app: any, email: string, handle: string) {
+/**
+ * Registers and signs in a test account. Like the other suites, it clears the
+ * per-IP email-verification limiter before and after, so these suites never
+ * leave limiter state that makes parallel suites hit 429.
+ */
+export async function registerAccount(app: any, email: string, handle: string, db?: any) {
+  const clearLimiter = async () => { if (db) await db.deleteFrom('greenfield_auth_rate_limits').where('purpose', '=', 'email_verification').execute() }
+  await clearLimiter()
+  try {
+    return await registerAccountInner(app, email, handle)
+  } finally {
+    await clearLimiter()
+  }
+}
+
+async function registerAccountInner(app: any, email: string, handle: string) {
   const password = 'secure-pass-word-1'
   const register = await app.inject({method: 'POST', url: '/v1/accounts/register', payload: {email, password, handle, displayName: 'Registry Trust Test', acceptedTerms: true}})
   expect(register.statusCode, register.body).toBe(201)

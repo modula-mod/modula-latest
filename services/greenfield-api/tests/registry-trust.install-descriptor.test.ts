@@ -43,7 +43,7 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
     await app.ready()
     await publish(productId, '0.1.0')
     await publish(productId, '0.2.0')
-    token = (await registerAccount(app, `install-${suffix}@example.com`, `inst${suffix}`)).token
+    token = (await registerAccount(app, `install-${suffix}@example.com`, `inst${suffix}`, db)).token
   })
 
   afterAll(async () => {
