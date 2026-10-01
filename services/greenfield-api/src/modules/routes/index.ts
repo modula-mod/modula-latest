@@ -29,6 +29,7 @@ import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
+import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
 import {parseTrustOptions} from '../registry-trust-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
@@ -52,6 +53,7 @@ export async function registerModuleRoutes(
 ): Promise<void> {
   const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
+  const signingKeys = new GreenfieldPublisherSigningKeyService(db)
   const releases = new GreenfieldModuleReleaseService(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
   const installations = new GreenfieldModuleInstallationService(db, config)
@@ -206,6 +208,15 @@ export async function registerModuleRoutes(
       return reply.send(successEnvelope(await registry.getVersionDetail(canonicalModuleParam(request), params.version, parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
+    }
+  })
+
+  app.get('/v1/registry/publishers/:publisherId/signing-keys', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await signingKeys.listForPublisher(String((request.params as any).publisherId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key lookup failed')
     }
   })
 
@@ -965,6 +976,30 @@ export async function registerModuleRoutes(
   app.post('/v1/admin/registry/publishers/:publisherId/revoke', routeConfig.writeConfig, publisherAdminAction(sessions, publishers, request =>
     publishers.revokePublisher((request.params as any).publisherId),
   ))
+
+  // Publisher signing keys: public halves only. Private keys stay with the publisher.
+  app.post('/v1/admin/registry/publishers/:publisherId/signing-keys', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
+      return reply.code(201).send(successEnvelope(await signingKeys.register(String((request.params as any).publisherId), body, auth.accountId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key registration failed')
+    }
+  })
+  app.post('/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      const params = request.params as {publisherId: string; keyId: string}
+      return reply.send(successEnvelope(await signingKeys.revoke(params.publisherId, params.keyId, (request.body as any)?.reason, auth.accountId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key revocation failed')
+    }
+  })
 }
 
 async function publishByReleaseId(releases: GreenfieldModuleReleaseService, releaseId: string) {

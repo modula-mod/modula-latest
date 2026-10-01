@@ -59,6 +59,7 @@ export class GreenfieldMpsIngestService {
       throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
     }
     const assetBytes = verifyPresentationAssetBytes(product.presentationAssets, input.assets ?? [])
+    if (input.releaseId) await assertSignedDigestsMatch(this.db, input.releaseId, manifestSha256, product.frontendArtifact?.sha256 ?? null)
     const recordCollections = input.releaseId
       ? projectMpsRecordCollections({
           manifest: product.raw,
@@ -450,5 +451,27 @@ async function projectRecordCollections(
         updated_at: values.updated_at,
       }))
       .execute()
+  }
+}
+
+/**
+ * A signed release binds the exact modula.product.json and frontend bytes in
+ * its publisher statement. Bytes that differ from what the publisher signed
+ * are rejected rather than ingested next to a "verified" signature.
+ */
+async function assertSignedDigestsMatch(db: ModulaDb, releaseId: string, productManifestSha256: string, frontendSha256: string | null) {
+  const rows = await db.selectFrom('greenfield_module_release_signatures')
+    .select(['statement', 'verification_state'])
+    .where('release_id', '=', releaseId)
+    .execute()
+  for (const row of rows) {
+    const statement = (row.statement ?? null) as {productManifestSha256?: string | null; frontendSha256?: string | null} | null
+    if (!statement) continue
+    if (statement.productManifestSha256 && statement.productManifestSha256 !== productManifestSha256) {
+      throw moduleError('VALIDATION_FAILED', 'modula.product.json does not match the digest the publisher signed')
+    }
+    if (statement.frontendSha256 && statement.frontendSha256 !== frontendSha256) {
+      throw moduleError('VALIDATION_FAILED', 'Frontend artifact does not match the digest the publisher signed')
+    }
   }
 }

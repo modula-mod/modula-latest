@@ -9,6 +9,7 @@ import {
   type GreenfieldModuleManifest,
   type ModulaExtensionProduct,
 } from '@modula/greenfield-module-manifest'
+import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, normalizeSignatureInput, type PublisherReleaseStatement, type ReleaseSignatureInput, type SignatureVerificationResult} from './release-signing.js'
 import {sql} from 'kysely'
 import type {GreenfieldModuleReleaseState} from '../database/types.js'
 import type {ModulaDb} from '../database/client.js'
@@ -43,6 +44,12 @@ export type GreenfieldModuleReleaseEvidence = {
   releaseCommit: string
   artifactSha256: string
   manifestSha256?: string
+  /** sha256 of the exact modula.product.json bytes shipped in the release (bound by a publisher signature). */
+  productManifestSha256?: string | null
+  /** sha256 of the exact frontend artifact bytes (bound by a publisher signature). */
+  frontendSha256?: string | null
+  /** Publisher Ed25519 signature from the provenance sidecar: {algorithm: 'Ed25519', keyId, value}. */
+  signature?: unknown
 }
 
 const CONTRIBUTION_TYPE_BY_GROUP: Record<keyof GreenfieldModuleContributions, ContributionType> = {
@@ -84,6 +91,21 @@ export class GreenfieldModuleReleaseService {
     const sourceCommit = evidence?.releaseCommit ?? manifest.source.commit
     const backend = manifest.backend ?? {mode: 'greenfield-managed' as const}
     const productKind = productKindForManifest(manifest)
+    const signatureInput = releaseSignatureInput(manifest, evidence)
+    const signing = new GreenfieldPublisherSigningKeyService(this.db)
+    const signatureCheck = signatureInput
+      ? await signing.verify(buildPublisherReleaseStatement({
+          manifest,
+          sourceSha: sourceCommit,
+          artifactSha256: releaseSha,
+          productManifestSha256: evidence?.productManifestSha256 ?? null,
+          frontendSha256: evidence?.frontendSha256 ?? null,
+          signingKeyId: signatureInput.keyId,
+        }), signatureInput, now)
+      : null
+    if (signatureCheck && signatureCheck.state !== 'verified') {
+      throw moduleError('VALIDATION_FAILED', `Release signature rejected (${signatureCheck.state}): ${signatureCheck.detail}`)
+    }
     const dependencyRows = dependencyRequestsFromManifest(manifest)
       .filter(dependency => dependency.moduleId && (dependency.relation === 'requires' || dependency.relation === 'optional' || dependency.relation === 'recommended'))
 
@@ -141,8 +163,8 @@ export class GreenfieldModuleReleaseService {
           manifest_path: manifest.source.manifestPath,
           manifest_sha256: computedManifestSha,
           release_sha256: releaseSha,
-          signature_key_id: manifest.integrity.signatureKeyId ?? null,
-          signature: manifest.integrity.signature ?? null,
+          signature_key_id: signatureInput?.keyId ?? null,
+          signature: signatureInput?.value ?? null,
           compatibility: manifest.compatibility,
           license_status: manifest.license.status,
           trust_level: manifest.trust.requestedLevel,
@@ -286,17 +308,23 @@ export class GreenfieldModuleReleaseService {
           updated_at: now,
         })
         .execute()
-      if (manifest.integrity.signatureKeyId && manifest.integrity.signature) {
+      if (signatureInput && signatureCheck) {
         await trx
           .insertInto('greenfield_module_release_signatures')
           .values({
-            signature_id: `module-signature:${releaseId}:${manifest.integrity.signatureKeyId}`,
+            signature_id: `module-signature:${releaseId}:${signatureInput.keyId}`,
             release_id: releaseId,
-            signature_key_id: manifest.integrity.signatureKeyId,
-            signature: manifest.integrity.signature,
+            signature_key_id: signatureInput.keyId,
+            signature: signatureInput.value,
             algorithm: 'Ed25519',
-            verified_at: null,
+            verified_at: now,
             revoked_at: null,
+            statement: jsonb(signatureCheck.statement),
+            statement_sha256: signatureCheck.statementSha256,
+            verification_state: 'verified',
+            verification_detail: signatureCheck.detail,
+            public_key_fingerprint: signatureCheck.publicKeyFingerprint,
+            observed_at: now,
           })
           .execute()
       }
@@ -401,8 +429,52 @@ export class GreenfieldModuleReleaseService {
       await this.quarantineRelease(release.releaseId, 'checksum mismatch', 'block')
       throw moduleError('VALIDATION_FAILED', 'Manifest checksum mismatch quarantined release')
     }
+    await this.verifyReleaseSignatures(release)
     await this.setReleaseState(release.releaseId, 'verified')
     return this.requireRelease(moduleId, version)
+  }
+
+  /**
+   * Re-verifies every recorded publisher signature against a statement rebuilt
+   * from the registry's own facts. Unsigned releases pass (and surface as
+   * "unsigned" in the trust block); a failing signature quarantines the release.
+   */
+  async verifyReleaseSignatures(release: GreenfieldModuleReleaseRecord): Promise<SignatureVerificationResult[]> {
+    const rows = await this.db.selectFrom('greenfield_module_release_signatures').selectAll().where('release_id', '=', release.releaseId).execute()
+    if (!rows.length) return []
+    const ingestion = await this.db.selectFrom('greenfield_mps_ingestions').select(['manifest_sha256']).where('release_id', '=', release.releaseId).executeTakeFirst()
+    const frontend = await this.db.selectFrom('greenfield_release_frontends').select(['artifact_sha256']).where('release_id', '=', release.releaseId).executeTakeFirst()
+    const signing = new GreenfieldPublisherSigningKeyService(this.db)
+    const results: SignatureVerificationResult[] = []
+    for (const row of rows) {
+      const signed = (row.statement ?? {}) as Partial<PublisherReleaseStatement>
+      const statement = buildPublisherReleaseStatement({
+        manifest: release.manifest,
+        sourceSha: release.sourceCommit,
+        artifactSha256: release.releaseSha256 ?? '',
+        productManifestSha256: ingestion?.manifest_sha256 ?? signed.productManifestSha256 ?? null,
+        frontendSha256: frontend?.artifact_sha256 ?? signed.frontendSha256 ?? null,
+        signingKeyId: row.signature_key_id,
+      })
+      const result = await signing.verify(statement, {algorithm: row.algorithm, keyId: row.signature_key_id, value: row.signature}, row.observed_at ?? new Date())
+      results.push(result)
+      const now = new Date()
+      await this.db.updateTable('greenfield_module_release_signatures').set({
+        verification_state: result.state,
+        verification_detail: result.detail,
+        public_key_fingerprint: result.publicKeyFingerprint,
+        statement_sha256: result.statementSha256,
+        verified_at: result.state === 'verified' ? now : null,
+        revoked_at: result.state === 'revokedKey' ? (row.revoked_at ?? now) : row.revoked_at,
+        statement: row.statement ?? jsonb(statement),
+        observed_at: row.observed_at ?? now,
+      }).where('signature_id', '=', row.signature_id).execute()
+      if (result.state !== 'verified') {
+        await this.quarantineRelease(release.releaseId, `signature ${result.state}`, 'block')
+        throw moduleError('VALIDATION_FAILED', `Release signature ${result.state}: ${result.detail}; release quarantined`)
+      }
+    }
+    return results
   }
 
   async verifyReleaseFromId(releaseId: string): Promise<GreenfieldModuleReleaseRecord> {
@@ -682,6 +754,18 @@ function validateReleaseEvidence(
   if (Boolean(signatureKeyId) !== Boolean(signature)) throw moduleError('VALIDATION_FAILED', 'Release signature and key ID must be declared together')
   if (signatureKeyId && !/^[A-Za-z0-9._:-]{3,160}$/.test(signatureKeyId)) throw moduleError('VALIDATION_FAILED', 'Release signature key ID is malformed')
   if (signature && !/^[A-Za-z0-9_-]{86}$/.test(signature)) throw moduleError('VALIDATION_FAILED', 'Release signature is not a canonical Ed25519 base64url value')
+}
+
+function releaseSignatureInput(manifest: GreenfieldModuleManifest, evidence?: GreenfieldModuleReleaseEvidence): ReleaseSignatureInput | null {
+  const fromEvidence = normalizeSignatureInput(evidence?.signature)
+  const keyId = manifest.integrity.signatureKeyId
+  const value = manifest.integrity.signature
+  if (Boolean(keyId) !== Boolean(value)) throw moduleError('VALIDATION_FAILED', 'Release signature and key ID must be declared together')
+  const fromManifest = keyId && value ? normalizeSignatureInput({algorithm: 'Ed25519', keyId, value}) : null
+  if (fromEvidence && fromManifest && (fromEvidence.keyId !== fromManifest.keyId || fromEvidence.value !== fromManifest.value)) {
+    throw moduleError('VALIDATION_FAILED', 'Manifest integrity signature conflicts with the provenance signature')
+  }
+  return fromEvidence ?? fromManifest
 }
 
 function mapRelease(row: any): GreenfieldModuleReleaseRecord {
