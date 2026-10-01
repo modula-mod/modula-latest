@@ -8,7 +8,9 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
   const p = payload as any
   if (!p.installationId || !p.targetReleaseId || !p.previousStatus) throw permanentModuleJob('VALIDATION_FAILED', 'Invalid module.update payload')
   const release = await db.selectFrom('greenfield_module_releases').selectAll().where('release_id', '=', p.targetReleaseId).executeTakeFirst()
-  if (!release || release.release_state !== 'published') throw permanentModuleJob('VALIDATION_FAILED', 'Target release unavailable')
+  // Superseded releases stay immutable and published, so a downgrade may target them;
+  // revoked, quarantined and unpublished releases never bind to an installation.
+  if (!release || !['published', 'superseded'].includes(release.release_state)) throw permanentModuleJob('VALIDATION_FAILED', 'Target release unavailable')
   await db.transaction().execute(async trx => {
     const old = await trx.selectFrom('greenfield_extension_installations').select('extension_version_id').where('installation_id', '=', p.installationId).executeTakeFirst()
     if (old) {
@@ -39,6 +41,9 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): 
       productId: release.module_id,
       state: p.previousStatus === 'enabled' ? 'ENABLED' : 'DISABLED',
     })
+    if (typeof p.planId === 'string' && p.planId) {
+      await trx.updateTable('greenfield_module_install_plans').set({status: 'completed', updated_at: new Date()}).where('plan_id', '=', p.planId).execute()
+    }
     for (const dependant of Array.isArray(p.incompatibleExtensions) ? p.incompatibleExtensions : []) {
       if (!dependant?.installationId || !dependant?.productId) continue
       await projectExtensionLifecycle(trx as any, {

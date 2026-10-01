@@ -610,6 +610,34 @@ export async function registerModuleRoutes(
     }
   })
 
+  // Versions of a module relative to the account's installation (upgrade,
+  // downgrade, current), gated on registry trust and compatibility.
+  app.get('/v1/modules/:moduleId/versions', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      return reply.send(successEnvelope(await updates.versions(auth.accountId, canonicalModuleParam(request), parseTrustOptions(request.query)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Module versions lookup failed')
+    }
+  })
+
+  // Dry run of a version switch: permission changes, data-schema warning, trust
+  // and the immutable install descriptor of the target release. Changes nothing.
+  app.post('/v1/modules/:moduleId/version-preview', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const body = (request.body as any) ?? {}
+      return reply.send(successEnvelope(await updates.preview(auth.accountId, canonicalModuleParam(request), {
+        version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
+        ...parseTrustOptions({hostVersion: body.hostVersion, platform: body.platform}),
+      }), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Version preview failed')
+    }
+  })
+
   app.post('/v1/modules/:moduleId/update', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
@@ -618,8 +646,11 @@ export async function registerModuleRoutes(
       return reply.code(202).send(
         successEnvelope(
           await updates.update(auth.accountId, canonicalModuleParam(request), {
-            version: body.version,
-            approvedPermissionIncrease: Boolean(body.approvedPermissionIncrease),
+            version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
+            approvedPermissionIncrease: body.approvedPermissionIncrease === true,
+            approvedPermissions: Array.isArray(body.approvedPermissions) ? body.approvedPermissions.filter((permission: unknown): permission is string => typeof permission === 'string') : undefined,
+            acknowledgeDowngradeRisk: body.acknowledgeDowngradeRisk === true,
+            ...parseTrustOptions({hostVersion: body.hostVersion, platform: body.platform}),
             idempotencyKey: idempotencyKey(request, body),
           }),
           request.id,
