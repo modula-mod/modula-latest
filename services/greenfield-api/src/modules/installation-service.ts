@@ -1,4 +1,5 @@
 import {contributionCounts} from '@modula/greenfield-module-manifest'
+import {NOT_INSTALLED_STATUSES, isInstalledStatus} from './installation-status.js'
 import {
   assertInstallationTransition,
   type GreenfieldModuleInstallPreview,
@@ -80,7 +81,7 @@ export class GreenfieldModuleInstallationService {
         'greenfield_module_releases.product_kind',
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .orderBy('greenfield_module_releases.module_id')
       .execute()
     const installations = await Promise.all(rows.map(async row => {
@@ -185,7 +186,7 @@ export class GreenfieldModuleInstallationService {
       resolveCanonicalModuleId(row.moduleId) === canonicalId ||
       (isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId)),
     )
-    if (existingFamily && existingFamily.status !== 'removed') {
+    if (existingFamily && isInstalledStatus(existingFamily.status)) {
       if (input.version && existingFamily.version !== input.version) {
         throw moduleError('CONFLICT', `${canonicalId}@${existingFamily.version} is already installed; use update to move to ${input.version}`)
       }

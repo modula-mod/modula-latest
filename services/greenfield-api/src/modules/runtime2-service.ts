@@ -1,4 +1,5 @@
 import {canonicalJsonStringify} from '@modula/greenfield-protocol'
+import {NOT_INSTALLED_STATUSES} from './installation-status.js'
 import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {createCipheriv, createHash, randomBytes} from 'node:crypto'
 import {sql, type Transaction} from 'kysely'
@@ -441,7 +442,7 @@ export class GreenfieldModuleRuntime2Service {
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
       .where('greenfield_module_releases.module_id', '=', moduleId)
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .executeTakeFirst()
     if (!row) throw moduleError('NOT_FOUND', 'Module installation not found')
     return row

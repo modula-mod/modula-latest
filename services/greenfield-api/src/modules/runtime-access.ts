@@ -1,4 +1,5 @@
 import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
+import {NOT_INSTALLED_STATUSES} from './installation-status.js'
 import {moduleIdFamily, resolveCanonicalModuleId, rewriteLegacyVaultNotesId} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
@@ -38,7 +39,7 @@ export class GreenfieldModuleRuntimeAccessService {
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .executeTakeFirst()
 
     if (!row) throw moduleError('NOT_FOUND', 'Module installation not found')
