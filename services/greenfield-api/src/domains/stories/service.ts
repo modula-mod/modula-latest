@@ -8,6 +8,11 @@ import type {ModulaDb} from '../../database/client.js'
 const STORY_TTL_MS = 24 * 60 * 60 * 1000
 const IMAGE_DURATION_MS = 5_000
 
+/** Items expire STORY_TTL_MS after their own created_at, independent of the group's expires_at. */
+export function storyItemLiveCutoff(now: Date = new Date()): Date {
+  return new Date(now.getTime() - STORY_TTL_MS)
+}
+
 export type StoryRingState =
   | 'unviewed'
   | 'partial'
@@ -82,6 +87,7 @@ export class StoryService {
 
   async listRail(viewerActorId: string | null): Promise<StoryRailEntry[]> {
     const now = new Date()
+    const liveCutoff = storyItemLiveCutoff(now)
     const groups = await this.db
       .selectFrom('greenfield_story_groups as g')
       .innerJoin('actors as a', 'a.id', 'g.owner_actor_id')
@@ -111,7 +117,9 @@ export class StoryService {
         .select(['item_id', 'status'])
         .where('group_id', '=', group.group_id)
         .where('deleted_at', 'is', null)
+        .where('created_at', '>', liveCutoff)
         .execute()
+      // Hide groups with no live (unexpired) items.
       if (items.length === 0) continue
 
       const readyOrPending = items.filter(item => item.status !== 'failed' || group.owner_actor_id === viewerActorId)
@@ -136,6 +144,9 @@ export class StoryService {
       const hasUploading = items.some(item => item.status === 'uploading')
       const hasFailed = items.some(item => item.status === 'failed')
       const readyCount = items.filter(item => item.status === 'ready').length
+      const readyOrPendingCount = items.filter(
+        item => item.status === 'ready' || item.status === 'uploading',
+      ).length
       let ringState: StoryRingState = 'unviewed'
       if (isOwner) ringState = hasFailed ? 'failed' : hasUploading ? 'uploading' : 'owner'
       else if (viewedCount === 0) ringState = 'unviewed'
@@ -150,7 +161,7 @@ export class StoryService {
         handle: group.handle,
         avatarUrl: group.avatar_url,
         ringState,
-        itemCount: items.length,
+        itemCount: readyOrPendingCount,
         unviewedCount: Math.max(0, readyCount - viewedCount),
         expiresAt: group.expires_at.toISOString(),
         isOwner,
@@ -207,18 +218,25 @@ export class StoryService {
       ])
       .where('g.group_id', '=', groupId)
       .executeTakeFirst()
-    if (!group || group.deleted_at || group.expires_at <= new Date()) return null
+    const now = new Date()
+    if (!group || group.deleted_at || group.expires_at <= now) return null
     if (!(await this.canViewGroup(viewerActorId, group.owner_actor_id, group.visibility))) {
       return null
     }
 
-    const items = await this.db
-      .selectFrom('greenfield_story_items')
-      .selectAll()
-      .where('group_id', '=', groupId)
-      .where('deleted_at', 'is', null)
-      .orderBy('sort_order', 'asc')
-      .execute()
+    const isOwner = viewerActorId === group.owner_actor_id
+    const items = (
+      await this.db
+        .selectFrom('greenfield_story_items')
+        .selectAll()
+        .where('group_id', '=', groupId)
+        .where('deleted_at', 'is', null)
+        .where('created_at', '>', storyItemLiveCutoff(now))
+        .orderBy('sort_order', 'asc')
+        .execute()
+    ).filter(item => item.status === 'ready' || isOwner)
+    // A group with no live items visible to this viewer is treated as gone.
+    if (items.length === 0) return null
 
     const viewedIds = new Set<string>()
     if (viewerActorId) {
@@ -244,20 +262,18 @@ export class StoryService {
       avatarUrl: group.avatar_url,
       visibility: group.visibility,
       expiresAt: group.expires_at.toISOString(),
-      isOwner: viewerActorId === group.owner_actor_id,
-      items: items
-        .filter(item => item.status === 'ready' || viewerActorId === group.owner_actor_id)
-        .map(item => ({
-          itemId: item.item_id,
-          groupId: item.group_id,
-          mediaKind: item.media_kind,
-          mediaUrl: item.media_url,
-          caption: item.caption,
-          status: item.status,
-          durationMs: item.duration_ms,
-          viewed: viewedIds.has(item.item_id),
-          createdAt: item.created_at.toISOString(),
-        })),
+      isOwner,
+      items: items.map(item => ({
+        itemId: item.item_id,
+        groupId: item.group_id,
+        mediaKind: item.media_kind,
+        mediaUrl: item.media_url,
+        caption: item.caption,
+        status: item.status,
+        durationMs: item.duration_ms,
+        viewed: viewedIds.has(item.item_id),
+        createdAt: item.created_at.toISOString(),
+      })),
     }
   }
 
@@ -357,6 +373,7 @@ export class StoryService {
       .select(['i.item_id', 'i.status', 'g.owner_actor_id', 'g.visibility', 'g.expires_at', 'g.deleted_at'])
       .where('i.item_id', '=', itemId)
       .where('i.deleted_at', 'is', null)
+      .where('i.created_at', '>', storyItemLiveCutoff())
       .executeTakeFirst()
     if (!item || item.deleted_at || item.expires_at <= new Date() || item.status !== 'ready') {
       throw Object.assign(new Error('Story item not found'), {code: 'NOT_FOUND'})

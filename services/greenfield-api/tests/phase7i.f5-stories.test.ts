@@ -142,6 +142,88 @@ describeIfDb('Phase 7I-F5 stories acceptance', () => {
     expect(expiredRail.json().data.items.some((item: any) => item.groupId === expiredGroupId)).toBe(false)
   })
 
+  it('expires items 24h after their own created_at and counts only live ready/pending items', async () => {
+    const owner = await createVerifiedUser(`f5se${runSuffix}`.slice(0, 20), 'F5B Stories Expiry')
+    const pixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII='
+    const first = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: pixel, visibility: 'public',
+    })
+    expect(first.statusCode).toBe(201)
+    const groupId = first.json().data.groupId
+    const oldItemId = first.json().data.items[0].itemId
+
+    // Backdate the first item past the TTL; the group itself stays unexpired.
+    await db
+      .updateTable('greenfield_story_items')
+      .set({created_at: new Date(Date.now() - 25 * 60 * 60 * 1000)})
+      .where('item_id', '=', oldItemId)
+      .execute()
+
+    const anonRail = await app.inject({method: 'GET', url: '/v1/stories/rail'})
+    expect(anonRail.statusCode).toBe(200)
+    expect(anonRail.json().data.items.some((item: any) => item.groupId === groupId)).toBe(false)
+    const anonGroup = await app.inject({method: 'GET', url: `/v1/stories/${groupId}`})
+    expect(anonGroup.statusCode).toBe(404)
+    const ownerRail = await authed(owner.accessToken, 'GET', '/v1/stories/rail')
+    expect(ownerRail.statusCode).toBe(200)
+    const ownerEntry = ownerRail.json().data.items.find((item: any) => item.ownerActorId === owner.actorId)
+    expect(ownerEntry.groupId).toBe(`add:${owner.actorId}`)
+    expect(ownerEntry.itemCount).toBe(0)
+    const viewExpired = await authed(owner.accessToken, 'POST', `/v1/stories/items/${oldItemId}/viewed`)
+    expect(viewExpired.statusCode).toBe(404)
+
+    const second = await authed(owner.accessToken, 'POST', '/v1/stories', {
+      mediaKind: 'image', contentType: 'image/png', base64: pixel, visibility: 'public',
+    })
+    expect(second.statusCode).toBe(201)
+    expect(second.json().data.groupId).toBe(groupId)
+    expect(second.json().data.items.map((item: any) => item.itemId)).not.toContain(oldItemId)
+    expect(second.json().data.items).toHaveLength(1)
+
+    // A failed item is shown to the owner but is not counted.
+    await db
+      .insertInto('greenfield_story_items')
+      .values({
+        item_id: crypto.randomUUID(), group_id: groupId, media_kind: 'image', media_url: null,
+        media_file_name: null, caption: null, status: 'failed', sort_order: 99, duration_ms: 5000,
+        created_at: new Date(), deleted_at: null,
+      })
+      .execute()
+    const liveRail = await app.inject({method: 'GET', url: '/v1/stories/rail'})
+    const liveEntry = liveRail.json().data.items.find((item: any) => item.groupId === groupId)
+    expect(liveEntry).toBeTruthy()
+    expect(liveEntry.itemCount).toBe(1)
+    const liveGroup = await app.inject({method: 'GET', url: `/v1/stories/${groupId}`})
+    expect(liveGroup.statusCode).toBe(200)
+    expect(liveGroup.json().data.items).toHaveLength(1)
+    const ownerGroup = await authed(owner.accessToken, 'GET', `/v1/stories/${groupId}`)
+    expect(ownerGroup.json().data.items).toHaveLength(2)
+    const ownerLiveRail = await authed(owner.accessToken, 'GET', '/v1/stories/rail')
+    expect(ownerLiveRail.json().data.items[0].groupId).toBe(groupId)
+    expect(ownerLiveRail.json().data.items[0].itemCount).toBe(1)
+  })
+
+  it('rejects a present but invalid Authorization header on optional-auth story routes', async () => {
+    const bogus = {authorization: 'Bearer not-a-real-token'}
+    const rail = await app.inject({method: 'GET', url: '/v1/stories/rail', headers: bogus})
+    expect(rail.statusCode).toBe(401)
+    expect(rail.json().error.code).toBe('UNAUTHENTICATED')
+    const group = await app.inject({
+      method: 'GET', url: '/v1/stories/00000000-0000-0000-0000-000000000000', headers: bogus,
+    })
+    expect(group.statusCode).toBe(401)
+    const anonymous = await app.inject({method: 'GET', url: '/v1/stories/rail'})
+    expect(anonymous.statusCode).toBe(200)
+
+    const user = await createVerifiedUser(`f5sr${runSuffix}`.slice(0, 20), 'F5B Stories Revoked')
+    const valid = await authed(user.accessToken, 'GET', '/v1/stories/rail')
+    expect(valid.statusCode).toBe(200)
+    const logout = await authed(user.accessToken, 'DELETE', '/v1/sessions/current')
+    expect([200, 204]).toContain(logout.statusCode)
+    const revoked = await authed(user.accessToken, 'GET', '/v1/stories/rail')
+    expect(revoked.statusCode).toBe(401)
+  })
+
   async function createVerifiedUser(handle: string, displayName: string) {
     const password = 'secure-pass-word-1'
     const email = `${handle}@example.com`
