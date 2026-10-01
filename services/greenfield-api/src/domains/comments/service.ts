@@ -1,7 +1,8 @@
 import {randomUUID} from 'node:crypto'
 import {GREENFIELD_REACTION_TYPES} from '@modula/greenfield-contracts'
-import {sql} from 'kysely'
+import {sql, type Selectable} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
 import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
@@ -29,7 +30,7 @@ export class CommentService {
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
     let query = this.db.selectFrom('greenfield_comments').selectAll().where('post_id', '=', postId).where('parent_comment_id', 'is', null).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
-    return query.execute()
+    return this.withAuthors(await query.execute())
   }
 
   async listReplies(viewerActorId: string | null, commentId: string) {
@@ -41,7 +42,7 @@ export class CommentService {
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
     let query = this.db.selectFrom('greenfield_comments').selectAll().where('root_comment_id', '=', commentId).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
-    return query.execute()
+    return this.withAuthors(await query.execute())
   }
 
   async createComment(actorId: string, postId: string, text: string) {
@@ -180,7 +181,27 @@ export class CommentService {
         {type: 'comment', id, actorId},
       )
     })
-    return this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', id).executeTakeFirstOrThrow()
+    const created = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', id).executeTakeFirstOrThrow()
+    return (await this.withAuthors([created]))[0]!
+  }
+
+  // Attribution for already-authorized comments, not a full profile disclosure.
+  // One batched query avoids an extra profile request for every visible row.
+  private async withAuthors(rows: Selectable<Database['greenfield_comments']>[]) {
+    if (!rows.length) return []
+    const profiles = await this.db.selectFrom('profiles')
+      .select(['actor_id', 'id', 'handle', 'display_name', 'avatar_url'])
+      .where('actor_id', 'in', [...new Set(rows.map(row => row.author_actor_id))])
+      .where('deleted_at', 'is', null)
+      .execute()
+    const byActor = new Map(profiles.map(profile => [profile.actor_id, profile]))
+    return rows.map(row => {
+      const profile = byActor.get(row.author_actor_id)
+      return {...row, author: profile ? {
+        id: profile.id, handle: profile.handle, displayName: profile.display_name,
+        avatarUri: profile.avatar_url ?? undefined,
+      } : null}
+    })
   }
 
   private async excludedActors(viewerActorId: string) {
