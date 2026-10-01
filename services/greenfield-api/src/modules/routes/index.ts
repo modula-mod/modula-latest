@@ -30,6 +30,7 @@ import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
+import {GreenfieldGithubReleaseSyncService, HttpGithubReleaseSource, type GithubReleaseSource} from '../github-release-sync-service.js'
 import {parseTrustOptions} from '../registry-trust-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
@@ -50,10 +51,12 @@ export async function registerModuleRoutes(
   config: AppConfig,
   sessions: GreenfieldSessionService,
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
+  options: {githubReleaseSource?: GithubReleaseSource} = {},
 ): Promise<void> {
   const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
   const signingKeys = new GreenfieldPublisherSigningKeyService(db)
+  const githubSync = new GreenfieldGithubReleaseSyncService(db, options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}))
   const releases = new GreenfieldModuleReleaseService(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
   const installations = new GreenfieldModuleInstallationService(db, config)
@@ -937,7 +940,16 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       await publishers.requireAdminAccount(auth.accountId)
-      return reply.code(202).send(successEnvelope({queued: false, githubSyncEnabled: config.moduleGithubSyncEnabled}, request.id))
+      if (!config.moduleGithubSyncEnabled) throw moduleError('CAPABILITY_DISABLED', 'GitHub registry sync is disabled')
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
+      const result = await githubSync.sync({
+        repository: String(body.repository ?? ''),
+        releaseTag: String(body.releaseTag ?? ''),
+        publish: body.publish === true,
+        // Dry run unless the caller explicitly asks to apply.
+        dryRun: body.dryRun !== false,
+      })
+      return reply.code(result.mode === 'APPLIED' ? 201 : 200).send(successEnvelope(result, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry sync failed')
     }

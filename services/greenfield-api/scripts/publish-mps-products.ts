@@ -28,7 +28,13 @@ type ProductRelease = {
   provenance: ReleaseProvenance
 }
 
-const {apply, roots} = parseArgs(process.argv.slice(2))
+// DEPRECATED: superseded by scripts/sync-github-release.ts, which fetches and
+// verifies the GitHub release server-side. Kept for existing verification
+// harnesses that run against a local, tag-pinned checkout.
+if (!process.argv.includes('--legacy-local-checkout')) {
+  console.warn('[deprecated] publish-mps-products.ts: use scripts/sync-github-release.ts (registry:sync-github-release); pass --legacy-local-checkout to silence this warning')
+}
+const {apply, roots} = parseArgs(process.argv.slice(2).filter(arg => arg !== '--legacy-local-checkout'))
 const databaseUrl = process.env.MODULA_DATABASE_MIGRATOR_URL ?? process.env.MODULA_DATABASE_URL
 if (!databaseUrl) fail('MODULA_DATABASE_MIGRATOR_URL or MODULA_DATABASE_URL is required')
 
