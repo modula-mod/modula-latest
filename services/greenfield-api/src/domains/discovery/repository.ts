@@ -1,10 +1,11 @@
 import type {ActivityItemDto, DiscoverResultDto, ReelItemDto} from '@modula/api-contracts'
 import type {ModulaDb} from '../../database/client.js'
 import {ProfileRepository} from '../profiles/repository.js'
+import {PostRepository} from '../posts/repository.js'
 
 export class DiscoveryRepository {
   private readonly profiles: ProfileRepository
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, private readonly publicApiUrl = '') {
     this.profiles = new ProfileRepository(db)
   }
 
@@ -59,25 +60,34 @@ export class DiscoveryRepository {
   async listReels(viewerActorId: string | null = null, suppliedExcluded?: string[]): Promise<ReelItemDto[]> {
     const excluded = suppliedExcluded ?? await this.excludedActorIds(viewerActorId)
     let query = this.db
-      .selectFrom('reels')
-      .selectAll()
-      .where('deleted_at', 'is', null)
-      .orderBy('created_at', 'desc')
-    if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
+      .selectFrom('posts as p')
+      .select(['p.id', 'p.created_at'])
+      .where('p.deleted_at', 'is', null)
+      .where('p.audience', '=', 'public')
+      .where(({exists, selectFrom}) => exists(selectFrom('post_content as c')
+        .innerJoin('attachments as a', 'a.attachment_id', 'c.attachment_id')
+        .select('c.content_id').whereRef('c.post_id', '=', 'p.id')
+        .where('c.content_type', '=', 'video').where('a.status', '=', 'ready')))
+      .orderBy('p.created_at', 'desc')
+      .orderBy('p.id', 'desc')
+      .limit(30)
+    if (excluded.length) query = query.where('p.author_actor_id', 'not in', excluded)
     const rows = await query.execute()
+    const posts = new PostRepository(this.db, this.publicApiUrl)
     const out: ReelItemDto[] = []
     for (const row of rows) {
-      const author = await this.profiles.getByActorId(row.author_actor_id, viewerActorId)
-      if (!author) continue
+      const post = await posts.getById(row.id, viewerActorId)
+      if (!post || !post.content?.some(block => block.type === 'video' && block.attachment.status === 'ready')) continue
       out.push({
-        id: row.id,
-        author,
-        caption: row.caption,
-        source: row.source,
-        colour: row.colour,
-        liked: false,
-        likeCount: row.like_count,
-        replyCount: row.reply_count,
+        id: post.id,
+        author: post.author,
+        caption: post.text ?? '',
+        source: 'video-post',
+        colour: post.glowColour ?? '#111111',
+        liked: post.liked,
+        likeCount: post.likeCount,
+        replyCount: post.replyCount,
+        post,
       })
     }
     return out

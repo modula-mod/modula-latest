@@ -5,7 +5,7 @@ import type {FastifyInstance} from 'fastify'
 
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
-import {StoryService} from '../domains/stories/service.js'
+import {StoryService, storyItemLiveCutoff} from '../domains/stories/service.js'
 import {requireCapability} from '../security/auth-context.js'
 import type {SessionService} from '../security/session.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
@@ -29,6 +29,22 @@ function mapDomainError(reply: any, error: any, requestId: string, fallback: str
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
 }
 
+/**
+ * Optional-auth routes treat a missing Authorization header as anonymous, but a
+ * header that is present and does not resolve to a live session (invalid,
+ * expired or revoked) must be rejected so clients refresh or sign out instead
+ * of silently receiving the anonymous view.
+ */
+function rejectUnresolvedAuthorization(request: any, reply: any): boolean {
+  const header = request.headers?.authorization
+  const present = typeof header === 'string' ? header.trim().length > 0 : Array.isArray(header) && header.length > 0
+  if (present && !request.auth) {
+    sendError(reply, 'UNAUTHENTICATED', 'Authentication required', request.id)
+    return true
+  }
+  return false
+}
+
 export async function registerPhase7fStoriesRoutes(
   app: FastifyInstance,
   db: ModulaDb,
@@ -43,11 +59,13 @@ export async function registerPhase7fStoriesRoutes(
   const {feedConfig, writeConfig} = options
 
   app.get('/v1/stories/rail', feedConfig, async (request, reply) => {
+    if (rejectUnresolvedAuthorization(request, reply)) return reply
     const rail = await stories.listRail(request.auth?.actorId ?? null)
     return reply.send(successEnvelope({items: rail}, request.id))
   })
 
   app.get('/v1/stories/:groupId', feedConfig, async (request, reply) => {
+    if (rejectUnresolvedAuthorization(request, reply)) return reply
     const params = request.params as {groupId?: string}
     const groupId = params.groupId ?? ''
     if (!groupId || groupId.startsWith('add:')) {
@@ -123,6 +141,7 @@ export async function registerPhase7fStoriesRoutes(
       .select(['i.media_file_name', 'i.status', 'g.owner_actor_id', 'g.visibility', 'g.expires_at', 'g.deleted_at'])
       .where('i.media_file_name', '=', mediaFile)
       .where('i.deleted_at', 'is', null)
+      .where('i.created_at', '>', storyItemLiveCutoff())
       .executeTakeFirst()
     if (!item || item.deleted_at || item.expires_at <= new Date() || item.status !== 'ready') {
       return sendError(reply, 'NOT_FOUND', 'Media not found', request.id)

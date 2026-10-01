@@ -242,19 +242,28 @@ describeIf('Phase 6S social product integration', () => {
       expect(reloaded.json().data.viewerReaction).toBe(reaction)
     }
 
+    // Metadata contract fixture; this assertion does not claim image decoding.
+    const avatarUri = 'https://example.invalid/comment-avatar.png'
+    await db.updateTable('profiles').set({avatar_url: avatarUri}).where('id', '=', beta.profileId).execute()
     const comment = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/comments`, {
       text: `F5B comment ${runSuffix}`,
     })
     expect(comment.statusCode).toBe(201)
     const commentId = comment.json().data.comment_id
+    expect(comment.json().data.author).toMatchObject({id: beta.profileId, handle: beta.handle, avatarUri})
+    expect(Object.keys(comment.json().data.author).sort()).toEqual(['avatarUri', 'displayName', 'handle', 'id'])
+    const commentReload = await authed(beta.accessToken, 'GET', `/v1/posts/${socialPostId}/comments`)
+    expect(commentReload.json().data.items.find((item: any) => item.comment_id === commentId).author.handle).toBe(beta.handle)
 
     const reply = await authed(alpha.accessToken, 'POST', `/v1/comments/${commentId}/replies`, {
       text: `F5B reply ${runSuffix}`,
     })
     expect(reply.statusCode).toBe(201)
+    expect(reply.json().data.author).toMatchObject({id: alpha.profileId, handle: alpha.handle})
     const replies = await authed(beta.accessToken, 'GET', `/v1/comments/${commentId}/replies`)
     expect(replies.statusCode).toBe(200)
     expect(replies.json().data.items.some((item: any) => item.text === `F5B reply ${runSuffix}`)).toBe(true)
+    expect(replies.json().data.items.find((item: any) => item.text === `F5B reply ${runSuffix}`).author.handle).toBe(alpha.handle)
 
     const bookmark = await authed(beta.accessToken, 'POST', `/v1/posts/${socialPostId}/save`)
     expect(bookmark.statusCode).toBe(200)

@@ -149,7 +149,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   app.addContentTypeParser('application/octet-stream', (request, payload, done) => done(null, payload))
   const profiles = new ProfileRepository(db)
   const posts = new PostRepository(db, config.publicApiUrl)
-  const discovery = new DiscoveryRepository(db)
+  const discovery = new DiscoveryRepository(db, config.publicApiUrl)
   const sessions = new SessionService(db, config)
   const postWrites = new PostWriteService(db, config)
   const reactions = new ReactionService(db)
@@ -1732,6 +1732,39 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       return mapDomainError(reply, error, request.id, 'Profile update failed')
     }
   })
+
+  for (const mediaKind of ['avatar', 'cover'] as const) {
+    app.post(`/v1/profiles/me/${mediaKind}`, writeConfig, async (request, reply) => {
+      if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+      const auth = requireCapability(request, reply, 'profile:update')
+      if (!auth) return
+      try {
+        const attachmentId = (request.body as {attachmentId?: unknown} | undefined)?.attachmentId
+        if (typeof attachmentId !== 'string') {
+          return sendError(reply, 'VALIDATION_FAILED', 'attachmentId is required', request.id)
+        }
+        const updated = await profileWrites.updateMedia(auth.actorId, auth.accountId, mediaKind, attachmentId, config.publicApiUrl, {
+          requestId: request.id, correlationId: request.id,
+        })
+        return reply.send(successEnvelope(updated, request.id))
+      } catch (error: any) {
+        return mapDomainError(reply, error, request.id, 'Profile media update failed')
+      }
+    })
+    app.delete(`/v1/profiles/me/${mediaKind}`, writeConfig, async (request, reply) => {
+      if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+      const auth = requireCapability(request, reply, 'profile:update')
+      if (!auth) return
+      try {
+        const updated = await profileWrites.updateMedia(auth.actorId, auth.accountId, mediaKind, null, config.publicApiUrl, {
+          requestId: request.id, correlationId: request.id,
+        })
+        return reply.send(successEnvelope(updated, request.id))
+      } catch (error: any) {
+        return mapDomainError(reply, error, request.id, 'Profile media removal failed')
+      }
+    })
+  }
 
   app.post('/v1/profiles/:profileId/block', writeConfig, async (request, reply) => {
     if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)

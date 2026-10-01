@@ -61,6 +61,7 @@ export function mapProfile(
       : [],
     links: links.map(mapLink),
     featuredModuleIds: Array.isArray(row.featured_module_ids) ? row.featured_module_ids : [],
+    visibility: row.visibility as ProfileVisibility,
     isFollowing: false,
     followsViewer: false,
     version: row.version,

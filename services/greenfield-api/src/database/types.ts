@@ -380,6 +380,13 @@ export interface Database {
     created_at: Date
     updated_at: Date
   }
+  profile_media: {
+    profile_id: string
+    kind: 'avatar' | 'cover'
+    attachment_id: string
+    created_at: Date
+    updated_at: Date
+  }
   post_content: {
     content_id: string
     post_id: string

@@ -3,6 +3,7 @@ import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AttachmentService} from '../domains/attachments/service.js'
 import {PostRepository} from '../domains/posts/repository.js'
+import {ProfileRepository} from '../domains/profiles/repository.js'
 import {requireCapability} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {applyBrowserVisibleMediaHeaders} from './media-response.js'
@@ -27,6 +28,7 @@ export async function registerAttachmentRoutes(
 ) {
   const attachments = new AttachmentService(db, config)
   const posts = new PostRepository(db, config.publicApiUrl)
+  const profiles = new ProfileRepository(db)
   const {writeConfig, feedConfig, mutationsAllowed} = options
 
   app.post('/v1/attachments/uploads', writeConfig, async (request, reply) => {
@@ -90,6 +92,15 @@ export async function registerAttachmentRoutes(
       .where('attachment_id', '=', attachmentId).executeTakeFirst()
     if (!row || row.status !== 'ready') return sendError(reply, 'NOT_FOUND', 'Attachment not found', request.id)
     let allowed = request.auth?.accountId === row.owner_account_id
+    if (!allowed) {
+      const profileBinding = await db.selectFrom('profile_media as media')
+        .innerJoin('profiles as profile', 'profile.id', 'media.profile_id')
+        .select(['profile.id'])
+        .where('media.attachment_id', '=', attachmentId)
+        .where('profile.deleted_at', 'is', null)
+        .executeTakeFirst()
+      allowed = Boolean(profileBinding && await profiles.getById(profileBinding.id, request.auth?.actorId ?? null))
+    }
     if (!allowed) {
       const bindings = await db.selectFrom('post_content').select('post_id').where('attachment_id', '=', attachmentId).execute()
       for (const binding of bindings) {

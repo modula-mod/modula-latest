@@ -37,6 +37,7 @@ describeIfDb('POST-04 attachment integration', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let serverDb: Awaited<ReturnType<typeof createServer>>['db']
   let bearer: string
+  let attackerBearer: string
   const suffix = randomUUID().replaceAll('-', '').slice(0, 10)
   const owner = identity('owner', suffix)
   const attacker = identity('attacker', suffix)
@@ -52,6 +53,7 @@ describeIfDb('POST-04 attachment integration', () => {
     await seedIdentity(db, owner)
     await seedIdentity(db, attacker)
     bearer = (await new SessionService(db, config).createSession(owner.actorId, STANDARD_SESSION_CAPABILITIES)).token
+    attackerBearer = (await new SessionService(db, config).createSession(attacker.actorId, STANDARD_SESSION_CAPABILITIES)).token
     const server = await createServer(config)
     app = server.app
     serverDb = server.db
@@ -80,6 +82,26 @@ describeIfDb('POST-04 attachment integration', () => {
     })
     expect(post.content?.map(item => item.attachment.id)).toEqual([second.attachmentId, first.attachmentId])
     expect(post.content?.every(item => item.attachment.status === 'ready')).toBe(true)
+  })
+
+  it('hydrates Reels from real video post attachments and excludes private or deleted posts', async () => {
+    // Container signature fixture tests the API contract, not AVPlayer decoding.
+    const video = Buffer.from('00000018667479706d703432000000006d70343269736f6d', 'hex')
+    const upload = await service.createUpload(owner.accountId, {filename: 'reel.mp4', mimeType: 'video/mp4', size: video.length})
+    await service.upload(owner.accountId, upload.uploadId, video)
+    const post = await posts.create(owner.actorId, {text: 'Video post #modula', audience: 'public', content: [{type: 'video', attachmentId: upload.attachmentId}]})
+    const response = await app.inject({method: 'GET', url: '/v1/reels', headers: {authorization: `Bearer ${bearer}`}})
+    expect(response.statusCode).toBe(200)
+    const reel = response.json().data.find((item: any) => item.id === post.id)
+    expect(reel.post.id).toBe(post.id)
+    expect(reel.post.content[0].attachment).toMatchObject({id: upload.attachmentId, kind: 'video', status: 'ready'})
+    expect(reel.post.content[0].attachment.originalURL).toContain(`/v1/attachments/${upload.attachmentId}/content`)
+    await db.updateTable('posts').set({audience: 'private'}).where('id', '=', post.id).execute()
+    const privateList = await app.inject({method: 'GET', url: '/v1/reels'})
+    expect(privateList.json().data.some((item: any) => item.id === post.id)).toBe(false)
+    await db.updateTable('posts').set({audience: 'public', deleted_at: new Date()}).where('id', '=', post.id).execute()
+    const deletedList = await app.inject({method: 'GET', url: '/v1/reels'})
+    expect(deletedList.json().data.some((item: any) => item.id === post.id)).toBe(false)
   })
 
   it('blocks cross-account, mismatched bytes, reuse and unready publication', async () => {
@@ -177,6 +199,68 @@ describeIfDb('POST-04 attachment integration', () => {
     const result = await service.cleanupStaleOrphans(new Date())
     expect(result.removedAttachments).toBeGreaterThanOrEqual(1)
     await expect(service.status(owner.accountId, orphan.attachmentId)).rejects.toMatchObject({code: 'NOT_FOUND'})
+  })
+
+  it('binds owned image attachments as persistent avatar and cover media', async () => {
+    const avatar = await service.createUpload(owner.accountId, {filename: 'avatar.png', mimeType: 'image/png', size: png.length})
+    await service.upload(owner.accountId, avatar.uploadId, png)
+    const bound = await app.inject({
+      method: 'POST', url: '/v1/profiles/me/avatar',
+      headers: {authorization: `Bearer ${bearer}`}, payload: {attachmentId: avatar.attachmentId},
+    })
+    expect(bound.statusCode, bound.body).toBe(200)
+    expect(bound.json().data.avatarUri).toBe(`https://api.example.test/v1/attachments/${avatar.attachmentId}/content`)
+
+    const fresh = await app.inject({method: 'GET', url: `/v1/profiles/${owner.handle}`})
+    expect(fresh.statusCode, fresh.body).toBe(200)
+    expect(fresh.json().data.avatarUri).toBe(bound.json().data.avatarUri)
+    const publicContent = await app.inject({method: 'GET', url: `/v1/attachments/${avatar.attachmentId}/content`})
+    expect(publicContent.statusCode, publicContent.body).toBe(200)
+    expect(publicContent.rawPayload.equals(png)).toBe(true)
+
+    const cover = await service.createUpload(owner.accountId, {filename: 'cover.png', mimeType: 'image/png', size: png.length})
+    await service.upload(owner.accountId, cover.uploadId, png)
+    const coverBound = await app.inject({
+      method: 'POST', url: '/v1/profiles/me/cover',
+      headers: {authorization: `Bearer ${bearer}`}, payload: {attachmentId: cover.attachmentId},
+    })
+    expect(coverBound.statusCode, coverBound.body).toBe(200)
+    expect(coverBound.json().data.coverUri).toContain(cover.attachmentId)
+
+    const followed = await app.inject({
+      method: 'POST', url: `/v1/profiles/${owner.profileId}/follow`,
+      headers: {authorization: `Bearer ${attackerBearer}`},
+    })
+    expect(followed.statusCode, followed.body).toBe(200)
+    await db.updateTable('profiles').set({visibility: 'followers'}).where('actor_id', '=', owner.actorId).execute()
+    const anonymousFollowerCover = await app.inject({method: 'GET', url: `/v1/attachments/${cover.attachmentId}/content`})
+    expect(anonymousFollowerCover.statusCode, anonymousFollowerCover.body).toBe(403)
+    const followerCover = await app.inject({
+      method: 'GET', url: `/v1/attachments/${cover.attachmentId}/content`,
+      headers: {authorization: `Bearer ${attackerBearer}`},
+    })
+    expect(followerCover.statusCode, followerCover.body).toBe(200)
+
+    await db.updateTable('profiles').set({visibility: 'private'}).where('actor_id', '=', owner.actorId).execute()
+    const privateCover = await app.inject({method: 'GET', url: `/v1/attachments/${cover.attachmentId}/content`})
+    expect(privateCover.statusCode, privateCover.body).toBe(403)
+    const ownerCover = await app.inject({
+      method: 'GET', url: `/v1/attachments/${cover.attachmentId}/content`,
+      headers: {authorization: `Bearer ${bearer}`},
+    })
+    expect(ownerCover.statusCode, ownerCover.body).toBe(200)
+
+    const denied = await app.inject({
+      method: 'POST', url: '/v1/profiles/me/avatar',
+      headers: {authorization: `Bearer ${attackerBearer}`}, payload: {attachmentId: avatar.attachmentId},
+    })
+    expect(denied.statusCode, denied.body).toBe(403)
+
+    const removed = await app.inject({
+      method: 'DELETE', url: '/v1/profiles/me/avatar', headers: {authorization: `Bearer ${bearer}`},
+    })
+    expect(removed.statusCode, removed.body).toBe(200)
+    expect(removed.json().data.avatarUri).toBeUndefined()
   })
 })
 

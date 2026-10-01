@@ -48,6 +48,7 @@ export type ModulaProfileDto = {
   identityClaims: Array<Record<string, unknown>>
   links: ProfileLink[]
   featuredModuleIds: string[]
+  visibility: ProfileVisibility
   isFollowing: boolean
   followsViewer: boolean
   version?: number
