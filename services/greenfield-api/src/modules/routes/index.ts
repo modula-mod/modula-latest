@@ -209,6 +209,24 @@ export async function registerModuleRoutes(
     }
   })
 
+  // Immutable release package, when the registry holds the verified bytes.
+  app.get('/v1/registry/releases/:releaseId/artifact', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const artifact = await registry.presentation.readReleaseArtifact(String((request.params as {releaseId?: string}).releaseId ?? ''))
+      return reply
+        .header('ETag', `"sha256-${artifact.sha256}"`)
+        .header('Cache-Control', 'public, max-age=31536000, immutable')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Content-Disposition', `attachment; filename="${artifact.filename}"`)
+        .header('X-Modula-Artifact-Sha256', artifact.sha256)
+        .type('application/gzip')
+        .send(artifact.bytes)
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release artifact lookup failed')
+    }
+  })
+
   // Immutable release media. Bytes are content-addressed and verified at ingest;
   // the registry is the only distribution origin for presentation artwork.
   app.get('/v1/registry/releases/:releaseId/assets/:assetId', routeConfig.profileConfig, async (request, reply) => {
@@ -531,9 +549,10 @@ export async function registerModuleRoutes(
       return reply.code(202).send(
         successEnvelope(
           await installations.install(auth.accountId, canonicalModuleParam(request), {
-            version: body.version,
+            version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
             approvedPermissions: body.approvedPermissions,
             platform: modulePlatform(body.platform),
+            hostVersion: parseTrustOptions({hostVersion: body.hostVersion}).hostVersion,
             idempotencyKey: idempotencyKey(request, body),
           }),
           request.id,
@@ -541,6 +560,17 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/install-descriptor', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const options = parseTrustOptions(request.query)
+      return reply.send(successEnvelope(await installations.getInstallDescriptor(auth.accountId, canonicalModuleParam(request), {hostVersion: options.hostVersion}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Install descriptor lookup failed')
     }
   })
 

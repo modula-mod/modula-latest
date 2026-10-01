@@ -103,6 +103,19 @@ export class GreenfieldRegistryPresentationService {
     return {mediaType: row.media_type, sha256: row.sha256, bytes: Buffer.from(row.bytes), developmentAsset: row.development_asset}
   }
 
+  async readReleaseArtifact(releaseId: string): Promise<{sha256: string; bytes: Buffer; filename: string}> {
+    const row = await this.db.selectFrom('greenfield_module_releases as r')
+      .leftJoin('greenfield_module_sources as s', 's.release_id', 'r.release_id')
+      .leftJoin('greenfield_release_asset_blobs as b', 'b.sha256', 'r.release_sha256')
+      .select(['r.release_state', 'r.release_sha256', 'r.module_id', 'r.version', 's.release_asset_name', 'b.bytes'])
+      .where('r.release_id', '=', releaseId)
+      .executeTakeFirst()
+    if (!row || !(SERVABLE_RELEASE_STATES as readonly string[]).includes(row.release_state)) throw moduleError('NOT_FOUND', 'Release artifact not found')
+    if (!row.bytes || !row.release_sha256) throw moduleError('NOT_FOUND', 'Release artifact bytes are not held by the registry')
+    const filename = (row.release_asset_name ?? `${row.module_id}-${row.version}.tgz`).replace(/[^A-Za-z0-9._-]/g, '_')
+    return {sha256: row.release_sha256, bytes: Buffer.from(row.bytes), filename}
+  }
+
   assetUrl(releaseId: string, assetId: string): string {
     const path = `/v1/registry/releases/${encodeURIComponent(releaseId)}/assets/${encodeURIComponent(assetId)}`
     return this.publicApiUrl ? `${this.publicApiUrl.replace(/\/+$/, '')}${path}` : path
