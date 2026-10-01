@@ -71,6 +71,16 @@ describeIfDb('registry trust pipeline: immutable release media', () => {
     expect(item.registryReleaseId).toBe(releaseId)
     expect(item.presentation.icon.sha256).toBe('9534b516b144c7e8e22a1a6ab181ade6b39fe527587d17863f18d051000ad120')
     expect(item.presentation.screenshots).toHaveLength(1)
+    expect(item.presentation.version).toBe('0.1.0')
+    expect(item.presentation.icon.url).toMatch(/^https:\/\/api\.test\.modula\.digital\/v1\/registry\/releases\//)
+    expect(item.presentation.cover.sha256).toMatch(/^[0-9a-f]{64}$/)
+    expect(item.presentation.screenshots[0].url).toMatch(/\/assets\//)
+    expect(item.trustSummary).toMatchObject({
+      registryReleaseId: releaseId, version: '0.1.0', releaseState: 'published',
+      signatureState: 'unsigned', revoked: false, quarantined: false,
+    })
+    expect(item.trustSummary.warnings).toContain('RELEASE_UNSIGNED')
+    expect(item.trustSummary).not.toHaveProperty('provenance')
   })
 
   it('serves the exact verified bytes with immutable caching headers', async () => {

@@ -144,6 +144,11 @@ export class GreenfieldModuleRegistryService {
       item.registryReleaseId = releaseId ?? null
       item.presentation = releaseId ? summaryPresentation(presentations.get(releaseId) ?? null) : null
     }
+    await Promise.all((items as any[]).map(async item => {
+      const releaseId = latestReleaseIds.get(item.moduleId)
+      const release = releaseId ? await this.releases.getReleaseById(releaseId) : undefined
+      item.trustSummary = release ? summaryTrust(await this.trust.forRelease(release, {}, item.latestVersion ?? null)) : null
+    }))
     return {items, nextCursor: byModule.size > limit ? String(limit) : null}
   }
 
@@ -352,6 +357,23 @@ function summaryPresentation(presentation: Awaited<ReturnType<GreenfieldRegistry
     cover: presentation.cover,
     screenshots: presentation.screenshots,
     developmentAssets: presentation.developmentAssets,
+  }
+}
+
+/** Compact trust summary for list items; the full block stays on the detail endpoint. */
+function summaryTrust(trust: Awaited<ReturnType<GreenfieldRegistryTrustService['forRelease']>>) {
+  return {
+    registryReleaseId: trust.registryReleaseId,
+    version: trust.version,
+    releaseState: trust.releaseState,
+    verified: trust.verified,
+    publisherVerified: trust.publisher.verified,
+    trustLevel: trust.publisher.trustLevel,
+    signatureState: trust.signature.state,
+    releaseSha256: trust.digests.releaseSha256,
+    revoked: trust.revocation.revoked,
+    quarantined: trust.quarantine.quarantined,
+    warnings: trust.warnings.map(warning => warning.code),
   }
 }
 
