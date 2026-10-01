@@ -24,6 +24,8 @@ export class GreenfieldMpsIngestService {
     releaseId?: string | null
     frontend?: {path: string; bytes: string | Buffer} | null
     schemas?: MpsSchemaArtifact[]
+    /** Verified bytes of declared presentation assets (paths relative to the product root). */
+    assets?: Array<{path: string; bytes: Buffer}>
   }) {
     const result = ingestProductManifest({filename: input.filename, bytes: input.bytes})
     if (!result.ok || !result.product) {
@@ -56,6 +58,7 @@ export class GreenfieldMpsIngestService {
     } else if (input.frontend) {
       throw moduleError('VALIDATION_FAILED', 'frontend.mode none cannot ingest a frontend artifact')
     }
+    const assetBytes = verifyPresentationAssetBytes(product.presentationAssets, input.assets ?? [])
     const recordCollections = input.releaseId
       ? projectMpsRecordCollections({
           manifest: product.raw,
@@ -80,6 +83,7 @@ export class GreenfieldMpsIngestService {
       if (input.releaseId && existing.release_id && existing.release_id !== input.releaseId) {
         throw moduleError('CONFLICT', `Product release ${product.productId}@${product.version} is already bound to another registry release`)
       }
+      if (assetBytes.length) await storeAssetBlobs(this.db, assetBytes)
       if (input.releaseId) {
         await this.db.transaction().execute(async trx => {
           if (!existing.release_id) {
@@ -205,11 +209,15 @@ export class GreenfieldMpsIngestService {
           media_type: asset.mediaType,
           width: asset.width ?? null,
           height: asset.height ?? null,
-          sha256: asset.sha256 ?? null,
+          sha256: asset.sha256 ?? assetBytes.find(item => item.path === asset.path)?.sha256 ?? null,
           development_asset: asset.developmentAsset === true,
+          alt_text: asset.alt ?? null,
+          presentation_slot: asset.slot,
+          sort_order: asset.sortOrder,
           created_at: now,
         }))).execute()
       }
+      if (assetBytes.length) await storeAssetBlobs(trx, assetBytes)
 
       const privacy = product.privacy
       if (privacy) {
@@ -299,6 +307,9 @@ export class GreenfieldMpsIngestService {
         path: asset.artifact_path,
         mediaType: asset.media_type,
         sha256: asset.sha256,
+        width: asset.width,
+        height: asset.height,
+        alt: asset.alt_text,
         developmentAsset: asset.development_asset,
       })),
       frontend: frontend ? {
@@ -329,6 +340,72 @@ export class GreenfieldMpsIngestService {
       .executeTakeFirst()
     return alias?.canonical_product_id ?? productId
   }
+}
+
+const ASSET_MEDIA_TYPES = new Set(['image/svg+xml', 'image/png', 'image/webp', 'image/jpeg', 'video/mp4', 'video/webm'])
+const MAX_ASSET_BYTES = 25 * 1024 * 1024
+
+type VerifiedAssetBytes = {path: string; sha256: string; mediaType: string; bytes: Buffer}
+
+/**
+ * Bind supplied bytes to the presentation assets the verified manifest declares.
+ * Declared SHA-256 digests and PNG dimensions must match the bytes exactly; any
+ * undeclared path is rejected so a package cannot smuggle extra media.
+ */
+export function verifyPresentationAssetBytes(
+  declared: Array<{path: string; mediaType: string; sha256?: string; width?: number; height?: number}>,
+  supplied: Array<{path: string; bytes: Buffer}>,
+): VerifiedAssetBytes[] {
+  const verified: VerifiedAssetBytes[] = []
+  for (const item of supplied) {
+    const matches = declared.filter(asset => asset.path === item.path)
+    if (!matches.length) throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} is not declared by the product manifest`)
+    if (!isSafeRelativePath(item.path)) throw moduleError('VALIDATION_FAILED', `Presentation asset path ${item.path} is unsafe`)
+    const bytes = Buffer.isBuffer(item.bytes) ? item.bytes : Buffer.from(item.bytes)
+    if (bytes.length === 0 || bytes.length > MAX_ASSET_BYTES) throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} has an invalid size`)
+    const sha256 = createHash('sha256').update(bytes).digest('hex')
+    for (const asset of matches) {
+      if (!ASSET_MEDIA_TYPES.has(asset.mediaType)) throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} has unsupported media type ${asset.mediaType}`)
+      if (asset.sha256 && asset.sha256 !== sha256) throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} does not match its declared SHA-256`)
+      if (!mediaMatches(asset.mediaType, bytes)) throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} bytes are not ${asset.mediaType}`)
+      const png = asset.mediaType === 'image/png' ? pngDimensions(bytes) : null
+      if (png && ((asset.width && asset.width !== png.width) || (asset.height && asset.height !== png.height))) {
+        throw moduleError('VALIDATION_FAILED', `Presentation asset ${item.path} dimensions do not match the declaration`)
+      }
+    }
+    verified.push({path: item.path, sha256, mediaType: matches[0]!.mediaType, bytes})
+  }
+  return verified
+}
+
+async function storeAssetBlobs(db: any, assets: VerifiedAssetBytes[]) {
+  for (const asset of assets) {
+    await db.insertInto('greenfield_release_asset_blobs')
+      .values({sha256: asset.sha256, media_type: asset.mediaType, byte_size: asset.bytes.length, bytes: asset.bytes, created_at: new Date()})
+      .onConflict((oc: any) => oc.column('sha256').doNothing())
+      .execute()
+  }
+}
+
+function isSafeRelativePath(path: string) {
+  return Boolean(path) && !path.startsWith('/') && !path.includes('\\') && !path.split('/').some(part => part === '..' || part === '')
+}
+
+function mediaMatches(mediaType: string, bytes: Buffer) {
+  switch (mediaType) {
+    case 'image/png': return bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+    case 'image/jpeg': return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+    case 'image/webp': return bytes.subarray(0, 4).toString('latin1') === 'RIFF' && bytes.subarray(8, 12).toString('latin1') === 'WEBP'
+    case 'image/svg+xml': return /<svg[\s>]/i.test(bytes.subarray(0, 4096).toString('utf8'))
+    case 'video/mp4': return bytes.subarray(4, 8).toString('latin1') === 'ftyp'
+    case 'video/webm': return bytes.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]))
+    default: return false
+  }
+}
+
+function pngDimensions(bytes: Buffer): {width: number; height: number} | null {
+  if (bytes.length < 24 || bytes.subarray(12, 16).toString('latin1') !== 'IHDR') return null
+  return {width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20)}
 }
 
 async function projectRecordCollections(

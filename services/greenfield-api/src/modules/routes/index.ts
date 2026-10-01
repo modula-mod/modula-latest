@@ -49,7 +49,7 @@ export async function registerModuleRoutes(
   sessions: GreenfieldSessionService,
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
 ): Promise<void> {
-  const registry = new GreenfieldModuleRegistryService(db)
+  const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
   const releases = new GreenfieldModuleReleaseService(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
@@ -202,9 +202,33 @@ export async function registerModuleRoutes(
     if (!requireRegistry(reply, request.id)) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await registry.getVersion(canonicalModuleParam(request), params.version), request.id))
+      return reply.send(successEnvelope(await registry.getVersionDetail(canonicalModuleParam(request), params.version), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
+    }
+  })
+
+  // Immutable release media. Bytes are content-addressed and verified at ingest;
+  // the registry is the only distribution origin for presentation artwork.
+  app.get('/v1/registry/releases/:releaseId/assets/:assetId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    const params = request.params as {releaseId?: string; assetId?: string}
+    try {
+      const asset = await registry.presentation.readAsset(String(params.releaseId ?? ''), String(params.assetId ?? ''))
+      const etag = `"sha256-${asset.sha256}"`
+      reply
+        .header('ETag', etag)
+        .header('Cache-Control', 'public, max-age=31536000, immutable')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox")
+        .header('Cross-Origin-Resource-Policy', 'cross-origin')
+        .header('Content-Disposition', 'inline')
+        .header('X-Modula-Asset-Sha256', asset.sha256)
+        .header('X-Modula-Development-Asset', asset.developmentAsset ? 'true' : 'false')
+      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      return reply.type(asset.mediaType).send(asset.bytes)
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release asset lookup failed')
     }
   })
 
