@@ -6,6 +6,7 @@ import {
   validateMpsFrontendArtifact,
   type MpsFrontendArtifact,
 } from '@modula/greenfield-product-standard'
+import {registerModuleIdentityAliases, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
@@ -118,9 +119,10 @@ export class GreenfieldMpsIngestService {
       }
 
       for (const alias of product.aliases) {
+        await assertAliasClaimable(trx, alias, product.productId, product.publisherId)
         await trx.insertInto('greenfield_product_identity_aliases')
           .values({alias_id: alias, canonical_product_id: product.productId, reason: 'mps identity.aliases', created_at: now})
-          .onConflict(oc => oc.column('alias_id').doUpdateSet({canonical_product_id: product.productId, reason: 'mps identity.aliases'}))
+          .onConflict(oc => oc.column('alias_id').doNothing())
           .execute()
       }
 
@@ -253,6 +255,7 @@ export class GreenfieldMpsIngestService {
       }
     })
 
+    if (product.aliases.length) registerModuleIdentityAliases(product.aliases.map(alias => ({alias, canonicalId: product.productId})))
     return this.get(product.productId, product.version)
   }
 
@@ -474,4 +477,20 @@ async function assertSignedDigestsMatch(db: ModulaDb, releaseId: string, product
       throw moduleError('VALIDATION_FAILED', 'Frontend artifact does not match the digest the publisher signed')
     }
   }
+}
+
+/**
+ * An MPS may claim identity aliases, but never one that already resolves to a
+ * different product or that is another publisher's live product id: aliases
+ * are never re-pointed (previously an ingest could silently re-point one).
+ */
+async function assertAliasClaimable(db: ModulaDb, alias: string, productId: string, publisherId: string) {
+  if (alias === productId) throw moduleError('VALIDATION_FAILED', 'A product cannot alias its own id')
+  const existing = await db.selectFrom('greenfield_product_identity_aliases').select('canonical_product_id').where('alias_id', '=', alias).executeTakeFirst()
+  if (existing && existing.canonical_product_id !== productId) throw moduleError('CONFLICT', `Identity alias ${alias} already belongs to ${existing.canonical_product_id}`)
+  const resolved = resolveCanonicalModuleId(alias)
+  if (resolved !== alias && resolved !== productId) throw moduleError('CONFLICT', `Identity alias ${alias} already resolves to ${resolved}`)
+  if (existing) return
+  const foreign = await db.selectFrom('greenfield_module_releases').select('publisher_id').where('module_id', '=', alias).where('publisher_id', '!=', publisherId).executeTakeFirst()
+  if (foreign) throw moduleError('CONFLICT', `Identity alias ${alias} is a product id owned by another publisher`)
 }

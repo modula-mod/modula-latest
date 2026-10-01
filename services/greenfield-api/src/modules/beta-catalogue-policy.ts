@@ -1,15 +1,23 @@
+import {isModuleIdentityAlias, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import type {
   GreenfieldModuleBetaClassification,
   GreenfieldModuleInstallabilityProjection,
   GreenfieldModuleReleaseStatus,
 } from '@modula/greenfield-module-registry-contracts'
 
-const LEGACY_MODULE_REPLACEMENTS: Record<string, string> = {
-  'modula.module.vaultNotes': 'digital.modula.vault-notes',
-  'modula.vault-notes': 'digital.modula.vault-notes',
-  'module-vault-notes': 'digital.modula.vault-notes',
+/**
+ * Historical first-generation module ids that were replaced by a new product
+ * (not identity aliases: their releases are separate rows). Data only. Identity
+ * aliases (e.g. the Vault Notes legacy ids) are resolved generically through
+ * the alias registry below.
+ */
+const HISTORICAL_MODULE_REPLACEMENTS: Record<string, string> = {
   'modula.module.tasks': 'digital.modula.tasks',
   'modula.module.dimon': 'digital.dimon.core',
+}
+
+function replacementFor(moduleId: string): string | undefined {
+  return HISTORICAL_MODULE_REPLACEMENTS[moduleId] ?? (isModuleIdentityAlias(moduleId) ? resolveCanonicalModuleId(moduleId) : undefined)
 }
 
 export function classifyBetaModule(input: {
@@ -23,7 +31,7 @@ export function classifyBetaModule(input: {
   reasonCode: string
   reason: string
 } {
-  const canonicalModuleId = LEGACY_MODULE_REPLACEMENTS[input.moduleId]
+  const canonicalModuleId = replacementFor(input.moduleId)
   if (canonicalModuleId) {
     return {
       classification: 'DUPLICATE',

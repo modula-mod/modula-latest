@@ -19,8 +19,7 @@ import {GreenfieldEventBus} from '../events/index.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
-import {canonicalizeVaultNotesManifest} from './canonical-manifest.js'
-import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
+import {isModuleIdentityAlias, moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -71,7 +70,12 @@ export class GreenfieldModuleReleaseService {
   constructor(private readonly db: ModulaDb) {}
 
   async importPendingReview(manifest: GreenfieldModuleManifest, evidence?: GreenfieldModuleReleaseEvidence): Promise<GreenfieldModuleReleaseRecord> {
-    manifest = canonicalizeVaultNotesManifest(manifest)
+    // Registry core never rewrites a publisher's manifest. A release declared
+    // under a historical alias is refused; it must be published under the
+    // canonical identity (aliases stay resolvable for lookups and installs).
+    if (isModuleIdentityAlias(manifest.moduleId)) {
+      throw moduleError('CONFLICT', `${manifest.moduleId} is an identity alias of ${resolveCanonicalModuleId(manifest.moduleId)}; publish the release under the canonical id`)
+    }
     const publisher = new GreenfieldModulePublisherService(this.db)
     await publisher.ensurePublisherForManifest(manifest)
 

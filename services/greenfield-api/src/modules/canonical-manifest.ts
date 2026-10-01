@@ -9,6 +9,10 @@ import {
 import {manifestChecksum, type GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 
 /**
+ * @deprecated Registry core no longer calls this: imports are never rewritten
+ * and releases declared under an identity alias are refused. Kept only for
+ * historical test fixtures that pre-date the canonical Vault Notes manifests.
+ *
  * Overlay a Vault Notes source manifest onto the single canonical product identity.
  * Source files may still declare `modula.vault-notes` until the GitHub repo is
  * updated; the registry must never publish that as a competing product.

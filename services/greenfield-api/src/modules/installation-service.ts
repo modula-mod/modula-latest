@@ -24,10 +24,9 @@ import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
 import {GreenfieldInstallDescriptorService, type IssuedInstallDescriptor} from './install-descriptor-service.js'
 import {GreenfieldRegistryTrustService, type RegistryTrustOptions} from './registry-trust-service.js'
 import {
-  isVaultNotesModuleId,
+  moduleIdentityAliasesFor,
   moduleIdFamily,
   resolveCanonicalModuleId,
-  selectCanonicalVaultNotesInstallation,
 } from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
@@ -113,7 +112,7 @@ export class GreenfieldModuleInstallationService {
       lifecycleState: projection?.state,
       }
     }))
-    return collapseVaultNotesInstallations(installations)
+    return collapseAliasedInstallations(installations)
   }
 
   async getInstalled(accountId: string, moduleId: string): Promise<GreenfieldModuleInstallationRow | undefined> {
@@ -182,10 +181,7 @@ export class GreenfieldModuleInstallationService {
     if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     await this.permissions.enforceModuleInstallCapability(accountId)
     const canonicalId = resolveCanonicalModuleId(moduleId)
-    const existingFamily = (await this.listInstalled(accountId)).find(row =>
-      resolveCanonicalModuleId(row.moduleId) === canonicalId ||
-      (isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId)),
-    )
+    const existingFamily = (await this.listInstalled(accountId)).find(row => resolveCanonicalModuleId(row.moduleId) === canonicalId)
     if (existingFamily && isInstalledStatus(existingFamily.status)) {
       if (input.version && existingFamily.version !== input.version) {
         throw moduleError('CONFLICT', `${canonicalId}@${existingFamily.version} is already installed; use update to move to ${input.version}`)
@@ -503,9 +499,22 @@ function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }
 
-function collapseVaultNotesInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
-  const others = installations.filter(row => !isVaultNotesModuleId(row.moduleId))
-  const preferred = selectCanonicalVaultNotesInstallation(installations)
-  if (!preferred) return others
-  return [...others, {...preferred, moduleId: resolveCanonicalModuleId(preferred.moduleId)}]
+/**
+ * A product that has identity aliases can have historical installation rows
+ * under several ids. Present one logical installation per canonical product
+ * (the enabled one if any). Products without aliases are returned unchanged.
+ */
+function collapseAliasedInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
+  const result: GreenfieldModuleInstallationRow[] = []
+  const aliased = new Map<string, GreenfieldModuleInstallationRow[]>()
+  for (const row of installations) {
+    const canonicalId = resolveCanonicalModuleId(row.moduleId)
+    if (!moduleIdentityAliasesFor(canonicalId).length) { result.push(row); continue }
+    aliased.set(canonicalId, [...(aliased.get(canonicalId) ?? []), row])
+  }
+  for (const [canonicalId, rows] of aliased) {
+    const preferred = rows.find(row => row.status === 'enabled') ?? rows[0]!
+    result.push({...preferred, moduleId: canonicalId})
+  }
+  return result
 }

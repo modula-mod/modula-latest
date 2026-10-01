@@ -1,6 +1,6 @@
 import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {NOT_INSTALLED_STATUSES} from './installation-status.js'
-import {moduleIdFamily, resolveCanonicalModuleId, rewriteLegacyVaultNotesId} from '@modula/greenfield-contracts'
+import {moduleIdFamily, resolveCanonicalModuleId, rewriteModuleIdentityAliases} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
 import {moduleError} from './module-errors.js'
@@ -57,7 +57,7 @@ export class GreenfieldModuleRuntimeAccessService {
       .orderBy('reviewed_at', 'desc')
       .executeTakeFirst()
     const manifest = row.manifest as GreenfieldModuleManifest
-    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteLegacyVaultNotesId(permission.permission))
+    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteModuleIdentityAliases(permission.permission))
     return {
       accountId,
       moduleId: canonicalId,
@@ -68,7 +68,7 @@ export class GreenfieldModuleRuntimeAccessService {
       extensionVersionId: row.extension_version_id,
       releaseState: row.release_state,
       manifest,
-      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteLegacyVaultNotesId),
+      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteModuleIdentityAliases),
     }
   }
 

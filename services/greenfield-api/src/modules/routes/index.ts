@@ -30,6 +30,7 @@ import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
 import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
+import {loadRegisteredIdentityAliases} from '../identity-aliases.js'
 import {GreenfieldGithubReleaseSyncService, HttpGithubReleaseSource, type GithubReleaseSource} from '../github-release-sync-service.js'
 import {parseTrustOptions} from '../registry-trust-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
@@ -53,6 +54,7 @@ export async function registerModuleRoutes(
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
   options: {githubReleaseSource?: GithubReleaseSource} = {},
 ): Promise<void> {
+  await loadRegisteredIdentityAliases(db, app.log)
   const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
   const signingKeys = new GreenfieldPublisherSigningKeyService(db)
