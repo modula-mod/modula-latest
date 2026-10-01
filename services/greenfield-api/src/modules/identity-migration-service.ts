@@ -4,6 +4,7 @@ import {
   isVaultNotesModuleId,
   rewriteLegacyVaultNotesValue,
 } from '@modula/greenfield-contracts'
+import {NOT_INSTALLED_STATUSES} from './installation-status.js'
 import type {ModulaDb} from '../database/client.js'
 
 const LEGACY_IDS = [...LEGACY_VAULT_NOTES_MODULE_IDS]
@@ -89,7 +90,7 @@ export class GreenfieldModuleIdentityMigrationService {
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
       .where('greenfield_module_releases.module_id', 'in', [CANONICAL_VAULT_NOTES_MODULE_ID, ...LEGACY_IDS])
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .execute()
     if (rows.length <= 1) return 0
     const preferred = rows.find(row => row.status === 'enabled') ?? rows[0]!

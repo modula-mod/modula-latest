@@ -1,5 +1,6 @@
 import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
-import {moduleIdFamily, resolveCanonicalModuleId, rewriteLegacyVaultNotesId} from '@modula/greenfield-contracts'
+import {NOT_INSTALLED_STATUSES} from './installation-status.js'
+import {moduleIdFamily, resolveCanonicalModuleId, rewriteModuleIdentityAliases} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
 import {moduleError} from './module-errors.js'
@@ -38,7 +39,7 @@ export class GreenfieldModuleRuntimeAccessService {
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .executeTakeFirst()
 
     if (!row) throw moduleError('NOT_FOUND', 'Module installation not found')
@@ -56,7 +57,7 @@ export class GreenfieldModuleRuntimeAccessService {
       .orderBy('reviewed_at', 'desc')
       .executeTakeFirst()
     const manifest = row.manifest as GreenfieldModuleManifest
-    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteLegacyVaultNotesId(permission.permission))
+    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteModuleIdentityAliases(permission.permission))
     return {
       accountId,
       moduleId: canonicalId,
@@ -67,7 +68,7 @@ export class GreenfieldModuleRuntimeAccessService {
       extensionVersionId: row.extension_version_id,
       releaseState: row.release_state,
       manifest,
-      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteLegacyVaultNotesId),
+      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteModuleIdentityAliases),
     }
   }
 

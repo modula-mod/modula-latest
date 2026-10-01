@@ -13,14 +13,22 @@ import {GreenfieldModuleReleaseService} from './release-service.js'
 import {classifyBetaModule, installabilityForBetaModule} from './beta-catalogue-policy.js'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from './marketplace-service.js'
+import {GreenfieldRegistryPresentationService} from './registry-presentation-service.js'
+import {GreenfieldRegistryTrustService, productProjection, type RegistryTrustOptions} from './registry-trust-service.js'
+
+export type GreenfieldModuleRegistryOptions = {publicApiUrl?: string | null}
 
 export class GreenfieldModuleRegistryService {
   private readonly releases: GreenfieldModuleReleaseService
   private readonly marketplace: GreenfieldModuleMarketplaceService
+  readonly presentation: GreenfieldRegistryPresentationService
+  readonly trust: GreenfieldRegistryTrustService
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, options: GreenfieldModuleRegistryOptions = {}) {
     this.releases = new GreenfieldModuleReleaseService(db)
     this.marketplace = new GreenfieldModuleMarketplaceService(db)
+    this.presentation = new GreenfieldRegistryPresentationService(db, options.publicApiUrl)
+    this.trust = new GreenfieldRegistryTrustService(db)
   }
 
   async listModules(filters: GreenfieldRegistryFilter = {}): Promise<{items: GreenfieldRegistryModuleSummary[]; nextCursor: string | null}> {
@@ -30,6 +38,7 @@ export class GreenfieldModuleRegistryService {
       .innerJoin('greenfield_module_versions', 'greenfield_module_versions.module_version_id', 'greenfield_module_releases.module_version_id')
       .innerJoin('greenfield_publishers', 'greenfield_publishers.publisher_id', 'greenfield_module_releases.publisher_id')
       .select([
+        'greenfield_module_releases.release_id',
         'greenfield_module_releases.module_id',
         'greenfield_module_releases.version',
         'greenfield_module_releases.release_state',
@@ -50,6 +59,7 @@ export class GreenfieldModuleRegistryService {
       .execute()
 
     const byModule = new Map<string, GreenfieldRegistryModuleSummary>()
+    const latestReleaseIds = new Map<string, string>()
     for (const row of releases as any[]) {
       const manifest = row.manifest as GreenfieldModuleManifest
       const canonicalId = resolveCanonicalModuleId(row.module_id)
@@ -61,6 +71,7 @@ export class GreenfieldModuleRegistryService {
       const newer = !existing || versionIsNewer(row.version, existing.latestVersion)
       if (newer) {
         const installable = row.release_state === 'published'
+        latestReleaseIds.set(canonicalId, row.release_id)
         byModule.set(canonicalId, {
           moduleId: canonicalId,
           productKind: row.product_kind,
@@ -126,25 +137,41 @@ export class GreenfieldModuleRegistryService {
       } as any)
     }
 
-    const items = Array.from(byModule.values()).sort((a, b) => a.moduleId.localeCompare(b.moduleId))
-    return {items: items.slice(0, limit), nextCursor: items.length > limit ? String(limit) : null}
+    const items = Array.from(byModule.values()).sort((a, b) => a.moduleId.localeCompare(b.moduleId)).slice(0, limit)
+    const presentations = await this.presentation.forReleases(items.map(item => latestReleaseIds.get(item.moduleId) ?? ''))
+    for (const item of items as any[]) {
+      const releaseId = latestReleaseIds.get(item.moduleId)
+      item.registryReleaseId = releaseId ?? null
+      item.presentation = releaseId ? summaryPresentation(presentations.get(releaseId) ?? null) : null
+    }
+    return {items, nextCursor: byModule.size > limit ? String(limit) : null}
   }
 
-  async getModule(moduleId: string) {
+  async getModule(moduleId: string, trustOptions: RegistryTrustOptions = {}) {
     const canonicalId = resolveCanonicalModuleId(moduleId)
     const releases = await this.listVersions(canonicalId)
     if (releases.length > 0) {
       const latest = releases[0]!
+      const latestPublishedVersion = releases.find(item => item.releaseState === 'published')?.version ?? null
       const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
-      const marketplace = await this.marketplace.project({
-        moduleId: latest.moduleId,
-        manifest: latest.manifest,
-        registryPublishedAt: latest.publishedAt,
-      })
+      const [marketplace, presentation, trust, product] = await Promise.all([
+        this.marketplace.project({
+          moduleId: latest.moduleId,
+          manifest: latest.manifest,
+          registryPublishedAt: latest.publishedAt,
+        }),
+        this.presentation.forRelease(latest.releaseId),
+        this.trust.forRelease(latest, trustOptions, latestPublishedVersion),
+        this.productProjectionFor(latest.releaseId),
+      ])
       return {
+        registryReleaseId: latest.releaseId,
+        product,
+        presentation,
+        registryTrust: trust,
         moduleId: latest.moduleId,
         productKind: (latest.manifest as any).extensionProduct?.kind ?? 'module',
         name: latest.manifest.name,
@@ -258,7 +285,9 @@ export class GreenfieldModuleRegistryService {
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(canonicalId)])
       .orderBy('greenfield_module_releases.version', 'desc')
       .execute()
-    return (rows as any[]).map(row => ({
+    // Order by semantic version, not by string ("1.10.0" must sort above "1.9.0").
+    const ordered = [...(rows as any[])].sort((left, right) => (versionIsNewer(left.version, right.version) ? -1 : versionIsNewer(right.version, left.version) ? 1 : 0))
+    return ordered.map(row => ({
       releaseId: row.release_id,
       extensionId: row.extension_id,
       extensionVersionId: row.extension_version_id,
@@ -286,12 +315,43 @@ export class GreenfieldModuleRegistryService {
     return release
   }
 
+  async getVersionDetail(moduleId: string, version: string, trustOptions: RegistryTrustOptions = {}) {
+    const release = await this.getVersion(moduleId, version)
+    const latestPublishedVersion = (await this.listVersions(release.moduleId)).find(item => item.releaseState === 'published')?.version ?? null
+    const [presentation, trust, product] = await Promise.all([
+      this.presentation.forRelease(release.releaseId),
+      this.trust.forRelease(release, trustOptions, latestPublishedVersion),
+      this.productProjectionFor(release.releaseId),
+    ])
+    return {...release, registryReleaseId: release.releaseId, product, presentation, registryTrust: trust}
+  }
+
+  async productProjectionFor(releaseId: string) {
+    const ingestion = await this.db.selectFrom('greenfield_mps_ingestions')
+      .select(['manifest', 'manifest_sha256', 'product_standard'])
+      .where('release_id', '=', releaseId)
+      .executeTakeFirst()
+    return productProjection(ingestion)
+  }
+
   async latestPublished(moduleId: string): Promise<GreenfieldModuleReleaseRecord> {
     const releases = await this.listVersions(moduleId)
     const published = releases.filter(item => item.releaseState === 'published')
     const release = published.sort((left, right) => (versionIsNewer(left.version, right.version) ? -1 : 1))[0]
     if (!release) throw moduleError('NOT_FOUND', `Published release for ${moduleId} not found`)
     return release
+  }
+}
+
+function summaryPresentation(presentation: Awaited<ReturnType<GreenfieldRegistryPresentationService['forRelease']>>) {
+  if (!presentation) return null
+  return {
+    releaseId: presentation.releaseId,
+    version: presentation.version,
+    icon: presentation.icon,
+    cover: presentation.cover,
+    screenshots: presentation.screenshots,
+    developmentAssets: presentation.developmentAssets,
   }
 }
 

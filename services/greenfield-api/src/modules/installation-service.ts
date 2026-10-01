@@ -1,4 +1,5 @@
 import {contributionCounts} from '@modula/greenfield-module-manifest'
+import {NOT_INSTALLED_STATUSES, isInstalledStatus} from './installation-status.js'
 import {
   assertInstallationTransition,
   type GreenfieldModuleInstallPreview,
@@ -20,11 +21,12 @@ import {GreenfieldModuleRegistryService} from './registry-service.js'
 import {allRuntimePermissionKeys, GreenfieldModuleRuntime2Service} from './runtime2-service.js'
 import {GreenfieldModuleIdentityMigrationService} from './identity-migration-service.js'
 import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
+import {GreenfieldInstallDescriptorService, type IssuedInstallDescriptor} from './install-descriptor-service.js'
+import {GreenfieldRegistryTrustService, type RegistryTrustOptions} from './registry-trust-service.js'
 import {
-  isVaultNotesModuleId,
+  moduleIdentityAliasesFor,
   moduleIdFamily,
   resolveCanonicalModuleId,
-  selectCanonicalVaultNotesInstallation,
 } from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
@@ -46,12 +48,16 @@ export class GreenfieldModuleInstallationService {
   private readonly permissions: GreenfieldModulePermissionService
   private readonly runtime2: GreenfieldModuleRuntime2Service
   private readonly extensionFabric: GreenfieldExtensionFabricService
+  private readonly descriptors: GreenfieldInstallDescriptorService
+  private readonly trust: GreenfieldRegistryTrustService
 
   constructor(
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
   ) {
-    this.registry = new GreenfieldModuleRegistryService(db)
+    this.registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
+    this.descriptors = new GreenfieldInstallDescriptorService(db, config.publicApiUrl)
+    this.trust = new GreenfieldRegistryTrustService(db)
     this.dependencies = new GreenfieldModuleDependencyResolver(db)
     this.permissions = new GreenfieldModulePermissionService(db)
     this.runtime2 = new GreenfieldModuleRuntime2Service(db)
@@ -74,7 +80,7 @@ export class GreenfieldModuleInstallationService {
         'greenfield_module_releases.product_kind',
       ])
       .where('greenfield_extension_installations.account_id', '=', accountId)
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .orderBy('greenfield_module_releases.module_id')
       .execute()
     const installations = await Promise.all(rows.map(async row => {
@@ -106,7 +112,7 @@ export class GreenfieldModuleInstallationService {
       lifecycleState: projection?.state,
       }
     }))
-    return collapseVaultNotesInstallations(installations)
+    return collapseAliasedInstallations(installations)
   }
 
   async getInstalled(accountId: string, moduleId: string): Promise<GreenfieldModuleInstallationRow | undefined> {
@@ -170,17 +176,23 @@ export class GreenfieldModuleInstallationService {
     }
   }
 
-  async install(accountId: string, moduleId: string, input: {version?: string; idempotencyKey: string; approvedPermissions?: string[]; platform?: 'ios' | 'android' | 'web' | 'desktop' | 'server'}) {
+  async install(accountId: string, moduleId: string, input: {version?: string; idempotencyKey: string; approvedPermissions?: string[]; platform?: 'ios' | 'android' | 'web' | 'desktop' | 'server'; hostVersion?: string | null}) {
     if (!this.config.moduleInstallationEnabled) throw moduleError('CAPABILITY_DISABLED', 'Greenfield module installation is disabled')
     if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     await this.permissions.enforceModuleInstallCapability(accountId)
     const canonicalId = resolveCanonicalModuleId(moduleId)
-    const existingFamily = (await this.listInstalled(accountId)).find(row =>
-      resolveCanonicalModuleId(row.moduleId) === canonicalId ||
-      (isVaultNotesModuleId(canonicalId) && isVaultNotesModuleId(row.moduleId)),
-    )
-    if (existingFamily && existingFamily.status !== 'removed') {
-      return {planId: existingFamily.installationId, installationId: existingFamily.installationId, status: existingFamily.status, idempotent: true}
+    const existingFamily = (await this.listInstalled(accountId)).find(row => resolveCanonicalModuleId(row.moduleId) === canonicalId)
+    if (existingFamily && isInstalledStatus(existingFamily.status)) {
+      if (input.version && existingFamily.version !== input.version) {
+        throw moduleError('CONFLICT', `${canonicalId}@${existingFamily.version} is already installed; use update to move to ${input.version}`)
+      }
+      return {
+        planId: existingFamily.installationId,
+        installationId: existingFamily.installationId,
+        status: existingFamily.status,
+        idempotent: true,
+        descriptor: await this.getInstallDescriptor(accountId, canonicalId, {hostVersion: input.hostVersion ?? null}),
+      }
     }
     const existingPlan = await this.db
       .selectFrom('greenfield_module_install_plans')
@@ -189,7 +201,13 @@ export class GreenfieldModuleInstallationService {
       .where('idempotency_key', '=', input.idempotencyKey)
       .executeTakeFirst()
     if (existingPlan) {
-      return {planId: existingPlan.plan_id, installationId: existingPlan.installation_id, status: existingPlan.status, idempotent: true}
+      return {
+        planId: existingPlan.plan_id,
+        installationId: existingPlan.installation_id,
+        status: existingPlan.status,
+        idempotent: true,
+        descriptor: (existingPlan.install_descriptor ?? null) as IssuedInstallDescriptor | null,
+      }
     }
 
     const release = input.version ? await this.registry.getVersion(canonicalId, input.version) : await this.registry.latestPublished(canonicalId)
@@ -204,10 +222,20 @@ export class GreenfieldModuleInstallationService {
       ? input.approvedPermissions.filter(permission => declaredPermissions.includes(permission)).sort()
       : declaredPermissions
     const deniedPermissions = declaredPermissions.filter(permission => !grantedPermissions.includes(permission))
+    // Platform support is already enforced by the compatibility preview above;
+    // the trust block adds the explicit host-version check when one is sent.
+    const trustBlock = await this.trust.forRelease(release, {hostVersion: input.hostVersion ?? null})
+    if (['invalid', 'unknownKey', 'revokedKey'].includes(trustBlock.signature.state)) {
+      throw moduleError('VALIDATION_FAILED', `Release signature is ${trustBlock.signature.state}; the release cannot be installed`)
+    }
+    if (trustBlock.compatibility.evaluated && trustBlock.compatibility.compatible === false) {
+      throw moduleError('VALIDATION_FAILED', `Module is incompatible with this host: ${trustBlock.compatibility.reasons.map(reason => reason.code).join(', ')}`)
+    }
 
     const now = new Date()
     const installationId = uuidv7()
     const planId = uuidv7()
+    let descriptor: IssuedInstallDescriptor | null = null
     let actualInstallationId = installationId
     await this.db.transaction().execute(async trx => {
       await trx
@@ -230,6 +258,12 @@ export class GreenfieldModuleInstallationService {
         .where('account_id', '=', accountId)
         .executeTakeFirstOrThrow()
       actualInstallationId = installed.installation_id
+      descriptor = await this.descriptors.build(release, {
+        installationId: installed.installation_id,
+        grantedPermissions,
+        deniedPermissions,
+        trustBlock,
+      })
       await trx
         .insertInto('greenfield_module_permission_reviews')
         .values({
@@ -256,6 +290,8 @@ export class GreenfieldModuleInstallationService {
           permission_decision: jsonb({grantedPermissions, deniedPermissions}),
           status: 'queued',
           idempotency_key: input.idempotencyKey,
+          install_descriptor: jsonb(descriptor),
+          install_descriptor_sha256: descriptor.descriptorSha256,
           created_at: now,
           updated_at: now,
         })
@@ -284,7 +320,40 @@ export class GreenfieldModuleInstallationService {
         payload: {planId, installationId: installed.installation_id, releaseId: release.releaseId, moduleId, accountId},
       })
     })
-    return {planId, installationId: actualInstallationId, status: 'installing'}
+    return {planId, installationId: actualInstallationId, status: 'installing', descriptor}
+  }
+
+  /**
+   * The immutable install descriptor for the account's installed release. The
+   * descriptor issued with the install plan is returned when it matches the
+   * installed release; otherwise it is rebuilt from registry state.
+   */
+  async getInstallDescriptor(accountId: string, moduleId: string, trustOptions: RegistryTrustOptions = {}): Promise<IssuedInstallDescriptor> {
+    const installed = await this.getInstalled(accountId, moduleId)
+    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    const release = await this.registry.getVersion(installed.moduleId, installed.version)
+    if (!trustOptions.hostVersion && !trustOptions.platform) {
+      const plan = await this.db.selectFrom('greenfield_module_install_plans')
+        .select(['install_descriptor'])
+        .where('account_id', '=', accountId)
+        .where('installation_id', '=', installed.installationId)
+        .where('release_id', '=', release.releaseId)
+        .where('install_descriptor', 'is not', null)
+        .orderBy('created_at', 'desc')
+        .executeTakeFirst()
+      if (plan?.install_descriptor) return plan.install_descriptor as IssuedInstallDescriptor
+    }
+    const declared = Array.from(new Set([
+      ...release.manifest.permissions.map(permission => permission.permission),
+      ...allRuntimePermissionKeys(release.manifest),
+    ])).sort()
+    const granted = (installed.grantedPermissions ?? []).filter(permission => declared.includes(permission)).sort()
+    return this.descriptors.build(release, {
+      installationId: installed.installationId,
+      grantedPermissions: granted,
+      deniedPermissions: declared.filter(permission => !granted.includes(permission)),
+      trustOptions,
+    })
   }
 
   async enable(accountId: string, moduleId: string, idempotencyKey: string) {
@@ -430,9 +499,22 @@ function arrayOfStrings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 }
 
-function collapseVaultNotesInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
-  const others = installations.filter(row => !isVaultNotesModuleId(row.moduleId))
-  const preferred = selectCanonicalVaultNotesInstallation(installations)
-  if (!preferred) return others
-  return [...others, {...preferred, moduleId: resolveCanonicalModuleId(preferred.moduleId)}]
+/**
+ * A product that has identity aliases can have historical installation rows
+ * under several ids. Present one logical installation per canonical product
+ * (the enabled one if any). Products without aliases are returned unchanged.
+ */
+function collapseAliasedInstallations(installations: GreenfieldModuleInstallationRow[]): GreenfieldModuleInstallationRow[] {
+  const result: GreenfieldModuleInstallationRow[] = []
+  const aliased = new Map<string, GreenfieldModuleInstallationRow[]>()
+  for (const row of installations) {
+    const canonicalId = resolveCanonicalModuleId(row.moduleId)
+    if (!moduleIdentityAliasesFor(canonicalId).length) { result.push(row); continue }
+    aliased.set(canonicalId, [...(aliased.get(canonicalId) ?? []), row])
+  }
+  for (const [canonicalId, rows] of aliased) {
+    const preferred = rows.find(row => row.status === 'enabled') ?? rows[0]!
+    result.push({...preferred, moduleId: canonicalId})
+  }
+  return result
 }

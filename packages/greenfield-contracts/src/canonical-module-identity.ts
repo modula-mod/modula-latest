@@ -41,16 +41,112 @@ export function isVaultNotesModuleId(moduleId: string): boolean {
   return moduleId === CANONICAL_VAULT_NOTES_MODULE_ID || isLegacyVaultNotesModuleId(moduleId)
 }
 
-export function resolveCanonicalModuleId(moduleId: string): string {
-  return isLegacyVaultNotesModuleId(moduleId) ? CANONICAL_VAULT_NOTES_MODULE_ID : moduleId
+// ---------------------------------------------------------------------------
+// Generic product identity aliases.
+//
+// Registry core resolves identities through this data-driven alias map rather
+// than product-specific code. The historical aliases below are DATA: they are
+// the published identity aliases that already exist in production
+// (greenfield_product_identity_aliases) and are seeded here so every process
+// resolves them even before the database-backed aliases are loaded. Further
+// aliases come from modula.product.json `identity.aliases` via
+// registerModuleIdentityAliases().
+// ---------------------------------------------------------------------------
+
+export type ModuleIdentityAlias = {alias: string; canonicalId: string}
+
+export const HISTORICAL_MODULE_IDENTITY_ALIASES: readonly ModuleIdentityAlias[] = LEGACY_VAULT_NOTES_MODULE_IDS.map(alias => ({
+  alias,
+  canonicalId: CANONICAL_VAULT_NOTES_MODULE_ID,
+}))
+
+const aliasToCanonical = new Map<string, string>()
+const IDENTITY = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}$/
+
+/**
+ * Registers identity aliases. First registration wins: an alias already bound
+ * to a different canonical product, an alias that is itself a canonical target,
+ * or a canonical id that is itself an alias (a chain) is rejected, never
+ * silently re-pointed.
+ */
+export function registerModuleIdentityAliases(entries: Iterable<ModuleIdentityAlias>): {registered: number; rejected: Array<ModuleIdentityAlias & {reason: string}>} {
+  let registered = 0
+  const rejected: Array<ModuleIdentityAlias & {reason: string}> = []
+  const canonicalTargets = new Set(aliasToCanonical.values())
+  for (const entry of entries) {
+    const alias = entry.alias?.trim()
+    const canonicalId = entry.canonicalId?.trim()
+    const reject = (reason: string) => rejected.push({alias: entry.alias, canonicalId: entry.canonicalId, reason})
+    if (!alias || !canonicalId || !IDENTITY.test(alias) || !IDENTITY.test(canonicalId)) { reject('malformed identity'); continue }
+    if (alias === canonicalId) { reject('alias equals canonical id'); continue }
+    const existing = aliasToCanonical.get(alias)
+    if (existing === canonicalId) continue
+    if (existing) { reject(`alias already resolves to ${existing}`); continue }
+    if (canonicalTargets.has(alias)) { reject('alias is a canonical product id'); continue }
+    if (aliasToCanonical.has(canonicalId)) { reject('canonical id is itself an alias'); continue }
+    aliasToCanonical.set(alias, canonicalId)
+    canonicalTargets.add(canonicalId)
+    registered += 1
+  }
+  return {registered, rejected}
 }
 
+registerModuleIdentityAliases(HISTORICAL_MODULE_IDENTITY_ALIASES)
+
+export function isModuleIdentityAlias(moduleId: string): boolean {
+  return aliasToCanonical.has(moduleId)
+}
+
+export function moduleIdentityAliasesFor(canonicalId: string): string[] {
+  const aliases: string[] = []
+  for (const [alias, target] of aliasToCanonical) if (target === canonicalId) aliases.push(alias)
+  return aliases
+}
+
+export function moduleIdentityAliases(): ModuleIdentityAlias[] {
+  return [...aliasToCanonical].map(([alias, canonicalId]) => ({alias, canonicalId}))
+}
+
+export function resolveCanonicalModuleId(moduleId: string): string {
+  return aliasToCanonical.get(moduleId) ?? moduleId
+}
+
+/** The canonical id followed by every registered alias of it. */
+export function moduleIdFamily(moduleId: string): readonly string[] {
+  const canonicalId = resolveCanonicalModuleId(moduleId)
+  return [canonicalId, ...moduleIdentityAliasesFor(canonicalId)]
+}
+
+/**
+ * Rewrites registered aliases embedded in identifiers (permission keys, record
+ * namespaces, view ids). Canonical ids are protected first, so an alias that is
+ * a substring of its canonical id (e.g. `modula.vault-notes` inside
+ * `digital.modula.vault-notes`) is never double-prefixed.
+ */
+export function rewriteModuleIdentityAliases(value: string): string {
+  if (!aliasToCanonical.size || !value) return value
+  const canonicalIds = [...new Set(aliasToCanonical.values())].sort((a, b) => b.length - a.length)
+  const protectedTokens: string[] = []
+  let output = value
+  for (const canonicalId of canonicalIds) {
+    output = output.replace(new RegExp(`(?<![A-Za-z0-9_-])${escapeRegExp(canonicalId)}(?![A-Za-z0-9_-])`, 'g'), () => {
+      protectedTokens.push(canonicalId)
+      return `\u0000${protectedTokens.length - 1}\u0000`
+    })
+  }
+  // One pass over all aliases (longest first) so replaced text is never rescanned.
+  const aliases = [...aliasToCanonical.keys()].sort((a, b) => b.length - a.length).map(escapeRegExp)
+  output = output.replace(new RegExp(`(?<![A-Za-z0-9_-])(?:${aliases.join('|')})(?![A-Za-z0-9_-])`, 'g'), match => aliasToCanonical.get(match) ?? match)
+  return output.replace(/\u0000(\d+)\u0000/g, (_match, index: string) => protectedTokens[Number(index)]!)
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/** @deprecated Vault-specific; use moduleIdFamily(). Kept for callers outside registry core. */
 export function vaultNotesIdentityFamily(): readonly string[] {
   return [CANONICAL_VAULT_NOTES_MODULE_ID, ...LEGACY_VAULT_NOTES_MODULE_IDS]
-}
-
-export function moduleIdFamily(moduleId: string): readonly string[] {
-  return isVaultNotesModuleId(moduleId) ? vaultNotesIdentityFamily() : [resolveCanonicalModuleId(moduleId)]
 }
 
 /**

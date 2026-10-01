@@ -29,6 +29,10 @@ import {ModuleBackendWebhookService} from '../backend/webhook-service.js'
 import {ModuleBackendGatewayService} from '../backend/gateway-service.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {GreenfieldModuleMarketplaceService} from '../marketplace-service.js'
+import {GreenfieldPublisherSigningKeyService} from '../release-signing.js'
+import {loadRegisteredIdentityAliases} from '../identity-aliases.js'
+import {GreenfieldGithubReleaseSyncService, HttpGithubReleaseSource, type GithubReleaseSource} from '../github-release-sync-service.js'
+import {parseTrustOptions} from '../registry-trust-service.js'
 import {GreenfieldExtensionFabricService} from '../extension-fabric-service.js'
 import {GreenfieldDataLedgerService} from '../../data-ledger/index.js'
 import {GreenfieldMpsIngestService} from '../../product-standard/ingest-service.js'
@@ -48,9 +52,13 @@ export async function registerModuleRoutes(
   config: AppConfig,
   sessions: GreenfieldSessionService,
   routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig},
+  options: {githubReleaseSource?: GithubReleaseSource} = {},
 ): Promise<void> {
-  const registry = new GreenfieldModuleRegistryService(db)
+  await loadRegisteredIdentityAliases(db, app.log)
+  const registry = new GreenfieldModuleRegistryService(db, {publicApiUrl: config.publicApiUrl})
   const marketplace = new GreenfieldModuleMarketplaceService(db)
+  const signingKeys = new GreenfieldPublisherSigningKeyService(db)
+  const githubSync = new GreenfieldGithubReleaseSyncService(db, options.githubReleaseSource ?? new HttpGithubReleaseSource({token: process.env.GREENFIELD_MODULE_GITHUB_TOKEN ?? null}))
   const releases = new GreenfieldModuleReleaseService(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
   const installations = new GreenfieldModuleInstallationService(db, config)
@@ -106,7 +114,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/modules/:moduleId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request)), request.id))
+      return reply.send(successEnvelope(await registry.getModule(canonicalModuleParam(request), parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module lookup failed')
     }
@@ -115,7 +123,7 @@ export async function registerModuleRoutes(
   app.get('/v1/registry/products/:productId', routeConfig.profileConfig, async (request, reply) => {
     if (!requireRegistry(reply, request.id)) return
     try {
-      return reply.send(successEnvelope(await registry.getModule(String((request.params as any).productId)), request.id))
+      return reply.send(successEnvelope(await registry.getModule(String((request.params as any).productId), parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry product lookup failed')
     }
@@ -202,9 +210,60 @@ export async function registerModuleRoutes(
     if (!requireRegistry(reply, request.id)) return
     const params = request.params as any
     try {
-      return reply.send(successEnvelope(await registry.getVersion(canonicalModuleParam(request), params.version), request.id))
+      return reply.send(successEnvelope(await registry.getVersionDetail(canonicalModuleParam(request), params.version, parseTrustOptions(request.query)), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Module version lookup failed')
+    }
+  })
+
+  app.get('/v1/registry/publishers/:publisherId/signing-keys', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      return reply.send(successEnvelope(await signingKeys.listForPublisher(String((request.params as any).publisherId)), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key lookup failed')
+    }
+  })
+
+  // Immutable release package, when the registry holds the verified bytes.
+  app.get('/v1/registry/releases/:releaseId/artifact', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    try {
+      const artifact = await registry.presentation.readReleaseArtifact(String((request.params as {releaseId?: string}).releaseId ?? ''))
+      return reply
+        .header('ETag', `"sha256-${artifact.sha256}"`)
+        .header('Cache-Control', 'public, max-age=31536000, immutable')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Content-Disposition', `attachment; filename="${artifact.filename}"`)
+        .header('X-Modula-Artifact-Sha256', artifact.sha256)
+        .type('application/gzip')
+        .send(artifact.bytes)
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release artifact lookup failed')
+    }
+  })
+
+  // Immutable release media. Bytes are content-addressed and verified at ingest;
+  // the registry is the only distribution origin for presentation artwork.
+  app.get('/v1/registry/releases/:releaseId/assets/:assetId', routeConfig.profileConfig, async (request, reply) => {
+    if (!requireRegistry(reply, request.id)) return
+    const params = request.params as {releaseId?: string; assetId?: string}
+    try {
+      const asset = await registry.presentation.readAsset(String(params.releaseId ?? ''), String(params.assetId ?? ''))
+      const etag = `"sha256-${asset.sha256}"`
+      reply
+        .header('ETag', etag)
+        .header('Cache-Control', 'public, max-age=31536000, immutable')
+        .header('X-Content-Type-Options', 'nosniff')
+        .header('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox")
+        .header('Cross-Origin-Resource-Policy', 'cross-origin')
+        .header('Content-Disposition', 'inline')
+        .header('X-Modula-Asset-Sha256', asset.sha256)
+        .header('X-Modula-Development-Asset', asset.developmentAsset ? 'true' : 'false')
+      if (request.headers['if-none-match'] === etag) return reply.code(304).send()
+      return reply.type(asset.mediaType).send(asset.bytes)
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release asset lookup failed')
     }
   })
 
@@ -506,9 +565,10 @@ export async function registerModuleRoutes(
       return reply.code(202).send(
         successEnvelope(
           await installations.install(auth.accountId, canonicalModuleParam(request), {
-            version: body.version,
+            version: typeof body.version === 'string' && body.version.trim() ? body.version.trim() : undefined,
             approvedPermissions: body.approvedPermissions,
             platform: modulePlatform(body.platform),
+            hostVersion: parseTrustOptions({hostVersion: body.hostVersion}).hostVersion,
             idempotencyKey: idempotencyKey(request, body),
           }),
           request.id,
@@ -516,6 +576,17 @@ export async function registerModuleRoutes(
       )
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Install failed')
+    }
+  })
+
+  app.get('/v1/modules/:moduleId/install-descriptor', routeConfig.profileConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      const options = parseTrustOptions(request.query)
+      return reply.send(successEnvelope(await installations.getInstallDescriptor(auth.accountId, canonicalModuleParam(request), {hostVersion: options.hostVersion}), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Install descriptor lookup failed')
     }
   })
 
@@ -871,7 +942,16 @@ export async function registerModuleRoutes(
     if (!auth) return
     try {
       await publishers.requireAdminAccount(auth.accountId)
-      return reply.code(202).send(successEnvelope({queued: false, githubSyncEnabled: config.moduleGithubSyncEnabled}, request.id))
+      if (!config.moduleGithubSyncEnabled) throw moduleError('CAPABILITY_DISABLED', 'GitHub registry sync is disabled')
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
+      const result = await githubSync.sync({
+        repository: String(body.repository ?? ''),
+        releaseTag: String(body.releaseTag ?? ''),
+        publish: body.publish === true,
+        // Dry run unless the caller explicitly asks to apply.
+        dryRun: body.dryRun !== false,
+      })
+      return reply.code(result.mode === 'APPLIED' ? 201 : 200).send(successEnvelope(result, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'Registry sync failed')
     }
@@ -910,6 +990,30 @@ export async function registerModuleRoutes(
   app.post('/v1/admin/registry/publishers/:publisherId/revoke', routeConfig.writeConfig, publisherAdminAction(sessions, publishers, request =>
     publishers.revokePublisher((request.params as any).publisherId),
   ))
+
+  // Publisher signing keys: public halves only. Private keys stay with the publisher.
+  app.post('/v1/admin/registry/publishers/:publisherId/signing-keys', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      const body = (request.body as Record<string, unknown> | undefined) ?? {}
+      return reply.code(201).send(successEnvelope(await signingKeys.register(String((request.params as any).publisherId), body, auth.accountId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key registration failed')
+    }
+  })
+  app.post('/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke', routeConfig.writeConfig, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      const params = request.params as {publisherId: string; keyId: string}
+      return reply.send(successEnvelope(await signingKeys.revoke(params.publisherId, params.keyId, (request.body as any)?.reason, auth.accountId), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Signing key revocation failed')
+    }
+  })
 }
 
 async function publishByReleaseId(releases: GreenfieldModuleReleaseService, releaseId: string) {

@@ -5,6 +5,7 @@ import type {
   GreenfieldModuleRatingAggregate,
   GreenfieldRegistryDeclaration,
 } from '@modula/greenfield-module-registry-contracts'
+import {NOT_INSTALLED_STATUSES} from './installation-status.js'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
@@ -105,7 +106,7 @@ export class GreenfieldModuleMarketplaceService {
       .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
       .select(sql<string>`count(distinct greenfield_extension_installations.account_id)`.as('installation_count'))
       .where('greenfield_module_releases.module_id', 'in', [...moduleIdFamily(moduleId)])
-      .where('greenfield_extension_installations.status', '!=', 'removed')
+      .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
       .executeTakeFirst()
     const count = Number(row?.installation_count ?? 0)
     return Number.isFinite(count) ? count : 0
@@ -127,7 +128,7 @@ export class GreenfieldModuleMarketplaceService {
         .selectFrom('greenfield_extension_installations')
         .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
         .select(['greenfield_module_releases.module_id', 'greenfield_extension_installations.account_id'])
-        .where('greenfield_extension_installations.status', '!=', 'removed')
+        .where('greenfield_extension_installations.status', 'not in', [...NOT_INSTALLED_STATUSES])
         .execute(),
     ])
 

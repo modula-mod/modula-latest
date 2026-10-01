@@ -36,6 +36,9 @@ export type NormalizedMpsProduct = {
     width?: number
     height?: number
     developmentAsset?: boolean
+    alt?: string
+    slot: string
+    sortOrder: number
   }>
   privacy: Record<string, unknown> | null
   marketplace: Record<string, unknown> | null
@@ -274,26 +277,26 @@ export function ingestProductManifest(input: {
 }
 
 function collectAssets(presentation: Record<string, unknown>) {
-  const list = [
-    ...(Array.isArray(presentation.assets) ? presentation.assets : []),
-    ...(Array.isArray(presentation.screenshots) ? presentation.screenshots : []),
-    presentation.icon,
-    presentation.logo,
-    presentation.wordmark,
-    presentation.cover,
-    presentation.hero,
-    presentation.background,
-    presentation.badge,
+  const slotted: Array<{slot: string; value: unknown}> = [
+    ...(Array.isArray(presentation.assets) ? presentation.assets : []).map(value => ({slot: 'assets', value})),
+    ...(Array.isArray(presentation.screenshots) ? presentation.screenshots : []).map(value => ({slot: 'screenshots', value})),
+    ...['icon', 'logo', 'wordmark', 'cover', 'hero', 'background', 'badge'].map(slot => ({slot, value: presentation[slot]})),
   ]
-  return list.filter(isRecord).map(asset => ({
-    role: String(asset.role ?? ''),
-    path: String(asset.path ?? ''),
-    mediaType: String(asset.mediaType ?? ''),
-    sha256: asset.sha256 ? String(asset.sha256) : undefined,
-    width: typeof asset.width === 'number' ? asset.width : undefined,
-    height: typeof asset.height === 'number' ? asset.height : undefined,
-    developmentAsset: asset.developmentAsset === true,
-  }))
+  return slotted
+    .map((entry, index) => ({...entry, index}))
+    .filter((entry): entry is {slot: string; value: Record<string, unknown>; index: number} => isRecord(entry.value))
+    .map(({slot, value: asset, index}) => ({
+      role: String(asset.role ?? ''),
+      path: String(asset.path ?? ''),
+      mediaType: String(asset.mediaType ?? ''),
+      sha256: asset.sha256 ? String(asset.sha256) : undefined,
+      width: typeof asset.width === 'number' ? asset.width : undefined,
+      height: typeof asset.height === 'number' ? asset.height : undefined,
+      developmentAsset: asset.developmentAsset === true,
+      alt: localized(asset.alt) || undefined,
+      slot,
+      sortOrder: index,
+    }))
 }
 
 function walkForbiddenKeys(value: unknown, path: string, out: IngestDiagnostic[]): void {
