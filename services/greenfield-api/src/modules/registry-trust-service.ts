@@ -218,7 +218,7 @@ function signatureState(rows: Array<{signature_key_id: string; algorithm: string
   }
 }
 
-function evaluateCompatibility(
+export function evaluateCompatibility(
   release: GreenfieldModuleReleaseRecord,
   options: RegistryTrustOptions,
   declared: {host: string | null; frontendHostRuntime: string | null; platforms: string[]; requiredCapabilities: unknown[]},

@@ -20,6 +20,10 @@ export class GreenfieldModuleMarketplaceService {
     moduleId: string
     manifest: unknown
     registryPublishedAt: Date | null
+    /** Facts the registry recorded for the release itself. They win over the manifest's
+     * self-declared `marketplace.release` block, which is only a fallback (it is easily
+     * left stale when a release is cut). */
+    registryRelease?: {sizeBytes?: number | null; notes?: string[] | null} | null
   }): Promise<GreenfieldModuleMarketplace> {
     const moduleId = resolveCanonicalModuleId(input.moduleId)
     const manifest = record(input.manifest)
@@ -42,11 +46,7 @@ export class GreenfieldModuleMarketplaceService {
       rating,
       installations: {count: installationCount},
       chart,
-      release: {
-        publishedAt: isoDate(release?.publishedAt) ?? input.registryPublishedAt?.toISOString() ?? null,
-        sizeBytes: nonNegativeInteger(release?.sizeBytes),
-        notes: stringArray(release?.notes),
-      },
+      release: releaseFacts(release, input.registryPublishedAt, input.registryRelease ?? null),
     }
   }
 
@@ -162,6 +162,27 @@ export class GreenfieldModuleMarketplaceService {
     const rank = 1 + new Set(ranked.slice(0, index).map(item => item.count).filter(count => count > targetCount)).size
     return {rank, category, totalModules: ranked.length}
   }
+}
+
+/** Registry facts first (publish time, stored artifact size, MPS release notes); the
+ * manifest's `marketplace.release` declaration only fills what the registry lacks. */
+export function releaseFacts(
+  declared: JsonRecord | null,
+  registryPublishedAt: Date | null,
+  registry: {sizeBytes?: number | null; notes?: string[] | null} | null,
+): GreenfieldModuleMarketplace['release'] {
+  const registryNotes = stringArray(registry?.notes ?? null)
+  return {
+    publishedAt: (registryPublishedAt && !Number.isNaN(registryPublishedAt.getTime()) ? registryPublishedAt.toISOString() : null) ?? isoDate(declared?.publishedAt),
+    sizeBytes: nonNegativeInteger(registry?.sizeBytes ?? null) ?? nonNegativeInteger(declared?.sizeBytes),
+    notes: registryNotes.length ? registryNotes : stringArray(declared?.notes),
+  }
+}
+
+/** MPS `release.notes` may be a single paragraph or a list; normalise to a list. */
+export function notesList(value: unknown): string[] {
+  if (typeof value === 'string') return value.trim() ? [value.trim()] : []
+  return stringArray(value)
 }
 
 function record(value: unknown): JsonRecord | null {

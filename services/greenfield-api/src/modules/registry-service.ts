@@ -12,7 +12,7 @@ import {normalizeModuleManifest} from './manifest-normalizer.js'
 import {GreenfieldModuleReleaseService} from './release-service.js'
 import {classifyBetaModule, installabilityForBetaModule} from './beta-catalogue-policy.js'
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
-import {GreenfieldModuleMarketplaceService} from './marketplace-service.js'
+import {GreenfieldModuleMarketplaceService, notesList} from './marketplace-service.js'
 import {GreenfieldRegistryPresentationService} from './registry-presentation-service.js'
 import {GreenfieldRegistryTrustService, productProjection, type RegistryTrustOptions} from './registry-trust-service.js'
 
@@ -144,6 +144,11 @@ export class GreenfieldModuleRegistryService {
       item.registryReleaseId = releaseId ?? null
       item.presentation = releaseId ? summaryPresentation(presentations.get(releaseId) ?? null) : null
     }
+    await Promise.all((items as any[]).map(async item => {
+      const releaseId = latestReleaseIds.get(item.moduleId)
+      const release = releaseId ? await this.releases.getReleaseById(releaseId) : undefined
+      item.trustSummary = release ? summaryTrust(await this.trust.forRelease(release, {}, item.latestVersion ?? null)) : null
+    }))
     return {items, nextCursor: byModule.size > limit ? String(limit) : null}
   }
 
@@ -157,15 +162,19 @@ export class GreenfieldModuleRegistryService {
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
       const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
-      const [marketplace, presentation, trust, product] = await Promise.all([
+      const [product, packageSizeBytes] = await Promise.all([
+        this.productProjectionFor(latest.releaseId),
+        this.packageSizeBytes(latest.releaseSha256),
+      ])
+      const [marketplace, presentation, trust] = await Promise.all([
         this.marketplace.project({
           moduleId: latest.moduleId,
           manifest: latest.manifest,
-          registryPublishedAt: latest.publishedAt,
+          registryPublishedAt: latest.publishedAt ? new Date(latest.publishedAt as any) : null,
+          registryRelease: {sizeBytes: packageSizeBytes, notes: notesList(product?.release?.notes)},
         }),
         this.presentation.forRelease(latest.releaseId),
         this.trust.forRelease(latest, trustOptions, latestPublishedVersion),
-        this.productProjectionFor(latest.releaseId),
       ])
       return {
         registryReleaseId: latest.releaseId,
@@ -326,6 +335,14 @@ export class GreenfieldModuleRegistryService {
     return {...release, registryReleaseId: release.releaseId, product, presentation, registryTrust: trust}
   }
 
+  /** Byte size of the verified release package the registry stored, when it stored it. */
+  async packageSizeBytes(releaseSha256: string | null | undefined): Promise<number | null> {
+    if (!releaseSha256) return null
+    const row = await this.db.selectFrom('greenfield_release_asset_blobs').select('byte_size').where('sha256', '=', releaseSha256).executeTakeFirst()
+    const size = row ? Number(row.byte_size) : Number.NaN
+    return Number.isSafeInteger(size) && size >= 0 ? size : null
+  }
+
   async productProjectionFor(releaseId: string) {
     const ingestion = await this.db.selectFrom('greenfield_mps_ingestions')
       .select(['manifest', 'manifest_sha256', 'product_standard'])
@@ -352,6 +369,23 @@ function summaryPresentation(presentation: Awaited<ReturnType<GreenfieldRegistry
     cover: presentation.cover,
     screenshots: presentation.screenshots,
     developmentAssets: presentation.developmentAssets,
+  }
+}
+
+/** Compact trust summary for list items; the full block stays on the detail endpoint. */
+function summaryTrust(trust: Awaited<ReturnType<GreenfieldRegistryTrustService['forRelease']>>) {
+  return {
+    registryReleaseId: trust.registryReleaseId,
+    version: trust.version,
+    releaseState: trust.releaseState,
+    verified: trust.verified,
+    publisherVerified: trust.publisher.verified,
+    trustLevel: trust.publisher.trustLevel,
+    signatureState: trust.signature.state,
+    releaseSha256: trust.digests.releaseSha256,
+    revoked: trust.revocation.revoked,
+    quarantined: trust.quarantine.quarantined,
+    warnings: trust.warnings.map(warning => warning.code),
   }
 }
 

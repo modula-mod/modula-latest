@@ -235,6 +235,16 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
     expect(await installedVersion()).toEqual({version: '1.0.0', status: 'enabled'})
   })
 
+  it('never blocks a version when the client sends no hostVersion', async () => {
+    const list = (await app.inject({method: 'GET', url: `/v1/modules/${moduleId}/versions?platform=ios`, headers: auth()})).json().data
+    for (const item of list.versions) {
+      expect(item.blockers.map((blocker: any) => blocker.code)).not.toContain('HOST_INCOMPATIBLE')
+    }
+    const preview = await app.inject({method: 'POST', url: `/v1/modules/${moduleId}/version-preview`, headers: auth(), payload: {version: '1.2.0', platform: 'ios'}})
+    expect(preview.statusCode, preview.body).toBe(200)
+    expect(preview.json().data.blockers.map((blocker: any) => blocker.code)).not.toContain('HOST_INCOMPATIBLE')
+  })
+
   it('refuses a target that is incompatible with the host', async () => {
     const preview = await app.inject({method: 'POST', url: `/v1/modules/${moduleId}/version-preview`, headers: auth(), payload: {version: '1.2.0', hostVersion: '0.5.0'}})
     expect(preview.statusCode, preview.body).toBe(200)

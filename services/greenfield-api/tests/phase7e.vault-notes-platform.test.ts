@@ -110,11 +110,11 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       previews: [],
       rating: {average: null, count: 0},
       installations: {count: 0},
-      release: {
-        publishedAt: '2026-08-24T00:00:00.000Z',
-        sizeBytes: null,
-      },
     })
+    // Registry facts win over the manifest's self-declared marketplace.release block.
+    const registryRelease = await db.selectFrom('greenfield_module_releases').select('published_at').where('module_id', '=', moduleId).where('release_state', '=', 'published').orderBy('published_at', 'desc').executeTakeFirstOrThrow()
+    expect(initial.json().data.marketplace.release.publishedAt).toBe(new Date(registryRelease.published_at as any).toISOString())
+    expect(initial.json().data.publishedAt).toBe(initial.json().data.marketplace.release.publishedAt)
 
     const primaryRating = await app.inject({
       method: 'PUT',
