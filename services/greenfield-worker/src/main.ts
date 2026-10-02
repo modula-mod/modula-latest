@@ -8,6 +8,7 @@ import {reapExpiredLeases} from './jobs/claim.js'
 import {reapExpiredEventDeliveryLeases} from './events/claim.js'
 import {ingestAllConnections} from './bridges/atproto/ingest.js'
 import {isOperationalFlagSet} from './bridges/atproto/session.js'
+import {heartbeatDue, recordHeartbeat} from './heartbeat/heartbeat.js'
 
 async function main() {
   const config = loadConfig()
@@ -27,9 +28,16 @@ async function main() {
   let lastReap = 0
   let lastDrain = 0
   let lastIngest = 0
+  let lastBeat = 0
+  const startedAt = new Date()
+  const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
 
   while (!stopping) {
     const now = Date.now()
+    if (heartbeatDue(lastBeat, now)) {
+      await recordHeartbeat(db, {workerId: config.workerId, releaseSha, startedAt})
+      lastBeat = now
+    }
     if (now - lastReap >= config.leaseReapIntervalMs) {
       await reapExpiredLeases(db)
       await reapExpiredEventDeliveryLeases(db)

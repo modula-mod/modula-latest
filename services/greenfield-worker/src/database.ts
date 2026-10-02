@@ -51,6 +51,12 @@ export type AtprotoPublicationStatus =
   | 'revoked'
 
 export interface Database {
+  greenfield_worker_heartbeats: {
+    worker_id: string
+    release_sha: string | null
+    started_at: Date
+    last_seen_at: Date
+  }
   background_jobs: {
     id: string
     job_type: string

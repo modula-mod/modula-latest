@@ -341,6 +341,24 @@ function templateModel(message: MailMessage, context: TemplateContext): Template
       ],
       securityNotice: 'If you did not request this, contact Modula support immediately.',
     },
+    'support-case': {
+      subject: `[${valueOr(variables.reference, 'MOD-UNKNOWN')}] ${valueOr(variables.category, 'help')}: ${valueOr(variables.subject, 'Support request')}`,
+      preheader: `Support request ${valueOr(variables.reference, '')} from @${valueOr(variables.handle, 'member').replace(/^@/, '')}`,
+      eyebrow: 'Support request',
+      headline: valueOr(variables.subject, 'Support request'),
+      body: valueOr(variables.message, 'No message was provided.'),
+      ctaLabel: variables.replyTo?.trim() ? 'Reply to member' : 'Open Modula',
+      actionUrl: variables.replyTo?.trim() ? `mailto:${encodeURIComponent(variables.replyTo.trim()).replace(/%40/g, '@')}?subject=${encodeURIComponent(`Re: [${valueOr(variables.reference, '')}] ${valueOr(variables.subject, '')}`)}` : context.publicWebUrl,
+      metadata: [
+        {label: 'Reference', value: valueOr(variables.reference, 'Unknown')},
+        {label: 'Category', value: valueOr(variables.category, 'help')},
+        {label: 'Member', value: `@${valueOr(variables.handle, 'unknown').replace(/^@/, '')} (${valueOr(variables.accountId, 'unknown')})`},
+        {label: 'Reply to', value: valueOr(variables.replyTo, 'No email on file')},
+        {label: 'Diagnostics', value: valueOr(variables.diagnostics, 'Not attached')},
+        {label: 'Expires', value: 'Open until answered'},
+      ],
+      securityNotice: 'Sent from the Modula app by a signed-in member. Never ask members for passwords or codes.',
+    },
   }
 
   return definitions[message.templateId]

@@ -21,6 +21,7 @@ export const MAIL_TEMPLATE_IDS = [
   'invite',
   'account-deletion',
   'account-deletion-requested',
+  'support-case',
 ] as const
 
 export type MailTemplateId = (typeof MAIL_TEMPLATE_IDS)[number]
