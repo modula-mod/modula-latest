@@ -1,0 +1,417 @@
+{
+  "capturedAt": "2026-10-03T10:05:40.701Z",
+  "baseUrl": "https://api.modula.digital",
+  "policy": "anonymous and non-mutating except a schema-invalid registration request that cannot persist",
+  "probes": [
+    {
+      "method": "GET",
+      "path": "GET /version.json",
+      "targetPath": "/version.json",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 102.3,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 471,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/health/live",
+      "targetPath": "/v1/health/live",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 39.8,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 136,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/health/live",
+      "targetPath": "/v1/health/live",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 20.8,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 136,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/health/live",
+      "targetPath": "/v1/health/live",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 23.5,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 136,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/health/ready",
+      "targetPath": "/v1/health/ready",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 39.9,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 137,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/status",
+      "targetPath": "/v1/status",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 33.6,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 932,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/status",
+      "targetPath": "/v1/status",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 21.3,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 932,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/status",
+      "targetPath": "/v1/status",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 22.6,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 932,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/meta",
+      "targetPath": "/v1/meta",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 30.2,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 3671,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules",
+      "targetPath": "/v1/registry/modules",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 41.7,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 6492,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules",
+      "targetPath": "/v1/registry/modules",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 36.6,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 6492,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules",
+      "targetPath": "/v1/registry/modules",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 35.7,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 6492,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules/:moduleId",
+      "targetPath": "/v1/registry/modules/digital.modula.vault-notes",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 40.5,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 47321,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules/:moduleId/versions",
+      "targetPath": "/v1/registry/modules/digital.modula.vault-notes/versions",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 27.8,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 85633,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules/:moduleId/versions/:version",
+      "targetPath": "/v1/registry/modules/digital.modula.vault-notes/versions/1.8.0",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 27.2,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 20785,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/releases/:releaseId/artifact",
+      "targetPath": "/v1/registry/releases/module-release%3Adigital.modula.vault-notes%3A1.8.0/artifact",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 46,
+      "contentType": "application/gzip",
+      "contentLength": 260526,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": "response SHA-256 matches published release digest"
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/releases/:releaseId/assets/:assetId",
+      "targetPath": "/v1/registry/releases/module-release%3Adigital.modula.vault-notes%3A1.8.0/assets/01a0f998-85d9-7e67-964b-cd2881a89329",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 60.8,
+      "contentType": "image/png",
+      "contentLength": 178236,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": "asset is available and SHA-256 matches metadata"
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules/:moduleId",
+      "targetPath": "/v1/registry/modules/digital.modula.vault-notes.ai",
+      "status": 200,
+      "expectedStatus": [
+        200
+      ],
+      "latencyMs": 29.5,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 43641,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/releases/:releaseId/assets/:assetId",
+      "targetPath": "/v1/registry/releases/module-release%3Adigital.modula.vault-notes.ai%3A0.5.0/assets/01a05d39-2431-7281-9028-16f442758225",
+      "status": 404,
+      "expectedStatus": [
+        404
+      ],
+      "latencyMs": 26.9,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 265,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": "metadata declares unavailable and delivery returns 404"
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/registry/modules/:moduleId",
+      "targetPath": "/v1/registry/modules/api-atlas-01-unknown",
+      "status": 404,
+      "expectedStatus": [
+        404
+      ],
+      "latencyMs": 26.1,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 260,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/profiles/:handle",
+      "targetPath": "/v1/profiles/api-atlas-01-does-not-exist",
+      "status": 404,
+      "expectedStatus": [
+        404
+      ],
+      "latencyMs": 22.5,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 240,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/accounts/me",
+      "targetPath": "/v1/accounts/me",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "latencyMs": 20.9,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 252,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/modules/installed",
+      "targetPath": "/v1/modules/installed",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "latencyMs": 19.9,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 252,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/intelligence/missions",
+      "targetPath": "/v1/intelligence/missions",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "latencyMs": 21.7,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 252,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "GET",
+      "path": "GET /v1/support/cases",
+      "targetPath": "/v1/support/cases",
+      "status": 401,
+      "expectedStatus": [
+        401
+      ],
+      "latencyMs": 17.3,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 252,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    },
+    {
+      "method": "POST",
+      "path": "POST /v1/accounts/register",
+      "targetPath": "/v1/accounts/register",
+      "status": 400,
+      "expectedStatus": [
+        400
+      ],
+      "latencyMs": 21.7,
+      "contentType": "application/json; charset=utf-8",
+      "contentLength": 251,
+      "requestIdPresent": true,
+      "result": "PASS",
+      "assertion": null
+    }
+  ],
+  "latency": {
+    "GET /v1/health/live": {
+      "samples": 3,
+      "minimumMs": 20.8,
+      "medianMs": 23.5,
+      "maximumMs": 39.8
+    },
+    "GET /v1/status": {
+      "samples": 3,
+      "minimumMs": 21.3,
+      "medianMs": 22.6,
+      "maximumMs": 33.6
+    },
+    "GET /v1/registry/modules": {
+      "samples": 3,
+      "minimumMs": 35.7,
+      "medianMs": 36.6,
+      "maximumMs": 41.7
+    }
+  }
+}

@@ -5,7 +5,7 @@ flowchart LR
   api --> requestId[Request ID hook]
   requestId --> security[Helmet and CORS]
   security --> rate[Per-route Fastify rate limit]
-  rate --> auth[Bearer [REDACTED] service assertion attachment]
+  rate --> auth[Bearer or service assertion attachment]
   auth --> authorize[Route capability and ownership checks]
   authorize --> validate[Handler and service validation]
   validate --> service[Domain service/repository]

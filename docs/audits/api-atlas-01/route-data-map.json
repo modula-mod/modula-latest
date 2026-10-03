@@ -5366,7 +5366,8 @@
       "greenfield_extension_catalogue",
       "greenfield_module_releases",
       "greenfield_module_versions",
-      "greenfield_mps_ingestions"
+      "greenfield_mps_ingestions",
+      "greenfield_release_asset_blobs"
     ],
     "writes": [],
     "emits": [],
@@ -5375,6 +5376,7 @@
     "evidence": [
       "services/greenfield-api/src/modules/registry-service.ts#getModule",
       "services/greenfield-api/src/modules/registry-service.ts#listVersions",
+      "services/greenfield-api/src/modules/registry-service.ts#packageSizeBytes",
       "services/greenfield-api/src/modules/registry-service.ts#productProjectionFor"
     ]
   },
@@ -5445,7 +5447,8 @@
       "greenfield_extension_catalogue",
       "greenfield_module_releases",
       "greenfield_module_versions",
-      "greenfield_mps_ingestions"
+      "greenfield_mps_ingestions",
+      "greenfield_release_asset_blobs"
     ],
     "writes": [],
     "emits": [],
@@ -5454,6 +5457,7 @@
     "evidence": [
       "services/greenfield-api/src/modules/registry-service.ts#getModule",
       "services/greenfield-api/src/modules/registry-service.ts#listVersions",
+      "services/greenfield-api/src/modules/registry-service.ts#packageSizeBytes",
       "services/greenfield-api/src/modules/registry-service.ts#productProjectionFor"
     ]
   },
@@ -5992,6 +5996,14 @@
       "services/greenfield-api/src/sessions/service.ts#revokeFamily"
     ]
   },
+  "GET /v1/status": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
   "POST /v1/stories": {
     "reads": [
       "blocks",
@@ -6087,6 +6099,44 @@
       "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
       "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
       "services/greenfield-api/src/domains/stories/service.ts#listRail"
+    ]
+  },
+  "GET /v1/support/cases": {
+    "reads": [
+      "greenfield_support_cases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/support/service.ts#list"
+    ]
+  },
+  "POST /v1/support/cases": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_support_cases"
+    ],
+    "writes": [
+      "greenfield_support_cases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/support/service.ts#open"
+    ]
+  },
+  "GET /v1/support/contact": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/support/service.ts#contact"
     ]
   },
   "GET /v1/tools": {

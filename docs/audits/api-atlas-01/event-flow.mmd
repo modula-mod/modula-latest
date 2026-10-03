@@ -1,0 +1,13 @@
+flowchart LR
+  api[HTTP domain mutation] --> outbox[(greenfield outbox)]
+  outbox --> worker[GreenField worker poller]
+  worker --> event[Event delivery consumers]
+  worker --> job[Background job runner]
+  event --> notification[(Notifications)]
+  event --> search[(Search projections)]
+  event --> audit[(Audit and activity effects)]
+  job --> mail[SMTP or mail identity provisioner]
+  job --> registry[Registry synchronization]
+  worker --> retry[Retry lease and backoff]
+  retry --> dead[(FAILED or DEAD LETTER)]
+  worker --> heartbeat[(Worker heartbeat)]

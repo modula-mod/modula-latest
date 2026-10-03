@@ -56,12 +56,19 @@ export function domainFor(path) {
   const rules = [
     [/^\/v1\/(accounts|sessions|auth)\b/, 'Authentication'],
     [/^\/v1\/account\b/, 'Account'],
+    [/^\/v1\/support\b/, 'Support'],
+    [/^\/v1\/(extensions|function-jobs|functions|module-host|plugins|product-standard|providers|tools|widgets)\b/, 'Modules'],
+    [/^\/v1\/repositories\b/, 'Account'],
+    [/^\/v1\/(board)\b/, 'Account'],
+    [/^\/v1\/saves\b/, 'Posts'],
+    [/\/comments?(?:\/|$)|\/replies(?:\/|$)/, 'Comments'],
+    [/\/reactions?(?:\/|$)|\/likes?(?:\/|$)/, 'Reactions'],
+    [/\/(?:followers|following|follow|unfollow|relationships?|blocks?|mutes?)(?:\/|$)/, 'Social'],
+    [/\/(?:shares?|reposts?|quote)(?:\/|$)/, 'Sharing'],
     [/^\/v1\/profiles?\b/, 'Profile'],
     [/^\/v1\/(follows|relationships|blocks|mutes)\b/, 'Social'],
     [/^\/v1\/(feed|reels)\b/, 'Feed'],
     [/^\/v1\/posts?\b/, 'Posts'],
-    [/^\/v1\/comments?\b/, 'Comments'],
-    [/reaction|like/, 'Reactions'],
     [/^\/v1\/(attachments|media|stories)\b/, 'Media'],
     [/^\/v1\/search\b/, 'Search'],
     [/^\/v1\/discover\b/, 'Discover'],
@@ -75,7 +82,7 @@ export function domainFor(path) {
     [/^\/v1\/connect/, 'Connectors'],
     [/^\/v1\/atproto\b|^\/oauth\/atproto/, 'AT Protocol'],
     [/^\/v1\/commerce\b/, 'Commerce'],
-    [/^\/v1\/(health|version|meta)\b|^\/version\.json$/, 'Operations'],
+    [/^\/v1\/(health|version|meta|status)\b|^\/version\.json$/, 'Operations'],
     [/^\/v1\/internal\b/, 'Internal'],
   ]
   return rules.find(([pattern]) => pattern.test(path))?.[1] ?? 'Platform'
@@ -132,9 +139,10 @@ function routeAuth(handlerText, path, file) {
   const admin = path.startsWith('/v1/admin') || capabilities.some(value => value.startsWith('admin:'))
   const backendAssertion = /requireServiceAssertion|verifyAssertion|requireAssertionOperation|serviceRoute\s*\(/.test(handlerText) || path.startsWith('/v1/backend/')
   const signedModuleIngress = /backendEvents\.ingest|backendWebhooks\.receive|signatureHeader\s*\(/.test(handlerText)
-  const wrappedGreenfield = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers)\/routes\.ts$/.test(file)
+  const wrappedGreenfield = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|support)\/routes\.ts$/.test(file)
+  const adminWrapper = path.startsWith('/v1/admin/') && /(?:releaseAdminAction|publisherAdminAction|\baction)\s*\(/.test(handlerText)
   const internalBuildService = path.startsWith('/v1/internal/build-service/')
-  const greenfield = /requireGreenfieldAuth/.test(handlerText) || wrappedGreenfield
+  const greenfield = /requireGreenfieldAuth/.test(handlerText) || wrappedGreenfield || adminWrapper
   const legacy = /requireAuth\s*\(|requireCapability\s*\(/.test(handlerText)
   const moduleInstallation = /runtimeAccess\.resolve|requireInstallation|installationId|assertInstalled/.test(handlerText)
   const modulePermission = /permission|capabilit|requireAssertionOperation/.test(handlerText) && path.includes('/modules/')
@@ -168,13 +176,19 @@ function routeAuth(handlerText, path, file) {
 }
 
 function ownershipFor(handlerText, path, auth, file) {
-  const wrappedAccount = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers)\/routes\.ts$/.test(file)
-  const account = wrappedAccount || /auth\.accountId|accountId\s*===\s*auth|account_id/.test(handlerText)
+  const wrappedAccount = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|support)\/routes\.ts$/.test(file)
+  const account = wrappedAccount || /auth\.accountId|auth\.session|accountId\s*===\s*auth|account_id|resolveSearchActorContext/.test(handlerText)
   const actor = /auth\.actorId|actorId\s*===\s*auth|owner_actor_id/.test(handlerText)
   const workspace = /workspaceId|workspace_id/.test(handlerText)
   const resourceId = /request\.params|param\(request/.test(handlerText)
   return {
-    rule: auth.serviceOperations.length
+    rule: path === '/v1/functions/:functionId/invoke'
+      ? 'MISSING: client-supplied installationId is capability-checked without authenticated account ownership'
+      : /^\/v1\/ai\/streams\/:streamId\/(cancel|reconnect)$/.test(path)
+        ? 'MISSING: authenticated session is required but stream ownership is not checked'
+        : auth.adminRequired
+          ? 'admin capability is the resource boundary; per-user ownership is not applicable'
+          : auth.serviceAssertionRequired || auth.serviceOperations.length
       ? 'service identity, product/release assertion, and declared operation are resolved server-side'
       : account
         ? 'authenticated account id is passed into the service/repository scope'
@@ -182,12 +196,18 @@ function ownershipFor(handlerText, path, auth, file) {
           ? 'authenticated actor id is passed into the service/repository scope'
           : auth.anonymousAllowed
             ? 'public/optional-viewer policy; downstream visibility checks must enforce privacy'
-            : 'not evident in the route handler; inspect downstream service',
+            : /^\/v1\/ai\/(providers|models)$/.test(path)
+              ? 'authenticated global catalogue read; no user-owned resource identifier'
+              : 'not evident in the route handler; inspect downstream service',
     accountScoped: account,
     actorScoped: actor,
     workspaceScoped: workspace,
     parameterizedResource: resourceId,
-    evidenceStrength: account || actor || auth.serviceOperations.length ? 'route-handler' : 'downstream-or-none',
+    evidenceStrength: path === '/v1/functions/:functionId/invoke' || /^\/v1\/ai\/streams\/:streamId\/(cancel|reconnect)$/.test(path)
+      ? 'route-handler-gap'
+      : account || actor || auth.adminRequired || auth.serviceAssertionRequired || auth.serviceOperations.length
+        ? 'route-handler'
+        : 'downstream-or-none',
   }
 }
 
@@ -537,6 +557,73 @@ SELECT jsonb_build_object(
   return JSON.parse(result.stdout)
 }
 
+function captureSqlJson(container, sql) {
+  const shell = `psql -X -qAt -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "$API_ATLAS_SQL"`
+  const result = spawnSync('docker', ['exec', '-e', `API_ATLAS_SQL=${sql}`, container, 'sh', '-lc', shell], {
+    encoding: 'utf8',
+    maxBuffer: 128 * 1024 * 1024,
+  })
+  if (result.status !== 0) throw new Error(`database aggregate capture failed: ${result.stderr}`)
+  return JSON.parse(result.stdout)
+}
+
+export function captureOperationalAggregates(container) {
+  const sql = String.raw`
+SELECT jsonb_build_object(
+  'moduleReleasesByState', COALESCE((SELECT jsonb_object_agg(release_state, n) FROM (SELECT release_state, count(*) n FROM greenfield_module_releases GROUP BY release_state ORDER BY release_state) q), '{}'::jsonb),
+  'publishedReleases', (SELECT count(*) FROM greenfield_module_releases WHERE release_state='published'),
+  'publishedUnsignedReleases', (SELECT count(*) FROM greenfield_module_releases r WHERE r.release_state='published' AND NOT EXISTS (SELECT 1 FROM greenfield_module_release_signatures s WHERE s.release_id=r.release_id AND s.verification_state='verified' AND s.revoked_at IS NULL)),
+  'publisherSigningKeys', (SELECT count(*) FROM greenfield_publisher_signing_keys),
+  'releaseSignatures', (SELECT count(*) FROM greenfield_module_release_signatures),
+  'releaseIntegrityRows', (SELECT count(*) FROM greenfield_module_release_integrity),
+  'releaseArtifactCoverage', (SELECT jsonb_build_object('releases', count(*), 'blobAvailable', count(*) FILTER (WHERE b.sha256 IS NOT NULL)) FROM greenfield_module_releases r LEFT JOIN greenfield_release_asset_blobs b ON b.sha256=r.release_sha256),
+  'releaseAssetBlobs', (SELECT jsonb_build_object('count', count(*), 'bytes', COALESCE(sum(byte_size),0)) FROM greenfield_release_asset_blobs),
+  'presentationAssets', (SELECT jsonb_build_object('count', count(*), 'blobAvailable', count(*) FILTER (WHERE b.sha256 IS NOT NULL), 'development', count(*) FILTER (WHERE a.development_asset)) FROM greenfield_release_presentation_assets a LEFT JOIN greenfield_release_asset_blobs b ON b.sha256=a.sha256),
+  'frontendsByMode', COALESCE((SELECT jsonb_object_agg(frontend_mode, n) FROM (SELECT frontend_mode, count(*) n FROM greenfield_release_frontends GROUP BY frontend_mode ORDER BY frontend_mode) q), '{}'::jsonb),
+  'verifiedFrontends', (SELECT count(*) FROM greenfield_release_frontends WHERE verified_at IS NOT NULL),
+  'installPlans', (SELECT jsonb_build_object('count', count(*), 'withDescriptor', count(*) FILTER (WHERE install_descriptor IS NOT NULL), 'withDescriptorDigest', count(*) FILTER (WHERE install_descriptor_sha256 IS NOT NULL)) FROM greenfield_module_install_plans),
+  'installDescriptorKeys', COALESCE((SELECT jsonb_agg(key ORDER BY key) FROM (SELECT DISTINCT jsonb_object_keys(install_descriptor) key FROM greenfield_module_install_plans WHERE install_descriptor IS NOT NULL) q), '[]'::jsonb),
+  'installationsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM greenfield_extension_installations GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'activeInstallPermissionReviews', (SELECT jsonb_build_object('active', count(*), 'withoutReview', count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM greenfield_module_permission_reviews p WHERE p.installation_id=i.installation_id AND p.release_id=r.release_id)), 'reviews', (SELECT count(*) FROM greenfield_module_permission_reviews)) FROM greenfield_extension_installations i JOIN greenfield_module_releases r ON r.extension_version_id=i.extension_version_id WHERE i.status NOT IN ('removed','uninstalled','notInstalled')),
+  'syncSources', (SELECT jsonb_build_object('count', count(*), 'enabled', count(*) FILTER (WHERE enabled)) FROM greenfield_module_sync_sources),
+  'syncRunsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM greenfield_module_sync_runs GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'aiProvidersByState', COALESCE((SELECT jsonb_object_agg(provider_kind || ':' || status, n) FROM (SELECT provider_kind, status, count(*) n FROM greenfield_ai_providers GROUP BY provider_kind,status ORDER BY provider_kind,status) q), '{}'::jsonb),
+  'aiProviders', COALESCE((SELECT jsonb_agg(jsonb_build_object('providerId',provider_id,'kind',provider_kind,'status',status,'configurationMode',configuration_mode) ORDER BY provider_id) FROM greenfield_ai_providers), '[]'::jsonb),
+  'aiModelsByState', COALESCE((SELECT jsonb_object_agg(availability || ':' || lifecycle_status || ':enabled=' || enabled::text, n) FROM (SELECT availability,lifecycle_status,enabled,count(*) n FROM greenfield_ai_models GROUP BY availability,lifecycle_status,enabled ORDER BY availability,lifecycle_status,enabled) q), '{}'::jsonb),
+  'aiRequests', (SELECT count(*) FROM greenfield_ai_request_ledger),
+  'aiRuntime', jsonb_build_object('credentials',(SELECT count(*) FROM ai_provider_credentials),'executions',(SELECT count(*) FROM ai_executions),'streams',(SELECT count(*) FROM ai_stream_sessions),'productActions',(SELECT count(*) FROM ai_product_action_executions)),
+  'legacyFunctionRuntime', jsonb_build_object('functions',(SELECT count(*) FROM greenfield_functions),'remoteHttp',(SELECT count(*) FROM greenfield_functions WHERE kind='remoteHttp'),'activeInvokeCapabilityInstallations',(SELECT count(DISTINCT installation_id) FROM greenfield_extension_capabilities WHERE capability='function:invoke' AND revoked_at IS NULL)),
+  'intelligence', jsonb_build_object(
+    'missions', (SELECT count(*) FROM intelligence_missions),
+    'plans', (SELECT count(*) FROM intelligence_plans),
+    'proposals', (SELECT count(*) FROM intelligence_proposals),
+    'akiDecisions', (SELECT count(*) FROM intelligence_aki_decisions),
+    'governorDecisions', (SELECT count(*) FROM intelligence_governor_decisions),
+    'approvals', (SELECT count(*) FROM intelligence_approvals),
+    'runs', (SELECT count(*) FROM intelligence_runs),
+    'ledgerEvents', (SELECT count(*) FROM intelligence_ledger_events)
+  ),
+  'backgroundJobsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM background_jobs GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'backgroundJobsByType', COALESCE((SELECT jsonb_object_agg(job_type, n) FROM (SELECT job_type, count(*) n FROM background_jobs GROUP BY job_type ORDER BY job_type) q), '{}'::jsonb),
+  'failedJobs', COALESCE((SELECT jsonb_agg(jsonb_build_object('jobType',job_type,'status',status,'count',n,'latest',latest) ORDER BY job_type,status) FROM (SELECT job_type,status,count(*) n,max(updated_at) latest FROM background_jobs WHERE status IN ('FAILED','DEAD_LETTER') GROUP BY job_type,status) q), '[]'::jsonb),
+  'jobFailuresByCode', COALESCE((SELECT jsonb_object_agg(COALESCE(error_code,'UNCLASSIFIED'), n) FROM (SELECT error_code, count(*) n FROM job_failures GROUP BY error_code ORDER BY error_code) q), '{}'::jsonb),
+  'jobFailureDetails', COALESCE((SELECT jsonb_agg(jsonb_build_object('code',COALESCE(error_code,'UNCLASSIFIED'),'count',n,'latest',latest) ORDER BY error_code) FROM (SELECT error_code,count(*) n,max(created_at) latest FROM job_failures GROUP BY error_code) q), '[]'::jsonb),
+  'outbox', (SELECT jsonb_build_object('count', count(*), 'pending', count(*) FILTER (WHERE published_at IS NULL), 'failed', count(*) FILTER (WHERE last_error IS NOT NULL)) FROM outbox_events),
+  'eventDeliveriesByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM greenfield_event_deliveries GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'asyncRegistrations', jsonb_build_object('moduleJobs',(SELECT count(*) FROM greenfield_module_job_registrations),'scheduledModuleJobs',(SELECT count(*) FROM greenfield_module_job_registrations WHERE schedule IS NOT NULL),'extensionEventSubscriptions',(SELECT count(*) FROM greenfield_extension_event_subscriptions),'engineJobs',(SELECT count(*) FROM greenfield_engine_job_registrations),'engineConsumers',(SELECT count(*) FROM greenfield_engine_event_consumer_registrations)),
+  'attachmentsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM attachments GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'readyAttachmentLinkage', (SELECT jsonb_build_object('ready', count(*) FILTER (WHERE a.status='ready'), 'linked', count(*) FILTER (WHERE a.status='ready' AND (pm.attachment_id IS NOT NULL OR pcm.attachment_id IS NOT NULL)), 'orphanCandidates', count(*) FILTER (WHERE a.status='ready' AND pm.attachment_id IS NULL AND pcm.attachment_id IS NULL)) FROM attachments a LEFT JOIN profile_media pm ON pm.attachment_id=a.attachment_id LEFT JOIN post_content pcm ON pcm.attachment_id=a.attachment_id),
+  'profileMediaByKind', COALESCE((SELECT jsonb_object_agg(kind, n) FROM (SELECT kind, count(*) n FROM profile_media GROUP BY kind ORDER BY kind) q), '{}'::jsonb),
+  'postContentByType', COALESCE((SELECT jsonb_object_agg(content_type, n) FROM (SELECT content_type, count(*) n FROM post_content GROUP BY content_type ORDER BY content_type) q), '{}'::jsonb),
+  'postMedia', (SELECT jsonb_build_object('count', count(*), 'active', count(*) FILTER (WHERE deleted_at IS NULL), 'activeWithUrl', count(*) FILTER (WHERE deleted_at IS NULL AND url IS NOT NULL)) FROM post_media),
+  'storyItems', (SELECT jsonb_build_object('count', count(*), 'active', count(*) FILTER (WHERE deleted_at IS NULL AND status='active'), 'deletedOrInactive', count(*) FILTER (WHERE deleted_at IS NOT NULL OR status<>'active')) FROM greenfield_story_items),
+  'workerHeartbeats', (SELECT jsonb_build_object('count', count(*), 'fresh', count(*) FILTER (WHERE last_seen_at > now()-interval '2 minutes'), 'releases', COALESCE(jsonb_agg(DISTINCT release_sha) FILTER (WHERE release_sha IS NOT NULL),'[]'::jsonb)) FROM greenfield_worker_heartbeats),
+  'moduleWebhookDeliveriesByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM module_backend_webhook_deliveries GROUP BY status ORDER BY status) q), '{}'::jsonb),
+  'notifications', (SELECT jsonb_build_object('count', count(*), 'active', count(*) FILTER (WHERE deleted_at IS NULL), 'unread', count(*) FILTER (WHERE deleted_at IS NULL AND read_at IS NULL)) FROM notifications)
+);`
+  return captureSqlJson(container, sql)
+}
+
 export function captureContainer(container) {
   const raw = JSON.parse(command('docker', ['inspect', container]))[0]
   return {
@@ -582,6 +669,10 @@ export function captureHostSnapshot() {
   const mediaStat = statSync(mediaRoot)
   const mediaFiles = Number(commandOr('find', [mediaRoot, '-type', 'f', '-printf', '.'], '').length)
   const mediaBytes = Number(commandOr('du', ['-sb', mediaRoot], '0').split(/\s+/)[0] || 0)
+  const mediaClasses = Object.fromEntries(readdirSync(mediaRoot, {withFileTypes: true}).filter(entry => entry.isDirectory()).sort((a, b) => a.name.localeCompare(b.name)).map(entry => {
+    const path = join(mediaRoot, entry.name)
+    return [entry.name, {files: Number(commandOr('find', [path, '-type', 'f', '-printf', '.'], '').length), bytes: Number(commandOr('du', ['-sb', path], '0').split(/\s+/)[0] || 0)}]
+  }))
   return {
     capturedAt: new Date().toISOString(),
     hostname: command('hostname', ['--fqdn']),
@@ -600,26 +691,44 @@ export function captureHostSnapshot() {
       originMain: command('git', ['-C', repoRoot, 'rev-parse', 'origin/main']),
       auditPath: repoRoot,
       auditBranch: command('git', ['-C', repoRoot, 'branch', '--show-current']),
-      auditStartSha: command('git', ['-C', repoRoot, 'rev-parse', 'HEAD']),
+      auditHeadAtCapture: command('git', ['-C', repoRoot, 'rev-parse', 'HEAD']),
+      tagsAtCanonicalHead: commandOr('git', ['-C', dirtyCheckout, 'tag', '--points-at', 'HEAD']).split('\n').filter(Boolean),
+      describeCanonicalHead: commandOr('git', ['-C', dirtyCheckout, 'describe', '--tags', '--always', '--dirty']),
     },
     versions: {
       hostNode: command('node', ['--version']),
       hostPnpm: command('pnpm', ['--version']),
       hostNpm: command('npm', ['--version']),
-      nginx: command('nginx', ['-v']).replace(/^nginx version:\s*/, ''),
+      nginx: command('sh', ['-lc', 'nginx -v 2>&1']).replace(/^nginx version:\s*/, ''),
       containerNode: command('docker', ['exec', containers[0], 'node', '--version']),
     },
     containers: {api, worker, database, redis},
     config: {api: captureSanitizedConfig(containers[0]), worker: captureSanitizedConfig(containers[1], true)},
+    edge: {
+      dns: commandOr('sh', ['-lc', "getent ahosts api.modula.digital | awk '{print $1}' | sort -u"]).split('\n').filter(Boolean),
+      tls: commandOr('sh', ['-lc', "printf '' | openssl s_client -servername api.modula.digital -connect api.modula.digital:443 2>/dev/null | openssl x509 -noout -subject -issuer -dates -fingerprint -sha256 2>/dev/null"]).split('\n').filter(Boolean),
+    },
     nginx: {path: nginxPath, sha256: sha256(readFileSync(nginxPath)), content: readFileSync(nginxPath, 'utf8')},
-    storage: {type: 'host bind mount', root: mediaRoot, mode: (mediaStat.mode & 0o777).toString(8), files: mediaFiles, bytes: mediaBytes},
+    hostProcesses: {
+      docker: command('docker', ['ps', '--format', '{{json .}}']).split('\n').filter(Boolean).map(line => JSON.parse(line)),
+      relevantSystemdUnits: commandOr('sh', ['-lc', "systemctl list-units --type=service --all --no-legend --plain | grep -Ei 'modula|nginx|docker|postgres|redis' || true"]).split('\n').filter(Boolean),
+      timers: commandOr('sh', ['-lc', "systemctl list-timers --all --no-legend --plain | grep -Ei 'modula|greenfield|registry|backup|mail' || true"]).split('\n').filter(Boolean),
+      cronFiles: commandOr('find', ['/etc/cron.d', '-maxdepth', '1', '-type', 'f', '-printf', '%f\n']).split('\n').filter(Boolean).sort(),
+    },
+    redisRuntime: {
+      appendonly: commandOr('docker', ['exec', containers[3], 'sh', '-lc', 'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning CONFIG GET appendonly']).split('\n')[1] ?? 'UNKNOWN',
+      save: commandOr('docker', ['exec', containers[3], 'sh', '-lc', 'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning CONFIG GET save']).split('\n')[1] || 'disabled',
+      applicationSourceReferences: 0,
+    },
+    storage: {type: 'host bind mount', root: mediaRoot, mode: (mediaStat.mode & 0o777).toString(8), files: mediaFiles, bytes: mediaBytes, classes: mediaClasses},
     runtimeRoutes: captureRuntimeRoutes(containers[0]),
     databaseSchema: captureDatabaseSchema(containers[2]),
+    operationalAggregates: captureOperationalAggregates(containers[2]),
   }
 }
 
 export function sanitizeForSecretScan(text) {
   return text
     .replaceAll(/(postgres(?:ql)?:\/\/)[^\s"']+/gi, '$1[REDACTED]')
-    .replaceAll(/(Bearer\s+)[A-Za-z0-9._~+\/-]+/gi, '$1[REDACTED]')
+    .replaceAll(/(Bearer\s+)[A-Za-z0-9._~+\/-]{16,}/gi, '$1[REDACTED]')
 }

@@ -1,10 +1,10 @@
 {
-  "capturedAt": "2026-10-02T10:38:28.839Z",
+  "capturedAt": "2026-10-03T10:02:55.876Z",
   "hostname": "core.modula.digital",
   "os": "Ubuntu 24.04.4 LTS",
   "kernel": "Linux 6.8.0-137-generic",
   "architecture": "x86_64",
-  "uptime": "up 7 weeks, 5 days, 11 hours, 56 minutes",
+  "uptime": "up 7 weeks, 6 days, 11 hours, 20 minutes",
   "repository": {
     "canonicalPath": "/root/modula-latest",
     "origin": "https://github.com/modula-mod/modula-latest.git",
@@ -13,31 +13,33 @@
     "status": "## fix/n4-foryou-private-author-hydrate...origin/fix/n4-foryou-private-author-hydrate\n M ops/nginx/api.modula.digital.conf\n M services/greenfield-api/src/app/register-phase7f-stories-routes.ts\n M services/greenfield-api/src/domains/stories/service.ts\n M services/greenfield-api/tests/phase7i.f5-stories.test.ts",
     "trackedChanges": "M\tops/nginx/api.modula.digital.conf\nM\tservices/greenfield-api/src/app/register-phase7f-stories-routes.ts\nM\tservices/greenfield-api/src/domains/stories/service.ts\nM\tservices/greenfield-api/tests/phase7i.f5-stories.test.ts",
     "untrackedFiles": "",
-    "originMain": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
+    "originMain": "160f31d8c1cbaae55afc004162e75944e7f0cac3",
     "auditPath": "/root/modula-worktrees/api-atlas-01",
     "auditBranch": "audit/api-atlas-01",
-    "auditStartSha": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea"
+    "auditHeadAtCapture": "635152caafad5d4310b50cf1312d3cff275a2a2f",
+    "tagsAtCanonicalHead": [],
+    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-170-g80c2c0d-dirty"
   },
   "versions": {
     "hostNode": "v24.15.0",
     "hostPnpm": "11.11.0",
     "hostNpm": "11.12.1",
-    "nginx": "",
+    "nginx": "nginx/1.31.3",
     "containerNode": "v24.18.0"
   },
   "containers": {
     "api": {
       "name": "modula-production-greenfield-api-1",
-      "imageId": "sha256:643fff69c4d17dd61d77d5123ea26affe12b1bbce1bb64a389098138605ec781",
-      "image": "modula-greenfield-api:fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
-      "created": "2026-10-01T22:12:27.406494039Z",
-      "startedAt": "2026-10-01T22:12:27.79959473Z",
+      "imageId": "sha256:ee941cbb3cbcb62af8448fef97401f9da6b876245e7843cda3678232d3a7c305",
+      "image": "modula-greenfield-api:c7c46dfa3d85b89617de833723aab8f207f0ba94",
+      "created": "2026-10-02T23:45:50.159234096Z",
+      "startedAt": "2026-10-02T23:45:50.525081612Z",
       "status": "running",
       "health": "healthy",
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-api/dist/main.js",
       "workingDir": "/app",
-      "revision": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
+      "revision": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-post05-runtime/ops/docker/compose.production.yml",
       "ports": {
@@ -122,16 +124,16 @@
     },
     "worker": {
       "name": "modula-production-greenfield-worker-1",
-      "imageId": "sha256:06eef07101366399e3eba43d9e9d27807a04e876d687a4ed71c571aa24304e9e",
-      "image": "modula-greenfield-worker:fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
-      "created": "2026-10-01T22:12:27.620381274Z",
-      "startedAt": "2026-10-01T22:12:43.437810392Z",
+      "imageId": "sha256:cf3aaa8b68655cf8bafd1b395f88bc66955a5dce59353f82135a725fcb5f77ee",
+      "image": "modula-greenfield-worker:c7c46dfa3d85b89617de833723aab8f207f0ba94",
+      "created": "2026-10-02T23:45:50.377819847Z",
+      "startedAt": "2026-10-02T23:46:06.191640012Z",
       "status": "running",
       "health": null,
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-worker/dist/main.js",
       "workingDir": "/app",
-      "revision": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
+      "revision": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-post05-runtime/ops/docker/compose.production.yml",
       "ports": {},
@@ -295,9 +297,9 @@
         "BACKEND_FABRIC_ENABLED": "false",
         "BACKEND_FABRIC_ENVIRONMENT": "production",
         "BACKEND_FABRIC_CONTRACT_VERSION": "1.0",
-        "MODULA_RELEASE_SHA": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
-        "MODULA_WORKER_RELEASE_SHA": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea",
-        "MODULA_RELEASE_BUILT_AT": "2026-10-01T22:10:24Z"
+        "MODULA_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+        "MODULA_WORKER_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+        "MODULA_RELEASE_BUILT_AT": "2026-10-02T23:43:23Z"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -332,7 +334,7 @@
         "GREENFIELD_MODULE_GITHUB_SYNC_ENABLED": "false",
         "GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED": "false",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED": "false",
-        "MODULA_RELEASE_SHA": "fbb74e5e5cd83268aaca5ffeef84663703e5bdea"
+        "MODULA_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -343,17 +345,332 @@
       }
     }
   },
+  "edge": {
+    "dns": [
+      "104.21.27.33",
+      "172.67.168.220",
+      "2606:4700:3034::ac43:a8dc",
+      "2606:4700:3036::6815:1b21"
+    ],
+    "tls": [
+      "subject=CN = modula.digital",
+      "issuer=C = US, O = Google Trust Services, CN = WE1",
+      "notBefore=Aug 13 15:00:45 2026 GMT",
+      "notAfter=Nov 11 16:00:39 2026 GMT",
+      "sha256 Fingerprint=9E:D4:DC:9D:4C:02:56:C8:E3:1C:0E:9E:30:16:24:F7:C5:EB:D3:4F:40:F3:EE:0A:7F:6D:01:28:8A:9E:AD:BB"
+    ]
+  },
   "nginx": {
     "path": "/etc/nginx/conf.d/api.modula.digital.greenfield.conf",
-    "sha256": "729085dfb57d0e1e4c18efef758251cb42edade62aa2a193c9c08f1e529a49e1",
-    "content": "server {\n    listen 87.106.40.136:443 ssl;\n    listen [2a02:2479:68:e400::]:443 ssl;\n    http2 on;\n    server_name api.modula.digital;\n\n    ssl_certificate     /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.pem;\n    ssl_certificate_key /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.key;\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    server_tokens off;\n    client_max_body_size 1m;\n    proxy_connect_timeout 10s;\n    proxy_send_timeout 60s;\n    proxy_read_timeout 60s;\n\n    add_header X-Content-Type-Options nosniff always;\n    add_header X-Frame-Options DENY always;\n    add_header Referrer-Policy no-referrer always;\n\n    location / {\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location = /v1/stories {\n        client_max_body_size 25m;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location ~ ^/v1/attachments/uploads/[0-9a-fA-F-]+/content$ {\n        client_max_body_size 101m;\n        proxy_request_buffering off;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n}\n"
+    "sha256": "8fbed6189f4bb1113ea61467ebb4adc3c777a92c93d2d30597393e1acebf0535",
+    "content": "server {\n    listen 87.106.40.136:443 ssl;\n    listen [2a02:2479:68:e400::]:443 ssl;\n    http2 on;\n    server_name api.modula.digital;\n\n    ssl_certificate     /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.pem;\n    ssl_certificate_key /home/andrei/conf/web/api.modula.digital/ssl/api.modula.digital.key;\n    ssl_protocols TLSv1.2 TLSv1.3;\n\n    server_tokens off;\n    client_max_body_size 1m;\n    proxy_connect_timeout 10s;\n    proxy_send_timeout 60s;\n    proxy_read_timeout 60s;\n\n    add_header X-Content-Type-Options nosniff always;\n    add_header X-Frame-Options DENY always;\n    add_header Referrer-Policy no-referrer always;\n\n    location / {\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    # Immutable registry release media (icon/cover/screenshots). The API sends\n    # \"Cache-Control: public, max-age=31536000, immutable\" plus a sha256 ETag; do not\n    # override it with no-store. Server-level security headers still apply.\n    location ~ ^/v1/registry/releases/[^/]+/assets/[^/]+$ {\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location = /v1/stories {\n        client_max_body_size 25m;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n\n    location ~ ^/v1/attachments/uploads/[0-9a-fA-F-]+/content$ {\n        client_max_body_size 101m;\n        proxy_request_buffering off;\n        proxy_send_timeout 300s;\n        proxy_read_timeout 300s;\n        client_body_timeout 300s;\n        add_header Cache-Control \"no-store\" always;\n        proxy_http_version 1.1;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto https;\n        proxy_set_header Connection \"\";\n        proxy_pass http://127.0.0.1:4020;\n    }\n}\n"
+  },
+  "hostProcesses": {
+    "docker": [
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-03 00:45:50 +0100 BST",
+        "ID": "4f314fc5ebb0",
+        "Image": "modula-greenfield-worker:c7c46dfa3d85b89617de833723aab8f207f0ba94",
+        "Labels": "com.docker.compose.config-hash=4f0fad3977a09760cec98bf9b0929f0cb3c73534df4db1a9a44fbf9e87d98d32,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:cf3aaa8b68655cf8bafd1b395f88bc66955a5dce59353f82135a725fcb5f77ee,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-post05-runtime/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-post05-runtime/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.opencontainers.image.created=,org.opencontainers.image.revision=c7c46dfa3d85b89617de833723aab8f207f0ba94,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker",
+        "LocalVolumes": "0",
+        "Mounts": "",
+        "Names": "modula-production-greenfield-worker-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "",
+        "RunningFor": "10 hours ago",
+        "Size": "0B (virtual 2.5GB)",
+        "State": "running",
+        "Status": "Up 10 hours"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-03 00:45:50 +0100 BST",
+        "ID": "50e8c6362bd0",
+        "Image": "modula-greenfield-api:c7c46dfa3d85b89617de833723aab8f207f0ba94",
+        "Labels": "com.docker.compose.config-hash=b3e613aba2c3af0ed47390760bbb135073efe615ed98c0b823b48149ba3710ff,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:ee941cbb3cbcb62af8448fef97401f9da6b876245e7843cda3678232d3a7c305,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-post05-runtime/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-post05-runtime/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.opencontainers.image.created=,org.opencontainers.image.revision=c7c46dfa3d85b89617de833723aab8f207f0ba94,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api",
+        "LocalVolumes": "0",
+        "Mounts": "/var/lib/modul…",
+        "Names": "modula-production-greenfield-api-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "127.0.0.1:4020->4020/tcp",
+        "RunningFor": "10 hours ago",
+        "Size": "0B (virtual 2.52GB)",
+        "State": "running",
+        "Status": "Up 10 hours (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-02 20:22:10 +0100 BST",
+        "ID": "59f73f28f3a8",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "4fd62e10751885…",
+        "Names": "rf-test-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55499->5432/tcp",
+        "RunningFor": "15 hours ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 15 hours"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-02 20:15:10 +0100 BST",
+        "ID": "f4ed77bb5490",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "cf90e821f76bff…",
+        "Names": "rf-base-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55498->5432/tcp",
+        "RunningFor": "15 hours ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 15 hours"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-09-20 20:23:12 +0100 BST",
+        "ID": "fa43a3fb3ed5",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "com.docker.compose.config-hash=9efd11cef48e8fc1f7b278afde546891526b6de65bfa1d6e7e4144eacd7ae190,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dca9c7aa70c71caf8bcc48c8ec40658c1fdf2d1e4e8d26bc27d4d18e030d779a,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-builds/966440fe64efc4c88350ce6423795965a5c62013/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-builds/966440fe64efc4c88350ce6423795965a5c62013/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-postgres-1,com.docker.compose.service=greenfield-postgres,com.docker.compose.version=5.4.0",
+        "LocalVolumes": "1",
+        "Mounts": "/root/modula-b…,modula-product…",
+        "Names": "modula-production-greenfield-postgres-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "5432/tcp",
+        "RunningFor": "12 days ago",
+        "Size": "1.92MB (virtual 278MB)",
+        "State": "running",
+        "Status": "Up 12 days (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-31 15:47:32 +0100 BST",
+        "ID": "a0c1cb4250a6",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "modula-final-c…",
+        "Names": "modula-final-closure-recovery-pg",
+        "Networks": "modula-final-closure-recovery",
+        "Platform": null,
+        "Ports": "5432/tcp",
+        "RunningFor": "4 weeks ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 4 weeks (healthy)"
+      },
+      {
+        "Command": "\"/usr/local/bin/dock…\"",
+        "CreatedAt": "2026-08-28 15:23:22 +0100 BST",
+        "ID": "a51d0c0b1cd7",
+        "Image": "modula-ai-backend:891bbee46a72627fa333ad280fc0d9bb6c776806",
+        "Labels": "com.docker.compose.config-hash=4db14a59e0c8c0f94ceb10b8436e626012cdb3abb2df445bc92a55637a31fb4f,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:4d48e145e0ffe34f95acbb91dc1397aee015a660e5b7b30565501292a4fb1455,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-platform/modula-ai-backend/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-platform/modula-ai-backend,com.docker.compose.project=modula-ai,com.docker.compose.replace=ai-backend-1,com.docker.compose.service=ai-backend,com.docker.compose.version=5.4.0,digital.modula.engine-contracts.revision=bcef62e4b4e9b6b9a29b7bee52278d7a68a21061,org.opencontainers.image.created=2026-08-28T14:23:06Z,org.opencontainers.image.revision=891bbee46a72627fa333ad280fc0d9bb6c776806,org.opencontainers.image.source=https://github.com/modula-mod/modula-ai-backend,org.opencontainers.image.title=modula-ai-backend",
+        "LocalVolumes": "0",
+        "Mounts": "/root/modula-s…",
+        "Names": "modula-ai-ai-backend-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "4040/tcp",
+        "RunningFor": "5 weeks ago",
+        "Size": "0B (virtual 168MB)",
+        "State": "running",
+        "Status": "Up 5 weeks (healthy)"
+      },
+      {
+        "Command": "\"/usr/local/bin/dock…\"",
+        "CreatedAt": "2026-08-26 14:55:54 +0100 BST",
+        "ID": "75f4d2b64af0",
+        "Image": "modula-secrets-service:aa3f8c0da821786963c189861768b95a11165a50",
+        "Labels": "com.docker.compose.config-hash=2b5610c64b39ac558eac9a2e44a15723088d02ac527a877e3dc7e786ebf982ea,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:562956e7da6a950023ab02c7986fafb693e4d1174bc0b2cfc12ca67e7ef79854,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-platform/modula-secrets-service/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-platform/modula-secrets-service,com.docker.compose.project=modula-secrets,com.docker.compose.replace=secrets-service-1,com.docker.compose.service=secrets-service,com.docker.compose.version=5.4.0,org.opencontainers.image.created=2026-08-26T13:55:45Z,org.opencontainers.image.revision=aa3f8c0da821786963c189861768b95a11165a50,org.opencontainers.image.source=https://github.com/modula-mod/modula-secrets-service,org.opencontainers.image.title=modula-secrets-service",
+        "LocalVolumes": "0",
+        "Mounts": "/root/modula-s…,/root/modula-s…,/var/lib/modul…",
+        "Names": "modula-secrets-secrets-service-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "4030/tcp",
+        "RunningFor": "5 weeks ago",
+        "Size": "0B (virtual 190MB)",
+        "State": "running",
+        "Status": "Up 5 weeks (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-24 21:27:16 +0100 BST",
+        "ID": "1e5a2a82aa92",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "0",
+        "Mounts": "/root/modula-w…",
+        "Names": "modula-pvp-platform2-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55438->5432/tcp",
+        "RunningFor": "5 weeks ago",
+        "Size": "1.31MB (virtual 277MB)",
+        "State": "running",
+        "Status": "Up 5 weeks (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-13 18:22:54 +0100 BST",
+        "ID": "548ed62d2764",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "291ed586b12382…",
+        "Names": "modula-phase7l-b-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55437->5432/tcp",
+        "RunningFor": "7 weeks ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 7 weeks"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-13 15:12:42 +0100 BST",
+        "ID": "b6b5c6cc0bb4",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "/root/modula-l…,53a8321b794afa…",
+        "Names": "modula-phase7k-verifier-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55436->5432/tcp",
+        "RunningFor": "7 weeks ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 7 weeks"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-11 15:47:39 +0100 BST",
+        "ID": "1ea29f5eb918",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "516e0a5d7a49a8…",
+        "Names": "modula-phase7i-f5b-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55434->5432/tcp",
+        "RunningFor": "7 weeks ago",
+        "Size": "1.85kB (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 7 weeks"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-09 01:27:09 +0100 BST",
+        "ID": "77de870467a0",
+        "Image": "redis:7.4-alpine",
+        "Labels": "com.docker.compose.config-hash=e888004581c2552ced0fde9e1df6f2c955822486b9ece97cda0afd603b5b609d,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:2a51817f79255c8b69f86a974459c2e0359aff81417d80158f2b9e541e6f4b33,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.service=greenfield-redis,com.docker.compose.version=5.4.0",
+        "LocalVolumes": "1",
+        "Mounts": "238ff481d566d8…",
+        "Names": "modula-production-greenfield-redis-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "6379/tcp",
+        "RunningFor": "7 weeks ago",
+        "Size": "0B (virtual 39.1MB)",
+        "State": "running",
+        "Status": "Up 7 weeks (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-08-09 01:09:15 +0100 BST",
+        "ID": "cd05f033d849",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "",
+        "LocalVolumes": "1",
+        "Mounts": "08a587e2c6b9ab…",
+        "Names": "modula-phase7id-restore-pg",
+        "Networks": "bridge",
+        "Platform": null,
+        "Ports": "127.0.0.1:55433->5432/tcp",
+        "RunningFor": "7 weeks ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 7 weeks"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-07-26 22:38:52 +0100 BST",
+        "ID": "accf814e1909",
+        "Image": "postgres:16.9-alpine",
+        "Labels": "com.docker.compose.config-hash=2086878c8a83b6f05b37516d5aed1564df25871572aae2e8703c0be0e302a010,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dca9c7aa70c71caf8bcc48c8ec40658c1fdf2d1e4e8d26bc27d4d18e030d779a,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/home/andrei/modula-latest/ops/docker/compose.preview.yml,com.docker.compose.project.working_dir=/home/andrei/modula-latest/ops/docker,com.docker.compose.project=modula-preview,com.docker.compose.replace=greenfield-postgres-1,com.docker.compose.service=greenfield-postgres,com.docker.compose.version=2.40.3",
+        "LocalVolumes": "1",
+        "Mounts": "/home/andrei/m…,modula-preview…",
+        "Names": "modula-preview-greenfield-postgres-1",
+        "Networks": "modula-preview_modula_internal",
+        "Platform": null,
+        "Ports": "127.0.0.1:5433->5432/tcp",
+        "RunningFor": "2 months ago",
+        "Size": "63B (virtual 276MB)",
+        "State": "running",
+        "Status": "Up 7 weeks (healthy)"
+      }
+    ],
+    "relevantSystemdUnits": [
+      "docker.service                                 loaded    active   running Docker Application Container Engine",
+      "modula-native-n1-worker.service                loaded    active   running /usr/bin/node /root/modula-native-n1/start-vps.mjs --worker",
+      "modula-native-n1.service                       loaded    active   running /usr/bin/node /root/modula-native-n1/start-vps.mjs",
+      "nginx.service                                  loaded    active   running nginx - high performance web server"
+    ],
+    "timers": [
+      "Sun 2026-10-04 00:00:00 BST       12h Sat 2026-10-03 00:00:01 BST      11h ago dpkg-db-backup.timer           dpkg-db-backup.service"
+    ],
+    "cronFiles": [
+      ".placeholder",
+      "certbot",
+      "e2scrub_all",
+      "hestia-proc",
+      "hestia-sftp",
+      "php",
+      "sysstat"
+    ]
+  },
+  "redisRuntime": {
+    "appendonly": "no",
+    "save": "disabled",
+    "applicationSourceReferences": 0
   },
   "storage": {
     "type": "host bind mount",
     "root": "/var/lib/modula/greenfield-media",
     "mode": "775",
     "files": 45,
-    "bytes": 24378792
+    "bytes": 24378792,
+    "classes": {
+      "attachments": {
+        "files": 18,
+        "bytes": 19171402
+      },
+      "posts": {
+        "files": 13,
+        "bytes": 887529
+      },
+      "profiles": {
+        "files": 3,
+        "bytes": 1224761
+      },
+      "stories": {
+        "files": 11,
+        "bytes": 3095100
+      }
+    }
   },
   "runtimeRoutes": [
     {
@@ -7635,6 +7952,104 @@
       "method": "POST",
       "url": "/v1/account/data-requests/:requestId/cancel",
       "path": "/v1/account/data-requests/:requestId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/status",
+      "path": "/v1/status",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/status",
+      "path": "/v1/status",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/support/contact",
+      "path": "/v1/support/contact",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/support/contact",
+      "path": "/v1/support/contact",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
       "prefix": "",
       "schema": null,
       "config": {
@@ -30718,6 +31133,127 @@
         ]
       },
       {
+        "name": "greenfield_support_cases",
+        "columns": [
+          {
+            "name": "case_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "reference",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "category",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "subject",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "message",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "diagnostics",
+            "type": "jsonb",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "state",
+            "type": "text",
+            "default": "'OPEN'::text",
+            "nullable": false
+          },
+          {
+            "name": "idempotency_key",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mail_job_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_support_cases_account_id_idempotency_key_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_support_cases_account_id_idempotency_key_key ON public.greenfield_support_cases USING btree (account_id, idempotency_key)"
+          },
+          {
+            "name": "greenfield_support_cases_account_idx",
+            "definition": "CREATE INDEX greenfield_support_cases_account_idx ON public.greenfield_support_cases USING btree (account_id, created_at DESC)"
+          },
+          {
+            "name": "greenfield_support_cases_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_support_cases_pkey ON public.greenfield_support_cases USING btree (case_id)"
+          },
+          {
+            "name": "greenfield_support_cases_reference_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_support_cases_reference_key ON public.greenfield_support_cases USING btree (reference)"
+          }
+        ],
+        "primaryKey": [
+          "case_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_support_cases_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_support_cases_account_id_idempotency_key_key",
+            "columns": [
+              "account_id",
+              "idempotency_key"
+            ]
+          },
+          {
+            "name": "greenfield_support_cases_reference_key",
+            "columns": [
+              "reference"
+            ]
+          }
+        ]
+      },
+      {
         "name": "greenfield_tools",
         "columns": [
           {
@@ -31122,6 +31658,50 @@
             "referencesColumn": "extension_version_id"
           }
         ],
+        "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_worker_heartbeats",
+        "columns": [
+          {
+            "name": "worker_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "release_sha",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "started_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "last_seen_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_worker_heartbeats_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_worker_heartbeats_pkey ON public.greenfield_worker_heartbeats USING btree (worker_id)"
+          },
+          {
+            "name": "greenfield_worker_heartbeats_seen_idx",
+            "definition": "CREATE INDEX greenfield_worker_heartbeats_seen_idx ON public.greenfield_worker_heartbeats USING btree (last_seen_at DESC)"
+          }
+        ],
+        "primaryKey": [
+          "worker_id"
+        ],
+        "foreignKeys": [],
         "uniqueConstraints": []
       },
       {
@@ -37039,7 +37619,320 @@
         "id": "061_registry_publisher_signing_keys",
         "name": "061_registry_publisher_signing_keys.sql",
         "appliedAt": "2026-10-01T20:45:43.906344+00:00"
+      },
+      {
+        "id": "062_public_status_support_cases",
+        "name": "062_public_status_support_cases.sql",
+        "appliedAt": "2026-10-02T23:45:14.057107+00:00"
       }
     ]
+  },
+  "operationalAggregates": {
+    "outbox": {
+      "count": 426,
+      "failed": 0,
+      "pending": 0
+    },
+    "aiRuntime": {
+      "streams": 0,
+      "executions": 0,
+      "credentials": 0,
+      "productActions": 0
+    },
+    "postMedia": {
+      "count": 16,
+      "active": 16,
+      "activeWithUrl": 13
+    },
+    "aiRequests": 0,
+    "failedJobs": [
+      {
+        "count": 6,
+        "latest": "2026-08-15T15:23:34.49+00:00",
+        "status": "DEAD_LETTER",
+        "jobType": "mail.identity.provision"
+      },
+      {
+        "count": 4,
+        "latest": "2026-08-31T20:17:21.136+00:00",
+        "status": "FAILED",
+        "jobType": "mail.identity.provision"
+      },
+      {
+        "count": 10,
+        "latest": "2026-10-02T00:07:46.278+00:00",
+        "status": "DEAD_LETTER",
+        "jobType": "notification.reaction"
+      },
+      {
+        "count": 2,
+        "latest": "2026-07-18T10:29:42.108+00:00",
+        "status": "DEAD_LETTER",
+        "jobType": "plugin.enable"
+      },
+      {
+        "count": 4,
+        "latest": "2026-07-29T08:56:58.964+00:00",
+        "status": "DEAD_LETTER",
+        "jobType": "search.reindex"
+      }
+    ],
+    "storyItems": {
+      "count": 11,
+      "active": 0,
+      "deletedOrInactive": 11
+    },
+    "aiProviders": [
+      {
+        "kind": "anthropic",
+        "status": "unconfigured",
+        "providerId": "provider:anthropic",
+        "configurationMode": "platform-managed"
+      },
+      {
+        "kind": "local",
+        "status": "available",
+        "providerId": "provider:development-mock",
+        "configurationMode": "development-mock"
+      },
+      {
+        "kind": "google",
+        "status": "unconfigured",
+        "providerId": "provider:gemini",
+        "configurationMode": "platform-managed"
+      },
+      {
+        "kind": "local",
+        "status": "unconfigured",
+        "providerId": "provider:local",
+        "configurationMode": "local"
+      },
+      {
+        "kind": "ollama",
+        "status": "unconfigured",
+        "providerId": "provider:ollama",
+        "configurationMode": "local"
+      },
+      {
+        "kind": "openai",
+        "status": "unconfigured",
+        "providerId": "provider:openai",
+        "configurationMode": "platform-managed"
+      }
+    ],
+    "syncSources": {
+      "count": 0,
+      "enabled": 0
+    },
+    "installPlans": {
+      "count": 36,
+      "withDescriptor": 6,
+      "withDescriptorDigest": 6
+    },
+    "intelligence": {
+      "runs": 0,
+      "plans": 0,
+      "missions": 0,
+      "approvals": 0,
+      "proposals": 0,
+      "akiDecisions": 0,
+      "ledgerEvents": 0,
+      "governorDecisions": 0
+    },
+    "notifications": {
+      "count": 105,
+      "active": 105,
+      "unread": 96
+    },
+    "aiModelsByState": {
+      "available:active:enabled=true": 1,
+      "unavailable:preview:enabled=false": 5
+    },
+    "frontendsByMode": {
+      "declarative": 4,
+      "host-contribution": 4
+    },
+    "syncRunsByStatus": {
+      "completed": 2
+    },
+    "workerHeartbeats": {
+      "count": 1,
+      "fresh": 1,
+      "releases": [
+        "c7c46dfa3d85b89617de833723aab8f207f0ba94"
+      ]
+    },
+    "jobFailureDetails": [
+      {
+        "code": "23505",
+        "count": 10,
+        "latest": "2026-10-02T00:07:46.278+00:00"
+      },
+      {
+        "code": "42P18",
+        "count": 2,
+        "latest": "2026-07-18T10:29:42.108+00:00"
+      },
+      {
+        "code": "MAIL_PROVISIONER_DISABLED",
+        "count": 10,
+        "latest": "2026-08-31T20:17:21.136+00:00"
+      },
+      {
+        "code": "PLUGIN_FAILED",
+        "count": 1,
+        "latest": "2026-07-18T10:31:18.634+00:00"
+      },
+      {
+        "code": "PLUGIN_TIMEOUT",
+        "count": 1,
+        "latest": "2026-07-18T10:31:24.646+00:00"
+      },
+      {
+        "code": "UNSUPPORTED_RECORD_TYPE",
+        "count": 10,
+        "latest": "2026-07-29T08:56:58.964+00:00"
+      }
+    ],
+    "jobFailuresByCode": {
+      "23505": 10,
+      "42P18": 2,
+      "PLUGIN_FAILED": 1,
+      "PLUGIN_TIMEOUT": 1,
+      "UNSUPPORTED_RECORD_TYPE": 10,
+      "MAIL_PROVISIONER_DISABLED": 10
+    },
+    "postContentByType": {
+      "pdf": 2,
+      "audio": 1,
+      "image": 5,
+      "video": 2,
+      "document": 1
+    },
+    "publishedReleases": 12,
+    "releaseAssetBlobs": {
+      "bytes": 4644817,
+      "count": 6
+    },
+    "releaseSignatures": 0,
+    "verifiedFrontends": 8,
+    "aiProvidersByState": {
+      "local:available": 1,
+      "local:unconfigured": 1,
+      "google:unconfigured": 1,
+      "ollama:unconfigured": 1,
+      "openai:unconfigured": 1,
+      "anthropic:unconfigured": 1
+    },
+    "asyncRegistrations": {
+      "engineJobs": 8,
+      "moduleJobs": 0,
+      "engineConsumers": 11,
+      "scheduledModuleJobs": 0,
+      "extensionEventSubscriptions": 2
+    },
+    "presentationAssets": {
+      "count": 17,
+      "development": 17,
+      "blobAvailable": 10
+    },
+    "profileMediaByKind": {
+      "cover": 1,
+      "avatar": 1
+    },
+    "attachmentsByStatus": {
+      "ready": 18,
+      "failed": 1,
+      "created": 2,
+      "expired": 1
+    },
+    "backgroundJobsByType": {
+      "mail.deliver": 317,
+      "module.enable": 66,
+      "module.update": 92,
+      "plugin.enable": 14,
+      "module.disable": 34,
+      "module.install": 60,
+      "plugin.disable": 6,
+      "search.reindex": 4,
+      "function.invoke": 15,
+      "module.uninstall": 24,
+      "search.index.post": 146,
+      "notification.quote": 6,
+      "notification.reply": 8,
+      "notification.create": 28,
+      "notification.repost": 26,
+      "notification.comment": 24,
+      "notification.mention": 2,
+      "search.index.profile": 50,
+      "extension.job.execute": 2,
+      "module.release.verify": 30,
+      "notification.reaction": 60,
+      "atproto.publish.delete": 38,
+      "atproto.publish.update": 10,
+      "module.release.publish": 30,
+      "mail.identity.provision": 10,
+      "module.release.imported": 2
+    },
+    "publisherSigningKeys": 0,
+    "releaseIntegrityRows": 14,
+    "installDescriptorKeys": [
+      "artifact",
+      "compatibility",
+      "descriptorSha256",
+      "descriptorVersion",
+      "frontend",
+      "installationId",
+      "issuedAt",
+      "manifest",
+      "moduleId",
+      "permissions",
+      "publisherId",
+      "registryReleaseId",
+      "releaseState",
+      "trust",
+      "version"
+    ],
+    "installationsByStatus": {
+      "failed": 1,
+      "enabled": 13,
+      "removed": 4,
+      "disabled": 2,
+      "uninstalled": 3,
+      "installedDisabled": 2
+    },
+    "legacyFunctionRuntime": {
+      "functions": 24,
+      "remoteHttp": 2,
+      "activeInvokeCapabilityInstallations": 0
+    },
+    "moduleReleasesByState": {
+      "published": 12,
+      "superseded": 2
+    },
+    "backgroundJobsByStatus": {
+      "FAILED": 4,
+      "SUCCEEDED": 1078,
+      "DEAD_LETTER": 22
+    },
+    "readyAttachmentLinkage": {
+      "ready": 18,
+      "linked": 13,
+      "orphanCandidates": 5
+    },
+    "eventDeliveriesByStatus": {
+      "completed": 283
+    },
+    "releaseArtifactCoverage": {
+      "releases": 14,
+      "blobAvailable": 2
+    },
+    "publishedUnsignedReleases": 12,
+    "activeInstallPermissionReviews": {
+      "active": 15,
+      "reviews": 44,
+      "withoutReview": 2
+    },
+    "moduleWebhookDeliveriesByStatus": {}
   }
 }

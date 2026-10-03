@@ -1,0 +1,966 @@
+{
+  "metadata": {
+    "capturedAt": "2026-10-03T10:02:55.876Z",
+    "status": "PARTIAL"
+  },
+  "gaps": [
+    {
+      "id": "API-ATLAS-GAP-001",
+      "domain": "release",
+      "type": "architecture debt",
+      "severity": "P1",
+      "title": "Running production revision is not canonical origin/main",
+      "evidence": [
+        "evidence/production-snapshot.json#/repository",
+        "evidence/production-snapshot.json#/containers/api/revision"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "Production contains three feature-branch commits not on origin/main, while /root/modula-latest is a different dirty checkout.",
+      "recommendedFix": "Converge the deployed revision through reviewed mainline history without resetting the dirty checkout.",
+      "dependencies": [
+        "release governance"
+      ],
+      "verification": "Fetch origin, prove ancestry, and compare OCI revision plus /version.json after a reviewed deployment."
+    },
+    {
+      "id": "API-ATLAS-GAP-002",
+      "domain": "social",
+      "type": "missing endpoint",
+      "severity": "P1",
+      "title": "Follower-only profiles have no follow-request approval flow",
+      "evidence": [
+        "services/greenfield-api/src/domains/profiles/writes.ts:57",
+        "services/greenfield-api/src/domains/profiles/writes.ts:89"
+      ],
+      "affectedRoutes": [
+        "POST /v1/profiles/:profileId/follow"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/profiles/writes.ts"
+      ],
+      "productionImpact": "Any authenticated follower can create the follow row immediately; follower-only visibility therefore has no owner approval boundary.",
+      "recommendedFix": "Add pending/accept/reject follow requests and make follower-only authorization depend on accepted state.",
+      "dependencies": [
+        "social schema",
+        "client request UI"
+      ],
+      "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data."
+    },
+    {
+      "id": "API-ATLAS-GAP-003",
+      "domain": "modules",
+      "type": "missing signature verification",
+      "severity": "P1",
+      "title": "All published releases are unsigned and unsigned releases are still trusted",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/publishedUnsignedReleases",
+        "services/greenfield-api/src/modules/registry-trust-service.ts:109",
+        "services/greenfield-api/src/modules/registry-trust-service.ts:127",
+        "services/greenfield-api/src/modules/release-service.ts:441"
+      ],
+      "affectedRoutes": [
+        "GET /v1/registry/modules/:moduleId",
+        "POST /v1/modules/:moduleId/install"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/release-signing.ts",
+        "services/greenfield-api/src/modules/registry-trust-service.ts"
+      ],
+      "productionImpact": "Cryptographic Ed25519 verification exists, but 12 of 12 published releases have no signature and policy calls them verified.",
+      "recommendedFix": "Require a verified publisher signature for production publication/install, with an explicit controlled legacy migration.",
+      "dependencies": [
+        "publisher key ceremony",
+        "release republishing"
+      ],
+      "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified."
+    },
+    {
+      "id": "API-ATLAS-GAP-004",
+      "domain": "modules",
+      "type": "missing artifact",
+      "severity": "P1",
+      "title": "Only 2 of 14 registry releases have retrievable package bytes",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/releaseArtifactCoverage",
+        "docs/audits/api-atlas-01/evidence/live-probes.json"
+      ],
+      "affectedRoutes": [
+        "GET /v1/registry/releases/:releaseId/artifact",
+        "POST /v1/modules/:moduleId/install"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/install-descriptor-service.ts"
+      ],
+      "productionImpact": "Published metadata can exist without an artifact ref, preventing independent package retrieval/verification for most releases.",
+      "recommendedFix": "Backfill immutable package blobs and block publication/installability when the package is absent.",
+      "dependencies": [
+        "registry ingestion",
+        "artifact retention"
+      ],
+      "verification": "Every published installable release must pass a digest-matched artifact GET."
+    },
+    {
+      "id": "API-ATLAS-GAP-005",
+      "domain": "modules",
+      "type": "missing storage delivery",
+      "severity": "P1",
+      "title": "Seven of seventeen module presentation assets have metadata but no blob",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/presentationAssets",
+        "docs/audits/api-atlas-01/evidence/live-probes.json"
+      ],
+      "affectedRoutes": [
+        "GET /v1/registry/releases/:releaseId/assets/:assetId"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/routes/index.ts"
+      ],
+      "productionImpact": "Product Hub receives declared URLs whose asset route returns 404 for affected releases.",
+      "recommendedFix": "Require asset blob presence during ingestion/publication and backfill or remove broken metadata.",
+      "dependencies": [
+        "registry ingestion",
+        "artwork pipeline"
+      ],
+      "verification": "Catalogue crawl must retrieve and digest-check every advertised available asset."
+    },
+    {
+      "id": "API-ATLAS-GAP-006",
+      "domain": "modules",
+      "type": "inconsistent permission",
+      "severity": "P1",
+      "title": "Runtime auto-grants manifest permissions when no review row exists",
+      "evidence": [
+        "services/greenfield-api/src/modules/runtime-access.ts:51",
+        "services/greenfield-api/src/modules/runtime-access.ts:71",
+        "evidence/production-snapshot.json#/operationalAggregates/activeInstallPermissionReviews"
+      ],
+      "affectedRoutes": [
+        "GET /v1/modules/:moduleId/records/:collection",
+        "POST /v1/modules/:moduleId/actions/:actionId"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/runtime-access.ts"
+      ],
+      "productionImpact": "Two active production installations have no review; their declared permissions become effective without recorded user grant.",
+      "recommendedFix": "Remove the fallback for production, backfill explicit reviews, and fail closed when grant evidence is absent.",
+      "dependencies": [
+        "installation migration"
+      ],
+      "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN."
+    },
+    {
+      "id": "API-ATLAS-GAP-007",
+      "domain": "activity",
+      "type": "event delivery gap",
+      "severity": "P1",
+      "title": "Reaction notification jobs are dead-lettering on database uniqueness errors",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/failedJobs",
+        "evidence/production-snapshot.json#/operationalAggregates/jobFailureDetails"
+      ],
+      "affectedRoutes": [
+        "PUT /v1/posts/:postId/reaction",
+        "GET /v1/notifications"
+      ],
+      "affectedFiles": [
+        "services/greenfield-worker/src/notifications/create.ts"
+      ],
+      "productionImpact": "Ten notification.reaction jobs reached DEAD_LETTER with PostgreSQL 23505, most recently 2026-10-02.",
+      "recommendedFix": "Make notification aggregation/upsert idempotent, repair/replay affected dead letters, and add an alert.",
+      "dependencies": [
+        "notification schema",
+        "dead-letter replay"
+      ],
+      "verification": "Repeated reactions must converge to one notification and leave no dead letter."
+    },
+    {
+      "id": "API-ATLAS-GAP-008",
+      "domain": "intelligence",
+      "type": "placeholder implementation",
+      "severity": "P1",
+      "title": "No operational production model/provider is available",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/aiProviders",
+        "evidence/production-snapshot.json#/operationalAggregates/aiRuntime",
+        "services/greenfield-api/src/ai/providers/resolver.ts:53"
+      ],
+      "affectedRoutes": [
+        "POST /v1/modules/:moduleId/ai/requests",
+        "POST /v1/ai/requests"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/ai/provider-runtime-service.ts"
+      ],
+      "productionImpact": "All real providers/models are unconfigured or disabled; the sole available model is a development mock and production has zero executions.",
+      "recommendedFix": "Configure and verify a governed real/local provider, then run safe production acceptance through the gateway.",
+      "dependencies": [
+        "provider credentials",
+        "policy approval"
+      ],
+      "verification": "A non-mock production request must execute, ledger usage, and pass failure/timeout tests."
+    },
+    {
+      "id": "API-ATLAS-GAP-009",
+      "domain": "intelligence",
+      "type": "placeholder implementation",
+      "severity": "P1",
+      "title": "GAIA is an acceptance-fixture planner, not a general operational planner",
+      "evidence": [
+        "packages/intelligence-governance/src/gaia.ts:10",
+        "packages/intelligence-governance/src/gaia.ts:17",
+        "packages/intelligence-governance/src/gaia.ts:86",
+        "services/greenfield-api/src/intelligence/service.ts:18"
+      ],
+      "affectedRoutes": [
+        "POST /v1/intelligence/missions/:missionId/start"
+      ],
+      "affectedFiles": [
+        "packages/intelligence-governance/src/gaia.ts",
+        "services/greenfield-api/src/intelligence/service.ts"
+      ],
+      "productionImpact": "Only four exact fixture objectives are recognized and production has zero mission/decision/ledger rows.",
+      "recommendedFix": "Introduce a provider-backed or local Nodus planner behind the existing governed proposal contract without bypassing AKI.",
+      "dependencies": [
+        "operational provider",
+        "Nodus contract"
+      ],
+      "verification": "Unseen objectives must yield bounded proposals and every run must traverse decisions, approvals and ledger."
+    },
+    {
+      "id": "API-ATLAS-GAP-010",
+      "domain": "intelligence",
+      "type": "missing endpoint",
+      "severity": "P1",
+      "title": "No Nodus integration surface or local-client contract exists",
+      "evidence": [
+        "evidence/source-sweep.json",
+        "packages/intelligence-contracts/src/domain.ts"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "packages/intelligence-contracts/src"
+      ],
+      "productionImpact": "Native/offline Nodus has no declared handshake, capability discovery, proposal submission or synchronization contract.",
+      "recommendedFix": "Define a local-first Nodus adapter/API boundary using intelligence contracts; do not model Nodus as a cloud provider.",
+      "dependencies": [
+        "intelligence contract design"
+      ],
+      "verification": "Contract tests must cover offline proposal, reconnect, approval and ledger synchronization."
+    },
+    {
+      "id": "API-ATLAS-GAP-011",
+      "domain": "security",
+      "type": "missing ownership check",
+      "severity": "P1",
+      "title": "Legacy remote function invocation trusts a client-supplied installation ID",
+      "evidence": [
+        "services/greenfield-api/src/app/register-routes.ts:1244",
+        "services/greenfield-api/src/app/register-routes.ts:1250",
+        "services/greenfield-api/src/functions/service.ts:6",
+        "services/greenfield-api/src/extensions/capability-resolver.ts:2",
+        "evidence/production-snapshot.json#/operationalAggregates/legacyFunctionRuntime"
+      ],
+      "affectedRoutes": [
+        "POST /v1/functions/:functionId/invoke"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/functions/service.ts",
+        "services/greenfield-api/src/extensions/capability-resolver.ts"
+      ],
+      "productionImpact": "Any authenticated account can nominate another installation ID; the service checks only that installation capability, not installation ownership. Production has two remoteHttp functions but zero active function:invoke grants, so no currently executable production path was proven.",
+      "recommendedFix": "Require the installation to belong to the authenticated account and route through the canonical installation/runtime permission service; deprecate the legacy invoke route.",
+      "dependencies": [
+        "function route consolidation"
+      ],
+      "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy."
+    },
+    {
+      "id": "API-ATLAS-GAP-012",
+      "domain": "security",
+      "type": "missing ownership check",
+      "severity": "P1",
+      "title": "AI stream cancel and reconnect omit account ownership checks",
+      "evidence": [
+        "services/greenfield-api/src/ai/routes.ts:186",
+        "services/greenfield-api/src/ai/routes.ts:198",
+        "services/greenfield-api/src/ai/streaming-runtime.ts:50",
+        "services/greenfield-api/src/ai/streaming-runtime.ts:94",
+        "evidence/production-snapshot.json#/operationalAggregates/aiRuntime/streams"
+      ],
+      "affectedRoutes": [
+        "POST /v1/ai/streams/:streamId/cancel",
+        "POST /v1/ai/streams/:streamId/reconnect"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/ai/routes.ts",
+        "services/greenfield-api/src/ai/streaming-runtime.ts"
+      ],
+      "productionImpact": "The routes authenticate but pass only streamId; repository loads the stream without account scope. Production has zero stream rows, so active cross-account impact was not exercised.",
+      "recommendedFix": "Pass auth.accountId into streaming operations and query/update by stream plus account; return uniform not-found to other users.",
+      "dependencies": [
+        "AI stream contract"
+      ],
+      "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream."
+    },
+    {
+      "id": "API-ATLAS-GAP-013",
+      "domain": "posts",
+      "type": "client contract mismatch",
+      "severity": "P1",
+      "title": "Link and poll composer contracts are not persisted by GreenField",
+      "evidence": [
+        "packages/api-contracts/src/posts.ts:103",
+        "services/greenfield-api/src/domains/posts/writes.ts:32",
+        "src/features/composer/screens/ComposerScreen.tsx:523"
+      ],
+      "affectedRoutes": [
+        "POST /v1/posts"
+      ],
+      "affectedFiles": [
+        "packages/api-contracts/src/posts.ts",
+        "services/greenfield-api/src/domains/posts/writes.ts"
+      ],
+      "productionImpact": "The client has link/poll concepts; the server input has neither. A linkPreview field can be ignored while a text post succeeds.",
+      "recommendedFix": "Either remove/disable the controls at the API boundary or implement explicit validated link and poll persistence/contracts.",
+      "dependencies": [
+        "post schema",
+        "client decoder"
+      ],
+      "verification": "Contract tests must prove each advertised composer type survives create and retrieval."
+    },
+    {
+      "id": "API-ATLAS-GAP-014",
+      "domain": "media",
+      "type": "missing storage delivery",
+      "severity": "P1",
+      "title": "Legacy post image limit is incompatible with nginx public body limit",
+      "evidence": [
+        "/etc/nginx/conf.d/api.modula.digital.greenfield.conf:12",
+        "services/greenfield-api/src/domains/media/post-media-storage.ts:117"
+      ],
+      "affectedRoutes": [
+        "POST /v1/posts"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/media/post-media-storage.ts"
+      ],
+      "productionImpact": "GreenField accepts up to 20 MiB of legacy image bytes, but nginx rejects the base64 request above 1 MiB before Fastify.",
+      "recommendedFix": "Retire legacy inline media in favor of attachment upload, or align a narrowly scoped edge limit.",
+      "dependencies": [
+        "client upload migration",
+        "nginx review"
+      ],
+      "verification": "A boundary-size audit attachment must publish through the intended path without widening unrelated routes."
+    },
+    {
+      "id": "API-ATLAS-GAP-015",
+      "domain": "media",
+      "type": "architecture debt",
+      "severity": "P1",
+      "title": "User media exists only on one host bind mount",
+      "evidence": [
+        "evidence/production-snapshot.json#/storage",
+        "services/greenfield-api/src/domains/attachments/service.ts:169"
+      ],
+      "affectedRoutes": [
+        "GET /v1/attachments/:attachmentId/content",
+        "GET /v1/media/:mediaFile",
+        "GET /v1/media/stories/:mediaFile"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/attachments/service.ts"
+      ],
+      "productionImpact": "Container recreation preserves the bind, but host loss has no discovered object replication or storage readiness/recovery contract.",
+      "recommendedFix": "Define backed-up object storage or a tested media backup/restore policy and expose storage readiness internally.",
+      "dependencies": [
+        "storage decision",
+        "recovery rehearsal"
+      ],
+      "verification": "Restore media plus metadata to a clean host and digest-check every referenced object."
+    },
+    {
+      "id": "API-ATLAS-GAP-016",
+      "domain": "modules",
+      "type": "missing worker",
+      "severity": "P1",
+      "title": "Automated registry/GitHub ingestion is disabled and has no production source",
+      "evidence": [
+        "evidence/production-snapshot.json#/config/worker/safe/GREENFIELD_MODULE_GITHUB_SYNC_ENABLED",
+        "evidence/production-snapshot.json#/operationalAggregates/syncSources",
+        "services/greenfield-worker/src/jobs/runner.ts:84"
+      ],
+      "affectedRoutes": [
+        "POST /v1/admin/registry/sync"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/github-release-sync-service.ts",
+        "services/greenfield-worker/src/jobs/runner.ts"
+      ],
+      "productionImpact": "Ingestion code exists, but production automation is disabled, source count is zero, and the two historical runs cannot recur automatically.",
+      "recommendedFix": "Configure a reviewed source and exercise repository-to-published-release convergence with signature/artifact gates.",
+      "dependencies": [
+        "signing policy",
+        "GitHub source"
+      ],
+      "verification": "A tagged release must be discovered, verified, ingested and published without manual database work."
+    },
+    {
+      "id": "API-ATLAS-GAP-017",
+      "domain": "contracts",
+      "type": "missing request schema",
+      "severity": "P2",
+      "title": "No application route registers a Fastify request or response schema",
+      "evidence": [
+        "api-atlas.json#/routes",
+        "openapi.generated.yaml"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "services/greenfield-api/src"
+      ],
+      "productionImpact": "All 384 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
+      "recommendedFix": "Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.",
+      "dependencies": [
+        "API contract ownership"
+      ],
+      "verification": "Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass."
+    },
+    {
+      "id": "API-ATLAS-GAP-018",
+      "domain": "media",
+      "type": "missing worker",
+      "severity": "P2",
+      "title": "Attachment orphan cleanup exists but is never scheduled",
+      "evidence": [
+        "services/greenfield-api/src/domains/attachments/service.ts:191",
+        "services/greenfield-api/tests/post04.attachments.test.ts:199",
+        "evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage"
+      ],
+      "affectedRoutes": [
+        "POST /v1/attachments/uploads"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/attachments/service.ts"
+      ],
+      "productionImpact": "Five ready attachments are unbound; only tests invoke cleanup.",
+      "recommendedFix": "Add a bounded worker/ops job with retention, metrics and dry-run visibility.",
+      "dependencies": [
+        "worker schedule"
+      ],
+      "verification": "Expired sessions/orphans must be removed while bound media remains retrievable."
+    },
+    {
+      "id": "API-ATLAS-GAP-019",
+      "domain": "media",
+      "type": "missing request schema",
+      "severity": "P2",
+      "title": "Story upload validates labels but not decoded size or file signature",
+      "evidence": [
+        "services/greenfield-api/src/domains/stories/service.ts:280",
+        "services/greenfield-api/src/domains/stories/service.ts:333",
+        "services/greenfield-api/src/domains/stories/service.ts:411"
+      ],
+      "affectedRoutes": [
+        "POST /v1/stories"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/stories/service.ts"
+      ],
+      "productionImpact": "Arbitrary base64 bytes can be stored under an image/video content type; expiration/deletion leaves files on disk.",
+      "recommendedFix": "Reuse AttachmentPolicy byte/count/signature validation and add physical cleanup.",
+      "dependencies": [
+        "attachment service"
+      ],
+      "verification": "Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed."
+    },
+    {
+      "id": "API-ATLAS-GAP-020",
+      "domain": "profiles",
+      "type": "architecture debt",
+      "severity": "P2",
+      "title": "Profile media has competing canonical-attachment and arbitrary-URL paths",
+      "evidence": [
+        "services/greenfield-api/src/domains/profiles/writes.ts:173",
+        "services/greenfield-api/src/domains/profiles/writes.ts:292"
+      ],
+      "affectedRoutes": [
+        "PATCH /v1/profiles/me",
+        "POST /v1/profiles/me/avatar",
+        "POST /v1/profiles/me/cover"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/profiles/writes.ts"
+      ],
+      "productionImpact": "PATCH can bypass profile_media ownership/binding with an arbitrary public HTTPS URL, producing two ownership/delivery models.",
+      "recommendedFix": "Deprecate raw avatarUri/coverUri writes and require owned attachment bindings.",
+      "dependencies": [
+        "client migration"
+      ],
+      "verification": "All new avatar/cover writes must create profile_media and resolve to canonical attachment URLs."
+    },
+    {
+      "id": "API-ATLAS-GAP-021",
+      "domain": "feed",
+      "type": "missing request schema",
+      "severity": "P2",
+      "title": "Unknown feed modes silently receive a mislabeled fallback",
+      "evidence": [
+        "services/greenfield-api/src/app/register-routes.ts:1443",
+        "services/greenfield-api/src/app/register-routes.ts:1449"
+      ],
+      "affectedRoutes": [
+        "GET /v1/feed/home"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/app/register-routes.ts"
+      ],
+      "productionImpact": "Typos or unsupported modes do not fail validation and are labeled modules-chrono-v1.",
+      "recommendedFix": "Validate the FeedMode enum before querying.",
+      "dependencies": [
+        "shared schema"
+      ],
+      "verification": "Unknown mode must return VALIDATION_FAILED; three supported modes need response snapshots."
+    },
+    {
+      "id": "API-ATLAS-GAP-022",
+      "domain": "privacy",
+      "type": "data exposure risk",
+      "severity": "P2",
+      "title": "Attachment authorization distinguishes private existing IDs from unknown IDs",
+      "evidence": [
+        "services/greenfield-api/src/app/register-attachment-routes.ts:91",
+        "services/greenfield-api/src/app/register-attachment-routes.ts:110"
+      ],
+      "affectedRoutes": [
+        "GET /v1/attachments/:attachmentId/content"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/app/register-attachment-routes.ts"
+      ],
+      "productionImpact": "An unauthorised existing attachment returns 403 while an unknown ID returns 404, disclosing existence if a UUID is learned.",
+      "recommendedFix": "Use a uniform not-found response for unauthorized private media and test timing/shape consistency.",
+      "dependencies": [
+        "error policy"
+      ],
+      "verification": "Cross-user fixture must receive the same status/shape for private-existing and unknown IDs."
+    },
+    {
+      "id": "API-ATLAS-GAP-023",
+      "domain": "social",
+      "type": "missing idempotency",
+      "severity": "P2",
+      "title": "Follow, reaction and comment counters have concurrent race windows",
+      "evidence": [
+        "services/greenfield-api/src/domains/profiles/writes.ts:81",
+        "services/greenfield-api/src/domains/reactions/service.ts:25",
+        "services/greenfield-api/src/domains/comments/service.ts:156"
+      ],
+      "affectedRoutes": [
+        "POST /v1/profiles/:profileId/follow",
+        "PUT /v1/posts/:postId/reaction",
+        "POST /v1/posts/:postId/comments"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/profiles/writes.ts",
+        "services/greenfield-api/src/domains/reactions/service.ts",
+        "services/greenfield-api/src/domains/comments/service.ts"
+      ],
+      "productionImpact": "Select-then-insert can surface unique violations, and read-then-set counters can lose increments.",
+      "recommendedFix": "Use conflict-safe upserts/row locks or atomic SQL increments and add concurrency tests.",
+      "dependencies": [
+        "database transaction design"
+      ],
+      "verification": "Parallel duplicate submissions must converge without 500s or counter drift."
+    },
+    {
+      "id": "API-ATLAS-GAP-024",
+      "domain": "discover",
+      "type": "performance risk",
+      "severity": "P2",
+      "title": "Discover/activity surfaces are unpaginated and activity is N+1 hydrated",
+      "evidence": [
+        "services/greenfield-api/src/domains/discovery/repository.ts:96",
+        "services/greenfield-api/src/domains/discovery/repository.ts:107"
+      ],
+      "affectedRoutes": [
+        "GET /v1/discover",
+        "GET /v1/activity"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/discovery/repository.ts"
+      ],
+      "productionImpact": "Activity reads every active row and resolves profiles in a loop; growth can create unbounded latency.",
+      "recommendedFix": "Add stable cursor pagination and batch actor hydration.",
+      "dependencies": [
+        "response contract"
+      ],
+      "verification": "Seeded volume test must show bounded queries and stable cursors."
+    },
+    {
+      "id": "API-ATLAS-GAP-025",
+      "domain": "realtime",
+      "type": "missing endpoint",
+      "severity": "P2",
+      "title": "No persistent real-time social or push delivery surface exists",
+      "evidence": [
+        "services/greenfield-api/src/ai/routes.ts:136",
+        "/etc/nginx/conf.d/api.modula.digital.greenfield.conf:21"
+      ],
+      "affectedRoutes": [
+        "GET /v1/ai/executions/:executionId/stream"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/ai/routes.ts"
+      ],
+      "productionImpact": "The sole SSE path replays AI events; nginx has no WebSocket upgrade and no APNs/web-push subscription API was found.",
+      "recommendedFix": "Define polling guarantees or add governed SSE/push subscription infrastructure.",
+      "dependencies": [
+        "notification delivery design"
+      ],
+      "verification": "A client must receive a new notification through the documented mechanism with reconnect semantics."
+    },
+    {
+      "id": "API-ATLAS-GAP-026",
+      "domain": "connectors",
+      "type": "placeholder implementation",
+      "severity": "P2",
+      "title": "Connector metadata advertises webhooks without inbound webhook routes",
+      "evidence": [
+        "services/greenfield-api/src/connectors/provider-metadata.ts:60",
+        "services/greenfield-api/src/connectors/provider-metadata.ts:107",
+        "api-atlas.json#/routes"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "services/greenfield-api/src/connectors/provider-metadata.ts"
+      ],
+      "productionImpact": "Provider definitions claim webhook support, but only the module-backend Modula webhook route exists.",
+      "recommendedFix": "Mark providers unimplemented or add signed, replay-safe, idempotent provider ingress.",
+      "dependencies": [
+        "provider adapters"
+      ],
+      "verification": "Each advertised webhook provider must have a verified route and replay test."
+    },
+    {
+      "id": "API-ATLAS-GAP-027",
+      "domain": "async",
+      "type": "dead endpoint",
+      "severity": "P2",
+      "title": "Several accepted worker job types complete with no side effect",
+      "evidence": [
+        "services/greenfield-worker/src/jobs/runner.ts:95",
+        "services/greenfield-worker/src/jobs/runner.ts:140",
+        "services/greenfield-worker/src/jobs/runner.ts:183"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "services/greenfield-worker/src/jobs/runner.ts"
+      ],
+      "productionImpact": "Lifecycle event-like jobs, module.settings.migrate and audit.checkpoint are marked succeeded after a no-op.",
+      "recommendedFix": "Stop enqueueing event names as jobs or implement explicit consumers and audit checkpoint behavior.",
+      "dependencies": [
+        "event/job taxonomy"
+      ],
+      "verification": "Every supported job type must have an asserted effect or be rejected as unsupported."
+    },
+    {
+      "id": "API-ATLAS-GAP-028",
+      "domain": "modules",
+      "type": "module special case",
+      "severity": "P2",
+      "title": "Vault Notes remains special-cased outside the generic host",
+      "evidence": [
+        "services/greenfield-api/src/intelligence/action-boundary.ts:8",
+        "services/greenfield-api/src/ai/product-action-service.ts:23",
+        "services/greenfield-worker/src/search/subscribers.ts:23",
+        "src/features/board/screens/BoardScreen.tsx:114"
+      ],
+      "affectedRoutes": [
+        "POST /v1/intelligence/missions/:missionId/start",
+        "POST /v1/modules/:moduleId/ai/actions/:actionId/executions"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/intelligence/action-boundary.ts",
+        "services/greenfield-api/src/ai/product-action-service.ts",
+        "services/greenfield-worker/src/search/subscribers.ts",
+        "src/features/board/screens/BoardScreen.tsx"
+      ],
+      "productionImpact": "Generic MPS hosting works, but search, governed actions, AI actions, Board and presentation logic contain product-specific branches.",
+      "recommendedFix": "Move behaviors into manifest/schema/action/projector declarations and retain only generic adapters.",
+      "dependencies": [
+        "module standard extensions"
+      ],
+      "verification": "A neutral reference module must exercise the same flows without core code changes."
+    },
+    {
+      "id": "API-ATLAS-GAP-029",
+      "domain": "modules",
+      "type": "partial endpoint",
+      "severity": "P2",
+      "title": "Only 6 of 36 historical install plans carry the current descriptor",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/installPlans",
+        "services/greenfield-api/src/modules/install-descriptor-service.ts:14"
+      ],
+      "affectedRoutes": [
+        "GET /v1/modules/:moduleId/install-descriptor"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/modules/install-descriptor-service.ts"
+      ],
+      "productionImpact": "Current descriptors are complete, but historical plans cannot be audited through the same immutable contract.",
+      "recommendedFix": "Backfill descriptors where release facts are sufficient or explicitly version legacy plans.",
+      "dependencies": [
+        "migration policy"
+      ],
+      "verification": "Every active installation must resolve a digest-verified descriptor."
+    },
+    {
+      "id": "API-ATLAS-GAP-030",
+      "domain": "security",
+      "type": "untested endpoint",
+      "severity": "P2",
+      "title": "Production cross-user and authenticated write acceptance was not safe to execute",
+      "evidence": [
+        "10-live-probe-results.md"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "Static and integration evidence exists, but no dedicated production audit identities/harness were available.",
+      "recommendedFix": "Provision isolated audit identities and a cleanup-capable production acceptance harness.",
+      "dependencies": [
+        "test accounts",
+        "cleanup automation"
+      ],
+      "verification": "Execute owner/non-owner, module isolation and intelligence isolation cases without real-user data."
+    },
+    {
+      "id": "API-ATLAS-GAP-031",
+      "domain": "profiles",
+      "type": "DB/API mismatch",
+      "severity": "P2",
+      "title": "profile_links is read but has no current write API",
+      "evidence": [
+        "services/greenfield-api/src/domains/profiles/repository.ts:166",
+        "04-database-api-map.md"
+      ],
+      "affectedRoutes": [
+        "GET /v1/profiles/:handle",
+        "PATCH /v1/profiles/me"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src/domains/profiles/repository.ts"
+      ],
+      "productionImpact": "The table participates in serialization, but profile update writes only the single website fields on profiles.",
+      "recommendedFix": "Define link CRUD or retire/migrate the table.",
+      "dependencies": [
+        "profile contract"
+      ],
+      "verification": "Create/update/delete a link and verify privacy-filtered retrieval."
+    },
+    {
+      "id": "API-ATLAS-GAP-032",
+      "domain": "architecture",
+      "type": "duplicate endpoint",
+      "severity": "P2",
+      "title": "Legacy and canonical media/social/auth paths overlap",
+      "evidence": [
+        "services/greenfield-api/src/domains/media/post-media-storage.ts:29",
+        "services/greenfield-api/src/domains/attachments/service.ts:13",
+        "services/greenfield-api/src/app/register-routes.ts:1425"
+      ],
+      "affectedRoutes": [
+        "POST /v1/posts",
+        "POST /v1/attachments/uploads",
+        "POST /v1/sessions",
+        "POST /v1/accounts/sessions"
+      ],
+      "affectedFiles": [
+        "services/greenfield-api/src"
+      ],
+      "productionImpact": "Multiple upload, session and reaction/like paths increase contract drift and already differ at the edge.",
+      "recommendedFix": "Declare canonical routes, instrument callers, and deprecate aliases with compatibility windows.",
+      "dependencies": [
+        "client migration"
+      ],
+      "verification": "All clients use canonical routes; aliases have explicit sunset tests."
+    },
+    {
+      "id": "API-ATLAS-GAP-033",
+      "domain": "observability",
+      "type": "observability gap",
+      "severity": "P2",
+      "title": "Request IDs do not provide complete nginx-to-worker tracing",
+      "evidence": [
+        "services/greenfield-api/src/app/register-plugins.ts:8",
+        "services/greenfield-worker/src/observability/metrics.ts:3",
+        "/etc/nginx/conf.d/api.modula.digital.greenfield.conf:21"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "services/greenfield-api/src/app/register-plugins.ts",
+        "services/greenfield-worker/src/observability/metrics.ts"
+      ],
+      "productionImpact": "API/worker use structured logs and database trace fields, but nginx does not preserve the generated response ID into a shared trace and no metrics/tracing backend was discovered.",
+      "recommendedFix": "Propagate trace/correlation IDs into jobs and edge logs; export queue/dead-letter/error metrics.",
+      "dependencies": [
+        "observability backend"
+      ],
+      "verification": "One synthetic request must be traceable across edge, API, outbox, job and result."
+    },
+    {
+      "id": "API-ATLAS-GAP-034",
+      "domain": "operations",
+      "type": "observability gap",
+      "severity": "P2",
+      "title": "Worker container has no Docker healthcheck",
+      "evidence": [
+        "evidence/production-snapshot.json#/containers/worker",
+        "services/greenfield-api/src/domains/system/status.ts:91"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "The new DB heartbeat makes status observable, but Docker cannot independently mark the worker unhealthy.",
+      "recommendedFix": "Add a non-invasive healthcheck based on process/heartbeat freshness.",
+      "dependencies": [
+        "deployment config"
+      ],
+      "verification": "Stopping worker progress must transition container/status health within the documented window."
+    },
+    {
+      "id": "API-ATLAS-GAP-035",
+      "domain": "testing",
+      "type": "untested endpoint",
+      "severity": "P2",
+      "title": "Seventy-two application routes have no statically matched automated test",
+      "evidence": [
+        "api-atlas.json#/routes"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "The route families remain regression-prone; the per-route list is in api-atlas.json.",
+      "recommendedFix": "Prioritize authz, mutations, admin/service ingress and feature-gated routes.",
+      "dependencies": [
+        "test fixtures"
+      ],
+      "verification": "Atlas automatedTest coverage should reach the agreed threshold with security routes at 100%."
+    },
+    {
+      "id": "API-ATLAS-GAP-036",
+      "domain": "modules",
+      "type": "placeholder implementation",
+      "severity": "P2",
+      "title": "All module presentation assets are marked development-only",
+      "evidence": [
+        "evidence/production-snapshot.json#/operationalAggregates/presentationAssets"
+      ],
+      "affectedRoutes": [
+        "GET /v1/registry/modules/:moduleId"
+      ],
+      "affectedFiles": [],
+      "productionImpact": "Even retrievable Product Hub artwork is explicitly placeholder/development media.",
+      "recommendedFix": "Publish production artwork with provenance and remove the development flag.",
+      "dependencies": [
+        "design approval",
+        "asset ingestion"
+      ],
+      "verification": "Public catalogue must contain no developmentAsset=true for released products."
+    },
+    {
+      "id": "API-ATLAS-GAP-037",
+      "domain": "testing",
+      "type": "architecture debt",
+      "severity": "P2",
+      "title": "Legacy canonical backend verifier is pinned to schema 055",
+      "evidence": [
+        "scripts/verify-greenfield-backend-v1.mjs:98",
+        "evidence/production-snapshot.json#/databaseSchema/appliedMigrations"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [
+        "scripts/verify-greenfield-backend-v1.mjs"
+      ],
+      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at migration 062 and this audit must run on a branch; it cannot truthfully serve as the current acceptance command.",
+      "recommendedFix": "Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.",
+      "dependencies": [
+        "verification ownership"
+      ],
+      "verification": "The canonical verifier must pass on reviewed current main at schema 062+ without weakening exact-SHA production checks."
+    },
+    {
+      "id": "API-ATLAS-GAP-038",
+      "domain": "database",
+      "type": "orphan table",
+      "severity": "P3",
+      "title": "Fifteen tables have no API/worker source reference",
+      "evidence": [
+        "04-database-api-map.md"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "The static scan identifies legacy, verifier-only or incomplete surfaces that need explicit ownership; it does not prove they are safe to drop.",
+      "recommendedFix": "Assign a disposition to each candidate before any cleanup migration.",
+      "dependencies": [
+        "schema owners"
+      ],
+      "verification": "Repository-wide reference and production usage review resolves every candidate."
+    },
+    {
+      "id": "API-ATLAS-GAP-039",
+      "domain": "operations",
+      "type": "architecture debt",
+      "severity": "P3",
+      "title": "Multiple old verification/recovery PostgreSQL containers remain running",
+      "evidence": [
+        "evidence/production-snapshot.json#/hostProcesses/docker"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "Old test/recovery databases consume resources and complicate topology, though they are excluded from production truth.",
+      "recommendedFix": "Inventory owners and retire only after backup/recovery confirmation.",
+      "dependencies": [
+        "operations approval"
+      ],
+      "verification": "Only documented production and active audit containers remain."
+    },
+    {
+      "id": "API-ATLAS-GAP-040",
+      "domain": "operations",
+      "type": "architecture debt",
+      "severity": "P3",
+      "title": "Redis is running without persistence and has no application source references",
+      "evidence": [
+        "evidence/production-snapshot.json#/redisRuntime",
+        "evidence/production-snapshot.json#/containers/redis"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "Redis adds operational surface but GreenField uses PostgreSQL queues and no Redis client reference was found.",
+      "recommendedFix": "Remove it from the GreenField stack if truly unused, or document and monitor its intended role.",
+      "dependencies": [
+        "compose review"
+      ],
+      "verification": "Dependency graph either names a real Redis consumer or the service is absent."
+    },
+    {
+      "id": "API-ATLAS-GAP-041",
+      "domain": "atlas",
+      "type": "architecture debt",
+      "severity": "P3",
+      "title": "Route-to-table and caller mappings are static approximations",
+      "evidence": [
+        "route-data-map.json",
+        "client-contract-analysis.json"
+      ],
+      "affectedRoutes": [],
+      "affectedFiles": [],
+      "productionImpact": "Dynamic dispatch, SQL helpers and client-computed paths can evade the extractor; confidence is recorded per route.",
+      "recommendedFix": "Add runtime SQL tracing in a disposable test harness and typed client instrumentation.",
+      "dependencies": [
+        "test environment"
+      ],
+      "verification": "Representative flows reconcile static maps with observed queries without production tracing."
+    }
+  ]
+}

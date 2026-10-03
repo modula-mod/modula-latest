@@ -1,0 +1,1522 @@
+{
+  "methodology": "Static path-property scan of production client source; local mock routers, tests, demos and seeds are excluded.",
+  "calls": [
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 107,
+      "raw": "/v1/notifications",
+      "normalized": "/v1/notifications",
+      "matchedRoutes": [
+        "GET /v1/notifications"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 108,
+      "raw": "/v1/activity",
+      "normalized": "/v1/activity",
+      "matchedRoutes": [
+        "GET /v1/activity"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 114,
+      "raw": "/v1/notifications/${encodeURIComponent(activityId)}/read",
+      "normalized": "/v1/notifications/:param/read",
+      "matchedRoutes": [
+        "POST /v1/notifications/:notificationId/read"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 121,
+      "raw": "/v1/notifications/read-all",
+      "normalized": "/v1/notifications/read-all",
+      "matchedRoutes": [
+        "POST /v1/notifications/read-all"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 128,
+      "raw": "/v1/accounts/me/notification-preferences",
+      "normalized": "/v1/accounts/me/notification-preferences",
+      "matchedRoutes": [
+        "GET /v1/accounts/me/notification-preferences",
+        "PATCH /v1/accounts/me/notification-preferences"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiActivityRepository.ts",
+      "line": 137,
+      "raw": "/v1/accounts/me/notification-preferences",
+      "normalized": "/v1/accounts/me/notification-preferences",
+      "matchedRoutes": [
+        "GET /v1/accounts/me/notification-preferences",
+        "PATCH /v1/accounts/me/notification-preferences"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAppearanceRepository.ts",
+      "line": 57,
+      "raw": "/v1/accounts/me/appearance",
+      "normalized": "/v1/accounts/me/appearance",
+      "matchedRoutes": [
+        "GET /v1/accounts/me/appearance",
+        "PATCH /v1/accounts/me/appearance"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAppearanceRepository.ts",
+      "line": 65,
+      "raw": "/v1/accounts/me/appearance",
+      "normalized": "/v1/accounts/me/appearance",
+      "matchedRoutes": [
+        "GET /v1/accounts/me/appearance",
+        "PATCH /v1/accounts/me/appearance"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 25,
+      "raw": "/v1/atproto/connections",
+      "normalized": "/v1/atproto/connections",
+      "matchedRoutes": [
+        "GET /v1/atproto/connections"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 33,
+      "raw": "/v1/atproto/connections/${encodeURIComponent(connectionId)}/status",
+      "normalized": "/v1/atproto/connections/:param/status",
+      "matchedRoutes": [
+        "GET /v1/atproto/connections/:connectionId/status"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 42,
+      "raw": "/v1/atproto/oauth/start",
+      "normalized": "/v1/atproto/oauth/start",
+      "matchedRoutes": [
+        "POST /v1/atproto/oauth/start"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 50,
+      "raw": "/v1/atproto/oauth/callback",
+      "normalized": "/v1/atproto/oauth/callback",
+      "matchedRoutes": [
+        "GET /v1/atproto/oauth/callback"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 61,
+      "raw": "/v1/atproto/connections/${encodeURIComponent(connectionId)}/disconnect",
+      "normalized": "/v1/atproto/connections/:param/disconnect",
+      "matchedRoutes": [
+        "POST /v1/atproto/connections/:connectionId/disconnect"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 71,
+      "raw": "/v1/atproto/connections/${encodeURIComponent(connectionId)}/refresh",
+      "normalized": "/v1/atproto/connections/:param/refresh",
+      "matchedRoutes": [
+        "POST /v1/atproto/connections/:connectionId/refresh"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 83,
+      "raw": "/v1/atproto/preferences",
+      "normalized": "/v1/atproto/preferences",
+      "matchedRoutes": [
+        "GET /v1/atproto/preferences",
+        "PATCH /v1/atproto/preferences"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 90,
+      "raw": "/v1/atproto/preferences",
+      "normalized": "/v1/atproto/preferences",
+      "matchedRoutes": [
+        "GET /v1/atproto/preferences",
+        "PATCH /v1/atproto/preferences"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAtprotoRepository.ts",
+      "line": 98,
+      "raw": "/v1/atproto/feed",
+      "normalized": "/v1/atproto/feed",
+      "matchedRoutes": [
+        "GET /v1/atproto/feed"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 116,
+      "raw": "/v1/sessions",
+      "normalized": "/v1/sessions",
+      "matchedRoutes": [
+        "POST /v1/sessions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 125,
+      "raw": "/v1/sessions/email-code/request",
+      "normalized": "/v1/sessions/email-code/request",
+      "matchedRoutes": [
+        "POST /v1/sessions/email-code/request"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 147,
+      "raw": "/v1/sessions/email-code",
+      "normalized": "/v1/sessions/email-code",
+      "matchedRoutes": [
+        "DELETE /v1/sessions/:sessionId",
+        "POST /v1/sessions/email-code"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 163,
+      "raw": "/v1/accounts/register",
+      "normalized": "/v1/accounts/register",
+      "matchedRoutes": [
+        "POST /v1/accounts/register"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 180,
+      "raw": "/v1/accounts/verify-email",
+      "normalized": "/v1/accounts/verify-email",
+      "matchedRoutes": [
+        "POST /v1/accounts/verify-email"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 218,
+      "raw": "/v1/accounts/resend-verification",
+      "normalized": "/v1/accounts/resend-verification",
+      "matchedRoutes": [
+        "POST /v1/accounts/resend-verification"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 228,
+      "raw": "/v1/sessions/refresh",
+      "normalized": "/v1/sessions/refresh",
+      "matchedRoutes": [
+        "DELETE /v1/sessions/:sessionId",
+        "POST /v1/sessions/refresh"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 236,
+      "raw": "/v1/accounts/me",
+      "normalized": "/v1/accounts/me",
+      "matchedRoutes": [
+        "GET /v1/accounts/me",
+        "PATCH /v1/accounts/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 249,
+      "raw": "/v1/accounts/me",
+      "normalized": "/v1/accounts/me",
+      "matchedRoutes": [
+        "GET /v1/accounts/me",
+        "PATCH /v1/accounts/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 254,
+      "raw": "/v1/accounts/me/handle",
+      "normalized": "/v1/accounts/me/handle",
+      "matchedRoutes": [
+        "POST /v1/accounts/me/handle"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 267,
+      "raw": "/v1/accounts/handles/${encodeURIComponent(handle)}/availability",
+      "normalized": "/v1/accounts/handles/:param/availability",
+      "matchedRoutes": [
+        "GET /v1/accounts/handles/:handle/availability"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 281,
+      "raw": "/v1/accounts/me/sessions",
+      "normalized": "/v1/accounts/me/sessions",
+      "matchedRoutes": [
+        "DELETE /v1/accounts/me/sessions",
+        "GET /v1/accounts/me/sessions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 288,
+      "raw": "/v1/sessions/${encodeURIComponent(sessionId)}",
+      "normalized": "/v1/sessions/:param",
+      "matchedRoutes": [
+        "DELETE /v1/sessions/:sessionId",
+        "POST /v1/sessions/apple",
+        "DELETE /v1/sessions/current",
+        "POST /v1/sessions/email-code",
+        "DELETE /v1/sessions/me",
+        "GET /v1/sessions/me",
+        "POST /v1/sessions/passkey",
+        "POST /v1/sessions/recovery-code",
+        "POST /v1/sessions/refresh"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 295,
+      "raw": "/v1/accounts/me/sessions",
+      "normalized": "/v1/accounts/me/sessions",
+      "matchedRoutes": [
+        "DELETE /v1/accounts/me/sessions",
+        "GET /v1/accounts/me/sessions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 302,
+      "raw": "/v1/accounts/me/password",
+      "normalized": "/v1/accounts/me/password",
+      "matchedRoutes": [
+        "POST /v1/accounts/me/password"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 308,
+      "raw": "/v1/accounts/forgot-password",
+      "normalized": "/v1/accounts/forgot-password",
+      "matchedRoutes": [
+        "POST /v1/accounts/forgot-password"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 315,
+      "raw": "/v1/accounts/reset-password",
+      "normalized": "/v1/accounts/reset-password",
+      "matchedRoutes": [
+        "POST /v1/accounts/reset-password"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 323,
+      "raw": "/v1/repositories/me/exports",
+      "normalized": "/v1/repositories/me/exports",
+      "matchedRoutes": [
+        "POST /v1/repositories/me/exports"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 331,
+      "raw": "/v1/repositories/me/exports/${encodeURIComponent(exportId)}",
+      "normalized": "/v1/repositories/me/exports/:param",
+      "matchedRoutes": [
+        "GET /v1/repositories/me/exports/:exportId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 340,
+      "raw": "/v1/sessions/current",
+      "normalized": "/v1/sessions/current",
+      "matchedRoutes": [
+        "DELETE /v1/sessions/:sessionId",
+        "DELETE /v1/sessions/current"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 353,
+      "raw": "/v1/accounts/me",
+      "normalized": "/v1/accounts/me",
+      "matchedRoutes": [
+        "GET /v1/accounts/me",
+        "PATCH /v1/accounts/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiAuthRepository.ts",
+      "line": 387,
+      "raw": "/v1/profiles/${encodeURIComponent(account.primaryHandle)}",
+      "normalized": "/v1/profiles/:param",
+      "matchedRoutes": [
+        "GET /v1/profiles/:handle",
+        "PATCH /v1/profiles/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 21,
+      "raw": "/v1/discover",
+      "normalized": "/v1/discover",
+      "matchedRoutes": [
+        "GET /v1/discover"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 27,
+      "raw": "/v1/search",
+      "normalized": "/v1/search",
+      "matchedRoutes": [
+        "GET /v1/search"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 44,
+      "raw": "/v1/search",
+      "normalized": "/v1/search",
+      "matchedRoutes": [
+        "GET /v1/search"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 61,
+      "raw": "/v1/search/recent",
+      "normalized": "/v1/search/recent",
+      "matchedRoutes": [
+        "DELETE /v1/search/recent",
+        "GET /v1/search/recent",
+        "POST /v1/search/recent"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 68,
+      "raw": "/v1/search/recent",
+      "normalized": "/v1/search/recent",
+      "matchedRoutes": [
+        "DELETE /v1/search/recent",
+        "GET /v1/search/recent",
+        "POST /v1/search/recent"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 75,
+      "raw": "/v1/search/saved",
+      "normalized": "/v1/search/saved",
+      "matchedRoutes": [
+        "GET /v1/search/saved",
+        "POST /v1/search/saved"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 81,
+      "raw": "/v1/search/saved",
+      "normalized": "/v1/search/saved",
+      "matchedRoutes": [
+        "GET /v1/search/saved",
+        "POST /v1/search/saved"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiDiscoverRepository.ts",
+      "line": 97,
+      "raw": "/v1/search/saved/${encodeURIComponent(savedSearchId)}",
+      "normalized": "/v1/search/saved/:param",
+      "matchedRoutes": [
+        "DELETE /v1/search/saved/:savedSearchId",
+        "PATCH /v1/search/saved/:savedSearchId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 33,
+      "raw": "/v1/extensions/catalogue",
+      "normalized": "/v1/extensions/catalogue",
+      "matchedRoutes": [
+        "GET /v1/extensions/:extensionId",
+        "GET /v1/extensions/catalogue"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 34,
+      "raw": "/v1/extensions",
+      "normalized": "/v1/extensions",
+      "matchedRoutes": [
+        "GET /v1/extensions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 39,
+      "raw": "/v1/extensions/installed",
+      "normalized": "/v1/extensions/installed",
+      "matchedRoutes": [
+        "GET /v1/extensions/:extensionId",
+        "GET /v1/extensions/installed"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 49,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}",
+      "normalized": "/v1/extensions/:param",
+      "matchedRoutes": [
+        "GET /v1/extensions/:extensionId",
+        "GET /v1/extensions/catalogue",
+        "GET /v1/extensions/installed"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 65,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}/install",
+      "normalized": "/v1/extensions/:param/install",
+      "matchedRoutes": [
+        "DELETE /v1/extensions/:extensionId/install",
+        "POST /v1/extensions/:extensionId/install"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 75,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}/install",
+      "normalized": "/v1/extensions/:param/install",
+      "matchedRoutes": [
+        "DELETE /v1/extensions/:extensionId/install",
+        "POST /v1/extensions/:extensionId/install"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 85,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}/enable",
+      "normalized": "/v1/extensions/:param/enable",
+      "matchedRoutes": [
+        "POST /v1/extensions/:extensionId/enable"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 96,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}/disable",
+      "normalized": "/v1/extensions/:param/disable",
+      "matchedRoutes": [
+        "POST /v1/extensions/:extensionId/disable"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiExtensionRepository.ts",
+      "line": 104,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionId)}/preferences",
+      "normalized": "/v1/extensions/:param/preferences",
+      "matchedRoutes": [
+        "PATCH /v1/extensions/:extensionId/preferences"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiFeedRepository.ts",
+      "line": 12,
+      "raw": "/v1/feed/home",
+      "normalized": "/v1/feed/home",
+      "matchedRoutes": [
+        "GET /v1/feed/home"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiFeedRepository.ts",
+      "line": 19,
+      "raw": "/v1/feed/profile/${encodeURIComponent(input.profileId)}",
+      "normalized": "/v1/feed/profile/:param",
+      "matchedRoutes": [
+        "GET /v1/feed/profile/:profileId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiMetadataRepository.ts",
+      "line": 9,
+      "raw": "/v1/meta",
+      "normalized": "/v1/meta",
+      "matchedRoutes": [
+        "GET /v1/meta"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModerationRepository.ts",
+      "line": 40,
+      "raw": "/v1/profiles/${encodeURIComponent(profileId)}/block",
+      "normalized": "/v1/profiles/:param/block",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/block",
+        "POST /v1/profiles/:profileId/block"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModerationRepository.ts",
+      "line": 51,
+      "raw": "/v1/profiles/${encodeURIComponent(profileId)}/block",
+      "normalized": "/v1/profiles/:param/block",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/block",
+        "POST /v1/profiles/:profileId/block"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModerationRepository.ts",
+      "line": 62,
+      "raw": "/v1/profiles/${encodeURIComponent(profileId)}/mute",
+      "normalized": "/v1/profiles/:param/mute",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/mute",
+        "POST /v1/profiles/:profileId/mute"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModerationRepository.ts",
+      "line": 73,
+      "raw": "/v1/profiles/${encodeURIComponent(profileId)}/mute",
+      "normalized": "/v1/profiles/:param/mute",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/mute",
+        "POST /v1/profiles/:profileId/mute"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModerationRepository.ts",
+      "line": 83,
+      "raw": "/v1/reports",
+      "normalized": "/v1/reports",
+      "matchedRoutes": [
+        "POST /v1/reports"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 119,
+      "raw": "/v1/registry/products",
+      "normalized": "/v1/registry/products",
+      "matchedRoutes": [
+        "GET /v1/registry/products"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 136,
+      "raw": "/v1/registry/products/${encodeURIComponent(moduleId)}",
+      "normalized": "/v1/registry/products/:param",
+      "matchedRoutes": [
+        "GET /v1/registry/products/:productId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 173,
+      "raw": "/v1/registry/modules/${encodeURIComponent(moduleId)}/rating",
+      "normalized": "/v1/registry/modules/:param/rating",
+      "matchedRoutes": [
+        "PUT /v1/registry/modules/:moduleId/rating"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 181,
+      "raw": "/v1/modules/installed",
+      "normalized": "/v1/modules/installed",
+      "matchedRoutes": [
+        "GET /v1/modules/installed"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 189,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/install-preview",
+      "normalized": "/v1/modules/:param/install-preview",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/install-preview",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 193,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/install",
+      "normalized": "/v1/modules/:param/install",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/install",
+        "POST /v1/modules/:moduleId/install",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 197,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/enable",
+      "normalized": "/v1/modules/:param/enable",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/enable",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 201,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/disable",
+      "normalized": "/v1/modules/:param/disable",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/disable",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 205,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/update",
+      "normalized": "/v1/modules/:param/update",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/update",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 210,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/permissions/review",
+      "normalized": "/v1/modules/:param/permissions/review",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/permissions/review"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 217,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/install",
+      "normalized": "/v1/modules/:param/install",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/install",
+        "POST /v1/modules/:moduleId/install",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 221,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/uninstall-preview",
+      "normalized": "/v1/modules/:param/uninstall-preview",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/uninstall-preview",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 226,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/views",
+      "normalized": "/v1/modules/:param/views",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/views",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 236,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/views/${encodeURIComponent(viewId)}",
+      "normalized": "/v1/modules/:param/views/:param",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/views/:viewId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 246,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/frontend",
+      "normalized": "/v1/modules/:param/frontend",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/frontend",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 257,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}",
+      "normalized": "/v1/modules/:param/records/:param",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/records/:collection",
+        "POST /v1/modules/:moduleId/records/:collection"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 264,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}",
+      "normalized": "/v1/modules/:param/records/:param/:param",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId",
+        "PATCH /v1/modules/:moduleId/records/:collection/:recordId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 275,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}",
+      "normalized": "/v1/modules/:param/records/:param",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/records/:collection",
+        "POST /v1/modules/:moduleId/records/:collection"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 282,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}",
+      "normalized": "/v1/modules/:param/records/:param/:param",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId",
+        "PATCH /v1/modules/:moduleId/records/:collection/:recordId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 289,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}",
+      "normalized": "/v1/modules/:param/records/:param/:param",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/records/:collection/:recordId",
+        "GET /v1/modules/:moduleId/records/:collection/:recordId",
+        "PATCH /v1/modules/:moduleId/records/:collection/:recordId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 296,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/restore",
+      "normalized": "/v1/modules/:param/records/:param/:param/restore",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/records/:collection/:recordId/restore"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 304,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/records/${encodeURIComponent(collection)}/${encodeURIComponent(recordId)}/permanent",
+      "normalized": "/v1/modules/:param/records/:param/:param/permanent",
+      "matchedRoutes": [
+        "DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 311,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/actions/${encodeURIComponent(actionId)}",
+      "normalized": "/v1/modules/:param/actions/:param",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/actions/:actionId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 316,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/ai/actions/${encodeURIComponent(actionId)}/executions",
+      "normalized": "/v1/modules/:param/ai/actions/:param/executions",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/ai/actions/:actionId/executions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 324,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/ai/executions/${encodeURIComponent(executionId)}/apply",
+      "normalized": "/v1/modules/:param/ai/executions/:param/apply",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/ai/executions/:executionId/apply"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 332,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/settings-schema",
+      "normalized": "/v1/modules/:param/settings-schema",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/settings-schema",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 339,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/settings",
+      "normalized": "/v1/modules/:param/settings",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/settings",
+        "PATCH /v1/modules/:moduleId/settings",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 345,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/settings",
+      "normalized": "/v1/modules/:param/settings",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/settings",
+        "PATCH /v1/modules/:moduleId/settings",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 350,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/health",
+      "normalized": "/v1/modules/:param/health",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/health",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 357,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/backend",
+      "normalized": "/v1/modules/:param/backend",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/backend",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 363,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/backend/discover",
+      "normalized": "/v1/modules/:param/backend/discover",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/backend/discover"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 367,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/backend/health",
+      "normalized": "/v1/modules/:param/backend/health",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/backend/health"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 371,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/backend/disable",
+      "normalized": "/v1/modules/:param/backend/disable",
+      "matchedRoutes": [
+        "POST /v1/modules/:moduleId/backend/disable"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 376,
+      "raw": "/v1/modules/contributions",
+      "normalized": "/v1/modules/contributions",
+      "matchedRoutes": [
+        "GET /v1/modules/contributions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 385,
+      "raw": "/v1/modules/${encodeURIComponent(moduleId)}/runtime",
+      "normalized": "/v1/modules/:param/runtime",
+      "matchedRoutes": [
+        "GET /v1/modules/:moduleId/runtime",
+        "GET /v1/modules/installed/:moduleId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 391,
+      "raw": "/v1/registry/products/${encodeURIComponent(productId)}/relationships",
+      "normalized": "/v1/registry/products/:param/relationships",
+      "matchedRoutes": [
+        "GET /v1/registry/products/:productId/relationships"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 395,
+      "raw": "/v1/module-host/${encodeURIComponent(moduleId)}/composition",
+      "normalized": "/v1/module-host/:param/composition",
+      "matchedRoutes": [
+        "GET /v1/module-host/:targetProductId/composition"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 399,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionProductId)}/contributions/${encodeURIComponent(contributionId)}/invoke",
+      "normalized": "/v1/extensions/:param/contributions/:param/invoke",
+      "matchedRoutes": [
+        "POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 403,
+      "raw": "/v1/extensions/${encodeURIComponent(extensionProductId)}/contributions/${encodeURIComponent(contributionId)}/fail",
+      "normalized": "/v1/extensions/:param/contributions/:param/fail",
+      "matchedRoutes": [
+        "POST /v1/extensions/:extensionProductId/contributions/:contributionId/fail"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 16,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}",
+      "normalized": "/v1/posts/:param",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId",
+        "GET /v1/posts/:postId",
+        "PATCH /v1/posts/:postId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 20,
+      "raw": "/v1/posts",
+      "normalized": "/v1/posts",
+      "matchedRoutes": [
+        "POST /v1/posts"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 26,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}",
+      "normalized": "/v1/posts/:param",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId",
+        "GET /v1/posts/:postId",
+        "PATCH /v1/posts/:postId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 36,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}",
+      "normalized": "/v1/posts/:param",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId",
+        "GET /v1/posts/:postId",
+        "PATCH /v1/posts/:postId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 42,
+      "raw": "/v1/posts/${postId}/like",
+      "normalized": "/v1/posts/:param/like",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/like",
+        "POST /v1/posts/:postId/like"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 46,
+      "raw": "/v1/posts/${postId}/like",
+      "normalized": "/v1/posts/:param/like",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/like",
+        "POST /v1/posts/:postId/like"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 50,
+      "raw": "/v1/posts/${postId}/save",
+      "normalized": "/v1/posts/:param/save",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/save",
+        "POST /v1/posts/:postId/save"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 54,
+      "raw": "/v1/posts/${postId}/save",
+      "normalized": "/v1/posts/:param/save",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/save",
+        "POST /v1/posts/:postId/save"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 58,
+      "raw": "/v1/posts/${postId}/repost",
+      "normalized": "/v1/posts/:param/repost",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/repost",
+        "POST /v1/posts/:postId/repost"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 62,
+      "raw": "/v1/posts/${postId}/repost",
+      "normalized": "/v1/posts/:param/repost",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/repost",
+        "POST /v1/posts/:postId/repost"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiPostRepository.ts",
+      "line": 67,
+      "raw": "/v1/saves",
+      "normalized": "/v1/saves",
+      "matchedRoutes": [
+        "GET /v1/saves"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiProductPreferencesRepository.ts",
+      "line": 25,
+      "raw": "/v1/board/layout",
+      "normalized": "/v1/board/layout",
+      "matchedRoutes": [
+        "GET /v1/board/layout",
+        "PATCH /v1/board/layout"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiProductPreferencesRepository.ts",
+      "line": 30,
+      "raw": "/v1/board/layout",
+      "normalized": "/v1/board/layout",
+      "matchedRoutes": [
+        "GET /v1/board/layout",
+        "PATCH /v1/board/layout"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiProfileRepository.ts",
+      "line": 10,
+      "raw": "/v1/profiles/${encodeURIComponent(handle)}",
+      "normalized": "/v1/profiles/:param",
+      "matchedRoutes": [
+        "GET /v1/profiles/:handle",
+        "PATCH /v1/profiles/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiProfileRepository.ts",
+      "line": 14,
+      "raw": "/v1/profiles/me",
+      "normalized": "/v1/profiles/me",
+      "matchedRoutes": [
+        "GET /v1/profiles/:handle",
+        "PATCH /v1/profiles/me"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiReelsRepository.ts",
+      "line": 9,
+      "raw": "/v1/reels",
+      "normalized": "/v1/reels",
+      "matchedRoutes": [
+        "GET /v1/reels"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiSocialGraphRepository.ts",
+      "line": 21,
+      "raw": "/v1/profiles/${profileId}/follow",
+      "normalized": "/v1/profiles/:param/follow",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/follow",
+        "POST /v1/profiles/:profileId/follow"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiSocialGraphRepository.ts",
+      "line": 25,
+      "raw": "/v1/profiles/${profileId}/follow",
+      "normalized": "/v1/profiles/:param/follow",
+      "matchedRoutes": [
+        "DELETE /v1/profiles/:profileId/follow",
+        "POST /v1/profiles/:profileId/follow"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiSocialGraphRepository.ts",
+      "line": 30,
+      "raw": "/v1/profiles/${encodeURIComponent(input.handle)}/followers",
+      "normalized": "/v1/profiles/:param/followers",
+      "matchedRoutes": [
+        "GET /v1/profiles/:handle/followers"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiSocialGraphRepository.ts",
+      "line": 37,
+      "raw": "/v1/profiles/${encodeURIComponent(input.handle)}/following",
+      "normalized": "/v1/profiles/:param/following",
+      "matchedRoutes": [
+        "GET /v1/profiles/:handle/following"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiStoriesRepository.ts",
+      "line": 80,
+      "raw": "/v1/stories/rail",
+      "normalized": "/v1/stories/rail",
+      "matchedRoutes": [
+        "GET /v1/stories/:groupId",
+        "GET /v1/stories/rail"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiStoriesRepository.ts",
+      "line": 89,
+      "raw": "/v1/stories/${encodeURIComponent(groupId)}",
+      "normalized": "/v1/stories/:param",
+      "matchedRoutes": [
+        "GET /v1/stories/:groupId",
+        "GET /v1/stories/rail"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiStoriesRepository.ts",
+      "line": 97,
+      "raw": "/v1/stories",
+      "normalized": "/v1/stories",
+      "matchedRoutes": [
+        "POST /v1/stories"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiStoriesRepository.ts",
+      "line": 108,
+      "raw": "/v1/stories/items/${encodeURIComponent(itemId)}/viewed",
+      "normalized": "/v1/stories/items/:param/viewed",
+      "matchedRoutes": [
+        "POST /v1/stories/items/:itemId/viewed"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiStoriesRepository.ts",
+      "line": 119,
+      "raw": "/v1/stories/items/${encodeURIComponent(itemId)}",
+      "normalized": "/v1/stories/items/:param",
+      "matchedRoutes": [
+        "DELETE /v1/stories/items/:itemId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 308,
+      "raw": "/v1/modules/contributions",
+      "normalized": "/v1/modules/contributions",
+      "matchedRoutes": [
+        "GET /v1/modules/contributions"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 311,
+      "raw": "/v1/tools",
+      "normalized": "/v1/tools",
+      "matchedRoutes": [
+        "GET /v1/tools"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 326,
+      "raw": "/v1/functions/${encodeURIComponent(functionId)}/invoke",
+      "normalized": "/v1/functions/:param/invoke",
+      "matchedRoutes": [
+        "POST /v1/functions/:functionId/invoke"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/composer/screens/ComposerScreen.tsx",
+      "line": 407,
+      "raw": "/v1/posts/${params.quotePostId}/quote",
+      "normalized": "/v1/posts/:param/quote",
+      "matchedRoutes": [
+        "POST /v1/posts/:postId/quote"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/settings/screens/ModulaMailSettingsScreen.tsx",
+      "line": 39,
+      "raw": "/v1/version",
+      "normalized": "/v1/version",
+      "matchedRoutes": [
+        "GET /v1/version"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/settings/screens/ModulaMailSettingsScreen.tsx",
+      "line": 46,
+      "raw": "/v1/accounts/me/modula-mail",
+      "normalized": "/v1/accounts/me/modula-mail",
+      "matchedRoutes": [
+        "GET /v1/accounts/me/modula-mail"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 39,
+      "raw": "/v1/posts/${encodeURIComponent(postId!)}/comments",
+      "normalized": "/v1/posts/:param/comments",
+      "matchedRoutes": [
+        "GET /v1/posts/:postId/comments",
+        "POST /v1/posts/:postId/comments"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 52,
+      "raw": "/v1/comments/${encodeURIComponent(commentId)}/replies",
+      "normalized": "/v1/comments/:param/replies",
+      "matchedRoutes": [
+        "GET /v1/comments/:commentId/replies",
+        "POST /v1/comments/:commentId/replies"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 66,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}/comments",
+      "normalized": "/v1/posts/:param/comments",
+      "matchedRoutes": [
+        "GET /v1/posts/:postId/comments",
+        "POST /v1/posts/:postId/comments"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 74,
+      "raw": "/v1/comments/${encodeURIComponent(commentId)}/replies",
+      "normalized": "/v1/comments/:param/replies",
+      "matchedRoutes": [
+        "GET /v1/comments/:commentId/replies",
+        "POST /v1/comments/:commentId/replies"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 85,
+      "raw": "/v1/comments/${encodeURIComponent(commentId)}",
+      "normalized": "/v1/comments/:param",
+      "matchedRoutes": [
+        "DELETE /v1/comments/:commentId",
+        "PATCH /v1/comments/:commentId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useCommentsQuery.ts",
+      "line": 93,
+      "raw": "/v1/comments/${encodeURIComponent(commentId)}",
+      "normalized": "/v1/comments/:param",
+      "matchedRoutes": [
+        "DELETE /v1/comments/:commentId",
+        "PATCH /v1/comments/:commentId"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useReactionMutation.ts",
+      "line": 22,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}/reaction",
+      "normalized": "/v1/posts/:param/reaction",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/reaction",
+        "PUT /v1/posts/:postId/reaction"
+      ],
+      "status": "matched"
+    },
+    {
+      "file": "src/features/social/data/useReactionMutation.ts",
+      "line": 26,
+      "raw": "/v1/posts/${encodeURIComponent(postId)}/reaction",
+      "normalized": "/v1/posts/:param/reaction",
+      "matchedRoutes": [
+        "DELETE /v1/posts/:postId/reaction",
+        "PUT /v1/posts/:postId/reaction"
+      ],
+      "status": "matched"
+    }
+  ],
+  "unmatched": [],
+  "matched": 142
+}

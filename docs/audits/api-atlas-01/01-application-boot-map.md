@@ -20,21 +20,21 @@
 `services/greenfield-api/src/app/register-routes.ts:148-214`
 
 1. instantiate domain services;
-2. global preHandler attaches legacy and Greenfield bearer [REDACTED];
+2. global preHandler attaches legacy and Greenfield bearer authentication;
 3. register health/version/meta and primary route families;
 4. register module, AI, Backend Fabric, intelligence, social, stories, developer, entitlement, account-data, attachment and provider route groups;
 5. handlers perform authorization and validation; no global schema-validation layer or global custom error handler is registered.
 
 ## Actual production boot
 
-- Image: `modula-greenfield-api:fbb74e5e5cd83268aaca5ffeef84663703e5bdea`
-- Image ID: `sha256:643fff69c4d17dd61d77d5123ea26affe12b1bbce1bb64a389098138605ec781`
-- Revision: `fbb74e5e5cd83268aaca5ffeef84663703e5bdea`
+- Image: `modula-greenfield-api:c7c46dfa3d85b89617de833723aab8f207f0ba94`
+- Image ID: `sha256:ee941cbb3cbcb62af8448fef97401f9da6b876245e7843cda3678232d3a7c305`
+- Revision: `c7c46dfa3d85b89617de833723aab8f207f0ba94`
 - Command: `docker-entrypoint.sh node services/greenfield-api/dist/main.js`
 - Working directory: `/app`
 - Host binding: loopback `127.0.0.1:4020 -> container 4020`
-- Fastify application routes: 380
-- Automatic HEAD routes: 147
+- Fastify application routes: 384
+- Automatic HEAD routes: 150
 - Framework OPTIONS routes: 1
 
 ## Registration graph

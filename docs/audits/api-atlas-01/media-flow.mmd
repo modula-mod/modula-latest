@@ -1,0 +1,13 @@
+flowchart LR
+  client[Client] --> initiate[POST attachment upload session]
+  initiate --> policy[MIME size ownership policy]
+  policy --> bytes[PUT raw bytes]
+  bytes --> verify[Length checksum and magic signature]
+  verify --> disk[(Host bind media root)]
+  verify --> metadata[(Attachment metadata)]
+  metadata --> bind[Profile or post attachment binding]
+  bind --> canonical[Canonical attachment URL]
+  canonical --> auth[Public private and owner delivery policy]
+  auth --> nginx[nginx]
+  nginx --> client
+  legacy[Legacy post base64 and story base64] --> disk

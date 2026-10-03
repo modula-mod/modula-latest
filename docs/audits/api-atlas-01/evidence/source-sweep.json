@@ -1,0 +1,3598 @@
+{
+  "methodology": "Literal marker scan. Findings are classified, not automatically treated as production defects.",
+  "findings": [
+    {
+      "file": "services/greenfield-api/src/ai/provider-runtime-service.ts",
+      "line": 1065,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "if (providerId === 'provider:development-mock') return [{scopeType: 'development'}, {scopeType: 'platform'}]"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/index.ts",
+      "line": 4,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "export * from './mock-provider.js'"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 19,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "modelId: 'greenfield.mock.deterministic',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 20,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "providerModelId: 'mock-deterministic-v1',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 21,
+      "marker": "Mock",
+      "classification": "implementation-word-review",
+      "excerpt": "displayName: 'Deterministic Mock Model',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 37,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "providerRequestId: `mock-response:${request.executionId}`,"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 47,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "providerMode: 'development-mock',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 56,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "yield {type: 'execution.started', metadata: {providerMode: 'development-mock'}}"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 102,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "return `mock:${request.moduleId}:${stablePreview(lastUser)}${toolSuffix}`"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 122,
+      "marker": "Mock",
+      "classification": "implementation-word-review",
+      "excerpt": "throw new ProviderExecutionError(code as GreenfieldAIExecutionFailureCode, `Mock provider failure: ${code}`, code !== 'AI_PROVIDER_AUTH_FAILED')"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 148,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "return `mock:${seed}`"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/registry.ts",
+      "line": 3,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/registry.ts",
+      "line": 32,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/resolver.ts",
+      "line": 55,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/resolver.ts",
+      "line": 112,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "provider.configurationMode === 'development-mock'"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 46,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple subject missing')"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 49,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple nonce mismatch')"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 53,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple audience mismatch')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 199,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "Buffer.from(JSON.stringify({did: input.did, placeholder: true})),"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 249,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!connection) throw new Error('Failed to load connection')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 347,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.publication',"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 348,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.profileExtension',"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 353,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "query = query.where('collection', 'like', 'digital.modula.temp.%')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 360,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "origin: row.collection.startsWith('digital.modula.temp') ? 'modula+atproto' : 'atproto',"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 211,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 239,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 241,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "refuse('placeholder database credentials are not allowed')"
+    },
+    {
+      "file": "services/greenfield-api/src/database/types.ts",
+      "line": 172,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/posts/writes.ts",
+      "line": 219,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!created) throw new Error('Failed to load created post')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 70,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed !== 'object') throw new Error('bad cursor')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 71,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed.sort || !SORTS.has(parsed.sort)) throw new Error('bad sort')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 73,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isSafeInteger(parsed.offset) || parsed.offset < 0 || parsed.offset > 1_000_000) throw new Error('bad offset')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 76,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof parsed.updatedAt !== 'string' || Number.isNaN(Date.parse(parsed.updatedAt))) throw new Error('bad updatedAt')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof parsed.documentId !== 'string' || parsed.documentId.length < 1 || parsed.documentId.length > 240) throw new Error('bad documentId')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 78,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (parsed.score !== undefined && (typeof parsed.score !== 'number' || !Number.isFinite(parsed.score))) throw new Error('bad score')"
+    },
+    {
+      "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
+      "line": 82,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/backend/gateway-service.ts",
+      "line": 161,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Module backend retry bounds exhausted')"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const placeholder = await this.db"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 238,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 239,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 240,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 245,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "name: placeholder.name,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 246,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: placeholder.description,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 247,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 250,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "trust: placeholder.trust,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 254,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: manifest,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-trust-service.ts",
+      "line": 113,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/runtime/session-store.ts",
+      "line": 133,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/runtime/session-store.ts",
+      "line": 241,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Runtime session persistence rejected provider implementation reference: ${[...path, key].join('.')}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/secrets/client.ts",
+      "line": 56,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 22,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 34,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 37,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 13,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "* handler code) so tests can inject a mock without any network or real"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 34,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "/** Preview OAuth (preview=1) stores a placeholder session without real JWTs. */"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 35,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder?: boolean"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 56,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "* Never talks to a real PDS — records fake at:// URIs so the publication"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session-crypto.ts",
+      "line": 16,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session-crypto.ts",
+      "line": 19,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 115,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "// Preview OAuth stores `{did, placeholder:true}` without JWTs. Use the stub"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 115,
+      "marker": "stub",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "// Preview OAuth stores `{did, placeholder:true}` without JWTs. Use the stub"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 117,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (session.placeholder === true && config.environment === 'preview') {"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/validate-record.ts",
+      "line": 14,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "if (collection.startsWith('digital.modula.temp.') && !isModulaLexiconNsid(collection)) {"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 110,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Modula worker configuration: ${message}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 128,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 130,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "refuse('placeholder database credentials are not allowed')"
+    },
+    {
+      "file": "services/greenfield-worker/src/functions/invoke.ts",
+      "line": 6,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "* Background function job runner. Deterministic preview helpers only — no fake AI."
+    },
+    {
+      "file": "services/greenfield-worker/src/mail/provisioner.ts",
+      "line": 419,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",
+      "line": 267,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (dependencies.includes(id)) throw new Error(`Standard 2 hook ordering cycle detected at ${id}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",
+      "line": 274,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
+    },
+    {
+      "file": "packages/api-contracts/src/identifiers.ts",
+      "line": 15,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid ${label}`)"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 3,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Validates every lexicon JSON file under lexicons/digital/modula/temp/:"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 17,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "const lexiconsDir = path.join(root, 'lexicons', 'digital', 'modula', 'temp')"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 20,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.profileExtension',"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 21,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.moduleManifest',"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 22,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.publication',"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/moduleManifest.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/moduleManifest.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/moduleManifest.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const MODULE_MANIFEST_NSID = 'digital.modula.temp.moduleManifest' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/profileExtension.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/profileExtension.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/profileExtension.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const PROFILE_EXTENSION_NSID = 'digital.modula.temp.profileExtension' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/publication.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/publication.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/publication.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const PUBLICATION_NSID = 'digital.modula.temp.publication' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.profileExtension'"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 14,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.moduleManifest'"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 28,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.publication'"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 173,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unregistered MDHS attribute path: ${path}`)"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 184,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Avatar confidence must be between 0 and 1 when present')"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 221,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid avatar URI: ${uri}`)"
+    },
+    {
+      "file": "packages/greenfield-connector-contracts/src/connection-state.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield connection transition: ${from} -> ${to}`)"
+    },
+    {
+      "file": "packages/greenfield-connector-contracts/src/connector-capability.ts",
+      "line": 46,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid connector capability: ${value}`)"
+    },
+    {
+      "file": "packages/greenfield-contracts/src/ai.ts",
+      "line": 23,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "| 'development-mock'"
+    },
+    {
+      "file": "packages/greenfield-mcp/src/index.ts",
+      "line": 195,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "description: 'CRM foreshadow with automation nodes; not hardcoded in host.',"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/capability.ts",
+      "line": 11,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield runtime capability: ${String(value)}`)"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/engine-kind.ts",
+      "line": 26,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield engine kind: ${String(value)}`)"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/session.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid runtime session transition: ${from} -> ${to}`)"
+    },
+    {
+      "file": "packages/greenfield-module-manifest/src/compatibility.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!left || !right) throw new Error('Invalid semantic version')"
+    },
+    {
+      "file": "packages/greenfield-module-manifest/src/identity.ts",
+      "line": 37,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Module identifiers must be lowercase reverse-domain IDs without versions')"
+    },
+    {
+      "file": "packages/greenfield-module-registry-contracts/src/registry.ts",
+      "line": 25,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "| 'PLACEHOLDER'"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/define-module.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield module manifest: ${result.issues.map(issue => `${issue.path} ${issue.message}`).join('; ')}`)"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/define-module.ts",
+      "line": 32,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield module manifest: ${result.issues.map(issue => `${issue.path} ${issue.message}`).join('; ')}`)"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/identifiers.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Contribution suffix must be lowercase dot-separated identifier parts')"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/identifiers.ts",
+      "line": 13,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^[a-z0-9-]+$/.test(collection)) throw new Error('Collection suffix must be lowercase kebab identifier')"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder?: string"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 394,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "checkKnownKeys(field, path, ['fieldId', 'name', 'type', 'label', 'required', 'sensitive', 'secretRefRequired', 'options', 'referenceCollection', 'placeholder', 'helpText'], add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-product-standard/src/kinds.ts",
+      "line": 59,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unsupported product kind: ${kind}`)"
+    },
+    {
+      "file": "packages/greenfield-product-standard/src/tests/ingest.test.ts",
+      "line": 137,
+      "marker": "fake",
+      "classification": "test-fixture-or-development",
+      "excerpt": "test('backend-free plugin does not bind fake infrastructure', () => {"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 20,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI requires accountId, collection, and recordId')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 23,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI segments must not contain \"/\"')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 30,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI must start with modula://')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI must be modula://<accountId>/<collection>/<recordId>')"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 10,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid runtime provider ID: ${provider.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 13,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Runtime provider already registered: ${provider.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 36,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!current) throw new Error(`Runtime provider not found: ${providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 165,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!resolution) throw new Error('Runtime session has no resolution')"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 168,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!adapter) throw new Error(`Selected provider is no longer registered: ${selected.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 172,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!prepared.ready) throw new Error(`Runtime provider was not ready: ${selected.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 181,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/session-store.ts",
+      "line": 33,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (this.sessions.has(session.sessionId)) throw new Error(`Runtime session already exists: ${session.sessionId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/session-store.ts",
+      "line": 52,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/tests/runtime-manager.test.ts",
+      "line": 183,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('prepare failed')"
+    },
+    {
+      "file": "packages/intelligence-core/tests/provider-registry.test.ts",
+      "line": 58,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('remote stub should not execute in registry tests')"
+    },
+    {
+      "file": "packages/intelligence-core/tests/provider-registry.test.ts",
+      "line": 58,
+      "marker": "stub",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('remote stub should not execute in registry tests')"
+    },
+    {
+      "file": "packages/intelligence-core/tests/routing.test.ts",
+      "line": 105,
+      "marker": "throw new Error",
+      "classification": "test-fixture-or-development",
+      "excerpt": "throw new Error('remote must not be selected unexpectedly')"
+    },
+    {
+      "file": "packages/modula-cli/src/cli.ts",
+      "line": 132,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "description: 'CRM foreshadow with automation nodes; not hardcoded in host.',"
+    },
+    {
+      "file": "packages/modula-cli/src/cli.ts",
+      "line": 641,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "The Modula CLI does not start or fake an MCP process."
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 267,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!record) throw new Error('Local record not found')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 462,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const placeholder = (row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 462,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const placeholder = (row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 465,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const manifest = (row.manifest ?? row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 485,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 717,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "value === 'PLACEHOLDER' ||"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 834,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Product frontend response is invalid')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 844,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Verified product frontend projection is incoherent')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1238,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (index < 0) throw new Error('Local record not found')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1240,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new Error('Local revision conflict')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1251,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new Error('Local revision conflict')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 112,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Creates a DM follow-up stub from social context; no message is sent.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 151,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Queues a local approval stub for team drafts.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 181,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "description: 'Product cards require Commerce. There is no fake pricing checkout.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 315,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Composer tools are unavailable.')"
+    },
+    {
+      "file": "src/data/repositories/contracts/ModuleRepository.ts",
+      "line": 52,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "| 'PLACEHOLDER'"
+    },
+    {
+      "file": "src/features/atproto/oauth/completeAtprotoOAuth.ts",
+      "line": 58,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('OAuth callback must not include tokens.')"
+    },
+    {
+      "file": "src/features/atproto/screens/AtprotoConnectionScreen.tsx",
+      "line": 289,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"handle.bsky.social\""
+    },
+    {
+      "file": "src/features/composer/screens/ComposerScreen.tsx",
+      "line": 754,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Add alt text — Preview\""
+    },
+    {
+      "file": "src/features/discover/screens/DiscoverScreen.tsx",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people, topics, and modules\""
+    },
+    {
+      "file": "src/features/feed/components/HomeSearchModal.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search Modula\""
+    },
+    {
+      "file": "src/features/feed/data/usePostQuery.ts",
+      "line": 16,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!postId) throw new Error('Post id required')"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 391,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'Commerce module preview. Settlements require DIMON later — no fake checkout.',"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 433,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'Inventory foreshadow only. Never required for professional use. No fake item balances.',"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 741,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Sponsor Slots is planned. It does not provide fake pricing, checkout, ad serving, or settlement.',"
+    },
+    {
+      "file": "src/features/marketplace/screens/ModuleDetailScreen.tsx",
+      "line": 120,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')"
+    },
+    {
+      "file": "src/features/modules/components/ProductHubSearchChrome.tsx",
+      "line": 109,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search modules, tools and more…\""
+    },
+    {
+      "file": "src/features/modules/runtime/module-action-bar.tsx",
+      "line": 7,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "* Generic host action bar. Actions come from the view manifest — never hardcoded Notes verbs."
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 62,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 62,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 129,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? defaultPlaceholder(field.type)}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 129,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? defaultPlaceholder(field.type)}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 168,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? 'Choose a record'}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 168,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? 'Choose a record'}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 122,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!route) throw new Error('Module route action is missing required route parameters')"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 144,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!recordId) throw new Error('The record is not available to update.')"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 229,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search\""
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/screens/ModulePreScreen.tsx",
+      "line": 118,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "Host stays light. Modules ship as packages with permissions — not hardcoded shell features."
+    },
+    {
+      "file": "src/features/presence/components/PresenceStoriesRail.tsx",
+      "line": 55,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "// Honest empty state — never invent demo stories. Home injects an owner stub when signed in."
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 86,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "styles.placeholder,"
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Optional caption\""
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: {"
+    },
+    {
+      "file": "src/features/product/components/ProductPreScreen.tsx",
+      "line": 127,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "Honest preview — this surface explains direction. It does not fake live data, balances,"
+    },
+    {
+      "file": "src/features/product/data/boardWidgets.ts",
+      "line": 139,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'DIMON is not active yet, so this card shows reserved ledger language only and never fake token activity.',"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 248,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'module-catalogue', name: 'Module Catalogue', maturity: 'preview', summary: 'Marketplace lists module cards, status labels, and pre-screens without fake installs.', route: '/marketplace', tags: ['catalogue', 'modules', 'preview']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 380,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'anti-speculation-policy', name: 'Anti-Speculation Policy', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not fake balances, token prices, minting, or wallet activity.', route: '/settings/dimon', tags: ['policy"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 387,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'inventory-display-future', name: 'Inventory Display Future', maturity: 'planned', summary: 'Inventory display is a planned UI concept; it must not show fake balances or wallet assets.', tags: ['inventory', 'wallet', 'honesty']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 491,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'newsletter-module', name: 'Newsletter Module', maturity: 'planned', summary: 'Newsletter publishing is planned as a module, not a hardcoded host runtime.', route: '/modules', tags: ['newsletter', 'module', 'publishing']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 514,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'inventory-status', name: 'Inventory Status', maturity: 'planned', summary: 'Inventory is planned UI only; it must not display fake balances, wallets, or mints.', tags: ['inventory', 'honesty', 'planned']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "Fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 47,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['post-analytics-owner', 'Owner Post Analytics', 'Owner-only reach previews — no fake vanity metrics.', ['analytics', 'owner']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 56,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "['verification-badges', 'Verification Badges', 'Identity verification states without fake chain proofs.', ['identity', 'trust']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 59,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['module-shop-tab', 'Shop Tab Slot', 'Marketplace-backed shop tab — no fake checkout.', ['shop', 'marketplace']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 91,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['template-game', 'Template · Game Stub', 'Optional game module that cannot break pro OS.', ['template', 'games']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 103,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['refund-policy-stub', 'Refund Policy Stub', 'Settlement policies wait for DIMON activation.', ['dimon', 'billing']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 103,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['refund-policy-stub', 'Refund Policy Stub', 'Settlement policies wait for DIMON activation.', ['dimon', 'billing']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 174,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "['tools-drawer', 'Composer Tools Drawer', 'Registry-driven + menu — not hardcoded forever.', ['tools', 'composer']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 223,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['creator-studio', 'Creator Studio', 'Insights and monetisation stubs — no fake revenue.', ['creator', 'studio']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 254,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "['day-agenda', 'Day Agenda Module', 'External calendar module — not host hardcoded.', ['calendar', 'modules']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 316,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['royalty-policy', 'Royalty Policy Stub', 'DIMON is not active yet — royalties not live.', ['dimon', 'creator']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 444,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "['glass-privacy-chat-chrome', 'Glass Privacy Chat Chrome', 'Protected chat chrome studies make privacy level visible without fake security.', ['privacy', 'chrome']],"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 21,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "{id: 'preview', label: 'Preview', hint: 'Profile tab / Board / Settings mock'},"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 28,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Apple chrome-layer -> native-feeling controls frame the work without fake glass runtime.',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 339,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "id: 'game-stub',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 340,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "name: 'Game stub',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 342,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Tiny game route with Board score card; runtime remains a preview stub.',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 719,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "return 'Templates include Vault Notes, Tasks, CRM, Calendar, Files, Newsletter, Analytics, Health Agent, Game stub, Widget pack, Team inbox, Automations pack, Integrations Element, Presence pack, Theme pack, and Search extension. They only "
+    },
+    {
+      "file": "src/features/product/data/intelligenceLayers.ts",
+      "line": 239,
+      "marker": "Fake",
+      "classification": "implementation-word-review",
+      "excerpt": "mustNot: ['Execute untrusted GitHub code in host', 'Fake publish success'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 143,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "bullets: ['Module catalogue', 'Sellers', 'Pre-screens', 'No fake billing'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 206,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "body: 'Agents are modules — not hardcoded host features. Enable drafts locally; runtime stays Preview until Registry + sandbox land.',"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 506,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "bullets: ['Creator studio', 'Insights preview', 'Monetization stub', 'Communities'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 531,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "body: 'DIMON is Modula’s economic and ownership layer, not speculative theatre. It activates only after shell, social, and module standard are reliable. No fake balances.',"
+    },
+    {
+      "file": "src/features/product/screens/AutomationsStudioScreen.tsx",
+      "line": 118,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Flow title\""
+    },
+    {
+      "file": "src/features/product/screens/ChatAssistScreen.tsx",
+      "line": 44,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{id: 'translate', label: 'Translate', detail: 'Language assist placeholder.'},"
+    },
+    {
+      "file": "src/features/product/screens/CommandsLayerScreen.tsx",
+      "line": 70,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search commands — e.g. focus, task, send\""
+    },
+    {
+      "file": "src/features/product/screens/CreatorEconomyScreen.tsx",
+      "line": 80,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "Creators use Profile-OS + Marketplace. Monetization previews stay honest — no fake"
+    },
+    {
+      "file": "src/features/product/screens/CustomizationSurfacesScreens.tsx",
+      "line": 93,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Focusing · building · offline for deep work…\""
+    },
+    {
+      "file": "src/features/product/screens/CustomizationSurfacesScreens.tsx",
+      "line": 470,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Filter commands…\""
+    },
+    {
+      "file": "src/features/product/screens/DesignLabScreen.tsx",
+      "line": 82,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "checks: ['Show selected state', 'Avoid fake success', 'Keep counts and reactions calm'],"
+    },
+    {
+      "file": "src/features/product/screens/FeatureAtlasScreen.tsx",
+      "line": 139,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search atlas features, domains, tags...\""
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 564,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Ask about permissions, publish, templates…\""
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 730,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "<AppText variant=\"headline\">Live shell mock</AppText>"
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 732,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "Bolt-style Preview pane — local mock only."
+    },
+    {
+      "file": "src/features/product/screens/GaiaConsoleScreen.tsx",
+      "line": 186,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"e.g. Prepare my Board for tomorrow\""
+    },
+    {
+      "file": "src/features/product/screens/IntelligenceLayerScreen.tsx",
+      "line": 211,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "title: 'Retained patterns (local stub)',"
+    },
+    {
+      "file": "src/features/product/screens/KaizenScreen.tsx",
+      "line": 154,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"component id, e.g. product.start.launcher\""
+    },
+    {
+      "file": "src/features/product/screens/KaizenScreen.tsx",
+      "line": 171,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"What should improve?\""
+    },
+    {
+      "file": "src/features/product/screens/MergeFeedsScreen.tsx",
+      "line": 109,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Name this preset\""
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 47,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no mintable collection exists.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 52,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no creator edition can be minted.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 57,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no profile collectible ownership is live.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 62,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no team credential NFT exists.',"
+    },
+    {
+      "file": "src/features/product/screens/OwnershipPortabilityScreen.tsx",
+      "line": 67,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'No fake wallet or ledger in this build',"
+    },
+    {
+      "file": "src/features/product/screens/StartLauncherScreen.tsx",
+      "line": 146,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search commands, capabilities, modules...\""
+    },
+    {
+      "file": "src/features/product/screens/TeamsOsScreen.tsx",
+      "line": 93,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "state: 'Approval stub',"
+    },
+    {
+      "file": "src/features/product/screens/UniversalSearchScreen.tsx",
+      "line": 102,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people, posts, modules\""
+    },
+    {
+      "file": "src/features/profile/runtime/useProfile.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfile must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/runtime/useProfileActions.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfileActions must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/runtime/useProfileRegistry.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfileRegistry must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/screens/ProfileConnectionsScreen.tsx",
+      "line": 68,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search profiles\""
+    },
+    {
+      "file": "src/features/security/app-lock/UnlockPasswordScreen.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Password\""
+    },
+    {
+      "file": "src/features/security/app-lock/app-lock-context.tsx",
+      "line": 390,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useAppLock must be used within AppLockProvider')"
+    },
+    {
+      "file": "src/features/settings/screens/AccessibilityScreen.tsx",
+      "line": 133,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "footer=\"Captions and Live Speech are configured by the operating system; Modula does not show fake switches for them.\">"
+    },
+    {
+      "file": "src/features/settings/screens/AppearanceLabScreen.tsx",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Input sample\""
+    },
+    {
+      "file": "src/features/settings/screens/AppearanceScreen.tsx",
+      "line": 340,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder={resolved.accent.base}"
+    },
+    {
+      "file": "src/features/settings/screens/DeveloperSettingsScreen.tsx",
+      "line": 30,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "caption=\"Labs and builder foreshadow. Modules stay external — never hardcoded into the host.\""
+    },
+    {
+      "file": "src/features/settings/screens/DimonPlaceholderScreen.tsx",
+      "line": 49,
+      "marker": "Fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Fake balances',"
+    },
+    {
+      "file": "src/features/settings/screens/DimonPlaceholderScreen.tsx",
+      "line": 76,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "caption=\"DIMON is not active yet. Modula is preparing Greenfield account IDs, integrity, and capability namespaces so a future economic ledger can bind safely — without fake balances, wallets, or blockchain.\""
+    },
+    {
+      "file": "src/features/settings/screens/SettingsHomeScreen.tsx",
+      "line": 315,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search settings\""
+    },
+    {
+      "file": "src/features/social/posts/interactions/comments-surface.tsx",
+      "line": 231,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder={signedIn ? 'Write a comment…' : 'Sign in to comment'}"
+    },
+    {
+      "file": "src/features/social/posts/interactions/post-interaction-context.tsx",
+      "line": 67,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('usePostInteraction must be used within PostInteractionProvider')"
+    },
+    {
+      "file": "src/features/social/registerExpansionDestinations.ts",
+      "line": 6,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "* Preview-only entries are `devOnly` so production builds do not surface fake paths."
+    },
+    {
+      "file": "src/features/social/screens/SocialSurfaceScreens.tsx",
+      "line": 354,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search messages\""
+    },
+    {
+      "file": "src/features/social/screens/SocialSurfaceScreens.tsx",
+      "line": 1269,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Optional details\""
+    },
+    {
+      "file": "src/features/social/sheets/ShareToSheet.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people\""
+    }
+  ],
+  "productionReview": [
+    {
+      "file": "services/greenfield-api/src/ai/provider-runtime-service.ts",
+      "line": 1065,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "if (providerId === 'provider:development-mock') return [{scopeType: 'development'}, {scopeType: 'platform'}]"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/index.ts",
+      "line": 4,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "export * from './mock-provider.js'"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 19,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "modelId: 'greenfield.mock.deterministic',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 20,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "providerModelId: 'mock-deterministic-v1',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 21,
+      "marker": "Mock",
+      "classification": "implementation-word-review",
+      "excerpt": "displayName: 'Deterministic Mock Model',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 37,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "providerRequestId: `mock-response:${request.executionId}`,"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 47,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "providerMode: 'development-mock',"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 56,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "yield {type: 'execution.started', metadata: {providerMode: 'development-mock'}}"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 102,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "return `mock:${request.moduleId}:${stablePreview(lastUser)}${toolSuffix}`"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 122,
+      "marker": "Mock",
+      "classification": "implementation-word-review",
+      "excerpt": "throw new ProviderExecutionError(code as GreenfieldAIExecutionFailureCode, `Mock provider failure: ${code}`, code !== 'AI_PROVIDER_AUTH_FAILED')"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/mock-provider.ts",
+      "line": 148,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "return `mock:${seed}`"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/registry.ts",
+      "line": 3,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "import {MockGreenfieldAIProviderAdapter} from './mock-provider.js'"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/registry.ts",
+      "line": 32,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "registry.register(new MockGreenfieldAIProviderAdapter('provider:development-mock'))"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/resolver.ts",
+      "line": 55,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "if (provider.configurationMode === 'development-mock' && !input.allowDevelopmentMock) continue"
+    },
+    {
+      "file": "services/greenfield-api/src/ai/providers/resolver.ts",
+      "line": 112,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "provider.configurationMode === 'development-mock'"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 46,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple subject missing')"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 49,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple nonce mismatch')"
+    },
+    {
+      "file": "services/greenfield-api/src/auth/apple/service.ts",
+      "line": 53,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Apple audience mismatch')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 199,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "Buffer.from(JSON.stringify({did: input.did, placeholder: true})),"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 249,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!connection) throw new Error('Failed to load connection')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 347,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.publication',"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 348,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.profileExtension',"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 353,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "query = query.where('collection', 'like', 'digital.modula.temp.%')"
+    },
+    {
+      "file": "services/greenfield-api/src/bridges/atproto/service.ts",
+      "line": 360,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "origin: row.collection.startsWith('digital.modula.temp') ? 'modula+atproto' : 'atproto',"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 211,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Modula API configuration: ${message}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 239,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
+    },
+    {
+      "file": "services/greenfield-api/src/config/env.ts",
+      "line": 241,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "refuse('placeholder database credentials are not allowed')"
+    },
+    {
+      "file": "services/greenfield-api/src/database/types.ts",
+      "line": 172,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "export type GreenfieldAIProviderConfigurationMode = 'disabled' | 'platform-managed' | 'customer-managed' | 'local' | 'development-mock' | 'server-managed' | 'account-managed' | 'local-runtime' | 'future'"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/posts/writes.ts",
+      "line": 219,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!created) throw new Error('Failed to load created post')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 70,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed || typeof parsed !== 'object') throw new Error('bad cursor')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 71,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!parsed.sort || !SORTS.has(parsed.sort)) throw new Error('bad sort')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 73,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Number.isSafeInteger(parsed.offset) || parsed.offset < 0 || parsed.offset > 1_000_000) throw new Error('bad offset')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 76,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof parsed.updatedAt !== 'string' || Number.isNaN(Date.parse(parsed.updatedAt))) throw new Error('bad updatedAt')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof parsed.documentId !== 'string' || parsed.documentId.length < 1 || parsed.documentId.length > 240) throw new Error('bad documentId')"
+    },
+    {
+      "file": "services/greenfield-api/src/domains/search/query-parser.ts",
+      "line": 78,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (parsed.score !== undefined && (typeof parsed.score !== 'number' || !Number.isFinite(parsed.score))) throw new Error('bad score')"
+    },
+    {
+      "file": "services/greenfield-api/src/intelligence/action-boundary.ts",
+      "line": 82,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unsupported governed runtime action ${proposal.family}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/backend/gateway-service.ts",
+      "line": 161,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Module backend retry bounds exhausted')"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const placeholder = await this.db"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 238,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "if (!placeholder) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 239,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const manifest = (placeholder.manifest ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 240,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "const status = (manifest.state === 'planned' ? 'planned' : placeholder.catalogue_status) as GreenfieldRegistryModuleSummary['status']"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 245,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "name: placeholder.name,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 246,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: placeholder.description,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 247,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "publisher: {publisherId: 'modula', displayName: placeholder.publisher},"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 250,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "trust: placeholder.trust,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-service.ts",
+      "line": 254,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: manifest,"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/registry-trust-service.ts",
+      "line": 113,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/product-standard/record-projection.ts",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "...(typeof override?.placeholder === 'string' ? {placeholder: override.placeholder} : {}),"
+    },
+    {
+      "file": "services/greenfield-api/src/runtime/session-store.ts",
+      "line": 133,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/runtime/session-store.ts",
+      "line": 241,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Runtime session persistence rejected provider implementation reference: ${[...path, key].join('.')}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/secrets/client.ts",
+      "line": 56,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 22,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 34,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-api/src/security/crypto.ts",
+      "line": 37,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 13,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "* handler code) so tests can inject a mock without any network or real"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 34,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "/** Preview OAuth (preview=1) stores a placeholder session without real JWTs. */"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 35,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder?: boolean"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
+      "line": 56,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "* Never talks to a real PDS — records fake at:// URIs so the publication"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session-crypto.ts",
+      "line": 16,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encryption key must be 32 bytes for AES-256-GCM')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session-crypto.ts",
+      "line": 19,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 115,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "// Preview OAuth stores `{did, placeholder:true}` without JWTs. Use the stub"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 115,
+      "marker": "stub",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "// Preview OAuth stores `{did, placeholder:true}` without JWTs. Use the stub"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/session.ts",
+      "line": 117,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (session.placeholder === true && config.environment === 'preview') {"
+    },
+    {
+      "file": "services/greenfield-worker/src/bridges/atproto/validate-record.ts",
+      "line": 14,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "if (collection.startsWith('digital.modula.temp.') && !isModulaLexiconNsid(collection)) {"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 110,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Modula worker configuration: ${message}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 128,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "if (raw.MODULA_DATABASE_URL.includes('placeholder') || raw.MODULA_DATABASE_URL.includes('change-me')) {"
+    },
+    {
+      "file": "services/greenfield-worker/src/config.ts",
+      "line": 130,
+      "marker": "placeholder",
+      "classification": "configuration-safety-guard",
+      "excerpt": "refuse('placeholder database credentials are not allowed')"
+    },
+    {
+      "file": "services/greenfield-worker/src/functions/invoke.ts",
+      "line": 6,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "* Background function job runner. Deterministic preview helpers only — no fake AI."
+    },
+    {
+      "file": "services/greenfield-worker/src/mail/provisioner.ts",
+      "line": 419,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",
+      "line": 267,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (dependencies.includes(id)) throw new Error(`Standard 2 hook ordering cycle detected at ${id}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",
+      "line": 274,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (visiting.has(id)) throw new Error(`Standard 2 hook ordering cycle detected: ${[...path, id].join(' -> ')}`)"
+    },
+    {
+      "file": "packages/api-contracts/src/identifiers.ts",
+      "line": 15,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid ${label}`)"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 3,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Validates every lexicon JSON file under lexicons/digital/modula/temp/:"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 17,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "const lexiconsDir = path.join(root, 'lexicons', 'digital', 'modula', 'temp')"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 20,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.profileExtension',"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 21,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.moduleManifest',"
+    },
+    {
+      "file": "packages/atproto-lexicons/scripts/validate.mjs",
+      "line": 22,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "'digital.modula.temp.publication',"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/moduleManifest.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/moduleManifest.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/moduleManifest.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const MODULE_MANIFEST_NSID = 'digital.modula.temp.moduleManifest' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/profileExtension.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/profileExtension.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/profileExtension.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const PROFILE_EXTENSION_NSID = 'digital.modula.temp.profileExtension' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/publication.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "* Hand-written types mirroring lexicons/digital/modula/temp/publication.json."
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/publication.ts",
+      "line": 6,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "export const PUBLICATION_NSID = 'digital.modula.temp.publication' as const"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 2,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.profileExtension'"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 14,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.moduleManifest'"
+    },
+    {
+      "file": "packages/atproto-lexicons/src/generated/types.ts",
+      "line": 28,
+      "marker": "temp",
+      "classification": "feature-gated-experimental-protocol",
+      "excerpt": "$type: 'digital.modula.temp.publication'"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 173,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unregistered MDHS attribute path: ${path}`)"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 184,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Avatar confidence must be between 0 and 1 when present')"
+    },
+    {
+      "file": "packages/avatar-contracts/src/index.ts",
+      "line": 221,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid avatar URI: ${uri}`)"
+    },
+    {
+      "file": "packages/greenfield-connector-contracts/src/connection-state.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield connection transition: ${from} -> ${to}`)"
+    },
+    {
+      "file": "packages/greenfield-connector-contracts/src/connector-capability.ts",
+      "line": 46,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid connector capability: ${value}`)"
+    },
+    {
+      "file": "packages/greenfield-contracts/src/ai.ts",
+      "line": 23,
+      "marker": "mock",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "| 'development-mock'"
+    },
+    {
+      "file": "packages/greenfield-mcp/src/index.ts",
+      "line": 195,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "description: 'CRM foreshadow with automation nodes; not hardcoded in host.',"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/capability.ts",
+      "line": 11,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield runtime capability: ${String(value)}`)"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/engine-kind.ts",
+      "line": 26,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield engine kind: ${String(value)}`)"
+    },
+    {
+      "file": "packages/greenfield-module-engine-contracts/src/session.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid runtime session transition: ${from} -> ${to}`)"
+    },
+    {
+      "file": "packages/greenfield-module-manifest/src/compatibility.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!left || !right) throw new Error('Invalid semantic version')"
+    },
+    {
+      "file": "packages/greenfield-module-manifest/src/identity.ts",
+      "line": 37,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Module identifiers must be lowercase reverse-domain IDs without versions')"
+    },
+    {
+      "file": "packages/greenfield-module-registry-contracts/src/registry.ts",
+      "line": 25,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "| 'PLACEHOLDER'"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/define-module.ts",
+      "line": 14,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield module manifest: ${result.issues.map(issue => `${issue.path} ${issue.message}`).join('; ')}`)"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/define-module.ts",
+      "line": 32,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid Greenfield module manifest: ${result.issues.map(issue => `${issue.path} ${issue.message}`).join('; ')}`)"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/identifiers.ts",
+      "line": 6,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Contribution suffix must be lowercase dot-separated identifier parts')"
+    },
+    {
+      "file": "packages/greenfield-module-sdk/src/identifiers.ts",
+      "line": 13,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!/^[a-z0-9-]+$/.test(collection)) throw new Error('Collection suffix must be lowercase kebab identifier')"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder?: string"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 394,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "checkKnownKeys(field, path, ['fieldId', 'name', 'type', 'label', 'required', 'sensitive', 'secretRefRequired', 'options', 'referenceCollection', 'placeholder', 'helpText'], add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-module-ui-contracts/src/index.ts",
+      "line": 417,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "if (field.placeholder !== undefined) checkBoundedString(field.placeholder, `${path}.placeholder`, 0, 160, add)"
+    },
+    {
+      "file": "packages/greenfield-product-standard/src/kinds.ts",
+      "line": 59,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Unsupported product kind: ${kind}`)"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 20,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI requires accountId, collection, and recordId')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 23,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI segments must not contain \"/\"')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 30,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI must start with modula://')"
+    },
+    {
+      "file": "packages/greenfield-protocol/src/record-uri.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Greenfield record URI must be modula://<accountId>/<collection>/<recordId>')"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 10,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Invalid runtime provider ID: ${provider.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 13,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Runtime provider already registered: ${provider.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/provider-registry.ts",
+      "line": 36,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!current) throw new Error(`Runtime provider not found: ${providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 165,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!resolution) throw new Error('Runtime session has no resolution')"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 168,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!adapter) throw new Error(`Selected provider is no longer registered: ${selected.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 172,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!prepared.ready) throw new Error(`Runtime provider was not ready: ${selected.providerId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/runtime-manager.ts",
+      "line": 181,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/session-store.ts",
+      "line": 33,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (this.sessions.has(session.sessionId)) throw new Error(`Runtime session already exists: ${session.sessionId}`)"
+    },
+    {
+      "file": "packages/greenfield-runtime/src/session-store.ts",
+      "line": 52,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!session) throw new Error(`Runtime session not found: ${sessionId}`)"
+    },
+    {
+      "file": "packages/modula-cli/src/cli.ts",
+      "line": 132,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "description: 'CRM foreshadow with automation nodes; not hardcoded in host.',"
+    },
+    {
+      "file": "packages/modula-cli/src/cli.ts",
+      "line": 641,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "The Modula CLI does not start or fake an MCP process."
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 267,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!record) throw new Error('Local record not found')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 462,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const placeholder = (row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 462,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const placeholder = (row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 465,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "const manifest = (row.manifest ?? row.placeholder ?? {}) as Record<string, unknown>"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 485,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "sourceRepository: String(source.repository ?? placeholder.sourceRepository ?? manifest.sourceRepository ?? ''),"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 717,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "value === 'PLACEHOLDER' ||"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 834,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Product frontend response is invalid')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 844,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Verified product frontend projection is incoherent')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1049,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof row.placeholder === 'string' ? row.placeholder : undefined,"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1238,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (index < 0) throw new Error('Local record not found')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1240,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new Error('Local revision conflict')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiModuleRepository.ts",
+      "line": 1251,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new Error('Local revision conflict')"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 112,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Creates a DM follow-up stub from social context; no message is sent.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 151,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Queues a local approval stub for team drafts.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 181,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "description: 'Product cards require Commerce. There is no fake pricing checkout.',"
+    },
+    {
+      "file": "src/data/repositories/api/ApiToolsRepository.ts",
+      "line": 315,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Composer tools are unavailable.')"
+    },
+    {
+      "file": "src/data/repositories/contracts/ModuleRepository.ts",
+      "line": 52,
+      "marker": "PLACEHOLDER",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "| 'PLACEHOLDER'"
+    },
+    {
+      "file": "src/features/atproto/oauth/completeAtprotoOAuth.ts",
+      "line": 58,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('OAuth callback must not include tokens.')"
+    },
+    {
+      "file": "src/features/atproto/screens/AtprotoConnectionScreen.tsx",
+      "line": 289,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"handle.bsky.social\""
+    },
+    {
+      "file": "src/features/composer/screens/ComposerScreen.tsx",
+      "line": 754,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Add alt text — Preview\""
+    },
+    {
+      "file": "src/features/discover/screens/DiscoverScreen.tsx",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people, topics, and modules\""
+    },
+    {
+      "file": "src/features/feed/components/HomeSearchModal.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search Modula\""
+    },
+    {
+      "file": "src/features/feed/data/usePostQuery.ts",
+      "line": 16,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!postId) throw new Error('Post id required')"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 391,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'Commerce module preview. Settlements require DIMON later — no fake checkout.',"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 433,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'Inventory foreshadow only. Never required for professional use. No fake item balances.',"
+    },
+    {
+      "file": "src/features/marketplace/data/catalog.ts",
+      "line": 741,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Sponsor Slots is planned. It does not provide fake pricing, checkout, ad serving, or settlement.',"
+    },
+    {
+      "file": "src/features/marketplace/screens/ModuleDetailScreen.tsx",
+      "line": 120,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(nextPreview.incompatibilityReasons.join(', ') || 'This module is not compatible.')"
+    },
+    {
+      "file": "src/features/modules/components/ProductHubSearchChrome.tsx",
+      "line": 109,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search modules, tools and more…\""
+    },
+    {
+      "file": "src/features/modules/runtime/module-action-bar.tsx",
+      "line": 7,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "* Generic host action bar. Actions come from the view manifest — never hardcoded Notes verbs."
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 62,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 62,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 129,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? defaultPlaceholder(field.type)}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 129,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? defaultPlaceholder(field.type)}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 168,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? 'Choose a record'}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-field-renderer.tsx",
+      "line": 168,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder={field.placeholder ?? 'Choose a record'}"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 122,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!route) throw new Error('Module route action is missing required route parameters')"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 144,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!recordId) throw new Error('The record is not available to update.')"
+    },
+    {
+      "file": "src/features/modules/runtime/module-view-renderer.tsx",
+      "line": 229,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search\""
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/runtime/mps-frontend-adapter.ts",
+      "line": 209,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: typeof field.placeholder === 'string' ? field.placeholder : undefined,"
+    },
+    {
+      "file": "src/features/modules/screens/ModulePreScreen.tsx",
+      "line": 118,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "Host stays light. Modules ship as packages with permissions — not hardcoded shell features."
+    },
+    {
+      "file": "src/features/presence/components/PresenceStoriesRail.tsx",
+      "line": 55,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "// Honest empty state — never invent demo stories. Home injects an owner stub when signed in."
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 86,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "styles.placeholder,"
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Optional caption\""
+    },
+    {
+      "file": "src/features/presence/screens/StoryCreateScreen.tsx",
+      "line": 135,
+      "marker": "placeholder",
+      "classification": "contract-or-ui-placeholder-field",
+      "excerpt": "placeholder: {"
+    },
+    {
+      "file": "src/features/product/components/ProductPreScreen.tsx",
+      "line": 127,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "Honest preview — this surface explains direction. It does not fake live data, balances,"
+    },
+    {
+      "file": "src/features/product/data/boardWidgets.ts",
+      "line": 139,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'DIMON is not active yet, so this card shows reserved ledger language only and never fake token activity.',"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 248,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'module-catalogue', name: 'Module Catalogue', maturity: 'preview', summary: 'Marketplace lists module cards, status labels, and pre-screens without fake installs.', route: '/marketplace', tags: ['catalogue', 'modules', 'preview']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 380,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'anti-speculation-policy', name: 'Anti-Speculation Policy', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not fake balances, token prices, minting, or wallet activity.', route: '/settings/dimon', tags: ['policy"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 387,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'inventory-display-future', name: 'Inventory Display Future', maturity: 'planned', summary: 'Inventory display is a planned UI concept; it must not show fake balances or wallet assets.', tags: ['inventory', 'wallet', 'honesty']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 395,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{slug: 'monetization-stub', name: 'Monetization Stub', maturity: 'preview', summary: 'Monetization UI is framed as a stub and does not process billing or payouts.', route: '/creator/monetization', tags: ['monetization', 'billing', 'honesty'"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 491,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'newsletter-module', name: 'Newsletter Module', maturity: 'planned', summary: 'Newsletter publishing is planned as a module, not a hardcoded host runtime.', route: '/modules', tags: ['newsletter', 'module', 'publishing']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 514,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "{slug: 'inventory-status', name: 'Inventory Status', maturity: 'planned', summary: 'Inventory is planned UI only; it must not display fake balances, wallets, or mints.', tags: ['inventory', 'honesty', 'planned']},"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "Fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlas.ts",
+      "line": 542,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "{slug: 'no-fake-wallet-rule', name: 'No Fake Wallet Rule', maturity: 'inactive', summary: 'DIMON is not active yet; Modula must not show fake NFT balances, wallet addresses, mints, or trades.', route: '/settings/dimon', tags: ['wallet', 'ho"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 47,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['post-analytics-owner', 'Owner Post Analytics', 'Owner-only reach previews — no fake vanity metrics.', ['analytics', 'owner']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 56,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "['verification-badges', 'Verification Badges', 'Identity verification states without fake chain proofs.', ['identity', 'trust']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 59,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['module-shop-tab', 'Shop Tab Slot', 'Marketplace-backed shop tab — no fake checkout.', ['shop', 'marketplace']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 91,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['template-game', 'Template · Game Stub', 'Optional game module that cannot break pro OS.', ['template', 'games']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 103,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['refund-policy-stub', 'Refund Policy Stub', 'Settlement policies wait for DIMON activation.', ['dimon', 'billing']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 103,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['refund-policy-stub', 'Refund Policy Stub', 'Settlement policies wait for DIMON activation.', ['dimon', 'billing']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 174,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "['tools-drawer', 'Composer Tools Drawer', 'Registry-driven + menu — not hardcoded forever.', ['tools', 'composer']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 223,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "['creator-studio', 'Creator Studio', 'Insights and monetisation stubs — no fake revenue.', ['creator', 'studio']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 254,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "['day-agenda', 'Day Agenda Module', 'External calendar module — not host hardcoded.', ['calendar', 'modules']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 316,
+      "marker": "Stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "['royalty-policy', 'Royalty Policy Stub', 'DIMON is not active yet — royalties not live.', ['dimon', 'creator']],"
+    },
+    {
+      "file": "src/features/product/data/featureAtlasExpansion.ts",
+      "line": 444,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "['glass-privacy-chat-chrome', 'Glass Privacy Chat Chrome', 'Protected chat chrome studies make privacy level visible without fake security.', ['privacy', 'chrome']],"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 21,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "{id: 'preview', label: 'Preview', hint: 'Profile tab / Board / Settings mock'},"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 28,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Apple chrome-layer -> native-feeling controls frame the work without fake glass runtime.',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 339,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "id: 'game-stub',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 340,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "name: 'Game stub',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 342,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "description: 'Tiny game route with Board score card; runtime remains a preview stub.',"
+    },
+    {
+      "file": "src/features/product/data/forgeDraft.ts",
+      "line": 719,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "return 'Templates include Vault Notes, Tasks, CRM, Calendar, Files, Newsletter, Analytics, Health Agent, Game stub, Widget pack, Team inbox, Automations pack, Integrations Element, Presence pack, Theme pack, and Search extension. They only "
+    },
+    {
+      "file": "src/features/product/data/intelligenceLayers.ts",
+      "line": 239,
+      "marker": "Fake",
+      "classification": "implementation-word-review",
+      "excerpt": "mustNot: ['Execute untrusted GitHub code in host', 'Fake publish success'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 143,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "bullets: ['Module catalogue', 'Sellers', 'Pre-screens', 'No fake billing'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 206,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "body: 'Agents are modules — not hardcoded host features. Enable drafts locally; runtime stays Preview until Registry + sandbox land.',"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 506,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "bullets: ['Creator studio', 'Insights preview', 'Monetization stub', 'Communities'],"
+    },
+    {
+      "file": "src/features/product/data/productCatalogue.ts",
+      "line": 531,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "body: 'DIMON is Modula’s economic and ownership layer, not speculative theatre. It activates only after shell, social, and module standard are reliable. No fake balances.',"
+    },
+    {
+      "file": "src/features/product/screens/AutomationsStudioScreen.tsx",
+      "line": 118,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Flow title\""
+    },
+    {
+      "file": "src/features/product/screens/ChatAssistScreen.tsx",
+      "line": 44,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "{id: 'translate', label: 'Translate', detail: 'Language assist placeholder.'},"
+    },
+    {
+      "file": "src/features/product/screens/CommandsLayerScreen.tsx",
+      "line": 70,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search commands — e.g. focus, task, send\""
+    },
+    {
+      "file": "src/features/product/screens/CreatorEconomyScreen.tsx",
+      "line": 80,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "Creators use Profile-OS + Marketplace. Monetization previews stay honest — no fake"
+    },
+    {
+      "file": "src/features/product/screens/CustomizationSurfacesScreens.tsx",
+      "line": 93,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Focusing · building · offline for deep work…\""
+    },
+    {
+      "file": "src/features/product/screens/CustomizationSurfacesScreens.tsx",
+      "line": 470,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Filter commands…\""
+    },
+    {
+      "file": "src/features/product/screens/DesignLabScreen.tsx",
+      "line": 82,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "checks: ['Show selected state', 'Avoid fake success', 'Keep counts and reactions calm'],"
+    },
+    {
+      "file": "src/features/product/screens/FeatureAtlasScreen.tsx",
+      "line": 139,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search atlas features, domains, tags...\""
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 564,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Ask about permissions, publish, templates…\""
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 730,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "<AppText variant=\"headline\">Live shell mock</AppText>"
+    },
+    {
+      "file": "src/features/product/screens/ForgeStudioScreen.tsx",
+      "line": 732,
+      "marker": "mock",
+      "classification": "implementation-word-review",
+      "excerpt": "Bolt-style Preview pane — local mock only."
+    },
+    {
+      "file": "src/features/product/screens/GaiaConsoleScreen.tsx",
+      "line": 186,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"e.g. Prepare my Board for tomorrow\""
+    },
+    {
+      "file": "src/features/product/screens/IntelligenceLayerScreen.tsx",
+      "line": 211,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "title: 'Retained patterns (local stub)',"
+    },
+    {
+      "file": "src/features/product/screens/KaizenScreen.tsx",
+      "line": 154,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"component id, e.g. product.start.launcher\""
+    },
+    {
+      "file": "src/features/product/screens/KaizenScreen.tsx",
+      "line": 171,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"What should improve?\""
+    },
+    {
+      "file": "src/features/product/screens/MergeFeedsScreen.tsx",
+      "line": 109,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Name this preset\""
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 47,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no mintable collection exists.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 52,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no creator edition can be minted.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 57,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no profile collectible ownership is live.',"
+    },
+    {
+      "file": "src/features/product/screens/NftStudioScreen.tsx",
+      "line": 62,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "status: 'Reserved preview stub - no team credential NFT exists.',"
+    },
+    {
+      "file": "src/features/product/screens/OwnershipPortabilityScreen.tsx",
+      "line": 67,
+      "marker": "fake",
+      "classification": "development-adapter-or-comment",
+      "excerpt": "'No fake wallet or ledger in this build',"
+    },
+    {
+      "file": "src/features/product/screens/StartLauncherScreen.tsx",
+      "line": 146,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search commands, capabilities, modules...\""
+    },
+    {
+      "file": "src/features/product/screens/TeamsOsScreen.tsx",
+      "line": 93,
+      "marker": "stub",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "state: 'Approval stub',"
+    },
+    {
+      "file": "src/features/product/screens/UniversalSearchScreen.tsx",
+      "line": 102,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people, posts, modules\""
+    },
+    {
+      "file": "src/features/profile/runtime/useProfile.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfile must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/runtime/useProfileActions.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfileActions must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/runtime/useProfileRegistry.ts",
+      "line": 8,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useProfileRegistry must be used within ProfilePresentationProvider')"
+    },
+    {
+      "file": "src/features/profile/screens/ProfileConnectionsScreen.tsx",
+      "line": 68,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search profiles\""
+    },
+    {
+      "file": "src/features/security/app-lock/UnlockPasswordScreen.tsx",
+      "line": 96,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Password\""
+    },
+    {
+      "file": "src/features/security/app-lock/app-lock-context.tsx",
+      "line": 390,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('useAppLock must be used within AppLockProvider')"
+    },
+    {
+      "file": "src/features/settings/screens/AccessibilityScreen.tsx",
+      "line": 133,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "footer=\"Captions and Live Speech are configured by the operating system; Modula does not show fake switches for them.\">"
+    },
+    {
+      "file": "src/features/settings/screens/AppearanceLabScreen.tsx",
+      "line": 232,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Input sample\""
+    },
+    {
+      "file": "src/features/settings/screens/AppearanceScreen.tsx",
+      "line": 340,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder={resolved.accent.base}"
+    },
+    {
+      "file": "src/features/settings/screens/DeveloperSettingsScreen.tsx",
+      "line": 30,
+      "marker": "hardcoded",
+      "classification": "implementation-word-review",
+      "excerpt": "caption=\"Labs and builder foreshadow. Modules stay external — never hardcoded into the host.\""
+    },
+    {
+      "file": "src/features/settings/screens/DimonPlaceholderScreen.tsx",
+      "line": 49,
+      "marker": "Fake",
+      "classification": "implementation-word-review",
+      "excerpt": "'Fake balances',"
+    },
+    {
+      "file": "src/features/settings/screens/DimonPlaceholderScreen.tsx",
+      "line": 76,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "caption=\"DIMON is not active yet. Modula is preparing Greenfield account IDs, integrity, and capability namespaces so a future economic ledger can bind safely — without fake balances, wallets, or blockchain.\""
+    },
+    {
+      "file": "src/features/settings/screens/SettingsHomeScreen.tsx",
+      "line": 315,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search settings\""
+    },
+    {
+      "file": "src/features/social/posts/interactions/comments-surface.tsx",
+      "line": 231,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder={signedIn ? 'Write a comment…' : 'Sign in to comment'}"
+    },
+    {
+      "file": "src/features/social/posts/interactions/post-interaction-context.tsx",
+      "line": 67,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('usePostInteraction must be used within PostInteractionProvider')"
+    },
+    {
+      "file": "src/features/social/registerExpansionDestinations.ts",
+      "line": 6,
+      "marker": "fake",
+      "classification": "implementation-word-review",
+      "excerpt": "* Preview-only entries are `devOnly` so production builds do not surface fake paths."
+    },
+    {
+      "file": "src/features/social/screens/SocialSurfaceScreens.tsx",
+      "line": 354,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search messages\""
+    },
+    {
+      "file": "src/features/social/screens/SocialSurfaceScreens.tsx",
+      "line": 1269,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Optional details\""
+    },
+    {
+      "file": "src/features/social/sheets/ShareToSheet.tsx",
+      "line": 90,
+      "marker": "placeholder",
+      "classification": "possible-runtime-placeholder",
+      "excerpt": "placeholder=\"Search people\""
+    }
+  ]
+}

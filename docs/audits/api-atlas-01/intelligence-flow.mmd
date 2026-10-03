@@ -1,0 +1,18 @@
+flowchart LR
+  client[Authenticated client] --> mission[Mission API]
+  mission --> gaia[Deterministic GAIA planner]
+  gaia --> proposal[Plan and proposed actions]
+  proposal --> aki[AKI schema capability permission evidence risk policy checks]
+  aki -->|ALLOW read only| governor[Governor]
+  aki -->|ALLOW WITH CONDITIONS| governor
+  aki -->|REQUIRE APPROVAL| approval[Human approval]
+  aki -->|DENY| blocked[Blocked]
+  aki -->|ABSTAIN| human[Human required]
+  approval --> governor
+  governor --> command[Command layer revalidation and claim]
+  command --> boundary[GreenField action boundary]
+  boundary --> vault[Current Vault record query or create]
+  vault --> database[(PostgreSQL)]
+  command --> ledger[(Governed append-only ledger)]
+  blocked --> ledger
+  human --> ledger

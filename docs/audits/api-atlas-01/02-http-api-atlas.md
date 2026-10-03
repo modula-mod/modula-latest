@@ -1,14 +1,14 @@
 # Complete HTTP API Atlas
 
-Captured: 2026-10-02T10:38:28.839Z
+Captured: 2026-10-03T10:02:55.876Z
 
-- Runtime method routes: 528
-- Application routes: 380
-- Automatically generated HEAD routes: 147
+- Runtime method routes: 535
+- Application routes: 384
+- Automatically generated HEAD routes: 150
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `528 = 380 application + 148 framework-derived`
+- Reconciliation: `535 = 384 application + 151 framework-derived`
 
 Every runtime method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -16,47 +16,55 @@ Every runtime method route is either represented below or explicitly listed as f
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | yes | reachable or feature-gated | 380 |
+| yes | yes | yes | reachable or feature-gated | 384 |
 | yes | no | no | source-only | 0 |
 | no | yes | yes | dynamically registered / investigate | 0 |
-| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 148 |
+| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 151 |
+
+## Error contract
+
+The canonical envelope is `{ok,data,meta:{requestId,serverTime}}` or `{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta}` (`services/greenfield-api/src/transport/envelope.ts:9`). Status mapping is 400 for validation/schema/abstention, 401 for authentication/session/step-up, 403 for authorization/policy denial, 404 for unknown resources, 409 for conflicts/approval state, 429 for explicit rate-limit codes and 500 by default. Fastify-generated 413 body-limit and 415 content-parser errors can bypass this envelope because no global custom error handler exists. No canonical 422 mapping was found. Binary media, OAuth redirects and SSE are deliberate specialized responses.
+
+## Pagination contract
+
+Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque cursor, stable route-specific ordering, `nextCursor`, and no previous cursor (`services/greenfield-api/src/transport/pagination.ts:1`). Every route's machine record includes `request.pagination`; `none observed` exposes unpaginated or non-list handlers rather than inventing a contract. Discover/activity unbounded behavior is a registered gap.
 
 ## Endpoint index
 
 | Domain | Method | Effective route | Access | Rate | Source | Runtime status |
 | --- | --- | --- | --- | --- | --- | --- |
-| AT Protocol | GET | `/oauth/atproto/native-client-metadata.json` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:305` | reachable |
-| AT Protocol | GET | `/oauth/atproto/web-client-metadata.json` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:301` | reachable |
+| AT Protocol | GET | `/oauth/atproto/native-client-metadata.json` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:306` | reachable |
+| AT Protocol | GET | `/oauth/atproto/web-client-metadata.json` | PUBLIC | none | `services/greenfield-api/src/app/register-routes.ts:302` | reachable |
 | Account | POST | `/v1/account/data-exports` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/account-data/routes.ts:38` | reachable |
 | Account | GET | `/v1/account/data-requests/:requestId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/account-data/routes.ts:46` | reachable |
 | Account | POST | `/v1/account/data-requests/:requestId/advance` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/account-data/routes.ts:48` | reachable |
 | Account | GET | `/v1/account/data-requests/:requestId/artifacts` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/account-data/routes.ts:47` | reachable |
 | Account | POST | `/v1/account/data-requests/:requestId/cancel` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/account-data/routes.ts:52` | reachable |
 | Account | POST | `/v1/account/deletion-requests` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/account-data/routes.ts:42` | reachable |
-| Authentication | GET | `/v1/accounts/:accountId/handle-history` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:576` | reachable |
-| Authentication | POST | `/v1/accounts/forgot-password` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:465` | reachable |
-| Authentication | GET | `/v1/accounts/handles/:handle/availability` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:481` | reachable |
-| Authentication | GET | `/v1/accounts/mail-local-parts/:localPart/availability` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:485` | reachable |
-| Authentication | GET | `/v1/accounts/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:493` | reachable |
-| Authentication | PATCH | `/v1/accounts/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:539` | reachable |
+| Authentication | GET | `/v1/accounts/:accountId/handle-history` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:577` | reachable |
+| Authentication | POST | `/v1/accounts/forgot-password` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:466` | reachable |
+| Authentication | GET | `/v1/accounts/handles/:handle/availability` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:482` | reachable |
+| Authentication | GET | `/v1/accounts/mail-local-parts/:localPart/availability` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:486` | reachable |
+| Authentication | GET | `/v1/accounts/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:494` | reachable |
+| Authentication | PATCH | `/v1/accounts/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:540` | reachable |
 | Authentication | GET | `/v1/accounts/me/appearance` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:237` | reachable |
 | Authentication | PATCH | `/v1/accounts/me/appearance` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:242` | reachable |
-| Authentication | POST | `/v1/accounts/me/handle` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:548` | reachable |
-| Authentication | GET | `/v1/accounts/me/modula-mail` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:498` | reachable |
-| Authentication | POST | `/v1/accounts/me/modula-mail/forwarding` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:513` | reachable |
-| Authentication | POST | `/v1/accounts/me/modula-mail/provision` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:503` | reachable |
-| Authentication | GET | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1949` | reachable |
-| Authentication | PATCH | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1959` | reachable |
-| Authentication | POST | `/v1/accounts/me/password` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:559` | reachable |
-| Authentication | DELETE | `/v1/accounts/me/sessions` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:590` | reachable |
-| Authentication | GET | `/v1/accounts/me/sessions` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:585` | reachable |
+| Authentication | POST | `/v1/accounts/me/handle` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:549` | reachable |
+| Authentication | GET | `/v1/accounts/me/modula-mail` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:499` | reachable |
+| Authentication | POST | `/v1/accounts/me/modula-mail/forwarding` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:514` | reachable |
+| Authentication | POST | `/v1/accounts/me/modula-mail/provision` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:504` | reachable |
+| Authentication | GET | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1950` | reachable |
+| Authentication | PATCH | `/v1/accounts/me/notification-preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1960` | reachable |
+| Authentication | POST | `/v1/accounts/me/password` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:560` | reachable |
+| Authentication | DELETE | `/v1/accounts/me/sessions` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:591` | reachable |
+| Authentication | GET | `/v1/accounts/me/sessions` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:586` | reachable |
 | Authentication | POST | `/v1/accounts/recovery/complete` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:263` | reachable |
 | Authentication | POST | `/v1/accounts/recovery/request` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:255` | reachable |
-| Authentication | POST | `/v1/accounts/register` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:414` | reachable |
-| Authentication | POST | `/v1/accounts/resend-verification` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:450` | reachable |
-| Authentication | POST | `/v1/accounts/reset-password` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:472` | reachable |
-| Authentication | POST | `/v1/accounts/verify-email` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:436` | reachable |
-| Activity | GET | `/v1/activity` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2097` | reachable |
+| Authentication | POST | `/v1/accounts/register` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:415` | reachable |
+| Authentication | POST | `/v1/accounts/resend-verification` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:451` | reachable |
+| Authentication | POST | `/v1/accounts/reset-password` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:473` | reachable |
+| Authentication | POST | `/v1/accounts/verify-email` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:437` | reachable |
+| Activity | GET | `/v1/activity` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2098` | reachable |
 | Admin | POST | `/v1/admin/ai/models` | ADMIN | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:235` | reachable |
 | Admin | POST | `/v1/admin/ai/prompts` | ADMIN | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:239` | reachable |
 | Admin | POST | `/v1/admin/ai/providers` | ADMIN | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:231` | reachable |
@@ -68,10 +76,10 @@ Every runtime method route is either represented below or explicitly listed as f
 | Admin | PUT | `/v1/admin/developer/build-services/:serviceId` | ADMIN | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:47` | reachable |
 | Admin | POST | `/v1/admin/developer/namespaces/:namespace/verify` | ADMIN | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:46` | reachable |
 | Admin | PATCH | `/v1/admin/developer/programme/:accountId` | ADMIN | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:45` | reachable |
-| Admin | GET | `/v1/admin/moderation/reports` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1853` | reachable |
-| Admin | GET | `/v1/admin/moderation/reports/:reportId` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1871` | reachable |
-| Admin | PATCH | `/v1/admin/moderation/reports/:reportId` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1882` | reachable |
-| Admin | POST | `/v1/admin/moderation/reports/:reportId/actions` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1900` | reachable |
+| Admin | GET | `/v1/admin/moderation/reports` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1854` | reachable |
+| Admin | GET | `/v1/admin/moderation/reports/:reportId` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1872` | reachable |
+| Admin | PATCH | `/v1/admin/moderation/reports/:reportId` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1883` | reachable |
+| Admin | POST | `/v1/admin/moderation/reports/:reportId/actions` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1901` | reachable |
 | Admin | GET | `/v1/admin/ops/ai/executions` | ADMIN | 120/1 minute | `services/greenfield-api/src/ai/routes.ts:282` | reachable |
 | Admin | GET | `/v1/admin/ops/ai/providers` | ADMIN | 120/1 minute | `services/greenfield-api/src/ai/routes.ts:247` | reachable |
 | Admin | POST | `/v1/admin/ops/ai/providers/:providerId/credentials` | ADMIN | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:271` | reachable |
@@ -80,26 +88,26 @@ Every runtime method route is either represented below or explicitly listed as f
 | Admin | GET | `/v1/admin/ops/ai/providers/:providerId/health` | ADMIN | 120/1 minute | `services/greenfield-api/src/ai/routes.ts:251` | reachable |
 | Admin | POST | `/v1/admin/ops/ai/providers/:providerId/verify` | ADMIN | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:255` | reachable |
 | Admin | GET | `/v1/admin/ops/ai/usage` | ADMIN | 120/1 minute | `services/greenfield-api/src/ai/routes.ts:286` | reachable |
-| Admin | POST | `/v1/admin/ops/atproto/connections/:connectionId/revoke` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2260` | reachable |
-| Admin | POST | `/v1/admin/ops/atproto/ingest` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2252` | reachable |
-| Admin | POST | `/v1/admin/ops/atproto/lexicons/:collection/disable` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2538` | reachable |
-| Admin | POST | `/v1/admin/ops/atproto/publish` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2244` | reachable |
-| Admin | GET | `/v1/admin/ops/engines` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2382` | reachable |
-| Admin | GET | `/v1/admin/ops/engines/:engineId` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2392` | reachable |
-| Admin | POST | `/v1/admin/ops/events/dead-letters/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2505` | reachable |
-| Admin | POST | `/v1/admin/ops/events/replay` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2480` | reachable |
-| Admin | POST | `/v1/admin/ops/events/replay/:replayId/cancel` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2525` | reachable |
-| Admin | GET | `/v1/admin/ops/events/subscriber-failures` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2361` | reachable |
-| Admin | POST | `/v1/admin/ops/mail/identities/adopt` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2286` | reachable |
-| Admin | GET | `/v1/admin/ops/mail/summary` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2280` | reachable |
-| Admin | POST | `/v1/admin/ops/policy/evaluate` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2450` | reachable |
-| Admin | POST | `/v1/admin/ops/queue/dead-letters/:deadLetterId/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2315` | reachable |
-| Admin | POST | `/v1/admin/ops/queue/drain` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2272` | reachable |
-| Admin | GET | `/v1/admin/ops/search/failures` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2415` | reachable |
-| Admin | POST | `/v1/admin/ops/search/failures/:failureId/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2437` | reachable |
-| Admin | GET | `/v1/admin/ops/search/health` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2372` | reachable |
-| Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2405` | reachable |
-| Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2425` | reachable |
+| Admin | POST | `/v1/admin/ops/atproto/connections/:connectionId/revoke` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2261` | reachable |
+| Admin | POST | `/v1/admin/ops/atproto/ingest` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2253` | reachable |
+| Admin | POST | `/v1/admin/ops/atproto/lexicons/:collection/disable` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2539` | reachable |
+| Admin | POST | `/v1/admin/ops/atproto/publish` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2245` | reachable |
+| Admin | GET | `/v1/admin/ops/engines` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2383` | reachable |
+| Admin | GET | `/v1/admin/ops/engines/:engineId` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2393` | reachable |
+| Admin | POST | `/v1/admin/ops/events/dead-letters/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2506` | reachable |
+| Admin | POST | `/v1/admin/ops/events/replay` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2481` | reachable |
+| Admin | POST | `/v1/admin/ops/events/replay/:replayId/cancel` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2526` | reachable |
+| Admin | GET | `/v1/admin/ops/events/subscriber-failures` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2362` | reachable |
+| Admin | POST | `/v1/admin/ops/mail/identities/adopt` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2287` | reachable |
+| Admin | GET | `/v1/admin/ops/mail/summary` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2281` | reachable |
+| Admin | POST | `/v1/admin/ops/policy/evaluate` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2451` | reachable |
+| Admin | POST | `/v1/admin/ops/queue/dead-letters/:deadLetterId/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2316` | reachable |
+| Admin | POST | `/v1/admin/ops/queue/drain` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2273` | reachable |
+| Admin | GET | `/v1/admin/ops/search/failures` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2416` | reachable |
+| Admin | POST | `/v1/admin/ops/search/failures/:failureId/retry` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2438` | reachable |
+| Admin | GET | `/v1/admin/ops/search/health` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2373` | reachable |
+| Admin | GET | `/v1/admin/ops/search/projections` | ADMIN | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2406` | reachable |
+| Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2426` | reachable |
 | Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:165` | reachable |
 | Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:958` | reachable |
 | Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:1021` | reachable |
@@ -122,34 +130,34 @@ Every runtime method route is either represented below or explicitly listed as f
 | Intelligence | POST | `/v1/ai/streams/:streamId/cancel` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:186` | reachable |
 | Intelligence | POST | `/v1/ai/streams/:streamId/reconnect` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:198` | reachable |
 | Intelligence | POST | `/v1/ai/tools/:toolId/validate` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:209` | reachable |
-| AT Protocol | GET | `/v1/atproto/connections` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2107` | registered-feature-disabled |
-| AT Protocol | POST | `/v1/atproto/connections/:connectionId/disconnect` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2172` | registered-feature-disabled |
-| AT Protocol | POST | `/v1/atproto/connections/:connectionId/refresh` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2184` | registered-feature-disabled |
-| AT Protocol | GET | `/v1/atproto/connections/:connectionId/status` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2196` | registered-feature-disabled |
-| AT Protocol | GET | `/v1/atproto/feed` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2219` | registered-feature-disabled |
-| AT Protocol | GET | `/v1/atproto/oauth/callback` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2139` | registered-feature-disabled |
-| AT Protocol | POST | `/v1/atproto/oauth/start` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2114` | registered-feature-disabled |
-| AT Protocol | GET | `/v1/atproto/preferences` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2205` | registered-feature-disabled |
-| AT Protocol | PATCH | `/v1/atproto/preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2212` | registered-feature-disabled |
+| AT Protocol | GET | `/v1/atproto/connections` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2108` | registered-feature-disabled |
+| AT Protocol | POST | `/v1/atproto/connections/:connectionId/disconnect` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2173` | registered-feature-disabled |
+| AT Protocol | POST | `/v1/atproto/connections/:connectionId/refresh` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2185` | registered-feature-disabled |
+| AT Protocol | GET | `/v1/atproto/connections/:connectionId/status` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2197` | registered-feature-disabled |
+| AT Protocol | GET | `/v1/atproto/feed` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2220` | registered-feature-disabled |
+| AT Protocol | GET | `/v1/atproto/oauth/callback` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2140` | registered-feature-disabled |
+| AT Protocol | POST | `/v1/atproto/oauth/start` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2115` | registered-feature-disabled |
+| AT Protocol | GET | `/v1/atproto/preferences` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2206` | registered-feature-disabled |
+| AT Protocol | PATCH | `/v1/atproto/preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2213` | registered-feature-disabled |
 | Media | DELETE | `/v1/attachments/:attachmentId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-attachment-routes.ts:76` | reachable |
 | Media | GET | `/v1/attachments/:attachmentId` | AUTHENTICATED | 60/1 minute | `services/greenfield-api/src/app/register-attachment-routes.ts:65` | reachable |
 | Media | GET | `/v1/attachments/:attachmentId/content` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-attachment-routes.ts:89` | reachable |
 | Media | POST | `/v1/attachments/uploads` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-attachment-routes.ts:34` | reachable |
 | Media | PUT | `/v1/attachments/uploads/:uploadId/content` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-attachment-routes.ts:47` | reachable |
-| Authentication | POST | `/v1/auth/apple/link` | AUTHENTICATED | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:703` | reachable |
-| Authentication | POST | `/v1/auth/apple/link/options` | AUTHENTICATED | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:693` | reachable |
-| Authentication | GET | `/v1/auth/apple/status` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:690` | reachable |
-| Authentication | GET | `/v1/auth/passkeys` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:684` | reachable |
-| Authentication | DELETE | `/v1/auth/passkeys/:passkeyId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:769` | reachable |
-| Authentication | POST | `/v1/auth/passkeys/registration/options` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:726` | reachable |
-| Authentication | POST | `/v1/auth/passkeys/registration/verify` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:741` | reachable |
-| Authentication | POST | `/v1/auth/preview/session` | PUBLIC | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:309` | reachable |
-| Authentication | GET | `/v1/auth/recovery-codes` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:790` | reachable |
-| Authentication | POST | `/v1/auth/recovery-codes/regenerate` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:795` | reachable |
-| Authentication | POST | `/v1/auth/step-up/totp` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:664` | reachable |
-| Authentication | POST | `/v1/auth/totp/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:639` | reachable |
-| Authentication | POST | `/v1/auth/totp/enroll` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:598` | reachable |
-| Authentication | POST | `/v1/auth/totp/verify` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:613` | reachable |
+| Authentication | POST | `/v1/auth/apple/link` | AUTHENTICATED | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:704` | reachable |
+| Authentication | POST | `/v1/auth/apple/link/options` | AUTHENTICATED | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:694` | reachable |
+| Authentication | GET | `/v1/auth/apple/status` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:691` | reachable |
+| Authentication | GET | `/v1/auth/passkeys` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:685` | reachable |
+| Authentication | DELETE | `/v1/auth/passkeys/:passkeyId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:770` | reachable |
+| Authentication | POST | `/v1/auth/passkeys/registration/options` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:727` | reachable |
+| Authentication | POST | `/v1/auth/passkeys/registration/verify` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:742` | reachable |
+| Authentication | POST | `/v1/auth/preview/session` | PUBLIC | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:310` | reachable |
+| Authentication | GET | `/v1/auth/recovery-codes` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:791` | reachable |
+| Authentication | POST | `/v1/auth/recovery-codes/regenerate` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:796` | reachable |
+| Authentication | POST | `/v1/auth/step-up/totp` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:665` | reachable |
+| Authentication | POST | `/v1/auth/totp/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:640` | reachable |
+| Authentication | POST | `/v1/auth/totp/enroll` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:599` | reachable |
+| Authentication | POST | `/v1/auth/totp/verify` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:614` | reachable |
 | Module Runtime | GET | `/v1/backend/products/:productId/accounts/:accountId` | SERVICE/WORKER | 240/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:81` | registered-feature-disabled |
 | Module Runtime | GET | `/v1/backend/products/:productId/accounts/:accountId/entitlements` | SERVICE/WORKER | 240/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:320` | registered-feature-disabled |
 | Module Runtime | POST | `/v1/backend/products/:productId/capabilities/check` | SERVICE/WORKER | 240/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:115` | registered-feature-disabled |
@@ -179,8 +187,8 @@ Every runtime method route is either represented below or explicitly listed as f
 | Module Runtime | POST | `/v1/backend/products/:productId/resources/:resourceId/schemas` | SERVICE/WORKER | 120/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:219` | registered-feature-disabled |
 | Module Runtime | POST | `/v1/backend/products/:productId/secrets/lease` | SERVICE/WORKER | 120/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:352` | registered-feature-disabled |
 | Module Runtime | POST | `/v1/backend/products/:productId/usage` | SERVICE/WORKER | 120/1 minute | `services/greenfield-api/src/backend-fabric/routes.ts:341` | registered-feature-disabled |
-| Platform | GET | `/v1/board/layout` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1041` | reachable |
-| Platform | PATCH | `/v1/board/layout` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1051` | reachable |
+| Account | GET | `/v1/board/layout` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1042` | reachable |
+| Account | PATCH | `/v1/board/layout` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1052` | reachable |
 | Comments | DELETE | `/v1/comments/:commentId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:172` | reachable |
 | Comments | PATCH | `/v1/comments/:commentId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:154` | reachable |
 | Comments | DELETE | `/v1/comments/:commentId/reaction` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:197` | reachable |
@@ -190,15 +198,15 @@ Every runtime method route is either represented below or explicitly listed as f
 | Commerce | GET | `/v1/commerce/billing-adapters` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/entitlements/routes.ts:32` | reachable |
 | Commerce | GET | `/v1/commerce/entitlements` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/entitlements/routes.ts:30` | reachable |
 | Commerce | POST | `/v1/commerce/entitlements/check` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/entitlements/routes.ts:31` | reachable |
-| Connectors | GET | `/v1/connections` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1305` | reachable |
-| Connectors | DELETE | `/v1/connections/:connectionId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1389` | reachable |
-| Connectors | GET | `/v1/connections/:connectionId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1314` | reachable |
-| Connectors | POST | `/v1/connections/:connectionId/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1332` | reachable |
-| Connectors | POST | `/v1/connections/:connectionId/enable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1323` | reachable |
-| Connectors | POST | `/v1/connections/:connectionId/refresh` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1341` | reachable |
-| Connectors | GET | `/v1/connectors` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1258` | reachable |
-| Connectors | GET | `/v1/connectors/:providerId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1261` | reachable |
-| Connectors | POST | `/v1/connectors/:providerId/authorise` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1266` | reachable |
+| Connectors | GET | `/v1/connections` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1306` | reachable |
+| Connectors | DELETE | `/v1/connections/:connectionId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1390` | reachable |
+| Connectors | GET | `/v1/connections/:connectionId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1315` | reachable |
+| Connectors | POST | `/v1/connections/:connectionId/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1333` | reachable |
+| Connectors | POST | `/v1/connections/:connectionId/enable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1324` | reachable |
+| Connectors | POST | `/v1/connections/:connectionId/refresh` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1342` | reachable |
+| Connectors | GET | `/v1/connectors` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1259` | reachable |
+| Connectors | GET | `/v1/connectors/:providerId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1262` | reachable |
+| Connectors | POST | `/v1/connectors/:providerId/authorise` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1267` | reachable |
 | Developer | POST | `/v1/developer/agreements/:agreementId/:version/accept` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:43` | reachable |
 | Developer | GET | `/v1/developer/board` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/developers/routes.ts:36` | reachable |
 | Developer | POST | `/v1/developer/organisations` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:38` | reachable |
@@ -217,32 +225,32 @@ Every runtime method route is either represented below or explicitly listed as f
 | Developer | POST | `/v1/developer/programme/enrol` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:44` | reachable |
 | Developer | POST | `/v1/developer/publishers` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:41` | reachable |
 | Developer | POST | `/v1/developer/publishers/:publisherId/namespaces` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:42` | reachable |
-| Discover | GET | `/v1/discover` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2092` | reachable |
-| Platform | GET | `/v1/extensions` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1171` | reachable |
-| Platform | GET | `/v1/extensions/:extensionId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1179` | reachable |
-| Platform | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:294` | reachable |
-| Platform | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:284` | reachable |
-| Platform | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:274` | reachable |
-| Platform | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1203` | reachable |
-| Platform | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1191` | reachable |
-| Platform | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1213` | reachable |
-| Platform | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:318` | reachable |
-| Platform | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:328` | reachable |
-| Platform | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:394` | reachable |
-| Platform | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:340` | reachable |
-| Platform | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:431` | reachable |
-| Platform | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:411` | reachable |
-| Platform | GET | `/v1/extensions/catalogue` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1174` | reachable |
-| Platform | GET | `/v1/extensions/installed` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1186` | reachable |
-| Feed | GET | `/v1/feed/home` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1437` | reachable |
-| Feed | GET | `/v1/feed/profile/:profileId` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1468` | reachable |
-| Platform | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:311` | reachable |
-| Platform | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:321` | reachable |
-| Platform | GET | `/v1/functions` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1239` | reachable |
-| Platform | POST | `/v1/functions/:functionId/invoke` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1243` | reachable |
-| Platform | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:333` | reachable |
-| Operations | GET | `/v1/health/live` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:232` | reachable |
-| Operations | GET | `/v1/health/ready` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:236` | reachable |
+| Discover | GET | `/v1/discover` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2093` | reachable |
+| Modules | GET | `/v1/extensions` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1172` | reachable |
+| Modules | GET | `/v1/extensions/:extensionId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1180` | reachable |
+| Modules | PATCH | `/v1/extensions/:extensionId/configuration` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:294` | reachable |
+| Modules | POST | `/v1/extensions/:extensionId/disable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:284` | reachable |
+| Modules | POST | `/v1/extensions/:extensionId/enable` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:274` | reachable |
+| Modules | DELETE | `/v1/extensions/:extensionId/install` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1204` | reachable |
+| Modules | POST | `/v1/extensions/:extensionId/install` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1192` | reachable |
+| Modules | PATCH | `/v1/extensions/:extensionId/preferences` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1214` | reachable |
+| Modules | GET | `/v1/extensions/:extensionProductId/capabilities` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:318` | reachable |
+| Modules | POST | `/v1/extensions/:extensionProductId/capabilities/review` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:328` | reachable |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/fail` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:394` | reachable |
+| Modules | POST | `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:340` | reachable |
+| Modules | GET | `/v1/extensions/:extensionProductId/inspector` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:431` | reachable |
+| Modules | POST | `/v1/extensions/:extensionProductId/jobs` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:411` | reachable |
+| Modules | GET | `/v1/extensions/catalogue` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1175` | reachable |
+| Modules | GET | `/v1/extensions/installed` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1187` | reachable |
+| Feed | GET | `/v1/feed/home` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1438` | reachable |
+| Feed | GET | `/v1/feed/profile/:profileId` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1469` | reachable |
+| Modules | GET | `/v1/function-jobs/:jobId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:311` | reachable |
+| Modules | POST | `/v1/function-jobs/:jobId/cancel` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:321` | reachable |
+| Modules | GET | `/v1/functions` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1240` | reachable |
+| Modules | POST | `/v1/functions/:functionId/invoke` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1244` | reachable |
+| Modules | POST | `/v1/functions/:functionId/jobs` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:333` | reachable |
+| Operations | GET | `/v1/health/live` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:233` | reachable |
+| Operations | GET | `/v1/health/ready` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:237` | reachable |
 | Intelligence | GET | `/v1/intelligence/missions` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/intelligence/routes.ts:22` | reachable |
 | Intelligence | POST | `/v1/intelligence/missions` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/intelligence/routes.ts:13` | reachable |
 | Intelligence | GET | `/v1/intelligence/missions/:missionId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/intelligence/routes.ts:28` | reachable |
@@ -256,12 +264,12 @@ Every runtime method route is either represented below or explicitly listed as f
 | Intelligence | POST | `/v1/intelligence/missions/:missionId/start` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/intelligence/routes.ts:35` | reachable |
 | Internal | POST | `/v1/internal/build-service/builds/:buildId/result` | INTERNAL (nginx-reachable; handler/service guard applies) | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:72` | reachable |
 | Internal | POST | `/v1/internal/build-service/claims` | INTERNAL (nginx-reachable; handler/service guard applies) | 30/1 minute | `services/greenfield-api/src/developers/routes.ts:71` | reachable |
-| Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2573` | registered-but-production-hidden |
-| Media | GET | `/v1/media/:mediaFile` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2065` | reachable |
+| Internal | GET | `/v1/internal/ssrf-check` | INTERNAL (nginx-reachable; handler/service guard applies) | none | `services/greenfield-api/src/app/register-routes.ts:2574` | registered-but-production-hidden |
+| Media | GET | `/v1/media/:mediaFile` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2066` | reachable |
 | Media | GET | `/v1/media/stories/:mediaFile` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:133` | reachable |
-| Operations | GET | `/v1/meta` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:248` | reachable |
-| Platform | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:303` | reachable |
-| Modules | GET | `/v1/modules` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1408` | reachable |
+| Operations | GET | `/v1/meta` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:249` | reachable |
+| Modules | GET | `/v1/module-host/:targetProductId/composition` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:303` | reachable |
+| Modules | GET | `/v1/modules` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1409` | reachable |
 | Modules | POST | `/v1/modules/:moduleId/actions/:actionId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:854` | reachable |
 | Modules | POST | `/v1/modules/:moduleId/ai/actions/:actionId/executions` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:62` | reachable |
 | Modules | POST | `/v1/modules/:moduleId/ai/executions/:executionId/apply` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/ai/routes.ts:78` | reachable |
@@ -308,48 +316,48 @@ Every runtime method route is either represented below or explicitly listed as f
 | Modules | GET | `/v1/modules/contributions` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:740` | reachable |
 | Modules | GET | `/v1/modules/installed` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:289` | reachable |
 | Modules | GET | `/v1/modules/installed/:moduleId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:295` | reachable |
-| Activity | GET | `/v1/notifications` | AUTHENTICATED | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1918` | reachable |
-| Activity | POST | `/v1/notifications/:notificationId/read` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1933` | reachable |
-| Activity | POST | `/v1/notifications/read-all` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1942` | reachable |
-| Platform | GET | `/v1/plugins` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1255` | reachable |
-| Posts | POST | `/v1/posts` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1497` | reachable |
-| Posts | DELETE | `/v1/posts/:postId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1533` | reachable |
-| Posts | GET | `/v1/posts/:postId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1490` | reachable |
-| Posts | PATCH | `/v1/posts/:postId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1516` | reachable |
-| Posts | GET | `/v1/posts/:postId/comments` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:108` | reachable |
-| Posts | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:117` | reachable |
-| Posts | DELETE | `/v1/posts/:postId/like` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | POST | `/v1/posts/:postId/like` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:211` | reachable |
-| Posts | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:85` | reachable |
-| Posts | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:72` | reachable |
-| Posts | GET | `/v1/posts/:postId/reactions` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:96` | reachable |
-| Posts | DELETE | `/v1/posts/:postId/repost` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | POST | `/v1/posts/:postId/repost` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | POST | `/v1/posts/:postId/save` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1557` | reachable |
-| Posts | POST | `/v1/posts/:postId/share` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1594` | reachable |
-| Platform | GET | `/v1/product-standard/products/:productId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:141` | reachable |
-| Platform | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:153` | reachable |
-| Profile | GET | `/v1/profiles/:handle` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1613` | reachable |
-| Profile | GET | `/v1/profiles/:handle/followers` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1637` | reachable |
-| Profile | GET | `/v1/profiles/:handle/following` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1653` | reachable |
-| Profile | GET | `/v1/profiles/:handle/posts` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1621` | reachable |
-| Profile | DELETE | `/v1/profiles/:profileId/block` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1784` | reachable |
-| Profile | POST | `/v1/profiles/:profileId/block` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1769` | reachable |
-| Profile | DELETE | `/v1/profiles/:profileId/follow` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1689` | reachable |
-| Profile | POST | `/v1/profiles/:profileId/follow` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1669` | reachable |
-| Profile | DELETE | `/v1/profiles/:profileId/mute` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1814` | reachable |
-| Profile | POST | `/v1/profiles/:profileId/mute` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1799` | reachable |
-| Profile | PATCH | `/v1/profiles/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1709` | reachable |
-| Profile | DELETE | `/v1/profiles/me/avatar` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1754` | reachable |
-| Profile | POST | `/v1/profiles/me/avatar` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1737` | reachable |
-| Profile | DELETE | `/v1/profiles/me/cover` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1754` | reachable |
-| Profile | POST | `/v1/profiles/me/cover` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1737` | reachable |
-| Platform | GET | `/v1/providers/:capabilityRole` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/providers/routes.ts:28` | reachable |
-| Platform | PUT | `/v1/providers/:capabilityRole/default` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/providers/routes.ts:32` | reachable |
-| Platform | GET | `/v1/providers/:capabilityRole/resolve` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/providers/routes.ts:30` | reachable |
-| Feed | GET | `/v1/reels` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2102` | reachable |
+| Activity | GET | `/v1/notifications` | AUTHENTICATED | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1919` | reachable |
+| Activity | POST | `/v1/notifications/:notificationId/read` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1934` | reachable |
+| Activity | POST | `/v1/notifications/read-all` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1943` | reachable |
+| Modules | GET | `/v1/plugins` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1256` | reachable |
+| Posts | POST | `/v1/posts` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1498` | reachable |
+| Posts | DELETE | `/v1/posts/:postId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1534` | reachable |
+| Posts | GET | `/v1/posts/:postId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1491` | reachable |
+| Posts | PATCH | `/v1/posts/:postId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1517` | reachable |
+| Comments | GET | `/v1/posts/:postId/comments` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:108` | reachable |
+| Comments | POST | `/v1/posts/:postId/comments` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:117` | reachable |
+| Reactions | DELETE | `/v1/posts/:postId/like` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Reactions | POST | `/v1/posts/:postId/like` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Sharing | POST | `/v1/posts/:postId/quote` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:211` | reachable |
+| Reactions | DELETE | `/v1/posts/:postId/reaction` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:85` | reachable |
+| Reactions | PUT | `/v1/posts/:postId/reaction` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:72` | reachable |
+| Reactions | GET | `/v1/posts/:postId/reactions` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:96` | reachable |
+| Sharing | DELETE | `/v1/posts/:postId/repost` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Sharing | POST | `/v1/posts/:postId/repost` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Posts | DELETE | `/v1/posts/:postId/save` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Posts | POST | `/v1/posts/:postId/save` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1558` | reachable |
+| Sharing | POST | `/v1/posts/:postId/share` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1595` | reachable |
+| Modules | GET | `/v1/product-standard/products/:productId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:141` | reachable |
+| Modules | GET | `/v1/product-standard/products/:productId/versions/:version` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:153` | reachable |
+| Profile | GET | `/v1/profiles/:handle` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1614` | reachable |
+| Social | GET | `/v1/profiles/:handle/followers` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1638` | reachable |
+| Social | GET | `/v1/profiles/:handle/following` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1654` | reachable |
+| Profile | GET | `/v1/profiles/:handle/posts` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1622` | reachable |
+| Social | DELETE | `/v1/profiles/:profileId/block` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1785` | reachable |
+| Social | POST | `/v1/profiles/:profileId/block` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1770` | reachable |
+| Social | DELETE | `/v1/profiles/:profileId/follow` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1690` | reachable |
+| Social | POST | `/v1/profiles/:profileId/follow` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1670` | reachable |
+| Social | DELETE | `/v1/profiles/:profileId/mute` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1815` | reachable |
+| Social | POST | `/v1/profiles/:profileId/mute` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1800` | reachable |
+| Profile | PATCH | `/v1/profiles/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1710` | reachable |
+| Profile | DELETE | `/v1/profiles/me/avatar` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1755` | reachable |
+| Profile | POST | `/v1/profiles/me/avatar` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1738` | reachable |
+| Profile | DELETE | `/v1/profiles/me/cover` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1755` | reachable |
+| Profile | POST | `/v1/profiles/me/cover` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1738` | reachable |
+| Modules | GET | `/v1/providers/:capabilityRole` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/providers/routes.ts:28` | reachable |
+| Modules | PUT | `/v1/providers/:capabilityRole/default` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/providers/routes.ts:32` | reachable |
+| Modules | GET | `/v1/providers/:capabilityRole/resolve` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/providers/routes.ts:30` | reachable |
+| Feed | GET | `/v1/reels` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:2103` | reachable |
 | Modules | GET | `/v1/registry/modules` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:96` | reachable |
 | Modules | GET | `/v1/registry/modules/:moduleId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:114` | reachable |
 | Modules | PUT | `/v1/registry/modules/:moduleId/rating` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/modules/routes/index.ts:270` | reachable |
@@ -357,54 +365,58 @@ Every runtime method route is either represented below or explicitly listed as f
 | Modules | GET | `/v1/registry/modules/:moduleId/versions/:version` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:209` | reachable |
 | Modules | GET | `/v1/registry/products` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:105` | reachable |
 | Modules | GET | `/v1/registry/products/:productId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:123` | reachable |
-| Modules | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:132` | reachable |
+| Social | GET | `/v1/registry/products/:productId/relationships` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:132` | reachable |
 | Modules | GET | `/v1/registry/publishers/:publisherId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:282` | reachable |
 | Modules | GET | `/v1/registry/publishers/:publisherId/signing-keys` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:219` | reachable |
 | Modules | GET | `/v1/registry/releases/:releaseId/artifact` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:229` | reachable |
 | Modules | GET | `/v1/registry/releases/:releaseId/assets/:assetId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/modules/routes/index.ts:248` | reachable |
-| Moderation | POST | `/v1/reports` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1829` | reachable |
-| Moderation | GET | `/v1/reports/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1842` | reachable |
-| Platform | GET | `/v1/repositories/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1062` | reachable |
-| Platform | POST | `/v1/repositories/me/exports` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1151` | reachable |
-| Platform | GET | `/v1/repositories/me/exports/:exportId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1160` | reachable |
-| Platform | GET | `/v1/repositories/me/records` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1071` | reachable |
-| Platform | POST | `/v1/repositories/me/records` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1085` | reachable |
-| Platform | DELETE | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1128` | reachable |
-| Platform | GET | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1077` | reachable |
-| Platform | PATCH | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1104` | reachable |
-| Platform | GET | `/v1/saves` | AUTHENTICATED | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:225` | reachable |
-| Search | GET | `/v1/search` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1975` | reachable |
-| Search | DELETE | `/v1/search/recent` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2012` | reachable |
-| Search | GET | `/v1/search/recent` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1992` | reachable |
-| Search | POST | `/v1/search/recent` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2002` | reachable |
-| Search | GET | `/v1/search/saved` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2023` | reachable |
-| Search | POST | `/v1/search/saved` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2033` | reachable |
-| Search | DELETE | `/v1/search/saved/:savedSearchId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2054` | reachable |
-| Search | PATCH | `/v1/search/saved/:savedSearchId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2043` | reachable |
-| Search | GET | `/v1/search/suggestions` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1984` | reachable |
-| Authentication | POST | `/v1/sessions` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:811` | reachable |
-| Authentication | DELETE | `/v1/sessions/:sessionId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1033` | reachable |
-| Authentication | POST | `/v1/sessions/apple` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:972` | reachable |
-| Authentication | POST | `/v1/sessions/apple/options` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:960` | reachable |
-| Authentication | DELETE | `/v1/sessions/current` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1027` | reachable |
-| Authentication | POST | `/v1/sessions/email-code` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:848` | reachable |
-| Authentication | POST | `/v1/sessions/email-code/request` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:833` | reachable |
-| Authentication | DELETE | `/v1/sessions/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1430` | reachable |
-| Authentication | GET | `/v1/sessions/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1424` | reachable |
-| Authentication | POST | `/v1/sessions/passkey` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:919` | reachable |
-| Authentication | POST | `/v1/sessions/passkey/options` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:904` | reachable |
-| Authentication | POST | `/v1/sessions/recovery-code` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:876` | reachable |
-| Authentication | POST | `/v1/sessions/refresh` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:1008` | reachable |
+| Moderation | POST | `/v1/reports` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1830` | reachable |
+| Moderation | GET | `/v1/reports/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1843` | reachable |
+| Account | GET | `/v1/repositories/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1063` | reachable |
+| Account | POST | `/v1/repositories/me/exports` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1152` | reachable |
+| Account | GET | `/v1/repositories/me/exports/:exportId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1161` | reachable |
+| Account | GET | `/v1/repositories/me/records` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1072` | reachable |
+| Account | POST | `/v1/repositories/me/records` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1086` | reachable |
+| Account | DELETE | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1129` | reachable |
+| Account | GET | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1078` | reachable |
+| Account | PATCH | `/v1/repositories/me/records/:recordId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1105` | reachable |
+| Posts | GET | `/v1/saves` | AUTHENTICATED | 60/1 minute | `services/greenfield-api/src/app/register-phase6s-routes.ts:225` | reachable |
+| Search | GET | `/v1/search` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1976` | reachable |
+| Search | DELETE | `/v1/search/recent` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2013` | reachable |
+| Search | GET | `/v1/search/recent` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1993` | reachable |
+| Search | POST | `/v1/search/recent` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2003` | reachable |
+| Search | GET | `/v1/search/saved` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:2024` | reachable |
+| Search | POST | `/v1/search/saved` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2034` | reachable |
+| Search | DELETE | `/v1/search/saved/:savedSearchId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2055` | reachable |
+| Search | PATCH | `/v1/search/saved/:savedSearchId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:2044` | reachable |
+| Search | GET | `/v1/search/suggestions` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-routes.ts:1985` | reachable |
+| Authentication | POST | `/v1/sessions` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:812` | reachable |
+| Authentication | DELETE | `/v1/sessions/:sessionId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1034` | reachable |
+| Authentication | POST | `/v1/sessions/apple` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:973` | reachable |
+| Authentication | POST | `/v1/sessions/apple/options` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:961` | reachable |
+| Authentication | DELETE | `/v1/sessions/current` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1028` | reachable |
+| Authentication | POST | `/v1/sessions/email-code` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:849` | reachable |
+| Authentication | POST | `/v1/sessions/email-code/request` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:834` | reachable |
+| Authentication | DELETE | `/v1/sessions/me` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-routes.ts:1431` | reachable |
+| Authentication | GET | `/v1/sessions/me` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1425` | reachable |
+| Authentication | POST | `/v1/sessions/passkey` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:920` | reachable |
+| Authentication | POST | `/v1/sessions/passkey/options` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:905` | reachable |
+| Authentication | POST | `/v1/sessions/recovery-code` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:877` | reachable |
+| Authentication | POST | `/v1/sessions/refresh` | PUBLIC | 10/1 minute | `services/greenfield-api/src/app/register-routes.ts:1009` | reachable |
+| Operations | GET | `/v1/status` | PUBLIC | 120/1 minute | `services/greenfield-api/src/support/routes.ts:20` | reachable |
 | Media | POST | `/v1/stories` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:79` | reachable |
 | Media | GET | `/v1/stories/:groupId` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:67` | reachable |
 | Media | DELETE | `/v1/stories/items/:itemId` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:121` | reachable |
 | Media | POST | `/v1/stories/items/:itemId/viewed` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:109` | reachable |
 | Media | GET | `/v1/stories/rail` | PUBLIC | 60/1 minute | `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:61` | reachable |
-| Platform | GET | `/v1/tools` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1225` | reachable |
-| Platform | GET | `/v1/tools/:toolId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1229` | reachable |
-| Operations | GET | `/v1/version` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:228` | reachable |
-| Platform | GET | `/v1/widgets` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1405` | reachable |
-| Operations | GET | `/version.json` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:224` | reachable |
+| Support | GET | `/v1/support/cases` | AUTHENTICATED | 120/1 minute | `services/greenfield-api/src/support/routes.ts:53` | reachable |
+| Support | POST | `/v1/support/cases` | AUTHENTICATED | 30/1 minute | `services/greenfield-api/src/support/routes.ts:54` | reachable |
+| Support | GET | `/v1/support/contact` | PUBLIC | 120/1 minute | `services/greenfield-api/src/support/routes.ts:29` | reachable |
+| Modules | GET | `/v1/tools` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1226` | reachable |
+| Modules | GET | `/v1/tools/:toolId` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1230` | reachable |
+| Operations | GET | `/v1/version` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:229` | reachable |
+| Modules | GET | `/v1/widgets` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:1406` | reachable |
+| Operations | GET | `/version.json` | PUBLIC | 120/1 minute | `services/greenfield-api/src/app/register-routes.ts:225` | reachable |
 
 ## Endpoint records
 
@@ -416,7 +428,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/oauth/atproto/native-client-metadata.json`
 - Public URL: `https://api.modula.digital/oauth/atproto/native-client-metadata.json`
 - API version: versionless
-- Source file: `services/greenfield-api/src/app/register-routes.ts:305`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:306`
 - Handler: inline
 - Controller/service calls: `atproto.nativeClientMetadata`
 - Authentication: none
@@ -428,6 +440,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
@@ -454,7 +467,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/oauth/atproto/web-client-metadata.json`
 - Public URL: `https://api.modula.digital/oauth/atproto/web-client-metadata.json`
 - API version: versionless
-- Source file: `services/greenfield-api/src/app/register-routes.ts:301`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:302`
 - Handler: inline
 - Controller/service calls: `atproto.webClientMetadata`
 - Authentication: none
@@ -466,6 +479,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
@@ -495,7 +509,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:38`
 - Handler: inline
 - Controller/service calls: `service.requestExport`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -504,6 +518,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -533,7 +548,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:46`
 - Handler: inline
 - Controller/service calls: `service.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -542,6 +557,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -571,7 +587,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:48`
 - Handler: inline
 - Controller/service calls: `service.advance`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -580,6 +596,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -609,7 +626,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:47`
 - Handler: inline
 - Controller/service calls: `service.artifacts`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -618,6 +635,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -647,7 +665,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:52`
 - Handler: inline
 - Controller/service calls: `service.cancel`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -656,6 +674,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -685,7 +704,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/account-data/routes.ts:42`
 - Handler: inline
 - Controller/service calls: `service.requestDeletion`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -694,6 +713,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -720,10 +740,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/:accountId/handle-history`
 - Public URL: `https://api.modula.digital/v1/accounts/:accountId/handle-history`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:576`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:577`
 - Handler: inline
 - Controller/service calls: `accounts.handleHistory`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -732,6 +752,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{accountId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -758,7 +779,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/forgot-password`
 - Public URL: `https://api.modula.digital/v1/accounts/forgot-password`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:465`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:466`
 - Handler: inline
 - Controller/service calls: `recovery.requestRecovery`
 - Authentication: none
@@ -770,6 +791,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any).email ?? '', {correlationId: request.id}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -796,7 +818,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/handles/:handle/availability`
 - Public URL: `https://api.modula.digital/v1/accounts/handles/:handle/availability`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:481`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:482`
 - Handler: inline
 - Controller/service calls: `accounts.handleAvailability`
 - Authentication: none
@@ -808,6 +830,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{handle: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -834,7 +857,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/mail-local-parts/:localPart/availability`
 - Public URL: `https://api.modula.digital/v1/accounts/mail-local-parts/:localPart/availability`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:485`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:486`
 - Handler: inline
 - Controller/service calls: `mailIdentities.availability`
 - Authentication: none
@@ -846,6 +869,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{localPart: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -872,10 +896,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me`
 - Public URL: `https://api.modula.digital/v1/accounts/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:493`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:494`
 - Handler: inline
 - Controller/service calls: `accounts.getMe`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -884,6 +908,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -896,7 +921,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/api/local/routes/appearanceRoutes.ts`, `src/api/local/routes/authRoutes.ts`, `src/api/local/routes/notificationRoutes.ts`, `src/data/repositories/api/ApiActivityRepository.ts`, `src/data/repositories/api/ApiAppearanceRepository.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/features/settings/screens/ModulaMailSettingsScreen.tsx`
 - Tests: `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase6s-social-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-product-complete.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7c-social-core.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (401)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -910,10 +935,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me`
 - Public URL: `https://api.modula.digital/v1/accounts/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:539`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:540`
 - Handler: inline
 - Controller/service calls: `accounts.patchMe`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -922,6 +947,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -951,7 +977,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:237`
 - Handler: inline
 - Controller/service calls: `appearance.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -960,6 +986,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -989,7 +1016,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:242`
 - Handler: inline
 - Controller/service calls: `appearance.patch`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -998,6 +1025,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1024,10 +1052,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/handle`
 - Public URL: `https://api.modula.digital/v1/accounts/me/handle`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:548`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:549`
 - Handler: inline
 - Controller/service calls: `accounts.changeHandle`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1036,6 +1064,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any).handle ?? ''), request.id),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1062,10 +1091,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/modula-mail`
 - Public URL: `https://api.modula.digital/v1/accounts/me/modula-mail`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:498`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:499`
 - Handler: inline
 - Controller/service calls: `mailIdentities.getForAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1074,6 +1103,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -1100,10 +1130,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/modula-mail/forwarding`
 - Public URL: `https://api.modula.digital/v1/accounts/me/modula-mail/forwarding`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:513`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:514`
 - Handler: inline
 - Controller/service calls: `mail.queueMailForwardingChanged`, `mailIdentities.updateForwarding`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1112,6 +1142,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {enabled?: boolean`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1138,10 +1169,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/modula-mail/provision`
 - Public URL: `https://api.modula.digital/v1/accounts/me/modula-mail/provision`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:503`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:504`
 - Handler: inline
 - Controller/service calls: `db.transaction`, `mailIdentities.queueProvisioningForVerifiedAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1150,6 +1181,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1176,10 +1208,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/notification-preferences`
 - Public URL: `https://api.modula.digital/v1/accounts/me/notification-preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1949`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1950`
 - Handler: inline
 - Controller/service calls: `notificationPreferences.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1188,6 +1220,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -1214,10 +1247,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/notification-preferences`
 - Public URL: `https://api.modula.digital/v1/accounts/me/notification-preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1959`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1960`
 - Handler: inline
 - Controller/service calls: `notificationPreferences.patch`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1226,6 +1259,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1252,10 +1286,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/password`
 - Public URL: `https://api.modula.digital/v1/accounts/me/password`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:559`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:560`
 - Handler: inline
 - Controller/service calls: `accounts.changePassword`, `greenfieldSessions.revokeOtherSessions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1264,6 +1298,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {currentPassword?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1290,10 +1325,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/sessions`
 - Public URL: `https://api.modula.digital/v1/accounts/me/sessions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:590`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:591`
 - Handler: inline
 - Controller/service calls: `greenfieldSessions.revokeAllForAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1302,6 +1337,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -1328,10 +1364,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/me/sessions`
 - Public URL: `https://api.modula.digital/v1/accounts/me/sessions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:585`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:586`
 - Handler: inline
 - Controller/service calls: `greenfieldSessions.listSessions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -1340,6 +1376,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -1378,6 +1415,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{token?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1416,6 +1454,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any)?.email ?? '')`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1442,7 +1481,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/register`
 - Public URL: `https://api.modula.digital/v1/accounts/register`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:414`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:415`
 - Handler: inline
 - Controller/service calls: `accounts.register`
 - Authentication: none
@@ -1454,6 +1493,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1466,7 +1506,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/api/local/routes/authRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`
 - Tests: `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase6-greenfield-frontend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7e-real-auth.mjs`, `services/greenfield-api/tests/greenfield-backend-v1.provider-fabric.test.ts`, `services/greenfield-api/tests/greenfield-product-frontend-v1.runtime.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/helpers/registry-fixtures.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7b.module-runtime.test.ts`, `services/greenfield-api/tests/phase7e.module-runtime-2.test.ts`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/pvp-platform-2.extension-fabric.test.ts`, `services/greenfield-api/tests/pvp-platform-2.reference-products.test.ts`, `tests/phase7l-b-auth-regression.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (400)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -1480,7 +1520,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/resend-verification`
 - Public URL: `https://api.modula.digital/v1/accounts/resend-verification`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:450`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:451`
 - Handler: inline
 - Controller/service calls: `accounts.resendVerification`
 - Authentication: none
@@ -1492,6 +1532,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any).email ?? '', {`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1518,7 +1559,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/reset-password`
 - Public URL: `https://api.modula.digital/v1/accounts/reset-password`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:472`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:473`
 - Handler: inline
 - Controller/service calls: `recovery.completeRecovery`
 - Authentication: none
@@ -1530,6 +1571,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {token?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1556,7 +1598,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/accounts/verify-email`
 - Public URL: `https://api.modula.digital/v1/accounts/verify-email`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:436`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:437`
 - Handler: inline
 - Controller/service calls: `accounts.verifyEmail`, `accounts.verifyEmailCode`
 - Authentication: none
@@ -1568,6 +1610,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -1594,7 +1637,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/activity`
 - Public URL: `https://api.modula.digital/v1/activity`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2097`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2098`
 - Handler: inline
 - Controller/service calls: `discovery.listActivity`
 - Authentication: none
@@ -1606,6 +1649,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -1637,13 +1681,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `repository.upsertModel`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -1675,13 +1720,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `repository.registerPrompt`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -1713,13 +1759,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `repository.upsertProvider`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -1751,13 +1798,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `tools.declareTool`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -1787,15 +1835,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:34`
 - Handler: inline
 - Controller/service calls: `service.grant`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -1825,15 +1874,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:35`
 - Handler: inline
 - Controller/service calls: `service.transition`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -1863,15 +1913,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:33`
 - Handler: inline
 - Controller/service calls: `service.upsertOffer`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -1901,15 +1952,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:36`
 - Handler: inline
 - Controller/service calls: `service.upsertQuota`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -1939,15 +1991,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:47`
 - Handler: inline
 - Controller/service calls: `developers.registerBuildService`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -1977,15 +2030,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:46`
 - Handler: inline
 - Controller/service calls: `developers.verifyNamespace`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2015,15 +2069,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:45`
 - Handler: inline
 - Controller/service calls: `developers.setProgrammeState`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2050,18 +2105,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/moderation/reports`
 - Public URL: `https://api.modula.digital/v1/admin/moderation/reports`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1853`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1854`
 - Handler: inline
 - Controller/service calls: `moderation.listReports`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2088,18 +2144,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/moderation/reports/:reportId`
 - Public URL: `https://api.modula.digital/v1/admin/moderation/reports/:reportId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1871`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1872`
 - Handler: inline
 - Controller/service calls: `moderation.getReport`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 120 per 1 minute
 - Request params: `{reportId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2126,18 +2183,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/moderation/reports/:reportId`
 - Public URL: `https://api.modula.digital/v1/admin/moderation/reports/:reportId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1882`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1883`
 - Handler: inline
 - Controller/service calls: `moderation.reviewReport`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: `{reportId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2164,18 +2222,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/moderation/reports/:reportId/actions`
 - Public URL: `https://api.modula.digital/v1/admin/moderation/reports/:reportId/actions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1900`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1901`
 - Handler: inline
 - Controller/service calls: `moderation.applyAction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: `{reportId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2207,13 +2266,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.diagnostics`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -2245,13 +2305,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `repository.listProviders`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -2283,13 +2344,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `credentials.store`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{providerId: string}).providerId,`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -2321,13 +2383,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.setProviderEnabled`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{providerId: string}).providerId, enabled: false, requestId: request.id}),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -2359,13 +2422,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.setProviderEnabled`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{providerId: string}).providerId, enabled: true, requestId: request.id}),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -2397,13 +2461,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.verifyProvider`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: `{providerId: string}).providerId, {scopeType: 'platform'}),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -2435,13 +2500,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.verifyProvider`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{providerId: string}).providerId, {`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -2473,13 +2539,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `providerRuntime.diagnostics`
 - Authentication: none
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -2506,18 +2573,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/atproto/connections/:connectionId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/ops/atproto/connections/:connectionId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2260`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2261`
 - Handler: inline
 - Controller/service calls: `atproto.adminRevokeConnection`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: `{connectionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2544,18 +2612,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/atproto/ingest`
 - Public URL: `https://api.modula.digital/v1/admin/ops/atproto/ingest`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2252`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2253`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `{paused?: boolean}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2582,18 +2651,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/atproto/lexicons/:collection/disable`
 - Public URL: `https://api.modula.digital/v1/admin/ops/atproto/lexicons/:collection/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2538`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2539`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: `{collection: string}`
 - Request query: none observed
 - Request body: `{disabled?: boolean}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2620,18 +2690,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/atproto/publish`
 - Public URL: `https://api.modula.digital/v1/admin/ops/atproto/publish`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2244`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2245`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `{enabled?: boolean}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2658,18 +2729,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/engines`
 - Public URL: `https://api.modula.digital/v1/admin/ops/engines`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2382`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2383`
 - Handler: inline
 - Controller/service calls: `engines.list`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2696,18 +2768,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/engines/:engineId`
 - Public URL: `https://api.modula.digital/v1/admin/ops/engines/:engineId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2392`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2393`
 - Handler: inline
 - Controller/service calls: `engines.get`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: `{engineId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2734,18 +2807,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/events/dead-letters/retry`
 - Public URL: `https://api.modula.digital/v1/admin/ops/events/dead-letters/retry`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2505`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2506`
 - Handler: inline
 - Controller/service calls: `eventReplays.retryDeadLetters`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2772,18 +2846,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/events/replay`
 - Public URL: `https://api.modula.digital/v1/admin/ops/events/replay`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2480`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2481`
 - Handler: inline
 - Controller/service calls: `eventReplays.replay`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2810,18 +2885,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/events/replay/:replayId/cancel`
 - Public URL: `https://api.modula.digital/v1/admin/ops/events/replay/:replayId/cancel`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2525`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2526`
 - Handler: inline
 - Controller/service calls: `eventReplays.cancelReplay`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: `{replayId: string}`
 - Request query: none observed
 - Request body: `{reason?: string}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2848,18 +2924,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/events/subscriber-failures`
 - Public URL: `https://api.modula.digital/v1/admin/ops/events/subscriber-failures`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2361`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2362`
 - Handler: inline
 - Controller/service calls: `eventReplays.inspectSubscriberFailures`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: `{subscriberId?: string}`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2886,18 +2963,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/mail/identities/adopt`
 - Public URL: `https://api.modula.digital/v1/admin/ops/mail/identities/adopt`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2286`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2287`
 - Handler: inline
 - Controller/service calls: `mailIdentities.adopt`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -2924,18 +3002,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/mail/summary`
 - Public URL: `https://api.modula.digital/v1/admin/ops/mail/summary`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2280`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2281`
 - Handler: inline
 - Controller/service calls: `mail.summary`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -2962,18 +3041,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/policy/evaluate`
 - Public URL: `https://api.modula.digital/v1/admin/ops/policy/evaluate`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2450`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2451`
 - Handler: inline
 - Controller/service calls: `policies.evaluateAndAudit`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: workspace identifier observed; downstream enforcement requires service evidence
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `Record<string, unknown>) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3000,18 +3080,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/queue/dead-letters/:deadLetterId/retry`
 - Public URL: `https://api.modula.digital/v1/admin/ops/queue/dead-letters/:deadLetterId/retry`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2315`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2316`
 - Handler: inline
 - Controller/service calls: `db.transaction`, `now.getTime`, `trx.updateTable`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: `{deadLetterId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3038,18 +3119,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/queue/drain`
 - Public URL: `https://api.modula.digital/v1/admin/ops/queue/drain`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2272`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2273`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:moderation`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `{drained?: boolean}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3076,18 +3158,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/search/failures`
 - Public URL: `https://api.modula.digital/v1/admin/ops/search/failures`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2415`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2416`
 - Handler: inline
 - Controller/service calls: `search.projectionFailures`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -3114,18 +3197,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/search/failures/:failureId/retry`
 - Public URL: `https://api.modula.digital/v1/admin/ops/search/failures/:failureId/retry`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2437`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2438`
 - Handler: inline
 - Controller/service calls: `search.retryFailure`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: `{failureId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3152,18 +3236,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/search/health`
 - Public URL: `https://api.modula.digital/v1/admin/ops/search/health`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2372`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2373`
 - Handler: inline
 - Controller/service calls: `search.health`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -3190,18 +3275,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/search/projections`
 - Public URL: `https://api.modula.digital/v1/admin/ops/search/projections`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2405`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2406`
 - Handler: inline
 - Controller/service calls: `search.projectionStates`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -3228,18 +3314,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/admin/ops/search/reindex`
 - Public URL: `https://api.modula.digital/v1/admin/ops/search/reindex`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2425`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2426`
 - Handler: inline
 - Controller/service calls: `search.requestReindex`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: ADMIN
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: `admin:ops`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3269,15 +3356,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:165`
 - Handler: inline
 - Controller/service calls: `filename.trim`, `mpsIngest.ingest`, `publishers.requireAdminAccount`, `releaseId.trim`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `{`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3307,15 +3395,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:958`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `releases.importPendingReview`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3345,18 +3434,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1021`
 - Handler: inline
 - Controller/service calls: `publishers.revokePublisher`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).publisherId),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_publishers`
 - Database writes: `greenfield_publisher_namespaces`, `greenfield_publishers`
 - Storage: none observed
@@ -3383,15 +3473,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1026`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.register`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).publisherId), body, auth.accountId), request.id))`
 - Request query: none observed
 - Request body: `Record<string, unknown> | undefined) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3421,15 +3512,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1037`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.revoke`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{publisherId: string`
 - Request query: none observed
 - Request body: `any)?.reason, auth.accountId), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3459,18 +3551,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1018`
 - Handler: inline
 - Controller/service calls: `publishers.suspendPublisher`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).publisherId),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_publishers`
 - Database writes: `greenfield_publishers`
 - Storage: none observed
@@ -3497,18 +3590,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1015`
 - Handler: inline
 - Controller/service calls: `publishers.verifyPublisher`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).publisherId),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_publishers`
 - Database writes: `greenfield_publishers`
 - Storage: none observed
@@ -3535,18 +3629,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1005`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).releaseId),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: none observed
 - Database writes: none observed
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
@@ -3573,18 +3668,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1008`
 - Handler: inline
 - Controller/service calls: `releases.quarantineRelease`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).releaseId, ((request.body as any)?.reason ?? 'administrative quarantine') as string, ((request.body as any)?.policyAction ?? 'block') as any),`
 - Request query: none observed
 - Request body: `any)?.reason ?? 'administrative quarantine') as string, ((request.body as any)?.policyAction ?? 'block') as any),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_module_releases`
 - Database writes: `greenfield_module_contributions`, `greenfield_module_quarantines`, `greenfield_module_releases`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
@@ -3611,18 +3707,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1011`
 - Handler: inline
 - Controller/service calls: `releases.revokeRelease`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).releaseId, ((request.body as any)?.reason ?? 'administrative revocation') as string),`
 - Request query: none observed
 - Request body: `any)?.reason ?? 'administrative revocation') as string),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_module_releases`
 - Database writes: `greenfield_module_releases`, `greenfield_module_revocations`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
@@ -3649,18 +3746,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:1002`
 - Handler: inline
 - Controller/service calls: `releases.verifyReleaseFromId`
-- Authentication: none
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `any).releaseId),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
-- Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
 - Database reads: `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_frontends`
 - Database writes: `greenfield_module_contributions`, `greenfield_module_quarantines`, `greenfield_module_release_signatures`, `greenfield_module_releases`
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
@@ -3687,15 +3785,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:971`
 - Handler: inline
 - Controller/service calls: `githubSync.sync`, `publishers.requireAdminAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `Record<string, unknown> | undefined) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -3725,15 +3824,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:991`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`, `publishers.requireAdminAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: ADMIN
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -3763,7 +3863,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:119`
 - Handler: inline
 - Controller/service calls: `providerRuntime.getExecution`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -3772,6 +3872,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{executionId: string}).executionId, auth.accountId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -3801,7 +3902,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:155`
 - Handler: inline
 - Controller/service calls: `providerRuntime.cancelExecution`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -3810,6 +3911,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{executionId: string}).executionId, auth.accountId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -3839,7 +3941,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:130`
 - Handler: inline
 - Controller/service calls: `providerRuntime.streamEvents`, `raw.end`, `raw.write`, `raw.writeHead`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -3848,6 +3950,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{executionId: string}).executionId, auth.accountId, cursor)`
 - Request query: none observed
 - Request body: none observed
+- Pagination: cursor
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -3877,15 +3980,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:55`
 - Handler: inline
 - Controller/service calls: `repository.listModels`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated global catalogue read; no user-owned resource identifier
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -3915,15 +4019,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:48`
 - Handler: inline
 - Controller/service calls: `repository.listProviders`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated global catalogue read; no user-owned resource identifier
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -3953,7 +4058,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:166`
 - Handler: inline
 - Controller/service calls: `gateway.createRequest`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -3962,6 +4067,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as Partial<GreenfieldAIRequestContract>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -3991,15 +4097,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:186`
 - Handler: inline
 - Controller/service calls: `streaming.cancel`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: MISSING: authenticated session is required but stream ownership is not checked
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{streamId: string}).streamId)`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4029,15 +4136,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:198`
 - Handler: inline
 - Controller/service calls: `streaming.reconnect`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: MISSING: authenticated session is required but stream ownership is not checked
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{streamId: string}).streamId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4067,7 +4175,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:209`
 - Handler: inline
 - Controller/service calls: `grantedPermissions.filter`, `tools.validateAndRecord`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4076,6 +4184,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{toolId: string}).toolId,`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4102,10 +4211,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/connections`
 - Public URL: `https://api.modula.digital/v1/atproto/connections`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2107`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2108`
 - Handler: inline
 - Controller/service calls: `atproto.listConnections`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4114,6 +4223,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -4140,10 +4250,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/connections/:connectionId/disconnect`
 - Public URL: `https://api.modula.digital/v1/atproto/connections/:connectionId/disconnect`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2172`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2173`
 - Handler: inline
 - Controller/service calls: `atproto.disconnect`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4152,6 +4262,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{connectionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4178,10 +4289,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/connections/:connectionId/refresh`
 - Public URL: `https://api.modula.digital/v1/atproto/connections/:connectionId/refresh`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2184`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2185`
 - Handler: inline
 - Controller/service calls: `atproto.getConnection`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4190,6 +4301,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{connectionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4216,10 +4328,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/connections/:connectionId/status`
 - Public URL: `https://api.modula.digital/v1/atproto/connections/:connectionId/status`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2196`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2197`
 - Handler: inline
 - Controller/service calls: `atproto.getConnection`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4228,6 +4340,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{connectionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -4254,7 +4367,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/feed`
 - Public URL: `https://api.modula.digital/v1/atproto/feed`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2219`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2220`
 - Handler: inline
 - Controller/service calls: `atproto.atmosphereFeed`
 - Authentication: none
@@ -4266,6 +4379,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -4292,18 +4406,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/oauth/callback`
 - Public URL: `https://api.modula.digital/v1/atproto/oauth/callback`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2139`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2140`
 - Handler: inline
 - Controller/service calls: `actorId.replace`, `atproto.completePreviewOAuth`, `atproto.consumeOAuthState`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `atproto:connect`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, string>`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -4330,18 +4445,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/oauth/start`
 - Public URL: `https://api.modula.digital/v1/atproto/oauth/start`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2114`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2115`
 - Handler: inline
 - Controller/service calls: `atproto.startOAuth`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: authenticated actor id is passed into the service/repository scope
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: `atproto:connect`
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `{`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4368,10 +4484,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/preferences`
 - Public URL: `https://api.modula.digital/v1/atproto/preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2205`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2206`
 - Handler: inline
 - Controller/service calls: `atproto.getPreferences`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4380,6 +4496,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -4406,10 +4523,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/atproto/preferences`
 - Public URL: `https://api.modula.digital/v1/atproto/preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2212`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2213`
 - Handler: inline
 - Controller/service calls: `atproto.updatePreferences`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4418,6 +4535,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any)`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4447,7 +4565,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:76`
 - Handler: inline
 - Controller/service calls: `attachments.removeOrphan`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4456,6 +4574,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{attachmentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4485,7 +4604,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:65`
 - Handler: inline
 - Controller/service calls: `attachments.status`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4494,6 +4613,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{attachmentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -4532,6 +4652,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{attachmentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -4561,7 +4682,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:34`
 - Handler: inline
 - Controller/service calls: `attachments.createUpload`, `log.info`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4570,6 +4691,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4599,7 +4721,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-attachment-routes.ts:47`
 - Handler: inline
 - Controller/service calls: `attachments.upload`, `log.info`, `log.warn`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4608,6 +4730,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{uploadId: string}`
 - Request query: none observed
 - Request body: `any)`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -4634,10 +4757,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/apple/link`
 - Public URL: `https://api.modula.digital/v1/auth/apple/link`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:703`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:704`
 - Handler: inline
 - Controller/service calls: `appleAuthentication.completeLink`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4646,6 +4769,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4672,10 +4796,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/apple/link/options`
 - Public URL: `https://api.modula.digital/v1/auth/apple/link/options`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:693`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:694`
 - Handler: inline
 - Controller/service calls: `appleAuthentication.beginLink`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4684,6 +4808,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4710,7 +4835,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/apple/status`
 - Public URL: `https://api.modula.digital/v1/auth/apple/status`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:690`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:691`
 - Handler: inline
 - Controller/service calls: `appleAuthentication.status`
 - Authentication: none
@@ -4722,6 +4847,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -4748,10 +4874,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/passkeys`
 - Public URL: `https://api.modula.digital/v1/auth/passkeys`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:684`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:685`
 - Handler: inline
 - Controller/service calls: `passkeys.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4760,6 +4886,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -4786,10 +4913,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/passkeys/:passkeyId`
 - Public URL: `https://api.modula.digital/v1/auth/passkeys/:passkeyId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:769`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:770`
 - Handler: inline
 - Controller/service calls: `mail.queuePasskeyRemoved`, `passkeys.revoke`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4798,6 +4925,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{passkeyId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4824,10 +4952,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/passkeys/registration/options`
 - Public URL: `https://api.modula.digital/v1/auth/passkeys/registration/options`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:726`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:727`
 - Handler: inline
 - Controller/service calls: `passkeys.beginRegistration`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4836,6 +4964,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4862,10 +4991,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/passkeys/registration/verify`
 - Public URL: `https://api.modula.digital/v1/auth/passkeys/registration/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:741`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:742`
 - Handler: inline
 - Controller/service calls: `mail.queuePasskeyAdded`, `passkeys.verifyRegistration`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4874,6 +5003,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {challengeId?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -4900,7 +5030,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/preview/session`
 - Public URL: `https://api.modula.digital/v1/auth/preview/session`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:309`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:310`
 - Handler: inline
 - Controller/service calls: `adminHandles.includes`, `handle.toLowerCase`, `profiles.getByHandle`, `sessions.createSession`
 - Authentication: none
@@ -4912,6 +5042,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{handle?: string}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -4938,10 +5069,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/recovery-codes`
 - Public URL: `https://api.modula.digital/v1/auth/recovery-codes`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:790`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:791`
 - Handler: inline
 - Controller/service calls: `recoveryCodes.remaining`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4950,6 +5081,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -4976,10 +5108,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/recovery-codes/regenerate`
 - Public URL: `https://api.modula.digital/v1/auth/recovery-codes/regenerate`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:795`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:796`
 - Handler: inline
 - Controller/service calls: `recoveryCodes.regenerate`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -4988,6 +5120,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -5014,10 +5147,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/step-up/totp`
 - Public URL: `https://api.modula.digital/v1/auth/step-up/totp`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:664`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:665`
 - Handler: inline
 - Controller/service calls: `greenfieldSessions.markRecentlyAuthenticated`, `totp.verifyActiveTotp`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -5026,6 +5159,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -5052,10 +5186,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/totp/disable`
 - Public URL: `https://api.modula.digital/v1/auth/totp/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:639`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:640`
 - Handler: inline
 - Controller/service calls: `mail.queueAuthenticatorDisabled`, `totp.disable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -5064,6 +5198,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -5090,10 +5225,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/totp/enroll`
 - Public URL: `https://api.modula.digital/v1/auth/totp/enroll`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:598`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:599`
 - Handler: inline
 - Controller/service calls: `totp.beginEnrollment`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -5102,6 +5237,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -5128,10 +5264,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/auth/totp/verify`
 - Public URL: `https://api.modula.digital/v1/auth/totp/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:613`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:614`
 - Handler: inline
 - Controller/service calls: `mail.queueAuthenticatorEnabled`, `totp.verifyEnrollment`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -5140,6 +5276,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -5171,13 +5308,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `created_at.toISOString`, `updated_at.toISOString`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: authenticated account id is passed into the service/repository scope
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: `{accountId?: string}).accountId ?? '')`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5216,6 +5354,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{accountId?: string}).accountId ?? '')`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5247,13 +5386,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: none observed
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5285,13 +5425,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `accountData.completeServiceDomain`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: `{domainId?: unknown}).domainId, 'domainId'),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5323,13 +5464,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `accountData.claimServiceDomains`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5368,6 +5510,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5406,6 +5549,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5437,13 +5581,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: none observed
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5475,13 +5620,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: none observed
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5513,13 +5659,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: none observed
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5551,13 +5698,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `ledger.list`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: `{cursor?: string`
 - Request body: none observed
+- Pagination: cursor
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5596,6 +5744,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5634,6 +5783,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5672,6 +5822,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5710,6 +5861,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5748,6 +5900,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5786,6 +5939,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5824,6 +5978,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5855,13 +6010,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `records.list`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: `{cursor?: string`
 - Request body: none observed
+- Pagination: cursor
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -5893,13 +6049,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `records.create`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5931,13 +6088,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `records.delete`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -5969,13 +6127,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `records.get`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -6007,13 +6166,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `records.patch`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6045,13 +6205,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `ledger.register`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6083,13 +6244,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `ledger.get`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 240 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `403`, `404`, `429`, `500`
@@ -6121,13 +6283,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `ledger.recordMigration`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6159,13 +6322,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `ledger.declareSchemaVersion`
 - Authentication: signed service assertion
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6204,6 +6368,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6242,6 +6407,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -6263,15 +6429,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/board/layout</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: GET
 - Effective route: `/v1/board/layout`
 - Public URL: `https://api.modula.digital/v1/board/layout`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1041`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1042`
 - Handler: inline
 - Controller/service calls: `boardLayouts.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6280,6 +6446,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -6301,15 +6468,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PATCH /v1/board/layout</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: PATCH
 - Effective route: `/v1/board/layout`
 - Public URL: `https://api.modula.digital/v1/board/layout`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1051`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1052`
 - Handler: inline
 - Controller/service calls: `boardLayouts.patch`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6318,6 +6485,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6347,7 +6515,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:172`
 - Handler: inline
 - Controller/service calls: `comments.deleteComment`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6356,6 +6524,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -6385,7 +6554,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:154`
 - Handler: inline
 - Controller/service calls: `comments.updateComment`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6394,6 +6563,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: `{text?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -6423,7 +6593,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:197`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6432,6 +6602,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -6461,7 +6632,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:184`
 - Handler: inline
 - Controller/service calls: `comments.setCommentReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6470,6 +6641,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: `{type?: string} | null)?.type ?? null`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -6508,6 +6680,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -6537,7 +6710,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:140`
 - Handler: inline
 - Controller/service calls: `comments.createReply`, `mentions.storeMentions`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6546,6 +6719,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{commentId: string}`
 - Request query: none observed
 - Request body: `any)?.text ?? '')`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -6575,7 +6749,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:32`
 - Handler: inline
 - Controller/service calls: `service.adapterStatus`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6584,6 +6758,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -6613,7 +6788,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:30`
 - Handler: inline
 - Controller/service calls: `service.listAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6622,6 +6797,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -6651,7 +6827,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/entitlements/routes.ts:31`
 - Handler: inline
 - Controller/service calls: `service.check`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6660,6 +6836,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6686,10 +6863,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections`
 - Public URL: `https://api.modula.digital/v1/connections`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1305`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1306`
 - Handler: inline
 - Controller/service calls: `connectorConnections.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6698,6 +6875,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -6724,10 +6902,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections/:connectionId`
 - Public URL: `https://api.modula.digital/v1/connections/:connectionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1389`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1390`
 - Handler: inline
 - Controller/service calls: `connectorConnections.disconnect`, `policies.assertAllowed`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6736,6 +6914,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).connectionId,`, `any).connectionId, ownerAccountId: auth.accountId},`, `any).connectionId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6762,10 +6941,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections/:connectionId`
 - Public URL: `https://api.modula.digital/v1/connections/:connectionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1314`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1315`
 - Handler: inline
 - Controller/service calls: `connectorConnections.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6774,6 +6953,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).connectionId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -6800,10 +6980,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections/:connectionId/disable`
 - Public URL: `https://api.modula.digital/v1/connections/:connectionId/disable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1332`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1333`
 - Handler: inline
 - Controller/service calls: `connectorConnections.disable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6812,6 +6992,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).connectionId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6838,10 +7019,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections/:connectionId/enable`
 - Public URL: `https://api.modula.digital/v1/connections/:connectionId/enable`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1323`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1324`
 - Handler: inline
 - Controller/service calls: `connectorConnections.enable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6850,6 +7031,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).connectionId), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6876,10 +7058,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connections/:connectionId/refresh`
 - Public URL: `https://api.modula.digital/v1/connections/:connectionId/refresh`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1341`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1342`
 - Handler: inline
 - Controller/service calls: `adapter.refreshCredentials`, `connectorAdapters.require`, `connectorConnections.beginRefresh`, `connectorConnections.completeRefresh`, `connectorConnections.fail`, `connectorConnections.get`, `connectorCredentials.decryptForTrustedBackend`, `connectorCredentials.storeEncrypted`, `policies.assertAllowed`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -6888,6 +7070,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).connectionId)`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -6914,7 +7097,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connectors`
 - Public URL: `https://api.modula.digital/v1/connectors`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1258`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1259`
 - Handler: inline
 - Controller/service calls: `connectorProviders.list`
 - Authentication: none
@@ -6926,6 +7109,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -6952,7 +7136,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connectors/:providerId`
 - Public URL: `https://api.modula.digital/v1/connectors/:providerId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1261`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1262`
 - Handler: inline
 - Controller/service calls: `connectorProviders.get`
 - Authentication: none
@@ -6964,6 +7148,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).providerId)`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -6990,10 +7175,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/connectors/:providerId/authorise`
 - Public URL: `https://api.modula.digital/v1/connectors/:providerId/authorise`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1266`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1267`
 - Handler: inline
 - Controller/service calls: `adapter.getAuthorisationUrl`, `connectorAdapters.require`, `connectorOAuthStates.initiate`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7002,6 +7187,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).providerId`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7031,7 +7217,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:43`
 - Handler: inline
 - Controller/service calls: `developers.acceptAgreement`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7040,6 +7226,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7069,7 +7256,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:36`
 - Handler: inline
 - Controller/service calls: `developers.board`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7078,6 +7265,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -7107,7 +7295,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:38`
 - Handler: inline
 - Controller/service calls: `developers.createOrganisation`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7116,6 +7304,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7145,7 +7334,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:40`
 - Handler: inline
 - Controller/service calls: `developers.acceptOrganisationInvitation`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7154,6 +7343,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7183,7 +7373,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:39`
 - Handler: inline
 - Controller/service calls: `developers.inviteOrganisationMember`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7192,6 +7382,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7221,7 +7412,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:48`
 - Handler: inline
 - Controller/service calls: `developers.listProducts`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7230,6 +7421,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -7259,7 +7451,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:49`
 - Handler: inline
 - Controller/service calls: `developers.createProduct`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7268,6 +7460,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7297,7 +7490,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:50`
 - Handler: inline
 - Controller/service calls: `developers.productDetail`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7306,6 +7499,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -7335,7 +7529,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:52`
 - Handler: inline
 - Controller/service calls: `developers.requestBuild`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7344,6 +7538,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7373,7 +7568,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:53`
 - Handler: inline
 - Controller/service calls: `developers.createRelease`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7382,6 +7577,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7411,7 +7607,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:55`
 - Handler: inline
 - Controller/service calls: `developers.assignReleaseTestGroup`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7420,6 +7616,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7449,7 +7646,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:56`
 - Handler: inline
 - Controller/service calls: `developers.submitReview`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7458,6 +7655,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7487,7 +7685,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:51`
 - Handler: inline
 - Controller/service calls: `developers.connectSource`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7496,6 +7694,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7525,7 +7724,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:54`
 - Handler: inline
 - Controller/service calls: `developers.createTestGroup`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7534,6 +7733,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7563,7 +7763,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:37`
 - Handler: inline
 - Controller/service calls: `developers.upsertProfile`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7572,6 +7772,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7601,7 +7802,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:44`
 - Handler: inline
 - Controller/service calls: `developers.enrol`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7610,6 +7811,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7639,7 +7841,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:41`
 - Handler: inline
 - Controller/service calls: `developers.createPublisher`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7648,6 +7850,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7677,7 +7880,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/developers/routes.ts:42`
 - Handler: inline
 - Controller/service calls: `developers.claimNamespace`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7686,6 +7889,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7712,7 +7916,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/discover`
 - Public URL: `https://api.modula.digital/v1/discover`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2092`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2093`
 - Handler: inline
 - Controller/service calls: `discovery.getDiscover`
 - Authentication: none
@@ -7724,6 +7928,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -7745,12 +7950,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions`
 - Public URL: `https://api.modula.digital/v1/extensions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1171`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1172`
 - Handler: inline
 - Controller/service calls: `extensions.listPublished`
 - Authentication: none
@@ -7762,6 +7967,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -7783,12 +7989,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions/:extensionId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions/:extensionId`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1179`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1180`
 - Handler: inline
 - Controller/service calls: `extensions.listPublished`, `items.find`
 - Authentication: none
@@ -7800,6 +8006,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -7821,7 +8028,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PATCH /v1/extensions/:extensionId/configuration</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: PATCH
 - Effective route: `/v1/extensions/:extensionId/configuration`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/configuration`
@@ -7829,7 +8036,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:294`
 - Handler: inline
 - Controller/service calls: `lifecycle.configure`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7838,6 +8045,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: `any)?.configuration ?? {}),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7859,7 +8067,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionId/disable</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionId/disable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/disable`
@@ -7867,7 +8075,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:284`
 - Handler: inline
 - Controller/service calls: `lifecycle.disable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7876,6 +8084,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7897,7 +8106,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionId/enable</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionId/enable`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/enable`
@@ -7905,7 +8114,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:274`
 - Handler: inline
 - Controller/service calls: `lifecycle.enable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7914,6 +8123,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7935,15 +8145,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/extensions/:extensionId/install</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: DELETE
 - Effective route: `/v1/extensions/:extensionId/install`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1203`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1204`
 - Handler: inline
 - Controller/service calls: `installations.uninstall`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7952,6 +8162,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -7973,15 +8184,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionId/install</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionId/install`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/install`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1191`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1192`
 - Handler: inline
 - Controller/service calls: `installations.install`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -7990,6 +8201,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8011,15 +8223,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PATCH /v1/extensions/:extensionId/preferences</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: PATCH
 - Effective route: `/v1/extensions/:extensionId/preferences`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionId/preferences`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1213`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1214`
 - Handler: inline
 - Controller/service calls: `installations.updatePreferences`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8028,6 +8240,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{extensionId: string}`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id),`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8049,7 +8262,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions/:extensionProductId/capabilities</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions/:extensionProductId/capabilities`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities`
@@ -8057,7 +8270,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:318`
 - Handler: inline
 - Controller/service calls: `extensionFabric.declaredCapabilities`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8066,6 +8279,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId)), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8087,7 +8301,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionProductId/capabilities/review</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionProductId/capabilities/review`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/capabilities/review`
@@ -8095,7 +8309,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:328`
 - Handler: inline
 - Controller/service calls: `approvedCapabilities.filter`, `extensionFabric.reviewCapabilities`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8104,6 +8318,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId), approved), request.id))`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8125,7 +8340,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionProductId/contributions/:contributionId/fail</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/fail`
@@ -8133,7 +8348,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:394`
 - Handler: inline
 - Controller/service calls: `extensionFabric.failContribution`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8142,6 +8357,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId),`, `any).contributionId),`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8163,7 +8379,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/contributions/:contributionId/invoke`
@@ -8171,7 +8387,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:340`
 - Handler: inline
 - Controller/service calls: `backendGateway.canHandle`, `backendGateway.executeAction`, `extensionAi.canHandle`, `extensionAi.execute`, `extensionFabric.assertInvocation`, `requiredCapabilities.filter`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8180,6 +8396,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId),`, `any).contributionId),`, `any).extensionProductId)`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8201,7 +8418,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions/:extensionProductId/inspector</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions/:extensionProductId/inspector`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/inspector`
@@ -8209,7 +8426,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:431`
 - Handler: inline
 - Controller/service calls: `extensionFabric.developerInspector`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8218,6 +8435,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId)), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8239,7 +8457,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/extensions/:extensionProductId/jobs</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/extensions/:extensionProductId/jobs`
 - Public URL: `https://api.modula.digital/v1/extensions/:extensionProductId/jobs`
@@ -8247,7 +8465,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:411`
 - Handler: inline
 - Controller/service calls: `extensionFabric.enqueueJob`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8256,6 +8474,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).extensionProductId),`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8277,12 +8496,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions/catalogue</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions/catalogue`
 - Public URL: `https://api.modula.digital/v1/extensions/catalogue`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1174`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1175`
 - Handler: inline
 - Controller/service calls: `lifecycle.listCatalogue`
 - Authentication: none
@@ -8294,6 +8513,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8315,15 +8535,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/extensions/installed</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/extensions/installed`
 - Public URL: `https://api.modula.digital/v1/extensions/installed`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1186`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1187`
 - Handler: inline
 - Controller/service calls: `installations.listInstalled`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8332,6 +8552,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8358,7 +8579,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/feed/home`
 - Public URL: `https://api.modula.digital/v1/feed/home`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1437`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1438`
 - Handler: inline
 - Controller/service calls: `moderation.blockedSet`, `moderation.mutedSet`, `posts.listHome`
 - Authentication: none
@@ -8370,6 +8591,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8396,7 +8618,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/feed/profile/:profileId`
 - Public URL: `https://api.modula.digital/v1/feed/profile/:profileId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1468`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1469`
 - Handler: inline
 - Controller/service calls: `posts.listForHandle`
 - Authentication: none
@@ -8408,6 +8630,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8429,7 +8652,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/function-jobs/:jobId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/function-jobs/:jobId`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId`
@@ -8437,7 +8660,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:311`
 - Handler: inline
 - Controller/service calls: `functionJobs.getJob`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8446,6 +8669,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{jobId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8467,7 +8691,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/function-jobs/:jobId/cancel</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/function-jobs/:jobId/cancel`
 - Public URL: `https://api.modula.digital/v1/function-jobs/:jobId/cancel`
@@ -8475,7 +8699,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:321`
 - Handler: inline
 - Controller/service calls: `functionJobs.cancel`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8484,6 +8708,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{jobId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8505,12 +8730,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/functions</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/functions`
 - Public URL: `https://api.modula.digital/v1/functions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1239`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1240`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`
 - Authentication: none
@@ -8522,6 +8747,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8543,23 +8769,24 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/functions/:functionId/invoke</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/functions/:functionId/invoke`
 - Public URL: `https://api.modula.digital/v1/functions/:functionId/invoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1243`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1244`
 - Handler: inline
 - Controller/service calls: `functions.invoke`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: MISSING: client-supplied installationId is capability-checked without authenticated account ownership
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{functionId: string}`
 - Request query: none observed
 - Request body: `any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8581,7 +8808,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/functions/:functionId/jobs</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: POST
 - Effective route: `/v1/functions/:functionId/jobs`
 - Public URL: `https://api.modula.digital/v1/functions/:functionId/jobs`
@@ -8589,7 +8816,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:333`
 - Handler: inline
 - Controller/service calls: `functionJobs.invoke`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8598,6 +8825,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{functionId: string}`
 - Request query: none observed
 - Request body: `any)?.input ?? {}) as Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8624,7 +8852,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/health/live`
 - Public URL: `https://api.modula.digital/v1/health/live`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:232`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:233`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -8636,6 +8864,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8648,7 +8877,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `scripts/verify-phase5-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7h-live-contracts.mjs`, `scripts/verify-phase7i-mail-production.mjs`, `scripts/verify-phase7j-b.mjs`, `scripts/verify-phase7j-mac.mjs`, `services/greenfield-api/tests/api.integration.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -8662,7 +8891,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/health/ready`
 - Public URL: `https://api.modula.digital/v1/health/ready`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:236`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:237`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -8674,6 +8903,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -8686,7 +8916,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `scripts/verify-greenfield-backend-v1.mjs`, `scripts/verify-phase5-backend.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7h-live-contracts.mjs`, `scripts/verify-phase7i-mail-production.mjs`, `scripts/verify-phase7j-b.mjs`, `scripts/verify-phase7j-mac.mjs`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.engine-fabric.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -8703,7 +8933,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:22`
 - Handler: inline
 - Controller/service calls: `intelligence.listMissions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8712,6 +8942,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8724,7 +8955,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `services/greenfield-api/tests/gai01.contract.test.ts`, `services/greenfield-api/tests/gai01.integration.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (401)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -8741,7 +8972,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:13`
 - Handler: inline
 - Controller/service calls: `intelligence.createMission`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: workspace identifier observed; downstream enforcement requires service evidence
@@ -8750,6 +8981,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8779,7 +9011,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:28`
 - Handler: inline
 - Controller/service calls: `intelligence.detail`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8788,6 +9020,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8817,7 +9050,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:56`
 - Handler: inline
 - Controller/service calls: `intelligence.approvals`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8826,6 +9059,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8855,7 +9089,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:70`
 - Handler: inline
 - Controller/service calls: `intelligence.approve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8864,6 +9098,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8893,7 +9128,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:77`
 - Handler: inline
 - Controller/service calls: `intelligence.reject`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8902,6 +9137,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -8931,7 +9167,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:49`
 - Handler: inline
 - Controller/service calls: `intelligence.decisions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8940,6 +9176,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -8969,7 +9206,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:63`
 - Handler: inline
 - Controller/service calls: `intelligence.evidence`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -8978,6 +9215,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9007,7 +9245,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:42`
 - Handler: inline
 - Controller/service calls: `intelligence.ledger`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9016,6 +9254,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9045,7 +9284,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:84`
 - Handler: inline
 - Controller/service calls: `intelligence.execute`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9054,6 +9293,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9083,7 +9323,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/intelligence/routes.ts:35`
 - Handler: inline
 - Controller/service calls: `intelligence.start`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9092,6 +9332,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9123,13 +9364,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `builds.recordResult`
 - Authentication: build-service id plus request signature
 - Authorization: INTERNAL (nginx-reachable; handler/service guard applies)
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -9161,13 +9403,14 @@ Every runtime method route is either represented below or explicitly listed as f
 - Controller/service calls: `builds.claim`
 - Authentication: build-service id plus request signature
 - Authorization: INTERNAL (nginx-reachable; handler/service guard applies)
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -9194,7 +9437,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/internal/ssrf-check`
 - Public URL: `https://api.modula.digital/v1/internal/ssrf-check`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2573`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2574`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -9206,6 +9449,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `{url?: string`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `500`
@@ -9232,7 +9476,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/media/:mediaFile`
 - Public URL: `https://api.modula.digital/v1/media/:mediaFile`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2065`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2066`
 - Handler: inline
 - Controller/service calls: `i.exec`, `postMediaStorage.readPostMedia`, `posts.getById`
 - Authentication: none
@@ -9244,6 +9488,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{mediaFile?: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -9282,6 +9527,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{mediaFile?: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -9308,7 +9554,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/meta`
 - Public URL: `https://api.modula.digital/v1/meta`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:248`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:249`
 - Handler: inline
 - Controller/service calls: `appleAuthentication.status`, `engines.publicTopology`
 - Authentication: none
@@ -9320,6 +9566,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -9332,7 +9579,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/api/local/routes/atprotoRoutes.ts`, `src/api/local/routes/metaRoutes.ts`, `src/data/repositories/api/ApiMetadataRepository.ts`
 - Tests: `scripts/verify-phase5-backend.mjs`, `scripts/verify-phase7c-release-candidate.mjs`, `scripts/verify-phase7e-web-production-cutover.mjs`, `scripts/verify-phase7h-live-contracts.mjs`, `scripts/verify-phase7h-registration.mjs`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.apple-auth.test.ts`, `services/greenfield-api/tests/greenfield-backend-v1.engine-fabric.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `tests/phase7l-b-public-routes.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -9341,7 +9588,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/module-host/:targetProductId/composition</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/module-host/:targetProductId/composition`
 - Public URL: `https://api.modula.digital/v1/module-host/:targetProductId/composition`
@@ -9349,7 +9596,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:303`
 - Handler: inline
 - Controller/service calls: `extensionFabric.composeHost`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9358,6 +9605,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).targetProductId), {`
 - Request query: `any) ?? {}`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9384,7 +9632,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/modules`
 - Public URL: `https://api.modula.digital/v1/modules`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1408`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1409`
 - Handler: inline
 - Controller/service calls: `modules.filter`
 - Authentication: none
@@ -9396,6 +9644,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -9425,7 +9674,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:854`
 - Handler: inline
 - Controller/service calls: `actions.execute`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9434,6 +9683,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any)?.input ?? request.body ?? {},`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9463,7 +9713,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:62`
 - Handler: inline
 - Controller/service calls: `productActions.execute`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9472,6 +9722,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{moduleId: string`
 - Request query: none observed
 - Request body: `any) ?? {}) as Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9501,7 +9752,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:78`
 - Handler: inline
 - Controller/service calls: `productActions.apply`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9510,6 +9761,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{moduleId: string`
 - Request query: none observed
 - Request body: `any) ?? {}) as Record<string, unknown>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9539,7 +9791,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/ai/routes.ts:94`
 - Handler: inline
 - Controller/service calls: `providerRuntime.executeModuleRequest`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9548,6 +9800,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{moduleId: string}).moduleId`
 - Request query: none observed
 - Request body: `any) ?? {}) as Partial<GreenfieldAIRequestContract>`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9577,7 +9830,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:896`
 - Handler: inline
 - Controller/service calls: `backendHealth.diagnostics`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9586,6 +9839,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9615,7 +9869,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:929`
 - Handler: inline
 - Controller/service calls: `backendLifecycle.disable`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9624,6 +9878,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9653,7 +9908,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:907`
 - Handler: inline
 - Controller/service calls: `backendDiscovery.discover`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9662,6 +9917,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any)?.origin)}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9691,15 +9947,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:940`
 - Handler: inline
 - Controller/service calls: `backendEvents.ingest`
-- Authentication: module backend bearer [REDACTED] plus HMAC signature
+- Authentication: module backend bearer token plus HMAC signature
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -9729,7 +9986,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:918`
 - Handler: inline
 - Controller/service calls: `backendHealth.check`, `runtimeAccess.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9738,6 +9995,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9767,15 +10025,16 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:949`
 - Handler: inline
 - Controller/service calls: `backendWebhooks.receive`
-- Authentication: module backend bearer [REDACTED] plus HMAC signature
+- Authentication: module backend bearer token plus HMAC signature
 - Authorization: SERVICE/WORKER
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: service identity, product/release assertion, and declared operation are resolved server-side
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `403`, `404`, `409`, `429`, `500`
@@ -9805,7 +10064,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:452`
 - Handler: inline
 - Controller/service calls: `dataLedger.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9814,6 +10073,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `{installationId?: string`
 - Request body: none observed
+- Pagination: cursor
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9843,7 +10103,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:467`
 - Handler: inline
 - Controller/service calls: `dataLedger.register`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9852,6 +10112,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `Record<string, unknown>) ?? {}) as any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9881,7 +10142,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:482`
 - Handler: inline
 - Controller/service calls: `dataLedger.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9890,6 +10151,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{resourceId?: string}).resourceId ?? ''),`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -9919,7 +10181,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:496`
 - Handler: inline
 - Controller/service calls: `dataLedger.recordMigration`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9928,6 +10190,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{resourceId?: string}).resourceId ?? ''),`
 - Request query: none observed
 - Request body: `Record<string, unknown>) ?? {}) as any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9957,7 +10220,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:512`
 - Handler: inline
 - Controller/service calls: `dataLedger.declareSchemaVersion`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -9966,6 +10229,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{resourceId?: string}).resourceId ?? ''),`
 - Request query: none observed
 - Request body: `Record<string, unknown>) ?? {}) as any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -9995,7 +10259,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:603`
 - Handler: inline
 - Controller/service calls: `installations.disable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10004,6 +10268,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10033,7 +10298,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:593`
 - Handler: inline
 - Controller/service calls: `installations.enable`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10042,6 +10307,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10071,7 +10337,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:875`
 - Handler: inline
 - Controller/service calls: `exports.create`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10080,6 +10346,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10109,7 +10376,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:756`
 - Handler: inline
 - Controller/service calls: `productFrontends.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10118,6 +10385,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10147,7 +10415,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:886`
 - Handler: inline
 - Controller/service calls: `health.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10156,6 +10424,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10185,7 +10454,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:688`
 - Handler: inline
 - Controller/service calls: `uninstall.uninstall`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10194,6 +10463,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10223,7 +10493,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:560`
 - Handler: inline
 - Controller/service calls: `installations.install`, `version.trim`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10232,6 +10502,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10261,7 +10532,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:582`
 - Handler: inline
 - Controller/service calls: `installations.getInstallDescriptor`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10270,6 +10541,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10299,7 +10571,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:549`
 - Handler: inline
 - Controller/service calls: `installations.installPreview`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10308,6 +10580,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10337,7 +10610,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:664`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `installations.reviewPermissions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10346,6 +10619,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10375,7 +10649,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:777`
 - Handler: inline
 - Controller/service calls: `records.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10384,6 +10658,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: `Record<string, unknown>)), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10413,7 +10688,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:788`
 - Handler: inline
 - Controller/service calls: `records.create`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10422,6 +10697,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10451,7 +10727,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:821`
 - Handler: inline
 - Controller/service calls: `records.delete`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10460,6 +10736,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10489,7 +10766,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:799`
 - Handler: inline
 - Controller/service calls: `records.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10498,6 +10775,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10527,7 +10805,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:810`
 - Handler: inline
 - Controller/service calls: `records.patch`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10536,6 +10814,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10565,7 +10844,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:843`
 - Handler: inline
 - Controller/service calls: `records.purge`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10574,6 +10853,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10603,7 +10883,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:832`
 - Handler: inline
 - Controller/service calls: `records.restore`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10612,6 +10892,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10641,7 +10922,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:442`
 - Handler: inline
 - Controller/service calls: `runtime2.runtimeSummary`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10650,6 +10931,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10679,7 +10961,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:528`
 - Handler: inline
 - Controller/service calls: `runtime2.invokeService`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10688,6 +10970,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).serviceId,`
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10717,7 +11000,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:720`
 - Handler: inline
 - Controller/service calls: `settings.get`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10726,6 +11009,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10755,7 +11039,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:730`
 - Handler: inline
 - Controller/service calls: `settings.patch`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10764,6 +11048,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any)?.values ?? request.body ?? {}) as any), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10793,7 +11078,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:710`
 - Handler: inline
 - Controller/service calls: `settings.schema`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10802,6 +11087,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10831,7 +11117,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:678`
 - Handler: inline
 - Controller/service calls: `uninstall.preview`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10840,6 +11126,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10869,7 +11156,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:641`
 - Handler: inline
 - Controller/service calls: `approvedPermissions.filter`, `updates.update`, `version.trim`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10878,6 +11165,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `202`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10907,7 +11195,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:627`
 - Handler: inline
 - Controller/service calls: `updates.preview`, `version.trim`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10916,6 +11204,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -10945,7 +11234,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:615`
 - Handler: inline
 - Controller/service calls: `updates.versions`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10954,6 +11243,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -10983,7 +11273,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:746`
 - Handler: inline
 - Controller/service calls: `views.listViews`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -10992,6 +11282,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -11021,7 +11312,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:766`
 - Handler: inline
 - Controller/service calls: `views.getView`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11030,6 +11321,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -11059,7 +11351,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:740`
 - Handler: inline
 - Controller/service calls: `contributions.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11068,6 +11360,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `any), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -11097,7 +11390,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:289`
 - Handler: inline
 - Controller/service calls: `installations.listInstalled`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11106,6 +11399,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -11118,7 +11412,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.installed-state.test.ts`, `tests/konsta-web-presentation.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (401)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -11135,7 +11429,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:295`
 - Handler: inline
 - Controller/service calls: `installations.getInstalled`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11144,6 +11438,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -11170,10 +11465,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/notifications`
 - Public URL: `https://api.modula.digital/v1/notifications`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1918`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1919`
 - Handler: inline
 - Controller/service calls: `notifications.listForActor`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11182,6 +11477,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -11208,10 +11504,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/notifications/:notificationId/read`
 - Public URL: `https://api.modula.digital/v1/notifications/:notificationId/read`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1933`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1934`
 - Handler: inline
 - Controller/service calls: `notifications.markRead`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11220,6 +11516,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{notificationId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11246,10 +11543,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/notifications/read-all`
 - Public URL: `https://api.modula.digital/v1/notifications/read-all`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1942`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1943`
 - Handler: inline
 - Controller/service calls: `notifications.markAllRead`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11258,6 +11555,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11279,12 +11577,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/plugins</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/plugins`
 - Public URL: `https://api.modula.digital/v1/plugins`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1255`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1256`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`
 - Authentication: none
@@ -11296,6 +11594,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -11322,10 +11621,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts`
 - Public URL: `https://api.modula.digital/v1/posts`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1497`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1498`
 - Handler: inline
 - Controller/service calls: `postWrites.create`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11334,6 +11633,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `CreatePostInput`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11360,10 +11660,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts/:postId`
 - Public URL: `https://api.modula.digital/v1/posts/:postId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1533`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1534`
 - Handler: inline
 - Controller/service calls: `postWrites.delete`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11372,6 +11672,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11398,7 +11699,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts/:postId`
 - Public URL: `https://api.modula.digital/v1/posts/:postId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1490`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1491`
 - Handler: inline
 - Controller/service calls: `posts.getById`
 - Authentication: none
@@ -11410,6 +11711,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -11436,10 +11738,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts/:postId`
 - Public URL: `https://api.modula.digital/v1/posts/:postId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1516`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1517`
 - Handler: inline
 - Controller/service calls: `postWrites.update`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11448,6 +11750,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: `UpdatePostInput`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11469,7 +11772,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/posts/:postId/comments</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Comments
 - Method: GET
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
@@ -11486,6 +11789,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -11507,7 +11811,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/posts/:postId/comments</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Comments
 - Method: POST
 - Effective route: `/v1/posts/:postId/comments`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/comments`
@@ -11515,7 +11819,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:117`
 - Handler: inline
 - Controller/service calls: `comments.createComment`, `mentions.storeMentions`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11524,6 +11828,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: `any)?.text ?? '')`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11545,15 +11850,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/posts/:postId/like</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Reactions
 - Method: DELETE
 - Effective route: `/v1/posts/:postId/like`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/like`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11562,6 +11867,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11583,15 +11889,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/posts/:postId/like</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Reactions
 - Method: POST
 - Effective route: `/v1/posts/:postId/like`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/like`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11600,6 +11906,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11621,7 +11928,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/posts/:postId/quote</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Sharing
 - Method: POST
 - Effective route: `/v1/posts/:postId/quote`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/quote`
@@ -11629,7 +11936,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:211`
 - Handler: inline
 - Controller/service calls: `mentions.storeMentions`, `quotes.createQuote`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11638,6 +11945,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: `any)?.commentary ?? '')`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11659,7 +11967,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/posts/:postId/reaction</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Reactions
 - Method: DELETE
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
@@ -11667,7 +11975,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:85`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11676,6 +11984,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11697,7 +12006,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PUT /v1/posts/:postId/reaction</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Reactions
 - Method: PUT
 - Effective route: `/v1/posts/:postId/reaction`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reaction`
@@ -11705,7 +12014,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:72`
 - Handler: inline
 - Controller/service calls: `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11714,6 +12023,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: `{type?: string} | null)?.type ?? null`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11735,7 +12045,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/posts/:postId/reactions</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Reactions
 - Method: GET
 - Effective route: `/v1/posts/:postId/reactions`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/reactions`
@@ -11752,6 +12062,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -11773,15 +12084,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/posts/:postId/repost</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Sharing
 - Method: DELETE
 - Effective route: `/v1/posts/:postId/repost`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/repost`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11790,6 +12101,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11811,15 +12123,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/posts/:postId/repost</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Sharing
 - Method: POST
 - Effective route: `/v1/posts/:postId/repost`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/repost`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11828,6 +12140,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11854,10 +12167,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts/:postId/save`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/save`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11866,6 +12179,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11892,10 +12206,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/posts/:postId/save`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/save`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1557`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1558`
 - Handler: inline
 - Controller/service calls: `postWrites.setEngagement`, `posts.getById`, `reactions.listReactions`, `reactions.setReaction`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11904,6 +12218,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11925,15 +12240,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/posts/:postId/share</code> — reachable</summary>
 
-- Domain: Posts
+- Domain: Sharing
 - Method: POST
 - Effective route: `/v1/posts/:postId/share`
 - Public URL: `https://api.modula.digital/v1/posts/:postId/share`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1594`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1595`
 - Handler: inline
 - Controller/service calls: `postShares.record`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -11942,6 +12257,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{postId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -11963,7 +12279,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/product-standard/products/:productId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/product-standard/products/:productId`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId`
@@ -11980,6 +12296,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{productId?: string}).productId ?? '')`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12001,7 +12318,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/product-standard/products/:productId/versions/:version</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/product-standard/products/:productId/versions/:version`
 - Public URL: `https://api.modula.digital/v1/product-standard/products/:productId/versions/:version`
@@ -12018,6 +12335,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{productId?: string`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12044,7 +12362,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/:handle`
 - Public URL: `https://api.modula.digital/v1/profiles/:handle`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1613`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1614`
 - Handler: inline
 - Controller/service calls: `profiles.getByHandle`
 - Authentication: none
@@ -12056,6 +12374,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{handle: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12068,7 +12387,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/api/local/routes/profileRoutes.ts`, `src/data/repositories/api/ApiAuthRepository.ts`, `src/data/repositories/api/ApiModerationRepository.ts`, `src/data/repositories/api/ApiProfileRepository.ts`, `src/data/repositories/api/ApiSocialGraphRepository.ts`
 - Tests: `scripts/verify-phase5-backend.mjs`, `scripts/verify-phase6-greenfield-backend.mjs`, `scripts/verify-phase7c-api-parity.mjs`, `scripts/verify-phase7c-profile.mjs`, `scripts/verify-phase7c-social-core.mjs`, `services/greenfield-api/tests/api.integration.test.ts`, `services/greenfield-api/tests/greenfield.accounts.test.ts`, `services/greenfield-api/tests/phase6.security.test.ts`, `services/greenfield-api/tests/phase6s.social.test.ts`, `services/greenfield-api/tests/phase7i.f5-stories.test.ts`, `services/greenfield-api/tests/phase7l.profile-update.test.ts`, `services/greenfield-api/tests/post04.attachments.test.ts`, `tests/konsta-web-presentation.test.ts`, `tests/phase7l-b-auth-regression.test.ts`, `tests/phase7l-b-public-routes.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (404)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -12077,12 +12396,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/profiles/:handle/followers</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: GET
 - Effective route: `/v1/profiles/:handle/followers`
 - Public URL: `https://api.modula.digital/v1/profiles/:handle/followers`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1637`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1638`
 - Handler: inline
 - Controller/service calls: `profiles.listFollowers`
 - Authentication: none
@@ -12094,6 +12413,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{handle: string}`
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12115,12 +12435,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/profiles/:handle/following</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: GET
 - Effective route: `/v1/profiles/:handle/following`
 - Public URL: `https://api.modula.digital/v1/profiles/:handle/following`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1653`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1654`
 - Handler: inline
 - Controller/service calls: `profiles.listFollowing`
 - Authentication: none
@@ -12132,6 +12452,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{handle: string}`
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12158,7 +12479,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/:handle/posts`
 - Public URL: `https://api.modula.digital/v1/profiles/:handle/posts`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1621`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1622`
 - Handler: inline
 - Controller/service calls: `posts.listForHandle`
 - Authentication: none
@@ -12170,6 +12491,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{handle: string}`
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12191,15 +12513,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/profiles/:profileId/block</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: DELETE
 - Effective route: `/v1/profiles/:profileId/block`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/block`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1784`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1785`
 - Handler: inline
 - Controller/service calls: `moderation.unblock`, `profileWrites.actorIdForProfileId`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12208,6 +12530,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12229,15 +12552,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/profiles/:profileId/block</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: POST
 - Effective route: `/v1/profiles/:profileId/block`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/block`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1769`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1770`
 - Handler: inline
 - Controller/service calls: `moderation.block`, `profileWrites.actorIdForProfileId`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12246,6 +12569,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12267,15 +12591,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/profiles/:profileId/follow</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: DELETE
 - Effective route: `/v1/profiles/:profileId/follow`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/follow`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1689`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1690`
 - Handler: inline
 - Controller/service calls: `profileWrites.unfollow`, `profiles.getById`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12284,6 +12608,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12305,15 +12630,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/profiles/:profileId/follow</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: POST
 - Effective route: `/v1/profiles/:profileId/follow`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/follow`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1669`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1670`
 - Handler: inline
 - Controller/service calls: `profileWrites.follow`, `profiles.getById`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12322,6 +12647,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12343,15 +12669,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/profiles/:profileId/mute</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: DELETE
 - Effective route: `/v1/profiles/:profileId/mute`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/mute`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1814`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1815`
 - Handler: inline
 - Controller/service calls: `moderation.unmute`, `profileWrites.actorIdForProfileId`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12360,6 +12686,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12381,15 +12708,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/profiles/:profileId/mute</code> — reachable</summary>
 
-- Domain: Profile
+- Domain: Social
 - Method: POST
 - Effective route: `/v1/profiles/:profileId/mute`
 - Public URL: `https://api.modula.digital/v1/profiles/:profileId/mute`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1799`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1800`
 - Handler: inline
 - Controller/service calls: `moderation.mute`, `profileWrites.actorIdForProfileId`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12398,6 +12725,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{profileId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12424,10 +12752,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/me`
 - Public URL: `https://api.modula.digital/v1/profiles/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1709`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1710`
 - Handler: inline
 - Controller/service calls: `accounts.changeHandle`, `handle.toLowerCase`, `handle.trim`, `profileWrites.updateMe`, `profiles.getByActorId`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12436,6 +12764,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{displayName?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12462,10 +12791,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/me/avatar`
 - Public URL: `https://api.modula.digital/v1/profiles/me/avatar`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1754`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1755`
 - Handler: inline
 - Controller/service calls: `profileWrites.updateMedia`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12474,6 +12803,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12500,10 +12830,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/me/avatar`
 - Public URL: `https://api.modula.digital/v1/profiles/me/avatar`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1737`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1738`
 - Handler: inline
 - Controller/service calls: `profileWrites.updateMedia`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12512,6 +12842,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{attachmentId?: unknown} | undefined)?.attachmentId`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12538,10 +12869,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/me/cover`
 - Public URL: `https://api.modula.digital/v1/profiles/me/cover`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1754`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1755`
 - Handler: inline
 - Controller/service calls: `profileWrites.updateMedia`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12550,6 +12881,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12576,10 +12908,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/profiles/me/cover`
 - Public URL: `https://api.modula.digital/v1/profiles/me/cover`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1737`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1738`
 - Handler: inline
 - Controller/service calls: `profileWrites.updateMedia`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12588,6 +12920,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{attachmentId?: unknown} | undefined)?.attachmentId`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -12609,7 +12942,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/providers/:capabilityRole</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/providers/:capabilityRole`
 - Public URL: `https://api.modula.digital/v1/providers/:capabilityRole`
@@ -12617,7 +12950,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/providers/routes.ts:28`
 - Handler: inline
 - Controller/service calls: `service.list`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12626,6 +12959,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -12647,7 +12981,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PUT /v1/providers/:capabilityRole/default</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: PUT
 - Effective route: `/v1/providers/:capabilityRole/default`
 - Public URL: `https://api.modula.digital/v1/providers/:capabilityRole/default`
@@ -12655,7 +12989,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/providers/routes.ts:32`
 - Handler: inline
 - Controller/service calls: `service.setDefault`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12664,6 +12998,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -12685,7 +13020,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/providers/:capabilityRole/resolve</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/providers/:capabilityRole/resolve`
 - Public URL: `https://api.modula.digital/v1/providers/:capabilityRole/resolve`
@@ -12693,7 +13028,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/providers/routes.ts:30`
 - Handler: inline
 - Controller/service calls: `service.resolve`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12702,6 +13037,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -12728,7 +13064,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/reels`
 - Public URL: `https://api.modula.digital/v1/reels`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2102`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2103`
 - Handler: inline
 - Controller/service calls: `discovery.listReels`
 - Authentication: none
@@ -12740,6 +13076,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12778,6 +13115,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `any), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12790,7 +13128,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -12816,10 +13154,11 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
-- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`
+- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_asset_blobs`
 - Database writes: none observed
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -12828,7 +13167,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (404)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -12845,7 +13184,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/modules/routes/index.ts:270`
 - Handler: inline
 - Controller/service calls: `marketplace.submitRating`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -12854,6 +13193,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `{rating?: unknown} | undefined)?.rating)`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -12892,6 +13232,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12904,7 +13245,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -12930,6 +13271,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -12942,7 +13284,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
 - Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -12968,6 +13310,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `any), productKind: (request.query as any)?.productKind ?? 'all'}), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13006,10 +13349,11 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).productId), parseTrustOptions(request.query)), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
-- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`
+- Database reads: `greenfield_extension_catalogue`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_asset_blobs`
 - Database writes: none observed
 - Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
 - Events produced: none observed
@@ -13027,7 +13371,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/registry/products/:productId/relationships</code> — reachable</summary>
 
-- Domain: Modules
+- Domain: Social
 - Method: GET
 - Effective route: `/v1/registry/products/:productId/relationships`
 - Public URL: `https://api.modula.digital/v1/registry/products/:productId/relationships`
@@ -13044,6 +13388,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).productId)), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13082,6 +13427,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).publisherId)`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13120,6 +13466,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `any).publisherId)), request.id))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13158,6 +13505,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{releaseId?: string}).releaseId ?? ''))`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13170,7 +13518,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -13196,6 +13544,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{releaseId?: string`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `304`
 - Expected errors: `404`, `429`, `500`
@@ -13208,7 +13557,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (404)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
@@ -13222,10 +13571,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/reports`
 - Public URL: `https://api.modula.digital/v1/reports`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1829`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1830`
 - Handler: inline
 - Controller/service calls: `moderation.createReport`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13234,6 +13583,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `CreateReportInput`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -13260,10 +13610,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/reports/me`
 - Public URL: `https://api.modula.digital/v1/reports/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1842`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1843`
 - Handler: inline
 - Controller/service calls: `moderation.listForReporter`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13272,6 +13622,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `Record<string, unknown>`
 - Request body: none observed
+- Pagination: cursor; default 20, max 50, next cursor yes
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -13293,15 +13644,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/repositories/me</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: GET
 - Effective route: `/v1/repositories/me`
 - Public URL: `https://api.modula.digital/v1/repositories/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1062`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1063`
 - Handler: inline
 - Controller/service calls: `repositories.getMe`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13310,6 +13661,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13331,15 +13683,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/repositories/me/exports</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: POST
 - Effective route: `/v1/repositories/me/exports`
 - Public URL: `https://api.modula.digital/v1/repositories/me/exports`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1151`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1152`
 - Handler: inline
 - Controller/service calls: `repositories.createExport`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13348,6 +13700,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13369,15 +13722,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/repositories/me/exports/:exportId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: GET
 - Effective route: `/v1/repositories/me/exports/:exportId`
 - Public URL: `https://api.modula.digital/v1/repositories/me/exports/:exportId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1160`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1161`
 - Handler: inline
 - Controller/service calls: `repositories.getExport`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13386,6 +13739,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{exportId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13407,15 +13761,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/repositories/me/records</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: GET
 - Effective route: `/v1/repositories/me/records`
 - Public URL: `https://api.modula.digital/v1/repositories/me/records`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1071`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1072`
 - Handler: inline
 - Controller/service calls: `records.listForAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13424,6 +13778,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: `any).collection === 'string' ? (request.query as any).collection : undefined`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13445,15 +13800,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>POST /v1/repositories/me/records</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: POST
 - Effective route: `/v1/repositories/me/records`
 - Public URL: `https://api.modula.digital/v1/repositories/me/records`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1085`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1086`
 - Handler: inline
 - Controller/service calls: `records.mutate`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13462,6 +13817,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13483,15 +13839,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>DELETE /v1/repositories/me/records/:recordId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: DELETE
 - Effective route: `/v1/repositories/me/records/:recordId`
 - Public URL: `https://api.modula.digital/v1/repositories/me/records/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1128`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1129`
 - Handler: inline
 - Controller/service calls: `records.getForAccount`, `records.mutate`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13500,6 +13856,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{recordId: string}`
 - Request query: none observed
 - Request body: `any)?.expectedRevision,`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13521,15 +13878,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/repositories/me/records/:recordId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: GET
 - Effective route: `/v1/repositories/me/records/:recordId`
 - Public URL: `https://api.modula.digital/v1/repositories/me/records/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1077`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1078`
 - Handler: inline
 - Controller/service calls: `records.getForAccount`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13538,6 +13895,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{recordId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13559,15 +13917,15 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>PATCH /v1/repositories/me/records/:recordId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Account
 - Method: PATCH
 - Effective route: `/v1/repositories/me/records/:recordId`
 - Public URL: `https://api.modula.digital/v1/repositories/me/records/:recordId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1104`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1105`
 - Handler: inline
 - Controller/service calls: `records.getForAccount`, `records.mutate`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13576,6 +13934,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{recordId: string}`
 - Request query: none observed
 - Request body: `any`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13597,7 +13956,7 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/saves</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Posts
 - Method: GET
 - Effective route: `/v1/saves`
 - Public URL: `https://api.modula.digital/v1/saves`
@@ -13605,7 +13964,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase6s-routes.ts:225`
 - Handler: inline
 - Controller/service calls: `saves.listSaves`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -13614,6 +13973,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `403`, `404`, `429`, `500`
@@ -13640,18 +14000,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search`
 - Public URL: `https://api.modula.digital/v1/search`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1975`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1976`
 - Handler: inline
 - Controller/service calls: `search.search`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 60 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, unknown>, await resolveSearchActorContext(request))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13678,18 +14039,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/recent`
 - Public URL: `https://api.modula.digital/v1/search/recent`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2012`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2013`
 - Handler: inline
 - Controller/service calls: `search.deleteRecent`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, unknown>), ...(((request.body as any) ?? {}) as Record<string, unknown>)}`
 - Request body: `any) ?? {}) as Record<string, unknown>)}`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13716,18 +14078,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/recent`
 - Public URL: `https://api.modula.digital/v1/search/recent`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1992`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1993`
 - Handler: inline
 - Controller/service calls: `search.listRecent`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, unknown>), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13754,18 +14117,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/recent`
 - Public URL: `https://api.modula.digital/v1/search/recent`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2002`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2003`
 - Handler: inline
 - Controller/service calls: `search.recordRecent`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13792,18 +14156,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/saved`
 - Public URL: `https://api.modula.digital/v1/search/saved`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2023`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2024`
 - Handler: inline
 - Controller/service calls: `search.listSaved`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -13830,18 +14195,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/saved`
 - Public URL: `https://api.modula.digital/v1/search/saved`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2033`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2034`
 - Handler: inline
 - Controller/service calls: `search.createSaved`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13868,18 +14234,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/saved/:savedSearchId`
 - Public URL: `https://api.modula.digital/v1/search/saved/:savedSearchId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2054`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2055`
 - Handler: inline
 - Controller/service calls: `search.deleteSaved`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{savedSearchId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13906,18 +14273,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/saved/:savedSearchId`
 - Public URL: `https://api.modula.digital/v1/search/saved/:savedSearchId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:2043`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:2044`
 - Handler: inline
 - Controller/service calls: `search.patchSaved`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: `{savedSearchId: string}`
 - Request query: none observed
 - Request body: `any) ?? {}), request.id))`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -13944,18 +14312,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/search/suggestions`
 - Public URL: `https://api.modula.digital/v1/search/suggestions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1984`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1985`
 - Handler: inline
 - Controller/service calls: `search.suggestions`
 - Authentication: none
 - Authorization: PUBLIC
-- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 60 per 1 minute
 - Request params: none observed
 - Request query: `Record<string, unknown>, await resolveSearchActorContext(request)), request.id))`
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -13982,7 +14351,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions`
 - Public URL: `https://api.modula.digital/v1/sessions`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:811`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:812`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `authentication.login`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -13994,6 +14363,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14020,10 +14390,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/:sessionId`
 - Public URL: `https://api.modula.digital/v1/sessions/:sessionId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1033`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1034`
 - Handler: inline
 - Controller/service calls: `greenfieldSessions.revokeSession`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -14032,6 +14402,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{sessionId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -14058,7 +14429,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/apple`
 - Public URL: `https://api.modula.digital/v1/sessions/apple`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:972`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:973`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `appleAuthentication.completeAuthentication`, `mail.queueNewSignIn`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -14070,6 +14441,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14096,7 +14468,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/apple/options`
 - Public URL: `https://api.modula.digital/v1/sessions/apple/options`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:960`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:961`
 - Handler: inline
 - Controller/service calls: `appleAuthentication.beginAuthentication`
 - Authentication: none
@@ -14108,6 +14480,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14134,10 +14507,10 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/current`
 - Public URL: `https://api.modula.digital/v1/sessions/current`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1027`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1028`
 - Handler: inline
 - Controller/service calls: `greenfieldSessions.revokeSession`
-- Authentication: greenfield bearer [REDACTED] session
+- Authentication: greenfield bearer access session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -14146,6 +14519,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -14172,7 +14546,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/email-code`
 - Public URL: `https://api.modula.digital/v1/sessions/email-code`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:848`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:849`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `authentication.loginWithEmailCode`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -14184,6 +14558,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14210,7 +14585,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/email-code/request`
 - Public URL: `https://api.modula.digital/v1/sessions/email-code/request`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:833`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:834`
 - Handler: inline
 - Controller/service calls: `authentication.requestEmailLoginCode`
 - Authentication: none
@@ -14222,6 +14597,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14248,18 +14624,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/me`
 - Public URL: `https://api.modula.digital/v1/sessions/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1430`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1431`
 - Handler: inline
 - Controller/service calls: `sessions.revokeSession`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 30 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
@@ -14286,18 +14663,19 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/me`
 - Public URL: `https://api.modula.digital/v1/sessions/me`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1424`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1425`
 - Handler: inline
 - Controller/service calls: none observed
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
-- Ownership rule: not evident in the route handler; inspect downstream service
+- Ownership rule: authenticated account id is passed into the service/repository scope
 - Workspace rule: none observed
 - Capability/permission: none observed
 - Rate limit: 120 per 1 minute
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `401`, `404`, `429`, `500`
@@ -14324,7 +14702,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/passkey`
 - Public URL: `https://api.modula.digital/v1/sessions/passkey`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:919`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:920`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `greenfieldSessions.issue`, `mail.queueNewSignIn`, `passkeys.verifyAuthentication`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -14336,6 +14714,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any) ?? {}) as {challengeId?: string`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14362,7 +14741,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/passkey/options`
 - Public URL: `https://api.modula.digital/v1/sessions/passkey/options`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:904`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:905`
 - Handler: inline
 - Controller/service calls: `passkeys.beginAuthentication`
 - Authentication: none
@@ -14374,6 +14753,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14400,7 +14780,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/recovery-code`
 - Public URL: `https://api.modula.digital/v1/sessions/recovery-code`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:876`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:877`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `authentication.loginWithRecoveryCode`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -14412,6 +14792,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14438,7 +14819,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/sessions/refresh`
 - Public URL: `https://api.modula.digital/v1/sessions/refresh`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1008`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1009`
 - Handler: inline
 - Controller/service calls: `accessExpiresAt.toISOString`, `greenfieldSessions.refresh`, `refreshExpiresAt.toISOString`
 - Authentication: none
@@ -14450,6 +14831,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: `any).refreshToken)`
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `404`, `409`, `429`, `500`
@@ -14469,6 +14851,45 @@ Every runtime method route is either represented below or explicitly listed as f
 </details>
 
 <details>
+<summary><code>GET /v1/status</code> — reachable</summary>
+
+- Domain: Operations
+- Method: GET
+- Effective route: `/v1/status`
+- Public URL: `https://api.modula.digital/v1/status`
+- API version: v1
+- Source file: `services/greenfield-api/src/support/routes.ts:20`
+- Handler: inline
+- Controller/service calls: none observed
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: 120 per 1 minute
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `503`
+- Expected errors: `404`, `429`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: PASS (200)
+- Status: reachable
+- Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>POST /v1/stories</code> — reachable</summary>
 
 - Domain: Media
@@ -14479,7 +14900,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:79`
 - Handler: inline
 - Controller/service calls: `stories.create`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -14488,6 +14909,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `201`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -14526,6 +14948,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{groupId?: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14555,7 +14978,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:121`
 - Handler: inline
 - Controller/service calls: `stories.deleteItem`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -14564,6 +14987,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{itemId?: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -14593,7 +15017,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Source file: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts:109`
 - Handler: inline
 - Controller/service calls: `stories.markViewed`
-- Authentication: legacy or bridged bearer [REDACTED]
+- Authentication: legacy or bridged bearer session
 - Authorization: AUTHENTICATED
 - Ownership rule: authenticated actor id is passed into the service/repository scope
 - Workspace rule: none observed
@@ -14602,6 +15026,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{itemId?: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `400`, `401`, `403`, `404`, `409`, `429`, `500`
@@ -14640,6 +15065,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14659,14 +15085,131 @@ Every runtime method route is either represented below or explicitly listed as f
 </details>
 
 <details>
+<summary><code>GET /v1/support/cases</code> — reachable</summary>
+
+- Domain: Support
+- Method: GET
+- Effective route: `/v1/support/cases`
+- Public URL: `https://api.modula.digital/v1/support/cases`
+- API version: v1
+- Source file: `services/greenfield-api/src/support/routes.ts:53`
+- Handler: inline
+- Controller/service calls: `service.list`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: 120 per 1 minute
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `401`, `404`, `429`, `500`
+- Database reads: `greenfield_support_cases`
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: PASS (401)
+- Status: reachable
+- Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/support/cases</code> — reachable</summary>
+
+- Domain: Support
+- Method: POST
+- Effective route: `/v1/support/cases`
+- Public URL: `https://api.modula.digital/v1/support/cases`
+- API version: v1
+- Source file: `services/greenfield-api/src/support/routes.ts:54`
+- Handler: inline
+- Controller/service calls: `key.trim`, `service.open`
+- Authentication: greenfield bearer access session
+- Authorization: AUTHENTICATED
+- Ownership rule: authenticated account id is passed into the service/repository scope
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: 30 per 1 minute
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `404`, `409`, `429`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_auth_identities`, `greenfield_support_cases`
+- Database writes: `greenfield_support_cases`
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: reachable
+- Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>GET /v1/support/contact</code> — reachable</summary>
+
+- Domain: Support
+- Method: GET
+- Effective route: `/v1/support/contact`
+- Public URL: `https://api.modula.digital/v1/support/contact`
+- API version: v1
+- Source file: `services/greenfield-api/src/support/routes.ts:29`
+- Handler: inline
+- Controller/service calls: `service.contact`
+- Authentication: none
+- Authorization: PUBLIC
+- Ownership rule: public/optional-viewer policy; downstream visibility checks must enforce privacy
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: 120 per 1 minute
+- Request params: none observed
+- Request query: none observed
+- Request body: none observed
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `404`, `429`, `500`
+- Database reads: none observed
+- Database writes: none observed
+- Storage: none observed
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: none observed
+- Known clients: none observed
+- Tests: none observed
+- Runtime registration: yes
+- Live probe: not executed
+- Status: reachable
+- Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
 <summary><code>GET /v1/tools</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/tools`
 - Public URL: `https://api.modula.digital/v1/tools`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1225`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1226`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`
 - Authentication: none
@@ -14678,6 +15221,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14699,12 +15243,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/tools/:toolId</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/tools/:toolId`
 - Public URL: `https://api.modula.digital/v1/tools/:toolId`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1229`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1230`
 - Handler: inline
 - Controller/service calls: `eb.or`
 - Authentication: none
@@ -14716,6 +15260,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: `{toolId: string}`
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14742,7 +15287,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/v1/version`
 - Public URL: `https://api.modula.digital/v1/version`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:228`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:229`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -14754,6 +15299,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14775,12 +15321,12 @@ Every runtime method route is either represented below or explicitly listed as f
 <details>
 <summary><code>GET /v1/widgets</code> — reachable</summary>
 
-- Domain: Platform
+- Domain: Modules
 - Method: GET
 - Effective route: `/v1/widgets`
 - Public URL: `https://api.modula.digital/v1/widgets`
 - API version: v1
-- Source file: `services/greenfield-api/src/app/register-routes.ts:1405`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:1406`
 - Handler: inline
 - Controller/service calls: `db.selectFrom`
 - Authentication: none
@@ -14792,6 +15338,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14818,7 +15365,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Effective route: `/version.json`
 - Public URL: `https://api.modula.digital/version.json`
 - API version: versionless
-- Source file: `services/greenfield-api/src/app/register-routes.ts:224`
+- Source file: `services/greenfield-api/src/app/register-routes.ts:225`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: none
@@ -14830,6 +15377,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Request params: none observed
 - Request query: none observed
 - Request body: none observed
+- Pagination: none observed
 - Response schema: not declared in Fastify
 - Success codes: `200`
 - Expected errors: `404`, `429`, `500`
@@ -14842,7 +15390,7 @@ Every runtime method route is either represented below or explicitly listed as f
 - Known clients: none observed
 - Tests: `scripts/verify-greenfield-backend-v1.mjs`, `scripts/verify-phase7e-web-production-cutover.mjs`, `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7j-b.mjs`, `scripts/verify-phase7j-mac.mjs`, `scripts/verify-phase7l-a.mjs`, `services/greenfield-api/tests/api.integration.test.ts`
 - Runtime registration: yes
-- Live probe: not executed
+- Live probe: PASS (200)
 - Status: reachable
 - Notes: No Fastify request/response schema is registered; validation, if present, is handler/service-level.
 
