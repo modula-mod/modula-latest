@@ -9,6 +9,7 @@ import {reapExpiredEventDeliveryLeases} from './events/claim.js'
 import {ingestAllConnections} from './bridges/atproto/ingest.js'
 import {isOperationalFlagSet} from './bridges/atproto/session.js'
 import {heartbeatDue, recordHeartbeat} from './heartbeat/heartbeat.js'
+import {DIGEST_PASS_INTERVAL_MS, runDigestPass} from './digests/digests.js'
 
 async function main() {
   const config = loadConfig()
@@ -29,6 +30,7 @@ async function main() {
   let lastDrain = 0
   let lastIngest = 0
   let lastBeat = 0
+  let lastDigest = 0
   const startedAt = new Date()
   const releaseSha = process.env.MODULA_RELEASE_SHA ?? null
 
@@ -37,6 +39,15 @@ async function main() {
     if (heartbeatDue(lastBeat, now)) {
       await recordHeartbeat(db, {workerId: config.workerId, releaseSha, startedAt})
       lastBeat = now
+    }
+    if (now - lastDigest >= DIGEST_PASS_INTERVAL_MS) {
+      lastDigest = now
+      try {
+        const result = await runDigestPass(db)
+        if (result.queued > 0) log.info(result, 'digest pass queued mail')
+      } catch (error) {
+        log.error({error}, 'digest pass failed')
+      }
     }
     if (now - lastReap >= config.leaseReapIntervalMs) {
       await reapExpiredLeases(db)

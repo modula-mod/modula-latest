@@ -1036,6 +1036,10 @@ export interface Database {
   }
   greenfield_worker_heartbeats: {worker_id: string; release_sha: string | null; started_at: Date; last_seen_at: Date}
   greenfield_support_cases: {case_id: string; reference: string; account_id: string; category: 'help' | 'bug' | 'account' | 'privacy' | 'safety' | 'feedback'; subject: string; message: string; diagnostics: unknown | null; state: 'OPEN' | 'ANSWERED' | 'CLOSED'; idempotency_key: string; mail_job_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_account_app_preferences: {account_id: string; preferences: unknown; version: number; updated_at: Date}
+  greenfield_digest_deliveries: {account_id: string; digest_kind: 'weekly' | 'morning'; period_key: string; outcome: 'queued' | 'quiet' | 'no-email'; mail_job_id: string | null; summary: unknown; created_at: Date}
+  greenfield_creator_ledger_entries: {entry_id: string; account_id: string; entry_kind: 'earning' | 'payout' | 'refund' | 'fee' | 'adjustment'; amount_minor: string | number; currency: string; description: string; source: string; source_reference: string | null; occurred_at: Date; created_at: Date}
+  greenfield_commerce_invoices: {invoice_id: string; account_id: string; invoice_number: string; state: 'open' | 'paid' | 'void' | 'refunded'; description: string; total_minor: string | number; currency: string; provider: string; provider_reference: string | null; issued_at: Date; paid_at: Date | null; created_at: Date}
   greenfield_accounts: {account_id: string; primary_handle: string; status: 'pendingVerification' | 'active' | 'suspended' | 'deactivated' | 'deleted'; created_at: Date; updated_at: Date}
   greenfield_handles: {handle: string; account_id: string; status: 'active' | 'released' | 'reserved'; created_at: Date}
   greenfield_handle_history: {history_id: string; account_id: string; handle: string; action: string; created_at: Date}
