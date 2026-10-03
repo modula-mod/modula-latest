@@ -1,0 +1,311 @@
+{
+  "metadata": {
+    "title": "API-BASELINE-02 authenticated production acceptance",
+    "capturedAt": "2026-10-03T18:23:49.727Z",
+    "baseUrl": "https://api.modula.digital",
+    "markerHash": "b8a19b9a3f11",
+    "release": {
+      "commit": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+      "releaseId": null,
+      "expectedMigration": null
+    },
+    "identities": [
+      "api-atlas-a",
+      "api-atlas-b"
+    ],
+    "secretsIncluded": false
+  },
+  "summary": {
+    "passed": 46,
+    "failed": 0
+  },
+  "checks": [
+    {
+      "name": "audit identity login",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "audit identity login",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "account A self read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "account B self read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "profile B owner read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "profile B follower-only setup",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B public post",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B private post",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write acceptance A post create",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B comment",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B attachment session",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B attachment content",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write fixture B private record",
+      "status": 201,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "account handle history cross-user denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "session cross-user revoke is owner-scoped",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "session B remains active after A revoke attempt",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "account update remains self-scoped",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "security sessions remain self-scoped",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "security passkeys remain self-scoped",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "private profile cross-user denial",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "profile update cross-user denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "avatar cross-user attachment denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "cover cross-user attachment denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "private post identifier denial",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "post cross-user edit denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "post cross-user delete denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "post cross-user media bind denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "comment cross-user edit denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "comment cross-user delete denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "attachment metadata cross-user denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "attachment content identifier denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "attachment delete cross-user denial",
+      "status": 403,
+      "errorCode": "FORBIDDEN",
+      "result": "PASS"
+    },
+    {
+      "name": "private repository record cross-user denial",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "private repository record mutation denial",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "known gap private follow succeeds immediately",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "known gap private profile visible immediately after follow",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "write acceptance A post delete",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    }
+  ],
+  "cleanup": [
+    {
+      "resource": "recovered-record",
+      "key": "1ad7ae21d7ca",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "recovered-record",
+      "key": "5e1e87b8381c",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "follow",
+      "key": "49161b86e128",
+      "status": 404,
+      "verificationStatus": 404,
+      "result": "PASS"
+    },
+    {
+      "resource": "comment",
+      "key": "4b647cf3ca5d",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "post",
+      "key": "fed19dd3751f",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "post",
+      "key": "c71041b0a557",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "attachment",
+      "key": "e6a31f6ec401",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "record",
+      "key": "7159bd160959",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "profile-visibility",
+      "key": "api-atlas-b",
+      "status": 200,
+      "verificationStatus": null,
+      "result": "PASS"
+    }
+  ]
+}

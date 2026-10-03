@@ -1,0 +1,25 @@
+{
+  "atlasFinalStatus": "PASS",
+  "controlledAcceptance": {
+    "passed": 28,
+    "failed": 0,
+    "expectedFailureRegressions": [
+      "legacy function invocation accepts another account installation identifier",
+      "AI stream reconnect omits account ownership",
+      "AI stream cancel omits account ownership",
+      "missing module permission review falls back to manifest permissions",
+      "unsigned published release is trusted and installation-eligible",
+      "reaction notification retry reproduces PostgreSQL 23505",
+      "follower-only profile follow becomes active without approval"
+    ]
+  },
+  "tests": {
+    "apiTypecheck": "passed",
+    "workerTypecheck": "passed",
+    "api": "107/107 standard and 23/23 targeted database acceptance passed",
+    "worker": "11/11 standard and 22/22 pre-migrated database acceptance passed",
+    "atlas": "80/80 passed",
+    "productionProbes": "26/26 passed against starting production revision",
+    "secretScan": "passed"
+  }
+}

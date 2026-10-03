@@ -170,6 +170,48 @@
       "excerpt": "origin: row.collection.startsWith('digital.modula.temp') ? 'modula+atproto' : 'atproto',"
     },
     {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 19,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value) throw new Error(`${name} is required`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 41,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!ALLOWED_HANDLES.has(spec.handle)) throw new Error(`Refusing unreserved audit handle ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 69,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Refusing collision with non-audit identity ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 72,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Stored password does not match the secured audit secret for ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 88,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!registration.verificationToken) throw new Error(`Audit verification token missing for ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 135,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Set API_ATLAS_IDENTITY_BOOTSTRAP to the exact documented guard value')"
+    },
+    {
       "file": "services/greenfield-api/src/config/env.ts",
       "line": 211,
       "marker": "throw new Error",
@@ -1983,6 +2025,48 @@
       "marker": "temp",
       "classification": "feature-gated-experimental-protocol",
       "excerpt": "origin: row.collection.startsWith('digital.modula.temp') ? 'modula+atproto' : 'atproto',"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 19,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value) throw new Error(`${name} is required`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 41,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!ALLOWED_HANDLES.has(spec.handle)) throw new Error(`Refusing unreserved audit handle ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 69,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Refusing collision with non-audit identity ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 72,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Stored password does not match the secured audit secret for ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 88,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!registration.verificationToken) throw new Error(`Audit verification token missing for ${spec.handle}`)"
+    },
+    {
+      "file": "services/greenfield-api/src/cli/api-atlas-identities.ts",
+      "line": 135,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error('Set API_ATLAS_IDENTITY_BOOTSTRAP to the exact documented guard value')"
     },
     {
       "file": "services/greenfield-api/src/config/env.ts",

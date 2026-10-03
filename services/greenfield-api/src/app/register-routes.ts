@@ -132,6 +132,8 @@ function releaseIdentity(config: AppConfig) {
     phase: 'phase7i-f5b',
     commit: releaseSha,
     builtAt: process.env.MODULA_RELEASE_BUILT_AT ?? null,
+    releaseId: process.env.MODULA_RELEASE_ID ?? releaseSha,
+    expectedMigration: process.env.MODULA_EXPECTED_MIGRATION ?? null,
     environment: config.environment,
     apiOrigin: config.publicApiUrl,
     worker: {

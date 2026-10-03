@@ -1,0 +1,33 @@
+name: API Atlas contract drift
+
+on:
+  pull_request:
+    paths:
+      - 'services/greenfield-api/**'
+      - 'services/greenfield-worker/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'tools/api-atlas/**'
+      - 'docs/audits/api-atlas-01/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+
+jobs:
+  atlas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.11.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm api:atlas:verify
+      - run: pnpm api:atlas:secrets
+      - name: Require committed contract updates
+        run: git diff --exit-code -- docs/audits/api-atlas-01 tools/api-atlas package.json

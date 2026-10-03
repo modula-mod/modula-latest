@@ -12,10 +12,10 @@ const required = [
   '08-events-workers-jobs.md', '09-client-capability-coverage.md', '10-live-probe-results.md',
   '11-gap-register.md', '12-remediation-roadmap.md', 'api-atlas.json', 'api-atlas.csv',
   '13-verification-results.md',
-  'route-data-map.json', 'gap-register.json', 'openapi.generated.yaml', 'request-flow.mmd',
+  'route-data-map.json', 'contract-baseline.json', 'worker-job-map.json', 'gap-register.json', 'openapi.generated.yaml', 'request-flow.mmd',
   'module-flow.mmd', 'intelligence-flow.mmd', 'media-flow.mmd', 'event-flow.mmd',
   'client-contract-analysis.json', 'evidence/production-snapshot.json', 'evidence/live-probes.json',
-  'evidence/source-sweep.json',
+  'evidence/source-sweep.json', 'evidence/authenticated-acceptance.json', 'evidence/api-baseline-02-closeout.json',
 ]
 
 const failures = []
@@ -78,6 +78,10 @@ let snapshot
 let probes
 let clientContracts
 let openapi
+let authenticatedAcceptance
+let closeout
+let contractBaseline
+let workerJobMap
 try { atlas = JSON.parse(readFileSync(join(outputDir, 'api-atlas.json'), 'utf8')); check('api-atlas.json parses', true) } catch (error) { check('api-atlas.json parses', false, error.message) }
 try { gaps = JSON.parse(readFileSync(join(outputDir, 'gap-register.json'), 'utf8')); check('gap-register.json parses', true) } catch (error) { check('gap-register.json parses', false, error.message) }
 try { routeData = JSON.parse(readFileSync(join(outputDir, 'route-data-map.json'), 'utf8')); check('route-data-map.json parses', true) } catch (error) { check('route-data-map.json parses', false, error.message) }
@@ -85,6 +89,10 @@ try { snapshot = JSON.parse(readFileSync(join(outputDir, 'evidence/production-sn
 try { probes = JSON.parse(readFileSync(join(outputDir, 'evidence/live-probes.json'), 'utf8')); check('live probes parse', true) } catch (error) { check('live probes parse', false, error.message) }
 try { clientContracts = JSON.parse(readFileSync(join(outputDir, 'client-contract-analysis.json'), 'utf8')); check('client contract analysis parses', true) } catch (error) { check('client contract analysis parses', false, error.message) }
 try { openapi = JSON.parse(readFileSync(join(outputDir, 'openapi.generated.yaml'), 'utf8')); check('OpenAPI YAML parses as JSON-compatible YAML', true) } catch (error) { check('OpenAPI YAML parses as JSON-compatible YAML', false, error.message) }
+try { authenticatedAcceptance = JSON.parse(readFileSync(join(outputDir, 'evidence/authenticated-acceptance.json'), 'utf8')); check('authenticated acceptance parses', true) } catch (error) { check('authenticated acceptance parses', false, error.message) }
+try { closeout = JSON.parse(readFileSync(join(outputDir, 'evidence/api-baseline-02-closeout.json'), 'utf8')); check('baseline closeout parses', true) } catch (error) { check('baseline closeout parses', false, error.message) }
+try { contractBaseline = JSON.parse(readFileSync(join(outputDir, 'contract-baseline.json'), 'utf8')); check('contract baseline parses', true) } catch (error) { check('contract baseline parses', false, error.message) }
+try { workerJobMap = JSON.parse(readFileSync(join(outputDir, 'worker-job-map.json'), 'utf8')); check('worker job map parses', true) } catch (error) { check('worker job map parses', false, error.message) }
 
 if (atlas && snapshot) {
   const reconciliation = atlas.reconciliation
@@ -110,6 +118,22 @@ if (gaps) {
 
 if (probes) check('safe probe suite passed', probes.probes.length > 0 && probes.probes.every(probe => probe.result === 'PASS'))
 if (clientContracts) check('literal client calls reconciled', clientContracts.unmatched.length === 0)
+if (contractBaseline && atlas) {
+  check('contract baseline covers every route', contractBaseline.routes.length === atlas.routes.length && contractBaseline.routes.every(route => typeof route.sourceContractSha256 === 'string' && route.sourceContractSha256.length === 64))
+}
+if (workerJobMap) check('worker jobs mapped', workerJobMap.jobs.length > 0 && workerJobMap.jobs.every(job => job.jobType && job.source && job.handler !== 'unresolved'))
+if (authenticatedAcceptance) {
+  check('authenticated acceptance excludes secrets', authenticatedAcceptance.metadata?.secretsIncluded === false)
+  if (closeout?.atlasFinalStatus === 'PASS') {
+    check('authenticated acceptance complete for PASS', authenticatedAcceptance.summary?.failed === 0 && authenticatedAcceptance.summary?.passed > 0)
+    check('authenticated cleanup complete for PASS', Array.isArray(authenticatedAcceptance.cleanup) && authenticatedAcceptance.cleanup.length > 0 && authenticatedAcceptance.cleanup.every(item => item.result === 'PASS'))
+  }
+}
+if (closeout?.atlasFinalStatus === 'PASS') {
+  check('controlled acceptance complete for PASS', closeout.controlledAcceptance?.failed === 0 && closeout.controlledAcceptance?.passed > 0)
+  check('atlas JSON status PASS', atlas?.metadata?.status === 'PASS')
+  check('gap register status PASS', gaps?.metadata?.status === 'PASS')
+}
 
 try {
   const csv = parseCsv(readFileSync(join(outputDir, 'api-atlas.csv'), 'utf8'))

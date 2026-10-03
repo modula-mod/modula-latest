@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {createHash} from 'node:crypto'
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs'
 import {extname, join, relative} from 'node:path'
 import {
@@ -22,6 +23,19 @@ if (!existsSync(snapshotPath)) throw new Error(`Missing ${snapshotPath}; run pnp
 const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'))
 const liveProbePath = join(evidenceDir, 'live-probes.json')
 const liveProbes = existsSync(liveProbePath) ? JSON.parse(readFileSync(liveProbePath, 'utf8')) : {probes: []}
+const authenticatedAcceptancePath = join(evidenceDir, 'authenticated-acceptance.json')
+const authenticatedAcceptance = existsSync(authenticatedAcceptancePath)
+  ? JSON.parse(readFileSync(authenticatedAcceptancePath, 'utf8'))
+  : {summary: {passed: 0, failed: 1}, checks: [], cleanup: []}
+const closeoutPath = join(evidenceDir, 'api-baseline-02-closeout.json')
+const closeout = existsSync(closeoutPath)
+  ? JSON.parse(readFileSync(closeoutPath, 'utf8'))
+  : {atlasFinalStatus: 'PARTIAL', controlledAcceptance: {passed: 0, failed: 1}}
+const acceptanceComplete = authenticatedAcceptance.summary?.failed === 0
+  && authenticatedAcceptance.summary?.passed > 0
+  && closeout.controlledAcceptance?.failed === 0
+  && closeout.controlledAcceptance?.passed > 0
+const atlasStatus = acceptanceComplete && closeout.atlasFinalStatus === 'PASS' ? 'PASS' : 'PARTIAL'
 const runtime = snapshot.runtimeRoutes
 const automaticHeadKeys = new Set(runtime.filter(route => route.method === 'GET').map(route => `HEAD ${route.url}`))
 const applicationRuntime = runtime.filter(route => route.method !== 'OPTIONS' && !automaticHeadKeys.has(`${route.method} ${route.url}`))
@@ -180,7 +194,18 @@ const routeReconciliation = {
 
 const tableUsage = scanAllTableUsage()
 const migrations = migrationIntroductions()
-const tables = snapshot.databaseSchema.tables.map(table => {
+const capturedTables = new Map(snapshot.databaseSchema.tables.map(table => [table.name, table]))
+const tableNames = [...new Set([...capturedTables.keys(), ...Object.keys(migrations.introduced)])].sort()
+const tables = tableNames.map(name => {
+  const table = capturedTables.get(name) ?? {
+    name,
+    columns: [],
+    primaryKey: [],
+    foreignKeys: [],
+    indexes: [],
+    uniqueConstraints: [],
+    sourceState: 'declared-in-migration-not-yet-captured-in-production',
+  }
   const usage = tableUsage[table.name] ?? {reads: [], writes: []}
   const routeReads = atlas.filter(route => route.data.reads.includes(table.name)).map(route => route.id)
   const routeWrites = atlas.filter(route => route.data.writes.includes(table.name)).map(route => route.id)
@@ -221,6 +246,7 @@ const output = {
     productionSha: snapshot.containers.api.revision,
     sourceSha: snapshot.repository.originMain,
     publicApiBase: baseUrl,
+    status: atlasStatus,
   },
   reconciliation: routeReconciliation,
   routes: atlas,
@@ -232,12 +258,23 @@ const output = {
 const capabilities = capabilityCoverage()
 const clientContracts = scanClientContracts(atlas)
 const sourceSweep = scanImplementationMarkers()
-const gaps = buildGapRegister()
+const gaps = buildGapRegister().filter(gap => !(acceptanceComplete && gap.title === 'Production cross-user and authenticated write acceptance was not safe to execute'))
+const contractBaseline = atlas.map(route => ({
+  id: route.id,
+  authorization: route.authorization,
+  ownership: route.authorization.ownership,
+  request: route.request,
+  response: route.response,
+  sourceContractSha256: sourceContractFingerprint(sourceByKey.get(route.id)),
+}))
+const workerJobMap = scanWorkerJobMap()
 
 mkdirSync(outputDir, {recursive: true})
 write('api-atlas.json', json(output))
 write('route-data-map.json', json(routeDataMap))
-write('gap-register.json', json({metadata: {capturedAt: snapshot.capturedAt, status: 'PARTIAL'}, gaps}))
+write('contract-baseline.json', json({metadata: {status: atlasStatus, capturedAt: snapshot.capturedAt}, routes: contractBaseline}))
+write('worker-job-map.json', json(workerJobMap))
+write('gap-register.json', json({metadata: {capturedAt: snapshot.capturedAt, status: atlasStatus}, gaps}))
 write('client-contract-analysis.json', json(clientContracts))
 write('evidence/source-sweep.json', json(sourceSweep))
 write('api-atlas.csv', renderCsv(atlas))
@@ -283,6 +320,41 @@ function purposeForTable(name) {
     ['ai_', 'AI provider/execution state'],
   ].find(([value]) => name.startsWith(value))
   return prefix?.[1] ?? `application state for ${name.replaceAll('_', ' ')}`
+}
+
+function sourceContractFingerprint(route) {
+  const relevant = (route?.handlerText ?? '').split('\n')
+    .map(line => line.trim().replaceAll(/\s+/g, ' '))
+    .filter(line => /schema|request\.(?:body|query|params)|bodyString|reply\.(?:code|send|type)|successEnvelope|failureEnvelope|sendError/.test(line))
+  return createHash('sha256').update(JSON.stringify(relevant)).digest('hex')
+}
+
+function scanWorkerJobMap() {
+  const file = 'services/greenfield-worker/src/jobs/runner.ts'
+  const text = readFileSync(join(repoRoot, file), 'utf8')
+  const lines = text.split('\n')
+  const jobs = []
+  let pendingCases = []
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = lines[index].match(/^\s*case\s+['"]([^'"]+)['"]:/)
+    if (match) {
+      pendingCases.push({jobType: match[1], source: `${file}:${index + 1}`})
+      continue
+    }
+    if (!pendingCases.length) continue
+    const statement = lines[index].trim()
+    if (/^await\s+/.test(statement)) {
+      jobs.push(...pendingCases.map(job => ({...job, handler: statement})))
+      pendingCases = []
+      continue
+    }
+    if (statement === 'break') {
+      jobs.push(...pendingCases.map(job => ({...job, handler: 'no-op (acknowledged event or reserved job type)'})))
+      pendingCases = []
+    }
+  }
+  jobs.push(...pendingCases.map(job => ({...job, handler: 'unresolved'})))
+  return {metadata: {generatedFrom: file}, jobs}
 }
 
 function capabilityCoverage() {
@@ -515,7 +587,8 @@ function list(values) {
 }
 
 function renderAuthMatrix(routes) {
-  return `# Authentication and Permissions Matrix\n\nThis matrix distinguishes transport reachability from application authorization. nginx has a catch-all proxy, so route-level guards are the decisive control for all application paths.\n\n| Method | Route | Anonymous | Session | Verified email | Owner/account scope | Workspace | Capabilities / service operations | Admin | Module install | Module permission | Evidence |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${routes.map(route => `| ${route.method} | \`${route.effectiveRoute}\` | ${yes(route.authorization.anonymousAllowed)} | ${yes(route.authorization.sessionRequired)} | ${yes(route.authorization.verifiedEmailRequired)} | ${yes(route.authorization.ownership.accountScoped || route.authorization.ownership.actorScoped)} | ${yes(route.authorization.ownership.workspaceScoped)} | ${[...route.authorization.capabilities, ...route.authorization.serviceOperations].join(', ') || 'none'} | ${yes(route.authorization.adminRequired)} | ${yes(route.authorization.moduleInstallationRequired)} | ${yes(route.authorization.modulePermissionRequired)} | ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'unmatched'} |`).join('\n')}\n\n## Interpretation limits\n\n- "Owner/account scope" means the authenticated account or actor identifier is visibly passed into the handler's service path; downstream SQL and service evidence remains authoritative.\n- "Anonymous" includes optional-viewer endpoints. Private, blocked, and muted content still depends on repository visibility predicates.\n- Backend Fabric routes use signed service assertions rather than user bearer sessions.\n`
+  const evidenceRows = (authenticatedAcceptance.checks ?? []).filter(check => /cross-user|private|owner-scoped|remains self-scoped/.test(check.name))
+  return `# Authentication and Permissions Matrix\n\nThis matrix distinguishes transport reachability from application authorization. nginx has a catch-all proxy, so route-level guards are the decisive control for all application paths.\n\n| Method | Route | Anonymous | Session | Verified email | Owner/account scope | Workspace | Capabilities / service operations | Admin | Module install | Module permission | Evidence |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n${routes.map(route => `| ${route.method} | \`${route.effectiveRoute}\` | ${yes(route.authorization.anonymousAllowed)} | ${yes(route.authorization.sessionRequired)} | ${yes(route.authorization.verifiedEmailRequired)} | ${yes(route.authorization.ownership.accountScoped || route.authorization.ownership.actorScoped)} | ${yes(route.authorization.ownership.workspaceScoped)} | ${[...route.authorization.capabilities, ...route.authorization.serviceOperations].join(', ') || 'none'} | ${yes(route.authorization.adminRequired)} | ${yes(route.authorization.moduleInstallationRequired)} | ${yes(route.authorization.modulePermissionRequired)} | ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'unmatched'} |`).join('\n')}\n\n## Authenticated acceptance evidence\n\nAtlas status: **${atlasStatus}**. Production authenticated checks: ${authenticatedAcceptance.summary?.passed ?? 0} passed / ${authenticatedAcceptance.summary?.failed ?? 0} failed. Controlled exact-schema ownership/trust checks: ${closeout.controlledAcceptance?.passed ?? 0} passed / ${closeout.controlledAcceptance?.failed ?? 0} failed.\n\n${evidenceRows.length ? mdTable(['Disposition','HTTP status','Error contract','Result'], evidenceRows.map(check => [check.name, String(check.status), check.errorCode ?? 'success envelope', check.result])) : 'Authenticated production evidence has not been captured.'}\n\nKnown vulnerable behavior is intentionally represented by expected-failure regressions; PASS means the authorization map is complete, not defect-free.\n\n## Interpretation limits\n\n- "Owner/account scope" means the authenticated account or actor identifier is visibly passed into the handler's service path; downstream SQL and service evidence remains authoritative.\n- "Anonymous" includes optional-viewer endpoints. Private, blocked, and muted content still depends on repository visibility predicates.\n- Backend Fabric routes use signed service assertions rather than user bearer sessions.\n`
 }
 
 function yes(value) { return value ? 'yes' : 'no' }
@@ -667,7 +740,7 @@ function countBy(items, key) {
 function renderReadme() {
   return `# MODULA GREENFIELD — API-ATLAS-01
 
-Status: **PARTIAL**. Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled. Route completeness passed: ${runtime.length} runtime method routes = ${atlas.length} mapped application routes + ${frameworkRuntime.length} explicitly excluded framework-derived routes. Authenticated cross-user and write acceptance was not executed because no dedicated production audit identities and cleanup harness were available.
+Status: **${atlasStatus}**. Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled. Route completeness passed: ${runtime.length} runtime method routes = ${atlas.length} mapped application routes + ${frameworkRuntime.length} explicitly excluded framework-derived routes. ${acceptanceComplete ? 'Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.' : 'Authenticated closeout evidence is not yet complete.'}
 
 This directory is the canonical evidence-backed snapshot captured at ${snapshot.capturedAt}. The machine-readable source of truth is \`api-atlas.json\`; Markdown files are generated views. Secret values and production row data are excluded.
 
@@ -683,16 +756,16 @@ This directory is the canonical evidence-backed snapshot captured at ${snapshot.
 - \`07-intelligence-api-map.md\`: Mission through governed ledger.
 - \`08-events-workers-jobs.md\`: outbox, jobs, consumers, mail and failures.
 - \`09-client-capability-coverage.md\`: product/client contract coverage.
-- \`10-live-probe-results.md\`: safe anonymous production probes.
+- \`10-live-probe-results.md\`: anonymous and authenticated production probes.
 - \`11-gap-register.md\`, \`gap-register.json\`: evidence-based findings.
 - \`12-remediation-roadmap.md\`: sequenced follow-up missions; no fixes were made here.
 - \`13-verification-results.md\`: audit-tool, typecheck and test outcomes plus explicit limitations.
 - \`openapi.generated.yaml\`: generated implementation snapshot, intentionally incomplete where route schemas do not exist.
-- \`evidence/production-snapshot.json\`: sanitized production facts; no secrets or user rows.
+- \`evidence/production-snapshot.json\`, \`evidence/authenticated-acceptance.json\`: sanitized production facts; no secrets or user rows.
 
 ## Reproduce
 
-\`pnpm api:atlas:capture\` reads production state without changing it. \`pnpm api:atlas:probe\` runs the bounded anonymous probe set. \`pnpm api:atlas\` regenerates the atlas. \`pnpm verify:api-atlas\` checks determinism, parsability, route reconciliation and secret safety.
+\`pnpm api:atlas:capture\` reads production state without changing it. \`pnpm api:atlas:probe\` runs the bounded anonymous probe set. \`pnpm api:atlas:acceptance\` runs cleanup-capable authenticated acceptance with protected credentials. \`pnpm api:atlas\` regenerates the atlas. \`pnpm api:atlas:verify\` checks determinism, parsability, route reconciliation and secret safety.
 `
 }
 
@@ -741,7 +814,7 @@ P1 gaps: ${severity.P1 ?? 0}
 P2 gaps: ${severity.P2 ?? 0}
 P3 gaps: ${severity.P3 ?? 0}
 
-Status: **PARTIAL**. Gates A, B, C (static), D, E, F, G, H, J and K are evidenced. Gate I is partial: ${liveProbes.probes.length} bounded anonymous requests passed across ${stats.liveProbed} unique routes, but safe authenticated cross-user/write acceptance was unavailable. This report therefore does not claim PASS.
+Status: **${atlasStatus}**. ${acceptanceComplete ? `The map is complete: ${liveProbes.probes.length} bounded anonymous probes, ${authenticatedAcceptance.summary.passed} authenticated production checks, and ${closeout.controlledAcceptance.passed} controlled ownership/trust checks passed. Known defects remain registered and regression-tested.` : `Gates A, B, C (static), D, E, F, G, H, J and K are evidenced, but authenticated closeout remains incomplete.`}
 
 ## Domain summary
 
@@ -752,7 +825,7 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 - The running API and worker are the same OCI revision, \`${snapshot.containers.api.revision}\`; that revision differs from both the dirty canonical checkout HEAD and current \`origin/main\`.
 - Source/runtime reconciliation is exact: ${runtime.length} = ${atlas.length} application routes + ${frameworkRuntime.length} automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
-- No P0 was established without a safe authenticated acceptance harness. That is an evidence boundary, not proof that no P0 exists.
+- No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
 ## What GreenField Is Missing
 
@@ -794,7 +867,7 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 
 ### Missing for Security
 
-- Production cross-user acceptance, account scoping on legacy function and AI-stream mutations, schema-declared boundaries, signature-required trust and uniform private-resource not-found semantics.
+- Remediation of the reproduced legacy function and AI-stream ownership failures, schema-declared boundaries, signature-required trust and uniform private-resource not-found semantics.
 
 ### Missing for Production Operations
 
@@ -1180,13 +1253,14 @@ function renderLiveProbes() {
     const values = probes.filter(probe => probe.targetPath === path).map(probe => probe.latencyMs).sort((a,b) => a-b)
     return values.length ? [path, String(values.length), String(values[Math.floor(values.length / 2)]), String(Math.max(...values))] : null
   }).filter(Boolean)
+  const authenticatedRows = authenticatedAcceptance.checks ?? []
   return `# Live Production Probe Results
 
 Captured: ${liveProbes.capturedAt ?? 'not run'}
 Policy: ${liveProbes.policy ?? 'not recorded'}
 Result: ${pass}/${probes.length} requests passed; ${new Set(probes.map(probe => probe.path)).size} unique route templates exercised.
 
-No bearer token, cookie or real account was used. The only POST was an empty registration body that failed schema validation with 400 and could not persist. No production cleanup was required.
+The anonymous suite used no bearer token, cookie or real account. The authenticated suite used two reserved non-person audit identities and marker-scoped fixtures with deterministic cleanup.
 
 ## Requests
 
@@ -1208,11 +1282,25 @@ No multi-second response was observed. Source review nevertheless identifies unb
 - Account, installed-modules, intelligence and support reads rejected anonymous access with 401.
 - Representative malformed registration input returned 400.
 
-## Explicitly not executed
+## Authenticated, cross-user and write probes
 
-- Authorized read/write, ownership rejection, module-record isolation and mission isolation were not live-probed because no dedicated production audit identities and cleanup-capable harness were available.
-- Install/uninstall, follow, reactions, posting, upload and intelligence execution were statically/integration verified only.
-- This limitation is why the mission status is PARTIAL rather than PASS.
+Captured: ${authenticatedAcceptance.metadata?.capturedAt ?? 'not run'}
+Result: ${authenticatedAcceptance.summary?.passed ?? 0}/${(authenticatedAcceptance.summary?.passed ?? 0) + (authenticatedAcceptance.summary?.failed ?? 0)} checks passed.
+
+${authenticatedRows.length ? mdTable(['Probe','Status','Error code','Result'], authenticatedRows.map(check => [check.name, String(check.status), check.errorCode ?? 'success envelope', check.result])) : 'No authenticated production evidence captured.'}
+
+Cleanup outcomes: ${(authenticatedAcceptance.cleanup ?? []).length ? (authenticatedAcceptance.cleanup ?? []).map(item => `${item.resource}=${item.status}`).join(', ') : 'not run'}.
+
+## Controlled exact-schema acceptance
+
+- Ownership/trust cases: ${closeout.controlledAcceptance?.passed ?? 0} passed / ${closeout.controlledAcceptance?.failed ?? 0} failed.
+- Legacy function invocation, AI reconnect, AI cancel, manifest-permission fallback, unsigned release trust/installability, reaction 23505, and private-profile immediate follow are executable expected-failure regressions.
+- Governed-intelligence mission detail, ledger, evidence, approval, proposal execution and stream ownership are exercised with two accounts without production mission execution.
+
+## Scope boundary
+
+- Production installation mutation and governed-intelligence execution were not used because they would create asynchronous product state; those paths ran against the exact build and migration schema in a disposable controlled database.
+- Atlas status is **${atlasStatus}**. PASS means complete mapping and characterized failures, not zero defects.
 `
 }
 
@@ -1222,7 +1310,7 @@ function renderGapRegister() {
   const sweepCounts = countBy(sourceSweep.findings, 'classification')
   return `# Gap Register
 
-Status: **PARTIAL**. Findings: ${gaps.length}; ${Object.entries(severity).map(([key,value]) => `${key}=${value}`).join(', ')}. No P0 was established with the available safe evidence; absence of authenticated production acceptance is itself recorded as P2.
+Status: **${atlasStatus}**. Findings: ${gaps.length}; ${Object.entries(severity).map(([key,value]) => `${key}=${value}`).join(', ')}. ${acceptanceComplete ? 'No P0 was established after authenticated production and controlled exact-schema acceptance; known defects are fully characterized.' : 'No P0 was established with the available evidence; authenticated closeout is incomplete.'}
 
 Types: ${Object.entries(typeCounts).map(([key,value]) => `${key}=${value}`).join(', ')}.
 
@@ -1290,11 +1378,12 @@ Converge the running feature revision through reviewed \`origin/main\` history w
 }
 
 function renderVerificationResults() {
+  const results = closeout.tests ?? {}
   return `# Verification Results
 
 ## Audit tooling
 
-- \`pnpm verify:api-atlas\`: PASS, 69/69 checks.
+- \`pnpm api:atlas:verify\`: ${results.atlas ?? 'pending'}.
 - Deterministic output: two consecutive generations byte-identical.
 - Runtime completeness: 535 = 384 application + 151 explicitly excluded framework-derived routes.
 - Parsers: JSON, RFC-style CSV and JSON-compatible OpenAPI YAML PASS.
@@ -1306,17 +1395,21 @@ function renderVerificationResults() {
 
 ## Repository verification
 
-- \`CI=true pnpm --filter @modula/greenfield-api typecheck\`: PASS after the repository's pretest build produced workspace dependency outputs.
-- \`CI=true pnpm --filter @modula/greenfield-worker typecheck\`: PASS.
-- \`CI=true pnpm api:test\`: PASS — 33 test files passed, 107 tests passed; 33 files / 258 tests skipped because database-backed suites require an isolated \`MODULA_TEST_DATABASE_URL\`.
-- \`CI=true pnpm worker:test\`: PASS — 8 files / 11 tests passed; 1 file / 10 tests skipped for database-backed paths.
+- \`CI=true pnpm --filter @modula/greenfield-api typecheck\`: ${results.apiTypecheck ?? 'pending'}.
+- \`CI=true pnpm --filter @modula/greenfield-worker typecheck\`: ${results.workerTypecheck ?? 'pending'}.
+- \`CI=true pnpm api:test\`: ${results.api ?? 'pending'}.
+- \`CI=true pnpm worker:test\`: ${results.worker ?? 'pending'}.
+- Authenticated production acceptance: ${authenticatedAcceptance.summary?.passed ?? 0} passed / ${authenticatedAcceptance.summary?.failed ?? 0} failed.
+- Controlled cross-user and expected-failure acceptance: ${closeout.controlledAcceptance?.passed ?? 0} passed / ${closeout.controlledAcceptance?.failed ?? 0} failed.
+- Production probes: ${results.productionProbes ?? 'pending'}.
+- Secret scan: ${results.secretScan ?? 'pending'}.
 
 An initial direct API typecheck before building workspace packages failed on unresolved workspace package outputs; the canonical package \`pretest\` built those dependencies, after which both typechecks passed. No source repair was made.
 
 ## Deliberate exclusions
 
 - \`verify:greenfield-backend-v1\` was not used as the acceptance signal because \`scripts/verify-greenfield-backend-v1.mjs:98\` hard-codes production schema 055 while observed production is at 062, and it requires a clean \`main\` checkout while this mission correctly uses \`audit/api-atlas-01\`. That stale verifier is recorded as a P2 gap rather than bypassed.
-- Database-backed tests were not pointed at production and no temporary production identities were created.
-- No load test, migration, restart, deploy, nginx edit, database write or user-content mutation occurred.
+- Database-backed suites use a disposable database, not production. Production writes are limited to reserved audit identities and marker-scoped fixtures with recorded cleanup.
+- No load test or nginx edit occurred. Product defects documented as expected failures were not remediated in this baseline phase.
 `
 }

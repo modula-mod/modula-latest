@@ -17,6 +17,7 @@
     "db:status": "tsx scripts/db-status.ts",
     "db:rollback": "tsx scripts/db-rollback.ts",
     "db:seed": "tsx scripts/db-seed.ts",
+    "api-atlas:identities": "node dist/cli/api-atlas-identities.js",
     "registry:publish-reference-products": "tsx scripts/publish-reference-products.ts",
     "registry:ingest-mps-products": "tsx scripts/ingest-mps-products.ts",
     "registry:publish-mps-products": "tsx scripts/publish-mps-products.ts",

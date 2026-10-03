@@ -5,7 +5,7 @@ import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
-import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, sha256} from './helpers/registry-fixtures.js'
+import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -14,6 +14,7 @@ const suffix = randomUUID().slice(0, 8)
 describeIfDb('registry trust pipeline: verified trust block', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
+  let token = ''
   const productId = `digital.modula.trust-${suffix}`
   const releases: Record<string, {releaseId: string; mpsBytes: string; frontendSha: string; artifactSha: string; manifestSha: string}> = {}
 
@@ -36,6 +37,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     db = created.db
     await app.ready()
     await publish('0.1.0')
+    token = (await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)).token
   })
 
   afterAll(async () => {
@@ -86,6 +88,22 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(desktop.reasons.map((reason: {code: string}) => reason.code)).toEqual(['PLATFORM_UNSUPPORTED'])
     const invalid = await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}?hostVersion=latest`})
     expect(invalid.statusCode).toBe(400)
+  })
+
+  it('[EXPECTED FAILURE] exposes an unsigned published release as trusted and installation-eligible', async () => {
+    const catalogue = await app.inject({method: 'GET', url: `/v1/registry/modules?q=${encodeURIComponent(productId)}`})
+    expect(catalogue.statusCode, catalogue.body).toBe(200)
+    const item = catalogue.json().data.items.find((candidate: {moduleId: string}) => candidate.moduleId === productId)
+    expect(item).toMatchObject({moduleId: productId, status: 'published', installable: true})
+    const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}`})
+    expect(detail.json().data.registryTrust).toMatchObject({verified: true, signature: {state: 'unsigned'}})
+
+    const preview = await app.inject({
+      method: 'POST', url: `/v1/modules/${productId}/install-preview`,
+      headers: {authorization: `Bearer ${token}`}, payload: {version: '0.1.0', platform: 'ios'},
+    })
+    expect(preview.statusCode, preview.body).toBe(200)
+    expect(preview.json().data).toMatchObject({moduleId: productId, version: '0.1.0', compatible: true})
   })
 
   it('reports update availability and revocation per immutable release', async () => {

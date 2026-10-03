@@ -134,6 +134,30 @@ describeLive('Phase 7E notification worker', () => {
     expect(row.body).toBe('2 people reacted to your post')
   })
 
+  it('[EXPECTED FAILURE] reproduces reaction 23505 when the active dedupe row is older than the aggregate window', async () => {
+    const resourceId = `post-api-baseline-02-${randomUUID()}`
+    await handleSocialNotification(db, 'reaction', {recipientActorId, actorId, resourceType: 'post', resourceId})
+    const dedupeKey = `social:reaction:post:${resourceId}`
+    await db.updateTable('notifications')
+      .set({created_at: new Date(Date.now() - 6 * 60_000), updated_at: new Date(Date.now() - 6 * 60_000)})
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', dedupeKey)
+      .execute()
+
+    await expect(handleSocialNotification(db, 'reaction', {
+      recipientActorId,
+      actorId,
+      resourceType: 'post',
+      resourceId,
+    })).rejects.toMatchObject({code: '23505'})
+
+    const rows = await db.selectFrom('notifications').select('id')
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', dedupeKey)
+      .execute()
+    expect(rows).toHaveLength(1)
+  })
+
   it('suppresses generic and social notifications across a block in either direction', async () => {
     await db.insertInto('blocks').values({
       id: randomUUID(),

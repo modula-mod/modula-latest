@@ -83,6 +83,11 @@
   },
   "scripts": {
     "api:atlas": "node tools/api-atlas/generate.mjs",
+    "api:atlas:verify": "node tools/api-atlas/verify.mjs",
+    "api:atlas:secrets": "node tools/api-atlas/secrets.mjs",
+    "api:atlas:acceptance": "node tools/api-atlas/acceptance.mjs",
+    "api:atlas:credentials": "node tools/api-atlas/create-secret-env.mjs",
+    "api:atlas:lineage": "node tools/api-atlas/release-lineage.mjs",
     "api:atlas:capture": "node tools/api-atlas/capture.mjs && node tools/api-atlas/generate.mjs",
     "api:atlas:probe": "node tools/api-atlas/probe.mjs && node tools/api-atlas/generate.mjs",
     "verify:api-atlas": "node tools/api-atlas/verify.mjs",

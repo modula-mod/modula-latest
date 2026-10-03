@@ -4,7 +4,7 @@ Captured: 2026-10-03T10:05:40.701Z
 Policy: anonymous and non-mutating except a schema-invalid registration request that cannot persist
 Result: 26/26 requests passed; 17 unique route templates exercised.
 
-No bearer token, cookie or real account was used. The only POST was an empty registration body that failed schema validation with 400 and could not persist. No production cleanup was required.
+The anonymous suite used no bearer token, cookie or real account. The authenticated suite used two reserved non-person audit identities and marker-scoped fixtures with deterministic cleanup.
 
 ## Requests
 
@@ -57,8 +57,60 @@ No multi-second response was observed. Source review nevertheless identifies unb
 - Account, installed-modules, intelligence and support reads rejected anonymous access with 401.
 - Representative malformed registration input returned 400.
 
-## Explicitly not executed
+## Authenticated, cross-user and write probes
 
-- Authorized read/write, ownership rejection, module-record isolation and mission isolation were not live-probed because no dedicated production audit identities and cleanup-capable harness were available.
-- Install/uninstall, follow, reactions, posting, upload and intelligence execution were statically/integration verified only.
-- This limitation is why the mission status is PARTIAL rather than PASS.
+Captured: 2026-10-03T18:23:49.727Z
+Result: 46/46 checks passed.
+
+| Probe | Status | Error code | Result |
+| --- | --- | --- | --- |
+| audit identity login | 200 | success envelope | PASS |
+| audit identity login | 200 | success envelope | PASS |
+| account A self read | 200 | success envelope | PASS |
+| account B self read | 200 | success envelope | PASS |
+| profile B owner read | 200 | success envelope | PASS |
+| profile B follower-only setup | 200 | success envelope | PASS |
+| write fixture B public post | 201 | success envelope | PASS |
+| write fixture B private post | 201 | success envelope | PASS |
+| write acceptance A post create | 201 | success envelope | PASS |
+| write fixture B comment | 201 | success envelope | PASS |
+| write fixture B attachment session | 201 | success envelope | PASS |
+| write fixture B attachment content | 200 | success envelope | PASS |
+| write fixture B private record | 201 | success envelope | PASS |
+| account handle history cross-user denial | 403 | FORBIDDEN | PASS |
+| session cross-user revoke is owner-scoped | 200 | success envelope | PASS |
+| session B remains active after A revoke attempt | 200 | success envelope | PASS |
+| account update remains self-scoped | 200 | success envelope | PASS |
+| security sessions remain self-scoped | 200 | success envelope | PASS |
+| security passkeys remain self-scoped | 200 | success envelope | PASS |
+| private profile cross-user denial | 404 | NOT_FOUND | PASS |
+| profile update cross-user denial | 403 | FORBIDDEN | PASS |
+| avatar cross-user attachment denial | 403 | FORBIDDEN | PASS |
+| cover cross-user attachment denial | 403 | FORBIDDEN | PASS |
+| private post identifier denial | 404 | NOT_FOUND | PASS |
+| post cross-user edit denial | 403 | FORBIDDEN | PASS |
+| post cross-user delete denial | 403 | FORBIDDEN | PASS |
+| post cross-user media bind denial | 403 | FORBIDDEN | PASS |
+| comment cross-user edit denial | 403 | FORBIDDEN | PASS |
+| comment cross-user delete denial | 403 | FORBIDDEN | PASS |
+| attachment metadata cross-user denial | 403 | FORBIDDEN | PASS |
+| attachment content identifier denial | 403 | FORBIDDEN | PASS |
+| attachment delete cross-user denial | 403 | FORBIDDEN | PASS |
+| private repository record cross-user denial | 404 | NOT_FOUND | PASS |
+| private repository record mutation denial | 404 | NOT_FOUND | PASS |
+| known gap private follow succeeds immediately | 200 | success envelope | PASS |
+| known gap private profile visible immediately after follow | 200 | success envelope | PASS |
+| write acceptance A post delete | 200 | success envelope | PASS |
+
+Cleanup outcomes: recovered-record=200, recovered-record=200, follow=404, comment=200, post=200, post=200, attachment=200, record=200, profile-visibility=200.
+
+## Controlled exact-schema acceptance
+
+- Ownership/trust cases: 28 passed / 0 failed.
+- Legacy function invocation, AI reconnect, AI cancel, manifest-permission fallback, unsigned release trust/installability, reaction 23505, and private-profile immediate follow are executable expected-failure regressions.
+- Governed-intelligence mission detail, ledger, evidence, approval, proposal execution and stream ownership are exercised with two accounts without production mission execution.
+
+## Scope boundary
+
+- Production installation mutation and governed-intelligence execution were not used because they would create asynchronous product state; those paths ran against the exact build and migration schema in a disposable controlled database.
+- Atlas status is **PASS**. PASS means complete mapping and characterized failures, not zero defects.

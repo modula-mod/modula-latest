@@ -232,7 +232,10 @@ export class AccountService {
     return result
   }
 
-  async verifyEmail(token: string): Promise<PublicAccount> {
+  async verifyEmail(
+    token: string,
+    options: {provisionMailIdentity?: boolean} = {},
+  ): Promise<PublicAccount> {
     const row = await this.db
       .selectFrom('greenfield_email_verifications')
       .selectAll()
@@ -250,7 +253,7 @@ export class AccountService {
         .set({consumed_at: now})
         .where('verification_id', '=', row.verification_id)
         .execute()
-      await this.activateVerifiedEmailInTransaction(trx, row.account_id, now)
+      await this.activateVerifiedEmailInTransaction(trx, row.account_id, now, options)
     })
 
     const account = await this.getMe(row.account_id)
@@ -278,6 +281,7 @@ export class AccountService {
     trx: Transaction<Database>,
     accountId: string,
     now: Date,
+    options: {provisionMailIdentity?: boolean} = {},
   ): Promise<void> {
     await trx
       .updateTable('greenfield_accounts')
@@ -305,7 +309,9 @@ export class AccountService {
       severity: 'notice',
       metadata: {},
     })
-    await this.mailIdentities.queueProvisioningForVerifiedAccount(trx, accountId, now)
+    if (options.provisionMailIdentity !== false) {
+      await this.mailIdentities.queueProvisioningForVerifiedAccount(trx, accountId, now)
+    }
 
     const existingRepository = await trx
       .selectFrom('greenfield_repositories')

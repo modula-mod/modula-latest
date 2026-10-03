@@ -2,7 +2,7 @@
 
 ## Audit tooling
 
-- `pnpm verify:api-atlas`: PASS, 69/69 checks.
+- `pnpm api:atlas:verify`: 80/80 passed.
 - Deterministic output: two consecutive generations byte-identical.
 - Runtime completeness: 535 = 384 application + 151 explicitly excluded framework-derived routes.
 - Parsers: JSON, RFC-style CSV and JSON-compatible OpenAPI YAML PASS.
@@ -14,15 +14,19 @@
 
 ## Repository verification
 
-- `CI=true pnpm --filter @modula/greenfield-api typecheck`: PASS after the repository's pretest build produced workspace dependency outputs.
-- `CI=true pnpm --filter @modula/greenfield-worker typecheck`: PASS.
-- `CI=true pnpm api:test`: PASS — 33 test files passed, 107 tests passed; 33 files / 258 tests skipped because database-backed suites require an isolated `MODULA_TEST_DATABASE_URL`.
-- `CI=true pnpm worker:test`: PASS — 8 files / 11 tests passed; 1 file / 10 tests skipped for database-backed paths.
+- `CI=true pnpm --filter @modula/greenfield-api typecheck`: passed.
+- `CI=true pnpm --filter @modula/greenfield-worker typecheck`: passed.
+- `CI=true pnpm api:test`: 107/107 standard and 23/23 targeted database acceptance passed.
+- `CI=true pnpm worker:test`: 11/11 standard and 22/22 pre-migrated database acceptance passed.
+- Authenticated production acceptance: 46 passed / 0 failed.
+- Controlled cross-user and expected-failure acceptance: 28 passed / 0 failed.
+- Production probes: 26/26 passed against starting production revision.
+- Secret scan: passed.
 
 An initial direct API typecheck before building workspace packages failed on unresolved workspace package outputs; the canonical package `pretest` built those dependencies, after which both typechecks passed. No source repair was made.
 
 ## Deliberate exclusions
 
 - `verify:greenfield-backend-v1` was not used as the acceptance signal because `scripts/verify-greenfield-backend-v1.mjs:98` hard-codes production schema 055 while observed production is at 062, and it requires a clean `main` checkout while this mission correctly uses `audit/api-atlas-01`. That stale verifier is recorded as a P2 gap rather than bypassed.
-- Database-backed tests were not pointed at production and no temporary production identities were created.
-- No load test, migration, restart, deploy, nginx edit, database write or user-content mutation occurred.
+- Database-backed suites use a disposable database, not production. Production writes are limited to reserved audit identities and marker-scoped fixtures with recorded cleanup.
+- No load test or nginx edit occurred. Product defects documented as expected failures were not remediated in this baseline phase.

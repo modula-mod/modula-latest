@@ -24,7 +24,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:306",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:308",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
@@ -43,7 +43,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:302",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:304",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
@@ -259,7 +259,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:577",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:579",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -286,7 +286,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:466",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:468",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -315,7 +315,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:482",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:484",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -344,7 +344,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:486",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:488",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -366,7 +366,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:494",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:496",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -391,7 +391,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:540",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:542",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -470,7 +470,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:549",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:551",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -497,7 +497,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:499",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:501",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -524,7 +524,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:514",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:516",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -551,7 +551,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:504",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:506",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -578,7 +578,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1950",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1952",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -603,7 +603,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1960",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1962",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -630,7 +630,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:560",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:562",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -657,7 +657,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:591",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:593",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -682,7 +682,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:586",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:588",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -753,7 +753,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:415",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:417",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -775,7 +775,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:451",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:453",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -797,7 +797,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:473",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:475",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -819,7 +819,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:437",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:439",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -841,7 +841,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2098",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2100",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -1182,7 +1182,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1854",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1856",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1216,7 +1216,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1872",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1874",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1248,7 +1248,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1883",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1885",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1282,7 +1282,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1901",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1903",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1527,7 +1527,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2261",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2263",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1554,7 +1554,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2253",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2255",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1588,7 +1588,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2539",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2541",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1615,7 +1615,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2245",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2247",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1642,7 +1642,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2383",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2385",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1676,7 +1676,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2393",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2395",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1703,7 +1703,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2506",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2508",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1730,7 +1730,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2481",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2483",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1764,7 +1764,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2526",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2528",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1791,7 +1791,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2362",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2364",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1818,7 +1818,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2287",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2289",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1845,7 +1845,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2281",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2283",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1872,7 +1872,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2451",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2453",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1906,7 +1906,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2316",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2318",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1933,7 +1933,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2273",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2275",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -1960,7 +1960,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2416",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2418",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -1994,7 +1994,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2438",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2440",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -2021,7 +2021,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2373",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2375",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -2048,7 +2048,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2406",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2408",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -2075,7 +2075,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2426",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2428",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -2807,7 +2807,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2108",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2110",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -2841,7 +2841,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2173",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2175",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -2875,7 +2875,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2185",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2187",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -2909,7 +2909,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2197",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2199",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -2936,7 +2936,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2220",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2222",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -2958,7 +2958,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2140",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2142",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -2985,7 +2985,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2115",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2117",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3012,7 +3012,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2206",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2208",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -3037,7 +3037,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2213",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2215",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3220,7 +3220,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:704",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:706",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 10,
@@ -3247,7 +3247,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:694",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:696",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 10,
@@ -3274,7 +3274,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:691",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:693",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -3296,7 +3296,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:685",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:687",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -3330,7 +3330,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:770",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:772",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3357,7 +3357,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:727",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:729",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3384,7 +3384,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:742",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:744",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3411,7 +3411,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:310",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:312",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3433,7 +3433,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:791",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:793",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -3460,7 +3460,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:796",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:798",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3487,7 +3487,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:665",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:667",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3514,7 +3514,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:640",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:642",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3541,7 +3541,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:599",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:601",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -3568,7 +3568,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:614",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:616",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -4707,7 +4707,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1042",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1044",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -4732,7 +4732,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1052",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1054",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5033,7 +5033,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1306",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1308",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -5067,7 +5067,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1390",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1392",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5099,7 +5099,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1315",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1317",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -5133,7 +5133,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1333",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1335",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5167,7 +5167,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1324",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1326",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5201,7 +5201,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1342",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1344",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5228,7 +5228,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1259",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1261",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -5257,7 +5257,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1262",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1264",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -5286,7 +5286,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1267",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1269",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -5892,7 +5892,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2093",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2095",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -5914,7 +5914,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1172",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1174",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -5943,7 +5943,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1180",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1182",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -6074,7 +6074,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1204",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1206",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -6106,7 +6106,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1192",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1194",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -6140,7 +6140,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1214",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1216",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -6383,7 +6383,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1175",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1177",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -6405,7 +6405,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1187",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1189",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -6432,7 +6432,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1438",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1440",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -6461,7 +6461,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1469",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1471",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -6551,7 +6551,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1240",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1242",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -6580,7 +6580,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1244",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1246",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -6641,7 +6641,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:233",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:235",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -6663,7 +6663,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:237",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:239",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -7122,7 +7122,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2574",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2576",
         "x-modula-auth": "none",
         "x-modula-rate-limit": null,
         "x-contract-completeness": "schema-missing"
@@ -7148,7 +7148,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2066",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2068",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -7199,7 +7199,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:249",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:251",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -7255,7 +7255,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1409",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1411",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -8935,7 +8935,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1919",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1921",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 60,
@@ -8969,7 +8969,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1934",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1936",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -8996,7 +8996,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1943",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1945",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9023,7 +9023,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1256",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1258",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -9045,7 +9045,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1498",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1500",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9079,7 +9079,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1534",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1536",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9111,7 +9111,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1491",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1493",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -9138,7 +9138,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1517",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1519",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9233,7 +9233,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9265,7 +9265,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9428,7 +9428,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9460,7 +9460,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9494,7 +9494,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9526,7 +9526,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1558",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1560",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9560,7 +9560,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1595",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1597",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9658,7 +9658,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1614",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1616",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -9687,7 +9687,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1638",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1640",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -9716,7 +9716,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1654",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1656",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -9745,7 +9745,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1622",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1624",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -9774,7 +9774,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1785",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1787",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9806,7 +9806,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1770",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1772",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9840,7 +9840,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1690",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1692",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9872,7 +9872,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1670",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1672",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9906,7 +9906,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1815",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1817",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9938,7 +9938,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1800",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1802",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9965,7 +9965,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1710",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1712",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -9992,7 +9992,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1755",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1757",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10017,7 +10017,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1738",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1740",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10044,7 +10044,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1755",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1757",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10069,7 +10069,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1738",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1740",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10198,7 +10198,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2103",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2105",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -10571,7 +10571,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1830",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1832",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10598,7 +10598,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1843",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1845",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10625,7 +10625,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1063",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1065",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10652,7 +10652,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1152",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1154",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10686,7 +10686,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1161",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1163",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10713,7 +10713,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1072",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1074",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10738,7 +10738,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1086",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1088",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10772,7 +10772,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1129",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1131",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10804,7 +10804,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1078",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1080",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10836,7 +10836,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1105",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1107",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10890,7 +10890,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1976",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1978",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -10912,7 +10912,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2013",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2015",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10937,7 +10937,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1993",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1995",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -10962,7 +10962,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2003",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2005",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -10989,7 +10989,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2024",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2026",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11014,7 +11014,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2034",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2036",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11048,7 +11048,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2055",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2057",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11080,7 +11080,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2044",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:2046",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11107,7 +11107,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1985",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1987",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 60,
@@ -11129,7 +11129,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:812",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:814",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11158,7 +11158,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1034",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1036",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11185,7 +11185,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:973",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:975",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11207,7 +11207,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:961",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:963",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11229,7 +11229,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1028",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1030",
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11256,7 +11256,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:849",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:851",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11278,7 +11278,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:834",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:836",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11300,7 +11300,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1431",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1433",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 30,
@@ -11325,7 +11325,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1425",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1427",
         "x-modula-auth": "legacy or bridged bearer session",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11352,7 +11352,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:920",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:922",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11374,7 +11374,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:905",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:907",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11396,7 +11396,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:877",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:879",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11418,7 +11418,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1009",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1011",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 10,
@@ -11682,7 +11682,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1226",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1228",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11711,7 +11711,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1230",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1232",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11733,7 +11733,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:229",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:231",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11755,7 +11755,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1406",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:1408",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,
@@ -11777,7 +11777,7 @@
             "description": "Implementation response; schema is not registered"
           }
         },
-        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:225",
+        "x-modula-source": "services/greenfield-api/src/app/register-routes.ts:227",
         "x-modula-auth": "none",
         "x-modula-rate-limit": {
           "max": 120,

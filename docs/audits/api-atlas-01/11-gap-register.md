@@ -1,8 +1,8 @@
 # Gap Register
 
-Status: **PARTIAL**. Findings: 41; P1=16, P2=21, P3=4. No P0 was established with the available safe evidence; absence of authenticated production acceptance is itself recorded as P2.
+Status: **PASS**. Findings: 40; P1=16, P2=20, P3=4. No P0 was established after authenticated production and controlled exact-schema acceptance; known defects are fully characterized.
 
-Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data exposure risk=1, dead endpoint=1, duplicate endpoint=1, event delivery gap=1, inconsistent permission=1, missing artifact=1, missing endpoint=3, missing idempotency=1, missing ownership check=2, missing request schema=3, missing signature verification=1, missing storage delivery=2, missing worker=2, module special case=1, observability gap=2, orphan table=1, partial endpoint=1, performance risk=1, placeholder implementation=4, untested endpoint=2.
+Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data exposure risk=1, dead endpoint=1, duplicate endpoint=1, event delivery gap=1, inconsistent permission=1, missing artifact=1, missing endpoint=3, missing idempotency=1, missing ownership check=2, missing request schema=3, missing signature verification=1, missing storage delivery=2, missing worker=2, module special case=1, observability gap=2, orphan table=1, partial endpoint=1, performance risk=1, placeholder implementation=4, untested endpoint=1.
 
 ## API-ATLAS-GAP-001 — P1 — Running production revision is not canonical origin/main
 
@@ -323,17 +323,6 @@ Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data 
 - Dependencies: migration policy
 - Verification: Every active installation must resolve a digest-verified descriptor.
 
-## API-ATLAS-GAP-030 — P2 — Production cross-user and authenticated write acceptance was not safe to execute
-
-- Domain/type: `security` / `untested endpoint`
-- Evidence: `10-live-probe-results.md`
-- Affected routes: none/architectural
-- Affected files: none
-- Production impact: Static and integration evidence exists, but no dedicated production audit identities/harness were available.
-- Recommended fix: Provision isolated audit identities and a cleanup-capable production acceptance harness.
-- Dependencies: test accounts, cleanup automation
-- Verification: Execute owner/non-owner, module isolation and intelligence isolation cases without real-user data.
-
 ## API-ATLAS-GAP-031 — P2 — profile_links is read but has no current write API
 
 - Domain/type: `profiles` / `DB/API mismatch`
@@ -460,4 +449,4 @@ The JSON form is canonical for remediation tooling and preserves these fields ve
 
 ## TODO / FIXME / placeholder sweep
 
-The literal sweep found 259 marker occurrences; 254 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=33, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=72, possible-runtime-placeholder=64, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.
+The literal sweep found 265 marker occurrences; 260 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=33, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=78, possible-runtime-placeholder=64, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.

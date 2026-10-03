@@ -14,7 +14,7 @@ Mutating routes: 234
 Read-only routes: 150
 Routes with request schemas: 0
 Routes with response schemas: 0
-Routes with automated tests: 312
+Routes with automated tests: 314
 Routes live-probed: 17 unique routes
 Routes with known callers: 200
 Database tables: 283
@@ -27,10 +27,10 @@ Partial capabilities: 12
 Missing capabilities: 5
 P0 gaps: 0
 P1 gaps: 16
-P2 gaps: 21
+P2 gaps: 20
 P3 gaps: 4
 
-Status: **PARTIAL**. Gates A, B, C (static), D, E, F, G, H, J and K are evidenced. Gate I is partial: 26 bounded anonymous requests passed across 17 unique routes, but safe authenticated cross-user/write acceptance was unavailable. This report therefore does not claim PASS.
+Status: **PASS**. The map is complete: 26 bounded anonymous probes, 46 authenticated production checks, and 28 controlled ownership/trust checks passed. Known defects remain registered and regression-tested.
 
 ## Domain summary
 
@@ -59,7 +59,7 @@ Status: **PARTIAL**. Gates A, B, C (static), D, E, F, G, H, J and K are evidence
 - The running API and worker are the same OCI revision, `c7c46dfa3d85b89617de833723aab8f207f0ba94`; that revision differs from both the dirty canonical checkout HEAD and current `origin/main`.
 - Source/runtime reconciliation is exact: 535 = 384 application routes + 151 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
-- No P0 was established without a safe authenticated acceptance harness. That is an evidence boundary, not proof that no P0 exists.
+- No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
 ## What GreenField Is Missing
 
@@ -101,7 +101,7 @@ Status: **PARTIAL**. Gates A, B, C (static), D, E, F, G, H, J and K are evidence
 
 ### Missing for Security
 
-- Production cross-user acceptance, account scoping on legacy function and AI-stream mutations, schema-declared boundaries, signature-required trust and uniform private-resource not-found semantics.
+- Remediation of the reproduced legacy function and AI-stream ownership failures, schema-declared boundaries, signature-required trust and uniform private-resource not-found semantics.
 
 ### Missing for Production Operations
 
@@ -116,7 +116,7 @@ Every item above is expanded with evidence, impact, dependency and verification 
 ## Existing GreenField Capabilities Not Currently Used
 
 - Complete passkey/TOTP/recovery/session security APIs, developer/build coordination, module installation descriptors, generic verified MPS ModuleHost execution, and governed intelligence mission routes exist beyond current observed client usage.
-- 204 registered routes have no statically observed product-client caller; 144 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
+- 204 registered routes have no statically observed product-client caller; 146 are test-observed without a product-client caller. Per-route evidence is in `api-atlas.json`.
 - Real AI provider adapters exist, but all real providers are unconfigured; only a development mock is available and excluded by the production resolver.
 
 ## Duplicate or Competing Implementations

@@ -1,7 +1,7 @@
 {
   "metadata": {
     "capturedAt": "2026-10-03T10:02:55.876Z",
-    "status": "PARTIAL"
+    "status": "PASS"
   },
   "gaps": [
     {
@@ -715,25 +715,6 @@
         "migration policy"
       ],
       "verification": "Every active installation must resolve a digest-verified descriptor."
-    },
-    {
-      "id": "API-ATLAS-GAP-030",
-      "domain": "security",
-      "type": "untested endpoint",
-      "severity": "P2",
-      "title": "Production cross-user and authenticated write acceptance was not safe to execute",
-      "evidence": [
-        "10-live-probe-results.md"
-      ],
-      "affectedRoutes": [],
-      "affectedFiles": [],
-      "productionImpact": "Static and integration evidence exists, but no dedicated production audit identities/harness were available.",
-      "recommendedFix": "Provision isolated audit identities and a cleanup-capable production acceptance harness.",
-      "dependencies": [
-        "test accounts",
-        "cleanup automation"
-      ],
-      "verification": "Execute owner/non-owner, module isolation and intelligence isolation cases without real-user data."
     },
     {
       "id": "API-ATLAS-GAP-031",
