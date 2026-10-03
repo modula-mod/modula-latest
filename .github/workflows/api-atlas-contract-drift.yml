@@ -17,8 +17,19 @@ on:
 jobs:
   atlas:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modula-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: modula-latest
+      - name: Check out pinned Module Standard dependency
+        uses: actions/checkout@v4
+        with:
+          repository: modula-mod/modula-module-standard
+          ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
+          path: modula-mod/modula-module-standard
       - uses: pnpm/action-setup@v4
         with:
           version: 11.11.0
@@ -26,6 +37,7 @@ jobs:
         with:
           node-version: 24.18.0
           cache: pnpm
+          cache-dependency-path: modula-latest/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm api:atlas:verify
       - run: pnpm api:atlas:secrets
