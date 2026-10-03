@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {defaultAppPreferences, isValidTimeZone, resolveAppPreferences, validateAppPreferencePatch} from '../src/settings-v2/preferences.js'
 import {maskEmail} from '../src/settings-v2/service.js'
-import {duePeriod, isoWeekKey, isQuiet, localClock, renderDigest} from '../../greenfield-worker/src/digests/digests.js'
+import {duePeriod, inQuietHours, isoWeekKey, isQuiet, localClock, renderDigest} from '../../greenfield-worker/src/digests/digests.js'
 
 describe('app preferences', () => {
   it('has defaults for every synced key', () => {
@@ -65,5 +65,14 @@ describe('digest schedule', () => {
     expect(mail.textBody).not.toContain('mention')
     expect(mail.htmlBody).toContain('&lt;Andy&gt;')
     expect(mail.htmlBody).not.toContain('<Andy>')
+  })
+
+  it('holds digests during quiet hours, including windows across midnight', () => {
+    const at = new Date('2026-10-05T07:30:00Z') // 08:30 London
+    expect(inQuietHours({enabled: true, start: '22:00', end: '09:00', timezone: 'Europe/London'}, at)).toBe(true)
+    expect(inQuietHours({enabled: true, start: '22:00', end: '08:00', timezone: 'Europe/London'}, at)).toBe(false)
+    expect(inQuietHours({enabled: false, start: '00:00', end: '23:59', timezone: 'Europe/London'}, at)).toBe(false)
+    expect(inQuietHours({enabled: true, start: '07:00', end: '08:00', timezone: 'Bad/Zone'}, at)).toBe(true)
+    expect(inQuietHours(null, at)).toBe(false)
   })
 })

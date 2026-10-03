@@ -72,7 +72,32 @@ export function renderDigest(kind: DigestKind, input: {displayName: string; summ
   return {subject, textBody, htmlBody}
 }
 
-type Candidate = {account_id: string; preferences: Record<string, unknown>; email: string | null; display_name: string | null; handle: string}
+type Candidate = {account_id: string; preferences: Record<string, unknown>; email: string | null; display_name: string | null; handle: string; quiet_hours: unknown}
+
+/** True while the member's quiet hours (Settings → Notifications → Quiet Hours) are on. */
+export function inQuietHours(quietHours: unknown, now: Date): boolean {
+  if (!quietHours || typeof quietHours !== 'object') return false
+  const value = quietHours as {enabled?: unknown; start?: unknown; end?: unknown; timezone?: unknown}
+  if (value.enabled !== true || typeof value.start !== 'string' || typeof value.end !== 'string') return false
+  const toMinutes = (clock: string) => {
+    const match = /^(\d{1,2}):(\d{2})$/.exec(clock)
+    if (!match) return null
+    const hours = Number(match[1]), minutes = Number(match[2])
+    return hours < 24 && minutes < 60 ? hours * 60 + minutes : null
+  }
+  const start = toMinutes(value.start), end = toMinutes(value.end)
+  if (start === null || end === null || start === end) return false
+  let zone = typeof value.timezone === 'string' ? value.timezone : 'UTC'
+  let parts: Intl.DateTimeFormatPart[]
+  try {
+    parts = new Intl.DateTimeFormat('en-GB', {timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23'}).formatToParts(now)
+  } catch {
+    zone = 'UTC'
+    parts = new Intl.DateTimeFormat('en-GB', {timeZone: zone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23'}).formatToParts(now)
+  }
+  const minute = Number(parts.find(p => p.type === 'hour')?.value ?? 0) * 60 + Number(parts.find(p => p.type === 'minute')?.value ?? 0)
+  return start < end ? minute >= start && minute < end : minute >= start || minute < end
+}
 
 /**
  * One digest pass: for every member who turned a digest on, compose at most one
@@ -85,13 +110,19 @@ export async function runDigestPass(db: Kysely<Database>, options: {now?: Date; 
   const candidates = await sql<Candidate>`
     SELECT p.account_id, p.preferences, a.primary_handle AS handle,
       (SELECT i.identifier FROM greenfield_auth_identities i WHERE i.account_id = p.account_id AND i.kind = 'email' AND i.verified_at IS NOT NULL ORDER BY i.created_at LIMIT 1) AS email,
-      (SELECT pr.display_name FROM profiles pr JOIN actors ac ON ac.id = pr.actor_id WHERE ac.account_id = p.account_id AND pr.deleted_at IS NULL LIMIT 1) AS display_name
+      (SELECT pr.display_name FROM profiles pr JOIN actors ac ON ac.id = pr.actor_id WHERE ac.account_id = p.account_id AND pr.deleted_at IS NULL LIMIT 1) AS display_name,
+      (SELECT np.quiet_hours FROM notification_preferences np JOIN actors ac ON ac.id = np.actor_id WHERE ac.account_id = p.account_id LIMIT 1) AS quiet_hours
     FROM greenfield_account_app_preferences p
     JOIN greenfield_accounts a ON a.account_id = p.account_id AND a.status = 'active'
     WHERE (p.preferences->>'digests.weekly') = 'true' OR (p.preferences->>'digests.morning') = 'true'
     LIMIT ${options.limit ?? 500}`.execute(db)
-  const result = {considered: candidates.rows.length, queued: 0, quiet: 0, noEmail: 0}
+  const result = {considered: candidates.rows.length, queued: 0, quiet: 0, noEmail: 0, held: 0}
   for (const candidate of candidates.rows) {
+    // Held, not skipped: the period is claimed on a later pass once quiet hours end.
+    if (inQuietHours(candidate.quiet_hours, now)) {
+      result.held += 1
+      continue
+    }
     const zone = typeof candidate.preferences['digests.timeZone'] === 'string' ? candidate.preferences['digests.timeZone'] as string : 'UTC'
     const clock = localClock(now, zone)
     for (const kind of ['morning', 'weekly'] as const) {
