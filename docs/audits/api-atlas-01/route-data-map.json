@@ -1,0 +1,6138 @@
+{
+  "GET /oauth/atproto/native-client-metadata.json": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#nativeClientMetadata"
+    ]
+  },
+  "GET /oauth/atproto/web-client-metadata.json": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#webClientMetadata"
+    ]
+  },
+  "POST /v1/account/data-exports": {
+    "reads": [
+      "greenfield_account_data_requests",
+      "greenfield_accounts",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies"
+    ],
+    "writes": [
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#createRequest",
+      "services/greenfield-api/src/account-data/service.ts#requestExport"
+    ]
+  },
+  "GET /v1/account/data-requests/:requestId": {
+    "reads": [
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#get",
+      "services/greenfield-api/src/account-data/service.ts#ownedRequest"
+    ]
+  },
+  "POST /v1/account/data-requests/:requestId/advance": {
+    "reads": [
+      "actors",
+      "greenfield_account_data_artifacts",
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests",
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_comments",
+      "greenfield_connections",
+      "greenfield_developer_products",
+      "greenfield_developer_profiles",
+      "greenfield_entitlements",
+      "greenfield_module_records",
+      "greenfield_sessions",
+      "greenfield_usage_events",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "actors",
+      "greenfield_account_data_artifacts",
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests",
+      "greenfield_account_deletion_tombstones",
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_authentication_methods",
+      "greenfield_comments",
+      "greenfield_connection_credentials",
+      "greenfield_connections",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_storage_bindings",
+      "greenfield_developer_products",
+      "greenfield_developer_profiles",
+      "greenfield_email_verifications",
+      "greenfield_external_identities",
+      "greenfield_module_records",
+      "greenfield_passkeys",
+      "greenfield_password_credentials",
+      "greenfield_recovery_code_sets",
+      "greenfield_recovery_codes",
+      "greenfield_recovery_tokens",
+      "greenfield_session_tokens",
+      "greenfield_sessions",
+      "greenfield_story_groups",
+      "greenfield_totp_credentials",
+      "posts",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#advance",
+      "services/greenfield-api/src/account-data/service.ts#advanceDeletion",
+      "services/greenfield-api/src/account-data/service.ts#advanceExport",
+      "services/greenfield-api/src/account-data/service.ts#deleteCore",
+      "services/greenfield-api/src/account-data/service.ts#deleteRecords",
+      "services/greenfield-api/src/account-data/service.ts#exportCore",
+      "services/greenfield-api/src/account-data/service.ts#exportRecords",
+      "services/greenfield-api/src/account-data/service.ts#get",
+      "services/greenfield-api/src/account-data/service.ts#ownedRequest",
+      "services/greenfield-api/src/account-data/service.ts#refresh",
+      "services/greenfield-api/src/account-data/service.ts#retainDomain",
+      "services/greenfield-api/src/account-data/service.ts#storeArtifact"
+    ]
+  },
+  "GET /v1/account/data-requests/:requestId/artifacts": {
+    "reads": [
+      "greenfield_account_data_artifacts",
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#artifacts",
+      "services/greenfield-api/src/account-data/service.ts#ownedRequest"
+    ]
+  },
+  "POST /v1/account/data-requests/:requestId/cancel": {
+    "reads": [
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "writes": [
+      "greenfield_account_data_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#cancel",
+      "services/greenfield-api/src/account-data/service.ts#get",
+      "services/greenfield-api/src/account-data/service.ts#ownedRequest"
+    ]
+  },
+  "POST /v1/account/deletion-requests": {
+    "reads": [
+      "greenfield_account_data_requests",
+      "greenfield_accounts",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies"
+    ],
+    "writes": [
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#createRequest",
+      "services/greenfield-api/src/account-data/service.ts#requestDeletion"
+    ]
+  },
+  "GET /v1/accounts/:accountId/handle-history": {
+    "reads": [
+      "greenfield_handle_history"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#handleHistory"
+    ]
+  },
+  "POST /v1/accounts/forgot-password": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_recovery_tokens"
+    ],
+    "writes": [
+      "greenfield_recovery_tokens"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/recovery.ts#requestRecovery"
+    ]
+  },
+  "GET /v1/accounts/handles/:handle/availability": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#handleAvailability"
+    ]
+  },
+  "GET /v1/accounts/mail-local-parts/:localPart/availability": {
+    "reads": [
+      "greenfield_mail_identities",
+      "greenfield_reserved_identifiers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/identity-service.ts#availability"
+    ]
+  },
+  "GET /v1/accounts/me": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#getMe"
+    ]
+  },
+  "PATCH /v1/accounts/me": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [
+      "failed"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#getMe",
+      "services/greenfield-api/src/accounts/service.ts#patchMe"
+    ]
+  },
+  "GET /v1/accounts/me/appearance": {
+    "reads": [
+      "greenfield_appearance_preferences"
+    ],
+    "writes": [
+      "greenfield_appearance_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/appearance/service.ts#get",
+      "services/greenfield-api/src/domains/appearance/service.ts#map"
+    ]
+  },
+  "PATCH /v1/accounts/me/appearance": {
+    "reads": [
+      "greenfield_appearance_preferences"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_appearance_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/appearance/service.ts#get",
+      "services/greenfield-api/src/domains/appearance/service.ts#map",
+      "services/greenfield-api/src/domains/appearance/service.ts#patch"
+    ]
+  },
+  "POST /v1/accounts/me/handle": {
+    "reads": [
+      "actors",
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_accounts",
+      "greenfield_handle_history",
+      "greenfield_handles",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#changeHandle"
+    ]
+  },
+  "GET /v1/accounts/me/modula-mail": {
+    "reads": [
+      "greenfield_mail_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/identity-service.ts#getForAccount"
+    ]
+  },
+  "POST /v1/accounts/me/modula-mail/forwarding": {
+    "reads": [
+      "greenfield_mail_identities"
+    ],
+    "writes": [
+      "background_jobs",
+      "failed",
+      "greenfield_mail_identities",
+      "greenfield_mail_identity_events",
+      "greenfield_mail_identity_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/identity-service.ts#recordEvent",
+      "services/greenfield-api/src/mail/identity-service.ts#updateForwarding",
+      "services/greenfield-api/src/mail/service.ts#modulaMailUrl",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queueMailForwardingChanged",
+      "services/greenfield-api/src/mail/service.ts#queueSecurityAlert"
+    ]
+  },
+  "POST /v1/accounts/me/modula-mail/provision": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_mail_identities"
+    ],
+    "writes": [
+      "background_jobs",
+      "greenfield_mail_identities",
+      "greenfield_mail_identity_events",
+      "greenfield_mail_identity_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/identity-service.ts#ensurePendingIdentityInTransaction",
+      "services/greenfield-api/src/mail/identity-service.ts#queueProvisioningForVerifiedAccount",
+      "services/greenfield-api/src/mail/identity-service.ts#recordEvent"
+    ]
+  },
+  "GET /v1/accounts/me/notification-preferences": {
+    "reads": [
+      "actors",
+      "notification_preferences"
+    ],
+    "writes": [
+      "notification_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/notifications/preferences.ts#ensureRow",
+      "services/greenfield-api/src/domains/notifications/preferences.ts#get"
+    ]
+  },
+  "PATCH /v1/accounts/me/notification-preferences": {
+    "reads": [
+      "actors",
+      "notification_preferences"
+    ],
+    "writes": [
+      "failed",
+      "notification_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/notifications/preferences.ts#ensureRow",
+      "services/greenfield-api/src/domains/notifications/preferences.ts#get",
+      "services/greenfield-api/src/domains/notifications/preferences.ts#patch"
+    ]
+  },
+  "POST /v1/accounts/me/password": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_password_credentials",
+      "greenfield_sessions"
+    ],
+    "writes": [
+      "greenfield_password_credentials",
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#changePassword",
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#revokeFamily",
+      "services/greenfield-api/src/sessions/service.ts#revokeOtherSessions"
+    ]
+  },
+  "DELETE /v1/accounts/me/sessions": {
+    "reads": [
+      "greenfield_sessions"
+    ],
+    "writes": [
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#revokeAllForAccount",
+      "services/greenfield-api/src/sessions/service.ts#revokeFamily"
+    ]
+  },
+  "GET /v1/accounts/me/sessions": {
+    "reads": [
+      "greenfield_sessions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/sessions/service.ts#listSessions"
+    ]
+  },
+  "POST /v1/accounts/recovery/complete": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_recovery_tokens"
+    ],
+    "writes": [
+      "greenfield_password_credentials",
+      "greenfield_recovery_tokens",
+      "greenfield_session_events",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/recovery.ts#completeRecovery"
+    ]
+  },
+  "POST /v1/accounts/recovery/request": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_recovery_tokens"
+    ],
+    "writes": [
+      "greenfield_recovery_tokens"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/recovery.ts#requestRecovery"
+    ]
+  },
+  "POST /v1/accounts/register": {
+    "reads": [
+      "greenfield_auth_identities"
+    ],
+    "writes": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_email_verifications",
+      "greenfield_handle_history",
+      "greenfield_handles",
+      "greenfield_password_credentials"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#register"
+    ]
+  },
+  "POST /v1/accounts/resend-verification": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#resendVerification"
+    ]
+  },
+  "POST /v1/accounts/reset-password": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_recovery_tokens"
+    ],
+    "writes": [
+      "greenfield_password_credentials",
+      "greenfield_recovery_tokens",
+      "greenfield_session_events",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/recovery.ts#completeRecovery"
+    ]
+  },
+  "POST /v1/accounts/verify-email": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_email_verifications",
+      "greenfield_repositories"
+    ],
+    "writes": [
+      "actors",
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_collections",
+      "greenfield_email_verifications",
+      "greenfield_records",
+      "greenfield_repositories",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#activateVerifiedEmailInTransaction",
+      "services/greenfield-api/src/accounts/service.ts#getMe",
+      "services/greenfield-api/src/accounts/service.ts#verifyEmail",
+      "services/greenfield-api/src/accounts/service.ts#verifyEmailCode"
+    ]
+  },
+  "GET /v1/activity": {
+    "reads": [
+      "activity_items",
+      "mutes"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/discovery/repository.ts#excludedActorIds",
+      "services/greenfield-api/src/domains/discovery/repository.ts#listActivity"
+    ]
+  },
+  "POST /v1/admin/ai/models": {
+    "reads": [
+      "greenfield_ai_models",
+      "greenfield_ai_providers"
+    ],
+    "writes": [
+      "greenfield_ai_models"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#requireModel",
+      "services/greenfield-api/src/ai/repository.ts#requireProvider",
+      "services/greenfield-api/src/ai/repository.ts#upsertModel"
+    ]
+  },
+  "POST /v1/admin/ai/prompts": {
+    "reads": [
+      "greenfield_ai_prompts"
+    ],
+    "writes": [
+      "greenfield_ai_prompts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#registerPrompt",
+      "services/greenfield-api/src/ai/repository.ts#requirePrompt"
+    ]
+  },
+  "POST /v1/admin/ai/providers": {
+    "reads": [
+      "greenfield_ai_providers"
+    ],
+    "writes": [
+      "greenfield_ai_providers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#requireProvider",
+      "services/greenfield-api/src/ai/repository.ts#upsertProvider"
+    ]
+  },
+  "POST /v1/admin/ai/tools": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/tool-broker.ts#declareTool"
+    ]
+  },
+  "POST /v1/admin/commerce/entitlements": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_developer_organisations",
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements",
+      "greenfield_external_billing_receipts",
+      "greenfield_offers"
+    ],
+    "writes": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlement_events",
+      "greenfield_entitlements"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#get",
+      "services/greenfield-api/src/entitlements/service.ts#grant"
+    ]
+  },
+  "POST /v1/admin/commerce/entitlements/:entitlementId/transitions": {
+    "reads": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements"
+    ],
+    "writes": [
+      "greenfield_entitlement_events",
+      "greenfield_entitlements"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#get",
+      "services/greenfield-api/src/entitlements/service.ts#transition"
+    ]
+  },
+  "PUT /v1/admin/commerce/offers/:offerId": {
+    "reads": [],
+    "writes": [
+      "greenfield_offers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#upsertOffer"
+    ]
+  },
+  "PUT /v1/admin/commerce/quotas/:quotaPolicyId": {
+    "reads": [],
+    "writes": [
+      "greenfield_quota_policies"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#upsertQuota"
+    ]
+  },
+  "PUT /v1/admin/developer/build-services/:serviceId": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_build_service_registrations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#registerBuildService",
+      "services/greenfield-api/src/developers/service.ts#requireAdmin"
+    ]
+  },
+  "POST /v1/admin/developer/namespaces/:namespace/verify": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_publisher_namespaces"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#requireAdmin",
+      "services/greenfield-api/src/developers/service.ts#verifyNamespace"
+    ]
+  },
+  "PATCH /v1/admin/developer/programme/:accountId": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_developer_programme_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#requireAdmin",
+      "services/greenfield-api/src/developers/service.ts#setProgrammeState"
+    ]
+  },
+  "GET /v1/admin/moderation/reports": {
+    "reads": [
+      "reports"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#listReports"
+    ]
+  },
+  "GET /v1/admin/moderation/reports/:reportId": {
+    "reads": [
+      "reports"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#getReport"
+    ]
+  },
+  "PATCH /v1/admin/moderation/reports/:reportId": {
+    "reads": [
+      "reports"
+    ],
+    "writes": [
+      "moderation_actions",
+      "reports"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#getReport",
+      "services/greenfield-api/src/domains/moderation/repository.ts#reviewReport"
+    ]
+  },
+  "POST /v1/admin/moderation/reports/:reportId/actions": {
+    "reads": [
+      "greenfield_comments",
+      "reports"
+    ],
+    "writes": [
+      "greenfield_comments",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "moderation_actions",
+      "posts",
+      "reports"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#applyAction",
+      "services/greenfield-api/src/domains/moderation/repository.ts#getReport",
+      "services/greenfield-api/src/domains/moderation/repository.ts#removeReportedContent"
+    ]
+  },
+  "GET /v1/admin/ops/ai/executions": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#diagnostics"
+    ]
+  },
+  "GET /v1/admin/ops/ai/providers": {
+    "reads": [
+      "greenfield_ai_providers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#listProviders"
+    ]
+  },
+  "POST /v1/admin/ops/ai/providers/:providerId/credentials": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/credential-service.ts#store"
+    ]
+  },
+  "POST /v1/admin/ops/ai/providers/:providerId/disable": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#publishMetadataEvent",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#setProviderEnabled"
+    ]
+  },
+  "POST /v1/admin/ops/ai/providers/:providerId/enable": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#publishMetadataEvent",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#setProviderEnabled"
+    ]
+  },
+  "GET /v1/admin/ops/ai/providers/:providerId/health": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#verifyProvider"
+    ]
+  },
+  "POST /v1/admin/ops/ai/providers/:providerId/verify": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#verifyProvider"
+    ]
+  },
+  "GET /v1/admin/ops/ai/usage": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#diagnostics"
+    ]
+  },
+  "POST /v1/admin/ops/atproto/connections/:connectionId/revoke": {
+    "reads": [
+      "atproto_connections"
+    ],
+    "writes": [
+      "atproto_connections",
+      "atproto_oauth_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#adminRevokeConnection"
+    ]
+  },
+  "POST /v1/admin/ops/atproto/ingest": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/admin/ops/atproto/lexicons/:collection/disable": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/admin/ops/atproto/publish": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/admin/ops/engines": {
+    "reads": [
+      "greenfield_engine_capability_registrations",
+      "greenfield_engine_event_consumer_registrations",
+      "greenfield_engine_job_registrations",
+      "greenfield_engine_registrations",
+      "greenfield_engine_service_registrations",
+      "greenfield_engine_usage_metric_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/engines/service.ts#list"
+    ]
+  },
+  "GET /v1/admin/ops/engines/:engineId": {
+    "reads": [
+      "greenfield_engine_capability_registrations",
+      "greenfield_engine_event_consumer_registrations",
+      "greenfield_engine_job_registrations",
+      "greenfield_engine_registrations",
+      "greenfield_engine_service_registrations",
+      "greenfield_engine_usage_metric_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/engines/service.ts#get",
+      "services/greenfield-api/src/domains/engines/service.ts#list"
+    ]
+  },
+  "POST /v1/admin/ops/events/dead-letters/retry": {
+    "reads": [
+      "greenfield_domain_events",
+      "greenfield_event_subscriptions"
+    ],
+    "writes": [
+      "greenfield_event_deliveries",
+      "greenfield_event_replay_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/events/replay.ts#planDeliveries",
+      "services/greenfield-api/src/events/replay.ts#replay",
+      "services/greenfield-api/src/events/replay.ts#retryDeadLetters",
+      "services/greenfield-api/src/events/replay.ts#selectEvents"
+    ]
+  },
+  "POST /v1/admin/ops/events/replay": {
+    "reads": [
+      "greenfield_domain_events",
+      "greenfield_event_subscriptions"
+    ],
+    "writes": [
+      "greenfield_event_deliveries",
+      "greenfield_event_replay_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/events/replay.ts#planDeliveries",
+      "services/greenfield-api/src/events/replay.ts#replay",
+      "services/greenfield-api/src/events/replay.ts#selectEvents"
+    ]
+  },
+  "POST /v1/admin/ops/events/replay/:replayId/cancel": {
+    "reads": [],
+    "writes": [
+      "greenfield_event_deliveries",
+      "greenfield_event_replay_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/events/replay.ts#cancelReplay"
+    ]
+  },
+  "GET /v1/admin/ops/events/subscriber-failures": {
+    "reads": [
+      "greenfield_domain_events",
+      "greenfield_event_deliveries"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/events/replay.ts#inspectSubscriberFailures"
+    ]
+  },
+  "POST /v1/admin/ops/mail/identities/adopt": {
+    "reads": [
+      "greenfield_mail_identities"
+    ],
+    "writes": [
+      "greenfield_mail_identities",
+      "greenfield_mail_identity_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/identity-service.ts#adopt",
+      "services/greenfield-api/src/mail/identity-service.ts#recordEvent"
+    ]
+  },
+  "GET /v1/admin/ops/mail/summary": {
+    "reads": [
+      "greenfield_mail_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/mail/service.ts#summary"
+    ]
+  },
+  "POST /v1/admin/ops/policy/evaluate": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_comments",
+      "greenfield_connections",
+      "greenfield_extension_capabilities",
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions",
+      "greenfield_records",
+      "greenfield_repositories",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_policy_decision_audit"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/policy/engine.ts#accountIdForActor",
+      "services/greenfield-api/src/domains/policy/engine.ts#auditRequiredFor",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluate",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAdmin",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAiContext",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAndAudit",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateConnection",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateDimon",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateModule",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateResourceVisibility",
+      "services/greenfield-api/src/domains/policy/engine.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/policy/engine.ts#recordDecision",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveInput",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveResource"
+    ]
+  },
+  "POST /v1/admin/ops/queue/dead-letters/:deadLetterId/retry": {
+    "reads": [
+      "atproto_dead_letters"
+    ],
+    "writes": [
+      "atproto_dead_letters",
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "POST /v1/admin/ops/queue/drain": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/admin/ops/search/failures": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#projectionFailures"
+    ]
+  },
+  "POST /v1/admin/ops/search/failures/:failureId/retry": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#retryFailure"
+    ]
+  },
+  "GET /v1/admin/ops/search/health": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#health"
+    ]
+  },
+  "GET /v1/admin/ops/search/projections": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#projectionStates"
+    ]
+  },
+  "POST /v1/admin/ops/search/reindex": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#requestReindex"
+    ]
+  },
+  "POST /v1/admin/product-standard/ingest": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_mps_ingestions",
+      "greenfield_product_family_members",
+      "greenfield_product_privacy_declarations",
+      "greenfield_release_frontends",
+      "greenfield_release_presentation_assets"
+    ],
+    "writes": [
+      "greenfield_mps_ingestions",
+      "greenfield_product_families",
+      "greenfield_product_family_members",
+      "greenfield_product_identity_aliases",
+      "greenfield_product_privacy_declarations",
+      "greenfield_product_relationships",
+      "greenfield_release_frontends",
+      "greenfield_release_presentation_assets"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+      "services/greenfield-api/src/product-standard/ingest-service.ts#get",
+      "services/greenfield-api/src/product-standard/ingest-service.ts#ingest"
+    ]
+  },
+  "POST /v1/admin/registry/modules/import": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [
+      "greenfield_extension_points",
+      "greenfield_extension_targets",
+      "greenfield_extension_versions",
+      "greenfield_extensions",
+      "greenfield_module_contributions",
+      "greenfield_module_dependencies",
+      "greenfield_module_license_evidence",
+      "greenfield_module_permissions",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_sources",
+      "greenfield_module_versions",
+      "module_backend_definitions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+      "services/greenfield-api/src/modules/release-service.ts#getRelease",
+      "services/greenfield-api/src/modules/release-service.ts#importPendingReview",
+      "services/greenfield-api/src/modules/release-service.ts#insertContributions"
+    ]
+  },
+  "POST /v1/admin/registry/publishers/:publisherId/revoke": {
+    "reads": [
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_publisher_namespaces",
+      "greenfield_publishers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#getPublisher",
+      "services/greenfield-api/src/modules/publisher-service.ts#revokePublisher"
+    ]
+  },
+  "POST /v1/admin/registry/publishers/:publisherId/signing-keys": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_publisher_signing_keys",
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_publisher_signing_key_events",
+      "greenfield_publisher_signing_keys"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+      "services/greenfield-api/src/modules/release-signing.ts#get",
+      "services/greenfield-api/src/modules/release-signing.ts#register"
+    ]
+  },
+  "POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_publisher_signing_keys"
+    ],
+    "writes": [
+      "greenfield_module_release_signatures",
+      "greenfield_module_revocations",
+      "greenfield_publisher_signing_key_events",
+      "greenfield_publisher_signing_keys"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+      "services/greenfield-api/src/modules/release-signing.ts#get",
+      "services/greenfield-api/src/modules/release-signing.ts#revoke"
+    ]
+  },
+  "POST /v1/admin/registry/publishers/:publisherId/suspend": {
+    "reads": [
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_publishers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#getPublisher",
+      "services/greenfield-api/src/modules/publisher-service.ts#suspendPublisher"
+    ]
+  },
+  "POST /v1/admin/registry/publishers/:publisherId/verify": {
+    "reads": [
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_publishers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#getPublisher",
+      "services/greenfield-api/src/modules/publisher-service.ts#verifyPublisher"
+    ]
+  },
+  "POST /v1/admin/registry/releases/:releaseId/publish": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/admin/registry/releases/:releaseId/quarantine": {
+    "reads": [
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "greenfield_module_contributions",
+      "greenfield_module_quarantines",
+      "greenfield_module_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/release-service.ts#quarantineRelease"
+    ]
+  },
+  "POST /v1/admin/registry/releases/:releaseId/revoke": {
+    "reads": [
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "greenfield_module_releases",
+      "greenfield_module_revocations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/release-service.ts#revokeRelease"
+    ]
+  },
+  "POST /v1/admin/registry/releases/:releaseId/verify": {
+    "reads": [
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "greenfield_module_contributions",
+      "greenfield_module_quarantines",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/release-service.ts#getRelease",
+      "services/greenfield-api/src/modules/release-service.ts#getReleaseById",
+      "services/greenfield-api/src/modules/release-service.ts#quarantineRelease",
+      "services/greenfield-api/src/modules/release-service.ts#requireRelease",
+      "services/greenfield-api/src/modules/release-service.ts#setReleaseState",
+      "services/greenfield-api/src/modules/release-service.ts#verifyRelease",
+      "services/greenfield-api/src/modules/release-service.ts#verifyReleaseFromId",
+      "services/greenfield-api/src/modules/release-service.ts#verifyReleaseSignatures"
+    ]
+  },
+  "POST /v1/admin/registry/sync": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_module_sync_failures",
+      "greenfield_module_sync_runs",
+      "greenfield_release_asset_blobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
+      "services/greenfield-api/src/modules/github-release-sync-service.ts#storePackageBlob",
+      "services/greenfield-api/src/modules/github-release-sync-service.ts#sync",
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount"
+    ]
+  },
+  "GET /v1/admin/registry/sync-runs": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_module_sync_runs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount"
+    ]
+  },
+  "GET /v1/ai/executions/:executionId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#getExecution"
+    ]
+  },
+  "POST /v1/ai/executions/:executionId/cancel": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#cancelExecution",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#publishMetadataEvent"
+    ]
+  },
+  "GET /v1/ai/executions/:executionId/stream": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#streamEvents"
+    ]
+  },
+  "GET /v1/ai/models": {
+    "reads": [
+      "greenfield_ai_models"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#listModels"
+    ]
+  },
+  "GET /v1/ai/providers": {
+    "reads": [
+      "greenfield_ai_providers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/repository.ts#listProviders"
+    ]
+  },
+  "POST /v1/ai/requests": {
+    "reads": [
+      "actors"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/gateway-service.ts#actorIdForAccount",
+      "services/greenfield-api/src/ai/gateway-service.ts#createRequest"
+    ]
+  },
+  "POST /v1/ai/streams/:streamId/cancel": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/streaming-runtime.ts#cancel"
+    ]
+  },
+  "POST /v1/ai/streams/:streamId/reconnect": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/streaming-runtime.ts#reconnect"
+    ]
+  },
+  "POST /v1/ai/tools/:toolId/validate": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/tool-broker.ts#auditTool",
+      "services/greenfield-api/src/ai/tool-broker.ts#publishToolEvent",
+      "services/greenfield-api/src/ai/tool-broker.ts#validateAndRecord"
+    ]
+  },
+  "GET /v1/atproto/connections": {
+    "reads": [
+      "atproto_connections"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#listConnections"
+    ]
+  },
+  "POST /v1/atproto/connections/:connectionId/disconnect": {
+    "reads": [
+      "atproto_connections"
+    ],
+    "writes": [
+      "atproto_connections",
+      "atproto_oauth_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#disconnect",
+      "services/greenfield-api/src/bridges/atproto/service.ts#getConnection"
+    ]
+  },
+  "POST /v1/atproto/connections/:connectionId/refresh": {
+    "reads": [
+      "atproto_connections"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#getConnection"
+    ]
+  },
+  "GET /v1/atproto/connections/:connectionId/status": {
+    "reads": [
+      "atproto_connections"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#getConnection"
+    ]
+  },
+  "GET /v1/atproto/feed": {
+    "reads": [
+      "atproto_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#atmosphereFeed"
+    ]
+  },
+  "GET /v1/atproto/oauth/callback": {
+    "reads": [
+      "atproto_connections",
+      "atproto_oauth_sessions",
+      "atproto_oauth_states"
+    ],
+    "writes": [
+      "atproto_connections",
+      "atproto_oauth_sessions",
+      "atproto_oauth_states",
+      "atproto_publication_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#completePreviewOAuth",
+      "services/greenfield-api/src/bridges/atproto/service.ts#consumeOAuthState",
+      "services/greenfield-api/src/bridges/atproto/service.ts#getConnection"
+    ]
+  },
+  "POST /v1/atproto/oauth/start": {
+    "reads": [],
+    "writes": [
+      "atproto_oauth_states"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#startOAuth"
+    ]
+  },
+  "GET /v1/atproto/preferences": {
+    "reads": [
+      "atproto_publication_preferences"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#getPreferences"
+    ]
+  },
+  "PATCH /v1/atproto/preferences": {
+    "reads": [
+      "atproto_publication_preferences"
+    ],
+    "writes": [
+      "atproto_publication_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/bridges/atproto/service.ts#getPreferences",
+      "services/greenfield-api/src/bridges/atproto/service.ts#updatePreferences"
+    ]
+  },
+  "DELETE /v1/attachments/:attachmentId": {
+    "reads": [
+      "attachments"
+    ],
+    "writes": [
+      "attachments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/attachments/service.ts#removeOrphan"
+    ]
+  },
+  "GET /v1/attachments/:attachmentId": {
+    "reads": [
+      "attachments"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/attachments/service.ts#requireDto",
+      "services/greenfield-api/src/domains/attachments/service.ts#status"
+    ]
+  },
+  "GET /v1/attachments/:attachmentId/content": {
+    "reads": [
+      "attachments",
+      "blocks",
+      "follows",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts",
+      "profile_links",
+      "profile_media",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/attachments/service.ts#openStored",
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getById",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing"
+    ]
+  },
+  "POST /v1/attachments/uploads": {
+    "reads": [],
+    "writes": [
+      "attachment_upload_sessions",
+      "attachments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/attachments/service.ts#createUpload"
+    ]
+  },
+  "PUT /v1/attachments/uploads/:uploadId/content": {
+    "reads": [
+      "attachment_upload_sessions",
+      "attachments"
+    ],
+    "writes": [
+      "attachment_upload_sessions",
+      "attachments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/attachments/service.ts#markExpired",
+      "services/greenfield-api/src/domains/attachments/service.ts#markFailed",
+      "services/greenfield-api/src/domains/attachments/service.ts#requireDto",
+      "services/greenfield-api/src/domains/attachments/service.ts#upload"
+    ]
+  },
+  "POST /v1/auth/apple/link": {
+    "reads": [
+      "greenfield_authentication_methods",
+      "greenfield_external_identities"
+    ],
+    "writes": [
+      "greenfield_authentication_methods",
+      "greenfield_external_identities"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#assertConfigured",
+      "services/greenfield-api/src/auth/apple/service.ts#completeLink",
+      "services/greenfield-api/src/auth/apple/service.ts#status"
+    ]
+  },
+  "POST /v1/auth/apple/link/options": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#assertConfigured",
+      "services/greenfield-api/src/auth/apple/service.ts#beginLink",
+      "services/greenfield-api/src/auth/apple/service.ts#serializeChallenge",
+      "services/greenfield-api/src/auth/apple/service.ts#status"
+    ]
+  },
+  "GET /v1/auth/apple/status": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#status"
+    ]
+  },
+  "GET /v1/auth/passkeys": {
+    "reads": [
+      "greenfield_passkeys"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#list"
+    ]
+  },
+  "DELETE /v1/auth/passkeys/:passkeyId": {
+    "reads": [
+      "greenfield_passkeys"
+    ],
+    "writes": [
+      "greenfield_authentication_methods",
+      "greenfield_passkeys"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#revoke",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queuePasskeyRemoved",
+      "services/greenfield-api/src/mail/service.ts#queueSecurityAlert",
+      "services/greenfield-api/src/mail/service.ts#securityUrl"
+    ]
+  },
+  "POST /v1/auth/passkeys/registration/options": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_passkeys"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#accountForPasskey",
+      "services/greenfield-api/src/auth/passkeys/service.ts#beginRegistration",
+      "services/greenfield-api/src/auth/passkeys/service.ts#listActivePasskeyCredentials"
+    ]
+  },
+  "POST /v1/auth/passkeys/registration/verify": {
+    "reads": [
+      "greenfield_auth_challenges",
+      "greenfield_passkeys"
+    ],
+    "writes": [
+      "greenfield_auth_identities",
+      "greenfield_passkeys"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#verifyRegistration",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queuePasskeyAdded",
+      "services/greenfield-api/src/mail/service.ts#queueSecurityAlert",
+      "services/greenfield-api/src/mail/service.ts#securityUrl"
+    ]
+  },
+  "POST /v1/auth/preview/session": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [
+      "session_capabilities",
+      "sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getByHandle",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/security/session.ts#createSession"
+    ]
+  },
+  "GET /v1/auth/recovery-codes": {
+    "reads": [
+      "greenfield_recovery_code_sets",
+      "greenfield_recovery_codes"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/recovery-codes.ts#remaining"
+    ]
+  },
+  "POST /v1/auth/recovery-codes/regenerate": {
+    "reads": [],
+    "writes": [
+      "greenfield_recovery_code_sets",
+      "greenfield_recovery_codes"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/recovery-codes.ts#invalidateActive",
+      "services/greenfield-api/src/auth/mfa/recovery-codes.ts#regenerate"
+    ]
+  },
+  "POST /v1/auth/step-up/totp": {
+    "reads": [
+      "greenfield_totp_credentials"
+    ],
+    "writes": [
+      "greenfield_session_events",
+      "greenfield_sessions",
+      "greenfield_totp_credentials"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/totp.ts#decryptSecret",
+      "services/greenfield-api/src/auth/mfa/totp.ts#verifyActiveTotp",
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#markRecentlyAuthenticated"
+    ]
+  },
+  "POST /v1/auth/totp/disable": {
+    "reads": [
+      "greenfield_totp_credentials"
+    ],
+    "writes": [
+      "greenfield_authentication_methods",
+      "greenfield_totp_credentials"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/totp.ts#disable",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueAuthenticatorDisabled",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queueSecurityAlert",
+      "services/greenfield-api/src/mail/service.ts#securityUrl"
+    ]
+  },
+  "POST /v1/auth/totp/enroll": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [
+      "greenfield_authentication_methods",
+      "greenfield_totp_credentials"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/totp.ts#beginEnrollment",
+      "services/greenfield-api/src/auth/mfa/totp.ts#executeWrite",
+      "services/greenfield-api/src/auth/mfa/totp.ts#forDb",
+      "services/greenfield-api/src/auth/mfa/totp.ts#getActiveAccount"
+    ]
+  },
+  "POST /v1/auth/totp/verify": {
+    "reads": [
+      "greenfield_auth_challenges",
+      "greenfield_totp_credentials"
+    ],
+    "writes": [
+      "greenfield_auth_challenges",
+      "greenfield_authentication_methods",
+      "greenfield_totp_credentials"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/mfa/totp.ts#forDb",
+      "services/greenfield-api/src/auth/mfa/totp.ts#verifyEnrollment",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueAuthenticatorEnabled",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queueSecurityAlert",
+      "services/greenfield-api/src/mail/service.ts#securityUrl"
+    ]
+  },
+  "GET /v1/backend/products/:productId/accounts/:accountId": {
+    "reads": [
+      "greenfield_accounts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "GET /v1/backend/products/:productId/accounts/:accountId/entitlements": {
+    "reads": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#get",
+      "services/greenfield-api/src/entitlements/service.ts#listAccount"
+    ]
+  },
+  "POST /v1/backend/products/:productId/capabilities/check": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/backend/products/:productId/data-request-domains/:domainId/complete": {
+    "reads": [
+      "greenfield_account_data_artifacts",
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "writes": [
+      "greenfield_account_data_artifacts",
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#completeServiceDomain",
+      "services/greenfield-api/src/account-data/service.ts#refresh"
+    ]
+  },
+  "POST /v1/backend/products/:productId/data-requests/claim": {
+    "reads": [
+      "greenfield_account_data_request_domains",
+      "greenfield_account_data_requests"
+    ],
+    "writes": [
+      "greenfield_account_data_request_domains"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/account-data/service.ts#claimServiceDomains"
+    ]
+  },
+  "POST /v1/backend/products/:productId/entitlements/check": {
+    "reads": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#check",
+      "services/greenfield-api/src/entitlements/service.ts#get"
+    ]
+  },
+  "POST /v1/backend/products/:productId/events": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#publishEvent"
+    ]
+  },
+  "GET /v1/backend/products/:productId/identity/context": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/backend/products/:productId/installations/:installationId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/backend/products/:productId/installations/:installationId/capabilities": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/backend/products/:productId/installations/:installationId/resources": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#list"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs": {
+    "reads": [
+      "background_jobs",
+      "greenfield_module_job_registrations"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#enqueueJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireDeclaredJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs/:jobId/cancel": {
+    "reads": [
+      "background_jobs"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#cancelJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireScopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs/:jobId/fail": {
+    "reads": [
+      "background_jobs"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#failJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireScopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob"
+    ]
+  },
+  "GET /v1/backend/products/:productId/jobs/:jobId/result": {
+    "reads": [
+      "background_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#jobResult",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireScopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs/:jobId/start": {
+    "reads": [
+      "background_jobs"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireScopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#startJob"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs/:jobId/succeed": {
+    "reads": [
+      "background_jobs"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#requireScopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#scopedJob",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#succeedJob"
+    ]
+  },
+  "POST /v1/backend/products/:productId/jobs/claim": {
+    "reads": [
+      "background_jobs",
+      "greenfield_module_job_registrations"
+    ],
+    "writes": [
+      "background_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#claimJobs",
+      "services/greenfield-api/src/backend-fabric/event-job-service.ts#reapExpiredServiceJobs"
+    ]
+  },
+  "GET /v1/backend/products/:productId/records/:collection": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#list",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "POST /v1/backend/products/:productId/records/:collection": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#create",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "DELETE /v1/backend/products/:productId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#delete",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+    ]
+  },
+  "GET /v1/backend/products/:productId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "PUT /v1/backend/products/:productId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#patch",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+    ]
+  },
+  "POST /v1/backend/products/:productId/resources": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_resources"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#register"
+    ]
+  },
+  "GET /v1/backend/products/:productId/resources/:resourceId": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get"
+    ]
+  },
+  "POST /v1/backend/products/:productId/resources/:resourceId/migrations": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_migration_history",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_migration_history",
+      "greenfield_data_resources",
+      "greenfield_data_schema_versions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#recordMigration"
+    ]
+  },
+  "POST /v1/backend/products/:productId/resources/:resourceId/schemas": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_schema_versions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#declareSchemaVersion",
+      "services/greenfield-api/src/data-ledger/service.ts#get"
+    ]
+  },
+  "POST /v1/backend/products/:productId/secrets/lease": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/secrets/client.ts#lease"
+    ]
+  },
+  "POST /v1/backend/products/:productId/usage": {
+    "reads": [
+      "greenfield_entitlements",
+      "greenfield_quota_policies",
+      "greenfield_usage_events"
+    ],
+    "writes": [
+      "greenfield_quota_counters",
+      "greenfield_usage_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#recordUsage"
+    ]
+  },
+  "GET /v1/board/layout": {
+    "reads": [
+      "greenfield_board_layouts"
+    ],
+    "writes": [
+      "greenfield_board_layouts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/board/service.ts#get"
+    ]
+  },
+  "PATCH /v1/board/layout": {
+    "reads": [
+      "greenfield_board_layouts"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_board_layouts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/board/service.ts#get",
+      "services/greenfield-api/src/domains/board/service.ts#patch"
+    ]
+  },
+  "DELETE /v1/comments/:commentId": {
+    "reads": [
+      "greenfield_comments"
+    ],
+    "writes": [
+      "greenfield_comments",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#deleteComment"
+    ]
+  },
+  "PATCH /v1/comments/:commentId": {
+    "reads": [
+      "greenfield_comments"
+    ],
+    "writes": [
+      "comment",
+      "greenfield_comments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#updateComment"
+    ]
+  },
+  "DELETE /v1/comments/:commentId/reaction": {
+    "reads": [
+      "greenfield_comment_reactions",
+      "greenfield_comments"
+    ],
+    "writes": [
+      "greenfield_comment_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#setCommentReaction"
+    ]
+  },
+  "PUT /v1/comments/:commentId/reaction": {
+    "reads": [
+      "greenfield_comment_reactions",
+      "greenfield_comments"
+    ],
+    "writes": [
+      "greenfield_comment_reactions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#setCommentReaction"
+    ]
+  },
+  "GET /v1/comments/:commentId/replies": {
+    "reads": [
+      "blocks",
+      "greenfield_comments",
+      "mutes",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#excludedActors",
+      "services/greenfield-api/src/domains/comments/service.ts#listReplies",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors"
+    ]
+  },
+  "POST /v1/comments/:commentId/replies": {
+    "reads": [
+      "actors",
+      "greenfield_comments",
+      "greenfield_handles",
+      "greenfield_mentions",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_comments",
+      "greenfield_mentions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#create",
+      "services/greenfield-api/src/domains/comments/service.ts#createReply",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors",
+      "services/greenfield-api/src/domains/mentions/service.ts#extractMentions",
+      "services/greenfield-api/src/domains/mentions/service.ts#storeMentions"
+    ]
+  },
+  "GET /v1/commerce/billing-adapters": {
+    "reads": [
+      "greenfield_billing_adapter_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#adapterStatus"
+    ]
+  },
+  "GET /v1/commerce/entitlements": {
+    "reads": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#get",
+      "services/greenfield-api/src/entitlements/service.ts#listAccount"
+    ]
+  },
+  "POST /v1/commerce/entitlements/check": {
+    "reads": [
+      "greenfield_entitlement_capabilities",
+      "greenfield_entitlements"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/entitlements/service.ts#check",
+      "services/greenfield-api/src/entitlements/service.ts#get"
+    ]
+  },
+  "GET /v1/connections": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#list"
+    ]
+  },
+  "DELETE /v1/connections/:connectionId": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_comments",
+      "greenfield_connections",
+      "greenfield_extension_capabilities",
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions",
+      "greenfield_records",
+      "greenfield_repositories",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_policy_decision_audit"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#disconnect",
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#get",
+      "services/greenfield-api/src/domains/policy/engine.ts#accountIdForActor",
+      "services/greenfield-api/src/domains/policy/engine.ts#assertAllowed",
+      "services/greenfield-api/src/domains/policy/engine.ts#auditRequiredFor",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluate",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAdmin",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAiContext",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAndAudit",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateConnection",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateDimon",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateModule",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateResourceVisibility",
+      "services/greenfield-api/src/domains/policy/engine.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/policy/engine.ts#recordDecision",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveInput",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveResource"
+    ]
+  },
+  "GET /v1/connections/:connectionId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#get"
+    ]
+  },
+  "POST /v1/connections/:connectionId/disable": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#disable"
+    ]
+  },
+  "POST /v1/connections/:connectionId/enable": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#enable"
+    ]
+  },
+  "POST /v1/connections/:connectionId/refresh": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_comments",
+      "greenfield_connections",
+      "greenfield_extension_capabilities",
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions",
+      "greenfield_records",
+      "greenfield_repositories",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_policy_decision_audit"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/connectors/adapter-registry.ts#get",
+      "services/greenfield-api/src/connectors/adapter-registry.ts#require",
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#beginRefresh",
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#completeRefresh",
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#fail",
+      "services/greenfield-api/src/domains/connectors/connections/service.ts#get",
+      "services/greenfield-api/src/domains/connectors/credentials/service.ts#decryptForTrustedBackend",
+      "services/greenfield-api/src/domains/connectors/credentials/service.ts#storeEncrypted",
+      "services/greenfield-api/src/domains/policy/engine.ts#accountIdForActor",
+      "services/greenfield-api/src/domains/policy/engine.ts#assertAllowed",
+      "services/greenfield-api/src/domains/policy/engine.ts#auditRequiredFor",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluate",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAdmin",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAiContext",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateAndAudit",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateConnection",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateDimon",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateModule",
+      "services/greenfield-api/src/domains/policy/engine.ts#evaluateResourceVisibility",
+      "services/greenfield-api/src/domains/policy/engine.ts#isBlockedEitherWay",
+      "services/greenfield-api/src/domains/policy/engine.ts#recordDecision",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveInput",
+      "services/greenfield-api/src/domains/policy/engine.ts#resolveResource"
+    ]
+  },
+  "GET /v1/connectors": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/connectors/provider-registry.ts#list"
+    ]
+  },
+  "GET /v1/connectors/:providerId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/connectors/provider-registry.ts#get"
+    ]
+  },
+  "POST /v1/connectors/:providerId/authorise": {
+    "reads": [
+      "greenfield_connector_oauth_states"
+    ],
+    "writes": [
+      "greenfield_connector_oauth_states"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/connectors/adapter-registry.ts#get",
+      "services/greenfield-api/src/connectors/adapter-registry.ts#require",
+      "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#initiate",
+      "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#recordAudit",
+      "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#requireOAuthProvider",
+      "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#resolveAllowedRedirectUri",
+      "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#transition"
+    ]
+  },
+  "POST /v1/developer/agreements/:agreementId/:version/accept": {
+    "reads": [
+      "greenfield_developer_agreement_acceptances",
+      "greenfield_developer_agreements"
+    ],
+    "writes": [
+      "greenfield_developer_agreement_acceptances"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#acceptAgreement"
+    ]
+  },
+  "GET /v1/developer/board": {
+    "reads": [
+      "greenfield_developer_builds",
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_organisations",
+      "greenfield_developer_products",
+      "greenfield_developer_profiles",
+      "greenfield_developer_programme_memberships",
+      "greenfield_developer_releases",
+      "greenfield_developer_review_submissions",
+      "greenfield_developer_test_group_members",
+      "greenfield_developer_test_groups"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#activeOrganisationIds",
+      "services/greenfield-api/src/developers/service.ts#board",
+      "services/greenfield-api/src/developers/service.ts#listProducts"
+    ]
+  },
+  "POST /v1/developer/organisations": {
+    "reads": [],
+    "writes": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_organisations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#createOrganisation"
+    ]
+  },
+  "POST /v1/developer/organisations/:organisationId/invitations/accept": {
+    "reads": [],
+    "writes": [
+      "greenfield_developer_organisation_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#acceptOrganisationInvitation"
+    ]
+  },
+  "POST /v1/developer/organisations/:organisationId/members": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_developer_organisation_memberships"
+    ],
+    "writes": [
+      "greenfield_developer_organisation_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#inviteOrganisationMember",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole"
+    ]
+  },
+  "GET /v1/developer/products": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#activeOrganisationIds",
+      "services/greenfield-api/src/developers/service.ts#listProducts"
+    ]
+  },
+  "POST /v1/developer/products": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_programme_memberships",
+      "greenfield_publisher_namespaces",
+      "greenfield_publisher_owners",
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_developer_products"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#assertPublicPublishingReady",
+      "services/greenfield-api/src/developers/service.ts#createProduct",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requirePublisherAccess"
+    ]
+  },
+  "GET /v1/developer/products/:productId": {
+    "reads": [
+      "greenfield_developer_builds",
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products",
+      "greenfield_developer_releases",
+      "greenfield_developer_review_submissions",
+      "greenfield_developer_source_connections",
+      "greenfield_developer_test_groups"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#productDetail",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "POST /v1/developer/products/:productId/builds": {
+    "reads": [
+      "greenfield_developer_builds",
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products",
+      "greenfield_developer_source_connections"
+    ],
+    "writes": [
+      "greenfield_developer_builds"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#requestBuild",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "POST /v1/developer/products/:productId/releases": {
+    "reads": [
+      "greenfield_build_provenance",
+      "greenfield_developer_builds",
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products"
+    ],
+    "writes": [
+      "greenfield_developer_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#createRelease",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "PUT /v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products",
+      "greenfield_developer_releases",
+      "greenfield_developer_test_groups"
+    ],
+    "writes": [
+      "greenfield_developer_release_test_groups"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#assignReleaseTestGroup",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "POST /v1/developer/products/:productId/reviews": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products",
+      "greenfield_developer_programme_memberships",
+      "greenfield_developer_releases",
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_developer_review_submissions",
+      "greenfield_release_review_checks"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#assertPublicPublishingReady",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess",
+      "services/greenfield-api/src/developers/service.ts#submitReview"
+    ]
+  },
+  "POST /v1/developer/products/:productId/sources": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products"
+    ],
+    "writes": [
+      "greenfield_developer_source_connections"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#connectSource",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "POST /v1/developer/products/:productId/test-groups": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_developer_products"
+    ],
+    "writes": [
+      "greenfield_developer_test_groups"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#createTestGroup",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole",
+      "services/greenfield-api/src/developers/service.ts#requireProductAccess"
+    ]
+  },
+  "PUT /v1/developer/profile": {
+    "reads": [],
+    "writes": [
+      "greenfield_developer_profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#upsertProfile"
+    ]
+  },
+  "POST /v1/developer/programme/enrol": {
+    "reads": [],
+    "writes": [
+      "greenfield_developer_programme_memberships"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#enrol"
+    ]
+  },
+  "POST /v1/developer/publishers": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_publisher_owners",
+      "greenfield_publishers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#createPublisher",
+      "services/greenfield-api/src/developers/service.ts#requireOrganisationRole"
+    ]
+  },
+  "POST /v1/developer/publishers/:publisherId/namespaces": {
+    "reads": [
+      "greenfield_developer_organisation_memberships",
+      "greenfield_publisher_namespaces",
+      "greenfield_publisher_owners"
+    ],
+    "writes": [
+      "greenfield_publisher_namespaces"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/service.ts#claimNamespace",
+      "services/greenfield-api/src/developers/service.ts#requirePublisherAccess"
+    ]
+  },
+  "GET /v1/discover": {
+    "reads": [
+      "attachments",
+      "featured_modules",
+      "mutes",
+      "post_media",
+      "posts",
+      "trending_topics"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/discovery/repository.ts#excludedActorIds",
+      "services/greenfield-api/src/domains/discovery/repository.ts#getDiscover",
+      "services/greenfield-api/src/domains/discovery/repository.ts#listReels"
+    ]
+  },
+  "GET /v1/extensions": {
+    "reads": [
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/extension-registry.ts#listPublished"
+    ]
+  },
+  "GET /v1/extensions/:extensionId": {
+    "reads": [
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/extension-registry.ts#listPublished"
+    ]
+  },
+  "PATCH /v1/extensions/:extensionId/configuration": {
+    "reads": [
+      "greenfield_extension_catalogue"
+    ],
+    "writes": [
+      "greenfield_extension_lifecycle_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#configure",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#enqueuePlugin",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#getCatalogueItem",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#recordEvent",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#requireCatalogueItem"
+    ]
+  },
+  "POST /v1/extensions/:extensionId/disable": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "greenfield_extension_lifecycle_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#disable",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#enqueuePlugin",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#getCatalogueItem",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#recordEvent",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#requireCatalogueItem",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#setInstallationStatus"
+    ]
+  },
+  "POST /v1/extensions/:extensionId/enable": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "greenfield_extension_lifecycle_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#enable",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#enqueuePlugin",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#getCatalogueItem",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#recordEvent",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#requireCatalogueItem",
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#setInstallationStatus"
+    ]
+  },
+  "DELETE /v1/extensions/:extensionId/install": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [
+      "greenfield_extension_installations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/installation-service.ts#uninstall"
+    ]
+  },
+  "POST /v1/extensions/:extensionId/install": {
+    "reads": [
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [
+      "greenfield_extension_capabilities",
+      "greenfield_extension_installations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/installation-service.ts#install"
+    ]
+  },
+  "PATCH /v1/extensions/:extensionId/preferences": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_extension_installations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/installation-service.ts#updatePreferences"
+    ]
+  },
+  "GET /v1/extensions/:extensionProductId/capabilities": {
+    "reads": [
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_runtime_projection"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#declaredCapabilities",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#requireProjection"
+    ]
+  },
+  "POST /v1/extensions/:extensionProductId/capabilities/review": {
+    "reads": [
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_event_subscriptions",
+      "greenfield_extension_runtime_projection"
+    ],
+    "writes": [
+      "greenfield_event_subscriptions",
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_event_subscriptions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#declaredCapabilities",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#requireProjection",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#reviewCapabilities"
+    ]
+  },
+  "POST /v1/extensions/:extensionProductId/contributions/:contributionId/fail": {
+    "reads": [
+      "greenfield_extension_contribution_registrations"
+    ],
+    "writes": [
+      "greenfield_extension_contribution_registrations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#failContribution"
+    ]
+  },
+  "POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke": {
+    "reads": [
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_contribution_registrations",
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_records",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/extension-action-service.ts#canHandle",
+      "services/greenfield-api/src/ai/extension-action-service.ts#ensureImmutablePrompt",
+      "services/greenfield-api/src/ai/extension-action-service.ts#execute",
+      "services/greenfield-api/src/modules/backend/gateway-service.ts#canHandle",
+      "services/greenfield-api/src/modules/backend/gateway-service.ts#executeAction",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#assertInvocation",
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "GET /v1/extensions/:extensionProductId/inspector": {
+    "reads": [
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_contribution_registrations",
+      "greenfield_extension_installation_edges",
+      "greenfield_extension_job_executions",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_service_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#developerInspector"
+    ]
+  },
+  "POST /v1/extensions/:extensionProductId/jobs": {
+    "reads": [
+      "greenfield_extension_capability_grants",
+      "greenfield_extension_contribution_registrations",
+      "greenfield_extension_job_executions",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_extension_job_executions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#assertInvocation",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#enqueueJob",
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#requireProjection"
+    ]
+  },
+  "GET /v1/extensions/catalogue": {
+    "reads": [
+      "greenfield_extension_catalogue"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/lifecycle-service.ts#listCatalogue"
+    ]
+  },
+  "GET /v1/extensions/installed": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/extensions/installation-service.ts#listInstalled"
+    ]
+  },
+  "GET /v1/feed/home": {
+    "reads": [
+      "attachments",
+      "blocks",
+      "follows",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "mutes",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#blockedSet",
+      "services/greenfield-api/src/domains/moderation/repository.ts#mutedSet",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrateMany",
+      "services/greenfield-api/src/domains/posts/repository.ts#listHome",
+      "services/greenfield-api/src/domains/posts/repository.ts#listHomeForYou"
+    ]
+  },
+  "GET /v1/feed/profile/:profileId": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/repository.ts#listForHandle"
+    ]
+  },
+  "GET /v1/function-jobs/:jobId": {
+    "reads": [
+      "greenfield_function_jobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/functions/job-service.ts#getJob"
+    ]
+  },
+  "POST /v1/function-jobs/:jobId/cancel": {
+    "reads": [
+      "greenfield_function_jobs"
+    ],
+    "writes": [
+      "greenfield_function_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/functions/job-service.ts#cancel",
+      "services/greenfield-api/src/functions/job-service.ts#getJob"
+    ]
+  },
+  "GET /v1/functions": {
+    "reads": [
+      "greenfield_functions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "POST /v1/functions/:functionId/invoke": {
+    "reads": [
+      "greenfield_functions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/functions/service.ts#invoke"
+    ]
+  },
+  "POST /v1/functions/:functionId/jobs": {
+    "reads": [
+      "greenfield_functions"
+    ],
+    "writes": [
+      "greenfield_function_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/functions/job-service.ts#invoke",
+      "services/greenfield-api/src/functions/job-service.ts#runDeterministic"
+    ]
+  },
+  "GET /v1/health/live": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/health/ready": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/intelligence/missions": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#listMissions"
+    ]
+  },
+  "POST /v1/intelligence/missions": {
+    "reads": [
+      "greenfield_developer_organisation_memberships"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#createMission",
+      "services/greenfield-api/src/intelligence/service.ts#hasWorkspaceAccess"
+    ]
+  },
+  "GET /v1/intelligence/missions/:missionId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#detail"
+    ]
+  },
+  "GET /v1/intelligence/missions/:missionId/approvals": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#approvals"
+    ]
+  },
+  "POST /v1/intelligence/missions/:missionId/approvals/:approvalId/approve": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#approve",
+      "services/greenfield-api/src/intelligence/service.ts#execute"
+    ]
+  },
+  "POST /v1/intelligence/missions/:missionId/approvals/:approvalId/reject": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#reject"
+    ]
+  },
+  "GET /v1/intelligence/missions/:missionId/decisions": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#decisions"
+    ]
+  },
+  "GET /v1/intelligence/missions/:missionId/evidence": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#evidence"
+    ]
+  },
+  "GET /v1/intelligence/missions/:missionId/ledger": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#ledger"
+    ]
+  },
+  "POST /v1/intelligence/missions/:missionId/proposals/:proposalId/execute": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#execute"
+    ]
+  },
+  "POST /v1/intelligence/missions/:missionId/start": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/intelligence/service.ts#execute",
+      "services/greenfield-api/src/intelligence/service.ts#start"
+    ]
+  },
+  "POST /v1/internal/build-service/builds/:buildId/result": {
+    "reads": [
+      "greenfield_build_service_registrations",
+      "greenfield_developer_builds",
+      "greenfield_developer_source_connections"
+    ],
+    "writes": [
+      "greenfield_build_provenance",
+      "greenfield_build_result_receipts",
+      "greenfield_developer_builds"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/build-coordinator.ts#recordResult",
+      "services/greenfield-api/src/developers/build-coordinator.ts#verifyProvenance"
+    ]
+  },
+  "POST /v1/internal/build-service/claims": {
+    "reads": [
+      "greenfield_build_claim_requests",
+      "greenfield_developer_builds",
+      "greenfield_developer_source_connections"
+    ],
+    "writes": [
+      "greenfield_build_claim_requests",
+      "greenfield_developer_builds"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/developers/build-coordinator.ts#claim"
+    ]
+  },
+  "GET /v1/internal/ssrf-check": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/media/:mediaFile": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/media/post-media-storage.ts#readPostMedia",
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate"
+    ]
+  },
+  "GET /v1/media/stories/:mediaFile": {
+    "reads": [
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+    ]
+  },
+  "GET /v1/meta": {
+    "reads": [
+      "greenfield_engine_capability_registrations",
+      "greenfield_engine_event_consumer_registrations",
+      "greenfield_engine_job_registrations",
+      "greenfield_engine_registrations",
+      "greenfield_engine_service_registrations",
+      "greenfield_engine_usage_metric_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#status",
+      "services/greenfield-api/src/domains/engines/service.ts#list",
+      "services/greenfield-api/src/domains/engines/service.ts#publicTopology"
+    ]
+  },
+  "GET /v1/module-host/:targetProductId/composition": {
+    "reads": [
+      "greenfield_extension_contribution_registrations",
+      "greenfield_extension_installations",
+      "greenfield_extension_points",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_release_frontends"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#composeHost"
+    ]
+  },
+  "GET /v1/modules": {
+    "reads": [
+      "greenfield_extension_versions",
+      "greenfield_extensions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "POST /v1/modules/:moduleId/actions/:actionId": {
+    "reads": [
+      "greenfield_module_action_events",
+      "greenfield_module_actions"
+    ],
+    "writes": [
+      "greenfield_module_action_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/action-service.ts#dispatch",
+      "services/greenfield-api/src/modules/action-service.ts#execute",
+      "services/greenfield-api/src/modules/action-service.ts#previousEvent",
+      "services/greenfield-api/src/modules/action-service.ts#recordBackendActionEvent",
+      "services/greenfield-api/src/modules/action-service.ts#recordEvent",
+      "services/greenfield-api/src/modules/action-service.ts#resolveAction"
+    ]
+  },
+  "POST /v1/modules/:moduleId/ai/actions/:actionId/executions": {
+    "reads": [
+      "ai_product_action_executions",
+      "ai_product_action_results"
+    ],
+    "writes": [
+      "ai_product_action_executions",
+      "ai_product_action_results"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/product-action-service.ts#completeExecution",
+      "services/greenfield-api/src/ai/product-action-service.ts#ensurePrompt",
+      "services/greenfield-api/src/ai/product-action-service.ts#execute",
+      "services/greenfield-api/src/ai/product-action-service.ts#executionResponse",
+      "services/greenfield-api/src/ai/product-action-service.ts#findExecutionByRequest",
+      "services/greenfield-api/src/ai/product-action-service.ts#insertQueuedExecution",
+      "services/greenfield-api/src/ai/product-action-service.ts#markExecutionFailed",
+      "services/greenfield-api/src/ai/product-action-service.ts#publishProductEvent"
+    ]
+  },
+  "POST /v1/modules/:moduleId/ai/executions/:executionId/apply": {
+    "reads": [
+      "ai_product_action_applications",
+      "ai_product_action_executions",
+      "ai_product_action_results"
+    ],
+    "writes": [
+      "ai_product_action_applications",
+      "ai_product_action_executions",
+      "ai_product_action_results"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/product-action-service.ts#apply",
+      "services/greenfield-api/src/ai/product-action-service.ts#expireExecution",
+      "services/greenfield-api/src/ai/product-action-service.ts#findApplicationByKey",
+      "services/greenfield-api/src/ai/product-action-service.ts#publishProductEvent",
+      "services/greenfield-api/src/ai/product-action-service.ts#recordApplication",
+      "services/greenfield-api/src/ai/product-action-service.ts#requireExecution",
+      "services/greenfield-api/src/ai/product-action-service.ts#requireResult"
+    ]
+  },
+  "POST /v1/modules/:moduleId/ai/requests": {
+    "reads": [
+      "actors",
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#actorIdForAccount",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#executeModuleRequest",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#executeStreamingAttempt",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#executeTargetAttempt",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#executeWithFailover",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#publishMetadataEvent",
+      "services/greenfield-api/src/ai/provider-runtime-service.ts#validateOrRepairStructuredOutput",
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "GET /v1/modules/:moduleId/backend": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "POST /v1/modules/:moduleId/backend/disable": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/backend/lifecycle-service.ts#disable",
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "POST /v1/modules/:moduleId/backend/discover": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/backend/discovery-service.ts#discover",
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "POST /v1/modules/:moduleId/backend/events": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/backend/event-service.ts#ingest"
+    ]
+  },
+  "POST /v1/modules/:moduleId/backend/health": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/runtime-access.ts#resolve"
+    ]
+  },
+  "POST /v1/modules/:moduleId/backend/webhooks/modula": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/backend/webhook-service.ts#receive"
+    ]
+  },
+  "GET /v1/modules/:moduleId/data-resources": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#list"
+    ]
+  },
+  "POST /v1/modules/:moduleId/data-resources": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_resources"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#register"
+    ]
+  },
+  "GET /v1/modules/:moduleId/data-resources/:resourceId": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get"
+    ]
+  },
+  "POST /v1/modules/:moduleId/data-resources/:resourceId/migrations": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_migration_history",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_migration_history",
+      "greenfield_data_resources",
+      "greenfield_data_schema_versions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#get",
+      "services/greenfield-api/src/data-ledger/service.ts#recordMigration"
+    ]
+  },
+  "POST /v1/modules/:moduleId/data-resources/:resourceId/schemas": {
+    "reads": [
+      "greenfield_data_backup_policies",
+      "greenfield_data_resource_owners",
+      "greenfield_data_resources",
+      "greenfield_data_retention_policies",
+      "greenfield_data_schema_versions",
+      "greenfield_data_storage_bindings"
+    ],
+    "writes": [
+      "greenfield_data_schema_versions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/data-ledger/service.ts#declareSchemaVersion",
+      "services/greenfield-api/src/data-ledger/service.ts#get"
+    ]
+  },
+  "POST /v1/modules/:moduleId/disable": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "greenfield_extension_lifecycle_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#disable",
+      "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
+    ]
+  },
+  "POST /v1/modules/:moduleId/enable": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "greenfield_extension_lifecycle_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#enable",
+      "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
+    ]
+  },
+  "POST /v1/modules/:moduleId/export": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_export_jobs"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/export-service.ts#create"
+    ]
+  },
+  "GET /v1/modules/:moduleId/frontend": {
+    "reads": [
+      "greenfield_mps_ingestions",
+      "greenfield_release_frontends"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/product-standard/frontend-service.ts#resolve"
+    ]
+  },
+  "GET /v1/modules/:moduleId/health": {
+    "reads": [
+      "greenfield_module_action_events",
+      "greenfield_module_export_jobs",
+      "greenfield_module_record_versions",
+      "greenfield_module_records",
+      "search_documents",
+      "search_projection_state"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/health-service.ts#countExports",
+      "services/greenfield-api/src/modules/health-service.ts#countFailedActions",
+      "services/greenfield-api/src/modules/health-service.ts#countRecords",
+      "services/greenfield-api/src/modules/health-service.ts#countVersions",
+      "services/greenfield-api/src/modules/health-service.ts#get",
+      "services/greenfield-api/src/modules/health-service.ts#searchProjection"
+    ]
+  },
+  "DELETE /v1/modules/:moduleId/install": {
+    "reads": [
+      "greenfield_module_contributions",
+      "greenfield_module_installation_settings",
+      "greenfield_module_records",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/uninstall-service.ts#preview",
+      "services/greenfield-api/src/modules/uninstall-service.ts#uninstall"
+    ]
+  },
+  "POST /v1/modules/:moduleId/install": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases",
+      "greenfield_publishers"
+    ],
+    "writes": [
+      "greenfield_extension_installations",
+      "greenfield_extension_lifecycle_events",
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews",
+      "to"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#install",
+      "services/greenfield-api/src/modules/installation-service.ts#installPreview",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
+    ]
+  },
+  "GET /v1/modules/:moduleId/install-descriptor": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled"
+    ]
+  },
+  "POST /v1/modules/:moduleId/install-preview": {
+    "reads": [
+      "greenfield_publishers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#installPreview"
+    ]
+  },
+  "POST /v1/modules/:moduleId/permissions/review": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "greenfield_extension_lifecycle_events",
+      "greenfield_module_permission_reviews"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle",
+      "services/greenfield-api/src/modules/installation-service.ts#reviewPermissions"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#list",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "POST /v1/modules/:moduleId/records/:collection": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#create",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "DELETE /v1/modules/:moduleId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#delete",
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+    ]
+  },
+  "GET /v1/modules/:moduleId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_records"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "PATCH /v1/modules/:moduleId/records/:collection/:recordId": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#patch",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+    ]
+  },
+  "DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#purge",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext"
+    ]
+  },
+  "POST /v1/modules/:moduleId/records/:collection/:recordId/restore": {
+    "reads": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "writes": [
+      "greenfield_module_record_events",
+      "greenfield_module_record_versions",
+      "greenfield_module_records"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/record-service.ts#findRecord",
+      "services/greenfield-api/src/modules/record-service.ts#get",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordEvent",
+      "services/greenfield-api/src/modules/record-service.ts#insertRecordVersion",
+      "services/greenfield-api/src/modules/record-service.ts#publishRecordDomainEvent",
+      "services/greenfield-api/src/modules/record-service.ts#resolveRecordContext",
+      "services/greenfield-api/src/modules/record-service.ts#restore",
+      "services/greenfield-api/src/modules/record-service.ts#updateExisting"
+    ]
+  },
+  "GET /v1/modules/:moduleId/runtime": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_api_registrations",
+      "greenfield_module_capability_registry",
+      "greenfield_module_hook_registrations",
+      "greenfield_module_job_registrations",
+      "greenfield_module_permission_states",
+      "greenfield_module_releases",
+      "greenfield_module_resolved_dependencies",
+      "greenfield_module_service_registrations",
+      "greenfield_module_storage_allocations",
+      "greenfield_module_ui_contribution_registrations"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/runtime2-service.ts#installation",
+      "services/greenfield-api/src/modules/runtime2-service.ts#runtimeSummary"
+    ]
+  },
+  "POST /v1/modules/:moduleId/services/:serviceId/invoke": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_permission_states",
+      "greenfield_module_records",
+      "greenfield_module_releases",
+      "greenfield_module_service_invocations",
+      "greenfield_module_service_registrations",
+      "greenfield_module_storage_allocations"
+    ],
+    "writes": [
+      "greenfield_module_service_invocations"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/runtime2-service.ts#enforceRateLimit",
+      "services/greenfield-api/src/modules/runtime2-service.ts#enforceServicePermissions",
+      "services/greenfield-api/src/modules/runtime2-service.ts#installation",
+      "services/greenfield-api/src/modules/runtime2-service.ts#invokeGreenfieldProvider",
+      "services/greenfield-api/src/modules/runtime2-service.ts#invokeService",
+      "services/greenfield-api/src/modules/runtime2-service.ts#recordInvocation"
+    ]
+  },
+  "GET /v1/modules/:moduleId/settings": {
+    "reads": [
+      "greenfield_module_installation_settings"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/settings-service.ts#get"
+    ]
+  },
+  "PATCH /v1/modules/:moduleId/settings": {
+    "reads": [
+      "greenfield_module_installation_settings"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_module_installation_settings",
+      "greenfield_module_settings_versions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/settings-service.ts#get",
+      "services/greenfield-api/src/modules/settings-service.ts#patch",
+      "services/greenfield-api/src/modules/settings-service.ts#schema"
+    ]
+  },
+  "GET /v1/modules/:moduleId/settings-schema": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/settings-service.ts#schema"
+    ]
+  },
+  "POST /v1/modules/:moduleId/uninstall-preview": {
+    "reads": [
+      "greenfield_module_contributions",
+      "greenfield_module_installation_settings",
+      "greenfield_module_records",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/uninstall-service.ts#preview"
+    ]
+  },
+  "POST /v1/modules/:moduleId/update": {
+    "reads": [
+      "greenfield_module_install_plans"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_module_install_plans",
+      "greenfield_module_permission_reviews"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/update-service.ts#planKey",
+      "services/greenfield-api/src/modules/update-service.ts#update"
+    ]
+  },
+  "POST /v1/modules/:moduleId/version-preview": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/update-service.ts#preview"
+    ]
+  },
+  "GET /v1/modules/:moduleId/versions": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/update-service.ts#versions"
+    ]
+  },
+  "GET /v1/modules/:moduleId/views": {
+    "reads": [
+      "greenfield_module_actions",
+      "greenfield_module_views"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/view-service.ts#actionsById",
+      "services/greenfield-api/src/modules/view-service.ts#hasCapability",
+      "services/greenfield-api/src/modules/view-service.ts#listViews",
+      "services/greenfield-api/src/modules/view-service.ts#safeView"
+    ]
+  },
+  "GET /v1/modules/:moduleId/views/:viewId": {
+    "reads": [
+      "greenfield_module_actions",
+      "greenfield_module_views"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/view-service.ts#actionsById",
+      "services/greenfield-api/src/modules/view-service.ts#getView",
+      "services/greenfield-api/src/modules/view-service.ts#hasCapability",
+      "services/greenfield-api/src/modules/view-service.ts#safeView"
+    ]
+  },
+  "GET /v1/modules/contributions": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_module_contributions",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/contribution-service.ts#list"
+    ]
+  },
+  "GET /v1/modules/installed": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled"
+    ]
+  },
+  "GET /v1/modules/installed/:moduleId": {
+    "reads": [
+      "greenfield_extension_installations",
+      "greenfield_extension_runtime_projection",
+      "greenfield_module_permission_reviews",
+      "greenfield_module_releases"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
+      "services/greenfield-api/src/modules/installation-service.ts#listInstalled"
+    ]
+  },
+  "GET /v1/notifications": {
+    "reads": [
+      "blocks",
+      "mutes",
+      "notifications"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/notifications/repository.ts#excludedActorIds",
+      "services/greenfield-api/src/domains/notifications/repository.ts#listForActor"
+    ]
+  },
+  "POST /v1/notifications/:notificationId/read": {
+    "reads": [],
+    "writes": [
+      "notifications"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/notifications/repository.ts#markRead"
+    ]
+  },
+  "POST /v1/notifications/read-all": {
+    "reads": [],
+    "writes": [
+      "notifications"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/notifications/repository.ts#markAllRead"
+    ]
+  },
+  "GET /v1/plugins": {
+    "reads": [
+      "greenfield_plugins"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "POST /v1/posts": {
+    "reads": [
+      "actors",
+      "attachments",
+      "posts"
+    ],
+    "writes": [
+      "attachments",
+      "post_content",
+      "post_media",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/writes.ts#create"
+    ]
+  },
+  "DELETE /v1/posts/:postId": {
+    "reads": [
+      "actors",
+      "posts"
+    ],
+    "writes": [
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/writes.ts#delete"
+    ]
+  },
+  "GET /v1/posts/:postId": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate"
+    ]
+  },
+  "PATCH /v1/posts/:postId": {
+    "reads": [
+      "actors",
+      "posts"
+    ],
+    "writes": [
+      "post",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/writes.ts#update"
+    ]
+  },
+  "GET /v1/posts/:postId/comments": {
+    "reads": [
+      "blocks",
+      "greenfield_comments",
+      "mutes",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#excludedActors",
+      "services/greenfield-api/src/domains/comments/service.ts#listComments",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors"
+    ]
+  },
+  "POST /v1/posts/:postId/comments": {
+    "reads": [
+      "actors",
+      "greenfield_comments",
+      "greenfield_handles",
+      "greenfield_mentions",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_comments",
+      "greenfield_mentions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#create",
+      "services/greenfield-api/src/domains/comments/service.ts#createComment",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors",
+      "services/greenfield-api/src/domains/mentions/service.ts#extractMentions",
+      "services/greenfield-api/src/domains/mentions/service.ts#storeMentions"
+    ]
+  },
+  "DELETE /v1/posts/:postId/like": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "POST /v1/posts/:postId/like": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "POST /v1/posts/:postId/quote": {
+    "reads": [
+      "actors",
+      "greenfield_handles",
+      "greenfield_mentions",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_mentions",
+      "greenfield_quote_posts",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/mentions/service.ts#extractMentions",
+      "services/greenfield-api/src/domains/mentions/service.ts#storeMentions",
+      "services/greenfield-api/src/domains/quotes/service.ts#createQuote",
+      "services/greenfield-api/src/domains/quotes/service.ts#getQuotedPreview"
+    ]
+  },
+  "DELETE /v1/posts/:postId/reaction": {
+    "reads": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "PUT /v1/posts/:postId/reaction": {
+    "reads": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "GET /v1/posts/:postId/reactions": {
+    "reads": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost"
+    ]
+  },
+  "DELETE /v1/posts/:postId/repost": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "POST /v1/posts/:postId/repost": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "DELETE /v1/posts/:postId/save": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "POST /v1/posts/:postId/save": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_reactions",
+      "posts"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#getById",
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/writes.ts#setEngagement",
+      "services/greenfield-api/src/domains/reactions/service.ts#listReactions",
+      "services/greenfield-api/src/domains/reactions/service.ts#resolveVisiblePost",
+      "services/greenfield-api/src/domains/reactions/service.ts#setReaction"
+    ]
+  },
+  "POST /v1/posts/:postId/share": {
+    "reads": [
+      "greenfield_post_shares",
+      "posts"
+    ],
+    "writes": [
+      "greenfield_post_shares"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/shares/service.ts#record"
+    ]
+  },
+  "GET /v1/product-standard/products/:productId": {
+    "reads": [
+      "greenfield_mps_ingestions",
+      "greenfield_product_family_members",
+      "greenfield_product_identity_aliases",
+      "greenfield_product_privacy_declarations",
+      "greenfield_release_frontends",
+      "greenfield_release_presentation_assets"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/product-standard/ingest-service.ts#get",
+      "services/greenfield-api/src/product-standard/ingest-service.ts#getLatest",
+      "services/greenfield-api/src/product-standard/ingest-service.ts#resolveCanonicalProductId"
+    ]
+  },
+  "GET /v1/product-standard/products/:productId/versions/:version": {
+    "reads": [
+      "greenfield_mps_ingestions",
+      "greenfield_product_family_members",
+      "greenfield_product_privacy_declarations",
+      "greenfield_release_frontends",
+      "greenfield_release_presentation_assets"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/product-standard/ingest-service.ts#get"
+    ]
+  },
+  "GET /v1/profiles/:handle": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getByHandle",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing"
+    ]
+  },
+  "GET /v1/profiles/:handle/followers": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#blockedActorIds",
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getRawByHandle",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/profiles/repository.ts#listFollowers"
+    ]
+  },
+  "GET /v1/profiles/:handle/following": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#blockedActorIds",
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getRawByHandle",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/profiles/repository.ts#listFollowing"
+    ]
+  },
+  "GET /v1/profiles/:handle/posts": {
+    "reads": [
+      "attachments",
+      "greenfield_quote_posts",
+      "greenfield_reactions",
+      "post_content",
+      "post_media",
+      "post_reposts",
+      "post_saves",
+      "posts",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/posts/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/posts/repository.ts#listForHandle"
+    ]
+  },
+  "DELETE /v1/profiles/:profileId/block": {
+    "reads": [
+      "profiles"
+    ],
+    "writes": [
+      "blocks"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#unblock",
+      "services/greenfield-api/src/domains/profiles/writes.ts#actorIdForProfileId"
+    ]
+  },
+  "POST /v1/profiles/:profileId/block": {
+    "reads": [
+      "blocks",
+      "profiles"
+    ],
+    "writes": [
+      "blocks",
+      "follows"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#block",
+      "services/greenfield-api/src/domains/profiles/writes.ts#actorIdForProfileId"
+    ]
+  },
+  "DELETE /v1/profiles/:profileId/follow": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [
+      "follows"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getById",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/profiles/writes.ts#unfollow"
+    ]
+  },
+  "POST /v1/profiles/:profileId/follow": {
+    "reads": [
+      "blocks",
+      "follows",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [
+      "follows"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getById",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/profiles/writes.ts#follow"
+    ]
+  },
+  "DELETE /v1/profiles/:profileId/mute": {
+    "reads": [
+      "profiles"
+    ],
+    "writes": [
+      "mutes"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#unmute",
+      "services/greenfield-api/src/domains/profiles/writes.ts#actorIdForProfileId"
+    ]
+  },
+  "POST /v1/profiles/:profileId/mute": {
+    "reads": [
+      "mutes",
+      "profiles"
+    ],
+    "writes": [
+      "mutes"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#mute",
+      "services/greenfield-api/src/domains/profiles/writes.ts#actorIdForProfileId"
+    ]
+  },
+  "PATCH /v1/profiles/me": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_accounts",
+      "posts",
+      "profile_links",
+      "profiles"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_accounts",
+      "greenfield_handle_history",
+      "greenfield_handles",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/accounts/service.ts#changeHandle",
+      "services/greenfield-api/src/domains/profiles/repository.ts#canView",
+      "services/greenfield-api/src/domains/profiles/repository.ts#getByActorId",
+      "services/greenfield-api/src/domains/profiles/repository.ts#hydrate",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/profiles/repository.ts#isFollowing",
+      "services/greenfield-api/src/domains/profiles/writes.ts#updateMe"
+    ]
+  },
+  "DELETE /v1/profiles/me/avatar": {
+    "reads": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "writes": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#updateMedia"
+    ]
+  },
+  "POST /v1/profiles/me/avatar": {
+    "reads": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "writes": [
+      "attachments",
+      "failed",
+      "profile_media",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#updateMedia"
+    ]
+  },
+  "DELETE /v1/profiles/me/cover": {
+    "reads": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "writes": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#updateMedia"
+    ]
+  },
+  "POST /v1/profiles/me/cover": {
+    "reads": [
+      "attachments",
+      "profile_media",
+      "profiles"
+    ],
+    "writes": [
+      "attachments",
+      "failed",
+      "profile_media",
+      "profiles"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#updateMedia"
+    ]
+  },
+  "GET /v1/providers/:capabilityRole": {
+    "reads": [
+      "greenfield_account_default_providers",
+      "greenfield_extension_installations",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/providers/service.ts#list"
+    ]
+  },
+  "PUT /v1/providers/:capabilityRole/default": {
+    "reads": [
+      "greenfield_account_default_providers",
+      "greenfield_extension_installations",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [
+      "greenfield_account_default_providers"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/providers/service.ts#list",
+      "services/greenfield-api/src/providers/service.ts#setDefault"
+    ]
+  },
+  "GET /v1/providers/:capabilityRole/resolve": {
+    "reads": [
+      "greenfield_account_default_providers",
+      "greenfield_extension_installations",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/providers/service.ts#list",
+      "services/greenfield-api/src/providers/service.ts#resolve"
+    ]
+  },
+  "GET /v1/reels": {
+    "reads": [
+      "attachments",
+      "mutes",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/discovery/repository.ts#excludedActorIds",
+      "services/greenfield-api/src/domains/discovery/repository.ts#listReels"
+    ]
+  },
+  "GET /v1/registry/modules": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publishers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#listModules"
+    ]
+  },
+  "GET /v1/registry/modules/:moduleId": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#getModule",
+      "services/greenfield-api/src/modules/registry-service.ts#listVersions",
+      "services/greenfield-api/src/modules/registry-service.ts#productProjectionFor"
+    ]
+  },
+  "PUT /v1/registry/modules/:moduleId/rating": {
+    "reads": [
+      "greenfield_module_ratings",
+      "greenfield_module_releases"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_module_ratings"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/marketplace-service.ts#ratingAggregate",
+      "services/greenfield-api/src/modules/marketplace-service.ts#submitRating"
+    ]
+  },
+  "GET /v1/registry/modules/:moduleId/versions": {
+    "reads": [
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#listVersions"
+    ]
+  },
+  "GET /v1/registry/modules/:moduleId/versions/:version": {
+    "reads": [
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#getVersion",
+      "services/greenfield-api/src/modules/registry-service.ts#getVersionDetail",
+      "services/greenfield-api/src/modules/registry-service.ts#listVersions",
+      "services/greenfield-api/src/modules/registry-service.ts#productProjectionFor"
+    ]
+  },
+  "GET /v1/registry/products": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_publishers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#listModules"
+    ]
+  },
+  "GET /v1/registry/products/:productId": {
+    "reads": [
+      "greenfield_extension_catalogue",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-service.ts#getModule",
+      "services/greenfield-api/src/modules/registry-service.ts#listVersions",
+      "services/greenfield-api/src/modules/registry-service.ts#productProjectionFor"
+    ]
+  },
+  "GET /v1/registry/products/:productId/relationships": {
+    "reads": [
+      "greenfield_extension_targets",
+      "greenfield_module_releases",
+      "greenfield_module_versions"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/extension-fabric-service.ts#relationships"
+    ]
+  },
+  "GET /v1/registry/publishers/:publisherId": {
+    "reads": [
+      "greenfield_publishers"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/publisher-service.ts#getPublisher"
+    ]
+  },
+  "GET /v1/registry/publishers/:publisherId/signing-keys": {
+    "reads": [
+      "greenfield_publisher_signing_key_events",
+      "greenfield_publisher_signing_keys"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/release-signing.ts#listForPublisher"
+    ]
+  },
+  "GET /v1/registry/releases/:releaseId/artifact": {
+    "reads": [
+      "greenfield_module_releases",
+      "greenfield_module_sources",
+      "greenfield_release_asset_blobs"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-presentation-service.ts#readReleaseArtifact"
+    ]
+  },
+  "GET /v1/registry/releases/:releaseId/assets/:assetId": {
+    "reads": [
+      "greenfield_module_releases",
+      "greenfield_release_asset_blobs",
+      "greenfield_release_presentation_assets"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/registry-presentation-service.ts#readAsset"
+    ]
+  },
+  "POST /v1/reports": {
+    "reads": [
+      "greenfield_comments",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "posts",
+      "profiles",
+      "reports"
+    ],
+    "writes": [
+      "reports"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#createReport",
+      "services/greenfield-api/src/domains/moderation/repository.ts#getReport",
+      "services/greenfield-api/src/domains/moderation/repository.ts#reportTargetExists"
+    ]
+  },
+  "GET /v1/reports/me": {
+    "reads": [
+      "reports"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/moderation/repository.ts#listForReporter"
+    ]
+  },
+  "GET /v1/repositories/me": {
+    "reads": [
+      "greenfield_repositories"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/repositories/service.ts#getDefault",
+      "services/greenfield-api/src/repositories/service.ts#getMe"
+    ]
+  },
+  "POST /v1/repositories/me/exports": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [
+      "greenfield_repository_exports"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/repositories/service.ts#createExport",
+      "services/greenfield-api/src/repositories/service.ts#getDefault"
+    ]
+  },
+  "GET /v1/repositories/me/exports/:exportId": {
+    "reads": [
+      "greenfield_repositories",
+      "greenfield_repository_exports"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/repositories/service.ts#getExport"
+    ]
+  },
+  "GET /v1/repositories/me/records": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/records/service.ts#listForAccount"
+    ]
+  },
+  "POST /v1/repositories/me/records": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [
+      "greenfield_record_events",
+      "greenfield_records",
+      "greenfield_repositories",
+      "outbox_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/records/service.ts#mutate"
+    ]
+  },
+  "DELETE /v1/repositories/me/records/:recordId": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [
+      "greenfield_record_events",
+      "greenfield_records",
+      "greenfield_repositories",
+      "outbox_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/records/service.ts#getForAccount",
+      "services/greenfield-api/src/records/service.ts#mutate"
+    ]
+  },
+  "GET /v1/repositories/me/records/:recordId": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/records/service.ts#getForAccount"
+    ]
+  },
+  "PATCH /v1/repositories/me/records/:recordId": {
+    "reads": [
+      "greenfield_records",
+      "greenfield_repositories"
+    ],
+    "writes": [
+      "failed",
+      "greenfield_record_events",
+      "greenfield_records",
+      "greenfield_repositories",
+      "outbox_events"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/records/service.ts#getForAccount",
+      "services/greenfield-api/src/records/service.ts#mutate"
+    ]
+  },
+  "GET /v1/saves": {
+    "reads": [
+      "post_saves"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/saves/service.ts#listSaves"
+    ]
+  },
+  "GET /v1/search": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#assertAccountScope",
+      "services/greenfield-api/src/domains/search/service.ts#search"
+    ]
+  },
+  "DELETE /v1/search/recent": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#deleteRecent"
+    ]
+  },
+  "GET /v1/search/recent": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#listRecent"
+    ]
+  },
+  "POST /v1/search/recent": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#recordRecent"
+    ]
+  },
+  "GET /v1/search/saved": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#listSaved"
+    ]
+  },
+  "POST /v1/search/saved": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#createSaved"
+    ]
+  },
+  "DELETE /v1/search/saved/:savedSearchId": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#deleteSaved"
+    ]
+  },
+  "PATCH /v1/search/saved/:savedSearchId": {
+    "reads": [],
+    "writes": [
+      "failed"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#patchSaved"
+    ]
+  },
+  "GET /v1/search/suggestions": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/search/service.ts#suggestions"
+    ]
+  },
+  "POST /v1/sessions": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_password_credentials"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/authentication/service.ts#login"
+    ]
+  },
+  "DELETE /v1/sessions/:sessionId": {
+    "reads": [
+      "greenfield_sessions"
+    ],
+    "writes": [
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#revokeFamily",
+      "services/greenfield-api/src/sessions/service.ts#revokeSession"
+    ]
+  },
+  "POST /v1/sessions/apple": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_authentication_methods",
+      "greenfield_external_identities"
+    ],
+    "writes": [
+      "greenfield_external_identities"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#assertConfigured",
+      "services/greenfield-api/src/auth/apple/service.ts#completeAuthentication",
+      "services/greenfield-api/src/auth/apple/service.ts#status",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queueNewSignIn",
+      "services/greenfield-api/src/mail/service.ts#securityUrl"
+    ]
+  },
+  "POST /v1/sessions/apple/options": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/apple/service.ts#assertConfigured",
+      "services/greenfield-api/src/auth/apple/service.ts#beginAuthentication",
+      "services/greenfield-api/src/auth/apple/service.ts#serializeChallenge",
+      "services/greenfield-api/src/auth/apple/service.ts#status"
+    ]
+  },
+  "DELETE /v1/sessions/current": {
+    "reads": [
+      "greenfield_sessions"
+    ],
+    "writes": [
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#revokeFamily",
+      "services/greenfield-api/src/sessions/service.ts#revokeSession"
+    ]
+  },
+  "POST /v1/sessions/email-code": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/authentication/service.ts#loginWithEmailCode"
+    ]
+  },
+  "POST /v1/sessions/email-code/request": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/authentication/service.ts#requestEmailLoginCode"
+    ]
+  },
+  "DELETE /v1/sessions/me": {
+    "reads": [],
+    "writes": [
+      "sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/security/session.ts#revokeSession"
+    ]
+  },
+  "GET /v1/sessions/me": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "POST /v1/sessions/passkey": {
+    "reads": [
+      "greenfield_auth_challenges",
+      "greenfield_passkeys"
+    ],
+    "writes": [
+      "greenfield_passkeys",
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#verifyAuthentication",
+      "services/greenfield-api/src/mail/service.ts#queue",
+      "services/greenfield-api/src/mail/service.ts#queueInTransaction",
+      "services/greenfield-api/src/mail/service.ts#queueNewSignIn",
+      "services/greenfield-api/src/mail/service.ts#securityUrl",
+      "services/greenfield-api/src/sessions/service.ts#hash",
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#issue"
+    ]
+  },
+  "POST /v1/sessions/passkey/options": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities",
+      "greenfield_passkeys"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/auth/passkeys/service.ts#accountForEmail",
+      "services/greenfield-api/src/auth/passkeys/service.ts#beginAuthentication",
+      "services/greenfield-api/src/auth/passkeys/service.ts#listActivePasskeyCredentials"
+    ]
+  },
+  "POST /v1/sessions/recovery-code": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_auth_identities"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/authentication/service.ts#loginWithRecoveryCode"
+    ]
+  },
+  "POST /v1/sessions/refresh": {
+    "reads": [
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "writes": [
+      "greenfield_session_events",
+      "greenfield_session_tokens",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/sessions/service.ts#hash",
+      "services/greenfield-api/src/sessions/service.ts#insertEvent",
+      "services/greenfield-api/src/sessions/service.ts#refresh",
+      "services/greenfield-api/src/sessions/service.ts#revokeFamily"
+    ]
+  },
+  "POST /v1/stories": {
+    "reads": [
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_views",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#create",
+      "services/greenfield-api/src/domains/stories/service.ts#getGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+    ]
+  },
+  "GET /v1/stories/:groupId": {
+    "reads": [
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_views",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "partial-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#getGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection"
+    ]
+  },
+  "DELETE /v1/stories/items/:itemId": {
+    "reads": [
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "writes": [
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#deleteItem"
+    ]
+  },
+  "POST /v1/stories/items/:itemId/viewed": {
+    "reads": [
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items"
+    ],
+    "writes": [
+      "greenfield_story_views"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/stories/service.ts#markViewed"
+    ]
+  },
+  "GET /v1/stories/rail": {
+    "reads": [
+      "actors",
+      "blocks",
+      "follows",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_views",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/stories/service.ts#canViewGroup",
+      "services/greenfield-api/src/domains/stories/service.ts#isBlockedEitherDirection",
+      "services/greenfield-api/src/domains/stories/service.ts#listRail"
+    ]
+  },
+  "GET /v1/tools": {
+    "reads": [
+      "greenfield_tools"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "GET /v1/tools/:toolId": {
+    "reads": [
+      "greenfield_tools"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "GET /v1/version": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/widgets": {
+    "reads": [
+      "greenfield_widgets"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "direct-handler-only",
+    "evidence": []
+  },
+  "GET /version.json": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  }
+}

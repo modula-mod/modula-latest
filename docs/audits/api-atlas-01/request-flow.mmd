@@ -1,0 +1,18 @@
+flowchart LR
+  client[Client] --> tls[DNS and TLS: api.modula.digital]
+  tls --> nginx[nginx catch-all plus upload overrides]
+  nginx -->|127.0.0.1:4020| api[GreenField Fastify API]
+  api --> requestId[Request ID hook]
+  requestId --> security[Helmet and CORS]
+  security --> rate[Per-route Fastify rate limit]
+  rate --> auth[Bearer [REDACTED] service assertion attachment]
+  auth --> authorize[Route capability and ownership checks]
+  authorize --> validate[Handler and service validation]
+  validate --> service[Domain service/repository]
+  service --> postgres[(PostgreSQL 16.9)]
+  service --> media[(Host media bind mount)]
+  service --> outbox[(Outbox/events/jobs)]
+  outbox --> worker[GreenField worker]
+  service --> response[Success/failure envelope or media stream]
+  response --> nginx
+  nginx --> client

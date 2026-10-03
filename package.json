@@ -82,6 +82,9 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "api:atlas": "node tools/api-atlas/generate.mjs",
+    "api:atlas:capture": "node tools/api-atlas/capture.mjs && node tools/api-atlas/generate.mjs",
+    "verify:api-atlas": "node tools/api-atlas/verify.mjs",
     "start": "EXPO_UNSTABLE_MCP_SERVER=1 expo start",
     "start:clear": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --clear",
     "start:go": "EXPO_UNSTABLE_MCP_SERVER=1 expo start --go --tunnel",
