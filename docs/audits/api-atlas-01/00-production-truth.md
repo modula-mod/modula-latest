@@ -56,7 +56,7 @@ flowchart TD
 ## Versions and migration truth
 
 - Applied migrations: 62; latest `062_public_status_support_cases` at 2026-10-02T23:45:14.057107+00:00.
-- Git up migrations: 62; latest `062_public_status_support_cases.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Git up migrations: 63; latest `063_settings_backend_v2.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
 - Runtime routes: 535; application routes: 384; excluded automatic framework routes: 151.
 
 ## Safe configuration

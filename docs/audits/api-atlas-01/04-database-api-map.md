@@ -1,16 +1,16 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `062_public_status_support_cases`; 62 applied migrations. Git contains 62 ordered up migrations, latest `062_public_status_support_cases.sql`.
+Production PostgreSQL: 16.9; schema migration `062_public_status_support_cases`; 62 applied migrations. Git contains 63 ordered up migrations, latest `063_settings_backend_v2.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
 ## Reconciliation
 
-- Production tables: 283
-- Tables with API/worker source references: 268
-- Orphan candidates requiring manual confirmation: 15
+- Production tables: 287
+- Tables with API/worker source references: 273
+- Orphan candidates requiring manual confirmation: 14
 - Write-only candidates: 38
-- Read-only candidates: 18
+- Read-only candidates: 21
 
 ## Table inventory
 
@@ -44,7 +44,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/handle`, `GET /v1/accounts/me/notification-preferences`, `PATCH /v1/accounts/me/notification-preferences`, `POST /v1/admin/ops/policy/evaluate`, `POST /v1/ai/requests`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `POST /v1/modules/:moduleId/ai/requests`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `POST /v1/posts/:postId/quote`, `PATCH /v1/profiles/me`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/verify-email`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/ai/gateway-service.ts`, `services/greenfield-api/src/ai/provider-runtime-service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/mentions/service.ts`, `services/greenfield-api/src/domains/notifications/preferences.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/security/session.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/ai/gateway-service.ts`, `services/greenfield-api/src/ai/provider-runtime-service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/mentions/service.ts`, `services/greenfield-api/src/domains/notifications/preferences.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/security/session.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -453,7 +453,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes reading: `POST /v1/backend/products/:productId/jobs`, `POST /v1/backend/products/:productId/jobs/:jobId/cancel`, `POST /v1/backend/products/:productId/jobs/:jobId/fail`, `GET /v1/backend/products/:productId/jobs/:jobId/result`, `POST /v1/backend/products/:productId/jobs/:jobId/start`, `POST /v1/backend/products/:productId/jobs/:jobId/succeed`, `POST /v1/backend/products/:productId/jobs/claim`
 - Routes writing: `POST /v1/accounts/me/modula-mail/forwarding`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/admin/ops/queue/dead-letters/:deadLetterId/retry`, `POST /v1/backend/products/:productId/jobs`, `POST /v1/backend/products/:productId/jobs/:jobId/cancel`, `POST /v1/backend/products/:productId/jobs/:jobId/fail`, `POST /v1/backend/products/:productId/jobs/:jobId/start`, `POST /v1/backend/products/:productId/jobs/:jobId/succeed`, `POST /v1/backend/products/:productId/jobs/claim`
 - API/worker source reads: `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/system/status.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/outbox/drain.ts`
-- API/worker source writes: `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/outbox/repository.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/events/runner.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/modules/extension-event-handler.ts`, `services/greenfield-worker/src/outbox/drain.ts`
+- API/worker source writes: `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/backend-fabric/event-job-service.ts`, `services/greenfield-api/src/domains/outbox/repository.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/events/runner.ts`, `services/greenfield-worker/src/jobs/claim.ts`, `services/greenfield-worker/src/modules/extension-event-handler.ts`, `services/greenfield-worker/src/outbox/drain.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `blocks`
@@ -503,8 +503,25 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/feed/home`, `GET /v1/media/stories/:mediaFile`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `PATCH /v1/profiles/me`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `POST /v1/stories/items/:itemId/viewed`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/profiles/:profileId/block`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`
-- API/worker source reads: `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/search/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_account_app_preferences`
+
+- Purpose: application state for greenfield account app preferences
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `063_settings_backend_v2.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
+- API/worker source writes: `services/greenfield-api/src/settings-v2/service.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_account_data_artifacts`
@@ -554,7 +571,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `050_greenfield_backend_v1_account_data_orchestration.sql`
 - Routes reading: `POST /v1/account/data-exports`, `GET /v1/account/data-requests/:requestId`, `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/account/data-requests/:requestId/artifacts`, `POST /v1/account/data-requests/:requestId/cancel`, `POST /v1/account/deletion-requests`, `POST /v1/backend/products/:productId/data-request-domains/:domainId/complete`, `POST /v1/backend/products/:productId/data-requests/claim`
 - Routes writing: `POST /v1/account/data-exports`, `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/account/data-requests/:requestId/cancel`, `POST /v1/account/deletion-requests`, `POST /v1/backend/products/:productId/data-request-domains/:domainId/complete`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -605,7 +622,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `004_greenfield_sovereign_core.sql`
 - Routes reading: `POST /v1/account/data-exports`, `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/account/deletion-requests`, `POST /v1/accounts/forgot-password`, `GET /v1/accounts/me`, `PATCH /v1/accounts/me`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/accounts/me/password`, `POST /v1/accounts/recovery/complete`, `POST /v1/accounts/recovery/request`, `POST /v1/accounts/resend-verification`, `POST /v1/accounts/reset-password`, `POST /v1/accounts/verify-email`, `POST /v1/admin/commerce/entitlements`, `PUT /v1/admin/developer/build-services/:serviceId`, `POST /v1/admin/developer/namespaces/:namespace/verify`, `PATCH /v1/admin/developer/programme/:accountId`, `POST /v1/admin/product-standard/ingest`, `POST /v1/admin/registry/modules/import`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `POST /v1/admin/registry/sync`, `GET /v1/admin/registry/sync-runs`, `POST /v1/auth/passkeys/registration/options`, `POST /v1/auth/totp/enroll`, `GET /v1/backend/products/:productId/accounts/:accountId`, `POST /v1/developer/organisations/:organisationId/members`, `PATCH /v1/profiles/me`, `POST /v1/sessions`, `POST /v1/sessions/apple`, `POST /v1/sessions/email-code`, `POST /v1/sessions/email-code/request`, `POST /v1/sessions/passkey/options`, `POST /v1/sessions/recovery-code`, `POST /v1/support/cases`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/register`, `POST /v1/accounts/verify-email`, `PATCH /v1/profiles/me`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/apple/service.ts`, `services/greenfield-api/src/auth/mfa/totp.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/backend-fabric/routes.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/entitlements/routes.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/modules/permission-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/support/service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/apple/service.ts`, `services/greenfield-api/src/auth/mfa/totp.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/backend-fabric/routes.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/developers/service.ts`, `services/greenfield-api/src/entitlements/routes.ts`, `services/greenfield-api/src/entitlements/service.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/modules/permission-service.ts`, `services/greenfield-api/src/modules/publisher-service.ts`, `services/greenfield-api/src/support/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -792,7 +809,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `004_greenfield_sovereign_core.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/forgot-password`, `GET /v1/accounts/me`, `PATCH /v1/accounts/me`, `POST /v1/accounts/me/modula-mail/provision`, `POST /v1/accounts/me/password`, `POST /v1/accounts/recovery/complete`, `POST /v1/accounts/recovery/request`, `POST /v1/accounts/register`, `POST /v1/accounts/resend-verification`, `POST /v1/accounts/reset-password`, `POST /v1/accounts/verify-email`, `POST /v1/auth/passkeys/registration/options`, `POST /v1/sessions`, `POST /v1/sessions/email-code`, `POST /v1/sessions/email-code/request`, `POST /v1/sessions/passkey/options`, `POST /v1/sessions/recovery-code`, `POST /v1/support/cases`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/register`, `POST /v1/accounts/verify-email`, `POST /v1/auth/passkeys/registration/verify`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/support/service.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/mail/identity-service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-api/src/support/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/auth/passkeys/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -1030,9 +1047,26 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `006_phase6s_social_product.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/moderation/reports/:reportId/actions`, `POST /v1/admin/ops/policy/evaluate`, `DELETE /v1/comments/:commentId`, `PATCH /v1/comments/:commentId`, `DELETE /v1/comments/:commentId/reaction`, `PUT /v1/comments/:commentId/reaction`, `GET /v1/comments/:commentId/replies`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/posts/:postId/comments`, `POST /v1/posts/:postId/comments`, `POST /v1/reports`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/moderation/reports/:reportId/actions`, `DELETE /v1/comments/:commentId`, `PATCH /v1/comments/:commentId`, `POST /v1/comments/:commentId/replies`, `POST /v1/posts/:postId/comments`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`
 - Disposition: active read/write or ledger/schema table
+
+### `greenfield_commerce_invoices`
+
+- Purpose: application state for greenfield commerce invoices
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `063_settings_backend_v2.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
 
 ### `greenfield_connection_credentials`
 
@@ -1186,6 +1220,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - API/worker source reads: none observed
 - API/worker source writes: `services/greenfield-worker/src/modules/contribution-registration-handler.ts`
 - Disposition: WRITE-ONLY CANDIDATE
+
+### `greenfield_creator_ledger_entries`
+
+- Purpose: application state for greenfield creator ledger entries
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `063_settings_backend_v2.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`
+- API/worker source writes: none observed
+- Disposition: READ-ONLY APPLICATION CANDIDATE
 
 ### `greenfield_data_backup_policies`
 
@@ -1542,6 +1593,23 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes writing: `POST /v1/developer/products/:productId/test-groups`
 - API/worker source reads: `services/greenfield-api/src/developers/service.ts`
 - API/worker source writes: `services/greenfield-api/src/developers/service.ts`
+- Disposition: active read/write or ledger/schema table
+
+### `greenfield_digest_deliveries`
+
+- Purpose: application state for greenfield digest deliveries
+- Primary key: none observed
+- Foreign keys: none
+- Ownership/workspace/user/module columns: none observed
+- Indexes: none observed
+- Unique constraints: none observed
+- Soft delete: none
+- Timestamps: none observed
+- Migration introduced: `063_settings_backend_v2.sql`
+- Routes reading: none observed
+- Routes writing: none observed
+- API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`
+- API/worker source writes: `services/greenfield-worker/src/digests/digests.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_domain_events`
@@ -2272,7 +2340,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Routes reading: `GET /v1/admin/ops/mail/summary`
 - Routes writing: none observed
 - API/worker source reads: `services/greenfield-api/src/domains/system/status.ts`, `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/mail/handler.ts`
-- API/worker source writes: `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/mail/handler.ts`
+- API/worker source writes: `services/greenfield-api/src/mail/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/mail/handler.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_mailbox_credentials`
@@ -3104,7 +3172,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `004_greenfield_sovereign_core.sql`
 - Routes reading: `POST /v1/accounts/me/password`, `POST /v1/sessions`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/password`, `POST /v1/accounts/recovery/complete`, `POST /v1/accounts/register`, `POST /v1/accounts/reset-password`
-- API/worker source reads: `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`
+- API/worker source reads: `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/authentication/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/recovery.ts`, `services/greenfield-api/src/accounts/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3155,7 +3223,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `046_greenfield_backend_v1_social_completion.sql`
 - Routes reading: `POST /v1/posts/:postId/share`
 - Routes writing: `POST /v1/posts/:postId/share`
-- API/worker source reads: `services/greenfield-api/src/domains/shares/service.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/shares/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/shares/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3393,7 +3461,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `006_phase6s_social_product.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/media/:mediaFile`, `GET /v1/posts/:postId`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `GET /v1/posts/:postId/reactions`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `GET /v1/profiles/:handle/posts`
 - Routes writing: `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`
-- API/worker source reads: `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/reactions/service.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/reactions/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3767,7 +3835,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `028_phase7f_stories.sql`
 - Routes reading: `GET /v1/media/stories/:mediaFile`, `POST /v1/reports`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `DELETE /v1/stories/items/:itemId`, `POST /v1/stories/items/:itemId/viewed`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/moderation/reports/:reportId/actions`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
-- API/worker source reads: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`
+- API/worker source reads: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3784,7 +3852,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `028_phase7f_stories.sql`
 - Routes reading: `GET /v1/media/stories/:mediaFile`, `POST /v1/reports`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `DELETE /v1/stories/items/:itemId`, `POST /v1/stories/items/:itemId/viewed`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/admin/moderation/reports/:reportId/actions`, `POST /v1/stories`, `DELETE /v1/stories/items/:itemId`
-- API/worker source reads: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`
+- API/worker source reads: `services/greenfield-api/src/app/register-phase7f-stories-routes.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/stories/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3801,7 +3869,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `028_phase7f_stories.sql`
 - Routes reading: `POST /v1/stories`, `GET /v1/stories/:groupId`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/stories/items/:itemId/viewed`
-- API/worker source reads: `services/greenfield-api/src/domains/stories/service.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/stories/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4396,7 +4464,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `002_phase6_social_atproto.sql`
 - Routes reading: `GET /v1/notifications`
 - Routes writing: `POST /v1/notifications/:notificationId/read`, `POST /v1/notifications/read-all`
-- API/worker source reads: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/notifications/create.ts`, `services/greenfield-worker/src/notifications/social.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/notifications/create.ts`, `services/greenfield-worker/src/notifications/social.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/notifications/repository.ts`, `services/greenfield-worker/src/notifications/create.ts`, `services/greenfield-worker/src/notifications/social.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4464,9 +4532,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: none observed
+- API/worker source reads: `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`
 - API/worker source writes: none observed
-- Disposition: ORPHAN CANDIDATE — no static API/worker reference
+- Disposition: READ-ONLY APPLICATION CANDIDATE
 
 ### `post_media`
 
@@ -4515,7 +4583,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: `GET /v1/attachments/:attachmentId/content`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/media/:mediaFile`, `GET /v1/posts/:postId`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `GET /v1/profiles/:handle/posts`, `GET /v1/saves`
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/saves/service.ts`
+- API/worker source reads: `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/saves/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`
 - API/worker source writes: `services/greenfield-api/src/domains/saves/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4532,7 +4600,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/discover`, `GET /v1/feed/home`, `GET /v1/feed/profile/:profileId`, `GET /v1/media/:mediaFile`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `GET /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `POST /v1/posts/:postId/quote`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `GET /v1/posts/:postId/reactions`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`, `POST /v1/posts/:postId/share`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `PATCH /v1/profiles/me`, `GET /v1/reels`, `POST /v1/reports`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/moderation/reports/:reportId/actions`, `DELETE /v1/comments/:commentId`, `POST /v1/comments/:commentId/replies`, `POST /v1/posts`, `DELETE /v1/posts/:postId`, `PATCH /v1/posts/:postId`, `POST /v1/posts/:postId/comments`, `DELETE /v1/posts/:postId/like`, `POST /v1/posts/:postId/like`, `POST /v1/posts/:postId/quote`, `DELETE /v1/posts/:postId/reaction`, `PUT /v1/posts/:postId/reaction`, `DELETE /v1/posts/:postId/repost`, `POST /v1/posts/:postId/repost`, `DELETE /v1/posts/:postId/save`, `POST /v1/posts/:postId/save`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/domains/saves/service.ts`, `services/greenfield-api/src/domains/shares/service.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/discovery/repository.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/domains/saves/service.ts`, `services/greenfield-api/src/domains/shares/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/posts/writes.ts`, `services/greenfield-api/src/domains/quotes/service.ts`, `services/greenfield-api/src/domains/reactions/service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4583,7 +4651,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `001_init_schema.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/admin/ops/policy/evaluate`, `GET /v1/attachments/:attachmentId/content`, `POST /v1/auth/preview/session`, `GET /v1/comments/:commentId/replies`, `POST /v1/comments/:commentId/replies`, `DELETE /v1/connections/:connectionId`, `POST /v1/connections/:connectionId/refresh`, `GET /v1/feed/profile/:profileId`, `GET /v1/posts/:postId/comments`, `POST /v1/posts/:postId/comments`, `GET /v1/profiles/:handle`, `GET /v1/profiles/:handle/followers`, `GET /v1/profiles/:handle/following`, `GET /v1/profiles/:handle/posts`, `DELETE /v1/profiles/:profileId/block`, `POST /v1/profiles/:profileId/block`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`, `DELETE /v1/profiles/:profileId/mute`, `POST /v1/profiles/:profileId/mute`, `PATCH /v1/profiles/me`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`, `POST /v1/reports`, `POST /v1/stories`, `GET /v1/stories/:groupId`, `GET /v1/stories/rail`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/accounts/me/handle`, `POST /v1/accounts/verify-email`, `PATCH /v1/profiles/me`, `DELETE /v1/profiles/me/avatar`, `POST /v1/profiles/me/avatar`, `DELETE /v1/profiles/me/cover`, `POST /v1/profiles/me/cover`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/app/register-attachment-routes.ts`, `services/greenfield-api/src/app/register-routes.ts`, `services/greenfield-api/src/domains/comments/service.ts`, `services/greenfield-api/src/domains/moderation/repository.ts`, `services/greenfield-api/src/domains/policy/engine.ts`, `services/greenfield-api/src/domains/posts/repository.ts`, `services/greenfield-api/src/domains/profiles/repository.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/stories/service.ts`, `services/greenfield-api/src/settings-v2/service.ts`, `services/greenfield-worker/src/digests/digests.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/post-projector.ts`, `services/greenfield-worker/src/search/profile-projector.ts`
 - API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/accounts/service.ts`, `services/greenfield-api/src/cli/api-atlas-identities.ts`, `services/greenfield-api/src/domains/profiles/writes.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -4841,5 +4909,4 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - `intelligence_circuit_revisions`
 - `intelligence_circuits`
 - `module_backend_event_subscriptions`
-- `post_likes`
 - `reels`

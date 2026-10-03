@@ -436,6 +436,13 @@
       "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
     },
     {
+      "file": "services/greenfield-api/src/settings-v2/service.ts",
+      "line": 236,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!this.sessions) throw new Error('sessions unavailable')"
+    },
+    {
       "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
       "line": 13,
       "marker": "mock",
@@ -2291,6 +2298,13 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('Encrypted blob is too short to contain iv + authTag')"
+    },
+    {
+      "file": "services/greenfield-api/src/settings-v2/service.ts",
+      "line": 236,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!this.sessions) throw new Error('sessions unavailable')"
     },
     {
       "file": "services/greenfield-worker/src/bridges/atproto/pds-client.ts",
