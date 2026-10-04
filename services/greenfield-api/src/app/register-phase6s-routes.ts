@@ -121,7 +121,7 @@ export async function registerPhase6sRoutes(
     try {
       const {postId} = request.params as {postId: string}
       const text = String((request.body as any)?.text ?? '')
-      const created = await comments.createComment(auth.actorId, postId, text, {accountId: auth.accountId, raw: (request.body as any)?.media})
+      const created = await comments.createComment(auth.actorId, postId, text, {accountId: auth.accountId, raw: (request.body as any)?.media}, (request.body as any)?.quotedCommentId)
       await mentions.storeMentions(auth.actorId, 'comment', created.comment_id, text)
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {
@@ -181,6 +181,32 @@ export async function registerPhase6sRoutes(
       return mapDomainError(reply, error, request.id, 'Failed to delete comment')
     }
   })
+  app.put('/v1/comments/:commentId/poll/vote', opts.writeConfig, async (request, reply) => {
+    if (!opts.mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = requireCapability(request, reply, 'post:engage')
+    if (!auth) return
+    try {
+      const {commentId} = request.params as {commentId: string}
+      const raw = (request.body as {optionIndex?: unknown} | null)?.optionIndex
+      const updated = await comments.votePoll(auth.actorId, commentId, raw === null || raw === undefined ? null : Number(raw))
+      return reply.send(successEnvelope(updated, request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Poll vote failed')
+    }
+  })
+  for (const [method, pinned] of [['put', true], ['delete', false]] as const) {
+    app[method]('/v1/comments/:commentId/pin', opts.writeConfig, async (request, reply) => {
+      if (!opts.mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+      const auth = requireCapability(request, reply, 'post:engage')
+      if (!auth) return
+      try {
+        const {commentId} = request.params as {commentId: string}
+        return reply.send(successEnvelope(await comments.setPinned(auth.actorId, commentId, pinned), request.id))
+      } catch (error) {
+        return mapDomainError(reply, error, request.id, pinned ? 'Pin failed' : 'Unpin failed')
+      }
+    })
+  }
   app.put('/v1/comments/:commentId/reaction', opts.writeConfig, async (request, reply) => {
     if (!opts.mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
     const auth = requireCapability(request, reply, 'post:engage')

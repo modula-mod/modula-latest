@@ -29,9 +29,10 @@ export class CommentService {
       resource: {type: 'post', id: postId},
     })
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
-    let query = this.db.selectFrom('greenfield_comments').selectAll().where('post_id', '=', postId).where('parent_comment_id', 'is', null).orderBy('created_at', 'asc')
+    let query = this.db.selectFrom('greenfield_comments').selectAll().where('post_id', '=', postId).where('parent_comment_id', 'is', null)
+      .orderBy(sql`pinned_at IS NULL`).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
-    return this.withAuthors(await query.execute())
+    return this.withAuthors(await query.execute(), viewerActorId)
   }
 
   async listReplies(viewerActorId: string | null, commentId: string) {
@@ -43,12 +44,56 @@ export class CommentService {
     const excluded = viewerActorId ? await this.excludedActors(viewerActorId) : []
     let query = this.db.selectFrom('greenfield_comments').selectAll().where('root_comment_id', '=', commentId).orderBy('created_at', 'asc')
     if (excluded.length) query = query.where('author_actor_id', 'not in', excluded)
-    return this.withAuthors(await query.execute())
+    return this.withAuthors(await query.execute(), viewerActorId)
   }
 
-  async createComment(actorId: string, postId: string, text: string, media?: {accountId: string; raw: unknown}) {
+  async createComment(actorId: string, postId: string, text: string, media?: {accountId: string; raw: unknown}, quotedCommentId?: unknown) {
     const items = media ? await normalizeCommentMedia(this.db, media.accountId, media.raw) : []
-    return this.create(actorId, postId, null, validateText(text, items.length > 0), undefined, items)
+    const quoted = await this.resolveQuote(postId, quotedCommentId)
+    return this.create(actorId, postId, null, validateText(text, items.length > 0 || Boolean(quoted)), undefined, items, quoted)
+  }
+
+  /** Quotes must point at a live comment on the same post. */
+  private async resolveQuote(postId: string, raw: unknown): Promise<string | null> {
+    if (raw === undefined || raw === null || raw === '') return null
+    if (typeof raw !== 'string' || raw.length > 64) throw Object.assign(new Error('Invalid quote'), {code: 'VALIDATION_FAILED'})
+    const row = await this.db.selectFrom('greenfield_comments').select(['comment_id', 'post_id']).where('comment_id', '=', raw).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!row || row.post_id !== postId) throw Object.assign(new Error('Quoted comment not found'), {code: 'VALIDATION_FAILED'})
+    return row.comment_id
+  }
+
+  async votePoll(actorId: string, commentId: string, optionIndex: number | null) {
+    const comment = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!comment) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
+    await this.policies.assertAllowed({actorId, action: 'comment.react', resource: {type: 'comment', id: commentId}})
+    const poll = (Array.isArray(comment.media) ? comment.media : []).find((item: any) => item?.type === 'poll') as {options: string[]; closesAt: string | null} | undefined
+    if (!poll) throw Object.assign(new Error('This comment has no poll'), {code: 'VALIDATION_FAILED'})
+    if (poll.closesAt && Date.parse(poll.closesAt) < Date.now()) throw Object.assign(new Error('Poll closed'), {code: 'VALIDATION_FAILED'})
+    if (optionIndex === null) {
+      await this.db.deleteFrom('greenfield_comment_poll_votes').where('comment_id', '=', commentId).where('actor_id', '=', actorId).execute()
+    } else {
+      if (!Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex >= poll.options.length) throw Object.assign(new Error('Invalid option'), {code: 'VALIDATION_FAILED'})
+      await this.db.insertInto('greenfield_comment_poll_votes').values({comment_id: commentId, actor_id: actorId, option_index: optionIndex, created_at: new Date()})
+        .onConflict(oc => oc.columns(['comment_id', 'actor_id']).doUpdateSet({option_index: optionIndex, created_at: new Date()})).execute()
+    }
+    return (await this.withAuthors([comment], actorId))[0]!
+  }
+
+  /** Post authors can pin one top-level comment. */
+  async setPinned(actorId: string, commentId: string, pinned: boolean) {
+    const comment = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!comment) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
+    const post = await this.db.selectFrom('posts').select(['author_actor_id']).where('id', '=', comment.post_id).where('deleted_at', 'is', null).executeTakeFirst()
+    if (!post || post.author_actor_id !== actorId) throw Object.assign(new Error('Only the post author can pin comments'), {code: 'FORBIDDEN'})
+    if (comment.parent_comment_id) throw Object.assign(new Error('Only top-level comments can be pinned'), {code: 'VALIDATION_FAILED'})
+    const now = new Date()
+    await this.db.transaction().execute(async trx => {
+      if (pinned) await trx.updateTable('greenfield_comments').set({pinned_at: null}).where('post_id', '=', comment.post_id).where('pinned_at', 'is not', null).execute()
+      await trx.updateTable('greenfield_comments').set({pinned_at: pinned ? now : null}).where('comment_id', '=', commentId).execute()
+      await new AuditRepository(trx).append(pinned ? 'comment.pinned' : 'comment.unpinned', {postId: comment.post_id}, {type: 'comment', id: commentId, actorId})
+    })
+    const updated = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', commentId).executeTakeFirstOrThrow()
+    return (await this.withAuthors([updated], actorId))[0]!
   }
 
   async createReply(actorId: string, parentCommentId: string, text: string, media?: {accountId: string; raw: unknown}) {
@@ -124,6 +169,7 @@ export class CommentService {
     text: string,
     forcedDepth?: number,
     media: CommentMediaItem[] = [],
+    quotedCommentId: string | null = null,
   ) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
@@ -156,6 +202,7 @@ export class CommentService {
           deleted_at: null,
           deletion_kind: null,
           media: JSON.stringify(media),
+          quoted_comment_id: quotedCommentId,
         })
         .execute()
       const attachmentIds = media.flatMap(item => item.type === 'attachment' ? [item.attachmentId] : [])
@@ -192,25 +239,60 @@ export class CommentService {
       )
     })
     const created = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', id).executeTakeFirstOrThrow()
-    return (await this.withAuthors([created]))[0]!
+    return (await this.withAuthors([created], actorId))[0]!
   }
 
   // Attribution for already-authorized comments, not a full profile disclosure.
   // One batched query avoids an extra profile request for every visible row.
-  private async withAuthors(rows: Selectable<Database['greenfield_comments']>[]) {
+  private async withAuthors(rows: Selectable<Database['greenfield_comments']>[], viewerActorId: string | null = null) {
     if (!rows.length) return []
+    const ids = rows.map(row => row.comment_id)
+    const quotedIds = [...new Set(rows.flatMap(row => row.quoted_comment_id ? [row.quoted_comment_id] : []))]
+    const [quotedRows, reactionRows, voteRows] = await Promise.all([
+      quotedIds.length ? this.db.selectFrom('greenfield_comments').select(['comment_id', 'author_actor_id', 'text', 'deleted_at']).where('comment_id', 'in', quotedIds).execute() : Promise.resolve([]),
+      this.db.selectFrom('greenfield_comment_reactions').select(['comment_id', 'reaction_type', 'actor_id']).where('comment_id', 'in', ids).execute(),
+      this.db.selectFrom('greenfield_comment_poll_votes').select(['comment_id', 'option_index', 'actor_id']).where('comment_id', 'in', ids).execute(),
+    ])
     const profiles = await this.db.selectFrom('profiles')
       .select(['actor_id', 'id', 'handle', 'display_name', 'avatar_url'])
-      .where('actor_id', 'in', [...new Set(rows.map(row => row.author_actor_id))])
+      .where('actor_id', 'in', [...new Set([...rows.map(row => row.author_actor_id), ...quotedRows.map(row => row.author_actor_id)])])
       .where('deleted_at', 'is', null)
       .execute()
     const byActor = new Map(profiles.map(profile => [profile.actor_id, profile]))
+    const present = (actorId: string) => {
+      const profile = byActor.get(actorId)
+      return profile ? {id: profile.id, handle: profile.handle, displayName: profile.display_name, avatarUri: profile.avatar_url ?? undefined} : null
+    }
+    const quotedById = new Map(quotedRows.map(row => [row.comment_id, row]))
     return rows.map(row => {
-      const profile = byActor.get(row.author_actor_id)
-      return {...row, media: row.deleted_at ? [] : presentCommentMedia(this.publicApiUrl, row.media), author: profile ? {
-        id: profile.id, handle: profile.handle, displayName: profile.display_name,
-        avatarUri: profile.avatar_url ?? undefined,
-      } : null}
+      const counts = new Map<string, number>()
+      let viewerReaction: string | null = null
+      for (const reaction of reactionRows) {
+        if (reaction.comment_id !== row.comment_id) continue
+        counts.set(reaction.reaction_type, (counts.get(reaction.reaction_type) ?? 0) + 1)
+        if (viewerActorId && reaction.actor_id === viewerActorId) viewerReaction = reaction.reaction_type
+      }
+      const media = row.deleted_at ? [] : presentCommentMedia(this.publicApiUrl, row.media).map((item: any) => {
+        if (item?.type !== 'poll') return item
+        const votes = voteRows.filter(vote => vote.comment_id === row.comment_id)
+        return {
+          ...item,
+          counts: item.options.map((_: string, index: number) => votes.filter(vote => vote.option_index === index).length),
+          totalVotes: votes.length,
+          viewerVote: viewerActorId ? votes.find(vote => vote.actor_id === viewerActorId)?.option_index ?? null : null,
+          closed: Boolean(item.closesAt && Date.parse(item.closesAt) < Date.now()),
+        }
+      })
+      const quoted = row.quoted_comment_id ? quotedById.get(row.quoted_comment_id) : undefined
+      return {
+        ...row,
+        media,
+        pinned: Boolean(row.pinned_at),
+        reactions: [...counts.entries()].map(([type, count]) => ({type, count})).sort((a, b) => b.count - a.count),
+        viewerReaction,
+        quotedComment: quoted ? {id: quoted.comment_id, text: quoted.deleted_at ? '' : quoted.text.slice(0, 280), deleted: Boolean(quoted.deleted_at), author: present(quoted.author_actor_id)} : null,
+        author: present(row.author_actor_id),
+      }
     })
   }
 

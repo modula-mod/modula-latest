@@ -2,6 +2,9 @@ import type {FastifyInstance} from 'fastify'
 import type {ModulaDb} from '../database/client.js'
 import {GifService} from '../domains/gifs/service.js'
 import {LinkPreviewService} from '../domains/link-previews/service.js'
+import {linkSafety} from '../domains/link-previews/safety.js'
+import {STICKER_PACKS} from '../domains/comments/stickers.js'
+import {sql} from 'kysely'
 import {requireAuth} from '../security/auth-context.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 
@@ -43,10 +46,46 @@ export async function registerComposerRoutes(app: FastifyInstance, db: ModulaDb,
   app.get('/v1/link-previews', options.feedConfig, async (request, reply) => {
     if (!requireAuth(request, reply)) return
     try {
-      const preview = await previews.preview((request.query as {url?: string}).url)
-      return reply.send(successEnvelope({preview}, request.id))
+      const raw = (request.query as {url?: string}).url
+      const [preview, safety] = await Promise.all([previews.preview(raw), linkSafety(db, raw)])
+      return reply.send(successEnvelope({preview, safety}, request.id))
     } catch (error) {
       return fail(reply, error, request.id, 'Link preview unavailable')
+    }
+  })
+
+  /** Safety verdict only (used by the in-app browser before loading a page). */
+  app.get('/v1/link-safety', options.feedConfig, async (request, reply) => {
+    if (!requireAuth(request, reply)) return
+    try {
+      return reply.send(successEnvelope(await linkSafety(db, (request.query as {url?: string}).url), request.id))
+    } catch (error) {
+      return fail(reply, error, request.id, 'Link check unavailable')
+    }
+  })
+
+  app.get('/v1/stickers/packs', options.feedConfig, async (request, reply) => {
+    return reply.send(successEnvelope({packs: STICKER_PACKS}, request.id))
+  })
+
+  /** Hashtag autocomplete from recent public posts and comments. */
+  app.get('/v1/hashtags/suggest', options.feedConfig, async (request, reply) => {
+    if (!requireAuth(request, reply)) return
+    const q = String((request.query as {q?: string}).q ?? '').replace(/^#/, '').toLowerCase()
+    if (!/^[a-z0-9_]{0,40}$/.test(q)) return reply.send(successEnvelope({items: []}, request.id))
+    try {
+      const rows = await sql<{tag: string; uses: number}>`
+        SELECT lower(m[1]) AS tag, count(*)::int AS uses FROM (
+          SELECT text FROM posts WHERE deleted_at IS NULL AND audience = 'public' AND text LIKE '%#%' AND created_at > NOW() - INTERVAL '180 days'
+          UNION ALL
+          SELECT c.text FROM greenfield_comments c JOIN posts p ON p.id = c.post_id
+          WHERE c.deleted_at IS NULL AND p.deleted_at IS NULL AND p.audience = 'public' AND c.text LIKE '%#%' AND c.created_at > NOW() - INTERVAL '180 days'
+        ) src, regexp_matches(src.text, '#([A-Za-z0-9_]{2,40})', 'g') AS m
+        WHERE lower(m[1]) LIKE ${q + '%'}
+        GROUP BY 1 ORDER BY uses DESC, tag ASC LIMIT 8`.execute(db)
+      return reply.send(successEnvelope({items: rows.rows}, request.id))
+    } catch (error) {
+      return fail(reply, error, request.id, 'Hashtag suggestions unavailable')
     }
   })
 }
