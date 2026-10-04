@@ -18,7 +18,7 @@
 - `CI=true pnpm --filter @modula/greenfield-worker typecheck`: passed.
 - `CI=true pnpm api:test`: 117/117 standard and 31/31 targeted migration, settings, ownership and trust acceptance passed.
 - `CI=true pnpm worker:test`: 11/11 standard and 22/22 pre-migrated database acceptance passed.
-- Authenticated production acceptance: 46 passed / 0 failed.
+- Authenticated production acceptance: 82 passed / 0 failed.
 - Controlled cross-user and expected-failure acceptance: 28 passed / 0 failed.
 - Production probes: 35/35 passed against Settings V2 production revision.
 - Secret scan: passed.

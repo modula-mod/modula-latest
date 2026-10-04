@@ -1,13 +1,13 @@
 {
   "metadata": {
     "title": "API-BASELINE-02 authenticated production acceptance",
-    "capturedAt": "2026-10-03T18:23:49.727Z",
+    "capturedAt": "2026-10-04T08:59:21.594Z",
     "baseUrl": "https://api.modula.digital",
-    "markerHash": "b8a19b9a3f11",
+    "markerHash": "665f4a2fd221",
     "release": {
-      "commit": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
-      "releaseId": null,
-      "expectedMigration": null
+      "commit": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+      "releaseId": "api-baseline-02-11bfc7638c6d",
+      "expectedMigration": "063_settings_backend_v2"
     },
     "identities": [
       "api-atlas-a",
@@ -16,7 +16,7 @@
     "secretsIncluded": false
   },
   "summary": {
-    "passed": 46,
+    "passed": 82,
     "failed": 0
   },
   "checks": [
@@ -54,6 +54,222 @@
       "name": "profile B follower-only setup",
       "status": 200,
       "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A preferences read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B preferences read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A preferences write",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B preferences write",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A write is account scoped",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B write is account scoped",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A preferences persistence",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B preferences persistence",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A persisted value",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B persisted value",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 query identifier remains self scoped",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 query identifier cannot read B",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 alternate account route absent",
+      "status": 404,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 body identifier rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 unknown preference rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 nested namespace rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 invalid enum rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 wrong type rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 invalid time zone rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 empty patch rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 oversized payload rejected",
+      "status": 413,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A mutes read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A blocks read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A insights read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A payouts read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A invoices read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A password step-up",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 A deletion status read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B mutes read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B blocks read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B insights read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B payouts read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B invoices read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B password step-up",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 B deletion status read",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "settings v2 password target identifier rejected",
+      "status": 400,
+      "errorCode": "VALIDATION_FAILED",
       "result": "PASS"
     },
     {
@@ -245,20 +461,6 @@
   ],
   "cleanup": [
     {
-      "resource": "recovered-record",
-      "key": "1ad7ae21d7ca",
-      "status": 200,
-      "verificationStatus": null,
-      "result": "PASS"
-    },
-    {
-      "resource": "recovered-record",
-      "key": "5e1e87b8381c",
-      "status": 200,
-      "verificationStatus": null,
-      "result": "PASS"
-    },
-    {
       "resource": "follow",
       "key": "49161b86e128",
       "status": 404,
@@ -267,37 +469,53 @@
     },
     {
       "resource": "comment",
-      "key": "4b647cf3ca5d",
+      "key": "7628f2cf8166",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "fed19dd3751f",
+      "key": "727caffa3add",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "c71041b0a557",
+      "key": "418647cb9d4b",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "attachment",
-      "key": "e6a31f6ec401",
+      "key": "e2260f319aba",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "record",
-      "key": "7159bd160959",
+      "key": "9bdd77a42e80",
       "status": 200,
       "verificationStatus": null,
+      "result": "PASS"
+    },
+    {
+      "resource": "settings-preferences",
+      "key": "api-atlas-b",
+      "status": 200,
+      "verificationStatus": 200,
+      "disposition": "restored through supported PATCH; audit-owned row retained because no delete route exists",
+      "result": "PASS"
+    },
+    {
+      "resource": "settings-preferences",
+      "key": "api-atlas-a",
+      "status": 200,
+      "verificationStatus": 200,
+      "disposition": "restored through supported PATCH; audit-owned row retained because no delete route exists",
       "result": "PASS"
     },
     {

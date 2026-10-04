@@ -36,4 +36,4 @@ Introduce shared request/response schemas at auth, admin, upload, module and int
 
 ## Release-governance follow-up
 
-Converge the running feature revision through reviewed `origin/main` history. Rebuild/deploy exact reviewed main, verify OCI/version/route/migration identity and retain rollback.
+The running release is reconciled to reviewed `origin/main`; retain the source, build, image, deployment and runtime record for every future deployment.

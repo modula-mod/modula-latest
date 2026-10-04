@@ -1,30 +1,11 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-04T08:18:44.111Z",
+    "capturedAt": "2026-10-04T08:58:59.613Z",
     "status": "PASS"
   },
   "gaps": [
     {
       "id": "API-ATLAS-GAP-001",
-      "domain": "release",
-      "type": "architecture debt",
-      "severity": "P1",
-      "title": "Running production revision is not canonical origin/main",
-      "evidence": [
-        "evidence/production-snapshot.json#/repository",
-        "evidence/production-snapshot.json#/containers/api/revision"
-      ],
-      "affectedRoutes": [],
-      "affectedFiles": [],
-      "productionImpact": "The captured production source revision differs from origin/main and does not yet have an accepted canonical-lineage disposition.",
-      "recommendedFix": "Converge the deployed revision through reviewed mainline history and record the source, build, image, deployment and runtime correlation.",
-      "dependencies": [
-        "release governance"
-      ],
-      "verification": "Fetch origin, prove ancestry, and compare OCI revision plus /version.json after a reviewed deployment."
-    },
-    {
-      "id": "API-ATLAS-GAP-002",
       "domain": "social",
       "type": "missing endpoint",
       "severity": "P1",
@@ -48,7 +29,7 @@
       "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data."
     },
     {
-      "id": "API-ATLAS-GAP-003",
+      "id": "API-ATLAS-GAP-002",
       "domain": "modules",
       "type": "missing signature verification",
       "severity": "P1",
@@ -76,7 +57,7 @@
       "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified."
     },
     {
-      "id": "API-ATLAS-GAP-004",
+      "id": "API-ATLAS-GAP-003",
       "domain": "modules",
       "type": "missing artifact",
       "severity": "P1",
@@ -101,7 +82,7 @@
       "verification": "Every published installable release must pass a digest-matched artifact GET."
     },
     {
-      "id": "API-ATLAS-GAP-005",
+      "id": "API-ATLAS-GAP-004",
       "domain": "modules",
       "type": "missing storage delivery",
       "severity": "P1",
@@ -125,7 +106,7 @@
       "verification": "Catalogue crawl must retrieve and digest-check every advertised available asset."
     },
     {
-      "id": "API-ATLAS-GAP-006",
+      "id": "API-ATLAS-GAP-005",
       "domain": "modules",
       "type": "inconsistent permission",
       "severity": "P1",
@@ -150,7 +131,7 @@
       "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN."
     },
     {
-      "id": "API-ATLAS-GAP-007",
+      "id": "API-ATLAS-GAP-006",
       "domain": "activity",
       "type": "event delivery gap",
       "severity": "P1",
@@ -175,7 +156,7 @@
       "verification": "Repeated reactions must converge to one notification and leave no dead letter."
     },
     {
-      "id": "API-ATLAS-GAP-008",
+      "id": "API-ATLAS-GAP-007",
       "domain": "intelligence",
       "type": "placeholder implementation",
       "severity": "P1",
@@ -201,7 +182,7 @@
       "verification": "A non-mock production request must execute, ledger usage, and pass failure/timeout tests."
     },
     {
-      "id": "API-ATLAS-GAP-009",
+      "id": "API-ATLAS-GAP-008",
       "domain": "intelligence",
       "type": "placeholder implementation",
       "severity": "P1",
@@ -228,7 +209,7 @@
       "verification": "Unseen objectives must yield bounded proposals and every run must traverse decisions, approvals and ledger."
     },
     {
-      "id": "API-ATLAS-GAP-010",
+      "id": "API-ATLAS-GAP-009",
       "domain": "intelligence",
       "type": "missing endpoint",
       "severity": "P1",
@@ -249,7 +230,7 @@
       "verification": "Contract tests must cover offline proposal, reconnect, approval and ledger synchronization."
     },
     {
-      "id": "API-ATLAS-GAP-011",
+      "id": "API-ATLAS-GAP-010",
       "domain": "security",
       "type": "missing ownership check",
       "severity": "P1",
@@ -276,7 +257,7 @@
       "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy."
     },
     {
-      "id": "API-ATLAS-GAP-012",
+      "id": "API-ATLAS-GAP-011",
       "domain": "security",
       "type": "missing ownership check",
       "severity": "P1",
@@ -304,7 +285,7 @@
       "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream."
     },
     {
-      "id": "API-ATLAS-GAP-013",
+      "id": "API-ATLAS-GAP-012",
       "domain": "posts",
       "type": "client contract mismatch",
       "severity": "P1",
@@ -330,7 +311,7 @@
       "verification": "Contract tests must prove each advertised composer type survives create and retrieval."
     },
     {
-      "id": "API-ATLAS-GAP-014",
+      "id": "API-ATLAS-GAP-013",
       "domain": "media",
       "type": "missing storage delivery",
       "severity": "P1",
@@ -354,7 +335,7 @@
       "verification": "A boundary-size audit attachment must publish through the intended path without widening unrelated routes."
     },
     {
-      "id": "API-ATLAS-GAP-015",
+      "id": "API-ATLAS-GAP-014",
       "domain": "media",
       "type": "architecture debt",
       "severity": "P1",
@@ -380,7 +361,7 @@
       "verification": "Restore media plus metadata to a clean host and digest-check every referenced object."
     },
     {
-      "id": "API-ATLAS-GAP-016",
+      "id": "API-ATLAS-GAP-015",
       "domain": "modules",
       "type": "missing worker",
       "severity": "P1",
@@ -406,7 +387,7 @@
       "verification": "A tagged release must be discovered, verified, ingested and published without manual database work."
     },
     {
-      "id": "API-ATLAS-GAP-017",
+      "id": "API-ATLAS-GAP-016",
       "domain": "contracts",
       "type": "missing request schema",
       "severity": "P2",
@@ -427,7 +408,7 @@
       "verification": "Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass."
     },
     {
-      "id": "API-ATLAS-GAP-018",
+      "id": "API-ATLAS-GAP-017",
       "domain": "media",
       "type": "missing worker",
       "severity": "P2",
@@ -451,7 +432,7 @@
       "verification": "Expired sessions/orphans must be removed while bound media remains retrievable."
     },
     {
-      "id": "API-ATLAS-GAP-019",
+      "id": "API-ATLAS-GAP-018",
       "domain": "media",
       "type": "missing request schema",
       "severity": "P2",
@@ -475,7 +456,7 @@
       "verification": "Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed."
     },
     {
-      "id": "API-ATLAS-GAP-020",
+      "id": "API-ATLAS-GAP-019",
       "domain": "profiles",
       "type": "architecture debt",
       "severity": "P2",
@@ -500,7 +481,7 @@
       "verification": "All new avatar/cover writes must create profile_media and resolve to canonical attachment URLs."
     },
     {
-      "id": "API-ATLAS-GAP-021",
+      "id": "API-ATLAS-GAP-020",
       "domain": "feed",
       "type": "missing request schema",
       "severity": "P2",
@@ -523,7 +504,7 @@
       "verification": "Unknown mode must return VALIDATION_FAILED; three supported modes need response snapshots."
     },
     {
-      "id": "API-ATLAS-GAP-022",
+      "id": "API-ATLAS-GAP-021",
       "domain": "privacy",
       "type": "data exposure risk",
       "severity": "P2",
@@ -546,7 +527,7 @@
       "verification": "Cross-user fixture must receive the same status/shape for private-existing and unknown IDs."
     },
     {
-      "id": "API-ATLAS-GAP-023",
+      "id": "API-ATLAS-GAP-022",
       "domain": "social",
       "type": "missing idempotency",
       "severity": "P2",
@@ -574,7 +555,7 @@
       "verification": "Parallel duplicate submissions must converge without 500s or counter drift."
     },
     {
-      "id": "API-ATLAS-GAP-024",
+      "id": "API-ATLAS-GAP-023",
       "domain": "discover",
       "type": "performance risk",
       "severity": "P2",
@@ -598,7 +579,7 @@
       "verification": "Seeded volume test must show bounded queries and stable cursors."
     },
     {
-      "id": "API-ATLAS-GAP-025",
+      "id": "API-ATLAS-GAP-024",
       "domain": "realtime",
       "type": "missing endpoint",
       "severity": "P2",
@@ -621,7 +602,7 @@
       "verification": "A client must receive a new notification through the documented mechanism with reconnect semantics."
     },
     {
-      "id": "API-ATLAS-GAP-026",
+      "id": "API-ATLAS-GAP-025",
       "domain": "connectors",
       "type": "placeholder implementation",
       "severity": "P2",
@@ -643,7 +624,7 @@
       "verification": "Each advertised webhook provider must have a verified route and replay test."
     },
     {
-      "id": "API-ATLAS-GAP-027",
+      "id": "API-ATLAS-GAP-026",
       "domain": "async",
       "type": "dead endpoint",
       "severity": "P2",
@@ -665,7 +646,7 @@
       "verification": "Every supported job type must have an asserted effect or be rejected as unsupported."
     },
     {
-      "id": "API-ATLAS-GAP-028",
+      "id": "API-ATLAS-GAP-027",
       "domain": "modules",
       "type": "module special case",
       "severity": "P2",
@@ -694,7 +675,7 @@
       "verification": "A neutral reference module must exercise the same flows without core code changes."
     },
     {
-      "id": "API-ATLAS-GAP-029",
+      "id": "API-ATLAS-GAP-028",
       "domain": "modules",
       "type": "partial endpoint",
       "severity": "P2",
@@ -717,7 +698,7 @@
       "verification": "Every active installation must resolve a digest-verified descriptor."
     },
     {
-      "id": "API-ATLAS-GAP-031",
+      "id": "API-ATLAS-GAP-030",
       "domain": "profiles",
       "type": "DB/API mismatch",
       "severity": "P2",
@@ -741,7 +722,7 @@
       "verification": "Create/update/delete a link and verify privacy-filtered retrieval."
     },
     {
-      "id": "API-ATLAS-GAP-032",
+      "id": "API-ATLAS-GAP-031",
       "domain": "architecture",
       "type": "duplicate endpoint",
       "severity": "P2",
@@ -768,7 +749,7 @@
       "verification": "All clients use canonical routes; aliases have explicit sunset tests."
     },
     {
-      "id": "API-ATLAS-GAP-033",
+      "id": "API-ATLAS-GAP-032",
       "domain": "observability",
       "type": "observability gap",
       "severity": "P2",
@@ -791,7 +772,7 @@
       "verification": "One synthetic request must be traceable across edge, API, outbox, job and result."
     },
     {
-      "id": "API-ATLAS-GAP-034",
+      "id": "API-ATLAS-GAP-033",
       "domain": "operations",
       "type": "observability gap",
       "severity": "P2",
@@ -810,7 +791,7 @@
       "verification": "Stopping worker progress must transition container/status health within the documented window."
     },
     {
-      "id": "API-ATLAS-GAP-035",
+      "id": "API-ATLAS-GAP-034",
       "domain": "testing",
       "type": "untested endpoint",
       "severity": "P2",
@@ -828,7 +809,7 @@
       "verification": "Atlas automatedTest coverage should reach the agreed threshold with security routes at 100%."
     },
     {
-      "id": "API-ATLAS-GAP-036",
+      "id": "API-ATLAS-GAP-035",
       "domain": "modules",
       "type": "placeholder implementation",
       "severity": "P2",
@@ -849,7 +830,7 @@
       "verification": "Public catalogue must contain no developmentAsset=true for released products."
     },
     {
-      "id": "API-ATLAS-GAP-037",
+      "id": "API-ATLAS-GAP-036",
       "domain": "testing",
       "type": "architecture debt",
       "severity": "P2",
@@ -870,7 +851,7 @@
       "verification": "The canonical verifier must pass on reviewed current main at 063_settings_backend_v2 without weakening exact-SHA production checks."
     },
     {
-      "id": "API-ATLAS-GAP-038",
+      "id": "API-ATLAS-GAP-037",
       "domain": "database",
       "type": "orphan table",
       "severity": "P3",
@@ -888,7 +869,7 @@
       "verification": "Repository-wide reference and production usage review resolves every candidate."
     },
     {
-      "id": "API-ATLAS-GAP-039",
+      "id": "API-ATLAS-GAP-038",
       "domain": "operations",
       "type": "architecture debt",
       "severity": "P3",
@@ -906,7 +887,7 @@
       "verification": "Only documented production and active audit containers remain."
     },
     {
-      "id": "API-ATLAS-GAP-040",
+      "id": "API-ATLAS-GAP-039",
       "domain": "operations",
       "type": "architecture debt",
       "severity": "P3",
@@ -925,7 +906,7 @@
       "verification": "Dependency graph either names a real Redis consumer or the service is absent."
     },
     {
-      "id": "API-ATLAS-GAP-041",
+      "id": "API-ATLAS-GAP-040",
       "domain": "atlas",
       "type": "architecture debt",
       "severity": "P3",
