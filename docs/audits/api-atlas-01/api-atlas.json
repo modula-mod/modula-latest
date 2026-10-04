@@ -2,9 +2,9 @@
   "metadata": {
     "title": "MODULA GREENFIELD API-ATLAS-01",
     "generatedFrom": "current implementation and captured production runtime; not a design contract",
-    "capturedAt": "2026-10-04T08:58:59.613Z",
+    "capturedAt": "2026-10-04T15:10:21.196Z",
     "productionSha": "11bfc7638c6d757215e75a934d02e40c9a40c839",
-    "sourceSha": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+    "sourceSha": "384b2e1999a71b356ff4dd2186d3bda8af7b5e72",
     "publicApiBase": "https://api.modula.digital",
     "status": "PASS"
   },

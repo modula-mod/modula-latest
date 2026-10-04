@@ -597,7 +597,37 @@ SELECT jsonb_build_object(
   'installPlans', (SELECT jsonb_build_object('count', count(*), 'withDescriptor', count(*) FILTER (WHERE install_descriptor IS NOT NULL), 'withDescriptorDigest', count(*) FILTER (WHERE install_descriptor_sha256 IS NOT NULL)) FROM greenfield_module_install_plans),
   'installDescriptorKeys', COALESCE((SELECT jsonb_agg(key ORDER BY key) FROM (SELECT DISTINCT jsonb_object_keys(install_descriptor) key FROM greenfield_module_install_plans WHERE install_descriptor IS NOT NULL) q), '[]'::jsonb),
   'installationsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM greenfield_extension_installations GROUP BY status ORDER BY status) q), '{}'::jsonb),
-  'activeInstallPermissionReviews', (SELECT jsonb_build_object('active', count(*), 'withoutReview', count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM greenfield_module_permission_reviews p WHERE p.installation_id=i.installation_id AND p.release_id=r.release_id)), 'reviews', (SELECT count(*) FROM greenfield_module_permission_reviews)) FROM greenfield_extension_installations i JOIN greenfield_module_releases r ON r.extension_version_id=i.extension_version_id WHERE i.status NOT IN ('removed','uninstalled','notInstalled')),
+  'activeInstallPermissionReviews', (SELECT jsonb_build_object(
+    'active', count(*),
+    'withoutReview', count(*) FILTER (WHERE NOT EXISTS (SELECT 1 FROM greenfield_module_permission_reviews p WHERE p.installation_id=i.installation_id AND p.release_id=r.release_id)),
+    'reviews', (SELECT count(*) FROM greenfield_module_permission_reviews),
+    'missingReviews', COALESCE((
+      SELECT jsonb_agg(jsonb_build_object(
+        'moduleId', missing.module_id,
+        'requestedPermissionClasses', missing.requested_permission_classes,
+        'requestedPermissions', missing.requested_permissions,
+        'reviewRowPresent', false,
+        'effectiveAuthorizationSource', 'manifest requested permissions'
+      ) ORDER BY missing.module_id)
+      FROM (
+        SELECT
+          missing_release.module_id,
+          COALESCE(jsonb_agg(DISTINCT regexp_replace(permission.permission, '[:.].*$', '') ORDER BY regexp_replace(permission.permission, '[:.].*$', '')) FILTER (WHERE permission.permission IS NOT NULL), '[]'::jsonb) AS requested_permission_classes,
+          COALESCE(jsonb_agg(DISTINCT permission.permission ORDER BY permission.permission) FILTER (WHERE permission.permission IS NOT NULL), '[]'::jsonb) AS requested_permissions
+        FROM greenfield_extension_installations missing_installation
+        JOIN greenfield_module_releases missing_release ON missing_release.extension_version_id=missing_installation.extension_version_id
+        LEFT JOIN greenfield_module_permissions permission ON permission.release_id=missing_release.release_id
+        WHERE missing_installation.status NOT IN ('removed','uninstalled','notInstalled')
+          AND NOT EXISTS (
+            SELECT 1
+            FROM greenfield_module_permission_reviews review
+            WHERE review.installation_id=missing_installation.installation_id
+              AND review.release_id=missing_release.release_id
+          )
+        GROUP BY missing_release.module_id
+      ) missing
+    ), '[]'::jsonb)
+  ) FROM greenfield_extension_installations i JOIN greenfield_module_releases r ON r.extension_version_id=i.extension_version_id WHERE i.status NOT IN ('removed','uninstalled','notInstalled')),
   'syncSources', (SELECT jsonb_build_object('count', count(*), 'enabled', count(*) FILTER (WHERE enabled)) FROM greenfield_module_sync_sources),
   'syncRunsByStatus', COALESCE((SELECT jsonb_object_agg(status, n) FROM (SELECT status, count(*) n FROM greenfield_module_sync_runs GROUP BY status ORDER BY status) q), '{}'::jsonb),
   'aiProvidersByState', COALESCE((SELECT jsonb_object_agg(provider_kind || ':' || status, n) FROM (SELECT provider_kind, status, count(*) n FROM greenfield_ai_providers GROUP BY provider_kind,status ORDER BY provider_kind,status) q), '{}'::jsonb),

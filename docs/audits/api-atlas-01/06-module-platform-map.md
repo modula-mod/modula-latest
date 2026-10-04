@@ -32,6 +32,15 @@ The descriptor service (`install-descriptor-service.ts:14`, `:77`) returns modul
 
 Historical `removed` and `uninstalled` rows are excluded by centralized active-status logic (`installation-status.ts:1`) and runtime access checks. No stale historical row bug was reproduced. A distinct security gap remains: `runtime-access.ts:71` falls back to all manifest permissions if a review row is absent; 2 active production installations are in that state.
 
+### Missing permission-review inventory
+
+This inventory excludes account and installation identifiers. It records only the module and authorization facts needed for remediation.
+
+| Module ID | Requested permission classes | Requested permissions | Review row present | Effective authorization source |
+| --- | --- | --- | --- | --- |
+| `digital.modula.vault-notes.ai` | ai, notes | ai.context.private, ai.request, notes.actions.contribute, notes.editor.contribute, notes.read | false | manifest requested permissions |
+| `digital.modula.vault-notes.voice` | media, notes, transcription | media.audio.capture, media.audio.playback, notes.actions.contribute, notes.attachments.create, notes.attachments.read, notes.editor.contribute, notes.update, transcription.request | false | manifest requested permissions |
+
 ## Runtime, records and functions
 
 - Record create/read/update/delete/list/filter/sort/cursor paths are registered under module-scoped routes. `record-service.ts:42`, `:98`, `:216` validates schema and scopes SQL to account + installation + module collection.
