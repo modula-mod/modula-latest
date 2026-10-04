@@ -67,10 +67,10 @@ jobs:
           node-version: 24.18.0
           cache: pnpm
           cache-dependency-path: modula-latest/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
       - name: Build pinned Module Standard contracts
         working-directory: modula-mod/modula-module-standard
         run: pnpm install --frozen-lockfile && pnpm --filter @modula/module-standard build
+      - run: pnpm install --frozen-lockfile
       - name: API tests
         run: CI=true pnpm api:test
       - name: Worker tests
