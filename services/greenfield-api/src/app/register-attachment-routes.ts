@@ -1,4 +1,5 @@
 import type {FastifyInstance} from 'fastify'
+import {sql} from 'kysely'
 import type {AppConfig} from '../config/index.js'
 import type {ModulaDb} from '../database/client.js'
 import {AttachmentService} from '../domains/attachments/service.js'
@@ -104,6 +105,16 @@ export async function registerAttachmentRoutes(
     if (!allowed) {
       const bindings = await db.selectFrom('post_content').select('post_id').where('attachment_id', '=', attachmentId).execute()
       for (const binding of bindings) {
+        if (await posts.getById(binding.post_id, request.auth?.actorId ?? null)) { allowed = true; break }
+      }
+    }
+    if (!allowed) {
+      // Comment media: visible wherever the comment's post is visible.
+      const commentBindings = await db.selectFrom('greenfield_comments').select('post_id')
+        .where('deleted_at', 'is', null)
+        .where(sql<boolean>`media @> ${JSON.stringify([{type: 'attachment', attachmentId}])}::jsonb`)
+        .limit(5).execute()
+      for (const binding of commentBindings) {
         if (await posts.getById(binding.post_id, request.auth?.actorId ?? null)) { allowed = true; break }
       }
     }
