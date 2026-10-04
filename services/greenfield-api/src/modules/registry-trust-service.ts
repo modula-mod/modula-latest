@@ -124,8 +124,13 @@ export class GreenfieldRegistryTrustService {
       version: release.version,
       releaseState: release.releaseState,
       publishedAt: release.publishedAt ? new Date(release.publishedAt).toISOString() : null,
-      verified: ['published', 'superseded'].includes(release.releaseState) && integrityOk && publisherVerified && !revoked && !quarantined
-        && !['invalid', 'unknownKey', 'revokedKey'].includes(signature.state),
+      verified: ['published', 'superseded'].includes(release.releaseState)
+        && Boolean(release.releaseSha256 && release.manifestSha256)
+        && integrityOk
+        && publisherVerified
+        && signature.state === 'verified'
+        && !revoked
+        && !quarantined,
       publisher: {
         publisherId: release.publisherId,
         displayName: publisher?.display_name ?? null,

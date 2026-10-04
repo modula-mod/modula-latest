@@ -4,6 +4,7 @@ import {registerModuleContributions} from './contribution-registration-handler.j
 import {permanentModuleJob} from './module-job-errors.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
+import {assertTrustedModuleRelease} from './release-trust-guard.js'
 
 export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as any
@@ -15,6 +16,14 @@ export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfi
     .where('greenfield_extension_installations.installation_id', '=', p.installationId)
     .executeTakeFirst()
   if (!release || release.release_state !== 'published') throw permanentModuleJob('VALIDATION_FAILED', 'Cannot enable unavailable module release')
+  await assertTrustedModuleRelease(db, config, release)
+  const review = await db.selectFrom('greenfield_module_permission_reviews')
+    .select('review_id')
+    .where('installation_id', '=', p.installationId)
+    .where('release_id', '=', release.release_id)
+    .where('account_id', '=', p.accountId)
+    .executeTakeFirst()
+  if (!review) throw permanentModuleJob('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required before enabling')
   if (release.trust_level !== 'firstParty' && !config.moduleCommunityExecutionEnabled) {
     throw permanentModuleJob('VALIDATION_FAILED', 'Community executable module contributions are disabled')
   }

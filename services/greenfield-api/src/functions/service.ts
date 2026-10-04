@@ -1,11 +1,17 @@
 import type {ModulaDb} from '../database/client.js'
-import {requireInstallationCapability} from '../extensions/capability-resolver.js'
+import {requireInstallationCapabilityForAccount} from '../extensions/capability-resolver.js'
 import {safeFetch} from '../security/ssrf.js'
 export class FunctionService {
   constructor(private readonly db: ModulaDb) {}
-  async invoke(installationId: string, functionId: string, input: unknown) {
-    await requireInstallationCapability(this.db, installationId, 'function:invoke')
-    const fn = await this.db.selectFrom('greenfield_functions').selectAll().where('function_id', '=', functionId).executeTakeFirstOrThrow()
+  async invoke(accountId: string, installationId: string, functionId: string, input: unknown) {
+    const installation = await requireInstallationCapabilityForAccount(this.db, accountId, installationId, 'function:invoke')
+    const fn = await this.db
+      .selectFrom('greenfield_functions')
+      .selectAll()
+      .where('function_id', '=', functionId)
+      .where('extension_version_id', '=', installation.extension_version_id)
+      .executeTakeFirst()
+    if (!fn) throw Object.assign(new Error('Function not found'), {code: 'NOT_FOUND'})
     if (fn.kind === 'remoteHttp') {
       const url = (fn.config as {url?: string}).url
       if (!url) throw Object.assign(new Error('Remote function URL missing'), {code: 'VALIDATION_FAILED'})

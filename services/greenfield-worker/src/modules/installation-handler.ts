@@ -5,6 +5,7 @@ import {registerModuleContributions} from './contribution-registration-handler.j
 import {registerModuleSchemas} from './schema-registration-handler.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
+import {assertTrustedModuleRelease} from './release-trust-guard.js'
 
 type InstallPayload = {
   planId: string
@@ -14,13 +15,14 @@ type InstallPayload = {
   accountId: string
 }
 
-export async function handleModuleInstall(db: ModulaWorkerDb, _config: WorkerConfig, payload: unknown): Promise<void> {
+export async function handleModuleInstall(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as Partial<InstallPayload>
   if (!p.planId || !p.installationId || !p.releaseId || !p.accountId || !p.moduleId) {
     throw permanentModuleJob('VALIDATION_FAILED', 'Invalid module.install payload')
   }
   const release = await db.selectFrom('greenfield_module_releases').selectAll().where('release_id', '=', p.releaseId).executeTakeFirst()
   if (!release || release.release_state !== 'published') throw permanentModuleJob('VALIDATION_FAILED', 'Module release is not published')
+  await assertTrustedModuleRelease(db, config, release)
   const review = await db
     .selectFrom('greenfield_module_permission_reviews')
     .select('review_id')

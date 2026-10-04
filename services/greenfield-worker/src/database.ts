@@ -16,6 +16,7 @@ export type EventDataClassification = 'public' | 'internal' | 'private' | 'sensi
 export type NotificationCategory = 'social' | 'module' | 'AI' | 'connector' | 'automation' | 'security' | 'system' | 'DIMON' | 'marketplace'
 export type NotificationChannel = 'in-app' | 'email' | 'web-push'
 export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'manual'
+export type FollowRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED'
 export type GreenfieldEventDeliveryTargetType =
   | 'notification'
   | 'search-index'

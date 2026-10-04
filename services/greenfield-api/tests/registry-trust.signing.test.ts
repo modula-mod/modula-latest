@@ -190,13 +190,13 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     expect(JSON.stringify(body)).not.toMatch(/PRIVATE KEY/)
   })
 
-  it('keeps unsigned releases valid and reports them as unsigned', async () => {
+  it('keeps unsigned release facts visible but never marks them trusted', async () => {
     const id = nextId()
     const manifest = adapterManifest(id, '1.0.0')
     await releases.importPendingReview(manifest, evidenceFor(manifest))
     const published = await releases.publishRelease(id, '1.0.0')
     expect(published.releaseState).toBe('published')
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${id}`})
-    expect(detail.json().data.registryTrust.signature.state).toBe('unsigned')
+    expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'unsigned'}})
   })
 })

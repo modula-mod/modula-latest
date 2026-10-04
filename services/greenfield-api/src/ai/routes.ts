@@ -188,7 +188,7 @@ export async function registerAiRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      await streaming.cancel((request.params as {streamId: string}).streamId)
+      await streaming.cancel(auth.accountId, (request.params as {streamId: string}).streamId)
       return reply.send(successEnvelope({cancelled: true}, request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'AI stream cancellation failed')
@@ -200,7 +200,7 @@ export async function registerAiRoutes(
     const auth = await requireGreenfieldAuth(request, reply, sessions)
     if (!auth) return
     try {
-      return reply.send(successEnvelope(await streaming.reconnect((request.params as {streamId: string}).streamId), request.id))
+      return reply.send(successEnvelope(await streaming.reconnect(auth.accountId, (request.params as {streamId: string}).streamId), request.id))
     } catch (error) {
       return sendMapped(reply, error, request.id, 'AI stream reconnect failed')
     }

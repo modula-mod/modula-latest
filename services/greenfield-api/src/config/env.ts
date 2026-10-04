@@ -88,6 +88,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED: z
     .string()
     .optional()
@@ -195,6 +199,8 @@ export type AppConfig = {
   pdsPilotEnabled: boolean
   moduleRegistryEnabled: boolean
   moduleInstallationEnabled: boolean
+  /** Explicit local-only escape hatch for unsigned development fixtures. */
+  moduleAllowUntrustedDevelopmentReleases: boolean
   moduleDeclarativeContributionsEnabled: boolean
   moduleFirstPartyExecutionEnabled: boolean
   moduleRemoteFunctionsEnabled: boolean
@@ -280,6 +286,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const aiBackendUrl = validateAIBackendUrl(raw.MODULA_AI_BACKEND_URL, raw.MODULA_ENVIRONMENT)
 
   const environment = raw.MODULA_ENVIRONMENT
+  if (environment !== 'development' && raw.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES) {
+    refuse('GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES is only valid in development')
+  }
   const mediaRoot = raw.MODULA_MEDIA_ROOT ?? (raw.NODE_ENV === 'test' ? '/tmp/modula-greenfield-test-media' : '.data/greenfield-media')
   const isEphemeralEligible = environment === 'development' || raw.NODE_ENV === 'test'
   const registrationMode: RegistrationMode =
@@ -461,6 +470,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     pdsPilotEnabled: Boolean(raw.MODULA_PDS_PILOT_ENABLED),
     moduleRegistryEnabled: Boolean(raw.GREENFIELD_MODULE_REGISTRY_ENABLED),
     moduleInstallationEnabled: Boolean(raw.GREENFIELD_MODULE_INSTALLATION_ENABLED),
+    moduleAllowUntrustedDevelopmentReleases: Boolean(raw.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES),
     moduleDeclarativeContributionsEnabled: Boolean(raw.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED),
     moduleFirstPartyExecutionEnabled: Boolean(raw.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED),
     moduleRemoteFunctionsEnabled: Boolean(raw.GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED),

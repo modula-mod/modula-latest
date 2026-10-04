@@ -15,6 +15,7 @@ export type GreenfieldModuleRuntimeContext = {
   extensionVersionId: string
   releaseState: string
   manifest: GreenfieldModuleManifest
+  permissionReviewRequired: boolean
   grantedPermissions: string[]
 }
 
@@ -57,7 +58,6 @@ export class GreenfieldModuleRuntimeAccessService {
       .orderBy('reviewed_at', 'desc')
       .executeTakeFirst()
     const manifest = row.manifest as GreenfieldModuleManifest
-    const fallbackPermissions = (manifest.permissions ?? []).map(permission => rewriteModuleIdentityAliases(permission.permission))
     return {
       accountId,
       moduleId: canonicalId,
@@ -68,11 +68,18 @@ export class GreenfieldModuleRuntimeAccessService {
       extensionVersionId: row.extension_version_id,
       releaseState: row.release_state,
       manifest,
-      grantedPermissions: (arrayOfStrings(review?.granted_permissions).length ? arrayOfStrings(review?.granted_permissions) : fallbackPermissions).map(rewriteModuleIdentityAliases),
+      permissionReviewRequired: !review,
+      // A manifest is a request, never an authorization decision. An absent
+      // review therefore grants nothing; an explicit review may also grant an
+      // intentionally empty set.
+      grantedPermissions: arrayOfStrings(review?.granted_permissions).map(rewriteModuleIdentityAliases),
     }
   }
 
   enforceCapability(context: GreenfieldModuleRuntimeContext, capability: string): void {
+    if (context.permissionReviewRequired) {
+      throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required')
+    }
     if (!capability || !context.grantedPermissions.includes(capability)) {
       throw moduleError('FORBIDDEN', `Module capability denied: ${capability}`)
     }

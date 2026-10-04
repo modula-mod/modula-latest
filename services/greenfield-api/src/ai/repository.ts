@@ -530,6 +530,46 @@ export class GreenfieldAIRepository {
       .execute()
   }
 
+  async reconnectOwnedStream(accountId: string, streamId: string): Promise<Database['greenfield_ai_streams']> {
+    const reconnected = await this.db
+      .updateTable('greenfield_ai_streams')
+      .set({status: 'reconnecting', updated_at: new Date()})
+      .where('stream_id', '=', streamId)
+      .where('account_id', '=', accountId)
+      .where('status', '=', 'open')
+      .returningAll()
+      .executeTakeFirst()
+    return reconnected ?? this.requireOwnedStream(accountId, streamId)
+  }
+
+  async cancelOwnedStream(accountId: string, streamId: string): Promise<Database['greenfield_ai_streams']> {
+    const cancelled = await this.db
+      .updateTable('greenfield_ai_streams')
+      .set({
+        status: 'cancelled',
+        cancellation_requested_at: new Date(),
+        updated_at: new Date(),
+        completed_at: new Date(),
+      })
+      .where('stream_id', '=', streamId)
+      .where('account_id', '=', accountId)
+      .returningAll()
+      .executeTakeFirst()
+    if (!cancelled) throw moduleError('NOT_FOUND', 'AI stream not found')
+    return cancelled
+  }
+
+  async requireOwnedStream(accountId: string, streamId: string): Promise<Database['greenfield_ai_streams']> {
+    const row = await this.db
+      .selectFrom('greenfield_ai_streams')
+      .selectAll()
+      .where('stream_id', '=', streamId)
+      .where('account_id', '=', accountId)
+      .executeTakeFirst()
+    if (!row) throw moduleError('NOT_FOUND', 'AI stream not found')
+    return row
+  }
+
   async requireStream(streamId: string): Promise<Database['greenfield_ai_streams']> {
     const row = await this.db.selectFrom('greenfield_ai_streams').selectAll().where('stream_id', '=', streamId).executeTakeFirst()
     if (!row) throw moduleError('NOT_FOUND', 'AI stream not found')

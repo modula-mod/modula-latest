@@ -91,29 +91,64 @@ export async function handleSocialNotification(
   const channels: NotificationChannel[] = ['in-app']
   const dedupeKey = kind === 'reaction' && resourceId ? `social:reaction:${resourceType}:${resourceId}` : null
   if (kind === 'reaction') {
-    const recent = await db
-      .selectFrom('notifications')
-      .selectAll()
-      .where('recipient_actor_id', '=', recipientActorId)
-      .where('type', '=', 'like')
-      .where('dedupe_key', '=', dedupeKey)
-      .where('created_at', '>', new Date(now.getTime() - 5 * 60_000))
-      .orderBy('created_at', 'desc')
-      .executeTakeFirst()
-    if (recent) {
-      await db
-        .updateTable('notifications')
-        .set({
-          body: `${recent.aggregate_count + 1} people reacted to your post`,
-          aggregate_count: recent.aggregate_count + 1,
+    // Reaction notification identity is permanent for a recipient/resource pair,
+    // matching notifications_recipient_dedupe_uidx. Derive the aggregate from
+    // canonical reaction state so a retried outbox job cannot increment twice.
+    const aggregate = resourceType === 'post'
+      ? await db
+          .selectFrom('greenfield_reactions')
+          .select(({fn}) => fn.countAll<number>().as('count'))
+          .where('post_id', '=', resourceId)
+          .executeTakeFirst()
+      : undefined
+    const aggregateCount = Math.max(1, Number(aggregate?.count ?? 1))
+    const body = aggregateCount === 1
+      ? BODIES.reaction
+      : `${aggregateCount} people reacted to your post`
+
+    await db
+      .insertInto('notifications')
+      .values({
+        id: randomUUID(),
+        recipient_actor_id: recipientActorId,
+        actor_id: actorId,
+        type: 'like',
+        category,
+        channels: jsonb(channels),
+        dedupe_key: dedupeKey,
+        aggregate_count: aggregateCount,
+        aggregate_window_started_at: now,
+        last_aggregated_at: now,
+        resource_type: resourceType,
+        resource_id: resourceId,
+        body,
+        read_at: null,
+        created_at: now,
+        updated_at: now,
+        deleted_at: null,
+        version: 1,
+      })
+      .onConflict(conflict => conflict
+        .columns(['recipient_actor_id', 'dedupe_key'])
+        .where('dedupe_key', 'is not', null)
+        .where('deleted_at', 'is', null)
+        .doUpdateSet({
+          actor_id: actorId,
+          category,
+          channels: jsonb(channels),
+          aggregate_count: aggregateCount,
+          aggregate_window_started_at: now,
           last_aggregated_at: now,
+          resource_type: resourceType,
+          resource_id: resourceId,
+          body,
+          read_at: null,
+          created_at: now,
           updated_at: now,
-          version: recent.version + 1,
-        })
-        .where('id', '=', recent.id)
-        .execute()
-      return
-    }
+          version: sql<number>`notifications.version + 1`,
+        }))
+      .execute()
+    return
   }
 
   await db

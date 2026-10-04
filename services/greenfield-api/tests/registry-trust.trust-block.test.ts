@@ -31,6 +31,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
+    process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'false'
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -55,7 +56,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
       moduleId: productId,
       version: '0.1.0',
       releaseState: 'published',
-      verified: true,
+      verified: false,
       publisher: {publisherId: 'modula', status: 'verified', verified: true},
       signature: {state: 'unsigned'},
       digests: {
@@ -90,20 +91,20 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(invalid.statusCode).toBe(400)
   })
 
-  it('[EXPECTED FAILURE] exposes an unsigned published release as trusted and installation-eligible', async () => {
+  it('exposes an unsigned published release as untrusted and refuses install preview', async () => {
     const catalogue = await app.inject({method: 'GET', url: `/v1/registry/modules?q=${encodeURIComponent(productId)}`})
     expect(catalogue.statusCode, catalogue.body).toBe(200)
     const item = catalogue.json().data.items.find((candidate: {moduleId: string}) => candidate.moduleId === productId)
-    expect(item).toMatchObject({moduleId: productId, status: 'published', installable: true})
+    expect(item).toMatchObject({moduleId: productId, status: 'published', installable: false})
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}`})
-    expect(detail.json().data.registryTrust).toMatchObject({verified: true, signature: {state: 'unsigned'}})
+    expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'unsigned'}})
 
     const preview = await app.inject({
       method: 'POST', url: `/v1/modules/${productId}/install-preview`,
       headers: {authorization: `Bearer ${token}`}, payload: {version: '0.1.0', platform: 'ios'},
     })
-    expect(preview.statusCode, preview.body).toBe(200)
-    expect(preview.json().data).toMatchObject({moduleId: productId, version: '0.1.0', compatible: true})
+    expect(preview.statusCode, preview.body).toBe(403)
+    expect(preview.json().error).toMatchObject({code: 'UNTRUSTED_RELEASE'})
   })
 
   it('reports update availability and revocation per immutable release', async () => {
@@ -116,6 +117,6 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(revoked).toMatchObject({verified: false, releaseState: 'revoked', revocation: {revoked: true, scope: 'release', reason: 'test revocation'}})
     expect(revoked.warnings.map((warning: {code: string}) => warning.code)).toContain('RELEASE_REVOKED')
     const latest = (await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}`})).json().data.registryTrust
-    expect(latest).toMatchObject({version: '0.2.0', verified: true, revocation: {revoked: false}})
+    expect(latest).toMatchObject({version: '0.2.0', verified: false, signature: {state: 'unsigned'}, revocation: {revoked: false}})
   })
 })

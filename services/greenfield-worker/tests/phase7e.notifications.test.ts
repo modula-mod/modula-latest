@@ -134,7 +134,7 @@ describeLive('Phase 7E notification worker', () => {
     expect(row.body).toBe('2 people reacted to your post')
   })
 
-  it('[EXPECTED FAILURE] reproduces reaction 23505 when the active dedupe row is older than the aggregate window', async () => {
+  it('reuses the permanent reaction identity when the active dedupe row is older than the aggregate window', async () => {
     const resourceId = `post-api-baseline-02-${randomUUID()}`
     await handleSocialNotification(db, 'reaction', {recipientActorId, actorId, resourceType: 'post', resourceId})
     const dedupeKey = `social:reaction:post:${resourceId}`
@@ -149,13 +149,73 @@ describeLive('Phase 7E notification worker', () => {
       actorId,
       resourceType: 'post',
       resourceId,
-    })).rejects.toMatchObject({code: '23505'})
+    })).resolves.toBeUndefined()
 
-    const rows = await db.selectFrom('notifications').select('id')
+    const rows = await db.selectFrom('notifications').select(['id', 'aggregate_count', 'body'])
       .where('recipient_actor_id', '=', recipientActorId)
       .where('dedupe_key', '=', dedupeKey)
       .execute()
     expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({aggregate_count: 1, body: 'reacted to your post'})
+  })
+
+  it('is retry-safe and converges concurrent reaction jobs on canonical reaction state', async () => {
+    const resourceId = `post-api-fix-01-${randomUUID()}`
+    const secondActorAccountId = `notif-concurrent-account-${suffix}`
+    const secondActorId = `notif-concurrent-actor-${suffix}`
+    await seedActor(db, secondActorAccountId, secondActorId)
+    const now = new Date()
+    await db.insertInto('posts').values({
+      id: resourceId,
+      author_actor_id: recipientActorId,
+      kind: 'text',
+      text: 'reaction concurrency fixture',
+      feed: 'following',
+      audience: 'public',
+      reply_permission: 'everyone',
+      idempotency_key: null,
+      link_domain: null,
+      link_title: null,
+      link_description: null,
+      link_image: null,
+      module_name: null,
+      module_action_label: null,
+      module_status: null,
+      glow_colour: null,
+      like_count: 0,
+      reaction_count: 2,
+      quote_count: 0,
+      reply_count: 0,
+      repost_count: 0,
+      created_at: now,
+      updated_at: now,
+      deleted_at: null,
+      version: 1,
+    }).execute()
+    await db.insertInto('greenfield_reactions').values([
+      {reaction_id: randomUUID(), actor_id: actorId, post_id: resourceId, reaction_type: 'like', created_at: now, updated_at: now},
+      {reaction_id: randomUUID(), actor_id: secondActorId, post_id: resourceId, reaction_type: 'love', created_at: now, updated_at: now},
+    ]).execute()
+
+    const first = {recipientActorId, actorId, resourceType: 'post', resourceId}
+    const second = {recipientActorId, actorId: secondActorId, resourceType: 'post', resourceId}
+    await Promise.all([
+      handleSocialNotification(db, 'reaction', first),
+      handleSocialNotification(db, 'reaction', second),
+    ])
+    await handleSocialNotification(db, 'reaction', first)
+
+    const rows = await db.selectFrom('notifications').select(['aggregate_count', 'body'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .execute()
+    expect(rows).toEqual([{aggregate_count: 2, body: '2 people reacted to your post'}])
+
+    await db.deleteFrom('greenfield_reactions').where('post_id', '=', resourceId).execute()
+    await db.deleteFrom('notifications').where('resource_id', '=', resourceId).execute()
+    await db.deleteFrom('posts').where('id', '=', resourceId).execute()
+    await db.deleteFrom('actors').where('id', '=', secondActorId).execute()
+    await db.deleteFrom('greenfield_accounts').where('account_id', '=', secondActorAccountId).execute()
   })
 
   it('suppresses generic and social notifications across a block in either direction', async () => {

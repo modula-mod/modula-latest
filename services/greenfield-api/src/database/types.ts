@@ -32,6 +32,7 @@ export type AuthenticationChallengeResult = 'succeeded' | 'failed' | 'expired' |
 export type AuthenticationDeliveryChannel = 'email' | 'authenticator' | 'webauthn' | 'recovery' | 'internal' | 'external'
 export type SecurityEventSeverity = 'info' | 'notice' | 'warning' | 'critical'
 export type NotificationType = 'follow' | 'like' | 'repost' | 'reply' | 'mention' | 'module_event'
+export type FollowRequestStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED'
 export type ReportTargetType = 'profile' | 'post' | 'comment' | 'story' | 'message' | 'other'
 export type ReportCategory = 'spam' | 'harassment' | 'impersonation' | 'illegal-content' | 'privacy' | 'other'
 export type ReportStatus = 'open' | 'reviewing' | 'resolved' | 'dismissed'
@@ -403,6 +404,16 @@ export interface Database {
     created_at: Date
     updated_at: Date
     deleted_at: Date | null
+    version: number
+  }
+  follow_requests: {
+    request_id: string
+    requester_actor_id: string
+    target_actor_id: string
+    status: FollowRequestStatus
+    created_at: Date
+    updated_at: Date
+    resolved_at: Date | null
     version: number
   }
   post_likes: {

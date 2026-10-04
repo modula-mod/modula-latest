@@ -147,19 +147,34 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
     expect(after.statusCode).toBe(200)
   })
 
-  it('[EXPECTED FAILURE] proves legacy invocation accepts another account installation ID', async () => {
+  it('hides foreign installations and binds legacy functions to the owned installation version', async () => {
     const fixture = await seedModuleFixture(db, accountA)
-    const response = await app.inject({
+    const otherFixture = await seedModuleFixture(db, accountA)
+    const foreign = await app.inject({
       method: 'POST', url: `/v1/functions/${fixture.functionId}/invoke`, headers: auth(tokenB),
       payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
     })
-    // The safe fixture has no URL. Reaching function validation proves that the
-    // foreign installation capability was accepted instead of owner-denied.
-    expect(response.statusCode).toBe(400)
-    expect(response.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Remote function URL missing'})
+    expect(foreign.statusCode, foreign.body).toBe(404)
+    expect(foreign.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Installation not found'})
+
+    const mismatchedFunction = await app.inject({
+      method: 'POST', url: `/v1/functions/${otherFixture.functionId}/invoke`, headers: auth(tokenA),
+      payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
+    })
+    expect(mismatchedFunction.statusCode, mismatchedFunction.body).toBe(404)
+    expect(mismatchedFunction.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Function not found'})
+
+    const owned = await app.inject({
+      method: 'POST', url: `/v1/functions/${fixture.functionId}/invoke`, headers: auth(tokenA),
+      payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
+    })
+    // The fixture intentionally has no URL. Its owner reaching function
+    // validation proves the scoped installation and capability were accepted.
+    expect(owned.statusCode, owned.body).toBe(400)
+    expect(owned.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Remote function URL missing'})
   })
 
-  it('[EXPECTED FAILURE] proves reconnect and cancel accept another account stream ID', async () => {
+  it('hides foreign AI streams from reconnect and cancel without mutating them', async () => {
     const repository = new GreenfieldAIRepository(db)
     const requestId = `api-atlas-request-${suffix}`
     await repository.createRequestLedger({
@@ -173,22 +188,39 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
       streamingUsed: true,
     })
     const streamId = await repository.createStream({requestId, accountId: accountA, moduleId: 'digital.modula.api-atlas-fixture', correlationId: `api-atlas-${suffix}`})
-    const reconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenB)})
+    const foreignReconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenB)})
+    expect(foreignReconnect.statusCode, foreignReconnect.body).toBe(404)
+    expect(foreignReconnect.json().error).toMatchObject({code: 'NOT_FOUND', message: 'AI stream not found'})
+    expect((await repository.requireStream(streamId)).status).toBe('open')
+
+    const foreignCancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenB)})
+    expect(foreignCancel.statusCode, foreignCancel.body).toBe(404)
+    expect(foreignCancel.json().error).toMatchObject({code: 'NOT_FOUND', message: 'AI stream not found'})
+    expect((await repository.requireStream(streamId)).status).toBe('open')
+
+    const reconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenA)})
     expect(reconnect.statusCode, reconnect.body).toBe(200)
     expect(reconnect.json().data).toMatchObject({streamId, status: 'reconnecting'})
     await repository.updateStream({streamId, status: 'open'})
-    const cancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenB)})
+    const cancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenA)})
     expect(cancel.statusCode, cancel.body).toBe(200)
     expect(cancel.json().data.cancelled).toBe(true)
     expect((await repository.requireStream(streamId)).status).toBe('cancelled')
   })
 
-  it('[EXPECTED FAILURE] proves missing permission review falls back to manifest permissions', async () => {
+  it('fails closed when a module permission review is missing', async () => {
     const fixture = await seedModuleFixture(db, accountB)
     const review = await db.selectFrom('greenfield_module_permission_reviews').select('review_id').where('installation_id', '=', fixture.installationId).executeTakeFirst()
     expect(review).toBeUndefined()
     const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountB, fixture.moduleId, {requireEnabled: true})
-    expect(context.grantedPermissions).toContain('api-atlas:fixture:read')
+    expect(context.permissionReviewRequired).toBe(true)
+    expect(context.grantedPermissions).toEqual([])
+    try {
+      new GreenfieldModuleRuntimeAccessService(db).enforceCapability(context, 'api-atlas:fixture:read')
+      throw new Error('Expected missing review to be denied')
+    } catch (error) {
+      expect(error).toMatchObject({code: 'PERMISSION_REVIEW_REQUIRED'})
+    }
   })
 
   it('denies cross-account module installation, settings and private record access', async () => {

@@ -23,7 +23,6 @@ import {allRuntimePermissionKeys} from './runtime2-service.js'
 
 /** Release states a user may switch to. Superseded releases stay immutable and published. */
 export const SWITCHABLE_RELEASE_STATES = ['published', 'superseded'] as const
-const REJECTED_SIGNATURE_STATES = ['invalid', 'unknownKey', 'revokedKey']
 const PLATFORMS = ['ios', 'android', 'web', 'desktop', 'server'] as const
 type Platform = typeof PLATFORMS[number]
 
@@ -211,7 +210,7 @@ export class GreenfieldModuleVersionSwitchService {
   static assertAllowed(evaluation: VersionSwitchEvaluation) {
     const blocker = evaluation.blockers[0]
     if (!blocker) return
-    const forbidden = ['RELEASE_NOT_SWITCHABLE', 'RELEASE_REVOKED', 'RELEASE_QUARANTINED', 'SIGNATURE_REJECTED']
+    const forbidden = ['RELEASE_NOT_SWITCHABLE', 'RELEASE_REVOKED', 'RELEASE_QUARANTINED', 'UNTRUSTED_RELEASE']
     throw moduleError(forbidden.includes(blocker.code) ? 'FORBIDDEN' : 'VALIDATION_FAILED', `${blocker.code}: ${blocker.message}`)
   }
 
@@ -222,7 +221,8 @@ export class GreenfieldModuleVersionSwitchService {
     if (!(SWITCHABLE_RELEASE_STATES as readonly string[]).includes(release.releaseState) && !blockers.length) {
       blockers.push({code: 'RELEASE_NOT_SWITCHABLE', message: `${release.version} is ${release.releaseState}, not published.`})
     }
-    if (REJECTED_SIGNATURE_STATES.includes(trust.signature.state)) blockers.push({code: 'SIGNATURE_REJECTED', message: `The release signature is ${trust.signature.state}.`})
+    const allowDevelopmentRelease = this.config.environment === 'development' && this.config.moduleAllowUntrustedDevelopmentReleases
+    if (!trust.verified && !allowDevelopmentRelease) blockers.push({code: 'UNTRUSTED_RELEASE', message: `The release is not production-trusted (signature: ${trust.signature.state}).`})
     if (trust.compatibility.evaluated && trust.compatibility.compatible === false) {
       blockers.push({code: 'HOST_INCOMPATIBLE', message: trust.compatibility.reasons.map(reason => `${reason.code}: ${reason.message}`).join(' ')})
     }

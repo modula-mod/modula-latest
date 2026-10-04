@@ -1,5 +1,7 @@
 import {randomUUID} from 'node:crypto'
+import {sql, type Transaction} from 'kysely'
 import type {ModulaDb} from '../../database/client.js'
+import type {Database} from '../../database/types.js'
 import {AuditRepository} from '../audit/repository.js'
 import {GreenfieldEventBus} from '../../events/index.js'
 import {OutboxRepository} from '../outbox/repository.js'
@@ -47,6 +49,27 @@ export type ProfileWriteContext = {
 
 export type ProfileMediaKind = 'avatar' | 'cover'
 
+export type FollowRelationshipState = 'none' | 'pending' | 'following'
+
+export type FollowMutationResult = {
+  relationship: FollowRelationshipState
+  following: boolean
+  pending: boolean
+  requestId?: string
+}
+
+export type IncomingFollowRequest = {
+  requestId: string
+  requester: {
+    id: string
+    actorId: string
+    handle: string
+    displayName: string
+    avatarUri?: string
+  }
+  createdAt: string
+}
+
 export class ProfileWriteService {
   private readonly profiles: ProfileRepository
 
@@ -54,10 +77,10 @@ export class ProfileWriteService {
     this.profiles = new ProfileRepository(db)
   }
 
-  async follow(followerActorId: string, profileId: string): Promise<void> {
+  async follow(followerActorId: string, profileId: string): Promise<FollowMutationResult> {
     const target = await this.db
       .selectFrom('profiles')
-      .selectAll()
+      .select(['id', 'actor_id', 'visibility'])
       .where('id', '=', profileId)
       .where('deleted_at', 'is', null)
       .executeTakeFirst()
@@ -65,84 +88,225 @@ export class ProfileWriteService {
     if (target.actor_id === followerActorId) {
       throw Object.assign(new Error('Cannot follow yourself'), {code: 'VALIDATION_FAILED'})
     }
-    const blocked = await this.db
-      .selectFrom('blocks')
-      .select('id')
-      .where('deleted_at', 'is', null)
-      .where(({eb, or, and}) =>
-        or([
-          and([eb('blocker_actor_id', '=', followerActorId), eb('blocked_actor_id', '=', target.actor_id)]),
-          and([eb('blocker_actor_id', '=', target.actor_id), eb('blocked_actor_id', '=', followerActorId)]),
-        ]),
-      )
-      .executeTakeFirst()
-    if (blocked) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
-    await this.db.transaction().execute(async trx => {
-      const existing = await trx
-        .selectFrom('follows')
-        .selectAll()
+    return this.db.transaction().execute(async trx => {
+      await lockRelationship(trx, followerActorId, target.actor_id)
+      const currentTarget = await trx.selectFrom('profiles').select(['id', 'actor_id', 'visibility'])
+        .where('id', '=', profileId).where('actor_id', '=', target.actor_id)
+        .where('deleted_at', 'is', null).forShare().executeTakeFirst()
+      if (!currentTarget || await isBlockedEitherDirection(trx, followerActorId, currentTarget.actor_id)) {
+        throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
+      }
+      const activeFollow = await trx.selectFrom('follows').select('id')
         .where('follower_actor_id', '=', followerActorId)
-        .where('followed_actor_id', '=', target.actor_id)
+        .where('followed_actor_id', '=', currentTarget.actor_id)
+        .where('deleted_at', 'is', null)
         .executeTakeFirst()
+      if (activeFollow) return followResult('following')
+
       const now = new Date()
-      let changed = false
-      if (!existing) {
-        await trx
-          .insertInto('follows')
-          .values({
-            id: randomUUID(),
-            follower_actor_id: followerActorId,
-            followed_actor_id: target.actor_id,
+      if (currentTarget.visibility !== 'public') {
+        const existingRequest = await trx.selectFrom('follow_requests').selectAll()
+          .where('requester_actor_id', '=', followerActorId)
+          .where('target_actor_id', '=', currentTarget.actor_id)
+          .forUpdate()
+          .executeTakeFirst()
+        if (existingRequest?.status === 'PENDING') {
+          return followResult('pending', existingRequest.request_id)
+        }
+        const requestId = existingRequest?.request_id ?? randomUUID()
+        if (existingRequest) {
+          await trx.updateTable('follow_requests').set({
+            status: 'PENDING', created_at: now, updated_at: now, resolved_at: null,
+            version: existingRequest.version + 1,
+          }).where('request_id', '=', requestId).execute()
+        } else {
+          await trx.insertInto('follow_requests').values({
+            request_id: requestId,
+            requester_actor_id: followerActorId,
+            target_actor_id: currentTarget.actor_id,
+            status: 'PENDING',
             created_at: now,
             updated_at: now,
-            deleted_at: null,
+            resolved_at: null,
             version: 1,
-          })
-          .execute()
-        changed = true
-      } else if (existing.deleted_at) {
-        await trx
-          .updateTable('follows')
-          .set({deleted_at: null, updated_at: now, version: existing.version + 1})
-          .where('id', '=', existing.id)
-          .execute()
-        changed = true
+          }).execute()
+        }
+        await new OutboxRepository(trx).enqueue(trx, {
+          eventType: 'notification.create',
+          aggregateType: 'follow-request',
+          aggregateId: requestId,
+          payload: {
+            type: 'follow',
+            actorId: followerActorId,
+            recipientActorId: currentTarget.actor_id,
+            resourceType: 'profile',
+            resourceId: currentTarget.id,
+            dedupeKey: `follow-request:${requestId}:requested`,
+            body: 'requested to follow you',
+          },
+        })
+        await new AuditRepository(trx).append('follow.requested', {requestId}, {
+          type: 'profile', id: currentTarget.id, actorId: followerActorId,
+        })
+        return followResult('pending', requestId)
       }
-      if (!changed) return
-      await new OutboxRepository(this.db).enqueue(trx, {
+
+      await activateFollow(trx, followerActorId, currentTarget.actor_id, now)
+      await trx.updateTable('follow_requests').set({
+        status: 'ACCEPTED', resolved_at: now, updated_at: now,
+        version: sql<number>`version + 1`,
+      }).where('requester_actor_id', '=', followerActorId)
+        .where('target_actor_id', '=', currentTarget.actor_id)
+        .where('status', '=', 'PENDING').execute()
+      await new OutboxRepository(trx).enqueue(trx, {
         eventType: 'notification.create',
         aggregateType: 'follow',
-        aggregateId: `${followerActorId}:${target.actor_id}`,
+        aggregateId: `${followerActorId}:${currentTarget.actor_id}`,
         payload: {
           type: 'follow',
           actorId: followerActorId,
-          recipientActorId: target.actor_id,
+          recipientActorId: currentTarget.actor_id,
           resourceType: 'profile',
-          resourceId: target.id,
+          resourceId: currentTarget.id,
         },
       })
       await new AuditRepository(trx).append('follow.created', {}, {
         type: 'profile',
-        id: target.id,
+        id: currentTarget.id,
         actorId: followerActorId,
       })
+      return followResult('following')
     })
   }
 
-  async unfollow(followerActorId: string, profileId: string): Promise<void> {
+  async unfollow(followerActorId: string, profileId: string): Promise<FollowMutationResult> {
     const target = await this.db
       .selectFrom('profiles')
       .select('actor_id')
       .where('id', '=', profileId)
       .executeTakeFirst()
     if (!target) throw Object.assign(new Error('Profile not found'), {code: 'NOT_FOUND'})
-    await this.db
-      .updateTable('follows')
-      .set({deleted_at: new Date(), updated_at: new Date()})
-      .where('follower_actor_id', '=', followerActorId)
-      .where('followed_actor_id', '=', target.actor_id)
-      .where('deleted_at', 'is', null)
-      .execute()
+    await this.db.transaction().execute(async trx => {
+      await lockRelationship(trx, followerActorId, target.actor_id)
+      const now = new Date()
+      await trx.updateTable('follows').set({deleted_at: now, updated_at: now, version: sql<number>`version + 1`})
+        .where('follower_actor_id', '=', followerActorId)
+        .where('followed_actor_id', '=', target.actor_id)
+        .where('deleted_at', 'is', null).execute()
+      await trx.updateTable('follow_requests').set({
+        status: 'CANCELLED', resolved_at: now, updated_at: now, version: sql<number>`version + 1`,
+      }).where('requester_actor_id', '=', followerActorId)
+        .where('target_actor_id', '=', target.actor_id)
+        .where('status', 'in', ['PENDING', 'ACCEPTED']).execute()
+    })
+    return followResult('none')
+  }
+
+  async listIncomingFollowRequests(
+    targetActorId: string,
+    limit: number,
+    cursor: string | null,
+  ): Promise<IncomingFollowRequest[]> {
+    let query = this.db.selectFrom('follow_requests')
+      .innerJoin('profiles', 'profiles.actor_id', 'follow_requests.requester_actor_id')
+      .select([
+        'follow_requests.request_id', 'follow_requests.requester_actor_id', 'follow_requests.created_at',
+        'profiles.id as profile_id', 'profiles.handle', 'profiles.display_name', 'profiles.avatar_url',
+      ])
+      .where('follow_requests.target_actor_id', '=', targetActorId)
+      .where('follow_requests.status', '=', 'PENDING')
+      .where('profiles.deleted_at', 'is', null)
+      .orderBy('follow_requests.created_at', 'desc')
+      .orderBy('follow_requests.request_id', 'desc')
+      .limit(limit + 1)
+    if (cursor) {
+      const cursorRow = await this.db.selectFrom('follow_requests').select(['created_at', 'request_id'])
+        .where('request_id', '=', cursor)
+        .where('target_actor_id', '=', targetActorId)
+        .executeTakeFirst()
+      if (!cursorRow) throw Object.assign(new Error('Invalid cursor'), {code: 'VALIDATION_FAILED'})
+      query = query.where(({eb, or, and}) => or([
+        eb('follow_requests.created_at', '<', cursorRow.created_at),
+        and([
+          eb('follow_requests.created_at', '=', cursorRow.created_at),
+          eb('follow_requests.request_id', '<', cursorRow.request_id),
+        ]),
+      ]))
+    }
+    const rows = await query.execute()
+    return rows.map(row => ({
+      requestId: row.request_id,
+      requester: {
+        id: row.profile_id,
+        actorId: row.requester_actor_id,
+        handle: row.handle,
+        displayName: row.display_name,
+        ...(row.avatar_url ? {avatarUri: row.avatar_url} : {}),
+      },
+      createdAt: row.created_at.toISOString(),
+    }))
+  }
+
+  async acceptFollowRequest(targetActorId: string, requestId: string): Promise<FollowMutationResult> {
+    return this.db.transaction().execute(async trx => {
+      const initial = await ownedFollowRequest(trx, requestId, 'target_actor_id', targetActorId)
+      await lockRelationship(trx, initial.requester_actor_id, initial.target_actor_id)
+      const request = await ownedFollowRequest(trx, requestId, 'target_actor_id', targetActorId, true)
+      if (await isBlockedEitherDirection(trx, request.requester_actor_id, request.target_actor_id)) {
+        throw Object.assign(new Error('Follow request not found'), {code: 'NOT_FOUND'})
+      }
+      if (request.status === 'ACCEPTED') return followResult('following', requestId)
+      if (request.status !== 'PENDING') throw Object.assign(new Error('Follow request is no longer pending'), {code: 'CONFLICT'})
+      const now = new Date()
+      await trx.updateTable('follow_requests').set({
+        status: 'ACCEPTED', resolved_at: now, updated_at: now, version: request.version + 1,
+      }).where('request_id', '=', requestId).where('status', '=', 'PENDING').executeTakeFirst()
+      await activateFollow(trx, request.requester_actor_id, request.target_actor_id, now)
+      await new OutboxRepository(trx).enqueue(trx, {
+        eventType: 'notification.create', aggregateType: 'follow-request', aggregateId: requestId,
+        payload: {
+          type: 'follow', actorId: request.target_actor_id, recipientActorId: request.requester_actor_id,
+          resourceType: 'profile', resourceId: request.target_actor_id,
+          dedupeKey: `follow-request:${requestId}:accepted`, body: 'accepted your follow request',
+        },
+      })
+      await new AuditRepository(trx).append('follow.accepted', {requestId}, {
+        type: 'profile', id: request.target_actor_id, actorId: targetActorId,
+      })
+      return followResult('following', requestId)
+    })
+  }
+
+  async rejectFollowRequest(targetActorId: string, requestId: string): Promise<FollowMutationResult> {
+    return this.resolvePendingRequest(requestId, 'target_actor_id', targetActorId, 'REJECTED', 'follow.rejected')
+  }
+
+  async cancelFollowRequest(requesterActorId: string, requestId: string): Promise<FollowMutationResult> {
+    return this.resolvePendingRequest(requestId, 'requester_actor_id', requesterActorId, 'CANCELLED', 'follow.cancelled')
+  }
+
+  private async resolvePendingRequest(
+    requestId: string,
+    ownerColumn: 'requester_actor_id' | 'target_actor_id',
+    ownerActorId: string,
+    status: 'REJECTED' | 'CANCELLED',
+    auditAction: string,
+  ): Promise<FollowMutationResult> {
+    return this.db.transaction().execute(async trx => {
+      const initial = await ownedFollowRequest(trx, requestId, ownerColumn, ownerActorId)
+      await lockRelationship(trx, initial.requester_actor_id, initial.target_actor_id)
+      const request = await ownedFollowRequest(trx, requestId, ownerColumn, ownerActorId, true)
+      if (request.status === status) return followResult('none', requestId)
+      if (request.status !== 'PENDING') throw Object.assign(new Error('Follow request is no longer pending'), {code: 'CONFLICT'})
+      const now = new Date()
+      await trx.updateTable('follow_requests').set({
+        status, resolved_at: now, updated_at: now, version: request.version + 1,
+      }).where('request_id', '=', requestId).where('status', '=', 'PENDING').execute()
+      await new AuditRepository(trx).append(auditAction, {requestId}, {
+        type: 'profile', id: request.target_actor_id, actorId: ownerActorId,
+      })
+      return followResult('none', requestId)
+    })
   }
 
   async updateMe(
@@ -359,6 +523,77 @@ export class ProfileWriteService {
       .executeTakeFirst()
     return row?.actor_id ?? null
   }
+}
+
+function followResult(relationship: FollowRelationshipState, requestId?: string): FollowMutationResult {
+  return {
+    relationship,
+    following: relationship === 'following',
+    pending: relationship === 'pending',
+    ...(requestId ? {requestId} : {}),
+  }
+}
+
+async function lockRelationship(
+  trx: Transaction<Database>,
+  actorA: string,
+  actorB: string,
+): Promise<void> {
+  const key = [actorA, actorB].sort().join(':')
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`.execute(trx)
+}
+
+async function isBlockedEitherDirection(
+  trx: Transaction<Database>,
+  actorA: string,
+  actorB: string,
+): Promise<boolean> {
+  const row = await trx.selectFrom('blocks').select('id').where('deleted_at', 'is', null)
+    .where(({eb, or, and}) => or([
+      and([eb('blocker_actor_id', '=', actorA), eb('blocked_actor_id', '=', actorB)]),
+      and([eb('blocker_actor_id', '=', actorB), eb('blocked_actor_id', '=', actorA)]),
+    ])).executeTakeFirst()
+  return Boolean(row)
+}
+
+async function activateFollow(
+  trx: Transaction<Database>,
+  followerActorId: string,
+  followedActorId: string,
+  now: Date,
+): Promise<void> {
+  const existing = await trx.selectFrom('follows').selectAll()
+    .where('follower_actor_id', '=', followerActorId)
+    .where('followed_actor_id', '=', followedActorId)
+    .forUpdate().executeTakeFirst()
+  if (existing) {
+    if (existing.deleted_at) {
+      await trx.updateTable('follows').set({
+        deleted_at: null, updated_at: now, version: existing.version + 1,
+      }).where('id', '=', existing.id).execute()
+    }
+    return
+  }
+  await trx.insertInto('follows').values({
+    id: randomUUID(), follower_actor_id: followerActorId, followed_actor_id: followedActorId,
+    created_at: now, updated_at: now, deleted_at: null, version: 1,
+  }).execute()
+}
+
+async function ownedFollowRequest(
+  trx: Transaction<Database>,
+  requestId: string,
+  ownerColumn: 'requester_actor_id' | 'target_actor_id',
+  ownerActorId: string,
+  lock = false,
+): Promise<Database['follow_requests']> {
+  let query = trx.selectFrom('follow_requests').selectAll()
+    .where('request_id', '=', requestId)
+    .where(ownerColumn, '=', ownerActorId)
+  if (lock) query = query.forUpdate()
+  const request = await query.executeTakeFirst()
+  if (!request) throw Object.assign(new Error('Follow request not found'), {code: 'NOT_FOUND'})
+  return request
 }
 
 function boundedText(value: string, max: number, label: string): string {
