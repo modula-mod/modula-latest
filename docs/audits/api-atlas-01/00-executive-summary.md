@@ -1,6 +1,6 @@
 # GREENFIELD API ATLAS
 
-Production SHA: `b45b5be4844befd451b827bbc30f4d48f0ac34d1`
+Production SHA: `11bfc7638c6d757215e75a934d02e40c9a40c839`
 Production migration: `063_settings_backend_v2`
 API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
@@ -26,11 +26,11 @@ Complete capabilities: 32
 Partial capabilities: 12
 Missing capabilities: 5
 P0 gaps: 0
-P1 gaps: 16
+P1 gaps: 15
 P2 gaps: 20
 P3 gaps: 4
 
-Status: **PASS**. The map is complete: 35 bounded anonymous probes, 46 authenticated production checks, and 28 controlled ownership/trust checks passed. Known defects remain registered and regression-tested.
+Status: **PASS**. The map is complete: 35 bounded anonymous probes, 82 authenticated production checks, and 28 controlled ownership/trust checks passed. Known defects remain registered and regression-tested.
 
 ## Domain summary
 
@@ -56,7 +56,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 46 authentic
 
 ## Production conclusions
 
-- The running API and worker are the same OCI revision, `b45b5be4844befd451b827bbc30f4d48f0ac34d1`; that revision differs from captured `origin/main` and remains a release-governance gap.
+- The running API and worker are the same OCI revision, `11bfc7638c6d757215e75a934d02e40c9a40c839`; that revision exactly matches captured `origin/main`.
 - Source/runtime reconciliation is exact: 551 = 393 application routes + 158 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.

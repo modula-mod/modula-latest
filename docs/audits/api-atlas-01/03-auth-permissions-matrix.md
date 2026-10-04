@@ -400,7 +400,7 @@ This matrix distinguishes transport reachability from application authorization.
 
 ## Authenticated acceptance evidence
 
-Atlas status: **PASS**. Production authenticated checks: 46 passed / 0 failed. Controlled exact-schema ownership/trust checks: 28 passed / 0 failed.
+Atlas status: **PASS**. Production authenticated checks: 82 passed / 0 failed. Controlled exact-schema ownership/trust checks: 28 passed / 0 failed.
 
 | Disposition | HTTP status | Error contract | Result |
 | --- | --- | --- | --- |

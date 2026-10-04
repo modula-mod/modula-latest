@@ -915,6 +915,11 @@ The preferred paths are canonical attachments, account security/session contract
 function renderProductionTruth() {
   const envRows = [...Object.entries(snapshot.config.api.safe), ...Object.entries(snapshot.config.worker.safe).map(([key, value]) => [`worker:${key}`, value])]
   const secretRows = [...Object.entries(snapshot.config.api.secrets), ...Object.entries(snapshot.config.worker.secrets).map(([key, value]) => [`worker:${key}`, value])]
+  const runningRevision = snapshot.containers.api.revision
+  const runningRevisionShort = runningRevision.slice(0, 7)
+  const runningRevisionRelationship = runningRevision === snapshot.repository.head && runningRevision === snapshot.repository.originMain
+    ? 'It matches canonical checkout HEAD and `origin/main`.'
+    : `Canonical checkout HEAD is \`${snapshot.repository.head}\` and \`origin/main\` is \`${snapshot.repository.originMain}\`.`
   return `Observed production truth at ${snapshot.capturedAt}: api.modula.digital terminates at nginx and proxies to a healthy loopback-only Fastify container running \`${snapshot.containers.api.revision}\`, backed by PostgreSQL ${snapshot.databaseSchema.serverVersion}, a same-revision worker, host-bound media storage, and an apparently unused Redis service.
 
 # Production Truth
@@ -925,7 +930,7 @@ function renderProductionTruth() {
 - Canonical checkout: \`${snapshot.repository.canonicalPath}\`; origin: \`${snapshot.repository.origin}\`; branch: \`${snapshot.repository.branch}\`; HEAD: \`${snapshot.repository.head}\`.
 - Canonical checkout is dirty: ${snapshot.repository.trackedChanges.split('\n').filter(Boolean).length} tracked modifications and ${snapshot.repository.untrackedFiles.split('\n').filter(Boolean).length} untracked files. Those files were not changed by this audit.
 - \`origin/main\` at capture: \`${snapshot.repository.originMain}\`.
-- Running SHA: \`${snapshot.containers.api.revision}\`. It is not canonical checkout HEAD and not \`origin/main\`. OCI revision, \`/version.json\`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
+- Running SHA: \`${runningRevision}\`. ${runningRevisionRelationship} OCI revision, \`/version.json\`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
 - Audit worktree: \`${snapshot.repository.auditPath}\`, branch \`${snapshot.repository.auditBranch}\`.
 
 ## Runtime inventory
@@ -950,11 +955,11 @@ ${mdTable(['Role','Container/image','Created','Ports','Health','Revision'], [
 flowchart TD
   internet[Internet clients] --> dns[Cloudflare DNS and TLS path]
   dns --> nginx[nginx api.modula.digital]
-  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API c7c46df]
+  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API ${runningRevisionShort}]
   api --> postgres[(PostgreSQL 16.9 named volume)]
   api --> media[(Host bind /var/lib/modula/greenfield-media)]
   api --> outbox[(PostgreSQL outbox and jobs)]
-  outbox --> worker[GreenField worker c7c46df]
+  outbox --> worker[GreenField worker ${snapshot.containers.worker.revision.slice(0, 7)}]
   api --> ai[Internal Modula AI backend when configured]
   api --> secrets[Internal secrets service]
   redis[(Redis 7.4 no persistence)] -. no source consumer found .- api

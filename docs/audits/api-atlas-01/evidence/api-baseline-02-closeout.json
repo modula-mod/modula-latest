@@ -13,6 +13,47 @@
       "follower-only profile follow becomes active without approval"
     ]
   },
+  "concurrentReleaseReconciliation": {
+    "detectedProductionSha": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+    "pullRequest": 105,
+    "migration": "063_settings_backend_v2",
+    "routesAdded": 9,
+    "initialAtlasResult": "84/85 failed with nine source-only Settings V2 routes",
+    "finalAtlasResult": "85/85 passed with 393 application routes and zero source-only or runtime-only routes",
+    "prCiBefore": "failed Atlas contract drift",
+    "prCiAfter": "atlas, repository-validation and migration-validation passed",
+    "prHeadSha": "4eff6a6fb3eefaab9c90b452c280eb5c5431ea6b",
+    "mergeSha": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+    "productionLineage": "b45b5be backfilled; canonical main 11bfc763 deployed and verified",
+    "settingsV2AuthenticatedAcceptance": "82/82 production checks passed",
+    "crossUserAcceptance": "A and B remained account-scoped across reads, writes and target-identifier manipulation",
+    "dataDisposition": "the original migration-063 preference row was preserved; two reserved audit-account rows were restored to their prior values and retained because no supported delete route exists"
+  },
+  "deploymentLineage": {
+    "reconciled": true,
+    "originMain": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+    "deployedSha": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+    "apiImageId": "sha256:dfd497932257da836519712e5385bd9f6eb2206459324803d5de6096389c82bf",
+    "workerImageId": "sha256:351e97e04e4a8149cc9c0040695fbf9b7c89d540d0687fa1a47e572fbfa8247d",
+    "releaseId": "api-baseline-02-11bfc7638c6d",
+    "migration": "063_settings_backend_v2",
+    "record": "/var/lib/modula/deployments/11bfc7638c6d757215e75a934d02e40c9a40c839.json",
+    "backfilledRecord": "/var/lib/modula/deployments/b45b5be4844befd451b827bbc30f4d48f0ac34d1.json"
+  },
+  "auditIdentities": {
+    "handles": ["api-atlas-a", "api-atlas-b"],
+    "discoveryExcluded": true,
+    "notificationsSuppressed": true,
+    "secretsCommitted": false,
+    "fixtureCleanup": "marker-scoped posts, comments, media, records, follows and profile state cleaned; settings restored through supported PATCH"
+  },
+  "dataDisposition": {
+    "appPreferenceRowsBeforeAcceptance": 1,
+    "appPreferenceRowsAfterAcceptance": 3,
+    "preExistingRowPreserved": true,
+    "auditIdentityRows": 2,
+    "allRowsValidJsonObjects": true
+  },
   "tests": {
     "apiTypecheck": "passed",
     "workerTypecheck": "passed",
@@ -20,6 +61,8 @@
     "worker": "11/11 standard and 22/22 pre-migrated database acceptance passed",
     "atlas": "85/85 passed",
     "productionProbes": "35/35 passed against Settings V2 production revision",
+    "authenticatedProductionAcceptance": "82/82 passed with 9/9 cleanup dispositions passed",
+    "deploymentLineage": "8/8 revision, image, environment, public version, migration and worker heartbeat checks passed",
     "secretScan": "passed"
   }
 }

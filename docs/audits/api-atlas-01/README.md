@@ -2,7 +2,7 @@
 
 Status: **PASS**. Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled. Route completeness passed: 551 runtime method routes = 393 mapped application routes + 158 explicitly excluded framework-derived routes. Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.
 
-This directory is the canonical evidence-backed snapshot captured at 2026-10-04T08:18:44.111Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Secret values and production row data are excluded.
+This directory is the canonical evidence-backed snapshot captured at 2026-10-04T08:58:59.613Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Secret values and production row data are excluded.
 
 ## Contents
 
