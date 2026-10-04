@@ -56,7 +56,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 82 authentic
 
 ## Production conclusions
 
-- The running API and worker are the same OCI revision, `11bfc7638c6d757215e75a934d02e40c9a40c839`; that revision exactly matches captured `origin/main`.
+- The running API and worker are the same OCI revision, `11bfc7638c6d757215e75a934d02e40c9a40c839`; its accepted relationship to canonical `origin/main` is recorded in the deployment-lineage closeout.
 - Source/runtime reconciliation is exact: 551 = 393 application routes + 158 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.

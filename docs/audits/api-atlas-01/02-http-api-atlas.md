@@ -1,6 +1,6 @@
 # Complete HTTP API Atlas
 
-Captured: 2026-10-04T08:58:59.613Z
+Captured: 2026-10-04T15:10:21.196Z
 
 - Runtime method routes: 551
 - Application routes: 393

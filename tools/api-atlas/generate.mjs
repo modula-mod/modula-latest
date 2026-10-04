@@ -1088,6 +1088,19 @@ The descriptor service (\`install-descriptor-service.ts:14\`, \`:77\`) returns m
 
 Historical \`removed\` and \`uninstalled\` rows are excluded by centralized active-status logic (\`installation-status.ts:1\`) and runtime access checks. No stale historical row bug was reproduced. A distinct security gap remains: \`runtime-access.ts:71\` falls back to all manifest permissions if a review row is absent; ${op.activeInstallPermissionReviews.withoutReview} active production installations are in that state.
 
+### Missing permission-review inventory
+
+This inventory excludes account and installation identifiers. It records only the module and authorization facts needed for remediation.
+
+${mdTable(['Module ID','Requested permission classes','Requested permissions','Review row present','Effective authorization source'],
+    (op.activeInstallPermissionReviews.missingReviews ?? []).map(review => [
+      `\`${review.moduleId}\``,
+      review.requestedPermissionClasses.join(', '),
+      review.requestedPermissions.join(', '),
+      String(review.reviewRowPresent),
+      review.effectiveAuthorizationSource,
+    ]))}
+
 ## Runtime, records and functions
 
 - Record create/read/update/delete/list/filter/sort/cursor paths are registered under module-scoped routes. \`record-service.ts:42\`, \`:98\`, \`:216\` validates schema and scopes SQL to account + installation + module collection.
