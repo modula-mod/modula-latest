@@ -1,24 +1,24 @@
 {
-  "capturedAt": "2026-10-03T10:02:55.876Z",
+  "capturedAt": "2026-10-04T08:18:44.111Z",
   "hostname": "core.modula.digital",
   "os": "Ubuntu 24.04.4 LTS",
   "kernel": "Linux 6.8.0-137-generic",
   "architecture": "x86_64",
-  "uptime": "up 7 weeks, 6 days, 11 hours, 20 minutes",
+  "uptime": "up 8 weeks, 9 hours, 36 minutes",
   "repository": {
     "canonicalPath": "/root/modula-latest",
     "origin": "https://github.com/modula-mod/modula-latest.git",
-    "branch": "fix/n4-foryou-private-author-hydrate",
-    "head": "80c2c0d506da50df28f342ca43e9898391afe79d",
-    "status": "## fix/n4-foryou-private-author-hydrate...origin/fix/n4-foryou-private-author-hydrate\n M ops/nginx/api.modula.digital.conf\n M services/greenfield-api/src/app/register-phase7f-stories-routes.ts\n M services/greenfield-api/src/domains/stories/service.ts\n M services/greenfield-api/tests/phase7i.f5-stories.test.ts",
-    "trackedChanges": "M\tops/nginx/api.modula.digital.conf\nM\tservices/greenfield-api/src/app/register-phase7f-stories-routes.ts\nM\tservices/greenfield-api/src/domains/stories/service.ts\nM\tservices/greenfield-api/tests/phase7i.f5-stories.test.ts",
+    "branch": "main",
+    "head": "38f33bdc3ce7de6b0c96674a7d293f2169dc4865",
+    "status": "## main...origin/main",
+    "trackedChanges": "",
     "untrackedFiles": "",
-    "originMain": "160f31d8c1cbaae55afc004162e75944e7f0cac3",
-    "auditPath": "/root/modula-worktrees/api-atlas-01",
-    "auditBranch": "audit/api-atlas-01",
-    "auditHeadAtCapture": "635152caafad5d4310b50cf1312d3cff275a2a2f",
+    "originMain": "38f33bdc3ce7de6b0c96674a7d293f2169dc4865",
+    "auditPath": "/root/modula-worktrees/api-baseline-02-settings-v2-capture",
+    "auditBranch": "",
+    "auditHeadAtCapture": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
     "tagsAtCanonicalHead": [],
-    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-170-g80c2c0d-dirty"
+    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-205-g38f33bd"
   },
   "versions": {
     "hostNode": "v24.15.0",
@@ -30,18 +30,18 @@
   "containers": {
     "api": {
       "name": "modula-production-greenfield-api-1",
-      "imageId": "sha256:ee941cbb3cbcb62af8448fef97401f9da6b876245e7843cda3678232d3a7c305",
-      "image": "modula-greenfield-api:c7c46dfa3d85b89617de833723aab8f207f0ba94",
-      "created": "2026-10-02T23:45:50.159234096Z",
-      "startedAt": "2026-10-02T23:45:50.525081612Z",
+      "imageId": "sha256:b67f8d2300ec6d9b0d910198f311ee5b0eda9dbcc4d7359ff67df34f1268d367",
+      "image": "modula-greenfield-api:b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+      "created": "2026-10-03T19:49:34.656562481Z",
+      "startedAt": "2026-10-03T19:49:35.028665353Z",
       "status": "running",
       "health": "healthy",
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-api/dist/main.js",
       "workingDir": "/app",
-      "revision": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+      "revision": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
       "source": "/root/modula-latest",
-      "composeFile": "/root/modula-post05-runtime/ops/docker/compose.production.yml",
+      "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {
         "4020/tcp": [
           {
@@ -92,6 +92,7 @@
         "MODULA_DATABASE_URL",
         "MODULA_EMAIL_VERIFICATION_TTL_HOURS",
         "MODULA_ENVIRONMENT",
+        "MODULA_EXPECTED_MIGRATION",
         "MODULA_INVITE_ONLY",
         "MODULA_LOG_LEVEL",
         "MODULA_MAIL_PROVISIONER_RELEASE_SHA",
@@ -107,6 +108,7 @@
         "MODULA_REFRESH_TOKEN_TTL_DAYS",
         "MODULA_REGISTRATION_MODE",
         "MODULA_RELEASE_BUILT_AT",
+        "MODULA_RELEASE_ID",
         "MODULA_RELEASE_SHA",
         "MODULA_REQUEST_BODY_LIMIT_BYTES",
         "MODULA_SECRETS_SERVICE_TIMEOUT_MS",
@@ -124,18 +126,18 @@
     },
     "worker": {
       "name": "modula-production-greenfield-worker-1",
-      "imageId": "sha256:cf3aaa8b68655cf8bafd1b395f88bc66955a5dce59353f82135a725fcb5f77ee",
-      "image": "modula-greenfield-worker:c7c46dfa3d85b89617de833723aab8f207f0ba94",
-      "created": "2026-10-02T23:45:50.377819847Z",
-      "startedAt": "2026-10-02T23:46:06.191640012Z",
+      "imageId": "sha256:a5079dc27e0976d5380afc6bff9f24131b8e852aebf8a1548e1257be22871515",
+      "image": "modula-greenfield-worker:b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+      "created": "2026-10-03T19:49:34.860241026Z",
+      "startedAt": "2026-10-03T19:49:50.684071021Z",
       "status": "running",
       "health": null,
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-worker/dist/main.js",
       "workingDir": "/app",
-      "revision": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+      "revision": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
       "source": "/root/modula-latest",
-      "composeFile": "/root/modula-post05-runtime/ops/docker/compose.production.yml",
+      "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {},
       "mounts": [],
       "environmentKeys": [
@@ -151,12 +153,14 @@
         "MODULA_ATPROTO_SSRF_ALLOW_PRIVATE_NETWORKS",
         "MODULA_DATABASE_URL",
         "MODULA_ENVIRONMENT",
+        "MODULA_EXPECTED_MIGRATION",
         "MODULA_LOG_LEVEL",
         "MODULA_MAIL_FROM",
         "MODULA_MAIL_PROVISIONER_RELEASE_SHA",
         "MODULA_MAIL_REQUIRED",
         "MODULA_MAIL_TRANSPORT",
         "MODULA_RELEASE_BUILT_AT",
+        "MODULA_RELEASE_ID",
         "MODULA_RELEASE_SHA",
         "MODULA_SMTP_HOST",
         "MODULA_SMTP_PASSWORD",
@@ -297,9 +301,9 @@
         "BACKEND_FABRIC_ENABLED": "false",
         "BACKEND_FABRIC_ENVIRONMENT": "production",
         "BACKEND_FABRIC_CONTRACT_VERSION": "1.0",
-        "MODULA_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
-        "MODULA_WORKER_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
-        "MODULA_RELEASE_BUILT_AT": "2026-10-02T23:43:23Z"
+        "MODULA_RELEASE_SHA": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+        "MODULA_WORKER_RELEASE_SHA": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+        "MODULA_RELEASE_BUILT_AT": "2026-10-03T19:48:10Z"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -334,7 +338,7 @@
         "GREENFIELD_MODULE_GITHUB_SYNC_ENABLED": "false",
         "GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED": "false",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED": "false",
-        "MODULA_RELEASE_SHA": "c7c46dfa3d85b89617de833723aab8f207f0ba94"
+        "MODULA_RELEASE_SHA": "b45b5be4844befd451b827bbc30f4d48f0ac34d1"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -369,37 +373,37 @@
     "docker": [
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-03 00:45:50 +0100 BST",
-        "ID": "4f314fc5ebb0",
-        "Image": "modula-greenfield-worker:c7c46dfa3d85b89617de833723aab8f207f0ba94",
-        "Labels": "com.docker.compose.config-hash=4f0fad3977a09760cec98bf9b0929f0cb3c73534df4db1a9a44fbf9e87d98d32,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:cf3aaa8b68655cf8bafd1b395f88bc66955a5dce59353f82135a725fcb5f77ee,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-post05-runtime/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-post05-runtime/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.opencontainers.image.created=,org.opencontainers.image.revision=c7c46dfa3d85b89617de833723aab8f207f0ba94,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker",
+        "CreatedAt": "2026-10-03 20:49:34 +0100 BST",
+        "ID": "fa85828f582a",
+        "Image": "modula-greenfield-worker:b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+        "Labels": "com.docker.compose.config-hash=4f26bdb58662b95cea00374d0ebe1e30f0d9a31e875e1f10ab565b8cfc99023f,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:a5079dc27e0976d5380afc6bff9f24131b8e852aebf8a1548e1257be22871515,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=063_settings_backend_v2,org.opencontainers.image.created=2026-10-03T19:48:10Z,org.opencontainers.image.revision=b45b5be4844befd451b827bbc30f4d48f0ac34d1,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=settings-v2-b45b5be4844b",
         "LocalVolumes": "0",
         "Mounts": "",
         "Names": "modula-production-greenfield-worker-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "",
-        "RunningFor": "10 hours ago",
+        "RunningFor": "12 hours ago",
         "Size": "0B (virtual 2.5GB)",
         "State": "running",
-        "Status": "Up 10 hours"
+        "Status": "Up 12 hours"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-03 00:45:50 +0100 BST",
-        "ID": "50e8c6362bd0",
-        "Image": "modula-greenfield-api:c7c46dfa3d85b89617de833723aab8f207f0ba94",
-        "Labels": "com.docker.compose.config-hash=b3e613aba2c3af0ed47390760bbb135073efe615ed98c0b823b48149ba3710ff,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:ee941cbb3cbcb62af8448fef97401f9da6b876245e7843cda3678232d3a7c305,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-post05-runtime/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-post05-runtime/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.opencontainers.image.created=,org.opencontainers.image.revision=c7c46dfa3d85b89617de833723aab8f207f0ba94,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api",
+        "CreatedAt": "2026-10-03 20:49:34 +0100 BST",
+        "ID": "b7fb26837d31",
+        "Image": "modula-greenfield-api:b45b5be4844befd451b827bbc30f4d48f0ac34d1",
+        "Labels": "com.docker.compose.config-hash=e8596366cfe65279f513d65efa3bab61f13e51e512fd1dea4346f9f2a7968a76,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:b67f8d2300ec6d9b0d910198f311ee5b0eda9dbcc4d7359ff67df34f1268d367,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=063_settings_backend_v2,org.opencontainers.image.created=2026-10-03T19:48:10Z,org.opencontainers.image.revision=b45b5be4844befd451b827bbc30f4d48f0ac34d1,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=settings-v2-b45b5be4844b",
         "LocalVolumes": "0",
         "Mounts": "/var/lib/modul…",
         "Names": "modula-production-greenfield-api-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "127.0.0.1:4020->4020/tcp",
-        "RunningFor": "10 hours ago",
+        "RunningFor": "12 hours ago",
         "Size": "0B (virtual 2.52GB)",
         "State": "running",
-        "Status": "Up 10 hours (healthy)"
+        "Status": "Up 12 hours (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -413,10 +417,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55499->5432/tcp",
-        "RunningFor": "15 hours ago",
+        "RunningFor": "37 hours ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 15 hours"
+        "Status": "Up 37 hours"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -430,10 +434,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55498->5432/tcp",
-        "RunningFor": "15 hours ago",
+        "RunningFor": "37 hours ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 15 hours"
+        "Status": "Up 37 hours"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -447,10 +451,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "5432/tcp",
-        "RunningFor": "12 days ago",
+        "RunningFor": "13 days ago",
         "Size": "1.92MB (virtual 278MB)",
         "State": "running",
-        "Status": "Up 12 days (healthy)"
+        "Status": "Up 13 days (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -583,10 +587,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "6379/tcp",
-        "RunningFor": "7 weeks ago",
+        "RunningFor": "8 weeks ago",
         "Size": "0B (virtual 39.1MB)",
         "State": "running",
-        "Status": "Up 7 weeks (healthy)"
+        "Status": "Up 8 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -600,10 +604,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55433->5432/tcp",
-        "RunningFor": "7 weeks ago",
+        "RunningFor": "8 weeks ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 7 weeks"
+        "Status": "Up 8 weeks"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -612,7 +616,7 @@
         "Image": "postgres:16.9-alpine",
         "Labels": "com.docker.compose.config-hash=2086878c8a83b6f05b37516d5aed1564df25871572aae2e8703c0be0e302a010,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dca9c7aa70c71caf8bcc48c8ec40658c1fdf2d1e4e8d26bc27d4d18e030d779a,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/home/andrei/modula-latest/ops/docker/compose.preview.yml,com.docker.compose.project.working_dir=/home/andrei/modula-latest/ops/docker,com.docker.compose.project=modula-preview,com.docker.compose.replace=greenfield-postgres-1,com.docker.compose.service=greenfield-postgres,com.docker.compose.version=2.40.3",
         "LocalVolumes": "1",
-        "Mounts": "/home/andrei/m…,modula-preview…",
+        "Mounts": "modula-preview…,/home/andrei/m…",
         "Names": "modula-preview-greenfield-postgres-1",
         "Networks": "modula-preview_modula_internal",
         "Platform": null,
@@ -620,7 +624,7 @@
         "RunningFor": "2 months ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 7 weeks (healthy)"
+        "Status": "Up 8 weeks (healthy)"
       }
     ],
     "relevantSystemdUnits": [
@@ -630,7 +634,7 @@
       "nginx.service                                  loaded    active   running nginx - high performance web server"
     ],
     "timers": [
-      "Sun 2026-10-04 00:00:00 BST       12h Sat 2026-10-03 00:00:01 BST      11h ago dpkg-db-backup.timer           dpkg-db-backup.service"
+      "Mon 2026-10-05 00:00:00 BST       14h Sun 2026-10-04 00:00:00 BST       9h ago dpkg-db-backup.timer           dpkg-db-backup.service"
     ],
     "cronFiles": [
       ".placeholder",
@@ -651,8 +655,8 @@
     "type": "host bind mount",
     "root": "/var/lib/modula/greenfield-media",
     "mode": "775",
-    "files": 45,
-    "bytes": 24378792,
+    "files": 46,
+    "bytes": 26307802,
     "classes": {
       "attachments": {
         "files": 18,
@@ -667,8 +671,8 @@
         "bytes": 1224761
       },
       "stories": {
-        "files": 11,
-        "bytes": 3095100
+        "files": 12,
+        "bytes": 5024110
       }
     }
   },
@@ -8062,6 +8066,230 @@
     },
     {
       "method": "GET",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/mutes",
+      "path": "/v1/accounts/me/mutes",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/mutes",
+      "path": "/v1/accounts/me/mutes",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/blocks",
+      "path": "/v1/accounts/me/blocks",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/blocks",
+      "path": "/v1/accounts/me/blocks",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/creator/insights",
+      "path": "/v1/creator/insights",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/creator/insights",
+      "path": "/v1/creator/insights",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/creator/payouts",
+      "path": "/v1/creator/payouts",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/creator/payouts",
+      "path": "/v1/creator/payouts",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/commerce/invoices",
+      "path": "/v1/commerce/invoices",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/commerce/invoices",
+      "path": "/v1/commerce/invoices",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/step-up/password",
+      "path": "/v1/auth/step-up/password",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/account/deletion-requests/current",
+      "path": "/v1/account/deletion-requests/current",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/account/deletion-requests/current",
+      "path": "/v1/account/deletion-requests/current",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
       "url": "/v1/providers/:capabilityRole",
       "path": "/v1/providers/:capabilityRole",
       "prefix": "",
@@ -11447,6 +11675,53 @@
         ]
       },
       {
+        "name": "greenfield_account_app_preferences",
+        "columns": [
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "preferences",
+            "type": "jsonb",
+            "default": "'{}'::jsonb",
+            "nullable": false
+          },
+          {
+            "name": "version",
+            "type": "integer",
+            "default": "1",
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_account_app_preferences_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_account_app_preferences_pkey ON public.greenfield_account_app_preferences USING btree (account_id)"
+          }
+        ],
+        "primaryKey": [
+          "account_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_account_app_preferences_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": []
+      },
+      {
         "name": "greenfield_account_data_artifacts",
         "columns": [
           {
@@ -14487,6 +14762,116 @@
         "uniqueConstraints": []
       },
       {
+        "name": "greenfield_commerce_invoices",
+        "columns": [
+          {
+            "name": "invoice_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "invoice_number",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "state",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "total_minor",
+            "type": "bigint",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "currency",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "provider",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "provider_reference",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "issued_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "paid_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_commerce_invoices_account_idx",
+            "definition": "CREATE INDEX greenfield_commerce_invoices_account_idx ON public.greenfield_commerce_invoices USING btree (account_id, issued_at DESC)"
+          },
+          {
+            "name": "greenfield_commerce_invoices_invoice_number_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_commerce_invoices_invoice_number_key ON public.greenfield_commerce_invoices USING btree (invoice_number)"
+          },
+          {
+            "name": "greenfield_commerce_invoices_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_commerce_invoices_pkey ON public.greenfield_commerce_invoices USING btree (invoice_id)"
+          }
+        ],
+        "primaryKey": [
+          "invoice_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_commerce_invoices_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_commerce_invoices_invoice_number_key",
+            "columns": [
+              "invoice_number"
+            ]
+          }
+        ]
+      },
+      {
         "name": "greenfield_connection_credentials",
         "columns": [
           {
@@ -15516,6 +15901,105 @@
           }
         ],
         "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_creator_ledger_entries",
+        "columns": [
+          {
+            "name": "entry_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "entry_kind",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "amount_minor",
+            "type": "bigint",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "currency",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "description",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "source_reference",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "occurred_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_creator_ledger_account_idx",
+            "definition": "CREATE INDEX greenfield_creator_ledger_account_idx ON public.greenfield_creator_ledger_entries USING btree (account_id, occurred_at DESC)"
+          },
+          {
+            "name": "greenfield_creator_ledger_entries_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_creator_ledger_entries_pkey ON public.greenfield_creator_ledger_entries USING btree (entry_id)"
+          },
+          {
+            "name": "greenfield_creator_ledger_entries_source_source_reference_key",
+            "definition": "CREATE UNIQUE INDEX greenfield_creator_ledger_entries_source_source_reference_key ON public.greenfield_creator_ledger_entries USING btree (source, source_reference)"
+          }
+        ],
+        "primaryKey": [
+          "entry_id"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_creator_ledger_entries_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": [
+          {
+            "name": "greenfield_creator_ledger_entries_source_source_reference_key",
+            "columns": [
+              "source",
+              "source_reference"
+            ]
+          }
+        ]
       },
       {
         "name": "greenfield_data_backup_policies",
@@ -17670,6 +18154,77 @@
             ]
           }
         ]
+      },
+      {
+        "name": "greenfield_digest_deliveries",
+        "columns": [
+          {
+            "name": "account_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "digest_kind",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "period_key",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "outcome",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "mail_job_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "summary",
+            "type": "jsonb",
+            "default": "'{}'::jsonb",
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_digest_deliveries_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_digest_deliveries_pkey ON public.greenfield_digest_deliveries USING btree (account_id, digest_kind, period_key)"
+          },
+          {
+            "name": "greenfield_digest_deliveries_recent_idx",
+            "definition": "CREATE INDEX greenfield_digest_deliveries_recent_idx ON public.greenfield_digest_deliveries USING btree (account_id, created_at DESC)"
+          }
+        ],
+        "primaryKey": [
+          "account_id",
+          "digest_kind",
+          "period_key"
+        ],
+        "foreignKeys": [
+          {
+            "name": "greenfield_digest_deliveries_account_id_fkey",
+            "column": "account_id",
+            "referencesTable": "greenfield_accounts",
+            "referencesColumn": "account_id"
+          }
+        ],
+        "uniqueConstraints": []
       },
       {
         "name": "greenfield_domain_events",
@@ -37624,12 +38179,17 @@
         "id": "062_public_status_support_cases",
         "name": "062_public_status_support_cases.sql",
         "appliedAt": "2026-10-02T23:45:14.057107+00:00"
+      },
+      {
+        "id": "063_settings_backend_v2",
+        "name": "063_settings_backend_v2.sql",
+        "appliedAt": "2026-10-03T19:30:21.887429+00:00"
       }
     ]
   },
   "operationalAggregates": {
     "outbox": {
-      "count": 426,
+      "count": 461,
       "failed": 0,
       "pending": 0
     },
@@ -37678,9 +38238,9 @@
       }
     ],
     "storyItems": {
-      "count": 11,
+      "count": 12,
       "active": 0,
-      "deletedOrInactive": 11
+      "deletedOrInactive": 12
     },
     "aiProviders": [
       {
@@ -37740,9 +38300,9 @@
       "governorDecisions": 0
     },
     "notifications": {
-      "count": 105,
-      "active": 105,
-      "unread": 96
+      "count": 113,
+      "active": 113,
+      "unread": 104
     },
     "aiModelsByState": {
       "available:active:enabled=true": 1,
@@ -37759,7 +38319,7 @@
       "count": 1,
       "fresh": 1,
       "releases": [
-        "c7c46dfa3d85b89617de833723aab8f207f0ba94"
+        "b45b5be4844befd451b827bbc30f4d48f0ac34d1"
       ]
     },
     "jobFailureDetails": [
@@ -37847,7 +38407,7 @@
       "expired": 1
     },
     "backgroundJobsByType": {
-      "mail.deliver": 317,
+      "mail.deliver": 329,
       "module.enable": 66,
       "module.update": 92,
       "plugin.enable": 14,
@@ -37857,18 +38417,18 @@
       "search.reindex": 4,
       "function.invoke": 15,
       "module.uninstall": 24,
-      "search.index.post": 146,
+      "search.index.post": 176,
       "notification.quote": 6,
       "notification.reply": 8,
-      "notification.create": 28,
+      "notification.create": 36,
       "notification.repost": 26,
       "notification.comment": 24,
       "notification.mention": 2,
-      "search.index.profile": 50,
+      "search.index.profile": 72,
       "extension.job.execute": 2,
       "module.release.verify": 30,
       "notification.reaction": 60,
-      "atproto.publish.delete": 38,
+      "atproto.publish.delete": 48,
       "atproto.publish.update": 10,
       "module.release.publish": 30,
       "mail.identity.provision": 10,
@@ -37912,7 +38472,7 @@
     },
     "backgroundJobsByStatus": {
       "FAILED": 4,
-      "SUCCEEDED": 1078,
+      "SUCCEEDED": 1160,
       "DEAD_LETTER": 22
     },
     "readyAttachmentLinkage": {
@@ -37921,7 +38481,7 @@
       "orphanCandidates": 5
     },
     "eventDeliveriesByStatus": {
-      "completed": 283
+      "completed": 349
     },
     "releaseArtifactCoverage": {
       "releases": 14,

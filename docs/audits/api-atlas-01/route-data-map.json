@@ -172,6 +172,18 @@
       "services/greenfield-api/src/account-data/service.ts#requestDeletion"
     ]
   },
+  "GET /v1/account/deletion-requests/current": {
+    "reads": [
+      "greenfield_account_data_requests"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#currentDeletion"
+    ]
+  },
   "GET /v1/accounts/:accountId/handle-history": {
     "reads": [
       "greenfield_handle_history"
@@ -252,6 +264,39 @@
       "services/greenfield-api/src/accounts/service.ts#patchMe"
     ]
   },
+  "GET /v1/accounts/me/app-preferences": {
+    "reads": [
+      "greenfield_account_app_preferences",
+      "greenfield_auth_identities",
+      "greenfield_digest_deliveries"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#digestStatus",
+      "services/greenfield-api/src/settings-v2/service.ts#preferences"
+    ]
+  },
+  "PATCH /v1/accounts/me/app-preferences": {
+    "reads": [
+      "greenfield_account_app_preferences",
+      "greenfield_auth_identities",
+      "greenfield_digest_deliveries"
+    ],
+    "writes": [
+      "greenfield_account_app_preferences"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#digestStatus",
+      "services/greenfield-api/src/settings-v2/service.ts#preferences",
+      "services/greenfield-api/src/settings-v2/service.ts#updatePreferences"
+    ]
+  },
   "GET /v1/accounts/me/appearance": {
     "reads": [
       "greenfield_appearance_preferences"
@@ -282,6 +327,21 @@
       "services/greenfield-api/src/domains/appearance/service.ts#get",
       "services/greenfield-api/src/domains/appearance/service.ts#map",
       "services/greenfield-api/src/domains/appearance/service.ts#patch"
+    ]
+  },
+  "GET /v1/accounts/me/blocks": {
+    "reads": [
+      "actors",
+      "blocks",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#blocks",
+      "services/greenfield-api/src/settings-v2/service.ts#mapRelations"
     ]
   },
   "POST /v1/accounts/me/handle": {
@@ -357,6 +417,21 @@
       "services/greenfield-api/src/mail/identity-service.ts#ensurePendingIdentityInTransaction",
       "services/greenfield-api/src/mail/identity-service.ts#queueProvisioningForVerifiedAccount",
       "services/greenfield-api/src/mail/identity-service.ts#recordEvent"
+    ]
+  },
+  "GET /v1/accounts/me/mutes": {
+    "reads": [
+      "actors",
+      "mutes",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#mapRelations",
+      "services/greenfield-api/src/settings-v2/service.ts#mutes"
     ]
   },
   "GET /v1/accounts/me/notification-preferences": {
@@ -1878,6 +1953,22 @@
       "services/greenfield-api/src/auth/mfa/recovery-codes.ts#regenerate"
     ]
   },
+  "POST /v1/auth/step-up/password": {
+    "reads": [
+      "greenfield_authentication_methods",
+      "greenfield_password_credentials"
+    ],
+    "writes": [
+      "greenfield_authentication_methods",
+      "greenfield_sessions"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#passwordStepUp"
+    ]
+  },
   "POST /v1/auth/step-up/totp": {
     "reads": [
       "greenfield_totp_credentials"
@@ -2577,6 +2668,18 @@
       "services/greenfield-api/src/entitlements/service.ts#get"
     ]
   },
+  "GET /v1/commerce/invoices": {
+    "reads": [
+      "greenfield_commerce_invoices"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#invoices"
+    ]
+  },
   "GET /v1/connections": {
     "reads": [],
     "writes": [],
@@ -2745,6 +2848,40 @@
       "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#requireOAuthProvider",
       "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#resolveAllowedRedirectUri",
       "services/greenfield-api/src/domains/connectors/oauth-state/service.ts#transition"
+    ]
+  },
+  "GET /v1/creator/insights": {
+    "reads": [
+      "actors",
+      "follows",
+      "greenfield_comments",
+      "greenfield_post_shares",
+      "greenfield_reactions",
+      "greenfield_story_groups",
+      "greenfield_story_items",
+      "greenfield_story_views",
+      "post_likes",
+      "post_saves",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#insights"
+    ]
+  },
+  "GET /v1/creator/payouts": {
+    "reads": [
+      "greenfield_creator_ledger_entries"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/settings-v2/service.ts#payouts"
     ]
   },
   "POST /v1/developer/agreements/:agreementId/:version/accept": {

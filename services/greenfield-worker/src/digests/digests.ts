@@ -140,20 +140,19 @@ export async function runDigestPass(db: Kysely<Database>, options: {now?: Date; 
 
 async function deliver(db: Kysely<Database>, candidate: Candidate, kind: DigestKind, period: string, now: Date, webUrl: string) {
   return db.transaction().execute(async trx => {
-    const claimed = await sql<{account_id: string}>`
-      INSERT INTO greenfield_digest_deliveries (account_id, digest_kind, period_key, outcome, created_at)
-      VALUES (${candidate.account_id}, ${kind}, ${period}, 'quiet', ${now})
+    const claim = async (outcome: 'queued' | 'quiet' | 'no-email', summary: DigestSummary | Record<string, never>, mailJobId: string | null) => sql<{account_id: string}>`
+      INSERT INTO greenfield_digest_deliveries (account_id, digest_kind, period_key, outcome, mail_job_id, summary, created_at)
+      VALUES (${candidate.account_id}, ${kind}, ${period}, ${outcome}, ${mailJobId}, ${JSON.stringify(summary)}::jsonb, ${now})
       ON CONFLICT DO NOTHING RETURNING account_id`.execute(trx)
-    if (claimed.rows.length === 0) return 'already'
     if (!candidate.email) {
-      await sql`UPDATE greenfield_digest_deliveries SET outcome = 'no-email' WHERE account_id = ${candidate.account_id} AND digest_kind = ${kind} AND period_key = ${period}`.execute(trx)
-      return 'no-email'
+      const claimed = await claim('no-email', {}, null)
+      return claimed.rows.length ? 'no-email' : 'already'
     }
     const since = new Date(now.getTime() - (kind === 'weekly' ? 7 : 1) * 86_400_000)
     const summary = await collectSummary(trx, candidate.account_id, since)
     if (isQuiet(summary)) {
-      await sql`UPDATE greenfield_digest_deliveries SET summary = ${JSON.stringify(summary)}::jsonb WHERE account_id = ${candidate.account_id} AND digest_kind = ${kind} AND period_key = ${period}`.execute(trx)
-      return 'quiet'
+      const claimed = await claim('quiet', summary, null)
+      return claimed.rows.length ? 'quiet' : 'already'
     }
     const rendered = renderDigest(kind, {displayName: candidate.display_name || candidate.handle, summary, webUrl, periodLabel: period})
     const email = candidate.email.trim().toLowerCase()
@@ -161,13 +160,14 @@ async function deliver(db: Kysely<Database>, candidate: Candidate, kind: DigestK
     const mailJobId = `mail-${randomUUID()}`
     const templateId = kind === 'weekly' ? 'digest-weekly' : 'digest-morning'
     const correlationId = `digest-${kind}-${period}`
+    const claimed = await claim('queued', summary, mailJobId)
+    if (claimed.rows.length === 0) return 'already'
     await sql`
       INSERT INTO greenfield_mail_jobs (mail_job_id, template_id, recipient_account_id, recipient_address, recipient_hash, recipient_domain, recipient_safe, locale, variables, subject, text_body, html_body, status, attempt_count, maximum_attempts, correlation_id, available_at, queued_at, created_at, updated_at)
       VALUES (${mailJobId}, ${templateId}, ${candidate.account_id}, ${email}, ${createHash('sha256').update(email).digest('hex')}, ${domain}, ${`${local.slice(0, 2)}${local.length > 2 ? '***' : '*'}@${domain}`}, 'en', ${JSON.stringify({kind, period, ...summary})}::jsonb, ${rendered.subject}, ${rendered.textBody}, ${rendered.htmlBody}, 'queued', 0, 4, ${correlationId}, ${now}, ${now}, ${now}, ${now})`.execute(trx)
     await sql`
       INSERT INTO background_jobs (id, job_type, payload, status, action, trace_id, priority, available_at, attempt_count, maximum_attempts, created_at, updated_at)
       VALUES (${`job-${mailJobId}`}, 'mail.deliver', ${JSON.stringify({mailJobId, templateId, correlationId})}::jsonb, 'QUEUED', 'mail.deliver', ${correlationId}, 20, ${now}, 0, 4, ${now}, ${now})`.execute(trx)
-    await sql`UPDATE greenfield_digest_deliveries SET outcome = 'queued', mail_job_id = ${mailJobId}, summary = ${JSON.stringify(summary)}::jsonb WHERE account_id = ${candidate.account_id} AND digest_kind = ${kind} AND period_key = ${period}`.execute(trx)
     return 'queued'
   })
 }

@@ -6,7 +6,7 @@ import {dirname} from 'node:path'
 const baseUrl = (process.env.API_ATLAS_BASE_URL ?? 'https://api.modula.digital').replace(/\/$/, '')
 const outputPath = process.env.API_ATLAS_EVIDENCE_PATH ?? '/var/lib/modula/api-atlas/authenticated-acceptance.json'
 const marker = `API-BASELINE-02:${new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14)}:${randomUUID()}`
-const fixtures = {posts: [], comments: [], attachments: [], records: [], follows: []}
+const fixtures = {posts: [], comments: [], attachments: [], records: [], follows: [], preferences: []}
 const checks = []
 const cleanup = []
 
@@ -43,6 +43,11 @@ function record(name, result, acceptedStatuses, acceptedCodes = []) {
   return result
 }
 
+function recordAssertion(name, ok) {
+  checks.push({name, status: null, errorCode: ok ? null : 'ASSERTION_FAILED', result: ok ? 'PASS' : 'FAIL'})
+  if (!ok) throw new Error(`${name}: assertion failed`)
+}
+
 function cleanupResult(resource, key, result, acceptedStatuses, verificationStatus = null, acceptedVerificationStatuses = []) {
   const ok = acceptedStatuses.includes(result.status) && (
     verificationStatus === null || acceptedVerificationStatuses.includes(verificationStatus)
@@ -57,8 +62,10 @@ async function login(email, password) {
 }
 
 async function main() {
-  const a = await login(process.env.API_ATLAS_A_EMAIL ?? 'api-atlas-a@audit.invalid', required('API_ATLAS_A_PASSWORD'))
-  const b = await login(process.env.API_ATLAS_B_EMAIL ?? 'api-atlas-b@audit.invalid', required('API_ATLAS_B_PASSWORD'))
+  const passwordA = required('API_ATLAS_A_PASSWORD')
+  const passwordB = required('API_ATLAS_B_PASSWORD')
+  const a = await login(process.env.API_ATLAS_A_EMAIL ?? 'api-atlas-a@audit.invalid', passwordA)
+  const b = await login(process.env.API_ATLAS_B_EMAIL ?? 'api-atlas-b@audit.invalid', passwordB)
   const meA = record('account A self read', await call('GET', '/v1/accounts/me', {token: a.token}), [200]).payload.data
   const meB = record('account B self read', await call('GET', '/v1/accounts/me', {token: b.token}), [200]).payload.data
   if (meA.primaryHandle !== 'api-atlas-a' || meB.primaryHandle !== 'api-atlas-b') throw new Error('Reserved audit handles do not match')
@@ -79,6 +86,44 @@ async function main() {
         cleanupResult('recovered-record', digest(item.record_id), result, [200])
       }
     }
+
+    const originalPreferencesA = record('settings v2 A preferences read', await call('GET', '/v1/accounts/me/app-preferences', {token: a.token}), [200]).payload.data
+    const originalPreferencesB = record('settings v2 B preferences read', await call('GET', '/v1/accounts/me/app-preferences', {token: b.token}), [200]).payload.data
+    fixtures.preferences.push({key: 'api-atlas-a', token: a.token, preferences: originalPreferencesA.preferences})
+    fixtures.preferences.push({key: 'api-atlas-b', token: b.token, preferences: originalPreferencesB.preferences})
+
+    const modeA = 'modules'
+    const modeB = 'for-you'
+    const updatedPreferencesA = record('settings v2 A preferences write', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {preferences: {'feed.defaultMode': modeA, 'time.relative': !originalPreferencesA.preferences['time.relative']}}}), [200]).payload.data
+    const updatedPreferencesB = record('settings v2 B preferences write', await call('PATCH', '/v1/accounts/me/app-preferences', {token: b.token, body: {preferences: {'feed.defaultMode': modeB, 'units.distance': originalPreferencesB.preferences['units.distance'] === 'metric' ? 'imperial' : 'metric'}}}), [200]).payload.data
+    recordAssertion('settings v2 A write is account scoped', updatedPreferencesA.preferences['feed.defaultMode'] === modeA)
+    recordAssertion('settings v2 B write is account scoped', updatedPreferencesB.preferences['feed.defaultMode'] === modeB)
+    const persistedPreferencesA = record('settings v2 A preferences persistence', await call('GET', '/v1/accounts/me/app-preferences', {token: a.token}), [200]).payload.data
+    const persistedPreferencesB = record('settings v2 B preferences persistence', await call('GET', '/v1/accounts/me/app-preferences', {token: b.token}), [200]).payload.data
+    recordAssertion('settings v2 A persisted value', persistedPreferencesA.preferences['feed.defaultMode'] === modeA)
+    recordAssertion('settings v2 B persisted value', persistedPreferencesB.preferences['feed.defaultMode'] === modeB)
+    const injectedPreferences = record('settings v2 query identifier remains self scoped', await call('GET', `/v1/accounts/me/app-preferences?accountId=${encodeURIComponent(meB.accountId)}`, {token: a.token}), [200]).payload.data
+    recordAssertion('settings v2 query identifier cannot read B', injectedPreferences.preferences['feed.defaultMode'] === modeA && injectedPreferences.preferences['feed.defaultMode'] !== modeB)
+    record('settings v2 alternate account route absent', await call('GET', `/v1/accounts/${encodeURIComponent(meB.accountId)}/app-preferences`, {token: a.token}), [404])
+    record('settings v2 body identifier rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {preferences: {'feed.defaultMode': 'following'}, accountId: meB.accountId}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 unknown preference rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {'unknown.namespace': true}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 nested namespace rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {feed: {defaultMode: 'following'}}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 invalid enum rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {'feed.defaultMode': 'invalid'}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 wrong type rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {'digests.weekly': 'yes'}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 invalid time zone rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {'digests.timeZone': 'Mars/Olympus'}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 empty patch rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {}}), [400], ['VALIDATION_FAILED'])
+    record('settings v2 oversized payload rejected', await call('PATCH', '/v1/accounts/me/app-preferences', {token: a.token, body: {'feed.defaultMode': 'x'.repeat(2_000_000)}}), [413])
+
+    for (const identity of [{label: 'A', token: a.token, password: passwordA}, {label: 'B', token: b.token, password: passwordB}]) {
+      record(`settings v2 ${identity.label} mutes read`, await call('GET', '/v1/accounts/me/mutes', {token: identity.token}), [200])
+      record(`settings v2 ${identity.label} blocks read`, await call('GET', '/v1/accounts/me/blocks', {token: identity.token}), [200])
+      record(`settings v2 ${identity.label} insights read`, await call('GET', '/v1/creator/insights?days=7', {token: identity.token}), [200])
+      record(`settings v2 ${identity.label} payouts read`, await call('GET', '/v1/creator/payouts', {token: identity.token}), [200])
+      record(`settings v2 ${identity.label} invoices read`, await call('GET', '/v1/commerce/invoices', {token: identity.token}), [200])
+      record(`settings v2 ${identity.label} password step-up`, await call('POST', '/v1/auth/step-up/password', {token: identity.token, body: {password: identity.password}}), [200])
+      record(`settings v2 ${identity.label} deletion status read`, await call('GET', '/v1/account/deletion-requests/current', {token: identity.token}), [200])
+    }
+    record('settings v2 password target identifier rejected', await call('POST', '/v1/auth/step-up/password', {token: a.token, body: {password: passwordA, accountId: meB.accountId}}), [400], ['VALIDATION_FAILED'])
 
     const publicPost = record('write fixture B public post', await call('POST', '/v1/posts', {token: b.token, body: {text: `[${marker}] B public post`, audience: 'public', idempotencyKey: `${marker}:b-public`}}), [201]).payload.data
     fixtures.posts.push({id: publicPost.id, token: b.token, version: publicPost.version})
@@ -152,6 +197,12 @@ async function main() {
     for (const item of fixtures.records.reverse()) {
       const result = await call('DELETE', `/v1/repositories/me/records/${item.id}`, {token: item.token, body: {expectedRevision: item.revision}})
       cleanupResult('record', digest(item.id), result, [200])
+    }
+    for (const item of fixtures.preferences.reverse()) {
+      const result = await call('PATCH', '/v1/accounts/me/app-preferences', {token: item.token, body: {preferences: item.preferences}})
+      const verification = await call('GET', '/v1/accounts/me/app-preferences', {token: item.token})
+      const restored = result.status === 200 && verification.status === 200 && JSON.stringify(verification.payload?.data?.preferences) === JSON.stringify(item.preferences)
+      cleanup.push({resource: 'settings-preferences', key: item.key, status: result.status, verificationStatus: verification.status, disposition: 'restored through supported PATCH; audit-owned row retained because no delete route exists', result: restored ? 'PASS' : 'FAIL'})
     }
     if (profileB) {
       const current = await call('GET', '/v1/profiles/api-atlas-b', {token: b.token})

@@ -10,8 +10,8 @@ Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data 
 - Evidence: `evidence/production-snapshot.json#/repository`, `evidence/production-snapshot.json#/containers/api/revision`
 - Affected routes: none/architectural
 - Affected files: none
-- Production impact: Production contains three feature-branch commits not on origin/main, while /root/modula-latest is a different dirty checkout.
-- Recommended fix: Converge the deployed revision through reviewed mainline history without resetting the dirty checkout.
+- Production impact: The captured production source revision differs from origin/main and does not yet have an accepted canonical-lineage disposition.
+- Recommended fix: Converge the deployed revision through reviewed mainline history and record the source, build, image, deployment and runtime correlation.
 - Dependencies: release governance
 - Verification: Fetch origin, prove ancestry, and compare OCI revision plus /version.json after a reviewed deployment.
 
@@ -186,7 +186,7 @@ Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data 
 - Evidence: `api-atlas.json#/routes`, `openapi.generated.yaml`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src`
-- Production impact: All 384 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
+- Production impact: All 393 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
 - Recommended fix: Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.
 - Dependencies: API contract ownership
 - Verification: Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.
@@ -367,7 +367,7 @@ Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data 
 - Dependencies: deployment config
 - Verification: Stopping worker progress must transition container/status health within the documented window.
 
-## API-ATLAS-GAP-035 — P2 — Seventy-two application routes have no statically matched automated test
+## API-ATLAS-GAP-035 — P2 — 70 application routes have no statically matched automated test
 
 - Domain/type: `testing` / `untested endpoint`
 - Evidence: `api-atlas.json#/routes`
@@ -395,12 +395,12 @@ Types: DB/API mismatch=1, architecture debt=7, client contract mismatch=1, data 
 - Evidence: `scripts/verify-greenfield-backend-v1.mjs:98`, `evidence/production-snapshot.json#/databaseSchema/appliedMigrations`
 - Affected routes: none/architectural
 - Affected files: `scripts/verify-greenfield-backend-v1.mjs`
-- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at migration 062 and this audit must run on a branch; it cannot truthfully serve as the current acceptance command.
+- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 063_settings_backend_v2; it cannot truthfully serve as the current acceptance command.
 - Recommended fix: Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.
 - Dependencies: verification ownership
-- Verification: The canonical verifier must pass on reviewed current main at schema 062+ without weakening exact-SHA production checks.
+- Verification: The canonical verifier must pass on reviewed current main at 063_settings_backend_v2 without weakening exact-SHA production checks.
 
-## API-ATLAS-GAP-038 — P3 — Fifteen tables have no API/worker source reference
+## API-ATLAS-GAP-038 — P3 — 14 tables have no API/worker source reference
 
 - Domain/type: `database` / `orphan table`
 - Evidence: `04-database-api-map.md`

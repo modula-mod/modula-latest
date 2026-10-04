@@ -43,7 +43,13 @@ export function isValidTimeZone(value: string): boolean {
 /** Validates a partial update. Unknown keys or wrong types fail the whole patch. */
 export function validateAppPreferencePatch(input: unknown): Partial<AppPreferences> {
   if (!input || typeof input !== 'object' || Array.isArray(input)) invalid('Preferences must be an object', 'preferences')
-  const source = (input as Record<string, unknown>).preferences ?? input
+  const container = input as Record<string, unknown>
+  const wrapped = Object.prototype.hasOwnProperty.call(container, 'preferences')
+  if (wrapped) {
+    const unknownWrapperKey = Object.keys(container).find(key => key !== 'preferences')
+    if (unknownWrapperKey) invalid(`Unknown field ${unknownWrapperKey.slice(0, 60)}`, unknownWrapperKey.slice(0, 60))
+  }
+  const source = wrapped ? container.preferences : input
   if (!source || typeof source !== 'object' || Array.isArray(source)) invalid('Preferences must be an object', 'preferences')
   const entries = Object.entries(source as Record<string, unknown>)
   if (entries.length === 0) invalid('Nothing to update', 'preferences')

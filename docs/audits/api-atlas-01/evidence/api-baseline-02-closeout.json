@@ -16,10 +16,10 @@
   "tests": {
     "apiTypecheck": "passed",
     "workerTypecheck": "passed",
-    "api": "107/107 standard and 23/23 targeted database acceptance passed",
+    "api": "117/117 standard and 31/31 targeted migration, settings, ownership and trust acceptance passed",
     "worker": "11/11 standard and 22/22 pre-migrated database acceptance passed",
-    "atlas": "80/80 passed",
-    "productionProbes": "26/26 passed against starting production revision",
+    "atlas": "85/85 passed",
+    "productionProbes": "35/35 passed against Settings V2 production revision",
     "secretScan": "passed"
   }
 }

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Modula GreenField API — generated implementation snapshot",
-    "version": "c7c46dfa3d85b89617de833723aab8f207f0ba94",
+    "version": "b45b5be4844befd451b827bbc30f4d48f0ac34d1",
     "description": "GENERATED FROM CURRENT IMPLEMENTATION — NOT YET THE CANONICAL DESIGN CONTRACT. Missing schemas remain intentionally empty."
   },
   "servers": [
@@ -239,6 +239,33 @@
         ]
       }
     },
+    "/v1/account/deletion-requests/current": {
+      "get": {
+        "operationId": "get_v1_account_deletion_requests_current",
+        "summary": "Account: GET /v1/account/deletion-requests/current",
+        "tags": [
+          "Account"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:48",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/accounts/{accountId}/handle-history": {
       "get": {
         "operationId": "get_v1_accounts_accountId_handle_history",
@@ -405,6 +432,58 @@
         ]
       }
     },
+    "/v1/accounts/me/app-preferences": {
+      "get": {
+        "operationId": "get_v1_accounts_me_app_preferences",
+        "summary": "Authentication: GET /v1/accounts/me/app-preferences",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:40",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "patch_v1_accounts_me_app_preferences",
+        "summary": "Authentication: PATCH /v1/accounts/me/app-preferences",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:41",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/accounts/me/appearance": {
       "get": {
         "operationId": "get_v1_accounts_me_appearance",
@@ -447,6 +526,33 @@
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/me/blocks": {
+      "get": {
+        "operationId": "get_v1_accounts_me_blocks",
+        "summary": "Authentication: GET /v1/accounts/me/blocks",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:43",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
           "timeWindow": "1 minute"
         },
         "x-contract-completeness": "schema-missing",
@@ -555,6 +661,33 @@
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/accounts/me/mutes": {
+      "get": {
+        "operationId": "get_v1_accounts_me_mutes",
+        "summary": "Authentication: GET /v1/accounts/me/mutes",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:42",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
           "timeWindow": "1 minute"
         },
         "x-contract-completeness": "schema-missing",
@@ -3474,6 +3607,33 @@
         ]
       }
     },
+    "/v1/auth/step-up/password": {
+      "post": {
+        "operationId": "post_v1_auth_step_up_password",
+        "summary": "Authentication: POST /v1/auth/step-up/password",
+        "tags": [
+          "Authentication"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:47",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/auth/step-up/totp": {
       "post": {
         "operationId": "post_v1_auth_step_up_totp",
@@ -5020,6 +5180,33 @@
         ]
       }
     },
+    "/v1/commerce/invoices": {
+      "get": {
+        "operationId": "get_v1_commerce_invoices",
+        "summary": "Commerce: GET /v1/commerce/invoices",
+        "tags": [
+          "Commerce"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:46",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/connections": {
       "get": {
         "operationId": "get_v1_connections",
@@ -5290,6 +5477,60 @@
         "x-modula-auth": "greenfield bearer access session",
         "x-modula-rate-limit": {
           "max": 30,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/creator/insights": {
+      "get": {
+        "operationId": "get_v1_creator_insights",
+        "summary": "Platform: GET /v1/creator/insights",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:44",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
+          "timeWindow": "1 minute"
+        },
+        "x-contract-completeness": "schema-missing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/creator/payouts": {
+      "get": {
+        "operationId": "get_v1_creator_payouts",
+        "summary": "Platform: GET /v1/creator/payouts",
+        "tags": [
+          "Platform"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Implementation response; schema is not registered"
+          }
+        },
+        "x-modula-source": "services/greenfield-api/src/settings-v2/routes.ts:45",
+        "x-modula-auth": "greenfield bearer access session",
+        "x-modula-rate-limit": {
+          "max": 120,
           "timeWindow": "1 minute"
         },
         "x-contract-completeness": "schema-missing",

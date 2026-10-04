@@ -26,6 +26,13 @@ describe('app preferences', () => {
     expect(isValidTimeZone('../etc')).toBe(false)
   })
 
+  it('rejects unsupported wrapper fields instead of silently ignoring target identifiers', () => {
+    expect(() => validateAppPreferencePatch({
+      preferences: {'feed.defaultMode': 'modules'},
+      accountId: 'another-account',
+    })).toThrow(/Unknown field accountId/)
+  })
+
   it('falls back to defaults for stale stored values', () => {
     const resolved = resolveAppPreferences({'feed.defaultMode': 'gone', 'digests.morning': true, junk: 1})
     expect(resolved['feed.defaultMode']).toBe('following')

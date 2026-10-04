@@ -7,6 +7,7 @@ import {resolveAppPreferences, validateAppPreferencePatch, type AppPreferences} 
 
 export const INSIGHT_WINDOWS = [7, 28, 90] as const
 export type InsightWindow = (typeof INSIGHT_WINDOWS)[number]
+type RelationRow = {profile_id: string; actor_id: string; handle: string; display_name: string; avatar_url: string | null; since: Date}
 
 const STEP_UP_ATTEMPTS = 5
 const STEP_UP_WINDOW_MS = 15 * 60_000
@@ -68,23 +69,31 @@ export class SettingsV2Service {
   // MARK: Mutes and blocks
 
   async mutes(accountId: string) {
-    return {items: await this.relationList(accountId, 'mutes', 'muter_actor_id', 'muted_actor_id')}
-  }
-
-  async blocks(accountId: string) {
-    return {items: await this.relationList(accountId, 'blocks', 'blocker_actor_id', 'blocked_actor_id')}
-  }
-
-  private async relationList(accountId: string, table: 'mutes' | 'blocks', ownerColumn: string, targetColumn: string) {
-    const rows = await sql<{profile_id: string; actor_id: string; handle: string; display_name: string; avatar_url: string | null; since: Date}>`
+    const rows = await sql<RelationRow>`
       SELECT p.id AS profile_id, p.actor_id, p.handle, p.display_name, p.avatar_url, r.created_at AS since
-      FROM ${sql.table(table)} r
-      JOIN actors me ON me.id = r.${sql.ref(ownerColumn)} AND me.account_id = ${accountId}
-      JOIN profiles p ON p.actor_id = r.${sql.ref(targetColumn)} AND p.deleted_at IS NULL
+      FROM mutes r
+      JOIN actors me ON me.id = r.muter_actor_id AND me.account_id = ${accountId}
+      JOIN profiles p ON p.actor_id = r.muted_actor_id AND p.deleted_at IS NULL
       WHERE r.deleted_at IS NULL
       ORDER BY r.created_at DESC
       LIMIT 500`.execute(this.db)
-    return rows.rows.map(row => ({
+    return {items: this.mapRelations(rows.rows)}
+  }
+
+  async blocks(accountId: string) {
+    const rows = await sql<RelationRow>`
+      SELECT p.id AS profile_id, p.actor_id, p.handle, p.display_name, p.avatar_url, r.created_at AS since
+      FROM blocks r
+      JOIN actors me ON me.id = r.blocker_actor_id AND me.account_id = ${accountId}
+      JOIN profiles p ON p.actor_id = r.blocked_actor_id AND p.deleted_at IS NULL
+      WHERE r.deleted_at IS NULL
+      ORDER BY r.created_at DESC
+      LIMIT 500`.execute(this.db)
+    return {items: this.mapRelations(rows.rows)}
+  }
+
+  private mapRelations(rows: RelationRow[]) {
+    return rows.map(row => ({
       profileId: row.profile_id,
       actorId: row.actor_id,
       handle: row.handle,
@@ -218,7 +227,13 @@ export class SettingsV2Service {
   // MARK: Password step-up + deletion status
 
   async passwordStepUp(auth: {accountId: string; sessionId: string}, body: unknown) {
-    const password = typeof (body as any)?.password === 'string' ? (body as any).password as string : ''
+    // @atlas-reads greenfield_authentication_methods
+    // @atlas-writes greenfield_authentication_methods greenfield_sessions
+    if (!body || typeof body !== 'object' || Array.isArray(body)) invalid('Enter your password', 'password')
+    const input = body as Record<string, unknown>
+    const unknownField = Object.keys(input).find(key => key !== 'password')
+    if (unknownField) invalid(`Unknown field ${unknownField.slice(0, 60)}`, unknownField.slice(0, 60))
+    const password = typeof input.password === 'string' ? input.password : ''
     if (!password || password.length > 1024) invalid('Enter your password', 'password')
     const now = Date.now()
     const recent = (this.attempts.get(auth.accountId) ?? []).filter(at => now - at < STEP_UP_WINDOW_MS)
