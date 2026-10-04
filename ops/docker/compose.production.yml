@@ -45,7 +45,7 @@ services:
         org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
         org.opencontainers.image.created: ${SOURCE_BUILT_AT}
         org.opencontainers.image.version: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-062_public_status_support_cases}
+        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-063_settings_backend_v2}
         org.opencontainers.image.title: modula-greenfield-api
     image: modula-greenfield-api:${SOURCE_RELEASE_SHA}
     restart: unless-stopped
@@ -56,7 +56,7 @@ services:
       MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
       MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-062_public_status_support_cases}
+      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-063_settings_backend_v2}
       MODULA_WORKER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
       MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
     volumes:
@@ -89,7 +89,7 @@ services:
         org.opencontainers.image.revision: ${SOURCE_RELEASE_SHA}
         org.opencontainers.image.created: ${SOURCE_BUILT_AT}
         org.opencontainers.image.version: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-062_public_status_support_cases}
+        org.modula.migration.expected: ${SOURCE_EXPECTED_MIGRATION:-063_settings_backend_v2}
         org.opencontainers.image.title: modula-greenfield-worker
     image: modula-greenfield-worker:${SOURCE_RELEASE_SHA}
     restart: unless-stopped
@@ -100,7 +100,7 @@ services:
       MODULA_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
       MODULA_RELEASE_BUILT_AT: ${SOURCE_BUILT_AT}
       MODULA_RELEASE_ID: ${SOURCE_RELEASE_ID:-${SOURCE_RELEASE_SHA}}
-      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-062_public_status_support_cases}
+      MODULA_EXPECTED_MIGRATION: ${SOURCE_EXPECTED_MIGRATION:-063_settings_backend_v2}
       MODULA_MAIL_PROVISIONER_RELEASE_SHA: ${SOURCE_RELEASE_SHA}
     extra_hosts:
       - 'host.docker.internal:host-gateway'

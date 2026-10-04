@@ -74,6 +74,7 @@ import {registerDeveloperRoutes} from '../developers/routes.js'
 import {registerEntitlementRoutes} from '../entitlements/routes.js'
 import {registerAccountDataRoutes} from '../account-data/routes.js'
 import {registerSupportRoutes} from '../support/routes.js'
+import {registerSettingsV2Routes} from '../settings-v2/routes.js'
 import {registerProviderRoutes} from '../providers/routes.js'
 import {registerIntelligenceRoutes} from '../intelligence/index.js'
 import {registerAttachmentRoutes} from './register-attachment-routes.js'
@@ -2608,6 +2609,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   await registerEntitlementRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerAccountDataRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerSupportRoutes(app, db, config, greenfieldSessions, {healthConfig, profileConfig, writeConfig})
+  await registerSettingsV2Routes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   await registerProviderRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
 }
 

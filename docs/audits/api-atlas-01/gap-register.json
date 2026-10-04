@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-03T10:02:55.876Z",
+    "capturedAt": "2026-10-04T08:18:44.111Z",
     "status": "PASS"
   },
   "gaps": [
@@ -16,8 +16,8 @@
       ],
       "affectedRoutes": [],
       "affectedFiles": [],
-      "productionImpact": "Production contains three feature-branch commits not on origin/main, while /root/modula-latest is a different dirty checkout.",
-      "recommendedFix": "Converge the deployed revision through reviewed mainline history without resetting the dirty checkout.",
+      "productionImpact": "The captured production source revision differs from origin/main and does not yet have an accepted canonical-lineage disposition.",
+      "recommendedFix": "Converge the deployed revision through reviewed mainline history and record the source, build, image, deployment and runtime correlation.",
       "dependencies": [
         "release governance"
       ],
@@ -419,7 +419,7 @@
       "affectedFiles": [
         "services/greenfield-api/src"
       ],
-      "productionImpact": "All 384 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
+      "productionImpact": "All 393 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
       "recommendedFix": "Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.",
       "dependencies": [
         "API contract ownership"
@@ -814,7 +814,7 @@
       "domain": "testing",
       "type": "untested endpoint",
       "severity": "P2",
-      "title": "Seventy-two application routes have no statically matched automated test",
+      "title": "70 application routes have no statically matched automated test",
       "evidence": [
         "api-atlas.json#/routes"
       ],
@@ -862,19 +862,19 @@
       "affectedFiles": [
         "scripts/verify-greenfield-backend-v1.mjs"
       ],
-      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at migration 062 and this audit must run on a branch; it cannot truthfully serve as the current acceptance command.",
+      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 063_settings_backend_v2; it cannot truthfully serve as the current acceptance command.",
       "recommendedFix": "Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.",
       "dependencies": [
         "verification ownership"
       ],
-      "verification": "The canonical verifier must pass on reviewed current main at schema 062+ without weakening exact-SHA production checks."
+      "verification": "The canonical verifier must pass on reviewed current main at 063_settings_backend_v2 without weakening exact-SHA production checks."
     },
     {
       "id": "API-ATLAS-GAP-038",
       "domain": "database",
       "type": "orphan table",
       "severity": "P3",
-      "title": "Fifteen tables have no API/worker source reference",
+      "title": "14 tables have no API/worker source reference",
       "evidence": [
         "04-database-api-map.md"
       ],

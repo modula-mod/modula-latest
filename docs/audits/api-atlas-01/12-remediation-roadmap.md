@@ -36,4 +36,4 @@ Introduce shared request/response schemas at auth, admin, upload, module and int
 
 ## Release-governance follow-up
 
-Converge the running feature revision through reviewed `origin/main` history while preserving the dirty canonical checkout. Rebuild/deploy exact reviewed main, verify OCI/version/route/migration identity and retain rollback. This is deliberately not performed by the audit mission.
+Converge the running feature revision through reviewed `origin/main` history. Rebuild/deploy exact reviewed main, verify OCI/version/route/migration identity and retain rollback.

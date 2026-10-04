@@ -43,3 +43,106 @@ jobs:
       - run: pnpm api:atlas:secrets
       - name: Require committed contract updates
         run: git diff --exit-code -- docs/audits/api-atlas-01 tools/api-atlas package.json
+
+  repository-validation:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modula-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: modula-latest
+      - name: Check out pinned Module Standard dependency
+        uses: actions/checkout@v4
+        with:
+          repository: modula-mod/modula-module-standard
+          ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
+          path: modula-mod/modula-module-standard
+      - name: Check out canonical Vault Notes test fixture
+        uses: actions/checkout@v4
+        with:
+          repository: modula-mod/modula-vault-notes
+          ref: c62f47a468c6d33fc5412db2d30f2b5d1c0bb2ce
+          path: modula-mod/modula-vault-notes
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.11.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+          cache-dependency-path: modula-latest/pnpm-lock.yaml
+      - name: Build pinned Module Standard contracts
+        working-directory: modula-mod/modula-module-standard
+        run: pnpm install --frozen-lockfile && pnpm build
+      - run: pnpm install --frozen-lockfile
+      - name: API tests
+        run: CI=true pnpm api:test
+      - name: Worker tests
+        run: CI=true pnpm worker:test
+      - name: API typecheck
+        run: CI=true pnpm --filter @modula/greenfield-api typecheck
+      - name: Worker typecheck
+        run: CI=true pnpm --filter @modula/greenfield-worker typecheck
+
+  migration-validation:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: modula_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d modula_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: modula-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: modula-latest
+      - name: Check out pinned Module Standard dependency
+        uses: actions/checkout@v4
+        with:
+          repository: modula-mod/modula-module-standard
+          ref: eebf12c7df0583a5051fc584170f7f3a9f6d946c
+          path: modula-mod/modula-module-standard
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.11.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+          cache-dependency-path: modula-latest/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Create restricted database roles
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGPASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: modula_test
+          MODULA_MIGRATOR_PASSWORD: modula_ci_migrator
+          MODULA_API_PASSWORD: modula_ci_api
+          MODULA_WORKER_PASSWORD: modula_ci_worker
+          MODULA_READONLY_PASSWORD: modula_ci_readonly
+          MODULA_BACKUP_PASSWORD: modula_ci_backup
+        run: bash ops/docker/postgres/init-roles.sh
+      - name: Migration 063 and restricted-role acceptance
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-api exec vitest run
+          tests/settings-v2.integration.test.ts
+          tests/greenfield-backend-v1.migration-ledger-security.test.ts
+          --maxWorkers=1 --no-file-parallelism

@@ -4,14 +4,14 @@
 
 - Backend: host filesystem bind at `/var/lib/modula/greenfield-media` mounted read/write into the API container.
 - Durability: survives container replacement, but no replicated object store, CDN origin, storage health check or host-loss recovery proof was discovered.
-- Inventory: 45 files / 24378792 bytes. No file contents or user metadata were copied into the atlas.
+- Inventory: 46 files / 26307802 bytes. No file contents or user metadata were copied into the atlas.
 
 | Class | Files | Bytes | API family |
 | --- | --- | --- | --- |
 | attachments | 18 | 19171402 | `/v1/attachments/*` |
 | posts | 13 | 887529 | `/v1/posts`, `/v1/media/*` |
 | profiles | 3 | 1224761 | `/v1/profiles/*/(avatar|cover)` |
-| stories | 11 | 3095100 | `/v1/stories`, `/v1/media/stories/*` |
+| stories | 12 | 5024110 | `/v1/stories`, `/v1/media/stories/*` |
 
 ## Canonical attachment lifecycle
 
@@ -31,7 +31,7 @@ Current attachment states: ready=18, failed=1, created=2, expired=1. Ready linka
 | Avatar/cover | canonical attachment bytes or external URL | profile_media (cover=1, avatar=1) | canonical attachment URL is policy-checked; PATCH also accepts public HTTPS URL | binding removal does not establish object garbage collection |
 | Post attachments | attachment store | post_content (pdf=2, audio=1, image=5, video=2, document=1) | viewer visibility follows post plus attachment policy | soft post deletion; orphan cleanup unscheduled |
 | Legacy post image | posts directory | post_media count=16 | `/v1/media/:mediaFile`; public path follows post policy | 13/16 active rows have a URL; 20 MiB app limit conflicts with 1 MiB nginx default |
-| Stories | stories directory | story_items count=11 | `/v1/media/stories/:mediaFile` with story visibility | 11 inactive/deleted rows and 11 files remain |
+| Stories | stories directory | story_items count=12 | `/v1/media/stories/:mediaFile` with story visibility | 12 inactive/deleted rows and 12 files remain |
 | Module packages | PostgreSQL release blob/ref metadata | 2/14 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
 | Module artwork | PostgreSQL blobs plus presentation metadata | 10/17 blobs | public immutable cache route; unavailable metadata returns 404 | all 17 are marked development assets |
 

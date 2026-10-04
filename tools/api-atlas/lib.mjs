@@ -139,7 +139,7 @@ function routeAuth(handlerText, path, file) {
   const admin = path.startsWith('/v1/admin') || capabilities.some(value => value.startsWith('admin:'))
   const backendAssertion = /requireServiceAssertion|verifyAssertion|requireAssertionOperation|serviceRoute\s*\(/.test(handlerText) || path.startsWith('/v1/backend/')
   const signedModuleIngress = /backendEvents\.ingest|backendWebhooks\.receive|signatureHeader\s*\(/.test(handlerText)
-  const wrappedGreenfield = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|support)\/routes\.ts$/.test(file)
+  const wrappedGreenfield = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|settings-v2|support)\/routes\.ts$/.test(file)
   const adminWrapper = path.startsWith('/v1/admin/') && /(?:releaseAdminAction|publisherAdminAction|\baction)\s*\(/.test(handlerText)
   const internalBuildService = path.startsWith('/v1/internal/build-service/')
   const greenfield = /requireGreenfieldAuth/.test(handlerText) || wrappedGreenfield || adminWrapper
@@ -176,7 +176,7 @@ function routeAuth(handlerText, path, file) {
 }
 
 function ownershipFor(handlerText, path, auth, file) {
-  const wrappedAccount = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|support)\/routes\.ts$/.test(file)
+  const wrappedAccount = /\baction\s*\(/.test(handlerText) && /\/(account-data|developers|entitlements|providers|settings-v2|support)\/routes\.ts$/.test(file)
   const account = wrappedAccount || /auth\.accountId|auth\.session|accountId\s*===\s*auth|account_id|resolveSearchActorContext/.test(handlerText)
   const actor = /auth\.actorId|actorId\s*===\s*auth|owner_actor_id/.test(handlerText)
   const workspace = /workspaceId|workspace_id/.test(handlerText)
@@ -226,6 +226,9 @@ function requestShape(handlerText) {
 function operationTables(text) {
   const reads = new Set()
   const writes = new Set()
+  const commonTableExpressions = new Set(
+    [...text.matchAll(/(?:\bWITH|,)\s*([a-zA-Z][a-zA-Z0-9_]*)\s+AS\s*\(/gi)].map(match => match[1]),
+  )
   const patterns = [
     [/\.(?:selectFrom|innerJoin|leftJoin|rightJoin|fullJoin)\(\s*['"]([a-zA-Z0-9_]+)/g, reads],
     [/\.(?:insertInto|updateTable|deleteFrom)\(\s*['"]([a-zA-Z0-9_]+)/g, writes],
@@ -234,6 +237,16 @@ function operationTables(text) {
   ]
   for (const [pattern, target] of patterns) {
     for (const match of text.matchAll(pattern)) target.add(match[1])
+  }
+  for (const match of text.matchAll(/@atlas-reads[ \t]+([a-zA-Z0-9_, \t]+)/g)) {
+    for (const table of match[1].trim().split(/[\s,]+/)) if (table) reads.add(table)
+  }
+  for (const match of text.matchAll(/@atlas-writes[ \t]+([a-zA-Z0-9_, \t]+)/g)) {
+    for (const table of match[1].trim().split(/[\s,]+/)) if (table) writes.add(table)
+  }
+  for (const alias of commonTableExpressions) {
+    reads.delete(alias)
+    writes.delete(alias)
   }
   return {reads: [...reads].sort(), writes: [...writes].sort()}
 }
