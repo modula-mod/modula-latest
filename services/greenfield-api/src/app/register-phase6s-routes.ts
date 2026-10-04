@@ -47,7 +47,7 @@ export async function registerPhase6sRoutes(
   },
 ): Promise<void> {
   const reactions = new ReactionService(db)
-  const comments = new CommentService(db)
+  const comments = new CommentService(db, config.publicApiUrl)
   const quotes = new QuoteService(db)
   const saves = new SaveService(db, config.publicApiUrl)
   const mentions = new MentionService(db)
@@ -121,7 +121,7 @@ export async function registerPhase6sRoutes(
     try {
       const {postId} = request.params as {postId: string}
       const text = String((request.body as any)?.text ?? '')
-      const created = await comments.createComment(auth.actorId, postId, text)
+      const created = await comments.createComment(auth.actorId, postId, text, {accountId: auth.accountId, raw: (request.body as any)?.media})
       await mentions.storeMentions(auth.actorId, 'comment', created.comment_id, text)
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {
@@ -144,7 +144,7 @@ export async function registerPhase6sRoutes(
     try {
       const {commentId} = request.params as {commentId: string}
       const text = String((request.body as any)?.text ?? '')
-      const created = await comments.createReply(auth.actorId, commentId, text)
+      const created = await comments.createReply(auth.actorId, commentId, text, {accountId: auth.accountId, raw: (request.body as any)?.media})
       await mentions.storeMentions(auth.actorId, 'comment', created.comment_id, text)
       return reply.code(201).send(successEnvelope(created, request.id))
     } catch (error) {

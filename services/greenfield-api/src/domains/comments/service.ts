@@ -7,17 +7,18 @@ import {AuditRepository} from '../audit/repository.js'
 import {OutboxRepository} from '../outbox/repository.js'
 import {GreenfieldPolicyEngine} from '../policy/index.js'
 import type {ReactionType} from '../reactions/service.js'
+import {normalizeCommentMedia, presentCommentMedia, type CommentMediaItem} from './media.js'
 
-const validateText = (text: string) => {
+const validateText = (text: string, allowEmpty = false) => {
   const value = text.trim()
-  if (!value || value.length > 5000) throw Object.assign(new Error('Invalid comment text'), {code: 'VALIDATION_FAILED'})
+  if ((!value && !allowEmpty) || value.length > 5000) throw Object.assign(new Error('Invalid comment text'), {code: 'VALIDATION_FAILED'})
   return value
 }
 
 export class CommentService {
   private readonly policies: GreenfieldPolicyEngine
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, private readonly publicApiUrl?: string) {
     this.policies = new GreenfieldPolicyEngine(db)
   }
 
@@ -45,11 +46,13 @@ export class CommentService {
     return this.withAuthors(await query.execute())
   }
 
-  async createComment(actorId: string, postId: string, text: string) {
-    return this.create(actorId, postId, null, validateText(text))
+  async createComment(actorId: string, postId: string, text: string, media?: {accountId: string; raw: unknown}) {
+    const items = media ? await normalizeCommentMedia(this.db, media.accountId, media.raw) : []
+    return this.create(actorId, postId, null, validateText(text, items.length > 0), undefined, items)
   }
 
-  async createReply(actorId: string, parentCommentId: string, text: string) {
+  async createReply(actorId: string, parentCommentId: string, text: string, media?: {accountId: string; raw: unknown}) {
+    const items = media ? await normalizeCommentMedia(this.db, media.accountId, media.raw) : []
     let parent = await this.db.selectFrom('greenfield_comments').selectAll().where('comment_id', '=', parentCommentId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!parent) throw Object.assign(new Error('Comment not found'), {code: 'NOT_FOUND'})
     await this.policies.assertAllowed({
@@ -68,7 +71,7 @@ export class CommentService {
       parent = ancestor
     }
     const depth = Math.min(parent.depth + 1, 4)
-    return this.create(actorId, parent.post_id, {...parent, depth: parent.depth}, validateText(text), depth)
+    return this.create(actorId, parent.post_id, {...parent, depth: parent.depth}, validateText(text, items.length > 0), depth, items)
   }
 
   async updateComment(actorId: string, commentId: string, text: string, expectedVersion: number) {
@@ -120,6 +123,7 @@ export class CommentService {
     parent: {comment_id: string; root_comment_id: string | null; depth: number; author_actor_id: string} | null,
     text: string,
     forcedDepth?: number,
+    media: CommentMediaItem[] = [],
   ) {
     const post = await this.db.selectFrom('posts').selectAll().where('id', '=', postId).where('deleted_at', 'is', null).executeTakeFirst()
     if (!post) throw Object.assign(new Error('Post not found'), {code: 'NOT_FOUND'})
@@ -151,8 +155,14 @@ export class CommentService {
           updated_at: now,
           deleted_at: null,
           deletion_kind: null,
+          media: JSON.stringify(media),
         })
         .execute()
+      const attachmentIds = media.flatMap(item => item.type === 'attachment' ? [item.attachmentId] : [])
+      if (attachmentIds.length) {
+        await trx.updateTable('attachments').set({attached_at: now, updated_at: now})
+          .where('attachment_id', 'in', attachmentIds).where('attached_at', 'is', null).execute()
+      }
       await trx.updateTable('posts').set({reply_count: post.reply_count + 1, updated_at: now}).where('id', '=', postId).execute()
       if (parent) {
         const parentRow = await trx
@@ -197,7 +207,7 @@ export class CommentService {
     const byActor = new Map(profiles.map(profile => [profile.actor_id, profile]))
     return rows.map(row => {
       const profile = byActor.get(row.author_actor_id)
-      return {...row, author: profile ? {
+      return {...row, media: row.deleted_at ? [] : presentCommentMedia(this.publicApiUrl, row.media), author: profile ? {
         id: profile.id, handle: profile.handle, displayName: profile.display_name,
         avatarUri: profile.avatar_url ?? undefined,
       } : null}

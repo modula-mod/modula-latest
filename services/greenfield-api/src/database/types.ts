@@ -1086,7 +1086,8 @@ export interface Database {
   greenfield_bridges: {bridge_id: string; slug: string; status: string; config: unknown; created_at: Date}
   greenfield_repository_exports: {export_id: string; repository_id: string; status: string; location: string | null; created_at: Date; expires_at: Date | null}
   greenfield_reactions: {reaction_id: string; actor_id: string; post_id: string; reaction_type: 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
-  greenfield_comments: {comment_id: string; post_id: string; author_actor_id: string; parent_comment_id: string | null; root_comment_id: string | null; text: string; depth: number; reply_count: number; version: number; created_at: Date; updated_at: Date; deleted_at: Date | null; deletion_kind: 'user' | 'moderation' | null}
+  greenfield_link_previews: {url_hash: string; url: string; status: 'ok' | 'failed'; preview: unknown; fetched_at: Date}
+  greenfield_comments: {comment_id: string; post_id: string; author_actor_id: string; parent_comment_id: string | null; root_comment_id: string | null; text: string; depth: number; reply_count: number; version: number; created_at: Date; updated_at: Date; deleted_at: Date | null; deletion_kind: 'user' | 'moderation' | null; media?: unknown}
   greenfield_comment_reactions: {reaction_id: string; actor_id: string; comment_id: string; reaction_type: 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'; created_at: Date; updated_at: Date}
   greenfield_quote_posts: {post_id: string; quoted_post_id: string; commentary: string; created_at: Date}
   greenfield_mentions: {mention_id: string; source_type: 'post' | 'comment'; source_id: string; mentioned_account_id: string; mentioned_actor_id: string | null; handle_at_mention: string; created_at: Date}
