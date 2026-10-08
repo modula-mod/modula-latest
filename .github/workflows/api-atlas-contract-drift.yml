@@ -127,10 +127,10 @@ jobs:
           node-version: 24.18.0
           cache: pnpm
           cache-dependency-path: modula-latest/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
       - name: Build pinned Module Standard contracts
         working-directory: modula-mod/modula-module-standard
         run: pnpm install --frozen-lockfile && pnpm build
+      - run: pnpm install --frozen-lockfile
       - name: Build API workspace dependencies
         run: pnpm --filter @modula/greenfield-api... build
       - name: Create restricted database roles
