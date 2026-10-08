@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-08T22:15:58.151Z",
+  "capturedAt": "2026-10-08T22:30:43.534Z",
   "source": {
     "branch": "phase-api-fix-01-trust-fail-closed",
-    "headAtCapture": "048ffd49580fcec895350ba2fa8bb92e8d4669bb",
+    "headAtCapture": "fe496ccff968cfeb36881a58c2bfe9adb0ae9917",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "740749ab3f8dc48ebc3b386ba4e7856c8a5a4bfcaacaf3cb88115ac74e2a0276"
+    "apiSourceSha256": "577707b80d292f274c677ffb7482facd5deb78e175315bdca3e890d9412aa2e4"
   },
   "runtimeRoutes": [
     {
@@ -1430,6 +1430,72 @@
       "path": "/v1/admin/registry/releases/:releaseId/verify",
       "prefix": "",
       "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/releases/:releaseId/signature",
+      "path": "/v1/admin/registry/releases/:releaseId/signature",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "releaseId"
+          ],
+          "properties": {
+            "releaseId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 240,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "signature",
+            "statementSha256"
+          ],
+          "properties": {
+            "signature": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "algorithm",
+                "keyId",
+                "value"
+              ],
+              "properties": {
+                "algorithm": {
+                  "type": "string",
+                  "const": "Ed25519"
+                },
+                "keyId": {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 160,
+                  "pattern": "^[A-Za-z0-9._:-]+$"
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 86,
+                  "maxLength": 86,
+                  "pattern": "^[A-Za-z0-9_-]+$"
+                }
+              }
+            },
+            "statementSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      },
       "config": null,
       "handler": ""
     },

@@ -207,7 +207,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Evidence: `api-atlas.json#/routes`, `openapi.generated.yaml`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src`
-- Production impact: All 408 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
+- Production impact: All 409 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
 - Recommended fix: Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.
 - Dependencies: API contract ownership
 - Verification: Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.
@@ -420,7 +420,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Dependencies: deployment config
 - Verification: Stopping worker progress must transition container/status health within the documented window.
 
-## API-ATLAS-GAP-034 — P2 — 77 application routes have no statically matched automated test
+## API-ATLAS-GAP-034 — P2 — 73 application routes have no statically matched automated test
 
 - Domain/type: `testing` / `untested endpoint`
 - Remediation status: **OPEN**

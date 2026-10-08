@@ -9,7 +9,7 @@ import {
   type GreenfieldModuleManifest,
   type ModulaExtensionProduct,
 } from '@modula/greenfield-module-manifest'
-import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, normalizeSignatureInput, type PublisherReleaseStatement, type ReleaseSignatureInput, type SignatureVerificationResult} from './release-signing.js'
+import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, normalizeSignatureInput, signingManifestDigest, statementSha256, type PublisherReleaseStatement, type ReleaseSignatureInput, type SignatureVerificationResult} from './release-signing.js'
 import {sql} from 'kysely'
 import type {GreenfieldModuleReleaseState} from '../database/types.js'
 import type {ModulaDb} from '../database/client.js'
@@ -18,6 +18,7 @@ import {OutboxRepository} from '../domains/outbox/repository.js'
 import {GreenfieldEventBus} from '../events/index.js'
 import {moduleError} from './module-errors.js'
 import {GreenfieldModulePublisherService} from './publisher-service.js'
+import type {VerifiedGithubRelease} from './github-release-sync-service.js'
 import type {GreenfieldModuleReleaseRecord} from './module-domain.js'
 import {isModuleIdentityAlias, moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
@@ -423,6 +424,135 @@ export class GreenfieldModuleReleaseService {
       .where('greenfield_module_releases.release_id', '=', releaseId)
       .executeTakeFirst()
     return row ? mapRelease(row as any) : undefined
+  }
+
+  /** Attach publisher evidence to an existing unsigned published release without rewriting its release facts. */
+  async attachPublishedSignature(
+    releaseId: string,
+    input: {signature: unknown; statementSha256: string},
+    verifiedArtifact: VerifiedGithubRelease,
+    actorAccountId: string,
+    requestId?: string,
+  ) {
+    const signature = normalizeSignatureInput(input.signature)
+    if (!signature) throw moduleError('VALIDATION_FAILED', 'A publisher signature is required')
+    if (!/^[0-9a-f]{64}$/.test(input.statementSha256)) throw moduleError('VALIDATION_FAILED', 'Statement SHA-256 is required')
+
+    return this.db.transaction().execute(async trx => {
+      const release = await trx.selectFrom('greenfield_module_releases as release')
+        .innerJoin('greenfield_module_versions as version', 'version.module_version_id', 'release.module_version_id')
+        .select([
+          'release.release_id', 'release.module_id', 'release.version', 'release.publisher_id',
+          'release.release_state', 'release.source_repository', 'release.source_commit',
+          'release.manifest_sha256', 'release.release_sha256', 'release.signature_key_id', 'release.signature',
+          'version.manifest',
+        ])
+        .where('release.release_id', '=', releaseId)
+        .forUpdate('release')
+        .executeTakeFirst()
+      if (!release) throw moduleError('NOT_FOUND', 'Release not found')
+      if (release.release_state !== 'published') throw moduleError('CONFLICT', 'Only published releases can receive retrospective signatures')
+      const existing = await trx.selectFrom('greenfield_module_release_signatures')
+        .select(['signature_id', 'signature_key_id', 'signature', 'statement_sha256', 'verification_state'])
+        .where('release_id', '=', releaseId).executeTakeFirst()
+
+      const manifest = release.manifest as GreenfieldModuleManifest
+      const integrity = await trx.selectFrom('greenfield_module_release_integrity')
+        .select(['manifest_sha256', 'release_sha256', 'source_commit', 'mismatch_at'])
+        .where('release_id', '=', releaseId).executeTakeFirst()
+      if (!release.release_sha256 || !/^[0-9a-f]{64}$/.test(release.release_sha256)
+        || !/^[0-9a-f]{40}$/.test(release.source_commit)
+        || !integrity || integrity.mismatch_at
+        || integrity.manifest_sha256 !== release.manifest_sha256
+        || integrity.release_sha256 !== release.release_sha256
+        || integrity.source_commit !== release.source_commit
+        || manifest.moduleId !== release.module_id || manifest.version !== release.version
+        || manifest.publisher.publisherId !== release.publisher_id
+        || manifest.source.repository !== release.source_repository
+        || !manifest.source.releaseTag
+        || verifiedArtifact.productId !== release.module_id
+        || verifiedArtifact.version !== release.version
+        || verifiedArtifact.repository !== release.source_repository
+        || verifiedArtifact.releaseTag !== manifest.source.releaseTag
+        || verifiedArtifact.releaseCommit !== release.source_commit
+        || verifiedArtifact.packageSha256 !== release.release_sha256
+        || signingManifestDigest(verifiedArtifact.manifest) !== release.manifest_sha256
+        || signingManifestDigest(manifest) !== release.manifest_sha256) {
+        throw moduleError('VALIDATION_FAILED', 'Release facts or integrity evidence do not match')
+      }
+
+      const [ingestion, frontend] = await Promise.all([
+        trx.selectFrom('greenfield_mps_ingestions').select('manifest_sha256')
+          .where('release_id', '=', releaseId).executeTakeFirst(),
+        trx.selectFrom('greenfield_release_frontends').select('artifact_sha256')
+          .where('release_id', '=', releaseId).executeTakeFirst(),
+      ])
+      const statement = buildPublisherReleaseStatement({
+        manifest,
+        sourceSha: release.source_commit,
+        artifactSha256: release.release_sha256,
+        productManifestSha256: ingestion?.manifest_sha256 ?? null,
+        frontendSha256: frontend?.artifact_sha256 ?? null,
+        signingKeyId: signature.keyId,
+      })
+      if ((ingestion && verifiedArtifact.evidence.productManifestSha256 !== ingestion.manifest_sha256)
+        || (frontend && verifiedArtifact.evidence.frontendSha256 !== frontend.artifact_sha256)) {
+        throw moduleError('VALIDATION_FAILED', 'Projected release digests do not match verified package bytes')
+      }
+      if (statementSha256(statement) !== input.statementSha256) {
+        throw moduleError('VALIDATION_FAILED', 'Signed statement does not match registry release facts')
+      }
+      const now = new Date()
+      const verified = await new GreenfieldPublisherSigningKeyService(trx).verify(statement, signature, now)
+      if (verified.state !== 'verified') {
+        throw moduleError('VALIDATION_FAILED', `Release signature rejected (${verified.state}): ${verified.detail}`)
+      }
+      if (existing || release.signature_key_id || release.signature) {
+        if (existing?.signature_key_id === signature.keyId && existing.signature === signature.value
+          && existing.statement_sha256 === verified.statementSha256 && existing.verification_state === 'verified'
+          && release.signature_key_id === signature.keyId && release.signature === signature.value) {
+          return {
+            releaseId,
+            keyId: signature.keyId,
+            verificationState: verified.state,
+            statementSha256: verified.statementSha256,
+            publicKeyFingerprint: verified.publicKeyFingerprint,
+            alreadyAttached: true,
+          }
+        }
+        throw moduleError('CONFLICT', 'Release already has different signature evidence')
+      }
+      await trx.insertInto('greenfield_module_release_signatures').values({
+        signature_id: `module-signature:${releaseId}:${signature.keyId}`,
+        release_id: releaseId,
+        signature_key_id: signature.keyId,
+        signature: signature.value,
+        algorithm: 'Ed25519',
+        verified_at: now,
+        revoked_at: null,
+        statement: jsonb(statement),
+        statement_sha256: verified.statementSha256,
+        verification_state: 'verified',
+        verification_detail: verified.detail,
+        public_key_fingerprint: verified.publicKeyFingerprint,
+        observed_at: now,
+      }).execute()
+      await trx.updateTable('greenfield_module_releases')
+        .set({signature_key_id: signature.keyId, signature: signature.value, updated_at: now})
+        .where('release_id', '=', releaseId).execute()
+      await new AuditRepository(trx).append('module.release.signature_attached', {
+        keyId: signature.keyId,
+        statementSha256: verified.statementSha256,
+        publicKeyFingerprint: verified.publicKeyFingerprint,
+      }, {type: 'moduleRelease', id: releaseId}, {accountId: actorAccountId, requestId})
+      return {
+        releaseId,
+        keyId: signature.keyId,
+        verificationState: verified.state,
+        statementSha256: verified.statementSha256,
+        publicKeyFingerprint: verified.publicKeyFingerprint,
+      }
+    })
   }
 
   async verifyRelease(moduleId: string, version: string): Promise<GreenfieldModuleReleaseRecord> {

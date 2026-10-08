@@ -1,15 +1,15 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-07T16:29:42.416Z
-Route evidence: local-candidate-runtime captured 2026-10-08T22:15:58.151Z for branch `phase-api-fix-01-trust-fail-closed`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-08T22:30:43.534Z for branch `phase-api-fix-01-trust-fail-closed`; this does not claim deployment.
 
-- Runtime method routes: 574
-- Application routes: 408
+- Runtime method routes: 575
+- Application routes: 409
 - Automatically generated HEAD routes: 165
 - Framework CORS routes: 1
 - Source-only: 0
 - Runtime-only: 0
-- Reconciliation: `574 = 408 application + 166 framework-derived`
+- Reconciliation: `575 = 409 application + 166 framework-derived`
 
 Every selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in `api-atlas.json`. The JSON file is canonical for machine use.
 
@@ -17,7 +17,7 @@ Every selected runtime-evidence method route is either represented below or expl
 
 | Source | Runtime | Public edge | Status | Count |
 | --- | --- | --- | --- | ---: |
-| yes | yes | not yet | candidate-registered | 408 |
+| yes | yes | not yet | candidate-registered | 409 |
 | yes | no | no | source-only | 0 |
 | no | yes | not yet | dynamically registered / investigate | 0 |
 | framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | 166 |
@@ -117,14 +117,15 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 | Admin | POST | `/v1/admin/ops/search/reindex` | ADMIN | none | `services/greenfield-api/src/app/register-routes.ts:2527` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/product-standard/ingest` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:165` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/registry/modules/import` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:958` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1021` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1026` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1037` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1018` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1015` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1005` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1008` | candidate-registered-not-production-probed |
-| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1011` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1058` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1063` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1074` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/suspend` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1055` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/publishers/:publisherId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1052` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/publish` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1042` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/quarantine` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1045` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/revoke` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1048` | candidate-registered-not-production-probed |
+| Admin | POST | `/v1/admin/registry/releases/:releaseId/signature` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1005` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/registry/releases/:releaseId/verify` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:1002` | candidate-registered-not-production-probed |
 | Admin | POST | `/v1/admin/registry/sync` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:971` | candidate-registered-not-production-probed |
 | Admin | GET | `/v1/admin/registry/sync-runs` | ADMIN | none | `services/greenfield-api/src/modules/routes/index.ts:991` | candidate-registered-not-production-probed |
@@ -3690,7 +3691,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1021`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1058`
 - Handler: inline
 - Controller/service calls: `publishers.revokePublisher`
 - Authentication: greenfield bearer access session
@@ -3729,7 +3730,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1026`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1063`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.register`
 - Authentication: greenfield bearer access session
@@ -3768,7 +3769,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1037`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1074`
 - Handler: inline
 - Controller/service calls: `publishers.requireAdminAccount`, `signingKeys.revoke`
 - Authentication: greenfield bearer access session
@@ -3807,7 +3808,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/suspend`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/suspend`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1018`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1055`
 - Handler: inline
 - Controller/service calls: `publishers.suspendPublisher`
 - Authentication: greenfield bearer access session
@@ -3846,7 +3847,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/publishers/:publisherId/verify`
 - Public URL: `https://api.modula.digital/v1/admin/registry/publishers/:publisherId/verify`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1015`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1052`
 - Handler: inline
 - Controller/service calls: `publishers.verifyPublisher`
 - Authentication: greenfield bearer access session
@@ -3885,7 +3886,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/publish`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/publish`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1005`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1042`
 - Handler: inline
 - Controller/service calls: none observed
 - Authentication: greenfield bearer access session
@@ -3908,7 +3909,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -3924,7 +3925,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/quarantine`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/quarantine`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1008`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1045`
 - Handler: inline
 - Controller/service calls: `releases.quarantineRelease`
 - Authentication: greenfield bearer access session
@@ -3947,7 +3948,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -3963,7 +3964,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Effective route: `/v1/admin/registry/releases/:releaseId/revoke`
 - Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/revoke`
 - API version: v1
-- Source file: `services/greenfield-api/src/modules/routes/index.ts:1011`
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1048`
 - Handler: inline
 - Controller/service calls: `releases.revokeRelease`
 - Authentication: greenfield bearer access session
@@ -3986,11 +3987,50 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
 - Notes: Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level.
+
+</details>
+
+<details>
+<summary><code>POST /v1/admin/registry/releases/:releaseId/signature</code> — candidate-registered-not-production-probed</summary>
+
+- Domain: Admin
+- Method: POST
+- Effective route: `/v1/admin/registry/releases/:releaseId/signature`
+- Public URL: `https://api.modula.digital/v1/admin/registry/releases/:releaseId/signature`
+- API version: v1
+- Source file: `services/greenfield-api/src/modules/routes/index.ts:1005`
+- Handler: inline
+- Controller/service calls: `githubSync.fetchVerified`, `publishers.requireAdminAccount`, `releases.attachPublishedSignature`, `releases.getReleaseById`
+- Authentication: greenfield bearer access session
+- Authorization: ADMIN
+- Ownership rule: admin capability is the resource boundary; per-user ownership is not applicable
+- Workspace rule: none observed
+- Capability/permission: none observed
+- Rate limit: none registered
+- Request params: `{releaseId: string}`
+- Request query: none observed
+- Request body: `{signature: unknown`
+- Pagination: none observed
+- Response schema: not declared in Fastify
+- Success codes: `200`
+- Expected errors: `400`, `401`, `403`, `404`, `409`, `500`
+- Database reads: `greenfield_accounts`, `greenfield_module_release_integrity`, `greenfield_module_release_signatures`, `greenfield_module_releases`, `greenfield_module_versions`, `greenfield_mps_ingestions`, `greenfield_release_frontends`
+- Database writes: `greenfield_module_release_signatures`, `greenfield_module_releases`
+- Storage: `host bind mount: /var/lib/modula/greenfield-media`, `PostgreSQL artifact/release metadata; artifact delivery route where present`
+- Events produced: none observed
+- Jobs produced: none observed
+- External integrations: `GitHub release source (automation disabled in production)`
+- Known clients: none observed
+- Tests: `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`
+- Runtime registration: yes
+- Live probe: not executed
+- Status: candidate-registered-not-production-probed
+- Notes: Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered.
 
 </details>
 
@@ -4025,7 +4065,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: none observed
-- Tests: none observed
+- Tests: `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14048,7 +14088,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
+- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
@@ -14087,7 +14127,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
+- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (404)
 - Status: candidate-registered-not-production-probed
@@ -14126,7 +14166,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
+- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
 - Live probe: not executed
 - Status: candidate-registered-not-production-probed
@@ -14165,7 +14205,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
+- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed
@@ -14204,7 +14244,7 @@ Shared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque 
 - Jobs produced: none observed
 - External integrations: none observed
 - Known clients: `src/data/repositories/api/ApiModuleRepository.ts`
-- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
+- Tests: `scripts/verify-phase7i-f5-auth-foundation.mjs`, `scripts/verify-phase7m-b10.mjs`, `services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts`, `services/greenfield-api/tests/registry-release-retrofit-signing.test.ts`, `services/greenfield-api/tests/registry-trust.assets.test.ts`, `services/greenfield-api/tests/registry-trust.github-sync.test.ts`, `services/greenfield-api/tests/registry-trust.identity-aliases.test.ts`, `services/greenfield-api/tests/registry-trust.signing.test.ts`, `services/greenfield-api/tests/registry-trust.trust-block.test.ts`
 - Runtime registration: yes
 - Live probe: PASS (200)
 - Status: candidate-registered-not-production-probed

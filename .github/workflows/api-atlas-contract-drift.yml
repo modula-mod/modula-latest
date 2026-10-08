@@ -160,6 +160,7 @@ jobs:
           tests/api-baseline-02.security-acceptance.test.ts
           tests/api-fix-01.follow-privacy.test.ts
           tests/registry-trust.signing.test.ts
+          tests/registry-release-retrofit-signing.test.ts
           tests/registry-trust.trust-block.test.ts
           tests/module-version-switch.test.ts
           --maxWorkers=1 --no-file-parallelism

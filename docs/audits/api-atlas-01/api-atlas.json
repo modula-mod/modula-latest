@@ -9,18 +9,18 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "phase-api-fix-01-trust-fail-closed",
-      "sourceSha256": "740749ab3f8dc48ebc3b386ba4e7856c8a5a4bfcaacaf3cb88115ac74e2a0276",
-      "capturedAt": "2026-10-08T22:15:58.151Z",
-      "routeCount": 574
+      "sourceSha256": "577707b80d292f274c677ffb7482facd5deb78e175315bdca3e890d9412aa2e4",
+      "capturedAt": "2026-10-08T22:30:43.534Z",
+      "routeCount": 575
     },
     "status": "PASS"
   },
   "reconciliation": {
-    "runtimeMethodRoutes": 574,
-    "applicationRuntimeRoutes": 408,
-    "mappedApplicationRoutes": 408,
+    "runtimeMethodRoutes": 575,
+    "applicationRuntimeRoutes": 409,
+    "mappedApplicationRoutes": 409,
     "runtimeOnlyRoutes": 0,
-    "sourceRoutes": 408,
+    "sourceRoutes": 409,
     "sourceOnlyRoutes": 0,
     "explicitlyExcludedFrameworkRoutes": 166,
     "frameworkRoutes": [
@@ -856,7 +856,7 @@
       }
     ],
     "duplicates": [],
-    "equation": "574 = 408 application + 166 framework-derived"
+    "equation": "575 = 409 application + 166 framework-derived"
   },
   "routes": [
     {
@@ -9907,7 +9907,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1021
+        "line": 1058
       },
       "handler": "inline",
       "controllerServices": [
@@ -10012,7 +10012,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1026
+        "line": 1063
       },
       "handler": "inline",
       "controllerServices": [
@@ -10123,7 +10123,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1037
+        "line": 1074
       },
       "handler": "inline",
       "controllerServices": [
@@ -10235,7 +10235,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1018
+        "line": 1055
       },
       "handler": "inline",
       "controllerServices": [
@@ -10339,7 +10339,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1015
+        "line": 1052
       },
       "handler": "inline",
       "controllerServices": [
@@ -10443,7 +10443,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1005
+        "line": 1042
       },
       "handler": "inline",
       "controllerServices": [],
@@ -10519,9 +10519,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -10540,7 +10542,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1008
+        "line": 1045
       },
       "handler": "inline",
       "controllerServices": [
@@ -10628,9 +10630,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -10649,7 +10653,7 @@
       "apiVersion": "v1",
       "source": {
         "file": "services/greenfield-api/src/modules/routes/index.ts",
-        "line": 1011
+        "line": 1048
       },
       "handler": "inline",
       "controllerServices": [
@@ -10736,9 +10740,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -10746,6 +10752,131 @@
       "liveProbe": null,
       "status": "candidate-registered-not-production-probed",
       "notes": "Registered in the local candidate runtime; production deployment is not implied. No Fastify request/response schema is registered; validation, if present, is handler/service-level."
+    },
+    {
+      "id": "POST /v1/admin/registry/releases/:releaseId/signature",
+      "domain": "Admin",
+      "method": "POST",
+      "effectiveRoute": "/v1/admin/registry/releases/:releaseId/signature",
+      "routePrefix": "/",
+      "publicUrl": "https://api.modula.digital/v1/admin/registry/releases/:releaseId/signature",
+      "apiVersion": "v1",
+      "source": {
+        "file": "services/greenfield-api/src/modules/routes/index.ts",
+        "line": 1005
+      },
+      "handler": "inline",
+      "controllerServices": [
+        "githubSync.fetchVerified",
+        "publishers.requireAdminAccount",
+        "releases.attachPublishedSignature",
+        "releases.getReleaseById"
+      ],
+      "authentication": "greenfield bearer access session",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "rateLimit": null,
+      "request": {
+        "params": [
+          "{releaseId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{signature: unknown"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "successCodes": [
+        200
+      ],
+      "expectedErrors": [
+        400,
+        401,
+        403,
+        404,
+        409,
+        500
+      ],
+      "data": {
+        "reads": [
+          "greenfield_accounts",
+          "greenfield_module_release_integrity",
+          "greenfield_module_release_signatures",
+          "greenfield_module_releases",
+          "greenfield_module_versions",
+          "greenfield_mps_ingestions",
+          "greenfield_release_frontends"
+        ],
+        "writes": [
+          "greenfield_module_release_signatures",
+          "greenfield_module_releases"
+        ],
+        "evidence": [
+          "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
+          "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+          "services/greenfield-api/src/modules/release-service.ts#attachPublishedSignature",
+          "services/greenfield-api/src/modules/release-service.ts#getReleaseById"
+        ],
+        "confidence": "method-level-static"
+      },
+      "storage": [
+        "host bind mount: /var/lib/modula/greenfield-media",
+        "PostgreSQL artifact/release metadata; artifact delivery route where present"
+      ],
+      "eventsProduced": [],
+      "jobsProduced": [],
+      "externalIntegrations": [
+        "GitHub release source (automation disabled in production)"
+      ],
+      "callers": {
+        "clients": [],
+        "server": [],
+        "tests": [
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts"
+        ]
+      },
+      "automatedTest": true,
+      "runtimeRegistration": true,
+      "sourceRegistration": true,
+      "publicEdge": false,
+      "featureState": "enabled",
+      "liveProbe": null,
+      "status": "candidate-registered-not-production-probed",
+      "notes": "Registered in the local candidate runtime; production deployment is not implied. Fastify route schema is registered."
     },
     {
       "id": "POST /v1/admin/registry/releases/:releaseId/verify",
@@ -10855,9 +10986,11 @@
       "callers": {
         "clients": [],
         "server": [],
-        "tests": []
+        "tests": [
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts"
+        ]
       },
-      "automatedTest": false,
+      "automatedTest": true,
       "runtimeRegistration": true,
       "sourceRegistration": true,
       "publicEdge": false,
@@ -40891,6 +41024,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
           "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.identity-aliases.test.ts",
@@ -41020,6 +41154,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
           "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.identity-aliases.test.ts",
@@ -41152,6 +41287,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
           "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.identity-aliases.test.ts",
@@ -41261,6 +41397,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
           "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.identity-aliases.test.ts",
@@ -41390,6 +41527,7 @@
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
           "services/greenfield-api/tests/phase7e.vault-notes-platform.test.ts",
+          "services/greenfield-api/tests/registry-release-retrofit-signing.test.ts",
           "services/greenfield-api/tests/registry-trust.assets.test.ts",
           "services/greenfield-api/tests/registry-trust.github-sync.test.ts",
           "services/greenfield-api/tests/registry-trust.identity-aliases.test.ts",
@@ -52565,6 +52703,7 @@
         "POST /v1/admin/registry/modules/import",
         "POST /v1/admin/registry/publishers/:publisherId/signing-keys",
         "POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/sync",
         "GET /v1/admin/registry/sync-runs",
         "POST /v1/auth/passkeys/registration/options",
@@ -70333,6 +70472,7 @@
       "migrationIntroduced": "009_phase7a_module_platform.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/registry-trust-service.ts",
+        "services/greenfield-api/src/modules/release-service.ts",
         "services/greenfield-worker/src/modules/release-trust-guard.ts"
       ],
       "sourceWrites": [
@@ -70345,7 +70485,9 @@
       "jobWrites": [
         "services/greenfield-worker/src/modules/release-verification-handler.ts"
       ],
-      "routeReads": [],
+      "routeReads": [
+        "POST /v1/admin/registry/releases/:releaseId/signature"
+      ],
       "routeWrites": [
         "POST /v1/admin/registry/modules/import"
       ],
@@ -70489,11 +70631,13 @@
       ],
       "jobWrites": [],
       "routeReads": [
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify"
       ],
       "routeWrites": [
         "POST /v1/admin/registry/modules/import",
         "POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify"
       ],
       "orphanCandidate": false,
@@ -70798,6 +70942,7 @@
         "POST /v1/admin/registry/modules/import",
         "POST /v1/admin/registry/releases/:releaseId/quarantine",
         "POST /v1/admin/registry/releases/:releaseId/revoke",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify",
         "POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke",
         "GET /v1/module-host/:targetProductId/composition",
@@ -70836,6 +70981,7 @@
         "POST /v1/admin/registry/modules/import",
         "POST /v1/admin/registry/releases/:releaseId/quarantine",
         "POST /v1/admin/registry/releases/:releaseId/revoke",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify"
       ],
       "orphanCandidate": false,
@@ -72655,6 +72801,7 @@
       "jobWrites": [],
       "routeReads": [
         "POST /v1/admin/registry/modules/import",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify",
         "POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke",
         "GET /v1/module-host/:targetProductId/composition",
@@ -72984,6 +73131,7 @@
       "jobWrites": [],
       "routeReads": [
         "POST /v1/admin/product-standard/ingest",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify",
         "GET /v1/modules/:moduleId/frontend",
         "GET /v1/product-standard/products/:productId",
@@ -76254,6 +76402,7 @@
       "jobWrites": [],
       "routeReads": [
         "POST /v1/admin/product-standard/ingest",
+        "POST /v1/admin/registry/releases/:releaseId/signature",
         "POST /v1/admin/registry/releases/:releaseId/verify",
         "GET /v1/module-host/:targetProductId/composition",
         "GET /v1/modules/:moduleId/frontend",

@@ -5093,6 +5093,64 @@
       "sourceContractSha256": "89db926982704455f3a63e072cf0e0f65a885bed28ce29658903a0c5c004617e"
     },
     {
+      "id": "POST /v1/admin/registry/releases/:releaseId/signature",
+      "authorization": {
+        "visibility": "ADMIN",
+        "anonymousAllowed": false,
+        "optionalSession": false,
+        "sessionRequired": true,
+        "sessionKind": "greenfield bearer access session",
+        "serviceAssertionRequired": false,
+        "verifiedEmailRequired": false,
+        "adminRequired": true,
+        "capabilities": [],
+        "serviceOperations": [],
+        "moduleInstallationRequired": false,
+        "modulePermissionRequired": false,
+        "ownership": {
+          "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+          "accountScoped": true,
+          "actorScoped": false,
+          "workspaceScoped": false,
+          "parameterizedResource": true,
+          "evidenceStrength": "route-handler"
+        }
+      },
+      "ownership": {
+        "rule": "admin capability is the resource boundary; per-user ownership is not applicable",
+        "accountScoped": true,
+        "actorScoped": false,
+        "workspaceScoped": false,
+        "parameterizedResource": true,
+        "evidenceStrength": "route-handler"
+      },
+      "request": {
+        "params": [
+          "{releaseId: string}"
+        ],
+        "query": [],
+        "body": [
+          "{signature: unknown"
+        ],
+        "explicitFastifySchema": true,
+        "manualValidationObserved": false,
+        "pagination": {
+          "style": "none observed",
+          "defaultPageSize": null,
+          "maximumPageSize": null,
+          "nextCursor": false,
+          "previousCursor": false,
+          "stability": "not a list or unpaginated"
+        }
+      },
+      "response": {
+        "explicitFastifySchema": false,
+        "schema": null,
+        "envelope": "Greenfield success/failure envelope (statically inferred)"
+      },
+      "sourceContractSha256": "c6515ccb1e4bcafc92279a06b643d2d9b5a6971e1278f3acdd2205a87c9133dc"
+    },
+    {
       "id": "POST /v1/admin/registry/releases/:releaseId/verify",
       "authorization": {
         "visibility": "ADMIN",
