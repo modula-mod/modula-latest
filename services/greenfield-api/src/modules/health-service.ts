@@ -14,8 +14,8 @@ export class GreenfieldModuleHealthService {
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
   ) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
-    this.views = new GreenfieldModuleViewService(db)
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+    this.views = new GreenfieldModuleViewService(db, config)
   }
 
   async get(accountId: string, moduleId: string) {

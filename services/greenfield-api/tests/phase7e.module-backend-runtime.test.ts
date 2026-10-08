@@ -76,7 +76,7 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
   })
 
   it('issues and resolves scoped module session tokens without storing raw credentials', async () => {
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, moduleId, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, config).resolve(accountId, moduleId, {requireEnabled: true})
     const backend = await new ModuleBackendRepository(db).ensureDefinitionForContext(context)
     const issued = await new ModuleBackendTokenService(db, config).issue({
       context,
@@ -160,7 +160,7 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
   })
 
   it('blocks gateway access when the backend connection is disabled before discovery or outbound calls', async () => {
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, moduleId, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, config).resolve(accountId, moduleId, {requireEnabled: true})
     const repository = new ModuleBackendRepository(db)
     await repository.ensureInstallation(context, null)
     await repository.disableInstallation(installationId)
@@ -175,7 +175,7 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
   })
 
   async function issueToken(permissions: string[], capabilities: string[]): Promise<string> {
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, moduleId, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, config).resolve(accountId, moduleId, {requireEnabled: true})
     const backend = await new ModuleBackendRepository(db).ensureDefinitionForContext(context)
     const issued = await new ModuleBackendTokenService(db, config).issue({context, backend, actorId, permissions, capabilities, requestId: `req-${randomUUID()}`})
     return issued.token
@@ -224,6 +224,7 @@ describeIfDb('Phase 7E module backend runtime substrate', () => {
 function configureTestEnv(): void {
   process.env.NODE_ENV = 'test'
   process.env.MODULA_ENVIRONMENT = 'development'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.MODULA_API_HOST = '127.0.0.1'
   process.env.MODULA_API_PORT = '4029'
   process.env.MODULA_PUBLIC_API_URL = 'https://api.test.modula.digital'

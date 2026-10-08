@@ -1,6 +1,7 @@
 import type {GaiaAvailableAction, ModulaActionProposal} from '@modula/intelligence-contracts'
 import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefinition} from '@modula/greenfield-module-ui-contracts'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import {GreenfieldModuleRecordService, type ModuleRecordQuery} from '../modules/record-service.js'
 import {collectionPermission, GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
 import {GreenfieldModuleViewService} from '../modules/view-service.js'
@@ -20,10 +21,10 @@ export class IntelligenceActionBoundary {
   private readonly views: GreenfieldModuleViewService
   private readonly records: GreenfieldModuleRecordService
 
-  constructor(private readonly db: ModulaDb) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
-    this.views = new GreenfieldModuleViewService(db)
-    this.records = new GreenfieldModuleRecordService(db)
+  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+    this.views = new GreenfieldModuleViewService(db, config)
+    this.records = new GreenfieldModuleRecordService(db, config)
   }
 
   async availableActions(accountId: string): Promise<GaiaAvailableAction[]> {

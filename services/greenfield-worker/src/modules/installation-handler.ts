@@ -6,6 +6,7 @@ import {registerModuleSchemas} from './schema-registration-handler.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 import {assertTrustedModuleRelease} from './release-trust-guard.js'
+import {assertPermissionReviewPresent} from './permission-review-guard.js'
 
 type InstallPayload = {
   planId: string
@@ -29,7 +30,7 @@ export async function handleModuleInstall(db: ModulaWorkerDb, config: WorkerConf
     .where('installation_id', '=', p.installationId)
     .where('release_id', '=', p.releaseId)
     .executeTakeFirst()
-  if (!review) throw permanentModuleJob('VALIDATION_FAILED', 'Module permission approval missing')
+  assertPermissionReviewPresent(review)
 
   const now = new Date()
   await db.transaction().execute(async trx => {

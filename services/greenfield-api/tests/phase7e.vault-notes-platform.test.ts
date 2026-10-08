@@ -28,10 +28,12 @@ import {GreenfieldSearchService} from '../src/domains/search/index.js'
 import {canonicalizeVaultNotesManifest} from '../src/modules/canonical-manifest.js'
 import {GreenfieldModuleInstallationService} from '../src/modules/installation-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {allRuntimePermissionKeys} from '../src/modules/runtime2-service.js'
 import {createDb as createWorkerDb, type ModulaWorkerDb} from '../../greenfield-worker/src/database.js'
 import {processOneEventDelivery} from '../../greenfield-worker/src/events/runner.js'
 import {handleModuleUninstall} from '../../greenfield-worker/src/modules/uninstall-handler.js'
 import {handleModuleUpdate} from '../../greenfield-worker/src/modules/update-handler.js'
+import {loadConfig as loadWorkerConfig} from '../../greenfield-worker/src/config.js'
 import type {WorkerConfig} from '../../greenfield-worker/src/config.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
@@ -173,7 +175,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/install`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `install-${suffix}`},
-      payload: {version: moduleVersion},
+      payload: {version: moduleVersion, approvedPermissions: approvedVaultPermissions()},
     })
     expect(install.statusCode).toBe(202)
     installationId = install.json().data.installationId
@@ -377,7 +379,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: '/v1/modules/modula.vault-notes/install',
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `dup-${suffix}`},
-      payload: {version: moduleVersion},
+      payload: {version: moduleVersion, approvedPermissions: approvedVaultPermissions()},
     })
     expect(second.statusCode).toBe(202)
     expect(second.json().data.installationId).toBe(installationId)
@@ -439,7 +441,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/install`,
       headers: {authorization: `Bearer ${token}`, 'idempotency-key': `reinstall-${suffix}`},
-      payload: {version: moduleVersion},
+      payload: {version: moduleVersion, approvedPermissions: approvedVaultPermissions()},
     })
     expect(reinstall.statusCode).toBe(202)
     installationId = reinstall.json().data.installationId
@@ -472,7 +474,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/install`,
       headers: {authorization: `Bearer ${otherToken}`, 'idempotency-key': `b-install-${suffix}`},
-      payload: {version: moduleVersion},
+      payload: {version: moduleVersion, approvedPermissions: approvedVaultPermissions()},
     })
     expect(installB.statusCode).toBe(202)
     const otherInstallationId = installB.json().data.installationId
@@ -511,7 +513,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/install`,
       headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `del-install-${suffix}`},
-      payload: {version: moduleVersion},
+      payload: {version: moduleVersion, approvedPermissions: approvedVaultPermissions()},
     })
     expect(install.statusCode).toBe(202)
     const disposableInstallationId = install.json().data.installationId
@@ -560,7 +562,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
       method: 'POST',
       url: `/v1/modules/${moduleId}/install`,
       headers: {authorization: `Bearer ${disposable.token}`, 'idempotency-key': `upd-install-${suffix}`},
-      payload: {version: historical.version},
+      payload: {version: historical.version, approvedPermissions: approvedVaultPermissions()},
     })
     expect(install.statusCode).toBe(202)
     const disposableInstallationId = install.json().data.installationId
@@ -581,7 +583,7 @@ describeIfDb('Phase 7E Vault Notes registry, lifecycle, data integrity and searc
     })
     expect(update.statusCode).toBe(202)
     const current = await new GreenfieldModuleReleaseService(db).getRelease(moduleId, moduleVersion)
-    await handleModuleUpdate(workerDb, {
+    await handleModuleUpdate(workerDb, loadWorkerConfig(), {
       installationId: disposableInstallationId,
       targetReleaseId: current!.releaseId,
       previousStatus: 'enabled',
@@ -795,6 +797,7 @@ function configureTestEnv(): void {
   process.env.MODULA_RATE_LIMIT_ENABLED = 'false'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_VAULT_NOTES_REFERENCE_ENABLED = 'true'
 }
@@ -833,6 +836,7 @@ function workerConfig(): WorkerConfig {
     moduleRemoteFunctionsEnabled: false,
     moduleCommunityExecutionEnabled: false,
     moduleGithubSyncEnabled: false,
+    moduleAllowUntrustedDevelopmentReleases: true,
   }
 }
 
@@ -841,6 +845,12 @@ function manifestForTest(): GreenfieldModuleManifest {
   const canonical = canonicalizeVaultNotesManifest(manifest)
   canonical.integrity.manifestSha256 = manifestChecksum({...canonical, integrity: {...canonical.integrity, manifestSha256: ''}})
   return canonical
+}
+
+function approvedVaultPermissions(): string[] {
+  // These lifecycle tests exercise a consciously approved module, not an
+  // implicit grant derived from the manifest when review data is absent.
+  return allRuntimePermissionKeys(manifestForTest())
 }
 
 function immutableReleaseEvidence(manifest: GreenfieldModuleManifest) {

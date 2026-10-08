@@ -130,7 +130,7 @@ describeIfDb('PVP Platform 2 immutable reference products', () => {
 
   it('issues Vault AI a single-purpose assertion for its own add-on backend without host authority', async () => {
     const installationId = installations.get('ai')!
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountA, ids.ai, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountA, ids.ai, {requireEnabled: true})
     const actor = await db.selectFrom('actors').select('id').where('account_id', '=', accountA).executeTakeFirstOrThrow()
     const actionId = context.manifest.backend?.actions?.[0]?.actionId
     expect(actionId).toBe('digital.modula.vault-notes.ai.function.summarise')
@@ -306,6 +306,7 @@ function configureTestEnv() {
   process.env.MODULA_REGISTRATION_MODE = 'open'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED = 'true'

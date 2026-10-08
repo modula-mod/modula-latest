@@ -33,7 +33,7 @@ export async function registerAiRoutes(
   const streaming = new GreenfieldAIStreamingRuntime(db)
   const tools = new GreenfieldAIToolBroker(db)
   const publishers = new GreenfieldModulePublisherService(db, config)
-  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
+  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db, config)
 
   const requireGateway = (reply: FastifyReply, requestId: string) => {
     if (!config.aiGatewayEnabled) {

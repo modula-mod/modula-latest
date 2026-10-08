@@ -8,6 +8,7 @@ import {
   GovernorV0,
 } from '@modula/intelligence-governance'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {IntelligenceActionBoundary} from './action-boundary.js'
 import {IntelligenceRepository} from './repository.js'
@@ -19,9 +20,9 @@ export class GovernedIntelligenceService {
   private readonly aki = new DeterministicAkiDecisionFabric()
   private readonly governor = new GovernorV0()
 
-  constructor(private readonly db: ModulaDb) {
+  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
     this.repository = new IntelligenceRepository(db)
-    this.boundary = new IntelligenceActionBoundary(db)
+    this.boundary = new IntelligenceActionBoundary(db, config)
   }
 
   async createMission(accountId: string, input: {objective?: unknown; workspaceId?: unknown; correlationId?: string}) {

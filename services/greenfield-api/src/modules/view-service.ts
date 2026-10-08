@@ -7,6 +7,7 @@ import {
   type GreenfieldModuleView,
 } from '@modula/greenfield-module-ui-contracts'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import {moduleError} from './module-errors.js'
 import {arrayOfStrings, collectionPermission, GreenfieldModuleRuntimeAccessService, type GreenfieldModuleRuntimeContext} from './runtime-access.js'
 
@@ -22,8 +23,8 @@ export type GreenfieldModuleViewResponse = {
 export class GreenfieldModuleViewService {
   private readonly access: GreenfieldModuleRuntimeAccessService
 
-  constructor(private readonly db: ModulaDb) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
+  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
   }
 
   async listViews(accountId: string, moduleId: string): Promise<GreenfieldModuleViewResponse> {

@@ -15,6 +15,7 @@ describeIfDb('Phase 7L profile update persistence', () => {
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let accounts: AccountService
   let profileWrites: ProfileWriteService
+  let registrationIp = 1
 
   beforeAll(async () => {
     configureTestEnv()
@@ -159,6 +160,9 @@ describeIfDb('Phase 7L profile update persistence', () => {
     const register = await app.inject({
       method: 'POST',
       url: '/v1/accounts/register',
+      // The verification challenge has a DB-backed per-IP limit shared by the
+      // entire integration suite; give each independent account its own IP.
+      remoteAddress: `198.18.0.${registrationIp++}`,
       payload: {email, password, handle, displayName, acceptedTerms: true},
     })
     expect(register.statusCode).toBe(201)

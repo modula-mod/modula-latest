@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto'
+import {sql} from 'kysely'
 import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {migrateUp} from '../../greenfield-api/src/database/migrate.js'
 import {createDb, type ModulaWorkerDb} from '../src/database.js'
@@ -103,7 +104,7 @@ describeLive('Phase 7E notification worker', () => {
     expect(suppressed).toBeUndefined()
   })
 
-  it('uses the shared aggregate columns for burst social notifications', async () => {
+  it('does not double-count a retried social reaction job', async () => {
     await db
       .updateTable('notification_preferences')
       .set({ai_completion_enabled: true, updated_at: new Date(), version: 3})
@@ -130,8 +131,117 @@ describeLive('Phase 7E notification worker', () => {
       .where('dedupe_key', '=', 'social:reaction:post:post-phase7e-notification-aggregate')
       .executeTakeFirstOrThrow()
     expect(row.category).toBe('social')
-    expect(row.aggregate_count).toBe(2)
-    expect(row.body).toBe('2 people reacted to your post')
+    expect(row.aggregate_count).toBe(1)
+    expect(row.body).toBe('reacted to your post')
+  })
+
+  it('does not resurface a read reaction notification for an identical outbox retry', async () => {
+    const resourceId = `post-api-fix-01-retry-${randomUUID()}`
+    const secondActorAccountId = `notif-retry-account-${suffix}`
+    const secondActorId = `notif-retry-actor-${suffix}`
+    await seedActor(db, secondActorAccountId, secondActorId)
+    const now = new Date()
+    await db.insertInto('posts').values({
+      id: resourceId, author_actor_id: recipientActorId, kind: 'text', text: 'reaction retry fixture',
+      feed: 'following', audience: 'public', reply_permission: 'everyone', idempotency_key: null,
+      link_domain: null, link_title: null, link_description: null, link_image: null,
+      module_name: null, module_action_label: null, module_status: null, glow_colour: null,
+      like_count: 0, reaction_count: 1, quote_count: 0, reply_count: 0, repost_count: 0,
+      created_at: now, updated_at: now, deleted_at: null, version: 1,
+    }).execute()
+    await db.insertInto('greenfield_reactions').values({
+      reaction_id: randomUUID(), actor_id: actorId, post_id: resourceId,
+      reaction_type: 'like', created_at: now, updated_at: now,
+    }).execute()
+
+    const firstEvent = {
+      recipientActorId,
+      actorId,
+      resourceType: 'post',
+      resourceId,
+      outboxEventId: `outbox-reaction-first-${randomUUID()}`,
+    }
+    await handleSocialNotification(db, 'reaction', firstEvent)
+    const readAt = new Date(Date.now() + 1_000)
+    await db.updateTable('notifications')
+      .set(eb => ({read_at: readAt, updated_at: readAt, version: eb('version', '+', 1)}))
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .execute()
+    const beforeRetry = await db.selectFrom('notifications')
+      .select(['id', 'actor_id', 'aggregate_count', 'body', 'read_at', 'created_at', 'updated_at', 'version'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .executeTakeFirstOrThrow()
+
+    await handleSocialNotification(db, 'reaction', firstEvent)
+    const afterRetry = await db.selectFrom('notifications')
+      .select(['id', 'actor_id', 'aggregate_count', 'body', 'read_at', 'created_at', 'updated_at', 'version'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .executeTakeFirstOrThrow()
+    expect(afterRetry).toEqual(beforeRetry)
+
+    const secondReactionAt = new Date(now.getTime() + 2_000)
+    await db.insertInto('greenfield_reactions').values({
+      reaction_id: randomUUID(), actor_id: secondActorId, post_id: resourceId,
+      reaction_type: 'love', created_at: secondReactionAt, updated_at: secondReactionAt,
+    }).execute()
+    await handleSocialNotification(db, 'reaction', {
+      ...firstEvent,
+      actorId: secondActorId,
+      outboxEventId: `outbox-reaction-second-${randomUUID()}`,
+    })
+    const afterNewReaction = await db.selectFrom('notifications')
+      .select(['id', 'actor_id', 'aggregate_count', 'body', 'read_at', 'version'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .executeTakeFirstOrThrow()
+    expect(afterNewReaction).toEqual({
+      id: beforeRetry.id,
+      actor_id: secondActorId,
+      aggregate_count: 2,
+      body: '2 people reacted to your post',
+      read_at: null,
+      version: beforeRetry.version + 1,
+    })
+
+    await db.deleteFrom('greenfield_reactions').where('post_id', '=', resourceId).execute()
+    await db.deleteFrom('notifications').where('resource_id', '=', resourceId).execute()
+    await db.deleteFrom('posts').where('id', '=', resourceId).execute()
+    await db.deleteFrom('actors').where('id', '=', secondActorId).execute()
+    await db.deleteFrom('greenfield_accounts').where('account_id', '=', secondActorAccountId).execute()
+  })
+
+  it('uses the supplied lifecycle identity to dedupe retried follow notifications', async () => {
+    const cases = [
+      {dedupeKey: `follow-request:${suffix}:requested`, body: 'requested to follow you'},
+      {dedupeKey: `follow-request:${suffix}:accepted`, body: 'accepted your follow request'},
+    ]
+    for (const item of cases) {
+      const payload = {
+        recipientActorId,
+        actorId,
+        resourceType: 'profile',
+        resourceId: `profile-${suffix}`,
+        ...item,
+      }
+      await Promise.all([
+        handleNotificationCreate(db, {...payload, type: 'follow'}),
+        handleNotificationCreate(db, {...payload, type: 'follow'}),
+      ])
+      await handleNotificationCreate(db, {...payload, type: 'follow'})
+    }
+
+    const rows = await db.selectFrom('notifications').select(['dedupe_key', 'aggregate_count', 'body'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', 'in', cases.map(item => item.dedupeKey))
+      .orderBy('dedupe_key')
+      .execute()
+    expect(rows).toEqual([
+      {dedupe_key: `follow-request:${suffix}:accepted`, aggregate_count: 1, body: 'accepted your follow request'},
+      {dedupe_key: `follow-request:${suffix}:requested`, aggregate_count: 1, body: 'requested to follow you'},
+    ])
   })
 
   it('reuses the permanent reaction identity when the active dedupe row is older than the aggregate window', async () => {
@@ -210,6 +320,64 @@ describeLive('Phase 7E notification worker', () => {
       .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
       .execute()
     expect(rows).toEqual([{aggregate_count: 2, body: '2 people reacted to your post'}])
+
+    await db.deleteFrom('greenfield_reactions').where('post_id', '=', resourceId).execute()
+    await db.deleteFrom('notifications').where('resource_id', '=', resourceId).execute()
+    await db.deleteFrom('posts').where('id', '=', resourceId).execute()
+    await db.deleteFrom('actors').where('id', '=', secondActorId).execute()
+    await db.deleteFrom('greenfield_accounts').where('account_id', '=', secondActorAccountId).execute()
+  })
+
+  it('locks the permanent identity before deriving reaction aggregate state', async () => {
+    const resourceId = `post-api-fix-01-lock-${randomUUID()}`
+    const secondActorAccountId = `notif-lock-account-${suffix}`
+    const secondActorId = `notif-lock-actor-${suffix}`
+    await seedActor(db, secondActorAccountId, secondActorId)
+    const now = new Date()
+    await db.insertInto('posts').values({
+      id: resourceId, author_actor_id: recipientActorId, kind: 'text', text: 'reaction serialization fixture',
+      feed: 'following', audience: 'public', reply_permission: 'everyone', idempotency_key: null,
+      link_domain: null, link_title: null, link_description: null, link_image: null,
+      module_name: null, module_action_label: null, module_status: null, glow_colour: null,
+      like_count: 0, reaction_count: 1, quote_count: 0, reply_count: 0, repost_count: 0,
+      created_at: now, updated_at: now, deleted_at: null, version: 1,
+    }).execute()
+    await db.insertInto('greenfield_reactions').values({
+      reaction_id: randomUUID(), actor_id: actorId, post_id: resourceId,
+      reaction_type: 'like', created_at: now, updated_at: now,
+    }).execute()
+
+    const identity = `${recipientActorId}:social:reaction:post:${resourceId}`
+    let unlock!: () => void
+    let locked!: () => void
+    const release = new Promise<void>(resolve => { unlock = resolve })
+    const acquired = new Promise<void>(resolve => { locked = resolve })
+    const lockHolder = db.transaction().execute(async trx => {
+      await sql`SELECT pg_advisory_xact_lock(hashtextextended(${identity}, 0))`.execute(trx)
+      locked()
+      await release
+    })
+    await acquired
+
+    let completed = false
+    const processing = handleSocialNotification(db, 'reaction', {
+      recipientActorId, actorId, resourceType: 'post', resourceId,
+    }).then(() => { completed = true })
+    await new Promise(resolve => setTimeout(resolve, 25))
+    const waitedForIdentityLock = !completed
+    await db.insertInto('greenfield_reactions').values({
+      reaction_id: randomUUID(), actor_id: secondActorId, post_id: resourceId,
+      reaction_type: 'love', created_at: new Date(now.getTime() + 1_000), updated_at: new Date(now.getTime() + 1_000),
+    }).execute()
+    unlock()
+    await Promise.all([lockHolder, processing])
+
+    expect(waitedForIdentityLock).toBe(true)
+    const notification = await db.selectFrom('notifications').select(['actor_id', 'aggregate_count', 'body'])
+      .where('recipient_actor_id', '=', recipientActorId)
+      .where('dedupe_key', '=', `social:reaction:post:${resourceId}`)
+      .executeTakeFirstOrThrow()
+    expect(notification).toEqual({actor_id: secondActorId, aggregate_count: 2, body: '2 people reacted to your post'})
 
     await db.deleteFrom('greenfield_reactions').where('post_id', '=', resourceId).execute()
     await db.deleteFrom('notifications').where('resource_id', '=', resourceId).execute()

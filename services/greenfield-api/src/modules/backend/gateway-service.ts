@@ -43,6 +43,9 @@ export class ModuleBackendGatewayService {
       capabilities: string[]
     }
   }) {
+    // This gateway is also called outside the generic action route (extension
+    // invocations), so enforce the review boundary before discovery or tokens.
+    if (input.context.permissionReviewRequired) throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required')
     const backend = await this.repository.ensureDefinitionForContext(input.context)
     if (!backendUsesModuleRuntime(input.context.manifest)) throw moduleError('VALIDATION_FAILED', 'Module does not use a module backend')
     const action = (backend.actions ?? []).find(item => item.actionId === input.actionId)

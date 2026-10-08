@@ -99,7 +99,8 @@ export class GreenfieldRegistryTrustService {
     const publisherVerified = publisher?.status === 'verified'
     const revoked = release.releaseState === 'revoked' || Boolean(revocations)
     const quarantined = release.releaseState === 'quarantined' || Boolean(quarantine)
-    const integrityOk = !integrity?.mismatch_at
+    // Missing integrity evidence is unknown trust, not a successful check.
+    const integrityOk = Boolean(integrity && !integrity.mismatch_at)
     const update = {
       latestPublishedVersion,
       updateAvailable: Boolean(latestPublishedVersion && latestPublishedVersion !== release.version && versionIsNewer(latestPublishedVersion, release.version)),
@@ -115,7 +116,8 @@ export class GreenfieldRegistryTrustService {
     if (release.releaseState === 'superseded') warnings.push({code: 'RELEASE_SUPERSEDED', message: 'A newer release supersedes this version.'})
     if (quarantined) warnings.push({code: 'RELEASE_QUARANTINED', message: quarantine?.reason ?? 'Release is quarantined.'})
     if (revoked) warnings.push({code: 'RELEASE_REVOKED', message: revocations?.reason ?? 'Release is revoked.'})
-    if (!integrityOk) warnings.push({code: 'INTEGRITY_MISMATCH', message: 'Release integrity verification recorded a mismatch.'})
+    if (!integrity) warnings.push({code: 'NO_INTEGRITY_EVIDENCE', message: 'No release integrity evidence is recorded.'})
+    else if (!integrityOk) warnings.push({code: 'INTEGRITY_MISMATCH', message: 'Release integrity verification recorded a mismatch.'})
     if (compatibility.evaluated && compatibility.compatible === false) warnings.push({code: 'HOST_INCOMPATIBLE', message: compatibility.reasons.map(reason => reason.message).join(' ')})
 
     return {

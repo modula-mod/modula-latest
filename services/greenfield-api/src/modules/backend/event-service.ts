@@ -18,7 +18,7 @@ export class ModuleBackendEventService {
     config: AppConfig,
   ) {
     this.tokens = new ModuleBackendTokenService(db, config)
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
     this.repository = new ModuleBackendRepository(db)
   }
 

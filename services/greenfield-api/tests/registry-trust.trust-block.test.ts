@@ -5,16 +5,30 @@ import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
+import {GreenfieldModuleVersionSwitchService} from '../src/modules/version-switch-service.js'
+import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
+describe('registry trust error contracts', () => {
+  it('preserves UNTRUSTED_RELEASE for version-switch denials', () => {
+    try {
+      GreenfieldModuleVersionSwitchService.assertAllowed({blockers: [{code: 'UNTRUSTED_RELEASE', message: 'Unsigned target'}]} as any)
+      throw new Error('Expected untrusted release denial')
+    } catch (error) {
+      expect(error).toMatchObject({code: 'UNTRUSTED_RELEASE', message: 'Unsigned target'})
+    }
+  })
+})
+
 describeIfDb('registry trust pipeline: verified trust block', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let token = ''
+  let accountId = ''
   const productId = `digital.modula.trust-${suffix}`
   const releases: Record<string, {releaseId: string; mpsBytes: string; frontendSha: string; artifactSha: string; manifestSha: string}> = {}
 
@@ -38,7 +52,9 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     db = created.db
     await app.ready()
     await publish('0.1.0')
-    token = (await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)).token
+    const account = await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)
+    token = account.token
+    accountId = account.accountId
   })
 
   afterAll(async () => {
@@ -105,6 +121,37 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     })
     expect(preview.statusCode, preview.body).toBe(403)
     expect(preview.json().error).toMatchObject({code: 'UNTRUSTED_RELEASE'})
+  })
+
+  it('refuses runtime access to an already-enabled unsigned release', async () => {
+    const release = await db.selectFrom('greenfield_module_releases')
+      .select(['release_id', 'extension_version_id'])
+      .where('release_id', '=', releases['0.1.0']!.releaseId)
+      .executeTakeFirstOrThrow()
+    const installationId = randomUUID()
+    await db.insertInto('greenfield_extension_installations').values({
+      installation_id: installationId,
+      extension_version_id: release.extension_version_id!,
+      account_id: accountId,
+      status: 'enabled',
+      config: {},
+      created_at: new Date(),
+      updated_at: new Date(),
+    }).execute()
+    await db.insertInto('greenfield_module_permission_reviews').values({
+      review_id: randomUUID(),
+      installation_id: installationId,
+      release_id: release.release_id,
+      account_id: accountId,
+      granted_permissions: [],
+      denied_permissions: [],
+      high_risk_increase: false,
+      idempotency_key: `runtime-review-${suffix}`,
+      reviewed_at: new Date(),
+    }).execute()
+
+    await expect(new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountId, productId, {requireEnabled: true}))
+      .rejects.toMatchObject({code: 'UNTRUSTED_RELEASE'})
   })
 
   it('reports update availability and revocation per immutable release', async () => {

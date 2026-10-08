@@ -86,8 +86,8 @@ export class GreenfieldAIProductActionService {
   private readonly events: GreenfieldEventBus
 
   constructor(private readonly db: ModulaDb, private readonly config: AppConfig) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
-    this.records = new GreenfieldModuleRecordService(db)
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+    this.records = new GreenfieldModuleRecordService(db, config)
     this.repository = new GreenfieldAIRepository(db)
     this.runtime = new GreenfieldAIProviderRuntimeService(db, config)
     this.events = new GreenfieldEventBus(db)

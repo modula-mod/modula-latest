@@ -109,6 +109,40 @@ export async function handleNotificationCreate(db: ModulaWorkerDb, rawPayload: u
 
   const now = new Date()
   const body = payload.body ?? DEFAULT_BODIES[payload.type]
+  if (payload.type === 'follow' && payload.dedupeKey) {
+    // Follow-request lifecycle keys identify one transition, not an aggregate
+    // family. At-least-once delivery must therefore converge without changing
+    // counts, body, or read state when the same outbox job is retried.
+    await db
+      .insertInto('notifications')
+      .values({
+        id: randomUUID(),
+        recipient_actor_id: payload.recipientActorId,
+        actor_id: payload.actorId ?? null,
+        type: payload.type,
+        category,
+        channels: jsonb(channels),
+        dedupe_key: payload.dedupeKey,
+        aggregate_count: 1,
+        aggregate_window_started_at: now,
+        last_aggregated_at: now,
+        resource_type: payload.resourceType ?? null,
+        resource_id: payload.resourceId ?? null,
+        body,
+        read_at: null,
+        created_at: now,
+        updated_at: now,
+        deleted_at: null,
+        version: 1,
+      })
+      .onConflict(conflict => conflict
+        .columns(['recipient_actor_id', 'dedupe_key'])
+        .where('dedupe_key', 'is not', null)
+        .where('deleted_at', 'is', null)
+        .doNothing())
+      .execute()
+    return
+  }
   if (payload.dedupeKey) {
     const existing = await db
       .selectFrom('notifications')

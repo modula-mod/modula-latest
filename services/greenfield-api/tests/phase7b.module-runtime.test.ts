@@ -67,6 +67,7 @@ describeIf('Phase 7B module runtime API', () => {
   beforeAll(async () => {
     process.env.NODE_ENV = 'test'
     process.env.MODULA_ENVIRONMENT = 'development'
+    process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
     process.env.MODULA_API_HOST = '127.0.0.1'
     process.env.MODULA_API_PORT = '4024'
     process.env.MODULA_PUBLIC_API_URL = 'http://127.0.0.1:4024'

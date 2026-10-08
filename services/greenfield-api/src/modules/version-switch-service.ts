@@ -210,7 +210,8 @@ export class GreenfieldModuleVersionSwitchService {
   static assertAllowed(evaluation: VersionSwitchEvaluation) {
     const blocker = evaluation.blockers[0]
     if (!blocker) return
-    const forbidden = ['RELEASE_NOT_SWITCHABLE', 'RELEASE_REVOKED', 'RELEASE_QUARANTINED', 'UNTRUSTED_RELEASE']
+    if (blocker.code === 'UNTRUSTED_RELEASE') throw moduleError('UNTRUSTED_RELEASE', blocker.message)
+    const forbidden = ['RELEASE_NOT_SWITCHABLE', 'RELEASE_REVOKED', 'RELEASE_QUARANTINED']
     throw moduleError(forbidden.includes(blocker.code) ? 'FORBIDDEN' : 'VALIDATION_FAILED', `${blocker.code}: ${blocker.message}`)
   }
 

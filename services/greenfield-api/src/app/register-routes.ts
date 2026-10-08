@@ -34,6 +34,7 @@ import {ModerationRepository} from '../domains/moderation/repository.js'
 import {PostMediaStorage} from '../domains/media/post-media-storage.js'
 import {NotificationPreferencesService} from '../domains/notifications/preferences.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
+import {retryReactionNotificationDeadLetter} from '../domains/notifications/reaction-dead-letter-retry.js'
 import {GreenfieldPolicyEngine} from '../domains/policy/index.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
@@ -232,7 +233,14 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   }
   const followRequestActionConfig = {
     ...writeConfig,
-    schema: {params: {type: 'object', additionalProperties: false, required: ['requestId'], properties: {requestId: {type: 'string', minLength: 1, maxLength: 200}}}},
+    schema: {params: {type: 'object', additionalProperties: false, required: ['requestId'], properties: {requestId: {type: 'string', format: 'uuid'}}}},
+  }
+  const reactionDeadLetterRetryConfig = {
+    ...writeConfig,
+    schema: {
+      params: {type: 'object', additionalProperties: false, required: ['jobId'], properties: {jobId: {type: 'string', minLength: 1, maxLength: 200, pattern: '^[A-Za-z0-9._:-]+$'}}},
+      body: {type: 'object', additionalProperties: false, properties: {reason: {type: 'string', minLength: 1, maxLength: 500, pattern: '\\S'}}},
+    },
   }
 
   const mutationsAllowed = config.mutationsEnabled
@@ -588,7 +596,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
-  await registerIntelligenceRoutes(app, db, greenfieldSessions, {profileConfig, writeConfig})
+  await registerIntelligenceRoutes(app, db, greenfieldSessions, {profileConfig, writeConfig}, config)
   await registerBackendFabricRoutes(app, db, config)
   await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
@@ -1255,8 +1263,9 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return reply.send(successEnvelope(tool, request.id))
   })
   app.get('/v1/functions', profileConfig, async (request, reply) => {
-    const rows = await db.selectFrom('greenfield_functions').selectAll().execute()
-    return reply.send(successEnvelope(rows, request.id))
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    return reply.send(successEnvelope(await functions.listForAccount(auth.accountId), request.id))
   })
   app.post('/v1/functions/:functionId/invoke', writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
@@ -2386,6 +2395,22 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Modula Mail adoption failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/jobs/reaction-dead-letters/:jobId/retry', reactionDeadLetterRetryConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const {jobId} = request.params as {jobId: string}
+    const body = (request.body ?? {}) as {reason?: string}
+    try {
+      return reply.send(successEnvelope(await retryReactionNotificationDeadLetter(db, jobId, auth.actorId, {
+        reason: body.reason?.trim() || undefined,
+        requestId: request.id,
+        correlationId: request.id,
+      }), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Failed to retry reaction notification dead letter')
     }
   })
 

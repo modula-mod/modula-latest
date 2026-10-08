@@ -27,7 +27,10 @@ describeIfDb('Greenfield Backend V1 authoritative data ledger', () => {
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
-    ledger = new GreenfieldDataLedgerService(db)
+    ledger = new GreenfieldDataLedgerService(db, {
+      environment: 'development',
+      moduleAllowUntrustedDevelopmentReleases: true,
+    })
     const now = new Date()
     for (const [accountId, handle] of [[accountA, `ledgera${suffix}`], [accountB, `ledgerb${suffix}`]] as const) {
       await db.insertInto('greenfield_accounts').values({account_id: accountId, primary_handle: handle, status: 'active', created_at: now, updated_at: now}).execute()

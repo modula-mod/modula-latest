@@ -2,8 +2,11 @@ import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {NOT_INSTALLED_STATUSES} from './installation-status.js'
 import {moduleIdFamily, resolveCanonicalModuleId, rewriteModuleIdentityAliases} from '@modula/greenfield-contracts'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import type {GreenfieldModuleInstallationStatus} from '@modula/greenfield-module-registry-contracts'
 import {moduleError} from './module-errors.js'
+import {GreenfieldModuleRegistryService} from './registry-service.js'
+import {GreenfieldRegistryTrustService} from './registry-trust-service.js'
 
 export type GreenfieldModuleRuntimeContext = {
   accountId: string
@@ -20,7 +23,16 @@ export type GreenfieldModuleRuntimeContext = {
 }
 
 export class GreenfieldModuleRuntimeAccessService {
-  constructor(private readonly db: ModulaDb) {}
+  private readonly registry: GreenfieldModuleRegistryService
+  private readonly trust: GreenfieldRegistryTrustService
+
+  constructor(
+    private readonly db: ModulaDb,
+    private readonly config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>,
+  ) {
+    this.registry = new GreenfieldModuleRegistryService(db)
+    this.trust = new GreenfieldRegistryTrustService(db)
+  }
 
   async resolve(accountId: string, moduleId: string, options: {requireEnabled?: boolean} = {}): Promise<GreenfieldModuleRuntimeContext> {
     const canonicalId = resolveCanonicalModuleId(moduleId)
@@ -48,6 +60,17 @@ export class GreenfieldModuleRuntimeAccessService {
     if (row.release_state === 'quarantined' || status === 'quarantined') throw moduleError('FORBIDDEN', 'Module release is quarantined')
     if (row.release_state !== 'published') throw moduleError('FORBIDDEN', 'Module release is not available')
     if (options.requireEnabled && status !== 'enabled') throw moduleError('FORBIDDEN', 'Module must be enabled')
+
+    // Executable trust is checked again at the runtime boundary. Install and
+    // enable guards cannot protect an already-enabled installation after its
+    // signer, signature or integrity evidence becomes untrusted.
+    const release = await this.registry.getVersion(canonicalId, row.version)
+    const releaseTrust = await this.trust.forRelease(release)
+    const allowDevelopmentRelease = this.config?.environment === 'development'
+      && this.config.moduleAllowUntrustedDevelopmentReleases
+    if (!releaseTrust.verified && !allowDevelopmentRelease) {
+      throw moduleError('UNTRUSTED_RELEASE', `Release is not production-trusted (signature: ${releaseTrust.signature.state})`)
+    }
 
     const review = await this.db
       .selectFrom('greenfield_module_permission_reviews')

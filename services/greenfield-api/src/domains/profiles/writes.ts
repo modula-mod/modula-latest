@@ -114,10 +114,11 @@ export class ProfileWriteService {
           return followResult('pending', existingRequest.request_id)
         }
         const requestId = existingRequest?.request_id ?? randomUUID()
+        const requestVersion = existingRequest ? existingRequest.version + 1 : 1
         if (existingRequest) {
           await trx.updateTable('follow_requests').set({
             status: 'PENDING', created_at: now, updated_at: now, resolved_at: null,
-            version: existingRequest.version + 1,
+            version: requestVersion,
           }).where('request_id', '=', requestId).execute()
         } else {
           await trx.insertInto('follow_requests').values({
@@ -128,7 +129,7 @@ export class ProfileWriteService {
             created_at: now,
             updated_at: now,
             resolved_at: null,
-            version: 1,
+            version: requestVersion,
           }).execute()
         }
         await new OutboxRepository(trx).enqueue(trx, {
@@ -141,7 +142,7 @@ export class ProfileWriteService {
             recipientActorId: currentTarget.actor_id,
             resourceType: 'profile',
             resourceId: currentTarget.id,
-            dedupeKey: `follow-request:${requestId}:requested`,
+            dedupeKey: `follow-request:${requestId}:v${requestVersion}:requested`,
             body: 'requested to follow you',
           },
         })
@@ -151,7 +152,7 @@ export class ProfileWriteService {
         return followResult('pending', requestId)
       }
 
-      await activateFollow(trx, followerActorId, currentTarget.actor_id, now)
+      const activatedFollow = await activateFollow(trx, followerActorId, currentTarget.actor_id, now)
       await trx.updateTable('follow_requests').set({
         status: 'ACCEPTED', resolved_at: now, updated_at: now,
         version: sql<number>`version + 1`,
@@ -168,6 +169,8 @@ export class ProfileWriteService {
           recipientActorId: currentTarget.actor_id,
           resourceType: 'profile',
           resourceId: currentTarget.id,
+          dedupeKey: `follow:${activatedFollow.id}:v${activatedFollow.version}`,
+          body: 'started following you',
         },
       })
       await new AuditRepository(trx).append('follow.created', {}, {
@@ -258,6 +261,9 @@ export class ProfileWriteService {
       if (request.status === 'ACCEPTED') return followResult('following', requestId)
       if (request.status !== 'PENDING') throw Object.assign(new Error('Follow request is no longer pending'), {code: 'CONFLICT'})
       const now = new Date()
+      const targetProfile = await trx.selectFrom('profiles').select('id')
+        .where('actor_id', '=', request.target_actor_id).where('deleted_at', 'is', null)
+        .executeTakeFirstOrThrow()
       await trx.updateTable('follow_requests').set({
         status: 'ACCEPTED', resolved_at: now, updated_at: now, version: request.version + 1,
       }).where('request_id', '=', requestId).where('status', '=', 'PENDING').executeTakeFirst()
@@ -266,12 +272,12 @@ export class ProfileWriteService {
         eventType: 'notification.create', aggregateType: 'follow-request', aggregateId: requestId,
         payload: {
           type: 'follow', actorId: request.target_actor_id, recipientActorId: request.requester_actor_id,
-          resourceType: 'profile', resourceId: request.target_actor_id,
-          dedupeKey: `follow-request:${requestId}:accepted`, body: 'accepted your follow request',
+          resourceType: 'profile', resourceId: targetProfile.id,
+          dedupeKey: `follow-request:${requestId}:v${request.version + 1}:accepted`, body: 'accepted your follow request',
         },
       })
       await new AuditRepository(trx).append('follow.accepted', {requestId}, {
-        type: 'profile', id: request.target_actor_id, actorId: targetActorId,
+        type: 'profile', id: targetProfile.id, actorId: targetActorId,
       })
       return followResult('following', requestId)
     })
@@ -561,23 +567,27 @@ async function activateFollow(
   followerActorId: string,
   followedActorId: string,
   now: Date,
-): Promise<void> {
+): Promise<{id: string; version: number}> {
   const existing = await trx.selectFrom('follows').selectAll()
     .where('follower_actor_id', '=', followerActorId)
     .where('followed_actor_id', '=', followedActorId)
     .forUpdate().executeTakeFirst()
   if (existing) {
     if (existing.deleted_at) {
+      const version = existing.version + 1
       await trx.updateTable('follows').set({
-        deleted_at: null, updated_at: now, version: existing.version + 1,
+        deleted_at: null, updated_at: now, version,
       }).where('id', '=', existing.id).execute()
+      return {id: existing.id, version}
     }
-    return
+    return {id: existing.id, version: existing.version}
   }
+  const id = randomUUID()
   await trx.insertInto('follows').values({
-    id: randomUUID(), follower_actor_id: followerActorId, followed_actor_id: followedActorId,
+    id, follower_actor_id: followerActorId, followed_actor_id: followedActorId,
     created_at: now, updated_at: now, deleted_at: null, version: 1,
   }).execute()
+  return {id, version: 1}
 }
 
 async function ownedFollowRequest(

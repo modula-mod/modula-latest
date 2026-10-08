@@ -83,7 +83,7 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
 
   async function completeSwitch(response: {json(): any}) {
     const data = response.json().data
-    await handleModuleUpdate(workerDb, {installationId, targetReleaseId: data.descriptor.registryReleaseId, previousStatus: 'enabled', moduleId, accountId, planId: data.planId})
+    await handleModuleUpdate(workerDb, loadWorkerConfig(), {installationId, targetReleaseId: data.descriptor.registryReleaseId, previousStatus: 'enabled', moduleId, accountId, planId: data.planId})
   }
 
   beforeAll(async () => {
@@ -103,7 +103,7 @@ describeIfDb('module version switching: upgrade and downgrade through the regist
     const registered = await registerAccount(app, `switch-${suffix}@example.com`, `sw${suffix}`, db)
     token = registered.token
     accountId = registered.accountId
-    const install = await app.inject({method: 'POST', url: `/v1/modules/${moduleId}/install`, headers: {...auth(), 'idempotency-key': `install-${suffix}`}, payload: {version: '1.0.0', platform: 'ios'}})
+    const install = await app.inject({method: 'POST', url: `/v1/modules/${moduleId}/install`, headers: {...auth(), 'idempotency-key': `install-${suffix}`}, payload: {version: '1.0.0', platform: 'ios', approvedPermissions: base}})
     expect(install.statusCode, install.body).toBe(202)
     installationId = install.json().data.installationId
     const plan = await db.selectFrom('greenfield_module_install_plans').select('plan_id').where('installation_id', '=', installationId).executeTakeFirstOrThrow()

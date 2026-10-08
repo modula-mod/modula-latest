@@ -1,14 +1,15 @@
 import {IntelligenceError, type IntelligenceErrorCode} from '@modula/intelligence-contracts'
 import type {FastifyInstance, FastifyReply, FastifyRequest} from 'fastify'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import type {GreenfieldSessionService} from '../sessions/service.js'
 import {failureEnvelope, statusForError, successEnvelope} from '../transport/envelope.js'
 import {GovernedIntelligenceService} from './service.js'
 
 type RouteConfig = Record<string, unknown>
 
-export async function registerIntelligenceRoutes(app: FastifyInstance, db: ModulaDb, sessions: GreenfieldSessionService, routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig}) {
-  const intelligence = new GovernedIntelligenceService(db)
+export async function registerIntelligenceRoutes(app: FastifyInstance, db: ModulaDb, sessions: GreenfieldSessionService, routeConfig: {profileConfig: RouteConfig; writeConfig: RouteConfig}, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+  const intelligence = new GovernedIntelligenceService(db, config)
 
   app.post('/v1/intelligence/missions', routeConfig.writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply, sessions)

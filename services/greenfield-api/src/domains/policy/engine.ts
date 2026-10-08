@@ -347,8 +347,11 @@ export class GreenfieldPolicyEngine {
       if (!comment) return {...resource, visibility: resource.visibility ?? 'private'}
       return {
         ...resource,
-        ownerActorId: resource.ownerActorId ?? comment.author_actor_id,
-        visibility: resource.visibility ?? comment.audience,
+        // A comment inherits the enclosing post's visibility boundary. Using
+        // the comment author here would let a former follower keep reading or
+        // mutating their old thread after losing access to the private post.
+        ownerActorId: comment.post_author_actor_id,
+        visibility: comment.audience,
       }
     }
     if (resource.type === 'profile') {

@@ -8,7 +8,7 @@ Provisioning uses the normal account service and database transaction path. The 
 
 The authenticated harness creates posts, a comment, an attachment and a private repository record with a unique `API-BASELINE-02` marker. It records every resource in memory, performs owner/non-owner checks, and deletes the fixtures in `finally`. Profile visibility is restored to private and the temporary follow is removed. Evidence contains only statuses, error codes and hashed fixture identifiers; tokens, passwords, email values and response bodies are excluded.
 
-Module-installation, module-record, permission-review, intelligence and known vulnerable behavior run against an isolated database migrated by the exact accepted build. They are not enabled against arbitrary production accounts. Expected-failure tests deliberately assert the current defect and must fail when remediation changes the behavior.
+Module-installation, module-record, permission-review, intelligence and trust/privacy regressions run against an isolated database migrated by the exact candidate or accepted build. They are not enabled against arbitrary production accounts. API-FIX-01 regressions assert fail-closed ownership, explicit permission review, signed-release trust, private follow approval and idempotent reaction notifications. Automated passes do not establish production acceptance; the protected two-account production suite and controlled trust fixtures must still run after deployment.
 
 Commands:
 

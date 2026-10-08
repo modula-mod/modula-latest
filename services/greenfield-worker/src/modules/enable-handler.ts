@@ -5,6 +5,7 @@ import {permanentModuleJob} from './module-job-errors.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 import {assertTrustedModuleRelease} from './release-trust-guard.js'
+import {assertPermissionReviewPresent} from './permission-review-guard.js'
 
 export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as any
@@ -23,7 +24,7 @@ export async function handleModuleEnable(db: ModulaWorkerDb, config: WorkerConfi
     .where('release_id', '=', release.release_id)
     .where('account_id', '=', p.accountId)
     .executeTakeFirst()
-  if (!review) throw permanentModuleJob('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required before enabling')
+  assertPermissionReviewPresent(review)
   if (release.trust_level !== 'firstParty' && !config.moduleCommunityExecutionEnabled) {
     throw permanentModuleJob('VALIDATION_FAILED', 'Community executable module contributions are disabled')
   }
