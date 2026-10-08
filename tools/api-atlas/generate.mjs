@@ -3,6 +3,8 @@ import {createHash} from 'node:crypto'
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs'
 import {extname, join, relative} from 'node:path'
 import {
+  apiSourceFingerprint,
+  commandOr,
   csvCell,
   domainFor,
   enrichRouteTables,
@@ -21,6 +23,30 @@ import {
 const snapshotPath = join(evidenceDir, 'production-snapshot.json')
 if (!existsSync(snapshotPath)) throw new Error(`Missing ${snapshotPath}; run pnpm api:atlas:capture first`)
 const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'))
+const candidatePath = join(evidenceDir, 'candidate-runtime.json')
+const candidate = existsSync(candidatePath) ? JSON.parse(readFileSync(candidatePath, 'utf8')) : null
+const currentBranch = process.env.GITHUB_HEAD_REF || commandOr('git', ['branch', '--show-current'])
+const candidateRequested = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate'
+const candidateApplies = Boolean(candidate) && (candidateRequested || (currentBranch && currentBranch === candidate.source?.branch))
+if (candidateRequested && !candidate) throw new Error(`Missing ${candidatePath}; run pnpm api:atlas:capture-candidate first`)
+if (candidateApplies && candidate.evidenceKind !== 'local-candidate-runtime') throw new Error('Invalid candidate runtime evidence kind')
+if (candidateApplies && candidate.source?.apiSourceSha256 !== apiSourceFingerprint()) {
+  throw new Error('Candidate runtime evidence is stale for the current API source; run pnpm api:atlas:capture-candidate')
+}
+const runtimeEvidence = candidateApplies
+  ? {
+      kind: 'local-candidate-runtime',
+      branch: candidate.source.branch,
+      sourceSha256: candidate.source.apiSourceSha256,
+      capturedAt: candidate.capturedAt,
+      routeCount: candidate.runtimeRoutes.length,
+    }
+  : {
+      kind: 'production-runtime',
+      revision: snapshot.containers.api.revision,
+      capturedAt: snapshot.capturedAt,
+      routeCount: snapshot.runtimeRoutes.length,
+    }
 const latestMigrationId = snapshot.databaseSchema.appliedMigrations.at(-1)?.id ?? 'unknown'
 const liveProbePath = join(evidenceDir, 'live-probes.json')
 const liveProbes = existsSync(liveProbePath) ? JSON.parse(readFileSync(liveProbePath, 'utf8')) : {probes: []}
@@ -37,7 +63,10 @@ const acceptanceComplete = authenticatedAcceptance.summary?.failed === 0
   && closeout.controlledAcceptance?.failed === 0
   && closeout.controlledAcceptance?.passed > 0
 const atlasStatus = acceptanceComplete && closeout.atlasFinalStatus === 'PASS' ? 'PASS' : 'PARTIAL'
-const runtime = snapshot.runtimeRoutes
+const runtime = candidateApplies ? candidate.runtimeRoutes : snapshot.runtimeRoutes
+const productionRuntime = snapshot.runtimeRoutes
+const productionAutomaticHeadKeys = new Set(productionRuntime.filter(route => route.method === 'GET').map(route => `HEAD ${route.url}`))
+const productionFrameworkRuntime = productionRuntime.filter(route => route.method === 'OPTIONS' || productionAutomaticHeadKeys.has(`${route.method} ${route.url}`))
 const automaticHeadKeys = new Set(runtime.filter(route => route.method === 'GET').map(route => `HEAD ${route.url}`))
 const applicationRuntime = runtime.filter(route => route.method !== 'OPTIONS' && !automaticHeadKeys.has(`${route.method} ${route.url}`))
 const frameworkRuntime = runtime.filter(route => route.method === 'OPTIONS' || automaticHeadKeys.has(`${route.method} ${route.url}`))
@@ -120,7 +149,7 @@ const atlas = applicationRuntime.map(runtimeRoute => {
     publicUrl: `${baseUrl}${runtimeRoute.url === '*' ? '' : runtimeRoute.url}`,
     apiVersion: runtimeRoute.url.startsWith('/v1/') ? 'v1' : 'versionless',
     source: sourceRoute ? {file: sourceRoute.file, line: sourceRoute.line} : null,
-    handler: sourceRoute?.handler ?? runtimeRoute.handler ?? 'unresolved',
+    handler: sourceRoute?.handler || runtimeRoute.handler || 'unresolved',
     controllerServices: sourceRoute?.serviceCalls ?? [],
     authentication: auth.sessionKind,
     authorization: {
@@ -159,18 +188,20 @@ const atlas = applicationRuntime.map(runtimeRoute => {
     automatedTest: sourceRoute?.hasAutomatedTest ?? false,
     runtimeRegistration: true,
     sourceRegistration: Boolean(sourceRoute),
-    publicEdge: true,
+    publicEdge: !candidateApplies,
     featureState: state,
     liveProbe: probe,
-    status: runtimeRoute.url === '/v1/internal/ssrf-check'
+    status: candidateApplies
+      ? 'candidate-registered-not-production-probed'
+      : runtimeRoute.url === '/v1/internal/ssrf-check'
       ? 'registered-but-production-hidden'
       : state === 'disabled'
         ? 'registered-feature-disabled'
         : 'reachable',
     notes: sourceRoute
-      ? runtimeRoute.schema
+      ? `${candidateApplies ? 'Registered in the local candidate runtime; production deployment is not implied. ' : ''}${runtimeRoute.schema
         ? 'Fastify route schema is registered.'
-        : 'No Fastify request/response schema is registered; validation, if present, is handler/service-level.'
+        : 'No Fastify request/response schema is registered; validation, if present, is handler/service-level.'}`
       : 'Runtime route has no matched static route; investigate dynamic/plugin registration.',
   }
 }).sort((a, b) => a.effectiveRoute.localeCompare(b.effectiveRoute) || a.method.localeCompare(b.method))
@@ -242,11 +273,14 @@ const routeDataMap = Object.fromEntries(atlas.map(route => [route.id, {
 const output = {
   metadata: {
     title: 'MODULA GREENFIELD API-ATLAS-01',
-    generatedFrom: 'current implementation and captured production runtime; not a design contract',
+    generatedFrom: candidateApplies
+      ? 'current implementation and a fresh local candidate runtime for route reconciliation; production snapshot remains deployment truth'
+      : 'current implementation and captured production runtime; not a design contract',
     capturedAt: snapshot.capturedAt,
     productionSha: snapshot.containers.api.revision,
     sourceSha: snapshot.repository.originMain,
     publicApiBase: baseUrl,
+    runtimeEvidence,
     status: atlasStatus,
   },
   reconciliation: routeReconciliation,
@@ -478,6 +512,32 @@ function classifyImplementationMarker(file, line, rawMarker) {
 }
 
 function buildGapRegister() {
+  const automatedRegressionEvidence = new Map([
+    ['Follower-only profiles have no follow-request approval flow', [
+      'services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts',
+      'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible',
+    ]],
+    ['All published releases are unsigned and unsigned releases are still trusted', [
+      'services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview',
+      'services/greenfield-api/tests/module-version-switch.test.ts',
+      'services/greenfield-worker/tests/module-trust-guard.test.ts',
+    ]],
+    ['Runtime auto-grants manifest permissions when no review row exists', [
+      'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing',
+      'services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable',
+    ]],
+    ['Reaction notification jobs are dead-lettering on database uniqueness errors', [
+      'services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications',
+      'services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window',
+      'services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state',
+    ]],
+    ['Legacy remote function invocation trusts a client-supplied installation ID', [
+      'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation',
+    ]],
+    ['AI stream cancel and reconnect omit account ownership checks', [
+      'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel',
+    ]],
+  ])
   const entries = [
     ...(!closeout.deploymentLineage?.reconciled ? [[
       'release','architecture debt','P1','Running production revision is not canonical origin/main',
@@ -531,6 +591,9 @@ function buildGapRegister() {
   return entries.map((entry, index) => ({
     id: `API-ATLAS-GAP-${String(index + 1).padStart(3, '0')}`,
     domain: entry[0], type: entry[1], severity: entry[2], title: entry[3], evidence: entry[4], affectedRoutes: entry[5], affectedFiles: entry[6], productionImpact: entry[7], recommendedFix: entry[8], dependencies: entry[9], verification: entry[10],
+    remediation: automatedRegressionEvidence.has(entry[3])
+      ? {status: 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING', evidence: automatedRegressionEvidence.get(entry[3])}
+      : {status: 'OPEN', evidence: []},
   }))
 }
 
@@ -584,7 +647,7 @@ function renderCsv(routes) {
 }
 
 function renderHttpAtlas(routes, reconciliation, sourceOnlyRoutes, runtimeOnlyRoutes) {
-  const summary = `# Complete HTTP API Atlas\n\nCaptured: ${snapshot.capturedAt}\n\n- Runtime method routes: ${reconciliation.runtimeMethodRoutes}\n- Application routes: ${reconciliation.applicationRuntimeRoutes}\n- Automatically generated HEAD routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'HEAD').length}\n- Framework CORS routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'OPTIONS').length}\n- Source-only: ${sourceOnlyRoutes.length}\n- Runtime-only: ${runtimeOnlyRoutes.length}\n- Reconciliation: \`${reconciliation.equation}\`\n\nEvery runtime method route is either represented below or explicitly listed as framework-derived in \`api-atlas.json\`. The JSON file is canonical for machine use.\n\n## Three-way reconciliation\n\n| Source | Runtime | Public edge | Status | Count |\n| --- | --- | --- | --- | ---: |\n| yes | yes | yes | reachable or feature-gated | ${routes.filter(route => route.sourceRegistration).length} |\n| yes | no | no | source-only | ${sourceOnlyRoutes.length} |\n| no | yes | yes | dynamically registered / investigate | ${runtimeOnlyRoutes.length} |\n| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | ${reconciliation.explicitlyExcludedFrameworkRoutes} |\n\n## Endpoint index\n\n| Domain | Method | Effective route | Access | Rate | Source | Runtime status |\n| --- | --- | --- | --- | --- | --- | --- |\n${routes.map(route => `| ${route.domain} | ${route.method} | \`${route.effectiveRoute}\` | ${route.authorization.visibility} | ${route.rateLimit ? `${route.rateLimit.max}/${route.rateLimit.timeWindow}` : 'none'} | ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'unmatched'} | ${route.status} |`).join('\n')}\n\n## Endpoint records\n\n`
+  const summary = `# Complete HTTP API Atlas\n\nProduction facts captured: ${snapshot.capturedAt}\nRoute evidence: ${runtimeEvidence.kind} captured ${runtimeEvidence.capturedAt}${candidateApplies ? ` for branch \`${runtimeEvidence.branch}\`; this does not claim deployment` : ''}.\n\n- Runtime method routes: ${reconciliation.runtimeMethodRoutes}\n- Application routes: ${reconciliation.applicationRuntimeRoutes}\n- Automatically generated HEAD routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'HEAD').length}\n- Framework CORS routes: ${reconciliation.frameworkRoutes.filter(route => route.method === 'OPTIONS').length}\n- Source-only: ${sourceOnlyRoutes.length}\n- Runtime-only: ${runtimeOnlyRoutes.length}\n- Reconciliation: \`${reconciliation.equation}\`\n\nEvery selected runtime-evidence method route is either represented below or explicitly listed as framework-derived in \`api-atlas.json\`. The JSON file is canonical for machine use.\n\n## Three-way reconciliation\n\n| Source | Runtime | Public edge | Status | Count |\n| --- | --- | --- | --- | ---: |\n| yes | yes | ${candidateApplies ? 'not yet' : 'yes'} | ${candidateApplies ? 'candidate-registered' : 'reachable or feature-gated'} | ${routes.filter(route => route.sourceRegistration).length} |\n| yes | no | no | source-only | ${sourceOnlyRoutes.length} |\n| no | yes | ${candidateApplies ? 'not yet' : 'yes'} | dynamically registered / investigate | ${runtimeOnlyRoutes.length} |\n| framework | yes | edge-dependent | explicitly excluded Fastify/CORS route | ${reconciliation.explicitlyExcludedFrameworkRoutes} |\n\n## Endpoint index\n\n| Domain | Method | Effective route | Access | Rate | Source | Runtime status |\n| --- | --- | --- | --- | --- | --- | --- |\n${routes.map(route => `| ${route.domain} | ${route.method} | \`${route.effectiveRoute}\` | ${route.authorization.visibility} | ${route.rateLimit ? `${route.rateLimit.max}/${route.rateLimit.timeWindow}` : 'none'} | ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'unmatched'} | ${route.status} |`).join('\n')}\n\n## Endpoint records\n\n`
   const contractNotes = `## Error contract\n\nThe canonical envelope is \`{ok,data,meta:{requestId,serverTime}}\` or \`{ok:false,error:{code,message,requestId,retryable,fieldErrors?,details?},meta}\` (\`services/greenfield-api/src/transport/envelope.ts:9\`). Status mapping is 400 for validation/schema/abstention, 401 for authentication/session/step-up, 403 for authorization/policy denial, 404 for unknown resources, 409 for conflicts/approval state, 429 for explicit rate-limit codes and 500 by default. Fastify-generated 413 body-limit and 415 content-parser errors can bypass this envelope because no global custom error handler exists. No canonical 422 mapping was found. Binary media, OAuth redirects and SSE are deliberate specialized responses.\n\n## Pagination contract\n\nShared cursor pagination uses default 20, maximum 50, a maximum 512-byte opaque cursor, stable route-specific ordering, \`nextCursor\`, and no previous cursor (\`services/greenfield-api/src/transport/pagination.ts:1\`). Every route's machine record includes \`request.pagination\`; \`none observed\` exposes unpaginated or non-list handlers rather than inventing a contract. Discover/activity unbounded behavior is a registered gap.\n\n`
   const enrichedSummary = summary.replace('\n## Endpoint index', `\n${contractNotes}## Endpoint index`)
   return enrichedSummary + routes.map(route => `<details>\n<summary><code>${route.id}</code> — ${route.status}</summary>\n\n- Domain: ${route.domain}\n- Method: ${route.method}\n- Effective route: \`${route.effectiveRoute}\`\n- Public URL: \`${route.publicUrl}\`\n- API version: ${route.apiVersion}\n- Source file: ${route.source ? `\`${route.source.file}:${route.source.line}\`` : 'UNMATCHED'}\n- Handler: ${route.handler}\n- Controller/service calls: ${list(route.controllerServices)}\n- Authentication: ${route.authentication}\n- Authorization: ${route.authorization.visibility}\n- Ownership rule: ${route.authorization.ownership.rule}\n- Workspace rule: ${route.authorization.ownership.workspaceScoped ? 'workspace identifier observed; downstream enforcement requires service evidence' : 'none observed'}\n- Capability/permission: ${list([...route.authorization.capabilities, ...route.authorization.serviceOperations])}\n- Rate limit: ${route.rateLimit ? `${route.rateLimit.max} per ${route.rateLimit.timeWindow}` : 'none registered'}\n- Request params: ${list(route.request.params)}\n- Request query: ${list(route.request.query)}\n- Request body: ${list(route.request.body)}\n- Pagination: ${route.request.pagination.style}${route.request.pagination.maximumPageSize ? `; default ${route.request.pagination.defaultPageSize}, max ${route.request.pagination.maximumPageSize}, next cursor ${route.request.pagination.nextCursor ? 'yes' : 'no'}` : ''}\n- Response schema: ${route.response.explicitFastifySchema ? JSON.stringify(route.response.schema) : 'not declared in Fastify'}\n- Success codes: ${list(route.successCodes)}\n- Expected errors: ${list(route.expectedErrors)}\n- Database reads: ${list(route.data.reads)}\n- Database writes: ${list(route.data.writes)}\n- Storage: ${list(route.storage)}\n- Events produced: ${list(route.eventsProduced)}\n- Jobs produced: ${list(route.jobsProduced)}\n- External integrations: ${list(route.externalIntegrations)}\n- Known clients: ${list(route.callers.clients)}\n- Tests: ${list(route.callers.tests)}\n- Runtime registration: yes\n- Live probe: ${route.liveProbe ? `${route.liveProbe.result} (${route.liveProbe.status})` : 'not executed'}\n- Status: ${route.status}\n- Notes: ${route.notes}\n\n</details>\n\n`).join('')
@@ -748,9 +811,9 @@ function countBy(items, key) {
 function renderReadme() {
   return `# MODULA GREENFIELD — API-ATLAS-01
 
-Status: **${atlasStatus}**. Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled. Route completeness passed: ${runtime.length} runtime method routes = ${atlas.length} mapped application routes + ${frameworkRuntime.length} explicitly excluded framework-derived routes. ${acceptanceComplete ? 'Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.' : 'Authenticated closeout evidence is not yet complete.'}
+Status: **${atlasStatus}**. ${candidateApplies ? 'Candidate source and locally built runtime routes are reconciled; deployment, database, edge and operational facts remain sourced only from the production snapshot.' : 'Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled.'} Route completeness passed: ${runtime.length} runtime method routes = ${atlas.length} mapped application routes + ${frameworkRuntime.length} explicitly excluded framework-derived routes. ${acceptanceComplete ? 'Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.' : 'Authenticated closeout evidence is not yet complete.'}
 
-This directory is the canonical evidence-backed snapshot captured at ${snapshot.capturedAt}. The machine-readable source of truth is \`api-atlas.json\`; Markdown files are generated views. Secret values and production row data are excluded.
+This directory combines production truth captured at ${snapshot.capturedAt} with ${candidateApplies ? `fresh local candidate route evidence captured at ${runtimeEvidence.capturedAt}` : 'the captured production runtime route evidence'}. The machine-readable source of truth is \`api-atlas.json\`; Markdown files are generated views. Candidate evidence never claims deployment. Secret values and production row data are excluded.
 
 ## Contents
 
@@ -770,10 +833,11 @@ This directory is the canonical evidence-backed snapshot captured at ${snapshot.
 - \`13-verification-results.md\`: audit-tool, typecheck and test outcomes plus explicit limitations.
 - \`openapi.generated.yaml\`: generated implementation snapshot, intentionally incomplete where route schemas do not exist.
 - \`evidence/production-snapshot.json\`, \`evidence/authenticated-acceptance.json\`: sanitized production facts; no secrets or user rows.
+- \`evidence/candidate-runtime.json\`: locally built feature-branch route registration plus an API-source fingerprint; never production truth.
 
 ## Reproduce
 
-\`pnpm api:atlas:capture\` reads production state without changing it. \`pnpm api:atlas:probe\` runs the bounded anonymous probe set. \`pnpm api:atlas:acceptance\` runs cleanup-capable authenticated acceptance with protected credentials. \`pnpm api:atlas\` regenerates the atlas. \`pnpm api:atlas:verify\` checks determinism, parsability, route reconciliation and secret safety.
+\`pnpm api:atlas:capture\` reads production state without changing it. \`pnpm api:atlas:capture-candidate\` builds the API and captures feature-branch route registration without connecting to PostgreSQL. \`pnpm api:atlas:probe\` runs the bounded anonymous probe set. \`pnpm api:atlas:acceptance\` runs cleanup-capable authenticated acceptance with protected credentials. \`pnpm api:atlas\` regenerates the atlas. \`pnpm api:atlas:verify\` checks evidence provenance, source freshness, determinism, parsability, route reconciliation and secret safety.
 `
 }
 
@@ -799,6 +863,7 @@ Worker service: \`${snapshot.containers.worker.name}\` (DB heartbeat fresh; no D
 Database: PostgreSQL ${snapshot.databaseSchema.serverVersion}
 Public API base: \`${baseUrl}\`
 HTTP routes discovered: ${atlas.length} application / ${runtime.length} runtime method routes
+Route evidence: ${runtimeEvidence.kind}${candidateApplies ? ` for feature branch ${runtimeEvidence.branch}; not deployed` : ` at production revision ${runtimeEvidence.revision}`}
 Public routes: ${stats.visibility.PUBLIC}
 Authenticated routes: ${stats.visibility.AUTHENTICATED}
 Admin/internal routes: ${stats.visibility.ADMIN + stats.visibility['SERVICE/WORKER'] + stats.visibility['INTERNAL (nginx-reachable; handler/service guard applies)']}
@@ -828,10 +893,10 @@ Status: **${atlasStatus}**. ${acceptanceComplete ? `The map is complete: ${liveP
 
 ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Missing/client-only','P0 gaps'], domainRows)}
 
-## Production conclusions
+## ${candidateApplies ? 'Candidate and production conclusions' : 'Production conclusions'}
 
 - The running API and worker are the same OCI revision, \`${snapshot.containers.api.revision}\`; ${snapshot.repository.originMain === snapshot.containers.api.revision ? 'that revision exactly matches captured `origin/main`.' : closeout.deploymentLineage?.reconciled ? 'its accepted relationship to canonical `origin/main` is recorded in the deployment-lineage closeout.' : 'that revision differs from captured `origin/main` and remains a release-governance gap.'}
-- Source/runtime reconciliation is exact: ${runtime.length} = ${atlas.length} application routes + ${frameworkRuntime.length} automatic framework routes; there are no unexplained source-only or runtime-only application routes.
+- ${candidateApplies ? 'Candidate source/runtime' : 'Source/runtime'} reconciliation is exact: ${runtime.length} = ${atlas.length} application routes + ${frameworkRuntime.length} automatic framework routes; there are no unexplained source-only or runtime-only application routes.${candidateApplies ? ` Production remains separately observed at ${snapshot.runtimeRoutes.length} runtime method routes on ${snapshot.containers.api.revision}.` : ''}
 - The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
@@ -979,7 +1044,7 @@ flowchart TD
 
 - Applied migrations: ${snapshot.databaseSchema.appliedMigrations.length}; latest \`${snapshot.databaseSchema.appliedMigrations.at(-1).id}\` at ${snapshot.databaseSchema.appliedMigrations.at(-1).appliedAt}.
 - Git up migrations: ${migrations.files.length}; latest \`${migrations.files.at(-1)}\`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
-- Runtime routes: ${runtime.length}; application routes: ${atlas.length}; excluded automatic framework routes: ${frameworkRuntime.length}.
+- Production runtime routes: ${productionRuntime.length}; excluded automatic production framework routes: ${productionFrameworkRuntime.length}. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration
 
@@ -1343,6 +1408,8 @@ Types: ${Object.entries(typeCounts).map(([key,value]) => `${key}=${value}`).join
 ${gaps.map(gap => `## ${gap.id} — ${gap.severity} — ${gap.title}
 
 - Domain/type: \`${gap.domain}\` / \`${gap.type}\`
+- Remediation status: **${gap.remediation.status}**
+- Remediation evidence: ${gap.remediation.evidence.map(value => `\`${value}\``).join(', ') || 'none'}
 - Evidence: ${gap.evidence.map(value => `\`${value}\``).join(', ') || 'none'}
 - Affected routes: ${gap.affectedRoutes.map(value => `\`${value}\``).join(', ') || 'none/architectural'}
 - Affected files: ${gap.affectedFiles.map(value => `\`${value}\``).join(', ') || 'none'}

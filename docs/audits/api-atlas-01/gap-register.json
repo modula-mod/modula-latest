@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-04T15:10:21.196Z",
+    "capturedAt": "2026-10-07T16:29:42.416Z",
     "status": "PASS"
   },
   "gaps": [
@@ -26,7 +26,14 @@
         "social schema",
         "client request UI"
       ],
-      "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data."
+      "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-002",
@@ -54,7 +61,15 @@
         "publisher key ceremony",
         "release republishing"
       ],
-      "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified."
+      "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview",
+          "services/greenfield-api/tests/module-version-switch.test.ts",
+          "services/greenfield-worker/tests/module-trust-guard.test.ts"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-003",
@@ -79,7 +94,11 @@
         "registry ingestion",
         "artifact retention"
       ],
-      "verification": "Every published installable release must pass a digest-matched artifact GET."
+      "verification": "Every published installable release must pass a digest-matched artifact GET.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-004",
@@ -103,7 +122,11 @@
         "registry ingestion",
         "artwork pipeline"
       ],
-      "verification": "Catalogue crawl must retrieve and digest-check every advertised available asset."
+      "verification": "Catalogue crawl must retrieve and digest-check every advertised available asset.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-005",
@@ -128,7 +151,14 @@
       "dependencies": [
         "installation migration"
       ],
-      "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN."
+      "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing",
+          "services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-006",
@@ -153,7 +183,15 @@
         "notification schema",
         "dead-letter replay"
       ],
-      "verification": "Repeated reactions must converge to one notification and leave no dead letter."
+      "verification": "Repeated reactions must converge to one notification and leave no dead letter.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications",
+          "services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window",
+          "services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-007",
@@ -179,7 +217,11 @@
         "provider credentials",
         "policy approval"
       ],
-      "verification": "A non-mock production request must execute, ledger usage, and pass failure/timeout tests."
+      "verification": "A non-mock production request must execute, ledger usage, and pass failure/timeout tests.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-008",
@@ -206,7 +248,11 @@
         "operational provider",
         "Nodus contract"
       ],
-      "verification": "Unseen objectives must yield bounded proposals and every run must traverse decisions, approvals and ledger."
+      "verification": "Unseen objectives must yield bounded proposals and every run must traverse decisions, approvals and ledger.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-009",
@@ -227,7 +273,11 @@
       "dependencies": [
         "intelligence contract design"
       ],
-      "verification": "Contract tests must cover offline proposal, reconnect, approval and ledger synchronization."
+      "verification": "Contract tests must cover offline proposal, reconnect, approval and ledger synchronization.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-010",
@@ -254,7 +304,13 @@
       "dependencies": [
         "function route consolidation"
       ],
-      "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy."
+      "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-011",
@@ -282,7 +338,13 @@
       "dependencies": [
         "AI stream contract"
       ],
-      "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream."
+      "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream.",
+      "remediation": {
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "evidence": [
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel"
+        ]
+      }
     },
     {
       "id": "API-ATLAS-GAP-012",
@@ -308,7 +370,11 @@
         "post schema",
         "client decoder"
       ],
-      "verification": "Contract tests must prove each advertised composer type survives create and retrieval."
+      "verification": "Contract tests must prove each advertised composer type survives create and retrieval.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-013",
@@ -332,7 +398,11 @@
         "client upload migration",
         "nginx review"
       ],
-      "verification": "A boundary-size audit attachment must publish through the intended path without widening unrelated routes."
+      "verification": "A boundary-size audit attachment must publish through the intended path without widening unrelated routes.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-014",
@@ -358,7 +428,11 @@
         "storage decision",
         "recovery rehearsal"
       ],
-      "verification": "Restore media plus metadata to a clean host and digest-check every referenced object."
+      "verification": "Restore media plus metadata to a clean host and digest-check every referenced object.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-015",
@@ -384,7 +458,11 @@
         "signing policy",
         "GitHub source"
       ],
-      "verification": "A tagged release must be discovered, verified, ingested and published without manual database work."
+      "verification": "A tagged release must be discovered, verified, ingested and published without manual database work.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-016",
@@ -400,12 +478,16 @@
       "affectedFiles": [
         "services/greenfield-api/src"
       ],
-      "productionImpact": "All 393 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
+      "productionImpact": "All 408 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.",
       "recommendedFix": "Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.",
       "dependencies": [
         "API contract ownership"
       ],
-      "verification": "Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass."
+      "verification": "Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-017",
@@ -429,7 +511,11 @@
       "dependencies": [
         "worker schedule"
       ],
-      "verification": "Expired sessions/orphans must be removed while bound media remains retrievable."
+      "verification": "Expired sessions/orphans must be removed while bound media remains retrievable.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-018",
@@ -453,7 +539,11 @@
       "dependencies": [
         "attachment service"
       ],
-      "verification": "Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed."
+      "verification": "Invalid magic bytes and oversized decoded payloads must fail; expired bytes must be removed.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-019",
@@ -478,7 +568,11 @@
       "dependencies": [
         "client migration"
       ],
-      "verification": "All new avatar/cover writes must create profile_media and resolve to canonical attachment URLs."
+      "verification": "All new avatar/cover writes must create profile_media and resolve to canonical attachment URLs.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-020",
@@ -501,7 +595,11 @@
       "dependencies": [
         "shared schema"
       ],
-      "verification": "Unknown mode must return VALIDATION_FAILED; three supported modes need response snapshots."
+      "verification": "Unknown mode must return VALIDATION_FAILED; three supported modes need response snapshots.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-021",
@@ -524,7 +622,11 @@
       "dependencies": [
         "error policy"
       ],
-      "verification": "Cross-user fixture must receive the same status/shape for private-existing and unknown IDs."
+      "verification": "Cross-user fixture must receive the same status/shape for private-existing and unknown IDs.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-022",
@@ -552,7 +654,11 @@
       "dependencies": [
         "database transaction design"
       ],
-      "verification": "Parallel duplicate submissions must converge without 500s or counter drift."
+      "verification": "Parallel duplicate submissions must converge without 500s or counter drift.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-023",
@@ -576,7 +682,11 @@
       "dependencies": [
         "response contract"
       ],
-      "verification": "Seeded volume test must show bounded queries and stable cursors."
+      "verification": "Seeded volume test must show bounded queries and stable cursors.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-024",
@@ -599,7 +709,11 @@
       "dependencies": [
         "notification delivery design"
       ],
-      "verification": "A client must receive a new notification through the documented mechanism with reconnect semantics."
+      "verification": "A client must receive a new notification through the documented mechanism with reconnect semantics.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-025",
@@ -621,7 +735,11 @@
       "dependencies": [
         "provider adapters"
       ],
-      "verification": "Each advertised webhook provider must have a verified route and replay test."
+      "verification": "Each advertised webhook provider must have a verified route and replay test.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-026",
@@ -643,7 +761,11 @@
       "dependencies": [
         "event/job taxonomy"
       ],
-      "verification": "Every supported job type must have an asserted effect or be rejected as unsupported."
+      "verification": "Every supported job type must have an asserted effect or be rejected as unsupported.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-027",
@@ -672,7 +794,11 @@
       "dependencies": [
         "module standard extensions"
       ],
-      "verification": "A neutral reference module must exercise the same flows without core code changes."
+      "verification": "A neutral reference module must exercise the same flows without core code changes.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-028",
@@ -695,7 +821,11 @@
       "dependencies": [
         "migration policy"
       ],
-      "verification": "Every active installation must resolve a digest-verified descriptor."
+      "verification": "Every active installation must resolve a digest-verified descriptor.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-030",
@@ -719,7 +849,11 @@
       "dependencies": [
         "profile contract"
       ],
-      "verification": "Create/update/delete a link and verify privacy-filtered retrieval."
+      "verification": "Create/update/delete a link and verify privacy-filtered retrieval.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-031",
@@ -746,7 +880,11 @@
       "dependencies": [
         "client migration"
       ],
-      "verification": "All clients use canonical routes; aliases have explicit sunset tests."
+      "verification": "All clients use canonical routes; aliases have explicit sunset tests.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-032",
@@ -769,7 +907,11 @@
       "dependencies": [
         "observability backend"
       ],
-      "verification": "One synthetic request must be traceable across edge, API, outbox, job and result."
+      "verification": "One synthetic request must be traceable across edge, API, outbox, job and result.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-033",
@@ -788,14 +930,18 @@
       "dependencies": [
         "deployment config"
       ],
-      "verification": "Stopping worker progress must transition container/status health within the documented window."
+      "verification": "Stopping worker progress must transition container/status health within the documented window.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-034",
       "domain": "testing",
       "type": "untested endpoint",
       "severity": "P2",
-      "title": "70 application routes have no statically matched automated test",
+      "title": "77 application routes have no statically matched automated test",
       "evidence": [
         "api-atlas.json#/routes"
       ],
@@ -806,7 +952,11 @@
       "dependencies": [
         "test fixtures"
       ],
-      "verification": "Atlas automatedTest coverage should reach the agreed threshold with security routes at 100%."
+      "verification": "Atlas automatedTest coverage should reach the agreed threshold with security routes at 100%.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-035",
@@ -827,7 +977,11 @@
         "design approval",
         "asset ingestion"
       ],
-      "verification": "Public catalogue must contain no developmentAsset=true for released products."
+      "verification": "Public catalogue must contain no developmentAsset=true for released products.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-036",
@@ -843,19 +997,23 @@
       "affectedFiles": [
         "scripts/verify-greenfield-backend-v1.mjs"
       ],
-      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 063_settings_backend_v2; it cannot truthfully serve as the current acceptance command.",
+      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 065_comments_rich; it cannot truthfully serve as the current acceptance command.",
       "recommendedFix": "Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.",
       "dependencies": [
         "verification ownership"
       ],
-      "verification": "The canonical verifier must pass on reviewed current main at 063_settings_backend_v2 without weakening exact-SHA production checks."
+      "verification": "The canonical verifier must pass on reviewed current main at 065_comments_rich without weakening exact-SHA production checks.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-037",
       "domain": "database",
       "type": "orphan table",
       "severity": "P3",
-      "title": "14 tables have no API/worker source reference",
+      "title": "13 tables have no API/worker source reference",
       "evidence": [
         "04-database-api-map.md"
       ],
@@ -866,7 +1024,11 @@
       "dependencies": [
         "schema owners"
       ],
-      "verification": "Repository-wide reference and production usage review resolves every candidate."
+      "verification": "Repository-wide reference and production usage review resolves every candidate.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-038",
@@ -884,7 +1046,11 @@
       "dependencies": [
         "operations approval"
       ],
-      "verification": "Only documented production and active audit containers remain."
+      "verification": "Only documented production and active audit containers remain.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-039",
@@ -903,7 +1069,11 @@
       "dependencies": [
         "compose review"
       ],
-      "verification": "Dependency graph either names a real Redis consumer or the service is absent."
+      "verification": "Dependency graph either names a real Redis consumer or the service is absent.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     },
     {
       "id": "API-ATLAS-GAP-040",
@@ -922,7 +1092,11 @@
       "dependencies": [
         "test environment"
       ],
-      "verification": "Representative flows reconcile static maps with observed queries without production tracing."
+      "verification": "Representative flows reconcile static maps with observed queries without production tracing.",
+      "remediation": {
+        "status": "OPEN",
+        "evidence": []
+      }
     }
   ]
 }

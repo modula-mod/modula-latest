@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto'
 import {execFileSync} from 'node:child_process'
 import {existsSync, readFileSync, readdirSync, statSync} from 'node:fs'
 import {extname, join, relative} from 'node:path'
-import {outputDir, repoRoot} from './lib.mjs'
+import {apiSourceFingerprint, commandOr, outputDir, repoRoot} from './lib.mjs'
 
 const required = [
   'README.md', '00-executive-summary.md', '00-production-truth.md', '01-application-boot-map.md',
@@ -14,7 +14,7 @@ const required = [
   '13-verification-results.md',
   'route-data-map.json', 'contract-baseline.json', 'worker-job-map.json', 'gap-register.json', 'openapi.generated.yaml', 'request-flow.mmd',
   'module-flow.mmd', 'intelligence-flow.mmd', 'media-flow.mmd', 'event-flow.mmd',
-  'client-contract-analysis.json', 'evidence/production-snapshot.json', 'evidence/live-probes.json',
+  'client-contract-analysis.json', 'evidence/production-snapshot.json', 'evidence/candidate-runtime.json', 'evidence/live-probes.json',
   'evidence/source-sweep.json', 'evidence/authenticated-acceptance.json', 'evidence/api-baseline-02-closeout.json',
 ]
 
@@ -75,6 +75,7 @@ let atlas
 let gaps
 let routeData
 let snapshot
+let candidate
 let probes
 let clientContracts
 let openapi
@@ -86,6 +87,7 @@ try { atlas = JSON.parse(readFileSync(join(outputDir, 'api-atlas.json'), 'utf8')
 try { gaps = JSON.parse(readFileSync(join(outputDir, 'gap-register.json'), 'utf8')); check('gap-register.json parses', true) } catch (error) { check('gap-register.json parses', false, error.message) }
 try { routeData = JSON.parse(readFileSync(join(outputDir, 'route-data-map.json'), 'utf8')); check('route-data-map.json parses', true) } catch (error) { check('route-data-map.json parses', false, error.message) }
 try { snapshot = JSON.parse(readFileSync(join(outputDir, 'evidence/production-snapshot.json'), 'utf8')); check('production snapshot parses', true) } catch (error) { check('production snapshot parses', false, error.message) }
+try { candidate = JSON.parse(readFileSync(join(outputDir, 'evidence/candidate-runtime.json'), 'utf8')); check('candidate runtime parses', true) } catch (error) { check('candidate runtime parses', false, error.message) }
 try { probes = JSON.parse(readFileSync(join(outputDir, 'evidence/live-probes.json'), 'utf8')); check('live probes parse', true) } catch (error) { check('live probes parse', false, error.message) }
 try { clientContracts = JSON.parse(readFileSync(join(outputDir, 'client-contract-analysis.json'), 'utf8')); check('client contract analysis parses', true) } catch (error) { check('client contract analysis parses', false, error.message) }
 try { openapi = JSON.parse(readFileSync(join(outputDir, 'openapi.generated.yaml'), 'utf8')); check('OpenAPI YAML parses as JSON-compatible YAML', true) } catch (error) { check('OpenAPI YAML parses as JSON-compatible YAML', false, error.message) }
@@ -96,11 +98,14 @@ try { workerJobMap = JSON.parse(readFileSync(join(outputDir, 'worker-job-map.jso
 
 if (atlas && snapshot) {
   const reconciliation = atlas.reconciliation
+  const runtimeEvidence = atlas.metadata?.runtimeEvidence
+  const selectedRouteCount = runtimeEvidence?.routeCount
   check('runtime route equation', reconciliation.runtimeMethodRoutes === reconciliation.applicationRuntimeRoutes + reconciliation.explicitlyExcludedFrameworkRoutes, JSON.stringify(reconciliation))
   check('every application route mapped', reconciliation.mappedApplicationRoutes === reconciliation.applicationRuntimeRoutes && reconciliation.runtimeOnlyRoutes === 0)
   check('no source-only route', reconciliation.sourceOnlyRoutes === 0)
   check('no duplicate source route', reconciliation.duplicates.length === 0)
-  check('route count matches runtime snapshot', reconciliation.runtimeMethodRoutes === snapshot.runtimeRoutes.length)
+  check('route count matches selected runtime evidence', reconciliation.runtimeMethodRoutes === selectedRouteCount)
+  check('production runtime remains separately identified', snapshot.runtimeRoutes.length > 0 && snapshot.containers?.api?.revision === atlas.metadata?.productionSha)
   check('unique route IDs', new Set(atlas.routes.map(route => route.id)).size === atlas.routes.length)
   check('effective prefixes resolved', atlas.routes.every(route => route.effectiveRoute === '*' || route.effectiveRoute.startsWith('/')))
   check('every route has source evidence', atlas.routes.every(route => route.source?.file && Number.isInteger(route.source.line)))
@@ -110,10 +115,25 @@ if (atlas && snapshot) {
   check('OpenAPI operation count', Object.values(openapi.paths).reduce((count, path) => count + Object.keys(path).length, 0) === atlas.routes.length)
 }
 
+if (candidate) {
+  check('candidate evidence kind', candidate.evidenceKind === 'local-candidate-runtime')
+  check('candidate evidence schema', candidate.schemaVersion === 1 && Array.isArray(candidate.runtimeRoutes) && candidate.runtimeRoutes.length > 0)
+  check('candidate evidence does not claim production', !candidate.production && !candidate.deployed && !candidate.publicEdge)
+  const currentBranch = process.env.GITHUB_HEAD_REF || commandOr('git', ['branch', '--show-current'])
+  const candidateSelected = atlas?.metadata?.runtimeEvidence?.kind === 'local-candidate-runtime'
+  if (candidateSelected) {
+    const explicitMainPredeploy = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate' && currentBranch === 'main'
+    check('candidate branch matches current branch or explicit main predeploy', Boolean(currentBranch) && (candidate.source?.branch === currentBranch || explicitMainPredeploy), `${candidate.source?.branch ?? 'missing'} != ${currentBranch || 'missing'}`)
+    check('candidate source fingerprint is fresh', candidate.source?.apiSourceSha256 === apiSourceFingerprint())
+    check('candidate atlas is not marked public edge', atlas.routes.every(route => route.publicEdge === false && route.status === 'candidate-registered-not-production-probed'))
+  }
+}
+
 if (gaps) {
   check('gap IDs unique', new Set(gaps.gaps.map(gap => gap.id)).size === gaps.gaps.length)
-  check('gap schema complete', gaps.gaps.every(gap => ['id','domain','type','severity','title','evidence','affectedRoutes','affectedFiles','productionImpact','recommendedFix','dependencies','verification'].every(key => key in gap)))
+  check('gap schema complete', gaps.gaps.every(gap => ['id','domain','type','severity','title','evidence','affectedRoutes','affectedFiles','productionImpact','recommendedFix','dependencies','verification','remediation'].every(key => key in gap)))
   check('gap severities valid', gaps.gaps.every(gap => ['P0','P1','P2','P3'].includes(gap.severity)))
+  check('gap remediation states valid', gaps.gaps.every(gap => ['OPEN','FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING'].includes(gap.remediation?.status)))
 }
 
 if (probes) check('safe probe suite passed', probes.probes.length > 0 && probes.probes.every(probe => probe.result === 'PASS'))

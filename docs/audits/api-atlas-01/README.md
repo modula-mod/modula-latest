@@ -1,8 +1,8 @@
 # MODULA GREENFIELD — API-ATLAS-01
 
-Status: **PASS**. Production, source, runtime, edge, database, module, intelligence and asynchronous surfaces were reconciled. Route completeness passed: 551 runtime method routes = 393 mapped application routes + 158 explicitly excluded framework-derived routes. Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.
+Status: **PASS**. Candidate source and locally built runtime routes are reconciled; deployment, database, edge and operational facts remain sourced only from the production snapshot. Route completeness passed: 574 runtime method routes = 408 mapped application routes + 166 explicitly excluded framework-derived routes. Dedicated production audit identities executed authenticated cross-user and write acceptance; controlled exact-schema tests characterize module, intelligence and known expected-failure behavior.
 
-This directory is the canonical evidence-backed snapshot captured at 2026-10-04T15:10:21.196Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Secret values and production row data are excluded.
+This directory combines production truth captured at 2026-10-07T16:29:42.416Z with fresh local candidate route evidence captured at 2026-10-08T22:15:58.151Z. The machine-readable source of truth is `api-atlas.json`; Markdown files are generated views. Candidate evidence never claims deployment. Secret values and production row data are excluded.
 
 ## Contents
 
@@ -22,7 +22,8 @@ This directory is the canonical evidence-backed snapshot captured at 2026-10-04T
 - `13-verification-results.md`: audit-tool, typecheck and test outcomes plus explicit limitations.
 - `openapi.generated.yaml`: generated implementation snapshot, intentionally incomplete where route schemas do not exist.
 - `evidence/production-snapshot.json`, `evidence/authenticated-acceptance.json`: sanitized production facts; no secrets or user rows.
+- `evidence/candidate-runtime.json`: locally built feature-branch route registration plus an API-source fingerprint; never production truth.
 
 ## Reproduce
 
-`pnpm api:atlas:capture` reads production state without changing it. `pnpm api:atlas:probe` runs the bounded anonymous probe set. `pnpm api:atlas:acceptance` runs cleanup-capable authenticated acceptance with protected credentials. `pnpm api:atlas` regenerates the atlas. `pnpm api:atlas:verify` checks determinism, parsability, route reconciliation and secret safety.
+`pnpm api:atlas:capture` reads production state without changing it. `pnpm api:atlas:capture-candidate` builds the API and captures feature-branch route registration without connecting to PostgreSQL. `pnpm api:atlas:probe` runs the bounded anonymous probe set. `pnpm api:atlas:acceptance` runs cleanup-capable authenticated acceptance with protected credentials. `pnpm api:atlas` regenerates the atlas. `pnpm api:atlas:verify` checks evidence provenance, source freshness, determinism, parsability, route reconciliation and secret safety.

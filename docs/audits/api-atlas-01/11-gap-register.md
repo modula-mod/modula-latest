@@ -7,6 +7,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-001 — P1 — Follower-only profiles have no follow-request approval flow
 
 - Domain/type: `social` / `missing endpoint`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible`
 - Evidence: `services/greenfield-api/src/domains/profiles/writes.ts:57`, `services/greenfield-api/src/domains/profiles/writes.ts:89`
 - Affected routes: `POST /v1/profiles/:profileId/follow`
 - Affected files: `services/greenfield-api/src/domains/profiles/writes.ts`
@@ -18,6 +20,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-002 — P1 — All published releases are unsigned and unsigned releases are still trusted
 
 - Domain/type: `modules` / `missing signature verification`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-worker/tests/module-trust-guard.test.ts`
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/publishedUnsignedReleases`, `services/greenfield-api/src/modules/registry-trust-service.ts:109`, `services/greenfield-api/src/modules/registry-trust-service.ts:127`, `services/greenfield-api/src/modules/release-service.ts:441`
 - Affected routes: `GET /v1/registry/modules/:moduleId`, `POST /v1/modules/:moduleId/install`
 - Affected files: `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`
@@ -29,6 +33,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-003 — P1 — Only 2 of 14 registry releases have retrievable package bytes
 
 - Domain/type: `modules` / `missing artifact`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/releaseArtifactCoverage`, `docs/audits/api-atlas-01/evidence/live-probes.json`
 - Affected routes: `GET /v1/registry/releases/:releaseId/artifact`, `POST /v1/modules/:moduleId/install`
 - Affected files: `services/greenfield-api/src/modules/install-descriptor-service.ts`
@@ -40,6 +46,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-004 — P1 — Seven of seventeen module presentation assets have metadata but no blob
 
 - Domain/type: `modules` / `missing storage delivery`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/presentationAssets`, `docs/audits/api-atlas-01/evidence/live-probes.json`
 - Affected routes: `GET /v1/registry/releases/:releaseId/assets/:assetId`
 - Affected files: `services/greenfield-api/src/modules/routes/index.ts`
@@ -51,6 +59,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-005 — P1 — Runtime auto-grants manifest permissions when no review row exists
 
 - Domain/type: `modules` / `inconsistent permission`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing`, `services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable`
 - Evidence: `services/greenfield-api/src/modules/runtime-access.ts:51`, `services/greenfield-api/src/modules/runtime-access.ts:71`, `evidence/production-snapshot.json#/operationalAggregates/activeInstallPermissionReviews`
 - Affected routes: `GET /v1/modules/:moduleId/records/:collection`, `POST /v1/modules/:moduleId/actions/:actionId`
 - Affected files: `services/greenfield-api/src/modules/runtime-access.ts`
@@ -62,6 +72,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-006 — P1 — Reaction notification jobs are dead-lettering on database uniqueness errors
 
 - Domain/type: `activity` / `event delivery gap`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state`
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/failedJobs`, `evidence/production-snapshot.json#/operationalAggregates/jobFailureDetails`
 - Affected routes: `PUT /v1/posts/:postId/reaction`, `GET /v1/notifications`
 - Affected files: `services/greenfield-worker/src/notifications/create.ts`
@@ -73,6 +85,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-007 — P1 — No operational production model/provider is available
 
 - Domain/type: `intelligence` / `placeholder implementation`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/aiProviders`, `evidence/production-snapshot.json#/operationalAggregates/aiRuntime`, `services/greenfield-api/src/ai/providers/resolver.ts:53`
 - Affected routes: `POST /v1/modules/:moduleId/ai/requests`, `POST /v1/ai/requests`
 - Affected files: `services/greenfield-api/src/ai/provider-runtime-service.ts`
@@ -84,6 +98,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-008 — P1 — GAIA is an acceptance-fixture planner, not a general operational planner
 
 - Domain/type: `intelligence` / `placeholder implementation`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `packages/intelligence-governance/src/gaia.ts:10`, `packages/intelligence-governance/src/gaia.ts:17`, `packages/intelligence-governance/src/gaia.ts:86`, `services/greenfield-api/src/intelligence/service.ts:18`
 - Affected routes: `POST /v1/intelligence/missions/:missionId/start`
 - Affected files: `packages/intelligence-governance/src/gaia.ts`, `services/greenfield-api/src/intelligence/service.ts`
@@ -95,6 +111,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-009 — P1 — No Nodus integration surface or local-client contract exists
 
 - Domain/type: `intelligence` / `missing endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/source-sweep.json`, `packages/intelligence-contracts/src/domain.ts`
 - Affected routes: none/architectural
 - Affected files: `packages/intelligence-contracts/src`
@@ -106,6 +124,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-010 — P1 — Legacy remote function invocation trusts a client-supplied installation ID
 
 - Domain/type: `security` / `missing ownership check`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation`
 - Evidence: `services/greenfield-api/src/app/register-routes.ts:1244`, `services/greenfield-api/src/app/register-routes.ts:1250`, `services/greenfield-api/src/functions/service.ts:6`, `services/greenfield-api/src/extensions/capability-resolver.ts:2`, `evidence/production-snapshot.json#/operationalAggregates/legacyFunctionRuntime`
 - Affected routes: `POST /v1/functions/:functionId/invoke`
 - Affected files: `services/greenfield-api/src/functions/service.ts`, `services/greenfield-api/src/extensions/capability-resolver.ts`
@@ -117,6 +137,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-011 — P1 — AI stream cancel and reconnect omit account ownership checks
 
 - Domain/type: `security` / `missing ownership check`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel`
 - Evidence: `services/greenfield-api/src/ai/routes.ts:186`, `services/greenfield-api/src/ai/routes.ts:198`, `services/greenfield-api/src/ai/streaming-runtime.ts:50`, `services/greenfield-api/src/ai/streaming-runtime.ts:94`, `evidence/production-snapshot.json#/operationalAggregates/aiRuntime/streams`
 - Affected routes: `POST /v1/ai/streams/:streamId/cancel`, `POST /v1/ai/streams/:streamId/reconnect`
 - Affected files: `services/greenfield-api/src/ai/routes.ts`, `services/greenfield-api/src/ai/streaming-runtime.ts`
@@ -128,6 +150,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-012 — P1 — Link and poll composer contracts are not persisted by GreenField
 
 - Domain/type: `posts` / `client contract mismatch`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `packages/api-contracts/src/posts.ts:103`, `services/greenfield-api/src/domains/posts/writes.ts:32`, `src/features/composer/screens/ComposerScreen.tsx:523`
 - Affected routes: `POST /v1/posts`
 - Affected files: `packages/api-contracts/src/posts.ts`, `services/greenfield-api/src/domains/posts/writes.ts`
@@ -139,6 +163,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-013 — P1 — Legacy post image limit is incompatible with nginx public body limit
 
 - Domain/type: `media` / `missing storage delivery`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `/etc/nginx/conf.d/api.modula.digital.greenfield.conf:12`, `services/greenfield-api/src/domains/media/post-media-storage.ts:117`
 - Affected routes: `POST /v1/posts`
 - Affected files: `services/greenfield-api/src/domains/media/post-media-storage.ts`
@@ -150,6 +176,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-014 — P1 — User media exists only on one host bind mount
 
 - Domain/type: `media` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/storage`, `services/greenfield-api/src/domains/attachments/service.ts:169`
 - Affected routes: `GET /v1/attachments/:attachmentId/content`, `GET /v1/media/:mediaFile`, `GET /v1/media/stories/:mediaFile`
 - Affected files: `services/greenfield-api/src/domains/attachments/service.ts`
@@ -161,6 +189,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-015 — P1 — Automated registry/GitHub ingestion is disabled and has no production source
 
 - Domain/type: `modules` / `missing worker`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/config/worker/safe/GREENFIELD_MODULE_GITHUB_SYNC_ENABLED`, `evidence/production-snapshot.json#/operationalAggregates/syncSources`, `services/greenfield-worker/src/jobs/runner.ts:84`
 - Affected routes: `POST /v1/admin/registry/sync`
 - Affected files: `services/greenfield-api/src/modules/github-release-sync-service.ts`, `services/greenfield-worker/src/jobs/runner.ts`
@@ -172,10 +202,12 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-016 — P2 — No application route registers a Fastify request or response schema
 
 - Domain/type: `contracts` / `missing request schema`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `api-atlas.json#/routes`, `openapi.generated.yaml`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src`
-- Production impact: All 393 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
+- Production impact: All 408 routes rely on ad hoc handler/service validation; derived OpenAPI cannot describe request/response bodies.
 - Recommended fix: Adopt shared schemas incrementally at trust-boundary and mutating routes, then generate canonical OpenAPI.
 - Dependencies: API contract ownership
 - Verification: Runtime route capture must report schemas for prioritized routes and OpenAPI validation must pass.
@@ -183,6 +215,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-017 — P2 — Attachment orphan cleanup exists but is never scheduled
 
 - Domain/type: `media` / `missing worker`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/attachments/service.ts:191`, `services/greenfield-api/tests/post04.attachments.test.ts:199`, `evidence/production-snapshot.json#/operationalAggregates/readyAttachmentLinkage`
 - Affected routes: `POST /v1/attachments/uploads`
 - Affected files: `services/greenfield-api/src/domains/attachments/service.ts`
@@ -194,6 +228,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-018 — P2 — Story upload validates labels but not decoded size or file signature
 
 - Domain/type: `media` / `missing request schema`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/stories/service.ts:280`, `services/greenfield-api/src/domains/stories/service.ts:333`, `services/greenfield-api/src/domains/stories/service.ts:411`
 - Affected routes: `POST /v1/stories`
 - Affected files: `services/greenfield-api/src/domains/stories/service.ts`
@@ -205,6 +241,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-019 — P2 — Profile media has competing canonical-attachment and arbitrary-URL paths
 
 - Domain/type: `profiles` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/profiles/writes.ts:173`, `services/greenfield-api/src/domains/profiles/writes.ts:292`
 - Affected routes: `PATCH /v1/profiles/me`, `POST /v1/profiles/me/avatar`, `POST /v1/profiles/me/cover`
 - Affected files: `services/greenfield-api/src/domains/profiles/writes.ts`
@@ -216,6 +254,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-020 — P2 — Unknown feed modes silently receive a mislabeled fallback
 
 - Domain/type: `feed` / `missing request schema`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/app/register-routes.ts:1443`, `services/greenfield-api/src/app/register-routes.ts:1449`
 - Affected routes: `GET /v1/feed/home`
 - Affected files: `services/greenfield-api/src/app/register-routes.ts`
@@ -227,6 +267,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-021 — P2 — Attachment authorization distinguishes private existing IDs from unknown IDs
 
 - Domain/type: `privacy` / `data exposure risk`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/app/register-attachment-routes.ts:91`, `services/greenfield-api/src/app/register-attachment-routes.ts:110`
 - Affected routes: `GET /v1/attachments/:attachmentId/content`
 - Affected files: `services/greenfield-api/src/app/register-attachment-routes.ts`
@@ -238,6 +280,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-022 — P2 — Follow, reaction and comment counters have concurrent race windows
 
 - Domain/type: `social` / `missing idempotency`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/profiles/writes.ts:81`, `services/greenfield-api/src/domains/reactions/service.ts:25`, `services/greenfield-api/src/domains/comments/service.ts:156`
 - Affected routes: `POST /v1/profiles/:profileId/follow`, `PUT /v1/posts/:postId/reaction`, `POST /v1/posts/:postId/comments`
 - Affected files: `services/greenfield-api/src/domains/profiles/writes.ts`, `services/greenfield-api/src/domains/reactions/service.ts`, `services/greenfield-api/src/domains/comments/service.ts`
@@ -249,6 +293,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-023 — P2 — Discover/activity surfaces are unpaginated and activity is N+1 hydrated
 
 - Domain/type: `discover` / `performance risk`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/discovery/repository.ts:96`, `services/greenfield-api/src/domains/discovery/repository.ts:107`
 - Affected routes: `GET /v1/discover`, `GET /v1/activity`
 - Affected files: `services/greenfield-api/src/domains/discovery/repository.ts`
@@ -260,6 +306,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-024 — P2 — No persistent real-time social or push delivery surface exists
 
 - Domain/type: `realtime` / `missing endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/ai/routes.ts:136`, `/etc/nginx/conf.d/api.modula.digital.greenfield.conf:21`
 - Affected routes: `GET /v1/ai/executions/:executionId/stream`
 - Affected files: `services/greenfield-api/src/ai/routes.ts`
@@ -271,6 +319,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-025 — P2 — Connector metadata advertises webhooks without inbound webhook routes
 
 - Domain/type: `connectors` / `placeholder implementation`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/connectors/provider-metadata.ts:60`, `services/greenfield-api/src/connectors/provider-metadata.ts:107`, `api-atlas.json#/routes`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src/connectors/provider-metadata.ts`
@@ -282,6 +332,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-026 — P2 — Several accepted worker job types complete with no side effect
 
 - Domain/type: `async` / `dead endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-worker/src/jobs/runner.ts:95`, `services/greenfield-worker/src/jobs/runner.ts:140`, `services/greenfield-worker/src/jobs/runner.ts:183`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-worker/src/jobs/runner.ts`
@@ -293,6 +345,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-027 — P2 — Vault Notes remains special-cased outside the generic host
 
 - Domain/type: `modules` / `module special case`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/intelligence/action-boundary.ts:8`, `services/greenfield-api/src/ai/product-action-service.ts:23`, `services/greenfield-worker/src/search/subscribers.ts:23`, `src/features/board/screens/BoardScreen.tsx:114`
 - Affected routes: `POST /v1/intelligence/missions/:missionId/start`, `POST /v1/modules/:moduleId/ai/actions/:actionId/executions`
 - Affected files: `services/greenfield-api/src/intelligence/action-boundary.ts`, `services/greenfield-api/src/ai/product-action-service.ts`, `services/greenfield-worker/src/search/subscribers.ts`, `src/features/board/screens/BoardScreen.tsx`
@@ -304,6 +358,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-028 — P2 — Only 6 of 36 historical install plans carry the current descriptor
 
 - Domain/type: `modules` / `partial endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/installPlans`, `services/greenfield-api/src/modules/install-descriptor-service.ts:14`
 - Affected routes: `GET /v1/modules/:moduleId/install-descriptor`
 - Affected files: `services/greenfield-api/src/modules/install-descriptor-service.ts`
@@ -315,6 +371,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-030 — P2 — profile_links is read but has no current write API
 
 - Domain/type: `profiles` / `DB/API mismatch`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/profiles/repository.ts:166`, `04-database-api-map.md`
 - Affected routes: `GET /v1/profiles/:handle`, `PATCH /v1/profiles/me`
 - Affected files: `services/greenfield-api/src/domains/profiles/repository.ts`
@@ -326,6 +384,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-031 — P2 — Legacy and canonical media/social/auth paths overlap
 
 - Domain/type: `architecture` / `duplicate endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/domains/media/post-media-storage.ts:29`, `services/greenfield-api/src/domains/attachments/service.ts:13`, `services/greenfield-api/src/app/register-routes.ts:1425`
 - Affected routes: `POST /v1/posts`, `POST /v1/attachments/uploads`, `POST /v1/sessions`, `POST /v1/accounts/sessions`
 - Affected files: `services/greenfield-api/src`
@@ -337,6 +397,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-032 — P2 — Request IDs do not provide complete nginx-to-worker tracing
 
 - Domain/type: `observability` / `observability gap`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `services/greenfield-api/src/app/register-plugins.ts:8`, `services/greenfield-worker/src/observability/metrics.ts:3`, `/etc/nginx/conf.d/api.modula.digital.greenfield.conf:21`
 - Affected routes: none/architectural
 - Affected files: `services/greenfield-api/src/app/register-plugins.ts`, `services/greenfield-worker/src/observability/metrics.ts`
@@ -348,6 +410,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-033 — P2 — Worker container has no Docker healthcheck
 
 - Domain/type: `operations` / `observability gap`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/containers/worker`, `services/greenfield-api/src/domains/system/status.ts:91`
 - Affected routes: none/architectural
 - Affected files: none
@@ -356,9 +420,11 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Dependencies: deployment config
 - Verification: Stopping worker progress must transition container/status health within the documented window.
 
-## API-ATLAS-GAP-034 — P2 — 70 application routes have no statically matched automated test
+## API-ATLAS-GAP-034 — P2 — 77 application routes have no statically matched automated test
 
 - Domain/type: `testing` / `untested endpoint`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `api-atlas.json#/routes`
 - Affected routes: none/architectural
 - Affected files: none
@@ -370,6 +436,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-035 — P2 — All module presentation assets are marked development-only
 
 - Domain/type: `modules` / `placeholder implementation`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/presentationAssets`
 - Affected routes: `GET /v1/registry/modules/:moduleId`
 - Affected files: none
@@ -381,17 +449,21 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-036 — P2 — Legacy canonical backend verifier is pinned to schema 055
 
 - Domain/type: `testing` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `scripts/verify-greenfield-backend-v1.mjs:98`, `evidence/production-snapshot.json#/databaseSchema/appliedMigrations`
 - Affected routes: none/architectural
 - Affected files: `scripts/verify-greenfield-backend-v1.mjs`
-- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 063_settings_backend_v2; it cannot truthfully serve as the current acceptance command.
+- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 065_comments_rich; it cannot truthfully serve as the current acceptance command.
 - Recommended fix: Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.
 - Dependencies: verification ownership
-- Verification: The canonical verifier must pass on reviewed current main at 063_settings_backend_v2 without weakening exact-SHA production checks.
+- Verification: The canonical verifier must pass on reviewed current main at 065_comments_rich without weakening exact-SHA production checks.
 
-## API-ATLAS-GAP-037 — P3 — 14 tables have no API/worker source reference
+## API-ATLAS-GAP-037 — P3 — 13 tables have no API/worker source reference
 
 - Domain/type: `database` / `orphan table`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `04-database-api-map.md`
 - Affected routes: none/architectural
 - Affected files: none
@@ -403,6 +475,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-038 — P3 — Multiple old verification/recovery PostgreSQL containers remain running
 
 - Domain/type: `operations` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/hostProcesses/docker`
 - Affected routes: none/architectural
 - Affected files: none
@@ -414,6 +488,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-039 — P3 — Redis is running without persistence and has no application source references
 
 - Domain/type: `operations` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `evidence/production-snapshot.json#/redisRuntime`, `evidence/production-snapshot.json#/containers/redis`
 - Affected routes: none/architectural
 - Affected files: none
@@ -425,6 +501,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-040 — P3 — Route-to-table and caller mappings are static approximations
 
 - Domain/type: `atlas` / `architecture debt`
+- Remediation status: **OPEN**
+- Remediation evidence: none
 - Evidence: `route-data-map.json`, `client-contract-analysis.json`
 - Affected routes: none/architectural
 - Affected files: none
@@ -438,4 +516,4 @@ The JSON form is canonical for remediation tooling and preserves these fields ve
 
 ## TODO / FIXME / placeholder sweep
 
-The literal sweep found 266 marker occurrences; 261 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=33, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=79, possible-runtime-placeholder=64, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.
+The literal sweep found 267 marker occurrences; 262 are outside test/fixture/demo paths. They are not automatically defects. Classification totals: configuration-safety-guard=4, contract-or-ui-placeholder-field=33, development-adapter-or-comment=25, feature-gated-experimental-protocol=19, implementation-word-review=37, ordinary-error-handling-review=79, possible-runtime-placeholder=65, test-fixture-or-development=5. Every source location, marker and excerpt is in `evidence/source-sweep.json`. Confirmed operational placeholders from that set are represented as gaps above; ordinary error throws, contract/UI placeholder fields, safety guards and feature-gated experimental namespaces remain explicitly distinguished.

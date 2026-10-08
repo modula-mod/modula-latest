@@ -1,27 +1,27 @@
-Observed production truth at 2026-10-04T15:10:21.196Z: api.modula.digital terminates at nginx and proxies to a healthy loopback-only Fastify container running `11bfc7638c6d757215e75a934d02e40c9a40c839`, backed by PostgreSQL 16.9, a same-revision worker, host-bound media storage, and an apparently unused Redis service.
+Observed production truth at 2026-10-07T16:29:42.416Z: api.modula.digital terminates at nginx and proxies to a healthy loopback-only Fastify container running `736056445f5e09f968488a3ec66dddfaffea6f08`, backed by PostgreSQL 16.9, a same-revision worker, host-bound media storage, and an apparently unused Redis service.
 
 # Production Truth
 
 ## Host and repository
 
-- Host: `core.modula.digital`; OS: Ubuntu 24.04.4 LTS; architecture: x86_64; kernel: Linux 6.8.0-137-generic; uptime: up 8 weeks, 16 hours, 28 minutes.
-- Canonical checkout: `/root/modula-latest`; origin: `https://github.com/modula-mod/modula-latest.git`; branch: `main`; HEAD: `384b2e1999a71b356ff4dd2186d3bda8af7b5e72`.
+- Host: `core.modula.digital`; OS: Ubuntu 24.04.4 LTS; architecture: x86_64; kernel: Linux 6.8.0-137-generic; uptime: up 8 weeks, 3 days, 17 hours, 47 minutes.
+- Canonical checkout: `/root/modula-latest`; origin: `https://github.com/modula-mod/modula-latest.git`; branch: `main`; HEAD: `cd2485ba9f360819fc67b5ed1f334b9ea000974f`.
 - Canonical checkout is dirty: 0 tracked modifications and 0 untracked files. Those files were not changed by this audit.
-- `origin/main` at capture: `384b2e1999a71b356ff4dd2186d3bda8af7b5e72`.
-- Running SHA: `11bfc7638c6d757215e75a934d02e40c9a40c839`. Canonical checkout HEAD is `384b2e1999a71b356ff4dd2186d3bda8af7b5e72` and `origin/main` is `384b2e1999a71b356ff4dd2186d3bda8af7b5e72`. OCI revision, `/version.json`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
-- Audit worktree: `/root/modula-worktrees/api-baseline-02-permission-evidence`, branch `phase-api-baseline-02-permission-evidence`.
+- `origin/main` at capture: `736056445f5e09f968488a3ec66dddfaffea6f08`.
+- Running SHA: `736056445f5e09f968488a3ec66dddfaffea6f08`. Canonical checkout HEAD is `cd2485ba9f360819fc67b5ed1f334b9ea000974f` and `origin/main` is `736056445f5e09f968488a3ec66dddfaffea6f08`. OCI revision, `/version.json`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
+- Audit worktree: `/root/modula-latest`, branch `main`.
 
 ## Runtime inventory
 
 | Role | Container/image | Created | Ports | Health | Revision |
 | --- | --- | --- | --- | --- | --- |
-| API | `modula-greenfield-api:11bfc7638c6d757215e75a934d02e40c9a40c839` | 2026-10-04T08:57:28.439159597Z | `127.0.0.1:4020 -> 4020` | healthy | `11bfc7638c6d757215e75a934d02e40c9a40c839` |
-| Worker | `modula-greenfield-worker:11bfc7638c6d757215e75a934d02e40c9a40c839` | 2026-10-04T08:57:59.261435058Z | internal only | no Docker healthcheck | `11bfc7638c6d757215e75a934d02e40c9a40c839` |
+| API | `modula-greenfield-api:736056445f5e09f968488a3ec66dddfaffea6f08` | 2026-10-04T21:54:55.43410342Z | `127.0.0.1:4020 -> 4020` | healthy | `736056445f5e09f968488a3ec66dddfaffea6f08` |
+| Worker | `modula-greenfield-worker:736056445f5e09f968488a3ec66dddfaffea6f08` | 2026-10-04T19:27:42.855443403Z | internal only | no Docker healthcheck | `736056445f5e09f968488a3ec66dddfaffea6f08` |
 | Database | `postgres:16.9-alpine` | 2026-09-20T19:23:12.840616636Z | Docker network only | healthy | image-pinned PostgreSQL |
 | Redis | `redis:7.4-alpine` | 2026-08-09T00:27:09.295758521Z | Docker network only | healthy | no GreenField source consumer found |
 
 - Host Node v24.15.0; container Node v24.18.0; pnpm 11.11.0; npm 11.12.1; nginx/1.31.3.
-- PostgreSQL data uses a named Docker volume. Media uses read/write host bind `/var/lib/modula/greenfield-media`; 46 files / 26307802 bytes were counted without reading user contents.
+- PostgreSQL data uses a named Docker volume. Media uses read/write host bind `/var/lib/modula/greenfield-media`; 56 files / 28483978 bytes were counted without reading user contents.
 - PostgreSQL queue/outbox drives asynchronous work. Redis reports append-only disabled and snapshot saving disabled; no GreenField source reference was found.
 - Related internal services on the Docker network: Modula AI backend and secrets service. Their own repositories are outside this atlas. Old verifier/recovery/preview PostgreSQL containers are explicitly non-production and listed in sanitized evidence.
 
@@ -33,11 +33,11 @@ Observed production truth at 2026-10-04T15:10:21.196Z: api.modula.digital termin
 flowchart TD
   internet[Internet clients] --> dns[Cloudflare DNS and TLS path]
   dns --> nginx[nginx api.modula.digital]
-  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API 11bfc76]
+  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API 7360564]
   api --> postgres[(PostgreSQL 16.9 named volume)]
   api --> media[(Host bind /var/lib/modula/greenfield-media)]
   api --> outbox[(PostgreSQL outbox and jobs)]
-  outbox --> worker[GreenField worker 11bfc76]
+  outbox --> worker[GreenField worker 7360564]
   api --> ai[Internal Modula AI backend when configured]
   api --> secrets[Internal secrets service]
   redis[(Redis 7.4 no persistence)] -. no source consumer found .- api
@@ -50,14 +50,14 @@ flowchart TD
 - Registry release assets: separate immutable-cache location.
 - `/v1/stories`: 25 MiB and 300s timeouts.
 - attachment byte upload: 101 MiB, proxy buffering disabled, 300s timeouts.
-- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 390/393 application routes carry Fastify rate-limit configuration.
+- Security headers: nosniff, DENY framing, no-referrer. No nginx request-rate directive or WebSocket upgrade stanza was found; 0/408 application routes carry Fastify rate-limit configuration.
 - Every registered route is transport-reachable through the catch-all; feature flags and handler authorization still determine application availability. `/v1/internal/ssrf-check` is handler-hidden in production.
 
 ## Versions and migration truth
 
-- Applied migrations: 63; latest `063_settings_backend_v2` at 2026-10-03T19:30:21.887429+00:00.
-- Git up migrations: 63; latest `063_settings_backend_v2.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
-- Runtime routes: 551; application routes: 393; excluded automatic framework routes: 158.
+- Applied migrations: 65; latest `065_comments_rich` at 2026-10-04T19:27:42.25093+00:00.
+- Git up migrations: 66; latest `066_trust_privacy_fail_closed.sql`. No missing, extra, duplicate-numbered or out-of-order production migration was found.
+- Production runtime routes: 568; excluded automatic production framework routes: 165. Candidate route counts, when present, are reported only in the HTTP atlas and do not alter deployment truth.
 
 ## Safe configuration
 
@@ -95,9 +95,9 @@ flowchart TD
 | `BACKEND_FABRIC_ENABLED` | `false` |
 | `BACKEND_FABRIC_ENVIRONMENT` | `production` |
 | `BACKEND_FABRIC_CONTRACT_VERSION` | `1.0` |
-| `MODULA_RELEASE_SHA` | `11bfc7638c6d757215e75a934d02e40c9a40c839` |
-| `MODULA_WORKER_RELEASE_SHA` | `11bfc7638c6d757215e75a934d02e40c9a40c839` |
-| `MODULA_RELEASE_BUILT_AT` | `2026-10-04T08:55:00Z` |
+| `MODULA_RELEASE_SHA` | `736056445f5e09f968488a3ec66dddfaffea6f08` |
+| `MODULA_WORKER_RELEASE_SHA` | `736056445f5e09f968488a3ec66dddfaffea6f08` |
+| `MODULA_RELEASE_BUILT_AT` | `2026-10-04T19:26:32Z` |
 | `worker:NODE_ENV` | `production` |
 | `worker:MODULA_ENVIRONMENT` | `production` |
 | `worker:MODULA_MAIL_TRANSPORT` | `smtp` |
@@ -117,7 +117,7 @@ flowchart TD
 | `worker:GREENFIELD_MODULE_GITHUB_SYNC_ENABLED` | `false` |
 | `worker:GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED` | `false` |
 | `worker:GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED` | `false` |
-| `worker:MODULA_RELEASE_SHA` | `11bfc7638c6d757215e75a934d02e40c9a40c839` |
+| `worker:MODULA_RELEASE_SHA` | `736056445f5e09f968488a3ec66dddfaffea6f08` |
 
 ## Secret-presence inventory
 

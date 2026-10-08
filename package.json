@@ -83,6 +83,7 @@
   },
   "scripts": {
     "api:atlas": "node tools/api-atlas/generate.mjs",
+    "api:atlas:capture-candidate": "node tools/api-atlas/capture-candidate.mjs && node tools/api-atlas/generate.mjs",
     "api:atlas:verify": "node tools/api-atlas/verify.mjs",
     "api:atlas:secrets": "node tools/api-atlas/secrets.mjs",
     "api:atlas:acceptance": "node tools/api-atlas/acceptance.mjs",

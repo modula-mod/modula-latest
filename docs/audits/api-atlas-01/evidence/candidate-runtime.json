@@ -1,0 +1,5315 @@
+{
+  "schemaVersion": 1,
+  "evidenceKind": "local-candidate-runtime",
+  "capturedAt": "2026-10-08T22:15:58.151Z",
+  "source": {
+    "branch": "phase-api-fix-01-trust-fail-closed",
+    "headAtCapture": "048ffd49580fcec895350ba2fa8bb92e8d4669bb",
+    "worktreeDirtyAtCapture": true,
+    "apiSourceSha256": "740749ab3f8dc48ebc3b386ba4e7856c8a5a4bfcaacaf3cb88115ac74e2a0276"
+  },
+  "runtimeRoutes": [
+    {
+      "method": "OPTIONS",
+      "url": "*",
+      "path": "*",
+      "prefix": "",
+      "schema": {
+        "hide": true
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/attachments/uploads",
+      "path": "/v1/attachments/uploads",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/attachments/uploads/:uploadId/content",
+      "path": "/v1/attachments/uploads/:uploadId/content",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/attachments/:attachmentId",
+      "path": "/v1/attachments/:attachmentId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/attachments/:attachmentId",
+      "path": "/v1/attachments/:attachmentId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/attachments/:attachmentId",
+      "path": "/v1/attachments/:attachmentId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/attachments/:attachmentId/content",
+      "path": "/v1/attachments/:attachmentId/content",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/attachments/:attachmentId/content",
+      "path": "/v1/attachments/:attachmentId/content",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/status",
+      "path": "/v1/gifs/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/status",
+      "path": "/v1/gifs/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/trending",
+      "path": "/v1/gifs/trending",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/trending",
+      "path": "/v1/gifs/trending",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/search",
+      "path": "/v1/gifs/search",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/search",
+      "path": "/v1/gifs/search",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/link-previews",
+      "path": "/v1/link-previews",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/link-previews",
+      "path": "/v1/link-previews",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/link-safety",
+      "path": "/v1/link-safety",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/link-safety",
+      "path": "/v1/link-safety",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stickers/packs",
+      "path": "/v1/stickers/packs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stickers/packs",
+      "path": "/v1/stickers/packs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/hashtags/suggest",
+      "path": "/v1/hashtags/suggest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/hashtags/suggest",
+      "path": "/v1/hashtags/suggest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/version.json",
+      "path": "/version.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/version.json",
+      "path": "/version.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/version",
+      "path": "/v1/version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/version",
+      "path": "/v1/version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/health/live",
+      "path": "/v1/health/live",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/health/live",
+      "path": "/v1/health/live",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/health/ready",
+      "path": "/v1/health/ready",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/health/ready",
+      "path": "/v1/health/ready",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/meta",
+      "path": "/v1/meta",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/meta",
+      "path": "/v1/meta",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/oauth/atproto/web-client-metadata.json",
+      "path": "/oauth/atproto/web-client-metadata.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/oauth/atproto/web-client-metadata.json",
+      "path": "/oauth/atproto/web-client-metadata.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/oauth/atproto/native-client-metadata.json",
+      "path": "/oauth/atproto/native-client-metadata.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/oauth/atproto/native-client-metadata.json",
+      "path": "/oauth/atproto/native-client-metadata.json",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/preview/session",
+      "path": "/v1/auth/preview/session",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/register",
+      "path": "/v1/accounts/register",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/verify-email",
+      "path": "/v1/accounts/verify-email",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/resend-verification",
+      "path": "/v1/accounts/resend-verification",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/forgot-password",
+      "path": "/v1/accounts/forgot-password",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/reset-password",
+      "path": "/v1/accounts/reset-password",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/handles/:handle/availability",
+      "path": "/v1/accounts/handles/:handle/availability",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/handles/:handle/availability",
+      "path": "/v1/accounts/handles/:handle/availability",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/mail-local-parts/:localPart/availability",
+      "path": "/v1/accounts/mail-local-parts/:localPart/availability",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/mail-local-parts/:localPart/availability",
+      "path": "/v1/accounts/mail-local-parts/:localPart/availability",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me",
+      "path": "/v1/accounts/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me",
+      "path": "/v1/accounts/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/modula-mail",
+      "path": "/v1/accounts/me/modula-mail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/modula-mail",
+      "path": "/v1/accounts/me/modula-mail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/me/modula-mail/provision",
+      "path": "/v1/accounts/me/modula-mail/provision",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/me/modula-mail/forwarding",
+      "path": "/v1/accounts/me/modula-mail/forwarding",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/accounts/me",
+      "path": "/v1/accounts/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/me/handle",
+      "path": "/v1/accounts/me/handle",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/me/password",
+      "path": "/v1/accounts/me/password",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/modules",
+      "path": "/v1/registry/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/modules",
+      "path": "/v1/registry/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/products",
+      "path": "/v1/registry/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/products",
+      "path": "/v1/registry/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/modules/:moduleId",
+      "path": "/v1/registry/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/modules/:moduleId",
+      "path": "/v1/registry/modules/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/products/:productId",
+      "path": "/v1/registry/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/products/:productId",
+      "path": "/v1/registry/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/products/:productId/relationships",
+      "path": "/v1/registry/products/:productId/relationships",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/products/:productId/relationships",
+      "path": "/v1/registry/products/:productId/relationships",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/product-standard/products/:productId",
+      "path": "/v1/product-standard/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/product-standard/products/:productId",
+      "path": "/v1/product-standard/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/product-standard/products/:productId/versions/:version",
+      "path": "/v1/product-standard/products/:productId/versions/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/product-standard/products/:productId/versions/:version",
+      "path": "/v1/product-standard/products/:productId/versions/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/product-standard/ingest",
+      "path": "/v1/admin/product-standard/ingest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/modules/:moduleId/versions",
+      "path": "/v1/registry/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/modules/:moduleId/versions",
+      "path": "/v1/registry/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/modules/:moduleId/versions/:version",
+      "path": "/v1/registry/modules/:moduleId/versions/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/modules/:moduleId/versions/:version",
+      "path": "/v1/registry/modules/:moduleId/versions/:version",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/publishers/:publisherId/signing-keys",
+      "path": "/v1/registry/publishers/:publisherId/signing-keys",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/publishers/:publisherId/signing-keys",
+      "path": "/v1/registry/publishers/:publisherId/signing-keys",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/releases/:releaseId/artifact",
+      "path": "/v1/registry/releases/:releaseId/artifact",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/releases/:releaseId/artifact",
+      "path": "/v1/registry/releases/:releaseId/artifact",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/releases/:releaseId/assets/:assetId",
+      "path": "/v1/registry/releases/:releaseId/assets/:assetId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/releases/:releaseId/assets/:assetId",
+      "path": "/v1/registry/releases/:releaseId/assets/:assetId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/registry/modules/:moduleId/rating",
+      "path": "/v1/registry/modules/:moduleId/rating",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/registry/publishers/:publisherId",
+      "path": "/v1/registry/publishers/:publisherId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/registry/publishers/:publisherId",
+      "path": "/v1/registry/publishers/:publisherId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/installed",
+      "path": "/v1/modules/installed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/installed",
+      "path": "/v1/modules/installed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/installed/:moduleId",
+      "path": "/v1/modules/installed/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/installed/:moduleId",
+      "path": "/v1/modules/installed/:moduleId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/module-host/:targetProductId/composition",
+      "path": "/v1/module-host/:targetProductId/composition",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/module-host/:targetProductId/composition",
+      "path": "/v1/module-host/:targetProductId/composition",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions/:extensionProductId/capabilities",
+      "path": "/v1/extensions/:extensionProductId/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions/:extensionProductId/capabilities",
+      "path": "/v1/extensions/:extensionProductId/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionProductId/capabilities/review",
+      "path": "/v1/extensions/:extensionProductId/capabilities/review",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionProductId/contributions/:contributionId/invoke",
+      "path": "/v1/extensions/:extensionProductId/contributions/:contributionId/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionProductId/contributions/:contributionId/fail",
+      "path": "/v1/extensions/:extensionProductId/contributions/:contributionId/fail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionProductId/jobs",
+      "path": "/v1/extensions/:extensionProductId/jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions/:extensionProductId/inspector",
+      "path": "/v1/extensions/:extensionProductId/inspector",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions/:extensionProductId/inspector",
+      "path": "/v1/extensions/:extensionProductId/inspector",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/runtime",
+      "path": "/v1/modules/:moduleId/runtime",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/runtime",
+      "path": "/v1/modules/:moduleId/runtime",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/data-resources",
+      "path": "/v1/modules/:moduleId/data-resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/data-resources",
+      "path": "/v1/modules/:moduleId/data-resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/data-resources",
+      "path": "/v1/modules/:moduleId/data-resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/data-resources/:resourceId",
+      "path": "/v1/modules/:moduleId/data-resources/:resourceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/data-resources/:resourceId",
+      "path": "/v1/modules/:moduleId/data-resources/:resourceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/data-resources/:resourceId/migrations",
+      "path": "/v1/modules/:moduleId/data-resources/:resourceId/migrations",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/data-resources/:resourceId/schemas",
+      "path": "/v1/modules/:moduleId/data-resources/:resourceId/schemas",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/services/:serviceId/invoke",
+      "path": "/v1/modules/:moduleId/services/:serviceId/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/install-preview",
+      "path": "/v1/modules/:moduleId/install-preview",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/install",
+      "path": "/v1/modules/:moduleId/install",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/install-descriptor",
+      "path": "/v1/modules/:moduleId/install-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/install-descriptor",
+      "path": "/v1/modules/:moduleId/install-descriptor",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/enable",
+      "path": "/v1/modules/:moduleId/enable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/disable",
+      "path": "/v1/modules/:moduleId/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/versions",
+      "path": "/v1/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/versions",
+      "path": "/v1/modules/:moduleId/versions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/version-preview",
+      "path": "/v1/modules/:moduleId/version-preview",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/update",
+      "path": "/v1/modules/:moduleId/update",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/permissions/review",
+      "path": "/v1/modules/:moduleId/permissions/review",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/uninstall-preview",
+      "path": "/v1/modules/:moduleId/uninstall-preview",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/install",
+      "path": "/v1/modules/:moduleId/install",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/settings-schema",
+      "path": "/v1/modules/:moduleId/settings-schema",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/settings-schema",
+      "path": "/v1/modules/:moduleId/settings-schema",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/settings",
+      "path": "/v1/modules/:moduleId/settings",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/settings",
+      "path": "/v1/modules/:moduleId/settings",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/settings",
+      "path": "/v1/modules/:moduleId/settings",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/contributions",
+      "path": "/v1/modules/contributions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/contributions",
+      "path": "/v1/modules/contributions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/views",
+      "path": "/v1/modules/:moduleId/views",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/views",
+      "path": "/v1/modules/:moduleId/views",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/frontend",
+      "path": "/v1/modules/:moduleId/frontend",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/frontend",
+      "path": "/v1/modules/:moduleId/frontend",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/views/:viewId",
+      "path": "/v1/modules/:moduleId/views/:viewId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/views/:viewId",
+      "path": "/v1/modules/:moduleId/views/:viewId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection",
+      "path": "/v1/modules/:moduleId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection",
+      "path": "/v1/modules/:moduleId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection",
+      "path": "/v1/modules/:moduleId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/restore",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/restore",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/modules/:moduleId/records/:collection/:recordId/permanent",
+      "path": "/v1/modules/:moduleId/records/:collection/:recordId/permanent",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/actions/:actionId",
+      "path": "/v1/modules/:moduleId/actions/:actionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/export",
+      "path": "/v1/modules/:moduleId/export",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/health",
+      "path": "/v1/modules/:moduleId/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/health",
+      "path": "/v1/modules/:moduleId/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules/:moduleId/backend",
+      "path": "/v1/modules/:moduleId/backend",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules/:moduleId/backend",
+      "path": "/v1/modules/:moduleId/backend",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/backend/discover",
+      "path": "/v1/modules/:moduleId/backend/discover",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/backend/health",
+      "path": "/v1/modules/:moduleId/backend/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/backend/disable",
+      "path": "/v1/modules/:moduleId/backend/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/backend/events",
+      "path": "/v1/modules/:moduleId/backend/events",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/backend/webhooks/modula",
+      "path": "/v1/modules/:moduleId/backend/webhooks/modula",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/modules/import",
+      "path": "/v1/admin/registry/modules/import",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/sync",
+      "path": "/v1/admin/registry/sync",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/registry/sync-runs",
+      "path": "/v1/admin/registry/sync-runs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/registry/sync-runs",
+      "path": "/v1/admin/registry/sync-runs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/releases/:releaseId/verify",
+      "path": "/v1/admin/registry/releases/:releaseId/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/releases/:releaseId/publish",
+      "path": "/v1/admin/registry/releases/:releaseId/publish",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/releases/:releaseId/quarantine",
+      "path": "/v1/admin/registry/releases/:releaseId/quarantine",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/releases/:releaseId/revoke",
+      "path": "/v1/admin/registry/releases/:releaseId/revoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/publishers/:publisherId/verify",
+      "path": "/v1/admin/registry/publishers/:publisherId/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/publishers/:publisherId/suspend",
+      "path": "/v1/admin/registry/publishers/:publisherId/suspend",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/publishers/:publisherId/revoke",
+      "path": "/v1/admin/registry/publishers/:publisherId/revoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/publishers/:publisherId/signing-keys",
+      "path": "/v1/admin/registry/publishers/:publisherId/signing-keys",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke",
+      "path": "/v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions",
+      "path": "/v1/intelligence/missions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions",
+      "path": "/v1/intelligence/missions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions",
+      "path": "/v1/intelligence/missions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions/:missionId",
+      "path": "/v1/intelligence/missions/:missionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions/:missionId",
+      "path": "/v1/intelligence/missions/:missionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/start",
+      "path": "/v1/intelligence/missions/:missionId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions/:missionId/ledger",
+      "path": "/v1/intelligence/missions/:missionId/ledger",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions/:missionId/ledger",
+      "path": "/v1/intelligence/missions/:missionId/ledger",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions/:missionId/decisions",
+      "path": "/v1/intelligence/missions/:missionId/decisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions/:missionId/decisions",
+      "path": "/v1/intelligence/missions/:missionId/decisions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions/:missionId/approvals",
+      "path": "/v1/intelligence/missions/:missionId/approvals",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions/:missionId/approvals",
+      "path": "/v1/intelligence/missions/:missionId/approvals",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/intelligence/missions/:missionId/evidence",
+      "path": "/v1/intelligence/missions/:missionId/evidence",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/intelligence/missions/:missionId/evidence",
+      "path": "/v1/intelligence/missions/:missionId/evidence",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/approvals/:approvalId/approve",
+      "path": "/v1/intelligence/missions/:missionId/approvals/:approvalId/approve",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/approvals/:approvalId/reject",
+      "path": "/v1/intelligence/missions/:missionId/approvals/:approvalId/reject",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/intelligence/missions/:missionId/proposals/:proposalId/execute",
+      "path": "/v1/intelligence/missions/:missionId/proposals/:proposalId/execute",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/identity/context",
+      "path": "/v1/backend/products/:productId/identity/context",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/identity/context",
+      "path": "/v1/backend/products/:productId/identity/context",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/accounts/:accountId",
+      "path": "/v1/backend/products/:productId/accounts/:accountId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/accounts/:accountId",
+      "path": "/v1/backend/products/:productId/accounts/:accountId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/installations/:installationId",
+      "path": "/v1/backend/products/:productId/installations/:installationId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/installations/:installationId",
+      "path": "/v1/backend/products/:productId/installations/:installationId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/installations/:installationId/capabilities",
+      "path": "/v1/backend/products/:productId/installations/:installationId/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/installations/:installationId/capabilities",
+      "path": "/v1/backend/products/:productId/installations/:installationId/capabilities",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/capabilities/check",
+      "path": "/v1/backend/products/:productId/capabilities/check",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/records/:collection",
+      "path": "/v1/backend/products/:productId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/records/:collection",
+      "path": "/v1/backend/products/:productId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "path": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "path": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/records/:collection",
+      "path": "/v1/backend/products/:productId/records/:collection",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "path": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "path": "/v1/backend/products/:productId/records/:collection/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/installations/:installationId/resources",
+      "path": "/v1/backend/products/:productId/installations/:installationId/resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/installations/:installationId/resources",
+      "path": "/v1/backend/products/:productId/installations/:installationId/resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/resources/:resourceId",
+      "path": "/v1/backend/products/:productId/resources/:resourceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/resources/:resourceId",
+      "path": "/v1/backend/products/:productId/resources/:resourceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/resources",
+      "path": "/v1/backend/products/:productId/resources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/resources/:resourceId/schemas",
+      "path": "/v1/backend/products/:productId/resources/:resourceId/schemas",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/resources/:resourceId/migrations",
+      "path": "/v1/backend/products/:productId/resources/:resourceId/migrations",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/events",
+      "path": "/v1/backend/products/:productId/events",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs",
+      "path": "/v1/backend/products/:productId/jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs/claim",
+      "path": "/v1/backend/products/:productId/jobs/claim",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/start",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/succeed",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/succeed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/fail",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/fail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/result",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/result",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/jobs/:jobId/cancel",
+      "path": "/v1/backend/products/:productId/jobs/:jobId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/backend/products/:productId/accounts/:accountId/entitlements",
+      "path": "/v1/backend/products/:productId/accounts/:accountId/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/backend/products/:productId/accounts/:accountId/entitlements",
+      "path": "/v1/backend/products/:productId/accounts/:accountId/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/entitlements/check",
+      "path": "/v1/backend/products/:productId/entitlements/check",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/usage",
+      "path": "/v1/backend/products/:productId/usage",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/secrets/lease",
+      "path": "/v1/backend/products/:productId/secrets/lease",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/data-requests/claim",
+      "path": "/v1/backend/products/:productId/data-requests/claim",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/backend/products/:productId/data-request-domains/:domainId/complete",
+      "path": "/v1/backend/products/:productId/data-request-domains/:domainId/complete",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/providers",
+      "path": "/v1/ai/providers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/providers",
+      "path": "/v1/ai/providers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/models",
+      "path": "/v1/ai/models",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/models",
+      "path": "/v1/ai/models",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/ai/actions/:actionId/executions",
+      "path": "/v1/modules/:moduleId/ai/actions/:actionId/executions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/ai/executions/:executionId/apply",
+      "path": "/v1/modules/:moduleId/ai/executions/:executionId/apply",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/modules/:moduleId/ai/requests",
+      "path": "/v1/modules/:moduleId/ai/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/executions/:executionId",
+      "path": "/v1/ai/executions/:executionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/executions/:executionId",
+      "path": "/v1/ai/executions/:executionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/ai/executions/:executionId/stream",
+      "path": "/v1/ai/executions/:executionId/stream",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/ai/executions/:executionId/stream",
+      "path": "/v1/ai/executions/:executionId/stream",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/executions/:executionId/cancel",
+      "path": "/v1/ai/executions/:executionId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/requests",
+      "path": "/v1/ai/requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/streams/:streamId/cancel",
+      "path": "/v1/ai/streams/:streamId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/streams/:streamId/reconnect",
+      "path": "/v1/ai/streams/:streamId/reconnect",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/ai/tools/:toolId/validate",
+      "path": "/v1/ai/tools/:toolId/validate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ai/providers",
+      "path": "/v1/admin/ai/providers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ai/models",
+      "path": "/v1/admin/ai/models",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ai/prompts",
+      "path": "/v1/admin/ai/prompts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ai/tools",
+      "path": "/v1/admin/ai/tools",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/ai/providers",
+      "path": "/v1/admin/ops/ai/providers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/ai/providers",
+      "path": "/v1/admin/ops/ai/providers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/ai/providers/:providerId/health",
+      "path": "/v1/admin/ops/ai/providers/:providerId/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/ai/providers/:providerId/health",
+      "path": "/v1/admin/ops/ai/providers/:providerId/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/ai/providers/:providerId/verify",
+      "path": "/v1/admin/ops/ai/providers/:providerId/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/ai/providers/:providerId/disable",
+      "path": "/v1/admin/ops/ai/providers/:providerId/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/ai/providers/:providerId/enable",
+      "path": "/v1/admin/ops/ai/providers/:providerId/enable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/ai/providers/:providerId/credentials",
+      "path": "/v1/admin/ops/ai/providers/:providerId/credentials",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/ai/executions",
+      "path": "/v1/admin/ops/ai/executions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/ai/executions",
+      "path": "/v1/admin/ops/ai/executions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/ai/usage",
+      "path": "/v1/admin/ops/ai/usage",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/ai/usage",
+      "path": "/v1/admin/ops/ai/usage",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/:accountId/handle-history",
+      "path": "/v1/accounts/:accountId/handle-history",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/:accountId/handle-history",
+      "path": "/v1/accounts/:accountId/handle-history",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/sessions",
+      "path": "/v1/accounts/me/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/sessions",
+      "path": "/v1/accounts/me/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/accounts/me/sessions",
+      "path": "/v1/accounts/me/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/totp/enroll",
+      "path": "/v1/auth/totp/enroll",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/totp/verify",
+      "path": "/v1/auth/totp/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/totp/disable",
+      "path": "/v1/auth/totp/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/step-up/totp",
+      "path": "/v1/auth/step-up/totp",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/auth/passkeys",
+      "path": "/v1/auth/passkeys",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/auth/passkeys",
+      "path": "/v1/auth/passkeys",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/auth/apple/status",
+      "path": "/v1/auth/apple/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/auth/apple/status",
+      "path": "/v1/auth/apple/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/apple/link/options",
+      "path": "/v1/auth/apple/link/options",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/apple/link",
+      "path": "/v1/auth/apple/link",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/passkeys/registration/options",
+      "path": "/v1/auth/passkeys/registration/options",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/passkeys/registration/verify",
+      "path": "/v1/auth/passkeys/registration/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/auth/passkeys/:passkeyId",
+      "path": "/v1/auth/passkeys/:passkeyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/auth/recovery-codes",
+      "path": "/v1/auth/recovery-codes",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/auth/recovery-codes",
+      "path": "/v1/auth/recovery-codes",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/recovery-codes/regenerate",
+      "path": "/v1/auth/recovery-codes/regenerate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions",
+      "path": "/v1/sessions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/email-code/request",
+      "path": "/v1/sessions/email-code/request",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/email-code",
+      "path": "/v1/sessions/email-code",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/recovery-code",
+      "path": "/v1/sessions/recovery-code",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/passkey/options",
+      "path": "/v1/sessions/passkey/options",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/passkey",
+      "path": "/v1/sessions/passkey",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/apple/options",
+      "path": "/v1/sessions/apple/options",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/apple",
+      "path": "/v1/sessions/apple",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/sessions/refresh",
+      "path": "/v1/sessions/refresh",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/sessions/current",
+      "path": "/v1/sessions/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/sessions/:sessionId",
+      "path": "/v1/sessions/:sessionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/board/layout",
+      "path": "/v1/board/layout",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/board/layout",
+      "path": "/v1/board/layout",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/board/layout",
+      "path": "/v1/board/layout",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/repositories/me",
+      "path": "/v1/repositories/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/repositories/me",
+      "path": "/v1/repositories/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/repositories/me/records",
+      "path": "/v1/repositories/me/records",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/repositories/me/records",
+      "path": "/v1/repositories/me/records",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/repositories/me/records/:recordId",
+      "path": "/v1/repositories/me/records/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/repositories/me/records/:recordId",
+      "path": "/v1/repositories/me/records/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/repositories/me/records",
+      "path": "/v1/repositories/me/records",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/repositories/me/records/:recordId",
+      "path": "/v1/repositories/me/records/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/repositories/me/records/:recordId",
+      "path": "/v1/repositories/me/records/:recordId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/repositories/me/exports",
+      "path": "/v1/repositories/me/exports",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/repositories/me/exports/:exportId",
+      "path": "/v1/repositories/me/exports/:exportId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/repositories/me/exports/:exportId",
+      "path": "/v1/repositories/me/exports/:exportId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions",
+      "path": "/v1/extensions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions",
+      "path": "/v1/extensions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions/catalogue",
+      "path": "/v1/extensions/catalogue",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions/catalogue",
+      "path": "/v1/extensions/catalogue",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions/:extensionId",
+      "path": "/v1/extensions/:extensionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions/:extensionId",
+      "path": "/v1/extensions/:extensionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/extensions/installed",
+      "path": "/v1/extensions/installed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/extensions/installed",
+      "path": "/v1/extensions/installed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionId/install",
+      "path": "/v1/extensions/:extensionId/install",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/extensions/:extensionId/install",
+      "path": "/v1/extensions/:extensionId/install",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/extensions/:extensionId/preferences",
+      "path": "/v1/extensions/:extensionId/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/tools",
+      "path": "/v1/tools",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/tools",
+      "path": "/v1/tools",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/tools/:toolId",
+      "path": "/v1/tools/:toolId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/tools/:toolId",
+      "path": "/v1/tools/:toolId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/functions",
+      "path": "/v1/functions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/functions",
+      "path": "/v1/functions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/functions/:functionId/invoke",
+      "path": "/v1/functions/:functionId/invoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/plugins",
+      "path": "/v1/plugins",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/plugins",
+      "path": "/v1/plugins",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/connectors",
+      "path": "/v1/connectors",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/connectors",
+      "path": "/v1/connectors",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/connectors/:providerId",
+      "path": "/v1/connectors/:providerId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/connectors/:providerId",
+      "path": "/v1/connectors/:providerId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/connectors/:providerId/authorise",
+      "path": "/v1/connectors/:providerId/authorise",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/connections",
+      "path": "/v1/connections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/connections",
+      "path": "/v1/connections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/connections/:connectionId",
+      "path": "/v1/connections/:connectionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/connections/:connectionId",
+      "path": "/v1/connections/:connectionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/connections/:connectionId/enable",
+      "path": "/v1/connections/:connectionId/enable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/connections/:connectionId/disable",
+      "path": "/v1/connections/:connectionId/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/connections/:connectionId/refresh",
+      "path": "/v1/connections/:connectionId/refresh",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/connections/:connectionId",
+      "path": "/v1/connections/:connectionId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/widgets",
+      "path": "/v1/widgets",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/widgets",
+      "path": "/v1/widgets",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/modules",
+      "path": "/v1/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/modules",
+      "path": "/v1/modules",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/sessions/me",
+      "path": "/v1/sessions/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/sessions/me",
+      "path": "/v1/sessions/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/sessions/me",
+      "path": "/v1/sessions/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/feed/home",
+      "path": "/v1/feed/home",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/feed/home",
+      "path": "/v1/feed/home",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/feed/profile/:profileId",
+      "path": "/v1/feed/profile/:profileId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/feed/profile/:profileId",
+      "path": "/v1/feed/profile/:profileId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/posts/:postId",
+      "path": "/v1/posts/:postId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/posts/:postId",
+      "path": "/v1/posts/:postId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts",
+      "path": "/v1/posts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/posts/:postId",
+      "path": "/v1/posts/:postId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/posts/:postId",
+      "path": "/v1/posts/:postId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/like",
+      "path": "/v1/posts/:postId/like",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/posts/:postId/like",
+      "path": "/v1/posts/:postId/like",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/save",
+      "path": "/v1/posts/:postId/save",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/posts/:postId/save",
+      "path": "/v1/posts/:postId/save",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/repost",
+      "path": "/v1/posts/:postId/repost",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/posts/:postId/repost",
+      "path": "/v1/posts/:postId/repost",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": "handler"
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/share",
+      "path": "/v1/posts/:postId/share",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/:handle",
+      "path": "/v1/profiles/:handle",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/:handle",
+      "path": "/v1/profiles/:handle",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/:handle/posts",
+      "path": "/v1/profiles/:handle/posts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/:handle/posts",
+      "path": "/v1/profiles/:handle/posts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/:handle/followers",
+      "path": "/v1/profiles/:handle/followers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/:handle/followers",
+      "path": "/v1/profiles/:handle/followers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/:handle/following",
+      "path": "/v1/profiles/:handle/following",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/:handle/following",
+      "path": "/v1/profiles/:handle/following",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/profiles/:profileId/follow",
+      "path": "/v1/profiles/:profileId/follow",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "profileId"
+          ],
+          "properties": {
+            "profileId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/profiles/:profileId/follow",
+      "path": "/v1/profiles/:profileId/follow",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "profileId"
+          ],
+          "properties": {
+            "profileId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/profiles/me/follow-requests",
+      "path": "/v1/profiles/me/follow-requests",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/profiles/me/follow-requests",
+      "path": "/v1/profiles/me/follow-requests",
+      "prefix": "",
+      "schema": {
+        "querystring": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "cursor": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/follow-requests/:requestId/accept",
+      "path": "/v1/follow-requests/:requestId/accept",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requestId"
+          ],
+          "properties": {
+            "requestId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/follow-requests/:requestId/reject",
+      "path": "/v1/follow-requests/:requestId/reject",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requestId"
+          ],
+          "properties": {
+            "requestId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/follow-requests/:requestId",
+      "path": "/v1/follow-requests/:requestId",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requestId"
+          ],
+          "properties": {
+            "requestId": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/profiles/me",
+      "path": "/v1/profiles/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/profiles/me/avatar",
+      "path": "/v1/profiles/me/avatar",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/profiles/me/avatar",
+      "path": "/v1/profiles/me/avatar",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/profiles/me/cover",
+      "path": "/v1/profiles/me/cover",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/profiles/me/cover",
+      "path": "/v1/profiles/me/cover",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/profiles/:profileId/block",
+      "path": "/v1/profiles/:profileId/block",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/profiles/:profileId/block",
+      "path": "/v1/profiles/:profileId/block",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/profiles/:profileId/mute",
+      "path": "/v1/profiles/:profileId/mute",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/profiles/:profileId/mute",
+      "path": "/v1/profiles/:profileId/mute",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/reports",
+      "path": "/v1/reports",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/reports/me",
+      "path": "/v1/reports/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/reports/me",
+      "path": "/v1/reports/me",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/moderation/reports",
+      "path": "/v1/admin/moderation/reports",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/moderation/reports",
+      "path": "/v1/admin/moderation/reports",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/moderation/reports/:reportId",
+      "path": "/v1/admin/moderation/reports/:reportId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/moderation/reports/:reportId",
+      "path": "/v1/admin/moderation/reports/:reportId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/admin/moderation/reports/:reportId",
+      "path": "/v1/admin/moderation/reports/:reportId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/moderation/reports/:reportId/actions",
+      "path": "/v1/admin/moderation/reports/:reportId/actions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/notifications",
+      "path": "/v1/notifications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/notifications",
+      "path": "/v1/notifications",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/notifications/:notificationId/read",
+      "path": "/v1/notifications/:notificationId/read",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/notifications/read-all",
+      "path": "/v1/notifications/read-all",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/notification-preferences",
+      "path": "/v1/accounts/me/notification-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/notification-preferences",
+      "path": "/v1/accounts/me/notification-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/accounts/me/notification-preferences",
+      "path": "/v1/accounts/me/notification-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/search",
+      "path": "/v1/search",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/search",
+      "path": "/v1/search",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/search/suggestions",
+      "path": "/v1/search/suggestions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/search/suggestions",
+      "path": "/v1/search/suggestions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/search/recent",
+      "path": "/v1/search/recent",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/search/recent",
+      "path": "/v1/search/recent",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/search/recent",
+      "path": "/v1/search/recent",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/search/recent",
+      "path": "/v1/search/recent",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/search/saved",
+      "path": "/v1/search/saved",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/search/saved",
+      "path": "/v1/search/saved",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/search/saved",
+      "path": "/v1/search/saved",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/search/saved/:savedSearchId",
+      "path": "/v1/search/saved/:savedSearchId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/search/saved/:savedSearchId",
+      "path": "/v1/search/saved/:savedSearchId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/media/:mediaFile",
+      "path": "/v1/media/:mediaFile",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/media/:mediaFile",
+      "path": "/v1/media/:mediaFile",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/discover",
+      "path": "/v1/discover",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/discover",
+      "path": "/v1/discover",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/activity",
+      "path": "/v1/activity",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/activity",
+      "path": "/v1/activity",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/reels",
+      "path": "/v1/reels",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/reels",
+      "path": "/v1/reels",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/atproto/connections",
+      "path": "/v1/atproto/connections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/atproto/connections",
+      "path": "/v1/atproto/connections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/atproto/oauth/start",
+      "path": "/v1/atproto/oauth/start",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/atproto/oauth/callback",
+      "path": "/v1/atproto/oauth/callback",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/atproto/oauth/callback",
+      "path": "/v1/atproto/oauth/callback",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/atproto/connections/:connectionId/disconnect",
+      "path": "/v1/atproto/connections/:connectionId/disconnect",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/atproto/connections/:connectionId/refresh",
+      "path": "/v1/atproto/connections/:connectionId/refresh",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/atproto/connections/:connectionId/status",
+      "path": "/v1/atproto/connections/:connectionId/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/atproto/connections/:connectionId/status",
+      "path": "/v1/atproto/connections/:connectionId/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/atproto/preferences",
+      "path": "/v1/atproto/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/atproto/preferences",
+      "path": "/v1/atproto/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/atproto/preferences",
+      "path": "/v1/atproto/preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/atproto/feed",
+      "path": "/v1/atproto/feed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/atproto/feed",
+      "path": "/v1/atproto/feed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/atproto/publish",
+      "path": "/v1/admin/ops/atproto/publish",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/atproto/ingest",
+      "path": "/v1/admin/ops/atproto/ingest",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/atproto/connections/:connectionId/revoke",
+      "path": "/v1/admin/ops/atproto/connections/:connectionId/revoke",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/queue/drain",
+      "path": "/v1/admin/ops/queue/drain",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/mail/summary",
+      "path": "/v1/admin/ops/mail/summary",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/mail/summary",
+      "path": "/v1/admin/ops/mail/summary",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/mail/identities/adopt",
+      "path": "/v1/admin/ops/mail/identities/adopt",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/jobs/reaction-dead-letters/:jobId/retry",
+      "path": "/v1/admin/ops/jobs/reaction-dead-letters/:jobId/retry",
+      "prefix": "",
+      "schema": {
+        "params": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "jobId"
+          ],
+          "properties": {
+            "jobId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "pattern": "^[A-Za-z0-9._:-]+$"
+            }
+          }
+        },
+        "body": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "pattern": "\\S"
+            }
+          }
+        }
+      },
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/queue/dead-letters/:deadLetterId/retry",
+      "path": "/v1/admin/ops/queue/dead-letters/:deadLetterId/retry",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/events/subscriber-failures",
+      "path": "/v1/admin/ops/events/subscriber-failures",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/events/subscriber-failures",
+      "path": "/v1/admin/ops/events/subscriber-failures",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/search/health",
+      "path": "/v1/admin/ops/search/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/search/health",
+      "path": "/v1/admin/ops/search/health",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/engines",
+      "path": "/v1/admin/ops/engines",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/engines",
+      "path": "/v1/admin/ops/engines",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/engines/:engineId",
+      "path": "/v1/admin/ops/engines/:engineId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/engines/:engineId",
+      "path": "/v1/admin/ops/engines/:engineId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/search/projections",
+      "path": "/v1/admin/ops/search/projections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/search/projections",
+      "path": "/v1/admin/ops/search/projections",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/admin/ops/search/failures",
+      "path": "/v1/admin/ops/search/failures",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/admin/ops/search/failures",
+      "path": "/v1/admin/ops/search/failures",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/search/reindex",
+      "path": "/v1/admin/ops/search/reindex",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/search/failures/:failureId/retry",
+      "path": "/v1/admin/ops/search/failures/:failureId/retry",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/policy/evaluate",
+      "path": "/v1/admin/ops/policy/evaluate",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/events/replay",
+      "path": "/v1/admin/ops/events/replay",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/events/dead-letters/retry",
+      "path": "/v1/admin/ops/events/dead-letters/retry",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/events/replay/:replayId/cancel",
+      "path": "/v1/admin/ops/events/replay/:replayId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/ops/atproto/lexicons/:collection/disable",
+      "path": "/v1/admin/ops/atproto/lexicons/:collection/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/internal/ssrf-check",
+      "path": "/v1/internal/ssrf-check",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/internal/ssrf-check",
+      "path": "/v1/internal/ssrf-check",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/posts/:postId/reaction",
+      "path": "/v1/posts/:postId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/posts/:postId/reaction",
+      "path": "/v1/posts/:postId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/posts/:postId/reactions",
+      "path": "/v1/posts/:postId/reactions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/posts/:postId/reactions",
+      "path": "/v1/posts/:postId/reactions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/posts/:postId/comments",
+      "path": "/v1/posts/:postId/comments",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/posts/:postId/comments",
+      "path": "/v1/posts/:postId/comments",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/comments",
+      "path": "/v1/posts/:postId/comments",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/comments/:commentId/replies",
+      "path": "/v1/comments/:commentId/replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/comments/:commentId/replies",
+      "path": "/v1/comments/:commentId/replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/comments/:commentId/replies",
+      "path": "/v1/comments/:commentId/replies",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/comments/:commentId",
+      "path": "/v1/comments/:commentId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/comments/:commentId",
+      "path": "/v1/comments/:commentId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/comments/:commentId/poll/vote",
+      "path": "/v1/comments/:commentId/poll/vote",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/comments/:commentId/pin",
+      "path": "/v1/comments/:commentId/pin",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/comments/:commentId/pin",
+      "path": "/v1/comments/:commentId/pin",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/comments/:commentId/reaction",
+      "path": "/v1/comments/:commentId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/comments/:commentId/reaction",
+      "path": "/v1/comments/:commentId/reaction",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/posts/:postId/quote",
+      "path": "/v1/posts/:postId/quote",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/saves",
+      "path": "/v1/saves",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/saves",
+      "path": "/v1/saves",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/appearance",
+      "path": "/v1/accounts/me/appearance",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/appearance",
+      "path": "/v1/accounts/me/appearance",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/accounts/me/appearance",
+      "path": "/v1/accounts/me/appearance",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/recovery/request",
+      "path": "/v1/accounts/recovery/request",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/accounts/recovery/complete",
+      "path": "/v1/accounts/recovery/complete",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionId/enable",
+      "path": "/v1/extensions/:extensionId/enable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/extensions/:extensionId/disable",
+      "path": "/v1/extensions/:extensionId/disable",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/extensions/:extensionId/configuration",
+      "path": "/v1/extensions/:extensionId/configuration",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/function-jobs/:jobId",
+      "path": "/v1/function-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/function-jobs/:jobId",
+      "path": "/v1/function-jobs/:jobId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/function-jobs/:jobId/cancel",
+      "path": "/v1/function-jobs/:jobId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/functions/:functionId/jobs",
+      "path": "/v1/functions/:functionId/jobs",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/rail",
+      "path": "/v1/stories/rail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/rail",
+      "path": "/v1/stories/rail",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stories/:groupId",
+      "path": "/v1/stories/:groupId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stories/:groupId",
+      "path": "/v1/stories/:groupId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/stories",
+      "path": "/v1/stories",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/stories/items/:itemId/viewed",
+      "path": "/v1/stories/items/:itemId/viewed",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/stories/items/:itemId",
+      "path": "/v1/stories/items/:itemId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/media/stories/:mediaFile",
+      "path": "/v1/media/stories/:mediaFile",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/media/stories/:mediaFile",
+      "path": "/v1/media/stories/:mediaFile",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/developer/board",
+      "path": "/v1/developer/board",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/developer/board",
+      "path": "/v1/developer/board",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/developer/profile",
+      "path": "/v1/developer/profile",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/organisations",
+      "path": "/v1/developer/organisations",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/organisations/:organisationId/members",
+      "path": "/v1/developer/organisations/:organisationId/members",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/organisations/:organisationId/invitations/accept",
+      "path": "/v1/developer/organisations/:organisationId/invitations/accept",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/publishers",
+      "path": "/v1/developer/publishers",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/publishers/:publisherId/namespaces",
+      "path": "/v1/developer/publishers/:publisherId/namespaces",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/agreements/:agreementId/:version/accept",
+      "path": "/v1/developer/agreements/:agreementId/:version/accept",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/programme/enrol",
+      "path": "/v1/developer/programme/enrol",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/admin/developer/programme/:accountId",
+      "path": "/v1/admin/developer/programme/:accountId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/developer/namespaces/:namespace/verify",
+      "path": "/v1/admin/developer/namespaces/:namespace/verify",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/developer/build-services/:serviceId",
+      "path": "/v1/admin/developer/build-services/:serviceId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/developer/products",
+      "path": "/v1/developer/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/developer/products",
+      "path": "/v1/developer/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products",
+      "path": "/v1/developer/products",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/developer/products/:productId",
+      "path": "/v1/developer/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/developer/products/:productId",
+      "path": "/v1/developer/products/:productId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products/:productId/sources",
+      "path": "/v1/developer/products/:productId/sources",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products/:productId/builds",
+      "path": "/v1/developer/products/:productId/builds",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products/:productId/releases",
+      "path": "/v1/developer/products/:productId/releases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products/:productId/test-groups",
+      "path": "/v1/developer/products/:productId/test-groups",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId",
+      "path": "/v1/developer/products/:productId/releases/:releaseId/test-groups/:testGroupId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/developer/products/:productId/reviews",
+      "path": "/v1/developer/products/:productId/reviews",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/internal/build-service/claims",
+      "path": "/v1/internal/build-service/claims",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/internal/build-service/builds/:buildId/result",
+      "path": "/v1/internal/build-service/builds/:buildId/result",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/commerce/entitlements",
+      "path": "/v1/commerce/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/commerce/entitlements",
+      "path": "/v1/commerce/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/commerce/entitlements/check",
+      "path": "/v1/commerce/entitlements/check",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/commerce/billing-adapters",
+      "path": "/v1/commerce/billing-adapters",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/commerce/billing-adapters",
+      "path": "/v1/commerce/billing-adapters",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/commerce/offers/:offerId",
+      "path": "/v1/admin/commerce/offers/:offerId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/commerce/entitlements",
+      "path": "/v1/admin/commerce/entitlements",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/admin/commerce/entitlements/:entitlementId/transitions",
+      "path": "/v1/admin/commerce/entitlements/:entitlementId/transitions",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/admin/commerce/quotas/:quotaPolicyId",
+      "path": "/v1/admin/commerce/quotas/:quotaPolicyId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/account/data-exports",
+      "path": "/v1/account/data-exports",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/account/deletion-requests",
+      "path": "/v1/account/deletion-requests",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/account/data-requests/:requestId",
+      "path": "/v1/account/data-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/account/data-requests/:requestId",
+      "path": "/v1/account/data-requests/:requestId",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/account/data-requests/:requestId/artifacts",
+      "path": "/v1/account/data-requests/:requestId/artifacts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/account/data-requests/:requestId/artifacts",
+      "path": "/v1/account/data-requests/:requestId/artifacts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/account/data-requests/:requestId/advance",
+      "path": "/v1/account/data-requests/:requestId/advance",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/account/data-requests/:requestId/cancel",
+      "path": "/v1/account/data-requests/:requestId/cancel",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/status",
+      "path": "/v1/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/status",
+      "path": "/v1/status",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/support/contact",
+      "path": "/v1/support/contact",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/support/contact",
+      "path": "/v1/support/contact",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/support/cases",
+      "path": "/v1/support/cases",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PATCH",
+      "url": "/v1/accounts/me/app-preferences",
+      "path": "/v1/accounts/me/app-preferences",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/mutes",
+      "path": "/v1/accounts/me/mutes",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/mutes",
+      "path": "/v1/accounts/me/mutes",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/accounts/me/blocks",
+      "path": "/v1/accounts/me/blocks",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/accounts/me/blocks",
+      "path": "/v1/accounts/me/blocks",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/creator/insights",
+      "path": "/v1/creator/insights",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/creator/insights",
+      "path": "/v1/creator/insights",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/creator/payouts",
+      "path": "/v1/creator/payouts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/creator/payouts",
+      "path": "/v1/creator/payouts",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/commerce/invoices",
+      "path": "/v1/commerce/invoices",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/commerce/invoices",
+      "path": "/v1/commerce/invoices",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "POST",
+      "url": "/v1/auth/step-up/password",
+      "path": "/v1/auth/step-up/password",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/account/deletion-requests/current",
+      "path": "/v1/account/deletion-requests/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/account/deletion-requests/current",
+      "path": "/v1/account/deletion-requests/current",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/providers/:capabilityRole",
+      "path": "/v1/providers/:capabilityRole",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/providers/:capabilityRole",
+      "path": "/v1/providers/:capabilityRole",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/providers/:capabilityRole/resolve",
+      "path": "/v1/providers/:capabilityRole/resolve",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/providers/:capabilityRole/resolve",
+      "path": "/v1/providers/:capabilityRole/resolve",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/providers/:capabilityRole/default",
+      "path": "/v1/providers/:capabilityRole/default",
+      "prefix": "",
+      "schema": null,
+      "config": null,
+      "handler": ""
+    }
+  ]
+}

@@ -43,6 +43,13 @@ export function sha256(value) {
   return createHash('sha256').update(value).digest('hex')
 }
 
+export function apiSourceFingerprint() {
+  const root = join(repoRoot, 'services/greenfield-api/src')
+  const files = walk(root, path => extname(path) === '.ts')
+  const content = files.map(file => `${relative(repoRoot, file)}\0${readFileSync(file)}`).join('\0')
+  return sha256(content)
+}
+
 export function json(value) {
   return `${JSON.stringify(value, null, 2)}\n`
 }
@@ -182,11 +189,7 @@ function ownershipFor(handlerText, path, auth, file) {
   const workspace = /workspaceId|workspace_id/.test(handlerText)
   const resourceId = /request\.params|param\(request/.test(handlerText)
   return {
-    rule: path === '/v1/functions/:functionId/invoke'
-      ? 'MISSING: client-supplied installationId is capability-checked without authenticated account ownership'
-      : /^\/v1\/ai\/streams\/:streamId\/(cancel|reconnect)$/.test(path)
-        ? 'MISSING: authenticated session is required but stream ownership is not checked'
-        : auth.adminRequired
+    rule: auth.adminRequired
           ? 'admin capability is the resource boundary; per-user ownership is not applicable'
           : auth.serviceAssertionRequired || auth.serviceOperations.length
       ? 'service identity, product/release assertion, and declared operation are resolved server-side'
@@ -203,9 +206,7 @@ function ownershipFor(handlerText, path, auth, file) {
     actorScoped: actor,
     workspaceScoped: workspace,
     parameterizedResource: resourceId,
-    evidenceStrength: path === '/v1/functions/:functionId/invoke' || /^\/v1\/ai\/streams\/:streamId\/(cancel|reconnect)$/.test(path)
-      ? 'route-handler-gap'
-      : account || actor || auth.adminRequired || auth.serviceAssertionRequired || auth.serviceOperations.length
+    evidenceStrength: account || actor || auth.adminRequired || auth.serviceAssertionRequired || auth.serviceOperations.length
         ? 'route-handler'
         : 'downstream-or-none',
   }
@@ -272,6 +273,32 @@ export function extractSourceRoutes() {
     const text = readFileSync(file, 'utf8')
     const sourceFile = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
     const visit = node => {
+      if (ts.isCallExpression(node) && ts.isElementAccessExpression(node.expression)) {
+        const receiver = node.expression.expression.getText(sourceFile)
+        const methodExpression = unwrapExpression(node.expression.argumentExpression)
+        const path = literal(node.arguments[0], sourceFile)
+        const loop = findAncestor(node, ts.isForOfStatement)
+        const loopExpression = unwrapExpression(loop?.expression)
+        const declaration = loop && ts.isVariableDeclarationList(loop.initializer) ? loop.initializer.declarations[0] : null
+        if (/^(app|server|fastify)$/.test(receiver)
+          && path
+          && methodExpression && ts.isIdentifier(methodExpression)
+          && declaration?.name && ts.isArrayBindingPattern(declaration.name)
+          && loopExpression && ts.isArrayLiteralExpression(loopExpression)) {
+          const names = declaration.name.elements.map(element => element.name.getText(sourceFile))
+          const methodIndex = names.indexOf(methodExpression.text)
+          if (methodIndex >= 0) {
+            for (const tupleNode of loopExpression.elements) {
+              const tuple = unwrapExpression(tupleNode)
+              if (!tuple || !ts.isArrayLiteralExpression(tuple)) continue
+              const method = literal(unwrapExpression(tuple.elements[methodIndex]), sourceFile)
+              if (method && ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'].includes(method.toLowerCase())) {
+                routes.push(sourceRoute({file, sourceFile, node, methods: [method.toUpperCase()], path, handler: node.arguments.at(-1), config: node.arguments.length >= 3 ? node.arguments[1] : null}))
+              }
+            }
+          }
+        }
+      }
       if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
         const receiver = node.expression.expression.getText(sourceFile)
         const methodName = node.expression.name.text.toLowerCase()
@@ -540,6 +567,45 @@ await db.destroy()
     maxBuffer: 128 * 1024 * 1024,
   })
   if (result.status !== 0) throw new Error(`runtime capture failed: ${result.stderr}`)
+  return JSON.parse(result.stdout)
+}
+
+export function captureLocalRuntimeRoutes() {
+  const script = String.raw`
+import Fastify from './services/greenfield-api/node_modules/fastify/fastify.js'
+import {loadConfig} from './services/greenfield-api/dist/config/index.js'
+import {createDb} from './services/greenfield-api/dist/database/client.js'
+import {registerPlugins} from './services/greenfield-api/dist/app/register-plugins.js'
+import {registerRoutes} from './services/greenfield-api/dist/app/register-routes.js'
+const config=loadConfig()
+const app=Fastify({logger:false,trustProxy:config.trustProxy,bodyLimit:config.requestBodyLimitBytes,genReqId:()=>''})
+const routes=[]
+app.addHook('onRoute',o=>routes.push({method:o.method,url:o.url,path:o.path,prefix:o.prefix??'',schema:o.schema??null,config:o.config??null,handler:o.handler?.name??null}))
+const db=createDb(config.databaseUrl)
+await registerPlugins(app,config)
+await registerRoutes(app,db,config)
+await app.ready()
+console.log(JSON.stringify(routes))
+await app.close()
+await db.destroy()
+`
+  const result = spawnSync(process.execPath, ['--input-type=module'], {
+    cwd: repoRoot,
+    input: script,
+    encoding: 'utf8',
+    maxBuffer: 128 * 1024 * 1024,
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+      MODULA_ENVIRONMENT: 'development',
+      MODULA_PUBLIC_API_URL: 'http://127.0.0.1:4020',
+      MODULA_PUBLIC_WEB_URL: 'http://127.0.0.1:8081',
+      MODULA_DATABASE_URL: 'postgresql://candidate-runtime@127.0.0.1:1/candidate-runtime',
+      MODULA_ALLOWED_ORIGINS: 'http://127.0.0.1:8081',
+      MODULA_RATE_LIMIT_ENABLED: 'false',
+    },
+  })
+  if (result.status !== 0) throw new Error(`candidate runtime capture failed: ${result.stderr}`)
   return JSON.parse(result.stdout)
 }
 
