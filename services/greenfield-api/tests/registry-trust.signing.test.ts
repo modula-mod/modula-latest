@@ -115,9 +115,10 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
 
   it('fails closed when a signed release has no integrity evidence row', async () => {
     const id = nextId()
-    const {manifest, evidence} = signedImport(id)
+    const {product, manifest, evidence} = signedImport(id)
     const imported = await releases.importPendingReview(manifest, evidence)
     await releases.publishRelease(id, '1.0.0')
+    await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: imported.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
     await db.deleteFrom('greenfield_module_release_integrity').where('release_id', '=', imported.releaseId).execute()
 
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${id}`})
@@ -131,9 +132,10 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
 
   it('keeps a valid signed release installable under strict production trust policy', async () => {
     const id = nextId()
-    const {manifest, evidence} = signedImport(id)
+    const {product, manifest, evidence} = signedImport(id)
     await releases.importPendingReview(manifest, evidence)
-    await releases.publishRelease(id, '1.0.0')
+    const published = await releases.publishRelease(id, '1.0.0')
+    await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: published.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
 
     const response = await app.inject({
       method: 'POST',
