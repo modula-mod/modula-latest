@@ -994,6 +994,9 @@ export interface Database {
     public_key_fingerprint: string | null
     observed_at: Date | null
   }
+  greenfield_mps_ingestions: {release_id: string | null; manifest_sha256: string}
+  greenfield_release_frontends: {release_id: string | null; artifact_sha256: string}
+  greenfield_module_sources: {release_id: string; release_tag: string | null}
   greenfield_module_installation_settings: {
     settings_id: string
     installation_id: string

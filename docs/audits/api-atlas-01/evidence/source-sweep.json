@@ -374,7 +374,7 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-trust-service.ts",
-      "line": 114,
+      "line": 122,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"
@@ -2245,7 +2245,7 @@
     },
     {
       "file": "services/greenfield-api/src/modules/registry-trust-service.ts",
-      "line": 114,
+      "line": 122,
       "marker": "placeholder",
       "classification": "possible-runtime-placeholder",
       "excerpt": "if (developmentAssets) warnings.push({code: 'DEVELOPMENT_ASSETS', message: 'Presentation media is marked as development placeholder artwork.'})"

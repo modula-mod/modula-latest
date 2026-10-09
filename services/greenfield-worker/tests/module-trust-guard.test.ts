@@ -6,10 +6,13 @@ import {assertTrustedModuleRelease} from '../src/modules/release-trust-guard.js'
 const release = {
   release_id: 'release:test',
   module_id: 'module:test',
+  version: '1.0.0',
   publisher_id: 'publisher:test',
   release_state: 'published',
   manifest_sha256: 'a'.repeat(64),
   release_sha256: 'b'.repeat(64),
+  source_repository: 'modula-mod/test',
+  source_commit: '1'.repeat(40),
 }
 
 const strictConfig = {environment: 'production', moduleAllowUntrustedDevelopmentReleases: false} as WorkerConfig
@@ -20,7 +23,15 @@ function database(rows: Record<string, unknown>) {
       const query = {
         select: () => query,
         where: () => query,
-        executeTakeFirst: async () => rows[table],
+        executeTakeFirst: async () => table === 'greenfield_module_release_signatures' && rows[table]
+          ? {statement: {
+            schemaVersion: '1.0.0', statementType: 'modula.publisher-release.v1',
+            productId: release.module_id, version: release.version, publisherId: release.publisher_id,
+            sourceRepository: release.source_repository, sourceSha: release.source_commit, releaseTag: null,
+            artifactSha256: release.release_sha256, manifestSha256: release.manifest_sha256,
+            signingKeyId: 'key:test', productManifestSha256: null, frontendSha256: null,
+          }, ...(rows[table] as object)}
+          : table === 'greenfield_module_sources' ? (rows[table] ?? {release_tag: null}) : rows[table],
       }
       return query
     },
@@ -86,6 +97,36 @@ describe('module worker trust boundary', () => {
     const db = {selectFrom: () => { throw new Error('trust database must not be queried for explicit local fixtures') }} as any
     const config = {environment: 'development', moduleAllowUntrustedDevelopmentReleases: true} as WorkerConfig
     await expect(assertTrustedModuleRelease(db, config, release)).resolves.toBeUndefined()
+  })
+
+  it('rejects a stale worker job when projected product bytes no longer match the signed statement', async () => {
+    const db = database({
+      greenfield_publishers: {status: 'verified'},
+      greenfield_module_release_signatures: {signature_id: 'signature:test', signature_key_id: 'key:test'},
+      greenfield_publisher_signing_keys: {publisher_id: 'publisher:test', state: 'ACTIVE', revoked_at: null},
+      greenfield_module_release_integrity: {mismatch_at: null},
+      greenfield_mps_ingestions: {manifest_sha256: 'c'.repeat(64)},
+    })
+    await expect(assertTrustedModuleRelease(db, strictConfig, release)).rejects.toMatchObject({code: 'UNTRUSTED_RELEASE'})
+  })
+
+  it('rejects a stale worker job when release bytes no longer match the signed statement', async () => {
+    const db = database({
+      greenfield_publishers: {status: 'verified'},
+      greenfield_module_release_signatures: {
+        signature_id: 'signature:test', signature_key_id: 'key:test',
+        statement: {
+          schemaVersion: '1.0.0', statementType: 'modula.publisher-release.v1',
+          productId: release.module_id, version: release.version, publisherId: release.publisher_id,
+          sourceRepository: release.source_repository, sourceSha: release.source_commit, releaseTag: null,
+          artifactSha256: 'f'.repeat(64), manifestSha256: release.manifest_sha256,
+          signingKeyId: 'key:test', productManifestSha256: null, frontendSha256: null,
+        },
+      },
+      greenfield_publisher_signing_keys: {publisher_id: 'publisher:test', state: 'ACTIVE', revoked_at: null},
+      greenfield_module_release_integrity: {mismatch_at: null},
+    })
+    await expect(assertTrustedModuleRelease(db, strictConfig, release)).rejects.toMatchObject({code: 'UNTRUSTED_RELEASE'})
   })
 
   it('requires a recorded permission review before enable', () => {

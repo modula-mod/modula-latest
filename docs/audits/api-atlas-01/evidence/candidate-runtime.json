@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-08T22:30:43.534Z",
+  "capturedAt": "2026-10-09T17:59:43.067Z",
   "source": {
     "branch": "phase-api-fix-01-trust-fail-closed",
-    "headAtCapture": "fe496ccff968cfeb36881a58c2bfe9adb0ae9917",
+    "headAtCapture": "d74e96bc1f8c7509b5b1515956ad96254d5565b3",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "577707b80d292f274c677ffb7482facd5deb78e175315bdca3e890d9412aa2e4"
+    "apiSourceSha256": "cf832867a021fb9fef6014010cd3279ada07d7be3a663547e7a6094d9e4803ec"
   },
   "runtimeRoutes": [
     {

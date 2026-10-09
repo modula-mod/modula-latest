@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "phase-api-fix-01-trust-fail-closed",
-      "sourceSha256": "577707b80d292f274c677ffb7482facd5deb78e175315bdca3e890d9412aa2e4",
-      "capturedAt": "2026-10-08T22:30:43.534Z",
+      "sourceSha256": "cf832867a021fb9fef6014010cd3279ada07d7be3a663547e7a6094d9e4803ec",
+      "capturedAt": "2026-10-09T17:59:43.067Z",
       "routeCount": 575
     },
     "status": "PASS"
@@ -72052,12 +72052,15 @@
       "migrationIntroduced": "009_phase7a_module_platform.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/registry-presentation-service.ts",
-        "services/greenfield-api/src/modules/registry-trust-service.ts"
+        "services/greenfield-api/src/modules/registry-trust-service.ts",
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/modules/release-service.ts"
       ],
-      "jobReads": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
+      ],
       "jobWrites": [],
       "routeReads": [
         "GET /v1/registry/releases/:releaseId/artifact"
@@ -73122,12 +73125,15 @@
         "services/greenfield-api/src/modules/registry-trust-service.ts",
         "services/greenfield-api/src/modules/release-service.ts",
         "services/greenfield-api/src/product-standard/frontend-service.ts",
-        "services/greenfield-api/src/product-standard/ingest-service.ts"
+        "services/greenfield-api/src/product-standard/ingest-service.ts",
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/product-standard/ingest-service.ts"
       ],
-      "jobReads": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
+      ],
       "jobWrites": [],
       "routeReads": [
         "POST /v1/admin/product-standard/ingest",
@@ -74961,6 +74967,7 @@
       ],
       "migrationIntroduced": "061_registry_publisher_signing_keys.sql",
       "sourceReads": [
+        "services/greenfield-api/src/modules/registry-trust-service.ts",
         "services/greenfield-api/src/modules/release-signing.ts",
         "services/greenfield-worker/src/modules/release-trust-guard.ts"
       ],
@@ -76393,12 +76400,15 @@
         "services/greenfield-api/src/modules/registry-trust-service.ts",
         "services/greenfield-api/src/modules/release-service.ts",
         "services/greenfield-api/src/product-standard/frontend-service.ts",
-        "services/greenfield-api/src/product-standard/ingest-service.ts"
+        "services/greenfield-api/src/product-standard/ingest-service.ts",
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/product-standard/ingest-service.ts"
       ],
-      "jobReads": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/release-trust-guard.ts"
+      ],
       "jobWrites": [],
       "routeReads": [
         "POST /v1/admin/product-standard/ingest",

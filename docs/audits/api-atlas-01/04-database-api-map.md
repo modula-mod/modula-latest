@@ -3019,7 +3019,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `GET /v1/registry/releases/:releaseId/artifact`
 - Routes writing: `POST /v1/admin/registry/modules/import`
-- API/worker source reads: `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/registry-presentation-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3155,7 +3155,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `054_greenfield_mps_v1_product_contract.sql`
 - Routes reading: `POST /v1/admin/product-standard/ingest`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/modules/:moduleId/frontend`, `GET /v1/product-standard/products/:productId`, `GET /v1/product-standard/products/:productId/versions/:version`, `GET /v1/registry/modules/:moduleId`, `GET /v1/registry/modules/:moduleId/versions/:version`, `GET /v1/registry/products/:productId`
 - Routes writing: `POST /v1/admin/product-standard/ingest`
-- API/worker source reads: `services/greenfield-api/src/modules/install-descriptor-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/frontend-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/install-descriptor-service.ts`, `services/greenfield-api/src/modules/registry-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/frontend-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/product-standard/ingest-service.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3444,7 +3444,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `061_registry_publisher_signing_keys.sql`
 - Routes reading: `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`, `GET /v1/registry/publishers/:publisherId/signing-keys`
 - Routes writing: `POST /v1/admin/registry/publishers/:publisherId/signing-keys`, `POST /v1/admin/registry/publishers/:publisherId/signing-keys/:keyId/revoke`
-- API/worker source reads: `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/modules/release-signing.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -3648,7 +3648,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `055_mps_product_frontend_runtime.sql`
 - Routes reading: `POST /v1/admin/product-standard/ingest`, `POST /v1/admin/registry/releases/:releaseId/signature`, `POST /v1/admin/registry/releases/:releaseId/verify`, `GET /v1/module-host/:targetProductId/composition`, `GET /v1/modules/:moduleId/frontend`, `GET /v1/product-standard/products/:productId`, `GET /v1/product-standard/products/:productId/versions/:version`
 - Routes writing: `POST /v1/admin/product-standard/ingest`
-- API/worker source reads: `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/install-descriptor-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/frontend-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/install-descriptor-service.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`, `services/greenfield-api/src/modules/release-service.ts`, `services/greenfield-api/src/product-standard/frontend-service.ts`, `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-worker/src/modules/release-trust-guard.ts`
 - API/worker source writes: `services/greenfield-api/src/product-standard/ingest-service.ts`
 - Disposition: active read/write or ledger/schema table
 

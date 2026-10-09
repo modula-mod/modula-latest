@@ -204,9 +204,10 @@ export class GreenfieldPublisherSigningKeyService {
   }
 
   /** Verifies a signature over the registry-rebuilt statement at `observedAt` (the time the registry first saw it). */
-  async verify(statement: PublisherReleaseStatement, signature: ReleaseSignatureInput, observedAt: Date): Promise<SignatureVerificationResult> {
+  async verify(statement: PublisherReleaseStatement, signature: ReleaseSignatureInput, observedAt: Date, lockKey = false): Promise<SignatureVerificationResult> {
     const base = {keyId: signature.keyId, statement, statementSha256: statementSha256(statement)}
-    const key = await this.db.selectFrom('greenfield_publisher_signing_keys').selectAll().where('key_id', '=', signature.keyId).executeTakeFirst()
+    const keyQuery = this.db.selectFrom('greenfield_publisher_signing_keys').selectAll().where('key_id', '=', signature.keyId)
+    const key = await (lockKey ? keyQuery.forShare() : keyQuery).executeTakeFirst()
     if (!key) return {...base, state: 'unknownKey', detail: 'No registered public key has this key ID', publicKeyFingerprint: null}
     const fingerprint = key.fingerprint
     if (key.publisher_id !== statement.publisherId) return {...base, state: 'unknownKey', detail: 'The key is registered to a different publisher', publicKeyFingerprint: fingerprint}

@@ -503,7 +503,8 @@ export class GreenfieldModuleReleaseService {
         throw moduleError('VALIDATION_FAILED', 'Signed statement does not match registry release facts')
       }
       const now = new Date()
-      const verified = await new GreenfieldPublisherSigningKeyService(trx).verify(statement, signature, now)
+      // Hold the key against concurrent revocation until the signature row commits.
+      const verified = await new GreenfieldPublisherSigningKeyService(trx).verify(statement, signature, now, true)
       if (verified.state !== 'verified') {
         throw moduleError('VALIDATION_FAILED', `Release signature rejected (${verified.state}): ${verified.detail}`)
       }

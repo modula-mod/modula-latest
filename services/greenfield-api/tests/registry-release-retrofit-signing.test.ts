@@ -172,4 +172,38 @@ describeIfDb('retrospective publisher release signatures', () => {
     const response = await app.inject({method: 'POST', url: endpoint(release.releaseId), headers: auth(adminToken), payload})
     expect(response.statusCode, response.body).toBe(409)
   })
+
+  it('fails closed when the signer is revoked even if stale signature evidence still says verified', async () => {
+    const {moduleId, release, payload} = await unsignedRelease()
+    const attached = await app.inject({method: 'POST', url: endpoint(release.releaseId), headers: auth(adminToken), payload})
+    expect(attached.statusCode, attached.body).toBe(200)
+    await db.updateTable('greenfield_publisher_signing_keys')
+      .set({state: 'REVOKED', revoked_at: new Date()}).where('key_id', '=', keyId).execute()
+    try {
+      const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
+      expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'revokedKey'}})
+    } finally {
+      await db.updateTable('greenfield_publisher_signing_keys')
+        .set({state: 'ACTIVE', revoked_at: null}).where('key_id', '=', keyId).execute()
+    }
+  })
+
+  it('fails closed when release or projection facts diverge from the signed statement', async () => {
+    const {moduleId, release, payload} = await unsignedRelease()
+    const attached = await app.inject({method: 'POST', url: endpoint(release.releaseId), headers: auth(adminToken), payload})
+    expect(attached.statusCode, attached.body).toBe(200)
+    const signatureRow = await db.selectFrom('greenfield_module_release_signatures')
+      .select(['signature_id', 'statement']).where('release_id', '=', release.releaseId).executeTakeFirstOrThrow()
+    await db.updateTable('greenfield_module_release_signatures')
+      .set({statement: {...(signatureRow.statement as object), productManifestSha256: 'c'.repeat(64)}})
+      .where('signature_id', '=', signatureRow.signature_id).execute()
+    const projectionMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
+    expect(projectionMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
+    await db.updateTable('greenfield_module_release_signatures')
+      .set({statement: signatureRow.statement}).where('signature_id', '=', signatureRow.signature_id).execute()
+    await db.updateTable('greenfield_module_releases')
+      .set({release_sha256: sha256('different release bytes')}).where('release_id', '=', release.releaseId).execute()
+    const releaseMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
+    expect(releaseMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
+  })
 })
