@@ -23,8 +23,10 @@ describeIfDb.sequential('API-FIX-01C legacy Vault data migration on disposable P
 
   beforeAll(async () => {
     admin = new pg.Pool({connectionString: adminUrl!})
-    await admin.query(`CREATE DATABASE "${databaseName}"`)
     const url = new URL(testUrl!)
+    const migratorUser = url.username
+    if (!/^[a-z_][a-z0-9_]*$/.test(migratorUser)) throw new Error('Unsafe test migrator role')
+    await admin.query(`CREATE DATABASE "${databaseName}" OWNER "${migratorUser}"`)
     url.pathname = `/${databaseName}`
     await migrateUp(url.toString())
     db = createDb(url.toString())
