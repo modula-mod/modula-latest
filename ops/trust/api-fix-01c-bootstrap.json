@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0.0",
+  "publisherId": "modula",
+  "keyId": "modula-2026-10-offline-01",
+  "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAfh+l+N+VW0u/BQPc30ldAdR4vMp3ySaxFZuJdxzUwII=\n-----END PUBLIC KEY-----\n",
+  "releases": [
+    {
+      "releaseId": "module-release:digital.modula.vault-notes:1.7.0",
+      "repository": "modula-mod/modula-vault-notes",
+      "releaseTag": "vault-notes-v1.7.0",
+      "statement": {"artifactSha256":"b3beb063b7464462d700ab12cc7a2c2c206aa7f05379fb750a9a54ba2c316ac0","frontendSha256":"4af252f64b8b55d18d10c827f1c998845256b985cfa664326284107871595d7d","manifestSha256":"fa1c934e5a97a4d32fecd938be3ac91cc0f3181247b905a159c77e0e17e451fd","productId":"digital.modula.vault-notes","productManifestSha256":"c67d8bffcdfc5aa57fc3566aeb1c8b612ddb45b75cc907a3224af2ca03bcf9b0","publisherId":"modula","releaseTag":"vault-notes-v1.7.0","schemaVersion":"1.0.0","signingKeyId":"modula-2026-10-offline-01","sourceRepository":"modula-mod/modula-vault-notes","sourceSha":"106b57d40a456e2812e9b3a6e9f3bb32fb15e11d","statementType":"modula.publisher-release.v1","version":"1.7.0"},
+      "signature": {"algorithm": "Ed25519", "keyId": "modula-2026-10-offline-01", "value": "ASqcEKnn8KsKdxWHF0kitBNO-8Mf5_V328IUmXBfP_AJEnOVFdDUwyTMuyyUT0jui8YIx_Oo2foHGOo4k6coDg"},
+      "statementSha256": "88b9cc36e468cdeb35f47af8c80599132fbebab94e28a6ba755968e318f646c1"
+    },
+    {
+      "releaseId": "module-release:digital.modula.vault-notes:1.8.0",
+      "repository": "modula-mod/modula-vault-notes",
+      "releaseTag": "vault-notes-v1.8.0",
+      "statement": {"artifactSha256":"a5a4fbe2d5221315620af75e21d79a9e4256948a9ef724b07ad2396cae1f4a27","frontendSha256":"f5d63cc809005987189ebcf4cb9cc2daddbb2b8eb8275d7a0df6939d3be6ff4d","manifestSha256":"4e6ed2aba0d8e775f760caeb79a95c5bf968c04934965ebd39427a782eb757cd","productId":"digital.modula.vault-notes","productManifestSha256":"46315cb1ff8592035231853fcc570b2d42164ec948d7209fc48755c9f7a36399","publisherId":"modula","releaseTag":"vault-notes-v1.8.0","schemaVersion":"1.0.0","signingKeyId":"modula-2026-10-offline-01","sourceRepository":"modula-mod/modula-vault-notes","sourceSha":"d45190e1f47c6802c5f15797a4abb36fa6bfdbe4","statementType":"modula.publisher-release.v1","version":"1.8.0"},
+      "signature": {"algorithm": "Ed25519", "keyId": "modula-2026-10-offline-01", "value": "DqyrjW2yGArBMTCMT27-QFZfEtMl4UADAsbqo_5WirAFpBOC4pyU4nazmELJCvdt9PPPfmBofEkcCowoXFUuDQ"},
+      "statementSha256": "7490c74cab150a0e2224a182739b09fb818a0e183385796c6160b698e9646607"
+    },
+    {
+      "releaseId": "module-release:digital.modula.vault-notes.ai:0.5.0",
+      "repository": "modula-mod/modula-vault-ai",
+      "releaseTag": "vault-ai-v0.5.0",
+      "statement": {"artifactSha256":"7206a84d353871dcdcebaa4a5fdfc232e36cd2f41b9c25dc0afbe27da6eabdae","frontendSha256":"a3cded86aa979b44c5cbb4a65d7ae652749580fba76313ea2569c8d7e99497a9","manifestSha256":"59367cd218c557b273782c3efbc51342bd038f52d0d39a0d91a47a486565c608","productId":"digital.modula.vault-notes.ai","productManifestSha256":"5c381d19a8315be3c705bc259d54ae81538c1f257cb9baa4c856b133c1b66774","publisherId":"modula","releaseTag":"vault-ai-v0.5.0","schemaVersion":"1.0.0","signingKeyId":"modula-2026-10-offline-01","sourceRepository":"modula-mod/modula-vault-ai","sourceSha":"c748b9414eb10192d3911b08741491f6da87a57c","statementType":"modula.publisher-release.v1","version":"0.5.0"},
+      "signature": {"algorithm": "Ed25519", "keyId": "modula-2026-10-offline-01", "value": "8fy2RhVlRYNBJ5W_txOfbRtUUi_6JSrd5oI2Wi1LwfyPIgwii8oTNcctMLX0ZWYfV-m8tSWI_3aF2RUHPC0SCg"},
+      "statementSha256": "217020ff43bd3ebd62c5ef32694affacd38a04a13acd247c33f60911ebd500d9"
+    },
+    {
+      "releaseId": "module-release:digital.modula.vault-notes.formatting:0.4.0",
+      "repository": "modula-mod/modula-vault-formatting",
+      "releaseTag": "vault-formatting-v0.4.0",
+      "statement": {"artifactSha256":"6e31038086a603e02f07d14f52319ace0b3efe9dddae70ad2b15252c13bd0d2e","frontendSha256":"bc4318287f602e0f25d3707cbbb4fc6b2a7f754ff8d4fb6fd2460df920a93216","manifestSha256":"aa3ebf495d1d6c24273937d54855490abe71bcea573f3fa8baf94030052684b6","productId":"digital.modula.vault-notes.formatting","productManifestSha256":"9f7f8131b576df4eaccb1a406308eb8f25df455ddac088a57c5b3a23784250d2","publisherId":"modula","releaseTag":"vault-formatting-v0.4.0","schemaVersion":"1.0.0","signingKeyId":"modula-2026-10-offline-01","sourceRepository":"modula-mod/modula-vault-formatting","sourceSha":"f38525c315586b094637e12ee281d61dd07f167a","statementType":"modula.publisher-release.v1","version":"0.4.0"},
+      "signature": {"algorithm": "Ed25519", "keyId": "modula-2026-10-offline-01", "value": "WNfV8SaaUmIJhGfWhsCB1XUxOntC-p9nfH92wl215HvjOuCahlloO9PRV7uOMVCix_UT98lPDBLt_dqb7qlhBA"},
+      "statementSha256": "013bcac96d089c4a37b32a1cd15c569f08cd82347e3d9f29072452a81d2ce934"
+    },
+    {
+      "releaseId": "module-release:digital.modula.vault-notes.voice:0.4.0",
+      "repository": "modula-mod/modula-vault-voice",
+      "releaseTag": "vault-voice-v0.4.0",
+      "statement": {"artifactSha256":"123d55de1af744b00e82112c8dd51fe453360a6af49f90f4c354eef85bccfa10","frontendSha256":"5a6e72d0b4d460331262d8d307bad5bce8e11fb3a24d6b00ba13fce73d0b009f","manifestSha256":"eb8616b43e261f036daf8009a3f22e40d42fb60e5608b983457c7f611e3a1d36","productId":"digital.modula.vault-notes.voice","productManifestSha256":"87e61b70969be18e00aba6f01206933d154ff512e120cfcdb83f4c18ee0818a7","publisherId":"modula","releaseTag":"vault-voice-v0.4.0","schemaVersion":"1.0.0","signingKeyId":"modula-2026-10-offline-01","sourceRepository":"modula-mod/modula-vault-voice","sourceSha":"40f24340091255c410bcac359d394374fe244fb8","statementType":"modula.publisher-release.v1","version":"0.4.0"},
+      "signature": {"algorithm": "Ed25519", "keyId": "modula-2026-10-offline-01", "value": "fweCDXV1G7TRZ3hSJJBdz1An0hCClX7G5TLPe7SxXu4fbU6dJI4LYDRNzMKsOcCcr_5yADguep5MWsm0XrPCAQ"},
+      "statementSha256": "a9521eebabd339615f8b6dd8de8af7252741f404387b7b4eabc7bb2b0f02582c"
+    }
+  ],
+  "legacyUpgrades": [
+    {"moduleId": "digital.modula.vault-notes", "fromVersion": "0.1.0", "toVersion": "1.8.0", "expectedStates": {"installedDisabled": 1}},
+    {"moduleId": "digital.modula.vault-notes", "fromVersion": "0.2.0", "toVersion": "1.8.0", "expectedStates": {"enabled": 6, "installedDisabled": 1}}
+  ]
+}

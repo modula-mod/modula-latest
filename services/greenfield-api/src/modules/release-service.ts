@@ -431,7 +431,7 @@ export class GreenfieldModuleReleaseService {
     releaseId: string,
     input: {signature: unknown; statementSha256: string},
     verifiedArtifact: VerifiedGithubRelease,
-    actorAccountId: string,
+    actorAccountId: string | null,
     requestId?: string,
   ) {
     const signature = normalizeSignatureInput(input.signature)

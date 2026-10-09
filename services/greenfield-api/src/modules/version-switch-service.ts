@@ -67,6 +67,7 @@ export type VersionSwitchEvaluation = {
 }
 
 export type VersionSwitchOptions = {hostVersion?: string | null; platform?: string | null}
+export type VersionSwitchEvaluationOptions = VersionSwitchOptions & {retainReviewedGrantsOnly?: boolean}
 
 export class GreenfieldModuleVersionSwitchService {
   private readonly registry: GreenfieldModuleRegistryService
@@ -136,7 +137,7 @@ export class GreenfieldModuleVersionSwitchService {
   }
 
   /** Everything a client needs to confirm a switch, without changing anything. */
-  async evaluate(accountId: string, installed: GreenfieldModuleInstallationRow, targetVersion: string | null | undefined, options: VersionSwitchOptions = {}): Promise<VersionSwitchEvaluation> {
+  async evaluate(accountId: string, installed: GreenfieldModuleInstallationRow, targetVersion: string | null | undefined, options: VersionSwitchEvaluationOptions = {}): Promise<VersionSwitchEvaluation> {
     const canonicalId = resolveCanonicalModuleId(installed.moduleId)
     const current = await this.registry.getVersion(canonicalId, installed.version)
     const target = targetVersion ? await this.registry.getVersion(canonicalId, targetVersion) : await this.registry.latestPublished(canonicalId)
@@ -171,7 +172,12 @@ export class GreenfieldModuleVersionSwitchService {
     }
 
     const projectedGrants = {
-      granted: [...new Set([...permissions.retained.filter(permission => (installed.grantedPermissions ?? []).includes(permission)), ...permissions.requiresConsent])].sort(),
+      // Administrative legacy exits retain only previously reviewed grants.
+      // Newly requested permissions remain denied until the owner reviews them.
+      granted: [...new Set([
+        ...permissions.retained.filter(permission => (installed.grantedPermissions ?? []).includes(permission)),
+        ...(options.retainReviewedGrantsOnly ? [] : permissions.requiresConsent),
+      ])].sort(),
       denied: [] as string[],
     }
     const declared = targetDeclared(target)

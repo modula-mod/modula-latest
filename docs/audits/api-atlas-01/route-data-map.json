@@ -4342,6 +4342,7 @@
     "evidence": [
       "services/greenfield-api/src/modules/installation-service.ts#disable",
       "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstallationForAccount",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
@@ -4365,6 +4366,7 @@
       "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#enable",
       "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+      "services/greenfield-api/src/modules/installation-service.ts#getInstallationForAccount",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
@@ -4779,7 +4781,8 @@
     "confidence": "partial-static",
     "evidence": [
       "services/greenfield-api/src/modules/update-service.ts#planKey",
-      "services/greenfield-api/src/modules/update-service.ts#update"
+      "services/greenfield-api/src/modules/update-service.ts#update",
+      "services/greenfield-api/src/modules/update-service.ts#updateInternal"
     ]
   },
   "POST /v1/modules/:moduleId/version-preview": {

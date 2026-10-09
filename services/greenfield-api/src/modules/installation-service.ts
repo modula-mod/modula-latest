@@ -122,6 +122,24 @@ export class GreenfieldModuleInstallationService {
     return (await this.listInstalled(accountId)).find(row => family.has(row.moduleId) || resolveCanonicalModuleId(row.moduleId) === canonicalId)
   }
 
+  /** Exact account-scoped lookup for administrative migration of historical duplicate installations. */
+  async getInstallationForAccount(accountId: string, installationId: string): Promise<GreenfieldModuleInstallationRow | undefined> {
+    const row = await this.db.selectFrom('greenfield_extension_installations as installation')
+      .innerJoin('greenfield_module_releases as release', 'release.extension_version_id', 'installation.extension_version_id')
+      .select(['installation.installation_id', 'installation.account_id', 'installation.status',
+        'release.module_id', 'release.version', 'release.extension_version_id', 'release.release_id', 'release.product_kind'])
+      .where('installation.installation_id', '=', installationId).where('installation.account_id', '=', accountId)
+      .where('installation.status', 'not in', [...NOT_INSTALLED_STATUSES]).executeTakeFirst()
+    if (!row) return undefined
+    const review = await this.db.selectFrom('greenfield_module_permission_reviews').select('granted_permissions')
+      .where('installation_id', '=', installationId).where('account_id', '=', accountId)
+      .where('release_id', '=', row.release_id).orderBy('reviewed_at', 'desc').executeTakeFirst()
+    return {installationId: row.installation_id, accountId: row.account_id, status: row.status as GreenfieldModuleInstallationStatus,
+      moduleId: resolveCanonicalModuleId(row.module_id), version: row.version, extensionVersionId: row.extension_version_id,
+      grantedPermissions: arrayOfStrings(review?.granted_permissions), permissionReviewRequired: !review,
+      productKind: row.product_kind}
+  }
+
   async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web'): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
     this.assertExecutableTrust(await this.trust.forRelease(release, {platform}))
@@ -430,13 +448,24 @@ export class GreenfieldModuleInstallationService {
     idempotencyKey: string,
     payload: Record<string, unknown> = {},
     prepare?: (trx: any, installed: GreenfieldModuleInstallationRow) => Promise<void>,
+    exactInstallationId?: string,
   ) {
     if (!idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
-    const installed = await this.getInstalled(accountId, moduleId)
+    const installed = exactInstallationId
+      ? await this.getInstallationForAccount(accountId, exactInstallationId)
+      : await this.getInstalled(accountId, moduleId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    if (resolveCanonicalModuleId(installed.moduleId) !== resolveCanonicalModuleId(moduleId)) throw moduleError('NOT_FOUND', 'Module installation not found')
     assertTransitionOrConflict(installed.status, nextStatus)
     const now = new Date()
     await this.db.transaction().execute(async trx => {
+      const current = await trx.selectFrom('greenfield_extension_installations')
+        .select(['account_id', 'status', 'extension_version_id'])
+        .where('installation_id', '=', installed.installationId).forUpdate().executeTakeFirst()
+      if (!current || current.account_id !== accountId || current.status !== installed.status
+        || current.extension_version_id !== installed.extensionVersionId) {
+        throw moduleError('CONFLICT', 'Installation changed before the transition could begin')
+      }
       if (prepare) await prepare(trx, installed)
       await trx.updateTable('greenfield_extension_installations').set({status: nextStatus, updated_at: now}).where('installation_id', '=', installed.installationId).execute()
       await this.recordLifecycle(trx, accountId, moduleId, eventName, installed.status, nextStatus, {idempotencyKey, ...payload})

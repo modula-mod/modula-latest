@@ -555,6 +555,83 @@
       "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
     },
     {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 30,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${label} is not an object`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "for (const key of Object.keys(data)) if (!allowed.has(key)) throw new Error(`${label} has an unsupported field ${key}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 40,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || !Number.isFinite(Date.parse(value))) throw new Error(`${label} is not an ISO date`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 45,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || value.length === 0 || value.length > max) throw new Error(`${label} is invalid`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || value.length > max) throw new Error(`${label} is invalid`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 65,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (body === null || body.length > 20_000) throw new Error('Legacy note body cannot be represented losslessly as one rich-text block')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 66,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Array.isArray(old.tags) || old.tags.length > 40) throw new Error('Legacy note tags are invalid')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 70,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!normalizedName) throw new Error('Legacy note tag is empty')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "try { new URL(sourceUri) } catch { throw new Error('Legacy note source URI is invalid') }"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 114,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`No legacy Vault conversion for collection ${input.collection}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 122,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!['updatedAt', 'createdAt', 'title'].includes(String(old.defaultNoteSort))) throw new Error('Legacy default note sort is invalid')"
+    },
+    {
       "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",
       "line": 267,
       "marker": "throw new Error",
@@ -2424,6 +2501,83 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "if (!this.config.mailHestiaUser) throw new Error('MODULA_MAIL_HESTIA_USER is required for Hestia provisioning')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 30,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`${label} is not an object`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 35,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "for (const key of Object.keys(data)) if (!allowed.has(key)) throw new Error(`${label} has an unsupported field ${key}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 40,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || !Number.isFinite(Date.parse(value))) throw new Error(`${label} is not an ISO date`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 45,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || value.length === 0 || value.length > max) throw new Error(`${label} is invalid`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 51,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (typeof value !== 'string' || value.length > max) throw new Error(`${label} is invalid`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 65,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (body === null || body.length > 20_000) throw new Error('Legacy note body cannot be represented losslessly as one rich-text block')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 66,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!Array.isArray(old.tags) || old.tags.length > 40) throw new Error('Legacy note tags are invalid')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 70,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!normalizedName) throw new Error('Legacy note tag is empty')"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 77,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "try { new URL(sourceUri) } catch { throw new Error('Legacy note source URI is invalid') }"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 114,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`No legacy Vault conversion for collection ${input.collection}`)"
+    },
+    {
+      "file": "services/greenfield-worker/src/modules/legacy-vault-notes-conversion.ts",
+      "line": 122,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "if (!['updatedAt', 'createdAt', 'title'].includes(String(old.defaultNoteSort))) throw new Error('Legacy default note sort is invalid')"
     },
     {
       "file": "services/greenfield-worker/src/modules/standard2-runtime-registration.ts",

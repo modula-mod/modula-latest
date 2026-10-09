@@ -830,6 +830,20 @@ export interface Database {
     updated_at: Date
     deleted_at: Date | null
   }
+  greenfield_module_record_events: {
+    event_id: string
+    record_id: string
+    account_id: string
+    module_id: string
+    collection: string
+    operation: 'create' | 'update' | 'delete' | 'restore' | 'move' | 'purge'
+    revision: number
+    previous_hash: string | null
+    event_hash: string
+    payload_hash: string
+    metadata: unknown
+    created_at: Date
+  }
   greenfield_module_record_versions: {
     version_id: string
     record_id: string
@@ -840,7 +854,8 @@ export interface Database {
     next_revision: number
     data_snapshot: unknown
     payload_hash: string
-    change_source: 'update' | 'restore' | 'import' | 'delete'
+    change_source: 'update' | 'restore' | 'import' | 'delete' | 'ai-assisted'
+    metadata: unknown
     created_at: Date
   }
   greenfield_module_export_jobs: {
@@ -1008,6 +1023,15 @@ export interface Database {
     version: number
     updated_by: string | null
     updated_at: Date
+  }
+  greenfield_module_settings_versions: {
+    settings_version_id: string
+    settings_id: string
+    version: number
+    values: unknown
+    secret_refs: unknown
+    changed_by: string | null
+    created_at: Date
   }
   greenfield_tools: {
     tool_id: string
