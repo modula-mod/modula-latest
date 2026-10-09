@@ -8,6 +8,8 @@ describe('module installation state machine', () => {
     expect(canTransitionInstallation('permissionReview', 'installing')).toBe(true)
     expect(canTransitionInstallation('installing', 'installedDisabled')).toBe(true)
     expect(canTransitionInstallation('installedDisabled', 'enabling')).toBe(true)
+    expect(canTransitionInstallation('installedDisabled', 'updating')).toBe(true)
+    expect(canTransitionInstallation('updating', 'installedDisabled')).toBe(true)
     expect(canTransitionInstallation('enabling', 'enabled')).toBe(true)
     expect(canTransitionInstallation('enabled', 'disabling')).toBe(true)
     expect(canTransitionInstallation('disabled', 'updating')).toBe(true)

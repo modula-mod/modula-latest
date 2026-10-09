@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase-api-fix-01-trust-fail-closed",
-      "sourceSha256": "cf832867a021fb9fef6014010cd3279ada07d7be3a663547e7a6094d9e4803ec",
-      "capturedAt": "2026-10-09T17:59:43.067Z",
+      "branch": "phase-api-fix-01c-offline-trust-bootstrap",
+      "sourceSha256": "abc324a906e6bd47c35166f0dd7274384942c7e201e07fc27eff0d656da42201",
+      "capturedAt": "2026-10-09T18:54:29.655Z",
       "routeCount": 575
     },
     "status": "PASS"
@@ -31343,6 +31343,7 @@
         "evidence": [
           "services/greenfield-api/src/modules/installation-service.ts#disable",
           "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+          "services/greenfield-api/src/modules/installation-service.ts#getInstallationForAccount",
           "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
           "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
           "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
@@ -31487,6 +31488,7 @@
           "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
           "services/greenfield-api/src/modules/installation-service.ts#enable",
           "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
+          "services/greenfield-api/src/modules/installation-service.ts#getInstallationForAccount",
           "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
           "services/greenfield-api/src/modules/installation-service.ts#listInstalled",
           "services/greenfield-api/src/modules/installation-service.ts#recordLifecycle"
@@ -34597,7 +34599,8 @@
         ],
         "evidence": [
           "services/greenfield-api/src/modules/update-service.ts#planKey",
-          "services/greenfield-api/src/modules/update-service.ts#update"
+          "services/greenfield-api/src/modules/update-service.ts#update",
+          "services/greenfield-api/src/modules/update-service.ts#updateInternal"
         ],
         "confidence": "partial-static"
       },
@@ -68511,15 +68514,20 @@
       "migrationIntroduced": "009_phase7a_module_platform.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/settings-service.ts",
-        "services/greenfield-api/src/modules/uninstall-service.ts"
+        "services/greenfield-api/src/modules/uninstall-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/modules/settings-service.ts",
-        "services/greenfield-worker/src/modules/installation-handler.ts"
+        "services/greenfield-worker/src/modules/installation-handler.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
-      "jobReads": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
       "jobWrites": [
-        "services/greenfield-worker/src/modules/installation-handler.ts"
+        "services/greenfield-worker/src/modules/installation-handler.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
       "routeReads": [
         "DELETE /v1/modules/:moduleId/install",
@@ -69837,13 +69845,16 @@
       ],
       "migrationIntroduced": "010_phase7b_module_runtime.sql",
       "sourceReads": [
-        "services/greenfield-api/src/modules/view-service.ts"
+        "services/greenfield-api/src/modules/view-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
       "sourceWrites": [
         "services/greenfield-api/src/product-standard/ingest-service.ts",
         "services/greenfield-worker/src/modules/contribution-registration-handler.ts"
       ],
-      "jobReads": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
       "jobWrites": [
         "services/greenfield-worker/src/modules/contribution-registration-handler.ts"
       ],
@@ -69966,13 +69977,19 @@
       ],
       "migrationIntroduced": "010_phase7b_module_runtime.sql",
       "sourceReads": [
-        "services/greenfield-api/src/modules/record-service.ts"
+        "services/greenfield-api/src/modules/record-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
       "sourceWrites": [
-        "services/greenfield-api/src/modules/record-service.ts"
+        "services/greenfield-api/src/modules/record-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
-      "jobReads": [],
-      "jobWrites": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
+      "jobWrites": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
       "routeReads": [
         "DELETE /v1/backend/products/:productId/records/:collection/:recordId",
         "PUT /v1/backend/products/:productId/records/:collection/:recordId",
@@ -70120,13 +70137,19 @@
       "migrationIntroduced": "022_phase7e_module_records_and_vault_notes.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/health-service.ts",
-        "services/greenfield-api/src/modules/record-service.ts"
+        "services/greenfield-api/src/modules/record-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
       "sourceWrites": [
-        "services/greenfield-api/src/modules/record-service.ts"
+        "services/greenfield-api/src/modules/record-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
-      "jobReads": [],
-      "jobWrites": [],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
+      "jobWrites": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
       "routeReads": [
         "DELETE /v1/backend/products/:productId/records/:collection/:recordId",
         "PUT /v1/backend/products/:productId/records/:collection/:recordId",
@@ -70320,6 +70343,7 @@
         "services/greenfield-api/src/modules/record-service.ts",
         "services/greenfield-api/src/modules/runtime2-service.ts",
         "services/greenfield-api/src/modules/uninstall-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts",
         "services/greenfield-worker/src/modules/uninstall-handler.ts",
         "services/greenfield-worker/src/search/index.ts",
         "services/greenfield-worker/src/search/vault-notes-projector.ts"
@@ -70328,14 +70352,17 @@
         "services/greenfield-api/src/account-data/service.ts",
         "services/greenfield-api/src/modules/identity-migration-service.ts",
         "services/greenfield-api/src/modules/record-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts",
         "services/greenfield-worker/src/modules/uninstall-handler.ts"
       ],
       "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts",
         "services/greenfield-worker/src/modules/uninstall-handler.ts",
         "services/greenfield-worker/src/search/index.ts",
         "services/greenfield-worker/src/search/vault-notes-projector.ts"
       ],
       "jobWrites": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts",
         "services/greenfield-worker/src/modules/uninstall-handler.ts"
       ],
       "routeReads": [
@@ -71924,18 +71951,25 @@
         "created_at"
       ],
       "migrationIntroduced": "009_phase7a_module_platform.sql",
-      "sourceReads": [],
-      "sourceWrites": [
-        "services/greenfield-api/src/modules/settings-service.ts"
+      "sourceReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
       ],
-      "jobReads": [],
-      "jobWrites": [],
+      "sourceWrites": [
+        "services/greenfield-api/src/modules/settings-service.ts",
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
+      "jobReads": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
+      "jobWrites": [
+        "services/greenfield-worker/src/modules/legacy-installation-data-migration.ts"
+      ],
       "routeReads": [],
       "routeWrites": [
         "PATCH /v1/modules/:moduleId/settings"
       ],
       "orphanCandidate": false,
-      "writeOnlyCandidate": true,
+      "writeOnlyCandidate": false,
       "readOnlyCandidate": false
     },
     {

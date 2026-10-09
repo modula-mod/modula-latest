@@ -89,6 +89,17 @@ jobs:
         run: CI=true pnpm --filter @modula/greenfield-api typecheck
       - name: Worker typecheck
         run: CI=true pnpm --filter @modula/greenfield-worker typecheck
+      - name: Trust bootstrap CLI typecheck
+        run: >-
+          pnpm --filter @modula/greenfield-api exec tsc --noEmit --module NodeNext
+          --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck
+          scripts/trust-bootstrap.ts scripts/migrate-legacy-installations.ts
+          scripts/trust-cutover-gate.ts
+      - name: Legacy data preflight CLI typecheck
+        run: >-
+          pnpm --filter @modula/greenfield-worker exec tsc --noEmit --module NodeNext
+          --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck
+          scripts/legacy-data-preflight.ts
 
   migration-validation:
     runs-on: ubuntu-latest
@@ -173,4 +184,5 @@ jobs:
           CI=true pnpm --filter @modula/greenfield-worker exec vitest run
           tests/phase7e.notifications.test.ts
           tests/module-trust-guard.test.ts
+          tests/legacy-installation-data-migration.test.ts
           --maxWorkers=1 --no-file-parallelism

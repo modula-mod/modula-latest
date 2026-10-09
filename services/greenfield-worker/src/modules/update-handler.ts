@@ -6,6 +6,7 @@ import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
 import {assertTrustedModuleRelease} from './release-trust-guard.js'
 import {assertPermissionReviewPresent} from './permission-review-guard.js'
+import {migrateHistoricalInstallationData} from './legacy-installation-data-migration.js'
 
 export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as any
@@ -22,10 +23,22 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfi
     .where('account_id', '=', p.accountId)
     .executeTakeFirst()
   assertPermissionReviewPresent(review)
+  const restoredStatus = p.previousStatus === 'installedDisabled' ? 'installedDisabled'
+    : p.previousStatus === 'enabled' ? 'enabled' : 'disabled'
   await db.transaction().execute(async trx => {
-    const old = await trx.selectFrom('greenfield_extension_installations').select('extension_version_id').where('installation_id', '=', p.installationId).executeTakeFirst()
+    const old = await trx.selectFrom('greenfield_extension_installations').select(['extension_version_id', 'account_id'])
+      .where('installation_id', '=', p.installationId).forUpdate().executeTakeFirst()
+    if (!old || old.account_id !== p.accountId) throw permanentModuleJob('VALIDATION_FAILED', 'Installation is unavailable to this account')
     if (old) {
-      const oldRelease = await trx.selectFrom('greenfield_module_releases').select('release_id').where('extension_version_id', '=', old.extension_version_id).executeTakeFirst()
+      const oldRelease = await trx.selectFrom('greenfield_module_releases').select(['release_id', 'module_id', 'version'])
+        .where('extension_version_id', '=', old.extension_version_id).executeTakeFirst()
+      if (p.legacyTrustMigration && oldRelease?.release_id !== release.release_id) {
+        if (!oldRelease || oldRelease.module_id !== release.module_id) throw permanentModuleJob('VALIDATION_FAILED', 'Historical update changed module identity')
+        await migrateHistoricalInstallationData(trx, {
+          installationId: p.installationId, accountId: p.accountId, moduleId: release.module_id,
+          fromVersion: oldRelease.version, toVersion: release.version, targetReleaseId: release.release_id,
+        })
+      }
       if (oldRelease) await unregisterModuleContributions(trx as any, oldRelease.release_id)
     }
     // The data-ledger scope guard resolves the installation's authoritative
@@ -34,7 +47,7 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfi
     // momentarily bind an installation to two different releases.
     await trx
       .updateTable('greenfield_extension_installations')
-      .set({extension_version_id: release.extension_version_id, status: p.previousStatus === 'enabled' ? 'enabled' : 'disabled', updated_at: new Date()})
+      .set({extension_version_id: release.extension_version_id, status: restoredStatus, updated_at: new Date()})
       .where('installation_id', '=', p.installationId)
       .execute()
     await registerModuleContributions(trx as any, release.release_id, release.extension_version_id, {enableExecutable: p.previousStatus === 'enabled'})
@@ -50,7 +63,7 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfi
       installationId: p.installationId,
       accountId: p.accountId,
       productId: release.module_id,
-      state: p.previousStatus === 'enabled' ? 'ENABLED' : 'DISABLED',
+      state: p.previousStatus === 'enabled' ? 'ENABLED' : p.previousStatus === 'installedDisabled' ? 'INSTALLED' : 'DISABLED',
     })
     if (typeof p.planId === 'string' && p.planId) {
       await trx.updateTable('greenfield_module_install_plans').set({status: 'completed', updated_at: new Date()}).where('plan_id', '=', p.planId).execute()

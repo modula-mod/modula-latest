@@ -9,6 +9,8 @@ import {GreenfieldExtensionFabricService} from './extension-fabric-service.js'
 import {GreenfieldModuleRuntime2Service} from './runtime2-service.js'
 import type {IssuedInstallDescriptor} from './install-descriptor-service.js'
 import {GreenfieldModuleVersionSwitchService, type VersionSwitchOptions} from './version-switch-service.js'
+import {GreenfieldRegistryTrustService} from './registry-trust-service.js'
+import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 const jsonb = (value: unknown) => sql`${JSON.stringify(value)}::jsonb`
 
@@ -55,17 +57,32 @@ export class GreenfieldModuleUpdateService {
   }
 
   async update(accountId: string, moduleId: string, input: GreenfieldModuleUpdateInput) {
+    return this.updateInternal(accountId, moduleId, input, false)
+  }
+
+  /** CLI-only escape from a historical untrusted source to a verified published target. */
+  async migrateLegacyInstallation(accountId: string, moduleId: string, input: Pick<GreenfieldModuleUpdateInput, 'version' | 'idempotencyKey' | 'hostVersion' | 'platform'> & {installationId: string}) {
+    if (!input.version) throw moduleError('VALIDATION_FAILED', 'A trusted target version is required')
+    if (!input.installationId) throw moduleError('VALIDATION_FAILED', 'An exact historical installation ID is required')
+    return this.updateInternal(accountId, moduleId, input, true, input.installationId)
+  }
+
+  private async updateInternal(accountId: string, moduleId: string, input: GreenfieldModuleUpdateInput, legacyTrustMigration: boolean, exactInstallationId?: string) {
     if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')
     const installations = new GreenfieldModuleInstallationService(this.db, this.config)
-    const installed = await installations.getInstalled(accountId, moduleId)
+    const installed = exactInstallationId
+      ? await installations.getInstallationForAccount(accountId, exactInstallationId)
+      : await installations.getInstalled(accountId, moduleId)
     if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    if (resolveCanonicalModuleId(installed.moduleId) !== resolveCanonicalModuleId(moduleId)) throw moduleError('NOT_FOUND', 'Module installation not found')
 
     const replay = await this.db.selectFrom('greenfield_module_install_plans')
-      .select(['plan_id', 'requested_version', 'install_descriptor'])
+      .select(['plan_id', 'requested_version', 'install_descriptor', 'installation_id'])
       .where('account_id', '=', accountId)
       .where('idempotency_key', '=', this.planKey(input.idempotencyKey))
       .executeTakeFirst()
     if (replay) {
+      if (replay.installation_id !== installed.installationId) throw moduleError('CONFLICT', 'Idempotency key belongs to another installation')
       return {
         installationId: installed.installationId,
         moduleId: installed.moduleId,
@@ -77,7 +94,20 @@ export class GreenfieldModuleUpdateService {
       }
     }
 
-    const evaluation = await new GreenfieldModuleVersionSwitchService(this.db, this.config).evaluate(accountId, installed, input.version, input)
+    if (legacyTrustMigration) {
+      const source = await new GreenfieldModuleRegistryService(this.db).getVersion(installed.moduleId, installed.version)
+      if ((await new GreenfieldRegistryTrustService(this.db).forRelease(source)).verified) {
+        throw moduleError('CONFLICT', 'Legacy trust migration requires an untrusted installed source')
+      }
+    }
+
+    const evaluation = await new GreenfieldModuleVersionSwitchService(this.db, this.config).evaluate(accountId, installed, input.version, {
+      ...input,
+      retainReviewedGrantsOnly: legacyTrustMigration,
+    })
+    if (legacyTrustMigration && (evaluation.direction !== 'upgrade' || evaluation.trust.releaseState !== 'published' || !evaluation.trust.verified)) {
+      throw moduleError('UNTRUSTED_RELEASE', 'Legacy migration requires a newer, published, cryptographically trusted target')
+    }
     const summary = {
       fromVersion: evaluation.fromVersion,
       toVersion: evaluation.toVersion,
@@ -99,7 +129,7 @@ export class GreenfieldModuleUpdateService {
 
     const approved = new Set(input.approvedPermissionIncrease ? evaluation.permissions.requiresConsent : (input.approvedPermissions ?? []))
     const missingConsent = evaluation.permissions.requiresConsent.filter(permission => !approved.has(permission))
-    if (missingConsent.length) {
+    if (missingConsent.length && !legacyTrustMigration) {
       throw moduleError('VALIDATION_FAILED', `PERMISSION_CONSENT_REQUIRED: ${evaluation.toVersion} adds permissions that need your consent: ${missingConsent.join(', ')}`)
     }
     if (evaluation.direction === 'downgrade' && evaluation.dataSchema.older && !input.acknowledgeDowngradeRisk) {
@@ -124,6 +154,7 @@ export class GreenfieldModuleUpdateService {
       },
       permissionIncrease: evaluation.permissions.added.length > 0,
       incompatibleExtensions: evaluation.incompatibleExtensions,
+      legacyTrustMigration,
     }, async trx => {
       const now = new Date()
       await trx
@@ -171,7 +202,7 @@ export class GreenfieldModuleUpdateService {
         release,
         grantedPermissions,
       })
-    })
+    }, exactInstallationId)
     return {...result, planId, ...summary, descriptor}
   }
 }

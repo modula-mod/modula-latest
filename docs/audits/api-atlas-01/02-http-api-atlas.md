@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
 Production facts captured: 2026-10-07T16:29:42.416Z
-Route evidence: local-candidate-runtime captured 2026-10-09T17:59:43.067Z for branch `phase-api-fix-01-trust-fail-closed`; this does not claim deployment.
+Route evidence: local-candidate-runtime captured 2026-10-09T18:54:29.655Z for branch `phase-api-fix-01c-offline-trust-bootstrap`; this does not claim deployment.
 
 - Runtime method routes: 575
 - Application routes: 409

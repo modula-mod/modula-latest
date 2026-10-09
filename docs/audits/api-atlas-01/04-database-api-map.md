@@ -9,7 +9,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Production tables: 291
 - Tables with API/worker source references: 278
 - Orphan candidates requiring manual confirmation: 13
-- Write-only candidates: 37
+- Write-only candidates: 36
 - Read-only candidates: 22
 
 ## Table inventory
@@ -2628,8 +2628,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: `DELETE /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/settings`, `PATCH /v1/modules/:moduleId/settings`, `POST /v1/modules/:moduleId/uninstall-preview`
 - Routes writing: `PATCH /v1/modules/:moduleId/settings`
-- API/worker source reads: `services/greenfield-api/src/modules/settings-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`
-- API/worker source writes: `services/greenfield-api/src/modules/settings-service.ts`, `services/greenfield-worker/src/modules/installation-handler.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/settings-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/settings-service.ts`, `services/greenfield-worker/src/modules/installation-handler.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_job_registrations`
@@ -2798,7 +2798,7 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `010_phase7b_module_runtime.sql`
 - Routes reading: none observed
 - Routes writing: none observed
-- API/worker source reads: `services/greenfield-api/src/modules/view-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/view-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
 - API/worker source writes: `services/greenfield-api/src/product-standard/ingest-service.ts`, `services/greenfield-worker/src/modules/contribution-registration-handler.ts`
 - Disposition: active read/write or ledger/schema table
 
@@ -2815,8 +2815,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `010_phase7b_module_runtime.sql`
 - Routes reading: `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Routes writing: `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
-- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`
-- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_record_versions`
@@ -2832,8 +2832,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `022_phase7e_module_records_and_vault_notes.sql`
 - Routes reading: `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `GET /v1/modules/:moduleId/health`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
 - Routes writing: `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
-- API/worker source reads: `services/greenfield-api/src/modules/health-service.ts`, `services/greenfield-api/src/modules/record-service.ts`
-- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`
+- API/worker source reads: `services/greenfield-api/src/modules/health-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_records`
@@ -2849,8 +2849,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `010_phase7b_module_runtime.sql`
 - Routes reading: `POST /v1/account/data-requests/:requestId/advance`, `GET /v1/backend/products/:productId/records/:collection`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `GET /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/extensions/:extensionProductId/contributions/:contributionId/invoke`, `POST /v1/extensions/:extensionProductId/jobs`, `POST /v1/modules/:moduleId/export`, `GET /v1/modules/:moduleId/health`, `DELETE /v1/modules/:moduleId/install`, `GET /v1/modules/:moduleId/records/:collection`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `GET /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`, `POST /v1/modules/:moduleId/services/:serviceId/invoke`, `POST /v1/modules/:moduleId/uninstall-preview`
 - Routes writing: `POST /v1/account/data-requests/:requestId/advance`, `POST /v1/backend/products/:productId/records/:collection`, `DELETE /v1/backend/products/:productId/records/:collection/:recordId`, `PUT /v1/backend/products/:productId/records/:collection/:recordId`, `POST /v1/modules/:moduleId/records/:collection`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId`, `PATCH /v1/modules/:moduleId/records/:collection/:recordId`, `DELETE /v1/modules/:moduleId/records/:collection/:recordId/permanent`, `POST /v1/modules/:moduleId/records/:collection/:recordId/restore`
-- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/modules/export-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/health-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-api/src/modules/runtime2-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/vault-notes-projector.ts`
-- API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`
+- API/worker source reads: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/modules/export-service.ts`, `services/greenfield-api/src/modules/extension-fabric-service.ts`, `services/greenfield-api/src/modules/health-service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-api/src/modules/runtime2-service.ts`, `services/greenfield-api/src/modules/uninstall-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`, `services/greenfield-worker/src/search/index.ts`, `services/greenfield-worker/src/search/vault-notes-projector.ts`
+- API/worker source writes: `services/greenfield-api/src/account-data/service.ts`, `services/greenfield-api/src/modules/identity-migration-service.ts`, `services/greenfield-api/src/modules/record-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`, `services/greenfield-worker/src/modules/uninstall-handler.ts`
 - Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_release_integrity`
@@ -3002,9 +3002,9 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Migration introduced: `009_phase7a_module_platform.sql`
 - Routes reading: none observed
 - Routes writing: `PATCH /v1/modules/:moduleId/settings`
-- API/worker source reads: none observed
-- API/worker source writes: `services/greenfield-api/src/modules/settings-service.ts`
-- Disposition: WRITE-ONLY CANDIDATE
+- API/worker source reads: `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- API/worker source writes: `services/greenfield-api/src/modules/settings-service.ts`, `services/greenfield-worker/src/modules/legacy-installation-data-migration.ts`
+- Disposition: active read/write or ledger/schema table
 
 ### `greenfield_module_sources`
 

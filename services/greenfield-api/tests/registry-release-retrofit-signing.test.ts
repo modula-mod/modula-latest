@@ -4,6 +4,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {GreenfieldModuleUpdateService} from '../src/modules/update-service.js'
 import {GreenfieldGithubReleaseSyncService, type VerifiedGithubRelease} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes, statementSha256} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount, sha256} from './helpers/registry-fixtures.js'
@@ -205,5 +206,55 @@ describeIfDb('retrospective publisher release signatures', () => {
       .set({release_sha256: sha256('different release bytes')}).where('release_id', '=', release.releaseId).execute()
     const releaseMismatch = await app.inject({method: 'GET', url: `/v1/registry/modules/${moduleId}`})
     expect(releaseMismatch.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'invalid'}})
+  })
+
+  it('lets an exact historical untrusted installation exit only to a signed target without granting new permissions', async () => {
+    const moduleId = `digital.modula.legacy-exit-${suffix}`
+    const sourceManifest = adapterManifest(moduleId, '0.2.0')
+    const targetManifest = adapterManifest(moduleId, '1.8.0', {
+      permissions: [{permission: 'records:write', risk: 'high', reason: 'New target capability'}],
+    })
+    await releases.importPendingReview(sourceManifest, evidenceFor(sourceManifest))
+    const source = await releases.publishRelease(moduleId, '0.2.0')
+    await releases.importPendingReview(targetManifest, evidenceFor(targetManifest))
+    const target = await releases.publishRelease(moduleId, '1.8.0')
+    const targetEvidence = evidenceFor(targetManifest)
+    const verified: VerifiedGithubRelease = {
+      productId: moduleId, version: '1.8.0', repository: targetEvidence.repository,
+      releaseTag: targetEvidence.releaseTag, releaseCommit: targetEvidence.releaseCommit,
+      packageFile: targetManifest.source.releaseAssetName!, packageSha256: targetEvidence.artifactSha256,
+      packageBytes: Buffer.from('test release'), mpsBytes: Buffer.alloc(0), manifest: targetManifest,
+      frontend: null, schemas: [], assets: [], evidence: targetEvidence, checks: ['package.sha256', 'tag.commit'],
+    }
+    const account = await registerAccount(app, `legacy-exit-${suffix}@example.com`, `legacyexit${suffix}`, db)
+    const installationId = `legacy-exit-install-${suffix}`
+    await db.insertInto('greenfield_extension_installations').values({
+      installation_id: installationId, account_id: account.accountId,
+      extension_version_id: source.extensionVersionId, status: 'installedDisabled', config: {},
+      created_at: new Date(), updated_at: new Date(),
+    }).execute()
+    const updates = new GreenfieldModuleUpdateService(db, {
+      ...loadConfig(), environment: 'production', moduleAllowUntrustedDevelopmentReleases: false,
+    })
+    const request = {installationId, version: '1.8.0', idempotencyKey: `legacy-exit-${suffix}`}
+    await expect(updates.migrateLegacyInstallation(account.accountId, moduleId, request)).rejects.toThrow(/trusted target/)
+    await expect(updates.migrateLegacyInstallation(randomUUID(), moduleId, request)).rejects.toThrow(/not found/i)
+    expect(await db.selectFrom('greenfield_module_install_plans').select('plan_id').where('installation_id', '=', installationId).execute()).toHaveLength(0)
+
+    const statement = buildPublisherReleaseStatement({manifest: targetManifest, sourceSha: targetManifest.source.commit,
+      artifactSha256: targetEvidence.artifactSha256, signingKeyId: keyId})
+    await releases.attachPublishedSignature(target.releaseId, {
+      statementSha256: statementSha256(statement),
+      signature: {algorithm: 'Ed25519', keyId, value: sign(null, statementBytes(statement), signer.privateKey).toString('base64url')},
+    }, verified, null)
+    const queued = await updates.migrateLegacyInstallation(account.accountId, moduleId, request)
+    expect(queued).toMatchObject({installationId, status: 'updating', toVersion: '1.8.0'})
+    expect(queued.descriptor.permissions.granted).toEqual([])
+    expect(queued.descriptor.permissions.denied).toContain('records:write')
+    const review = await db.selectFrom('greenfield_module_permission_reviews').select(['granted_permissions', 'denied_permissions'])
+      .where('installation_id', '=', installationId).where('release_id', '=', target.releaseId).executeTakeFirstOrThrow()
+    expect(review.granted_permissions).toEqual([])
+    expect(review.denied_permissions).toContain('records:write')
+    expect((await updates.migrateLegacyInstallation(account.accountId, moduleId, request)).idempotent).toBe(true)
   })
 })

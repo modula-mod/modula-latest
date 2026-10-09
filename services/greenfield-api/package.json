@@ -21,7 +21,10 @@
     "registry:publish-reference-products": "tsx scripts/publish-reference-products.ts",
     "registry:ingest-mps-products": "tsx scripts/ingest-mps-products.ts",
     "registry:publish-mps-products": "tsx scripts/publish-mps-products.ts",
-    "registry:sync-github-release": "tsx scripts/sync-github-release.ts"
+    "registry:sync-github-release": "tsx scripts/sync-github-release.ts",
+    "registry:trust-bootstrap": "tsx scripts/trust-bootstrap.ts",
+    "registry:migrate-legacy-installs": "tsx scripts/migrate-legacy-installations.ts",
+    "registry:trust-cutover-gate": "tsx scripts/trust-cutover-gate.ts"
   },
   "dependencies": {
     "@atproto/oauth-client-node": "^0.3.2",
