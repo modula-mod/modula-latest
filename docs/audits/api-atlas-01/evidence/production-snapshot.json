@@ -1,24 +1,24 @@
 {
-  "capturedAt": "2026-10-04T15:10:21.196Z",
+  "capturedAt": "2026-10-07T16:29:42.416Z",
   "hostname": "core.modula.digital",
   "os": "Ubuntu 24.04.4 LTS",
   "kernel": "Linux 6.8.0-137-generic",
   "architecture": "x86_64",
-  "uptime": "up 8 weeks, 16 hours, 28 minutes",
+  "uptime": "up 8 weeks, 3 days, 17 hours, 47 minutes",
   "repository": {
     "canonicalPath": "/root/modula-latest",
     "origin": "https://github.com/modula-mod/modula-latest.git",
     "branch": "main",
-    "head": "384b2e1999a71b356ff4dd2186d3bda8af7b5e72",
-    "status": "## main...origin/main",
+    "head": "cd2485ba9f360819fc67b5ed1f334b9ea000974f",
+    "status": "## main...origin/main [behind 4]",
     "trackedChanges": "",
     "untrackedFiles": "",
-    "originMain": "384b2e1999a71b356ff4dd2186d3bda8af7b5e72",
-    "auditPath": "/root/modula-worktrees/api-baseline-02-permission-evidence",
-    "auditBranch": "phase-api-baseline-02-permission-evidence",
-    "auditHeadAtCapture": "384b2e1999a71b356ff4dd2186d3bda8af7b5e72",
+    "originMain": "736056445f5e09f968488a3ec66dddfaffea6f08",
+    "auditPath": "/root/modula-latest",
+    "auditBranch": "main",
+    "auditHeadAtCapture": "cd2485ba9f360819fc67b5ed1f334b9ea000974f",
     "tagsAtCanonicalHead": [],
-    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-215-g384b2e1"
+    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-217-gcd2485b"
   },
   "versions": {
     "hostNode": "v24.15.0",
@@ -30,16 +30,16 @@
   "containers": {
     "api": {
       "name": "modula-production-greenfield-api-1",
-      "imageId": "sha256:dfd497932257da836519712e5385bd9f6eb2206459324803d5de6096389c82bf",
-      "image": "modula-greenfield-api:11bfc7638c6d757215e75a934d02e40c9a40c839",
-      "created": "2026-10-04T08:57:28.439159597Z",
-      "startedAt": "2026-10-04T08:57:29.411935423Z",
+      "imageId": "sha256:80acf6fc51678fa0b53fe60a0d36a6496cb3da9e48d888bf5393ac75e4fc9071",
+      "image": "modula-greenfield-api:736056445f5e09f968488a3ec66dddfaffea6f08",
+      "created": "2026-10-04T21:54:55.43410342Z",
+      "startedAt": "2026-10-04T21:54:55.645362912Z",
       "status": "running",
       "health": "healthy",
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-api/dist/main.js",
       "workingDir": "/app",
-      "revision": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+      "revision": "736056445f5e09f968488a3ec66dddfaffea6f08",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {
@@ -64,6 +64,7 @@
         "BACKEND_FABRIC_ENVIRONMENT",
         "BACKEND_FABRIC_SIGNING_KEY_ID",
         "BACKEND_FABRIC_SIGNING_PRIVATE_KEY",
+        "GIPHY_API_KEY",
         "GREENFIELD_AI_GATEWAY_ENABLED",
         "GREENFIELD_DIMON_ENABLED",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED",
@@ -126,16 +127,16 @@
     },
     "worker": {
       "name": "modula-production-greenfield-worker-1",
-      "imageId": "sha256:351e97e04e4a8149cc9c0040695fbf9b7c89d540d0687fa1a47e572fbfa8247d",
-      "image": "modula-greenfield-worker:11bfc7638c6d757215e75a934d02e40c9a40c839",
-      "created": "2026-10-04T08:57:59.261435058Z",
-      "startedAt": "2026-10-04T08:57:59.432664978Z",
+      "imageId": "sha256:deecd90feaecd69763f278da21701b708d3f130b0d4f5fe04c1fb8eb802d73c6",
+      "image": "modula-greenfield-worker:736056445f5e09f968488a3ec66dddfaffea6f08",
+      "created": "2026-10-04T19:27:42.855443403Z",
+      "startedAt": "2026-10-04T19:27:58.624264329Z",
       "status": "running",
       "health": null,
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-worker/dist/main.js",
       "workingDir": "/app",
-      "revision": "11bfc7638c6d757215e75a934d02e40c9a40c839",
+      "revision": "736056445f5e09f968488a3ec66dddfaffea6f08",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {},
@@ -203,16 +204,16 @@
       },
       "mounts": [
         {
-          "type": "bind",
-          "source": "/root/modula-builds/966440fe64efc4c88350ce6423795965a5c62013/ops/docker/postgres/init-roles.sh",
-          "destination": "/docker-entrypoint-initdb.d/10-init-roles.sh",
-          "readWrite": false
-        },
-        {
           "type": "volume",
           "source": "/var/lib/docker/volumes/modula-production_greenfield_pg_data/_data",
           "destination": "/var/lib/postgresql/data",
           "readWrite": true
+        },
+        {
+          "type": "bind",
+          "source": "/root/modula-builds/966440fe64efc4c88350ce6423795965a5c62013/ops/docker/postgres/init-roles.sh",
+          "destination": "/docker-entrypoint-initdb.d/10-init-roles.sh",
+          "readWrite": false
         }
       ],
       "environmentKeys": [
@@ -301,9 +302,9 @@
         "BACKEND_FABRIC_ENABLED": "false",
         "BACKEND_FABRIC_ENVIRONMENT": "production",
         "BACKEND_FABRIC_CONTRACT_VERSION": "1.0",
-        "MODULA_RELEASE_SHA": "11bfc7638c6d757215e75a934d02e40c9a40c839",
-        "MODULA_WORKER_RELEASE_SHA": "11bfc7638c6d757215e75a934d02e40c9a40c839",
-        "MODULA_RELEASE_BUILT_AT": "2026-10-04T08:55:00Z"
+        "MODULA_RELEASE_SHA": "736056445f5e09f968488a3ec66dddfaffea6f08",
+        "MODULA_WORKER_RELEASE_SHA": "736056445f5e09f968488a3ec66dddfaffea6f08",
+        "MODULA_RELEASE_BUILT_AT": "2026-10-04T19:26:32Z"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -338,7 +339,7 @@
         "GREENFIELD_MODULE_GITHUB_SYNC_ENABLED": "false",
         "GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED": "false",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED": "false",
-        "MODULA_RELEASE_SHA": "11bfc7638c6d757215e75a934d02e40c9a40c839"
+        "MODULA_RELEASE_SHA": "736056445f5e09f968488a3ec66dddfaffea6f08"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -373,37 +374,37 @@
     "docker": [
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-04 09:57:59 +0100 BST",
-        "ID": "dc9bb93485c0",
-        "Image": "modula-greenfield-worker:11bfc7638c6d757215e75a934d02e40c9a40c839",
-        "Labels": "com.docker.compose.config-hash=758ad1ca528772ac61a0079ab1e8e9aed5f4b68d56a61f80ee1066b860035be3,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:351e97e04e4a8149cc9c0040695fbf9b7c89d540d0687fa1a47e572fbfa8247d,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=063_settings_backend_v2,org.opencontainers.image.created=2026-10-04T08:55:00Z,org.opencontainers.image.revision=11bfc7638c6d757215e75a934d02e40c9a40c839,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=api-baseline-02-11bfc7638c6d",
-        "LocalVolumes": "0",
-        "Mounts": "",
-        "Names": "modula-production-greenfield-worker-1",
-        "Networks": "modula-production_greenfield_internal",
-        "Platform": null,
-        "Ports": "",
-        "RunningFor": "6 hours ago",
-        "Size": "0B (virtual 2.5GB)",
-        "State": "running",
-        "Status": "Up 6 hours"
-      },
-      {
-        "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-04 09:57:28 +0100 BST",
-        "ID": "77898fd147d1",
-        "Image": "modula-greenfield-api:11bfc7638c6d757215e75a934d02e40c9a40c839",
-        "Labels": "com.docker.compose.config-hash=13a84cebbbbd52e9330e8a85f948bc68287085204ff6ac79826c93ede8488081,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dfd497932257da836519712e5385bd9f6eb2206459324803d5de6096389c82bf,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=063_settings_backend_v2,org.opencontainers.image.created=2026-10-04T08:55:00Z,org.opencontainers.image.revision=11bfc7638c6d757215e75a934d02e40c9a40c839,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=api-baseline-02-11bfc7638c6d",
+        "CreatedAt": "2026-10-04 22:54:55 +0100 BST",
+        "ID": "caa42fa5c8fe",
+        "Image": "modula-greenfield-api:736056445f5e09f968488a3ec66dddfaffea6f08",
+        "Labels": "com.docker.compose.config-hash=56d5f5b6925ac2e7834799f98fcd42108336cb3fb7f43945305f2234c46bdb38,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:80acf6fc51678fa0b53fe60a0d36a6496cb3da9e48d888bf5393ac75e4fc9071,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=065_comments_rich,org.opencontainers.image.created=2026-10-04T19:26:32Z,org.opencontainers.image.revision=736056445f5e09f968488a3ec66dddfaffea6f08,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=richcomments-736056445f5e",
         "LocalVolumes": "0",
         "Mounts": "/var/lib/modul…",
         "Names": "modula-production-greenfield-api-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "127.0.0.1:4020->4020/tcp",
-        "RunningFor": "6 hours ago",
+        "RunningFor": "2 days ago",
         "Size": "0B (virtual 2.52GB)",
         "State": "running",
-        "Status": "Up 6 hours (healthy)"
+        "Status": "Up 2 days (healthy)"
+      },
+      {
+        "Command": "\"docker-entrypoint.s…\"",
+        "CreatedAt": "2026-10-04 20:27:42 +0100 BST",
+        "ID": "724026fa156b",
+        "Image": "modula-greenfield-worker:736056445f5e09f968488a3ec66dddfaffea6f08",
+        "Labels": "com.docker.compose.config-hash=88d61db10cc3d1f6a1106b03978b720204b1159ff9c7b83ccac2f6fea96d7be6,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:deecd90feaecd69763f278da21701b708d3f130b0d4f5fe04c1fb8eb802d73c6,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=065_comments_rich,org.opencontainers.image.created=2026-10-04T19:26:32Z,org.opencontainers.image.revision=736056445f5e09f968488a3ec66dddfaffea6f08,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=richcomments-736056445f5e",
+        "LocalVolumes": "0",
+        "Mounts": "",
+        "Names": "modula-production-greenfield-worker-1",
+        "Networks": "modula-production_greenfield_internal",
+        "Platform": null,
+        "Ports": "",
+        "RunningFor": "2 days ago",
+        "Size": "0B (virtual 2.5GB)",
+        "State": "running",
+        "Status": "Up 2 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -417,10 +418,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55499->5432/tcp",
-        "RunningFor": "44 hours ago",
+        "RunningFor": "4 days ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 44 hours"
+        "Status": "Up 4 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -434,10 +435,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55498->5432/tcp",
-        "RunningFor": "44 hours ago",
+        "RunningFor": "4 days ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 44 hours"
+        "Status": "Up 4 days"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -451,10 +452,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "5432/tcp",
-        "RunningFor": "13 days ago",
+        "RunningFor": "2 weeks ago",
         "Size": "1.92MB (virtual 278MB)",
         "State": "running",
-        "Status": "Up 13 days (healthy)"
+        "Status": "Up 2 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -468,10 +469,10 @@
         "Networks": "modula-final-closure-recovery",
         "Platform": null,
         "Ports": "5432/tcp",
-        "RunningFor": "4 weeks ago",
+        "RunningFor": "5 weeks ago",
         "Size": "63B (virtual 276MB)",
         "State": "running",
-        "Status": "Up 4 weeks (healthy)"
+        "Status": "Up 5 weeks (healthy)"
       },
       {
         "Command": "\"/usr/local/bin/dock…\"",
@@ -502,10 +503,10 @@
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "4030/tcp",
-        "RunningFor": "5 weeks ago",
+        "RunningFor": "6 weeks ago",
         "Size": "0B (virtual 190MB)",
         "State": "running",
-        "Status": "Up 5 weeks (healthy)"
+        "Status": "Up 6 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -519,10 +520,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55438->5432/tcp",
-        "RunningFor": "5 weeks ago",
+        "RunningFor": "6 weeks ago",
         "Size": "1.31MB (virtual 277MB)",
         "State": "running",
-        "Status": "Up 5 weeks (healthy)"
+        "Status": "Up 6 weeks (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -570,10 +571,10 @@
         "Networks": "bridge",
         "Platform": null,
         "Ports": "127.0.0.1:55434->5432/tcp",
-        "RunningFor": "7 weeks ago",
+        "RunningFor": "8 weeks ago",
         "Size": "1.85kB (virtual 276MB)",
         "State": "running",
-        "Status": "Up 7 weeks"
+        "Status": "Up 8 weeks"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -634,7 +635,7 @@
       "nginx.service                                  loaded    active   running nginx - high performance web server"
     ],
     "timers": [
-      "Mon 2026-10-05 00:00:00 BST        7h Sun 2026-10-04 00:00:00 BST      16h ago dpkg-db-backup.timer           dpkg-db-backup.service"
+      "Thu 2026-10-08 00:00:00 BST           6h Wed 2026-10-07 00:00:01 BST       17h ago dpkg-db-backup.timer           dpkg-db-backup.service"
     ],
     "cronFiles": [
       ".placeholder",
@@ -655,12 +656,12 @@
     "type": "host bind mount",
     "root": "/var/lib/modula/greenfield-media",
     "mode": "775",
-    "files": 46,
-    "bytes": 26307802,
+    "files": 56,
+    "bytes": 28483978,
     "classes": {
       "attachments": {
-        "files": 18,
-        "bytes": 19171402
+        "files": 25,
+        "bytes": 19921070
       },
       "posts": {
         "files": 13,
@@ -671,8 +672,8 @@
         "bytes": 1224761
       },
       "stories": {
-        "files": 12,
-        "bytes": 5024110
+        "files": 15,
+        "bytes": 6450618
       }
     }
   },
@@ -776,6 +777,202 @@
       "method": "HEAD",
       "url": "/v1/attachments/:attachmentId/content",
       "path": "/v1/attachments/:attachmentId/content",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/status",
+      "path": "/v1/gifs/status",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/status",
+      "path": "/v1/gifs/status",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/trending",
+      "path": "/v1/gifs/trending",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/trending",
+      "path": "/v1/gifs/trending",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/gifs/search",
+      "path": "/v1/gifs/search",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/gifs/search",
+      "path": "/v1/gifs/search",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/link-previews",
+      "path": "/v1/link-previews",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/link-previews",
+      "path": "/v1/link-previews",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/link-safety",
+      "path": "/v1/link-safety",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/link-safety",
+      "path": "/v1/link-safety",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/stickers/packs",
+      "path": "/v1/stickers/packs",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/stickers/packs",
+      "path": "/v1/stickers/packs",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "GET",
+      "url": "/v1/hashtags/suggest",
+      "path": "/v1/hashtags/suggest",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 60,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "HEAD",
+      "url": "/v1/hashtags/suggest",
+      "path": "/v1/hashtags/suggest",
       "prefix": "",
       "schema": null,
       "config": {
@@ -6990,6 +7187,48 @@
       "method": "DELETE",
       "url": "/v1/comments/:commentId",
       "path": "/v1/comments/:commentId",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/comments/:commentId/poll/vote",
+      "path": "/v1/comments/:commentId/poll/vote",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "PUT",
+      "url": "/v1/comments/:commentId/pin",
+      "path": "/v1/comments/:commentId/pin",
+      "prefix": "",
+      "schema": null,
+      "config": {
+        "rateLimit": {
+          "max": 30,
+          "timeWindow": "1 minute"
+        }
+      },
+      "handler": ""
+    },
+    {
+      "method": "DELETE",
+      "url": "/v1/comments/:commentId/pin",
+      "path": "/v1/comments/:commentId/pin",
       "prefix": "",
       "schema": null,
       "config": {
@@ -14550,6 +14789,51 @@
         ]
       },
       {
+        "name": "greenfield_comment_poll_votes",
+        "columns": [
+          {
+            "name": "comment_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "actor_id",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "option_index",
+            "type": "smallint",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_comment_poll_votes_comment_idx",
+            "definition": "CREATE INDEX greenfield_comment_poll_votes_comment_idx ON public.greenfield_comment_poll_votes USING btree (comment_id)"
+          },
+          {
+            "name": "greenfield_comment_poll_votes_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_comment_poll_votes_pkey ON public.greenfield_comment_poll_votes USING btree (comment_id, actor_id)"
+          }
+        ],
+        "primaryKey": [
+          "comment_id",
+          "actor_id"
+        ],
+        "foreignKeys": [],
+        "uniqueConstraints": []
+      },
+      {
         "name": "greenfield_comment_reactions",
         "columns": [
           {
@@ -14714,12 +14998,38 @@
             "type": "text",
             "default": null,
             "nullable": true
+          },
+          {
+            "name": "media",
+            "type": "jsonb",
+            "default": "'[]'::jsonb",
+            "nullable": false
+          },
+          {
+            "name": "pinned_at",
+            "type": "timestamp with time zone",
+            "default": null,
+            "nullable": true
+          },
+          {
+            "name": "quoted_comment_id",
+            "type": "text",
+            "default": null,
+            "nullable": true
           }
         ],
         "indexes": [
           {
+            "name": "greenfield_comments_media_idx",
+            "definition": "CREATE INDEX greenfield_comments_media_idx ON public.greenfield_comments USING gin (media jsonb_path_ops)"
+          },
+          {
             "name": "greenfield_comments_parent_idx",
             "definition": "CREATE INDEX greenfield_comments_parent_idx ON public.greenfield_comments USING btree (parent_comment_id, created_at)"
+          },
+          {
+            "name": "greenfield_comments_pinned_idx",
+            "definition": "CREATE INDEX greenfield_comments_pinned_idx ON public.greenfield_comments USING btree (post_id, pinned_at) WHERE (pinned_at IS NOT NULL)"
           },
           {
             "name": "greenfield_comments_pkey",
@@ -22175,6 +22485,90 @@
             "referencesColumn": "account_id"
           }
         ],
+        "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_link_blocklist",
+        "columns": [
+          {
+            "name": "domain",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "reason",
+            "type": "text",
+            "default": "'unsafe'::text",
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_link_blocklist_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_link_blocklist_pkey ON public.greenfield_link_blocklist USING btree (domain)"
+          }
+        ],
+        "primaryKey": [
+          "domain"
+        ],
+        "foreignKeys": [],
+        "uniqueConstraints": []
+      },
+      {
+        "name": "greenfield_link_previews",
+        "columns": [
+          {
+            "name": "url_hash",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "url",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "text",
+            "default": null,
+            "nullable": false
+          },
+          {
+            "name": "preview",
+            "type": "jsonb",
+            "default": "'{}'::jsonb",
+            "nullable": false
+          },
+          {
+            "name": "fetched_at",
+            "type": "timestamp with time zone",
+            "default": "now()",
+            "nullable": false
+          }
+        ],
+        "indexes": [
+          {
+            "name": "greenfield_link_previews_fetched_idx",
+            "definition": "CREATE INDEX greenfield_link_previews_fetched_idx ON public.greenfield_link_previews USING btree (fetched_at)"
+          },
+          {
+            "name": "greenfield_link_previews_pkey",
+            "definition": "CREATE UNIQUE INDEX greenfield_link_previews_pkey ON public.greenfield_link_previews USING btree (url_hash)"
+          }
+        ],
+        "primaryKey": [
+          "url_hash"
+        ],
+        "foreignKeys": [],
         "uniqueConstraints": []
       },
       {
@@ -38184,12 +38578,22 @@
         "id": "063_settings_backend_v2",
         "name": "063_settings_backend_v2.sql",
         "appliedAt": "2026-10-03T19:30:21.887429+00:00"
+      },
+      {
+        "id": "064_comment_media_link_previews",
+        "name": "064_comment_media_link_previews.sql",
+        "appliedAt": "2026-10-04T18:43:53.96032+00:00"
+      },
+      {
+        "id": "065_comments_rich",
+        "name": "065_comments_rich.sql",
+        "appliedAt": "2026-10-04T19:27:42.25093+00:00"
       }
     ]
   },
   "operationalAggregates": {
     "outbox": {
-      "count": 477,
+      "count": 516,
       "failed": 0,
       "pending": 0
     },
@@ -38219,8 +38623,8 @@
         "jobType": "mail.identity.provision"
       },
       {
-        "count": 10,
-        "latest": "2026-10-02T00:07:46.278+00:00",
+        "count": 24,
+        "latest": "2026-10-07T09:03:01.225+00:00",
         "status": "DEAD_LETTER",
         "jobType": "notification.reaction"
       },
@@ -38238,9 +38642,9 @@
       }
     ],
     "storyItems": {
-      "count": 12,
+      "count": 15,
       "active": 0,
-      "deletedOrInactive": 12
+      "deletedOrInactive": 15
     },
     "aiProviders": [
       {
@@ -38300,9 +38704,9 @@
       "governorDecisions": 0
     },
     "notifications": {
-      "count": 121,
-      "active": 121,
-      "unread": 112
+      "count": 169,
+      "active": 169,
+      "unread": 160
     },
     "aiModelsByState": {
       "available:active:enabled=true": 1,
@@ -38319,14 +38723,14 @@
       "count": 1,
       "fresh": 1,
       "releases": [
-        "11bfc7638c6d757215e75a934d02e40c9a40c839"
+        "736056445f5e09f968488a3ec66dddfaffea6f08"
       ]
     },
     "jobFailureDetails": [
       {
         "code": "23505",
-        "count": 10,
-        "latest": "2026-10-02T00:07:46.278+00:00"
+        "count": 24,
+        "latest": "2026-10-07T09:03:01.225+00:00"
       },
       {
         "code": "42P18",
@@ -38355,7 +38759,7 @@
       }
     ],
     "jobFailuresByCode": {
-      "23505": 10,
+      "23505": 24,
       "42P18": 2,
       "PLUGIN_FAILED": 1,
       "PLUGIN_TIMEOUT": 1,
@@ -38365,7 +38769,7 @@
     "postContentByType": {
       "pdf": 2,
       "audio": 1,
-      "image": 5,
+      "image": 8,
       "video": 2,
       "document": 1
     },
@@ -38401,13 +38805,13 @@
       "avatar": 1
     },
     "attachmentsByStatus": {
-      "ready": 18,
+      "ready": 25,
       "failed": 1,
       "created": 2,
       "expired": 1
     },
     "backgroundJobsByType": {
-      "mail.deliver": 333,
+      "mail.deliver": 337,
       "module.enable": 66,
       "module.update": 92,
       "plugin.enable": 14,
@@ -38417,17 +38821,17 @@
       "search.reindex": 4,
       "function.invoke": 15,
       "module.uninstall": 24,
-      "search.index.post": 188,
+      "search.index.post": 194,
       "notification.quote": 6,
       "notification.reply": 8,
       "notification.create": 40,
-      "notification.repost": 30,
-      "notification.comment": 24,
+      "notification.repost": 36,
+      "notification.comment": 64,
       "notification.mention": 2,
-      "search.index.profile": 80,
+      "search.index.profile": 88,
       "extension.job.execute": 2,
       "module.release.verify": 30,
-      "notification.reaction": 60,
+      "notification.reaction": 78,
       "atproto.publish.delete": 52,
       "atproto.publish.update": 10,
       "module.release.publish": 30,
@@ -38472,16 +38876,16 @@
     },
     "backgroundJobsByStatus": {
       "FAILED": 4,
-      "SUCCEEDED": 1196,
-      "DEAD_LETTER": 22
+      "SUCCEEDED": 1264,
+      "DEAD_LETTER": 36
     },
     "readyAttachmentLinkage": {
-      "ready": 18,
-      "linked": 13,
-      "orphanCandidates": 5
+      "ready": 25,
+      "linked": 16,
+      "orphanCandidates": 9
     },
     "eventDeliveriesByStatus": {
-      "completed": 375
+      "completed": 386
     },
     "releaseArtifactCoverage": {
       "releases": 14,

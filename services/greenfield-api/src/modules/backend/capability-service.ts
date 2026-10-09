@@ -16,7 +16,7 @@ export class ModuleBackendCapabilityService {
       return {
         capability,
         available: provider === 'greenfield' || Boolean(discovery?.capabilities?.includes(capability) || (backend.actions ?? []).some(action => action.actionId === capability)),
-        granted: context.grantedPermissions.includes(capability) || (backend.actions ?? []).some(action => action.actionId === capability),
+        granted: !context.permissionReviewRequired && (context.grantedPermissions.includes(capability) || (backend.actions ?? []).some(action => action.actionId === capability)),
         provider,
         reason: provider === 'module-backend' ? 'resolved through module backend declaration' : 'resolved through Greenfield platform',
       } satisfies ResolvedModuleCapability

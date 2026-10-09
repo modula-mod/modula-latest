@@ -7,7 +7,7 @@ import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, parsePublisherPublicKey, statementBytes} from '../src/modules/release-signing.js'
-import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, sha256} from './helpers/registry-fixtures.js'
+import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
@@ -51,6 +51,7 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let releases: GreenfieldModuleReleaseService
   let keys: GreenfieldPublisherSigningKeyService
+  let token = ''
   const primary = keyPair()
   const primaryKeyId = `modula-test-${suffix}-a`
   let n = 0
@@ -58,6 +59,7 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
+    process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'false'
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
@@ -66,6 +68,7 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     releases = new GreenfieldModuleReleaseService(db)
     keys = new GreenfieldPublisherSigningKeyService(db)
     await keys.register('modula', {keyId: primaryKeyId, publicKeyPem: primary.publicKeyPem}, null)
+    token = (await registerAccount(app, `signed-${suffix}@example.com`, `signed${suffix}`.slice(0, 20), db)).token
   })
 
   afterAll(async () => {
@@ -108,6 +111,40 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     expect(detail.statusCode, detail.body).toBe(200)
     expect(detail.json().data.registryTrust.signature).toMatchObject({state: 'verified', algorithm: 'Ed25519', keyId: primaryKeyId, publicKeyFingerprint: row.public_key_fingerprint})
     expect(detail.json().data.registryTrust.warnings.map((w: {code: string}) => w.code)).not.toContain('RELEASE_UNSIGNED')
+  })
+
+  it('fails closed when a signed release has no integrity evidence row', async () => {
+    const id = nextId()
+    const {product, manifest, evidence} = signedImport(id)
+    const imported = await releases.importPendingReview(manifest, evidence)
+    await releases.publishRelease(id, '1.0.0')
+    await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: imported.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
+    await db.deleteFrom('greenfield_module_release_integrity').where('release_id', '=', imported.releaseId).execute()
+
+    const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${id}`})
+    expect(detail.statusCode, detail.body).toBe(200)
+    expect(detail.json().data.registryTrust).toMatchObject({
+      verified: false,
+      signature: {state: 'verified'},
+    })
+    expect(detail.json().data.registryTrust.warnings.map((warning: {code: string}) => warning.code)).toContain('NO_INTEGRITY_EVIDENCE')
+  })
+
+  it('keeps a valid signed release installable under strict production trust policy', async () => {
+    const id = nextId()
+    const {product, manifest, evidence} = signedImport(id)
+    await releases.importPendingReview(manifest, evidence)
+    const published = await releases.publishRelease(id, '1.0.0')
+    await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes, releaseId: published.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/v1/modules/${id}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `signed-install-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: []},
+    })
+    expect(response.statusCode, response.body).toBe(202)
+    expect(response.json().data).toMatchObject({status: 'installing'})
   })
 
   it('rejects a signature from an unknown key', async () => {
@@ -190,13 +227,13 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     expect(JSON.stringify(body)).not.toMatch(/PRIVATE KEY/)
   })
 
-  it('keeps unsigned releases valid and reports them as unsigned', async () => {
+  it('keeps unsigned release facts visible but never marks them trusted', async () => {
     const id = nextId()
     const manifest = adapterManifest(id, '1.0.0')
     await releases.importPendingReview(manifest, evidenceFor(manifest))
     const published = await releases.publishRelease(id, '1.0.0')
     expect(published.releaseState).toBe('published')
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${id}`})
-    expect(detail.json().data.registryTrust.signature.state).toBe('unsigned')
+    expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'unsigned'}})
   })
 })

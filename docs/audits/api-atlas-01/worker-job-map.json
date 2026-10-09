@@ -241,7 +241,7 @@
     {
       "jobType": "module.update",
       "source": "services/greenfield-worker/src/jobs/runner.ts:128",
-      "handler": "await handleModuleUpdate(db, job.payload)"
+      "handler": "await handleModuleUpdate(db, config, job.payload)"
     },
     {
       "jobType": "module.uninstall",

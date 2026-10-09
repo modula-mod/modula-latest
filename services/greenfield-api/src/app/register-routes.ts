@@ -34,6 +34,7 @@ import {ModerationRepository} from '../domains/moderation/repository.js'
 import {PostMediaStorage} from '../domains/media/post-media-storage.js'
 import {NotificationPreferencesService} from '../domains/notifications/preferences.js'
 import {NotificationRepository} from '../domains/notifications/repository.js'
+import {retryReactionNotificationDeadLetter} from '../domains/notifications/reaction-dead-letter-retry.js'
 import {GreenfieldPolicyEngine} from '../domains/policy/index.js'
 import {PostRepository} from '../domains/posts/repository.js'
 import {PostWriteService} from '../domains/posts/writes.js'
@@ -222,6 +223,25 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   const feedConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 60, timeWindow: '1 minute'}}} : {}
   const profileConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 120, timeWindow: '1 minute'}}} : {}
   const writeConfig = config.rateLimitEnabled ? {config: {rateLimit: {max: 30, timeWindow: '1 minute'}}} : {}
+  const profileIdWriteConfig = {
+    ...writeConfig,
+    schema: {params: {type: 'object', additionalProperties: false, required: ['profileId'], properties: {profileId: {type: 'string', minLength: 1, maxLength: 200}}}},
+  }
+  const followRequestListConfig = {
+    ...profileConfig,
+    schema: {querystring: {type: 'object', additionalProperties: false, properties: {limit: {type: 'integer', minimum: 1, maximum: 100}, cursor: {type: 'string', minLength: 1, maxLength: 200}}}},
+  }
+  const followRequestActionConfig = {
+    ...writeConfig,
+    schema: {params: {type: 'object', additionalProperties: false, required: ['requestId'], properties: {requestId: {type: 'string', format: 'uuid'}}}},
+  }
+  const reactionDeadLetterRetryConfig = {
+    ...writeConfig,
+    schema: {
+      params: {type: 'object', additionalProperties: false, required: ['jobId'], properties: {jobId: {type: 'string', minLength: 1, maxLength: 200, pattern: '^[A-Za-z0-9._:-]+$'}}},
+      body: {type: 'object', additionalProperties: false, properties: {reason: {type: 'string', minLength: 1, maxLength: 500, pattern: '\\S'}}},
+    },
+  }
 
   const mutationsAllowed = config.mutationsEnabled
   await registerAttachmentRoutes(app, db, config, {writeConfig, feedConfig, mutationsAllowed})
@@ -576,7 +596,7 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
   })
 
   await registerModuleRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
-  await registerIntelligenceRoutes(app, db, greenfieldSessions, {profileConfig, writeConfig})
+  await registerIntelligenceRoutes(app, db, greenfieldSessions, {profileConfig, writeConfig}, config)
   await registerBackendFabricRoutes(app, db, config)
   await registerAiRoutes(app, db, config, greenfieldSessions, {profileConfig, writeConfig})
   app.get('/v1/accounts/:accountId/handle-history', profileConfig, async (request, reply) => {
@@ -1243,16 +1263,20 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     return reply.send(successEnvelope(tool, request.id))
   })
   app.get('/v1/functions', profileConfig, async (request, reply) => {
-    const rows = await db.selectFrom('greenfield_functions').selectAll().execute()
-    return reply.send(successEnvelope(rows, request.id))
+    const auth = await requireGreenfieldAuth(request, reply)
+    if (!auth) return
+    return reply.send(successEnvelope(await functions.listForAccount(auth.accountId), request.id))
   })
   app.post('/v1/functions/:functionId/invoke', writeConfig, async (request, reply) => {
     const auth = await requireGreenfieldAuth(request, reply)
     if (!auth) return
     try {
       const {functionId} = request.params as {functionId: string}
-      const body = request.body as any
-      const result = await functions.invoke(body.installationId, functionId, body.input ?? {})
+      const body = ((request.body as any) ?? {}) as Record<string, unknown>
+      if (typeof body.installationId !== 'string' || !body.installationId) {
+        throw Object.assign(new Error('installationId is required'), {code: 'VALIDATION_FAILED'})
+      }
+      const result = await functions.invoke(auth.accountId, body.installationId, functionId, body.input ?? {})
       return reply.send(successEnvelope(result, request.id))
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Function invoke failed')
@@ -1672,18 +1696,21 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
 
-  app.post('/v1/profiles/:profileId/follow', writeConfig, async (request, reply) => {
+  app.post('/v1/profiles/:profileId/follow', profileIdWriteConfig, async (request, reply) => {
     if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
     const auth = requireCapability(request, reply, 'social:follow')
     if (!auth) return
     try {
       const {profileId} = request.params as {profileId: string}
-      await profileWrites.follow(auth.actorId, profileId)
-      const profile = await profiles.getById(profileId, auth.actorId)
-      if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
+      const relationship = await profileWrites.follow(auth.actorId, profileId)
+      const profile = relationship.following ? await profiles.getById(profileId, auth.actorId) : null
       return reply.send(
         successEnvelope(
-          {profile, isFollowing: profile.isFollowing, followerCount: profile.followerCount},
+          {
+            ...relationship,
+            isFollowing: relationship.following,
+            ...(profile ? {profile, followerCount: profile.followerCount} : {}),
+          },
           request.id,
         ),
       )
@@ -1692,23 +1719,76 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
     }
   })
 
-  app.delete('/v1/profiles/:profileId/follow', writeConfig, async (request, reply) => {
+  app.delete('/v1/profiles/:profileId/follow', profileIdWriteConfig, async (request, reply) => {
     if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
     const auth = requireCapability(request, reply, 'social:follow')
     if (!auth) return
     try {
       const {profileId} = request.params as {profileId: string}
-      await profileWrites.unfollow(auth.actorId, profileId)
+      const relationship = await profileWrites.unfollow(auth.actorId, profileId)
       const profile = await profiles.getById(profileId, auth.actorId)
-      if (!profile) return sendError(reply, 'NOT_FOUND', 'Profile not found', request.id)
       return reply.send(
         successEnvelope(
-          {profile, isFollowing: profile.isFollowing, followerCount: profile.followerCount},
+          {
+            ...relationship,
+            isFollowing: false,
+            ...(profile ? {profile, followerCount: profile.followerCount} : {}),
+          },
           request.id,
         ),
       )
     } catch (error: any) {
       return mapDomainError(reply, error, request.id, 'Unfollow failed')
+    }
+  })
+
+  app.get('/v1/profiles/me/follow-requests', followRequestListConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'social:follow')
+    if (!auth) return
+    try {
+      const query = request.query as Record<string, unknown>
+      const limit = parseLimit(query.limit)
+      const cursor = decodeCursor(query.cursor)
+      const requests = await profileWrites.listIncomingFollowRequests(auth.actorId, limit, cursor)
+      return reply.send(successEnvelope(toCursorPage(requests, limit, item => item.requestId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Failed to load follow requests')
+    }
+  })
+
+  app.post('/v1/follow-requests/:requestId/accept', followRequestActionConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = requireCapability(request, reply, 'social:follow')
+    if (!auth) return
+    try {
+      const {requestId} = request.params as {requestId: string}
+      return reply.send(successEnvelope(await profileWrites.acceptFollowRequest(auth.actorId, requestId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Follow request acceptance failed')
+    }
+  })
+
+  app.post('/v1/follow-requests/:requestId/reject', followRequestActionConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = requireCapability(request, reply, 'social:follow')
+    if (!auth) return
+    try {
+      const {requestId} = request.params as {requestId: string}
+      return reply.send(successEnvelope(await profileWrites.rejectFollowRequest(auth.actorId, requestId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Follow request rejection failed')
+    }
+  })
+
+  app.delete('/v1/follow-requests/:requestId', followRequestActionConfig, async (request, reply) => {
+    if (!mutationsAllowed) return sendError(reply, 'CAPABILITY_DISABLED', 'Mutations disabled', request.id)
+    const auth = requireCapability(request, reply, 'social:follow')
+    if (!auth) return
+    try {
+      const {requestId} = request.params as {requestId: string}
+      return reply.send(successEnvelope(await profileWrites.cancelFollowRequest(auth.actorId, requestId), request.id))
+    } catch (error: any) {
+      return mapDomainError(reply, error, request.id, 'Follow request cancellation failed')
     }
   })
 
@@ -2315,6 +2395,22 @@ export async function registerRoutes(app: FastifyInstance, db: ModulaDb, config:
       )
     } catch (error) {
       return mapDomainError(reply, error, request.id, 'Modula Mail adoption failed')
+    }
+  })
+
+  app.post('/v1/admin/ops/jobs/reaction-dead-letters/:jobId/retry', reactionDeadLetterRetryConfig, async (request, reply) => {
+    const auth = requireCapability(request, reply, 'admin:ops')
+    if (!auth) return
+    const {jobId} = request.params as {jobId: string}
+    const body = (request.body ?? {}) as {reason?: string}
+    try {
+      return reply.send(successEnvelope(await retryReactionNotificationDeadLetter(db, jobId, auth.actorId, {
+        reason: body.reason?.trim() || undefined,
+        requestId: request.id,
+        correlationId: request.id,
+      }), request.id))
+    } catch (error) {
+      return mapDomainError(reply, error, request.id, 'Failed to retry reaction notification dead letter')
     }
   })
 

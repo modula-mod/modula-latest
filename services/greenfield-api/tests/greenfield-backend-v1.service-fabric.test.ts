@@ -616,7 +616,7 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
   }
 
   async function serviceHeaders(extra: Record<string, string> = {}, operations = fullOperations): Promise<Record<string, string>> {
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountA, productId, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountA, productId, {requireEnabled: true})
     const identity = randomUUID()
     const issued = await new ModuleBackendTokenService(db, loadConfig()).issue({
       context,
@@ -645,6 +645,7 @@ describeIfDb('Greenfield Backend V1 service fabric boundary', () => {
 function configureTestEnv(): void {
   process.env.NODE_ENV = 'test'
   process.env.MODULA_ENVIRONMENT = 'development'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.MODULA_API_HOST = '127.0.0.1'
   process.env.MODULA_API_PORT = '4051'
   process.env.MODULA_PUBLIC_API_URL = 'https://api.test.modula.digital'

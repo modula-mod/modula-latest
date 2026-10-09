@@ -30,6 +30,7 @@ export function configureRegistryTestEnv(databaseUrl: string, port = '4057') {
   process.env.MODULA_REGISTRATION_MODE = 'open'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED = 'true'

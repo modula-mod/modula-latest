@@ -147,7 +147,19 @@ export class GreenfieldModuleRegistryService {
     await Promise.all((items as any[]).map(async item => {
       const releaseId = latestReleaseIds.get(item.moduleId)
       const release = releaseId ? await this.releases.getReleaseById(releaseId) : undefined
-      item.trustSummary = release ? summaryTrust(await this.trust.forRelease(release, {}, item.latestVersion ?? null)) : null
+      const trust = release ? await this.trust.forRelease(release, {}, item.latestVersion ?? null) : null
+      item.trustSummary = trust ? summaryTrust(trust) : null
+      if (trust) {
+        item.installable = trust.verified
+        item.installability = installabilityForBetaModule({
+          moduleId: item.moduleId,
+          version: item.latestVersion,
+          releaseId,
+          releaseState: item.status,
+          classification: item.betaClassification,
+          installable: trust.verified,
+        })
+      }
     }))
     return {items, nextCursor: byModule.size > limit ? String(limit) : null}
   }
@@ -160,7 +172,6 @@ export class GreenfieldModuleRegistryService {
       const latestPublishedVersion = releases.find(item => item.releaseState === 'published')?.version ?? null
       const beta = classifyBetaModule({moduleId: latest.moduleId, status: latest.releaseState, manifest: latest.manifest as any})
       if (!beta.visibleInBeta) throw moduleError('NOT_FOUND', `Module ${moduleId} not found`)
-      const installable = latest.releaseState === 'published'
       const manifestRecord = latest.manifest as Record<string, unknown>
       const [product, packageSizeBytes] = await Promise.all([
         this.productProjectionFor(latest.releaseId),
@@ -219,7 +230,7 @@ export class GreenfieldModuleRegistryService {
           releaseId: latest.releaseId,
           releaseState: latest.releaseState,
           classification: beta.classification,
-          installable,
+          installable: trust.verified,
         }),
         dependencyGraph: manifestRecord.dependencyGraph,
         serviceRegistry: manifestRecord.serviceRegistry,

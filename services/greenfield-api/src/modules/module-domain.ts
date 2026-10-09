@@ -87,6 +87,7 @@ export type GreenfieldModuleInstallationRow = {
   version: string
   extensionVersionId: string
   grantedPermissions?: string[]
+  permissionReviewRequired?: boolean
   productKind?: GreenfieldExtensionProductKind
   lifecycleState?: string
 }

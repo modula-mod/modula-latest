@@ -18,6 +18,7 @@ const accountA = `gai01-a-${suffix}`
 const accountB = `gai01-b-${suffix}`
 const releaseId = `gai01-release-${suffix}`
 const installationId = `gai01-installation-${suffix}`
+const developmentTrust = {environment: 'development' as const, moduleAllowUntrustedDevelopmentReleases: true}
 
 describeIfDb('GAI-01 governed intelligence database acceptance', () => {
   let db: ModulaDb
@@ -27,12 +28,12 @@ describeIfDb('GAI-01 governed intelligence database acceptance', () => {
   beforeAll(async () => {
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
-    service = new GovernedIntelligenceService(db)
+    service = new GovernedIntelligenceService(db, developmentTrust)
     await seedRuntime(db)
     app = Fastify()
     await registerIntelligenceRoutes(app, db, {
       resolveAccess: async (token: string) => token === 'token-a' ? {accountId: accountA} : token === 'token-b' ? {accountId: accountB} : null,
-    } as any, {profileConfig: {}, writeConfig: {}})
+    } as any, {profileConfig: {}, writeConfig: {}}, developmentTrust)
     await app.ready()
   })
 
@@ -260,7 +261,7 @@ async function seedRuntime(db: ModulaDb) {
     {fieldId: 'dataSchemaVersion', name: 'dataSchemaVersion', type: 'text', label: 'Schema', required: true},
   ]
   await db.insertInto('greenfield_module_record_collections').values({collection_id: `gai01-collection-${suffix}`, release_id: releaseId, module_id: moduleId, collection: 'note', schema_ref: 'schemas/note.json', default_visibility: 'private', fields: jsonb(fields), searchable_fields: jsonb(['title', 'plainTextProjection']), filterable_fields: jsonb(['pinned', 'archived']), sortable_fields: jsonb(['title']), folder_field: null, reference_fields: jsonb([]), schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now}).execute()
-  const records = new GreenfieldModuleRecordService(db)
+  const records = new GreenfieldModuleRecordService(db, developmentTrust)
   for (let index = 0; index < 7; index += 1) {
     await records.create(accountA, moduleId, 'note', {data: {title: `Acceptance ${index}`, document: {type: 'doc', content: []}, plainTextProjection: `Note ${index}`, tagIds: [], pinned: false, favourite: false, archived: false, dataSchemaVersion: '1.0.0'}})
   }

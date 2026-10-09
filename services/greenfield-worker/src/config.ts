@@ -61,6 +61,10 @@ const envSchema = z.object({
     .string()
     .optional()
     .transform(v => v === 'true'),
+  GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES: z
+    .string()
+    .optional()
+    .transform(v => v === 'true'),
   GREENFIELD_MODULE_GITHUB_SYNC_ENABLED: z
     .string()
     .optional()
@@ -103,6 +107,7 @@ export type WorkerConfig = {
   ssrfAllowPrivateNetworks: boolean
   moduleRemoteFunctionsEnabled: boolean
   moduleCommunityExecutionEnabled: boolean
+  moduleAllowUntrustedDevelopmentReleases: boolean
   moduleGithubSyncEnabled: boolean
 }
 
@@ -132,6 +137,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
   }
 
   const environment = raw.MODULA_ENVIRONMENT
+  if (environment !== 'development' && raw.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES) {
+    refuse('GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES is only valid in development')
+  }
   const mailTransport = raw.MODULA_MAIL_TRANSPORT ?? (environment === 'production' ? 'smtp' : 'disabled')
   const mailProvisionerMode = raw.MODULA_MAIL_PROVISIONER_MODE ?? (environment === 'production' ? 'disabled' : 'dry-run')
   const mailRequired = raw.MODULA_MAIL_REQUIRED === true || environment === 'production'
@@ -207,6 +215,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): WorkerConfig {
     ssrfAllowPrivateNetworks: Boolean(raw.MODULA_ATPROTO_SSRF_ALLOW_PRIVATE_NETWORKS),
     moduleRemoteFunctionsEnabled: Boolean(raw.GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED),
     moduleCommunityExecutionEnabled: Boolean(raw.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED),
+    moduleAllowUntrustedDevelopmentReleases: Boolean(raw.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES),
     moduleGithubSyncEnabled: Boolean(raw.GREENFIELD_MODULE_GITHUB_SYNC_ENABLED),
   }
 }

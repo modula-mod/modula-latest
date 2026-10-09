@@ -1,16 +1,27 @@
 import type {ModulaWorkerDb} from '../database.js'
+import type {WorkerConfig} from '../config.js'
 import {registerModuleContributions, unregisterModuleContributions} from './contribution-registration-handler.js'
 import {permanentModuleJob} from './module-job-errors.js'
 import {projectStandard2Runtime} from './standard2-runtime-registration.js'
 import {projectExtensionLifecycle} from './extension-fabric-projection.js'
+import {assertTrustedModuleRelease} from './release-trust-guard.js'
+import {assertPermissionReviewPresent} from './permission-review-guard.js'
 
-export async function handleModuleUpdate(db: ModulaWorkerDb, payload: unknown): Promise<void> {
+export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfig, payload: unknown): Promise<void> {
   const p = payload as any
-  if (!p.installationId || !p.targetReleaseId || !p.previousStatus) throw permanentModuleJob('VALIDATION_FAILED', 'Invalid module.update payload')
+  if (!p.installationId || !p.targetReleaseId || !p.previousStatus || !p.accountId) throw permanentModuleJob('VALIDATION_FAILED', 'Invalid module.update payload')
   const release = await db.selectFrom('greenfield_module_releases').selectAll().where('release_id', '=', p.targetReleaseId).executeTakeFirst()
   // Superseded releases stay immutable and published, so a downgrade may target them;
   // revoked, quarantined and unpublished releases never bind to an installation.
   if (!release || !['published', 'superseded'].includes(release.release_state)) throw permanentModuleJob('VALIDATION_FAILED', 'Target release unavailable')
+  await assertTrustedModuleRelease(db, config, release)
+  const review = await db.selectFrom('greenfield_module_permission_reviews')
+    .select('review_id')
+    .where('installation_id', '=', p.installationId)
+    .where('release_id', '=', release.release_id)
+    .where('account_id', '=', p.accountId)
+    .executeTakeFirst()
+  assertPermissionReviewPresent(review)
   await db.transaction().execute(async trx => {
     const old = await trx.selectFrom('greenfield_extension_installations').select('extension_version_id').where('installation_id', '=', p.installationId).executeTakeFirst()
     if (old) {

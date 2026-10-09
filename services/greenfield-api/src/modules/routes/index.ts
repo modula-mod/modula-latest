@@ -66,12 +66,12 @@ export async function registerModuleRoutes(
   const uninstall = new GreenfieldModuleUninstallService(db, config)
   const settings = new GreenfieldModuleSettingsService(db, config)
   const contributions = new GreenfieldModuleContributionService(db, config)
-  const views = new GreenfieldModuleViewService(db)
-  const records = new GreenfieldModuleRecordService(db)
+  const views = new GreenfieldModuleViewService(db, config)
+  const records = new GreenfieldModuleRecordService(db, config)
   const actions = new GreenfieldModuleActionService(db, config)
   const exports = new GreenfieldModuleExportService(db, config)
   const health = new GreenfieldModuleHealthService(db, config)
-  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
+  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   const runtime2 = new GreenfieldModuleRuntime2Service(db)
   const backendDiscovery = new ModuleBackendDiscoveryService(db)
   const backendHealth = new GreenfieldModuleBackendHealthService(db, config)
@@ -80,9 +80,9 @@ export async function registerModuleRoutes(
   const backendWebhooks = new ModuleBackendWebhookService(db, config)
   const backendGateway = new ModuleBackendGatewayService(db, config)
   const extensionFabric = new GreenfieldExtensionFabricService(db)
-  const dataLedger = new GreenfieldDataLedgerService(db)
+  const dataLedger = new GreenfieldDataLedgerService(db, config)
   const mpsIngest = new GreenfieldMpsIngestService(db)
-  const productFrontends = new GreenfieldProductFrontendService(db)
+  const productFrontends = new GreenfieldProductFrontendService(db, config)
   const extensionAi = new GreenfieldAIExtensionActionService(db, config)
 
   const requireRegistry = (reply: FastifyReply, requestId: string) => {
@@ -1002,6 +1002,43 @@ export async function registerModuleRoutes(
   app.post('/v1/admin/registry/releases/:releaseId/verify', routeConfig.writeConfig, releaseAdminAction(sessions, publishers, request =>
     releases.verifyReleaseFromId((request.params as any).releaseId),
   ))
+  app.post('/v1/admin/registry/releases/:releaseId/signature', {
+    ...routeConfig.writeConfig,
+    schema: {
+      params: {type: 'object', additionalProperties: false, required: ['releaseId'], properties: {
+        releaseId: {type: 'string', minLength: 1, maxLength: 240, pattern: '^[A-Za-z0-9._:-]+$'},
+      }},
+      body: {type: 'object', additionalProperties: false, required: ['signature', 'statementSha256'], properties: {
+        signature: {type: 'object', additionalProperties: false, required: ['algorithm', 'keyId', 'value'], properties: {
+          algorithm: {type: 'string', const: 'Ed25519'},
+          keyId: {type: 'string', minLength: 3, maxLength: 160, pattern: '^[A-Za-z0-9._:-]+$'},
+          value: {type: 'string', minLength: 86, maxLength: 86, pattern: '^[A-Za-z0-9_-]+$'},
+        }},
+        statementSha256: {type: 'string', pattern: '^[0-9a-f]{64}$'},
+      }},
+    },
+  }, async (request, reply) => {
+    const auth = await requireGreenfieldAuth(request, reply, sessions)
+    if (!auth) return
+    try {
+      await publishers.requireAdminAccount(auth.accountId)
+      const {releaseId} = request.params as {releaseId: string}
+      const body = request.body as {signature: unknown; statementSha256: string}
+      const release = await releases.getReleaseById(releaseId)
+      if (!release) throw moduleError('NOT_FOUND', 'Release not found')
+      if (release.releaseState !== 'published' || !release.manifest.source.releaseTag) {
+        throw moduleError('CONFLICT', 'Published release provenance is required for signature attachment')
+      }
+      // Download and verify GitHub tag, package bytes and provenance before taking a database row lock.
+      const verifiedArtifact = await githubSync.fetchVerified({
+        repository: release.sourceRepository,
+        releaseTag: release.manifest.source.releaseTag,
+      })
+      return reply.send(successEnvelope(await releases.attachPublishedSignature(releaseId, body, verifiedArtifact, auth.accountId, request.id), request.id))
+    } catch (error) {
+      return sendMapped(reply, error, request.id, 'Release signature attachment failed')
+    }
+  })
   app.post('/v1/admin/registry/releases/:releaseId/publish', routeConfig.writeConfig, releaseAdminAction(sessions, publishers, request =>
     publishByReleaseId(releases, (request.params as any).releaseId),
   ))
@@ -1173,7 +1210,7 @@ function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fall
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
   }
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)

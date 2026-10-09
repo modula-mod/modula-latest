@@ -15,6 +15,7 @@ import {AuditRepository} from '../domains/audit/repository.js'
 import {uuidv7} from '../lib/uuidv7.js'
 import {moduleError} from '../modules/module-errors.js'
 import {GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
+import type {AppConfig} from '../config/index.js'
 import {resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 
 type Db = ModulaDb | Transaction<Database>
@@ -90,8 +91,11 @@ export type DeclareDataSchemaVersionInput = {
 export class GreenfieldDataLedgerService {
   private readonly runtimeAccess: GreenfieldModuleRuntimeAccessService
 
-  constructor(private readonly db: ModulaDb) {
-    this.runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
+  constructor(
+    private readonly db: ModulaDb,
+    config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>,
+  ) {
+    this.runtimeAccess = new GreenfieldModuleRuntimeAccessService(db, config)
   }
 
   async register(accountId: string, productId: string, input: RegisterDataResourceInput) {

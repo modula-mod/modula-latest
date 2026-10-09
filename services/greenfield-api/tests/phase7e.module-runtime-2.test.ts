@@ -248,7 +248,7 @@ describeIfDb('Phase 7E Standard 2 dependency, capability, service, lifecycle, st
     })
     expect(update.statusCode).toBe(202)
     expect(update.json().data.status).toBe('updating')
-    await handleModuleUpdate(workerDb, {installationId, targetReleaseId: updateRelease.releaseId, previousStatus: 'enabled', moduleId, accountId})
+    await handleModuleUpdate(workerDb, loadWorkerConfig(), {installationId, targetReleaseId: updateRelease.releaseId, previousStatus: 'enabled', moduleId, accountId})
     const updatedInstallation = await db
       .selectFrom('greenfield_extension_installations')
       .innerJoin('greenfield_module_releases', 'greenfield_module_releases.extension_version_id', 'greenfield_extension_installations.extension_version_id')
@@ -400,6 +400,7 @@ function configureTestEnv(): void {
   process.env.MODULA_INVITE_ONLY = 'false'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED = 'true'
   process.env.GREENFIELD_AI_GATEWAY_ENABLED = 'true'

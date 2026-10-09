@@ -131,7 +131,7 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
     expect((await app.inject({method: 'PATCH', url: `/v1/repositories/me/records/${recordId}`, headers: auth(tokenA), payload: {data: {stolen: true}, expectedRevision: 1}})).statusCode).toBe(404)
   })
 
-  it('[EXPECTED FAILURE] proves follower-only profiles become visible immediately without request/accept/reject', async () => {
+  it('requires explicit approval before a follower-only profile becomes visible', async () => {
     const profileB = await db.selectFrom('profiles').select(['id', 'version']).where('actor_id', '=', `actor-${accountB}`).executeTakeFirstOrThrow()
     const ownerView = await app.inject({method: 'GET', url: `/v1/profiles/${handleB}`, headers: auth(tokenB)})
     if (ownerView.json().data.visibility !== 'followers') {
@@ -142,24 +142,78 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
     expect(before.statusCode).toBe(404)
     const follow = await app.inject({method: 'POST', url: `/v1/profiles/${profileB.id}/follow`, headers: auth(tokenA)})
     expect(follow.statusCode, follow.body).toBe(200)
-    expect(follow.json().data.isFollowing).toBe(true)
-    const after = await app.inject({method: 'GET', url: `/v1/profiles/${handleB}`, headers: auth(tokenA)})
-    expect(after.statusCode).toBe(200)
+    expect(follow.json().data).toMatchObject({relationship: 'pending', following: false, pending: true, isFollowing: false})
+    const requestId = follow.json().data.requestId as string
+    expect((await app.inject({method: 'GET', url: `/v1/profiles/${handleB}`, headers: auth(tokenA)})).statusCode).toBe(404)
+
+    const incoming = await app.inject({method: 'GET', url: '/v1/profiles/me/follow-requests', headers: auth(tokenB)})
+    expect(incoming.statusCode, incoming.body).toBe(200)
+    expect(incoming.json().data.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({requestId, requester: expect.objectContaining({handle: handleA})}),
+    ]))
+
+    const accepted = await app.inject({method: 'POST', url: `/v1/follow-requests/${requestId}/accept`, headers: auth(tokenB)})
+    expect(accepted.statusCode, accepted.body).toBe(200)
+    expect(accepted.json().data).toMatchObject({relationship: 'following', following: true, pending: false})
+    expect((await app.inject({method: 'GET', url: `/v1/profiles/${handleB}`, headers: auth(tokenA)})).statusCode).toBe(200)
   })
 
-  it('[EXPECTED FAILURE] proves legacy invocation accepts another account installation ID', async () => {
+  it('hides foreign installations and binds legacy functions to the owned installation version', async () => {
     const fixture = await seedModuleFixture(db, accountA)
-    const response = await app.inject({
+    const otherFixture = await seedModuleFixture(db, accountA)
+    const foreignFixture = await seedModuleFixture(db, accountB)
+    const unauthenticatedCatalog = await app.inject({method: 'GET', url: '/v1/functions'})
+    expect(unauthenticatedCatalog.statusCode, unauthenticatedCatalog.body).toBe(401)
+
+    const ownedCatalog = await app.inject({method: 'GET', url: '/v1/functions', headers: auth(tokenA)})
+    expect(ownedCatalog.statusCode, ownedCatalog.body).toBe(200)
+    expect(ownedCatalog.json().data).toEqual(expect.arrayContaining([
+      {
+        function_id: fixture.functionId,
+        installation_id: fixture.installationId,
+        name: 'API Atlas safe missing URL fixture',
+        kind: 'remoteHttp',
+        timeout_ms: 1000,
+      },
+      expect.objectContaining({function_id: otherFixture.functionId, installation_id: otherFixture.installationId}),
+    ]))
+    expect(ownedCatalog.json().data).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({function_id: foreignFixture.functionId}),
+    ]))
+    expect(ownedCatalog.json().data.every((item: Record<string, unknown>) => !('config' in item) && !('extension_version_id' in item))).toBe(true)
+
+    const missingInstallation = await app.inject({
+      method: 'POST', url: `/v1/functions/${fixture.functionId}/invoke`, headers: auth(tokenA),
+      payload: {input: {auditMarker: 'API-BASELINE-02'}},
+    })
+    expect(missingInstallation.statusCode, missingInstallation.body).toBe(400)
+    expect(missingInstallation.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'installationId is required'})
+
+    const foreign = await app.inject({
       method: 'POST', url: `/v1/functions/${fixture.functionId}/invoke`, headers: auth(tokenB),
       payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
     })
-    // The safe fixture has no URL. Reaching function validation proves that the
-    // foreign installation capability was accepted instead of owner-denied.
-    expect(response.statusCode).toBe(400)
-    expect(response.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Remote function URL missing'})
+    expect(foreign.statusCode, foreign.body).toBe(404)
+    expect(foreign.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Installation not found'})
+
+    const mismatchedFunction = await app.inject({
+      method: 'POST', url: `/v1/functions/${otherFixture.functionId}/invoke`, headers: auth(tokenA),
+      payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
+    })
+    expect(mismatchedFunction.statusCode, mismatchedFunction.body).toBe(404)
+    expect(mismatchedFunction.json().error).toMatchObject({code: 'NOT_FOUND', message: 'Function not found'})
+
+    const owned = await app.inject({
+      method: 'POST', url: `/v1/functions/${fixture.functionId}/invoke`, headers: auth(tokenA),
+      payload: {installationId: fixture.installationId, input: {auditMarker: 'API-BASELINE-02'}},
+    })
+    // The fixture intentionally has no URL. Its owner reaching function
+    // validation proves the scoped installation and capability were accepted.
+    expect(owned.statusCode, owned.body).toBe(400)
+    expect(owned.json().error).toMatchObject({code: 'VALIDATION_FAILED', message: 'Remote function URL missing'})
   })
 
-  it('[EXPECTED FAILURE] proves reconnect and cancel accept another account stream ID', async () => {
+  it('hides foreign AI streams from reconnect and cancel without mutating them', async () => {
     const repository = new GreenfieldAIRepository(db)
     const requestId = `api-atlas-request-${suffix}`
     await repository.createRequestLedger({
@@ -173,22 +227,41 @@ describeIfDb('API-BASELINE-02 ownership and trust acceptance', () => {
       streamingUsed: true,
     })
     const streamId = await repository.createStream({requestId, accountId: accountA, moduleId: 'digital.modula.api-atlas-fixture', correlationId: `api-atlas-${suffix}`})
-    const reconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenB)})
+    const foreignReconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenB)})
+    expect(foreignReconnect.statusCode, foreignReconnect.body).toBe(404)
+    expect(foreignReconnect.json().error).toMatchObject({code: 'NOT_FOUND', message: 'AI stream not found'})
+    expect(await repository.requireStream(streamId)).toMatchObject({status: 'open', cancellation_requested_at: null})
+
+    const foreignCancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenB)})
+    expect(foreignCancel.statusCode, foreignCancel.body).toBe(404)
+    expect(foreignCancel.json().error).toMatchObject({code: 'NOT_FOUND', message: 'AI stream not found'})
+    expect(await repository.requireStream(streamId)).toMatchObject({status: 'open', cancellation_requested_at: null})
+    expect(await db.selectFrom('greenfield_ai_request_ledger').select('status').where('request_id', '=', requestId).executeTakeFirstOrThrow()).toMatchObject({status: 'running'})
+    expect(await db.selectFrom('greenfield_domain_events').select('event_id').where('aggregate_id', '=', requestId).where('event_type', '=', 'ai.cancelled').execute()).toHaveLength(0)
+
+    const reconnect = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/reconnect`, headers: auth(tokenA)})
     expect(reconnect.statusCode, reconnect.body).toBe(200)
     expect(reconnect.json().data).toMatchObject({streamId, status: 'reconnecting'})
     await repository.updateStream({streamId, status: 'open'})
-    const cancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenB)})
+    const cancel = await app.inject({method: 'POST', url: `/v1/ai/streams/${streamId}/cancel`, headers: auth(tokenA)})
     expect(cancel.statusCode, cancel.body).toBe(200)
     expect(cancel.json().data.cancelled).toBe(true)
     expect((await repository.requireStream(streamId)).status).toBe('cancelled')
   })
 
-  it('[EXPECTED FAILURE] proves missing permission review falls back to manifest permissions', async () => {
+  it('fails closed when a module permission review is missing', async () => {
     const fixture = await seedModuleFixture(db, accountB)
     const review = await db.selectFrom('greenfield_module_permission_reviews').select('review_id').where('installation_id', '=', fixture.installationId).executeTakeFirst()
     expect(review).toBeUndefined()
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountB, fixture.moduleId, {requireEnabled: true})
-    expect(context.grantedPermissions).toContain('api-atlas:fixture:read')
+    const context = await new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountB, fixture.moduleId, {requireEnabled: true})
+    expect(context.permissionReviewRequired).toBe(true)
+    expect(context.grantedPermissions).toEqual([])
+    try {
+      new GreenfieldModuleRuntimeAccessService(db).enforceCapability(context, 'api-atlas:fixture:read')
+      throw new Error('Expected missing review to be denied')
+    } catch (error) {
+      expect(error).toMatchObject({code: 'PERMISSION_REVIEW_REQUIRED'})
+    }
   })
 
   it('denies cross-account module installation, settings and private record access', async () => {
@@ -237,6 +310,18 @@ async function seedModuleFixture(db: any, accountId: string, withRecord = false)
   await db.insertInto('greenfield_extension_capabilities').values({capability_id: `api-atlas-capability-${id}`, installation_id: installationId, capability: 'function:invoke', granted_at: now, revoked_at: null}).execute()
   await db.insertInto('greenfield_functions').values({function_id: functionId, extension_version_id: extensionVersionId, name: 'API Atlas safe missing URL fixture', kind: 'remoteHttp', config: {}, timeout_ms: 1000, created_at: now}).execute()
   if (withRecord) {
+    const grantedPermissions = manifest.permissions.map(({permission}: {permission: string}) => permission)
+    await db.insertInto('greenfield_module_permission_reviews').values({
+      review_id: `api-atlas-review-${id}`,
+      installation_id: installationId,
+      release_id: releaseId,
+      account_id: accountId,
+      granted_permissions: sql`${JSON.stringify(grantedPermissions)}::jsonb`,
+      denied_permissions: sql`'[]'::jsonb`,
+      high_risk_increase: false,
+      idempotency_key: `api-atlas-review-${id}`,
+      reviewed_at: now,
+    }).execute()
     await db.insertInto('greenfield_module_record_collections').values({
       collection_id: `api-atlas-collection-${id}`, release_id: releaseId, module_id: moduleId, collection: 'note', schema_ref: 'schemas/note.json', default_visibility: 'private',
       fields: sql`${JSON.stringify([{fieldId: 'title', name: 'title', type: 'text', label: 'Title', required: true}])}::jsonb`, searchable_fields: sql`'[]'::jsonb`, filterable_fields: sql`'[]'::jsonb`, sortable_fields: sql`'["title"]'::jsonb`, folder_field: null, reference_fields: sql`'[]'::jsonb`, schema_definition: {}, retention_policy: 'keepOnUninstall', registration_status: 'registered', created_at: now, updated_at: now,

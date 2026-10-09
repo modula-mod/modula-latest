@@ -270,6 +270,7 @@ function workerConfig(): WorkerConfig {
     ssrfAllowPrivateNetworks: false,
     moduleRemoteFunctionsEnabled: false,
     moduleCommunityExecutionEnabled: false,
+    moduleAllowUntrustedDevelopmentReleases: true,
     moduleGithubSyncEnabled: false,
   }
 }

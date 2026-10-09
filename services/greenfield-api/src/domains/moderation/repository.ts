@@ -18,6 +18,8 @@ export class ModerationRepository {
       throw Object.assign(new Error('Cannot block yourself'), {code: 'VALIDATION_FAILED'})
     }
     await this.db.transaction().execute(async trx => {
+      const relationshipKey = [blockerActorId, blockedActorId].sort().join(':')
+      await sql`SELECT pg_advisory_xact_lock(hashtextextended(${relationshipKey}, 0))`.execute(trx)
       const existing = await trx
         .selectFrom('blocks')
         .selectAll()
@@ -47,12 +49,23 @@ export class ModerationRepository {
       }
       await trx
         .updateTable('follows')
-        .set({deleted_at: now, updated_at: now})
+        .set({deleted_at: now, updated_at: now, version: sql<number>`version + 1`})
         .where('deleted_at', 'is', null)
         .where(({eb, or, and}) =>
           or([
             and([eb('follower_actor_id', '=', blockerActorId), eb('followed_actor_id', '=', blockedActorId)]),
             and([eb('follower_actor_id', '=', blockedActorId), eb('followed_actor_id', '=', blockerActorId)]),
+          ]),
+        )
+        .execute()
+      await trx
+        .updateTable('follow_requests')
+        .set({status: 'CANCELLED', resolved_at: now, updated_at: now, version: sql<number>`version + 1`})
+        .where('status', 'in', ['PENDING', 'ACCEPTED'])
+        .where(({eb, or, and}) =>
+          or([
+            and([eb('requester_actor_id', '=', blockerActorId), eb('target_actor_id', '=', blockedActorId)]),
+            and([eb('requester_actor_id', '=', blockedActorId), eb('target_actor_id', '=', blockerActorId)]),
           ]),
         )
         .execute()

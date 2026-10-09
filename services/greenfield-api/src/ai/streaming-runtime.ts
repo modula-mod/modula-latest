@@ -47,10 +47,9 @@ export class GreenfieldAIStreamingRuntime {
     return {streamId: input.streamId, type: 'token', sequence, token: input.token}
   }
 
-  async reconnect(streamId: string): Promise<{streamId: string; status: string; lastSequence: number}> {
-    const stream = await this.repository.requireStream(streamId)
-    if (stream.status === 'open') await this.repository.updateStream({streamId, status: 'reconnecting'})
-    return {streamId, status: stream.status === 'open' ? 'reconnecting' : stream.status, lastSequence: stream.last_sequence}
+  async reconnect(accountId: string, streamId: string): Promise<{streamId: string; status: string; lastSequence: number}> {
+    const stream = await this.repository.reconnectOwnedStream(accountId, streamId)
+    return {streamId, status: stream.status, lastSequence: stream.last_sequence}
   }
 
   async complete(input: {
@@ -91,9 +90,8 @@ export class GreenfieldAIStreamingRuntime {
     })
   }
 
-  async cancel(streamId: string): Promise<void> {
-    const stream = await this.repository.requireStream(streamId)
-    await this.repository.updateStream({streamId, status: 'cancelled', cancellationRequested: true})
+  async cancel(accountId: string, streamId: string): Promise<void> {
+    const stream = await this.repository.cancelOwnedStream(accountId, streamId)
     await this.repository.updateRequestUsage(stream.request_id, {status: 'cancelled', streamingUsed: true})
     await this.events.publish({
       eventType: 'ai.cancelled',

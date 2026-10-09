@@ -4,7 +4,7 @@
 
 - `pnpm api:atlas:verify`: 85/85 passed.
 - Deterministic output: two consecutive generations byte-identical.
-- Runtime completeness: 551 = 393 application + 158 framework-derived; all framework-derived routes are explicitly excluded.
+- Runtime completeness: 575 = 409 application + 166 framework-derived; all framework-derived routes are explicitly excluded.
 - Parsers: JSON, RFC-style CSV and JSON-compatible OpenAPI YAML PASS.
 - Mermaid sanity: request, module, intelligence, media and event flows PASS.
 - Client literals: 142/142 matched; 0 unresolved.
@@ -27,6 +27,6 @@ An initial direct API typecheck before building workspace packages failed on unr
 
 ## Deliberate exclusions
 
-- `verify:greenfield-backend-v1` was not used as the acceptance signal because `scripts/verify-greenfield-backend-v1.mjs:98` hard-codes production schema 055 while observed production is at `063_settings_backend_v2`. That stale verifier is recorded as a P2 gap rather than bypassed.
+- `verify:greenfield-backend-v1` was not used as the acceptance signal because `scripts/verify-greenfield-backend-v1.mjs:98` hard-codes production schema 055 while observed production is at `065_comments_rich`. That stale verifier is recorded as a P2 gap rather than bypassed.
 - Database-backed suites use a disposable database, not production. Production writes are limited to reserved audit identities and marker-scoped fixtures with recorded cleanup.
 - No load test or nginx edit occurred. Product defects documented as expected failures were not remediated in this baseline phase.

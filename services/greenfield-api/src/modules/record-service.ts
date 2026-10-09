@@ -4,6 +4,7 @@ import type {GreenfieldModuleCollectionDefinition, GreenfieldModuleFieldDefiniti
 import {moduleIdFamily, resolveCanonicalModuleId} from '@modula/greenfield-contracts'
 import {sql} from 'kysely'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import {AuditRepository} from '../domains/audit/repository.js'
 import {GreenfieldEventBus} from '../events/index.js'
 import {uuidv7} from '../lib/uuidv7.js'
@@ -34,9 +35,9 @@ export class GreenfieldModuleRecordService {
   private readonly access: GreenfieldModuleRuntimeAccessService
   private readonly views: GreenfieldModuleViewService
 
-  constructor(private readonly db: ModulaDb) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
-    this.views = new GreenfieldModuleViewService(db)
+  constructor(private readonly db: ModulaDb, config?: Pick<AppConfig, 'environment' | 'moduleAllowUntrustedDevelopmentReleases'>) {
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+    this.views = new GreenfieldModuleViewService(db, config)
   }
 
   async list(accountId: string, moduleId: string, collection: string, input: ModuleRecordQuery = {}) {

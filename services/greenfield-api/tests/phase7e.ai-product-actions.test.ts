@@ -47,7 +47,7 @@ describeIfDb('Phase 7E AI product actions', () => {
     await migrateUp(databaseUrl!)
     db = createDb(databaseUrl!)
     config = loadConfig()
-    records = new GreenfieldModuleRecordService(db)
+    records = new GreenfieldModuleRecordService(db, config)
     productActions = new GreenfieldAIProductActionService(db, config)
     installations = new GreenfieldModuleInstallationService(db, config)
     accountId = `ai-product-account-${suffix}`
@@ -232,6 +232,7 @@ describeIfDb('Phase 7E AI product actions', () => {
 function configureTestEnv(): void {
   process.env.NODE_ENV = 'test'
   process.env.MODULA_ENVIRONMENT = 'development'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.MODULA_API_HOST = '127.0.0.1'
   process.env.MODULA_API_PORT = '4034'
   process.env.MODULA_PUBLIC_API_URL = 'http://127.0.0.1:4034'

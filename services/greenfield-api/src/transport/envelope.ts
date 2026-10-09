@@ -64,6 +64,8 @@ export function statusForError(code: ApiErrorCode): number {
     case 'AUTHENTICATION_NOT_AVAILABLE':
       return 401
     case 'FORBIDDEN':
+    case 'PERMISSION_REVIEW_REQUIRED':
+    case 'UNTRUSTED_RELEASE':
     case 'ACCOUNT_SUSPENDED':
     case 'CAPABILITY_DISABLED':
     case 'AI_ACTION_PERMISSION_REQUIRED':

@@ -36,6 +36,7 @@ const foreignRole = `gbv1_foreign_role_${suffix}`
 const modulePassword = randomBytes(24).toString('base64url')
 const accounts = [`module-owner-a-${suffix}`, `module-owner-b-${suffix}`]
 const installations = accounts.map(accountId => `installation:${fixtureProductId}:${accountId}`)
+const developmentTrust = {environment: 'development' as const, moduleAllowUntrustedDevelopmentReleases: true}
 
 describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
   let db: ModulaDb
@@ -119,8 +120,8 @@ describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
         updated_at: new Date(),
       }).execute()
     }
-    contexts = await Promise.all(accounts.map(accountId => new GreenfieldModuleRuntimeAccessService(db).resolve(accountId, fixtureProductId, {requireEnabled: true})))
-    resources = await Promise.all(accounts.map((accountId, index) => new GreenfieldDataLedgerService(db).register(accountId, fixtureProductId, {
+    contexts = await Promise.all(accounts.map(accountId => new GreenfieldModuleRuntimeAccessService(db, developmentTrust).resolve(accountId, fixtureProductId, {requireEnabled: true})))
+    resources = await Promise.all(accounts.map((accountId, index) => new GreenfieldDataLedgerService(db, developmentTrust).register(accountId, fixtureProductId, {
       resourceKey: `${fixtureProductId}.records`,
       installationId: installations[index],
       releaseId,
@@ -156,7 +157,7 @@ describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
     expect(readFileSync(join(fixtureRoot, 'frontend/index.mjs'), 'utf8')).toContain(fixtureProductId)
     expect(resources).toHaveLength(2)
     for (let index = 0; index < resources.length; index += 1) {
-      const resource = await new GreenfieldDataLedgerService(db).get(accounts[index]!, fixtureProductId, resources[index]!.resourceId)
+      const resource = await new GreenfieldDataLedgerService(db, developmentTrust).get(accounts[index]!, fixtureProductId, resources[index]!.resourceId)
       expect(resource).toMatchObject({ownerAccountId: accounts[index], installationId: installations[index], primaryStorageMode: 'dedicated-postgres', backendServiceId: fixtureServiceId})
       expect(resource.storageBindings[0]).toMatchObject({credentialRef: `secret://product/${fixtureProductId}/database`})
     }
@@ -213,7 +214,7 @@ describeIfDb('Greenfield Backend V1 TEST_ONLY module-owned backend', () => {
     const states = await db.selectFrom('greenfield_extension_installations').select(['installation_id', 'status']).where('installation_id', 'in', installations).execute()
     expect(states.find(row => row.installation_id === installations[0])?.status).toBe('removed')
     expect(states.find(row => row.installation_id === installations[1])?.status).toBe('enabled')
-    expect((await new GreenfieldDataLedgerService(db).get(accounts[0]!, fixtureProductId, resources[0]!.resourceId)).lifecycleState).toBe('DELETE_PENDING')
+    expect((await new GreenfieldDataLedgerService(db, developmentTrust).get(accounts[0]!, fixtureProductId, resources[0]!.resourceId)).lifecycleState).toBe('DELETE_PENDING')
   })
 
   function serviceContext(index: number) {

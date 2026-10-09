@@ -233,7 +233,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
   })
 
   it('issues the existing Greenfield signed token as a scoped service assertion and never records raw bearer forwarding', async () => {
-    const context = await new GreenfieldModuleRuntimeAccessService(db).resolve(accountA, formattingId, {requireEnabled: true})
+    const context = await new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountA, formattingId, {requireEnabled: true})
     const issued = await new ModuleBackendTokenService(db, loadConfig()).issue({
       context,
       actorId: `account:${accountA}`,
@@ -413,7 +413,7 @@ describeIfDb('PVP Platform 2 governed extension fabric', () => {
     })
     expect(response.statusCode, response.body).toBe(202)
     expect(response.json().data.status).toBe('updating')
-    await handleModuleUpdate(workerDb, {
+    await handleModuleUpdate(workerDb, loadWorkerConfig(), {
       installationId: formattingInstallationId,
       targetReleaseId: updateRelease.releaseId,
       previousStatus: 'enabled',
@@ -599,6 +599,7 @@ function configureTestEnv() {
   process.env.MODULA_REGISTRATION_MODE = 'open'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED = 'true'

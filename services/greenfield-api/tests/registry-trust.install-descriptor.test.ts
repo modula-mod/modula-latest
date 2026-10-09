@@ -52,7 +52,7 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
   })
 
   it('returns an install descriptor pinned to the exact requested release', async () => {
-    const response = await install(productId, {version: '0.1.0', approvedPermissions: [], hostVersion: '1.3.0'}, `install-${suffix}-a`)
+    const response = await install(productId, {version: '0.1.0', hostVersion: '1.3.0'}, `install-${suffix}-a`)
     expect(response.statusCode, response.body).toBe(202)
     const {descriptor, installationId} = response.json().data
     const expected = facts[`${productId}@0.1.0`]!
@@ -67,7 +67,7 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
       artifact: {sha256: expected.artifactSha, mediaType: 'application/gzip', ref: null, source: {provider: 'github', repository: 'modula-mod/registry-trust-fixtures'}},
       manifest: {productManifestSha256: expected.mpsSha, adapterManifestSha256: expected.manifestSha},
       frontend: {mode: 'declarative', sha256: expected.frontendSha, mediaType: 'application/vnd.modula.frontend+json', entryView: 'home'},
-      trust: {verified: true, publisherVerified: true, signatureState: 'unsigned', revoked: false, quarantined: false},
+      trust: {verified: false, publisherVerified: true, signatureState: 'unsigned', revoked: false, quarantined: false},
       compatibility: {evaluated: true, hostVersion: '1.3.0', compatible: true},
     })
     expect(descriptor.frontend.ref).toBe(`https://api.test.modula.digital/v1/modules/${productId}/frontend`)
@@ -77,6 +77,9 @@ describeIfDb('registry trust pipeline: immutable install descriptor', () => {
     expect(descriptorDigest(body)).toBe(descriptorSha256)
     const plan = await db.selectFrom('greenfield_module_install_plans').select(['install_descriptor_sha256', 'release_id']).where('installation_id', '=', installationId).executeTakeFirstOrThrow()
     expect(plan).toEqual({install_descriptor_sha256: descriptorSha256, release_id: expected.releaseId})
+    const review = await db.selectFrom('greenfield_module_permission_reviews').select(['granted_permissions', 'denied_permissions']).where('installation_id', '=', installationId).executeTakeFirstOrThrow()
+    expect(review.granted_permissions).toEqual([])
+    expect(review.denied_permissions).toEqual([])
   })
 
   it('replays the same descriptor for the same idempotency key and from the descriptor endpoint', async () => {

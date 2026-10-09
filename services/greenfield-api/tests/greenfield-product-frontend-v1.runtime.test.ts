@@ -131,7 +131,7 @@ describeIfDb('MPS product-owned frontend exact-release runtime', () => {
   })
 
   it('marks a historical release without MPS ingestion as legacy explicitly', async () => {
-    const legacyId = `com.example.legacy-frontend-${suffix}`
+    const legacyId = `digital.modula.legacy-frontend-${suffix}`
     const legacyVersion = '1.0.0'
     const manifest = productManifest(legacyId, legacyVersion)
     const releases = new GreenfieldModuleReleaseService(db)
@@ -209,6 +209,7 @@ function configureTestEnv() {
   process.env.MODULA_REGISTRATION_MODE = 'open'
   process.env.GREENFIELD_MODULE_REGISTRY_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_INSTALLATION_ENABLED = 'true'
+  process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'true'
   process.env.GREENFIELD_MODULE_DECLARATIVE_CONTRIBUTIONS_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_FIRST_PARTY_EXECUTION_ENABLED = 'true'
   process.env.GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED = 'true'

@@ -97,6 +97,7 @@ export class ModuleBackendTokenService {
       scope: ExtensionInvocationScope
     }
   }): Promise<IssuedModuleBackendToken> {
+    if (input.context.permissionReviewRequired) throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required')
     if (input.backend.authentication?.tokenExchangeRequired !== true) throw moduleError('FORBIDDEN', 'Module backend token exchange is required')
     const nowSeconds = Math.floor(Date.now() / 1000)
     const ttl = Math.min(input.backend.authentication?.tokenTtlSeconds ?? 900, 900)

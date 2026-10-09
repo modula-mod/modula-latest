@@ -5,16 +5,30 @@ import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
+import {GreenfieldModuleVersionSwitchService} from '../src/modules/version-switch-service.js'
+import {GreenfieldModuleRuntimeAccessService} from '../src/modules/runtime-access.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const describeIfDb = databaseUrl ? describe : describe.skip
 const suffix = randomUUID().slice(0, 8)
 
+describe('registry trust error contracts', () => {
+  it('preserves UNTRUSTED_RELEASE for version-switch denials', () => {
+    try {
+      GreenfieldModuleVersionSwitchService.assertAllowed({blockers: [{code: 'UNTRUSTED_RELEASE', message: 'Unsigned target'}]} as any)
+      throw new Error('Expected untrusted release denial')
+    } catch (error) {
+      expect(error).toMatchObject({code: 'UNTRUSTED_RELEASE', message: 'Unsigned target'})
+    }
+  })
+})
+
 describeIfDb('registry trust pipeline: verified trust block', () => {
   let app: Awaited<ReturnType<typeof createServer>>['app']
   let db: Awaited<ReturnType<typeof createServer>>['db']
   let token = ''
+  let accountId = ''
   const productId = `digital.modula.trust-${suffix}`
   const releases: Record<string, {releaseId: string; mpsBytes: string; frontendSha: string; artifactSha: string; manifestSha: string}> = {}
 
@@ -31,13 +45,16 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
 
   beforeAll(async () => {
     configureRegistryTestEnv(databaseUrl!)
+    process.env.GREENFIELD_MODULE_ALLOW_UNTRUSTED_DEVELOPMENT_RELEASES = 'false'
     await migrateUp(databaseUrl!)
     const created = await createServer(loadConfig())
     app = created.app
     db = created.db
     await app.ready()
     await publish('0.1.0')
-    token = (await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)).token
+    const account = await registerAccount(app, `unsigned-${suffix}@example.com`, `unsigned${suffix}`.slice(0, 20), db)
+    token = account.token
+    accountId = account.accountId
   })
 
   afterAll(async () => {
@@ -55,7 +72,7 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
       moduleId: productId,
       version: '0.1.0',
       releaseState: 'published',
-      verified: true,
+      verified: false,
       publisher: {publisherId: 'modula', status: 'verified', verified: true},
       signature: {state: 'unsigned'},
       digests: {
@@ -90,20 +107,51 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(invalid.statusCode).toBe(400)
   })
 
-  it('[EXPECTED FAILURE] exposes an unsigned published release as trusted and installation-eligible', async () => {
+  it('exposes an unsigned published release as untrusted and refuses install preview', async () => {
     const catalogue = await app.inject({method: 'GET', url: `/v1/registry/modules?q=${encodeURIComponent(productId)}`})
     expect(catalogue.statusCode, catalogue.body).toBe(200)
     const item = catalogue.json().data.items.find((candidate: {moduleId: string}) => candidate.moduleId === productId)
-    expect(item).toMatchObject({moduleId: productId, status: 'published', installable: true})
+    expect(item).toMatchObject({moduleId: productId, status: 'published', installable: false})
     const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}`})
-    expect(detail.json().data.registryTrust).toMatchObject({verified: true, signature: {state: 'unsigned'}})
+    expect(detail.json().data.registryTrust).toMatchObject({verified: false, signature: {state: 'unsigned'}})
 
     const preview = await app.inject({
       method: 'POST', url: `/v1/modules/${productId}/install-preview`,
       headers: {authorization: `Bearer ${token}`}, payload: {version: '0.1.0', platform: 'ios'},
     })
-    expect(preview.statusCode, preview.body).toBe(200)
-    expect(preview.json().data).toMatchObject({moduleId: productId, version: '0.1.0', compatible: true})
+    expect(preview.statusCode, preview.body).toBe(403)
+    expect(preview.json().error).toMatchObject({code: 'UNTRUSTED_RELEASE'})
+  })
+
+  it('refuses runtime access to an already-enabled unsigned release', async () => {
+    const release = await db.selectFrom('greenfield_module_releases')
+      .select(['release_id', 'extension_version_id'])
+      .where('release_id', '=', releases['0.1.0']!.releaseId)
+      .executeTakeFirstOrThrow()
+    const installationId = randomUUID()
+    await db.insertInto('greenfield_extension_installations').values({
+      installation_id: installationId,
+      extension_version_id: release.extension_version_id!,
+      account_id: accountId,
+      status: 'enabled',
+      config: {},
+      created_at: new Date(),
+      updated_at: new Date(),
+    }).execute()
+    await db.insertInto('greenfield_module_permission_reviews').values({
+      review_id: randomUUID(),
+      installation_id: installationId,
+      release_id: release.release_id,
+      account_id: accountId,
+      granted_permissions: [],
+      denied_permissions: [],
+      high_risk_increase: false,
+      idempotency_key: `runtime-review-${suffix}`,
+      reviewed_at: new Date(),
+    }).execute()
+
+    await expect(new GreenfieldModuleRuntimeAccessService(db, loadConfig()).resolve(accountId, productId, {requireEnabled: true}))
+      .rejects.toMatchObject({code: 'UNTRUSTED_RELEASE'})
   })
 
   it('reports update availability and revocation per immutable release', async () => {
@@ -116,6 +164,6 @@ describeIfDb('registry trust pipeline: verified trust block', () => {
     expect(revoked).toMatchObject({verified: false, releaseState: 'revoked', revocation: {revoked: true, scope: 'release', reason: 'test revocation'}})
     expect(revoked.warnings.map((warning: {code: string}) => warning.code)).toContain('RELEASE_REVOKED')
     const latest = (await app.inject({method: 'GET', url: `/v1/registry/modules/${productId}`})).json().data.registryTrust
-    expect(latest).toMatchObject({version: '0.2.0', verified: true, revocation: {revoked: false}})
+    expect(latest).toMatchObject({version: '0.2.0', verified: false, signature: {state: 'unsigned'}, revocation: {revoked: false}})
   })
 })

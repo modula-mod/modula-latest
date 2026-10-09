@@ -29,9 +29,9 @@ export async function registerBackendFabricRoutes(
   config: AppConfig,
 ): Promise<void> {
   const assertions = new ModuleBackendTokenService(db, config)
-  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db)
-  const records = new GreenfieldModuleRecordService(db)
-  const ledger = new GreenfieldDataLedgerService(db)
+  const runtimeAccess = new GreenfieldModuleRuntimeAccessService(db, config)
+  const records = new GreenfieldModuleRecordService(db, config)
+  const ledger = new GreenfieldDataLedgerService(db, config)
   const credentialBroker = new CredentialBrokerClient(config)
   const eventJobs = new GreenfieldBackendEventJobService(db)
   const entitlements = new GreenfieldEntitlementService(db)

@@ -70,7 +70,15 @@ export class GreenfieldRegistryTrustService {
   async forRelease(release: GreenfieldModuleReleaseRecord, options: RegistryTrustOptions = {}, latestPublishedVersion: string | null = null): Promise<RegistryTrustBlock> {
     const [publisher, signatures, ingestion, frontend, integrity, source, revocations, quarantine, developmentAssets] = await Promise.all([
       this.db.selectFrom('greenfield_publishers').selectAll().where('publisher_id', '=', release.publisherId).executeTakeFirst(),
-      this.db.selectFrom('greenfield_module_release_signatures').selectAll().where('release_id', '=', release.releaseId).execute(),
+      this.db.selectFrom('greenfield_module_release_signatures as signature')
+        .leftJoin('greenfield_publisher_signing_keys as signing_key', 'signing_key.key_id', 'signature.signature_key_id')
+        .selectAll('signature')
+        .select([
+          'signing_key.publisher_id as signing_key_publisher_id',
+          'signing_key.state as signing_key_state',
+          'signing_key.revoked_at as signing_key_revoked_at',
+        ])
+        .where('signature.release_id', '=', release.releaseId).execute(),
       this.db.selectFrom('greenfield_mps_ingestions').select(['manifest_sha256', 'manifest', 'ingested_at']).where('release_id', '=', release.releaseId).executeTakeFirst(),
       this.db.selectFrom('greenfield_release_frontends').select(['artifact_sha256', 'compatibility', 'required_capabilities']).where('release_id', '=', release.releaseId).executeTakeFirst(),
       this.db.selectFrom('greenfield_module_release_integrity').select(['verified_at', 'mismatch_at']).where('release_id', '=', release.releaseId).executeTakeFirst(),
@@ -86,7 +94,7 @@ export class GreenfieldRegistryTrustService {
       this.db.selectFrom('greenfield_release_presentation_assets').select('asset_id').where('release_id', '=', release.releaseId).where('development_asset', '=', true).executeTakeFirst(),
     ])
 
-    const signature = signatureState(signatures as any[])
+    const signature = signatureState(signatures, release, ingestion?.manifest_sha256 ?? null, frontend?.artifact_sha256 ?? null)
     const mps = record(ingestion?.manifest)
     const mpsCompatibility = record(mps?.compatibility)
     const frontendCompatibility = record(frontend?.compatibility)
@@ -99,7 +107,8 @@ export class GreenfieldRegistryTrustService {
     const publisherVerified = publisher?.status === 'verified'
     const revoked = release.releaseState === 'revoked' || Boolean(revocations)
     const quarantined = release.releaseState === 'quarantined' || Boolean(quarantine)
-    const integrityOk = !integrity?.mismatch_at
+    // Missing integrity evidence is unknown trust, not a successful check.
+    const integrityOk = Boolean(integrity && !integrity.mismatch_at)
     const update = {
       latestPublishedVersion,
       updateAvailable: Boolean(latestPublishedVersion && latestPublishedVersion !== release.version && versionIsNewer(latestPublishedVersion, release.version)),
@@ -115,7 +124,8 @@ export class GreenfieldRegistryTrustService {
     if (release.releaseState === 'superseded') warnings.push({code: 'RELEASE_SUPERSEDED', message: 'A newer release supersedes this version.'})
     if (quarantined) warnings.push({code: 'RELEASE_QUARANTINED', message: quarantine?.reason ?? 'Release is quarantined.'})
     if (revoked) warnings.push({code: 'RELEASE_REVOKED', message: revocations?.reason ?? 'Release is revoked.'})
-    if (!integrityOk) warnings.push({code: 'INTEGRITY_MISMATCH', message: 'Release integrity verification recorded a mismatch.'})
+    if (!integrity) warnings.push({code: 'NO_INTEGRITY_EVIDENCE', message: 'No release integrity evidence is recorded.'})
+    else if (!integrityOk) warnings.push({code: 'INTEGRITY_MISMATCH', message: 'Release integrity verification recorded a mismatch.'})
     if (compatibility.evaluated && compatibility.compatible === false) warnings.push({code: 'HOST_INCOMPATIBLE', message: compatibility.reasons.map(reason => reason.message).join(' ')})
 
     return {
@@ -124,8 +134,13 @@ export class GreenfieldRegistryTrustService {
       version: release.version,
       releaseState: release.releaseState,
       publishedAt: release.publishedAt ? new Date(release.publishedAt).toISOString() : null,
-      verified: ['published', 'superseded'].includes(release.releaseState) && integrityOk && publisherVerified && !revoked && !quarantined
-        && !['invalid', 'unknownKey', 'revokedKey'].includes(signature.state),
+      verified: ['published', 'superseded'].includes(release.releaseState)
+        && Boolean(release.releaseSha256 && release.manifestSha256)
+        && integrityOk
+        && publisherVerified
+        && signature.state === 'verified'
+        && !revoked
+        && !quarantined,
       publisher: {
         publisherId: release.publisherId,
         displayName: publisher?.display_name ?? null,
@@ -201,20 +216,46 @@ export function productProjection(ingestion: {manifest: unknown; manifest_sha256
   }
 }
 
-function signatureState(rows: Array<{signature_key_id: string; algorithm: string; verified_at: Date | null; revoked_at: Date | null; verification_state?: string | null; public_key_fingerprint?: string | null; verification_detail?: string | null}>): RegistryTrustBlock['signature'] {
+function signatureState(rows: Array<{
+  signature_key_id: string; algorithm: string; verified_at: Date | null; revoked_at: Date | null;
+  verification_state?: string | null; public_key_fingerprint?: string | null; verification_detail?: string | null;
+  statement?: unknown; signing_key_publisher_id?: string | null; signing_key_state?: string | null; signing_key_revoked_at?: Date | null;
+}>, release: GreenfieldModuleReleaseRecord, productManifestSha256: string | null, frontendSha256: string | null): RegistryTrustBlock['signature'] {
   if (!rows.length) return {state: 'unsigned', algorithm: null, keyId: null, publicKeyFingerprint: null, verifiedAt: null, detail: null}
-  const best = rows.find(row => row.verified_at && !row.revoked_at && (row.verification_state ?? 'verified') === 'verified') ?? rows[0]!
-  let state: RegistrySignatureState
-  if (best.revoked_at) state = 'revokedKey'
-  else if (best.verification_state && best.verification_state !== 'pending') state = best.verification_state as RegistrySignatureState
-  else state = best.verified_at ? 'verified' : 'unverified'
+  const effective = rows.map(row => {
+    const statement = record(row.statement)
+    if (row.revoked_at || row.signing_key_state === 'REVOKED' || row.signing_key_revoked_at) {
+      return {row, state: 'revokedKey' as const, detail: 'Publisher signing key has been revoked'}
+    }
+    if (!['ACTIVE', 'ROTATED'].includes(row.signing_key_state ?? '') || row.signing_key_publisher_id !== release.publisherId) {
+      return {row, state: 'unknownKey' as const, detail: 'Publisher signing key is missing or belongs to another publisher'}
+    }
+    if (row.verification_state !== 'verified' || !row.verified_at) {
+      return {row, state: (row.verification_state && row.verification_state !== 'pending' ? row.verification_state : 'unverified') as RegistrySignatureState, detail: row.verification_detail ?? null}
+    }
+    if (!statement || statement.schemaVersion !== '1.0.0'
+      || statement.statementType !== 'modula.publisher-release.v1'
+      || statement.productId !== release.moduleId || statement.version !== release.version
+      || statement.publisherId !== release.publisherId
+      || statement.sourceRepository !== release.sourceRepository || statement.sourceSha !== release.sourceCommit
+      || statement.releaseTag !== (release.manifest.source.releaseTag ?? null)
+      || statement.artifactSha256 !== release.releaseSha256 || statement.manifestSha256 !== release.manifestSha256
+      || statement.signingKeyId !== row.signature_key_id
+      || (statement.productManifestSha256 ?? null) !== productManifestSha256
+      || (statement.frontendSha256 ?? null) !== frontendSha256) {
+      return {row, state: 'invalid' as const, detail: 'Signed statement does not match current release or projection facts'}
+    }
+    return {row, state: 'verified' as const, detail: row.verification_detail ?? null}
+  })
+  const selected = effective.find(item => item.state === 'verified') ?? effective[0]!
+  const best = selected.row
   return {
-    state,
+    state: selected.state,
     algorithm: best.algorithm,
     keyId: best.signature_key_id,
     publicKeyFingerprint: best.public_key_fingerprint ?? null,
     verifiedAt: best.verified_at ? best.verified_at.toISOString() : null,
-    detail: best.verification_detail ?? null,
+    detail: selected.detail,
   }
 }
 

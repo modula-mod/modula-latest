@@ -311,6 +311,14 @@ export interface Database {
     deleted_at: Date | null
     version: number
   }
+  greenfield_reactions: {
+    reaction_id: string
+    actor_id: string
+    post_id: string
+    reaction_type: 'like' | 'love' | 'laugh' | 'fire' | 'celebrate' | 'insightful' | 'support' | 'curious'
+    created_at: Date
+    updated_at: Date
+  }
   notification_preferences: {
     id: string
     actor_id: string
@@ -968,6 +976,27 @@ export interface Database {
     verified_at: Date | null
     mismatch_at: Date | null
   }
+  greenfield_module_quarantines: {quarantine_id: string; release_id: string; reason: string; policy_action: 'warn' | 'disableExecutableContributions' | 'block'; created_by: string | null; created_at: Date; lifted_at: Date | null}
+  greenfield_module_revocations: {revocation_id: string; scope: 'release' | 'module' | 'publisher' | 'signingKey'; target_id: string; reason: string; created_by: string | null; created_at: Date}
+  greenfield_publisher_signing_keys: {key_id: string; publisher_id: string; algorithm: 'Ed25519'; public_key_pem: string; fingerprint: string; state: 'ACTIVE' | 'ROTATED' | 'REVOKED'; valid_from: Date; valid_until: Date | null; rotated_at: Date | null; rotated_to_key_id: string | null; revoked_at: Date | null; revocation_reason: string | null; registered_by_account_id: string | null; created_at: Date; updated_at: Date}
+  greenfield_module_release_signatures: {
+    signature_id: string
+    release_id: string
+    signature_key_id: string
+    signature: string
+    algorithm: string
+    verified_at: Date | null
+    revoked_at: Date | null
+    statement: unknown | null
+    statement_sha256: string | null
+    verification_state: 'pending' | 'verified' | 'invalid' | 'unknownKey' | 'revokedKey' | null
+    verification_detail: string | null
+    public_key_fingerprint: string | null
+    observed_at: Date | null
+  }
+  greenfield_mps_ingestions: {release_id: string | null; manifest_sha256: string}
+  greenfield_release_frontends: {release_id: string | null; artifact_sha256: string}
+  greenfield_module_sources: {release_id: string; release_tag: string | null}
   greenfield_module_installation_settings: {
     settings_id: string
     installation_id: string

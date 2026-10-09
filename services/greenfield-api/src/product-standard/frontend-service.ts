@@ -1,5 +1,6 @@
 import type {MpsFrontendArtifact} from '@modula/greenfield-product-standard'
 import type {ModulaDb} from '../database/client.js'
+import type {AppConfig} from '../config/index.js'
 import {moduleError} from '../modules/module-errors.js'
 import {GreenfieldModuleRuntimeAccessService} from '../modules/runtime-access.js'
 
@@ -39,8 +40,8 @@ export type GreenfieldProductFrontendResponse =
 export class GreenfieldProductFrontendService {
   private readonly access: GreenfieldModuleRuntimeAccessService
 
-  constructor(private readonly db: ModulaDb) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
+  constructor(private readonly db: ModulaDb, config?: AppConfig) {
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
   }
 
   async resolve(accountId: string, moduleId: string): Promise<GreenfieldProductFrontendResponse> {

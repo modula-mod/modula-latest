@@ -126,7 +126,7 @@ export async function processOneJob(db: ModulaWorkerDb, config: WorkerConfig): P
         await handleModuleDisable(db, job.payload)
         break
       case 'module.update':
-        await handleModuleUpdate(db, job.payload)
+        await handleModuleUpdate(db, config, job.payload)
         break
       case 'module.uninstall':
         await handleModuleUninstall(db, job.payload)

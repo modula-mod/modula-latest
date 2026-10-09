@@ -1096,6 +1096,14 @@
       "services/greenfield-api/src/events/replay.ts#inspectSubscriberFailures"
     ]
   },
+  "POST /v1/admin/ops/jobs/reaction-dead-letters/:jobId/retry": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
   "POST /v1/admin/ops/mail/identities/adopt": {
     "reads": [
       "greenfield_mail_identities"
@@ -1418,6 +1426,30 @@
       "services/greenfield-api/src/modules/release-service.ts#revokeRelease"
     ]
   },
+  "POST /v1/admin/registry/releases/:releaseId/signature": {
+    "reads": [
+      "greenfield_accounts",
+      "greenfield_module_release_integrity",
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases",
+      "greenfield_module_versions",
+      "greenfield_mps_ingestions",
+      "greenfield_release_frontends"
+    ],
+    "writes": [
+      "greenfield_module_release_signatures",
+      "greenfield_module_releases"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/modules/github-release-sync-service.ts#fetchVerified",
+      "services/greenfield-api/src/modules/publisher-service.ts#requireAdminAccount",
+      "services/greenfield-api/src/modules/release-service.ts#attachPublishedSignature",
+      "services/greenfield-api/src/modules/release-service.ts#getReleaseById"
+    ]
+  },
   "POST /v1/admin/registry/releases/:releaseId/verify": {
     "reads": [
       "greenfield_module_release_signatures",
@@ -1734,6 +1766,7 @@
       "attachments",
       "blocks",
       "follows",
+      "greenfield_comments",
       "greenfield_quote_posts",
       "greenfield_reactions",
       "post_content",
@@ -2556,6 +2589,62 @@
       "services/greenfield-api/src/domains/comments/service.ts#updateComment"
     ]
   },
+  "DELETE /v1/comments/:commentId/pin": {
+    "reads": [
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
+      "greenfield_comments",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_comments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#setPinned",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors"
+    ]
+  },
+  "PUT /v1/comments/:commentId/pin": {
+    "reads": [
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
+      "greenfield_comments",
+      "posts",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_comments"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#setPinned",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors"
+    ]
+  },
+  "PUT /v1/comments/:commentId/poll/vote": {
+    "reads": [
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
+      "greenfield_comments",
+      "profiles"
+    ],
+    "writes": [
+      "greenfield_comment_poll_votes"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/comments/service.ts#votePoll",
+      "services/greenfield-api/src/domains/comments/service.ts#withAuthors"
+    ]
+  },
   "DELETE /v1/comments/:commentId/reaction": {
     "reads": [
       "greenfield_comment_reactions",
@@ -2589,6 +2678,8 @@
   "GET /v1/comments/:commentId/replies": {
     "reads": [
       "blocks",
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
       "greenfield_comments",
       "mutes",
       "profiles"
@@ -2606,6 +2697,8 @@
   "POST /v1/comments/:commentId/replies": {
     "reads": [
       "actors",
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
       "greenfield_comments",
       "greenfield_handles",
       "greenfield_mentions",
@@ -2613,6 +2706,7 @@
       "profiles"
     ],
     "writes": [
+      "attachments",
       "greenfield_comments",
       "greenfield_mentions",
       "posts"
@@ -3531,6 +3625,46 @@
       "services/greenfield-api/src/domains/posts/repository.ts#listForHandle"
     ]
   },
+  "DELETE /v1/follow-requests/:requestId": {
+    "reads": [],
+    "writes": [
+      "follow_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#cancelFollowRequest",
+      "services/greenfield-api/src/domains/profiles/writes.ts#resolvePendingRequest"
+    ]
+  },
+  "POST /v1/follow-requests/:requestId/accept": {
+    "reads": [
+      "profiles"
+    ],
+    "writes": [
+      "follow_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#acceptFollowRequest"
+    ]
+  },
+  "POST /v1/follow-requests/:requestId/reject": {
+    "reads": [],
+    "writes": [
+      "follow_requests"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#rejectFollowRequest",
+      "services/greenfield-api/src/domains/profiles/writes.ts#resolvePendingRequest"
+    ]
+  },
   "GET /v1/function-jobs/:jobId": {
     "reads": [
       "greenfield_function_jobs"
@@ -3560,13 +3694,16 @@
   },
   "GET /v1/functions": {
     "reads": [
+      "greenfield_extension_installations",
       "greenfield_functions"
     ],
     "writes": [],
     "emits": [],
     "jobs": [],
-    "confidence": "direct-handler-only",
-    "evidence": []
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/functions/service.ts#listForAccount"
+    ]
   },
   "POST /v1/functions/:functionId/invoke": {
     "reads": [
@@ -3594,6 +3731,47 @@
       "services/greenfield-api/src/functions/job-service.ts#invoke",
       "services/greenfield-api/src/functions/job-service.ts#runDeterministic"
     ]
+  },
+  "GET /v1/gifs/search": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/gifs/service.ts#call",
+      "services/greenfield-api/src/domains/gifs/service.ts#search"
+    ]
+  },
+  "GET /v1/gifs/status": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/gifs/trending": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/gifs/service.ts#call",
+      "services/greenfield-api/src/domains/gifs/service.ts#trending"
+    ]
+  },
+  "GET /v1/hashtags/suggest": {
+    "reads": [
+      "greenfield_comments",
+      "posts"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
   },
   "GET /v1/health/live": {
     "reads": [],
@@ -3763,6 +3941,28 @@
     ]
   },
   "GET /v1/internal/ssrf-check": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/link-previews": {
+    "reads": [
+      "greenfield_link_previews"
+    ],
+    "writes": [
+      "greenfield_link_previews"
+    ],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/link-previews/service.ts#preview"
+    ]
+  },
+  "GET /v1/link-safety": {
     "reads": [],
     "writes": [],
     "emits": [],
@@ -4162,6 +4362,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#enable",
       "services/greenfield-api/src/modules/installation-service.ts#enqueueTransition",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
@@ -4254,6 +4455,7 @@
     "jobs": [],
     "confidence": "partial-static",
     "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#getInstallDescriptor",
       "services/greenfield-api/src/modules/installation-service.ts#getInstalled",
       "services/greenfield-api/src/modules/installation-service.ts#install",
@@ -4289,6 +4491,7 @@
     "jobs": [],
     "confidence": "method-level-static",
     "evidence": [
+      "services/greenfield-api/src/modules/installation-service.ts#assertExecutableTrust",
       "services/greenfield-api/src/modules/installation-service.ts#installPreview"
     ]
   },
@@ -4798,6 +5001,8 @@
   "GET /v1/posts/:postId/comments": {
     "reads": [
       "blocks",
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
       "greenfield_comments",
       "mutes",
       "profiles"
@@ -4815,6 +5020,8 @@
   "POST /v1/posts/:postId/comments": {
     "reads": [
       "actors",
+      "greenfield_comment_poll_votes",
+      "greenfield_comment_reactions",
       "greenfield_comments",
       "greenfield_handles",
       "greenfield_mentions",
@@ -4822,6 +5029,7 @@
       "profiles"
     ],
     "writes": [
+      "attachments",
       "greenfield_comments",
       "greenfield_mentions",
       "posts"
@@ -4832,6 +5040,7 @@
     "evidence": [
       "services/greenfield-api/src/domains/comments/service.ts#create",
       "services/greenfield-api/src/domains/comments/service.ts#createComment",
+      "services/greenfield-api/src/domains/comments/service.ts#resolveQuote",
       "services/greenfield-api/src/domains/comments/service.ts#withAuthors",
       "services/greenfield-api/src/domains/mentions/service.ts#extractMentions",
       "services/greenfield-api/src/domains/mentions/service.ts#storeMentions"
@@ -5228,6 +5437,7 @@
     ],
     "writes": [
       "blocks",
+      "follow_requests",
       "follows"
     ],
     "emits": [],
@@ -5247,6 +5457,7 @@
       "profiles"
     ],
     "writes": [
+      "follow_requests",
       "follows"
     ],
     "emits": [],
@@ -5264,13 +5475,14 @@
   "POST /v1/profiles/:profileId/follow": {
     "reads": [
       "blocks",
+      "follow_requests",
       "follows",
       "posts",
       "profile_links",
       "profiles"
     ],
     "writes": [
-      "follows"
+      "follow_requests"
     ],
     "emits": [],
     "jobs": [],
@@ -5417,6 +5629,19 @@
     "confidence": "method-level-static",
     "evidence": [
       "services/greenfield-api/src/domains/profiles/writes.ts#updateMedia"
+    ]
+  },
+  "GET /v1/profiles/me/follow-requests": {
+    "reads": [
+      "follow_requests",
+      "profiles"
+    ],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": [
+      "services/greenfield-api/src/domains/profiles/writes.ts#listIncomingFollowRequests"
     ]
   },
   "GET /v1/providers/:capabilityRole": {
@@ -6134,6 +6359,14 @@
     ]
   },
   "GET /v1/status": {
+    "reads": [],
+    "writes": [],
+    "emits": [],
+    "jobs": [],
+    "confidence": "method-level-static",
+    "evidence": []
+  },
+  "GET /v1/stickers/packs": {
     "reads": [],
     "writes": [],
     "emits": [],

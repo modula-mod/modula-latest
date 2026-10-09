@@ -95,7 +95,9 @@ describeIf('Modula API integration', () => {
   })
 
   it('returns home feed and profile', async () => {
-    const feed = await app.inject({method: 'GET', url: '/v1/feed/home'})
+    // Anonymous callers cannot have a following graph; exercise the public
+    // discovery feed explicitly instead of expecting private relationship data.
+    const feed = await app.inject({method: 'GET', url: '/v1/feed/home?mode=forYou'})
     expect(feed.statusCode).toBe(200)
     expect(feed.json().data.items.length).toBeGreaterThan(0)
     const profile = await app.inject({method: 'GET', url: '/v1/profiles/andrei.modula'})

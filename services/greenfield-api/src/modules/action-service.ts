@@ -21,14 +21,17 @@ export class GreenfieldModuleActionService {
     private readonly db: ModulaDb,
     private readonly config: AppConfig,
   ) {
-    this.access = new GreenfieldModuleRuntimeAccessService(db)
-    this.records = new GreenfieldModuleRecordService(db)
+    this.access = new GreenfieldModuleRuntimeAccessService(db, config)
+    this.records = new GreenfieldModuleRecordService(db, config)
     this.settings = new GreenfieldModuleSettingsService(db, config)
     this.backendGateway = new ModuleBackendGatewayService(db, config)
   }
 
   async execute(accountId: string, moduleId: string, actionId: string, input: {input?: unknown; idempotencyKey?: string; actorId?: string; requestId?: string} = {}) {
     const context = await this.access.resolve(accountId, moduleId, {requireEnabled: true})
+    // A prior idempotent result is still protected module output. Do not replay
+    // it, or invoke a zero-permission backend action, without a review row.
+    if (context.permissionReviewRequired) throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required')
     const payload = normalizeInput(input.input)
     if (this.backendGateway.canHandle(context, actionId)) {
       if (!input.idempotencyKey) throw moduleError('VALIDATION_FAILED', 'Idempotency key is required')

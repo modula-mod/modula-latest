@@ -108,6 +108,7 @@ export class GreenfieldModuleInstallationService {
       version: row.version,
       extensionVersionId: row.extension_version_id,
       grantedPermissions: arrayOfStrings(review?.granted_permissions),
+      permissionReviewRequired: !review,
       productKind: row.product_kind,
       lifecycleState: projection?.state,
       }
@@ -123,6 +124,7 @@ export class GreenfieldModuleInstallationService {
 
   async installPreview(accountId: string, moduleId: string, version?: string, platform: 'ios' | 'android' | 'web' | 'desktop' | 'server' = 'web'): Promise<GreenfieldModuleInstallPreview> {
     const release = version ? await this.registry.getVersion(moduleId, version) : await this.registry.latestPublished(moduleId)
+    this.assertExecutableTrust(await this.trust.forRelease(release, {platform}))
     const publisher = await this.db.selectFrom('greenfield_publishers').select(['status']).where('publisher_id', '=', release.publisherId).executeTakeFirst()
     const dependencyPlan = await this.dependencies.resolve({moduleId, manifest: release.manifest, accountId})
     const extensionReview = await this.extensionFabric.targetReview(accountId, release)
@@ -218,16 +220,14 @@ export class GreenfieldModuleInstallationService {
       ...preview.permissions.map(permission => permission.permission),
       ...allRuntimePermissionKeys(release.manifest),
     ])).sort()
-    const grantedPermissions = input.approvedPermissions?.length
-      ? input.approvedPermissions.filter(permission => declaredPermissions.includes(permission)).sort()
-      : declaredPermissions
+    const grantedPermissions = Array.from(new Set(input.approvedPermissions ?? []))
+      .filter(permission => declaredPermissions.includes(permission))
+      .sort()
     const deniedPermissions = declaredPermissions.filter(permission => !grantedPermissions.includes(permission))
     // Platform support is already enforced by the compatibility preview above;
     // the trust block adds the explicit host-version check when one is sent.
     const trustBlock = await this.trust.forRelease(release, {hostVersion: input.hostVersion ?? null})
-    if (['invalid', 'unknownKey', 'revokedKey'].includes(trustBlock.signature.state)) {
-      throw moduleError('VALIDATION_FAILED', `Release signature is ${trustBlock.signature.state}; the release cannot be installed`)
-    }
+    this.assertExecutableTrust(trustBlock)
     if (trustBlock.compatibility.evaluated && trustBlock.compatibility.compatible === false) {
       throw moduleError('VALIDATION_FAILED', `Module is incompatible with this host: ${trustBlock.compatibility.reasons.map(reason => reason.code).join(', ')}`)
     }
@@ -357,6 +357,11 @@ export class GreenfieldModuleInstallationService {
   }
 
   async enable(accountId: string, moduleId: string, idempotencyKey: string) {
+    const installed = await this.getInstalled(accountId, moduleId)
+    if (!installed) throw moduleError('NOT_FOUND', 'Module installation not found')
+    if (installed.permissionReviewRequired) throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required before enabling')
+    const release = await this.registry.getVersion(installed.moduleId, installed.version)
+    this.assertExecutableTrust(await this.trust.forRelease(release))
     await this.runtime2.assertActivationAllowed(accountId, moduleId)
     return this.enqueueTransition(accountId, moduleId, 'enabling', 'module.enable.requested', 'module.enable', idempotencyKey)
   }
@@ -408,6 +413,12 @@ export class GreenfieldModuleInstallationService {
       await new AuditRepository(trx).append('module.permissions.reviewed', {moduleId, grantedPermissions, deniedPermissions}, {type: 'moduleInstallation', id: installed.installationId})
     })
     return {installationId: installed.installationId, moduleId, grantedPermissions, deniedPermissions}
+  }
+
+  private assertExecutableTrust(trust: Awaited<ReturnType<GreenfieldRegistryTrustService['forRelease']>>): void {
+    if (trust.verified) return
+    if (this.config.environment === 'development' && this.config.moduleAllowUntrustedDevelopmentReleases) return
+    throw moduleError('UNTRUSTED_RELEASE', `Release is not production-trusted (signature: ${trust.signature.state})`)
   }
 
   async enqueueTransition(

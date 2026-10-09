@@ -27,14 +27,14 @@
 
 ## Actual production boot
 
-- Image: `modula-greenfield-api:11bfc7638c6d757215e75a934d02e40c9a40c839`
-- Image ID: `sha256:dfd497932257da836519712e5385bd9f6eb2206459324803d5de6096389c82bf`
-- Revision: `11bfc7638c6d757215e75a934d02e40c9a40c839`
+- Image: `modula-greenfield-api:736056445f5e09f968488a3ec66dddfaffea6f08`
+- Image ID: `sha256:80acf6fc51678fa0b53fe60a0d36a6496cb3da9e48d888bf5393ac75e4fc9071`
+- Revision: `736056445f5e09f968488a3ec66dddfaffea6f08`
 - Command: `docker-entrypoint.sh node services/greenfield-api/dist/main.js`
 - Working directory: `/app`
 - Host binding: loopback `127.0.0.1:4020 -> container 4020`
-- Fastify application routes: 393
-- Automatic HEAD routes: 157
+- Fastify application routes: 409
+- Automatic HEAD routes: 165
 - Framework OPTIONS routes: 1
 
 ## Registration graph

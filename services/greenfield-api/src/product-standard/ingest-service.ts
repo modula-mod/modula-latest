@@ -469,11 +469,10 @@ async function assertSignedDigestsMatch(db: ModulaDb, releaseId: string, product
     .execute()
   for (const row of rows) {
     const statement = (row.statement ?? null) as {productManifestSha256?: string | null; frontendSha256?: string | null} | null
-    if (!statement) continue
-    if (statement.productManifestSha256 && statement.productManifestSha256 !== productManifestSha256) {
+    if (!statement || (statement.productManifestSha256 ?? null) !== productManifestSha256) {
       throw moduleError('VALIDATION_FAILED', 'modula.product.json does not match the digest the publisher signed')
     }
-    if (statement.frontendSha256 && statement.frontendSha256 !== frontendSha256) {
+    if ((statement.frontendSha256 ?? null) !== frontendSha256) {
       throw moduleError('VALIDATION_FAILED', 'Frontend artifact does not match the digest the publisher signed')
     }
   }

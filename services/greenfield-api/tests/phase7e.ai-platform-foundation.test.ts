@@ -224,7 +224,7 @@ describeIfDb('Phase 7E Greenfield AI platform foundation', () => {
     expect(streamId).toBeTruthy()
     const tokenEvent = await streaming.appendToken({streamId: streamId!, token: 'secret streamed token'})
     expect(tokenEvent).toMatchObject({type: 'token', sequence: 1, token: 'secret streamed token'})
-    expect(await streaming.reconnect(streamId!)).toMatchObject({streamId, lastSequence: 1})
+    expect(await streaming.reconnect(accountId, streamId!)).toMatchObject({streamId, lastSequence: 1})
     await streaming.complete({
       streamId: streamId!,
       structuredCompletion: {summary: 'Done'},

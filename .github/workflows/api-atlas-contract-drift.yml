@@ -17,6 +17,10 @@ on:
 jobs:
   atlas:
     runs-on: ubuntu-latest
+    env:
+      # Pre-deployment contract drift is reconciled against the committed local
+      # candidate capture. Production facts remain in production-snapshot.json.
+      API_ATLAS_RUNTIME_EVIDENCE: candidate
     defaults:
       run:
         working-directory: modula-latest
@@ -123,7 +127,12 @@ jobs:
           node-version: 24.18.0
           cache: pnpm
           cache-dependency-path: modula-latest/pnpm-lock.yaml
+      - name: Build pinned Module Standard contracts
+        working-directory: modula-mod/modula-module-standard
+        run: pnpm install --frozen-lockfile && pnpm build
       - run: pnpm install --frozen-lockfile
+      - name: Build API workspace dependencies
+        run: pnpm --filter @modula/greenfield-api... build
       - name: Create restricted database roles
         env:
           PGHOST: 127.0.0.1
@@ -137,12 +146,31 @@ jobs:
           MODULA_READONLY_PASSWORD: modula_ci_readonly
           MODULA_BACKUP_PASSWORD: modula_ci_backup
         run: bash ops/docker/postgres/init-roles.sh
-      - name: Migration 063 and restricted-role acceptance
+      - name: Migration 066 and API-FIX-01 database regressions
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
           MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
         run: >-
           CI=true pnpm --filter @modula/greenfield-api exec vitest run
           tests/settings-v2.integration.test.ts
           tests/greenfield-backend-v1.migration-ledger-security.test.ts
+          tests/api-fix-01.migration.test.ts
+          tests/api-fix-01.reaction-dead-letter-retry.test.ts
+          tests/api-baseline-02.security-acceptance.test.ts
+          tests/api-fix-01.follow-privacy.test.ts
+          tests/registry-trust.signing.test.ts
+          tests/registry-release-retrofit-signing.test.ts
+          tests/registry-trust.trust-block.test.ts
+          tests/module-version-switch.test.ts
+          --maxWorkers=1 --no-file-parallelism
+      - name: API-FIX-01 worker database regressions
+        env:
+          MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
+          MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+          MODULA_TEST_WORKER_DATABASE_URL: postgresql://modula_worker:modula_ci_worker@127.0.0.1:5432/modula_test
+        run: >-
+          CI=true pnpm --filter @modula/greenfield-worker exec vitest run
+          tests/phase7e.notifications.test.ts
+          tests/module-trust-guard.test.ts
           --maxWorkers=1 --no-file-parallelism
