@@ -27,7 +27,11 @@ const candidatePath = join(evidenceDir, 'candidate-runtime.json')
 const candidate = existsSync(candidatePath) ? JSON.parse(readFileSync(candidatePath, 'utf8')) : null
 const currentBranch = process.env.GITHUB_HEAD_REF || commandOr('git', ['branch', '--show-current'])
 const candidateRequested = process.env.API_ATLAS_RUNTIME_EVIDENCE === 'candidate'
-const candidateApplies = Boolean(candidate) && (candidateRequested || (currentBranch && currentBranch === candidate.source?.branch))
+// A docs-only production closeout must not inherit a candidate captured for a
+// different feature branch, even when CI's default requests candidate evidence.
+// A source-changing PR still fails source/runtime reconciliation against the
+// captured production routes unless it supplies its own candidate capture.
+const candidateApplies = Boolean(candidate) && (currentBranch === candidate.source?.branch || (candidateRequested && currentBranch === 'main'))
 if (candidateRequested && !candidate) throw new Error(`Missing ${candidatePath}; run pnpm api:atlas:capture-candidate first`)
 if (candidateApplies && candidate.evidenceKind !== 'local-candidate-runtime') throw new Error('Invalid candidate runtime evidence kind')
 if (candidateApplies && candidate.source?.apiSourceSha256 !== apiSourceFingerprint()) {
