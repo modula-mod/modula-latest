@@ -150,4 +150,39 @@ describeIfDb.sequential('API-FIX-01C legacy Vault data migration on disposable P
       .where('installation_id', '=', disabledInstall).executeTakeFirstOrThrow()
     expect(updated).toMatchObject({extension_version_id: `target-version-${suffix}`, status: 'installedDisabled'})
   })
+
+  it('preserves a second historical identity at the trusted target without weakening ordinary install uniqueness', async () => {
+    const duplicateAccount = `duplicate-account-${suffix}`
+    const firstInstallation = `duplicate-first-${suffix}`
+    const secondInstallation = `duplicate-second-${suffix}`
+    const now = new Date()
+    await db.insertInto('greenfield_accounts').values({account_id: duplicateAccount, primary_handle: `duplicate${suffix}`,
+      status: 'active', created_at: now, updated_at: now}).execute()
+    for (const [installationId, status, versionId] of [
+      [firstInstallation, 'installedDisabled', `target-version-${suffix}`],
+      [secondInstallation, 'enabled', `source-version-${suffix}`],
+    ]) {
+      await db.insertInto('greenfield_extension_installations').values({installation_id: installationId,
+        extension_version_id: versionId, account_id: duplicateAccount, status, config: {}, created_at: now, updated_at: now}).execute()
+    }
+    await db.insertInto('greenfield_module_permission_reviews').values({review_id: `duplicate-review-${suffix}`,
+      installation_id: secondInstallation, release_id: targetReleaseId, account_id: duplicateAccount,
+      granted_permissions: [], denied_permissions: [], high_risk_increase: false,
+      idempotency_key: `duplicate-review-${suffix}`, reviewed_at: now}).execute()
+    const config = {environment: 'development', moduleAllowUntrustedDevelopmentReleases: true} as WorkerConfig
+    await handleModuleUpdate(db, config, {installationId: secondInstallation, targetReleaseId,
+      previousStatus: 'enabled', accountId: duplicateAccount, moduleId, legacyTrustMigration: true})
+    const rows = await db.selectFrom('greenfield_extension_installations')
+      .select(['installation_id', 'extension_version_id', 'status', 'legacy_duplicate_allowed'])
+      .where('account_id', '=', duplicateAccount).orderBy('installation_id').execute()
+    expect(rows).toEqual([
+      {installation_id: firstInstallation, extension_version_id: `target-version-${suffix}`,
+        status: 'installedDisabled', legacy_duplicate_allowed: false},
+      {installation_id: secondInstallation, extension_version_id: `target-version-${suffix}`,
+        status: 'enabled', legacy_duplicate_allowed: true},
+    ])
+    await expect(db.insertInto('greenfield_extension_installations').values({installation_id: `duplicate-ordinary-${suffix}`,
+      extension_version_id: `target-version-${suffix}`, account_id: duplicateAccount, status: 'enabled', config: {},
+      created_at: now, updated_at: now}).execute()).rejects.toMatchObject({code: '23505'})
+  })
 })

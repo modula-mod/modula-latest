@@ -635,6 +635,7 @@ export interface Database {
     account_id: string
     status: string
     config: unknown
+    legacy_duplicate_allowed: Generated<boolean>
     created_at: Date
     updated_at: Date
   }

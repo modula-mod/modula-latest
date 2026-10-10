@@ -60,7 +60,7 @@ export class InstallationService {
           created_at: now,
           updated_at: now,
         })
-        .onConflict(oc => oc.columns(['extension_version_id', 'account_id']).doUpdateSet({status: 'active', updated_at: now}))
+        .onConflict(oc => oc.columns(['extension_version_id', 'account_id']).where('legacy_duplicate_allowed', '=', false).doUpdateSet({status: 'active', updated_at: now}))
         .execute()
       if (capabilities.length) {
         await trx

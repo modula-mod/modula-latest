@@ -45,6 +45,23 @@ export async function handleModuleUpdate(db: ModulaWorkerDb, config: WorkerConfi
     // release through extension_version_id. Reconcile that control-plane link
     // before projecting release-scoped runtime resources so an upgrade cannot
     // momentarily bind an installation to two different releases.
+    if (p.legacyTrustMigration) {
+      const sibling = await trx.selectFrom('greenfield_extension_installations')
+        .select('installation_id')
+        .where('account_id', '=', p.accountId)
+        .where('extension_version_id', '=', release.extension_version_id)
+        .where('installation_id', '!=', p.installationId)
+        .executeTakeFirst()
+      if (sibling) {
+        // Preserve both historical installation identities. The exemption is
+        // attached only to this exact, verified-target migration; ordinary
+        // installs remain protected by the partial unique index.
+        await trx.updateTable('greenfield_extension_installations')
+          .set({legacy_duplicate_allowed: true})
+          .where('installation_id', '=', p.installationId)
+          .execute()
+      }
+    }
     await trx
       .updateTable('greenfield_extension_installations')
       .set({extension_version_id: release.extension_version_id, status: restoredStatus, updated_at: new Date()})

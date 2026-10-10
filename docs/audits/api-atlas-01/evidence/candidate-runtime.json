@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "evidenceKind": "local-candidate-runtime",
-  "capturedAt": "2026-10-09T18:54:29.655Z",
+  "capturedAt": "2026-10-10T09:00:17.444Z",
   "source": {
-    "branch": "phase-api-fix-01c-offline-trust-bootstrap",
-    "headAtCapture": "8b7fd5d968148f0f9aa13814e8ee4dffe68772b1",
+    "branch": "phase-api-fix-01c-legacy-resume",
+    "headAtCapture": "b23f83c08428637617e6850eea1694285e48e67f",
     "worktreeDirtyAtCapture": true,
-    "apiSourceSha256": "abc324a906e6bd47c35166f0dd7274384942c7e201e07fc27eff0d656da42201"
+    "apiSourceSha256": "8940738890706cf8b2ac893593f7872f5ae2c828f9214196e5a8d4ea0a31445a"
   },
   "runtimeRoutes": [
     {

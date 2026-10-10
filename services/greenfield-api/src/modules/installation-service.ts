@@ -267,13 +267,14 @@ export class GreenfieldModuleInstallationService {
           created_at: now,
           updated_at: now,
         })
-        .onConflict(oc => oc.columns(['extension_version_id', 'account_id']).doUpdateSet({status: 'installing', updated_at: now}))
+        .onConflict(oc => oc.columns(['extension_version_id', 'account_id']).where('legacy_duplicate_allowed', '=', false).doUpdateSet({status: 'installing', updated_at: now}))
         .execute()
       const installed = await trx
         .selectFrom('greenfield_extension_installations')
         .select('installation_id')
         .where('extension_version_id', '=', release.extensionVersionId)
         .where('account_id', '=', accountId)
+        .where('legacy_duplicate_allowed', '=', false)
         .executeTakeFirstOrThrow()
       actualInstallationId = installed.installation_id
       descriptor = await this.descriptors.build(release, {
