@@ -3,6 +3,7 @@
   "capturedAt": "2026-10-10T22:03:13Z",
   "status": "PASS",
   "runtimeSha": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
+  "apiSourceSha256": "956789be8b821a974a3a33481fedbdd690b1aa9d2803232bfa027f10062d2b4d",
   "migration": "067_legacy_duplicate_installation_versions",
   "pullRequest": 116,
   "ci": {"atlas": "PASS", "repositoryValidation": "PASS", "migrationValidation": "PASS"},
