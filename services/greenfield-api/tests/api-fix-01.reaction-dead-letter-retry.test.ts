@@ -3,7 +3,7 @@ import {afterAll, beforeAll, describe, expect, it} from 'vitest'
 import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
-import {retryReactionNotificationDeadLetter} from '../src/domains/notifications/reaction-dead-letter-retry.js'
+import {listEligibleReactionDeadLetters, retryReactionNotificationDeadLetter} from '../src/domains/notifications/reaction-dead-letter-retry.js'
 import {configureRegistryTestEnv, registerAccount} from './helpers/registry-fixtures.js'
 
 const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
@@ -72,6 +72,10 @@ describeIfDb.sequential('API-FIX-01 reaction dead-letter replay authority', () =
 
   const auth = (token: string) => ({authorization: `Bearer ${token}`})
   const url = (id: string) => `/v1/admin/ops/jobs/reaction-dead-letters/${id}/retry`
+
+  it('inventories only dead letters with the latest exact reaction constraint evidence', async () => {
+    expect(await listEligibleReactionDeadLetters(db)).toEqual([eligibleId])
+  })
 
   it('denies anonymous and non-admin callers without changing the job', async () => {
     const anonymous = await app.inject({method: 'POST', url: url(eligibleId), payload: {reason: 'test'}})

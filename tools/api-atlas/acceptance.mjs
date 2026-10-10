@@ -170,10 +170,23 @@ async function main() {
     record('private repository record cross-user denial', await call('GET', `/v1/repositories/me/records/${privateRecord.payload.data.record_id}`, {token: a.token}), [404], ['NOT_FOUND'])
     record('private repository record mutation denial', await call('PATCH', `/v1/repositories/me/records/${privateRecord.payload.data.record_id}`, {token: a.token, body: {data: {auditMarker: marker, stolen: true}, expectedRevision: privateRecord.payload.data.revision}}), [404], ['NOT_FOUND'])
 
-    const follow = record('known gap private follow succeeds immediately', await call('POST', `/v1/profiles/${profileB.id}/follow`, {token: a.token}), [200]).payload.data
+    const followerCountBefore = profileB.followerCount
+    const follow = record('private follow creates pending request', await call('POST', `/v1/profiles/${profileB.id}/follow`, {token: a.token}), [200]).payload.data
     fixtures.follows.push({profileId: profileB.id, token: a.token})
-    if (follow.isFollowing !== true) throw new Error('Private follow did not become active immediately as characterized')
-    record('known gap private profile visible immediately after follow', await call('GET', '/v1/profiles/api-atlas-b', {token: a.token}), [200])
+    recordAssertion('pending follow grants no relationship', follow.relationship === 'pending' && follow.following === false && follow.pending === true && follow.isFollowing === false && typeof follow.requestId === 'string')
+    const duplicateFollow = record('duplicate private follow stays pending', await call('POST', `/v1/profiles/${profileB.id}/follow`, {token: a.token}), [200]).payload.data
+    recordAssertion('duplicate private follow reuses request', duplicateFollow.requestId === follow.requestId && duplicateFollow.following === false)
+    record('pending private profile remains hidden', await call('GET', '/v1/profiles/api-atlas-b', {token: a.token}), [404], ['NOT_FOUND'])
+    const pendingOwnerProfile = record('private profile owner read before approval', await call('GET', '/v1/profiles/api-atlas-b', {token: b.token}), [200]).payload.data
+    recordAssertion('pending request does not increment followers', pendingOwnerProfile.followerCount === followerCountBefore)
+    const incoming = record('private owner lists incoming requests', await call('GET', '/v1/profiles/me/follow-requests', {token: b.token}), [200]).payload.data
+    recordAssertion('incoming list contains exact pending request', incoming.items.some(item => item.requestId === follow.requestId))
+    record('requester cannot approve own request', await call('POST', `/v1/follow-requests/${follow.requestId}/accept`, {token: a.token}), [404], ['NOT_FOUND'])
+    const accepted = record('private owner approves request', await call('POST', `/v1/follow-requests/${follow.requestId}/accept`, {token: b.token}), [200]).payload.data
+    recordAssertion('approval establishes following relationship', accepted.relationship === 'following' && accepted.following === true && accepted.pending === false)
+    record('private profile visible after explicit approval', await call('GET', '/v1/profiles/api-atlas-b', {token: a.token}), [200])
+    const acceptedOwnerProfile = record('private profile owner read after approval', await call('GET', '/v1/profiles/api-atlas-b', {token: b.token}), [200]).payload.data
+    recordAssertion('approval increments follower count once', acceptedOwnerProfile.followerCount === followerCountBefore + 1)
     record('write acceptance A post delete', await call('DELETE', `/v1/posts/${ownPost.id}`, {token: a.token}), [200])
     fixtures.posts = fixtures.posts.filter(item => item.id !== ownPost.id)
   } finally {

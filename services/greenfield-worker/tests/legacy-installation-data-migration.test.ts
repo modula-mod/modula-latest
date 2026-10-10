@@ -80,7 +80,6 @@ describeIfDb.sequential('API-FIX-01C legacy Vault data migration on disposable P
   afterAll(async () => {
     await db?.destroy()
     if (admin) {
-      await admin.query('SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1', [databaseName])
       await admin.query(`DROP DATABASE IF EXISTS "${databaseName}"`)
       await admin.end()
     }
