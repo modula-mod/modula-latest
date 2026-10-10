@@ -1,6 +1,6 @@
 # Database to API Map
 
-Production PostgreSQL: 16.9; schema migration `065_comments_rich`; 65 applied migrations. Git contains 67 ordered up migrations, latest `067_legacy_duplicate_installation_versions.sql`.
+Production PostgreSQL: 16.9; schema migration `067_legacy_duplicate_installation_versions`; 67 applied migrations. Git contains 67 ordered up migrations, latest `067_legacy_duplicate_installation_versions.sql`.
 
 No row values were collected. This inventory is PostgreSQL catalogue metadata plus static source references.
 
@@ -493,13 +493,13 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 ### `follow_requests`
 
 - Purpose: application state for follow requests
-- Primary key: none observed
-- Foreign keys: none
-- Ownership/workspace/user/module columns: none observed
-- Indexes: none observed
-- Unique constraints: none observed
+- Primary key: `request_id`
+- Foreign keys: `requester_actor_id -> actors.id`, `target_actor_id -> actors.id`
+- Ownership/workspace/user/module columns: `requester_actor_id`, `target_actor_id`
+- Indexes: `follow_requests_pkey`, `follow_requests_requester_actor_id_target_actor_id_key`, `follow_requests_requester_pending_idx`, `follow_requests_target_pending_idx`
+- Unique constraints: `follow_requests_requester_actor_id_target_actor_id_key(requester_actor_id,target_actor_id)`
 - Soft delete: none
-- Timestamps: none observed
+- Timestamps: `created_at`, `updated_at`, `resolved_at`
 - Migration introduced: `066_trust_privacy_fail_closed.sql`
 - Routes reading: `POST /v1/profiles/:profileId/follow`, `GET /v1/profiles/me/follow-requests`
 - Routes writing: `DELETE /v1/follow-requests/:requestId`, `POST /v1/follow-requests/:requestId/accept`, `POST /v1/follow-requests/:requestId/reject`, `POST /v1/profiles/:profileId/block`, `DELETE /v1/profiles/:profileId/follow`, `POST /v1/profiles/:profileId/follow`
@@ -2060,8 +2060,8 @@ No row values were collected. This inventory is PostgreSQL catalogue metadata pl
 - Primary key: `installation_id`
 - Foreign keys: `account_id -> greenfield_accounts.account_id`, `extension_version_id -> greenfield_extension_versions.extension_version_id`
 - Ownership/workspace/user/module columns: `installation_id`, `account_id`
-- Indexes: `greenfield_extension_installa_extension_version_id_account__key`, `greenfield_extension_installations_pkey`
-- Unique constraints: `greenfield_extension_installa_extension_version_id_account__key(extension_version_id,account_id)`
+- Indexes: `greenfield_extension_installations_account_version_idx`, `greenfield_extension_installations_pkey`, `greenfield_extension_installations_standard_version_account_uid`
+- Unique constraints: none observed
 - Soft delete: none
 - Timestamps: `created_at`, `updated_at`
 - Migration introduced: `004_greenfield_sovereign_core.sql`

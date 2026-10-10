@@ -133,7 +133,7 @@ if (gaps) {
   check('gap IDs unique', new Set(gaps.gaps.map(gap => gap.id)).size === gaps.gaps.length)
   check('gap schema complete', gaps.gaps.every(gap => ['id','domain','type','severity','title','evidence','affectedRoutes','affectedFiles','productionImpact','recommendedFix','dependencies','verification','remediation'].every(key => key in gap)))
   check('gap severities valid', gaps.gaps.every(gap => ['P0','P1','P2','P3'].includes(gap.severity)))
-  check('gap remediation states valid', gaps.gaps.every(gap => ['OPEN','FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING'].includes(gap.remediation?.status)))
+  check('gap remediation states valid', gaps.gaps.every(gap => ['OPEN','FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING','FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS'].includes(gap.remediation?.status)))
 }
 
 if (probes) check('safe probe suite passed', probes.probes.length > 0 && probes.probes.every(probe => probe.result === 'PASS'))

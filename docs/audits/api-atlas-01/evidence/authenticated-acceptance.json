@@ -1,13 +1,13 @@
 {
   "metadata": {
     "title": "API-BASELINE-02 authenticated production acceptance",
-    "capturedAt": "2026-10-04T08:59:21.594Z",
+    "capturedAt": "2026-10-10T09:32:01.879Z",
     "baseUrl": "https://api.modula.digital",
-    "markerHash": "665f4a2fd221",
+    "markerHash": "64fdf845df0a",
     "release": {
-      "commit": "11bfc7638c6d757215e75a934d02e40c9a40c839",
-      "releaseId": "api-baseline-02-11bfc7638c6d",
-      "expectedMigration": "063_settings_backend_v2"
+      "commit": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+      "releaseId": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+      "expectedMigration": "067_legacy_duplicate_installation_versions"
     },
     "identities": [
       "api-atlas-a",
@@ -16,7 +16,7 @@
     "secretsIncluded": false
   },
   "summary": {
-    "passed": 82,
+    "passed": 95,
     "failed": 0
   },
   "checks": [
@@ -441,14 +441,92 @@
       "result": "PASS"
     },
     {
-      "name": "known gap private follow succeeds immediately",
+      "name": "private follow creates pending request",
       "status": 200,
       "errorCode": null,
       "result": "PASS"
     },
     {
-      "name": "known gap private profile visible immediately after follow",
+      "name": "pending follow grants no relationship",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "duplicate private follow stays pending",
       "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "duplicate private follow reuses request",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "pending private profile remains hidden",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "private profile owner read before approval",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "pending request does not increment followers",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "private owner lists incoming requests",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "incoming list contains exact pending request",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "requester cannot approve own request",
+      "status": 404,
+      "errorCode": "NOT_FOUND",
+      "result": "PASS"
+    },
+    {
+      "name": "private owner approves request",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "approval establishes following relationship",
+      "status": null,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "private profile visible after explicit approval",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "private profile owner read after approval",
+      "status": 200,
+      "errorCode": null,
+      "result": "PASS"
+    },
+    {
+      "name": "approval increments follower count once",
+      "status": null,
       "errorCode": null,
       "result": "PASS"
     },
@@ -463,41 +541,41 @@
     {
       "resource": "follow",
       "key": "49161b86e128",
-      "status": 404,
+      "status": 200,
       "verificationStatus": 404,
       "result": "PASS"
     },
     {
       "resource": "comment",
-      "key": "7628f2cf8166",
+      "key": "0bd6cbb478dd",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "727caffa3add",
+      "key": "6d3f4625ee80",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "418647cb9d4b",
+      "key": "7491431dfa6d",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "attachment",
-      "key": "e2260f319aba",
+      "key": "7d66853b5748",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "record",
-      "key": "9bdd77a42e80",
+      "key": "84652b966901",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"

@@ -8,8 +8,17 @@ import {evidenceDir} from './lib.mjs'
 // sanitized evidence back to this Mac worktree; production-snapshot.json is
 // written locally, never on the VPS.
 const remoteCode = `
+import {readFileSync} from 'node:fs'
 import {captureHostSnapshot, json, sanitizeForSecretScan} from './tools/api-atlas/lib.mjs'
-process.stdout.write(sanitizeForSecretScan(json(captureHostSnapshot())))
+const snapshot = captureHostSnapshot()
+const runtimeAccess = readFileSync('./services/greenfield-api/src/modules/runtime-access.ts', 'utf8')
+if (snapshot.repository.head === snapshot.containers.api.revision
+  && runtimeAccess.includes('grantedPermissions: arrayOfStrings(review?.granted_permissions)')) {
+  for (const missing of snapshot.operationalAggregates.activeInstallPermissionReviews.missingReviews ?? []) {
+    missing.effectiveAuthorizationSource = 'no recorded grants (fail closed)'
+  }
+}
+process.stdout.write(sanitizeForSecretScan(json(snapshot)))
 `
 const evidence = execFileSync(
   'ssh',

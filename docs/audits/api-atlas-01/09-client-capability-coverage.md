@@ -1,6 +1,6 @@
 # Client Capability Coverage
 
-This matrix compares product capabilities, not assumed literal URLs, against current GreenField behavior. Counts: BACKEND ONLY=1, CLIENT ONLY=3, COMPLETE=32, MISSING=2, PARTIAL=12.
+This matrix compares product capabilities, not assumed literal URLs, against current GreenField behavior. Counts: BACKEND ONLY=2, CLIENT ONLY=3, COMPLETE=34, MISSING=2, PARTIAL=10.
 
 | Domain | Capability | Status | Evidence/explanation |
 | --- | --- | --- | --- |
@@ -26,15 +26,16 @@ This matrix compares product capabilities, not assumed literal URLs, against cur
 | Profile | `/profile/:id/posts` | **COMPLETE** | Cursor-paginated visible posts are implemented. |
 | Profile | `/profile/:id/modules` | **MISSING** | No profile-scoped installed/featured module endpoint is registered. |
 | Profile | `/profile/:id/links` | **PARTIAL** | Public links are embedded in profile serialization; no link CRUD route writes profile_links. |
-| Profile | `/profile/:id/followers` | **PARTIAL** | Lists work, but follower-only profiles have no request/accept gate. |
-| Profile | `/profile/:id/following` | **PARTIAL** | Lists work, but follower-only profiles have no request/accept gate. |
+| Profile | `/profile/:id/followers` | **COMPLETE** | Lists and protected visibility now depend on accepted follows; Native must adopt pending state. |
+| Profile | `/profile/:id/following` | **COMPLETE** | Lists and protected visibility now depend on accepted follows; Native must adopt pending state. |
+| Profile | `/profile/:id/follow-requests` | **BACKEND ONLY** | Request, incoming list, accept, reject and cancel routes are live; Native UI adoption is pending. |
 | Module | `/module/:id` | **COMPLETE** | Registry detail is public and installation state can be hydrated for signed-in clients. |
-| Module | `/module/:id/permissions` | **PARTIAL** | Manifest permissions and installed review APIs exist; two active installations have no review row. |
+| Module | `/module/:id/permissions` | **PARTIAL** | Missing reviews now grant nothing; two existing installations still require explicit user review. |
 | Module | `/module/:id/whats-new` | **BACKEND ONLY** | Release notes are embedded in detail/version responses rather than a dedicated surface. |
 | Module | `/module/:id/screenshots` | **PARTIAL** | Presentation metadata exists, but 7 of 17 assets have no blob and all are development assets. |
 | Module | `/module/:id/versions` | **COMPLETE** | Public registry and authenticated installed-version routes exist. |
 | Settings | `account` | **COMPLETE** | Account, handle, password, sessions, deletion and data-request APIs exist. |
-| Settings | `privacy` | **PARTIAL** | Profile visibility, block and mute exist; follower-request policy and complete export controls are incomplete. |
+| Settings | `privacy` | **PARTIAL** | Profile visibility, block, mute and follower approval exist; complete export controls remain incomplete. |
 | Settings | `security` | **COMPLETE** | Passkeys, TOTP, recovery codes, step-up and session revocation exist. |
 | Settings | `appearance` | **COMPLETE** | GET/PATCH account appearance exists and is called. |
 | Settings | `developer` | **COMPLETE** | Developer profile, releases and build-service coordination routes exist. |
