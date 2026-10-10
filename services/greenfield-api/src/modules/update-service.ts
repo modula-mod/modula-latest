@@ -201,7 +201,7 @@ export class GreenfieldModuleUpdateService {
         accountId,
         release,
         grantedPermissions,
-      })
+      }, {preserveConflictingProjection: legacyTrustMigration})
     }, exactInstallationId)
     return {...result, planId, ...summary, descriptor}
   }

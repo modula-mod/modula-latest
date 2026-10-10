@@ -157,7 +157,7 @@ jobs:
           MODULA_READONLY_PASSWORD: modula_ci_readonly
           MODULA_BACKUP_PASSWORD: modula_ci_backup
         run: bash ops/docker/postgres/init-roles.sh
-      - name: Migration 066 and API-FIX-01 database regressions
+      - name: Migrations 066-067 and API-FIX-01 database regressions
         env:
           MODULA_TEST_DATABASE_URL: postgresql://modula_migrator:modula_ci_migrator@127.0.0.1:5432/modula_test
           MODULA_TEST_ADMIN_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres

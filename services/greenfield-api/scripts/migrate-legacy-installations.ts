@@ -10,6 +10,7 @@ import {loadConfig} from '../src/config/index.js'
 import {GreenfieldModuleUpdateService} from '../src/modules/update-service.js'
 import {GreenfieldModuleRegistryService} from '../src/modules/registry-service.js'
 import {GreenfieldRegistryTrustService} from '../src/modules/registry-trust-service.js'
+import {addStateCounts, completedLegacyUpgradeStates} from '../src/modules/legacy-upgrade-progress.js'
 
 type Upgrade = {moduleId: string; fromVersion: string; toVersion: string; expectedStates: Record<string, number>}
 
@@ -38,7 +39,7 @@ try {
   }
   const registry = new GreenfieldModuleRegistryService(db)
   const trust = new GreenfieldRegistryTrustService(db)
-  const planned: Array<{upgrade: Upgrade; installations: Array<{installationId: string; accountId: string; status: string}>}> = []
+  const planned: Array<{upgrade: Upgrade; completed: Record<string, number>; installations: Array<{installationId: string; accountId: string; status: string}>}> = []
   for (const upgrade of upgrades) {
     const target = await registry.getVersion(upgrade.moduleId, upgrade.toVersion)
     const targetTrust = await trust.forRelease(target)
@@ -51,17 +52,22 @@ try {
       .where('release.module_id', '=', upgrade.moduleId).where('release.version', '=', upgrade.fromVersion)
       .where('installation.status', 'not in', ['removed', 'uninstalled', 'notInstalled'])
       .orderBy('installation.installation_id').execute()
-    const actualStates: Record<string, number> = {}
-    for (const row of rows) actualStates[row.status] = (actualStates[row.status] ?? 0) + 1
+    const currentStates: Record<string, number> = {}
+    for (const row of rows) currentStates[row.status] = (currentStates[row.status] ?? 0) + 1
+    const completed = await completedLegacyUpgradeStates(db, {
+      moduleId: upgrade.moduleId, fromVersion: upgrade.fromVersion,
+      toVersion: upgrade.toVersion, targetReleaseId: target.releaseId,
+    })
+    const actualStates = addStateCounts(currentStates, completed)
     if (JSON.stringify(Object.entries(actualStates).sort()) !== JSON.stringify(Object.entries(upgrade.expectedStates).sort())) {
       throw new Error(`Historical installation state changed: ${upgrade.moduleId}@${upgrade.fromVersion}`)
     }
-    planned.push({upgrade, installations: rows.map(row => ({installationId: row.installation_id, accountId: row.account_id, status: row.status}))})
+    planned.push({upgrade, completed, installations: rows.map(row => ({installationId: row.installation_id, accountId: row.account_id, status: row.status}))})
   }
   if (!apply) {
     process.stdout.write(`${JSON.stringify({mode: 'dry-run', upgrades: planned.map(item => ({moduleId: item.upgrade.moduleId,
       fromVersion: item.upgrade.fromVersion, toVersion: item.upgrade.toVersion,
-      states: item.upgrade.expectedStates, installations: item.installations.length}))}, null, 2)}\n`)
+      states: item.upgrade.expectedStates, completed: item.completed, remaining: item.installations.length}))}, null, 2)}\n`)
   } else {
     const updates = new GreenfieldModuleUpdateService(db, loadConfig())
     const results: Array<{moduleId: string; fromVersion: string; toVersion: string; queued: number}> = []

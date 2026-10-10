@@ -11,6 +11,7 @@ import type {GreenfieldModuleManifest} from '@modula/greenfield-module-manifest'
 import {GreenfieldGithubReleaseSyncService, HttpGithubReleaseSource} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {buildPublisherReleaseStatement, normalizeSignatureInput, parsePublisherPublicKey, signingManifestDigest, statementBytes, statementSha256, GreenfieldPublisherSigningKeyService, type PublisherReleaseStatement} from '../src/modules/release-signing.js'
+import {addStateCounts, completedLegacyUpgradeStates} from '../src/modules/legacy-upgrade-progress.js'
 
 type BootstrapRelease = {
   releaseId: string
@@ -161,9 +162,14 @@ try {
   for (const mapping of bundle.legacyUpgrades) {
     const target = checked.find(entry => entry.artifact.productId === mapping.moduleId && entry.artifact.version === mapping.toVersion)
     if (!target) throw new Error(`Legacy upgrade target is not signed in this bundle: ${mapping.moduleId}@${mapping.toVersion}`)
-    const actualStates = Object.fromEntries(installationImpact.rows
+    const currentStates = Object.fromEntries(installationImpact.rows
       .filter(row => row.module_id === mapping.moduleId && row.version === mapping.fromVersion)
       .map(row => [row.status, row.count]))
+    const completedStates = await completedLegacyUpgradeStates(db, {
+      moduleId: mapping.moduleId, fromVersion: mapping.fromVersion,
+      toVersion: mapping.toVersion, targetReleaseId: target.item.releaseId,
+    })
+    const actualStates = addStateCounts(currentStates, completedStates)
     if (JSON.stringify(Object.entries(actualStates).sort()) !== JSON.stringify(Object.entries(mapping.expectedStates).sort())) {
       throw new Error(`Legacy installation count changed: ${mapping.moduleId}@${mapping.fromVersion}`)
     }

@@ -256,7 +256,19 @@ export class GreenfieldExtensionFabricService {
     }
   }
 
-  async persistUpdatePlanState(trx: any, input: PersistInstallInput): Promise<void> {
+  async persistUpdatePlanState(trx: any, input: PersistInstallInput, options: {preserveConflictingProjection?: boolean} = {}): Promise<void> {
+    if (options.preserveConflictingProjection) {
+      const projected = await trx.selectFrom('greenfield_extension_runtime_projection')
+        .select('installation_id')
+        .where('account_id', '=', input.accountId)
+        .where('product_id', '=', input.release.moduleId)
+        .executeTakeFirst()
+      // The fabric has one account/product projection, although historical
+      // installs can contain more than one exact installation. Keep the
+      // established projection; migrate the other installation's data and
+      // release without stealing its runtime identity.
+      if (projected && projected.installation_id !== input.installationId) return
+    }
     const subscriptions = await trx
       .selectFrom('greenfield_extension_event_subscriptions')
       .select('subscription_id')

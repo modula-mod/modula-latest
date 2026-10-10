@@ -10,7 +10,7 @@ const databaseUrl = process.env.MODULA_TEST_DATABASE_URL
 const adminDatabaseUrl = process.env.MODULA_TEST_ADMIN_DATABASE_URL
 const describeIfDb = databaseUrl && adminDatabaseUrl ? describe : describe.skip
 
-describeIfDb.sequential('API-FIX-01 migration 066', () => {
+describeIfDb.sequential('API-FIX-01 migrations 066-067', () => {
   const suffix = randomUUID().replaceAll('-', '').slice(0, 12)
   const predecessorDatabase = `modula_api_fix_01_pre_${suffix}`
   const freshDatabase = `modula_api_fix_01_fresh_${suffix}`
@@ -84,14 +84,16 @@ describeIfDb.sequential('API-FIX-01 migration 066', () => {
     )
     await client.end()
 
-    expect(await migrateUp(predecessorUrl)).toEqual(['066_trust_privacy_fail_closed'])
+    expect(await migrateUp(predecessorUrl)).toEqual([
+      '066_trust_privacy_fail_closed', '067_legacy_duplicate_installation_versions',
+    ])
     const verified = new pg.Client({connectionString: predecessorUrl})
     await verified.connect()
     const version = await verified.query(`SELECT value FROM schema_metadata WHERE key = 'schema_version'`)
     const follows = await verified.query(`SELECT count(*)::int AS count FROM follows WHERE id = 'migration-follow' AND deleted_at IS NULL`)
     const notifications = await verified.query(`SELECT count(*)::int AS count FROM notifications WHERE id = 'migration-notification' AND deleted_at IS NULL`)
     const requests = await verified.query(`SELECT count(*)::int AS count FROM follow_requests`)
-    expect(version.rows[0]?.value).toBe('066')
+    expect(version.rows[0]?.value).toBe('067')
     expect(follows.rows[0]?.count).toBe(1)
     expect(notifications.rows[0]?.count).toBe(1)
     expect(requests.rows[0]?.count).toBe(0)
@@ -100,7 +102,7 @@ describeIfDb.sequential('API-FIX-01 migration 066', () => {
 
   it('applies the full migration chain to a fresh database', async () => {
     const applied = await migrateUp(freshUrl)
-    expect(applied.at(-1)).toBe('066_trust_privacy_fail_closed')
+    expect(applied.at(-1)).toBe('067_legacy_duplicate_installation_versions')
     const client = new pg.Client({connectionString: freshUrl})
     await client.connect()
     const table = await client.query(`SELECT to_regclass('public.follow_requests') AS name`)

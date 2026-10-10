@@ -310,6 +310,13 @@
       "excerpt": "throw new Error('Module backend retry bounds exhausted')"
     },
     {
+      "file": "services/greenfield-api/src/modules/legacy-upgrade-progress.ts",
+      "line": 28,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Historical installation update is not complete: ${input.moduleId}@${input.fromVersion}`)"
+    },
+    {
       "file": "services/greenfield-api/src/modules/registry-service.ts",
       "line": 243,
       "marker": "placeholder",
@@ -2256,6 +2263,13 @@
       "marker": "throw new Error",
       "classification": "ordinary-error-handling-review",
       "excerpt": "throw new Error('Module backend retry bounds exhausted')"
+    },
+    {
+      "file": "services/greenfield-api/src/modules/legacy-upgrade-progress.ts",
+      "line": 28,
+      "marker": "throw new Error",
+      "classification": "ordinary-error-handling-review",
+      "excerpt": "throw new Error(`Historical installation update is not complete: ${input.moduleId}@${input.fromVersion}`)"
     },
     {
       "file": "services/greenfield-api/src/modules/registry-service.ts",

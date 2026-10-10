@@ -8,9 +8,9 @@
     "publicApiBase": "https://api.modula.digital",
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
-      "branch": "phase-api-fix-01c-offline-trust-bootstrap",
-      "sourceSha256": "abc324a906e6bd47c35166f0dd7274384942c7e201e07fc27eff0d656da42201",
-      "capturedAt": "2026-10-09T18:54:29.655Z",
+      "branch": "phase-api-fix-01c-legacy-resume",
+      "sourceSha256": "ed61180dd6bd5c2310b725b48615b4fa6bc8ecbbaf70f277353b5b17ca015af8",
+      "capturedAt": "2026-10-10T08:51:11.768Z",
       "routeCount": 575
     },
     "status": "PASS"
@@ -63785,6 +63785,7 @@
         "services/greenfield-api/src/modules/extension-fabric-service.ts",
         "services/greenfield-api/src/modules/identity-migration-service.ts",
         "services/greenfield-api/src/modules/installation-service.ts",
+        "services/greenfield-api/src/modules/legacy-upgrade-progress.ts",
         "services/greenfield-api/src/modules/marketplace-service.ts",
         "services/greenfield-api/src/modules/runtime-access.ts",
         "services/greenfield-api/src/modules/runtime2-service.ts",
@@ -68377,6 +68378,7 @@
       "migrationIntroduced": "009_phase7a_module_platform.sql",
       "sourceReads": [
         "services/greenfield-api/src/modules/installation-service.ts",
+        "services/greenfield-api/src/modules/legacy-upgrade-progress.ts",
         "services/greenfield-api/src/modules/update-service.ts"
       ],
       "sourceWrites": [
@@ -70931,6 +70933,7 @@
         "services/greenfield-api/src/modules/extension-fabric-service.ts",
         "services/greenfield-api/src/modules/identity-migration-service.ts",
         "services/greenfield-api/src/modules/installation-service.ts",
+        "services/greenfield-api/src/modules/legacy-upgrade-progress.ts",
         "services/greenfield-api/src/modules/marketplace-service.ts",
         "services/greenfield-api/src/modules/registry-presentation-service.ts",
         "services/greenfield-api/src/modules/registry-service.ts",

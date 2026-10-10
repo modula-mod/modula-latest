@@ -5,6 +5,7 @@ import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
 import {GreenfieldModuleUpdateService} from '../src/modules/update-service.js'
+import {addStateCounts, completedLegacyUpgradeStates} from '../src/modules/legacy-upgrade-progress.js'
 import {GreenfieldGithubReleaseSyncService, type VerifiedGithubRelease} from '../src/modules/github-release-sync-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, statementBytes, statementSha256} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, registerAccount, sha256} from './helpers/registry-fixtures.js'
@@ -216,6 +217,9 @@ describeIfDb('retrospective publisher release signatures', () => {
     })
     await releases.importPendingReview(sourceManifest, evidenceFor(sourceManifest))
     const source = await releases.publishRelease(moduleId, '0.2.0')
+    const olderManifest = adapterManifest(moduleId, '0.1.0')
+    await releases.importPendingReview(olderManifest, evidenceFor(olderManifest))
+    const older = await releases.publishRelease(moduleId, '0.1.0')
     await releases.importPendingReview(targetManifest, evidenceFor(targetManifest))
     const target = await releases.publishRelease(moduleId, '1.8.0')
     const targetEvidence = evidenceFor(targetManifest)
@@ -236,7 +240,7 @@ describeIfDb('retrospective publisher release signatures', () => {
     const updates = new GreenfieldModuleUpdateService(db, {
       ...loadConfig(), environment: 'production', moduleAllowUntrustedDevelopmentReleases: false,
     })
-    const request = {installationId, version: '1.8.0', idempotencyKey: `legacy-exit-${suffix}`}
+    const request = {installationId, version: '1.8.0', idempotencyKey: `api-fix-01c:legacy-exit-${suffix}`}
     await expect(updates.migrateLegacyInstallation(account.accountId, moduleId, request)).rejects.toThrow(/trusted target/)
     await expect(updates.migrateLegacyInstallation(randomUUID(), moduleId, request)).rejects.toThrow(/not found/i)
     expect(await db.selectFrom('greenfield_module_install_plans').select('plan_id').where('installation_id', '=', installationId).execute()).toHaveLength(0)
@@ -256,5 +260,52 @@ describeIfDb('retrospective publisher release signatures', () => {
     expect(review.granted_permissions).toEqual([])
     expect(review.denied_permissions).toContain('records:write')
     expect((await updates.migrateLegacyInstallation(account.accountId, moduleId, request)).idempotent).toBe(true)
+
+    const duplicateInstallationId = `legacy-exit-duplicate-${suffix}`
+    await db.insertInto('greenfield_extension_installations').values({
+      installation_id: duplicateInstallationId, account_id: account.accountId,
+      extension_version_id: older.extensionVersionId, status: 'enabled', config: {},
+      created_at: new Date(), updated_at: new Date(),
+    }).execute()
+    const duplicate = await updates.migrateLegacyInstallation(account.accountId, moduleId, {
+      installationId: duplicateInstallationId, version: '1.8.0', idempotencyKey: `api-fix-01c:legacy-exit-duplicate-${suffix}`,
+    })
+    expect(duplicate).toMatchObject({installationId: duplicateInstallationId, status: 'updating', toVersion: '1.8.0'})
+    const projections = await db.selectFrom('greenfield_extension_runtime_projection')
+      .select('installation_id').where('account_id', '=', account.accountId).where('product_id', '=', moduleId).execute()
+    expect(projections).toEqual([{installation_id: installationId}])
+    await db.transaction().execute(async trx => {
+      await trx.updateTable('greenfield_extension_installations')
+        .set({extension_version_id: target.extensionVersionId, status: 'installedDisabled'})
+        .where('installation_id', '=', installationId).execute()
+      await trx.updateTable('greenfield_extension_installations')
+        .set({extension_version_id: target.extensionVersionId, status: 'enabled'})
+        .where('installation_id', '=', duplicateInstallationId).execute()
+      await trx.updateTable('greenfield_module_install_plans')
+        .set({status: 'completed'}).where('plan_id', '=', queued.planId).execute()
+      const completed = await completedLegacyUpgradeStates(trx, {
+        moduleId, fromVersion: '0.2.0', toVersion: '1.8.0', targetReleaseId: target.releaseId,
+      })
+      expect(completed).toEqual({installedDisabled: 1})
+      expect(addStateCounts({enabled: 1}, completed)).toEqual({enabled: 1, installedDisabled: 1})
+      const migrated = await trx.selectFrom('greenfield_extension_installations')
+        .select(['installation_id', 'status']).where('account_id', '=', account.accountId)
+        .where('extension_version_id', '=', target.extensionVersionId).execute()
+      expect(migrated).toEqual(expect.arrayContaining([
+        {installation_id: installationId, status: 'installedDisabled'},
+        {installation_id: duplicateInstallationId, status: 'enabled'},
+      ]))
+      expect(migrated).toHaveLength(2)
+      // Do not leave same-version duplicates in the shared disposable test DB;
+      // unrelated migration-down tests still need to reverse 067.
+      await trx.updateTable('greenfield_extension_installations')
+        .set({extension_version_id: source.extensionVersionId, status: 'updating'})
+        .where('installation_id', '=', installationId).execute()
+      await trx.updateTable('greenfield_extension_installations')
+        .set({extension_version_id: older.extensionVersionId, status: 'updating'})
+        .where('installation_id', '=', duplicateInstallationId).execute()
+      await trx.updateTable('greenfield_module_install_plans')
+        .set({status: 'queued'}).where('plan_id', '=', queued.planId).execute()
+    })
   })
 })
