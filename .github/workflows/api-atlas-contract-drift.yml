@@ -97,7 +97,7 @@ jobs:
           pnpm --filter @modula/greenfield-api exec tsc --noEmit --module NodeNext
           --moduleResolution NodeNext --target ES2022 --strict --skipLibCheck
           scripts/trust-bootstrap.ts scripts/migrate-legacy-installations.ts
-          scripts/trust-cutover-gate.ts
+          scripts/trust-cutover-gate.ts scripts/api-fix-01d-crypto-acceptance.ts
       - name: Legacy data preflight CLI typecheck
         run: >-
           pnpm --filter @modula/greenfield-worker exec tsc --noEmit --module NodeNext
