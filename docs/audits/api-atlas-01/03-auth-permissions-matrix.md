@@ -416,7 +416,7 @@ This matrix distinguishes transport reachability from application authorization.
 
 ## Authenticated acceptance evidence
 
-Atlas status: **PASS**. Production authenticated checks: 82 passed / 0 failed. Controlled exact-schema ownership/trust checks: 28 passed / 0 failed.
+Atlas status: **PASS**. Production authenticated checks: 95 passed / 0 failed. Controlled exact-schema ownership/trust checks: 28 passed / 0 failed.
 
 | Disposition | HTTP status | Error contract | Result |
 | --- | --- | --- | --- |
@@ -439,8 +439,15 @@ Atlas status: **PASS**. Production authenticated checks: 82 passed / 0 failed. C
 | attachment delete cross-user denial | 403 | FORBIDDEN | PASS |
 | private repository record cross-user denial | 404 | NOT_FOUND | PASS |
 | private repository record mutation denial | 404 | NOT_FOUND | PASS |
-| known gap private follow succeeds immediately | 200 | success envelope | PASS |
-| known gap private profile visible immediately after follow | 200 | success envelope | PASS |
+| private follow creates pending request | 200 | success envelope | PASS |
+| duplicate private follow stays pending | 200 | success envelope | PASS |
+| duplicate private follow reuses request | null | success envelope | PASS |
+| pending private profile remains hidden | 404 | NOT_FOUND | PASS |
+| private profile owner read before approval | 200 | success envelope | PASS |
+| private owner lists incoming requests | 200 | success envelope | PASS |
+| private owner approves request | 200 | success envelope | PASS |
+| private profile visible after explicit approval | 200 | success envelope | PASS |
+| private profile owner read after approval | 200 | success envelope | PASS |
 
 Known vulnerable behavior is intentionally represented by expected-failure regressions; PASS means the authorization map is complete, not defect-free.
 

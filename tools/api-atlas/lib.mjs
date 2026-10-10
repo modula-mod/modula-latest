@@ -673,7 +673,7 @@ SELECT jsonb_build_object(
         'requestedPermissionClasses', missing.requested_permission_classes,
         'requestedPermissions', missing.requested_permissions,
         'reviewRowPresent', false,
-        'effectiveAuthorizationSource', 'manifest requested permissions'
+        'effectiveAuthorizationSource', 'no recorded grants (fail closed)'
       ) ORDER BY missing.module_id)
       FROM (
         SELECT

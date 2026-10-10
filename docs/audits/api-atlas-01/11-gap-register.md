@@ -7,8 +7,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-001 — P1 — Follower-only profiles have no follow-request approval flow
 
 - Domain/type: `social` / `missing endpoint`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts`, `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `services/greenfield-api/src/domains/profiles/writes.ts:57`, `services/greenfield-api/src/domains/profiles/writes.ts:89`
 - Affected routes: `POST /v1/profiles/:profileId/follow`
 - Affected files: `services/greenfield-api/src/domains/profiles/writes.ts`
@@ -21,7 +21,7 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 
 - Domain/type: `modules` / `missing signature verification`
 - Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-worker/tests/module-trust-guard.test.ts`
+- Remediation evidence: `services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-worker/tests/module-trust-guard.test.ts`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/publishedUnsignedReleases`, `services/greenfield-api/src/modules/registry-trust-service.ts:109`, `services/greenfield-api/src/modules/registry-trust-service.ts:127`, `services/greenfield-api/src/modules/release-service.ts:441`
 - Affected routes: `GET /v1/registry/modules/:moduleId`, `POST /v1/modules/:moduleId/install`
 - Affected files: `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`
@@ -59,8 +59,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-005 — P1 — Runtime auto-grants manifest permissions when no review row exists
 
 - Domain/type: `modules` / `inconsistent permission`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing`, `services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing`, `services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `services/greenfield-api/src/modules/runtime-access.ts:51`, `services/greenfield-api/src/modules/runtime-access.ts:71`, `evidence/production-snapshot.json#/operationalAggregates/activeInstallPermissionReviews`
 - Affected routes: `GET /v1/modules/:moduleId/records/:collection`, `POST /v1/modules/:moduleId/actions/:actionId`
 - Affected files: `services/greenfield-api/src/modules/runtime-access.ts`
@@ -72,8 +72,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-006 — P1 — Reaction notification jobs are dead-lettering on database uniqueness errors
 
 - Domain/type: `activity` / `event delivery gap`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window`, `services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/failedJobs`, `evidence/production-snapshot.json#/operationalAggregates/jobFailureDetails`
 - Affected routes: `PUT /v1/posts/:postId/reaction`, `GET /v1/notifications`
 - Affected files: `services/greenfield-worker/src/notifications/create.ts`
@@ -124,8 +124,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-010 — P1 — Legacy remote function invocation trusts a client-supplied installation ID
 
 - Domain/type: `security` / `missing ownership check`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `services/greenfield-api/src/app/register-routes.ts:1244`, `services/greenfield-api/src/app/register-routes.ts:1250`, `services/greenfield-api/src/functions/service.ts:6`, `services/greenfield-api/src/extensions/capability-resolver.ts:2`, `evidence/production-snapshot.json#/operationalAggregates/legacyFunctionRuntime`
 - Affected routes: `POST /v1/functions/:functionId/invoke`
 - Affected files: `services/greenfield-api/src/functions/service.ts`, `services/greenfield-api/src/extensions/capability-resolver.ts`
@@ -137,8 +137,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-011 — P1 — AI stream cancel and reconnect omit account ownership checks
 
 - Domain/type: `security` / `missing ownership check`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel`, `evidence/api-fix-01c-production-closeout.json`
 - Evidence: `services/greenfield-api/src/ai/routes.ts:186`, `services/greenfield-api/src/ai/routes.ts:198`, `services/greenfield-api/src/ai/streaming-runtime.ts:50`, `services/greenfield-api/src/ai/streaming-runtime.ts:94`, `evidence/production-snapshot.json#/operationalAggregates/aiRuntime/streams`
 - Affected routes: `POST /v1/ai/streams/:streamId/cancel`, `POST /v1/ai/streams/:streamId/reconnect`
 - Affected files: `services/greenfield-api/src/ai/routes.ts`, `services/greenfield-api/src/ai/streaming-runtime.ts`
@@ -454,10 +454,10 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 - Evidence: `scripts/verify-greenfield-backend-v1.mjs:98`, `evidence/production-snapshot.json#/databaseSchema/appliedMigrations`
 - Affected routes: none/architectural
 - Affected files: `scripts/verify-greenfield-backend-v1.mjs`
-- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 065_comments_rich; it cannot truthfully serve as the current acceptance command.
+- Production impact: The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 067_legacy_duplicate_installation_versions; it cannot truthfully serve as the current acceptance command.
 - Recommended fix: Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.
 - Dependencies: verification ownership
-- Verification: The canonical verifier must pass on reviewed current main at 065_comments_rich without weakening exact-SHA production checks.
+- Verification: The canonical verifier must pass on reviewed current main at 067_legacy_duplicate_installation_versions without weakening exact-SHA production checks.
 
 ## API-ATLAS-GAP-037 — P3 — 13 tables have no API/worker source reference
 

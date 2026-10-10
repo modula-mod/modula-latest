@@ -10,27 +10,27 @@ The generic host is real: `src/features/modules/runtime/module-host.tsx:16` fetc
 
 | Surface | Observed production truth |
 | --- | --- |
-| Releases | 14 total; 12 published; 12/12 published unsigned |
-| Signing | 0 publisher keys, 0 signatures, 14 integrity rows |
+| Releases | 14 total; 12 published; 7/12 published unsigned |
+| Signing | 1 publisher keys, 5 signatures, 14 integrity rows |
 | Artifacts | 2/14 release package blobs; 6 total release asset blobs |
 | Artwork | 10/17 retrievable; 17 development-only |
 | Frontends | 8 verified: declarative=4, host-contribution=4 |
-| Install plans | 36 total; 6 carry descriptor and digest |
-| Installations | failed=1, enabled=13, removed=4, disabled=2, uninstalled=3, installedDisabled=2 |
+| Install plans | 47 total; 17 carry descriptor and digest |
+| Installations | failed=1, enabled=13, removed=5, disabled=2, uninstalled=3, installedDisabled=2 |
 | Permissions | 15 active installations; 2 without a review row |
 | Ingestion | 0 sources (0 enabled); GitHub automation disabled; historical runs {"completed":2} |
 
 ## Release integrity and trust
 
 - Ed25519 cryptographic verification is implemented in `services/greenfield-api/src/modules/release-signing.ts:207` and invoked by `release-service.ts:441` when signing material exists.
-- Current policy explicitly classifies an unsigned release as trusted/verified (`registry-trust-service.ts:109`, `:127`). Therefore schema validation is not the problem: production policy and absent signatures are.
+- Production policy now rejects unsigned or invalid releases for executable transitions. 5 published releases have verified signatures; 7 historical published releases remain unsigned and untrusted. Missing artifact blobs are tracked separately from signature trust.
 - A live Vault Notes release artifact and icon were retrieved and SHA-256 matched. A declared unavailable AI module asset returned 404 as metadata predicted. These probes prove the delivery mechanisms for present blobs, not completeness.
 
 ## Install descriptor and installed-state correctness
 
 The descriptor service (`install-descriptor-service.ts:14`, `:77`) returns module/publisher/installation IDs, release/version/state, manifest, package artifact digest/ref, verified frontend digest/mode/ref, requested/granted permissions, compatibility, trust, issue time and descriptor digest. Production keys exactly match that contract.
 
-Historical `removed` and `uninstalled` rows are excluded by centralized active-status logic (`installation-status.ts:1`) and runtime access checks. No stale historical row bug was reproduced. A distinct security gap remains: `runtime-access.ts:71` falls back to all manifest permissions if a review row is absent; 2 active production installations are in that state.
+Historical `removed` and `uninstalled` rows are excluded by centralized active-status logic (`installation-status.ts:1`) and runtime access checks. No stale historical row bug was reproduced. 2 active production installations have no permission review; the fail-closed runtime gives them zero implicit grants and requires explicit review for privileged operations.
 
 ### Missing permission-review inventory
 
@@ -38,8 +38,8 @@ This inventory excludes account and installation identifiers. It records only th
 
 | Module ID | Requested permission classes | Requested permissions | Review row present | Effective authorization source |
 | --- | --- | --- | --- | --- |
-| `digital.modula.vault-notes.ai` | ai, notes | ai.context.private, ai.request, notes.actions.contribute, notes.editor.contribute, notes.read | false | manifest requested permissions |
-| `digital.modula.vault-notes.voice` | media, notes, transcription | media.audio.capture, media.audio.playback, notes.actions.contribute, notes.attachments.create, notes.attachments.read, notes.editor.contribute, notes.update, transcription.request | false | manifest requested permissions |
+| `digital.modula.vault-notes.ai` | ai, notes | ai.context.private, ai.request, notes.actions.contribute, notes.editor.contribute, notes.read | false | no recorded grants (fail closed) |
+| `digital.modula.vault-notes.voice` | media, notes, transcription | media.audio.capture, media.audio.playback, notes.actions.contribute, notes.attachments.create, notes.attachments.read, notes.editor.contribute, notes.update, transcription.request | false | no recorded grants (fail closed) |
 
 ## Runtime, records and functions
 
@@ -65,10 +65,10 @@ The canonical direction is the existing verified generic ModuleHost plus manifes
 
 | Control | Implemented | Production caveat |
 | --- | --- | --- |
-| Publisher trust | publisher and key schemas exist | no production publisher signing key |
+| Publisher trust | first-party Ed25519 public key registered | offline private key remains on Mac |
 | Package/frontend digests | integrity and live digest checks | most package blobs absent |
-| Release signature | real Ed25519 verify | all published releases unsigned yet trusted |
-| Install grant | review and descriptor tables | missing review falls back to manifest permissions |
-| Account/module isolation | scoped runtime access and record SQL | production cross-user live test not run |
+| Release signature | real Ed25519 verify enforced | historical unsigned releases remain untrusted |
+| Install grant | review and descriptor tables | missing review grants nothing; user review still needed |
+| Account/module isolation | scoped runtime access and record SQL | controlled cross-user production probe passed |
 | Workspace isolation | workspace-aware APIs where declared | not universal; per-route matrix is authoritative |
 | Outbound/filesystem policy | remote/community execution disabled | no general sandbox policy exercised |

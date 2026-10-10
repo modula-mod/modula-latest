@@ -45,7 +45,7 @@ The current runtime boundary in `services/greenfield-api/src/intelligence/action
 | provider:ollama | unconfigured | local |
 | provider:openai | unconfigured | platform-managed |
 
-Models: available:active:enabled=true=1, unavailable:preview:enabled=false=5. Credentials=0, requests=0, executions=0, streams=0, product actions=0. The sole available model is a development mock and the production resolver excludes development mocks (`services/greenfield-api/src/ai/providers/resolver.ts:53`). No real provider is operational.
+Models: available:active:enabled=true=1, unavailable:preview:enabled=false=5. Credentials=0, requests=1, executions=0, streams=0, product actions=0. The sole available model is a development mock and the production resolver excludes development mocks (`services/greenfield-api/src/ai/providers/resolver.ts:53`). No real provider is operational.
 
 ## Nodus readiness
 

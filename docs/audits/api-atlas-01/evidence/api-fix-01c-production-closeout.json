@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-10T16:14:14Z",
+  "runtimeSha": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+  "migration": "067_legacy_duplicate_installation_versions",
+  "publicProbes": {"passed": 35, "failed": 0},
+  "authenticatedAcceptance": {"passed": 95, "failed": 0},
+  "functionOwnership": {"foreignInstallationHidden": true, "auditInstallationRemoved": true},
+  "aiOwnership": {"foreignReconnectHidden": true, "foreignCancelHidden": true, "foreignCancelLeftStreamUnchanged": true, "ownerCancelledAuditStream": true},
+  "permissionReview": {"historicalUnreviewedInstallations": 2, "historicalImplicitGrants": 0, "controlledGrantReadStatus": 200, "controlledDenyReadStatus": 403, "auditInstallationRemoved": true},
+  "privateFollow": {"pendingBeforeApproval": true, "acceptedOnlyByTarget": true, "duplicateRequestStable": true, "cancelled": true, "rejected": true, "blockedFollowHidden": true, "auditRelationshipRestored": true},
+  "reactionNotification": {"controlledReactionDelivered": true, "replayCandidatesBefore": 28, "canarySucceeded": 1, "remainingReplayed": 27, "replaySucceeded": 28, "remainingDeadLetters": 0, "duplicateNotificationIdentities": 0},
+  "releaseTrust": {"signedVault180InstallSucceeded": true, "unsignedVault020InstallDenied": true, "unsignedVault020Error": "UNTRUSTED_RELEASE", "productionInvalidSignatureFixture": "NOT_RUN", "productionDigestMismatchFixture": "NOT_RUN", "productionRevokedKeyFixture": "NOT_RUN"},
+  "fixtureCleanup": {"auditActiveInstallations": 0, "auditProfilesRestoredPrivate": true, "auditFollowRelationshipsRestored": true},
+  "status": "PARTIAL",
+  "reason": "Production cryptographic negative fixtures for invalid signature, digest mismatch and revoked signer were not run against isolated registry releases; disposable-PostgreSQL regressions pass."
+}

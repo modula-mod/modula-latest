@@ -416,15 +416,16 @@ function capabilityCoverage() {
     ['Profile', '/profile/:id/posts', 'COMPLETE', 'Cursor-paginated visible posts are implemented.'],
     ['Profile', '/profile/:id/modules', 'MISSING', 'No profile-scoped installed/featured module endpoint is registered.'],
     ['Profile', '/profile/:id/links', 'PARTIAL', 'Public links are embedded in profile serialization; no link CRUD route writes profile_links.'],
-    ['Profile', '/profile/:id/followers', 'PARTIAL', 'Lists work, but follower-only profiles have no request/accept gate.'],
-    ['Profile', '/profile/:id/following', 'PARTIAL', 'Lists work, but follower-only profiles have no request/accept gate.'],
+    ['Profile', '/profile/:id/followers', 'COMPLETE', 'Lists and protected visibility now depend on accepted follows; Native must adopt pending state.'],
+    ['Profile', '/profile/:id/following', 'COMPLETE', 'Lists and protected visibility now depend on accepted follows; Native must adopt pending state.'],
+    ['Profile', '/profile/:id/follow-requests', 'BACKEND ONLY', 'Request, incoming list, accept, reject and cancel routes are live; Native UI adoption is pending.'],
     ['Module', '/module/:id', 'COMPLETE', 'Registry detail is public and installation state can be hydrated for signed-in clients.'],
-    ['Module', '/module/:id/permissions', 'PARTIAL', 'Manifest permissions and installed review APIs exist; two active installations have no review row.'],
+    ['Module', '/module/:id/permissions', 'PARTIAL', 'Missing reviews now grant nothing; two existing installations still require explicit user review.'],
     ['Module', '/module/:id/whats-new', 'BACKEND ONLY', 'Release notes are embedded in detail/version responses rather than a dedicated surface.'],
     ['Module', '/module/:id/screenshots', 'PARTIAL', 'Presentation metadata exists, but 7 of 17 assets have no blob and all are development assets.'],
     ['Module', '/module/:id/versions', 'COMPLETE', 'Public registry and authenticated installed-version routes exist.'],
     ['Settings', 'account', 'COMPLETE', 'Account, handle, password, sessions, deletion and data-request APIs exist.'],
-    ['Settings', 'privacy', 'PARTIAL', 'Profile visibility, block and mute exist; follower-request policy and complete export controls are incomplete.'],
+    ['Settings', 'privacy', 'PARTIAL', 'Profile visibility, block, mute and follower approval exist; complete export controls remain incomplete.'],
     ['Settings', 'security', 'COMPLETE', 'Passkeys, TOTP, recovery codes, step-up and session revocation exist.'],
     ['Settings', 'appearance', 'COMPLETE', 'GET/PATCH account appearance exists and is called.'],
     ['Settings', 'developer', 'COMPLETE', 'Developer profile, releases and build-service coordination routes exist.'],
@@ -538,6 +539,32 @@ function buildGapRegister() {
       'services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel',
     ]],
   ])
+  const productionCloseoutPath = join(evidenceDir, 'api-fix-01c-production-closeout.json')
+  const productionCloseout = existsSync(productionCloseoutPath)
+    ? JSON.parse(readFileSync(productionCloseoutPath, 'utf8'))
+    : null
+  const productionEvidenceMatches = productionCloseout?.runtimeSha === snapshot.containers.api.revision
+    && productionCloseout?.migration === latestMigrationId
+    && productionCloseout?.publicProbes?.failed === 0
+    && productionCloseout?.authenticatedAcceptance?.failed === 0
+  const productionPass = new Map([
+    ['Follower-only profiles have no follow-request approval flow',
+      productionCloseout?.privateFollow?.pendingBeforeApproval && productionCloseout?.privateFollow?.acceptedOnlyByTarget
+        && productionCloseout?.privateFollow?.blockedFollowHidden && productionCloseout?.privateFollow?.auditRelationshipRestored],
+    ['Runtime auto-grants manifest permissions when no review row exists',
+      productionCloseout?.permissionReview?.historicalImplicitGrants === 0
+        && productionCloseout?.permissionReview?.controlledGrantReadStatus === 200
+        && productionCloseout?.permissionReview?.controlledDenyReadStatus === 403],
+    ['Reaction notification jobs are dead-lettering on database uniqueness errors',
+      productionCloseout?.reactionNotification?.replaySucceeded === productionCloseout?.reactionNotification?.replayCandidatesBefore
+        && productionCloseout?.reactionNotification?.remainingDeadLetters === 0
+        && productionCloseout?.reactionNotification?.duplicateNotificationIdentities === 0],
+    ['Legacy remote function invocation trusts a client-supplied installation ID',
+      productionCloseout?.functionOwnership?.foreignInstallationHidden && productionCloseout?.functionOwnership?.auditInstallationRemoved],
+    ['AI stream cancel and reconnect omit account ownership checks',
+      productionCloseout?.aiOwnership?.foreignReconnectHidden && productionCloseout?.aiOwnership?.foreignCancelHidden
+        && productionCloseout?.aiOwnership?.foreignCancelLeftStreamUnchanged],
+  ])
   const entries = [
     ...(!closeout.deploymentLineage?.reconciled ? [[
       'release','architecture debt','P1','Running production revision is not canonical origin/main',
@@ -592,7 +619,12 @@ function buildGapRegister() {
     id: `API-ATLAS-GAP-${String(index + 1).padStart(3, '0')}`,
     domain: entry[0], type: entry[1], severity: entry[2], title: entry[3], evidence: entry[4], affectedRoutes: entry[5], affectedFiles: entry[6], productionImpact: entry[7], recommendedFix: entry[8], dependencies: entry[9], verification: entry[10],
     remediation: automatedRegressionEvidence.has(entry[3])
-      ? {status: 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING', evidence: automatedRegressionEvidence.get(entry[3])}
+      ? {
+          status: productionEvidenceMatches && productionPass.get(entry[3])
+            ? 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS'
+            : 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING',
+          evidence: [...automatedRegressionEvidence.get(entry[3]), ...(productionEvidenceMatches ? ['evidence/api-fix-01c-production-closeout.json'] : [])],
+        }
       : {status: 'OPEN', evidence: []},
   }))
 }
@@ -728,8 +760,8 @@ function renderModuleFlow() {
   package --> ingestion[Admin/manual or disabled GitHub ingestion]
   ingestion --> registry[(Registry release tables)]
   registry --> integrity[Integrity rows]
-  registry --> signature[Ed25519 verification when signature exists]
-  signature --> trust[Trust policy currently accepts unsigned]
+  registry --> signature[Ed25519 verification required for production trust]
+  signature --> trust[Unsigned or invalid release is untrusted]
   registry --> artwork[Presentation metadata and optional blobs]
   registry --> install[Install plan]
   install --> descriptor[Immutable install descriptor]
@@ -897,18 +929,18 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 
 - The running API and worker are the same OCI revision, \`${snapshot.containers.api.revision}\`; ${snapshot.repository.originMain === snapshot.containers.api.revision ? 'that revision exactly matches captured `origin/main`.' : closeout.deploymentLineage?.reconciled ? 'its accepted relationship to canonical `origin/main` is recorded in the deployment-lineage closeout.' : 'that revision differs from captured `origin/main` and remains a release-governance gap.'}
 - ${candidateApplies ? 'Candidate source/runtime' : 'Source/runtime'} reconciliation is exact: ${runtime.length} = ${atlas.length} application routes + ${frameworkRuntime.length} automatic framework routes; there are no unexplained source-only or runtime-only application routes.${candidateApplies ? ` Production remains separately observed at ${snapshot.runtimeRoutes.length} runtime method routes on ${snapshot.containers.api.revision}.` : ''}
-- The primary blocking risks are unsigned-but-trusted module releases, missing module artifacts/assets, implicit module permission grants, follower-only privacy without requests, legacy function/AI-stream ownership omissions, dead-lettered reaction notifications, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
+- API-FIX-01 ownership, permission, private-follow and reaction fixes are deployed; historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, incomplete release-trust negative production fixtures, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
 ## What GreenField Is Missing
 
 ### Missing for Modula Native
 
-- A profile modules surface, follow-request lifecycle, dedicated request/mention activity contracts, and real link/poll persistence. Evidence: capability matrix and gaps API-ATLAS-GAP-002/013.
+- A profile modules surface, Native adoption of the now-live follow-request lifecycle, dedicated request/mention activity contracts, and real link/poll persistence. Evidence: capability matrix and gap register.
 
 ### Missing for Social
 
-- Private-profile approval semantics, stable pagination for Discover/activity, production notification delivery reliability, and a documented real-time/polling contract.
+- Native adoption of the live private-follow approval contract, stable pagination for Discover/activity, and a documented real-time/polling contract. Reaction notification replay is complete; broader activity reliability remains future work.
 
 ### Missing for Profiles
 
@@ -924,7 +956,7 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 
 ### Missing for Modules
 
-- Required publisher signatures, fail-closed recorded permission grants, complete historical descriptors, and removal of Vault-specific branches.
+- Complete historical artifact/descriptors, explicit review of two pre-existing unreviewed installations, and removal of Vault-specific branches. Production signatures and fail-closed recorded grants are enforced.
 
 ### Missing for Third-Party Module Developers
 
@@ -1144,14 +1176,14 @@ ${mdTable(['Surface','Observed production truth'], [
 ## Release integrity and trust
 
 - Ed25519 cryptographic verification is implemented in \`services/greenfield-api/src/modules/release-signing.ts:207\` and invoked by \`release-service.ts:441\` when signing material exists.
-- Current policy explicitly classifies an unsigned release as trusted/verified (\`registry-trust-service.ts:109\`, \`:127\`). Therefore schema validation is not the problem: production policy and absent signatures are.
+- Production policy now rejects unsigned or invalid releases for executable transitions. ${op.publishedReleases - op.publishedUnsignedReleases} published releases have verified signatures; ${op.publishedUnsignedReleases} historical published releases remain unsigned and untrusted. Missing artifact blobs are tracked separately from signature trust.
 - A live Vault Notes release artifact and icon were retrieved and SHA-256 matched. A declared unavailable AI module asset returned 404 as metadata predicted. These probes prove the delivery mechanisms for present blobs, not completeness.
 
 ## Install descriptor and installed-state correctness
 
 The descriptor service (\`install-descriptor-service.ts:14\`, \`:77\`) returns module/publisher/installation IDs, release/version/state, manifest, package artifact digest/ref, verified frontend digest/mode/ref, requested/granted permissions, compatibility, trust, issue time and descriptor digest. Production keys exactly match that contract.
 
-Historical \`removed\` and \`uninstalled\` rows are excluded by centralized active-status logic (\`installation-status.ts:1\`) and runtime access checks. No stale historical row bug was reproduced. A distinct security gap remains: \`runtime-access.ts:71\` falls back to all manifest permissions if a review row is absent; ${op.activeInstallPermissionReviews.withoutReview} active production installations are in that state.
+Historical \`removed\` and \`uninstalled\` rows are excluded by centralized active-status logic (\`installation-status.ts:1\`) and runtime access checks. No stale historical row bug was reproduced. ${op.activeInstallPermissionReviews.withoutReview} active production installations have no permission review; the fail-closed runtime gives them zero implicit grants and requires explicit review for privileged operations.
 
 ### Missing permission-review inventory
 
@@ -1189,11 +1221,11 @@ The canonical direction is the existing verified generic ModuleHost plus manifes
 ## Security matrix
 
 ${mdTable(['Control','Implemented','Production caveat'], [
-    ['Publisher trust','publisher and key schemas exist','no production publisher signing key'],
+    ['Publisher trust','first-party Ed25519 public key registered','offline private key remains on Mac'],
     ['Package/frontend digests','integrity and live digest checks','most package blobs absent'],
-    ['Release signature','real Ed25519 verify','all published releases unsigned yet trusted'],
-    ['Install grant','review and descriptor tables','missing review falls back to manifest permissions'],
-    ['Account/module isolation','scoped runtime access and record SQL','production cross-user live test not run'],
+    ['Release signature','real Ed25519 verify enforced','historical unsigned releases remain untrusted'],
+    ['Install grant','review and descriptor tables','missing review grants nothing; user review still needed'],
+    ['Account/module isolation','scoped runtime access and record SQL','controlled cross-user production probe passed'],
     ['Workspace isolation','workspace-aware APIs where declared','not universal; per-route matrix is authoritative'],
     ['Outbound/filesystem policy','remote/community execution disabled','no general sandbox policy exercised'],
   ])}

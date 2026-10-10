@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-07T16:29:42.416Z",
+    "capturedAt": "2026-10-10T16:15:15.761Z",
     "status": "PASS"
   },
   "gaps": [
@@ -28,10 +28,11 @@
       ],
       "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -67,7 +68,8 @@
         "evidence": [
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview",
           "services/greenfield-api/tests/module-version-switch.test.ts",
-          "services/greenfield-worker/tests/module-trust-guard.test.ts"
+          "services/greenfield-worker/tests/module-trust-guard.test.ts",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -153,10 +155,11 @@
       ],
       "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing",
-          "services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable"
+          "services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -185,11 +188,12 @@
       ],
       "verification": "Repeated reactions must converge to one notification and leave no dead letter.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
           "services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications",
           "services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window",
-          "services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state"
+          "services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -306,9 +310,10 @@
       ],
       "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -340,9 +345,10 @@
       ],
       "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel",
+          "evidence/api-fix-01c-production-closeout.json"
         ]
       }
     },
@@ -997,12 +1003,12 @@
       "affectedFiles": [
         "scripts/verify-greenfield-backend-v1.mjs"
       ],
-      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 065_comments_rich; it cannot truthfully serve as the current acceptance command.",
+      "productionImpact": "The umbrella verifier requires schema 055 and exact clean main, while observed production is validly at 067_legacy_duplicate_installation_versions; it cannot truthfully serve as the current acceptance command.",
       "recommendedFix": "Update the verifier to derive the current migration ledger and separate source, audit-branch, web and production convergence gates.",
       "dependencies": [
         "verification ownership"
       ],
-      "verification": "The canonical verifier must pass on reviewed current main at 065_comments_rich without weakening exact-SHA production checks.",
+      "verification": "The canonical verifier must pass on reviewed current main at 067_legacy_duplicate_installation_versions without weakening exact-SHA production checks.",
       "remediation": {
         "status": "OPEN",
         "evidence": []
