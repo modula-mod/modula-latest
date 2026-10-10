@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "capturedAt": "2026-10-10T16:14:14Z",
   "runtimeSha": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+  "apiSourceSha256": "956789be8b821a974a3a33481fedbdd690b1aa9d2803232bfa027f10062d2b4d",
   "migration": "067_legacy_duplicate_installation_versions",
   "publicProbes": {"passed": 35, "failed": 0},
   "authenticatedAcceptance": {"passed": 95, "failed": 0},
