@@ -1969,7 +1969,9 @@
           "src/data/repositories/api/ApiAuthRepository.ts",
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase6-greenfield-backend.mjs",
           "scripts/verify-phase6-greenfield-frontend.mjs",
@@ -2434,7 +2436,9 @@
           "src/data/repositories/api/ApiAuthRepository.ts",
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase6s-social-backend.mjs",
@@ -2580,7 +2584,9 @@
           "src/data/repositories/api/ApiAuthRepository.ts",
           "src/features/settings/screens/ModulaMailSettingsScreen.tsx"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase6-greenfield-frontend.mjs",
           "scripts/verify-phase6s-social-backend.mjs",
@@ -30122,6 +30128,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30271,6 +30278,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30425,6 +30433,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30580,6 +30589,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30735,6 +30745,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -30874,6 +30885,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31016,6 +31028,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31161,6 +31174,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31296,6 +31310,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31437,6 +31452,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31572,6 +31588,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31715,6 +31732,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -31862,6 +31880,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32004,6 +32023,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32156,6 +32176,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32305,6 +32326,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32453,6 +32475,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32602,6 +32625,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32745,6 +32769,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -32881,6 +32906,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33026,6 +33052,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33169,6 +33196,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33326,6 +33354,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33467,6 +33496,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33607,6 +33637,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33756,6 +33787,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -33896,6 +33928,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34045,6 +34078,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34199,6 +34233,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34338,6 +34373,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34493,6 +34529,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34645,6 +34682,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34799,6 +34837,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -34945,6 +34984,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35099,6 +35139,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35234,6 +35275,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35379,6 +35421,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35512,6 +35555,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35652,6 +35696,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35799,6 +35844,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -35937,6 +35983,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36070,6 +36117,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36209,6 +36257,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -36350,6 +36399,7 @@
           "src/data/repositories/api/ApiToolsRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/extensions/extension-router.ts",
           "services/greenfield-api/src/modules/install-descriptor-service.ts"
         ],
@@ -42409,7 +42459,9 @@
         "clients": [
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
@@ -42543,7 +42595,9 @@
         "clients": [
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
@@ -42680,7 +42734,9 @@
         "clients": [
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
@@ -42794,7 +42850,9 @@
         "clients": [
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
@@ -42928,7 +42986,9 @@
         "clients": [
           "src/data/repositories/api/ApiModuleRepository.ts"
         ],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-phase7i-f5-auth-foundation.mjs",
           "scripts/verify-phase7m-b10.mjs",
@@ -46046,6 +46106,7 @@
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -46187,6 +46248,7 @@
           "src/data/repositories/api/ApiAuthRepository.ts"
         ],
         "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts",
           "services/greenfield-api/src/security/session.ts"
         ],
         "tests": [
@@ -49079,7 +49141,9 @@
       "externalIntegrations": [],
       "callers": {
         "clients": [],
-        "server": [],
+        "server": [
+          "services/greenfield-api/scripts/api-fix-01d-crypto-acceptance.ts"
+        ],
         "tests": [
           "scripts/verify-greenfield-backend-v1.mjs",
           "scripts/verify-phase7e-web-production-cutover.mjs",

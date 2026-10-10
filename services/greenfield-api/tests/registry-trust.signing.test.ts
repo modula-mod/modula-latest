@@ -5,6 +5,7 @@ import {loadConfig} from '../src/config/env.js'
 import {createServer} from '../src/app/create-server.js'
 import {migrateUp} from '../src/database/migrate.js'
 import {GreenfieldModuleReleaseService} from '../src/modules/release-service.js'
+import {GreenfieldRegistryTrustService} from '../src/modules/registry-trust-service.js'
 import {GreenfieldMpsIngestService} from '../src/product-standard/ingest-service.js'
 import {GreenfieldPublisherSigningKeyService, buildPublisherReleaseStatement, parsePublisherPublicKey, statementBytes} from '../src/modules/release-signing.js'
 import {adapterManifest, configureRegistryTestEnv, evidenceFor, fixtureProduct, registerAccount, sha256} from './helpers/registry-fixtures.js'
@@ -145,6 +146,80 @@ describeIfDb('registry trust pipeline: Ed25519 publisher signatures', () => {
     })
     expect(response.statusCode, response.body).toBe(202)
     expect(response.json().data).toMatchObject({status: 'installing'})
+  })
+
+  it('keeps an isolated signed manifest-only audit release trusted without a declared product projection', async () => {
+    const id = `test.modula.api-fix-01d-${suffix}`
+    const manifest = adapterManifest(id, '1.0.0')
+    const evidence = evidenceFor(manifest)
+    const signature = signRelease({manifest, artifactSha256: evidence.artifactSha256,
+      keyId: primaryKeyId, privateKey: primary.privateKey})
+    const imported = await releases.importPendingReview(manifest, {...evidence, signature})
+    await releases.publishRelease(id, '1.0.0')
+    const trust = await new GreenfieldRegistryTrustService(db).forRelease((await releases.getRelease(id, '1.0.0'))!)
+    expect(trust).toMatchObject({verified: true, signature: {state: 'verified'}})
+    const detail = await app.inject({method: 'GET', url: `/v1/registry/modules/${id}`})
+    expect(detail.statusCode).toBe(404)
+    const catalogue = await app.inject({method: 'GET', url: `/v1/registry/modules?q=${encodeURIComponent(id)}`})
+    expect(catalogue.statusCode).toBe(200)
+    expect(JSON.stringify(catalogue.json().data)).not.toContain(id)
+    expect(imported.releaseId).toBeTruthy()
+  })
+
+  it('denies the real install route after an isolated signature becomes invalid', async () => {
+    const id = `test.modula.api-fix-01d-${suffix}-invalid`
+    const {manifest, evidence} = signedImport(id)
+    const imported = await releases.importPendingReview(manifest, evidence)
+    await releases.publishRelease(id, '1.0.0')
+    await db.updateTable('greenfield_module_release_signatures')
+      .set({signature: randomBytes(64).toString('base64url')})
+      .where('release_id', '=', imported.releaseId).execute()
+    await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
+    const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `invalid-signature-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: []}})
+    expect(response.statusCode).toBe(403)
+    expect(response.json().error.code).toBe('UNTRUSTED_RELEASE')
+    expect(await db.selectFrom('greenfield_extension_installations').select('installation_id')
+      .where('extension_version_id', '=', imported.extensionVersionId).execute()).toHaveLength(0)
+  })
+
+  it('denies the real install route when signed artifact facts change', async () => {
+    const id = `test.modula.api-fix-01d-${suffix}-digest`
+    const {manifest, evidence} = signedImport(id)
+    const imported = await releases.importPendingReview(manifest, evidence)
+    await releases.publishRelease(id, '1.0.0')
+    await db.updateTable('greenfield_module_releases').set({release_sha256: sha256(`altered-${suffix}`)})
+      .where('release_id', '=', imported.releaseId).execute()
+    await expect(releases.verifyRelease(id, '1.0.0')).rejects.toThrow(/signature invalid/)
+    const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `digest-mismatch-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: []}})
+    expect(response.statusCode).toBe(403)
+    expect(response.json().error.code).toBe('UNTRUSTED_RELEASE')
+    expect(await db.selectFrom('greenfield_extension_installations').select('installation_id')
+      .where('extension_version_id', '=', imported.extensionVersionId).execute()).toHaveLength(0)
+  })
+
+  it('denies the real install route after only an audit signer is revoked', async () => {
+    const audit = keyPair()
+    const auditKeyId = `modula-test-${suffix}-install-revoke`
+    await keys.register('modula', {keyId: auditKeyId, publicKeyPem: audit.publicKeyPem}, null)
+    const id = `test.modula.api-fix-01d-${suffix}-revoked`
+    const {product, manifest, evidence} = signedImport(id, {keyId: auditKeyId, privateKey: audit.privateKey})
+    const imported = await releases.importPendingReview(manifest, evidence)
+    await releases.publishRelease(id, '1.0.0')
+    await new GreenfieldMpsIngestService(db).ingest({filename: 'modula.product.json', bytes: product.mpsBytes,
+      releaseId: imported.releaseId, frontend: product.frontend, schemas: product.schemas, assets: product.assets})
+    expect((await new GreenfieldRegistryTrustService(db).forRelease((await releases.getRelease(id, '1.0.0'))!)).verified).toBe(true)
+    await keys.revoke('modula', auditKeyId, 'isolated install rejection test', null)
+    const response = await app.inject({method: 'POST', url: `/v1/modules/${id}/install`,
+      headers: {authorization: `Bearer ${token}`, 'idempotency-key': `revoked-signer-${suffix}`},
+      payload: {version: '1.0.0', approvedPermissions: []}})
+    expect(response.statusCode).toBe(403)
+    expect(response.json().error.code).toBe('UNTRUSTED_RELEASE')
+    expect(await db.selectFrom('greenfield_extension_installations').select('installation_id')
+      .where('extension_version_id', '=', imported.extensionVersionId).execute()).toHaveLength(0)
   })
 
   it('rejects a signature from an unknown key', async () => {
