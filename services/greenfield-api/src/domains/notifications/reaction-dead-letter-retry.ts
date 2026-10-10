@@ -1,13 +1,36 @@
 import type {ModulaDb} from '../../database/client.js'
+import {sql} from 'kysely'
 import {AuditRepository} from '../audit/repository.js'
 
 const HISTORICAL_REACTION_CONSTRAINT = 'notifications_recipient_dedupe_uidx'
+
+/** Read-only exact candidate inventory; the transactional retry checks again. */
+export async function listEligibleReactionDeadLetters(db: ModulaDb): Promise<string[]> {
+  const candidates = await sql<{id: string}>`
+    SELECT job.id
+    FROM background_jobs job
+    JOIN LATERAL (
+      SELECT failure.error_code, failure.error_message
+      FROM job_failures failure
+      WHERE failure.job_id = job.id AND failure.job_type = 'notification.reaction'
+      ORDER BY failure.created_at DESC, failure.id DESC LIMIT 1
+    ) latest ON TRUE
+    WHERE job.job_type = 'notification.reaction'
+      AND job.dispatch_mode = 'GREENFIELD_WORKER'
+      AND job.status = 'DEAD_LETTER'
+      AND job.error_code = '23505'
+      AND latest.error_code = '23505'
+      AND latest.error_message LIKE '%notifications_recipient_dedupe_uidx%'
+    ORDER BY job.created_at, job.id
+  `.execute(db)
+  return candidates.rows.map(row => row.id)
+}
 
 /** Requeues only the historical reaction/notification uniqueness failure. */
 export async function retryReactionNotificationDeadLetter(
   db: ModulaDb,
   jobId: string,
-  operatorActorId: string,
+  operatorActorId: string | null,
   operatorContext: {reason?: string; requestId?: string; correlationId?: string} = {},
 ): Promise<{jobId: string; status: 'RETRYING'}> {
   return db.transaction().execute(async trx => {

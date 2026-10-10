@@ -9,8 +9,8 @@
     "runtimeEvidence": {
       "kind": "local-candidate-runtime",
       "branch": "phase-api-fix-01c-production-acceptance",
-      "sourceSha256": "8940738890706cf8b2ac893593f7872f5ae2c828f9214196e5a8d4ea0a31445a",
-      "capturedAt": "2026-10-10T09:13:29.934Z",
+      "sourceSha256": "956789be8b821a974a3a33481fedbdd690b1aa9d2803232bfa027f10062d2b4d",
+      "capturedAt": "2026-10-10T09:18:50.786Z",
       "routeCount": 575
     },
     "status": "PASS"
