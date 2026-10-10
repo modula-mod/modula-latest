@@ -41,8 +41,9 @@ const cryptoCloseout = existsSync(cryptoCloseoutPath)
   ? JSON.parse(readFileSync(cryptoCloseoutPath, 'utf8'))
   : null
 const cryptoProductionPass = cryptoCloseout?.status === 'PASS'
-  && cryptoCloseout?.runtimeSha === snapshot.containers.api.revision
-  && cryptoCloseout?.runtimeSha === snapshot.containers.worker.revision
+  && cryptoCloseout?.apiSourceSha256 === apiSourceFingerprint()
+  && isAncestor(cryptoCloseout?.runtimeSha, snapshot.containers.api.revision)
+  && snapshot.containers.api.revision === snapshot.containers.worker.revision
   && cryptoCloseout?.migration === snapshot.databaseSchema.appliedMigrations.at(-1)?.id
   && cryptoCloseout?.cases?.invalidSignature?.installDenied === true
   && cryptoCloseout?.cases?.digestMismatch?.installDenied === true
