@@ -1508,7 +1508,7 @@ API-ATLAS-01 made no product, schema, nginx or production changes. The following
 
 ## API-FIX-01 — Trust, privacy and permission fail-closed controls
 
-Require signed production releases, backfill publisher keys/signatures, remove the manifest-permission fallback, create recorded grants for active installs, implement follower requests, account-scope legacy function/AI-stream operations and apply uniform private-resource 404 semantics. Add isolated cross-user/module/intelligence acceptance identities. Covers the P1 trust, ownership and privacy findings.
+${cryptoProductionPass ? '**Closed (production PASS).** Signed-release enforcement, explicit permission review, follower approval, account-scoped function/AI-stream operations, and idempotent reaction notifications are live. API-FIX-01C recorded valid-signed and unsigned production transitions; API-FIX-01D proved isolated invalid-signature, changed-digest and revoked-signer denials through the deployed install route. Historical incomplete releases remain untrusted.' : 'Require signed production releases, backfill publisher keys/signatures, remove the manifest-permission fallback, create recorded grants for active installs, implement follower requests, account-scope legacy function/AI-stream operations and apply uniform private-resource 404 semantics. Add isolated cross-user/module/intelligence acceptance identities. Covers the P1 trust, ownership and privacy findings.'}
 
 ## API-FIX-02 — Registry bytes, ingestion and Product Hub integrity
 
