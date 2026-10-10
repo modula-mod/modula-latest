@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {createHash} from 'node:crypto'
+import {execFileSync} from 'node:child_process'
 import {existsSync, mkdirSync, readFileSync, writeFileSync} from 'node:fs'
 import {extname, join, relative} from 'node:path'
 import {
@@ -35,8 +36,19 @@ const productionCloseoutMarkerPath = join(evidenceDir, 'api-fix-01c-production-c
 const productionCloseoutMarker = existsSync(productionCloseoutMarkerPath)
   ? JSON.parse(readFileSync(productionCloseoutMarkerPath, 'utf8'))
   : null
-const acceptedProductionEvidence = productionCloseoutMarker?.runtimeSha === snapshot.containers.api.revision
-  && productionCloseoutMarker?.apiSourceSha256 === apiSourceFingerprint()
+function isAncestor(ancestor, descendant) {
+  if (!ancestor || !descendant) return false
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', ancestor, descendant], {cwd: repoRoot, stdio: 'ignore'})
+    return true
+  } catch {
+    return false
+  }
+}
+const acceptedProductionEvidence = productionCloseoutMarker?.apiSourceSha256 === apiSourceFingerprint()
+  && snapshot.repository.head === snapshot.containers.api.revision
+  && snapshot.repository.originMain === snapshot.containers.api.revision
+  && isAncestor(productionCloseoutMarker.runtimeSha, snapshot.containers.api.revision)
 const candidateApplies = Boolean(candidate) && (currentBranch === candidate.source?.branch
   || (candidateRequested && currentBranch === 'main' && !acceptedProductionEvidence))
 if (candidateRequested && !candidate) throw new Error(`Missing ${candidatePath}; run pnpm api:atlas:capture-candidate first`)
@@ -554,7 +566,7 @@ function buildGapRegister() {
   const productionCloseout = existsSync(productionCloseoutPath)
     ? JSON.parse(readFileSync(productionCloseoutPath, 'utf8'))
     : null
-  const productionEvidenceMatches = productionCloseout?.runtimeSha === snapshot.containers.api.revision
+  const productionEvidenceMatches = acceptedProductionEvidence
     && productionCloseout?.migration === latestMigrationId
     && productionCloseout?.publicProbes?.failed === 0
     && productionCloseout?.authenticatedAcceptance?.failed === 0

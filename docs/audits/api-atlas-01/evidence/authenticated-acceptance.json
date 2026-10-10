@@ -1,12 +1,12 @@
 {
   "metadata": {
     "title": "API-BASELINE-02 authenticated production acceptance",
-    "capturedAt": "2026-10-10T09:32:01.879Z",
+    "capturedAt": "2026-10-10T16:25:07.940Z",
     "baseUrl": "https://api.modula.digital",
-    "markerHash": "64fdf845df0a",
+    "markerHash": "8336323d7ea3",
     "release": {
-      "commit": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-      "releaseId": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+      "commit": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+      "releaseId": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
       "expectedMigration": "067_legacy_duplicate_installation_versions"
     },
     "identities": [
@@ -547,35 +547,35 @@
     },
     {
       "resource": "comment",
-      "key": "0bd6cbb478dd",
+      "key": "13d4eb1dc6ba",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "6d3f4625ee80",
+      "key": "6391573fe97a",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "post",
-      "key": "7491431dfa6d",
+      "key": "878742a3b1a5",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "attachment",
-      "key": "7d66853b5748",
+      "key": "3697fe53ce8e",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"
     },
     {
       "resource": "record",
-      "key": "84652b966901",
+      "key": "c8f10531de5b",
       "status": 200,
       "verificationStatus": null,
       "result": "PASS"

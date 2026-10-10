@@ -1,6 +1,6 @@
 # Live Production Probe Results
 
-Captured: 2026-10-10T09:33:45.036Z
+Captured: 2026-10-10T16:24:59.490Z
 Policy: anonymous and non-mutating except a schema-invalid registration request that cannot persist
 Result: 35/35 requests passed; 26 unique route templates exercised.
 
@@ -10,41 +10,41 @@ The anonymous suite used no bearer token, cookie or real account. The authentica
 
 | Method/route | Status | Latency ms | Content type | Request ID | Assertion | Result |
 | --- | --- | --- | --- | --- | --- | --- |
-| `GET /version.json` | 200 | 121.5 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/health/live` | 200 | 37.2 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/health/live` | 200 | 50.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/health/live` | 200 | 51.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/health/ready` | 200 | 42.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/status` | 200 | 60.5 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/status` | 200 | 24.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/status` | 200 | 23.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/meta` | 200 | 33.8 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules` | 200 | 62 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules` | 200 | 38.2 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules` | 200 | 40.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules/:moduleId` | 200 | 46.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules/:moduleId/versions` | 200 | 30.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/modules/:moduleId/versions/:version` | 200 | 36.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/releases/:releaseId/artifact` | 200 | 71 | application/gzip | yes | response SHA-256 matches published release digest | PASS |
-| `GET /v1/registry/releases/:releaseId/assets/:assetId` | 200 | 111.7 | image/png | yes | asset is available and SHA-256 matches metadata | PASS |
-| `GET /v1/registry/modules/:moduleId` | 200 | 43.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/registry/releases/:releaseId/assets/:assetId` | 404 | 25.3 | application/json; charset=utf-8 | yes | metadata declares unavailable and delivery returns 404 | PASS |
-| `GET /v1/registry/modules/:moduleId` | 404 | 26.2 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/profiles/:handle` | 404 | 23.9 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/accounts/me` | 401 | 22.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/modules/installed` | 401 | 59.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/intelligence/missions` | 401 | 21.3 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/support/cases` | 401 | 51 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/accounts/me/app-preferences` | 401 | 20.8 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `PATCH /v1/accounts/me/app-preferences` | 401 | 46.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/accounts/me/mutes` | 401 | 62 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/accounts/me/blocks` | 401 | 47.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/creator/insights` | 401 | 25 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/creator/payouts` | 401 | 28.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/commerce/invoices` | 401 | 19.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `POST /v1/auth/step-up/password` | 401 | 55.9 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `GET /v1/account/deletion-requests/current` | 401 | 19.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
-| `POST /v1/accounts/register` | 400 | 47.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /version.json` | 200 | 106.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/health/live` | 200 | 59 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/health/live` | 200 | 78.8 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/health/live` | 200 | 79.5 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/health/ready` | 200 | 80.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/status` | 200 | 61.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/status` | 200 | 56.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/status` | 200 | 64.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/meta` | 200 | 43 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules` | 200 | 75 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules` | 200 | 75 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules` | 200 | 73.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules/:moduleId` | 200 | 49.3 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules/:moduleId/versions` | 200 | 70.2 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/modules/:moduleId/versions/:version` | 200 | 72.5 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/releases/:releaseId/artifact` | 200 | 80.1 | application/gzip | yes | response SHA-256 matches published release digest | PASS |
+| `GET /v1/registry/releases/:releaseId/assets/:assetId` | 200 | 83.4 | image/png | yes | asset is available and SHA-256 matches metadata | PASS |
+| `GET /v1/registry/modules/:moduleId` | 200 | 94.9 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/registry/releases/:releaseId/assets/:assetId` | 404 | 33.2 | application/json; charset=utf-8 | yes | metadata declares unavailable and delivery returns 404 | PASS |
+| `GET /v1/registry/modules/:moduleId` | 404 | 28.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/profiles/:handle` | 404 | 32 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/accounts/me` | 401 | 25.9 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/modules/installed` | 401 | 60.5 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/intelligence/missions` | 401 | 48.9 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/support/cases` | 401 | 52.8 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/accounts/me/app-preferences` | 401 | 26 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `PATCH /v1/accounts/me/app-preferences` | 401 | 42.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/accounts/me/mutes` | 401 | 23 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/accounts/me/blocks` | 401 | 34.3 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/creator/insights` | 401 | 29 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/creator/payouts` | 401 | 36.7 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/commerce/invoices` | 401 | 22.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `POST /v1/auth/step-up/password` | 401 | 38.4 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `GET /v1/account/deletion-requests/current` | 401 | 23.1 | application/json; charset=utf-8 | yes | status/shape | PASS |
+| `POST /v1/accounts/register` | 400 | 47.6 | application/json; charset=utf-8 | yes | status/shape | PASS |
 
 ## Lightweight latency snapshot
 
@@ -52,9 +52,9 @@ Three normal serial requests were used for representative endpoints; this was no
 
 | Path | Samples | Median ms | Max ms |
 | --- | --- | --- | --- |
-| /v1/health/live | 3 | 50.4 | 51.4 |
-| /v1/status | 3 | 24.6 | 60.5 |
-| /v1/registry/modules | 3 | 40.1 | 62 |
+| /v1/health/live | 3 | 78.8 | 79.5 |
+| /v1/status | 3 | 61.4 | 64.7 |
+| /v1/registry/modules | 3 | 75 | 75 |
 
 No multi-second response was observed. Source review nevertheless identifies unbounded/N+1 activity hydration as a growth risk.
 
@@ -68,7 +68,7 @@ No multi-second response was observed. Source review nevertheless identifies unb
 
 ## Authenticated, cross-user and write probes
 
-Captured: 2026-10-10T09:32:01.879Z
+Captured: 2026-10-10T16:25:07.940Z
 Result: 95/95 checks passed.
 
 | Probe | Status | Error code | Result |

@@ -1,24 +1,24 @@
 {
-  "capturedAt": "2026-10-10T16:15:15.761Z",
+  "capturedAt": "2026-10-10T16:26:21.288Z",
   "hostname": "core.modula.digital",
   "os": "Ubuntu 24.04.4 LTS",
   "kernel": "Linux 6.8.0-137-generic",
   "architecture": "x86_64",
-  "uptime": "up 8 weeks, 6 days, 17 hours, 32 minutes",
+  "uptime": "up 8 weeks, 6 days, 17 hours, 44 minutes",
   "repository": {
     "canonicalPath": "/root/modula-latest",
     "origin": "https://github.com/modula-mod/modula-latest.git",
     "branch": "main",
-    "head": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+    "head": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
     "status": "## main...origin/main",
     "trackedChanges": "",
     "untrackedFiles": "",
-    "originMain": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+    "originMain": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
     "auditPath": "/root/modula-latest",
     "auditBranch": "main",
-    "auditHeadAtCapture": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+    "auditHeadAtCapture": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
     "tagsAtCanonicalHead": [],
-    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-238-ge5d2d63"
+    "describeCanonicalHead": "archive/pre-pvp-platform-2/cursor/pvp-ui-1r-product-hub-visual-reset/2026-08-24-239-gceb449a"
   },
   "versions": {
     "hostNode": "v24.15.0",
@@ -30,16 +30,16 @@
   "containers": {
     "api": {
       "name": "modula-production-greenfield-api-1",
-      "imageId": "sha256:f3013a373bd68ceed766f6d66bb3e246c5a2000c7d340e84aaa8e25e5b9c9318",
-      "image": "modula-greenfield-api:e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-      "created": "2026-10-10T09:31:24.848329625Z",
-      "startedAt": "2026-10-10T09:31:25.274484244Z",
+      "imageId": "sha256:f2c79721016349587bd989072208ed5ad81a9338240e54b6942aac29c1a971bf",
+      "image": "modula-greenfield-api:ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+      "created": "2026-10-10T16:24:33.099246992Z",
+      "startedAt": "2026-10-10T16:24:33.499141204Z",
       "status": "running",
       "health": "healthy",
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-api/dist/main.js",
       "workingDir": "/app",
-      "revision": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+      "revision": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {
@@ -127,16 +127,16 @@
     },
     "worker": {
       "name": "modula-production-greenfield-worker-1",
-      "imageId": "sha256:e5780fedeae2261ca618ccd1d5add84d9abb223c83e9ca94a2a023570f58254f",
-      "image": "modula-greenfield-worker:e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-      "created": "2026-10-10T09:31:25.131327749Z",
-      "startedAt": "2026-10-10T09:31:40.923682997Z",
+      "imageId": "sha256:47157d684e9874c85229aac2ee114ecf4182a66c873ea879983b3c7833997b0f",
+      "image": "modula-greenfield-worker:ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+      "created": "2026-10-10T16:24:33.352820824Z",
+      "startedAt": "2026-10-10T16:24:49.150026003Z",
       "status": "running",
       "health": null,
       "restartCount": 0,
       "command": "docker-entrypoint.sh node services/greenfield-worker/dist/main.js",
       "workingDir": "/app",
-      "revision": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+      "revision": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
       "source": "/root/modula-latest",
       "composeFile": "/root/modula-latest/ops/docker/compose.production.yml",
       "ports": {},
@@ -302,9 +302,9 @@
         "BACKEND_FABRIC_ENABLED": "false",
         "BACKEND_FABRIC_ENVIRONMENT": "production",
         "BACKEND_FABRIC_CONTRACT_VERSION": "1.0",
-        "MODULA_RELEASE_SHA": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-        "MODULA_WORKER_RELEASE_SHA": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-        "MODULA_RELEASE_BUILT_AT": "2026-10-10T09:29:26Z"
+        "MODULA_RELEASE_SHA": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+        "MODULA_WORKER_RELEASE_SHA": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+        "MODULA_RELEASE_BUILT_AT": "2026-10-10T16:24:23Z"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -339,7 +339,7 @@
         "GREENFIELD_MODULE_GITHUB_SYNC_ENABLED": "false",
         "GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED": "false",
         "GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED": "false",
-        "MODULA_RELEASE_SHA": "e5d2d63bfdc048010bda4a72e56cc0a0f1731542"
+        "MODULA_RELEASE_SHA": "ceb449aef7f4d5bf03dc33c70578d146400dac6c"
       },
       "secrets": {
         "MODULA_DATABASE_URL": "PRESENT",
@@ -374,37 +374,37 @@
     "docker": [
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-10 10:31:25 +0100 BST",
-        "ID": "69f366511b05",
-        "Image": "modula-greenfield-worker:e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-        "Labels": "com.docker.compose.config-hash=3a4646db84d1e29197bf3f3256400d7513bc71b1ea79e2a0f7f0bd3d2cb5d849,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:e5780fedeae2261ca618ccd1d5add84d9abb223c83e9ca94a2a023570f58254f,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T09:29:26Z,org.opencontainers.image.revision=e5d2d63bfdc048010bda4a72e56cc0a0f1731542,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+        "CreatedAt": "2026-10-10 17:24:33 +0100 BST",
+        "ID": "f69bf6cb19c5",
+        "Image": "modula-greenfield-worker:ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+        "Labels": "com.docker.compose.config-hash=443ec2d2474995550aa4c9abfebcc9b79e702edf631a9f017d04d54504078983,com.docker.compose.container-number=1,com.docker.compose.depends_on=greenfield-api:service_healthy:false,com.docker.compose.image=sha256:47157d684e9874c85229aac2ee114ecf4182a66c873ea879983b3c7833997b0f,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-worker-1,com.docker.compose.service=greenfield-worker,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T16:24:23Z,org.opencontainers.image.revision=ceb449aef7f4d5bf03dc33c70578d146400dac6c,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-worker,org.opencontainers.image.version=ceb449aef7f4d5bf03dc33c70578d146400dac6c",
         "LocalVolumes": "0",
         "Mounts": "",
         "Names": "modula-production-greenfield-worker-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "",
-        "RunningFor": "7 hours ago",
+        "RunningFor": "About a minute ago",
         "Size": "0B (virtual 2.5GB)",
         "State": "running",
-        "Status": "Up 7 hours"
+        "Status": "Up About a minute"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
-        "CreatedAt": "2026-10-10 10:31:24 +0100 BST",
-        "ID": "57865a4e6c33",
-        "Image": "modula-greenfield-api:e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
-        "Labels": "com.docker.compose.config-hash=1d16649468a5615af8823aac2999544bd6b9cea646f22dd71df2f518fc0d9d8b,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:f3013a373bd68ceed766f6d66bb3e246c5a2000c7d340e84aaa8e25e5b9c9318,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T09:29:26Z,org.opencontainers.image.revision=e5d2d63bfdc048010bda4a72e56cc0a0f1731542,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=e5d2d63bfdc048010bda4a72e56cc0a0f1731542",
+        "CreatedAt": "2026-10-10 17:24:33 +0100 BST",
+        "ID": "a5d8ccaa0f69",
+        "Image": "modula-greenfield-api:ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+        "Labels": "com.docker.compose.config-hash=9d987c2a816a14491b649de77e12690398b2bd323a30781d8e5fb1df88329ad1,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:f2c79721016349587bd989072208ed5ad81a9338240e54b6942aac29c1a971bf,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-api-1,com.docker.compose.service=greenfield-api,com.docker.compose.version=5.4.0,org.modula.migration.expected=067_legacy_duplicate_installation_versions,org.opencontainers.image.created=2026-10-10T16:24:23Z,org.opencontainers.image.revision=ceb449aef7f4d5bf03dc33c70578d146400dac6c,org.opencontainers.image.source=/root/modula-latest,org.opencontainers.image.title=modula-greenfield-api,org.opencontainers.image.version=ceb449aef7f4d5bf03dc33c70578d146400dac6c",
         "LocalVolumes": "0",
         "Mounts": "/var/lib/modul…",
         "Names": "modula-production-greenfield-api-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
         "Ports": "127.0.0.1:4020->4020/tcp",
-        "RunningFor": "7 hours ago",
+        "RunningFor": "About a minute ago",
         "Size": "0B (virtual 2.52GB)",
         "State": "running",
-        "Status": "Up 7 hours (healthy)"
+        "Status": "Up About a minute (healthy)"
       },
       {
         "Command": "\"docker-entrypoint.s…\"",
@@ -413,7 +413,7 @@
         "Image": "postgres:16.9-alpine",
         "Labels": "com.docker.compose.config-hash=b3417228f5117426b3a2a7a36145febb0886c1531885b46acede4e16ec6df51e,com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.image=sha256:dca9c7aa70c71caf8bcc48c8ec40658c1fdf2d1e4e8d26bc27d4d18e030d779a,com.docker.compose.oneoff=False,com.docker.compose.project.config_files=/root/modula-latest/ops/docker/compose.production.yml,com.docker.compose.project.working_dir=/root/modula-latest/ops/docker,com.docker.compose.project=modula-production,com.docker.compose.replace=greenfield-postgres-1,com.docker.compose.service=greenfield-postgres,com.docker.compose.version=5.4.0",
         "LocalVolumes": "1",
-        "Mounts": "/root/modula-l…,modula-product…",
+        "Mounts": "modula-product…,/root/modula-l…",
         "Names": "modula-production-greenfield-postgres-1",
         "Networks": "modula-production_greenfield_internal",
         "Platform": null,
@@ -549,7 +549,7 @@
         "Image": "postgres:16.9-alpine",
         "Labels": "",
         "LocalVolumes": "1",
-        "Mounts": "/root/modula-l…,53a8321b794afa…",
+        "Mounts": "53a8321b794afa…,/root/modula-l…",
         "Names": "modula-phase7k-verifier-pg",
         "Networks": "bridge",
         "Platform": null,
@@ -38991,7 +38991,7 @@
   },
   "operationalAggregates": {
     "outbox": {
-      "count": 567,
+      "count": 575,
       "failed": 0,
       "pending": 0
     },
@@ -39096,9 +39096,9 @@
       "governorDecisions": 0
     },
     "notifications": {
-      "count": 181,
-      "active": 181,
-      "unread": 172
+      "count": 183,
+      "active": 183,
+      "unread": 174
     },
     "aiModelsByState": {
       "available:active:enabled=true": 1,
@@ -39115,7 +39115,7 @@
       "count": 1,
       "fresh": 1,
       "releases": [
-        "e5d2d63bfdc048010bda4a72e56cc0a0f1731542"
+        "ceb449aef7f4d5bf03dc33c70578d146400dac6c"
       ]
     },
     "jobFailureDetails": [
@@ -39203,7 +39203,7 @@
       "expired": 1
     },
     "backgroundJobsByType": {
-      "mail.deliver": 362,
+      "mail.deliver": 364,
       "module.enable": 68,
       "module.update": 108,
       "plugin.enable": 14,
@@ -39213,18 +39213,18 @@
       "search.reindex": 4,
       "function.invoke": 15,
       "module.uninstall": 30,
-      "search.index.post": 212,
+      "search.index.post": 218,
       "notification.quote": 6,
       "notification.reply": 8,
-      "notification.create": 52,
+      "notification.create": 56,
       "notification.repost": 36,
       "notification.comment": 68,
       "notification.mention": 2,
-      "search.index.profile": 108,
+      "search.index.profile": 112,
       "extension.job.execute": 2,
       "module.release.verify": 30,
       "notification.reaction": 86,
-      "atproto.publish.delete": 62,
+      "atproto.publish.delete": 64,
       "atproto.publish.update": 10,
       "module.release.publish": 30,
       "mail.identity.provision": 10,
@@ -39268,7 +39268,7 @@
     },
     "backgroundJobsByStatus": {
       "FAILED": 4,
-      "SUCCEEDED": 1415,
+      "SUCCEEDED": 1433,
       "DEAD_LETTER": 12
     },
     "readyAttachmentLinkage": {
@@ -39277,7 +39277,7 @@
       "orphanCandidates": 9
     },
     "eventDeliveriesByStatus": {
-      "completed": 433
+      "completed": 446
     },
     "releaseArtifactCoverage": {
       "releases": 14,

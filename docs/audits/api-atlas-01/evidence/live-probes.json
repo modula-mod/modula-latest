@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-10-10T09:33:45.036Z",
+  "capturedAt": "2026-10-10T16:24:59.490Z",
   "baseUrl": "https://api.modula.digital",
   "policy": "anonymous and non-mutating except a schema-invalid registration request that cannot persist",
   "probes": [
@@ -11,7 +11,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 121.5,
+      "latencyMs": 106.6,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 591,
       "requestIdPresent": true,
@@ -26,7 +26,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 37.2,
+      "latencyMs": 59,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 136,
       "requestIdPresent": true,
@@ -41,7 +41,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 50.4,
+      "latencyMs": 78.8,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 136,
       "requestIdPresent": true,
@@ -56,7 +56,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 51.4,
+      "latencyMs": 79.5,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 136,
       "requestIdPresent": true,
@@ -71,7 +71,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 42.6,
+      "latencyMs": 80.7,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 137,
       "requestIdPresent": true,
@@ -86,9 +86,9 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 60.5,
+      "latencyMs": 61.4,
       "contentType": "application/json; charset=utf-8",
-      "contentLength": 935,
+      "contentLength": 932,
       "requestIdPresent": true,
       "result": "PASS",
       "assertion": null
@@ -101,9 +101,9 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 24.6,
+      "latencyMs": 56.7,
       "contentType": "application/json; charset=utf-8",
-      "contentLength": 935,
+      "contentLength": 932,
       "requestIdPresent": true,
       "result": "PASS",
       "assertion": null
@@ -116,9 +116,9 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 23.4,
+      "latencyMs": 64.7,
       "contentType": "application/json; charset=utf-8",
-      "contentLength": 935,
+      "contentLength": 932,
       "requestIdPresent": true,
       "result": "PASS",
       "assertion": null
@@ -131,7 +131,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 33.8,
+      "latencyMs": 43,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 3671,
       "requestIdPresent": true,
@@ -146,7 +146,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 62,
+      "latencyMs": 75,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 6518,
       "requestIdPresent": true,
@@ -161,7 +161,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 38.2,
+      "latencyMs": 75,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 6518,
       "requestIdPresent": true,
@@ -176,7 +176,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 40.1,
+      "latencyMs": 73.4,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 6518,
       "requestIdPresent": true,
@@ -191,7 +191,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 46.7,
+      "latencyMs": 49.3,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 47354,
       "requestIdPresent": true,
@@ -206,7 +206,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 30.4,
+      "latencyMs": 70.2,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 85847,
       "requestIdPresent": true,
@@ -221,7 +221,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 36.1,
+      "latencyMs": 72.5,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 20925,
       "requestIdPresent": true,
@@ -236,7 +236,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 71,
+      "latencyMs": 80.1,
       "contentType": "application/gzip",
       "contentLength": 260526,
       "requestIdPresent": true,
@@ -251,7 +251,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 111.7,
+      "latencyMs": 83.4,
       "contentType": "image/png",
       "contentLength": 178236,
       "requestIdPresent": true,
@@ -266,7 +266,7 @@
       "expectedStatus": [
         200
       ],
-      "latencyMs": 43.1,
+      "latencyMs": 94.9,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 43674,
       "requestIdPresent": true,
@@ -281,7 +281,7 @@
       "expectedStatus": [
         404
       ],
-      "latencyMs": 25.3,
+      "latencyMs": 33.2,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 265,
       "requestIdPresent": true,
@@ -296,7 +296,7 @@
       "expectedStatus": [
         404
       ],
-      "latencyMs": 26.2,
+      "latencyMs": 28.6,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 260,
       "requestIdPresent": true,
@@ -311,7 +311,7 @@
       "expectedStatus": [
         404
       ],
-      "latencyMs": 23.9,
+      "latencyMs": 32,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 240,
       "requestIdPresent": true,
@@ -326,7 +326,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 22.4,
+      "latencyMs": 25.9,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -341,7 +341,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 59.1,
+      "latencyMs": 60.5,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -356,7 +356,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 21.3,
+      "latencyMs": 48.9,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -371,7 +371,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 51,
+      "latencyMs": 52.8,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -386,7 +386,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 20.8,
+      "latencyMs": 26,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -401,7 +401,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 46.1,
+      "latencyMs": 42.4,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -416,7 +416,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 62,
+      "latencyMs": 23,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -431,7 +431,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 47.7,
+      "latencyMs": 34.3,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -446,7 +446,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 25,
+      "latencyMs": 29,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -461,7 +461,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 28.7,
+      "latencyMs": 36.7,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -476,7 +476,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 19.6,
+      "latencyMs": 22.6,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -491,7 +491,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 55.9,
+      "latencyMs": 38.4,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -506,7 +506,7 @@
       "expectedStatus": [
         401
       ],
-      "latencyMs": 19.4,
+      "latencyMs": 23.1,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 252,
       "requestIdPresent": true,
@@ -521,7 +521,7 @@
       "expectedStatus": [
         400
       ],
-      "latencyMs": 47.1,
+      "latencyMs": 47.6,
       "contentType": "application/json; charset=utf-8",
       "contentLength": 251,
       "requestIdPresent": true,
@@ -532,21 +532,21 @@
   "latency": {
     "GET /v1/health/live": {
       "samples": 3,
-      "minimumMs": 37.2,
-      "medianMs": 50.4,
-      "maximumMs": 51.4
+      "minimumMs": 59,
+      "medianMs": 78.8,
+      "maximumMs": 79.5
     },
     "GET /v1/status": {
       "samples": 3,
-      "minimumMs": 23.4,
-      "medianMs": 24.6,
-      "maximumMs": 60.5
+      "minimumMs": 56.7,
+      "medianMs": 61.4,
+      "maximumMs": 64.7
     },
     "GET /v1/registry/modules": {
       "samples": 3,
-      "minimumMs": 38.2,
-      "medianMs": 40.1,
-      "maximumMs": 62
+      "minimumMs": 73.4,
+      "medianMs": 75,
+      "maximumMs": 75
     }
   }
 }
