@@ -1,22 +1,22 @@
-Observed production truth at 2026-10-10T16:26:21.288Z: api.modula.digital terminates at nginx and proxies to a healthy loopback-only Fastify container running `ceb449aef7f4d5bf03dc33c70578d146400dac6c`, backed by PostgreSQL 16.9, a same-revision worker, host-bound media storage, and an apparently unused Redis service.
+Observed production truth at 2026-10-10T22:02:13.369Z: api.modula.digital terminates at nginx and proxies to a healthy loopback-only Fastify container running `50dfc12045be639ad65acb95d2b4e94ea864ed42`, backed by PostgreSQL 16.9, a same-revision worker, host-bound media storage, and an apparently unused Redis service.
 
 # Production Truth
 
 ## Host and repository
 
-- Host: `core.modula.digital`; OS: Ubuntu 24.04.4 LTS; architecture: x86_64; kernel: Linux 6.8.0-137-generic; uptime: up 8 weeks, 6 days, 17 hours, 44 minutes.
-- Canonical checkout: `/root/modula-latest`; origin: `https://github.com/modula-mod/modula-latest.git`; branch: `main`; HEAD: `ceb449aef7f4d5bf03dc33c70578d146400dac6c`.
+- Host: `core.modula.digital`; OS: Ubuntu 24.04.4 LTS; architecture: x86_64; kernel: Linux 6.8.0-137-generic; uptime: up 8 weeks, 6 days, 23 hours, 19 minutes.
+- Canonical checkout: `/root/modula-latest`; origin: `https://github.com/modula-mod/modula-latest.git`; branch: `main`; HEAD: `50dfc12045be639ad65acb95d2b4e94ea864ed42`.
 - Canonical checkout is dirty: 0 tracked modifications and 0 untracked files. Those files were not changed by this audit.
-- `origin/main` at capture: `ceb449aef7f4d5bf03dc33c70578d146400dac6c`.
-- Running SHA: `ceb449aef7f4d5bf03dc33c70578d146400dac6c`. It matches canonical checkout HEAD and `origin/main`. OCI revision, `/version.json`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
+- `origin/main` at capture: `50dfc12045be639ad65acb95d2b4e94ea864ed42`.
+- Running SHA: `50dfc12045be639ad65acb95d2b4e94ea864ed42`. It matches canonical checkout HEAD and `origin/main`. OCI revision, `/version.json`, worker heartbeat and runtime route introspection correlate the running code to this exact source revision.
 - Audit worktree: `/root/modula-latest`, branch `main`.
 
 ## Runtime inventory
 
 | Role | Container/image | Created | Ports | Health | Revision |
 | --- | --- | --- | --- | --- | --- |
-| API | `modula-greenfield-api:ceb449aef7f4d5bf03dc33c70578d146400dac6c` | 2026-10-10T16:24:33.099246992Z | `127.0.0.1:4020 -> 4020` | healthy | `ceb449aef7f4d5bf03dc33c70578d146400dac6c` |
-| Worker | `modula-greenfield-worker:ceb449aef7f4d5bf03dc33c70578d146400dac6c` | 2026-10-10T16:24:33.352820824Z | internal only | no Docker healthcheck | `ceb449aef7f4d5bf03dc33c70578d146400dac6c` |
+| API | `modula-greenfield-api:50dfc12045be639ad65acb95d2b4e94ea864ed42` | 2026-10-10T17:14:20.317689282Z | `127.0.0.1:4020 -> 4020` | healthy | `50dfc12045be639ad65acb95d2b4e94ea864ed42` |
+| Worker | `modula-greenfield-worker:50dfc12045be639ad65acb95d2b4e94ea864ed42` | 2026-10-10T17:14:20.986533173Z | internal only | no Docker healthcheck | `50dfc12045be639ad65acb95d2b4e94ea864ed42` |
 | Database | `postgres:16.9-alpine` | 2026-10-10T09:10:30.086517622Z | Docker network only | healthy | image-pinned PostgreSQL |
 | Redis | `redis:7.4-alpine` | 2026-08-09T00:27:09.295758521Z | Docker network only | healthy | no GreenField source consumer found |
 
@@ -33,11 +33,11 @@ Observed production truth at 2026-10-10T16:26:21.288Z: api.modula.digital termin
 flowchart TD
   internet[Internet clients] --> dns[Cloudflare DNS and TLS path]
   dns --> nginx[nginx api.modula.digital]
-  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API ceb449a]
+  nginx -->|catch-all 127.0.0.1:4020| api[GreenField Fastify API 50dfc12]
   api --> postgres[(PostgreSQL 16.9 named volume)]
   api --> media[(Host bind /var/lib/modula/greenfield-media)]
   api --> outbox[(PostgreSQL outbox and jobs)]
-  outbox --> worker[GreenField worker ceb449a]
+  outbox --> worker[GreenField worker 50dfc12]
   api --> ai[Internal Modula AI backend when configured]
   api --> secrets[Internal secrets service]
   redis[(Redis 7.4 no persistence)] -. no source consumer found .- api
@@ -95,9 +95,9 @@ flowchart TD
 | `BACKEND_FABRIC_ENABLED` | `false` |
 | `BACKEND_FABRIC_ENVIRONMENT` | `production` |
 | `BACKEND_FABRIC_CONTRACT_VERSION` | `1.0` |
-| `MODULA_RELEASE_SHA` | `ceb449aef7f4d5bf03dc33c70578d146400dac6c` |
-| `MODULA_WORKER_RELEASE_SHA` | `ceb449aef7f4d5bf03dc33c70578d146400dac6c` |
-| `MODULA_RELEASE_BUILT_AT` | `2026-10-10T16:24:23Z` |
+| `MODULA_RELEASE_SHA` | `50dfc12045be639ad65acb95d2b4e94ea864ed42` |
+| `MODULA_WORKER_RELEASE_SHA` | `50dfc12045be639ad65acb95d2b4e94ea864ed42` |
+| `MODULA_RELEASE_BUILT_AT` | `2026-10-10T17:12:40Z` |
 | `worker:NODE_ENV` | `production` |
 | `worker:MODULA_ENVIRONMENT` | `production` |
 | `worker:MODULA_MAIL_TRANSPORT` | `smtp` |
@@ -117,7 +117,7 @@ flowchart TD
 | `worker:GREENFIELD_MODULE_GITHUB_SYNC_ENABLED` | `false` |
 | `worker:GREENFIELD_MODULE_REMOTE_FUNCTIONS_ENABLED` | `false` |
 | `worker:GREENFIELD_MODULE_COMMUNITY_EXECUTION_ENABLED` | `false` |
-| `worker:MODULA_RELEASE_SHA` | `ceb449aef7f4d5bf03dc33c70578d146400dac6c` |
+| `worker:MODULA_RELEASE_SHA` | `50dfc12045be639ad65acb95d2b4e94ea864ed42` |
 
 ## Secret-presence inventory
 

@@ -10,12 +10,12 @@ The generic host is real: `src/features/modules/runtime/module-host.tsx:16` fetc
 
 | Surface | Observed production truth |
 | --- | --- |
-| Releases | 14 total; 12 published; 7/12 published unsigned |
-| Signing | 1 publisher keys, 5 signatures, 14 integrity rows |
-| Artifacts | 2/14 release package blobs; 6 total release asset blobs |
+| Releases | 17 total; 12 published; 7/12 published unsigned |
+| Signing | 3 publisher keys, 8 signatures, 17 integrity rows |
+| Artifacts | 2/17 release package blobs; 6 total release asset blobs |
 | Artwork | 10/17 retrievable; 17 development-only |
 | Frontends | 8 verified: declarative=4, host-contribution=4 |
-| Install plans | 47 total; 17 carry descriptor and digest |
+| Install plans | 49 total; 19 carry descriptor and digest |
 | Installations | failed=1, enabled=13, removed=5, disabled=2, uninstalled=3, installedDisabled=2 |
 | Permissions | 15 active installations; 2 without a review row |
 | Ingestion | 0 sources (0 enabled); GitHub automation disabled; historical runs {"completed":2} |

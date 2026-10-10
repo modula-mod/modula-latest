@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Modula GreenField API — generated implementation snapshot",
-    "version": "ceb449aef7f4d5bf03dc33c70578d146400dac6c",
+    "version": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
     "description": "GENERATED FROM CURRENT IMPLEMENTATION — NOT YET THE CANONICAL DESIGN CONTRACT. Missing schemas remain intentionally empty."
   },
   "servers": [

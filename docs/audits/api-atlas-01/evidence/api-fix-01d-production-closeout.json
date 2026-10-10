@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-10T22:03:13Z",
+  "status": "PASS",
+  "runtimeSha": "50dfc12045be639ad65acb95d2b4e94ea864ed42",
+  "migration": "067_legacy_duplicate_installation_versions",
+  "pullRequest": 116,
+  "ci": {"atlas": "PASS", "repositoryValidation": "PASS", "migrationValidation": "PASS"},
+  "fixtureNamespace": "test.modula.api-fix-01d-cafe10d1-*",
+  "fixtureAccount": "api-atlas-a",
+  "cases": {
+    "invalidSignature": {"validBeforeMutation": true, "signatureState": "invalid", "installDenied": true, "installError": "UNTRUSTED_RELEASE", "installationRows": 0, "permissionReviews": 0, "installPlans": 0},
+    "digestMismatch": {"validBeforeMutation": true, "mismatchType": "artifactSha256", "signatureState": "invalid", "installDenied": true, "installError": "UNTRUSTED_RELEASE", "installationRows": 0, "permissionReviews": 0, "installPlans": 0},
+    "revokedSigner": {"validBeforeRevocation": true, "signatureState": "revokedKey", "installDenied": true, "installError": "UNTRUSTED_RELEASE", "installationRows": 0, "permissionReviews": 0, "installPlans": 0}
+  },
+  "cleanup": {"auditInstallations": 0, "auditReleasesRevoked": 3, "auditKeysRevoked": 2, "auditPublisherRevoked": true},
+  "realTrust": {"published": 12, "signedPublished": 5, "productionSignerActive": true, "vault180": "published:verified", "vault020": "superseded:unsigned", "activeUnsignedInstallations": 0, "reaction23505DeadLetters": 0},
+  "postAcceptance": {"publicProbesPassed": 35, "publicProbesFailed": 0, "authenticatedPassed": 95, "authenticatedFailed": 0, "atlasPassed": 92, "atlasFailed": 0, "sourceOnly": 0, "runtimeOnly": 0, "live": 200, "ready": 200, "workerAligned": true, "deploymentLineage": "PASS", "secretScan": "PASS"},
+  "scope": "Synthetic manifest-only fixtures exercised registry trust and the deployed HTTP install transition; package-byte delivery and production invalid-target update were not exercised. Existing update/version-switch trust regressions and prior valid/unsigned production acceptance remain separately recorded in API-FIX-01C evidence.",
+  "secretsIncluded": false
+}

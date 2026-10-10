@@ -36,6 +36,22 @@ const productionCloseoutMarkerPath = join(evidenceDir, 'api-fix-01c-production-c
 const productionCloseoutMarker = existsSync(productionCloseoutMarkerPath)
   ? JSON.parse(readFileSync(productionCloseoutMarkerPath, 'utf8'))
   : null
+const cryptoCloseoutPath = join(evidenceDir, 'api-fix-01d-production-closeout.json')
+const cryptoCloseout = existsSync(cryptoCloseoutPath)
+  ? JSON.parse(readFileSync(cryptoCloseoutPath, 'utf8'))
+  : null
+const cryptoProductionPass = cryptoCloseout?.status === 'PASS'
+  && cryptoCloseout?.runtimeSha === snapshot.containers.api.revision
+  && cryptoCloseout?.runtimeSha === snapshot.containers.worker.revision
+  && cryptoCloseout?.migration === snapshot.databaseSchema.appliedMigrations.at(-1)?.id
+  && cryptoCloseout?.cases?.invalidSignature?.installDenied === true
+  && cryptoCloseout?.cases?.digestMismatch?.installDenied === true
+  && cryptoCloseout?.cases?.revokedSigner?.installDenied === true
+  && cryptoCloseout?.cleanup?.auditInstallations === 0
+  && cryptoCloseout?.cleanup?.auditReleasesRevoked === 3
+  && cryptoCloseout?.cleanup?.auditKeysRevoked === 2
+  && cryptoCloseout?.realTrust?.productionSignerActive === true
+  && cryptoCloseout?.realTrust?.activeUnsignedInstallations === 0
 function isAncestor(ancestor, descendant) {
   if (!ancestor || !descendant) return false
   try {
@@ -587,6 +603,7 @@ function buildGapRegister() {
     ['AI stream cancel and reconnect omit account ownership checks',
       productionCloseout?.aiOwnership?.foreignReconnectHidden && productionCloseout?.aiOwnership?.foreignCancelHidden
         && productionCloseout?.aiOwnership?.foreignCancelLeftStreamUnchanged],
+    ['All published releases are unsigned and unsigned releases are still trusted', cryptoProductionPass],
   ])
   const entries = [
     ...(!closeout.deploymentLineage?.reconciled ? [[
@@ -646,7 +663,9 @@ function buildGapRegister() {
           status: productionEvidenceMatches && productionPass.get(entry[3])
             ? 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS'
             : 'FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING',
-          evidence: [...automatedRegressionEvidence.get(entry[3]), ...(productionEvidenceMatches ? ['evidence/api-fix-01c-production-closeout.json'] : [])],
+          evidence: [...automatedRegressionEvidence.get(entry[3]), ...(productionEvidenceMatches ? ['evidence/api-fix-01c-production-closeout.json'] : []),
+            ...(entry[3] === 'All published releases are unsigned and unsigned releases are still trusted' && cryptoProductionPass
+              ? ['evidence/api-fix-01d-production-closeout.json'] : [])],
         }
       : {status: 'OPEN', evidence: []},
   }))
@@ -952,7 +971,7 @@ ${mdTable(['Domain','Routes','Complete capabilities','Partial capabilities','Mis
 
 - The running API and worker are the same OCI revision, \`${snapshot.containers.api.revision}\`; ${snapshot.repository.originMain === snapshot.containers.api.revision ? 'that revision exactly matches captured `origin/main`.' : closeout.deploymentLineage?.reconciled ? 'its accepted relationship to canonical `origin/main` is recorded in the deployment-lineage closeout.' : 'that revision differs from captured `origin/main` and remains a release-governance gap.'}
 - ${candidateApplies ? 'Candidate source/runtime' : 'Source/runtime'} reconciliation is exact: ${runtime.length} = ${atlas.length} application routes + ${frameworkRuntime.length} automatic framework routes; there are no unexplained source-only or runtime-only application routes.${candidateApplies ? ` Production remains separately observed at ${snapshot.runtimeRoutes.length} runtime method routes on ${snapshot.containers.api.revision}.` : ''}
-- API-FIX-01 ownership, permission, private-follow and reaction fixes are deployed; historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, incomplete release-trust negative production fixtures, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
+- API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; ${cryptoProductionPass ? 'the isolated invalid-signature, changed-digest and revoked-signer production fixtures all failed closed' : 'isolated cryptographic-negative production fixtures remain pending'}. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
 ## What GreenField Is Missing
