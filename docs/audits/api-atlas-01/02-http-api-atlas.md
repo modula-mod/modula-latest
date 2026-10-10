@@ -1,7 +1,7 @@
 # Complete HTTP API Atlas
 
-Production facts captured: 2026-10-10T16:15:15.761Z
-Route evidence: production-runtime captured 2026-10-10T16:15:15.761Z.
+Production facts captured: 2026-10-10T16:26:21.288Z
+Route evidence: production-runtime captured 2026-10-10T16:26:21.288Z.
 
 - Runtime method routes: 575
 - Application routes: 409

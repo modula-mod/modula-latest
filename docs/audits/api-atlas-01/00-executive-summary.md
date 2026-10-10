@@ -1,13 +1,13 @@
 # GREENFIELD API ATLAS
 
-Production SHA: `e5d2d63bfdc048010bda4a72e56cc0a0f1731542`
+Production SHA: `ceb449aef7f4d5bf03dc33c70578d146400dac6c`
 Production migration: `067_legacy_duplicate_installation_versions`
 API service: `modula-production-greenfield-api-1` (healthy)
 Worker service: `modula-production-greenfield-worker-1` (DB heartbeat fresh; no Docker healthcheck)
 Database: PostgreSQL 16.9
 Public API base: `https://api.modula.digital`
 HTTP routes discovered: 409 application / 575 runtime method routes
-Route evidence: production-runtime at production revision e5d2d63bfdc048010bda4a72e56cc0a0f1731542
+Route evidence: production-runtime at production revision ceb449aef7f4d5bf03dc33c70578d146400dac6c
 Public routes: 74
 Authenticated routes: 243
 Admin/internal routes: 92
@@ -57,7 +57,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 
 ## Production conclusions
 
-- The running API and worker are the same OCI revision, `e5d2d63bfdc048010bda4a72e56cc0a0f1731542`; that revision exactly matches captured `origin/main`.
+- The running API and worker are the same OCI revision, `ceb449aef7f4d5bf03dc33c70578d146400dac6c`; that revision exactly matches captured `origin/main`.
 - Source/runtime reconciliation is exact: 575 = 409 application routes + 166 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
 - API-FIX-01 ownership, permission, private-follow and reaction fixes are deployed; historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, incomplete release-trust negative production fixtures, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
