@@ -10,6 +10,9 @@ BEGIN
 END $$;
 
 DROP INDEX greenfield_extension_installations_account_version_idx;
+DROP INDEX greenfield_extension_installations_standard_version_account_uidx;
+ALTER TABLE greenfield_extension_installations
+  DROP COLUMN legacy_duplicate_allowed;
 ALTER TABLE greenfield_extension_installations
   ADD CONSTRAINT greenfield_extension_installa_extension_version_id_account__key
   UNIQUE (extension_version_id, account_id);

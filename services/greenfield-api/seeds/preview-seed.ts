@@ -540,7 +540,7 @@ export async function runSeed(connectionString: string): Promise<void> {
          ('installation-phase6s-composer','version-modula.core.composerTools-1.0.0','account-phase6s-fixture','enabled','{"fixture":true}'::jsonb,NOW(),NOW()),
          ('installation-phase6s-media','version-modula.core.mediaFunctions-1.0.0','account-phase6s-fixture','disabled','{"fixture":true}'::jsonb,NOW(),NOW()),
          ('installation-phase6s-moderation','version-modula.core.moderationPlugin-1.0.0','account-phase6s-fixture','failed','{"fixture":true}'::jsonb,NOW(),NOW())
-       ON CONFLICT (extension_version_id, account_id) DO UPDATE SET
+       ON CONFLICT (extension_version_id, account_id) WHERE legacy_duplicate_allowed = FALSE DO UPDATE SET
          status=EXCLUDED.status,
          config=EXCLUDED.config,
          updated_at=NOW()`,

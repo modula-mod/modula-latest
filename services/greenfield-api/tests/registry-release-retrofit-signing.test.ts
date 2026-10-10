@@ -279,7 +279,7 @@ describeIfDb('retrospective publisher release signatures', () => {
         .set({extension_version_id: target.extensionVersionId, status: 'installedDisabled'})
         .where('installation_id', '=', installationId).execute()
       await trx.updateTable('greenfield_extension_installations')
-        .set({extension_version_id: target.extensionVersionId, status: 'enabled'})
+        .set({extension_version_id: target.extensionVersionId, status: 'enabled', legacy_duplicate_allowed: true})
         .where('installation_id', '=', duplicateInstallationId).execute()
       await trx.updateTable('greenfield_module_install_plans')
         .set({status: 'completed'}).where('plan_id', '=', queued.planId).execute()
