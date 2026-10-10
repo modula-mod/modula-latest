@@ -28,6 +28,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: modula-latest
+          # Production evidence may be pinned to an accepted ancestor with
+          # unchanged API source; shallow history cannot prove that ancestry.
+          fetch-depth: 0
       - name: Check out pinned Module Standard dependency
         uses: actions/checkout@v4
         with:
