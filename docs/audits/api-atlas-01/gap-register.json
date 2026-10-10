@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "capturedAt": "2026-10-10T16:26:21.288Z",
+    "capturedAt": "2026-10-10T22:02:13.369Z",
     "status": "PASS"
   },
   "gaps": [
@@ -64,12 +64,13 @@
       ],
       "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
         "evidence": [
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview",
           "services/greenfield-api/tests/module-version-switch.test.ts",
           "services/greenfield-worker/tests/module-trust-guard.test.ts",
-          "evidence/api-fix-01c-production-closeout.json"
+          "evidence/api-fix-01c-production-closeout.json",
+          "evidence/api-fix-01d-production-closeout.json"
         ]
       }
     },

@@ -32,7 +32,7 @@ Current attachment states: ready=25, failed=1, created=2, expired=1. Ready linka
 | Post attachments | attachment store | post_content (pdf=2, audio=1, image=8, video=2, document=1) | viewer visibility follows post plus attachment policy | soft post deletion; orphan cleanup unscheduled |
 | Legacy post image | posts directory | post_media count=16 | `/v1/media/:mediaFile`; public path follows post policy | 13/16 active rows have a URL; 20 MiB app limit conflicts with 1 MiB nginx default |
 | Stories | stories directory | story_items count=16 | `/v1/media/stories/:mediaFile` with story visibility | 16 inactive/deleted rows and 16 files remain |
-| Module packages | PostgreSQL release blob/ref metadata | 2/14 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
+| Module packages | PostgreSQL release blob/ref metadata | 2/17 release blobs | public artifact route when blob is available; digest checked | immutable metadata, incomplete byte coverage |
 | Module artwork | PostgreSQL blobs plus presentation metadata | 10/17 blobs | public immutable cache route; unavailable metadata returns 404 | all 17 are marked development assets |
 
 ## Confirmed gaps

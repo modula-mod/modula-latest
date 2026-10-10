@@ -20,8 +20,8 @@ Types: DB/API mismatch=1, architecture debt=6, client contract mismatch=1, data 
 ## API-ATLAS-GAP-002 — P1 — All published releases are unsigned and unsigned releases are still trusted
 
 - Domain/type: `modules` / `missing signature verification`
-- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING**
-- Remediation evidence: `services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-worker/tests/module-trust-guard.test.ts`, `evidence/api-fix-01c-production-closeout.json`
+- Remediation status: **FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS**
+- Remediation evidence: `services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview`, `services/greenfield-api/tests/module-version-switch.test.ts`, `services/greenfield-worker/tests/module-trust-guard.test.ts`, `evidence/api-fix-01c-production-closeout.json`, `evidence/api-fix-01d-production-closeout.json`
 - Evidence: `evidence/production-snapshot.json#/operationalAggregates/publishedUnsignedReleases`, `services/greenfield-api/src/modules/registry-trust-service.ts:109`, `services/greenfield-api/src/modules/registry-trust-service.ts:127`, `services/greenfield-api/src/modules/release-service.ts:441`
 - Affected routes: `GET /v1/registry/modules/:moduleId`, `POST /v1/modules/:moduleId/install`
 - Affected files: `services/greenfield-api/src/modules/release-signing.ts`, `services/greenfield-api/src/modules/registry-trust-service.ts`
