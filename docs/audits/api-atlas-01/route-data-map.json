@@ -4451,6 +4451,7 @@
       "greenfield_extension_lifecycle_events",
       "greenfield_module_install_plans",
       "greenfield_module_permission_reviews",
+      "plan",
       "to"
     ],
     "emits": [],
@@ -4474,7 +4475,9 @@
       "greenfield_module_permission_reviews",
       "greenfield_module_releases"
     ],
-    "writes": [],
+    "writes": [
+      "plan"
+    ],
     "emits": [],
     "jobs": [],
     "confidence": "method-level-static",

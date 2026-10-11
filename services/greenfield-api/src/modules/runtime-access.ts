@@ -59,7 +59,7 @@ export class GreenfieldModuleRuntimeAccessService {
     const status = row.installation_status as GreenfieldModuleInstallationStatus
     if (row.release_state === 'quarantined' || status === 'quarantined') throw moduleError('FORBIDDEN', 'Module release is quarantined')
     if (row.release_state !== 'published') throw moduleError('FORBIDDEN', 'Module release is not available')
-    if (options.requireEnabled && status !== 'enabled') throw moduleError('FORBIDDEN', 'Module must be enabled')
+    if (options.requireEnabled && status !== 'enabled') throw moduleError('INSTALLATION_DISABLED', 'Module installation is not enabled')
 
     // Executable trust is checked again at the runtime boundary. Install and
     // enable guards cannot protect an already-enabled installation after its
@@ -79,6 +79,7 @@ export class GreenfieldModuleRuntimeAccessService {
       .where('installation_id', '=', row.installation_id)
       .where('release_id', '=', row.release_id)
       .orderBy('reviewed_at', 'desc')
+      .orderBy('review_id', 'desc')
       .executeTakeFirst()
     const manifest = row.manifest as GreenfieldModuleManifest
     return {
@@ -104,7 +105,7 @@ export class GreenfieldModuleRuntimeAccessService {
       throw moduleError('PERMISSION_REVIEW_REQUIRED', 'Module permission review is required')
     }
     if (!capability || !context.grantedPermissions.includes(capability)) {
-      throw moduleError('FORBIDDEN', `Module capability denied: ${capability}`)
+      throw moduleError('MODULE_PERMISSION_DENIED', `Module permission denied: ${capability}`)
     }
   }
 }

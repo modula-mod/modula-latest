@@ -59,7 +59,7 @@ Status: **PASS**. The map is complete: 35 bounded anonymous probes, 95 authentic
 
 - The running API and worker are the same OCI revision, `50dfc12045be639ad65acb95d2b4e94ea864ed42`; that revision exactly matches captured `origin/main`.
 - Source/runtime reconciliation is exact: 575 = 409 application routes + 166 automatic framework routes; there are no unexplained source-only or runtime-only application routes.
-- API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; the isolated invalid-signature, changed-digest and revoked-signer production fixtures all failed closed. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
+- API-FIX-01 ownership, permission, private-follow, reaction and signed-release trust controls are deployed; isolated cryptographic-negative production fixtures remain pending. Historical unsigned releases remain untrusted. Remaining risks include missing module artifacts/assets, non-operational AI/GAIA/Nodus paths, client-only link/poll composition, and media edge/durability gaps.
 - No P0 was established by static, authenticated production, or controlled exact-schema acceptance. Known P1/P2 failures remain explicit.
 
 ## What GreenField Is Missing

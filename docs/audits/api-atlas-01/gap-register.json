@@ -28,11 +28,10 @@
       ],
       "verification": "Cross-user acceptance must prove an unapproved account cannot view follower-only data.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
           "services/greenfield-api/tests/api-fix-01.follow-privacy.test.ts",
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible",
-          "evidence/api-fix-01c-production-closeout.json"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#requires explicit approval before a follower-only profile becomes visible"
         ]
       }
     },
@@ -64,13 +63,11 @@
       ],
       "verification": "A tampered/unsigned test release must be rejected; current releases must return signature.state=verified.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
           "services/greenfield-api/tests/registry-trust.trust-block.test.ts#exposes an unsigned published release as untrusted and refuses install preview",
           "services/greenfield-api/tests/module-version-switch.test.ts",
-          "services/greenfield-worker/tests/module-trust-guard.test.ts",
-          "evidence/api-fix-01c-production-closeout.json",
-          "evidence/api-fix-01d-production-closeout.json"
+          "services/greenfield-worker/tests/module-trust-guard.test.ts"
         ]
       }
     },
@@ -156,11 +153,10 @@
       ],
       "verification": "All active installations must have a review and missing-review requests must return FORBIDDEN.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
           "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#fails closed when a module permission review is missing",
-          "services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable",
-          "evidence/api-fix-01c-production-closeout.json"
+          "services/greenfield-worker/tests/module-trust-guard.test.ts#requires a recorded permission review before enable"
         ]
       }
     },
@@ -189,12 +185,11 @@
       ],
       "verification": "Repeated reactions must converge to one notification and leave no dead letter.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
           "services/greenfield-worker/tests/phase7e.notifications.test.ts#uses the supplied lifecycle identity to dedupe retried follow notifications",
           "services/greenfield-worker/tests/phase7e.notifications.test.ts#reuses the permanent reaction identity when the active dedupe row is older than the aggregate window",
-          "services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state",
-          "evidence/api-fix-01c-production-closeout.json"
+          "services/greenfield-worker/tests/phase7e.notifications.test.ts#is retry-safe and converges concurrent reaction jobs on canonical reaction state"
         ]
       }
     },
@@ -311,10 +306,9 @@
       ],
       "verification": "Two-account integration test must reject B invoking through A installation; an enabled owned grant must still execute through SSRF policy.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation",
-          "evidence/api-fix-01c-production-closeout.json"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign installations on legacy function invocation"
         ]
       }
     },
@@ -346,10 +340,9 @@
       ],
       "verification": "Two-account test must prove B cannot observe, cancel or reconnect A stream.",
       "remediation": {
-        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PASS",
+        "status": "FIXED — AUTOMATED REGRESSION PASS; PRODUCTION ACCEPTANCE PENDING",
         "evidence": [
-          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel",
-          "evidence/api-fix-01c-production-closeout.json"
+          "services/greenfield-api/tests/api-baseline-02.security-acceptance.test.ts#hides foreign AI streams on reconnect and cancel"
         ]
       }
     },

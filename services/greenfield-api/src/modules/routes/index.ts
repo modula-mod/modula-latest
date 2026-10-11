@@ -1210,7 +1210,7 @@ function sendMapped(reply: FastifyReply, error: unknown, requestId: string, fall
   if (typeof code === 'string' && code.startsWith('AI_')) {
     return reply.code(statusForAiError(code)).send(failureEnvelope(code as any, error instanceof Error ? error.message : fallback, requestId))
   }
-  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
+  if (['VALIDATION_FAILED', 'NOT_FOUND', 'FORBIDDEN', 'PERMISSION_REVIEW_REQUIRED', 'MODULE_PERMISSION_DENIED', 'INSTALLATION_DISABLED', 'UNTRUSTED_RELEASE', 'CONFLICT', 'NOTE_REVISION_CONFLICT', 'CAPABILITY_DISABLED', 'UNAUTHENTICATED'].includes(code)) {
     return sendError(reply, code, error instanceof Error ? error.message : fallback, requestId)
   }
   return sendError(reply, 'SERVER_ERROR', fallback, requestId)
